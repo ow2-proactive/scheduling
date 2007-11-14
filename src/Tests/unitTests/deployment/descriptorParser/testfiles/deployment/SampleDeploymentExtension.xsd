@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaUserExtension"
+	xmlns:pauext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaUserExtension"
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	elementFormDefault="qualified">
 
@@ -18,7 +18,7 @@
 		</complexContent>
 	</complexType>
 
-	<element name="myGroup" substitutionGroup="pa:abstractShElement" type="paext:myGroupType" />
+	<element name="myGroup" substitutionGroup="pa:abstractShElement" type="pauext:myGroupType" />
 
 
     <!--
@@ -32,6 +32,6 @@
 		</complexContent>
 	</complexType>
 
-	<element name="myBridge" substitutionGroup="pa:abstractBridgeElement" type="paext:myBridgeType" />
+	<element name="myBridge" substitutionGroup="pa:abstractBridgeElement" type="pauext:myBridgeType" />
 
 </schema>

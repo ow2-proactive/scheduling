@@ -40,11 +40,16 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupPrunParser extends AbstractGroupParser {
-    private static final String NODE_NAME_STDOUT = "stdout";
-    private static final String NODE_NAME_WALL_TIME = "wallTime";
-    private static final String NODE_NAME_PROCESSOR_PER_NODE = "processorPerNode";
-    private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
-    private static final String NODE_NAME_HOSTLIST = "hostlist";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
+        "stdout";
+    private static final String NODE_NAME_WALL_TIME = NODE_EXT_NAMESPACE +
+        "wallTime";
+    private static final String NODE_NAME_PROCESSOR_PER_NODE = NODE_EXT_NAMESPACE +
+        "processorPerNode";
+    private static final String NODE_NAME_HOSTS_NUMBER = NODE_EXT_NAMESPACE +
+        "hostsNumber";
+    private static final String NODE_NAME_HOSTLIST = NODE_EXT_NAMESPACE +
+        "hostList";
     private static final String ATTR_QUEUE = "queue";
     private static final String NODE_NAME = "prunGroup";
 

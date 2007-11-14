@@ -46,15 +46,24 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupARCParser extends AbstractGroupParser {
-    private static final String NODE_NAME_NOTIFY = "notify";
-    private static final String NODE_NAME_MAX_TIME = "maxTime";
-    private static final String NODE_NAME_STDIN = "stdin";
-    private static final String NODE_NAME_STDERR = "stderr";
-    private static final String NODE_NAME_STDOUT = "stdout";
-    private static final String NODE_NAME_OUTPUT_FILES = "outputFiles";
-    private static final String NODE_NAME_INPUT_FILES = "inputFiles";
-    private static final String NODE_NAME_ARGUMENTS = "arguments";
-    private static final String NODE_NAME_COUNT = "count";
+    private static final String XPATH_TRANSFER = NODE_EXT_NAMESPACE +
+        "transfer";
+    private static final String NODE_NAME_NOTIFY = NODE_EXT_NAMESPACE +
+        "notify";
+    private static final String NODE_NAME_MAX_TIME = NODE_EXT_NAMESPACE +
+        "maxTime";
+    private static final String NODE_NAME_STDIN = NODE_EXT_NAMESPACE + "stdin";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
+        "stderr";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
+        "stdout";
+    private static final String NODE_NAME_OUTPUT_FILES = NODE_EXT_NAMESPACE +
+        "outputFiles";
+    private static final String NODE_NAME_INPUT_FILES = NODE_EXT_NAMESPACE +
+        "inputFiles";
+    private static final String NODE_NAME_ARGUMENTS = NODE_EXT_NAMESPACE +
+        "arguments";
+    private static final String NODE_NAME_COUNT = NODE_EXT_NAMESPACE + "count";
     private static final String NODE_NAME = "arcGroup";
     private static final String ATTR_JOB_NAME = "jobName";
 
@@ -137,7 +146,7 @@ public class GroupARCParser extends AbstractGroupParser {
         Node fileTransferListNode, XPath xpath) throws XPathExpressionException {
         List<FileTransfer> res = new ArrayList<FileTransfer>();
 
-        NodeList ftNodes = (NodeList) xpath.evaluate("paext:transfer",
+        NodeList ftNodes = (NodeList) xpath.evaluate(XPATH_TRANSFER,
                 fileTransferListNode, XPathConstants.NODESET);
 
         for (int i = 0; i < ftNodes.getLength(); ++i) {

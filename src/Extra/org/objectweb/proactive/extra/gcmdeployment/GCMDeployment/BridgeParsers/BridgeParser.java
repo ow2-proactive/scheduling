@@ -40,8 +40,8 @@ public interface BridgeParser {
     public AbstractBridge parseBridgeNode(Node bridgeNode, XPath xpath);
 
     /**
-     * Returns the nodeName associated to a particular parser
-     * @return the nodeName as a String
+     * Returns the node's name associated to a particular parser
+     * @return the name as a String
      */
     public String getNodeName();
 }

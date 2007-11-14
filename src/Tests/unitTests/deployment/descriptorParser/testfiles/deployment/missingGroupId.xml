@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pa:GCMDeployment xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd ">
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"	
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                                     ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
+	                    http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	
+	
+	 ">
 
 	<pa:resources>
 		<pa:group refid="WRONG_ID">
@@ -12,7 +16,7 @@
 	<pa:infrastructure>
 	
 		<pa:groups>
-			<pa:sshGroup id="mygroup" hostList="host"></pa:sshGroup>
+			<paext:sshGroup id="mygroup" hostList="host" />
 		</pa:groups>
 
 		<pa:hosts>

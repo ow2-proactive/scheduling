@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <pa:GCMDeployment xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd ">
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"	
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                                     ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
+	                    http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	
+	
+	 ">
 
 	<pa:resources>
 		<pa:bridge refid="WRONG_ID" />
@@ -9,7 +13,7 @@
 
 	<pa:infrastructure>
 		<pa:bridges>
-			<pa:sshBridge hostname="host" id="mybridge" />
+			<paext:sshBridge hostname="host" id="mybridge" />
 		</pa:bridges>
 	</pa:infrastructure>
 </pa:GCMDeployment>

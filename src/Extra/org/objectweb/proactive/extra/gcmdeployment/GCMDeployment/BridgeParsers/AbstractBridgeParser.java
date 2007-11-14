@@ -74,7 +74,15 @@ public abstract class AbstractBridgeParser implements BridgeParser {
 
     protected abstract String getBaseNodeName();
 
+    /**
+     * Returns the node's XML namespace associated
+     * @return the namespace as a String
+     */
+    protected String getNodeNameSpace() {
+        return NODE_EXT_NAMESPACE;
+    }
+
     public String getNodeName() {
-        return NODE_EXT_NAMESPACE + getBaseNodeName();
+        return getNodeNameSpace() + getBaseNodeName();
     }
 }

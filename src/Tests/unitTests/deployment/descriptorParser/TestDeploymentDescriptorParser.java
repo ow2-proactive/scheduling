@@ -103,6 +103,11 @@ public class TestDeploymentDescriptorParser {
             return new UserGroup();
         }
 
+        @Override
+        protected String getNodeNameSpace() {
+            return "pauext:";
+        }
+
         public String getBaseNodeName() {
             return "myGroup";
         }
@@ -122,6 +127,11 @@ public class TestDeploymentDescriptorParser {
         @Override
         public AbstractBridge createBridge() {
             return new UserBridge();
+        }
+
+        @Override
+        protected String getNodeNameSpace() {
+            return "pauext:";
         }
 
         public String getBaseNodeName() {
