@@ -6,7 +6,7 @@
 
 	<complexType name="abstractGroupElementType" abstract="true">
 		<sequence>
-			<element name="environment" type="pa:environmentType" minOccurs="0" />
+			<element name="environment" type="pa:environmentVariablesType" minOccurs="0" />
 			<element name="scriptPath" type="pa:pathElementType" minOccurs="0" />
 		</sequence>
 		<attribute name="id" type="pa:idType" use="required" />

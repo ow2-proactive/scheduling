@@ -30,7 +30,9 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
@@ -40,6 +42,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 
 public abstract class AbstractGroupParser implements GroupParser {
@@ -75,11 +78,21 @@ public abstract class AbstractGroupParser implements GroupParser {
                     groupNode, XPathConstants.NODE);
 
             if (environmentNode != null) {
-                List<String> enviroment = GCMParserHelper.parseEnviromentNode(xpath,
-                        environmentNode);
+                
+                Map<String, String> envVars = new HashMap<String, String>();
+                
+                NodeList argNodes = (NodeList) xpath.evaluate("pa:variable",
+                        environmentNode, XPathConstants.NODESET);
 
-                // TODO - properly handle environment
-                //                group.setEnvironment(env);
+                for (int i = 0; i < argNodes.getLength(); ++i) {
+                    Node argNode = argNodes.item(i);
+                    String name = GCMParserHelper.getAttributeValue(argNode, "name");
+                    String value = GCMParserHelper.getAttributeValue(argNode, "value");
+                    envVars.put(name, value);
+                }
+                
+                group.setEnvironment(envVars);
+                
             }
 
             Node scriptPath = (Node) xpath.evaluate("pa:scriptPath", groupNode,

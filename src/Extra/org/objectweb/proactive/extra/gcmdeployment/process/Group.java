@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.gcmdeployment.process;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 
 public interface Group extends Serializable {
@@ -41,7 +42,7 @@ public interface Group extends Serializable {
      * Set environment variables for this cluster
      * @param env environment variables
      */
-    public void setEnvironment(String env);
+    public void setEnvironment(Map<String, String> env);
 
     /**
      * Set the command path to override the default one

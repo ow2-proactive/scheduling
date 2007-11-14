@@ -166,6 +166,14 @@
 		</sequence>
 	</complexType>
 
+	<complexType name="environmentVariablesType">
+		<sequence>
+			<element name="variable" type="pa:variableType" maxOccurs="unbounded" />
+		</sequence>
+	</complexType>
+
+
+
 	<complexType name="argumentListType">
 		<sequence>
 			<element name="arg" type="string" maxOccurs="unbounded" />
