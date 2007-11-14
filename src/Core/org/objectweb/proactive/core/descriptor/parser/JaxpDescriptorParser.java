@@ -2066,11 +2066,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             if (hostlist != null) {
                 listProcessDecorator.setHostList(hostlist, domain);
-                if (heldProcessRegistrationRefId != null) {
-                    ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
-                    proActiveDescriptor.registerProcess(cep,
-                        heldProcessRegistrationRefId);
-                }
+            }
+            if (heldProcessRegistrationRefId != null) {
+                ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
+                proActiveDescriptor.registerProcess(cep,
+                    heldProcessRegistrationRefId);
             }
 
             if ((closeStream != null) && closeStream.equals("yes")) {
