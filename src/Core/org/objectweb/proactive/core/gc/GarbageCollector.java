@@ -197,7 +197,11 @@ public class GarbageCollector {
         this.registered = body instanceof HalfBody;
         this.finished = FinishedState.NOT_FINISHED;
         this.iterations = 0;
-        this.lastActivity = new Activity(body.getID(), 0);
+        if (body != null) {
+            this.lastActivity = new Activity(body.getID(), 0);
+        } else {
+            this.lastActivity = null;
+        }
         this.parent = null;
         this.nrReachedConsensus = 0;
         this.referenced = new HashMap<UniqueID, Referenced>();

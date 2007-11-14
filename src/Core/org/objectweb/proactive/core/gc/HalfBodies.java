@@ -74,8 +74,21 @@ public class HalfBodies extends GarbageCollector {
      * @throws ActiveObjectCreationException
      */
     private HalfBodies() {
-        super(HalfBody.getHalfBody(LocalBodyStore.getInstance()
-                                                 .getHalfBodyMetaObjectFactory()));
+        super(makeMyHalfBody());
+    }
+
+    /*
+     * Avoid creating a useless HalfBody when the DGC is disabled
+     */
+    private static HalfBody makeMyHalfBody() {
+        HalfBody hb = null;
+
+        if (GarbageCollector.dgcIsEnabled()) {
+            hb = HalfBody.getHalfBody(LocalBodyStore.getInstance()
+                                                    .getHalfBodyMetaObjectFactory());
+        }
+
+        return hb;
     }
 
     /**
