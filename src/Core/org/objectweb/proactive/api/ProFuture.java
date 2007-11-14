@@ -43,6 +43,12 @@ import org.objectweb.proactive.core.util.TimeoutAccounter;
 public class ProFuture {
 
     /**
+     * This negative value is returned by waitForAny(java.util.Vector futures) if
+     * the parameter futures is an empty collection.
+     */
+    public static final int INVALID_EMPTY_COLLECTION = -1337;
+
+    /**
      * Return the object contains by the future (ie its target).
      * If parameter is not a future, it is returned.
      * A wait-by-necessity occurs if future is not available.
@@ -208,7 +214,7 @@ public class ProFuture {
              * Yes, this return value is meaningless but at least we are
              * not permanently blocked
              */
-            return -1;
+            return ProFuture.INVALID_EMPTY_COLLECTION;
         }
         FuturePool fp = ProActiveObject.getBodyOnThis().getFuturePool();
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
