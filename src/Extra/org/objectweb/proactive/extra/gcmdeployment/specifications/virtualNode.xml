@@ -1,0 +1,585 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?oxygen RNGSchema="http://www.oasis-open.org/docbook/xml/5.0/rng/docbook.rng" type="xml"?>
+<article xmlns="http://docbook.org/ns/docbook" version="5.0">
+    <info>
+        <title>Virtual Node Specification</title>
+        <author>
+            <personname>Clement MATHIEU</personname>
+            <email>cmathieu@sophia.inria.fr</email>
+        </author>
+    </info>
+    
+    <sect1>
+        <title>Introduction</title>
+        <para>
+            This document describe how <glossterm linkend="Node">ProActive Nodes</glossterm> are attributed to <glossterm linkend="VN">ProActive Virtual Nodes</glossterm>.
+        </para>
+    </sect1>
+    
+    <glossary>
+        <title>Definitions</title>
+        <glossentry>
+            <glossterm id="Node">Node</glossterm>
+            <glossdef>
+                <para>
+                    A location to execute a computation. By default a Node is created
+                    for each CPU reported by a Java Runtime.
+                </para>
+            </glossdef>
+        </glossentry>
+        
+        <glossentry>
+            <glossterm id="VN">Virtual Node</glossterm>
+            <acronym>VN</acronym>
+            <glossdef>
+                <para> A set of Nodes A Virtual Node is an abstraction for deploying parallel and
+                    distributed applications. Nodes are attached to Virtual Nodes by Node Providers.
+                    A set of Node Provider is attached to each Virtual Node. Only Nodes from theses
+                    Node Providers are elligible. If the set is empty then any Node can be attached
+                    to the Virtual Node. </para>
+            </glossdef>
+        </glossentry>
+        
+        <glossentry>
+            <glossterm id="NP">Node Provider</glossterm>
+            <glossdef>
+                <para>
+                    A GCM Deployment Descriptor instance.
+                </para>
+                <para> A Node Provider acquires the resources described inside a GCM Deployment
+                    Descriptor and creates Node on them as described. When a Node is ready the Node
+                    Provider send it to the ProActive Runtime that initiated the deployment
+                    process. Each GCM Deployment Descriptor has its own Node Provider.
+                </para>
+            </glossdef>
+        </glossentry>
+        
+        <glossentry>
+            <glossterm id="Capacity">Capacity</glossterm>
+            <glossdef>
+                <para>
+                    The number of Nodes asked by a Virtual Node or a Node Provider 
+                </para>
+            </glossdef>
+        </glossentry>
+        
+        <glossentry>
+            <glossterm id="Greedy">Greedy</glossterm>
+            <glossdef>
+                <para> A Virtual Node or a Node Provider is Greedy when not Capacity is defined.
+                    Such object will try to get as many Nodes as possible. If serveral Greedy
+                    objects are elligible, a round robin mecanism is applied.</para>
+            </glossdef>
+        </glossentry>
+    </glossary>
+    
+    <sect1>
+        <title>General Rules</title>
+        
+        <orderedlist>
+            <listitem>
+                <para> When a Node is ready, it register itself to its Node Provider on the
+                    ProActive Runtime that started the deployment. The Node Provider maintains a
+                    list of eligible Virtual Nodes for this Node. Each Node is them attributed to
+                    one Virtual Node. </para>
+            </listitem>
+            
+            <listitem>
+                <para> The deployment mechanism CAN NOT ensure that a deployment will be able to
+                    fulfill GCM Application requirements. For example if a Virtual Node wants 10
+                    Nodes but the LAN described by a GCM Deployment Descriptor has only 8 Nodes. The
+                    deployment mechanism DOES NOT try to address this issue, it's up to the deployer
+                    the check that GCM Application Descriptor and GCM Deployment Descriptor are
+                    compatible. However, if a mapping exists the deployment mechanism MUST satisfy
+                    requirements. </para>
+            </listitem>
+            
+            <listitem>
+                <para>
+                    A Virtual Node is said as a "Greedy Virtual Node" if no capacity is specified. 
+                    A such Virtual Node will try to get as many Nodes as possible.
+                </para>
+            </listitem>
+            
+            <listitem>
+                <para> Node are attributed to fulfill strong requirements first. For example if two
+                    Virtual Nodes are defined, <varname>vn1</varname> and <varname>vn2</varname>. If
+                    <varname>vn1</varname> is Greedy and <varname>vn2</varname> is not. Then
+                    <varname>vn2</varname> will be served before <varname>vn1</varname></para>
+            </listitem>
+            
+            <listitem>
+                <para> A round robin algorithm is applied between all Greedy Virtual Nodes. The
+                    round robin DOES NOT depend on the number of Resource Provider. </para>
+            </listitem>
+            
+            <listitem>
+                <para>
+                    A first match policy is applied for Resource Provider. If a Node fulfill a requirement
+                    then it is send to the Virtual Node. Ordering is not important here. 
+                </para>
+            </listitem>
+            
+            <listitem>
+                <para>
+                    A Virtual Node is Ready when all its requirements are fulfilled. A Greedy Virtual
+                    Node is ready as soon as all Resource Provider requirements are fulfilled.
+                </para>
+            </listitem>
+            
+            <listitem>
+                <para>     
+                    If a non Greedy Virtual Node has at least one Greedy and one non Greedy
+                    Resource Provider, then all requirements must be fulfilled before using the Best Effort
+                    Resource Providers. 
+                </para>
+            </listitem>
+        </orderedlist>
+    </sect1>
+    
+    <sect1>
+        <title>XML Schema</title>
+        <![CDATA[
+        
+        ]]>
+        
+    </sect1>
+    
+    <sect1>
+        <title></title>
+    </sect1>
+    
+    <sect1>
+        <title>Behavior specifications</title>
+        
+        <para> This section describes the expected behavior of ProActive when parsing a given XML
+            snippet. The behavior of any valid XML snippet can be inferred from the following
+            sections. If you find a way to describe an undefined behavior please send me an email.
+        </para>
+        
+        <sect2>
+            <title>Greedy  Virtual Node</title>
+            <code>
+                <![CDATA[
+<virtualNode id="vn1" />          
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Greedy Virtual Node, no Capacity specified
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Nodes from any Node Provider can be attached to it
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Always Ready since Greedy and no requirements at Node Provider level
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        
+        <sect2>
+            <title>Virtual Node with defined capacity</title>
+            <code>
+                <![CDATA[
+<virtualNode id="vn1" capacity="X" />      
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Asking for X Nodes
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Nodes from any Node Provider can be attached to it 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Is Ready when X Nodes are attached to it.
+                        <note>If less than X Nodes were created by the deployment then it will never be Ready</note>
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        
+        <sect2>
+            <title>Two Greedy Virtual Nodes</title>
+            <code>
+                <![CDATA[
+<virtualNode id="vn1" />
+<virtualNode id="vn2" />                
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <varname>vn1</varname> and <varname>vn2</varname> are Greedy Virtual Node
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Nodes from any Node Provider can be attached to them
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Always Ready since Greedy and no requirements at Node Provider level
+                    </para>
+                </listitem>
+                <listitem>
+                    <para> Nodes are attached to <varname>vn1</varname> and <varname>vn2</varname>
+                        by using a round robin algorithm. <varname>vn1</varname> and
+                        <varname>vn2</varname> will get the same number of Nodes</para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        
+        <sect2>
+            <title>Greedy Virtual Node  with Greedy Node Provider</title>
+            
+            <code>
+                <![CDATA[
+<virtualNode id="vn1">
+    <resourceProvider refid="RP1" />
+</virtualNode>
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Greedy Virtual Node, no Capacity specified               
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only Nodes from <varname>NP1</varname> can be attached to <varname>vn1</varname>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Always Ready since Greedy and no requirements at Node Provider level
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        
+        <sect2>
+            <title>Greedy Virtual Node with Node Provider</title>
+            
+            <code>
+                <![CDATA[
+<virtualNode id="vn1">
+    <resourceProvider refid="RP1" capacity="X" />
+</virtualNode>
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Greedy Virtual Node, no Capacity specified
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Node Provider  with a Capacity of X
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only X Nodes from <varname>NP1</varname> can be attached to <varname>vn1</varname>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Since only one Node Provider is listed, <varname>vn1</varname> will not get more than X Nodes
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Is Ready when X Nodes from <varname>NP1</varname> are attached to it
+                        <note>A Virtual Node is Ready when its Capacity requirement is fulfilled and
+                            all Node Providers requirements are also satisfied</note>
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        
+        <sect2>
+            <title>Virtual Node with a Greedy Node Provider</title>
+            
+            <code>
+                <![CDATA[
+<virtualNode id="vn1" capacity="X">
+    <resourceProvider refid="RP1"/>
+</virtualNode>	
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <varname>vn1</varname>asks for X Nodes        
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only Nodes from <varname>NP1</varname> can be attached to <varname>vn1</varname>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Is Ready when X Nodes are attached to it.
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        
+        <sect2>
+            <title>Virtual Node with a Node Provider</title>
+            
+            <code>
+                <![CDATA[
+<virtualNode id="vn1" capacity="X">
+    <resourceProvider refid="RP1" capacity="Y"/>
+</virtualNode>
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <varname>vn1</varname>asks for X Nodes 
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only Y Nodes from <varname>NP1</varname> can be attached to <varname>vn1</varname>
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Is Ready when X Nodes are attached to it and <function>min(X, Y)</function> node have been attached by <varname>RP1</varname>
+                        <note>If Y &lt; X then the Virtual Node cannot be ready</note>
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        
+        <sect2>
+            <title>Case</title>
+            
+            <code>
+                <![CDATA[
+<virtualNode id="vn1" capacity="X">
+    <resourceProvider refid="RP1" capacity="Y"/>
+    <resourceProvider refid="RP1" capacity="Z"/>
+</virtualNode>
+                ]]>
+            </code>
+            
+            <para>
+                Generalization of Use case 7 with X = Y + Z, X &lt; Y + Z and X &gt; Y + Z.
+            </para>
+            <para>
+                vn1 is Ready when X Nodes have been sent to it.
+            </para>
+        </sect2>
+        
+        <sect2>
+            <title>Virtual Node with several Greedy Node Providers</title>
+            
+            <code>
+                <![CDATA[
+<virtualNode id="vn1" capacity="X">
+    <resourceProvider refid="RP1">
+    <resourceProvider refid="RP2">
+</virtualNode>
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <varname>vn1</varname> asks for X Nodes                
+                    </para>
+                </listitem>    
+                <listitem>
+                    <para>
+                        Only Nodes from <varname>NP1</varname> or <varname>NP2</varname> can be attached to <varname>vn1</varname>
+                    </para>
+                </listitem>    
+                <listitem>
+                    <para>
+                        Is Ready when X Nodes are attached
+                    </para>
+                </listitem>    
+            </itemizedlist>
+        </sect2>
+        
+        <sect2>
+            <title>Greedy Virtual Node with Greedy and non Greedy Node Providers</title>
+            
+            <code>
+                <![CDATA[
+<virtualNode id="vn1">
+    <resourceProvider refid="RP1" capacity="Y" />
+    <resourceProvider refid="RP2" capacity="Z" />
+    <resourceProvider refid="RP3" />
+</virtualNode>
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        Greedy Virtual Node, no Capacity specified
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only Nodes from <varname>NP1</varname>, <varname>NP2</varname> or <varname>NP3</varname> can be attached
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only Y Nodes from <varname>NP1</varname> can be attached
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only Z Nodes from <varname>NP2</varname> can be attached
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Is Ready when Y Nodes from <varname>NP1</varname> and Z Nodes from <varname>NP2</varname> have been attached to it
+                        <note>Since the Virtual Node is Greedy nodes from NP3 can be attached as soon as they arrive</note>
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+        
+        <sect2>
+            <title>Virtual Node with Greedy and non Greedy Node Providers</title>
+            
+            <code>
+                <![CDATA[
+<virtualNode id="vn1" capacity="X">
+    <resourceProvider refid="RP1" capacity="Y" />
+    <resourceProvider refid="RP2" capacity="Z" />
+    <resourceProvider refid="RP3" />
+</virtualNode>
+                ]]>
+            </code>
+            
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <varname>vn1</varname> asks for X Nodes
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only Nodes from <varname>NP1</varname>, <varname>NP2</varname> or <varname>NP3</varname> can be attached
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only Y Nodes from <varname>NP1</varname> can be attached
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Only Z Nodes from <varname>NP2</varname> can be attached
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        Is Ready when X Nodes are attached and Y Nodes from <varname>NP1</varname> and Z Nodes from <varname>NP2</varname> have been attached to it
+                        <note>Nodes from NP3 have to wait that NP1 and NP2 requirements are satisfied before to be attached to vn1</note>
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>        
+    </sect1>
+    
+    <sect1>
+        <title>Use cases</title>
+        
+        <sect2>
+            <title>Simple Master/Worker</title>
+        </sect2>
+        
+        <sect2>
+            <title>Avanced Master/Worker</title>
+        </sect2>
+        
+        <sect2>
+            <title>Hierarchical Master/Worker</title>
+            
+            <para>
+                In this use case we have several <glossterm ></glossterm>Resource Provider
+            </para>
+            
+            <![CDATA[
+             <virtualNode id="masters">
+    <resourceProvider refid="RP1" capacity="1"/>
+    <resourceProvider refid="RP2" capacity="1"/>
+    <resourceProvider refid="RP3" capacity="1"/>
+    </virtualNode>
+    <virtualNode id="workers">
+    <resourceProvider refid="RP1" />
+    <resourceProvider refid="RP2" />
+    <resourceProvider refid="RP3" />
+    </virtualNode>	
+            
+            ]]>
+        </sect2>
+    </sect1>
+</article>
+<!--
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    Real World Examples:
+    
+    
+    Hierarchical Master/Worker
+    
+    <virtualNode id="masters">
+    <resourceProvider refid="RP1" capacity="1"/>
+    <resourceProvider refid="RP2" capacity="1"/>
+    <resourceProvider refid="RP3" capacity="1"/>
+    </virtualNode>
+    <virtualNode id="workers">
+    <resourceProvider refid="RP1" />
+    <resourceProvider refid="RP2" />
+    <resourceProvider refid="RP3" />
+    </virtualNode>	
+    
+-->
+
