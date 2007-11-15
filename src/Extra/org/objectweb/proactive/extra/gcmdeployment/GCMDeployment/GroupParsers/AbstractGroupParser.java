@@ -78,21 +78,21 @@ public abstract class AbstractGroupParser implements GroupParser {
                     groupNode, XPathConstants.NODE);
 
             if (environmentNode != null) {
-                
                 Map<String, String> envVars = new HashMap<String, String>();
-                
+
                 NodeList argNodes = (NodeList) xpath.evaluate("pa:variable",
                         environmentNode, XPathConstants.NODESET);
 
                 for (int i = 0; i < argNodes.getLength(); ++i) {
                     Node argNode = argNodes.item(i);
-                    String name = GCMParserHelper.getAttributeValue(argNode, "name");
-                    String value = GCMParserHelper.getAttributeValue(argNode, "value");
+                    String name = GCMParserHelper.getAttributeValue(argNode,
+                            "name");
+                    String value = GCMParserHelper.getAttributeValue(argNode,
+                            "value");
                     envVars.put(name, value);
                 }
-                
+
                 group.setEnvironment(envVars);
-                
             }
 
             Node scriptPath = (Node) xpath.evaluate("pa:scriptPath", groupNode,

@@ -109,25 +109,21 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         // TODO Auto-generated method stub
     }
 
-    @Override
     public DeploymentTree getDeploymentTree() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public Set<Node> getNodes() {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public boolean isReady() {
         // TODO Auto-generated method stub
         return false;
     }
 
-    @Override
     public void addNode(Node node) {
         if (requiredCapacity != MAX_CAPACITY) {
             requiredCapacity--;

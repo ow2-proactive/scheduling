@@ -179,12 +179,10 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
-    @Override
     public String getDescriptorFilePath() {
         return parser.getDescriptorFilePath();
     }
 
-    @Override
     public long getContributeTo(VirtualNodeInternal virtualNode) {
         return contributeTo.get(virtualNode);
     }
@@ -203,12 +201,10 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         return true;
     }
 
-    @Override
     public void setContributeTo(VirtualNodeInternal virtualNode, long capacity) {
         contributeTo.put(virtualNode, capacity);
     }
 
-    @Override
     public void addContributedNode(VirtualNodeInternal virtualNode, Node node) {
         Long val = contributeTo.get(virtualNode);
         contributeTo.put(virtualNode, --val);

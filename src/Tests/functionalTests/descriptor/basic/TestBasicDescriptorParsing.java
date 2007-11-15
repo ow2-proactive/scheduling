@@ -44,8 +44,7 @@ public class TestBasicDescriptorParsing {
 
         ProActiveDescriptor proActiveDescriptor = ProDeployment.getProactiveDescriptor(
                 "file:" + descriptorLocation);
-        
-//        proActiveDescriptor.activateMappings();
-        
+
+        //        proActiveDescriptor.activateMappings();
     }
 }
