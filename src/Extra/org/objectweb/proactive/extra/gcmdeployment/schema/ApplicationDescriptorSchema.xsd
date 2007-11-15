@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
 
 	<include schemaLocation="CommonTypes.xsd"></include>
 
@@ -42,19 +40,13 @@
 		<sequence>
 			<element name="file" maxOccurs="unbounded">
 				<complexType>
-					<attribute name="path"
-						type="pa:pathElementGeneralType">
-					</attribute>
+					<attribute name="path" type="pa:pathElementGeneralType"></attribute>
 				</complexType>
 			</element>
-			<element name="fileTransfer" type="pa:fileTransferType"
-				minOccurs="0" maxOccurs="unbounded">
-			</element>
+			<element name="fileTransfer" type="pa:fileTransferType" minOccurs="0" maxOccurs="unbounded"></element>
 			<element name="executable" minOccurs="0">
 				<complexType>
-					<attribute name="relpath"
-						type="pa:pathElementGeneralType">
-					</attribute>
+					<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
 				</complexType>
 			</element>
 		</sequence>
@@ -63,15 +55,11 @@
 
 	<complexType name="virtualNodeType">
 		<sequence>
-			<element name="fileTranfer" type="pa:fileTransferType"
-				minOccurs="0" maxOccurs="unbounded">
-			</element>
-			<element name="resourceProvider" minOccurs="0"
-				maxOccurs="unbounded">
+			<element name="fileTranfer" type="pa:fileTransferType" minOccurs="0" maxOccurs="unbounded"></element>
+			<element name="resourceProvider" minOccurs="0" maxOccurs="unbounded">
 				<complexType>
-					<attribute name="refid" type="pa:idType">
-					</attribute>
-					<attribute name="capacity" type="pa:capacityType"/>			
+					<attribute name="refid" type="pa:idType"></attribute>
+					<attribute name="capacity" type="pa:capacityType" />
 				</complexType>
 			</element>
 		</sequence>
@@ -82,12 +70,9 @@
 
 	<complexType name="commandType">
 		<sequence>
-			<element name="path" type="pa:pathElementType"
-				minOccurs="0" />
-			<element name="arg" type="string" minOccurs="0"
-				maxOccurs="unbounded" />
-			<element name="filetransfer" type="pa:fileTransferType"
-				minOccurs="0" />
+			<element name="path" type="pa:pathElementType" minOccurs="0" />
+			<element name="arg" type="string" minOccurs="0" maxOccurs="unbounded" />
+			<element name="filetransfer" type="pa:fileTransferType" minOccurs="0" />
 		</sequence>
 		<attribute name="name" type="pa:parameterType"></attribute>
 	</complexType>
@@ -101,36 +86,26 @@
 					<element name="configuration" minOccurs="0">
 						<complexType>
 							<all>
-								<element name="bootclasspath"
-									type="pa:pathType" minOccurs="0">
-								</element>
-								<element name="java" minOccurs="0" type="pa:pathElementType"/>
-								<element name="applicationClasspath" type="pa:classpathType" minOccurs="0">
-								</element>
-								<element name="proactiveClasspath"
-									type="pa:classpathType" minOccurs="0">
-								</element>
-								<element name="securityPolicy"
-									type="pa:pathElementType" minOccurs="0">
-								</element>
-								<element name="log4jProperties"
-									type="pa:pathElementType" minOccurs="0">
-								</element>
-								<element name="userProperties"
-									type="pa:pathElementType" minOccurs="0">
-								</element>
+								<element name="bootclasspath" type="pa:pathType" minOccurs="0"></element>
+								<element name="java" minOccurs="0" type="pa:pathElementType" />
+								<element name="applicationClasspath" type="pa:classpathType" minOccurs="0"></element>
+								<element name="proactiveClasspath" type="pa:classpathType" minOccurs="0"></element>
+								<element name="securityPolicy" type="pa:pathElementType" minOccurs="0"></element>
+								<element name="log4jProperties" type="pa:pathElementType" minOccurs="0"></element>
+								<element name="userProperties" type="pa:pathElementType" minOccurs="0"></element>
 							</all>
 						</complexType>
 					</element>
 
-					<element name="virtualNode"
-						type="pa:virtualNodeType" maxOccurs="unbounded">
+					<element name="virtualNode" type="pa:virtualNodeType" maxOccurs="unbounded">
+						<unique name="resourceProviderConstraint">
+							<selector xpath="pa:resourceProvider"></selector>
+							<field xpath="@refid"></field>
+						</unique>
 					</element>
 
 				</sequence>
-				<attribute name="relpath"
-					type="pa:pathElementGeneralType" use="optional">
-				</attribute>
+				<attribute name="relpath" type="pa:pathElementGeneralType" use="optional"></attribute>
 			</extension>
 		</complexContent>
 	</complexType>
@@ -139,8 +114,7 @@
 		<complexContent>
 			<extension base="pa:applicationNodeType">
 				<sequence>
-					<element name="resourceProvider"
-						maxOccurs="unbounded">
+					<element name="resourceProvider" maxOccurs="unbounded">
 						<complexType>
 							<attribute name="refid" type="string"></attribute>
 						</complexType>
@@ -160,40 +134,29 @@
 		</complexContent>
 	</complexType>
 
-	<element name="abstractApplicationElement"
-		type="pa:applicationNodeType" />
+	<element name="abstractApplicationElement" type="pa:applicationNodeType" />
 
-	<element name="executable" type="pa:executableType"
-		substitutionGroup="pa:abstractApplicationElement" />
-	<element name="proactive" type="pa:proactiveType"
-		substitutionGroup="pa:abstractApplicationElement" />
+	<element name="executable" type="pa:executableType" substitutionGroup="pa:abstractApplicationElement" />
+	<element name="proactive" type="pa:proactiveType" substitutionGroup="pa:abstractApplicationElement" />
 
 
 	<complexType name="applicationType">
 		<sequence>
-			<element ref="pa:abstractApplicationElement" maxOccurs="1"
-				minOccurs="1">
-			</element>
+			<element ref="pa:abstractApplicationElement" maxOccurs="1" minOccurs="1"></element>
 		</sequence>
 	</complexType>
 
 	<complexType name="ressourcesType">
 		<sequence>
-			<element name="resourceProvider"
-				type="pa:resourceProviderType" minOccurs="0"
-				maxOccurs="unbounded">
+			<element name="resourceProvider" type="pa:resourceProviderType" minOccurs="0" maxOccurs="unbounded">
 			</element>
 		</sequence>
 	</complexType>
 
 	<complexType name="GCMApplicationType">
 		<sequence>
-			<element name="application" type="pa:applicationType"
-				minOccurs="1" maxOccurs="1">
-			</element>
-			<element name="resources" type="pa:ressourcesType"
-				minOccurs="1" maxOccurs="1">
-			</element>
+			<element name="application" type="pa:applicationType" minOccurs="1" maxOccurs="1"></element>
+			<element name="resources" type="pa:ressourcesType" minOccurs="1" maxOccurs="1"></element>
 		</sequence>
 	</complexType>
 
@@ -204,18 +167,12 @@
 			<selector xpath="pa:resources/pa:resourceProvider" />
 			<field xpath="@id" />
 		</key>
-		<keyref name="refIdKeyResourceProvider"
-			refer="pa:idResourceProviders">
-			<selector
-				xpath="pa:application/pa:executable/pa:resourceProvider">
-			</selector>
+		<keyref name="refIdKeyResourceProvider" refer="pa:idResourceProviders">
+			<selector xpath="pa:application/pa:executable/pa:resourceProvider"></selector>
 			<field xpath="@refid"></field>
 		</keyref>
-		<keyref name="refIdKeyResourceProvider2"
-			refer="pa:idResourceProviders">
-			<selector
-				xpath="pa:application/pa:proactive/pa:virtualNode/pa:resourceProvider">
-			</selector>
+		<keyref name="refIdKeyResourceProvider2" refer="pa:idResourceProviders">
+			<selector xpath="pa:application/pa:proactive/pa:virtualNode/pa:resourceProvider"></selector>
 			<field xpath="@refid"></field>
 		</keyref>
 	</element>
