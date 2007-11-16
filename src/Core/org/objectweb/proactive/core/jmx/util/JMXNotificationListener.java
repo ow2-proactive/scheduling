@@ -41,9 +41,12 @@ import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -126,5 +129,13 @@ public class JMXNotificationListener implements NotificationListener,
 
         // Warning loggers is transient
         logger = ProActiveLogger.getLogger(Loggers.JMX);
+    }
+
+    public void unsubscribeFromRegistry() {
+        Body myBody = ProActiveObject.getBodyOnThis();
+        if (myBody instanceof AbstractBody) {
+            RemoteObjectExposer roe = ((AbstractBody) myBody).getRemoteObjectExposer();
+            roe.unregisterAll();
+        }
     }
 }

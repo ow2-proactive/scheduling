@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.core.jmx.util;
 
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,14 +49,23 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.AbstractUniversalBody;
+import org.objectweb.proactive.core.body.BodyMap;
+import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.UniversalBodyRemoteObjectAdapter;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -246,6 +257,11 @@ public class JMXNotificationManager implements NotificationListener {
                 if (!connection.isUsed()) {
                     // Updates our map
                     connectionsWithRuntimeUrl.remove(connection.getRuntimeUrl());
+                    connection.getConnection().unsubscribeFromRegistry();
+                    //TODO: terminates the connection active object 
+                    //Next line thgrows:  org.objectweb.proactive.core.ProActiveRuntimeException: FutureProxy: Illegal arguments in call _terminateAO
+                    // ProActiveObject.terminateActiveObject(connection.getConnection(),
+                    //false);
                 }
                 // Updates our map
                 connectionsWithObjectName.remove(objectName);
@@ -444,25 +460,72 @@ public class JMXNotificationManager implements NotificationListener {
      *
      */
     public void kill() {
+        unsubscribeAll();
+        //TODO (Emil): see if this code is better than the code in unsubscribeAll()
+        // use this code or remove it
+        //        Iterator<ObjectName> allObjectNames = connectionsWithObjectName.keySet()
+        //                                                                       .iterator();
+        //        while (allObjectNames.hasNext()) {
+        //            ObjectName objectName = allObjectNames.next();
+        //            Connection connection = connectionsWithObjectName.get(objectName);
+        //            connection.removeObjectName(objectName);
+        //            //if (!connection.isUsed()) 
+        //            { // Unsubscribes to the JMX notifications of the remote/local MBean.
+        //                try {
+        //                    notificationlistener.unsubscribe(connection.getConnection(),
+        //                        objectName, null, null);
+        //                } catch (Exception e) {
+        //                    System.out.println("Exception when removing jmx listener:" +
+        //                        e.getMessage() + " caused by" +
+        //                        e.getCause().getMessage());
+        //                }
+        //            } //if !connection.isUsed()
+        //        } //forall objectNames
+        //        System.out.println(
+        //            "JMXNotification manager have unsubscribed all listeners to the local and remote beans.");
+    } //kill()
+
+    private void unsubscribeAll() {
+        //Unregisters the notificationlistener for all objectNames
         Iterator<ObjectName> allObjectNames = connectionsWithObjectName.keySet()
                                                                        .iterator();
         while (allObjectNames.hasNext()) {
             ObjectName objectName = allObjectNames.next();
-            Connection connection = connectionsWithObjectName.get(objectName);
-            connection.removeObjectName(objectName);
-            //if (!connection.isUsed()) 
-            { // Unsubscribes to the JMX notifications of the remote/local MBean.
-                try {
-                    notificationlistener.unsubscribe(connection.getConnection(),
-                        objectName, null, null);
-                } catch (Exception e) {
-                    System.out.println("Exception when removing jmx listener:" +
-                        e.getMessage() + " caused by" +
-                        e.getCause().getMessage());
-                }
-            } //if !connection.isUsed()
-        } //forall objectNames
-        System.out.println(
-            "JMXNotification manager have unsubscribed all listeners to the local and remote beans.");
-    } //kill()
+            Iterator<NotificationListener> listeners = allListeners.get(objectName)
+                                                                   .iterator();
+            while (listeners.hasNext()) {
+                NotificationListener listener = listeners.next();
+                this.unsubscribe(objectName, listener);
+            }
+        } //while
+
+        //Removes the reference for the notificationlistener from the local registry(ies);
+        notificationlistener.unsubscribeFromRegistry();
+
+        //The localBody for this thread will be removed by the unregisterAllHalfBodiesFromRegistry()
+        //So we don't need to run this code (even if we could)
+        /*
+             Body myBody=ProActiveObject.getBodyOnThis();
+        if (myBody instanceof AbstractBody)
+        {
+                RemoteObjectExposer roe=((AbstractBody)myBody).getRemoteObjectExposer();
+                roe.unregisterAll();
+        }
+        */
+        unregisterAllHalfBodiesFromRegistry();
+    }
+
+    private void unregisterAllHalfBodiesFromRegistry() {
+        BodyMap bm = LocalBodyStore.getInstance().getLocalHalfBodies();
+
+        Iterator<UniversalBody> halfBodies = bm.bodiesIterator();
+        {
+            UniversalBody universalBody = halfBodies.next();
+
+            if (universalBody instanceof AbstractBody) {
+                RemoteObjectExposer roe = ((AbstractBody) universalBody).getRemoteObjectExposer();
+                roe.unregisterAll();
+            }
+        }
+    }
 }

@@ -218,14 +218,12 @@ public class WorldObject extends AbstractData {
         }
 
         if (ao == null) {
-            System.out.println("Suppression de " + ao);
+            System.out.println("Active Object " + id + " already removed.");
         } else {
-            System.out.println("Suppression de " + ao + ", sur " +
-                ao.getParent());
+            System.out.println("Removed  " + ao + ", on " + ao.getParent());
+            ao.resetCommunications();
+            ao.getParent().removeChild(ao);
         }
-
-        ao.resetCommunications();
-        ao.getParent().removeChild(ao);
     }
 
     @Override

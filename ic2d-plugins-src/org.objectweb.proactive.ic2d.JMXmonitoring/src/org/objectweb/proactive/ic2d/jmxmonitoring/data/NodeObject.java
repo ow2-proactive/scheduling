@@ -162,7 +162,8 @@ public class NodeObject extends AbstractData {
         for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator();
                 iter.hasNext();) {
             ActiveObject child = (ActiveObject) iter.next();
-            child.destroy();
+            child.stopMonitoring(true); //unsubscribes listener for this child object 
+                                        //and call destroy() on the child object
         }
     }
 
