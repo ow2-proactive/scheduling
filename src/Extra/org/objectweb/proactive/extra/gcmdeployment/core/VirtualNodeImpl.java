@@ -40,7 +40,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBl
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
 
-import com.pallas.unicore.requests.GetVsites;
+
 public class VirtualNodeImpl implements VirtualNodeInternal {
 
     /** The, unique, name of this Virtual Node */
