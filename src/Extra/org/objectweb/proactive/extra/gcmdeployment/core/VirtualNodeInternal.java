@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
-import java.util.Set;
-
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
@@ -47,9 +45,7 @@ public interface VirtualNodeInternal extends VirtualNode {
      */
     public void addFileTransfertBlock(FileTransferBlock ftb);
 
-    public void addProvider(GCMDeploymentDescriptor provider);
-
-    public Set<GCMDeploymentDescriptor> getProviders();
+    public void addProvider(GCMDeploymentDescriptor provider, long capacity);
 
     /**
      * Checks that all required informations are here.
@@ -64,7 +60,14 @@ public interface VirtualNodeInternal extends VirtualNode {
      */
     public void checkDirectMode() throws IllegalStateException;
 
-    public void addNode(Node node);
+    public boolean doesNodeProviderNeed(Node Node,
+        GCMDeploymentDescriptor nodeProvider);
 
-    public boolean needContribution();
+    public boolean doYouNeed(Node node, GCMDeploymentDescriptor nodeProvider);
+
+    public boolean doYouWant(Node node, GCMDeploymentDescriptor nodeProvider);
+
+    public boolean isGreedy();
+
+    public boolean needNode();
 }

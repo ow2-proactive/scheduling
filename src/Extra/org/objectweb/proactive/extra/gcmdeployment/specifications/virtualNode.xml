@@ -110,12 +110,12 @@
             
             <listitem>
                 <para> A round robin algorithm is applied between all Greedy Virtual Nodes. The
-                    round robin DOES NOT depend on the number of Resource Provider. </para>
+                    round robin DOES NOT depend on the number of Node Provider. </para>
             </listitem>
             
             <listitem>
                 <para>
-                    A first match policy is applied for Resource Provider. If a Node fulfill a requirement
+                    A first match policy is applied for Node Provider. If a Node fulfill a requirement
                     then it is send to the Virtual Node. Ordering is not important here. 
                 </para>
             </listitem>
@@ -123,15 +123,15 @@
             <listitem>
                 <para>
                     A Virtual Node is Ready when all its requirements are fulfilled. A Greedy Virtual
-                    Node is ready as soon as all Resource Provider requirements are fulfilled.
+                    Node is ready as soon as all Node Provider requirements are fulfilled.
                 </para>
             </listitem>
             
             <listitem>
                 <para>     
                     If a non Greedy Virtual Node has at least one Greedy and one non Greedy
-                    Resource Provider, then all requirements must be fulfilled before using the Best Effort
-                    Resource Providers. 
+                    Node Provider, then all requirements must be fulfilled before using the Greedy
+                    Node Providers. 
                 </para>
             </listitem>
         </orderedlist>
@@ -139,14 +139,49 @@
     
     <sect1>
         <title>XML Schema</title>
-        <![CDATA[
         
-        ]]>
         
+        <sect2>
+            <title>Virtual Node</title>
+            
+            <sect3>
+                <title>boolean isReady()</title>
+                
+                <programlisting>
+// Check if capacity requirement is fulfilled
+if !this.isGreedy() &amp;&amp; this.requiredNodes &lt; this.nodes.size()
+    return false
+
+// Check if Node Provider 
+foreach nodeProvider in this.nodeProviders
+    if !nodeProvider.isReady(this)
+        return false
+        
+return true
+                    
+                </programlisting>
+                
+            </sect3>
+        </sect2>   
+        
+        <sect2>
+            <title>Node Provider</title>
+            
+            <sect3>
+                <title>booelan isReady(VirtualNode virtualNode)</title>
+                
+                <programlisting>
+this.mustGiveTo(virtualNode)                     
+                </programlisting>
+            </sect3>
+        </sect2>
     </sect1>
     
     <sect1>
-        <title></title>
+        <title>Data Structures and Algorithms</title>
+        
+        
+        
     </sect1>
     
     <sect1>
@@ -251,7 +286,7 @@
             <code>
                 <![CDATA[
 <virtualNode id="vn1">
-    <resourceProvider refid="RP1" />
+    <resourceProvider refid="NP1" />
 </virtualNode>
                 ]]>
             </code>
@@ -281,7 +316,7 @@
             <code>
                 <![CDATA[
 <virtualNode id="vn1">
-    <resourceProvider refid="RP1" capacity="X" />
+    <resourceProvider refid="NP1" capacity="X" />
 </virtualNode>
                 ]]>
             </code>
@@ -323,7 +358,7 @@
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
-    <resourceProvider refid="RP1"/>
+    <resourceProvider refid="NP1"/>
 </virtualNode>	
                 ]]>
             </code>
@@ -353,7 +388,7 @@
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
-    <resourceProvider refid="RP1" capacity="Y"/>
+    <resourceProvider refid="NP1" capacity="Y"/>
 </virtualNode>
                 ]]>
             </code>
@@ -371,7 +406,7 @@
                 </listitem>
                 <listitem>
                     <para>
-                        Is Ready when X Nodes are attached to it and <function>min(X, Y)</function> node have been attached by <varname>RP1</varname>
+                        Is Ready when X Nodes are attached to it and <function>min(X, Y)</function> node have been attached by <varname>NP1</varname>
                         <note>If Y &lt; X then the Virtual Node cannot be ready</note>
                     </para>
                 </listitem>
@@ -384,8 +419,8 @@
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
-    <resourceProvider refid="RP1" capacity="Y"/>
-    <resourceProvider refid="RP1" capacity="Z"/>
+    <resourceProvider refid="NP1" capacity="Y"/>
+    <resourceProvider refid="NP1" capacity="Z"/>
 </virtualNode>
                 ]]>
             </code>
@@ -404,8 +439,8 @@
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
-    <resourceProvider refid="RP1">
-    <resourceProvider refid="RP2">
+    <resourceProvider refid="1">
+    <resourceProvider refid="2">
 </virtualNode>
                 ]]>
             </code>
@@ -435,9 +470,9 @@
             <code>
                 <![CDATA[
 <virtualNode id="vn1">
-    <resourceProvider refid="RP1" capacity="Y" />
-    <resourceProvider refid="RP2" capacity="Z" />
-    <resourceProvider refid="RP3" />
+    <resourceProvider refid="1" capacity="Y" />
+    <resourceProvider refid="2" capacity="Z" />
+    <resourceProvider refid="3" />
 </virtualNode>
                 ]]>
             </code>
@@ -478,9 +513,9 @@
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
-    <resourceProvider refid="RP1" capacity="Y" />
-    <resourceProvider refid="RP2" capacity="Z" />
-    <resourceProvider refid="RP3" />
+    <resourceProvider refid="1" capacity="Y" />
+    <resourceProvider refid="2" capacity="Z" />
+    <resourceProvider refid="3" />
 </virtualNode>
                 ]]>
             </code>
@@ -531,55 +566,24 @@
             <title>Hierarchical Master/Worker</title>
             
             <para>
-                In this use case we have several <glossterm ></glossterm>Resource Provider
+                In this use case we have several <glossterm ></glossterm>Node Providers
             </para>
             
             <![CDATA[
              <virtualNode id="masters">
-    <resourceProvider refid="RP1" capacity="1"/>
-    <resourceProvider refid="RP2" capacity="1"/>
-    <resourceProvider refid="RP3" capacity="1"/>
+    <resourceProvider refid="1" capacity="1"/>
+    <resourceProvider refid="2" capacity="1"/>
+    <resourceProvider refid="3" capacity="1"/>
     </virtualNode>
     <virtualNode id="workers">
-    <resourceProvider refid="RP1" />
-    <resourceProvider refid="RP2" />
-    <resourceProvider refid="RP3" />
+    <resourceProvider refid="1" />
+    <resourceProvider refid="2" />
+    <resourceProvider refid="3" />
     </virtualNode>	
             
             ]]>
         </sect2>
     </sect1>
 </article>
-<!--
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    Real World Examples:
-    
-    
-    Hierarchical Master/Worker
-    
-    <virtualNode id="masters">
-    <resourceProvider refid="RP1" capacity="1"/>
-    <resourceProvider refid="RP2" capacity="1"/>
-    <resourceProvider refid="RP3" capacity="1"/>
-    </virtualNode>
-    <virtualNode id="workers">
-    <resourceProvider refid="RP1" />
-    <resourceProvider refid="RP2" />
-    <resourceProvider refid="RP3" />
-    </virtualNode>	
-    
--->
+
 

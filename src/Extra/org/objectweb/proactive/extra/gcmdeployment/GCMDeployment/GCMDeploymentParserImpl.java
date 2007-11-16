@@ -338,14 +338,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             String childRefId = GCMParserHelper.getAttributeValue(childNode,
                     "refid");
 
-            if (childNodeName.equals("group")) {
+            if (childNodeName.equals("pa:group")) {
                 Group group = getGroup(childRefId);
                 parseGroupResource(childNode, group);
                 bridge.addGroup(group);
-            } else if (childNodeName.equals("host")) {
+            } else if (childNodeName.equals("pa:host")) {
                 HostInfo hostInfo = getHostInfo(childRefId);
                 bridge.setHostInfo(hostInfo);
-            } else if (childNodeName.equals("bridge")) {
+            } else if (childNodeName.equals("pa:bridge")) {
                 Bridge childBridge = getBridge(childRefId);
                 parseBridgeResource(childNode, childBridge);
                 bridge.addBridge(childBridge);

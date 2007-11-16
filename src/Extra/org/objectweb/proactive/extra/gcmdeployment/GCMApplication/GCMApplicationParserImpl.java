@@ -52,6 +52,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationPar
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParserProactive;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
@@ -304,21 +305,26 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 //
                 NodeList resourceProviderNodes = (NodeList) xpath.evaluate(XPATH_RESOURCE_PROVIDER,
                         node, XPathConstants.NODESET);
-                List<GCMDeploymentDescriptor> providers = new ArrayList<GCMDeploymentDescriptor>();
+                if (resourceProviderNodes.getLength() == 0) {
+                    // Add all the Node Providers to this Virtual Node
+                    for (GCMDeploymentDescriptor nodeProvider : GCMDeploymentDescriptorImpl.getAllNodeProviders()) {
+                        virtualNode.addProvider(nodeProvider,
+                            VirtualNode.MAX_CAPACITY);
+                    }
+                } else {
+                    for (int j = 0; j < resourceProviderNodes.getLength();
+                            j++) {
+                        Node nodeProv = resourceProviderNodes.item(j);
 
-                for (int j = 0; j < resourceProviderNodes.getLength(); ++j) {
-                    Node resProv = resourceProviderNodes.item(j);
-                    String refId = GCMParserHelper.getAttributeValue(resProv,
-                            "refid");
+                        String refId = GCMParserHelper.getAttributeValue(nodeProv,
+                                "refid");
+                        capacity = GCMParserHelper.getAttributeValue(nodeProv,
+                                ATTR_RP_CAPACITY);
 
-                    capacity = GCMParserHelper.getAttributeValue(resProv,
-                            ATTR_RP_CAPACITY);
-
-                    GCMDeploymentDescriptor resourceProvider = resourceProvidersMap.get(refId);
-                    resourceProvider.setContributeTo(virtualNode,
-                        capacityAsLong(capacity));
-                    providers.add(resourceProvider);
-                    virtualNode.addProvider(resourceProvider);
+                        GCMDeploymentDescriptor nodeProvider = resourceProvidersMap.get(refId);
+                        virtualNode.addProvider(nodeProvider,
+                            capacityAsLong(capacity));
+                    }
                 }
 
                 virtualNodes.put(virtualNode.getId(), virtualNode);

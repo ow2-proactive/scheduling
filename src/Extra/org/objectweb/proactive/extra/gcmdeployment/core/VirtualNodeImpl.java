@@ -31,16 +31,16 @@
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
+
+import com.pallas.unicore.requests.GetVsites;
 public class VirtualNodeImpl implements VirtualNodeInternal {
 
     /** The, unique, name of this Virtual Node */
@@ -51,20 +51,16 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
      * If 0 the Virtual Node will try to get as many node as possible
      */
     private long requiredCapacity;
-
-    /** Resource providers contributing to this Virtual Node
-     *
-     * The value indicates how many nodes a resource providers must contribute
-     * to the Virtual Node
-     */
-    private HashSet<GCMDeploymentDescriptor> providers;
+    Set<NodeProviderContract> nodeProvidersContracts;
+    Set<Node> nodes;
 
     /** All File Transfer Block associated to this VN */
     private List<FileTransferBlock> fts;
 
     public VirtualNodeImpl() {
         fts = new ArrayList<FileTransferBlock>();
-        providers = new HashSet<GCMDeploymentDescriptor>();
+        nodeProvidersContracts = new HashSet<NodeProviderContract>();
+        nodes = new HashSet<Node>();
     }
 
     public long getRequiredCapacity() {
@@ -83,12 +79,10 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         this.id = id;
     }
 
-    public void addProvider(GCMDeploymentDescriptor provider) {
-        providers.add(provider);
-    }
-
-    public Set<GCMDeploymentDescriptor> getProviders() {
-        return providers;
+    public void addProvider(GCMDeploymentDescriptor provider, long capacity) {
+        NodeProviderContract contract = new NodeProviderContract(provider,
+                capacity);
+        nodeProvidersContracts.add(contract);
     }
 
     public void addFileTransfertBlock(FileTransferBlock ftb) {
@@ -100,7 +94,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     public void check() throws IllegalStateException {
-        if (providers.size() == 0) {
+        if (nodeProvidersContracts.isEmpty()) {
             throw new IllegalStateException("providers is empty in " + this);
         }
     }
@@ -119,30 +113,149 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return null;
     }
 
-    public boolean isReady() {
-        // TODO Auto-generated method stub
+    private void addNode(Node node) {
+        GCM_NODEALLOC_LOGGER.debug("Node " +
+            node.getNodeInformation().getURL() + " attached to " + getName());
+        nodes.add(node);
+    }
+
+    @Override
+    public boolean doesNodeProviderNeed(Node node,
+        GCMDeploymentDescriptor nodeProvider) {
+        if (!needNode()) {
+            return false;
+        }
+
+        NodeProviderContract contract = findNodeProviderContract(nodeProvider);
+        if ((contract != null) && contract.doYouNeed(node, nodeProvider)) {
+            addNode(node);
+            return true;
+        }
+
         return false;
     }
 
-    public void addNode(Node node) {
-        if (requiredCapacity != MAX_CAPACITY) {
-            requiredCapacity--;
-            if (requiredCapacity < 0) {
-                GCMA_LOGGER.warn("Virtual Node " + id +
-                    " received to many node !");
+    @Override
+    public boolean doYouNeed(Node node, GCMDeploymentDescriptor nodeProvider) {
+        if (!needNode()) {
+            return false;
+        }
+
+        for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
+            if (!nodeProviderContract.needNode()) {
+                // We cannot accept this node since it can lead to a deadlock
+                // Example: VN.capacity = 4, NP1.capacity = MAX_NODE, NP2.capacity = 1
+                return false;
             }
         }
+
+        NodeProviderContract contract = findNodeProviderContract(nodeProvider);
+        if ((contract != null) && contract.isGreedy()) {
+            addNode(node);
+            return true;
+        }
+
+        return false;
     }
 
-    public boolean needContribution() {
-        if (requiredCapacity == MAX_CAPACITY) {
+    @Override
+    public boolean doYouWant(Node node, GCMDeploymentDescriptor nodeProvider) {
+        if (!isGreedy()) {
             return false;
         }
 
-        if (requiredCapacity < 0) {
-            return false;
+        NodeProviderContract contract = findNodeProviderContract(nodeProvider);
+        if (contract != null) {
+            addNode(node);
+            return true;
         }
 
-        return true;
+        return false;
+    }
+
+    public NodeProviderContract findNodeProviderContract(
+        GCMDeploymentDescriptor nodeProvider) {
+        for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
+            if (nodeProvider == nodeProviderContract.getNodeProvider()) {
+                return nodeProviderContract;
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean isGreedy() {
+        return requiredCapacity == MAX_CAPACITY;
+    }
+
+    public boolean needNode() {
+        return !isGreedy() && (nodes.size() < requiredCapacity);
+    }
+
+    public boolean wantNode() {
+        return needNode() || isGreedy();
+    }
+
+    private boolean isProvider(GCMDeploymentDescriptor nodeProvider) {
+        return findNodeProviderContract(nodeProvider) != null;
+    }
+
+    class NodeProviderContract {
+        GCMDeploymentDescriptor nodeProvider;
+        long capacity;
+        long nodes;
+
+        NodeProviderContract(GCMDeploymentDescriptor nodeProvider, long capacity) {
+            this.nodeProvider = nodeProvider;
+            this.capacity = capacity;
+            this.nodes = 0;
+        }
+
+        public boolean doYouNeed(Node node, GCMDeploymentDescriptor nodeProvider) {
+            if (this.nodeProvider != nodeProvider) {
+                return false;
+            }
+
+            if (isGreedy()) {
+                return false;
+            }
+
+            if (nodes >= capacity) {
+                return false;
+            }
+
+            nodes++;
+            return true;
+        }
+
+        public boolean doYouWant(Node node, GCMDeploymentDescriptor nodeProvider) {
+            if (this.nodeProvider != nodeProvider) {
+                return false;
+            }
+
+            if (!isGreedy()) {
+                return false;
+            }
+
+            nodes++;
+            return true;
+        }
+
+        public boolean isGreedy() {
+            return capacity == MAX_CAPACITY;
+        }
+
+        public boolean needNode() {
+            return !isGreedy() && (this.nodes < this.capacity);
+        }
+
+        public GCMDeploymentDescriptor getNodeProvider() {
+            return nodeProvider;
+        }
+
+        public void addNode(Node node) {
+            nodes++;
+        }
     }
 }

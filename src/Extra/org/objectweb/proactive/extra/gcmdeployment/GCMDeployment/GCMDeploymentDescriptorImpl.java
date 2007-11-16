@@ -33,18 +33,13 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.junit.Test;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
@@ -57,17 +52,22 @@ import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
+    static Set<GCMDeploymentDescriptor> GCMDeploymentDescriptors = new HashSet<GCMDeploymentDescriptor>();
     private GCMDeploymentParser parser;
     private GCMDeploymentEnvironment environment;
     private GCMDeploymentResources resources;
-    private Map<VirtualNodeInternal, Long> contributeTo;
 
     public GCMDeploymentDescriptorImpl(File descriptor,
         Set<FileTransferBlock> ftBlocks) throws SAXException, IOException {
         parser = new GCMDeploymentParserImpl(descriptor);
         environment = parser.getEnvironment();
         resources = parser.getResources();
-        contributeTo = new HashMap<VirtualNodeInternal, Long>();
+
+        GCMDeploymentDescriptors.add(this);
+    }
+
+    static public Set<GCMDeploymentDescriptor> getAllNodeProviders() {
+        return GCMDeploymentDescriptors;
     }
 
     /**
@@ -181,34 +181,5 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
     public String getDescriptorFilePath() {
         return parser.getDescriptorFilePath();
-    }
-
-    public long getContributeTo(VirtualNodeInternal virtualNode) {
-        return contributeTo.get(virtualNode);
-    }
-
-    public boolean needContribution(VirtualNodeInternal virtualNode) {
-        long val = contributeTo.get(virtualNode);
-
-        if (val == VirtualNode.MAX_CAPACITY) {
-            return false;
-        }
-
-        if (val <= 0) {
-            return false;
-        }
-
-        return true;
-    }
-
-    public void setContributeTo(VirtualNodeInternal virtualNode, long capacity) {
-        contributeTo.put(virtualNode, capacity);
-    }
-
-    public void addContributedNode(VirtualNodeInternal virtualNode, Node node) {
-        Long val = contributeTo.get(virtualNode);
-        contributeTo.put(virtualNode, --val);
-
-        virtualNode.addNode(node);
     }
 }

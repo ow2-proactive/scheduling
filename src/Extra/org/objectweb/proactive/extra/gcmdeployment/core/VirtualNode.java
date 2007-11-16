@@ -66,9 +66,6 @@ public interface VirtualNode {
      */
     public long getRequiredCapacity();
 
-    /** Are user requirement fulfilled  ? */
-    public boolean isReady();
-
     /** Get all the node currently available */
     public Set<Node> getNodes();
 

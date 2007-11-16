@@ -34,42 +34,30 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import javax.management.Notification;
-import javax.management.NotificationListener;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
-import org.objectweb.proactive.core.jmx.notification.NotificationType;
-import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.Executor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentResources;
-import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentTree;
 import org.objectweb.proactive.extra.gcmdeployment.core.VMNodeList;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
-import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderProActive;
 import org.xml.sax.SAXException;
 
 
-public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor,
-    NotificationListener {
+public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
     /** The descriptor file */
     private File gadFile = null;
@@ -83,6 +71,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor,
     private Map<String, GCMDeploymentDescriptor> selectedDeploymentDesc;
     private Map<Long, GCMDeploymentDescriptor> gcmDeploymentDescriptorMap;
     private ArrayList<String> currentDeploymentPath;
+    @SuppressWarnings("unused")
+    private NodeAllocator nodeAllocator;
 
     public GCMApplicationDescriptorImpl(String filename)
         throws IllegalArgumentException, SAXException, IOException,
@@ -121,18 +111,8 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor,
         // 4. Build the runtime tree
         buildDeploymentTree();
 
-        // JMXNotificationManager.getInstance().subscribe(FactoryName.createRuntimeObjectName(.getURL()),
-        // this);
-
         // 5. Start the deployment
-        if (commandBuilder instanceof CommandBuilderProActive) {
-            JMXNotificationManager.getInstance()
-                                  .subscribe(ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                 .getMBean()
-                                                                 .getObjectName(),
-                this);
-        }
-
+        nodeAllocator = new NodeAllocator(this, virtualNodes.values());
         for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {
             gdd.start(commandBuilder);
         }
@@ -143,74 +123,6 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor,
          *
          * if a "script" is described. The command has been started on each machine/VM/core and we can safely return
          */
-    }
-
-    public void handleNotification(Notification notification, Object handback) {
-        String type = notification.getType();
-
-        if (NotificationType.GCMRuntimeRegistered.equals(type)) {
-            GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification.getUserData();
-            GCMDeploymentDescriptor provider = gcmDeploymentDescriptorMap.get(data.getDeploymentId());
-
-            System.out.println("Received Nodes from " +
-                provider.getDescriptorFilePath());
-            for (Node node : data.getNodes()) {
-                System.out.println("\t" + node.getNodeInformation().getURL());
-            }
-
-/**
- * TODO cmathieu: Rewrite the dispatch algorithm
- */
-NodeDispatch: 
-            for (Node node : data.getNodes()) {
-                for (VirtualNodeInternal virtualNode : virtualNodes.values()) {
-                    if (virtualNode.getProviders().contains(provider)) {
-                        if (provider.needContribution(virtualNode)) {
-                            GCMA_LOGGER.debug("Sending " +
-                                node.getNodeInformation().getURL() + " to " +
-                                virtualNode.getName() +
-                                " due to Resource Provider requirements");
-                            provider.addContributedNode(virtualNode, node);
-                            continue NodeDispatch;
-                        }
-                    }
-                }
-
-                for (VirtualNodeInternal virtualNode : virtualNodes.values()) {
-                    if ((virtualNode.getProviders().size() != 0) ||
-                            !virtualNode.getProviders().contains(provider)) {
-                        continue;
-                    }
-
-                    if (virtualNode.needContribution()) {
-                        GCMA_LOGGER.debug("Sending " +
-                            node.getNodeInformation().getURL() + " to " +
-                            virtualNode.getName() +
-                            " due to Virtual Node requirements");
-                        virtualNode.addNode(node);
-                        continue NodeDispatch;
-                    }
-                }
-
-                for (VirtualNodeInternal virtualNode : virtualNodes.values()) {
-                    if ((virtualNode.getProviders().size() != 0) ||
-                            !virtualNode.getProviders().contains(provider)) {
-                        continue;
-                    }
-
-                    if (virtualNode.getRequiredCapacity() == VirtualNode.MAX_CAPACITY) {
-                        GCMA_LOGGER.debug("Sending " +
-                            node.getNodeInformation().getURL() + " to " +
-                            virtualNode.getName() + " due to MAX_CAPACITY");
-                        virtualNode.addNode(node);
-                        continue NodeDispatch;
-                    }
-                }
-
-                GCMA_LOGGER.info("No one wants " +
-                    node.getNodeInformation().getURL() + ", dropped !");
-            }
-        }
     }
 
     protected void buildDeploymentTree() {
@@ -387,10 +299,6 @@ NodeDispatch:
         // TODO Auto-generated method stub
     }
 
-    @SuppressWarnings("unused")
-    static public class TestGCMApplicationDescriptorImpl {
-    }
-
     public boolean allProcessExited() {
         // TODO Auto-generated method stub
         return false;
@@ -403,5 +311,9 @@ NodeDispatch:
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    @SuppressWarnings("unused")
+    static public class TestGCMApplicationDescriptorImpl {
     }
 }
