@@ -40,4 +40,5 @@ public interface GCMParserConstants {
     public static final String APPLICATION_DESC_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd";
     public static final String GCM_DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas";
     public static final String GCM_DESCRIPTOR_EXTENSION_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension";
+    public static final String GCM_DESCRIPTOR_NAMESPACE_PREFX = "pa:";
 }

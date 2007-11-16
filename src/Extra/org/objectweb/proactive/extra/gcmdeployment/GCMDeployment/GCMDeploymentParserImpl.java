@@ -85,6 +85,12 @@ import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
+    private static final String PA_HOST = GCM_DESCRIPTOR_NAMESPACE_PREFX +
+        "host";
+    private static final String PA_GROUP = GCM_DESCRIPTOR_NAMESPACE_PREFX +
+        "group";
+    private static final String PA_BRIDGE = GCM_DESCRIPTOR_NAMESPACE_PREFX +
+        "bridge";
     private static final String XPATH_GCMDEPLOYMENT = "/pa:GCMDeployment/";
     private static final String XPATH_INFRASTRUCTURE = XPATH_GCMDEPLOYMENT +
         "pa:infrastructure";
@@ -97,7 +103,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private static final String XPATH_BRIDGES = "pa:bridges/*";
     private static final String XPATH_GROUPS = "pa:groups/*";
     private static final String XPATH_HOSTS = "pa:hosts/pa:host";
-    private static final String XPATH_HOST = "pa:host";
+    private static final String XPATH_HOST = PA_HOST;
     private static final String XPATH_DESCRIPTOR_VARIABLE = "pa:descriptorVariable";
     protected Document document;
     protected DocumentBuilderFactory domFactory;
@@ -266,7 +272,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         String nodeName = resourceNode.getNodeName();
 
-        if (nodeName.equals("bridge")) {
+        if (nodeName.equals(PA_BRIDGE)) {
             Bridge bridge = getBridge(refid);
             if (bridge == null) {
                 throw new RuntimeException("no bridge with refid " + refid +
@@ -274,7 +280,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             }
             parseBridgeResource(resourceNode, bridge);
             resources.addBridge(bridge);
-        } else if (nodeName.equals("group")) {
+        } else if (nodeName.equals(PA_GROUP)) {
             Group group = getGroup(refid);
             if (group == null) {
                 throw new RuntimeException("no group with refid " + refid +
@@ -282,7 +288,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             }
             parseGroupResource(resourceNode, group);
             resources.addGroup(group);
-        } else if (nodeName.equals("host")) {
+        } else if (nodeName.equals(PA_HOST)) {
             HostInfo hostInfo = getHostInfo(refid);
             if (hostInfo == null) {
                 throw new RuntimeException("no host with refid " + refid +
