@@ -33,8 +33,6 @@
 	<classpathentry kind="lib" path="lib/dtdparser.jar"/>
 	<classpathentry kind="lib" path="lib/fractal.jar"/>
 	<classpathentry kind="lib" path="lib/fractal-adl.jar"/>
-	<classpathentry kind="lib" path="lib/fractal-gui.jar"/>
-	<classpathentry kind="lib" path="lib/fractal-swing.jar"/>
 	<classpathentry kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
 	<classpathentry kind="lib" path="lib/glite-wms-jdlj.jar"/>
 	<classpathentry kind="lib" path="lib/http.jar"/>
@@ -75,7 +73,6 @@
 	<classpathentry kind="lib" path="lib/shelltui.jar"/>
 	<classpathentry kind="lib" path="lib/simple.jar"/>
 	<classpathentry kind="lib" path="lib/soap.jar"/>
-	<classpathentry kind="lib" path="lib/SVGGraphics.jar"/>
 	<classpathentry kind="lib" path="lib/tablelayout.jar"/>
 	<classpathentry kind="lib" path="lib/wsdl4j.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl.jar"/>
