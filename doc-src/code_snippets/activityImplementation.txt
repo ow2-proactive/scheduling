@@ -1,0 +1,15 @@
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
+
+public class LIFOActivity implements RunActive {
+
+	// -- implements RunActive for serving request in a LIFO fashion
+	public void runActivity(Body body) {
+		Service service = new Service(body);
+		while (body.isActive()) {
+			System.out.println("Serving...");
+			service.blockingServeYoungest();
+		}
+	}
+}

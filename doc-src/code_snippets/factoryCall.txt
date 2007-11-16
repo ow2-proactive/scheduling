@@ -1,0 +1,10 @@
+import org.objectweb.proactive.core.node.Node;
+
+public class Main  {
+	public static void main(String[] args)  {
+		Worker w = new Worker();
+		Node node = null; //deploy locally
+		w = WorkerFactory.createActiveWorker(26, "Charlie", node);
+		w.doNothingGracefully();
+	}
+}

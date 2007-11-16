@@ -1,0 +1,55 @@
+import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.Service;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.api.ProActiveObject;
+
+
+public class Simulation implements RunActive {
+	private boolean stoppedSimulation=false;
+	private boolean startedSimulation=false;
+	private boolean suspendedSimulation=false;
+	private boolean notStarted = true;
+	
+	public void startSimulation(){
+		// Simulation starts
+		System.out.println("Simulation started...");
+		notStarted = false;
+		startedSimulation=true;
+	}
+	public void restartSimulation(){
+		// Simulation is restarted
+		System.out.println("Simulation restarted...");
+		startedSimulation=true;
+		suspendedSimulation=false;
+	}
+	public void suspendSimulation(){
+		// Simulation is suspended
+		System.out.println("Simulation suspended...");
+		suspendedSimulation=true;
+		startedSimulation = false;
+	}
+	public void stopSimulation(){
+		// Simulation is stopped
+		System.out.println("Simulation stopped...");
+		stoppedSimulation=true;
+	}
+	public void runActivity(Body body) {
+		Service service = new Service(body);
+		while (body.isActive()) {
+			// If the simulation is not yet started wait until startSimulation
+			// method
+			if(notStarted) service.blockingServeOldest("startSimulation");
+			// If the simulation is started serve request with FIFO
+			if(startedSimulation) service.blockingServeOldest();
+			// If simulation is suspended wait until restartSimulation method
+			if(suspendedSimulation) service.blockingServeOldest("restartSimulation");
+			// If simulation is stopped, exit
+			if(stoppedSimulation) 
+				{
+					body.terminate();
+					ProActive.exitSuccess();
+				}
+		}
+	}
+}

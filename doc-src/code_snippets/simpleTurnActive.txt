@@ -1,0 +1,11 @@
+Worker charlie = new Worker();
+try {
+	charlie = (Worker) ProActiveObject.turnActive(charlie, null);
+}
+catch (ActiveObjectCreationException aoExcep) {
+	// creation of ActiveObject failed
+	System.err.println(aoExcep.getMessage());
+}
+catch (NodeException nodeExcep){
+	System.err.println(nodeExcep.getMessage());
+}

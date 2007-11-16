@@ -1,0 +1,17 @@
+Worker charlie;
+Node node;
+//set the constructor values to be used
+Object[] params = new Object[] { new IntegerWrapper (26), "Charlie" };
+try {
+	//get the node form a virtual node
+	node = someVirtualNode.getNode();
+	charlie = (Worker)ProActiveObject.newActive(Worker.class.getName(),
+				params, node);
+} 
+catch (ActiveObjectCreationException aoExcep) {
+	// creation of ActiveObject failed
+	System.err.println(aoExcep.getMessage());
+}
+catch (NodeException nodeExcep){
+	System.err.println(nodeExcep.getMessage());
+}

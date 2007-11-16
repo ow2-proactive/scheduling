@@ -1,0 +1,13 @@
+Worker[] workers;
+Node[] nodes;
+try{
+	nodes =  someVirtualNode.getNodes();
+	Worker[] workers = (Worker[]) ProActiveObject.newActiveInParallel(Worker.class.getName(), 
+						new Object [nodes.length][],nodes);
+}						
+catch (ActiveObjectCreationException aoExcep){
+	System.err.println(aoExcep.getMessage());
+}
+catch (ClassNotFoundException classExcep) {
+	System.err.println(classExcep.getMessage());
+}
