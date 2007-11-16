@@ -91,3 +91,10 @@
 ./log4j.jar
 ./scilab
 ./scilab/javasci.jar
+./isorelax.jar					Scheduler parser (Relax NG validator) 
+./msv.jar 						Scheduler parser (Relax NG validator)
+./xsdlib.jar					Scheduler parser (Relax NG validator)
+./relaxngDatatype.jar			Scheduler parser (Relax NG validator)
+./saxon8.jar					Scheduler parser - descriptor variables (Saxon 8 XSLT engine)
+./saxon8-dom.jar				Scheduler parser - descriptor variables (Saxon 8 XSLT engine)
+

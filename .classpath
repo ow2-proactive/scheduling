@@ -106,5 +106,11 @@
 	<classpathentry kind="lib" path="compile/lib/jdepend.jar"/>
 	<classpathentry kind="lib" path="compile/lib/junit-4.3.jar"/>
 	<classpathentry kind="lib" path="lib/ptolemy.jar"/>
+	<classpathentry kind="lib" path="lib/isorelax.jar"/>
+	<classpathentry kind="lib" path="lib/msv.jar"/>
+	<classpathentry kind="lib" path="lib/xsdlib.jar"/>
+	<classpathentry kind="lib" path="lib/relaxngDatatype.jar"/>
+	<classpathentry kind="lib" path="lib/saxon8.jar"/>
+	<classpathentry kind="lib" path="lib/saxon8-dom.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
