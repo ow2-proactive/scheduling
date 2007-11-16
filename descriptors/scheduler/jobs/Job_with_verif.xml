@@ -1,130 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="Job_with_verif" priority="normal" >
+<job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+	name="Job_with_verif" priority="normal">
 	<description>8 tasks with variable durations and verifying process</description>
-	<tasks>
+	<variables>
+		<variable name="HOME" value="/user/jlscheef/home"/>
+	</variables>
+	<taskFlow>
 		<task name="task1">
 			<description>Parallel Tasks - Task 1</description>
-			<verifyingTask>
-				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
-			</verifyingTask>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="8" />
-						<parameter name="number" value="1" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<selection>
+				<script>
+					<file path="${HOME}/scripts/parallel_tasks.js"/>
+				</script>
+			</selection>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="8"/>
+					<parameter name="number" value="1"/>
+				</parameters>
+			</javaExecutable>
 		</task>
 		<task name="task2">
 			<description>Parallel Tasks - Task 2</description>
-			<verifyingTask>
-				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
-			</verifyingTask>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="6" />
-						<parameter name="number" value="2" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<selection>
+				<script>
+					<file path="${HOME}/scripts/parallel_tasks.js"/>
+				</script>
+			</selection>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="6"/>
+					<parameter name="number" value="2"/>
+				</parameters>
+			</javaExecutable>
 		</task>
 		<task name="task3">
 			<description>Parallel Tasks - Task 3</description>
-			<verifyingTask>
-				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
-			</verifyingTask>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="8" />
-						<parameter name="number" value="3" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<selection>
+				<script>
+					<file path="${HOME}/scripts/parallel_tasks.js"/>
+				</script>
+			</selection>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="8"/>
+					<parameter name="number" value="3"/>
+				</parameters>
+			</javaExecutable>
 		</task>
 		<task name="task4">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 4</description>
-			<verifyingTask>
-				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
-			</verifyingTask>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="5" />
-						<parameter name="number" value="4" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<selection>
+				<script>
+					<file path="${HOME}/scripts/parallel_tasks.js"/>
+				</script>
+			</selection>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="5"/>
+					<parameter name="number" value="4"/>
+				</parameters>
+			</javaExecutable>
 		</task>
 		<task name="task5">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 5</description>
-			<verifyingTask>
-				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
-			</verifyingTask>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="6" />
-						<parameter name="number" value="5" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<selection>
+				<script>
+					<file path="${HOME}/scripts/parallel_tasks.js"/>
+				</script>
+			</selection>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="6"/>
+					<parameter name="number" value="5"/>
+				</parameters>
+			</javaExecutable>
 		</task>
 		<task name="task6">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 6</description>
-			<verifyingTask>
-				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
-			</verifyingTask>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="5" />
-						<parameter name="number" value="6" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<selection>
+				<script>
+					<file path="${HOME}/scripts/parallel_tasks.js"/>
+				</script>
+			</selection>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="5"/>
+					<parameter name="number" value="6"/>
+				</parameters>
+			</javaExecutable>
 		</task>
 		<task name="task7">
 			<!-- Task human description -->
 			<description>Parallel Tasks - Task 7</description>
-			<verifyingTask>
-				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
-			</verifyingTask>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="4" />
-						<parameter name="number" value="7" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<selection>
+				<script>
+					<file path="${HOME}/scripts/parallel_tasks.js"/>
+				</script>
+			</selection>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="4"/>
+					<parameter name="number" value="7"/>
+				</parameters>
+			</javaExecutable>
 		</task>
-		<task name="task8" finalTask="true">
+		<task name="task8" preciousResult="true">
 			<description>Parallel Tasks - Task 8</description>
-			<verifyingTask>
-				<script file="/user/jlscheef/home/scripts/parallel_tasks.js"/>
-			</verifyingTask>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="30" />
-						<parameter name="number" value="8" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<selection>
+				<script>
+					<file path="${HOME}/scripts/parallel_tasks.js"/>
+				</script>
+			</selection>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="30"/>
+					<parameter name="number" value="8"/>
+				</parameters>
+			</javaExecutable>
 		</task>
-	</tasks>
+	</taskFlow>
 </job>

@@ -30,7 +30,14 @@
  */
 package org.objectweb.proactive.extra.scheduler.task;
 
-import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
+import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
+import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
@@ -66,20 +73,12 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @param jobId the job identification.
      * @param host the host on which the task is launched.
      * @param port the port on which the task is launched.
+     * @param pre the script executed before the task.
+     * @param post the script executed after the task.
      */
-    public NativeTaskLauncher(TaskId taskId, String host, Integer port) {
-        super(taskId, host, port);
-    }
-
-    /**
-     * Constructor with native task identification
-     *
-     * @param taskId represents the task the launcher will execute.
-     * @param jobId represents the job where the task is located.
-     */
-    public NativeTaskLauncher(TaskId taskId, PreScript pre, String host,
-        Integer port) {
-        super(taskId, pre, host, port);
+    public NativeTaskLauncher(TaskId taskId, String host, Integer port,
+        Script<?> pre, Script<?> post) {
+        super(taskId, host, port, pre, post);
     }
 
     /**
@@ -99,16 +98,16 @@ public class NativeTaskLauncher extends TaskLauncher {
             ExecutableNativeTask toBeLaunched = (ExecutableNativeTask) executableTask;
 
             //launch pre script
-            if (pre != null) {
-                String preScriptDefinedCommand = this.executePreScript(null);
+            if (toBeLaunched.getGenerationScript() != null) {
+                String preScriptDefinedCommand = this.executeGenerationScript(toBeLaunched.getGenerationScript());
 
                 // if preScriptDefinedCommand is not null, a new command 
                 // has been defined by the prescript
                 if ((preScriptDefinedCommand != null) &&
-                        (!PreScript.DEFAULT_COMMAND_VALUE.equals(
+                        (!GenerationScript.DEFAULT_COMMAND_VALUE.equals(
                             preScriptDefinedCommand))) {
-                    // a new NativeExecTask should be created
-                    toBeLaunched = new ExecutableNativeTask(preScriptDefinedCommand);
+                    // the command is set
+                    toBeLaunched.setCommand(preScriptDefinedCommand);
                 }
             }
             //get process
@@ -140,6 +139,26 @@ public class NativeTaskLauncher extends TaskLauncher {
             //terminate the task
             core.terminate(taskId);
         }
+    }
+
+    /**
+     * Execute the generationScript on the default node
+     * @throws ActiveObjectCreationException if the script handler cannot be created
+     * @throws NodeException if the script handler cannot be created
+     * @throws UserException if an error occured during the execution of the script
+     * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
+     */
+    protected String executeGenerationScript(GenerationScript script)
+        throws ActiveObjectCreationException, NodeException, UserException {
+        ScriptHandler handler = ScriptLoader.createHandler(null);
+        ScriptResult<String> res = handler.handle(script);
+        if (res.errorOccured()) {
+            System.err.println("Error on pre-script occured : ");
+            res.getException().printStackTrace();
+            throw new UserException(
+                "PreTask script has failed on the current node");
+        }
+        return res.getResult();
     }
 
     /**

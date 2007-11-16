@@ -208,10 +208,13 @@ public class InternalJobFactory implements Serializable {
      */
     private static InternalTask createTask(NativeTask task)
         throws SchedulerException {
-        if ((task.getCommandLine() == null) || (task.getCommandLine() == "")) {
-            throw new SchedulerException("The command line is null or empty !!");
+        if (((task.getCommandLine() == null) || (task.getCommandLine() == "")) &&
+                (task.getGenerationScript() == null)) {
+            throw new SchedulerException(
+                "The command line is null or empty and not generated !!");
         }
-        InternalNativeTask nativeTask = new InternalNativeTask(task.getCommandLine());
+        InternalNativeTask nativeTask = new InternalNativeTask(task.getCommandLine(),
+                task.getGenerationScript());
         setProperties(task, nativeTask);
         return nativeTask;
     }

@@ -111,13 +111,10 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
     public TaskLauncher createLauncher(String host, int port, Node node)
         throws ActiveObjectCreationException, NodeException {
         AppliTaskLauncher launcher;
-        if (getPreTask() == null) {
-            launcher = (AppliTaskLauncher) ProActiveObject.newActive(AppliTaskLauncher.class.getName(),
-                    new Object[] { getId(), host, port }, node);
-        } else {
-            launcher = (AppliTaskLauncher) ProActiveObject.newActive(AppliTaskLauncher.class.getName(),
-                    new Object[] { getId(), getPreTask(), host, port }, node);
-        }
+        launcher = (AppliTaskLauncher) ProActiveObject.newActive(AppliTaskLauncher.class.getName(),
+                new Object[] { getId(), host, port, getPreTask(), getPostTask() },
+                node);
+
         setExecuterInformations(new ExecuterInformations(launcher, node));
         return launcher;
     }

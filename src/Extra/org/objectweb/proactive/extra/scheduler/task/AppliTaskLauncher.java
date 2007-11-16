@@ -35,6 +35,7 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
@@ -64,8 +65,9 @@ public class AppliTaskLauncher extends TaskLauncher {
     public AppliTaskLauncher() {
     }
 
-    public AppliTaskLauncher(TaskId taskId, String host, Integer port) {
-        super(taskId, host, port);
+    public AppliTaskLauncher(TaskId taskId, String host, Integer port,
+        Script<?> pre, Script<?> post) {
+        super(taskId, host, port, pre, post);
     }
 
     /**

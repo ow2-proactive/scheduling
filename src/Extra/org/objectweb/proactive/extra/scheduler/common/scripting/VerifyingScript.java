@@ -99,6 +99,12 @@ public class VerifyingScript extends Script<Boolean> {
         this.dynamic = dynamic;
     }
 
+    public VerifyingScript(Script<?> script, boolean dynamic)
+        throws InvalidScriptException {
+        super(script);
+        this.dynamic = dynamic;
+    }
+
     @Override
     public String getId() {
         return this.id;

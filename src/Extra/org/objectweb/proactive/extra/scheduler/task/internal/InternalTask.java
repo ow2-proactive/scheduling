@@ -107,13 +107,10 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     public TaskLauncher createLauncher(String host, int port, Node node)
         throws ActiveObjectCreationException, NodeException {
         TaskLauncher launcher;
-        if (getPreTask() == null) {
-            launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
-                    new Object[] { getId(), host, port }, node);
-        } else {
-            launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
-                    new Object[] { getId(), getPreTask(), host, port }, node);
-        }
+        launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
+                new Object[] { getId(), host, port, getPreTask(), getPostTask() },
+                node);
+
         setExecuterInformations(new ExecuterInformations(launcher, node));
         return launcher;
     }

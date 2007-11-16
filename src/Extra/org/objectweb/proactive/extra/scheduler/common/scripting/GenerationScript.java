@@ -46,37 +46,46 @@ import javax.script.ScriptEngineManager;
  * @author cdelbe
  * @since 3.9
  */
-public class PreScript extends Script<String> {
+public class GenerationScript extends Script<String> {
 
     /**
-     * The variable name which must be set after the evaluation
-     * of a verifiying script.
-     */
+         *
+         */
+    private static final long serialVersionUID = 3897723948093818929L;
+
+    /**
+    * The variable name which must be set after the evaluation
+    * of a verifiying script.
+    */
     public static final String RESULT_VARIABLE = "command";
 
     /**
-     * Default value for PreScript return value
+     * Default value for GenerationScript return value
      */
     public static final String DEFAULT_COMMAND_VALUE = "NO COMMAND";
 
     /** ProActive needed constructor */
-    public PreScript() {
+    public GenerationScript() {
+    }
+
+    public GenerationScript(Script<?> script) throws InvalidScriptException {
+        super(script);
     }
 
     /** Directly create a script with a string. */
-    public PreScript(String script, String engineName)
+    public GenerationScript(String script, String engineName)
         throws InvalidScriptException {
         super(script, engineName);
     }
 
     /** Create a script from a file. */
-    public PreScript(File file, String[] parameters)
+    public GenerationScript(File file, String[] parameters)
         throws InvalidScriptException {
         super(file, parameters);
     }
 
     /** Create a script from an URL. */
-    public PreScript(URL url, String[] parameters)
+    public GenerationScript(URL url, String[] parameters)
         throws InvalidScriptException {
         super(url, parameters);
     }

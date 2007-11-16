@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="job_application" priority="low" type="APPLI">
-	<description>A job application that will find out the Nth first prime number where N is given as argument.</description>
-	<tasks>
-		<task name="Controller" neededNodes="5">
-			<!-- Task human description -->
+<job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+	name="job_application" priority="low">
+	<description>A job application that will find out the Nth first prime number where N is given as
+		argument.</description>
+	<proActive neededNodes="5">
+		<task name="Controller">
 			<description>Will control the workers in order to find the prime number</description>
-			<process>
-				<applicationProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.ApplicationExample">
-					<initParameters>
-						<parameter name="numberToFind" value="200" />
-					</initParameters>
-				</applicationProcess>
-			</process>
+			<proActiveExecutable
+				class="org.objectweb.proactive.extra.scheduler.examples.ApplicationExample">
+				<parameters>
+					<parameter name="numberToFind" value="200"/>
+				</parameters>
+			</proActiveExecutable>
 		</task>
-	</tasks>
+	</proActive>
+
 </job>

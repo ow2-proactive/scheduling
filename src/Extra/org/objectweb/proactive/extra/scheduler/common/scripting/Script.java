@@ -130,11 +130,15 @@ public abstract class Script<E> implements Serializable {
         this(url, null);
     }
 
+    public Script(Script<?> script2) throws InvalidScriptException {
+        this(script2.script, script2.scriptEngine, script2.parameters);
+    }
+
     /**
-     * Execute the script and return the ScriptResult corresponding.
-     *
-     * @return
-     */
+    * Execute the script and return the ScriptResult corresponding.
+    *
+    * @return
+    */
     public ScriptResult<E> execute() {
         ScriptEngine engine = getEngine();
         if (engine == null) {

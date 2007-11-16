@@ -52,7 +52,7 @@ import org.objectweb.proactive.extra.logforwarder.BufferedAppender;
 import org.objectweb.proactive.extra.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extra.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
-import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
@@ -78,7 +78,8 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 public class TaskLauncher implements InitActive, Serializable {
     private static final long serialVersionUID = -9159607482957244049L;
     protected TaskId taskId;
-    protected PreScript pre;
+    protected Script<?> pre;
+    protected Script<?> post;
     protected String host;
     protected Integer port;
 
@@ -99,25 +100,16 @@ public class TaskLauncher implements InitActive, Serializable {
      * @param taskId represents the task the launcher will execute.
      * @param host the host on which to append the standard output/input.
      * @param port the port number on which to send the standard output/input.
+     * @param pre the script executed before the task.
+     * @param post the script executed after the task.
      */
-    public TaskLauncher(TaskId taskId, String host, Integer port) {
+    public TaskLauncher(TaskId taskId, String host, Integer port,
+        Script<?> pre, Script<?> post) {
         this.taskId = taskId;
         this.host = host;
         this.port = port;
-    }
-
-    /**
-     * Constructor with task identification
-     *
-     * @param taskId represents the task the launcher will execute.
-     * @param pre the script executed before the task.
-     * @param host the host on which to append the standard output/input.
-     * @param port the port number on which to send the standard output/input.
-     */
-    public TaskLauncher(TaskId taskId, PreScript pre, String host, Integer port) {
-        this(taskId, host, port);
-        System.out.println("TaskLauncher.TaskLauncher() : " + pre);
         this.pre = pre;
+        this.post = post;
     }
 
     /**
@@ -221,13 +213,13 @@ public class TaskLauncher implements InitActive, Serializable {
     }
 
     /**
-     * Execute the preScript pre on the node n, or on the default node if n is null
+     * Execute the preScript on the node n, or on the default node if n is null
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
      * @throws UserException if an error occured during the execution of the script
-     * @return the value of the variable PreScript.COMMAND_NAME after the script evaluation.
+     * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
      */
-    protected String executePreScript(Node n)
+    protected void executePreScript(Node n)
         throws ActiveObjectCreationException, NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(n);
         ScriptResult<String> res = handler.handle(pre);
@@ -237,7 +229,8 @@ public class TaskLauncher implements InitActive, Serializable {
             throw new UserException(
                 "PreTask script has failed on the current node");
         }
-        return res.getResult();
+
+        //return res.getResult();
     }
 
     /**

@@ -35,25 +35,43 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.StringTokenizer;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.iso_relax.verifier.Schema;
+import org.iso_relax.verifier.Verifier;
+import org.iso_relax.verifier.VerifierConfigurationException;
+import org.iso_relax.verifier.VerifierFactory;
+import org.objectweb.proactive.extra.scheduler.common.exception.JobCreationException;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
+import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.InvalidScriptException;
-import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SimpleScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
@@ -65,19 +83,24 @@ import org.objectweb.proactive.extra.scheduler.common.task.NativeTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 
 public class JobFactory {
+    public static final String SCHEMA_LOCATION = "/org/objectweb/proactive/extra/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rng";
+    public static final String STYLESHEET_LOCATION = "/org/objectweb/proactive/extra/scheduler/common/xml/stylesheets/variables.xsl";
+    public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:0.9";
+    public static final String JOB_PREFIX = "js";
+    private static XPath xpath;
 
     /**
      * Singleton Pattern
      */
     private static JobFactory factory = null;
-    private static final boolean VALIDATING = false;
 
     public static JobFactory getFactory() {
         if (factory == null) {
@@ -87,239 +110,233 @@ public class JobFactory {
     }
 
     private JobFactory() {
+        xpath = XPathFactory.newInstance().newXPath();
+        xpath.setNamespaceContext(new SchedulerNamespaceContext());
     }
 
-    public Job createJob(String fileUrl)
-        throws ParserConfigurationException, SAXException, IOException,
-            XPathExpressionException, InvalidScriptException,
-            ClassNotFoundException {
-        File f = new File(fileUrl);
-        if (!f.exists()) {
-            throw new FileNotFoundException("This file has not been found : " +
-                fileUrl);
+    /**
+     * Creates a job using the given job descriptor
+     * @param filePath the path to a job descriptor
+     * @return a Job instance
+     * @throws JobCreationException
+     */
+    public Job createJob(String filePath) throws JobCreationException {
+        Job job = null;
+
+        try {
+            File f = new File(filePath);
+            if (!f.exists()) {
+                throw new FileNotFoundException(
+                    "This file has not been found : " + filePath);
+            }
+            validate(filePath);
+            Node rootNode = transformVariablesAndGetDOM(new FileInputStream(f));
+            job = createJob(rootNode);
+        } catch (Exception e) {
+            throw new JobCreationException("Exception occured during Job creation",
+                e);
         }
-        return createJob(new FileInputStream(f));
+        return job;
+    }
+
+    /**
+     * Validate the given job descriptor using the internal RELAX_NG Schema
+     * @param filePath
+     */
+    private void validate(String filePath)
+        throws URISyntaxException, VerifierConfigurationException, SAXException,
+            IOException {
+        // We use sun multi validator (msv)
+        VerifierFactory vfactory = new com.sun.msv.verifier.jarv.TheFactoryImpl();
+
+        URL schemaURL = this.getClass().getResource(SCHEMA_LOCATION);
+        File schemaFile = new File(schemaURL.toURI());
+        Schema schema = vfactory.compileSchema(schemaFile);
+        Verifier verifier = schema.newVerifier();
+        ValidatingErrorHandler veh = new ValidatingErrorHandler();
+        verifier.setErrorHandler(veh);
+        verifier.verify(filePath);
+        if (veh.mistakes > 0) {
+            System.err.println(veh.mistakes + " mistakes.");
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Parse the given octet stream to a XML DOM, and transform variable definitions using a stylesheet
+     * @param input
+     * @return
+     */
+    private Node transformVariablesAndGetDOM(InputStream input)
+        throws ParserConfigurationException, SAXException, IOException {
+        // create a new parser
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+
+        factory.setNamespaceAware(true);
+        DocumentBuilder db = factory.newDocumentBuilder();
+
+        Document docSource = db.parse(input);
+
+        System.setProperty("javax.xml.transform.TransformerFactory",
+            "net.sf.saxon.TransformerFactoryImpl");
+        DOMSource domSource = new DOMSource(docSource);
+        TransformerFactory tfactory = TransformerFactory.newInstance();
+
+        Source stylesheetSource = new StreamSource(this.getClass()
+                                                       .getResourceAsStream(STYLESHEET_LOCATION));
+        Transformer transformer = null;
+        try {
+            transformer = tfactory.newTransformer(stylesheetSource);
+        } catch (TransformerConfigurationException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        DOMResult result = new DOMResult();
+
+        try {
+            transformer.transform(domSource, result);
+        } catch (TransformerException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        return result.getNode();
     }
 
     @SuppressWarnings("unchecked")
-    public Job createJob(InputStream input)
-        throws ParserConfigurationException, SAXException, IOException,
-            XPathExpressionException, InvalidScriptException,
-            ClassNotFoundException {
-        // Recuperation du document DOM
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(VALIDATING);
-        DocumentBuilder parser = factory.newDocumentBuilder();
-        Document doc = parser.parse(input);
-
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        String name = null;
-        String priority = null;
-        String description = null;
-        String logFile = null;
-        boolean cancelOnError = false;
-        JobType jt = null;
-        Map<Task, String> tasks = new HashMap<Task, String>();
-        int jobAppliNeededNodes = 0;
+    private Job createJob(Node rootNode)
+        throws XPathExpressionException, InvalidScriptException, SAXException,
+            ClassNotFoundException, IOException, UserException {
+        Job job = null;
 
         // JOB
-        XPathExpression exp = xpath.compile("/job");
-        Node jobNode = (Node) exp.evaluate(doc, XPathConstants.NODE);
-        if (jobNode != null) {
-            NamedNodeMap jobAttr = jobNode.getAttributes();
-            if (jobAttr != null) {
-                // JOB NAME
-                Node node = jobAttr.getNamedItem("name");
-                if (node != null) {
-                    name = node.getNodeValue();
-                }
-                // JOB PRIORITY
-                node = jobAttr.getNamedItem("priority");
-                if (node != null) {
-                    priority = node.getNodeValue();
-                }
-                // JOB CANCEL ON EXCEPTION
-                node = jobAttr.getNamedItem("cancelOnError");
-                if (node != null) {
-                    cancelOnError = node.getNodeValue().equalsIgnoreCase("true");
-                }
-                // JOB TYPE
-                node = jobAttr.getNamedItem("type");
-                if (node != null) {
-                    String s = node.getNodeValue();
-                    jt = JobType.valueOf(s);
-                    if (jt == null) {
-                        throw new SAXException(
-                            "Invalid XML : Job must have a valid type");
-                    }
-                }
-                // JOB LOG FILE
-                node = jobAttr.getNamedItem("logFile");
-                if (node != null) {
-                    logFile = node.getNodeValue();
-                    System.out.println("Job log file = " + logFile);
-                }
+        XPathExpression exp = xpath.compile(addPrefixes("/job"));
 
-                // JOB DESCRIPTION
-                description = (String) xpath.evaluate("/job/description", doc,
-                        XPathConstants.STRING);
-                if (description != null) {
-                    System.out.println("Job description = " + description);
-                }
-            }
+        Node jobNode = (Node) exp.evaluate(rootNode, XPathConstants.NODE);
 
-            // TODO Add Env parameters
+        JobType jt = null;
+
+        // JOB TYPE
+        Node tfNode = (Node) xpath.evaluate(addPrefixes("taskFlow"), jobNode,
+                XPathConstants.NODE);
+        if (tfNode != null) {
+            jt = JobType.TASKSFLOW;
+        }
+        Node paNode = (Node) xpath.evaluate(addPrefixes("proActive"), jobNode,
+                XPathConstants.NODE);
+        if (paNode != null) {
+            jt = JobType.APPLI;
+        }
+        if (jt == null) {
+            throw new SAXException("Invalid XML : Job must have a valid type");
         }
 
-        System.out.println("Job : " + name + " - priority : " + priority);
+        switch (jt) {
+        case APPLI:
+            job = new ApplicationJob();
+            break;
+
+        //	TODO	job = new ParameterSweepingJob();
+        //			ParameterSweepingJob jobPS = (ParameterSweepingJob) job;
+        default:
+            job = new TaskFlowJob();
+        }
+        // JOB NAME
+        job.setName((String) xpath.evaluate("@name", jobNode,
+                XPathConstants.STRING));
+        System.out.println("Job : " + job.getName());
+        // JOB PRIORITY
+        String prio = xpath.evaluate("@priority", jobNode);
+        if (!"".equals(prio)) {
+            job.setPriority(JobPriority.findPriority((String) prio));
+        } else {
+            job.setPriority(JobPriority.NORMAL);
+        }
+
+        // JOB CANCEL ON EXCEPTION
+        String cancel = xpath.evaluate("@cancelOnException", jobNode);
+        if (!"".equals(cancel)) {
+            job.setCancelOnError(Boolean.parseBoolean(cancel));
+        } else {
+            job.setCancelOnError(false);
+        }
+
+        // JOB LOG FILE
+        String logFile = xpath.evaluate("@logFile", jobNode);
+        if (!"".equals(logFile)) {
+            job.setLogFile(logFile);
+        }
+
+        // JOB DESCRIPTION
+        Object description = (String) xpath.evaluate(addPrefixes(
+                    "/job/description"), rootNode, XPathConstants.STRING);
+        if (description != null) {
+            System.out.println("Job description = " + description);
+            job.setDescription((String) description);
+        }
+        return createTasks(jobNode, job, xpath);
+    }
+
+    Job createTasks(Node jobNode, Job job, XPath xpath)
+        throws XPathExpressionException, ClassNotFoundException, IOException,
+            InvalidScriptException, UserException {
+        Map<Task, ArrayList<String>> tasks = new HashMap<Task, ArrayList<String>>();
 
         // TASKS
-        NodeList list = (NodeList) xpath.evaluate("/job/tasks/task", doc,
-                XPathConstants.NODESET);
+        NodeList list = null;
+        switch (job.getType()) {
+        case TASKSFLOW:
+            list = (NodeList) xpath.evaluate(addPrefixes("taskFlow/task"),
+                    jobNode, XPathConstants.NODESET);
+            break;
+        default:
+            list = (NodeList) xpath.evaluate(addPrefixes("proActive/task"),
+                    jobNode, XPathConstants.NODESET);
+        }
         if (list != null) {
             for (int i = 0; i < list.getLength(); i++) {
                 Node taskNode = list.item(i);
+                Task task = null;
 
                 // TASK PROCESS
-                Task desc = null;
-                Node process = (Node) xpath.evaluate("process/javaProcess",
-                        taskNode, XPathConstants.NODE);
+                Node process = (Node) xpath.evaluate(addPrefixes(
+                            "javaExecutable"), taskNode, XPathConstants.NODE);
                 if (process != null) { // JAVA TASK
-                    desc = createJavaTask(process, xpath);
-                } else if ((process = (Node) xpath.evaluate(
-                                "process/nativeProcess", taskNode,
+                    task = createJavaTask(process);
+                } else if ((process = (Node) xpath.evaluate(addPrefixes(
+                                    "nativeExecutable"), taskNode,
                                 XPathConstants.NODE)) != null) { // NATIVE TASK
-                    desc = createNativeTask(process, xpath);
-                } else if ((process = (Node) xpath.evaluate(
-                                "process/applicationProcess", taskNode,
+                    task = createNativeTask(process);
+                } else if ((process = (Node) xpath.evaluate(addPrefixes(
+                                    "proActiveExecutable"), taskNode,
                                 XPathConstants.NODE)) != null) { // APPLICATION TASK
-                    desc = createApplicationTask(process, xpath);
+                    task = createApplicationTask(process);
                 } else {
                     throw new RuntimeException("Unknow process !!");
                 }
 
-                // TASK NAME
-                desc.setName((String) xpath.evaluate("@name", taskNode,
-                        XPathConstants.STRING));
-                System.out.println("name = " + desc.getName());
+                task = createTask(taskNode, task);
 
-                // TASK DESCRIPTION
-                desc.setDescription((String) xpath.evaluate("description",
-                        taskNode, XPathConstants.STRING));
-                System.out.println("desc = " + desc.getDescription());
-
-                // TASK RESULT DESCRIPTION
-                String descriptorClassName = (String) xpath.evaluate("@resultDescriptor",
-                        taskNode, XPathConstants.STRING);
-                if (!descriptorClassName.equals("")) {
-                    System.out.println("Descriptor class = " +
-                        descriptorClassName);
-                    Class<?extends ResultDescriptor> descriptorClass = (Class<?extends ResultDescriptor>) Class.forName(descriptorClassName);
-                    desc.setResultDescriptor(descriptorClass);
-                }
-
-                // TASK NEEDED_NODES
-                String needstr = (String) xpath.evaluate("@neededNodes",
-                        taskNode, XPathConstants.STRING);
-                if (!"".equals(needstr)) {
-                    try {
-                        jobAppliNeededNodes = Integer.parseInt(needstr);
-                    } catch (NumberFormatException e) {
-                        System.err.println(
-                            "Error parsing attribute @neededNodes");
-                    }
-                }
-
-                // TASK FINAL
-                desc.setFinalTask(((String) xpath.evaluate("@finalTask",
-                        taskNode, XPathConstants.STRING)).equals("true"));
-                System.out.println("final = " + desc.isFinalTask());
-
-                // TASK RE RUNNABLE
-                String rerunnable = (String) xpath.evaluate("@reRunnable",
-                        taskNode, XPathConstants.STRING);
-                if (rerunnable != "") {
-                    desc.setRerunnable(Integer.parseInt(rerunnable));
-                } else {
-                    desc.setRerunnable(1);
-                }
-                System.out.println("reRun = " + desc.getRerunnable());
-
-                // TASK RUN TIME LIMIT
-                String timeLimit = (String) xpath.evaluate("@runtimeLimit",
-                        taskNode, XPathConstants.STRING);
-                System.out.println("time limit = " + timeLimit);
-
-                // TASK VERIF
-                Node verifNode = (Node) xpath.evaluate("verifyingTask/script",
-                        taskNode, XPathConstants.NODE);
-                if (verifNode != null) {
-                    desc.setVerifyingScript(createVerifyingScript(verifNode,
-                            xpath));
-                }
-
-                // TASK PRE
-                Node preNode = (Node) xpath.evaluate("preTask/script",
-                        taskNode, XPathConstants.NODE);
-                if (preNode != null) {
-                    desc.setPreTask(createPreScript(preNode, xpath));
-                }
-
-                // TASK POST
-                Node postNode = (Node) xpath.evaluate("postTask/script",
-                        taskNode, XPathConstants.NODE);
-                if (postNode != null) {
-                    System.out.println("POST");
-                    desc.setPostTask(createScript(postNode, xpath));
+                switch (job.getType()) {
+                case APPLI:
+                    ((ApplicationJob) job).setTask((ApplicationTask) task);
+                    break;
+                default:
+                    ((TaskFlowJob) job).addTask(task);
                 }
 
                 // TASK DEPENDS
-                tasks.put(desc,
-                    (String) xpath.evaluate("@depends", taskNode,
-                        XPathConstants.STRING));
+                NodeList refList = (NodeList) xpath.evaluate(addPrefixes(
+                            "depends/task/@ref"), taskNode,
+                        XPathConstants.NODESET);
+                ArrayList<String> depList = new ArrayList<String>();
+                if (refList != null) {
+                    for (int j = 0; j < refList.getLength(); j++) {
+                        Node ref = refList.item(j);
+                        depList.add(ref.getNodeValue());
+                    }
+                }
+                tasks.put(task, depList);
             }
-        }
-
-        // Job creation
-        Job job = null;
-        if (jt == JobType.APPLI) {
-            if (!tasks.keySet().isEmpty()) {
-                Task td = tasks.keySet().iterator().next();
-                job = new ApplicationJob();
-                ApplicationJob jobA = (ApplicationJob) job;
-                jobA.setName(name);
-                jobA.setPriority(getPriority(priority));
-                jobA.setDescription(description);
-                jobA.setLogFile(logFile);
-
-                ApplicationTask td2 = new ApplicationTask();
-                jobA.setTask(td2);
-                td2.setDescription(td.getDescription());
-                td2.setName(td.getName());
-                td2.setPostTask(td.getPostTask());
-                td2.setPreTask(td.getPreTask());
-                td2.setRerunnable(td.getRerunnable());
-                td2.setRunTimeLimit(td.getRunTimeLimit());
-                td2.setVerifyingScript(td.getVerifyingScript());
-                td2.setArguments(((ApplicationTask) td).getArguments());
-                td2.setNumberOfNodesNeeded(jobAppliNeededNodes);
-                td2.setTaskClass(((ApplicationTask) td).getTaskClass());
-            }
-        } else if (jt == JobType.PARAMETER_SWEEPING) {
-            //	TODO	job = new ParameterSweepingJob();
-            //			ParameterSweepingJob jobPS = (ParameterSweepingJob) job;
-            //			jobPS.setName(name);
-            //			jobPS.setPriority(getPriority(priority));
-            //			jobPS.setCancelOnError(cancelOnError);
-            //			jobPS.setDescription(description);
-        } else {
-            job = new TaskFlowJob();
-            TaskFlowJob jobTF = (TaskFlowJob) job;
-            jobTF.setName(name);
-            jobTF.setPriority(getPriority(priority));
-            job.setCancelOnError(cancelOnError);
-            job.setDescription(description);
-            job.setLogFile(logFile);
         }
 
         // Dependencies
@@ -328,31 +345,17 @@ public class JobFactory {
         for (Task td : tasks.keySet())
             depends.put(td.getName(), td);
         if (job.getType() != JobType.APPLI) {
-            for (Entry<Task, String> task : tasks.entrySet()) {
+            for (Entry<Task, ArrayList<String>> task : tasks.entrySet()) {
                 //task.getKey().setJobId(job.getId());
-                String depstr = task.getValue();
-                if (!depstr.matches("[ ]*")) {
-                    String[] deps = depstr.split(" ");
-                    for (int i = 0; i < deps.length; i++) {
-                        if (depends.containsKey(deps[i])) {
-                            task.getKey().addDependence(depends.get(deps[i]));
-                        } else {
-                            System.err.println("Can't resolve dependence : " +
-                                deps[i]);
-                        }
+                ArrayList<String> depListStr = task.getValue();
+                for (int i = 0; i < depListStr.size(); i++) {
+                    if (depends.containsKey(depListStr.get(i))) {
+                        task.getKey()
+                            .addDependence(depends.get(depListStr.get(i)));
+                    } else {
+                        System.err.println("Can't resolve dependence : " +
+                            depListStr.get(i));
                     }
-                }
-                switch (job.getType()) {
-                case TASKSFLOW:
-                    try {
-                        ((TaskFlowJob) job).addTask(task.getKey());
-                    } catch (UserException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case PARAMETER_SWEEPING:
-
-                    //TODO ((TaskFlowJob) job).addTask(task.getKey());
                 }
             }
         }
@@ -360,48 +363,109 @@ public class JobFactory {
         return job;
     }
 
-    private JobPriority getPriority(String priority) {
-        if (priority.equals("highest")) {
-            return JobPriority.HIGHEST;
-        } else if (priority.equals("high")) {
-            return JobPriority.HIGH;
-        } else if (priority.equals("low")) {
-            return JobPriority.LOW;
-        } else if (priority.equals("lowest")) {
-            return JobPriority.LOWEST;
-        } else if (priority.equals("idle")) {
-            return JobPriority.IDLE;
-        } else {
-            return JobPriority.NORMAL;
+    @SuppressWarnings("unchecked")
+    private Task createTask(Node taskNode, Task task)
+        throws XPathExpressionException, ClassNotFoundException,
+            InvalidScriptException, MalformedURLException {
+        // TASK NAME
+        task.setName((String) xpath.evaluate("@name", taskNode,
+                XPathConstants.STRING));
+        System.out.println("name = " + task.getName());
+
+        // TASK DESCRIPTION
+        task.setDescription((String) xpath.evaluate(addPrefixes("description"),
+                taskNode, XPathConstants.STRING));
+        System.out.println("desc = " + task.getDescription());
+
+        // TASK RESULT DESCRIPTION
+        String descriptorClassName = (String) xpath.evaluate("@resultDescriptor",
+                taskNode, XPathConstants.STRING);
+        if (!descriptorClassName.equals("")) {
+            System.out.println("Descriptor class = " + descriptorClassName);
+            Class<?extends ResultDescriptor> descriptorClass = (Class<?extends ResultDescriptor>) Class.forName(descriptorClassName);
+            task.setResultDescriptor(descriptorClass);
         }
+
+        // TASK PRECIOUS RESULT
+        task.setFinalTask(((String) xpath.evaluate("@preciousResult", taskNode,
+                XPathConstants.STRING)).equals("true"));
+        System.out.println("final = " + task.isFinalTask());
+
+        // TASK RETRIES
+        String rerunnable = (String) xpath.evaluate("@retries", taskNode,
+                XPathConstants.STRING);
+        if (rerunnable != "") {
+            task.setRerunnable(Integer.parseInt(rerunnable));
+        } else {
+            task.setRerunnable(1);
+        }
+        System.out.println("reRun = " + task.getRerunnable());
+
+        // TASK VERIF
+        Node verifNode = (Node) xpath.evaluate(addPrefixes("selection/script"),
+                taskNode, XPathConstants.NODE);
+        if (verifNode != null) {
+            task.setVerifyingScript(createVerifyingScript(verifNode));
+        }
+
+        // TASK PRE
+        Node preNode = (Node) xpath.evaluate(addPrefixes("pre/script"),
+                taskNode, XPathConstants.NODE);
+        if (preNode != null) {
+            System.out.println("PRE");
+            task.setPreTask(createScript(preNode));
+        }
+
+        // TASK POST
+        Node postNode = (Node) xpath.evaluate(addPrefixes("post/script"),
+                taskNode, XPathConstants.NODE);
+        if (postNode != null) {
+            System.out.println("POST");
+            task.setPostTask(createScript(postNode));
+        }
+        return task;
     }
 
-    private Task createNativeTask(Node process, XPath xpath)
-        throws XPathExpressionException, ClassNotFoundException, IOException {
-        String cmd = (String) xpath.evaluate("@command", process,
-                XPathConstants.STRING);
-        NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
-                process, XPathConstants.NODESET);
-        if (args != null) {
-            for (int i = 0; i < args.getLength(); i++) {
-                Node arg = args.item(i);
-                String value = (String) xpath.evaluate("@value", arg,
-                        XPathConstants.STRING);
+    private Task createNativeTask(Node executable)
+        throws XPathExpressionException, ClassNotFoundException, IOException,
+            InvalidScriptException {
+        Node scNode = (Node) xpath.evaluate(addPrefixes("staticCommand"),
+                executable, XPathConstants.NODE);
+        Node dcNode = (Node) xpath.evaluate(addPrefixes("dynamicCommand"),
+                executable, XPathConstants.NODE);
+        NativeTask desc = new NativeTask();
+        if (scNode != null) {
+            // static command
+            String cmd = (String) xpath.evaluate("@value", scNode,
+                    XPathConstants.STRING);
+            NodeList args = (NodeList) xpath.evaluate(addPrefixes(
+                        "arguments/argument"), scNode, XPathConstants.NODESET);
+            if (args != null) {
+                for (int i = 0; i < args.getLength(); i++) {
+                    Node arg = args.item(i);
+                    String value = (String) xpath.evaluate("@value", arg,
+                            XPathConstants.STRING);
 
-                //				String serializedFile = (String) xpath.evaluate("@serializedFile",
-                //				arg, XPathConstants.STRING);
-                if (value != null) {
-                    cmd += (" " + value);
+                    if (value != null) {
+                        cmd += (" " + value);
+                    }
                 }
             }
+            desc.setCommandLine(cmd);
+        } else {
+            // dynamic command
+            Node scriptNode = (Node) xpath.evaluate(addPrefixes("generation"),
+                    dcNode, XPathConstants.NODE);
+            Script<?> script = createScript(scriptNode);
+            GenerationScript gscript = new GenerationScript(script);
+            desc.setGenerationScript(gscript);
         }
-        NativeTask desc = new NativeTask();
-        desc.setCommandLine(cmd);
+
         return desc;
     }
 
     @SuppressWarnings("unchecked")
-    private JavaTask createJavaTask(Node process, XPath xpath)
+    private JavaTask createJavaTask(Node process)
         throws XPathExpressionException, ClassNotFoundException, IOException {
         JavaTask desc = new JavaTask();
         desc.setTaskClass((Class<ExecutableJavaTask>) Class.forName(
@@ -409,8 +473,8 @@ public class JobFactory {
                               .evaluate(process, XPathConstants.STRING)));
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
-        NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
-                process, XPathConstants.NODESET);
+        NodeList args = (NodeList) xpath.evaluate(addPrefixes(
+                    "parameters/parameter"), process, XPathConstants.NODESET);
         if (args != null) {
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
@@ -418,14 +482,8 @@ public class JobFactory {
                         XPathConstants.STRING);
                 String value = (String) xpath.evaluate("@value", arg,
                         XPathConstants.STRING);
-                String serializedFile = (String) xpath.evaluate("@serializedFile",
-                        arg, XPathConstants.STRING);
                 if ((name != null) && (value != null)) {
                     desc.getArguments().put(name, value);
-                } else if ((name != null) && (serializedFile != null)) {
-                    FileInputStream fis = new FileInputStream(serializedFile);
-                    ObjectInputStream ois = new ObjectInputStream(fis);
-                    desc.getArguments().put(name, ois.readObject());
                 }
             }
         }
@@ -436,7 +494,7 @@ public class JobFactory {
     }
 
     @SuppressWarnings("unchecked")
-    private ApplicationTask createApplicationTask(Node process, XPath xpath)
+    private ApplicationTask createApplicationTask(Node process)
         throws XPathExpressionException, ClassNotFoundException, IOException {
         ApplicationTask desc = new ApplicationTask();
         desc.setTaskClass((Class<ExecutableApplicationTask>) Class.forName(
@@ -444,8 +502,8 @@ public class JobFactory {
                               .evaluate(process, XPathConstants.STRING)));
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
-        NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
-                process, XPathConstants.NODESET);
+        NodeList args = (NodeList) xpath.evaluate(addPrefixes(
+                    "parameters/parameter"), process, XPathConstants.NODESET);
         if (args != null) {
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
@@ -453,14 +511,13 @@ public class JobFactory {
                         XPathConstants.STRING);
                 String value = (String) xpath.evaluate("@value", arg,
                         XPathConstants.STRING);
-                String serializedFile = (String) xpath.evaluate("@serializedFile",
-                        arg, XPathConstants.STRING);
+
+                // TASK NEEDED_NODES
+                int neededNodes = ((Double) xpath.evaluate("@neededNodes", arg,
+                        XPathConstants.NUMBER)).intValue();
+                desc.setNumberOfNodesNeeded(neededNodes);
                 if ((name != null) && (value != null)) {
                     desc.getArguments().put(name, value);
-                } else if ((name != null) && (serializedFile != null)) {
-                    FileInputStream fis = new FileInputStream(serializedFile);
-                    ObjectInputStream ois = new ObjectInputStream(fis);
-                    desc.getArguments().put(name, ois.readObject());
                 }
             }
         }
@@ -470,62 +527,56 @@ public class JobFactory {
         return desc;
     }
 
-    private Script<?> createScript(Node node, XPath xpath)
-        throws XPathExpressionException, InvalidScriptException {
+    private String[] getArguments(Node node) throws XPathExpressionException {
         String[] parameters = null;
-        String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
-        if ((url != null) && (!url.equals(""))) {
-            try {
-                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
-                        node, XPathConstants.NODESET);
-                if (args != null) {
-                    parameters = new String[args.getLength()];
-                    for (int i = 0; i < args.getLength(); i++) {
-                        Node arg = args.item(i);
-                        String value = (String) xpath.evaluate("@value", arg,
-                                XPathConstants.STRING);
-                        parameters[i] = value;
-                    }
-                }
-                System.out.println(url);
-                return new SimpleScript(new URL(url), parameters);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (InvalidScriptException e) {
-                e.printStackTrace();
+        NodeList args = (NodeList) xpath.evaluate(addPrefixes(
+                    "arguments/argument"), node, XPathConstants.NODESET);
+        if (args != null) {
+            parameters = new String[args.getLength()];
+            for (int i = 0; i < args.getLength(); i++) {
+                Node arg = args.item(i);
+                String value = (String) xpath.evaluate("@value", arg,
+                        XPathConstants.STRING);
+                parameters[i] = value;
             }
         }
-        String path = (String) xpath.evaluate("@file", node,
-                XPathConstants.STRING);
-        if ((path != null) && (!path.equals(""))) {
-            try {
-                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
-                        node, XPathConstants.NODESET);
-                if (args != null) {
-                    parameters = new String[args.getLength()];
-                    for (int i = 0; i < args.getLength(); i++) {
-                        Node arg = args.item(i);
-                        String value = (String) xpath.evaluate("@value", arg,
-                                XPathConstants.STRING);
-                        parameters[i] = value;
-                    }
-                }
-                System.out.println(path);
-                return new SimpleScript(new File(path), parameters);
-            } catch (InvalidScriptException e) {
-                e.printStackTrace();
-            }
-        }
+        return parameters;
+    }
 
-        String engine = (String) xpath.evaluate("@engine", node,
-                XPathConstants.STRING);
-        if (((engine != null) && (!engine.equals(""))) &&
-                (node.getTextContent() != null)) {
-            String script = node.getTextContent();
-            try {
-                return new SimpleScript(script, engine);
-            } catch (InvalidScriptException e) {
-                e.printStackTrace();
+    private Script<?> createScript(Node node)
+        throws XPathExpressionException, InvalidScriptException,
+            MalformedURLException {
+        // JOB TYPE
+        Node fileNode = (Node) xpath.evaluate(addPrefixes("file"), node,
+                XPathConstants.NODE);
+        Node codeNode = (Node) xpath.evaluate(addPrefixes("code"), node,
+                XPathConstants.NODE);
+        if (fileNode != null) {
+            // file
+            String url = (String) xpath.evaluate("@url", fileNode,
+                    XPathConstants.STRING);
+            if ((url != null) && (!url.equals(""))) {
+                System.out.println(url);
+                return new SimpleScript(new URL(url), getArguments(fileNode));
+            }
+            String path = (String) xpath.evaluate("@path", fileNode,
+                    XPathConstants.STRING);
+            if ((path != null) && (!path.equals(""))) {
+                System.out.println(path);
+                return new SimpleScript(new File(path), getArguments(fileNode));
+            }
+        } else {
+            // code
+            String engine = (String) xpath.evaluate("@language", codeNode,
+                    XPathConstants.STRING);
+            if (((engine != null) && (!engine.equals(""))) &&
+                    (node.getTextContent() != null)) {
+                String script = node.getTextContent();
+                try {
+                    return new SimpleScript(script, engine);
+                } catch (InvalidScriptException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -533,126 +584,101 @@ public class JobFactory {
         throw new InvalidScriptException("The script is not recognized");
     }
 
-    private VerifyingScript createVerifyingScript(Node node, XPath xpath)
-        throws XPathExpressionException, InvalidScriptException {
-        // TODO Verify if script is dynamic or static (default : dynamic)
-        String[] parameters = null;
-        String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
-        if ((url != null) && (!url.equals(""))) {
-            try {
-                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
-                        node, XPathConstants.NODESET);
-                if (args != null) {
-                    parameters = new String[args.getLength()];
-                    for (int i = 0; i < args.getLength(); i++) {
-                        Node arg = args.item(i);
-                        String value = (String) xpath.evaluate("@value", arg,
-                                XPathConstants.STRING);
-                        parameters[i] = value;
-                    }
-                }
-                System.out.println(url);
-                return new VerifyingScript(new URL(url), parameters, true);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (InvalidScriptException e) {
-                e.printStackTrace();
-            }
-        }
-        String path = (String) xpath.evaluate("@file", node,
-                XPathConstants.STRING);
-        if ((path != null) && (!path.equals(""))) {
-            try {
-                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
-                        node, XPathConstants.NODESET);
-                if (args != null) {
-                    parameters = new String[args.getLength()];
-                    for (int i = 0; i < args.getLength(); i++) {
-                        Node arg = args.item(i);
-                        String value = (String) xpath.evaluate("@value", arg,
-                                XPathConstants.STRING);
-                        parameters[i] = value;
-                    }
-                }
-                System.out.println(path);
-                return new VerifyingScript(new File(path), parameters, true);
-            } catch (InvalidScriptException e) {
-                e.printStackTrace();
-            }
-        }
-        String engine = (String) xpath.evaluate("@engine", node,
-                XPathConstants.STRING);
-        if ((engine != null) && (node.getTextContent() != null)) {
-            String script = node.getTextContent();
-            try {
-                return new VerifyingScript(script, engine, true);
-            } catch (InvalidScriptException e) {
-                e.printStackTrace();
-            }
-        }
-        throw new InvalidScriptException("The script is not recognized");
+    private VerifyingScript createVerifyingScript(Node node)
+        throws XPathExpressionException, InvalidScriptException,
+            MalformedURLException {
+        Script<?> script = createScript(node);
+        return new VerifyingScript(script, true);
     }
 
-    private PreScript createPreScript(Node node, XPath xpath)
-        throws XPathExpressionException, InvalidScriptException {
-        // TODO Verify if script is dynamic or static (default : dynamic)
-        String[] parameters = null;
-        String url = (String) xpath.evaluate("@url", node, XPathConstants.STRING);
-        if ((url != null) && (!url.equals(""))) {
-            try {
-                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
-                        node, XPathConstants.NODESET);
-                if (args != null) {
-                    parameters = new String[args.getLength()];
-                    for (int i = 0; i < args.getLength(); i++) {
-                        Node arg = args.item(i);
-                        String value = (String) xpath.evaluate("@value", arg,
-                                XPathConstants.STRING);
-                        parameters[i] = value;
-                    }
-                }
-                System.out.println(url);
-                return new PreScript(new URL(url), parameters);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (InvalidScriptException e) {
-                e.printStackTrace();
-            }
+    private class ValidatingErrorHandler implements ErrorHandler {
+        private int mistakes = 0;
+
+        public ValidatingErrorHandler() {
         }
 
-        String path = (String) xpath.evaluate("@file", node,
-                XPathConstants.STRING);
-        if ((path != null) && (!path.equals(""))) {
-            try {
-                NodeList args = (NodeList) xpath.evaluate("initParameters/parameter",
-                        node, XPathConstants.NODESET);
-                if (args != null) {
-                    parameters = new String[args.getLength()];
-                    for (int i = 0; i < args.getLength(); i++) {
-                        Node arg = args.item(i);
-                        String value = (String) xpath.evaluate("@value", arg,
-                                XPathConstants.STRING);
-                        parameters[i] = value;
-                    }
-                }
-                System.out.println(path);
-                return new PreScript(new File(path), parameters);
-            } catch (InvalidScriptException e) {
-                e.printStackTrace();
-            }
+        @Override
+        public void error(SAXParseException exception)
+            throws SAXException {
+            System.err.println("ERROR:" + exception.getMessage() + " at line " +
+                exception.getLineNumber() + ", column " +
+                exception.getColumnNumber());
+            mistakes++;
         }
 
-        // no parameters
-        String engine = (String) xpath.evaluate("@engine", node,
-                XPathConstants.STRING);
-        if ((engine != null) && (node.getTextContent() != null)) {
-            String script = node.getTextContent();
-            try {
-                return new PreScript(script, engine);
-            } catch (InvalidScriptException e) {
-                e.printStackTrace();
-            }
+        @Override
+        public void fatalError(SAXParseException exception)
+            throws SAXException {
+            System.err.println("ERROR:" + exception.getMessage() + " at line " +
+                exception.getLineNumber() + ", column " +
+                exception.getColumnNumber());
+            mistakes++;
         }
-        throw new InvalidScriptException("The script is not recognized");
+
+        @Override
+        public void warning(SAXParseException exception)
+            throws SAXException {
+            System.err.println("WARNING:" + exception.getMessage() +
+                " at line " + exception.getLineNumber() + ", column " +
+                exception.getColumnNumber());
+        }
+    }
+
+    private class SchedulerNamespaceContext implements NamespaceContext {
+        public String getNamespaceURI(String prefix) {
+            if ((prefix == null) || (prefix.length() == 0)) {
+                throw new NullPointerException("Null prefix");
+            } else if (prefix.equals(JOB_PREFIX)) {
+                return JOB_NAMESPACE;
+            } else if ("xml".equals(prefix)) {
+                return XMLConstants.XML_NS_URI;
+            }
+            return XMLConstants.DEFAULT_NS_PREFIX;
+        }
+
+        // This method isn't necessary for XPath processing.
+        public String getPrefix(String uri) {
+            throw new UnsupportedOperationException();
+        }
+
+        // This method isn't necessary for XPath processing either.
+        public Iterator<?> getPrefixes(String uri) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private static String addPrefixes(String unprefixedPath) {
+        if ((JOB_PREFIX != null) || (JOB_PREFIX.length() > 0)) {
+            String pr = JOB_PREFIX + ":";
+            unprefixedPath = " " + unprefixedPath + " ";
+            StringTokenizer st = new StringTokenizer(unprefixedPath, "/");
+            StringBuilder sb = new StringBuilder();
+            boolean slash_start = false;
+            boolean in_the_middle = false;
+            while (st.hasMoreElements()) {
+                String token = st.nextToken().trim();
+                if (token.length() > 0) {
+                    if (in_the_middle || slash_start) {
+                        if (!token.startsWith("@")) {
+                            sb.append("/" + pr + token);
+                        } else {
+                            sb.append("/" + token);
+                        }
+                    } else {
+                        if (!token.startsWith("@")) {
+                            sb.append(pr + token);
+                        } else {
+                            sb.append(token);
+                        }
+
+                        in_the_middle = true;
+                    }
+                } else {
+                    slash_start = true;
+                }
+            }
+            return sb.toString();
+        }
+        return unprefixedPath;
     }
 }

@@ -35,6 +35,7 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
+import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript;
 import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
 import org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask;
 import org.objectweb.proactive.extra.scheduler.task.NativeTaskLauncher;
@@ -58,6 +59,9 @@ public class InternalNativeTask extends InternalTask {
     /** Command line to execute */
     private String cmd;
 
+    /** Generation Script */
+    private GenerationScript gscript;
+
     /**
      * ProActive empty constructor.
      */
@@ -69,8 +73,9 @@ public class InternalNativeTask extends InternalTask {
      *
      * @param cmd the command line to execute
      */
-    public InternalNativeTask(String cmd) {
+    public InternalNativeTask(String cmd, GenerationScript gscript) {
         this.cmd = cmd;
+        this.gscript = gscript;
     }
 
     /**
@@ -81,7 +86,8 @@ public class InternalNativeTask extends InternalTask {
         //create the new task that will launch the command on execute.
         ExecutableNativeTask executableNativeTask = null;
         try {
-            executableNativeTask = new ExecutableNativeTask(this.cmd);
+            executableNativeTask = new ExecutableNativeTask(this.cmd,
+                    this.gscript);
         } catch (Exception e) {
             throw new TaskCreationException("Cannot create native task !!", e);
         }
@@ -95,13 +101,10 @@ public class InternalNativeTask extends InternalTask {
     public TaskLauncher createLauncher(String host, int port, Node node)
         throws ActiveObjectCreationException, NodeException {
         NativeTaskLauncher launcher;
-        if (getPreTask() == null) {
-            launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                    new Object[] { getId(), host, port }, node);
-        } else {
-            launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                    new Object[] { getId(), getPreTask(), host, port }, node);
-        }
+        launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
+                new Object[] { getId(), host, port, getPreTask(), getPostTask() },
+                node);
+
         setExecuterInformations(new ExecuterInformations(launcher, node));
         return launcher;
     }

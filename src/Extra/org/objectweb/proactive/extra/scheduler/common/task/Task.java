@@ -34,7 +34,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.extra.scheduler.common.scripting.PreScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
 
@@ -78,7 +77,7 @@ public abstract class Task implements Serializable {
      * Pre-task script : can be used to launch script just before the task
      * execution.
      */
-    protected PreScript preTask;
+    protected Script<?> preTask;
 
     /**
      * Pre-task script : can be used to launch script just after the task
@@ -226,7 +225,7 @@ public abstract class Task implements Serializable {
      *
      * @return the preTask of this task.
      */
-    public PreScript getPreTask() {
+    public Script<?> getPreTask() {
         return preTask;
     }
 
@@ -236,7 +235,7 @@ public abstract class Task implements Serializable {
      * @param preTask
      *            the preTask to set.
      */
-    public void setPreTask(PreScript preTask) {
+    public void setPreTask(Script<?> preTask) {
         this.preTask = preTask;
     }
 

@@ -491,10 +491,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 //if we are here, it is that something append while launching the current task.
                 logger.warn("Current node has failed due to node failure : " +
                     node);
+                e1.printStackTrace();
                 //so get back the node to the resource manager
                 resourceManager.freeDownNode(internalTask.getExecuterInformations()
                                                          .getNodeName());
-                e1.printStackTrace();
             }
         }
     }

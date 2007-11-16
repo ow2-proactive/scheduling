@@ -1,110 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<job name="job_with_dep" priority="normal" type="TASKSFLOW">
+<job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+	name="job_with_dep" priority="normal">
 	<description>Test of 8 tasks with variable durations and dependencies</description>
-	<tasks>
-		<task name="task1" reRunnable="2">
+	<taskFlow>
+		<task name="task1" retries="2">
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="6" />
-						<parameter name="number" value="1" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="6"/>
+					<parameter name="number" value="1"/>
+				</parameters>
+			</javaExecutable>
 		</task>
 		<task name="task2">
 			<!-- Task human description -->
 			<description>This task will sleep 10s</description>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="10" />
-						<parameter name="number" value="2" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="10"/>
+					<parameter name="number" value="2"/>
+				</parameters>
+			</javaExecutable>
 		</task>
-		<task name="task3" depends="task1">
+		<task name="task3">
+
 			<!-- Task human description -->
 			<description>This task will sleep 4s</description>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="4" />
-						<parameter name="number" value="3" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<depends>
+				<task ref="task1"/>
+			</depends>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="4"/>
+					<parameter name="number" value="3"/>
+				</parameters>
+			</javaExecutable>
 		</task>
-		<task name="task4" depends="task1 task2" reRunnable="2">
+		<task name="task4" retries="2">
 			<!-- Task human description -->
 			<description>This task will sleep 5s</description>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="5" />
-						<parameter name="number" value="4" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<depends>
+				<task ref="task1"/>
+				<task ref="task2"/>
+			</depends>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="5"/>
+					<parameter name="number" value="4"/>
+				</parameters>
+			</javaExecutable>
 		</task>
-		<task name="task5" depends="task2">
+		<task name="task5">
 			<!-- Task human description -->
 			<description>This task will sleep 2s</description>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="2" />
-						<parameter name="number" value="5" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<depends>
+				<task ref="task2"/>
+			</depends>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="2"/>
+					<parameter name="number" value="5"/>
+				</parameters>
+			</javaExecutable>
 		</task>
-		<task name="task6" depends="task3 task4">
+		<task name="task6">
 			<!-- Task human description -->
 			<description>This task will sleep 8s</description>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="8" />
-						<parameter name="number" value="6" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<depends>
+				<task ref="task3"/>
+				<task ref="task4"/>
+			</depends>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="8"/>
+					<parameter name="number" value="6"/>
+				</parameters>
+			</javaExecutable>
 		</task>
-		<task name="task7" depends="task6 task4 task5" reRunnable="2" finalTask="true" >
+		<task name="task7" retries="2" preciousResult="true">
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="6" />
-						<parameter name="number" value="7" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<depends>
+				<task ref="task6"/>
+				<task ref="task4"/>
+				<task ref="task5"/>
+			</depends>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="6"/>
+					<parameter name="number" value="7"/>
+				</parameters>
+			</javaExecutable>
 		</task>
-		<task name="task8" finalTask="true" depends="task6">
+		<task name="task8" preciousResult="true">
 			<!-- Task human description -->
 			<description>This task will sleep 6s</description>
-			<process>
-				<javaProcess
-					class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
-					<initParameters>
-						<parameter name="sleepTime" value="6" />
-						<parameter name="number" value="8" />
-					</initParameters>
-				</javaProcess>
-			</process>
+			<depends>
+				<task ref="task6"/>
+			</depends>
+			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+				<parameters>
+					<parameter name="sleepTime" value="6"/>
+					<parameter name="number" value="8"/>
+				</parameters>
+			</javaExecutable>
 		</task>
-	</tasks>
+	</taskFlow>
 </job>

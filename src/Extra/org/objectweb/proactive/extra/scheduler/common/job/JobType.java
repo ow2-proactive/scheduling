@@ -67,4 +67,12 @@ public enum JobType implements java.io.Serializable {
     public String toString() {
         return name;
     }
+
+    static JobType getJobType(String typeName) {
+        if (typeName.equals("taskFlow")) {
+            return TASKSFLOW;
+        } else {
+            return APPLI;
+        }
+    }
 }

@@ -82,4 +82,23 @@ public enum JobPriority implements java.io.Serializable {
     public int getPriority() {
         return priority;
     }
+
+    public static JobPriority findPriority(String name) {
+        if (name.equalsIgnoreCase(IDLE.toString())) {
+            return IDLE;
+        }
+        if (name.equalsIgnoreCase(LOWEST.toString())) {
+            return LOWEST;
+        }
+        if (name.equalsIgnoreCase(LOW.toString())) {
+            return LOW;
+        }
+        if (name.equalsIgnoreCase(HIGH.toString())) {
+            return HIGH;
+        }
+        if (name.equalsIgnoreCase(HIGHEST.toString())) {
+            return HIGHEST;
+        }
+        return NORMAL;
+    }
 }
