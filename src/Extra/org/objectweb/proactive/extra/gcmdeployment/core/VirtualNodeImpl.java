@@ -39,8 +39,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
-
-
 public class VirtualNodeImpl implements VirtualNodeInternal {
 
     /** The, unique, name of this Virtual Node */
