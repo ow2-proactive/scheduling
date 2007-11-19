@@ -28,26 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
-
-import java.io.Serializable;
-
-import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+package org.objectweb.proactive.extensions.masterworker;
 
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
+/**
+ * An Exception thrown when a task has already been submitted
+ * @author fviale
+ *
+ */
+public class TaskAlreadySubmittedException extends Exception {
 
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
-
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+    /**
+     *
+     */
+    private static final long serialVersionUID = 7940573023893118257L;
 }

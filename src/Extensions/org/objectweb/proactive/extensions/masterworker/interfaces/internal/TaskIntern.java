@@ -28,26 +28,38 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
+package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.examples.masterworker.util.Pair;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
+/**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * Internal view of a task in the Master/Worker API<br/>
+ * Adds the notion of a "Task ID"<br/>
+ * @author fviale
+ *
+ * @param <R> the type of the result
+ */
+public interface TaskIntern<R extends Serializable> extends Task<R>, Identifiable,
+    Serializable {
 
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
+    /**
+     * The ID of the NullTask
+     */
+    long NULL_TASK_ID = -1;
 
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+    /**
+     * get the actual task
+     * @return the task
+     */
+    Task<R> getTask();
+
+    /**
+     * tells if the task is null (nothing to do)
+     * @return true if the task is null, false otherwise
+     */
+    boolean isNull();
 }

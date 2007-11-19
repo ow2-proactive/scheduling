@@ -40,10 +40,10 @@ import org.objectweb.proactive.examples.masterworker.nqueens.query.Query;
 import org.objectweb.proactive.examples.masterworker.nqueens.query.QueryExtern;
 import org.objectweb.proactive.examples.masterworker.nqueens.query.QueryGenerator;
 import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extra.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extra.masterworker.TaskAlreadySubmittedException;
-import org.objectweb.proactive.extra.masterworker.TaskException;
-import org.objectweb.proactive.extra.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
+import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 
 
 /**

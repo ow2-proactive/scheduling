@@ -40,8 +40,8 @@ import org.junit.Before;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.extra.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extra.masterworker.interfaces.Master;
+import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 import functionalTests.FunctionalTest;
 import functionalTests.masterworker.A;

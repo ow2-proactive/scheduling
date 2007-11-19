@@ -28,26 +28,39 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
+package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
-import java.io.Serializable;
-
-import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
+/**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * The interface of the worker objects <br/>
+ * A worker is connected to a TaskProvider (i.e. Master) which will provide tasks to execute <br/>
+ * @author fviale
+ *
+ */
+public interface Worker {
 
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
+    /**
+     * Returns the name of this worker
+     * @return name of the worker
+     */
+    String getName();
 
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+    /**
+     * tells that this worker is alive
+     */
+    void heartBeat();
+
+    /**
+     * terminates this worker
+     * @return true if the object terminated successfully
+     */
+    BooleanWrapper terminate();
+
+    /**
+     * Asks the worker to wake up
+     */
+    void wakeup();
 }

@@ -30,8 +30,8 @@
  */
 package functionalTests.masterworker.workermemory;
 
-import org.objectweb.proactive.extra.masterworker.interfaces.Task;
-import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
 
 public class MemoryTask implements Task<String> {

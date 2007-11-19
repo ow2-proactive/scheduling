@@ -28,26 +28,24 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
+package org.objectweb.proactive.extensions.masterworker.interfaces;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
+/**
+ * Definition of a Task (to be executed by the framework) <br/>
+ * @author fviale
+ *
+ * @param <R> the result type of this task
+ */
+public interface Task<R extends Serializable> extends Serializable {
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
-
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
-
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+    /**
+     * A task to be executed<br/>
+     * @param memory access to the worker memory
+     * @return the result
+     * @throws Exception any exception thrown by the task
+     */
+    R run(WorkerMemory memory) throws Exception;
 }

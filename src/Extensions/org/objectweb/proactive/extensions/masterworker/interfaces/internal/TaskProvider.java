@@ -28,26 +28,32 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
+package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
+/**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * A Task Provider provides tasks to be executed and excepts results of these tasks (i.e. the Master from the worker point of view)
+ * @author fviale
+ *
+ * @param <R> the type of the result client object
+ */
+public interface TaskProvider<R extends Serializable> {
+    /**
+     * Returns a task which needs to be executed
+     * @param worker the worker object which asks the tasks (stub)
+     * @param workerName the name of the worker which asks the tasks
+     * @return a new task to compute
+     */
+    TaskIntern<R> getTask(Worker worker, String workerName);
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
-
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
-
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+    /**
+     * Returns the result of a task to the provider
+     * @param result the result of the completed task
+     * @param workerName the name of the worker sending the result
+     * @return a new task to compute
+     */
+    TaskIntern<R> sendResultAndGetTask(ResultIntern<R> result, String workerName);
 }

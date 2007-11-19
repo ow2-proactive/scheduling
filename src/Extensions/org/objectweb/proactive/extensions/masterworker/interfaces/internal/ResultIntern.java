@@ -28,26 +28,50 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
+package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
+/**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * Internal view of a task in the Master/Worker API<br/>
+ * Adds the possibility to set the result for a task<br/>
+ * Adds the notion of a "Task ID"<br/>
+ * @author fviale
+ *
+ * @param <R>
+ */
+public interface ResultIntern<R extends Serializable> extends Identifiable,
+    Serializable {
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
+    /**
+     * get the result of the task
+     * @return the result
+     */
+    R getResult();
 
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
+    /**
+     * sets the result of the task
+     * @param res the result
+     */
+    void setResult(R res);
 
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+    /**
+     * tells if the task threw a functional exception
+     * @return answer
+     */
+    boolean threwException();
+
+    /**
+     * returns the actual functional exception thrown by the task
+     * @return the exception
+     */
+    Throwable getException();
+
+    /**
+     * sets the exception thrown by the task
+     * @param e the exception
+     */
+    void setException(Throwable e);
 }

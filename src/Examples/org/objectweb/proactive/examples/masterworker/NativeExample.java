@@ -37,11 +37,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.cli.HelpFormatter;
-import org.objectweb.proactive.extra.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extra.masterworker.TaskAlreadySubmittedException;
-import org.objectweb.proactive.extra.masterworker.TaskException;
-import org.objectweb.proactive.extra.masterworker.interfaces.Task;
-import org.objectweb.proactive.extra.masterworker.tasks.NativeTask;
+import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
+import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.tasks.NativeTask;
 
 
 /**

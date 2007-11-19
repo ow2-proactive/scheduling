@@ -28,26 +28,39 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
+package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
-import java.io.Serializable;
-
-import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
+/**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * A WorkerWatcher is responsible of watching workers'activity<br/>
+ * @author fviale
+ */
+public interface WorkerWatcher {
 
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
+    /**
+     * adds a worker to be watched
+     * @param worker worker which must be watched
+     */
+    void addWorkerToWatch(Worker worker);
 
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+    /**
+     * stops watching a worker
+     * @param worker workers which needn't be watched anymore
+     */
+    void removeWorkerToWatch(Worker worker);
+
+    /**
+     * Sets the period at which ping messages are sent to the workers <br/>
+     * @param periodMillis the new ping period
+     */
+    void setPingPeriod(long periodMillis);
+
+    /**
+     * terminates the watcher's activity
+     * @return true if the object terminated successfully
+     */
+    BooleanWrapper terminate();
 }

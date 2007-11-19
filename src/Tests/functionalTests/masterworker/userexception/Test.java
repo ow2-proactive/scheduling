@@ -36,9 +36,9 @@ import java.util.List;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.extra.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extra.masterworker.TaskException;
-import org.objectweb.proactive.extra.masterworker.interfaces.Master;
+import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 import functionalTests.FunctionalTest;
 import functionalTests.masterworker.A;

@@ -28,26 +28,20 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
-
-import java.io.Serializable;
-
-import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
+/**
+ * A simple interface for objects which are identifiable by a numeric id
+ * @author fviale
+ *
+ */
+public interface Identifiable extends Comparable<Identifiable> {
 
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
-
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+    /**
+     * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+     * get the id of the task
+     * @return the id
+     */
+    long getId();
 }

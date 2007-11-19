@@ -33,11 +33,11 @@ package org.objectweb.proactive.examples.masterworker;
 import java.util.List;
 import java.util.Vector;
 
-import org.objectweb.proactive.extra.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extra.masterworker.TaskAlreadySubmittedException;
-import org.objectweb.proactive.extra.masterworker.TaskException;
-import org.objectweb.proactive.extra.masterworker.interfaces.Task;
-import org.objectweb.proactive.extra.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
+import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
+import org.objectweb.proactive.extensions.masterworker.TaskException;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
+import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
 
 public class PIExample {

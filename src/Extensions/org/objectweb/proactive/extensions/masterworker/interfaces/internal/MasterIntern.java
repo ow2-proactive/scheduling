@@ -28,26 +28,14 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
+package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
 import java.io.Serializable;
+import java.util.List;
 
-import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
-
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
-
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+public interface MasterIntern extends Master<TaskIntern<ResultIntern<Serializable>>, ResultIntern<Serializable>> {
+    public void solveIds(final List<Long> taskIds);
 }

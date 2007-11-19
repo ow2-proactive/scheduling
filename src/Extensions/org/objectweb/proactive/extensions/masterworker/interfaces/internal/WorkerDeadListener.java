@@ -28,26 +28,20 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.examples.masterworker.nqueens.query;
-
-import java.io.Serializable;
-
-import org.objectweb.proactive.examples.masterworker.util.Pair;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
+package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
 
-public class QueryExtern implements Serializable, Task<Pair<Long, Long>> {
-    private Query query;
+/**
+ * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
+ * An object implementing this interface expects to be notified when a Worker is missing<br/>
+ * @author fviale
+ *
+ */
+public interface WorkerDeadListener {
 
-    public QueryExtern(Query query) {
-        this.query = query;
-    }
-
-    public Pair<Long, Long> run(WorkerMemory memory) {
-        long begin = System.currentTimeMillis();
-        long answer = query.run();
-        long time = System.currentTimeMillis() - begin;
-        return new Pair(answer, time);
-    }
+    /**
+     * Callback function called when a worker is missing
+     * @param worker the missing worker
+     */
+    void isDead(Worker worker);
 }
