@@ -129,6 +129,9 @@
         <ref name="preciousResult"/>
       </optional>
       <optional>
+        <ref name="resultPreviewClass"/>
+      </optional>
+      <optional>
         <ref name="taskDescription"/>
       </optional>
       <optional>
@@ -190,6 +193,12 @@
     <attribute name="preciousResult">
       <doc:documentation>do we keep the result among the job results  </doc:documentation>
       <data type="boolean"/>
+    </attribute>
+  </define>
+  <define name="resultPreviewClass">
+    <attribute name="resultPreviewClass">
+      <doc:documentation>A class implementing the ResultPreview interface which can be used to display the result of this task</doc:documentation>
+      <ref name="classPattern"/>
     </attribute>
   </define>
   <define name="depends">

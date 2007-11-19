@@ -378,7 +378,7 @@ public class JobFactory {
         System.out.println("desc = " + task.getDescription());
 
         // TASK RESULT DESCRIPTION
-        String descriptorClassName = (String) xpath.evaluate("@resultDescriptor",
+        String descriptorClassName = (String) xpath.evaluate("@resultPreviewClass",
                 taskNode, XPathConstants.STRING);
         if (!descriptorClassName.equals("")) {
             System.out.println("Descriptor class = " + descriptorClassName);
@@ -513,7 +513,8 @@ public class JobFactory {
                         XPathConstants.STRING);
 
                 // TASK NEEDED_NODES
-                int neededNodes = ((Double) xpath.evaluate("@neededNodes", arg,
+                int neededNodes = ((Double) xpath.evaluate(addPrefixes(
+                            "/job/proActive/@neededNodes"), arg,
                         XPathConstants.NUMBER)).intValue();
                 desc.setNumberOfNodesNeeded(neededNodes);
                 if ((name != null) && (value != null)) {
