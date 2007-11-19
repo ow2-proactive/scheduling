@@ -37,7 +37,7 @@
     </listitem>
   </itemizedlist>
 		<para>
-			We will also show the <ulink url="">IC2D</ulink>  view of the examples in this chapter. 
+			We will also show the IC2D  view of the examples in this chapter. 
 		</para>
 	
 	<para>
@@ -173,7 +173,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	<sect2>
 		<title>Monitoring The HelloWorld Application</title>
 		<para>
-			To see the the active object running start  <ulink url="">IC2D</ulink> and start 
+			To see the the active object running start  IC2D and start 
 			monitoring the local machine. To prevent the active object from stopping its
 			thread remove from the 
 			code above the line <literal>ProActive.exitSuccess();</literal>. IC2D will
@@ -292,7 +292,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
   	<sect2>
 		<title>Monitoring The InitializedHello Application</title>
 		<para>
-			To see the the active object running start  <ulink url="">IC2D</ulink> and start 
+			To see the the active object running start  IC2D and start 
 			monitoring the local machine. To prevent the active object from stopping its
 			thread remove from the 
 			code above the line <literal>ProActive.exitSuccess();</literal> and
@@ -531,7 +531,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 	<sect2>
 		<title>Monitoring The DeployedHello Application</title>
 		<para>
-			To see the the active object running, start  <ulink url="">IC2D</ulink> and start 
+			To see the the active object running, start  IC2D and start 
 			monitoring the remote machine on which you deployed. To prevent the active object
 			from stopping its	thread remove from the 
 			code above the line <literal>ProActive.exitSuccess();</literal> and
@@ -693,7 +693,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
 			Now on each Enter press the object will migrate to the next node. 
 		</para>
 		<para>
-			To see the the active object migrating start  <ulink url="">IC2D</ulink> and start 
+			To see the the active object migrating start  IC2D and start 
 			monitoring the remote machines on which the JVMs were started. On pressing Enter
 			the active object will migrate from machine to machine
 		</para>
@@ -871,7 +871,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
     <sect2>
 		<title>Monitoring The Distributed Primes</title>
         <para>
-			To see the the DistributePrimes example running  start <ulink url="">IC2D</ulink> and start 
+			To see the the DistributePrimes example running  start IC2D and start 
 			monitoring the remote machines on which the JVMs were started. IC2D will show the
 			active objects and the communication between them. You will see that the communication
 			only takes place between the PrimeManager and the PrimeWorkers. 
