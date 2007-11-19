@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="implementation">
-  <title>An implementation of the GCM</title>
+  <title>An implementation of the Grid Component Model</title>
 
   <para>
   	The GCM is an extension of the Fractal specification, and it
