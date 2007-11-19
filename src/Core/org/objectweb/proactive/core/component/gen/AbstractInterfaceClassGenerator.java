@@ -91,11 +91,11 @@ public abstract class AbstractInterfaceClassGenerator {
      * adds them to this list.
      * @param interfaces a list of interfaces
      */
-    public static void addSuperInterfaces(List interfaces)
+    public static void addSuperInterfaces(List<CtClass> interfaces)
         throws NotFoundException {
         for (int i = 0; i < interfaces.size(); i++) {
-            CtClass[] super_itfs_table = ((CtClass) interfaces.get(i)).getInterfaces();
-            List super_itfs = new ArrayList(super_itfs_table.length); // resizable list
+            CtClass[] super_itfs_table = interfaces.get(i).getInterfaces();
+            List<CtClass> super_itfs = new ArrayList<CtClass>(super_itfs_table.length); // resizable list
             for (int j = 0; j < super_itfs_table.length; j++) {
                 super_itfs.add(super_itfs_table[j]);
             }

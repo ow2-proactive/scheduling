@@ -58,7 +58,6 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
-import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.ClassDataCache;
