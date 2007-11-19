@@ -22,6 +22,8 @@
  */
 package functionalTests.component.conform;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import org.junit.Before;
@@ -30,9 +32,7 @@ import org.junit.Test;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
-import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -44,7 +44,7 @@ import functionalTests.component.conform.components.I;
 import functionalTests.component.conform.components.J;
 
 
-public class TestBindingController extends BindingConformtest {
+public class TestBindingController extends Conformtest {
     protected Component boot;
     protected TypeFactory tf;
     protected GenericFactory gf;
@@ -53,32 +53,41 @@ public class TestBindingController extends BindingConformtest {
     protected Component c;
     protected Component d;
     protected Component e;
-    protected boolean isComposite;
     protected boolean isTemplate;
 
     // -------------------------------------------------------------------------
     // Constructor ans setup
     // -------------------------------------------------------------------------
+    public TestBindingController() {
+        super();
+    }
+
     @Before
     public void setUp() throws Exception {
         boot = Fractal.getBootstrapComponent();
         tf = Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("server", I.class.getName(), false,
-                        false, false),
-                    tf.createFcItfType("servers", I.class.getName(), false,
-                        false, true),
-                    tf.createFcItfType("client", I.class.getName(), true,
-                        false, false),
-                    tf.createFcItfType("clients", I.class.getName(), true,
-                        false, true)
+                    tf.createFcItfType("server", I.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY,
+                        TypeFactory.SINGLE),
+                    tf.createFcItfType("servers", I.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY,
+                        TypeFactory.COLLECTION),
+                    tf.createFcItfType("client", I.class.getName(),
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                        TypeFactory.SINGLE),
+                    tf.createFcItfType("clients", I.class.getName(),
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                        TypeFactory.COLLECTION)
                 });
         u = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("serverI", I.class.getName(), false,
-                        true, false),
-                    tf.createFcItfType("serverJ", J.class.getName(), false,
-                        false, false),
+                    tf.createFcItfType("serverI", I.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.OPTIONAL,
+                        TypeFactory.SINGLE),
+                    tf.createFcItfType("serverJ", J.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY,
+                        TypeFactory.SINGLE),
                 });
         setUpComponents();
     }
@@ -124,6 +133,21 @@ public class TestBindingController extends BindingConformtest {
         }
     }
 
+    protected void checkList(BindingController bc, String[] expected) {
+        String[] names = bc.listFc();
+        HashSet<String> nameSet = new HashSet<String>();
+        for (int i = 0; i < names.length; ++i) {
+            String name = names[i];
+            if (!nameSet.add(name)) {
+                fail("Duplicated interface name: " + name);
+            }
+        }
+        assertEquals(new HashSet<String>(Arrays.asList(expected)), nameSet);
+    }
+
+    // -------------------------------------------------------------------------
+    // Test errors in lookup, bind, unbind
+    // -------------------------------------------------------------------------
     @Test
     @Ignore
     public void testNoSuchInterfaceLookup() throws Exception {
@@ -212,363 +236,6 @@ public class TestBindingController extends BindingConformtest {
             Fractal.getBindingController(c).unbindFc("client");
             fail();
         } catch (IllegalBindingException e) {
-        }
-    }
-
-    // ---
-    public static class Composite extends TestBindingController {
-        protected Component r;
-
-        public Composite() {
-            isComposite = true;
-        }
-
-        protected void setUpComponents() throws Exception {
-            r = gf.newFcInstance(t, "composite", null);
-            c = gf.newFcInstance(t, "primitive", C.class.getName());
-            d = gf.newFcInstance(t, "composite", null);
-            e = gf.newFcInstance(u, "composite", null);
-            Fractal.getContentController(r).addFcSubComponent(c);
-            Fractal.getContentController(r).addFcSubComponent(d);
-            Fractal.getContentController(r).addFcSubComponent(e);
-        }
-
-        @Test
-        @Ignore
-        public void testCompositeList() throws Exception {
-            BindingController bc = Fractal.getBindingController(r);
-            if (isTemplate) {
-                checkList(bc, new String[] { "client", "server", "factory" });
-            } else {
-                checkList(bc, new String[] { "client", "server" });
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testCompositeExportBindLookupUnbind()
-            throws Exception {
-            BindingController bc = Fractal.getBindingController(r);
-            bc.bindFc("server", c.getFcInterface("server"));
-            if (isTemplate) {
-                checkList(bc, new String[] { "client", "server", "factory" });
-            } else {
-                checkList(bc, new String[] { "client", "server" });
-            }
-            assertEquals(c.getFcInterface("server"), bc.lookupFc("server"));
-            bc.unbindFc("server");
-            assertEquals(null, bc.lookupFc("server"));
-        }
-
-        @Test
-        @Ignore
-        public void testCompositeCollectionExportBindLookupUnbind()
-            throws Exception {
-            BindingController bc = Fractal.getBindingController(r);
-            bc.bindFc("servers0", c.getFcInterface("server"));
-            if (isTemplate) {
-                checkList(bc,
-                    new String[] { "client", "server", "servers0", "factory" });
-            } else {
-                checkList(bc, new String[] { "client", "server", "servers0" });
-            }
-            assertEquals(c.getFcInterface("server"), bc.lookupFc("servers0"));
-            bc.unbindFc("servers0");
-            try {
-                assertEquals(null, bc.lookupFc("servers0"));
-            } catch (NoSuchInterfaceException e) {
-                checkList(bc, new String[] { "client", "server" });
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testCompositeImportBindLookupUnbind()
-            throws Exception {
-            ContentController cc = Fractal.getContentController(r);
-            BindingController bc = Fractal.getBindingController(d);
-            bc.bindFc("client", cc.getFcInternalInterface("client"));
-            if (isTemplate) {
-                checkList(bc, new String[] { "client", "server", "factory" });
-            } else {
-                checkList(bc, new String[] { "client", "server" });
-            }
-            assertEquals(cc.getFcInternalInterface("client"),
-                bc.lookupFc("client"));
-            bc.unbindFc("client");
-            assertEquals(null, bc.lookupFc("client"));
-        }
-
-        @Test
-        @Ignore
-        public void testCompositeCollectionImportBindLookupUnbind()
-            throws Exception {
-            ContentController cc = Fractal.getContentController(r);
-            BindingController bc = Fractal.getBindingController(d);
-            bc.bindFc("clients0", cc.getFcInternalInterface("client"));
-            if (isTemplate) {
-                checkList(bc,
-                    new String[] { "client", "clients0", "server", "factory" });
-            } else {
-                checkList(bc, new String[] { "client", "clients0", "server" });
-            }
-            assertEquals(cc.getFcInternalInterface("client"),
-                bc.lookupFc("clients0"));
-            bc.unbindFc("clients0");
-            try {
-                assertEquals(null, bc.lookupFc("clients0"));
-            } catch (NoSuchInterfaceException e) {
-                if (isTemplate) {
-                    checkList(bc, new String[] { "client", "server", "factory" });
-                } else {
-                    checkList(bc, new String[] { "client", "server" });
-                }
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testCompositeSelfBindLookupUnbind()
-            throws Exception {
-            Object itf = Fractal.getContentController(r)
-                                .getFcInternalInterface("client");
-            BindingController bc = Fractal.getBindingController(r);
-            bc.bindFc("server", itf);
-            if (isTemplate) {
-                checkList(bc, new String[] { "client", "server", "factory" });
-            } else {
-                checkList(bc, new String[] { "client", "server" });
-            }
-            assertEquals(itf, bc.lookupFc("server"));
-            bc.unbindFc("server");
-            assertEquals(null, bc.lookupFc("server"));
-        }
-
-        @Test
-        @Ignore
-        public void testCompositeCollectionSelfBindLookupUnbind()
-            throws Exception {
-            Object itf = Fractal.getContentController(r)
-                                .getFcInternalInterface("clients0");
-            BindingController bc = Fractal.getBindingController(r);
-            bc.bindFc("servers0", itf);
-            if (isTemplate) {
-                checkList(bc,
-                    new String[] { "client", "server", "servers0", "factory" });
-            } else {
-                checkList(bc, new String[] { "client", "server", "servers0" });
-            }
-            assertEquals(itf, bc.lookupFc("servers0"));
-            bc.unbindFc("servers0");
-            try {
-                assertEquals(null, bc.lookupFc("servers0"));
-            } catch (NoSuchInterfaceException e) {
-                checkList(bc, new String[] { "client", "server" });
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testCompositeNoSuchInterface() throws Exception {
-            try {
-                Fractal.getBindingController(r).lookupFc("c");
-                fail();
-            } catch (NoSuchInterfaceException e) {
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testAlreadyBound() throws Exception {
-            super.testAlreadyBound();
-            BindingController bc = Fractal.getBindingController(d);
-            bc.bindFc("client", c.getFcInterface("server"));
-            try {
-                bc.bindFc("client", c.getFcInterface("server"));
-                fail();
-            } catch (IllegalBindingException e) {
-            }
-            bc.bindFc("clients0", c.getFcInterface("server"));
-            try {
-                bc.bindFc("clients0", c.getFcInterface("server"));
-                fail();
-            } catch (IllegalBindingException e) {
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testNotBound() throws Exception {
-            super.testNotBound();
-            try {
-                Fractal.getBindingController(d).unbindFc("client");
-                fail();
-            } catch (IllegalBindingException e) {
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testInvalidExportBinding() throws Exception {
-            Fractal.getContentController(r).removeFcSubComponent(c);
-            BindingController bc = Fractal.getBindingController(r);
-            try {
-                bc.bindFc("server", c.getFcInterface("server"));
-                fail();
-            } catch (IllegalBindingException e) {
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testInvalidNormalBinding() throws Exception {
-            Fractal.getContentController(r).removeFcSubComponent(d);
-            BindingController bc = Fractal.getBindingController(c);
-            try {
-                bc.bindFc("client", d.getFcInterface("server"));
-                fail();
-            } catch (IllegalBindingException e) {
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testInvalidImportBinding() throws Exception {
-            BindingController bc = Fractal.getBindingController(d);
-            ContentController cc = Fractal.getContentController(r);
-            cc.removeFcSubComponent(d);
-            try {
-                bc.bindFc("client", cc.getFcInternalInterface("client"));
-                fail();
-            } catch (IllegalBindingException e) {
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testInvalidImportBinding2() throws Exception {
-
-            /*
-             * Test added by L. Seinturier.
-             * Following a bug report in AOKell submitted by P.-C. David.
-             */
-            BindingController bc = Fractal.getBindingController(r);
-            try {
-                bc.bindFc("client", d.getFcInterface("server"));
-                fail();
-            } catch (IllegalBindingException e) {
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testWouldCreateInvalidExportBinding()
-            throws Exception {
-            Fractal.getBindingController(r)
-                   .bindFc("server", c.getFcInterface("server"));
-            try {
-                Fractal.getContentController(r).removeFcSubComponent(c);
-                fail();
-            } catch (IllegalContentException e) {
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testWouldCreateInvalidLocalBinding()
-            throws Exception {
-            Fractal.getBindingController(c)
-                   .bindFc("client", d.getFcInterface("server"));
-            try {
-                Fractal.getContentController(r).removeFcSubComponent(c);
-                fail();
-            } catch (IllegalContentException e) {
-            }
-        }
-
-        @Test
-        @Ignore
-        public void testWouldCreateInvalidImportBinding()
-            throws Exception {
-            ContentController cc = Fractal.getContentController(r);
-            Fractal.getBindingController(d)
-                   .bindFc("client", cc.getFcInternalInterface("client"));
-            try {
-                cc.removeFcSubComponent(d);
-                fail();
-            } catch (IllegalContentException e) {
-            }
-        }
-    }
-
-    public static class Template extends TestBindingController {
-        public Template() {
-            isTemplate = true;
-        }
-
-        protected void setUpComponents() throws Exception {
-            c = gf.newFcInstance(t, flatPrimitiveTemplate, C.class.getName());
-            d = gf.newFcInstance(t, flatPrimitiveTemplate, C.class.getName());
-            e = gf.newFcInstance(u, flatPrimitiveTemplate, C.class.getName());
-        }
-    }
-
-    public static class CompositeTemplate extends Composite {
-        public CompositeTemplate() {
-            isTemplate = true;
-        }
-
-        protected void setUpComponents() throws Exception {
-            r = gf.newFcInstance(t, compositeTemplate, null);
-            c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
-            d = gf.newFcInstance(t, compositeTemplate, null);
-            e = gf.newFcInstance(u, compositeTemplate, null);
-            Fractal.getContentController(r).addFcSubComponent(c);
-            Fractal.getContentController(r).addFcSubComponent(d);
-            Fractal.getContentController(r).addFcSubComponent(e);
-        }
-
-        @Test
-        @Ignore
-        public void testInstanceBinding() throws Exception {
-            ContentController cc = Fractal.getContentController(r);
-            Fractal.getContentController(e).addFcSubComponent(c);
-
-            Fractal.getBindingController(r)
-                   .bindFc("server", c.getFcInterface("server"));
-            Fractal.getBindingController(c)
-                   .bindFc("client", d.getFcInterface("server"));
-            Fractal.getBindingController(d)
-                   .bindFc("client", cc.getFcInternalInterface("client"));
-
-            Fractal.getBindingController(r)
-                   .bindFc("servers0", c.getFcInterface("servers0"));
-            Fractal.getBindingController(c)
-                   .bindFc("clients0", d.getFcInterface("servers0"));
-            Fractal.getBindingController(d)
-                   .bindFc("clients0", cc.getFcInternalInterface("clients0"));
-
-            Component rComp = Fractal.getFactory(r).newFcInstance();
-
-            cc = Fractal.getContentController(rComp);
-            Component[] comps = cc.getFcSubComponents();
-
-            Component cComp = comps[0];
-            Component dComp = comps[1];
-
-            assertEquals(Fractal.getBindingController(rComp).lookupFc("server"),
-                cComp.getFcInterface("server"));
-            assertEquals(Fractal.getBindingController(cComp).lookupFc("client"),
-                dComp.getFcInterface("server"));
-            assertEquals(Fractal.getBindingController(dComp).lookupFc("client"),
-                cc.getFcInternalInterface("client"));
-
-            assertEquals(Fractal.getBindingController(rComp).lookupFc("servers0"),
-                cComp.getFcInterface("servers0"));
-            assertEquals(Fractal.getBindingController(cComp).lookupFc("clients0"),
-                dComp.getFcInterface("servers0"));
-            assertEquals(Fractal.getBindingController(dComp).lookupFc("clients0"),
-                cc.getFcInternalInterface("clients0"));
         }
     }
 }

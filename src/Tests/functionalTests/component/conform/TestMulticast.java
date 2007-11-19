@@ -35,8 +35,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
@@ -55,6 +53,8 @@ import functionalTests.component.conform.components.MasterImpl;
 import functionalTests.component.conform.components.Slave;
 import functionalTests.component.conform.components.SlaveImpl;
 import functionalTests.component.conform.components.SlaveMulticast;
+
+import junit.framework.Assert;
 
 
 public class TestMulticast extends Conformtest {
