@@ -163,8 +163,6 @@ public class ProActiveComponentRepresentativeImpl
         nfInterfaceReferences = new HashMap<String, Interface>(1 +
                 controllersConfiguration.size());
 
-        int i = 0;
-
         // add controllers
         //Enumeration controllersInterfaces = controllersConfiguration.propertyNames();
         Iterator iteratorOnControllers = controllersConfiguration.keySet()
@@ -217,8 +215,6 @@ public class ProActiveComponentRepresentativeImpl
             if (currentInterface != null) {
                 nfInterfaceReferences.put(currentController.getFcItfName(),
                     currentInterface);
-
-                i++;
             }
         }
     }
@@ -338,9 +334,7 @@ public class ProActiveComponentRepresentativeImpl
         ProActiveInterface[] interface_references = new ProActiveInterface[interfaces.length -
             1];
         for (int i = 0; i < interfaces.length; i++) {
-            if (interfaces[i].equals(this)) {
-                //TODO_C
-            } else {
+            if (!interfaces[i].equals(this)) {
                 interface_references[i] = (ProActiveInterface) interfaces[i];
             }
         }

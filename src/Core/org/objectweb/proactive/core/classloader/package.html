@@ -51,7 +51,7 @@ instantiated on runtime 3.<br>
 <p>We assume that runtime 2 is linked (through a "hook") to runtime 1
 and that runtime 3
 is linked to runtime 2. This linkage is automatic when the
-option "proactive.classloader" is enabled and when runtime 2 is created
+option "proactive.classloader" is set to "true" and when runtime 2 is created
 from runtime 1
 and runtime 3 is created from runtime 2. In this case, whenever a class
 is
@@ -73,7 +73,7 @@ runtime 3.</p>
  style="font-weight: bold;"></span></h3>
 <h3>Set-up</h3>
 <p>The ProActive class downloading mechanism is set up as follows : <br>
-- The property "proactive.classloader" should be set to "enable" in the
+- The property "proactive.classloader" should be set to "true" in the
 runtime that initiates the deployment - When a new runtime is created
 from a deployment descriptor, it holds a reference on the runtime that
 created it. <br>
