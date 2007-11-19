@@ -28,9 +28,38 @@
 		computing system with common interfaces, new programming models have to be defined to abstract away these complexities 
 		from programmers.
 	</para>
+	<sect1>
+		<title>ProActive Parallel Suite</title>
+		<sect2>
+			<title>Introduction</title>
+			<para>//TODO</para>
+		</sect2>
+		<sect2>
+			<title>IC2D Eclipse IDE</title>
+			<para>//TODO</para>
+		</sect2>
+		<sect2>
+			<title>Programming and Composing</title>
+			<para>//TODO</para>
+		</sect2>
+		<sect2>
+			<title>Activating Technical Services</title>
+			<para>//TODO</para>		
+		</sect2>
+		<sect2>
+			<title>Deployment And Virtualization</title>
+			<para>//TODO</para>
+		</sect2>
+		
+	</sect1>
+	
+		
    <sect1>
-  	<title>ProActive Middleware</title>
-  	  	 	
+  	<title>ProActive Programming Frameworks</title>
+		<sect2>
+			<title>Introduction</title>
+			<para>//TODO</para>
+		</sect2>
   	<para>
   	
   	ProActive is an open source Java library aiming to simplify the programming of
