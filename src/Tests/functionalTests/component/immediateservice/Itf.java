@@ -30,6 +30,7 @@
  */
 package functionalTests.component.immediateservice;
 
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
@@ -39,4 +40,6 @@ public interface Itf {
     public void loopQueueMethod();
 
     public void immediateStopLoopMethod();
+
+    public void startFc() throws IllegalLifeCycleException;
 }

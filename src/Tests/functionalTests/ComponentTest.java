@@ -32,7 +32,6 @@ package functionalTests;
 
 import org.junit.BeforeClass;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 import functionalTests.FunctionalTest;
 

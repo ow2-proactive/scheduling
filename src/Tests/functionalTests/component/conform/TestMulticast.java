@@ -34,8 +34,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
@@ -46,7 +47,6 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.component.conform.components.BadSlaveMulticast;
@@ -55,8 +55,6 @@ import functionalTests.component.conform.components.MasterImpl;
 import functionalTests.component.conform.components.Slave;
 import functionalTests.component.conform.components.SlaveImpl;
 import functionalTests.component.conform.components.SlaveMulticast;
-
-import junit.framework.Assert;
 
 
 public class TestMulticast extends Conformtest {

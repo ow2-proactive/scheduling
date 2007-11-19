@@ -31,6 +31,7 @@
 package functionalTests.component.immediateservice;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
@@ -68,16 +69,25 @@ public class Test extends ComponentTest {
                     }),
                 new ControllerDescription("component", Constants.PRIMITIVE),
                 new ContentDescription(A.class.getName(), new Object[] {  }));
-
         Fractal.getLifeCycleController(comp).startFc();
+
+        LifeCycleController lcc = Fractal.getLifeCycleController(comp);
+
+        Itf itf = (Itf) comp.getFcInterface("itf");
+
         // first execute an infinite loop in the component activity
-        ((Itf) comp.getFcInterface("itf")).loopQueueMethod();
+        itf.loopQueueMethod();
+
+        //itf.startFc();
+        //lcc.startFc();
+
         // call an immediate service: it is executed concurrently with the activity 
-        System.err.println("MAIN: result is '" +
-            ((Itf) comp.getFcInterface("itf")).immediateMethod("a ") + "'");
-        //Fractal.getLifeCycleController(comp).startFc();
+        System.err.println("MAIN: result is '" + itf.immediateMethod("a ") +
+            "'");
+
         // call an immediate service to set the condition false and thus terminate the loopQueueMethod
-        ((Itf) comp.getFcInterface("itf")).immediateStopLoopMethod();
-        //Fractal.getLifeCycleController(comp).stopFc();
+        itf.immediateStopLoopMethod();
+
+        lcc.stopFc();
     }
 }
