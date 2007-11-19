@@ -203,7 +203,7 @@ public class ProActiveComponentImpl extends AbstractRequestHandler
             }
             e.printStackTrace();
             throw new RuntimeException("cannot create interface references : " +
-                e.getMessage());
+                e.getMessage(), e);
         }
     }
 
