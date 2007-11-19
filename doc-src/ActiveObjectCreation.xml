@@ -1,2001 +1,2843 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="ActiveObjectCreation">
-  <title>Active Objects: creation and advanced concepts</title>
-
-  <para>Active objects are created on a per-object basis: an application can
-  contain active as well as passive instances of a given class. In the
-  remaining part of this section, we will consider that we want to create an
-  active instance of class <literal>example.A</literal>. Although almost any
-  object can be turned into an Active Object, there are some restrictions that
-  will be detailed below.</para>
-
-  <para>Any method call <emphasis>m</emphasis> done on a given instance
-  <emphasis>a</emphasis> of <literal>A</literal> would result in the
-  invocation of the method <emphasis>m</emphasis> on <emphasis>a</emphasis> by
-  the caller thread. By contrast, the same call done on the active object
-  <emphasis>aa</emphasis> created from <literal>A</literal> would result into
-  placing a request embedding the method call for <emphasis>m</emphasis> in
-  <indexterm>
-      <primary>Request Queue</primary>
-    </indexterm> the request queue of the active object
-  <emphasis>aa</emphasis>. Then, later on, the active thread of
-  <emphasis>aa</emphasis> would eventually pick-up and serve the request for
-  the method <emphasis>m</emphasis>. That would result in the invocation of
-  <emphasis>m</emphasis> on the reified object <emphasis>a</emphasis> by the
-  active thread.</para>
-
-  <para>The code for creating a passive instance of <literal>A</literal> could
-  be:</para>
-
-  <para><programlisting lang="java"> A a = new A(26, "astring"); </programlisting></para>
-
-  <para>In <emphasis role="bold">ProActive</emphasis> there are two ways to
-  create active objects. One way is to use
-  <literal>ProActive.newActive</literal> and is based on the instantiation of
-  a new object, the other is to use <literal>ProActive.turnActive</literal>
-  and is based on the use of an existing object.</para>
-
-  <sect1>
-    <title>Instantiation-Based Creation</title>
-
-    <indexterm>
-      <primary>newActive</primary>
-    </indexterm>
-
-    <indexterm>
-      <primary>Constructor</primary>
-
-      <secondary>empty no-args</secondary>
-    </indexterm>
-
-    <para>When using instantiation-based creation, any argument passed to the
-    constructor of the reified object through
-    <literal>ProActive.newActive</literal> is serialized and passed by copy to
-    the object. That's because the model behind <emphasis
-    role="bold">ProActive</emphasis> is uniform whether the active object is
-    instantiated locally or remotely. The parameters are therefore guaranteed
-    to be passed by copy to the constructor. When using
-    <literal>ProActive.newActive</literal>, one needs to make sure that the
-    constructor arguments are <literal>Serializable</literal>. On the other
-    hand, the class used to create the active object <emphasis
-    role="bold">does not need to be</emphasis><literal> Serializable</literal>
-    even in the case of remotely-created Active Objects. Bear in mind also
-    that a reified object must have a declared empty no-args constructor in
-    order to be properly created.</para>
-
-    <programlisting lang="java">    A a;
-    Object[] params = new Object[] { new Integer (26), "astring" };
-    try {
-      a = (A) ProActive.newActive("example.A", params);
-    } catch (ActiveObjectCreationException e) {
-      // creation of ActiveObject failed
-      e.printStackTrace();
-    }
-    catch(NodeException ex){
-        ex.printStackTrace();
-    }</programlisting>
-
-    <para>This code creates an active object of class <literal>A</literal> in
-    the local JVM. If the invocation of the constructor of class
-    <literal>A</literal> throws an exception, it is placed inside an exception
-    of type <literal>ActiveObjectCreationException</literal>. When the call to
-    <literal>newActive</literal> returns, the active object has been created
-    and its active thread is started.</para>
-
-    <sect2>
-      <title>Possible ambiguities on the constructor</title>
-
-      <para>The first parameter of newActive is a string containing the
-      fully-qualified name of the class we want to make active. Parameters to
-      the constructor have to be passed as an array of Object. Then, according
-      to the type of the elements of this array, the ProActive runtime
-      determines which constructor of class A to call. Nevertheless, there is
-      still room for some ambiguity in resolving the constructor
-      because:</para>
-
-      <itemizedlist>
-        <indexterm>
-          <primary>Constructor</primary>
-
-          <secondary>newActive Arguments</secondary>
-        </indexterm>
-
-        <listitem>
-          <para>As the arguments of the constructor are stored in an array of
-          type <literal>Object[]</literal>, primitive types have to be
-          represented by their wrappers object type. In the example above, we
-          use an <literal>Integer</literal> object to wrap the
-          <literal>int</literal> value 26. An ambiguity then arises if two
-          constructor of the same class only differ by converting a primitive
-          type to its corresponding wrapper class. In the example below, an
-          ambiguity exists between the first and the second
-          constructors.</para>
-        </listitem>
-
-        <listitem>
-          <para>If one argument is null, the runtime can obviously not
-          determine its type. This is the second source of ambiguity. In the
-          example below, an ambiguity exists between the third and the fourth
-          constructors if the second element of the array is
-          <literal>null</literal>.</para>
-        </listitem>
-      </itemizedlist>
-
-      <programlisting lang="java">    public A (int i) {
-        //
-    }
-    public A (Integer i) {
-        //
-    }
-    public A (int i, String s) {
-        //
-    }
-    public A (int i, Vector v) {
-        //
-    }</programlisting>
-    </sect2>
-
-    <sect2 id="Active_Object_On_Node">
-      <title>Using a Node</title>
-
-      <para>It is possible to pass a third parameter to the call to
-      <literal>newActive</literal> in order to create the new active object on
-      a specific JVM, possibly remote. The JVM is identified using a
-      <literal>Node</literal> object that offers the minimum services
-      ProActive needs on a given JVM to communicate with this JVM. If that
-      parameter is not given, the active object is created in the current JVM
-      and is attached to a default Node.</para>
-
-      <para>A node is identified by a node URL which is formed using the
-      protocol, the hostname hosting the JVM where is the node located and the
-      name of the node. The <literal>NodeFactory</literal> allows to create or
-      lookup nodes. The method <literal>newActive</literal> can take in
-      parameter a nodeURL as a <literal>String</literal> or a
-      <literal>Node</literal> object that points to an existing node. Here an
-      example:</para>
-
-      <programlisting lang="java">      a = (A) ProActive.newActive("example.A", params, "rmi://pluto.inria.fr/aNode");
-  or
-      Node node = NodeFactory.getNode("rmi://pluto.inria.fr/aNode");
-      a = (A) ProActive.newActive("example.A", params, node);</programlisting>
-    </sect2>
-  </sect1>
-
-  <sect1>
-    <title>Object-Based Creation</title>
-
-    <para>Object-based creation is used for turning an existing passive object
-    instance into an active one. It has been introduced in ProActive as an
-    answer to the following problem. Consider, for example, that an instance
-    of class A is created inside a library and returned as the result of a
-    method call. As a consequence, we do not have access to the source code
-    where the object is created, which prevents us for modifying it for
-    creating an active instance of A. Even if it were possible, it may not be
-    likely since we do not want to get an active instance of A for every call
-    on this method.</para>
-
-    <para>When using object based creation, you create the object that is
-    going to be reified as an active object before hand. Therefore there is no
-    serialization involved when you create the object. When you invoke
-    <literal>ProActive.turnActive</literal> on the object two cases are
-    possible. If you create the active object locally (on a local node), it
-    will not be serialized. If you create the active object remotely (on a
-    remote node), the reified object will be serialized. Therefore, if the
-    <literal>turnActive</literal> is done on a remote node, the class used to
-    create the active object this way <emphasis role="bold">has to
-    be</emphasis><literal>Serializable</literal>. In addition, when using
-    <literal>turnActive</literal>, care must be taken that no other references
-    to the originating object are kept by other objects after the call to
-    turnActive. A direct call to a method of the originating object without
-    passing by a ProActive stub on this object will break the model.</para>
-
-    <para>Code for object-based creation looks like this:</para>
-
-    <programlisting lang="java">    A a = new A (26, "astring");
-    a = (A) ProActive.turnActive(a);</programlisting>
-
-    <para>As for <literal>newActive</literal>, the second parameter of
-    <literal>turnActive</literal> if given is the location of the active
-    object to be created. No parameter or <literal>null</literal> means that
-    the active object is created locally in the current node.</para>
-
-    <para>When using this method, the programmer has to make sure that no
-    other reference on the passive object <emphasis>a</emphasis> exist after
-    the call to turnActive. If such references were used for calling methods
-    directly on the passive A (without going through its body), the model
-    would no more be consistent and specialization of synchronization could no
-    more be guaranteed.</para>
-  </sect1>
-
-  <sect1 id="ActiveObjectCreation_html_activity">
-    <title>Specifying the activity of an active object</title>
-
-    <indexterm>
-      <primary>Activity</primary>
-
-      <secondary>FIFO</secondary>
-    </indexterm>
-
-    <para>Customizing the activity of the active object is at the core of
-    ProActive because it allows to specify fully the behavior of an active
-    object. By default, an object turned into an active object serves its
-    incoming requests in a FIFO manner. In order to specify another policy for
-    serving the requests or to specify any other behaviors one can implement
-    interfaces defining methods that will be automatically called by
-    ProActive.</para>
-
-    <para>It is possible to specify what to do before the activity starts,
-    what the activity is and what to do after it ends. The three steps
-    are:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>the initialization of the activity (done only once)</para>
-      </listitem>
-
-      <listitem>
-        <para>the activity itself</para>
-      </listitem>
-
-      <listitem>
-        <para>the end of the activity (done only once)</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>Three interfaces are used to define and implement each step:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>InitActive (see code in <xref linkend="InitActive.java"
-        role="javaFileSrc" />)</para>
-      </listitem>
-
-      <listitem>
-        <para>RunActive (see code in <xref linkend="RunActive.java"
-        role="javaFileSrc" />)</para>
-      </listitem>
-
-      <listitem>
-        <para>EndActive (see code in <xref linkend="EndActive.java"
-        role="javaFileSrc" />)</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>In case of a migration, an active object stops and restarts its
-    activity automatically without invoking the init or ending phases. Only
-    the activity itself is restarted.</para>
-
-    <para>Two ways are possible to define each of the three phases of an
-    active object.</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Implementing one or more of the three interfaces directly in the
-        class used to create the active object</para>
-      </listitem>
-
-      <listitem>
-        <para>Passing an object implementing one or more of the three
-        interfaces in parameter to the method <literal>newActive</literal> or
-        <literal>turnActive</literal> (parameter active in those
-        methods)</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>Note that the methods defined by those 3 interfaces are guaranted to
-    be called by the active thread of the active object.</para>
-
-    <sect2>
-      <title>Algorithms deciding which activity to invoke</title>
-
-      <para>The algorithms that decide for each phase what to do are the
-      following (<literal>activity</literal> is the eventual object passed as
-      a parameter to <literal>newActive</literal> or
-      <literal>turnActive</literal>):</para>
-
-      <indexterm significance="preferred">
-        <primary>InitActive</primary>
-
-        <secondary>interface</secondary>
-      </indexterm>
-
-      <para><emphasis role="bold">InitActive</emphasis></para>
-
-      <screen>if activity is non null and implements InitActive
-  we invoke the method initActivity defined in the object activity
-else if the class of the reified object implements InitActive
-  we invoke the method initActivity of the reified object
-else
-  we don't do any initialization</screen>
-
-      <indexterm significance="preferred">
-        <primary>RunActive</primary>
-
-        <secondary>interface</secondary>
-      </indexterm>
-
-      <para><emphasis role="bold">RunActive</emphasis></para>
-
-      <screen>if activity is non null and implements RunActive
-  we invoke the method runActivity defined in the object activity
-else if the class of the reified object implements RunActive
-  we invoke the method runActivity of the reified object
-else
-  we run the standard FIFO activity</screen>
-
-      <indexterm significance="preferred">
-        <primary>EndActive</primary>
-
-        <secondary>interface</secondary>
-      </indexterm>
-
-      <para><emphasis role="bold">EndActive</emphasis></para>
-
-      <screen>if activity is non null and implements EndActive
-  we invoke the method endActivity defined in the object activity
-else if the class of the reified object implements EndActive
-  we invoke the method endActivity of the reified object
-else
-  we don't do any cleanup</screen>
-    </sect2>
-
-    <sect2>
-      <title>Implementing the interfaces directly in the class</title>
-
-      <para>Implementing the interfaces directly in the class used to create
-      the active object is the easiest solution when you control the class
-      that you make active. Depending on which phase in the life of the active
-      object you want to customize, you implement the corresponding interface
-      (one or more) amongst <literal>InitActive</literal>,
-      <literal>RunActive</literal> and <literal>EndActive</literal>. Here is
-      an example that has a custom initialization and activity.</para>
-
-      <example>
-        <title>Custom Init and Run</title>
-
-        <para><programlisting lang="java">  import org.objectweb.proactive.*;
-  public class A implements InitActive, RunActive {
-        private String myName;
-         public String getName() {
-         return myName;
-        }
-        // -- implements InitActive
-        public void initActivity(Body body) {
-        myName = body.getName();
-        }
-        // -- implements RunActive for serving request in a LIFO fashion
-         public void runActivity(Body body) {
-        Service service = new Service(Body);
-        while (body.isActive()) {
-         service.blockingServeYoungest();
-        }
-        }
-        public static void main(String[] args) throws Exception {
-        A a = (A) ProActive.newActive("A",null);
-        System.out.println("Name = "+a.getName());
-        }
-  }</programlisting></para>
-      </example>
-
-      <para><example>
-          <title>Start, stop, suspend, restart a simulation algorithm in
-          runActivity method</title>
-
-          <para><programlisting lang="java">import org.objectweb.proactive.*;
-public class Simulation implements RunActive {
-      private boolean stoppedSimulation=false;
-        private boolean startedSimulation=false
-        private boolean suspendedSimulation=false;
-        private boolean notStarted = true;
-        public void startSimulation(){
-        //<emphasis role="bold">Simulation starts</emphasis>
-        notStarted = false;
-        startedSimulation=true;
-        }
-        public void restartSimulation(){
-        //<emphasis role="bold">Simulation is restarted</emphasis>
-        startedSimulation=true;
-        suspendedSimulation=false;
-        }
-        public void suspendSimulation(){
-        //<emphasis role="bold">Simulation is suspended</emphasis>
-        suspendedSimulation=true;
-        startedSimulation = false;
-        }
-        public void stoppedSimulation(){
-        //<emphasis role="bold">Simulation is stopped</emphasis>
-        stoppedSimulation=true;
-        }
-        public void runActivity(Body body) {
-         Service service = new Service(Body);
-        while (body.isActive()) {
-        //If the simulation is not yet started wait until startSimulation method
-        <emphasis role="bold">if(notStarted) service.blockingServeOldest(startSimulation());</emphasis>
-       // If the simulation is started serve request with FIFO
-<emphasis role="bold">        if(startedSimulation) service.blockingServeOldest();</emphasis>
-        // If simulation is suspended wait until restartSimulation method
-<emphasis role="bold">        if(suspendedSimulation) service.blockingServeOldest(restartSimulation());</emphasis>
-        // If simulation is stopped, exit<emphasis role="bold">
-        if(stoppedSimulation) exit();</emphasis>
-        }
-}</programlisting></para>
-        </example></para>
-
-      <example>
-        <title>Reactive Active Object</title>
-
-        <para>Even when an AO is busy doing its own work, it can remain
-        reactive to external events (method calls). One just has to program
-        non-blocking services to take into account external
-        inputs.<programlisting lang="java">public class BusyButReactive implements RunActive {
-public void  runActivity(Body body) {
-Service service = new Service(body);
-while ( ! hasToTerminate ) {
-        ...    // Do some activity on its own
-        ...
-        ...    // Non blocking service
-        ...
-        service.serveOldest("changeParameters", "terminate");   ... 
-      }
-    }
-public void changeParameters () {...   // change computation parameters}
-public void terminate (){ hasToTerminate=true;}
-}</programlisting></para>
-      </example>
-
-      <para>It also allows one to specify explicit termination of AOs (there
-      is currently no Distributed Garbage Collector). Of course, the
-      reactivity is up to the length of going around the loop.</para>
-    </sect2>
-
-    <sect2>
-      <title>Passing an object implementing the interfaces at
-      creation-time</title>
-
-      <para>Passing an object implementing the interfaces when creating the
-      active object is the solution to use when you do not control the class
-      that you make active or when you want to write generic activities policy
-      and reused them with several active objects. Depending on which phase in
-      the life of the active object you want to customize, you implement the
-      corresponding interface (one or more) amongst
-      <literal>InitActive</literal>, <literal>RunActive</literal> and
-      <literal>EndActive</literal>. Following is an example that has a custom
-      activity.</para>
-
-      <para>Comparing to the solution above where interfaces are directly
-      implemented in the reified class, there is one restriction here: you
-      cannot access the internal state of the reified object. Using an
-      external object should therefore be used when the implementation of the
-      activity is generic enough not to have to access the member variables of
-      the reified object.</para>
-
-      <programlisting lang="java">  import org.objectweb.proactive.*;
-  public class LIFOActivity implements RunActive {
-    // -- implements RunActive for serving request in a LIFO fashion
-    public void runActivity(Body body) {
-      Service service = new Service(Body);
-      while (body.isActive()) {
-        service.blockingServeYoungest();
-      }
-    }
-  }
-  import org.objectweb.proactive.*;
-  public class A implements InitActive {
-    private String myName;
-    public String getName() {
-      return myName;
-    }
-    // -- implements InitActive
-    public void initActivity(Body body) {
-      myName = body.getName();
-    }
-    public static void main(String[] args) throws Exception {
-      // newActive(classname, constructor parameter (null = none), 
-      //           node (null = local), active, MetaObjectFactory (null = default)
-      A a = (A) ProActive.newActive("A", null, null, new LIFOActivity(), null);
-      System.out.println("Name = "+a.getName());
-    }
-  }</programlisting>
-    </sect2>
-  </sect1>
-
-  <sect1 id="ActiveObjectCreation_html_restrictions">
-    <title>Restrictions on reifiable objects</title>
-
-    <para>Not all classes can give birth to active objects. There exist some
-    restrictions, most of them caused by the 100% Java compliance, which
-    forbids modifying the Java Virtual Machine or the compiler.</para>
-
-    <para>Some of these restrictions work at class-level:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Final classes cannot give birth to active object</para>
-      </listitem>
-
-      <listitem>
-        <para>Same thing for non-public classes</para>
-      </listitem>
-
-      <listitem>
-        <para>Classes without a no-argument constructor cannot be reified.
-        This restriction will be softened in a later release of
-        ProActive</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>Some other happen at the level of a method in a specific
-    class:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>Final methods cannot be used at all. Calling a final method on
-        an active object leads to inconsistent behavior.</para>
-      </listitem>
-
-      <listitem>
-        <para>Calling a non-public method on an active object raises an
-        exception. This restriction disappeared with JDK 1.2.</para>
-      </listitem>
-    </itemizedlist>
-  </sect1>
-
-  <sect1 id="ActiveObjectCreation_html_events">
-    <title>Event based programming</title>
-
-	<para>ProActive supports an event based programming model. That is, an
-	active object can schedule one of its method to be called when a future
-	is updated. This method will be enqueued into the active object adding
-	the callback. Here is an excerpt from a class using the mechanism:
-	</para>
-	
-	 <programlisting lang="java">
-public class MyActiveObject {
-     public void myCallback(Future&lt;StringWrapper&gt; future) {
-         try {
- 			String s = future.get().stringValue();
- 			System.out.println("Got this value: " + s);
- 		} catch (InterruptedException e) {
- 			/* This cannot happen */
- 			return;
- 		} catch (ExecutionException e) {
- 			System.out.println("Got an exception instead of the future: " + e.getCause());
- 			return;
- 		}
-     }
-
-     public void someRunningMethod(SomeActiveObjectClass ao) {
-     	StringWrapper result = ao.foo();
-     	ProFuture.addActionOnFuture(result, "myCallback");
-     }
- }
-	</programlisting>
-
-	<para>As seen in the example, the callback method takes the Future as
-	parameter, it is the java.util.concurrent.Future one. It is also possible
-	to set the callback method to an immediate service method.
-	</para>
-  </sect1>
-
-
-  <sect1 id="ActiveObjectCreation_html_factory">
-    <title>Using the Factory Method Design Pattern</title>
-
-    <para>Creating an active object using ProActive might be a little bit
-    cumbersome and requires more lines of code that for creating a regular
-    object. A nice solution to this problem is through the use of the
-    <emphasis role="bold">factory</emphasis> pattern. This mainly applies to
-    class-based creation. It consists in adding a static method to class
-    <literal>pA</literal> that takes care of instantiating the active object
-    and returns it. The code is:</para>
-
-    <programlisting lang="java">  public class AA extends A {
-    public static A createActiveA (int i, String s, Node node) {
-      Object[] params = new Object[] {new Integer (i), s};
-      try {
-        return (A) ProActive.newActive("A", params, node);
-      } catch (Exception e) {
-        System.err.println ("The creation of an active instance of A raised an exception: "+e);
-        return null;
-      }
-    }
-  }</programlisting>
-
-    <para>It is up to the programmer to decide whether this method has to
-    throw exceptions or not. We recommend that this method only throws
-    exceptions that appear in the signature of the reified constructor (none
-    here as the constructor of A that we call doesn't throw any exception).
-    But the non functional exceptions induced by the creation of the active
-    object have to be dealt with somewhere in the code.</para>
-  </sect1>
-
-  <sect1 id="ActiveObjectCreation_html_customize">
-    <title>Advanced: Customizing the Body of an Active Object</title>
-
-    <indexterm>
-      <primary>Body</primary>
-    </indexterm>
-
-    <sect2>
-      <title>Motivations</title>
-
-      <para>There are many cases where you may want to customize the body used
-      when creating an active object. For instance, one may want to add some
-      debug messages or some timing behavior when sending or receiving
-      requests. The body is a non changeable object that delegates most of its
-      tasks to helper objects called MetaObjects. Standard MetaObjects are
-      already used by default in ProActive but one can easily replace any of
-      those MetaObjects by a custom one.</para>
-
-      <para>We have defined the <literal>MetaObjectFactory</literal> interface
-      (see code in <xref linkend="core/body/MetaObjectFactory.java"
-      role="javaFileSrc" />) able to create factories for each of those
-      MetaObjects. This interface is implemented by
-      <literal>ProActiveMetaObjectFactory</literal> (see code in <xref
-      linkend="core/body/ProActiveMetaObjectFactory.java"
-      role="javaFileSrc" />) which provides all the default factories used in
-      ProActive.</para>
-
-      <para>When creating an active object, as we saw above, it is possible to
-      specify which <literal>MetaObjectFactory</literal> to use for that
-      particular instance of active object being created. The class
-      <literal>ProActive</literal> (see code in <xref linkend="ProActive.java"
-      role="javaFileSrc" />) provides extra newActive and turnActive methods
-      for that:</para>
-
-      <!-- Don't link theses complicated methods in PDF manual -->
-
-      <screen os="pdf">ProActive.newActive(
-  java.lang.String, 
-  java.lang.Object[],
-  org.objectweb.proactive.core.node.Node, 
-  org.objectweb.proactive.Active,  
-  org.objectweb.proactive.core.body.MetaObjectFactory)
-               
-ProActive.turnActive(
-  java.lang.Object,
-  org.objectweb.proactive.core.node.Node,
-  org.objectweb.proactive.Active,
-  org.objectweb.proactive.core.body.MetaObjectFactory)</screen>
-
-      <!-- Create links for the HTML manual -->
-
-      <screen><ulink os="html"
-          url="../ProActive.html#newActive(java.lang.String,%20java.lang.Object[],%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">ProActive.newActive(
-  java.lang.String, 
-  java.lang.Object[],
-  org.objectweb.proactive.core.node.Node, 
-  org.objectweb.proactive.Active,  
-	org.objectweb.proactive.core.body.MetaObjectFactory)</ulink></screen>
-
-      <screen><ulink os="html"
-          url="../ProActive.html#turnActive(java.lang.Object,%20org.objectweb.proactive.core.node.Node,%20org.objectweb.proactive.Active,%20org.objectweb.proactive.core.body.MetaObjectFactory)">ProActive.turnActive(
-  java.lang.Object,
-  org.objectweb.proactive.core.node.Node,
-  org.objectweb.proactive.Active,
-	org.objectweb.proactive.core.body.MetaObjectFactory)</ulink></screen>
-    </sect2>
-
-    <sect2>
-      <title>How to do it</title>
-
-      <para>First you have to write a new MetaObject factory that inherits
-      from <literal>ProActiveMetaObjectFactory</literal> (see code in <xref
-      linkend="core/body/ProActiveMetaObjectFactory.java"
-      role="javaFileSrc" />) or directly implements the
-      <literal>MetaObjectFactory</literal> interface (see code in <xref
-      linkend="core/body/MetaObjectFactory.java" role="javaFileSrc" />), in
-      order to redefine everything. Inheriting from
-      <literal>ProActiveMetaObjectFactory</literal> is a great time saver as
-      you only redefine what you really need to. Here is an example:</para>
-
-      <para><programlisting lang="java">public class MyMetaObjectFactory extends ProActiveMetaObjectFactory {
-  private static final MetaObjectFactory instance = new MyMetaObjectFactory();
-  protected MyMetaObjectFactory() {
-    super();
-  }
-  public static MetaObjectFactory newInstance() {
-    return instance;
-  }
-  //
-  // -- PROTECTED METHODS -----------------------------------------------
-  //
-  protected RequestFactory newRequestFactorySingleton() {
-    return new MyRequestFactory();
-  }
-  //
-  // -- INNER CLASSES -----------------------------------------------
-  //
-  protected class MyRequestFactory implements RequestFactory, java.io.Serializable {
-    public Request newRequest(MethodCall methodCall, 
-                      UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-      return new MyRequest(methodCall, sourceBody, isOneWay, sequenceID, server);
-    }
-  } // end inner class MyRequestFactory
-}</programlisting></para>
-
-      <para>The factory above simply redefines the
-      <literal>RequestFactory</literal> in order to make the body use a new
-      type of request. The method <literal>protected RequestFactory
-      newRequestFactorySingleton()</literal> is one convenience method that
-      <literal>ProActiveMetaObjectFactory</literal> (see code in <xref
-      linkend="core/body/ProActiveMetaObjectFactory.java"
-      role="javaFileSrc" />) provides to simplify the creation of factories as
-      singleton. More explanations can be found in the <!-- This url can only work in the html generated files: in pdf there's no ".." -->
-      <ulink os="html"
-      url="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html">javadoc
-      of that class</ulink> <phrase
-      os="pdf"><literal>org.objectweb.proactive.core.body.ProActiveMetaObjectFactory</literal>
-      javadoc</phrase>. The use of that factory is fairly simple. All you have
-      to do is to pass an instance of the factory when creating a new active
-      object. If we take the same example as before we have:</para>
-
-      <programlisting lang="java">  Object[] params = new Object[] {new Integer (26), "astring"};
-  try {
-    A a = (A) ProActive.newActive("example.AA", params, null, null, 
-                                    MyMetaObjectFactory.newInstance());
-  } catch (Exception e) {
-    e.printStackTrace() ;
-  }</programlisting>
-
-      <para>In the case of a <literal>turnActive</literal> we would
-      have:</para>
-
-      <programlisting lang="java">  A a = new A(26, "astring");
-  a = (A) ProActive.turnActive(a, null, null, MyMetaObjectFactory.newInstance());</programlisting>
-    </sect2>
-  </sect1>
-
-  <sect1 id="ActiveObjectCreation_html_elementRole">
-    <title>Advanced: Role of the elements of an active object</title>
-
-    <para>In this section, we'll have a very close look at what happens when
-    an active object is created. This section aims at providing a better
-    understanding of how the library works and where the restrictions of
-    Proactive come from.</para>
-
-    <para>Consider that some code in an instance of class <literal>A</literal>
-    creates an active object of class <literal>B</literal> using a piece of
-    code like this:</para>
-
-    <para><programlisting lang="java">    B b;
-    Object[] params = {&lt;some parameters for the constructor&gt;};
-    try {
-      // We create an active instance of B on the current node
-      b = (B) ProActive.newActive("B", params);
-    } catch (Exception e) {
-      e.printStackTrace () ;
-    }</programlisting></para>
-
-    <para>If the creation of the active instance of B is successful, the graph
-    of objects is as described in figure below (with arrows denoting
-    references).</para>
-
-    <para><figure>
-        <title>The components of an active object</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="images/activeObjectComponents.png"
-                       format="PNG" width="6in" />
-          </imageobject>
-        </mediaobject>
-      </figure></para>
-
-    <para>The active instance of B is actually composed of 4 objects:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para>a stub (<literal>Stub_B</literal>)</para>
-      </listitem>
-
-      <listitem>
-        <para>a proxy (<literal>BodyProxy</literal>)</para>
-      </listitem>
-
-      <listitem>
-        <para>a body (<literal>Body</literal>)</para>
-      </listitem>
-
-      <listitem>
-        <para>an instance of <literal>B</literal></para>
-      </listitem>
-    </itemizedlist>
-
-    <sect2>
-      <title>Role of the stub</title>
-
-      <indexterm>
-        <primary>Stub</primary>
-      </indexterm>
-
-      <para>The role of the class <literal>Stub_B</literal> is to reify all
-      method calls that can be performed through a reference of type
-      <literal>B</literal>, and only these as calling a method declared in a
-      subclass of <literal>B</literal> through downcasting would result in a
-      runtime error). Reifying a call simply means constructing an object (in
-      our case, all reified calls are instance of class
-      <literal>MethodCall</literal>) that represents the call, so that it can
-      be manipulated as any other object. This reified call is then processed
-      by the other components of the active object in order to achieve the
-      behavior we expect from an active object.</para>
-
-      <para>The idea of using a standard object for representing elements of
-      the language that are not normally objects (such as method calls,
-      constructor calls, references, types,...) is what <emphasis>metaobject
-      programming</emphasis> is all about. The metaobject protocol (MOP)
-      ProActive is built on is described in <xref linkend="MOP" /> but it is
-      not a prerequisite for understanding and using ProActive.</para>
-
-      <para>As one of our objectives is to provide transparent active objects,
-      references to active objects of class <literal>B</literal> need to be of
-      the same type as references to passive instances of <literal>B</literal>
-      (this feature is called <emphasis>polymorphism</emphasis> between
-      passive and active instances of the same class). This is why, by
-      construction, <literal>Stub_B</literal> is a subclass of class
-      <literal>B</literal>, therefore allowing instances of class
-      <literal>Stub_B</literal> to be assigned to variables of type
-      <literal>B</literal>.</para>
-
-      <para>Class <literal>Stub_B</literal> redefines each of the methods
-      inherited from its superclasses. The code of each method of class
-      <literal>Stub_B</literal> actually builds an instance of class
-      <literal>MethodCall</literal> in order to represent the call to this
-      method. This object is then passed to the <literal>BodyProxy</literal>,
-      which returns an object that is returned as the result of the method
-      call. From the caller's point of view, everything looks like if the call
-      had been performed on an instance of <literal>B</literal>.</para>
-
-      <para>Now that we know how stubs work, we can understand some of the
-      limitations of ProActive:</para>
-
-      <itemizedlist>
-        <listitem>
-          <para>Obviously, <literal>Stub_B</literal> cannot redefine
-          <literal>final</literal> methods inherited from class
-          <literal>B</literal>. Therefore, calls to these methods are not
-          reified but are executed on the stub, which may lead to
-          unexplainable behavior if the programmer does not carefully avoid
-          calling <literal>final</literal> methods on active objects.</para>
-
-          <para>As there are 6 final methods in the base class
-          <literal>Object</literal>, one may wonder how to live without them.
-          In fact, 5 out of this 6 methods deal with thread synchronization
-          (<literal>notify()</literal>, <literal>notifyAll()</literal> and the
-          3 versions of <literal>wait()</literal>). Those method should not be
-          used since an active object provides thread synchronization. Indeed,
-          using the standard thread synchronization mechanism and ProActive
-          thread synchronization mechanism at the same time might conflict and
-          result in an absolute debugger's nightmare.</para>
-
-          <para>The last final method in the class <literal>Object</literal>
-          is <literal>getClass()</literal>. When invoked on an active object,
-          <literal>getClass()</literal> is not reified and therefore performed
-          on the stub object, which returns an object of class
-          <literal>Class</literal> that represents the class of the stub
-          (<literal>Stub_B</literal> in our example) and not the class of the
-          active object itself (<literal>B</literal> in our example). However,
-          this method is seldom used in standard applications and it doesn't
-          prevent the operator <literal>instanceof</literal> to work thanks to
-          its polymorphic behavior. Therefore the expression <literal>(foo
-          instanceof B)</literal> has the same value whether B is active or
-          not.</para>
-        </listitem>
-
-        <listitem>
-          <para>Getting or setting instance variables directly (not through a
-          getter or a setter) must be avoided in the case of active objects
-          because it results in getting or setting the value on the stub
-          object and not on the instance of the class <literal>B</literal>.
-          This problem is usually worked around by using get/set methods for
-          setting or reading attributes. This rule of strict encapsulation may
-          also be found in JavaBeans or in most distributed object systems
-          like RMI or CORBA.</para>
-        </listitem>
-      </itemizedlist>
-    </sect2>
-
-    <sect2>
-      <title>Role of the proxy</title>
-
-      <para>The role of the proxy is to handle asynchronism in calls to active
-      object. More specifically, it creates future objects if possible and
-      needed, forwards calls to bodies and returns future objects to the
-      stubs. As this class operates on <literal>MethodCall</literal> objects,
-      it is absolutely generic and does not depend at all on the type of the
-      stub that feeds calls in through its <literal>reify</literal>
-      method.</para>
-    </sect2>
-
-    <sect2>
-      <title>Role of the body</title>
-
-      <para>The <literal>body</literal> is responsible for storing calls
-      (actually, <literal>Request</literal> objects) in a queue of pending
-      requests and processing these request according to a given
-      synchronization policy, whose default behavior is FIFO. The Body has its
-      own thread, which alternatively chooses a request in the queue of
-      pending ones and executes the associated call.</para>
-    </sect2>
-
-    <sect2>
-      <title>Role of the instance of class B</title>
-
-      <para>This is a standard instance of class <literal>B</literal>. It may
-      contain some synchronized information in its <literal>live</literal>
-      method, if any. As the body executes calls one by one, there cannot be
-      any concurrent execution of two portions of code of this object by two
-      different threads. This enables the use of pre- and post-conditions and
-      class invariants. As a consequence, the use of the keyword
-      <literal>synchronized</literal> in class <literal>B</literal> should not
-      be necessary. Any synchronization scheme that can be expressed through
-      monitors and <literal>synchronized</literal> statements can be expressed
-      using ProActive's high-level synchronization mechanism in a much more
-      natural and user-friendly way.</para>
-    </sect2>
-  </sect1>
-
-  <sect1 id="FutureObjectCreation">
-    <title>Asynchronous calls and futures</title>
-
-    <sect2>
-      <title>Creation of a Future Object</title>
-
-      <para>Whenever possible a method call on an active object is reified as
-      an asynchronous request. If not possible the call is synchronous and
-      blocks until the reply is received. In case the request is asynchronous,
-      it immediately returns a future object.</para>
-
-      <para>This object acts as a placeholder for the result of the
-      not-yet-performed method invocation. As a consequence, the calling
-      thread can go on with executing its code, as long as it doesn't need to
-      invoke methods on the returned object, in which case the calling thread
-      is automatically blocked if the result of the method invocation is not
-      yet available. Below are shown the different cases that can lead to an
-      asynchronous call. Note that this table does not apply when using the
-      tryWithCatch anotators to deal with asynchronous exceptions. See <xref
-      linkend="exceptions" />.</para>
-
-      <table>
-        <title>Future creation, and asynchronous calls depending on return
-        type</title>
-
-        <tgroup cols="4">
-        <colspec colnum="1" colname="col1" colwidth="1*"/>
-		<colspec colnum="2" colname="col2" colwidth="2*"/>
-		<colspec colnum="3" colname="col3" colwidth="1.5*"/>
-		<colspec colnum="4" colname="col4" colwidth="1*"/>
-		<spanspec spanname="onetwo" namest="col1" nameend="col2"/>
-          <tbody>
-            <row>
-              <entry spanname="onetwo"> <para><emphasis role="bold">Method Signature</emphasis></para> </entry>
-              <entry morerows="1" valign="middle"><para><emphasis role="bold">Creation of a
-              future</emphasis></para></entry>
-
-              <entry morerows="1" valign="middle"><para><emphasis
-              role="bold">Asynchronous</emphasis></para></entry>
-            </row>
-            
-	 		<row>
-				<entry><para><emphasis role="bold">Return
-              type</emphasis></para></entry>
-
-              <entry><para><emphasis role="bold">Can throw checked
-              exception</emphasis></para></entry>
-			</row>
-            <row>
-              <entry><para>Void</para></entry>
-    		   <entry align="center"><para>No</para></entry>
-              <entry align="center"><para>No</para></entry>
-
-              <entry align="center"><para>Yes</para></entry>
-
-              
-            </row>
-			<row>
-              <entry><para>Void</para></entry>
-    		  <entry align="center"><para>Yes</para></entry>
-              <entry align="center"><para>No</para></entry>
-
-              <entry align="center"><para>No</para></entry>
-
-              
-            </row>
-
-
-			<row>
-              <entry><para>Non Reifiable Object</para></entry>
-
-              <entry align="center"><para>No</para></entry>
-
-              <entry align="center"><para>No</para></entry>
-
-              <entry align="center"><para>No</para></entry>
-            </row>
-
-            <row>
-              <entry><para>Non Reifiable Object</para></entry>
-
-              <entry align="center"><para>Yes</para></entry>
-
-              <entry align="center"><para>No</para></entry>
-
-              <entry align="center"><para>No</para></entry>
-            </row>
-           <row>
-              <entry><para>Reifiable Object</para></entry>
-
-              <entry align="center"><para>No</para></entry>
-
-              <entry align="center"><para>Yes</para></entry>
-
-              <entry align="center"><para>Yes</para></entry>
-            </row>
-            <row>
-              <entry><para>Reifiable Object</para></entry>
-
-              <entry align="center"><para>Yes</para></entry>
-
-              <entry align="center"><para>No</para></entry>
-
-              <entry align="center"><para>No</para></entry>
-            </row>
-
-          </tbody>
-        </tgroup>
-      </table>
-
-      <para>As we can see, the creation of a future depends not only on the
-      caller type, but also on the return object type. Creating a future is
-      only possible if the object is reifiable. Note although having a quite
-      similar structure as an active object, a future object is not active. It
-      only has a Stub and a Proxy as shown in figure below:</para>
-
-      <para><figure>
-          <title>A future object</title>
-
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/futureObject.png" format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </figure></para>
-
-      <para>During its lifetime, an active object can create many future
-      objects. There are all automatically kept in a FuturePool.</para>
-
-      <para>Each time a future is created, it is inserted in the future pool
-      of the corresponding active object. When the result becomes available,
-      the future object is removed from the pool. Although most of the methods
-      of the FuturePool are for internal use only and are directly called by
-      the proactive library we provide a method to wait until a result becomes
-      available. Instead of blocking until a specific future is available, the
-      call to <literal>waitForReply()</literal> blocks until any of the
-      current futures become available. An application can be found in the
-      FutureList class.</para>
-
-      <sect3>
-        <title>HashCode and equals</title>
-
-        <para>Any call to a future object is reified in order to be blocked if
-        the future is not yet available and later executed on the result
-        object. However, two methods don't follow this scheme: equals and
-        hashCode. They are often called by other methods from the Java
-        library, like <literal>HashTable.add()</literal> and so are most of
-        the time out of control from the user. This can lead very easily to
-        deadlocks if they are called on a not yet available object.</para>
-      </sect3>
-
-      <sect3>
-        <title>hashCode()</title>
-
-        <para>Instead of returning the hashcode of the object, it returns the
-        hashcode of its proxy. Since there is only one proxy per future
-        object, there is a unique equivalence between them.</para>
-      </sect3>
-
-      <sect3>
-        <title>equals()</title>
-
-        <para>The default implementation of <literal>equals()</literal> in the
-        Object class is to compare the references of two objects. In ProActive
-        it is redefined to compare the hashcode of two proxies. As a
-        consequence it is only possible to compare two future object, and not
-        a future object with a normal object.</para>
-
-        <para>There are some drawbacks with this technique, the main one being
-        the impossibility to have a user override the default
-        <literal>HashTable</literal> and <literal>equals()</literal>
-        methods.</para>
-      </sect3>
-
-      <sect3>
-        <title>toString()</title>
-
-        <para>The <literal>toString()</literal> method is most of the time
-        called with <literal>System.out.println()</literal> to turn an object
-        into a printable string. In the current implementation, a call to this
-        method will block on a future object like any other call, thus, one
-        has to be careful when using it. As an example, trying to print a
-        future object for debugging purpose will most of the time lead to a
-        deadlock. Instead of displaying the corresponding string of a future
-        object, you might consider displaying its hashCode.</para>
-      </sect3>
-    </sect2>
-
-    <sect2>
-      <title>Asynchronous calls in details</title>
-
-      <sect3>
-        <title>The setup</title>
-
-        <para>First, let's introduce the example we'll use throughout this
-        section. Let us say that some piece of code in an instance of class
-        <literal>A</literal> calls method <literal>foo</literal> on an active
-        instance of class <literal>B</literal>. This call is asynchronous and
-        returns a future object of class <literal>V</literal>. Then, possibly
-        after having executed some other code, the same thread that issued the
-        call calls method <literal>bar</literal> on the future object returned
-        by the call to <literal>foo</literal>.</para>
-      </sect3>
-
-      <sect3>
-        <title>What would have happened in a sequential world</title>
-
-        <para>In a sequential, single-threaded version of the same
-        application, the thread would have executed the code of the calling
-        method in class <literal>A</literal> up to the call of
-        <literal>foo</literal>, then the code of <literal>foo</literal> in
-        class <literal>B</literal>, then back to the code of the calling
-        method in class <literal>A</literal> up to the call to
-        <literal>bar</literal>, then the code of <literal>bar</literal> in
-        class <literal>V</literal>, and finally back to the code of the
-        calling method in class <literal>A</literal> until its end. The
-        sequence diagram below summarizes this execution. You can notice how
-        the single thread successively executes code of different methods in
-        different classes.</para>
-
-        <para><figure>
-            <title>Sequence Diagram - single-threaded version of the
-            program</title>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata fileref="images/sequentialCallUMLDiagram.png"
-                           format="PNG" />
-              </imageobject>
-            </mediaobject>
-          </figure></para>
-      </sect3>
-
-      <sect3>
-        <title>Visualizing the graph of objects</title>
-
-        <para>Let us first get an idea of what the graph of objects at
-        execution (the objects with their references to each other) looks like
-        at three different moments of the execution:</para>
-
-        <itemizedlist>
-          <listitem>
-            <para>Before calling <literal>foo</literal>, we have exactly the
-            same setup as after the creation of the active instance of
-            <literal>B</literal> and summarized in the figure below: an
-            instance of class <literal>A</literal> and an active instance of
-            class <literal>B</literal>. As all active objects, the instance of
-            class <literal>B</literal> is composed of a stub (an instance of
-            class <literal>Stub_B</literal>, which actually inherits directly
-            from <literal>B</literal>), a <literal>BodyProxy</literal>, a
-            <literal>Body</literal> and the actual instance of
-            <literal>B</literal>.</para>
-
-            <para><figure>
-                <title>The components of an active object</title>
-
-                <mediaobject>
-                  <imageobject>
-                    <imagedata contentwidth="100"
-                               fileref="images/activeObjectComponents.png"
-                               format="PNG" width="6in" />
-                  </imageobject>
-                </mediaobject>
-              </figure></para>
-          </listitem>
-
-          <listitem>
-            <para>After the asynchronous call to <literal>foo</literal> has
-            returned, <literal>A</literal> now holds a reference onto a future
-            object representing the not-yet-available result of the call. It
-            is actually composed of a <literal>Stub_V</literal> and a
-            <literal>FutureProxy</literal> as shown on the figure
-            below.</para>
-
-            <para><figure>
-                <title>The components of a future object before the result is
-                set</title>
-
-                <mediaobject>
-                  <imageobject>
-                    <imagedata contentwidth="100"
-                               fileref="images/futureObjectComponents.png"
-                               format="PNG" width="6in" />
-                  </imageobject>
-                </mediaobject>
-              </figure></para>
-          </listitem>
-
-          <listitem>
-            <para>Right after having executed <literal>foo</literal> on the
-            instance of <literal>B</literal>, the thread of the
-            <literal>Body</literal> sets the result in the future, which
-            results in the <literal>FutureProxy</literal> having a reference
-            onto a <literal>V</literal> (see figure below).</para>
-
-            <para><figure>
-                <title>All components of a future object</title>
-
-                <mediaobject>
-                  <imageobject>
-                    <imagedata contentwidth="100"
-                               fileref="images/futureObjectAllComponents.png"
-                               format="PNG" width="6in" />
-                  </imageobject>
-                </mediaobject>
-              </figure></para>
-          </listitem>
-        </itemizedlist>
-      </sect3>
-
-      <sect3>
-        <title>Sequence Diagram</title>
-
-        <para>Let us now concentrate on how and when and by which thread the
-        different methods are called. We have two threads: the thread that
-        belongs to the subsystem <literal>A</literal> is part of (let's call
-        it the <emphasis>first thread</emphasis>), and the thread that belongs
-        to the subsystem <literal>B</literal> is part of (the <emphasis>second
-        thread</emphasis>).</para>
-
-        <para>The first thread invokes <literal>foo</literal> on an instance
-        of <literal>Stub_B</literal>, which builds a
-        <literal>MethodCall</literal> object and passes it to the
-        <literal>BodyProxy</literal> as a parameter of the call to
-        <literal>reify</literal>. The proxy then checks the return type of the
-        call (in this case <literal>V</literal>) and generates a future object
-        of type <literal>V</literal> for representing the result of the method
-        invocation. The future object is actually composed of a
-        <literal>Stub_V</literal> and a <literal>FutureProxy</literal>. A
-        reference onto this future object is set in the
-        <literal>MethodCall</literal> object, which will prove useful once the
-        call is executed. Now that the <literal>MethodCall</literal> object is
-        ready, it is passed as a Request to the <literal>Body</literal> of the
-        Active Object as a parameter. The body simply appends this request to
-        the queue of pending requests and returns immediately. The call to
-        <literal>foo</literal> that an <literal>A</literal> issued now returns
-        a future object of type <literal>Stub_V</literal>, that is a subclass
-        of <literal>V</literal>.</para>
-
-        <para>At some point, possibly after having served some other requests,
-        the <emphasis>second thread</emphasis> (the active thread) picks up
-        the request issued by the <emphasis>first thread</emphasis> some time
-        ago. It then executes the embedded call by calling
-        <literal>foo</literal> on the instance of <literal>B</literal> with
-        the actual parameters stored in the <literal>MethodCall</literal>
-        object. As specified in its signature, this call returns an object of
-        type <literal>V</literal>. The <emphasis>second thread</emphasis> is
-        then responsible for setting this object in the future object (which
-        is the reason why <literal>MethodCall</literal> objects hold a
-        reference on the future object created by the
-        <literal>FutureProxy</literal>). The execution of the call is now
-        over, and the <emphasis>second thread</emphasis> can select another
-        request to serve in the queue and execute it.</para>
-
-        <para>In the meantime, the <emphasis>first thread</emphasis> has
-        continued executing the code of the calling method in class
-        <literal>A</literal>. At some point, it calls <literal>bar</literal>
-        on the object of type <literal>Stub_V</literal> that was returned by
-        the call to <literal>foo</literal>. This call is reified thanks to the
-        <literal>Stub_V</literal> and processed by the
-        <literal>FutureProxy</literal>. If the object the future represents is
-        available (the <emphasis>second thread</emphasis> has already set it
-        in the future object, which is described in figure below, the call is
-        executed on it and returns a value to the calling code in
-        <literal>A</literal>.</para>
-
-        <para><figure>
-            <title>Sequence Diagram</title>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata contentwidth="100"
-                           fileref="images/usingFutureAfterGettingResultDiagram.png"
-                           format="PNG" width="6in" />
-              </imageobject>
-            </mediaobject>
-          </figure></para>
-
-        <para>If it is not yet available, the first thread is suspended in
-        <literal>FutureProxy</literal> until the second thread sets the result
-        in the future object (see figure below).</para>
-
-        <para><figure>
-            <title>Sequence Diagram</title>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata contentwidth="100"
-                           fileref="images/usingFutureBeforeGettingResultDiagram.png"
-                           format="PNG" width="6in" />
-              </imageobject>
-            </mediaobject>
-          </figure></para>
-      </sect3>
-    </sect2>
-
-    <sect2 id="FutureObjectCreation_commonerror">
-      <title>Important Notes: Errors to avoid</title>
-
-      <para>There are few things to remember with asynchronous method calls
-      and futures, in order to avoid annoying debugging sessions:</para>
-
-      <itemizedlist>
-        <listitem>
-          <para><emphasis role="bold">Constructor with no-args:</emphasis>
-          this constructor will be used either for the Active Objects
-          creation(if not present, an exception might be thrown) or Future
-          creation for a method call (if not present, the method call is
-          synchronous). Avoid to put initialization stuff in this constructor,
-          as it might lead to unexpected behavior. Indeed this constructor is
-          called for the stub creation.</para>
-        </listitem>
-
-        <listitem>
-          <para>Make your classes implement <emphasis
-          role="bold">Serializable</emphasis> interface since ProActive deals
-          with objects that cross the network</para>
-        </listitem>
-
-        <listitem>
-          <indexterm>
-            <primary>Wrappers</primary>
-
-            <secondary>Asynchronism</secondary>
-          </indexterm>
-
-          <para>Think to use <emphasis role="bold">wrappers</emphasis> instead
-          of primitive types or final classes for methods result type
-          otherwise you will loose the asynchronism capabilities. For instance
-          if one of your object has a method</para>
-
-          <programlisting lang="java"> <emphasis role="bold">int</emphasis> giveSolution(parameter) </programlisting>
-
-          <para>calling this method with ProActive is sychronous. So to keep
-          the asynchronism it is advised to use</para>
-
-          <programlisting lang="java"> <emphasis role="bold">IntWrapper </emphasis>giveSolution(parameter) </programlisting>
-
-          <para>In that case call to this method is asynchronous.</para>
-
-          <para>All wrappers are in the package: <emphasis
-          role="bold">org.objectweb.proactive.core.util.wrapper</emphasis></para>
-
-          <para>ProActive provides more used primitive type wrappers, there
-          are 2 versions of each, one <emphasis
-          role="bold">mutable</emphasis>, and the other which is <emphasis
-          role="bold">immutable</emphasis>.</para>
-
-          <para>Only the methods return type are concerned not the
-          parameters.</para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">Avoid</emphasis> to return null in
-          Active Object methods: on the <emphasis
-          role="bold">caller</emphasis> side the test <emphasis
-          role="bold">if(result_from_method == null)</emphasis> has no sense.
-          Indeed result_from_method is a couple Stub-FutureProxy as explained
-          above, so even if the method returns null, result_from_method cannot
-          be null:</para>
-
-          <programlisting lang="java">public class MyObject{
- public MyObject(){
- //empty constructor with no-args
- }
-
- public Object getObject{
- if(.....) {
- return new Object();
- }
- else {
-   return null; --&gt; to avoid in ProActive
-  }
- }
-
-} </programlisting>
-
-          <para>On the caller side:</para>
-
-          <programlisting lang="java">MyObject o = new MyObject();
-Object result_from_method = o.getObject();
-if(result_from_method == null){
-......
-}</programlisting>
-
-          <para>This test is never true, indeed, result_from_method is
-          <emphasis role="bold">Stub--&gt;Proxy--&gt;null</emphasis> if the
-          future is not yet available or the method returns null or <emphasis
-          role="bold">Stub--&gt;Proxy--&gt;Object</emphasis> if the future is
-          available, but result_from_method is <emphasis role="bold">never
-          null</emphasis>.</para>
-        </listitem>
-      </itemizedlist>
-    </sect2>
-    <sect2>
-      <title>Lightweight Failure detection</title>
-
-      <para>Waiting for the update of a future in a ProActive application could
-      freeze it if the node responsible for updating the future experiences a
-      failure. To this end, ProActive has a comprehensive solution with the
-      generic fault tolerance mechanism, but it can be too expensive to
-      checkpoint active objects, when only fault detection of stateless active
-      objects is needed for example.</para>
-
-      <para>By default, ProActive continuously pings active objects expected
-      to update awaited futures. It is also possible to manually trigger the
-      continuous ping using the FutureMonitoring.monitorFuture(future) API.
-      </para>
-      
-      <para>When using the fault tolerance this mechanism is disabled as it
-      could interfere with the former. This should not be a problem as the
-      features provided by the fault tolerance mechanism is a super set of
-      this one.</para>
-    </sect2>
-  </sect1>
-
-  <sect1 id="AC">
-    <title>Automatic Continuation in ProActive</title>
-
-    <indexterm significance="preferred">
-      <primary>Automatic Continuation</primary>
-    </indexterm>
-
-    <sect2>
-      <title>Objectives</title>
-
-      <para>An Automatic Continuation is due to the propagation of a future
-      outside the activity that has sent the corresponding request.</para>
-
-      <para>Automatic Continuations allow to pass in parameter or return as a
-      result future objects(or objects containing a future) without blocking
-      to wait the result object of the future. When the result is available on
-      the object that originated the creation of the future, this object must
-      update the result in all objects to which it passed the future.</para>
-    </sect2>
-
-    <sect2>
-      <title>Principles</title>
-
-      <itemizedlist>
-        <listitem>
-          <para><emphasis role="bold">Message sending</emphasis></para>
-        </listitem>
-
-        <listitem>
-          <para>Automatic Continuations can occur when sending a request
-          (parameter of the request is a future or contains a future) or when
-          sending a reply (the result is a future or contains a
-          future).</para>
-
-          <para>Outgoing futures are registered in the <emphasis
-          role="bold">FuturePool</emphasis> of the Active Object sending this
-          future(request or reply). Registration for
-          couple(Future,BodyDestination) as an Automatic Continuation occurs
-          when the future is serialized(indeed every request or reply are
-          serialized before being sent, and the future is part of the request
-          or the reply). More precisely, a thread <emphasis
-          role="bold">T</emphasis> sending the message(request or
-          reply)---therefore the thread doing the serialization---, keeps in a
-          static table (<emphasis
-          role="bold">FuturePool.bodyDestination</emphasis>) a reference of
-          the destination body. Hence when a future <emphasis
-          role="bold">F</emphasis> is serialized by the same thread <emphasis
-          role="bold">T</emphasis>(since futures are part of request or reply,
-          it is the same thread serializing the request --or reply-- and the
-          future), it looks up in the static table, if there is a destination
-          <emphasis role="bold">D</emphasis> registered for the thread
-          <emphasis role="bold">T</emphasis>. If true, the future notifies its
-          <emphasis role="bold">FuturePool</emphasis> (that it is going to
-          leave), which in turn registers couple (F,D) as an Automatic
-          Continuation</para>
-
-          <para>When value <emphasis role="bold">V</emphasis> is available for
-          the future <emphasis role="bold">F</emphasis>, <emphasis
-          role="bold">V</emphasis> is propagated to all objects that received
-          the fututre <emphasis role="bold">F</emphasis>. This Update is
-          realized by a particular thread located in the <emphasis
-          role="bold">FuturePool</emphasis>.</para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">Message reception</emphasis></para>
-        </listitem>
-
-        <listitem>
-          <para>When a message is received(request or reply) by an Active
-          Object, this message can contain a future. So the Active Object
-          registers this future in the <emphasis
-          role="bold">FuturePool</emphasis> to be able to update it when the
-          value will be available. This registration takes place in two
-          steps:</para>
-
-          <itemizedlist>
-            <listitem>
-              <para>When the future is deserialized, it registers in a static
-              table (<emphasis
-              role="bold">FuturePool.incomingFutures</emphasis></para>
-            </listitem>
-
-            <listitem>
-              <para>In Receive[Request-Reply] method, it is checked if one or
-              many futures are registerd in that table, then, if true these
-              futures are registerd in the <emphasis
-              role="bold">FuturePool</emphasis> in a standart way.</para>
-            </listitem>
-          </itemizedlist>
-        </listitem>
-      </itemizedlist>
-    </sect2>
-
-    <sect2>
-      <title>Example</title>
-
-      <para>The following piece of code shows both cases: passing a future as
-      parameter or as a result.</para>
-
-      <para><programlisting lang="java">class C {
-....
-        public static void main(String[] args){
-        ......
-        A a = newActive(A);
-        A b = newActive(B);
-        Result r1 = a.foo();   //r1 is a future
-        Result r2 = b.bar(r1); //r1 is passed as parameter
-        Result r3 = b.bar2();  // see <emphasis role="bold">**</emphasis>
-        ........
-        }       //end of main
-...
-}       //end of class C</programlisting></para>
-
-      <para>where</para>
-
-      <programlisting lang="java">class A {
-  ...
-        public Result foo(){
-        ...
-        }
-  ...
-} //end of class A</programlisting>
-
-      <para>and</para>
-
-      <programlisting lang="java">class B {
-...
-         public Result bar (Result r) {
-        ...
-         }
-
-        public Result bar2 () {
-         A a = newActive(A);
-        return a.foo();     //  <emphasis role="bold">**</emphasis> future is sent as a result
-         }
-} //end of class B</programlisting>
-    </sect2>
-
-    <sect2>
-      <title>Illustration of an Automatic Continuation</title>
-
-      <indexterm>
-        <primary>Automatic Continuation</primary>
-      </indexterm>
-
-      <para>We will illustrate here how a future is first created, then passed
-      as parameter to a method later on.</para>
-
-      <para><informalfigure>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/e1.png" format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </informalfigure></para>
-
-      <para>Let us say that some piece of code in main method of an object C
-      calls method <emphasis role="bold">foo()</emphasis> on an instance of
-      class A.</para>
-
-      <para><informalfigure>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/e2.png" format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </informalfigure></para>
-
-      <para>This call is asynhronous and returns a future object <emphasis
-      role="bold">Future_r1</emphasis> of class Result.</para>
-
-      <para><informalfigure>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/e3.png" format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </informalfigure></para>
-
-      <para>Then method <emphasis role="bold">bar()</emphasis> is called on an
-      instance of class B passing future <emphasis
-      role="bold">Future_r1</emphasis> as a parameter to the method</para>
-
-      <para><informalfigure>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/e4.png" format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </informalfigure></para>
-
-      <para>This call is asynhronous and returns a future object <emphasis
-      role="bold">Future_r2</emphasis> of class Result. B needs the value of
-      <emphasis role="bold">Future_r1</emphasis> which is not yet available in
-      order to return the result of method <emphasis
-      role="bold">bar()</emphasis>, so it gets the future too.</para>
-
-      <para><informalfigure>
-          <mediaobject>
-            <imageobject>
-              <imagedata fileref="images/e5.png" format="PNG" />
-            </imageobject>
-          </mediaobject>
-        </informalfigure></para>
-
-      <para>The value of the result for the call to method <emphasis
-      role="bold">foo</emphasis> is now available, so A updates the value of
-      <emphasis role="bold">Future_r1</emphasis></para>
-
-      <para><informalfigure>
-          <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100" fileref="images/e6.png"
-                         format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </informalfigure></para>
-
-      <para>C updates the value of <emphasis role="bold">Future_r1</emphasis>
-      for B</para>
-
-      <para><informalfigure>
-          <mediaobject>
-            <imageobject>
-              <imagedata contentwidth="100" fileref="images/e7.png"
-                         format="PNG" width="6in" />
-            </imageobject>
-          </mediaobject>
-        </informalfigure></para>
-
-      <para>B returns the value for the call to method <emphasis
-      role="bold">bar()</emphasis> and updates the value of <emphasis
-      role="bold">Future_r2</emphasis> for C</para>
-    </sect2>
-  </sect1>
-
-  <sect1 id="HelloWorld">
-    <title>The Hello world example</title>
-
-    <para>This example implements a very simple client-server application. A
-    client object display a <literal>String</literal> received from a remote
-    server. We will see how to write classes from which active and remote
-    objects can be created, how to find a remote object and how to invoke
-    methods on remote objects.</para>
-
-    <sect2>
-      <title>The two classes</title>
-
-      <para>Only two classes are needed: one for the server object
-      <literal>Hello</literal> and one for the client that accesses it
-      <literal>HelloClient</literal>.</para>
-
-      <sect3>
-        <title>The Hello class</title>
-
-        <para>This class implements server-side functionalities. Its creation
-        involves the following steps:</para>
-
-        <itemizedlist>
-          <listitem>
-            <para>Provide an implementation for the required server-side
-            functionalities</para>
-          </listitem>
-
-          <listitem>
-            <para>Provide an empty, no-arg constructor</para>
-          </listitem>
-
-          <listitem>
-            <para>Write a <literal>main</literal> method in order to
-            instantiate one server object and register it with an URL.</para>
-          </listitem>
-        </itemizedlist>
-
-        <example>
-          <title>A possible implementation for the <literal>Hello</literal>
-          class:</title>
-
-          <para><programlisting lang="java">public class Hello {
-  private String name;
-  private String hi = "Hello world";
-  private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
-  public Hello() {
-  }
-  public Hello(String name) {
-    this.name = name;
-  }
-  public String sayHello() {
-    return hi + " at " + dateFormat.format(new java.util.Date())+
-        " from node: " + org.objectweb.proactive.ProActive.getBodyOnThis().getNodeURL();
-  }
-  public static void main(String[] args) {
-    // Registers it with an URL
-    try {
-      // Creates an active instance of class HelloServer on the local node
-      Hello hello = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), 
-                             new Object[]{"remote"});
-      java.net.InetAddress localhost = java.net.InetAddress.getLocalHost();
-      org.objectweb.proactive.ProActive.register(hello, "//" + localhost.getHostName() + "/Hello");
-    } catch (Exception e) {
-      System.err.println("Error: " + e.getMessage());
-      e.printStackTrace();
-    }
-  }
-}</programlisting></para>
-        </example>
-
-        <sect4>
-          <title>Implement the required functionalities</title>
-
-          <para>Implementing any remotely-accessible functionality is simply
-          done through normal Java methods in a normal Java class, in exactly
-          the same manner it would have been done in a non-distributed version
-          of the same class. This has to be contrasted with the RMI approach,
-          where several more steps are needed:</para>
-
-          <itemizedlist>
-            <listitem>
-              <para>Define a remote interface for declaring the
-              remotely-accessible methods.</para>
-            </listitem>
-
-            <listitem>
-              <para>Rewrite the class so that it inherits from
-              <literal>java.rmi.server.UnicastRemoteObject</literal>, which is
-              the root class of all remote objects.</para>
-            </listitem>
-
-            <listitem>
-              <para>Add remote exceptions handling to the code.</para>
-            </listitem>
-          </itemizedlist>
-        </sect4>
-
-        <sect4>
-          <title>Why an empty no-arg constructor?</title>
-
-          <para>You may have noticed that class <literal>Hello</literal> has a
-          constructor with no parameters and an empty implementation. The
-          presence of this empty no-arg constructor is imposed by ProActive
-          and is actually a side-effect of ProActive's transparent
-          implementation of active remote objects (as a matter of fact, this
-          side-effect is caused by ProActive being implemented on top of a
-          100% Java metaobject protocol). If no such constructor is provided,
-          active objects cannot be created.</para>
-
-          <para>If no constructor at all is provided, active objects can still
-          be created because, in this specific case, all Java compilers
-          provide a default no-arg empty constructor. If a no-arg constructor
-          is provided but its implementation is not empty, unwanted behavior
-          may appear because the no-arg constructor is always called when an
-          active object is created, whatever code the user can write.</para>
-        </sect4>
-
-        <sect4>
-          <title>Creating the remote <literal>Hello</literal> object</title>
-
-          <para>Now that we know how to write the class that implements the
-          required server-side functionalities, let us see how to create the
-          server object. In ProActive, there is actually no difference between
-          a server and a client object as both are remote objects.Creating the
-          active object is done through <emphasis>instantiation-based
-          creation</emphasis>. We want this active object to be created on the
-          current node, which is why we use <literal>newActive</literal> with
-          only two parameters. In order for the client to obtain an initial
-          reference onto this remote object, we need to register it in the
-          registry (which is actually the well-known
-          <literal>rmiregistry</literal>) with a valid RMI URL.</para>
-        </sect4>
-      </sect3>
-
-      <sect3>
-        <title>The <literal>HelloClient</literal> Class</title>
-
-        <para>The responsibility of this class is first to locate the remote
-        server object, then to invoke a method on it in order to retrieve a
-        message, and finally display that message.</para>
-
-        <example>
-          <title>HelloClient.java</title>
-
-          <programlisting lang="java">public class HelloClient {
-  public static void main(String[] args) {
-    Hello myServer;
-    String message;
-    try {
-      // checks for the server's URL
-      if (args.length == 0) {
-        // There is no url to the server, so create an active server within this VM
-        myServer = (Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(), 
-                          new Object[]{"local"});
-      } else {
-        // Lookups the server object
-        System.out.println("Using server located on " + args[0]);
-        myServer = (Hello)org.objectweb.proactive.ProActive.lookupActive(Hello.class.getName(), 
-                          args[0]);
-      }
-      // Invokes a remote method on this object to get the message
-      message = myServer.sayHello();
-      // Prints out the message
-      System.out.println("The message is: " + message);
-    } catch (Exception e) {
-      System.err.println("Could not reach/create server object");
-      e.printStackTrace();
-      System.exit(1);
-    }
-  }
-}</programlisting>
-        </example>
-
-        <sect4>
-          <title>Looking up a remote object</title>
-
-          <para>The operation of <emphasis>lookup</emphasis> simply means
-          obtaining a reference onto an object from the URL it is bound to.
-          The return type of method
-          <literal>Proactive.lookupActive()</literal> is
-          <literal>Object</literal>, then we need to cast it down into the
-          type of the variable that holds the reference
-          (<literal>Hello</literal> here). If no object is found at this URL,
-          the call to <literal>Proactive.lookupActive()</literal> returns
-          <literal>null</literal>.</para>
-        </sect4>
-
-        <sect4>
-          <title>Invoking a method on a remote object</title>
-
-          <para>This is exactly like invoking a method on a local object of
-          the same type. The user does not have to deal with catching
-          distribution related exceptions like, for example, when using RMI or
-          CORBA. Future versions of ProActive will provide an exception
-          handler mechanism in order to process these exceptions in a separate
-          place than the functional code. As class <literal>String</literal>
-          is <literal>final</literal>, there cannot be any asynchronism here
-          since the object returned from the call cannot be replaced by a
-          future object (this restriction on <literal>final</literal> classes
-          is imposed by ProActive's implementation).</para>
-        </sect4>
-
-        <sect4>
-          <title>Printing out the message</title>
-
-          <para>As already stated, the only modification brought to the code
-          by ProActive is located at the place where active objects are
-          created. All the rest of the code remains the same, which fosters
-          software reuse.</para>
-        </sect4>
-      </sect3>
-    </sect2>
-
-    <sect2>
-      <title>Hello World within the same VM</title>
-
-      <para>In order to run both the client and server in the same VM, the
-      client creates an active object in the same VM if it doesn't find the
-      server's URL. The code snippet which instantiates the Server in the same
-      VM is the following:</para>
-
-      <programlisting lang="java">if (args.length == 0) {
-  // There is no url to the server, so create an active server within this VM
-  myServer = (Hello)org.objectweb.proactive.ProActive.newActive(
-        Hello.class.getName(), new Object[]{"local"});
-}</programlisting>
-
-      <para>To launch the Client and the Server, just type:</para>
-
-      <screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
- -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient</screen>
-
-      <screen>windows&gt; java -Djava.security.policy=scripts\unix\proactive.java.policy
- -Dlog4j.configuration=file:scripts\unix\proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient &amp;</screen>
-    </sect2>
-
-    <sect2>
-      <title>Hello World from another VM on the same host</title>
-
-      <sect3>
-        <title>Starting the server</title>
-
-        <para>Just start the <literal>main</literal> method in the
-        <literal>Hello</literal> class.</para>
-
-        <screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
- -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.Hello &amp;</screen>
-
-        <screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy
-   -Dlog4j.configuration=file:scripts\proactive-log4j 
-   org.objectweb.proactive.examples.hello.Hello </screen>
-      </sect3>
-
-      <sect3>
-        <title>Launching the client</title>
-
-        <screen>linux&gt; java -Djava.security.policy=scripts/proactive.java.policy
- -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello &amp;</screen>
-
-        <screen>windows&gt; java -Djava.security.policy=scripts\proactive.java.policy
-   -Dlog4j.configuration=file:scripts\proactive-log4j
-   org.objectweb.proactive.examples.hello.HelloClient //localhost/Hello</screen>
-      </sect3>
-    </sect2>
-
-    <sect2>
-      <title>Hello World from abroad: another VM on a different host</title>
-
-      <sect3>
-        <title>Starting the server</title>
-
-        <para>Log on to the server's host, and launch the
-        <literal>Hello</literal> class.</para>
-
-        <screen>linux remoteHost&gt; java -Djava.security.policy=scripts/proactive.java.policy
- -Dlog4j.configuration=file:scripts/proactive-log4j
- org.objectweb.proactive.examples.hello.Hello &amp;</screen>
-
-        <screen>windows remoteHost&gt; java -Djava.security.policy=scripts\proactive.java.policy
-  -Dlog4j.configuration=file:scripts\proactive-log4j 
-  org.objectweb.proactive.examples.hello.Hello</screen>
-      </sect3>
-
-      <sect3>
-        <title>Launching the client</title>
-
-        <para>Log on to the client Host, and launch the client</para>
-
-        <screen>linux clientHost&gt; java -cp $CLASSPATH -Djava.security.policy=scripts/proactive.java.policy
-   -Dlog4j.configuration=file:scripts/proactive-log4j
-   org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello &amp;</screen>
-
-        <screen>windows clientHost&gt; java -cp $CLASSPATH -Djava.security.policy=scripts\proactive.java.policy
-  -Dlog4j.configuration=file:scripts\proactive-log4j
-  org.objectweb.proactive.examples.hello.HelloClient //remoteHost/Hello</screen>
-
-        <note>
-          <para>There is also a Guided Tour section on the Hello world
-          example: <xref linkend="hands_on_programming" /></para>
-        </note>
-      </sect3>
-    </sect2>
-  </sect1>
+	<title>Active Objects: Creation And Advanced Concepts</title>
+
+	<sect1>
+		<title>Overview</title>
+		<para>
+			Active objects are created on a per-object basis: an
+			application can contain active as well as passive instances
+			of a given class. In this section, we will present the three
+			methods for creating active instances of classes and how to
+			use the arguments passed to the methods to control creation.
+			Although almost any object can be turned into an Active
+			Object, there are some restrictions that will be detailed
+			below. We also present a in depth explanation of the
+			structure and behaviour of an active object.The examples in
+			this chapter contain only the code necessary for creation of
+			active object. To see how to start the nodes, JVMs, and
+			virtual nodes on which objects can be instantiated read
+			<xref linkend="Configuration" />
+		</para>
+
+		<para>
+			In
+			<emphasis role="bold">ProActive</emphasis>
+			there are two ways to create active objects: instantiation
+			based creation and by using an existing object. Instation
+			based creation is done through
+			<literal>ProActiveObject.newActive(...)</literal>
+			and
+			<literal>ProActiveObject.newActiveInParallel(...)</literal>
+			and object based creation is done through
+			<literal>ProActiveObject.turnActive(...)</literal>
+			. The methods are part of the
+			<literal>org.objectweb.proactive.api</literal>
+			package. Each method takes several parameters that control
+			how the active object is created and most of the parameters
+			are common between creation methods. All the available
+			creation methods with parameters are presented in the
+			<ulink
+				url="http://proactive.inria.fr/release-doc/api/org/objectweb/proactive/ProActiveObject.html">
+				ProActiveObject Javadoc
+			</ulink>
+			.
+		</para>
+
+
+		<figure>
+			<title>Active Object creation methods and parameters</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="images/creationMethodsTable.png" />
+
+				</imageobject>
+			</mediaobject>
+		</figure>
+
+	</sect1>
+
+	<sect1 id="ActiveObjectCreation_html_restrictions">
+		<title>Restrictions on creating active objects</title>
+		<para>
+			Not all classes can be used to instantiate active objects.
+			There are some restrictions, most of them caused by the 100%
+			Java compliance, which forbids modifying the Java Virtual
+			Machine or the compiler.
+		</para>
+
+		<para>Some of these restrictions work are at class-level:</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					final classes cannot be used to instantiate active
+					object
+				</para>
+			</listitem>
+
+			<listitem>
+				<para>
+					non public classes cannot be used to instantiate
+					active object
+				</para>
+			</listitem>
+
+			<listitem>
+				<para>
+					classes without a no-argument constructor cannot be
+					reified
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<para>
+			There are also restrictions at method level within a class.
+			Final methods cannot be used because the stub is created
+			from the object and having methods final prevents the stub
+			from overriding the methods.
+		</para>
+
+	</sect1>
+
+	<sect1>
+		<title>Instantiation Based Creation</title>
+
+		<para>
+			When creating new instances of active objects we can use
+			<literal>ProActiveObject.newActive(...)</literal>
+			or
+			<literal>ProActiveObject.newActiveInParallel(...)</literal>
+			. ProActive also provides a way to create multiple active
+			objects in parallel on several nodes.
+			<literal>ProActiveObject.newActiveInParallel(...)</literal>
+			creates a number of active objects deployed on one or more
+			nodes. The object creation is optimized by a thread pool.
+		</para>
+
+		<para>
+			When using instantiation based creation, any argument passed
+			to the constructor of the reified object through
+			<literal>ProActiveObject.newActive(...)</literal>
+			or
+			<literal>ProActiveObject.newActiveInParallel(...)</literal>
+			is serialized and passed by copy to the object. That is
+			because the model behind
+			<emphasis role="bold">ProActive</emphasis>
+			is uniform whether the active object is instantiated locally
+			or remotely. The parameters are therefore guaranteed to be
+			passed by copy to the constructor. When using
+			<literal>ProActiveObject.newActive(...)</literal>
+			, one needs to make sure that the constructor arguments are
+			<literal>Serializable</literal>
+			. On the other hand, the class used to create the active
+			object does not need to be
+			<literal>Serializable</literal>
+			even in the case of remotely-created Active Objects. Bear in
+			mind also that a reified object must have a declared empty
+			no-args constructor in order to be properly created.
+		</para>
+
+		<sect2>
+			<title>
+				Using
+				<literal>ProActiveObject.newActive(...)</literal>
+			</title>
+
+			<para>
+				To create a single active object from the class
+				<literal>Worker</literal>
+				in the local JVM we use the following code. If the
+				invocation of the constructor of class
+				<literal>Worker</literal>
+				throws an exception, it is placed inside an exception of
+				type
+				<literal>ActiveObjectCreationException</literal>
+				. When the call to
+				<literal>newActive</literal>
+				returns, the active object has been created and its
+				active thread is started.
+			</para>
+
+			<programlisting lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt" /></textobject></programlisting>
+		</sect2>
+
+
+		<sect2 id="newActiveInParallel_nodes">
+			<title>
+				Using
+				<literal>
+					ProActiveObject.newActiveInParallel(...)
+				</literal>
+			</title>
+
+			<para>
+				The following code deploys an active object on each node
+				contained in the virtual node
+				<literal>someVirtualNode</literal>
+				. In this case the
+				<literal>Worker</literal>
+				constructor doesn't take any arguments. However, we have
+				to create an
+				<literal>Object</literal>
+				array equal in length with the number of nodes. The
+				creation of active objects is optimized by a thread
+				pool. When the call to
+				<literal>newActiveInParallel</literal>
+				returns, the active objects have been created and their
+				threads have been started.
+			</para>
+			<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/ProActive.newActiveInParallel.txt" /></textobject></programlisting>
+
+
+		</sect2>
+
+
+	</sect1>
+
+
+
+
+	<sect1>
+		<title>Active Object Creation Arguments</title>
+
+		<sect2>
+			<title>
+				Using
+				<literal>classname</literal>
+				and
+				<literal>target</literal>
+			</title>
+			<para>
+				<literal>ProActiveObject.newActive(...)</literal>
+				and
+				<literal>
+					ProActiveObject.newActiveInParallel(...)
+				</literal>
+				always take as a first argument the class name from
+				which the active object will be instantiated. The
+				<literal>classname</literal>
+				argument must be of type
+				<literal>java.lang.String</literal>
+				and its value is usually obtained by calling
+				<literal>
+					ClassToInstantiateFrom.class.getName()
+				</literal>
+				.
+
+				<literal>ProActiveObject.turnActive(...)</literal>
+				does not create an active object from a class but from
+				an existing object, therefore it takes as a first
+				argument the object to be turned active.
+			</para>
+		</sect2>
+
+		<sect2>
+			<title>Using Constructor Arguments</title>
+			<para>
+
+				In order to create the active object
+				<literal>ProActiveObject.newActive(...)</literal>
+				and
+				<literal>
+					ProActiveObject.newActiveInParallel(...)
+				</literal>
+				must take a list of constructor arguments to be passed
+				to the constructor of the class to be instantiated as an
+				active object. Arguments to the constructor of the class
+				have to be passed as an array of
+				<literal>Object</literal>
+				. Also, we have to make sure that the constructor
+				arguments are
+				<literal>Serializable</literal>
+				since they are passed by a serialized copy to the
+				object. The ProActive runtime determines which
+				constructor of the class to call according to the type
+				of the elements of this array. Nevertheless, there is
+				still room for some ambiguity in resolving the
+				constructor because as the arguments of the constructor
+				are stored in an array of type
+				<literal>Object[]</literal>
+				or
+				<literal>Object[][]</literal>
+				. If one argument is null the runtime can obviously not
+				determine its type. In this case a exception is thrown
+				specifying that ProActive cannot determine the
+				constructor. In the example below, an ambiguity exists
+				between the two constructors if the corresponding
+				element of the
+				<literal>Object</literal>
+				array is
+				<literal>null</literal>
+				.
+			</para>
+
+			<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/ConstructorAmbiguities.txt" /></textobject></programlisting>
+			<para>
+				If we use
+				<literal>
+					ProActiveObject.newActiveInParallel(..., Nodes[]
+					nodes)
+				</literal>
+				we have the make sure the length of the first dimension
+				of
+				<literal>java.lang.Object[][]</literal>
+				is equal to the number of nodes since an active object
+				will be deployed on each node. The second dimension of
+				the array contains the constructor arguments for each
+				deployed active object. Different active objects can
+				have different constructor arguments.
+
+
+				If we use
+				<literal>
+					ProActiveObject.newActiveInParallel(..., VirtualNode
+					virtualNode)
+				</literal>
+				the virtual node will be activated if it is not active
+				and one active object will be started on each node
+				contained in the virtual node. In this case all the
+				active objects take the same constructor arguments as we
+				use a one dimensional array
+				<literal>java.lang.Object[]</literal>
+				.
+			</para>
+		</sect2>
+
+
+		<sect2>
+			<title>Using Parameterized Classes</title>
+			<para>//TODO explain generics</para>
+		</sect2>
+		<sect2>
+			<title>Using A Node</title>
+			<para>
+				It is possible to pass an argument to the call to
+				<literal>newActive</literal>
+				in order to create the new active object on a specific
+				JVM, possibly remote. The JVM is identified using a
+				<literal>Node</literal>
+				object, an array of
+				<literal>Node</literal>
+				or a
+				<literal>String</literal>
+				that contains an URL pointing to the node. If the
+				parameter is not given, the active object is created in
+				the current JVM and is attached to a default
+				<literal>Node</literal>
+				. The node argument and the URL string are used with
+				<literal>ProActiveObject.newActive(...)</literal>
+				and
+				<literal>ProActiveObject.turnActive(...)</literal>
+				. The array of
+				<literal>Node</literal>
+				and the virtual node argument is used with
+				<literal>
+					ProActiveObject.newActiveInParallel(...)
+				</literal>
+				. The virtual node will be activated if it is not active
+				and one active object will be started on each node
+				contained in the virtual node.
+
+			</para>
+			<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/ProActive.newActive.onNode.Node.txt" /></textobject></programlisting>
+
+			<para>
+				To deploy using the node's URL we just have the use the
+				URL instead of the Node as argument:
+			</para>
+			<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/ProActive.newActive.onNode.URL.txt" /></textobject></programlisting>
+			<para>
+				The usage is similar for
+				<literal>ProActiveObject.turnActive(...)</literal>
+				as in the examples above.
+			</para>
+			<para>
+				In order to deploy several active objects with
+				<literal>
+					ProActiveObject.newActiveInParallel(...)
+				</literal>
+				we can just pass an array of
+				<literal>Node</literal>
+				(see the example in
+				<xref linkend="newActiveInParallel_nodes" />
+				) or a
+				<literal>VirtualNode</literal>
+				.
+			</para>
+			<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/newActiveInParallel.onVirtualNode.txt" /></textobject></programlisting>
+
+
+		</sect2>
+		<sect2>
+			<title>Using A Custom Activity</title>
+
+
+			<para>
+				Customizing the activity of the active object is at the
+				core of ProActive because it allows to specify fully the
+				behavior of an active object. By default, an object
+				turned into an active object serves its incoming
+				requests in a FIFO manner. In order to specify another
+				policy for serving the requests or to specify any other
+				behaviors one can implement interfaces defining methods
+				that will be automatically called by ProActive.
+			</para>
+
+			<para>
+				It is possible to specify what to do before the activity
+				starts, what the activity is and what to do after it
+				ends. The three steps are:
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						the initialization of the activity (done only
+						once)
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>the activity itself</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						the end of the activity (done only once)
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>
+				Three interfaces are used to define and implement each
+				step:
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>InitActive</para>
+				</listitem>
+
+				<listitem>
+					<para>RunActive</para>
+				</listitem>
+
+				<listitem>
+					<para>EndActive</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>
+				In case of a migration, an active object stops and
+				restarts its activity automatically without invoking the
+				initialization or ending phases. Only the activity
+				itself is restarted.
+			</para>
+
+			<para>
+				Two ways are possible to define each of the three phases
+				of an active object.
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						implementing one or more of the three interfaces
+						directly in the class used to create the active
+						object
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						passing an object implementing one or more of
+						the three interfaces in parameter to the method
+						<literal>newActive</literal>
+						or
+						<literal>turnActive</literal>
+						(parameter
+						<literal>active</literal>
+						in those methods)
+					</para>
+				</listitem>
+			</itemizedlist>
+
+			<para>
+				Note that the methods defined by those 3 interfaces are
+				guaranteed to be called by the active thread of the
+				active object.
+			</para>
+
+			<sect3>
+				<title>
+					Algorithms deciding which activity to invoke
+				</title>
+
+				<para>
+					The algorithms that decide for each phase what to do
+					are the following (
+					<literal>activity</literal>
+					is the eventual object passed as a parameter to
+					<literal>newActive</literal>
+					or
+					<literal>turnActive</literal>
+					):
+				</para>
+
+
+				<para>
+					<emphasis role="bold">InitActive</emphasis>
+				</para><programlisting><textobject><textdata
+							fileref="code_snippets/InitActiveAlgorithm.txt" /></textobject></programlisting>
+				<para>
+					<emphasis role="bold">RunActive</emphasis>
+				</para>
+
+				<programlisting><textobject><textdata
+							fileref="code_snippets/RunActiveAlgorithm.txt" /></textobject></programlisting>
+
+				<indexterm significance="preferred">
+					<primary>EndActive</primary>
+
+					<secondary>interface</secondary>
+				</indexterm>
+
+				<para>
+					<emphasis role="bold">EndActive</emphasis>
+				</para>
+				<programlisting><textobject><textdata
+							fileref="code_snippets/EndActiveAlgorithm.txt" /></textobject></programlisting>
+
+
+
+			</sect3>
+
+			<sect3>
+				<title>
+					Implementing the interfaces directly in the class
+				</title>
+
+				<para>
+					Implementing the interfaces directly in the class
+					used to create the active object is the easiest
+					solution when you control the class that you make
+					active. Depending on which phase in the life of the
+					active object you want to customize, you implement
+					the corresponding interface (one or more):
+					<literal>InitActive</literal>
+					,
+					<literal>RunActive</literal>
+					and
+					<literal>EndActive</literal>
+					. Here is an example that has a custom
+					initialization and activity.
+				</para>
+
+				<programlisting lang="java">
+					<textobject>
+						<textdata
+							fileref="code_snippets/CustomInitAndRun.txt" />
+
+					</textobject>
+				</programlisting>
+
+				<para>
+					<example>
+						<title>
+							Start, stop, suspend, restart a simulation
+							algorithm in runActivity method
+						</title>
+						<para>
+							Bellow is the skeleton code for a class that
+							can run, suspend, restart and stop a
+							simulation. It uses a implementation of
+							<literal>RunActive</literal>
+							to provide the necessary control.
+						</para>
+						<para>
+							<programlisting lang="java">
+								<textobject>
+									<textdata
+										fileref="code_snippets/SimulationWithActivity.txt" />
+
+								</textobject>
+							</programlisting>
+						</para>
+					</example>
+				</para>
+
+			</sect3>
+
+			<sect3>
+				<title>
+					Passing an object implementing the interfaces at
+					creation time
+				</title>
+
+				<para>
+					Passing an object implementing the interfaces is the
+					solution to use when we do not control the class
+					that we make active or when you want to write a
+					generic activity policy and reuse it with several
+					active objects. Depending on which phase in the life
+					of the active object we want to customize, we will
+					implement the corresponding interface (one or more)
+					from
+					<literal>InitActive</literal>
+					,
+					<literal>RunActive</literal>
+					and
+					<literal>EndActive</literal>
+					. Following is an example that has a custom
+					activity.
+				</para>
+
+				<para>
+					First we need to implement the activity that it will
+					be passed to the active object. We do so by
+					implementing one or more interfaces.
+				</para>
+				<programlisting lang="java">
+					<textobject>
+						<textdata
+							fileref="code_snippets/activityImplementation.txt" />
+
+					</textobject>
+				</programlisting>
+				<para>
+					The implemented interface can be used with
+					<literal>ProActiveObject.newActive(..)</literal>
+					or
+					<literal>ProActiveObject.turnActive(...)</literal>
+					.
+				</para>
+				<programlisting lang="java">
+					<textobject>
+						<textdata
+							fileref="code_snippets/usingActivity.txt" />
+
+					</textobject>
+				</programlisting>
+
+			</sect3>
+
+		</sect2>
+
+		<sect2 id="ActiveObjectCreation_html_factory">
+			<title>Using the factory pattern with Active Objects</title>
+			<para>
+				<emphasis role="bold">
+					//TODO - very complex, it might need its own section
+				</emphasis>
+			</para>
+			<para>
+				Creating an active object using ProActive might be a
+				little bit cumbersome and requires more lines of code
+				that for creating a regular object. A nice solution to
+				this problem is through the use of the
+				<emphasis role="bold">factory</emphasis>
+				pattern. This mainly applies to class based creation. It
+				consists in adding a static method to class
+				<literal>WorkerFactory</literal>
+				that takes care of instantiating the active object and
+				returns it. The code is:
+			</para>
+
+			<programlisting lang="java"><textobject><textdata fileref="code_snippets/factoryAO.txt" />
+				</textobject>
+			</programlisting>
+			<para>
+				The static method in the factory class is then used to
+				create active objects:
+			</para>
+			<programlisting lang="java"><textobject><textdata fileref="code_snippets/factoryCall.txt" />
+				</textobject>
+			</programlisting>
+
+			<para>
+				It is up to the programmer to decide whether this method
+				has to throw exceptions or not. We recommend that this
+				method only throw exceptions that appear in the
+				signature of the reified constructor (none here as the
+				constructor of Worker that we call doesn't throw any
+				exception). However, the non functional exceptions
+				induced by the creation of the active object have to be
+				dealt with somewhere in the code.
+			</para>
+		</sect2>
+
+
+
+		<sect2>
+			<title>
+				Using
+				<literal>MetaObjectFactory</literal>
+				to customize the meta objects
+			</title>
+
+			<para>
+				There are many cases where you may want to customize the
+				body used when creating an active object. For instance,
+				one may want to add some debug messages or some timing
+				behavior when sending or receiving requests. The body is
+				a non changeable object that delegates most of its tasks
+				to helper objects called MetaObjects. Standard
+				MetaObjects are already used by default in ProActive but
+				one can easily replace any of those MetaObjects by a
+				custom one.
+			</para>
+
+			<para>
+				We have defined a
+				<literal>MetaObjectFactory</literal>
+				interface that is able to create factories for each of
+				those MetaObjects. This interface is implemented by
+				<literal>ProActiveMetaObjectFactory</literal>
+				which provides all the default factories used in
+				ProActive.
+			</para>
+
+			<para>
+				When creating an active object, it is possible to
+				specify which
+				<literal>MetaObjectFactory</literal>
+				to use for that particular instance of active object
+				being created.
+			</para>
+
+			<para>
+				First you have to write a new MetaObject factory that
+				inherits from
+				<literal>ProActiveMetaObjectFactory</literal>
+				or directly implements the
+				<literal>MetaObjectFactory</literal>
+				interface. Inheriting from
+				<literal>ProActiveMetaObjectFactory</literal>
+				is a great time saver as you only redefine what you
+				really need to as opposed to redefining everything when
+				inheriting from
+				<literal>MetaObjectFactory</literal>
+				. Here is an example:
+			</para>
+
+			<para>
+				<programlisting lang="java">
+					<textobject>
+						<textdata
+							fileref="code_snippets/metaObjectFactory.txt" />
+
+					</textobject>
+				</programlisting>
+			</para>
+
+			<para>
+				The factory above simply redefines the
+				<literal>RequestFactory</literal>
+				in order to make the body use a new type of request. The
+				method
+				<literal>
+					protected RequestFactory
+					newRequestFactorySingleton()
+				</literal>
+				is one convenience method that
+				<literal>ProActiveMetaObjectFactory</literal>
+				(see code in
+				<xref
+					linkend="core/body/ProActiveMetaObjectFactory.java"
+					role="javaFileSrc" />
+				) provides to simplify the creation of factories as
+				singleton. More explanations can be found in the<!-- This url can only work in the html generated files: in pdf there's no ".." -->
+				<ulink os="html"
+					url="../api/org/objectweb/proactive/core/body/ProActiveMetaObjectFactory.html">
+					javadoc of that class
+				</ulink>
+				<phrase os="pdf">
+					<literal>
+						org.objectweb.proactive.core.body.ProActiveMetaObjectFactory
+					</literal>
+					javadoc
+				</phrase>
+				. The use of that factory is fairly simple. All you have
+				to do is to pass an instance of the factory when
+				creating a new active object. If we take the same
+				example as before we have:
+			</para>
+
+			<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/metaObjectFactoryUsage.newActive.txt" /></textobject></programlisting>
+
+			<para>
+				In the case of a
+				<literal>turnActive</literal>
+				we would have:
+			</para>
+
+			<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/metaObjectFactoryUsage.turnActive.txt" /></textobject></programlisting>
+		</sect2>
+		<sect2>
+			<title>
+				Using
+				<literal>nameOfTargetType</literal>
+				with
+				<literal>ProActiveObject.turnActive(...)</literal>
+			</title>
+		</sect2>
+		<para>
+			//TODO - why doesn't newActive have the same parameter ?
+		</para>
+	</sect1>
+
+
+
+
+
+
+	<sect1 id="ActiveObjectCreation_html_elementRole">
+		<title>
+			Advanced: Role of the elements of an active object
+		</title>
+
+		<para>
+			In this section, we'll have a very close look at what
+			happens when an active object is created. This section aims
+			at providing a better understanding of how the library works
+			and where the restrictions of Proactive come from.
+		</para>
+
+		<para>
+			Consider that some code in an instance of class
+			<literal>A</literal>
+			creates an active object of class
+			<literal>B</literal>
+			using a piece of code like this:
+		</para>
+
+		<para>
+			<programlisting lang="java">
+				B b; Object[] params = {&lt;some parameters for the
+				constructor&gt;}; try { // We create an active instance
+				of B on the current node b = (B)
+				ProActive.newActive("B", params); } catch (Exception e)
+				{ e.printStackTrace () ; }
+			</programlisting>
+		</para>
+
+		<para>
+			If the creation of the active instance of B is successful,
+			the graph of objects is as described in figure below (with
+			arrows denoting references).
+		</para>
+
+		<para>
+			<figure>
+				<title>The components of an active object</title>
+
+				<mediaobject>
+					<imageobject>
+						<imagedata contentwidth="100"
+							fileref="images/activeObjectComponents.png" format="PNG"
+							width="6in" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+
+		<para>
+			The active instance of B is actually composed of 4 objects:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					a stub (
+					<literal>Stub_B</literal>
+					)
+				</para>
+			</listitem>
+
+			<listitem>
+				<para>
+					a proxy (
+					<literal>BodyProxy</literal>
+					)
+				</para>
+			</listitem>
+
+			<listitem>
+				<para>
+					a body (
+					<literal>Body</literal>
+					)
+				</para>
+			</listitem>
+
+			<listitem>
+				<para>
+					an instance of
+					<literal>B</literal>
+				</para>
+			</listitem>
+		</itemizedlist>
+
+		<sect2>
+			<title>Role of the stub</title>
+
+			<indexterm>
+				<primary>Stub</primary>
+			</indexterm>
+
+			<para>
+				The role of the class
+				<literal>Stub_B</literal>
+				is to reify all method calls that can be performed
+				through a reference of type
+				<literal>B</literal>
+				, and only these as calling a method declared in a
+				subclass of
+				<literal>B</literal>
+				through downcasting would result in a runtime error).
+				Reifying a call simply means constructing an object (in
+				our case, all reified calls are instance of class
+				<literal>MethodCall</literal>
+				) that represents the call, so that it can be
+				manipulated as any other object. This reified call is
+				then processed by the other components of the active
+				object in order to achieve the behavior we expect from
+				an active object.
+			</para>
+
+			<para>
+				The idea of using a standard object for representing
+				elements of the language that are not normally objects
+				(such as method calls, constructor calls, references,
+				types,...) is what
+				<emphasis>metaobject programming</emphasis>
+				is all about. The metaobject protocol (MOP) ProActive is
+				built on is described in
+				<xref linkend="MOP" />
+				but it is not a prerequisite for understanding and using
+				ProActive.
+			</para>
+
+			<para>
+				As one of our objectives is to provide transparent
+				active objects, references to active objects of class
+				<literal>B</literal>
+				need to be of the same type as references to passive
+				instances of
+				<literal>B</literal>
+				(this feature is called
+				<emphasis>polymorphism</emphasis>
+				between passive and active instances of the same class).
+				This is why, by construction,
+				<literal>Stub_B</literal>
+				is a subclass of class
+				<literal>B</literal>
+				, therefore allowing instances of class
+				<literal>Stub_B</literal>
+				to be assigned to variables of type
+				<literal>B</literal>
+				.
+			</para>
+
+			<para>
+				Class
+				<literal>Stub_B</literal>
+				redefines each of the methods inherited from its
+				superclasses. The code of each method of class
+				<literal>Stub_B</literal>
+				actually builds an instance of class
+				<literal>MethodCall</literal>
+				in order to represent the call to this method. This
+				object is then passed to the
+				<literal>BodyProxy</literal>
+				, which returns an object that is returned as the result
+				of the method call. From the caller's point of view,
+				everything looks like if the call had been performed on
+				an instance of
+				<literal>B</literal>
+				.
+			</para>
+
+			<para>
+				Now that we know how stubs work, we can understand some
+				of the limitations of ProActive:
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						Obviously,
+						<literal>Stub_B</literal>
+						cannot redefine
+						<literal>final</literal>
+						methods inherited from class
+						<literal>B</literal>
+						. Therefore, calls to these methods are not
+						reified but are executed on the stub, which may
+						lead to unexplainable behavior if the programmer
+						does not carefully avoid calling
+						<literal>final</literal>
+						methods on active objects.
+					</para>
+
+					<para>
+						As there are 6 final methods in the base class
+						<literal>Object</literal>
+						, one may wonder how to live without them. In
+						fact, 5 out of this 6 methods deal with thread
+						synchronization (
+						<literal>notify()</literal>
+						,
+						<literal>notifyAll()</literal>
+						and the 3 versions of
+						<literal>wait()</literal>
+						). Those method should not be used since an
+						active object provides thread synchronization.
+						Indeed, using the standard thread
+						synchronization mechanism and ProActive thread
+						synchronization mechanism at the same time might
+						conflict and result in an absolute debugger's
+						nightmare.
+					</para>
+
+					<para>
+						The last final method in the class
+						<literal>Object</literal>
+						is
+						<literal>getClass()</literal>
+						. When invoked on an active object,
+						<literal>getClass()</literal>
+						is not reified and therefore performed on the
+						stub object, which returns an object of class
+						<literal>Class</literal>
+						that represents the class of the stub (
+						<literal>Stub_B</literal>
+						in our example) and not the class of the active
+						object itself (
+						<literal>B</literal>
+						in our example). However, this method is seldom
+						used in standard applications and it doesn't
+						prevent the operator
+						<literal>instanceof</literal>
+						to work thanks to its polymorphic behavior.
+						Therefore the expression
+						<literal>(foo instanceof B)</literal>
+						has the same value whether B is active or not.
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						Getting or setting instance variables directly
+						(not through a getter or a setter) must be
+						avoided in the case of active objects because it
+						results in getting or setting the value on the
+						stub object and not on the instance of the class
+						<literal>B</literal>
+						. This problem is usually worked around by using
+						get/set methods for setting or reading
+						attributes. This rule of strict encapsulation
+						may also be found in JavaBeans or in most
+						distributed object systems like RMI or CORBA.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</sect2>
+
+		<sect2>
+			<title>Role of the proxy</title>
+
+			<para>
+				The role of the proxy is to handle asynchronism in calls
+				to active object. More specifically, it creates future
+				objects if possible and needed, forwards calls to bodies
+				and returns future objects to the stubs. As this class
+				operates on
+				<literal>MethodCall</literal>
+				objects, it is absolutely generic and does not depend at
+				all on the type of the stub that feeds calls in through
+				its
+				<literal>reify</literal>
+				method.
+			</para>
+		</sect2>
+
+		<sect2>
+			<title>Role of the body</title>
+
+			<para>
+				The
+				<literal>body</literal>
+				is responsible for storing calls (actually,
+				<literal>Request</literal>
+				objects) in a queue of pending requests and processing
+				these request according to a given synchronization
+				policy, whose default behavior is FIFO. The Body has its
+				own thread, which alternatively chooses a request in the
+				queue of pending ones and executes the associated call.
+			</para>
+		</sect2>
+
+		<sect2>
+			<title>Role of the instance of class B</title>
+
+			<para>
+				This is a standard instance of class
+				<literal>B</literal>
+				. It may contain some synchronized information in its
+				<literal>live</literal>
+				method, if any. As the body executes calls one by one,
+				there cannot be any concurrent execution of two portions
+				of code of this object by two different threads. This
+				enables the use of pre- and post-conditions and class
+				invariants. As a consequence, the use of the keyword
+				<literal>synchronized</literal>
+				in class
+				<literal>B</literal>
+				should not be necessary. Any synchronization scheme that
+				can be expressed through monitors and
+				<literal>synchronized</literal>
+				statements can be expressed using ProActive's high-level
+				synchronization mechanism in a much more natural and
+				user-friendly way.
+			</para>
+		</sect2>
+	</sect1>
+	<sect1>
+		<title>Object Based Creation</title>
+
+		<para>
+			Object based creation is used for turning an existing
+			passive object instance into an active one. It has been
+			introduced in ProActive as an answer to the problem of
+			creating active objects from already existing objects for
+			which we do not have access to the source code.
+		</para>
+
+		<para>
+			Because the object already exists before turning it active,
+			there is no serialization involved when we create the
+			object. When we invoke
+			<literal>ProActive.turnActive</literal>
+			on the object, two cases are possible. If we create the
+			active object locally (on a local node), it will not be
+			serialized. If we create the active object remotely (on a
+			remote node), the reified object will be serialized.
+			Therefore, if the
+			<literal>turnActive</literal>
+			is done on a remote node, the class used to create the
+			active object this way has to be
+			<literal>Serializable</literal>
+			. In addition, when using
+			<literal>turnActive</literal>
+			, care must be taken that no other references to the
+			originating object are kept by other objects after the call
+			to turnActive. A direct call to a method of the originating
+			object without passing by a ProActive stub on this object
+			will break the ProActive model.
+		</para>
+
+		<para>
+			The simplest code for object based creation looks like this:
+		</para>
+
+		<programlisting lang="java">
+			<textobject>
+				<textdata fileref="code_snippets/simpleTurnActive.txt" />
+
+			</textobject>
+		</programlisting>
+
+		<para>
+			The second parameter of
+			<literal>turnActive</literal>
+			is the location where the active object will be created. No
+			parameter or
+			<literal>null</literal>
+			means that the active object is created locally in the
+			current node.
+		</para>
+
+		<para>
+			When using this method, the programmer has to make sure that
+			no other reference on the passive object exist after the
+			call to
+			<literal>ProActiveObject.turnActive(...)</literal>
+			. If such references are used for calling methods directly
+			on the passive object (without going through its stub,
+			proxy, and body), the model will not be consistent and
+			specialization of synchronization will no be guaranteed.
+		</para>
+
+	</sect1>
+
+	<sect1 id="FutureObjectCreation">
+		<title>Asynchronous calls and futures</title>
+
+		<sect2>
+			<title>Creation of a Future Object</title>
+
+			<para>
+				Whenever possible a method call on an active object is
+				reified as an asynchronous request. If not possible the
+				call is synchronous and blocks until the reply is
+				received. In case the request is asynchronous, it
+				immediately returns a future object.
+			</para>
+
+			<para>
+				This object acts as a placeholder for the result of the
+				not-yet-performed method invocation. As a consequence,
+				the calling thread can go on with executing its code, as
+				long as it doesn't need to invoke methods on the
+				returned object, in which case the calling thread is
+				automatically blocked if the result of the method
+				invocation is not yet available. Below are shown the
+				different cases that can lead to an asynchronous call.
+				Note that this table does not apply when using the
+				tryWithCatch anotators to deal with asynchronous
+				exceptions. See
+				<xref linkend="exceptions" />
+				.
+			</para>
+
+			<table>
+				<title>
+					Future creation, and asynchronous calls depending on
+					return type
+				</title>
+
+				<tgroup cols="4">
+					<colspec colnum="1" colname="col1" colwidth="1*" />
+					<colspec colnum="2" colname="col2" colwidth="2*" />
+					<colspec colnum="3" colname="col3" colwidth="1.5*" />
+					<colspec colnum="4" colname="col4" colwidth="1*" />
+					<spanspec spanname="onetwo" namest="col1"
+						nameend="col2" />
+					<tbody>
+						<row>
+							<entry spanname="onetwo">
+								<para>
+									<emphasis role="bold">
+										Method Signature
+									</emphasis>
+								</para>
+							</entry>
+							<entry morerows="1" valign="middle">
+								<para>
+									<emphasis role="bold">
+										Creation of a future
+									</emphasis>
+								</para>
+							</entry>
+
+							<entry morerows="1" valign="middle">
+								<para>
+									<emphasis role="bold">
+										Asynchronous
+									</emphasis>
+								</para>
+							</entry>
+						</row>
+
+						<row>
+							<entry>
+								<para>
+									<emphasis role="bold">
+										Return type
+									</emphasis>
+								</para>
+							</entry>
+
+							<entry>
+								<para>
+									<emphasis role="bold">
+										Can throw checked exception
+									</emphasis>
+								</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Void</para>
+							</entry>
+							<entry align="center">
+								<para>No</para>
+							</entry>
+							<entry align="center">
+								<para>No</para>
+							</entry>
+
+							<entry align="center">
+								<para>Yes</para>
+							</entry>
+
+
+						</row>
+						<row>
+							<entry>
+								<para>Void</para>
+							</entry>
+							<entry align="center">
+								<para>Yes</para>
+							</entry>
+							<entry align="center">
+								<para>No</para>
+							</entry>
+
+							<entry align="center">
+								<para>No</para>
+							</entry>
+
+
+						</row>
+
+
+						<row>
+							<entry>
+								<para>Non Reifiable Object</para>
+							</entry>
+
+							<entry align="center">
+								<para>No</para>
+							</entry>
+
+							<entry align="center">
+								<para>No</para>
+							</entry>
+
+							<entry align="center">
+								<para>No</para>
+							</entry>
+						</row>
+
+						<row>
+							<entry>
+								<para>Non Reifiable Object</para>
+							</entry>
+
+							<entry align="center">
+								<para>Yes</para>
+							</entry>
+
+							<entry align="center">
+								<para>No</para>
+							</entry>
+
+							<entry align="center">
+								<para>No</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Reifiable Object</para>
+							</entry>
+
+							<entry align="center">
+								<para>No</para>
+							</entry>
+
+							<entry align="center">
+								<para>Yes</para>
+							</entry>
+
+							<entry align="center">
+								<para>Yes</para>
+							</entry>
+						</row>
+						<row>
+							<entry>
+								<para>Reifiable Object</para>
+							</entry>
+
+							<entry align="center">
+								<para>Yes</para>
+							</entry>
+
+							<entry align="center">
+								<para>No</para>
+							</entry>
+
+							<entry align="center">
+								<para>No</para>
+							</entry>
+						</row>
+
+					</tbody>
+				</tgroup>
+			</table>
+
+			<para>
+				As we can see, the creation of a future depends not only
+				on the caller type, but also on the return object type.
+				Creating a future is only possible if the object is
+				reifiable. Note although having a quite similar
+				structure as an active object, a future object is not
+				active. It only has a Stub and a Proxy as shown in
+				figure below:
+			</para>
+
+			<para>
+				<figure>
+					<title>A future object</title>
+
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/futureObject.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</figure>
+			</para>
+
+			<para>
+				During its lifetime, an active object can create many
+				future objects. There are all automatically kept in a
+				FuturePool.
+			</para>
+
+			<para>
+				Each time a future is created, it is inserted in the
+				future pool of the corresponding active object. When the
+				result becomes available, the future object is removed
+				from the pool. Although most of the methods of the
+				FuturePool are for internal use only and are directly
+				called by the proactive library we provide a method to
+				wait until a result becomes available. Instead of
+				blocking until a specific future is available, the call
+				to
+				<literal>waitForReply()</literal>
+				blocks until any of the current futures become
+				available. An application can be found in the FutureList
+				class.
+			</para>
+
+			<sect3>
+				<title>HashCode and equals</title>
+
+				<para>
+					Any call to a future object is reified in order to
+					be blocked if the future is not yet available and
+					later executed on the result object. However, two
+					methods don't follow this scheme: equals and
+					hashCode. They are often called by other methods
+					from the Java library, like
+					<literal>HashTable.add()</literal>
+					and so are most of the time out of control from the
+					user. This can lead very easily to deadlocks if they
+					are called on a not yet available object.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>hashCode()</title>
+
+				<para>
+					Instead of returning the hashcode of the object, it
+					returns the hashcode of its proxy. Since there is
+					only one proxy per future object, there is a unique
+					equivalence between them.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>equals()</title>
+
+				<para>
+					The default implementation of
+					<literal>equals()</literal>
+					in the Object class is to compare the references of
+					two objects. In ProActive it is redefined to compare
+					the hashcode of two proxies. As a consequence it is
+					only possible to compare two future object, and not
+					a future object with a normal object.
+				</para>
+
+				<para>
+					There are some drawbacks with this technique, the
+					main one being the impossibility to have a user
+					override the default
+					<literal>HashTable</literal>
+					and
+					<literal>equals()</literal>
+					methods.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>toString()</title>
+
+				<para>
+					The
+					<literal>toString()</literal>
+					method is most of the time called with
+					<literal>System.out.println()</literal>
+					to turn an object into a printable string. In the
+					current implementation, a call to this method will
+					block on a future object like any other call, thus,
+					one has to be careful when using it. As an example,
+					trying to print a future object for debugging
+					purpose will most of the time lead to a deadlock.
+					Instead of displaying the corresponding string of a
+					future object, you might consider displaying its
+					hashCode.
+				</para>
+			</sect3>
+		</sect2>
+
+		<sect2>
+			<title>Asynchronous calls in details</title>
+
+			<sect3>
+				<title>The setup</title>
+
+				<para>
+					First, let's introduce the example we'll use
+					throughout this section. Let us say that some piece
+					of code in an instance of class
+					<literal>A</literal>
+					calls method
+					<literal>foo</literal>
+					on an active instance of class
+					<literal>B</literal>
+					. This call is asynchronous and returns a future
+					object of class
+					<literal>V</literal>
+					. Then, possibly after having executed some other
+					code, the same thread that issued the call calls
+					method
+					<literal>bar</literal>
+					on the future object returned by the call to
+					<literal>foo</literal>
+					.
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>
+					What would have happened in a sequential world
+				</title>
+
+				<para>
+					In a sequential, single-threaded version of the same
+					application, the thread would have executed the code
+					of the calling method in class
+					<literal>A</literal>
+					up to the call of
+					<literal>foo</literal>
+					, then the code of
+					<literal>foo</literal>
+					in class
+					<literal>B</literal>
+					, then back to the code of the calling method in
+					class
+					<literal>A</literal>
+					up to the call to
+					<literal>bar</literal>
+					, then the code of
+					<literal>bar</literal>
+					in class
+					<literal>V</literal>
+					, and finally back to the code of the calling method
+					in class
+					<literal>A</literal>
+					until its end. The sequence diagram below summarizes
+					this execution. You can notice how the single thread
+					successively executes code of different methods in
+					different classes.
+				</para>
+
+				<para>
+					<figure>
+						<title>
+							Sequence Diagram - single-threaded version
+							of the program
+						</title>
+
+						<mediaobject>
+							<imageobject>
+								<imagedata
+									fileref="images/sequentialCallUMLDiagram.png" format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+				</para>
+			</sect3>
+
+			<sect3>
+				<title>Visualizing the graph of objects</title>
+
+				<para>
+					Let us first get an idea of what the graph of
+					objects at execution (the objects with their
+					references to each other) looks like at three
+					different moments of the execution:
+				</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							Before calling
+							<literal>foo</literal>
+							, we have exactly the same setup as after
+							the creation of the active instance of
+							<literal>B</literal>
+							and summarized in the figure below: an
+							instance of class
+							<literal>A</literal>
+							and an active instance of class
+							<literal>B</literal>
+							. As all active objects, the instance of
+							class
+							<literal>B</literal>
+							is composed of a stub (an instance of class
+							<literal>Stub_B</literal>
+							, which actually inherits directly from
+							<literal>B</literal>
+							), a
+							<literal>BodyProxy</literal>
+							, a
+							<literal>Body</literal>
+							and the actual instance of
+							<literal>B</literal>
+							.
+						</para>
+
+						<para>
+							<figure>
+								<title>
+									The components of an active object
+								</title>
+
+								<mediaobject>
+									<imageobject>
+										<imagedata contentwidth="100"
+											fileref="images/activeObjectComponents.png" format="PNG"
+											width="6in" />
+									</imageobject>
+								</mediaobject>
+							</figure>
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							After the asynchronous call to
+							<literal>foo</literal>
+							has returned,
+							<literal>A</literal>
+							now holds a reference onto a future object
+							representing the not-yet-available result of
+							the call. It is actually composed of a
+							<literal>Stub_V</literal>
+							and a
+							<literal>FutureProxy</literal>
+							as shown on the figure below.
+						</para>
+
+						<para>
+							<figure>
+								<title>
+									The components of a future object
+									before the result is set
+								</title>
+
+								<mediaobject>
+									<imageobject>
+										<imagedata contentwidth="100"
+											fileref="images/futureObjectComponents.png" format="PNG"
+											width="6in" />
+									</imageobject>
+								</mediaobject>
+							</figure>
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							Right after having executed
+							<literal>foo</literal>
+							on the instance of
+							<literal>B</literal>
+							, the thread of the
+							<literal>Body</literal>
+							sets the result in the future, which results
+							in the
+							<literal>FutureProxy</literal>
+							having a reference onto a
+							<literal>V</literal>
+							(see figure below).
+						</para>
+
+						<para>
+							<figure>
+								<title>
+									All components of a future object
+								</title>
+
+								<mediaobject>
+									<imageobject>
+										<imagedata contentwidth="100"
+											fileref="images/futureObjectAllComponents.png" format="PNG"
+											width="6in" />
+									</imageobject>
+								</mediaobject>
+							</figure>
+						</para>
+					</listitem>
+				</itemizedlist>
+			</sect3>
+
+			<sect3>
+				<title>Sequence Diagram</title>
+
+				<para>
+					Let us now concentrate on how and when and by which
+					thread the different methods are called. We have two
+					threads: the thread that belongs to the subsystem
+					<literal>A</literal>
+					is part of (let's call it the
+					<emphasis>first thread</emphasis>
+					), and the thread that belongs to the subsystem
+					<literal>B</literal>
+					is part of (the
+					<emphasis>second thread</emphasis>
+					).
+				</para>
+
+				<para>
+					The first thread invokes
+					<literal>foo</literal>
+					on an instance of
+					<literal>Stub_B</literal>
+					, which builds a
+					<literal>MethodCall</literal>
+					object and passes it to the
+					<literal>BodyProxy</literal>
+					as a parameter of the call to
+					<literal>reify</literal>
+					. The proxy then checks the return type of the call
+					(in this case
+					<literal>V</literal>
+					) and generates a future object of type
+					<literal>V</literal>
+					for representing the result of the method
+					invocation. The future object is actually composed
+					of a
+					<literal>Stub_V</literal>
+					and a
+					<literal>FutureProxy</literal>
+					. A reference onto this future object is set in the
+					<literal>MethodCall</literal>
+					object, which will prove useful once the call is
+					executed. Now that the
+					<literal>MethodCall</literal>
+					object is ready, it is passed as a Request to the
+					<literal>Body</literal>
+					of the Active Object as a parameter. The body simply
+					appends this request to the queue of pending
+					requests and returns immediately. The call to
+					<literal>foo</literal>
+					that an
+					<literal>A</literal>
+					issued now returns a future object of type
+					<literal>Stub_V</literal>
+					, that is a subclass of
+					<literal>V</literal>
+					.
+				</para>
+
+				<para>
+					At some point, possibly after having served some
+					other requests, the
+					<emphasis>second thread</emphasis>
+					(the active thread) picks up the request issued by
+					the
+					<emphasis>first thread</emphasis>
+					some time ago. It then executes the embedded call by
+					calling
+					<literal>foo</literal>
+					on the instance of
+					<literal>B</literal>
+					with the actual parameters stored in the
+					<literal>MethodCall</literal>
+					object. As specified in its signature, this call
+					returns an object of type
+					<literal>V</literal>
+					. The
+					<emphasis>second thread</emphasis>
+					is then responsible for setting this object in the
+					future object (which is the reason why
+					<literal>MethodCall</literal>
+					objects hold a reference on the future object
+					created by the
+					<literal>FutureProxy</literal>
+					). The execution of the call is now over, and the
+					<emphasis>second thread</emphasis>
+					can select another request to serve in the queue and
+					execute it.
+				</para>
+
+				<para>
+					In the meantime, the
+					<emphasis>first thread</emphasis>
+					has continued executing the code of the calling
+					method in class
+					<literal>A</literal>
+					. At some point, it calls
+					<literal>bar</literal>
+					on the object of type
+					<literal>Stub_V</literal>
+					that was returned by the call to
+					<literal>foo</literal>
+					. This call is reified thanks to the
+					<literal>Stub_V</literal>
+					and processed by the
+					<literal>FutureProxy</literal>
+					. If the object the future represents is available
+					(the
+					<emphasis>second thread</emphasis>
+					has already set it in the future object, which is
+					described in figure below, the call is executed on
+					it and returns a value to the calling code in
+					<literal>A</literal>
+					.
+				</para>
+
+				<para>
+					<figure>
+						<title>Sequence Diagram</title>
+
+						<mediaobject>
+							<imageobject>
+								<imagedata contentwidth="100"
+									fileref="images/usingFutureAfterGettingResultDiagram.png"
+									format="PNG" width="6in" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+				</para>
+
+				<para>
+					If it is not yet available, the first thread is
+					suspended in
+					<literal>FutureProxy</literal>
+					until the second thread sets the result in the
+					future object (see figure below).
+				</para>
+
+				<para>
+					<figure>
+						<title>Sequence Diagram</title>
+
+						<mediaobject>
+							<imageobject>
+								<imagedata contentwidth="100"
+									fileref="images/usingFutureBeforeGettingResultDiagram.png"
+									format="PNG" width="6in" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+				</para>
+			</sect3>
+		</sect2>
+
+		<sect2 id="FutureObjectCreation_commonerror">
+			<title>Important Notes: Errors to avoid</title>
+
+			<para>
+				There are few things to remember with asynchronous
+				method calls and futures, in order to avoid annoying
+				debugging sessions:
+			</para>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis role="bold">
+							Constructor with no-args:
+						</emphasis>
+						this constructor will be used either for the
+						Active Objects creation(if not present, an
+						exception might be thrown) or Future creation
+						for a method call (if not present, the method
+						call is synchronous). Avoid to put
+						initialization stuff in this constructor, as it
+						might lead to unexpected behavior. Indeed this
+						constructor is called for the stub creation.
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						Make your classes implement
+						<emphasis role="bold">Serializable</emphasis>
+						interface since ProActive deals with objects
+						that cross the network
+					</para>
+				</listitem>
+
+				<listitem>
+					<indexterm>
+						<primary>Wrappers</primary>
+
+						<secondary>Asynchronism</secondary>
+					</indexterm>
+
+					<para>
+						Think to use
+						<emphasis role="bold">wrappers</emphasis>
+						instead of primitive types or final classes for
+						methods result type otherwise you will loose the
+						asynchronism capabilities. For instance if one
+						of your object has a method
+					</para>
+
+					<programlisting lang="java">
+						<emphasis role="bold">int</emphasis>
+						giveSolution(parameter)
+					</programlisting>
+
+					<para>
+						calling this method with ProActive is
+						sychronous. So to keep the asynchronism it is
+						advised to use
+					</para>
+
+					<programlisting lang="java">
+						<emphasis role="bold">IntWrapper</emphasis>
+						giveSolution(parameter)
+					</programlisting>
+
+					<para>
+						In that case call to this method is
+						asynchronous.
+					</para>
+
+					<para>
+						All wrappers are in the package:
+						<emphasis role="bold">
+							org.objectweb.proactive.core.util.wrapper
+						</emphasis>
+					</para>
+
+					<para>
+						ProActive provides more used primitive type
+						wrappers, there are 2 versions of each, one
+						<emphasis role="bold">mutable</emphasis>
+						, and the other which is
+						<emphasis role="bold">immutable</emphasis>
+						.
+					</para>
+
+					<para>
+						Only the methods return type are concerned not
+						the parameters.
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						<emphasis role="bold">Avoid</emphasis>
+						to return null in Active Object methods: on the
+						<emphasis role="bold">caller</emphasis>
+						side the test
+						<emphasis role="bold">
+							if(result_from_method == null)
+						</emphasis>
+						has no sense. Indeed result_from_method is a
+						couple Stub-FutureProxy as explained above, so
+						even if the method returns null,
+						result_from_method cannot be null:
+					</para>
+
+					<programlisting lang="java">
+						public class MyObject{ public MyObject(){
+						//empty constructor with no-args }
+
+						public Object getObject{ if(.....) { return new
+						Object(); } else { return null; --&gt; to avoid
+						in ProActive } }
+
+						}
+					</programlisting>
+
+					<para>On the caller side:</para>
+
+					<programlisting lang="java">
+						MyObject o = new MyObject(); Object
+						result_from_method = o.getObject();
+						if(result_from_method == null){ ...... }
+					</programlisting>
+
+					<para>
+						This test is never true, indeed,
+						result_from_method is
+						<emphasis role="bold">
+							Stub--&gt;Proxy--&gt;null
+						</emphasis>
+						if the future is not yet available or the method
+						returns null or
+						<emphasis role="bold">
+							Stub--&gt;Proxy--&gt;Object
+						</emphasis>
+						if the future is available, but
+						result_from_method is
+						<emphasis role="bold">never null</emphasis>
+						.
+					</para>
+				</listitem>
+			</itemizedlist>
+		</sect2>
+		<sect2>
+			<title>Lightweight Failure detection</title>
+
+			<para>
+				Waiting for the update of a future in a ProActive
+				application could freeze it if the node responsible for
+				updating the future experiences a failure. To this end,
+				ProActive has a comprehensive solution with the generic
+				fault tolerance mechanism, but it can be too expensive
+				to checkpoint active objects, when only fault detection
+				of stateless active objects is needed for example.
+			</para>
+
+			<para>
+				By default, ProActive continuously pings active objects
+				expected to update awaited futures. It is also possible
+				to manually trigger the continuous ping using the
+				FutureMonitoring.monitorFuture(future) API.
+			</para>
+
+			<para>
+				When using the fault tolerance this mechanism is
+				disabled as it could interfere with the former. This
+				should not be a problem as the features provided by the
+				fault tolerance mechanism is a super set of this one.
+			</para>
+		</sect2>
+	</sect1>
+
+	<sect1 id="AC">
+		<title>Automatic Continuation in ProActive</title>
+
+		<indexterm significance="preferred">
+			<primary>Automatic Continuation</primary>
+		</indexterm>
+
+		<sect2>
+			<title>Objectives</title>
+
+			<para>
+				An Automatic Continuation is due to the propagation of a
+				future outside the activity that has sent the
+				corresponding request.
+			</para>
+
+			<para>
+				Automatic Continuations allow to pass in parameter or
+				return as a result future objects(or objects containing
+				a future) without blocking to wait the result object of
+				the future. When the result is available on the object
+				that originated the creation of the future, this object
+				must update the result in all objects to which it passed
+				the future.
+			</para>
+		</sect2>
+
+		<sect2>
+			<title>Principles</title>
+
+			<itemizedlist>
+				<listitem>
+					<para>
+						<emphasis role="bold">Message sending</emphasis>
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						Automatic Continuations can occur when sending a
+						request (parameter of the request is a future or
+						contains a future) or when sending a reply (the
+						result is a future or contains a future).
+					</para>
+
+					<para>
+						Outgoing futures are registered in the
+						<emphasis role="bold">FuturePool</emphasis>
+						of the Active Object sending this future(request
+						or reply). Registration for
+						couple(Future,BodyDestination) as an Automatic
+						Continuation occurs when the future is
+						serialized(indeed every request or reply are
+						serialized before being sent, and the future is
+						part of the request or the reply). More
+						precisely, a thread
+						<emphasis role="bold">T</emphasis>
+						sending the message(request or
+						reply)---therefore the thread doing the
+						serialization---, keeps in a static table (
+						<emphasis role="bold">
+							FuturePool.bodyDestination
+						</emphasis>
+						) a reference of the destination body. Hence
+						when a future
+						<emphasis role="bold">F</emphasis>
+						is serialized by the same thread
+						<emphasis role="bold">T</emphasis>
+						(since futures are part of request or reply, it
+						is the same thread serializing the request --or
+						reply-- and the future), it looks up in the
+						static table, if there is a destination
+						<emphasis role="bold">D</emphasis>
+						registered for the thread
+						<emphasis role="bold">T</emphasis>
+						. If true, the future notifies its
+						<emphasis role="bold">FuturePool</emphasis>
+						(that it is going to leave), which in turn
+						registers couple (F,D) as an Automatic
+						Continuation
+					</para>
+
+					<para>
+						When value
+						<emphasis role="bold">V</emphasis>
+						is available for the future
+						<emphasis role="bold">F</emphasis>
+						,
+						<emphasis role="bold">V</emphasis>
+						is propagated to all objects that received the
+						fututre
+						<emphasis role="bold">F</emphasis>
+						. This Update is realized by a particular thread
+						located in the
+						<emphasis role="bold">FuturePool</emphasis>
+						.
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						<emphasis role="bold">
+							Message reception
+						</emphasis>
+					</para>
+				</listitem>
+
+				<listitem>
+					<para>
+						When a message is received(request or reply) by
+						an Active Object, this message can contain a
+						future. So the Active Object registers this
+						future in the
+						<emphasis role="bold">FuturePool</emphasis>
+						to be able to update it when the value will be
+						available. This registration takes place in two
+						steps:
+					</para>
+
+					<itemizedlist>
+						<listitem>
+							<para>
+								When the future is deserialized, it
+								registers in a static table (
+								<emphasis role="bold">
+									FuturePool.incomingFutures
+								</emphasis>
+							</para>
+						</listitem>
+
+						<listitem>
+							<para>
+								In Receive[Request-Reply] method, it is
+								checked if one or many futures are
+								registerd in that table, then, if true
+								these futures are registerd in the
+								<emphasis role="bold">
+									FuturePool
+								</emphasis>
+								in a standart way.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</itemizedlist>
+		</sect2>
+
+		<sect2>
+			<title>Example</title>
+
+			<para>
+				The following piece of code shows both cases: passing a
+				future as parameter or as a result.
+			</para>
+
+			<para>
+				<programlisting lang="java">
+					class C { .... public static void main(String[]
+					args){ ...... A a = newActive(A); A b =
+					newActive(B); Result r1 = a.foo(); //r1 is a future
+					Result r2 = b.bar(r1); //r1 is passed as parameter
+					Result r3 = b.bar2(); // see
+					<emphasis role="bold">**</emphasis>
+					........ } //end of main ... } //end of class C
+				</programlisting>
+			</para>
+
+			<para>where</para>
+
+			<programlisting lang="java">
+				class A { ... public Result foo(){ ... } ... } //end of
+				class A
+			</programlisting>
+
+			<para>and</para>
+
+			<programlisting lang="java">
+				class B { ... public Result bar (Result r) { ... }
+
+				public Result bar2 () { A a = newActive(A); return
+				a.foo(); //
+				<emphasis role="bold">**</emphasis>
+				future is sent as a result } } //end of class B
+			</programlisting>
+		</sect2>
+
+		<sect2>
+			<title>Illustration of an Automatic Continuation</title>
+
+			<indexterm>
+				<primary>Automatic Continuation</primary>
+			</indexterm>
+
+			<para>
+				We will illustrate here how a future is first created,
+				then passed as parameter to a method later on.
+			</para>
+
+			<para>
+				<informalfigure>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/e1.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</informalfigure>
+			</para>
+
+			<para>
+				Let us say that some piece of code in main method of an
+				object C calls method
+				<emphasis role="bold">foo()</emphasis>
+				on an instance of class A.
+			</para>
+
+			<para>
+				<informalfigure>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/e2.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</informalfigure>
+			</para>
+
+			<para>
+				This call is asynhronous and returns a future object
+				<emphasis role="bold">Future_r1</emphasis>
+				of class Result.
+			</para>
+
+			<para>
+				<informalfigure>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/e3.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</informalfigure>
+			</para>
+
+			<para>
+				Then method
+				<emphasis role="bold">bar()</emphasis>
+				is called on an instance of class B passing future
+				<emphasis role="bold">Future_r1</emphasis>
+				as a parameter to the method
+			</para>
+
+			<para>
+				<informalfigure>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/e4.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</informalfigure>
+			</para>
+
+			<para>
+				This call is asynhronous and returns a future object
+				<emphasis role="bold">Future_r2</emphasis>
+				of class Result. B needs the value of
+				<emphasis role="bold">Future_r1</emphasis>
+				which is not yet available in order to return the result
+				of method
+				<emphasis role="bold">bar()</emphasis>
+				, so it gets the future too.
+			</para>
+
+			<para>
+				<informalfigure>
+					<mediaobject>
+						<imageobject>
+							<imagedata fileref="images/e5.png"
+								format="PNG" />
+						</imageobject>
+					</mediaobject>
+				</informalfigure>
+			</para>
+
+			<para>
+				The value of the result for the call to method
+				<emphasis role="bold">foo</emphasis>
+				is now available, so A updates the value of
+				<emphasis role="bold">Future_r1</emphasis>
+			</para>
+
+			<para>
+				<informalfigure>
+					<mediaobject>
+						<imageobject>
+							<imagedata contentwidth="100"
+								fileref="images/e6.png" format="PNG" width="6in" />
+						</imageobject>
+					</mediaobject>
+				</informalfigure>
+			</para>
+
+			<para>
+				C updates the value of
+				<emphasis role="bold">Future_r1</emphasis>
+				for B
+			</para>
+
+			<para>
+				<informalfigure>
+					<mediaobject>
+						<imageobject>
+							<imagedata contentwidth="100"
+								fileref="images/e7.png" format="PNG" width="6in" />
+						</imageobject>
+					</mediaobject>
+				</informalfigure>
+			</para>
+
+			<para>
+				B returns the value for the call to method
+				<emphasis role="bold">bar()</emphasis>
+				and updates the value of
+				<emphasis role="bold">Future_r2</emphasis>
+				for C
+			</para>
+		</sect2>
+	</sect1>
+
+	<sect1 id="HelloWorld">
+		<title>The Hello world example</title>
+
+		<para>
+			This example implements a very simple client-server
+			application. A client object display a
+			<literal>String</literal>
+			received from a remote server. We will see how to write
+			classes from which active and remote objects can be created,
+			how to find a remote object and how to invoke methods on
+			remote objects.
+		</para>
+
+		<sect2>
+			<title>The two classes</title>
+
+			<para>
+				Only two classes are needed: one for the server object
+				<literal>Hello</literal>
+				and one for the client that accesses it
+				<literal>HelloClient</literal>
+				.
+			</para>
+
+			<sect3>
+				<title>The Hello class</title>
+
+				<para>
+					This class implements server-side functionalities.
+					Its creation involves the following steps:
+				</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							Provide an implementation for the required
+							server-side functionalities
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							Provide an empty, no-arg constructor
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>
+							Write a
+							<literal>main</literal>
+							method in order to instantiate one server
+							object and register it with an URL.
+						</para>
+					</listitem>
+				</itemizedlist>
+
+				<example>
+					<title>
+						A possible implementation for the
+						<literal>Hello</literal>
+						class:
+					</title>
+
+					<para>
+						<programlisting lang="java">
+							public class Hello { private String name;
+							private String hi = "Hello world"; private
+							java.text.DateFormat dateFormat = new
+							java.text.SimpleDateFormat("dd/MM/yyyy
+							HH:mm:ss"); public Hello() { } public
+							Hello(String name) { this.name = name; }
+							public String sayHello() { return hi + " at
+							" + dateFormat.format(new java.util.Date())+
+							" from node: " +
+							org.objectweb.proactive.ProActive.getBodyOnThis().getNodeURL();
+							} public static void main(String[] args) {
+							// Registers it with an URL try { // Creates
+							an active instance of class HelloServer on
+							the local node Hello hello =
+							(Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(),
+							new Object[]{"remote"});
+							java.net.InetAddress localhost =
+							java.net.InetAddress.getLocalHost();
+							org.objectweb.proactive.ProActive.register(hello,
+							"//" + localhost.getHostName() + "/Hello");
+							} catch (Exception e) {
+							System.err.println("Error: " +
+							e.getMessage()); e.printStackTrace(); } } }
+						</programlisting>
+					</para>
+				</example>
+
+				<sect4>
+					<title>
+						Implement the required functionalities
+					</title>
+
+					<para>
+						Implementing any remotely-accessible
+						functionality is simply done through normal Java
+						methods in a normal Java class, in exactly the
+						same manner it would have been done in a
+						non-distributed version of the same class. This
+						has to be contrasted with the RMI approach,
+						where several more steps are needed:
+					</para>
+
+					<itemizedlist>
+						<listitem>
+							<para>
+								Define a remote interface for declaring
+								the remotely-accessible methods.
+							</para>
+						</listitem>
+
+						<listitem>
+							<para>
+								Rewrite the class so that it inherits
+								from
+								<literal>
+									java.rmi.server.UnicastRemoteObject
+								</literal>
+								, which is the root class of all remote
+								objects.
+							</para>
+						</listitem>
+
+						<listitem>
+							<para>
+								Add remote exceptions handling to the
+								code.
+							</para>
+						</listitem>
+					</itemizedlist>
+				</sect4>
+
+				<sect4>
+					<title>Why an empty no-arg constructor?</title>
+
+					<para>
+						You may have noticed that class
+						<literal>Hello</literal>
+						has a constructor with no parameters and an
+						empty implementation. The presence of this empty
+						no-arg constructor is imposed by ProActive and
+						is actually a side-effect of ProActive's
+						transparent implementation of active remote
+						objects (as a matter of fact, this side-effect
+						is caused by ProActive being implemented on top
+						of a 100% Java metaobject protocol). If no such
+						constructor is provided, active objects cannot
+						be created.
+					</para>
+
+					<para>
+						If no constructor at all is provided, active
+						objects can still be created because, in this
+						specific case, all Java compilers provide a
+						default no-arg empty constructor. If a no-arg
+						constructor is provided but its implementation
+						is not empty, unwanted behavior may appear
+						because the no-arg constructor is always called
+						when an active object is created, whatever code
+						the user can write.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>
+						Creating the remote
+						<literal>Hello</literal>
+						object
+					</title>
+
+					<para>
+						Now that we know how to write the class that
+						implements the required server-side
+						functionalities, let us see how to create the
+						server object. In ProActive, there is actually
+						no difference between a server and a client
+						object as both are remote objects.Creating the
+						active object is done through
+						<emphasis>
+							instantiation-based creation
+						</emphasis>
+						. We want this active object to be created on
+						the current node, which is why we use
+						<literal>newActive</literal>
+						with only two parameters. In order for the
+						client to obtain an initial reference onto this
+						remote object, we need to register it in the
+						registry (which is actually the well-known
+						<literal>rmiregistry</literal>
+						) with a valid RMI URL.
+					</para>
+				</sect4>
+			</sect3>
+
+			<sect3>
+				<title>
+					The
+					<literal>HelloClient</literal>
+					Class
+				</title>
+
+				<para>
+					The responsibility of this class is first to locate
+					the remote server object, then to invoke a method on
+					it in order to retrieve a message, and finally
+					display that message.
+				</para>
+
+				<example>
+					<title>HelloClient.java</title>
+
+					<programlisting lang="java">
+						public class HelloClient { public static void
+						main(String[] args) { Hello myServer; String
+						message; try { // checks for the server's URL if
+						(args.length == 0) { // There is no url to the
+						server, so create an active server within this
+						VM myServer =
+						(Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(),
+						new Object[]{"local"}); } else { // Lookups the
+						server object System.out.println("Using server
+						located on " + args[0]); myServer =
+						(Hello)org.objectweb.proactive.ProActive.lookupActive(Hello.class.getName(),
+						args[0]); } // Invokes a remote method on this
+						object to get the message message =
+						myServer.sayHello(); // Prints out the message
+						System.out.println("The message is: " +
+						message); } catch (Exception e) {
+						System.err.println("Could not reach/create
+						server object"); e.printStackTrace();
+						System.exit(1); } } }
+					</programlisting>
+				</example>
+
+				<sect4>
+					<title>Looking up a remote object</title>
+
+					<para>
+						The operation of
+						<emphasis>lookup</emphasis>
+						simply means obtaining a reference onto an
+						object from the URL it is bound to. The return
+						type of method
+						<literal>Proactive.lookupActive()</literal>
+						is
+						<literal>Object</literal>
+						, then we need to cast it down into the type of
+						the variable that holds the reference (
+						<literal>Hello</literal>
+						here). If no object is found at this URL, the
+						call to
+						<literal>Proactive.lookupActive()</literal>
+						returns
+						<literal>null</literal>
+						.
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Invoking a method on a remote object</title>
+
+					<para>
+						This is exactly like invoking a method on a
+						local object of the same type. The user does not
+						have to deal with catching distribution related
+						exceptions like, for example, when using RMI or
+						CORBA. Future versions of ProActive will provide
+						an exception handler mechanism in order to
+						process these exceptions in a separate place
+						than the functional code. As class
+						<literal>String</literal>
+						is
+						<literal>final</literal>
+						, there cannot be any asynchronism here since
+						the object returned from the call cannot be
+						replaced by a future object (this restriction on
+						<literal>final</literal>
+						classes is imposed by ProActive's
+						implementation).
+					</para>
+				</sect4>
+
+				<sect4>
+					<title>Printing out the message</title>
+
+					<para>
+						As already stated, the only modification brought
+						to the code by ProActive is located at the place
+						where active objects are created. All the rest
+						of the code remains the same, which fosters
+						software reuse.
+					</para>
+				</sect4>
+			</sect3>
+		</sect2>
+
+		<sect2>
+			<title>Hello World within the same VM</title>
+
+			<para>
+				In order to run both the client and server in the same
+				VM, the client creates an active object in the same VM
+				if it doesn't find the server's URL. The code snippet
+				which instantiates the Server in the same VM is the
+				following:
+			</para>
+
+			<programlisting lang="java">
+				if (args.length == 0) { // There is no url to the
+				server, so create an active server within this VM
+				myServer =
+				(Hello)org.objectweb.proactive.ProActive.newActive(
+				Hello.class.getName(), new Object[]{"local"}); }
+			</programlisting>
+
+			<para>To launch the Client and the Server, just type:</para>
+
+			<screen>
+				linux&gt; java
+				-Djava.security.policy=scripts/proactive.java.policy
+				-Dlog4j.configuration=file:scripts/proactive-log4j
+				org.objectweb.proactive.examples.hello.HelloClient
+			</screen>
+
+			<screen>
+				windows&gt; java
+				-Djava.security.policy=scripts\unix\proactive.java.policy
+				-Dlog4j.configuration=file:scripts\unix\proactive-log4j
+				org.objectweb.proactive.examples.hello.HelloClient &amp;
+			</screen>
+		</sect2>
+
+		<sect2>
+			<title>Hello World from another VM on the same host</title>
+
+			<sect3>
+				<title>Starting the server</title>
+
+				<para>
+					Just start the
+					<literal>main</literal>
+					method in the
+					<literal>Hello</literal>
+					class.
+				</para>
+
+				<screen>
+					linux&gt; java
+					-Djava.security.policy=scripts/proactive.java.policy
+					-Dlog4j.configuration=file:scripts/proactive-log4j
+					org.objectweb.proactive.examples.hello.Hello &amp;
+				</screen>
+
+				<screen>
+					windows&gt; java
+					-Djava.security.policy=scripts\proactive.java.policy
+					-Dlog4j.configuration=file:scripts\proactive-log4j
+					org.objectweb.proactive.examples.hello.Hello
+				</screen>
+			</sect3>
+
+			<sect3>
+				<title>Launching the client</title>
+
+				<screen>
+					linux&gt; java
+					-Djava.security.policy=scripts/proactive.java.policy
+					-Dlog4j.configuration=file:scripts/proactive-log4j
+					org.objectweb.proactive.examples.hello.HelloClient
+					//localhost/Hello &amp;
+				</screen>
+
+				<screen>
+					windows&gt; java
+					-Djava.security.policy=scripts\proactive.java.policy
+					-Dlog4j.configuration=file:scripts\proactive-log4j
+					org.objectweb.proactive.examples.hello.HelloClient
+					//localhost/Hello
+				</screen>
+			</sect3>
+		</sect2>
+
+		<sect2>
+			<title>
+				Hello World from abroad: another VM on a different host
+			</title>
+
+			<sect3>
+				<title>Starting the server</title>
+
+				<para>
+					Log on to the server's host, and launch the
+					<literal>Hello</literal>
+					class.
+				</para>
+
+				<screen>
+					linux remoteHost&gt; java
+					-Djava.security.policy=scripts/proactive.java.policy
+					-Dlog4j.configuration=file:scripts/proactive-log4j
+					org.objectweb.proactive.examples.hello.Hello &amp;
+				</screen>
+
+				<screen>
+					windows remoteHost&gt; java
+					-Djava.security.policy=scripts\proactive.java.policy
+					-Dlog4j.configuration=file:scripts\proactive-log4j
+					org.objectweb.proactive.examples.hello.Hello
+				</screen>
+			</sect3>
+
+			<sect3>
+				<title>Launching the client</title>
+
+				<para>
+					Log on to the client Host, and launch the client
+				</para>
+
+				<screen>
+					linux clientHost&gt; java -cp $CLASSPATH
+					-Djava.security.policy=scripts/proactive.java.policy
+					-Dlog4j.configuration=file:scripts/proactive-log4j
+					org.objectweb.proactive.examples.hello.HelloClient
+					//remoteHost/Hello &amp;
+				</screen>
+
+				<screen>
+					windows clientHost&gt; java -cp $CLASSPATH
+					-Djava.security.policy=scripts\proactive.java.policy
+					-Dlog4j.configuration=file:scripts\proactive-log4j
+					org.objectweb.proactive.examples.hello.HelloClient
+					//remoteHost/Hello
+				</screen>
+
+				<note>
+					<para>
+						There is also a Guided Tour section on the Hello
+						world example:
+						<xref linkend="hands_on_programming" />
+					</para>
+				</note>
+			</sect3>
+		</sect2>
+	</sect1>
+	<sect1 id="ActiveObjectCreation_html_events">
+		<title>Event based programming</title>
+
+		<para>//TODO add immediateService maybe ?</para>
+		<para>
+			ProActive supports an event based programming model. That
+			is, an active object can schedule one of its method to be
+			called when a future is updated. This method will be
+			enqueued into the active object adding the callback. Here is
+			an excerpt from a class using the mechanism:
+		</para>
+
+		<programlisting lang="java">
+			public class MyActiveObject { public void
+			myCallback(Future&lt;StringWrapper&gt; future) { try {
+			String s = future.get().stringValue();
+			System.out.println("Got this value: " + s); } catch
+			(InterruptedException e) { /* This cannot happen */ return;
+			} catch (ExecutionException e) { System.out.println("Got an
+			exception instead of the future: " + e.getCause()); return;
+			} }
+
+			public void someRunningMethod(SomeActiveObjectClass ao) {
+			StringWrapper result = ao.foo();
+			ProFuture.addActionOnFuture(result, "myCallback"); } }
+		</programlisting>
+
+		<para>
+			As seen in the example, the callback method takes the Future
+			as parameter, it is the java.util.concurrent.Future one. It
+			is also possible to set the callback method to an immediate
+			service method.
+		</para>
+	</sect1>
 </chapter>
