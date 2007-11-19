@@ -20,6 +20,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 
 
 public class NodeAllocator implements NotificationListener {
+    final static public int PERIOD = 3000;
     GCMApplicationDescriptorImpl gcma;
     List<VirtualNodeInternal> virtualNodes;
     Map<Node, GCMDeploymentDescriptor> nodePool;
@@ -114,30 +115,29 @@ public class NodeAllocator implements NotificationListener {
                 public void run() {
                     while (true) {
                         try {
-                            Thread.sleep(30000);
+                            Thread.sleep(PERIOD);
                         } catch (InterruptedException e) {
                             GCM_NODEALLOC_LOGGER.info(e);
                         }
-
-                        boolean canPerformGreedyDispatch = true;
-                        for (VirtualNodeInternal virtualNode : virtualNodes) {
-                            if (virtualNode.needNode()) {
-                                canPerformGreedyDispatch = false;
-                                break;
+                        for (Node node : nodePool.keySet()) {
+                            boolean dispatched;
+                            GCM_NODEALLOC_LOGGER.trace("Redispatching: node " +
+                                node.getNodeInformation().getURL() + " from " +
+                                nodePool.get(node).getDescriptorFilePath());
+                            dispatched = dispatch(node, nodePool.get(node));
+                            if (dispatched) {
+                                nodePool.remove(node);
+                                continue;
                             }
-                        }
-                        if (canPerformGreedyDispatch) {
-                            for (Node node : nodePool.keySet()) {
-                                GCM_NODEALLOC_LOGGER.trace(
-                                    "Greedy Dispatching: node " +
-                                    node.getNodeInformation().getURL() +
-                                    " from " +
-                                    nodePool.get(node).getDescriptorFilePath());
-                                boolean dispatched = dispatchToGreedy(node,
-                                        nodePool.get(node));
-                                if (dispatched) {
-                                    nodePool.remove(node);
-                                }
+
+                            GCM_NODEALLOC_LOGGER.trace(
+                                "Greedy Dispatching: node " +
+                                node.getNodeInformation().getURL() + " from " +
+                                nodePool.get(node).getDescriptorFilePath());
+                            dispatched = dispatchToGreedy(node,
+                                    nodePool.get(node));
+                            if (dispatched) {
+                                nodePool.remove(node);
                             }
                         }
                     }

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -58,7 +59,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     public VirtualNodeImpl() {
         fts = new ArrayList<FileTransferBlock>();
         nodeProvidersContracts = new HashSet<NodeProviderContract>();
-        nodes = new HashSet<Node>();
+        nodes = Collections.synchronizedSet(new HashSet<Node>());
     }
 
     public long getRequiredCapacity() {
@@ -107,8 +108,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     public Set<Node> getNodes() {
-        // TODO Auto-generated method stub
-        return null;
+        return nodes;
     }
 
     private void addNode(Node node) {
@@ -120,12 +120,10 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     @Override
     public boolean doesNodeProviderNeed(Node node,
         GCMDeploymentDescriptor nodeProvider) {
-        if (!needNode()) {
-            return false;
-        }
-
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
-        if ((contract != null) && contract.doYouNeed(node, nodeProvider)) {
+
+        if ((contract != null) && contract.doYouNeed(node, nodeProvider) &&
+                (needNode() || isGreedy())) {
             addNode(node);
             return true;
         }
@@ -140,7 +138,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         }
 
         for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
-            if (!nodeProviderContract.needNode()) {
+            if (nodeProviderContract.needNode()) {
                 // We cannot accept this node since it can lead to a deadlock
                 // Example: VN.capacity = 4, NP1.capacity = MAX_NODE, NP2.capacity = 1
                 return false;
@@ -163,7 +161,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         }
 
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
-        if (contract != null) {
+        if ((contract != null) && contract.isGreedy()) {
             addNode(node);
             return true;
         }

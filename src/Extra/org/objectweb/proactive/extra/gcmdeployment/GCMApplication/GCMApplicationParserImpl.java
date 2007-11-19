@@ -297,7 +297,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 // get capacity
                 //
                 String capacity = GCMParserHelper.getAttributeValue(node,
-                        ATTR_RP_CAPACITY).trim().toLowerCase();
+                        ATTR_RP_CAPACITY);
 
                 virtualNode.setRequiredCapacity(capacityAsLong(capacity));
 
@@ -338,10 +338,6 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
     static private long capacityAsLong(String capacity) {
         if (capacity == null) {
-            return VirtualNode.MAX_CAPACITY;
-        }
-
-        if (capacity.equals("max")) {
             return VirtualNode.MAX_CAPACITY;
         }
 
