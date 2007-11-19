@@ -2091,8 +2091,24 @@
 		must be designed.</para>
 
 		<para>The simplest alternative is to enable the DGC by setting the
-		"proactive.dgc" property to "true" and let it destroy unreferenced
-		active objects and cycles of idle active objects.</para>
+		<emphasis>proactive.dgc</emphasis> property to <emphasis>true</emphasis>
+		and let it destroy unreferenced active objects and cycles of idle active
+		objects.</para>
+		
+		<para>The default configuration should be suitable in most case, but
+		it is possible to alter the timing of the DGC algorithm using two
+		parameters: <emphasis>proactive.dgc.ttb</emphasis> and
+		<emphasis>proactive.dgc.tta</emphasis>.</para>
+		
+		<para><emphasis>proactive.dgc.ttb</emphasis> specifies the period of the
+		heartbeat in milliseconds, and <emphasis>proactive.dgc.tta</emphasis>
+		specifies the time to wait in milliseconds before assuming a beat was
+		received from all referencers.</para>
+		
+		<para>Scientifically speaking, <emphasis>proactive.dgc.tta</emphasis> must
+		be much greater than <emphasis>proactive.dgc.ttb</emphasis> to account for
+		the network latency. By default  <emphasis>proactive.dgc.ttb</emphasis> is
+		30 seconds and <emphasis>proactive.dgc.tta</emphasis> is 150 seconds.</para>
 	</sect2>
 	<sect2>
 		<title>Killing JVMs</title>
