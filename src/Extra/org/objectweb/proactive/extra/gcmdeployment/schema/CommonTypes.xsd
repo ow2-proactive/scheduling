@@ -62,7 +62,7 @@
 
 	<simpleType name="capacityType">
 		<restriction base="string">
-			<pattern value="([1-9]+)|max"></pattern>
+			<pattern value="([0-9]+)|max"></pattern>
 			<whiteSpace value="collapse"></whiteSpace>
 		</restriction>
 	</simpleType>
