@@ -688,11 +688,13 @@ public class GarbageCollector {
      */
     public void log(Level level, String msg) {
         if (AsyncLogger.isEnabledFor(level)) {
-            String prefix = level.toString().charAt(0) + ">";
-            prefix += ((this.body instanceof HalfBody) ? "h" : "b");
-            prefix += this.body.getID().shortString();
-            prefix += (" " + System.currentTimeMillis() + " ");
-            msg = prefix + msg;
+            if (AsyncLogger.isEnabledFor(Level.DEBUG)) {
+                String prefix = level.toString().charAt(0) + ">";
+                prefix += ((this.body instanceof HalfBody) ? "h" : "b");
+                prefix += this.body.getID().shortString();
+                prefix += (" " + System.currentTimeMillis() + " ");
+                msg = prefix + msg;
+            }
             AsyncLogger.queueLog(level, msg);
         }
     }
