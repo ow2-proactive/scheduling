@@ -44,11 +44,13 @@ import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderProActive;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
 public class ApplicationParserProactive extends AbstractApplicationParser {
     private static final String XPATH_JAVA = "pa:java";
+    private static final String XPATH_JVMARG = "pa:jvmarg";
     private static final String XPATH_CONFIGURATION = "pa:configuration";
     private static final String XPATH_PROACTIVE_CLASSPATH = "pa:proactiveClasspath";
     private static final String XPATH_APPLICATION_CLASSPATH = "pa:applicationClasspath";
@@ -151,6 +153,15 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         if (userPropertiesNode != null) {
             PathElement pathElement = GCMParserHelper.parsePathElementNode(userPropertiesNode);
             commandBuilderProActive.setUserProperties(pathElement);
+        }
+
+        // Optional: jvmarg
+        NodeList jvmargNodes = (NodeList) xpath.evaluate(XPATH_JVMARG,
+                configNode, XPathConstants.NODESET);
+        for (int i = 0; i < jvmargNodes.getLength(); i++) {
+            String jvmarg = GCMParserHelper.getAttributeValue(jvmargNodes.item(
+                        i), "value");
+            commandBuilderProActive.addJVMArg(jvmarg);
         }
     }
 }

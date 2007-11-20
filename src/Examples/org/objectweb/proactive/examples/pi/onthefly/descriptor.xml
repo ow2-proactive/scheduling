@@ -44,17 +44,17 @@
 			<!-- dir src="${PROACTIVE_LITE}" dest="${PROACTIVE_HOME}" /-->
 			<file src="${proactive.dir}/dist/ProActive/ProActive.jar"
 				dest="${PROACTIVE_HOME}/ProActive.jar" />
-			<file src="${proactive.dir}/lib/log4j.jar"
+			<file src="${proactive.dir}/dist/lib/log4j.jar"
 				dest="${PROACTIVE_HOME}/log4j.jar" />
-			<file src="${proactive.dir}/lib/components/fractal.jar"
+			<file src="${proactive.dir}/dist/lib/components/fractal.jar"
 				dest="${PROACTIVE_HOME}/fractal.jar" />
-			<file src="${proactive.dir}/lib/xercesImpl.jar"
+			<file src="${proactive.dir}/dist/lib/xercesImpl.jar"
 				dest="${PROACTIVE_HOME}/xercesImpl.jar" />
-			<file src="${proactive.dir}/lib/bouncycastle.jar"
+			<file src="${proactive.dir}/dist/lib/bouncycastle.jar"
 				dest="${PROACTIVE_HOME}/bouncycastle.jar" />
-			<file src="${proactive.dir}/lib/ganymed-ssh2-build210.jar"
+			<file src="${proactive.dir}/dist/lib/ganymed-ssh2-build210.jar"
 				dest="${PROACTIVE_HOME}/ganymed-ssh2-build210.jar" />
-			<file src="${proactive.dir}/lib/javassist.jar"
+			<file src="${proactive.dir}/dist/lib/javassist.jar"
 				dest="${PROACTIVE_HOME}/javassist.jar" />
 			<file src="${proactive.dir}/scripts/proactive.java.policy"
 				dest="${PROACTIVE_HOME}/proactive.java.policy" />

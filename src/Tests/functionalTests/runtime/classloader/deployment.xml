@@ -32,12 +32,12 @@
 					<classpath>
                      <!-- classpath is transformed during the test in order to match the correct path -->
 				     <absolutePath value="proactive.home/dist/ProActive/ProActive.jar"/>
-				     <absolutePath value="proactive.home/lib/bouncycastle.jar"/>
-				     <absolutePath value="proactive.home/lib/fractal.jar"/>
-                     <absolutePath value="proactive.home/lib/ganymed-ssh2-build210.jar"/>
-                     <absolutePath value="proactive.home/lib/javassist.jar"/>
-                     <absolutePath value="proactive.home/lib/log4j.jar"/>
-                     <absolutePath value="proactive.home/lib/xercesImpl.jar"/>
+				     <absolutePath value="proactive.home/dist/lib/bouncycastle.jar"/>
+				     <absolutePath value="proactive.home/dist/lib/fractal.jar"/>
+                     <absolutePath value="proactive.home/dist/lib/ganymed-ssh2-build210.jar"/>
+                     <absolutePath value="proactive.home/dist/lib/javassist.jar"/>
+                     <absolutePath value="proactive.home/dist/lib/log4j.jar"/>
+                     <absolutePath value="proactive.home/dist/lib/xercesImpl.jar"/>
 				     <absolutePath value="proactive.home/classes/Tests/functionalTests/runtime/classloader/"/>
 					</classpath>
 					<jvmParameters>

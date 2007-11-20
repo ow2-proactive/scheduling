@@ -35,11 +35,15 @@ then
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extensions
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extra
     CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Examples
+    for i in $PROACTIVE/lib/*.jar ; do
+      CLASSPATH=$CLASSPATH:$i
+    done
+else 
+    for i in $PROACTIVE/dist/lib/*.jar ; do
+      CLASSPATH=$CLASSPATH:$i
+    done
 fi
-if [ -f $PROACTIVE/ProActive.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive.jar
-fi
+
 if [ -f $PROACTIVE/ProActive_examples.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive_examples.jar
@@ -48,14 +52,6 @@ if [ -f $PROACTIVE/ic2d.jar ]
 then
     CLASSPATH=$CLASSPATH:$PROACTIVE/ic2d.jar
 fi
-
-# wildcard in classpath is not available in Java 5
-#CLASSPATH="$PROACTIVE/lib/*"
-for i in $PROACTIVE/lib/*.jar ; 
-do
-    CLASSPATH=$CLASSPATH:$i
-done
-
 
 #echo "CLASSPATH"=$CLASSPATH 
 export CLASSPATH

@@ -58,14 +58,14 @@
 							value="${USER_HOME}/classlibs/jdk" />
 					</bootclasspath>
 					<classpath>
-						                                                <absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+						                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
 
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/fractal.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar"/>
 
 					</classpath>
 					<!--<classpath>

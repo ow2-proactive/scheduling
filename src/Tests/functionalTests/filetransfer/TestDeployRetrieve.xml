@@ -77,9 +77,9 @@
 					<!-- javaPath><absolutePath value="${java.home}/bin/java"/></javaPath-->
 					<classpath>
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ProActive.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ProActive.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/*" />
+							value="${PROACTIVE_HOME}/dist/lib/*" />
 					</classpath>
 					<log4jpropertiesFile>
 						<absolutePath

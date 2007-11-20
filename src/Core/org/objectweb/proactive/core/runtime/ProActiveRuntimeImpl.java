@@ -1528,7 +1528,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         String hostname = vmInformation.getHostName();
         for (long i = 0; i < capacity; i++) {
-            String nodeName = Constants.GCM_NODE_NAME + i;
+            String nodeName = this.vmInformation.getName() + "_" +
+                Constants.GCM_NODE_NAME + i;
             String url = URIBuilder.buildURI(hostname, nodeName, protocol)
                                    .toString();
 

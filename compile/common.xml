@@ -79,12 +79,23 @@
 	<!--                   define the different classpaths                -->
 	<!--  =============================================================== -->
 
-	<path id="project.libs">
+	<path id="compile.libs">
 		<fileset dir="${lib.dir}">
 			<include name="*.jar" />
 		</fileset>
 		<!-- XXX ${dev.dir} is not included in the source release ! -->
 		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
+	</path>
+	
+	<path id="deploy.classpath">
+		<fileset dir="${dist.dir}/lib">
+			<include name="**/*.jar"/>
+		</fileset>
+	</path>
+	
+	<path id="test.classpath">
+		<path refid="deploy.classpath"/>
+		<pathelement location="${cl.test.dir}/" />
 	</path>
 
 	<path id="project.classpath">
@@ -93,7 +104,7 @@
 		<pathelement location="${cl.extra.dir}" />
 		<pathelement location="${cl.utils.dir}" />
 		<pathelement location="${cl.test.dir}"/>
-		<path refid="project.libs"/>
+		<path refid="compile.libs"/>
 	</path>
 
 	<macrodef name="compile_extra">
@@ -149,7 +160,7 @@
 			 failonerror="true">
 				<!-- <compilerarg value="-Xlint:unchecked"/> -->
 				<classpath>
-					<path refid="project.libs"/>
+					<path refid="compile.libs"/>
 					<pathelement location="${proactive.jar}"/>
 				</classpath>
 				<include name="@{package}/@{module}/**/*.java" />

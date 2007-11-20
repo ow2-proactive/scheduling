@@ -65,7 +65,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     private PathElement javaPath = null;
 
     /** Arguments to be passed to java */
-    private List<String> javaArgs;
+    private List<String> jvmArgs;
 
     /** ProActive classpath
      *
@@ -94,7 +94,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         GCMD_LOGGER.trace(this.getClass().getSimpleName() + " created");
         vns = new HashMap<String, VirtualNodeInternal>();
         fts = new ArrayList<FileTransferBlock>();
-        javaArgs = new ArrayList<String>();
+        jvmArgs = new ArrayList<String>();
     }
 
     public void addVirtualNode(VirtualNodeInternal vn) {
@@ -151,10 +151,10 @@ public class CommandBuilderProActive implements CommandBuilder {
         fts.add(ftb);
     }
 
-    public void addJavaArg(String arg) {
+    public void addJVMArg(String arg) {
         if (arg != null) {
             GCMD_LOGGER.trace(" Added " + arg + " to JavaArgs");
-            javaArgs.add(arg);
+            jvmArgs.add(arg);
         }
     }
 
@@ -238,9 +238,11 @@ public class CommandBuilderProActive implements CommandBuilder {
             char fs = hostInfo.getOS().fileSeparator();
             sb.append(getPath(hostInfo));
             sb.append(fs);
+            sb.append("dist");
+            sb.append(fs);
             sb.append("lib");
             sb.append(fs);
-            sb.append("*");
+            sb.append("\\*");
             sb.append(hostInfo.getOS().pathSeparator());
         }
 
@@ -281,6 +283,11 @@ public class CommandBuilderProActive implements CommandBuilder {
         command.append(getJava(hostInfo));
         command.append(" ");
 
+        for (String arg : jvmArgs) {
+            command.append(arg);
+            command.append(" ");
+        }
+
         // Class Path: ProActive then Application
         command.append(getClasspath(hostInfo));
         command.append(" ");
@@ -297,6 +304,10 @@ public class CommandBuilderProActive implements CommandBuilder {
         if (securityPolicy != null) {
             command.append(PAProperties.SECURITY_POLICY.getCmdLine());
             command.append(securityPolicy.getFullPath(hostInfo, this));
+            command.append(" ");
+        } else {
+            command.append(PAProperties.SECURITY_POLICY.getCmdLine());
+            command.append(PAProperties.SECURITY_POLICY.getValue());
             command.append(" ");
         }
 

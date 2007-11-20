@@ -134,7 +134,7 @@
 			<processDefinition id="JVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						<absolutePath value="${PA_PATH}/lib/\*" />
+						<absolutePath value="${PA_PATH}/dist/lib/\*" />
 
 						<absolutePath value="${USER_HOME}/classes/" />
 						<absolutePath value="${USER_HOME}/libs/\*" />

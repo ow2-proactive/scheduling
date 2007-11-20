@@ -38,7 +38,7 @@
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/*" />
+							value="${PROACTIVE_HOME}/dist/lib/*" />
 					</classpath>
 					<javaPath>
 						<absolutePath

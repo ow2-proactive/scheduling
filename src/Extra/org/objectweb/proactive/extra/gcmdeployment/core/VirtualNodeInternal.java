@@ -70,4 +70,8 @@ public interface VirtualNodeInternal extends VirtualNode {
     public boolean isGreedy();
 
     public boolean needNode();
+
+    public boolean hasContractWith(GCMDeploymentDescriptor nodeProvider);
+
+    public boolean hasUnsatisfiedContract();
 }

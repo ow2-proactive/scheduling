@@ -39,15 +39,15 @@
 						<absolutePath value="${PROACTIVE_HOME}/classes/Extra"/>
 						<absolutePath value="${PROACTIVE_HOME}/classes/Examples"/>
 						                                               
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
 
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/fractal.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar"/>
+                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar"/>
 
-                      <!-- <absolutePath value="${PROACTIVE_HOME}/lib/ibis/ibis-1.4.jar"/>-->
+                      <!-- <absolutePath value="${PROACTIVE_HOME}/dist/lib/ibis/ibis-1.4.jar"/>-->
 					</classpath>
 					<javaPath>
 						<absolutePath value="${JAVA_HOME}/bin/java"/>

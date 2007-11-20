@@ -36,12 +36,12 @@ scp -i $SOPHIA_CLUSTER_KEY $TUTORIAL/ssh/sophia/production.pub mmorel@cluster.in
 
 
 scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/dist/ProActive/ProActive.jar mmorel@cluster.inria.fr:~/tutorial/libs/
-scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/lib/asm.jar mmorel@cluster.inria.fr:~/tutorial/libs/
-scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/lib/log4j.jar mmorel@cluster.inria.fr:~/tutorial/libs/
-scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/lib/xercesImpl.jar mmorel@cluster.inria.fr:~/tutorial/libs/
-scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/lib/bouncycastle.jar mmorel@cluster.inria.fr:~/tutorial/libs/
-scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/lib/components/fractal.jar mmorel@cluster.inria.fr:~/tutorial/libs/
-scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/lib/ganymed-ssh2-build210.jar mmorel@cluster.inria.fr:~/tutorial/libs/
+scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/dist/lib/asm.jar mmorel@cluster.inria.fr:~/tutorial/libs/
+scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/dist/lib/log4j.jar mmorel@cluster.inria.fr:~/tutorial/libs/
+scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/dist/lib/xercesImpl.jar mmorel@cluster.inria.fr:~/tutorial/libs/
+scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/dist/lib/bouncycastle.jar mmorel@cluster.inria.fr:~/tutorial/libs/
+scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/dist/lib/components/fractal.jar mmorel@cluster.inria.fr:~/tutorial/libs/
+scp -i $SOPHIA_CLUSTER_KEY $PROACTIVE/dist/lib/ganymed-ssh2-build210.jar mmorel@cluster.inria.fr:~/tutorial/libs/
 
 scp -i $SOPHIA_CLUSTER_KEY $TUTORIAL/config/proactive-log4j mmorel@cluster.inria.fr:~/tutorial/config/
 scp -i $SOPHIA_CLUSTER_KEY $TUTORIAL/config/proactive.java.policy mmorel@cluster.inria.fr:~/tutorial/config/
@@ -61,12 +61,12 @@ scp -i $AMSTERDAM_CLUSTER_KEY $TUTORIAL/ssh/amsterdam/production rquilici@fs0.da
 scp -i $AMSTERDAM_CLUSTER_KEY $TUTORIAL/ssh/amsterdam/production.pub rquilici@fs0.das2.cs.vu.nl:~/tutorial/ssh/amsterdam/
 
 scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/dist/ProActive/ProActive.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
-scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/lib/asm.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
-scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/lib/log4j.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
-scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/lib/xercesImpl.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
-scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/lib/bouncycastle.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
-scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/lib/components/fractal.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
-scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/lib/ganymed-ssh2-build210.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
+scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/dist/lib/asm.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
+scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/dist/lib/log4j.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
+scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/dist/lib/xercesImpl.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
+scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/dist/lib/bouncycastle.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
+scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/dist/lib/components/fractal.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
+scp -i $AMSTERDAM_CLUSTER_KEY $PROACTIVE/dist/lib/ganymed-ssh2-build210.jar rquilici@fs0.das2.cs.vu.nl:~/tutorial/libs/
 
 scp -i $AMSTERDAM_CLUSTER_KEY $TUTORIAL/config/proactive-log4j rquilici@fs0.das2.cs.vu.nl:~/tutorial/config/
 scp -i $AMSTERDAM_CLUSTER_KEY $TUTORIAL/config/proactive.java.policy rquilici@fs0.das2.cs.vu.nl:~/tutorial/config/

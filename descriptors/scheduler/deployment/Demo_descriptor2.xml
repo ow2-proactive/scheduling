@@ -50,11 +50,11 @@
 						<absolutePath value="${PROACTIVE_HOME}/classes/Examples/"/>
 						<absolutePath value="${PROACTIVE_HOME}/classes/Utils/"/>
 						<absolutePath value="${PROACTIVE_HOME}/classes/Extensions/"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/javassist.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/bouncycastle.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/components/fractal.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/log4j.jar"/>
-						<absolutePath value="${PROACTIVE_HOME}/lib/xercesImpl.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/components/fractal.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar"/>
+						<absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar"/>
 					</classpath>
 					<javaPath>
 						<absolutePath value="${JAVA_HOME}/bin/java"/>

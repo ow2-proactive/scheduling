@@ -117,6 +117,21 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         nodes.add(node);
     }
 
+    public boolean hasContractWith(GCMDeploymentDescriptor nodeProvider) {
+        return null != findNodeProviderContract(nodeProvider);
+    }
+
+    @Override
+    public boolean hasUnsatisfiedContract() {
+        for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
+            if (nodeProviderContract.needNode()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean doesNodeProviderNeed(Node node,
         GCMDeploymentDescriptor nodeProvider) {
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
@@ -135,20 +150,15 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
             return false;
         }
 
-        for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
-            if (nodeProviderContract.needNode()) {
-                // We cannot accept this node since it can lead to a deadlock
-                // Example: VN.capacity = 4, NP1.capacity = MAX_NODE, NP2.capacity = 1
-                return false;
+        NodeProviderContract contract = findNodeProviderContract(nodeProvider);
+        if ((contract != null)) {
+            if (contract.isGreedy()) {
+                addNode(node);
+                return true;
+            } else {
+                GCM_NODEALLOC_LOGGER.warn("Bug !", new Exception());
             }
         }
-
-        NodeProviderContract contract = findNodeProviderContract(nodeProvider);
-        if ((contract != null) && contract.isGreedy()) {
-            addNode(node);
-            return true;
-        }
-
         return false;
     }
 

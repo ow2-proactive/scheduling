@@ -14,6 +14,7 @@
 	<!-- Performance test properties -->
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest" />
 	<property name="config.dir" value="${cl.proactive.dir}/${proactive.core.path}/config" />
+	
 	<!-- emma -->
 	<path id="emma.lib">
 		<pathelement location="${base.dir}/compile/lib/emma_ant.jar" />
@@ -42,11 +43,6 @@
 	<!--                   define the different classpaths                -->
 	<!--  =============================================================== -->
 
-	<path id="test.classpath">
-		<pathelement location="${dist.dir}/ProActive/ProActive.jar" />
-		<path refid="project.libs" />
-		<pathelement location="${cl.test.dir}/" />
-	</path>
 
 	<path id="examples.classpath">
 		<path refid="project.classpath" />
@@ -90,6 +86,23 @@
 		</else>
 	</if>
 
+	<target name="deploy" depends="proActiveJar">
+		<copy todir="${dist.dir}/lib" >
+			<!-- Copy all libs -->
+			<fileset dir="${lib.dir}">
+				<include name="**/*.jar"/>
+				<include name="**/*.so"/>
+			</fileset>
+		</copy>
+		
+		<copy todir="${dist.dir}/scripts">	
+			<!-- Copy script needed by legacy delpoyment -->
+			<fileset dir="${base.dir}/scripts">
+				<include name="unix/clusters/**"/>
+				<include name="windows/clusters/**"/>
+			</fileset>
+		</copy>		
+	</target>
 
 	<!-- ================================================================ -->
 	<!--                          Compile All                             -->
@@ -423,11 +436,11 @@
 		</sequential>
 	</macrodef>
 
-	<target name="junitDistributed" depends="tests, proActiveJar" description="Run all non regression tests">
+	<target name="junitDistributed" depends="tests, deploy" description="Run all non regression tests">
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" />
 	</target>
 
-	<target name="junit" depends="tests, proActiveJar" description="Run all non regression tests on the current host only">
+	<target name="junit" depends="tests, deploy" description="Run all non regression tests on the current host only">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" />
 	</target>
 
@@ -469,7 +482,7 @@
 
 
 
-	<target name="clover.junit" depends="proActiveJar" description="Same as junit but with code coverage enabled">
+	<target name="clover.junit" depends="deploy" description="Same as junit but with code coverage enabled">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml">
 			<additionalClassPath>
 				<pathelement location="${ant.home}/lib/clover.jar" />
@@ -477,7 +490,7 @@
 		</junitMacro>
 	</target>
 
-	<target name="junitCoverage" depends="proActiveJar" description="Same as junit but with code coverage enabled">
+	<target name="junitCoverage" depends="deploy" description="Same as junit but with code coverage enabled">
 
 		<delete dir="${classes.dir}/emma" />
 		<mkdir dir="${classes.dir}/emma" />
@@ -529,7 +542,7 @@
 	</target>
 -->
 
-	<target name="junitIbis" depends="proActiveJar">
+	<target name="junitIbis" depends="deploy">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocalIbis.xml">
 			<jvmargs>
 				<jvmarg value="-Dproactive.rmi=ibis" />
@@ -571,7 +584,7 @@
 	<!--                      Create ProActive.jar                        -->
 	<!--  =============================================================== -->
 	<target name="proActiveJar" depends="dist-mk-dir, compile" description="Create the ProActive jar, to be used for instance on a distant host">
-		<jar manifest="${manifest.dir}/Manifest.mf" destfile="${PAdist.dir}/ProActive.jar">
+		<jar manifest="${manifest.dir}/Manifest.mf" destfile="${dist.dir}/lib/ProActive.jar">
 			<fileset dir="${cl.proactive.dir}" includes="**" />
 			<fileset dir="${cl.extensions.dir}" includes="**" />
 			<fileset dir="${cl.extra.dir}" includes="**" />
@@ -615,7 +628,8 @@
 
 	<target name="dist-mk-dir" description="Make distribution directories">
 		<mkdir dir="${dist.dir}" />
-		<mkdir dir="${PAdist.dir}" />
+		<mkdir dir="${dist.dir}/lib" />
+		<mkdir dir="${dist.dir}/scripts" />
 	</target>
 
 

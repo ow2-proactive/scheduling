@@ -46,113 +46,113 @@
 							value="${PROACTIVE_HOME}/classes/" />
 
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/osgi/servicebinder.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/osgi/servicebinder.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/osgi/oscar.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/osgi/oscar.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/osgi/moduleloader.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/osgi/moduleloader.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/osgi/http.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/osgi/http.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/osgi/osgi.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/osgi/osgi.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/glite/glite-wms-jdlj.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/glite/glite-wms-jdlj.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/glite/classad.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/glite/classad.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/unicore/njs_client.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/unicore/njs_client.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/unicore/ajo.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/unicore/ajo.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/unicore/client.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/unicore/client.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/unicore/jh.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/unicore/jh.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/unicore/scriptPlugin.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/unicore/scriptPlugin.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/julia-runtime.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/julia-runtime.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/dtdparser.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/dtdparser.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/julia-mixins.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/julia-mixins.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/fractal-adl.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/fractal-adl.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/fractal.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/fractal.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/ow_deployment_scheduling.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/ow_deployment_scheduling.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/fractal-gui.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/fractal-gui.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/SVGGraphics.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/SVGGraphics.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/fractal-swing.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/fractal-swing.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/components/julia-asm.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/components/julia-asm.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ibis/ibis.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ibis/ibis.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/jini/jini-core.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/jini/jini-core.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/jini/jini-ext.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/jini/jini-ext.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/jini/reggie.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/jini/reggie.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/saaj-api.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/saaj-api.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/axis.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/axis.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/servlet-api.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/servlet-api.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/jaxrpc.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/jaxrpc.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/wsdl4j.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/wsdl4j.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/xml-apis.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/xml-apis.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/commons-discovery.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/commons-discovery.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/commons-logging.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/commons-logging.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/activation.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/activation.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/mail.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/mail.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ws/soap.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ws/soap.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/globus/cog-jglobus-1.2.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/globus/cog-jglobus-1.2.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/globus/cryptix32.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/globus/cryptix32.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/globus/cog-jglobus.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/globus/cog-jglobus.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/globus/puretls.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/globus/puretls.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/globus/cryptix-asn1.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/globus/cryptix-asn1.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/globus/cryptix.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/globus/cryptix.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/globus/cog-ogce.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/globus/cog-ogce.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/examples/clibwrapper_jiio.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/examples/clibwrapper_jiio.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/examples/mlibwrapper_jai.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/examples/mlibwrapper_jai.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/examples/jai_core.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/examples/jai_core.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/examples/jai_imageio.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/examples/jai_imageio.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/examples/jai_codec.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/examples/jai_codec.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/javassist.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/javassist.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar" />
 						<absolutePath
-							value="${PROACTIVE_HOME}/lib/log4j.jar" />
+							value="${PROACTIVE_HOME}/dist/lib/log4j.jar" />
 
 					</classpath>
 					<javaPath>

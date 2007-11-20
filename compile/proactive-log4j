@@ -7,6 +7,9 @@
 log4j.rootLogger=INFO,CONSOLE
 log4j.logger.testsuite=INFO,CONSOLE
 
+log4j.logger.proactive.deployment = TRACE
+#log4j.logger.testsuite = TRACE
+
 ########### The following are existing categories in ProActive
 #log4j.logger.proactive = INFO
 #log4j.logger.proactive.classloader = DEBUG

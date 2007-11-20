@@ -100,5 +100,5 @@ public interface Constants {
      * User are not allowed to create node with this name.
      * @TODO enforce this rule, currently the user node is destroyed
      */
-    public static final String GCM_NODE_NAME = "CapacityNode-";
+    public static final String GCM_NODE_NAME = "GCMNode-";
 }

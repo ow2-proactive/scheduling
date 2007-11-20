@@ -289,8 +289,13 @@ public enum PAProperties {
      * before changing it.
      */
     PA_DGC_TTB("proactive.dgc.ttb", false),
-
     // -------------- Misc
+
+    /**
+     * PRIVATE
+     * This flag indicate the VM is running unit or functional tests
+     */
+    PA_TEST("proactive.test", true),
 
     /** TODO Describe this property */
     PA_BYTECODEMANIPULATOR("byteCodeManipulator", false),

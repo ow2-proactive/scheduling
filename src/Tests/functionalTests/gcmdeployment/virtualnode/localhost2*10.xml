@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pa:GCMDeployment xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"	
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                                     /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
+	                    http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
+	 
+	
+	<pa:resources>
+	                    
+		<pa:bridge refid="bLocalhost">
+			<pa:host refid="hLocahost"/>
+		</pa:bridge>
+	</pa:resources>
+
+	<pa:infrastructure>
+		
+		<pa:hosts>
+			<pa:host id="hLocalhost" os="unix" hostCapacity="2" vmCapacity="10">
+				<pa:homeDirectory base="root" relpath="/user/cmathieu/home"/>				
+			</pa:host>
+		</pa:hosts>
+
+		<pa:bridges>
+			<paext:sshBridge
+				id="bLocalhost"
+				hostname="localhost"
+				commandOptions="-2" />
+		</pa:bridges>
+	</pa:infrastructure>
+</pa:GCMDeployment>

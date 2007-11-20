@@ -71,7 +71,7 @@
 				<paext:JDLFilePath>/users/dsksi/emathias/JDL</paext:JDLFilePath>
 				<paext:JDLRemoteFilePath>/users/dsksi/emathias/JDL</paext:JDLRemoteFilePath>
 				<paext:inputSandbox>
-					${PROACTIVE_HOME}/lib/classes.jar ${PROACTIVE_HOME}/lib/glite-wms-jdlj.jar
+					${PROACTIVE_HOME}/dist/lib/classes.jar ${PROACTIVE_HOME}/lib/glite-wms-jdlj.jar
 					${PROACTIVE_HOME}/scripts/unix/cluster/gLiteStartRuntime.sh
 				</paext:inputSandbox>
 				<paext:outputSandbox>error.log stdout.log</paext:outputSandbox>

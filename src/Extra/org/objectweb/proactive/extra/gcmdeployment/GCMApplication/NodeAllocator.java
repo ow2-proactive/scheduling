@@ -20,10 +20,21 @@ import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 
 
 public class NodeAllocator implements NotificationListener {
-    final static public int PERIOD = 3000;
-    GCMApplicationDescriptorImpl gcma;
-    List<VirtualNodeInternal> virtualNodes;
-    Map<Node, GCMDeploymentDescriptor> nodePool;
+
+    /** The GCM Application Descriptor associated to this Node Allocator*/
+    private GCMApplicationDescriptorImpl gcma;
+
+    /** All Virtual Nodes*/
+    private List<VirtualNodeInternal> virtualNodes;
+
+    /** Nodes waiting in Stage 2 */
+    private Map<Node, GCMDeploymentDescriptor> stage2Pool;
+
+    /** Nodes waiting in Stage 3 */
+    private Map<Node, GCMDeploymentDescriptor> stage3Pool;
+
+    /** A Semaphore to activate stage 2/3 node dispatching on node arrival */
+    private Object semaphore;
 
     public NodeAllocator(GCMApplicationDescriptorImpl gcma,
         Collection<VirtualNodeInternal> virtualNodes) {
@@ -32,10 +43,12 @@ public class NodeAllocator implements NotificationListener {
         this.virtualNodes = new LinkedList<VirtualNodeInternal>();
         this.virtualNodes.addAll(virtualNodes);
 
-        this.nodePool = new ConcurrentHashMap<Node, GCMDeploymentDescriptor>();
+        this.semaphore = new Object();
 
+        this.stage2Pool = new ConcurrentHashMap<Node, GCMDeploymentDescriptor>();
+        this.stage3Pool = new ConcurrentHashMap<Node, GCMDeploymentDescriptor>();
         subscribeJMXRuntimeEvent();
-        startGreedyThread();
+        startStage23Thread();
     }
 
     public void subscribeJMXRuntimeEvent() {
@@ -46,47 +59,45 @@ public class NodeAllocator implements NotificationListener {
             this);
     }
 
-    public void handleNotification(Notification notification, Object handback) {
-        String type = notification.getType();
+    synchronized public void handleNotification(Notification notification,
+        Object handback) {
+        try {
+            String type = notification.getType();
 
-        if (NotificationType.GCMRuntimeRegistered.equals(type)) {
-            GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification.getUserData();
+            if (NotificationType.GCMRuntimeRegistered.equals(type)) {
+                GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification.getUserData();
+                GCMDeploymentDescriptor nodeProvider = gcma.getGCMDeploymentDescriptorId(data.getDeploymentId());
 
-            GCMDeploymentDescriptor nodeProvider = gcma.getGCMDeploymentDescriptorId(data.getDeploymentId());
-
-            for (Node node : data.getNodes()) {
-                try {
-                    GCM_NODEALLOC_LOGGER.trace("Dispatching: node " +
-                        node.getNodeInformation().getURL() + " from " +
-                        nodeProvider.getDescriptorFilePath());
-                    boolean dispatched = dispatch(node, nodeProvider);
-                    if (!dispatched) {
-                        GCM_NODEALLOC_LOGGER.trace(
-                            "Node rejected by every VN, put it into the nodePool for latter retry");
-                        nodePool.put(node, nodeProvider);
+                for (Node node : data.getNodes()) {
+                    if (!dispatchS1(node, nodeProvider)) {
+                        stage2Pool.put(node, nodeProvider);
                     }
-                } catch (Exception e) {
-                    // If not handled by us, JMX eats the Exception !
-                    GCM_NODEALLOC_LOGGER.warn(e);
+                }
+
+                synchronized (semaphore) {
+                    semaphore.notify();
                 }
             }
+        } catch (Exception e) {
+            // If not handled by us, JMX eats the Exception !
+            GCM_NODEALLOC_LOGGER.warn(e);
         }
     }
 
-    synchronized public boolean dispatch(Node node,
-        GCMDeploymentDescriptor nodeProvider) {
-        // Check if a virtualNode need this Node to fulfill a NodeProvider requirement
-        for (VirtualNodeInternal virtualNode : virtualNodes) {
-            boolean dispatched = virtualNode.doesNodeProviderNeed(node,
-                    nodeProvider);
-            if (dispatched) {
-                return true;
-            }
-        }
+    /**
+     * Try to give the node to a Virtual Node to fulfill a NodeProviderContract
+     *
+     * @param node The node who registered to the local runtime
+     * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
+     * @return returns true if a VirtualNode took the Node, false otherwise
+     */
+    private boolean dispatchS1(Node node, GCMDeploymentDescriptor nodeProvider) {
+        GCM_NODEALLOC_LOGGER.trace("Stage1: " +
+            node.getNodeInformation().getURL() + " from " +
+            nodeProvider.getDescriptorFilePath());
 
         for (VirtualNodeInternal virtualNode : virtualNodes) {
-            boolean dispatched = virtualNode.doYouNeed(node, nodeProvider);
-            if (dispatched) {
+            if (virtualNode.doesNodeProviderNeed(node, nodeProvider)) {
                 return true;
             }
         }
@@ -94,13 +105,52 @@ public class NodeAllocator implements NotificationListener {
         return false;
     }
 
-    synchronized private boolean dispatchToGreedy(Node node,
-        GCMDeploymentDescriptor nodeProvider) {
-        // To be fair we have to wait that all Virtual Node are Ready
+    /**
+     * Offers node to each VirtualNode to fulfill VirtualNode Capacity requirement.
+     *
+     * @param node The node who registered to the local runtime
+     * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
+     * @return returns true if a VirtualNode took the Node, false otherwise
+     */
+    private boolean dispatchS2(Node node, GCMDeploymentDescriptor nodeProvider) {
+        GCM_NODEALLOC_LOGGER.trace("Stage2: " +
+            node.getNodeInformation().getURL() + " from " +
+            nodeProvider.getDescriptorFilePath());
+
+        // Check this Node can be dispatched 
         for (VirtualNodeInternal virtualNode : virtualNodes) {
-            boolean dispatched = virtualNode.doYouWant(node, nodeProvider);
-            if (dispatched) {
-                // For Round Robin between Virtual Node
+            if (virtualNode.hasContractWith(nodeProvider) &&
+                    virtualNode.hasUnsatisfiedContract()) {
+                return false;
+            }
+        }
+
+        for (VirtualNodeInternal virtualNode : virtualNodes) {
+            if (virtualNode.doYouNeed(node, nodeProvider)) {
+                stage2Pool.remove(node);
+                return true;
+            }
+        }
+
+        stage2Pool.remove(node);
+        stage3Pool.put(node, nodeProvider);
+        return false;
+    }
+
+    /**
+     *
+     * @param node The node who registered to the local runtime
+     * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
+     * @return
+     */
+    private boolean dispatchS3(Node node, GCMDeploymentDescriptor nodeProvider) {
+        GCM_NODEALLOC_LOGGER.trace("Stage3: " +
+            node.getNodeInformation().getURL() + " from " +
+            nodeProvider.getDescriptorFilePath());
+
+        for (VirtualNodeInternal virtualNode : virtualNodes) {
+            if (virtualNode.doYouWant(node, nodeProvider)) {
+                stage3Pool.remove(node);
                 virtualNodes.add(virtualNodes.remove(0));
                 return true;
             }
@@ -109,42 +159,30 @@ public class NodeAllocator implements NotificationListener {
         return false;
     }
 
-    private void startGreedyThread() {
-        Thread t = new Thread() {
-                @Override
-                public void run() {
-                    while (true) {
-                        try {
-                            Thread.sleep(PERIOD);
-                        } catch (InterruptedException e) {
-                            GCM_NODEALLOC_LOGGER.info(e);
-                        }
-                        for (Node node : nodePool.keySet()) {
-                            boolean dispatched;
-                            GCM_NODEALLOC_LOGGER.trace("Redispatching: node " +
-                                node.getNodeInformation().getURL() + " from " +
-                                nodePool.get(node).getDescriptorFilePath());
-                            dispatched = dispatch(node, nodePool.get(node));
-                            if (dispatched) {
-                                nodePool.remove(node);
-                                continue;
-                            }
-
-                            GCM_NODEALLOC_LOGGER.trace(
-                                "Greedy Dispatching: node " +
-                                node.getNodeInformation().getURL() + " from " +
-                                nodePool.get(node).getDescriptorFilePath());
-                            dispatched = dispatchToGreedy(node,
-                                    nodePool.get(node));
-                            if (dispatched) {
-                                nodePool.remove(node);
-                            }
-                        }
-                    }
-                }
-            };
-
+    private void startStage23Thread() {
+        Thread t = new Stage23Dispatcher();
         t.setDaemon(true);
         t.start();
+    }
+
+    private class Stage23Dispatcher extends Thread {
+        public void run() {
+            while (true) {
+                // Wait for next handleNotification invocation
+                try {
+                    synchronized (semaphore) {
+                        semaphore.wait();
+                    }
+                } catch (InterruptedException e) {
+                    GCM_NODEALLOC_LOGGER.info(e);
+                }
+
+                for (Node node : stage2Pool.keySet())
+                    dispatchS2(node, stage2Pool.get(node));
+
+                for (Node node : stage3Pool.keySet())
+                    dispatchS3(node, stage3Pool.get(node));
+            }
+        }
     }
 }
