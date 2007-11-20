@@ -196,6 +196,68 @@
 		</sect2>
 
 
+	</sect1><sect1>
+		<title>Object Based Creation using <literal>ProActiveObject.turnActive(...)</literal></title>
+
+		<para>
+			Object based creation is used for turning an existing
+			passive object instance into an active one. It has been
+			introduced in ProActive as an answer to the problem of
+			creating active objects from already existing objects for
+			which we do not have access to the source code.
+		</para>
+
+		<para>
+			Because the object already exists before turning it active,
+			there is no serialization involved when we create the
+			object. When we invoke
+			<literal>ProActive.turnActive</literal>
+			on the object, two cases are possible. If we create the
+			active object locally (on a local node), it will not be
+			serialized. If we create the active object remotely (on a
+			remote node), the reified object will be serialized.
+			Therefore, if the
+			<literal>turnActive</literal>
+			is done on a remote node, the class used to create the
+			active object this way has to be
+			<literal>Serializable</literal>
+			. In addition, when using
+			<literal>turnActive</literal>
+			, care must be taken that no other references to the
+			originating object are kept by other objects after the call
+			to turnActive. A direct call to a method of the originating
+			object without passing by a ProActive stub on this object
+			will break the ProActive model.
+		</para>
+
+		<para>
+			The simplest code for object based creation looks like this:
+		</para>
+
+		<programlisting lang="java"><textobject><textdata
+			 fileref="code_snippets/simpleTurnActive.txt" /></textobject></programlisting>
+
+		<para>
+			The second parameter of
+			<literal>turnActive</literal>
+			is the location where the active object will be created. No
+			parameter or
+			<literal>null</literal>
+			means that the active object is created locally in the
+			current node.
+		</para>
+
+		<para>
+			When using this method, the programmer has to make sure that
+			no other reference on the passive object exist after the
+			call to
+			<literal>ProActiveObject.turnActive(...)</literal>.
+			If such references are used for calling methods directly
+			on the passive object (without going through its stub,
+			proxy, and body), the model will not be consistent and
+			specialization of synchronization will no be guaranteed.
+		</para>
+
 	</sect1>
 
 
@@ -541,13 +603,8 @@
 					initialization and activity.
 				</para>
 
-				<programlisting lang="java">
-					<textobject>
-						<textdata
-							fileref="code_snippets/CustomInitAndRun.txt" />
-
-					</textobject>
-				</programlisting>
+				<programlisting lang="java"><textobject><textdata
+							fileref="code_snippets/CustomInitAndRun.txt" /></textobject></programlisting>
 
 				<para>
 					<example>
@@ -563,13 +620,8 @@
 							to provide the necessary control.
 						</para>
 						<para>
-							<programlisting lang="java">
-								<textobject>
-									<textdata
-										fileref="code_snippets/SimulationWithActivity.txt" />
-
-								</textobject>
-							</programlisting>
+							<programlisting lang="java"><textobject><textdata
+									fileref="code_snippets/SimulationWithActivity.txt" /></textobject></programlisting>
 						</para>
 					</example>
 				</para>
@@ -605,13 +657,8 @@
 					be passed to the active object. We do so by
 					implementing one or more interfaces.
 				</para>
-				<programlisting lang="java">
-					<textobject>
-						<textdata
-							fileref="code_snippets/activityImplementation.txt" />
-
-					</textobject>
-				</programlisting>
+				<programlisting lang="java"><textobject><textdata
+							fileref="code_snippets/activityImplementation.txt" /></textobject></programlisting>
 				<para>
 					The implemented interface can be used with
 					<literal>ProActiveObject.newActive(..)</literal>
@@ -619,13 +666,8 @@
 					<literal>ProActiveObject.turnActive(...)</literal>
 					.
 				</para>
-				<programlisting lang="java">
-					<textobject>
-						<textdata
-							fileref="code_snippets/usingActivity.txt" />
-
-					</textobject>
-				</programlisting>
+				<programlisting lang="java"><textobject><textdata
+							fileref="code_snippets/usingActivity.txt" /></textobject></programlisting>
 
 			</sect3>
 
@@ -651,16 +693,14 @@
 				returns it. The code is:
 			</para>
 
-			<programlisting lang="java"><textobject><textdata fileref="code_snippets/factoryAO.txt" />
-				</textobject>
-			</programlisting>
+			<programlisting lang="java"><textobject><textdata 
+				fileref="code_snippets/factoryAO.txt" /></textobject></programlisting>
 			<para>
 				The static method in the factory class is then used to
 				create active objects:
 			</para>
-			<programlisting lang="java"><textobject><textdata fileref="code_snippets/factoryCall.txt" />
-				</textobject>
-			</programlisting>
+			<programlisting lang="java"><textobject><textdata 
+				fileref="code_snippets/factoryCall.txt" /></textobject></programlisting>
 
 			<para>
 				It is up to the programmer to decide whether this method
@@ -729,13 +769,8 @@
 			</para>
 
 			<para>
-				<programlisting lang="java">
-					<textobject>
-						<textdata
-							fileref="code_snippets/metaObjectFactory.txt" />
-
-					</textobject>
-				</programlisting>
+				<programlisting lang="java"><textobject><textdata
+							fileref="code_snippets/metaObjectFactory.txt" /></textobject></programlisting>
 			</para>
 
 			<para>
@@ -795,9 +830,6 @@
 			//TODO - why doesn't newActive have the same parameter ?
 		</para>
 	</sect1>
-
-
-
 
 
 
@@ -1113,73 +1145,7 @@
 			</para>
 		</sect2>
 	</sect1>
-	<sect1>
-		<title>Object Based Creation</title>
-
-		<para>
-			Object based creation is used for turning an existing
-			passive object instance into an active one. It has been
-			introduced in ProActive as an answer to the problem of
-			creating active objects from already existing objects for
-			which we do not have access to the source code.
-		</para>
-
-		<para>
-			Because the object already exists before turning it active,
-			there is no serialization involved when we create the
-			object. When we invoke
-			<literal>ProActive.turnActive</literal>
-			on the object, two cases are possible. If we create the
-			active object locally (on a local node), it will not be
-			serialized. If we create the active object remotely (on a
-			remote node), the reified object will be serialized.
-			Therefore, if the
-			<literal>turnActive</literal>
-			is done on a remote node, the class used to create the
-			active object this way has to be
-			<literal>Serializable</literal>
-			. In addition, when using
-			<literal>turnActive</literal>
-			, care must be taken that no other references to the
-			originating object are kept by other objects after the call
-			to turnActive. A direct call to a method of the originating
-			object without passing by a ProActive stub on this object
-			will break the ProActive model.
-		</para>
-
-		<para>
-			The simplest code for object based creation looks like this:
-		</para>
-
-		<programlisting lang="java">
-			<textobject>
-				<textdata fileref="code_snippets/simpleTurnActive.txt" />
-
-			</textobject>
-		</programlisting>
-
-		<para>
-			The second parameter of
-			<literal>turnActive</literal>
-			is the location where the active object will be created. No
-			parameter or
-			<literal>null</literal>
-			means that the active object is created locally in the
-			current node.
-		</para>
-
-		<para>
-			When using this method, the programmer has to make sure that
-			no other reference on the passive object exist after the
-			call to
-			<literal>ProActiveObject.turnActive(...)</literal>
-			. If such references are used for calling methods directly
-			on the passive object (without going through its stub,
-			proxy, and body), the model will not be consistent and
-			specialization of synchronization will no be guaranteed.
-		</para>
-
-	</sect1>
+	
 
 	<sect1 id="FutureObjectCreation">
 		<title>Asynchronous calls and futures</title>
