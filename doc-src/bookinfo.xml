@@ -2,8 +2,13 @@
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <bookinfo>
   <title>ProActive <systemitem role="VERSION" /> Documentation</title>
-
-  <subtitle>A Comprehensive Solution for Parallel, Distributed, and Multithreaded Computing</subtitle>
+ <!--if you want to change the title in the html version on
+ change the subtitle tag in the  xsl/html.xsl
+ 
+ changing here applies only to the pdf  -->
+  <subtitle>A Comprehensive Solution For
+Multithreaded, Parallel, Distributed,
+And Concurrent Computing</subtitle>
 
   <author>
     <surname>OASIS Research Team</surname>
