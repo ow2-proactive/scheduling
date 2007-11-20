@@ -35,7 +35,6 @@ import java.util.Collection;
 
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -85,11 +84,10 @@ public interface BodyWrapperMBean extends Serializable {
     public ObjectName getObjectName();
 
     /**
-     * Returns a collection of BasicTimer.
-     * @param timerNames
-     * @return a collection of BasicTimer
+     * Returns an array of timers.
+     * @return an array of timers
      */
-    public Collection<BasicTimer> getTimersSnapshot(String[] timerNames);
+    public Object[] getTimersSnapshotFromBody() throws Exception;
 
     /**
      * Migrate the body to the given node.
@@ -104,7 +102,4 @@ public interface BodyWrapperMBean extends Serializable {
     public Collection<UniqueID> getReferenceList();
 
     public String getDgcState();
-
-    public Object[] getTimersSnapshotFromBody(String[] timerNames)
-        throws Exception;
 }

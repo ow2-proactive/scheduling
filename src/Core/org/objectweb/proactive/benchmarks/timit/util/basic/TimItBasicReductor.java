@@ -35,6 +35,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.result.BasicResultWriter;
 import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalService;
@@ -46,7 +47,7 @@ import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalServi
  *
  * @author vbodnart
  */
-public class TimItBasicReductor {
+public class TimItBasicReductor implements ProActiveInternalObject {
 
     /** A list of result bags */
     private List<ResultBag> results = new java.util.ArrayList<ResultBag>();

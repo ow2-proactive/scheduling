@@ -88,6 +88,11 @@ public class BasicResultWriter {
         // Create the ao element
         Element aoElement = new Element("ao");
         this.fillTimersResults(aoElement, bag);
+        Iterator it = aoElement.getDescendants();
+        while (it.hasNext()) {
+            Element e = (Element) it.next();
+            e.removeAttribute("parentId");
+        }
         // Attach the ao element as a child to the timit element
         this.eTimit.addContent(aoElement);
     }
@@ -137,11 +142,22 @@ public class BasicResultWriter {
         // Finding and adding all roots
         for (int i = 0; i < timersList.size(); i++) {
             // If the current is the root add it to the tree
-            BasicTimer currentTimer = timersList.get(i);
-            if (currentTimer.getParent() == null) {
-                timersElement.addContent(createTimerElement(currentTimer));
+            BasicTimer currentRoot = timersList.get(i);
+            if (currentRoot.getParent() == null) {
+                Element createdElement = createTimerElement(currentRoot);
+                timersElement.addContent(createdElement);
                 timersList.remove(i);
                 i--;
+                // Find and attach direct children of roots
+                for (int j = 0; j < timersList.size(); j++) {
+                    BasicTimer b = timersList.get(j);
+                    if (b.getParent().equals(currentRoot)) {
+                        Element directChildElement = createTimerElement(b);
+                        createdElement.addContent(directChildElement);
+                        timersList.remove(j);
+                        j--;
+                    }
+                }
             }
         }
 
@@ -192,7 +208,9 @@ public class BasicResultWriter {
         while (it.hasNext()) {
             Element ee = it.next();
             if (timerToAdd.getParent().getName()
-                              .equals(ee.getAttributeValue("name"))) {
+                              .equals(ee.getAttributeValue("name")) &&
+                    (timerToAdd.getParent().getParent().getId() == Integer.valueOf(
+                        ee.getAttributeValue("parentId")))) {
                 ee.addContent(createTimerElement(timerToAdd));
                 return true;
             }
@@ -201,10 +219,12 @@ public class BasicResultWriter {
     }
 
     /**
-     * Creates a an element timer from an instance of a timer
-     * @param currentTimer The timer to create an element of.
-     * @return The created element.
-     */
+         * Creates an element timer from an instance of a timer
+         *
+         * @param currentTimer
+         *            The timer to create an element of.
+         * @return The created element.
+         */
     private static final Element createTimerElement(
         final BasicTimer currentTimer) {
         final Element newTimerElement = new Element("timer");
@@ -222,6 +242,11 @@ public class BasicResultWriter {
         // Set the number of startStopCoupleCount value
         newTimerElement.setAttribute(new Attribute("startStopCoupleCount",
                 "" + currentTimer.getStartStopCoupleCount()));
+        // Set the temporary parent name 
+        newTimerElement.setAttribute(new Attribute("parentId",
+                ((currentTimer.getParent() == null) ? ""
+                                                    : ("" +
+                currentTimer.getParent().getId()))));
         return newTimerElement;
     }
 

@@ -44,6 +44,9 @@ public class BasicTimer implements java.io.Serializable {
     /** The name of the timer */
     private String name;
 
+    /** The id of the timer */
+    private int id;
+
     /** The start time */
     private long startTime;
 
@@ -67,8 +70,9 @@ public class BasicTimer implements java.io.Serializable {
     * @param name The name of the timer
     * @param parent A reference to the parent timer
     */
-    public BasicTimer(String name, BasicTimer parent) {
+    public BasicTimer(final String name, final BasicTimer parent) {
         this.name = name;
+        this.id = System.identityHashCode(this);
         this.startTime = 0L;
         this.totalTime = 0L;
         this.parent = parent;
@@ -247,17 +251,36 @@ public class BasicTimer implements java.io.Serializable {
 
     /**
      * Sets the number of start stop couples of this timer.
-     * @param startStopCoupleCount
+     *
+     * @param startStopCoupleCount The number of start/stop counts.
      */
     public final void setStartStopCoupleCount(int startStopCoupleCount) {
         this.startStopCoupleCount = startStopCoupleCount;
     }
 
+    /**
+     * Used to know if this timer was defined by the user.
+     *
+     * @return True if this timer was defined by the user, false otherwise
+     */
     public final boolean isUserLevel() {
         return isUserLevel;
     }
 
+    /**
+     * Sets this timer as a user one.
+     * @param isUserLevel
+     */
     public final void setUserLevel(boolean isUserLevel) {
         this.isUserLevel = isUserLevel;
+    }
+
+    /**
+     * A getter for the unique id of this timer.
+     *
+     * @return The unique id of this timer
+     */
+    public final int getId() {
+        return id;
     }
 }

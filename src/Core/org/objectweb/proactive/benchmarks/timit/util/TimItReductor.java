@@ -33,6 +33,7 @@ package org.objectweb.proactive.benchmarks.timit.util;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
@@ -46,7 +47,7 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
  * @author Brian Amedro, Vladimir Bodnartchouk
  *
  */
-public class TimItReductor implements Serializable {
+public class TimItReductor implements ProActiveInternalObject, Serializable {
 
     /**
      *

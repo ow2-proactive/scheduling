@@ -47,7 +47,6 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.ProMobileAgent;
-import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.migration.Migratable;
@@ -62,8 +61,6 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.profiling.TimerProvidable;
-import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 /**
@@ -173,15 +170,6 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         } else {
             notifications.add(notification);
         }
-    }
-
-    public Collection<BasicTimer> getTimersSnapshot(String[] timerNames) {
-        TimerProvidable container = TimerWarehouse.getTimerProvidable(getID());
-        if (container == null) {
-            throw new NullPointerException(
-                "The timers container is null, the body is not timed.");
-        }
-        return container.getSnapshot(timerNames);
     }
 
     public void migrateTo(String nodeUrl) throws MigrationException {
@@ -360,16 +348,18 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         return GarbageCollector.getDgcState(this.getID());
     }
 
-    public Object[] getTimersSnapshotFromBody(String[] timerNames)
-        throws Exception {
-        org.objectweb.proactive.core.util.profiling.TimerProvidable container = org.objectweb.proactive.core.util.profiling.TimerWarehouse.getTimerProvidable(this.id);
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#getTimersSnapshotFromBody()
+     */
+    public Object[] getTimersSnapshotFromBody() throws Exception {
+        final org.objectweb.proactive.core.util.profiling.TimerProvidable container =
+            org.objectweb.proactive.core.util.profiling.TimerWarehouse.getTimerProvidable(this.id);
         if (container == null) {
             throw new NullPointerException(
                 "The timers container is null, the body is not timed.");
         }
         return new Object[] {
-            container.getSnapshot(timerNames), // The list
-                                               // of timers
+            container.getSnapshot(), // The array of timers
             System.nanoTime() // The nano timestamp on this machine used
                               // to stop all timers at the caller side
         };

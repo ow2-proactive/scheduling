@@ -206,8 +206,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         throws InvocationTargetException {
         //System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.startXAndSkipSendRequest(ProActiveObject.getBodyOnThis()
-                                                                   .getID(),
+            TimerWarehouse.startXAndDisable(ProActiveObject.getBodyOnThis()
+                                                           .getID(),
                 ((mc.isOneWayCall() ||
                 (mc.getReifiedMethod().getReturnType() == Void.TYPE))
                 ? TimerWarehouse.GROUP_ONE_WAY_CALL
@@ -260,8 +260,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         this.threadpool.complete();
 
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.stopXAndUnskipSendRequest(ProActiveObject.getBodyOnThis()
-                                                                    .getID(),
+            TimerWarehouse.enableAndStopX(ProActiveObject.getBodyOnThis().getID(),
                 ((mc.isOneWayCall() ||
                 (mc.getReifiedMethod().getReturnType() == Void.TYPE))
                 ? TimerWarehouse.GROUP_ONE_WAY_CALL

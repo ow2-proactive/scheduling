@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.util.profiling;
 
+import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.api.ProActiveObject;
@@ -38,24 +39,48 @@ import org.objectweb.proactive.core.UniqueID;
 
 /**
  * Timers indexes are typed with int.
- * We suppose that the number of timers will not be more than 255
+ * This class handles all operations relative to the internal ProActive timing system.
  */
 public class TimerWarehouse {
+
+    /** The root Total timer */
     public static final int TOTAL = 0;
 
-    /** not used currently */
-    //public static final int DEPLOYEMENT = ;
+    /** The Serve timer represents the service time */
     public static final int SERVE = 1;
+
+    /** The WaitForRequest timer represents time that the active object has spent on waiting for requests */
+    public static final int WAIT_FOR_REQUEST = 2;
+
+    /** The UserComputation timer correponds to the computation time for a single method of an active object */
+    public static final int USER_COMPUTATION = 1;
+
+    /** The SendReques timer represents the time that the active object has spent on sending requests */
     public static final int SEND_REQUEST = 2;
+
+    /** The SendReply timer represents the time that the active object has spent on sending replies */
     public static final int SEND_REPLY = 3;
+
+    /** The LocalCopy timer represents the time that the active object has spent on copying something during a request send */
     public static final int LOCAL_COPY = 4;
+
+    /** The BeforeSerialization timer represents the time that the active object has spent between the remote call and a the serialization of the request */
     public static final int BEFORE_SERIALIZATION = 5;
+
+    /** The Serialization timer represents the time that the active object has spent on serialization of requests */
     public static final int SERIALIZATION = 6;
+
+    /** The AfterSerialization timer represents the time that the active object has spent after the end of the request serialization and the end of the remote call */
     public static final int AFTER_SERIALIZATION = 7;
+
+    /** The WaitByNecessity timer represents the time that the active object has spent on waiting by necessity */
     public static final int WAIT_BY_NECESSITY = 8;
-    public static final int WAIT_FOR_REQUEST = 9;
-    public static final int GROUP_ONE_WAY_CALL = 10;
-    public static final int GROUP_ASYNC_CALL = 11;
+
+    /** The GroupOneWayCall timer represents the time that the active object has spent on performing group one way calls */
+    public static final int GROUP_ONE_WAY_CALL = 9;
+
+    /** The GroupAsyncCall timer represents the time that the active object has spent on performing asynchronous calls on a group */
+    public static final int GROUP_ASYNC_CALL = 10;
 
     /** HashMap to store TimerProvidable objects */
     public static final ConcurrentHashMap<UniqueID, TimerProvidable> timerProvidableStore =
@@ -98,7 +123,11 @@ public class TimerWarehouse {
      */
     public static final void startTimer(final UniqueID uniqueID,
         final int timerId) {
-        startTimerWithInfos(uniqueID, timerId, null);
+        final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
+        if (timerProvidable == null) {
+            return;
+        }
+        timerProvidable.startTimer(timerId);
     }
 
     /**
@@ -108,65 +137,64 @@ public class TimerWarehouse {
      */
     public static final void stopTimer(final UniqueID uniqueID,
         final int timerId) {
-        stopTimerWithInfos(uniqueID, timerId, null);
-    }
-
-    /**
-     * Starts the timer specified by an id and provides some extra information.
-     * @param uniqueID The unique id of the timer providable object
-     * @param timerId The id of the timer to start
-     * @param infos Some extra information
-     */
-    public static final void startTimerWithInfos(final UniqueID uniqueID,
-        final int timerId, String infos) {
-        TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
+        final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
         }
-        timerProvidable.startTimer(timerId, infos);
+        timerProvidable.stopTimer(timerId);
     }
 
     /**
-     * Stops the timer specified by an id and provides some extra information.
-     * @param uniqueID The unique id of the timer providable object
-     * @param timerId The id of the timer to stop
-     * @param infos Some extra information
-     */
-    public static final void stopTimerWithInfos(final UniqueID uniqueID,
-        final int timerId, String infos) {
-        TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
-        if (timerProvidable == null) {
-            return;
-        }
-        timerProvidable.stopTimer(timerId, infos);
-    }
-
-    /**
-     * Starts the timer specified by an id, and disables the send request timers and its sons.
+     * Starts the timer specified by an id, and disables the timer container.
      * @param uniqueID The unique id of the timer providable object
      * @param timerId The id of timer to stop
      */
-    public static final void startXAndSkipSendRequest(final UniqueID uniqueID,
+    public static final void startXAndDisable(final UniqueID uniqueID,
         int timerId) {
-        TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
+        final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
         }
-        timerProvidable.startXAndSkipSendRequest(timerId);
+        timerProvidable.startXAndDisable(timerId);
     }
 
     /**
-     * Stops the timer specified by an id, and enables the send request timers and its sons.
+     * Enables the timer container and stops the timer specified by an id.
      * @param uniqueID The unique id of the timer providable object
      * @param timerId The id of timer to stop
      */
-    public static final void stopXAndUnskipSendRequest(
-        final UniqueID uniqueID, int timerId) {
-        TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
+    public static final void enableAndStopX(final UniqueID uniqueID, int timerId) {
+        final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
         }
-        timerProvidable.stopXAndUnskipSendRequest(timerId);
+        timerProvidable.enableAndStopX(timerId);
+    }
+
+    /**
+     * Starts the serve timer then starts the associated method timer given by the methodName.
+     * @param uniqueID The unique id of the timer providable object
+     * @param method The name of the timer associated to this method
+     */
+    public static final void startServeTimer(final UniqueID uniqueID,
+        final Method method) {
+        final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
+        if (timerProvidable == null) {
+            return;
+        }
+        timerProvidable.startServeTimer(method);
+    }
+
+    /**
+     * Stops the current started method timer and then stops the serve timer.
+     * @param uniqueID The unique id of the timer providable object
+     */
+    public static final void stopServeTimer(final UniqueID uniqueID) {
+        final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
+        if (timerProvidable == null) {
+            return;
+        }
+        timerProvidable.stopServeTimer();
     }
 
     /**

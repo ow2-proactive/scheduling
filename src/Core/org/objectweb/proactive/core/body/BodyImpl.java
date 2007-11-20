@@ -41,6 +41,7 @@ import java.util.List;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
+import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -140,11 +141,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         throws ActiveObjectCreationException {
         super(reifiedObject, nodeURL, factory, jobId);
 
-        //      TIMING
-        if (!CoreTimersContainer.checkReifiedObject(reifiedObject)) {
-            final String timitActivationPropertyValue = CoreTimersContainer.checkNodeProperty(nodeURL);
-            super.timersContainer = CoreTimersContainer.contructOnDemand(super.bodyID,
-                    factory, timitActivationPropertyValue);
+        // TIMING
+        if (!(reifiedObject instanceof ProActiveInternalObject)) {
+            super.timersContainer = CoreTimersContainer.create(super.bodyID,
+                    reifiedObject, factory, nodeURL);
             if (super.timersContainer != null) {
                 TimerWarehouse.enableTimers();
                 // START TOTAL TIMER
@@ -470,8 +470,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
          */
         public void serve(Request request) {
             if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.startTimer(bodyID, TimerWarehouse.SERVE);
-                // TimerWarehouse.startTimerWithInfos(bodyID, TimerWarehouse.SERVE, request.getMethodName());
+                TimerWarehouse.startServeTimer(bodyID,
+                    request.getMethodCall().getReifiedMethod());
             }
             // push the new context
             LocalBodyStore.getInstance()
@@ -482,9 +482,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 LocalBodyStore.getInstance().popContext();
             }
             if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.stopTimer(BodyImpl.this.bodyID,
-                    TimerWarehouse.SERVE);
-                //TimerWarehouse.stopTimerWithInfos(bodyID, TimerWarehouse.SERVE, request.getMethodName());
+                TimerWarehouse.stopServeTimer(BodyImpl.this.bodyID);
             }
         }
 
