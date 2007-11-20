@@ -413,6 +413,30 @@ public class CoreTimersContainer implements TimerProvidable {
     }
 
     /**
+     * Direct access to the Total timer
+     * @return The Total timer
+     */
+    public final BasicTimer getTotalTimer() {
+        return this.timersList.get(0);
+    }
+
+    /**
+     * Direct access to the Serve timer
+     * @return The Serve timer
+     */
+    public final BasicTimer getServeTimer() {
+        return this.timersList.get(1);
+    }
+
+    /**
+     * Direct access to the WaitForRequest timer
+     * @return The WaitForRequest timer
+     */
+    public final BasicTimer getWaitForRequestTimer() {
+        return this.timersList.get(2);
+    }
+
+    /**
      * Stops automatically all timers, use this method before terminate a body.
      */
     public final void stopAll() {

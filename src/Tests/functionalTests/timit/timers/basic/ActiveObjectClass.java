@@ -71,7 +71,8 @@ public class ActiveObjectClass implements java.io.Serializable {
     }
 
     /**
-     * Chekcs if the total timer is started.
+     * Checks if the total timer is started.
+     * @return null if test passed
      */
     public String checkIfTotalIsStarted() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
@@ -83,13 +84,17 @@ public class ActiveObjectClass implements java.io.Serializable {
         }
 
         // Get the the total timer
-        BasicTimer totalTimer = c.getTimer(TimerWarehouse.TOTAL);
+        BasicTimer totalTimer = c.getTotalTimer();
         if (!totalTimer.isStarted()) {
             return "Problem with the Total timer it's not started.";
         }
-        return "true";
+        return null;
     }
 
+    /**
+     * Checks WaitForRequest timer.
+     * @return null if test passed
+     */
     public String checkIfWfrIsStopped() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
                                                                                                        .getID());
@@ -100,19 +105,19 @@ public class ActiveObjectClass implements java.io.Serializable {
         }
 
         // Get the the WaitForWRequest timer
-        BasicTimer wfrTimer = c.getTimer(TimerWarehouse.WAIT_FOR_REQUEST);
+        BasicTimer wfrTimer = c.getWaitForRequestTimer();
 
         // If the wait for request timer is started during a request test is failed
         if (wfrTimer.isStarted()) {
             return "Problem with the WaitForRequest timer it's still started during the service of a request.";
         }
-        return "true";
+        return null;
     }
 
     /**
      * Since it's not possible to know if the serve timer is stopped correctly
      * we just check if it's well started.
-     * @return String The result of this test.
+     * @return null if test passed
      */
     public String checkIfServeIsStarted() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
@@ -124,16 +129,17 @@ public class ActiveObjectClass implements java.io.Serializable {
         }
 
         // Get the the serve timer
-        BasicTimer serveTimer = c.getTimer(TimerWarehouse.SERVE);
+        BasicTimer serveTimer = c.getServeTimer();
         if (!serveTimer.isStarted()) {
             return "Problem with the Serve timer it's not started during the service of a request.";
         }
-        return "true";
+        return null;
     }
 
     /**
      * Test of timers during a remote call
      * This method must be called once during the test
+     * @return null if test passed
      */
     public String performSyncCallOnRemote() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
@@ -209,12 +215,13 @@ public class ActiveObjectClass implements java.io.Serializable {
         }
 
         // If here the test is ok
-        return "true";
+        return null;
     }
 
     /**
      * Test of timers during a call on a reference of a ao tha is on the same node
      * This method must be called once during the test
+     * @return null if test passed
      */
     public String performSyncCallOnLocal() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
@@ -265,7 +272,7 @@ public class ActiveObjectClass implements java.io.Serializable {
         }
 
         // If here the test is ok
-        return "true";
+        return null;
     }
 
     public int syncCall() {
@@ -277,6 +284,10 @@ public class ActiveObjectClass implements java.io.Serializable {
         return 0;
     }
 
+    /**
+     * Checks SendRequest, WaitByNecessity
+     * @return null if test passed
+     */
     public String performAsyncCallWithWbnOnLocal() {
         CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(ProActiveObject.getBodyOnThis()
                                                                                                        .getID());
@@ -329,7 +340,7 @@ public class ActiveObjectClass implements java.io.Serializable {
         if ((timedWbnTime <= 0) || (timedWbnTime > realWbnTime)) {
             return "Problem with the WaitByNecessity timer, its value is incorrect.";
         }
-        return "true";
+        return null;
     }
 
     public IntWrapper asyncCall() {

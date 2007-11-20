@@ -40,13 +40,15 @@ import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
+
+
 public class Test extends FunctionalTest {
     private ActiveObjectClass a1;
     private ActiveObjectClass a1bis;
     private ActiveObjectClass a2;
     private ProActiveDescriptor descriptorPad;
-    private TimItBasicReductor t;
 
+    //private TimItBasicReductor t;
     public void initTest() throws Exception {
         // Access the nodes of the descriptor file
         descriptorPad = ProDeployment.getProactiveDescriptor(this.getClass()
@@ -83,31 +85,31 @@ public class Test extends FunctionalTest {
         assertTrue("Problem with the creation of active objects for this test !",
             this.preConditions());
         // Check if the Total timer is started
-        String result = this.a2.checkIfTotalIsStarted();
-        assertTrue(result, "true".equals(result));
+        String reason = this.a2.checkIfTotalIsStarted();
+        assertTrue(reason, reason == null);
 
         // Check if the WaitForRequest timer is stopped during a service of a
         // request
-        result = this.a2.checkIfWfrIsStopped();
-        assertTrue(result, "true".equals(result));
+        reason = this.a2.checkIfWfrIsStopped();
+        assertTrue(reason, reason == null);
 
         // Check if the Serve timer is started during a service of a request
-        result = this.a2.checkIfServeIsStarted();
-        assertTrue(result, "true".equals(result));
+        reason = this.a2.checkIfServeIsStarted();
+        assertTrue(reason, reason == null);
 
         // For the next requests a2 is going to use timers
         // SendRequest, BeforeSerialization, Serialization and
         // AfterSerialization timers must be used
-        result = this.a2.performSyncCallOnRemote();
-        assertTrue(result, "true".equals(result));
+        reason = this.a2.performSyncCallOnRemote();
+        assertTrue(reason, reason == null);
 
         // SendRequest and LocalCopy timers must be used
-        result = this.a2.performSyncCallOnLocal();
-        assertTrue(result, "true".equals(result));
+        reason = this.a2.performSyncCallOnLocal();
+        assertTrue(reason, reason == null);
 
         // SendRequest and WaitByNecessity timers must be used
-        result = this.a2.performAsyncCallWithWbnOnLocal();
-        assertTrue(result, "true".equals(result));
+        reason = this.a2.performAsyncCallWithWbnOnLocal();
+        assertTrue(reason, reason == null);
 
         // disable the result output
         // this.t = TimItBasicManager.getInstance().getTimItCommonReductor();
@@ -123,21 +125,17 @@ public class Test extends FunctionalTest {
         this.a1bis = null;
         this.a2 = null;
         this.descriptorPad = null;
-        this.t = null;
+        //this.t = null;
     }
 
     public static void main(String[] args) {
         Test test = new Test();
         try {
             test.action();
-        } catch (Exception e) {
+        } catch (Throwable e) {
             e.printStackTrace();
         } finally {
-            try {
-                System.exit(0);
-            } catch (Exception e1) {
-                e1.printStackTrace();
-            }
+            System.exit(0);
         }
     }
 }
