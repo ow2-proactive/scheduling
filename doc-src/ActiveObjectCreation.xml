@@ -2000,7 +2000,40 @@
 			</para>
 		</sect2>
 	</sect1>
+	<sect1 id="ActiveObjectCreation_html_events">
+		<title>Event based programming</title>
 
+		<para>//TODO add immediateService maybe ?</para>
+		<para>
+			ProActive supports an event based programming model. That
+			is, an active object can schedule one of its method to be
+			called when a future is updated. This method will be
+			enqueued into the active object adding the callback. Here is
+			an excerpt from a class using the mechanism:
+		</para>
+
+		<programlisting lang="java">
+			public class MyActiveObject { public void
+			myCallback(Future&lt;StringWrapper&gt; future) { try {
+			String s = future.get().stringValue();
+			System.out.println("Got this value: " + s); } catch
+			(InterruptedException e) { /* This cannot happen */ return;
+			} catch (ExecutionException e) { System.out.println("Got an
+			exception instead of the future: " + e.getCause()); return;
+			} }
+
+			public void someRunningMethod(SomeActiveObjectClass ao) {
+			StringWrapper result = ao.foo();
+			ProFuture.addActionOnFuture(result, "myCallback"); } }
+		</programlisting>
+
+		<para>
+			As seen in the example, the callback method takes the Future
+			as parameter, it is the java.util.concurrent.Future one. It
+			is also possible to set the callback method to an immediate
+			service method.
+		</para>
+	</sect1>
 	<sect1 id="AC">
 		<title>Automatic Continuation in ProActive</title>
 
@@ -2778,39 +2811,5 @@
 				</note>
 			</sect3>
 		</sect2>
-	</sect1>
-	<sect1 id="ActiveObjectCreation_html_events">
-		<title>Event based programming</title>
-
-		<para>//TODO add immediateService maybe ?</para>
-		<para>
-			ProActive supports an event based programming model. That
-			is, an active object can schedule one of its method to be
-			called when a future is updated. This method will be
-			enqueued into the active object adding the callback. Here is
-			an excerpt from a class using the mechanism:
-		</para>
-
-		<programlisting lang="java">
-			public class MyActiveObject { public void
-			myCallback(Future&lt;StringWrapper&gt; future) { try {
-			String s = future.get().stringValue();
-			System.out.println("Got this value: " + s); } catch
-			(InterruptedException e) { /* This cannot happen */ return;
-			} catch (ExecutionException e) { System.out.println("Got an
-			exception instead of the future: " + e.getCause()); return;
-			} }
-
-			public void someRunningMethod(SomeActiveObjectClass ao) {
-			StringWrapper result = ao.foo();
-			ProFuture.addActionOnFuture(result, "myCallback"); } }
-		</programlisting>
-
-		<para>
-			As seen in the example, the callback method takes the Future
-			as parameter, it is the java.util.concurrent.Future one. It
-			is also possible to set the callback method to an immediate
-			service method.
-		</para>
 	</sect1>
 </chapter>
