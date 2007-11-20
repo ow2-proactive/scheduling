@@ -121,7 +121,6 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return null != findNodeProviderContract(nodeProvider);
     }
 
-    @Override
     public boolean hasUnsatisfiedContract() {
         for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
             if (nodeProviderContract.needNode()) {
@@ -131,7 +130,6 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return false;
     }
 
-    @Override
     public boolean doesNodeProviderNeed(Node node,
         GCMDeploymentDescriptor nodeProvider) {
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
