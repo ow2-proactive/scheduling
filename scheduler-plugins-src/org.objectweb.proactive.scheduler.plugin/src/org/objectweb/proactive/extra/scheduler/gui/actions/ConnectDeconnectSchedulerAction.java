@@ -50,11 +50,7 @@ public class ConnectDeconnectSchedulerAction extends Action {
 
     private ConnectDeconnectSchedulerAction(Composite parent) {
         this.parent = parent;
-        this.isConnected = false;
-        this.setText("Connect to a scheduler");
-        this.setToolTipText("Connect to a started scheduler by its url");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/run.png"));
+        setDisconnectionMode();
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
@@ -80,9 +76,9 @@ public class ConnectDeconnectSchedulerAction extends Action {
                 SelectSchedulerDialog.saveInformations();
 
                 this.setText("Disconnect");
-                this.setToolTipText("Disconnect to the scheduler");
+                this.setToolTipText("Disconnect from the scheduler");
                 this.setImageDescriptor(ImageDescriptor.createFromFile(
-                        this.getClass(), "icons/run.png"));
+                        this.getClass(), "icons/disconnect.gif"));
 
                 // active reference
                 JobsController.getActiveView().init();
@@ -118,7 +114,7 @@ public class ConnectDeconnectSchedulerAction extends Action {
         this.setText("Connect to a scheduler");
         this.setToolTipText("Connect to a started scheduler by its url");
         this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/run.png"));
+                this.getClass(), "icons/connect.gif"));
     }
 
     public static ConnectDeconnectSchedulerAction newInstance(Composite parent) {

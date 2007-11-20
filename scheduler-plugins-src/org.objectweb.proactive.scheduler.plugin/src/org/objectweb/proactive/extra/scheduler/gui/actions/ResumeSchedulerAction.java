@@ -43,7 +43,7 @@ public class ResumeSchedulerAction extends Action {
         this.setText("Resume scheduler");
         this.setToolTipText("To resume the scheduler");
         this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/resume.png"));
+                this.getClass(), "icons/scheduler_resume.png"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 

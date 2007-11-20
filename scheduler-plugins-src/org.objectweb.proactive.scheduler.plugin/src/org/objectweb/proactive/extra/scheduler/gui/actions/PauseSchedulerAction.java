@@ -44,7 +44,7 @@ public class PauseSchedulerAction extends Action {
         this.setToolTipText(
             "To pause the scheduler (All running Jobs will be terminated)");
         this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/pause.png"));
+                this.getClass(), "icons/scheduler_pause.png"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 

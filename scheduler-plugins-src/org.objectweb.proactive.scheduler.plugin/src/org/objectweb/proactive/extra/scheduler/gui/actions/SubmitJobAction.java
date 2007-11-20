@@ -50,7 +50,7 @@ public class SubmitJobAction extends Action {
         this.setText("Submit a job");
         this.setToolTipText("Submit a job to the scheduler");
         this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/submit.png"));
+                this.getClass(), "icons/job_submit.gif"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 

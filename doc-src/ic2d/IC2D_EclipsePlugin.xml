@@ -2,207 +2,303 @@
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 
 <chapter id="IC2D_EclipsePlugin">
-	
+
 	<title>
-		IC2D: Interactive Control and Debugging of Distribution and Eclipse plugin
+		IC2D: Interactive Control and Debugging of Distribution and
+		Eclipse plugin
 	</title>
-	
-	
+
+
 	<para>
-		<emphasis role="bold">IC2D</emphasis> is a
+		<emphasis role="bold">IC2D</emphasis>
+		is a
 		<emphasis role="bold">graphical environment</emphasis>
 		for remote monitoring and steering of
-		<emphasis role="bold">distributed and grid applications</emphasis>.
-		IC2D is built on top of <emphasis role="bold">ProActive</emphasis>
+		<emphasis role="bold">
+			distributed and grid applications
+		</emphasis>
+		. IC2D is built on top of
+		<emphasis role="bold">ProActive</emphasis>
 		that provides asynchronous calls and migration.
 	</para>
 	<para>IC2D is available in two forms :</para>
 	<itemizedlist>
-		<listitem><para>
-			A <emphasis role="bold">Java standalone application</emphasis> based on
-			<ulink url="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
-				Eclipse Rich Client Platform (RCP)</ulink>, available for any platform
-			(Windows, Linux, Mac OSX,Solaris, ...)
-		</para></listitem>
-		<listitem><para>
-			A set of <emphasis role="bold"><ulink url="http://www.eclipse.org">Eclipse</ulink> plugins</emphasis>:
-			with all the functionnalities within the standalone	application, enhanced with a tool that makes easier the
-			development of Grid Applications, including:
-			<itemizedlist>
-				<listitem><para>
-					ProActive Editor (error highlighting, ...)
-				</para></listitem>
-				<listitem><para>
-					ProActive Wizards
-				</para></listitem>
-				<listitem><para>
-					Cheat Sheets for ProActive (Guided Tour)
-				</para></listitem>
-			</itemizedlist>
-		</para></listitem>
-	</itemizedlist>
-	
-	<!-- ************************************************************************************ -->
-	
-	<sect1 id="MonitoringControl">
-		
-		<title>Monitoring and Control</title>
-		
-		<para>
-			IC2D is based on a <emphasis role="bold">plugin architecture</emphasis>
-			and provides 2 plugins in relation to the 
-			<emphasis role="bold">monitoring</emphasis> and the 
-			<emphasis role="bold">control</emphasis> of ProActive applications: 
-		</para>
-		
-		<itemizedlist>
-			<listitem><para>
-				The <emphasis role="bold">Monitoring plugin</emphasis> which provides a
-				<emphasis role="bold">graphical visualisation</emphasis>
-				for hosts, Java Virtual Machines, and active objects,
-				including the topology and the volume of communications
-			</para></listitem>
-			<listitem><para>
-				The <emphasis role="bold">Job Monitoring plugin</emphasis> which provides a
-				<emphasis role="bold">tree representation</emphasis>
-				of all these objects.
-			</para></listitem>
-		</itemizedlist>
-		
-		
-		
-		<sect2>
-			
-			<title>The Monitoring plugin</title>
-			
-			<sect3>
-				
-				<title>The Monitoring perspective</title>
-				
-				<para>
-					The Monitoring plugin provides the <emphasis role="bold">Monitoring 
-						<ulink url="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">perspective</ulink>
-					</emphasis> displayed in the <xref linkend="monitoringPerspective"/>. 
-				</para>
-				
-				<para>
-					This perspective defines the following set of <ulink url="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">views</ulink>:
-				</para>
-				
+		<listitem>
+			<para>
+				A
+				<emphasis role="bold">
+					Java standalone application
+				</emphasis>
+				based on
+				<ulink
+					url="http://wiki.eclipse.org/index.php/Rich_Client_Platform">
+					Eclipse Rich Client Platform (RCP)
+				</ulink>
+				, available for any platform (Windows, Linux, Mac
+				OSX,Solaris, ...)
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				A set of
+				<emphasis role="bold">
+					<ulink url="http://www.eclipse.org">Eclipse</ulink>
+					plugins
+				</emphasis>
+				: with all the functionalities within the standalone
+				application, enhanced with a tool that makes easier the
+				development of Grid Applications, including:
 				<itemizedlist>
-					<listitem><para>
-						The <emphasis role="bold">Monitoring</emphasis> view: contains the graphical visualisation for ProActive objects
-					</para></listitem>
-					<listitem><para>
-						The <emphasis role="bold">Legend</emphasis> view: contains the legend corresponding to the Monitoring view's content
-					</para></listitem>
-					<listitem><para>
-						The <emphasis role="bold">Console</emphasis> view: contains log corresponding to the Monitoring view's events
-					</para></listitem>
+					<listitem>
+						<para>
+							ProActive Editor (error highlighting, ...)
+						</para>
+					</listitem>
+					<listitem>
+						<para>ProActive Wizards</para>
+					</listitem>
+					<listitem>
+						<para>
+							Cheat Sheets for ProActive (Guided Tour)
+						</para>
+					</listitem>
 				</itemizedlist>
-				
+			</para>
+		</listitem>
+	</itemizedlist>
+
+	<!-- ************************************************************************************ -->
+
+	<sect1 id="MonitoringControl">
+
+		<title>Monitoring and Control</title>
+
+		<para>
+			IC2D is based on a
+			<emphasis role="bold">plugin architecture</emphasis>
+			and provides 2 plugins in relation to the
+			<emphasis role="bold">monitoring</emphasis>
+			and the
+			<emphasis role="bold">control</emphasis>
+			of ProActive applications:
+		</para>
+
+		<itemizedlist>
+			<listitem>
+				<para>
+					The
+					<emphasis role="bold">Monitoring plugin</emphasis>
+					which provides a
+					<emphasis role="bold">
+						graphical visualisation
+					</emphasis>
+					for hosts, Java Virtual Machines, and active
+					objects, including the topology and the volume of
+					communications
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The
+					<emphasis role="bold">
+						Job Monitoring plugin
+					</emphasis>
+					which provides a
+					<emphasis role="bold">tree representation</emphasis>
+					of all these objects.
+				</para>
+			</listitem>
+		</itemizedlist>
+
+
+
+		<sect2>
+
+			<title>The Monitoring plugin</title>
+
+			<sect3>
+
+				<title>The Monitoring perspective</title>
+
+				<para>
+					The Monitoring plugin provides the
+					<emphasis role="bold">
+						Monitoring
+						<ulink
+							url="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
+							perspective
+						</ulink>
+					</emphasis>
+					displayed in the
+					<xref linkend="monitoringPerspective" />
+					.
+				</para>
+
+				<para>
+					This perspective defines the following set of
+					<ulink
+						url="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">
+						views
+					</ulink>
+					:
+				</para>
+
+				<itemizedlist>
+					<listitem>
+						<para>
+							The
+							<emphasis role="bold">Monitoring</emphasis>
+							view: contains the graphical visualisation
+							for ProActive objects
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The
+							<emphasis role="bold">Legend</emphasis>
+							view: contains the legend corresponding to
+							the Monitoring view's content
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The
+							<emphasis role="bold">Console</emphasis>
+							view: contains log corresponding to the
+							Monitoring view's events
+						</para>
+					</listitem>
+				</itemizedlist>
+
 				<figure id="monitoringPerspective">
 					<title>The Monitoring Perspective</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata
-								fileref="ic2d/images/features/monitoringPerspective4.png" format="PNG" />
+								fileref="ic2d/images/features/monitoringPerspective4.png"
+								format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
-			</sect3> <!-- The Monitoring perspective -->
-			
+
+			</sect3><!-- The Monitoring perspective -->
+
 			<sect3>
-				
+
 				<title>Monitor a new host</title>
-				
-				<para>
-					In order to monitor a new host:
-				</para>
-				
+
+				<para>In order to monitor a new host:</para>
+
 				<orderedlist>
-					<listitem><para>
-						open the Monitoring Perspective:
-						<emphasis role="bold">Window->Open Perspective->Other...->Monitoring</emphasis>
-						(in the standalone IC2D, it should be already opened because it is the default perspective)
-					</para></listitem>
-					<listitem><para>
-						select <emphasis role="bold">Monitoring->Monitor a new host...</emphasis>,
-						it opens the "Monitor a new Host" dialog displayed in the <xref linkend="monitorNewHost"/>
-					</para></listitem>
-					<listitem><para>
-						<emphasis role="bold">enter informations required</emphasis> about the host to monitor, and click
-						<emphasis role="bold">OK</emphasis>
-					</para></listitem>
+					<listitem>
+						<para>
+							open the Monitoring Perspective:
+							<emphasis role="bold">
+								Window->Open
+								Perspective->Other...->Monitoring
+							</emphasis>
+							(in the standalone IC2D, it should be
+							already opened because it is the default
+							perspective)
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							select
+							<emphasis role="bold">
+								Monitoring->Monitor a new host...
+							</emphasis>
+							, it opens the "Monitor a new Host" dialog
+							displayed in the
+							<xref linkend="monitorNewHost" />
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">
+								enter informations required
+							</emphasis>
+							about the host to monitor, and click
+							<emphasis role="bold">OK</emphasis>
+						</para>
+					</listitem>
 				</orderedlist>
-				
-				
+
+
 				<figure id="monitorNewHost">
 					<title>Monitor New Host Dialog</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata
-								fileref="ic2d/images/features/monitor_new_host.png" format="PNG" />
+								fileref="ic2d/images/features/monitor_new_host.png"
+								format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
+
 			</sect3><!-- Monitor a new host -->
-			
+
 			<sect3>
 				<title>The Monitoring buttons</title>
 				<para>
 					Here the buttons proposed in the monitoring view:
 				</para>
-				
+
 				<figure id="monitornewhostbutton">
 					<title>Monitor a new host</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata
-								fileref="ic2d/images/features/monitorNewHostButton.png" format="PNG" />
+								fileref="ic2d/images/features/monitorNewHostButton.png"
+								format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
+
 				<para>
-					Display the "Monitor a new host" dialog in order to monitor a new host.
+					Display the "Monitor a new host" dialog in order to
+					monitor a new host.
 				</para>
-				
+
 				<figure id="setdepthcontrolbutton">
 					<title>Set depth control</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata
-								fileref="ic2d/images/features/SetDepthControlButton.png" format="PNG" />
+								fileref="ic2d/images/features/SetDepthControlButton.png"
+								format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
+
 				<para>
-					Display the "Set Depth Control" dialog in order to change the depth variable.
-					For example: We have 3 hosts: 'A' 'B' and 'C'. And on A there is an active object
-					'aoA' which communicates with another active object 'aoB' which is on B.
-					This one communicates with an active object 'aoC' on C, and aoA don't communicate with aoC.
-					Then if we monitor A, and if the depth is 1, we will not see aoC. 
+					Display the "Set Depth Control" dialog in order to
+					change the depth variable. For example: We have 3
+					hosts: 'A' 'B' and 'C'. And on A there is an active
+					object 'aoA' which communicates with another active
+					object 'aoB' which is on B. This one communicates
+					with an active object 'aoC' on C, and aoA don't
+					communicate with aoC. Then if we monitor A, and if
+					the depth is 1, we will not see aoC.
 				</para>
-				
+
 				<figure id="settimetorefreshbutton">
 					<title>Set time to refresh</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata
-								fileref="ic2d/images/features/SetTimeRefreshButton.png" format="PNG" />
+								fileref="ic2d/images/features/SetTimeRefreshButton.png"
+								format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
+
 				<para>
-					Display the "Set Time to Refresh" dialog in order to change the time to refresh the model.
-					And find the new added objects.
+					Display the "Set Time to Refresh" dialog in order to
+					change the time to refresh the model. And find the
+					new added objects.
 				</para>
-				
+
 				<figure id="refreshbutton">
 					<title>Refresh</title>
 					<mediaobject>
@@ -212,25 +308,24 @@
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
-				<para>
-					Refreh the model.
-				</para>
-				
+
+				<para>Refreh the model.</para>
+
 				<figure id="enablemonitoringbutton">
 					<title>Enable/Disable Monitoring</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata
-								fileref="ic2d/images/features/EnableMonitoringButton.png" format="PNG" />
+								fileref="ic2d/images/features/EnableMonitoringButton.png"
+								format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
+
 				<para>
 					When the eye is opened the monitoring is activated.
 				</para>
-				
+
 				<figure id="p2pbutton">
 					<title>Show P2P objects</title>
 					<mediaobject>
@@ -240,11 +335,9 @@
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
-				<para>
-					Allows to see or not the P2P objects.
-				</para>
-				
+
+				<para>Allows to see or not the P2P objects.</para>
+
 				<figure id="zoominbutton">
 					<title>Zoom In</title>
 					<mediaobject>
@@ -264,32 +357,37 @@
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
+
 				<figure id="newmonitoringviewbutton">
 					<title>New Monitoring View</title>
 					<mediaobject>
 						<imageobject>
 							<imagedata
-								fileref="ic2d/images/features/NewMonitoringViewButton.png" format="PNG" />
+								fileref="ic2d/images/features/NewMonitoringViewButton.png"
+								format="PNG" />
 						</imageobject>
 					</mediaobject>
 				</figure>
 				<para>
-					Open a new Monitoring view. This button can be used in any perspective. The new created view will be named 'Monitoring#number_of_this_view'
+					Open a new Monitoring view. This button can be used
+					in any perspective. The new created view will be
+					named 'Monitoring#number_of_this_view'
 				</para>
-				
+
 			</sect3><!-- Monitoring icons -->
-			
+
 			<sect3>
-				
+
 				<title>The Virtual Nodes list</title>
-				
+
 				<para>
-					At the top of the Monitoring View, one can find the <emphasis role="bold">Virtual Nodes list</emphasis>.
-					When some nodes are monirored, their virtual nodes are added to this list. And when a virtual node is checked,
-					all its nodes are highlighted.
+					At the top of the Monitoring View, one can find the
+					<emphasis role="bold">Virtual Nodes list</emphasis>
+					. When some nodes are monirored, their virtual nodes
+					are added to this list. And when a virtual node is
+					checked, all its nodes are highlighted.
 				</para>
-				
+
 				<figure id="virtualNodesList">
 					<title>Virtual nodes List</title>
 					<mediaobject>
@@ -299,69 +397,114 @@
 						</imageobject>
 					</mediaobject>
 				</figure>
-				
+
 			</sect3><!-- The Virtual Nodes list -->
-			
+
 			<sect3>
-				
+
 				<title>Management of the communications display</title>
-				
+
 				<para>
-					At the bottom of the Monitoring view, one can find a set of buttons
-					used to manage the communications display:
+					At the bottom of the Monitoring view, one can find a
+					set of buttons used to manage the communications
+					display:
 				</para>
 				<orderedlist>
-					<listitem><para>
-						<emphasis role="bold">Auto Reset</emphasis>: Automatic reset of communications, you can specify the auto reset time
-					</para></listitem>
-					<listitem><para>
-						<emphasis role="bold">Display topology</emphasis>: show/hide communications
-					</para></listitem>
-					<listitem><para>
-						<emphasis role="bold">Proportional</emphasis>: arrows thickness is proportional to the number of requests
-					</para></listitem>
-					<listitem><para>
-						<emphasis role="bold">Ratio</emphasis>: arrows thickness uses a ratio of the number of requests
-					</para></listitem>
-					<listitem><para>
-						<emphasis role="bold">Fixed</emphasis>: arrows always have the same thickness whatever the number of communications
-					</para></listitem>
-					<listitem><para>
-						<emphasis role="bold">Topology</emphasis>: show/hide communications, and erase all communications
-					</para></listitem>
-					<listitem><para>
-						<emphasis role="bold">Monitoring enable</emphasis>: listen or not communications between active objects
-					</para></listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Auto Reset</emphasis>
+							: Automatic reset of communications, you can
+							specify the auto reset time
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">
+								Display topology
+							</emphasis>
+							: show/hide communications
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">
+								Proportional
+							</emphasis>
+							: arrows thickness is proportional to the
+							number of requests
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Ratio</emphasis>
+							: arrows thickness uses a ratio of the
+							number of requests
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Fixed</emphasis>
+							: arrows always have the same thickness
+							whatever the number of communications
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">Topology</emphasis>
+							: show/hide communications, and erase all
+							communications
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">
+								Monitoring enable
+							</emphasis>
+							: listen or not communications between
+							active objects
+						</para>
+					</listitem>
 				</orderedlist>
-				
+
 			</sect3><!-- The management of the communications display -->
-			
+
 			<sect3>
-				<title> Example </title>
+				<title>Example</title>
 				<para>
-					The <xref linkend="monitoring"/> shows an example where 3 hosts are monitored.
-					The applications running are philosophers
-					and C3D (<xref linkend="C3D_example"/>). 
+					The
+					<xref linkend="monitoring" />
+					shows an example where 3 hosts are monitored. The
+					applications running are philosophers and C3D (
+					<xref linkend="C3D_example" />
+					).
 				</para>
 			</sect3>
-		</sect2> <!-- The Monitoring plugin -->
-		
+		</sect2><!-- The Monitoring plugin -->
+
 		<sect2>
-			
+
 			<title>The Job Monitoring plugin</title>
-			
+
 			<para>
-				To look at the <emphasis role="bold">tree representation</emphasis>
-				of the monitored objects, one have to open the 
-				<emphasis role="bold">Job Monitoring view</emphasis>.
+				To look at the
+				<emphasis role="bold">tree representation</emphasis>
+				of the monitored objects, one have to open the
+				<emphasis role="bold">Job Monitoring view</emphasis>
+				.
 			</para>
 			<para>
-				For that,
-				select <emphasis role="bold">Window->Show view->Other...->Job Monitoring->Job Monitoring</emphasis>.
+				For that, select
+				<emphasis role="bold">
+					Window->Show view->Other...->Job Monitoring->Job
+					Monitoring
+				</emphasis>
+				.
 			</para>
-			
+
 			<figure id="openJobMonitoringView">
-				<title>Select the Job Monitoring view in the list</title>
+				<title>
+					Select the Job Monitoring view in the list
+				</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
@@ -370,12 +513,13 @@
 					</imageobject>
 				</mediaobject>
 			</figure>
-			
+
 			<para>
-				Then, select the model that you want to monitor. Each name corresponds to a monitoring view.
-				You can also monitor a new host.
+				Then, select the model that you want to monitor. Each
+				name corresponds to a monitoring view. You can also
+				monitor a new host.
 			</para>
-			
+
 			<figure id="jobmonitoringbutton">
 				<title>Select the Monitoring model</title>
 				<mediaobject>
@@ -386,23 +530,25 @@
 					</imageobject>
 				</mediaobject>
 			</figure>
-			
+
 			<figure id="monitoringviews">
 				<title>The monitoring views</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
-							fileref="ic2d/images/features/monitoringadded.png"
-							format="PNG" />
+							fileref="ic2d/images/features/monitoringadded.png" format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
-			
-			
+
+
 			<para>
-				One can see in the <xref linkend="monitoring"/> an example of a tree representation of some monitored objects.
+				One can see in the
+				<xref linkend="monitoring" />
+				an example of a tree representation of some monitored
+				objects.
 			</para>
-			
+
 			<figure id="monitoring">
 				<title>Monitoring of 2 applications</title>
 				<mediaobject>
@@ -412,155 +558,175 @@
 					</imageobject>
 				</mediaobject>
 			</figure>
-			
+
 		</sect2><!-- The Job Monitoring plugin -->
-		
-		
+
+
 	</sect1><!-- Monitoring and Control -->
-	
+
 	<!-- ************************************************************************************ -->
-	
-	<sect1 id="LauncherScheduler">
-		
-		<title>Launcher and Scheduler</title>
-		
+
+	<sect1 id="Launcher">
+
+		<title>Launcher</title>
+
 		<sect2>
-			<title>Launcher</title>
-			
-			<sect3>
-				<title>Principles</title>
-				
-				<para>The launcher allows users to launch applications directly from an
-      XML descriptor file, without any script. The new XML descriptor is
-      nearly the same as classical descriptor files, the syntax is only
-      extended. The deployment will be done in two different phasis.</para>
+			<title>Principles</title>
 
-      <para>first, a new node, a "main node" will be created and activated and
-      then, it is this node that will deploy the rest of the
-      application.</para>
-		    </sect3>
-      
-		    <sect3>
-      			<title>MainDefinition tag</title>
+			<para>
+				The launcher allows users to launch applications
+				directly from an XML descriptor file, without any
+				script. The new XML descriptor is nearly the same as
+				classical descriptor files, the syntax is only extended.
+				The deployment will be done in two different phasis.
+			</para>
 
-		      <para>A new tag has been introduced, just before the component
-		      definition tag. This tag is named "mainDefinition" and its syntax is:</para>
+			<para>
+				first, a new node, a "main node" will be created and
+				activated and then, it is this node that will deploy the
+				rest of the application.
+			</para>
+		</sect2>
 
-      <screen>   &lt;mainDefinition id="mainID" class="theClassToLaunchContainingAMainMethod"&gt;
-   &lt;arg value="param1"&gt; 
-   &lt;arg value="param2"&gt;
-   &lt;mapToVirtualNode value="main-Node"/&gt;
-  &lt;/mainDefinition&gt;</screen>
+		<sect2>
+			<title>MainDefinition tag</title>
 
-      <para>Eventually, several mains might be defined so the <emphasis
-      role="bold">id</emphasis> allows to identify all mainDefinitions.</para>
+			<para>
+				A new tag has been introduced, just before the component
+				definition tag. This tag is named "mainDefinition" and
+				its syntax is:
+			</para>
 
-      <para>The <emphasis role="bold">class</emphasis> attribute is the path
-      where can be found the class to launch.</para>
+			<screen>
+				&lt;mainDefinition id="mainID"
+				class="theClassToLaunchContainingAMainMethod"&gt;
+				&lt;arg value="param1"&gt; &lt;arg value="param2"&gt;
+				&lt;mapToVirtualNode value="main-Node"/&gt;
+				&lt;/mainDefinition&gt;
+			</screen>
 
-      <para><emphasis role="bold">This class MUST contain a main
-      method.</emphasis></para>
+			<para>
+				Eventually, several mains might be defined so the
+				<emphasis role="bold">id</emphasis>
+				allows to identify all mainDefinitions.
+			</para>
 
-      <para>Then any number of parameters can be declared in <emphasis
-      role="bold">arg</emphasis> tags. The parameters will be given to the
-      main method in the same order the were declared.</para>
+			<para>
+				The
+				<emphasis role="bold">class</emphasis>
+				attribute is the path where can be found the class to
+				launch.
+			</para>
 
-      <para>And finally a <emphasis role="bold">mapToVirtualNode</emphasis>
-      tag will link the main info to virtual node, declared with the same name
-      in the virtualNodeDefinitions tag (in componentDefinition).</para>
+			<para>
+				<emphasis role="bold">
+					This class MUST contain a main method.
+				</emphasis>
+			</para>
 
-      <screen>  &lt;?xml version="1.0" encoding="UTF-8"?&gt;
-  &lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:noNamespaceSchemaLocation=
- "http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;
-   &lt;!-- &lt;security file="../../descriptors/c3dPolicy.xml"&gt;&lt;/security&gt; --&gt; 
-   &lt; componentDefinition&gt;
-    &lt; virtualNodesDefinition&gt;
-     &lt; virtualNode name="Dispatcher"
- property="unique_singleAO"/&gt;
-     &lt; virtualNode name="Renderer"/&gt;
-    &lt; /virtualNodesDefinition&gt;
-   &lt; /componentDefinition&gt;
-   &lt; deployment&gt;
-    &lt; register virtualNode="Dispatcher"/&gt;
-    &lt; mapping&gt;
-     &lt; map virtualNode="Dispatcher"&gt;
-      &lt; jvmSet&gt;
-       &lt; currentJVM/&gt;
-      &lt; /jvmSet&gt;
-     &lt; /map&gt;
-     &lt; map virtualNode="Renderer"&gt;
-      &lt; jvmSet&gt;
-      &lt; vmName value="Jvm1"/&gt;
-      &lt; vmName value="Jvm2"/&gt;
-      &lt; vmName value="Jvm3"/&gt;
-      &lt; vmName value="Jvm4"/&gt;
-      &lt; /jvmSet&gt;
-     &lt; /map&gt;
-    &lt; /mapping&gt;
-    &lt; jvms&gt;
-     &lt; jvm name="Jvm1"&gt;
-      &lt; creation&gt;
-       &lt; processReference
- refid="localJVM"/&gt;
-      &lt; /creation&gt;
-     &lt; /jvm&gt;
-     &lt; jvm name="Jvm2"&gt;
-      &lt; creation&gt;
-       &lt; processReference
- refid="localJVM"/&gt;
-      &lt; /creation&gt;
-     &lt; /jvm&gt;
-      &lt; jvm name="Jvm3"&gt;
-      &lt; creation&gt;
-        &lt; processReference refid="localJVM"/&gt;
-      &lt; /creation&gt;
-     &lt; /jvm&gt;
-     &lt; jvm name="Jvm4"&gt;
-      &lt; creation&gt;
-       &lt; processReference refid="localJVM"/&gt;
-      &lt; /creation&gt;
-     &lt; /jvm&gt;
-    &lt; /jvms&gt;
-   &lt; /deployment&gt;
-   &lt; infrastructure&gt;
-    &lt; processes&gt;
-     &lt; processDefinition id="localJVM"&gt;
-      &lt; jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;&lt;/jvmProcess&gt;
-     &lt; /processDefinition&gt;
-    &lt; /processes&gt;
-   &lt; /infrastructure&gt;
-  &lt;/ProActiveDescriptor&gt;</screen>
-    </sect3>
+			<para>
+				Then any number of parameters can be declared in
+				<emphasis role="bold">arg</emphasis>
+				tags. The parameters will be given to the main method in
+				the same order the were declared.
+			</para>
 
-    <sect3>
-      <title>API</title>
+			<para>
+				And finally a
+				<emphasis role="bold">mapToVirtualNode</emphasis>
+				tag will link the main info to virtual node, declared
+				with the same name in the virtualNodeDefinitions tag (in
+				componentDefinition).
+			</para>
 
-      <para>The Launcher class is located in the package <emphasis
-      role="bold">org.objectweb.proactive.core.descriptor</emphasis>. To use
-      it you will have to create a new instance of the launcher with the path
-      of the XML descriptor (this descriptor must contain a <emphasis
-      role="bold">mainDefinition tag</emphasis>). The constructor will parse
-      the file and reify a ProActiveDescriptor. You only have to call the
-      <emphasis role="bold">activate()</emphasis> method on the launcher
-      instance to launch the application.</para>
+			<screen>
+				&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+				&lt;ProActiveDescriptor
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				xsi:noNamespaceSchemaLocation=
+				"http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;
+				&lt;!-- &lt;security
+				file="../../descriptors/c3dPolicy.xml"&gt;&lt;/security&gt;
+				--&gt; &lt; componentDefinition&gt; &lt;
+				virtualNodesDefinition&gt; &lt; virtualNode
+				name="Dispatcher" property="unique_singleAO"/&gt; &lt;
+				virtualNode name="Renderer"/&gt; &lt;
+				/virtualNodesDefinition&gt; &lt;
+				/componentDefinition&gt; &lt; deployment&gt; &lt;
+				register virtualNode="Dispatcher"/&gt; &lt; mapping&gt;
+				&lt; map virtualNode="Dispatcher"&gt; &lt; jvmSet&gt;
+				&lt; currentJVM/&gt; &lt; /jvmSet&gt; &lt; /map&gt; &lt;
+				map virtualNode="Renderer"&gt; &lt; jvmSet&gt; &lt;
+				vmName value="Jvm1"/&gt; &lt; vmName value="Jvm2"/&gt;
+				&lt; vmName value="Jvm3"/&gt; &lt; vmName
+				value="Jvm4"/&gt; &lt; /jvmSet&gt; &lt; /map&gt; &lt;
+				/mapping&gt; &lt; jvms&gt; &lt; jvm name="Jvm1"&gt; &lt;
+				creation&gt; &lt; processReference refid="localJVM"/&gt;
+				&lt; /creation&gt; &lt; /jvm&gt; &lt; jvm
+				name="Jvm2"&gt; &lt; creation&gt; &lt; processReference
+				refid="localJVM"/&gt; &lt; /creation&gt; &lt; /jvm&gt;
+				&lt; jvm name="Jvm3"&gt; &lt; creation&gt; &lt;
+				processReference refid="localJVM"/&gt; &lt;
+				/creation&gt; &lt; /jvm&gt; &lt; jvm name="Jvm4"&gt;
+				&lt; creation&gt; &lt; processReference
+				refid="localJVM"/&gt; &lt; /creation&gt; &lt; /jvm&gt;
+				&lt; /jvms&gt; &lt; /deployment&gt; &lt;
+				infrastructure&gt; &lt; processes&gt; &lt;
+				processDefinition id="localJVM"&gt; &lt; jvmProcess
+				class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;&lt;/jvmProcess&gt;
+				&lt; /processDefinition&gt; &lt; /processes&gt; &lt;
+				/infrastructure&gt; &lt;/ProActiveDescriptor&gt;
+			</screen>
+		</sect2>
 
-      <para><emphasis role="underline">For
-      example:</emphasis></para>
-      <para><literal>Launcher launcher = new Launcher
-      ("myDescriptor.xml") ;</literal></para>
+		<sect2>
+			<title>API</title>
 
-      <para><literal>launcher.activate() ;</literal></para>
+			<para>
+				The Launcher class is located in the package
+				<emphasis role="bold">
+					org.objectweb.proactive.core.descriptor
+				</emphasis>
+				. To use it you will have to create a new instance of
+				the launcher with the path of the XML descriptor (this
+				descriptor must contain a
+				<emphasis role="bold">mainDefinition tag</emphasis>
+				). The constructor will parse the file and reify a
+				ProActiveDescriptor. You only have to call the
+				<emphasis role="bold">activate()</emphasis>
+				method on the launcher instance to launch the
+				application.
+			</para>
 
-      <para>you can also get the ProActiveDescriptor built by the launcher by
-      calling the getDescriptor() method on the launcher instance.</para>
+			<para>
+				<emphasis role="underline">For example:</emphasis>
+			</para>
+			<para>
+				<literal>
+					Launcher launcher = new Launcher
+					("myDescriptor.xml") ;
+				</literal>
+			</para>
 
-      <para><literal>ProActiveDescriptor pad = launcher.getDescriptor()
-      ;</literal></para>
-    </sect3>
-				
-			<sect3>
-				<title>The Launcher Plug-in</title>
+			<para>
+				<literal>launcher.activate() ;</literal>
+			</para>
+
+			<para>
+				you can also get the ProActiveDescriptor built by the
+				launcher by calling the getDescriptor() method on the
+				launcher instance.
+			</para>
+
+			<para>
+				<literal>
+					ProActiveDescriptor pad = launcher.getDescriptor() ;
+				</literal>
+			</para>
+		</sect2>
+
+		<sect2>
+			<title>The Launcher Plug-in</title>
 			<para>
 				In order to launch a
 				<emphasis role="bold">deployment descriptor</emphasis>
@@ -568,12 +734,12 @@
 				<emphasis role="bold">IC2D XML Editor</emphasis>
 				.
 			</para>
-			
+
 			<para>To use this editor, you have two possibilities:</para>
-			
-			<sect4>
+
+			<sect3>
 				<title>First possibility</title>
-				
+
 				<para>
 					Open the
 					<emphasis role="bold">
@@ -584,11 +750,11 @@
 						Window > Open perspective > Other... > Launcher
 					</emphasis>
 				</para>
-				
+
 				<para>
 					<figure>
 						<title>The "Open Perspective" window</title>
-						
+
 						<mediaobject>
 							<imageobject>
 								<imagedata
@@ -598,7 +764,7 @@
 						</mediaobject>
 					</figure>
 				</para>
-				
+
 				<para>
 					Then select:
 					<emphasis role="bold">File > Open File...</emphasis>
@@ -610,9 +776,9 @@
 					</emphasis>
 					list.
 				</para>
-			</sect4>
-			
-			<sect4>
+			</sect3>
+
+			<sect3>
 				<title>Second possibility</title>
 				<para>
 					In the Navigator view, or another similar, a right
@@ -633,11 +799,11 @@
 						</mediaobject>
 					</figure>
 				</para>
-			</sect4>
-			
-			<sect4>
+			</sect3>
+
+			<sect3>
 				<title>The Launcher perspective</title>
-				
+
 				<para>
 					The
 					<xref linkend="launcherPerspective" />
@@ -651,27 +817,27 @@
 					</emphasis>
 					.
 				</para>
-				
+
 				<para>
 					To
 					<emphasis role="bold">launch</emphasis>
 					an application, select your file in the deployment
 					descriptors list, and click on the launch icon.
 				</para>
-				
+
 				<para>
 					You can
 					<emphasis role="bold">kill</emphasis>
 					the applications launched from a popup-menu in the
 					"Deployment descriptors" list.
 				</para>
-				
+
 				<para>
 					To see your application running, open the
 					"Monitoring perspective" and monitor the
 					corresponding host.
 				</para>
-				
+
 				<para>
 					<figure id="launcherPerspective">
 						<title>The Launcher perspective</title>
@@ -684,26 +850,17 @@
 						</mediaobject>
 					</figure>
 				</para>
-				
-			</sect4>
-		</sect3> <!-- The Launcher plug-in -->
-		</sect2>
-		
-		<sect2>
-			<title>The Scheduler plug-in</title>
-			
-			<para>Coming soon ...</para>	
-			
-		</sect2> <!-- The Scheduler plug-in -->
-		
+
+			</sect3>
+		</sect2><!-- The Launcher plug-in -->
 	</sect1><!-- Launcher and Scheduler -->
-	
+
 	<!-- ************************************************************************************ -->
-	
+
 	<sect1 id="ProgrammingTools">
-		
+
 		<title>Programming Tools</title>
-		
+
 		<sect2>
 			<title>ProActive Wizards</title>
 			<para>
@@ -739,7 +896,7 @@
 				</mediaobject>
 			</figure>
 		</sect2>
-		
+
 		<sect2>
 			<title>The ProActive Editor</title>
 			<para>
@@ -758,11 +915,11 @@
 				</mediaobject>
 			</figure>
 		</sect2>
-		
+
 	</sect1><!-- Programming Tools-->
-	
+
 	<!-- ************************************************************************************ -->
-	
+
 	<sect1><!-- The Guided Tours as Plugin  -->
 		<title>The Guided Tour as Plugin</title>
 		<para>
@@ -798,5 +955,5 @@
 			</listitem>
 		</itemizedlist>
 	</sect1>
-	
+
 </chapter>

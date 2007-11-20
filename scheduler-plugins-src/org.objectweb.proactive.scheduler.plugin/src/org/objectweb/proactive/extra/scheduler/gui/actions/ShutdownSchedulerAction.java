@@ -48,7 +48,7 @@ public class ShutdownSchedulerAction extends Action {
         this.setToolTipText(
             "To shutdown the scheduler (This will finish all running and pending jobs before shutdown)");
         this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/shutdown.png"));
+                this.getClass(), "icons/scheduler_shutdown.png"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 

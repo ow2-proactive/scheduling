@@ -74,16 +74,12 @@ public class PauseResumeJobAction extends Action {
         this.setText("Pause job");
         this.setToolTipText(
             "To pause this job (this will finish all running tasks)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/pause.png"));
     }
 
     public void setResumeMode() {
         this.setText("Resume job");
         this.setToolTipText(
             "To resume this job (this will restart all paused tasks)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/resume.png"));
     }
 
     public void setPauseResumeMode() {
@@ -91,7 +87,7 @@ public class PauseResumeJobAction extends Action {
         this.setText("Pause/Resume job");
         this.setToolTipText("To pause or resume a job");
         this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/resume.png"));
+                this.getClass(), "icons/job_pause_resume.gif"));
     }
 
     public static PauseResumeJobAction newInstance() {
