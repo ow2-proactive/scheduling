@@ -183,6 +183,7 @@ public class TestContentController extends Conformtest {
 
     // ---
     public static class Template extends TestContentController {
+        @Override
         protected void setUpComponents() throws Exception {
             c = gf.newFcInstance(t, compositeTemplate, null);
             d = gf.newFcInstance(t, compositeTemplate, null);

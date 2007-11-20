@@ -119,7 +119,7 @@ public class RequestWithMixedLocation extends RequestImpl implements java.io.Ser
         if (server == null) {
             server = LocationServerFactory.getLocationServer();
         }
-        UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
+        UniversalBody mobile = server.searchObject(bodyID);
         logger.debug("backupSolution() server has sent an answer");
         ProFuture.waitFor(mobile);
         return mobile;

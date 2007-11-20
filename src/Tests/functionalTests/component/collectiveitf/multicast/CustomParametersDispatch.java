@@ -54,7 +54,7 @@ public class CustomParametersDispatch implements ParamDispatch {
         }
 
         List<Object> result = new ArrayList<Object>();
-        result.add((WrappedInteger) ((List) inputParameter).get(0));
+        result.add(((List) inputParameter).get(0));
         return result;
     }
 

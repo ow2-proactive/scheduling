@@ -44,7 +44,6 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -111,7 +110,7 @@ public abstract class DynamicNodeSource extends IMNodeSource
 
         // delaying the node adding.
         for (int i = 0; i < nbMax; i++) {
-            niceTimes.add((long) currentTime + ((i * delay) / nbMax));
+            niceTimes.add(currentTime + ((i * delay) / nbMax));
         }
     }
 
@@ -207,6 +206,7 @@ public abstract class DynamicNodeSource extends IMNodeSource
         return new IntWrapper(freeNodes.size());
     }
 
+    @Override
     public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
         boolean ordered) {
         ArrayList<IMNode> result = getFreeNodes();
@@ -216,6 +216,7 @@ public abstract class DynamicNodeSource extends IMNodeSource
         return result;
     }
 
+    @Override
     public void setBusy(IMNode imnode) {
         removeFromAllLists(imnode);
         if (!nodes.containsKey(imnode)) {
@@ -231,6 +232,7 @@ public abstract class DynamicNodeSource extends IMNodeSource
         }
     }
 
+    @Override
     public void setDown(IMNode imnode) {
         //TODO 
         // peut etre rendre directement le noeud a la source dynamique ?
@@ -239,6 +241,7 @@ public abstract class DynamicNodeSource extends IMNodeSource
         imnode.setDown(true);
     }
 
+    @Override
     public void setFree(IMNode imnode) {
         removeFromAllLists(imnode);
         if (isNodeToRelease(imnode)) {
@@ -261,6 +264,7 @@ public abstract class DynamicNodeSource extends IMNodeSource
         }
     }
 
+    @Override
     public BooleanWrapper shutdown() {
         logger.info("Shutting down Node Source : " + getSourceId());
         running = false;

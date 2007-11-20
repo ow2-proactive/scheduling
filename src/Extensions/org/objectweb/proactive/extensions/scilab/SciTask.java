@@ -79,7 +79,7 @@ public class SciTask extends AbstractGeneralTask {
     public void sendListDataIn() {
         SciData data;
         for (int i = 0; i < listDataIn.size(); i++) {
-            data = (SciData) listDataIn.get(i);
+            data = listDataIn.get(i);
             Scilab.sendData(data);
         }
     }

@@ -44,6 +44,7 @@ public class TestSpecifiedCapacity extends FunctionalTest {
     @Test
     public void testSpecifiedCapacity() {
         new Thread() {
+                @Override
                 public void run() {
                     StartRuntime.main(new String[] {
                             "--capacity", new Long(askedCapacity).toString()

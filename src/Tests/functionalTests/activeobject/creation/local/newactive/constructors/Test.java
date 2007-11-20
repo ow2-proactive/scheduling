@@ -34,11 +34,8 @@ import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
-import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
-import functionalTests.activeobject.creation.A;
 import static junit.framework.Assert.assertTrue;
 
 /**

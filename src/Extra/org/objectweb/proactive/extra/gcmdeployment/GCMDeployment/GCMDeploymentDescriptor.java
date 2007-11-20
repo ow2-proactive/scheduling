@@ -30,10 +30,6 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
-import java.util.Set;
-
-import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
 

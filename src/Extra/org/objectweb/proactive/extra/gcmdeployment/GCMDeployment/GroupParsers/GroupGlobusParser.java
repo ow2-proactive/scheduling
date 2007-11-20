@@ -59,6 +59,7 @@ public class GroupGlobusParser extends AbstractGroupParser {
         return new GroupGlobus();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

@@ -237,78 +237,97 @@ public class ProxyFile extends File {
      *         BEGIN EXTENDED FILE METHODS
      *
      * ***********************************************************/
+    @Override
     public String getName() {
         return relative.getName();
     }
 
+    @Override
     public String getParent() {
         return getCurrent().getParent();
     }
 
+    @Override
     public File getParentFile() {
         return getCurrent().getParentFile();
     }
 
+    @Override
     public String getPath() {
         return getCurrent().getPath();
     }
 
+    @Override
     public boolean isAbsolute() {
         return getCurrent().isAbsolute();
     }
 
+    @Override
     public String getAbsolutePath() {
         return getCurrent().getAbsolutePath();
     }
 
+    @Override
     public File getAbsoluteFile() {
         return getCurrent().getAbsoluteFile();
     }
 
+    @Override
     public String getCanonicalPath() throws IOException {
         return getCurrent().getCanonicalPath();
     }
 
+    @Override
     public File getCanonicalFile() throws IOException {
         return getCurrent().getCanonicalFile();
     }
 
+    @Override
     public URL toURL() throws MalformedURLException {
         return getCurrent().toURL();
     }
 
+    @Override
     public URI toURI() {
         return getCurrent().toURI();
     }
 
+    @Override
     public boolean canRead() {
         return getCurrent().canRead();
     }
 
+    @Override
     public boolean canWrite() {
         return getCurrent().canWrite();
     }
 
+    @Override
     public boolean exists() {
         return getCurrent().exists();
     }
 
+    @Override
     public boolean isDirectory() {
         return getCurrent().isDirectory();
     }
 
+    @Override
     public boolean isFile() {
         return getCurrent().isFile();
     }
 
+    @Override
     public boolean isHidden() {
         return getCurrent().isHidden();
     }
 
+    @Override
     public long lastModified() {
         return getCurrent().lastModified();
     }
 
+    @Override
     public long length() {
         if (!isLocallyStored()) {
             return cachedSize;
@@ -317,46 +336,57 @@ public class ProxyFile extends File {
         return getCurrent().length();
     }
 
+    @Override
     public boolean createNewFile() throws IOException {
         return getCurrent().createNewFile();
     }
 
+    @Override
     public boolean delete() {
         return getCurrent().delete();
     }
 
+    @Override
     public void deleteOnExit() {
         getCurrent().deleteOnExit();
     }
 
+    @Override
     public String[] list() {
         return getCurrent().list();
     }
 
+    @Override
     public String[] list(FilenameFilter filter) {
         return getCurrent().list();
     }
 
+    @Override
     public File[] listFiles() {
         return getCurrent().listFiles();
     }
 
+    @Override
     public File[] listFiles(FilenameFilter filter) {
         return getCurrent().listFiles(filter);
     }
 
+    @Override
     public File[] listFiles(FileFilter filter) {
         return getCurrent().listFiles(filter);
     }
 
+    @Override
     public boolean mkdir() {
         return getCurrent().mkdir();
     }
 
+    @Override
     public boolean mkdirs() {
         return getCurrent().mkdirs();
     }
 
+    @Override
     public boolean renameTo(File dest) {
         //TODO check this method
         boolean res = getCurrent().renameTo(new File(wspace, dest.getPath()));
@@ -368,26 +398,32 @@ public class ProxyFile extends File {
         return res;
     }
 
+    @Override
     public boolean setLastModified(long time) {
         return getCurrent().setLastModified(time);
     }
 
+    @Override
     public boolean setReadOnly() {
         return getCurrent().setReadOnly();
     }
 
+    @Override
     public int compareTo(File pathname) {
         return getCurrent().compareTo(pathname);
     }
 
+    @Override
     public boolean equals(Object obj) {
         return getCurrent().equals(obj);
     }
 
+    @Override
     public int hashCode() {
         return getCurrent().hashCode();
     }
 
+    @Override
     public String toString() {
         return getCurrent().toString();
     }

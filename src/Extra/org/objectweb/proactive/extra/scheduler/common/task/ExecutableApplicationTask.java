@@ -54,6 +54,7 @@ public abstract class ExecutableApplicationTask extends ExecutableJavaTask {
      * That's why it is final. User cannot override/implement this one anymore.
      * Instead, implement the execute(ArrayList<Node>) method.
      */
+    @Override
     public final Object execute(TaskResult... results) {
         throw new RuntimeException(
             "This method should have NEVER been called in this context !!");

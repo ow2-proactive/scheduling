@@ -62,7 +62,7 @@ public class SciTestLibrary {
         //Activation
         Vector<BooleanWrapper> listStateEngine = new Vector<BooleanWrapper>();
         for (int i = 0; i < mapEngine.size(); i++) {
-            listStateEngine.add(((SciEngine) mapEngine.get(arrayEngine[i])).activate());
+            listStateEngine.add((mapEngine.get(arrayEngine[i])).activate());
         }
 
         ProFuture.waitForAll(listStateEngine);
@@ -89,7 +89,7 @@ public class SciTestLibrary {
         for (int i = 0; i < arrayKey.length; i++) {
             sciTaskEnv = new SciTask("sciEnv" + arrayKey[i]);
             sciTaskEnv.setJob("exec('" + remoteDest + "');");
-            sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
+            sciEngine = this.mapEngine.get(arrayKey[i]);
             sciEngine.execute(sciTaskEnv);
         }
 
@@ -104,13 +104,13 @@ public class SciTestLibrary {
             sciTaskCallFun.addDataOut("z");
             sciTaskCallFun.setJob("z" + "= mult(" + dataIn.getName() + "," +
                 dataIn.getName() + ");");
-            sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
+            sciEngine = this.mapEngine.get(arrayKey[i]);
             sciResult = sciEngine.execute(sciTaskCallFun);
             System.out.println(sciResult.get("z"));
         }
 
         for (int i = 0; i < arrayKey.length; i++) {
-            sciEngine = (SciEngine) this.mapEngine.get(arrayKey[i]);
+            sciEngine = this.mapEngine.get(arrayKey[i]);
             try {
                 sciEngine.exit();
             } catch (RuntimeException e) {

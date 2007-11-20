@@ -155,6 +155,7 @@ public class TestLifeCycleController extends Conformtest {
     public static class Composite extends TestLifeCycleController {
         protected Component r;
 
+        @Override
         protected void setUpComponents() throws Exception {
             Component o = gf.newFcInstance(t, "composite", null);
             r = gf.newFcInstance(t, "composite", null);
@@ -211,6 +212,7 @@ public class TestLifeCycleController extends Conformtest {
             //      assertTrue(t.isAlive());
         }
 
+        @Override
         @Test
         @Ignore
         public void testMandatoryInterfaceNotBound() throws Exception {

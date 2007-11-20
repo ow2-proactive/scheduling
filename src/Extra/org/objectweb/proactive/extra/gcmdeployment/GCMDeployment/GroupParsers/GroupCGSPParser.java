@@ -56,6 +56,7 @@ public class GroupCGSPParser extends AbstractGroupParser {
         return new GroupCGSP();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

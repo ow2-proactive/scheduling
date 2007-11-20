@@ -74,6 +74,7 @@ class TaskDispatcher extends Thread {
         }
     }
 
+    @Override
     public void run() {
         runSingle();
         //runMutliple();
@@ -173,6 +174,7 @@ class TaskDispatcher extends Thread {
             super(runnable, result);
         }
 
+        @Override
         protected void done() {
             try {
                 Task pTask = get();

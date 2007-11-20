@@ -74,10 +74,8 @@ public class Test extends ComponentTest {
 
         for (int i = 0; i < 100; i++) {
             // several iterations for thoroughly testing concurrency issues
-            BooleanWrapper result1 = (BooleanWrapper) ((TotoItf) testcase.getFcInterface(
-                    "testA")).test();
-            BooleanWrapper result2 = (BooleanWrapper) ((TotoItf) testcase.getFcInterface(
-                    "testB")).test();
+            BooleanWrapper result1 = ((TotoItf) testcase.getFcInterface("testA")).test();
+            BooleanWrapper result2 = ((TotoItf) testcase.getFcInterface("testB")).test();
 
             Assert.assertTrue(result1.booleanValue());
             Assert.assertTrue(result2.booleanValue());

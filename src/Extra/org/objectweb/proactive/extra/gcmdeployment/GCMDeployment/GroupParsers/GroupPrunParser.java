@@ -58,6 +58,7 @@ public class GroupPrunParser extends AbstractGroupParser {
         return new GroupPrun();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

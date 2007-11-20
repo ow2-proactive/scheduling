@@ -193,6 +193,6 @@ public class TaskFamily<T> implements Serializable {
 
         T[] res = (T[]) Array.newInstance(childResults.get(0).getClass(),
                 childResults.size());
-        return (T[]) childResults.toArray(res);
+        return childResults.toArray(res);
     }
 }

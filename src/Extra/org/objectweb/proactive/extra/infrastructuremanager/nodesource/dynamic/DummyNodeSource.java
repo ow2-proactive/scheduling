@@ -35,7 +35,6 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;

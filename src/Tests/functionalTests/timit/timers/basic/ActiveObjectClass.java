@@ -367,6 +367,7 @@ public class ActiveObjectClass implements java.io.Serializable {
     /**
      * @return The name of this object
      */
+    @Override
     public String toString() {
         return name;
     }

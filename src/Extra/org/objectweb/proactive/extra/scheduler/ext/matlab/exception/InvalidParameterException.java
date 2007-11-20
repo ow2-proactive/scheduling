@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extra.scheduler.ext.matlab.exception;
 
-import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-
 import ptolemy.data.type.Type;
 
 

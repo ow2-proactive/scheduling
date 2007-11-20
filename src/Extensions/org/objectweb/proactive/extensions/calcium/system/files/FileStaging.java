@@ -33,7 +33,6 @@ package org.objectweb.proactive.extensions.calcium.system.files;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.IdentityHashMap;
 import java.util.Vector;

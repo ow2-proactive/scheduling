@@ -54,6 +54,7 @@ public class FunctionalTest {
 
     /** A shutdown hook to kill all forked JVMs when exiting the main JVM */
     static final private Thread shutdownHook = new Thread() {
+            @Override
             public void run() {
                 logger.trace("FunctionalTest Shutdown Hook");
                 killProActive();

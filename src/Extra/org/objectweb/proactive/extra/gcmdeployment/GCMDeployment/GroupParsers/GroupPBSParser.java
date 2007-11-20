@@ -66,6 +66,7 @@ public class GroupPBSParser extends AbstractGroupParser {
         return new GroupPBS();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

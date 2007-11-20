@@ -39,7 +39,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;

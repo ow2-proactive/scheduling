@@ -118,8 +118,7 @@ public class MasterImpl implements BindingController, Master {
         for (List<String> list : multicastArgsList) {
             System.err.println("Async calls with " + list.size() +
                 " arguments.");
-            Object[] sw = ((List<StringWrapper>) slaves.computeAsync(list,
-                    "Async")).toArray();
+            Object[] sw = (slaves.computeAsync(list, "Async")).toArray();
             for (Object object : sw) {
                 System.err.println("Object result: " + object);
             }

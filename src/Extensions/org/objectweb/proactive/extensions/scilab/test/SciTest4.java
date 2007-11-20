@@ -88,8 +88,8 @@ public class SciTest4 {
             m1 = new double[nbRow * nbCol];
             m2 = new double[nbRow * nbCol];
             for (int i = 0; i < (nbRow * nbCol); i++) {
-                m1[i] = (double) (Math.random() * 10);
-                m2[i] = (double) (Math.random() * 10);
+                m1[i] = (Math.random() * 10);
+                m2[i] = (Math.random() * 10);
             }
 
             SciDoubleMatrix sciMatrix1 = new SciDoubleMatrix("M1", nbRow,

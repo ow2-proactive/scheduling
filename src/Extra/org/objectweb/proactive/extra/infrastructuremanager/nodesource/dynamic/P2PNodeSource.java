@@ -64,6 +64,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     public P2PNodeSource() {
     }
 
+    @Override
     public void initActivity(Body body) {
         super.initActivity(body);
         try {

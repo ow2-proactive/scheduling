@@ -80,6 +80,7 @@ public class TaskWrapperImpl implements TaskIntern<Serializable> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Identifiable) {
             return id == ((Identifiable) obj).getId();
@@ -105,6 +106,7 @@ public class TaskWrapperImpl implements TaskIntern<Serializable> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int hashCode() {
         return (int) id;
     }
@@ -132,6 +134,6 @@ public class TaskWrapperImpl implements TaskIntern<Serializable> {
             throw new NullPointerException();
         }
 
-        return (int) (id - ((Identifiable) o).getId());
+        return (int) (id - (o).getId());
     }
 }

@@ -111,6 +111,7 @@ public class IMNodeSourceManager extends IMNodeSource {
     /**
      * @see IMNodeManager#getNodesByScript(VerifyingScript, boolean)
      */
+    @Override
     public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
         boolean ordered) {
         ArrayList<IMNode> res = new ArrayList<IMNode>();
@@ -127,6 +128,7 @@ public class IMNodeSourceManager extends IMNodeSource {
     /**
      * delegate to the imnode's original nodesource.
      */
+    @Override
     public void setBusy(IMNode imnode) {
         IMNodeSource ns = imnode.getNodeSource();
         if (ns != null) {
@@ -137,6 +139,7 @@ public class IMNodeSourceManager extends IMNodeSource {
     /**
      * delegate to the imnode's original nodesource.
      */
+    @Override
     public void setDown(IMNode imnode) {
         IMNodeSource ns = imnode.getNodeSource();
         if (ns != null) {
@@ -147,6 +150,7 @@ public class IMNodeSourceManager extends IMNodeSource {
     /**
      * delegate to the imnode's original nodesource.
      */
+    @Override
     public void setFree(IMNode imnode) {
         IMNodeSource ns = imnode.getNodeSource();
         if (ns != null) {
@@ -157,6 +161,7 @@ public class IMNodeSourceManager extends IMNodeSource {
     /**
      * ShutDown all managed node sources.
      */
+    @Override
     public BooleanWrapper shutdown() {
         Boolean res = padNS.shutdown().booleanValue();
         for (DynamicNodeSource dns : dynNS)

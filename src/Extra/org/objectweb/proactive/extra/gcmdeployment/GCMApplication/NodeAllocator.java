@@ -196,6 +196,7 @@ public class NodeAllocator implements NotificationListener {
     }
 
     private class Stage23Dispatcher extends Thread {
+        @Override
         public void run() {
             while (true) {
                 // Wait for next handleNotification invocation

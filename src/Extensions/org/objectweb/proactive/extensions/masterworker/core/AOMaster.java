@@ -206,14 +206,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * {@inheritDoc}
      */
     public void addResources(Collection<Node> nodes) {
-        ((WorkerManager) smanager).addResources(nodes);
+        (smanager).addResources(nodes);
     }
 
     /**
      * {@inheritDoc}
      */
     public void addResources(final URL descriptorURL) {
-        ((WorkerManager) smanager).addResources(descriptorURL);
+        (smanager).addResources(descriptorURL);
     }
 
     /**
@@ -221,14 +221,14 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      */
     public void addResources(final URL descriptorURL,
         final String virtualNodeName) {
-        ((WorkerManager) smanager).addResources(descriptorURL, virtualNodeName);
+        (smanager).addResources(descriptorURL, virtualNodeName);
     }
 
     /**
      * {@inheritDoc}
      */
     public void addResources(final VirtualNode virtualnode) {
-        ((WorkerManager) smanager).addResources(virtualnode);
+        (smanager).addResources(virtualnode);
     }
 
     /**

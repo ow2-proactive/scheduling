@@ -30,8 +30,6 @@
  */
 package functionalTests.component.creation.local.newactive.primitive;
 
-import java.net.InetAddress;
-
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;

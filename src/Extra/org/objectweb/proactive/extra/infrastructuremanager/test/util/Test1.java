@@ -51,6 +51,7 @@ public class Test1 extends TestCase {
     IMAdmin admin;
     IMMonitoring monitor;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         System.err.println("Creating resource manager...");
@@ -103,7 +104,7 @@ public class Test1 extends TestCase {
 
             //			Get At Most 3 nodes not on fiacre (but there is only 2 nodes corresponding"
             nodes = user.getAtMostNodes(new IntWrapper(3), verif);
-            ProFuture.waitFor((Object) nodes);
+            ProFuture.waitFor(nodes);
             if (!nodes.isEmpty()) {
                 System.err.println("nodes obtained = " + nodes.size());
                 for (Node n : nodes)
@@ -125,6 +126,7 @@ public class Test1 extends TestCase {
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         System.err.println("Stopping test");

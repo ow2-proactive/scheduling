@@ -33,7 +33,6 @@ package functionalTests.timit.timers.basic;
 import org.junit.After;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicReductor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;

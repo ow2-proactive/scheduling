@@ -86,6 +86,7 @@ public class GroupGLiteParser extends AbstractGroupParser {
         return new GroupGLite();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

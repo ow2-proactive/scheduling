@@ -39,6 +39,7 @@ public class PropertyTask extends ExecutableJavaTask {
     /**  */
     private static final long serialVersionUID = -2536751215944833218L;
 
+    @Override
     public Object execute(TaskResult... results) {
         try {
             Thread.sleep(10000);

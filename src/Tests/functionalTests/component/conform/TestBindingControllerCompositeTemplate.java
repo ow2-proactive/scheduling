@@ -38,6 +38,7 @@ public class TestBindingControllerCompositeTemplate
         isTemplate = true;
     }
 
+    @Override
     protected void setUpComponents() throws Exception {
         r = gf.newFcInstance(t, compositeTemplate, null);
         c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());

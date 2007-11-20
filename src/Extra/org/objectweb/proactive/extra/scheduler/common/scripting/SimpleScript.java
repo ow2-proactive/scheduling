@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extra.scheduler.common.scripting;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;

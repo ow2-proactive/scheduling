@@ -124,6 +124,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj instanceof AOWorker) {
             return name.equals(((Worker) obj).getName());
@@ -149,6 +150,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
     /**
      * {@inheritDoc}
      */
+    @Override
     public int hashCode() {
         return name.hashCode();
     }

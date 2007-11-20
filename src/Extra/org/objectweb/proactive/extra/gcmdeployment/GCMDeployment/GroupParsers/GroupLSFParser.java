@@ -56,6 +56,7 @@ public class GroupLSFParser extends AbstractGroupParser {
         return new GroupLSF();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

@@ -84,7 +84,7 @@ public class TimedRequestWithMixedLocation
             destinationBody);
         //get the new location from the server
         while (!ok && (tries < MAX_TRIES)) {
-            UniversalBody mobile = (UniversalBody) server.searchObject(destinationBody.getID());
+            UniversalBody mobile = server.searchObject(destinationBody.getID());
             System.out.println(
                 "RequestWithMixedLocation: backupSolution() server has sent an answer");
 

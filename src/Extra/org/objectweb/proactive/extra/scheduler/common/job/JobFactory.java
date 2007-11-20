@@ -247,7 +247,7 @@ public class JobFactory {
         // JOB PRIORITY
         String prio = xpath.evaluate("@priority", jobNode);
         if (!"".equals(prio)) {
-            job.setPriority(JobPriority.findPriority((String) prio));
+            job.setPriority(JobPriority.findPriority(prio));
         } else {
             job.setPriority(JobPriority.NORMAL);
         }
@@ -267,8 +267,8 @@ public class JobFactory {
         }
 
         // JOB DESCRIPTION
-        Object description = (String) xpath.evaluate(addPrefixes(
-                    "/job/description"), rootNode, XPathConstants.STRING);
+        Object description = xpath.evaluate(addPrefixes("/job/description"),
+                rootNode, XPathConstants.STRING);
         if (description != null) {
             System.out.println("Job description = " + description);
             job.setDescription((String) description);

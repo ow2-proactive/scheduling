@@ -61,6 +61,7 @@ public class GroupOARParser extends AbstractGroupParser {
         return new GroupOAR();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

@@ -119,7 +119,7 @@ public abstract class Conformtest extends ComponentTest {
         i.m((byte) 1);
         i.m((char) 1);
         i.m((short) 1);
-        i.m((int) 1);
+        i.m(1);
         i.m((long) 1);
         i.m((float) 1);
         i.m((double) 1);
@@ -130,10 +130,10 @@ public abstract class Conformtest extends ComponentTest {
         assertEquals((byte) 1, i.n((byte) 1, null));
         assertEquals((char) 1, i.n((char) 1, (double) 0));
         assertEquals((short) 1, i.n((short) 1, (float) 0));
-        assertEquals((int) 1, i.n((int) 1, (long) 0));
-        assertEquals((long) 1, i.n((long) 1, (int) 0));
-        assertEquals((float) 1, i.n((float) 1, (short) 0), 0);
-        assertEquals((double) 1, i.n((double) 1, (char) 0), 0);
+        assertEquals(1, i.n(1, (long) 0));
+        assertEquals((long) 1, i.n((long) 1, 0));
+        assertEquals(1, i.n((float) 1, (short) 0), 0);
+        assertEquals(1, i.n((double) 1, (char) 0), 0);
         assertEquals("1", i.n("1", (byte) 0));
     }
 

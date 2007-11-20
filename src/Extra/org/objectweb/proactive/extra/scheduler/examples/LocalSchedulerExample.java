@@ -35,12 +35,10 @@ import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface;
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 

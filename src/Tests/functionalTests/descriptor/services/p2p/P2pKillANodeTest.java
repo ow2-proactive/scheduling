@@ -60,6 +60,7 @@ public class P2pKillANodeTest extends FunctionalTest {
              * parameters. This shutdownhook is added to kill every StartP2PService.
              */
         Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
                 public void run() {
                     HashMap<String, String> pids = new HashMap<String, String>();
 

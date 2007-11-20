@@ -97,7 +97,7 @@ public class Test extends FunctionalTest {
         assertTrue((el.size() == groupOfResult.size()));
         //        System.err.println(
         //                "the ExceptionListException hasn't the right size");
-        A resultOfResultGroup = (A) this.resultTypedGroup.asynchronousCall();
+        A resultOfResultGroup = this.resultTypedGroup.asynchronousCall();
         Group groupOfResultResult = ProGroup.getGroup(resultOfResultGroup);
 
         // has the result-result group the correct size ?

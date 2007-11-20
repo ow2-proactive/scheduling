@@ -42,7 +42,6 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
@@ -107,6 +106,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
      *                 -> To finish, the nodes that don't verify the script.
      * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNodesByScript(org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript)
      */
+    @Override
     public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
         boolean ordered) {
         ArrayList<IMNode> result = getFreeNodes();
@@ -137,6 +137,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
      * Set the busy state, and move the node to the internal busy list.
      * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setBusy(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
      */
+    @Override
     public void setBusy(IMNode imnode) {
         removeFromAllLists(imnode);
         busyNodes.add(imnode);
@@ -152,6 +153,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
      * Set the down state, and move the node to the internal down list.
      * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setDown(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
      */
+    @Override
     public void setDown(IMNode imnode) {
         removeFromAllLists(imnode);
         downNodes.add(imnode);
@@ -163,6 +165,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
      * Update the node status.
      * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#setFree(org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode)
      */
+    @Override
     public void setFree(IMNode imnode) {
         removeFromAllLists(imnode);
         freeNodes.add(imnode);
@@ -506,6 +509,7 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
         return new IntWrapper(listPad.size());
     }
 
+    @Override
     public BooleanWrapper shutdown() {
         logger.info("Shutting down PAD Node Source");
         try {

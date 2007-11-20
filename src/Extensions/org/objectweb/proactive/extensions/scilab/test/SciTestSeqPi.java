@@ -70,7 +70,7 @@ class SciTestSeqPi {
             precision = Integer.parseInt(line);
             startTime = System.currentTimeMillis();
             Scilab.Exec(SciMath.formulaPi("pi", 0, precision));
-            SciData sciPi = (SciData) Scilab.receiveDataByName("pi");
+            SciData sciPi = Scilab.receiveDataByName("pi");
             endTime = System.currentTimeMillis();
 
             System.out.println(sciPi);

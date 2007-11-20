@@ -52,7 +52,7 @@ public class BridgeSSHParser extends AbstractBridgeParser {
         String username = GCMParserHelper.getAttributeValue(bridgeNode,
                 ATTR_USERNAME);
 
-        BridgeSSH bridgeSSH = ((BridgeSSH) bridge);
+        BridgeSSH bridgeSSH = (bridge);
         bridgeSSH.setHostname(hostname);
         bridgeSSH.setUsername(username);
 
@@ -64,6 +64,7 @@ public class BridgeSSHParser extends AbstractBridgeParser {
         return new BridgeSSH();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

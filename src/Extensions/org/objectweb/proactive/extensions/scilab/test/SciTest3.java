@@ -60,7 +60,7 @@ public class SciTest3 {
 
         //Activation
         for (int i = 0; i < mapEngine.size(); i++) {
-            listStateEngine.add(((SciEngine) mapEngine.get(arrayEngine[i])).activate());
+            listStateEngine.add((mapEngine.get(arrayEngine[i])).activate());
         }
 
         ProFuture.waitForAll(listStateEngine);
@@ -81,7 +81,7 @@ public class SciTest3 {
         task1.addDataOut("x");
         task1.setJob("x = a+b;");
 
-        sciEngine = (SciEngine) mapEngine.get(this.getNextEngine());
+        sciEngine = mapEngine.get(this.getNextEngine());
 
         //asynchronous call
         GeneralResult result1 = sciEngine.execute(task1);
@@ -91,7 +91,7 @@ public class SciTest3 {
         task3.addDataOut("a");
         task3.setJob("a = a*2;");
 
-        sciEngine = (SciEngine) mapEngine.get(this.getNextEngine());
+        sciEngine = mapEngine.get(this.getNextEngine());
         //asynchronous call
         GeneralResult result3 = sciEngine.execute(task3);
 
@@ -103,7 +103,7 @@ public class SciTest3 {
         task2.addDataOut("y");
         task2.setJob("y = x+b;");
 
-        sciEngine = (SciEngine) mapEngine.get(this.getNextEngine());
+        sciEngine = mapEngine.get(this.getNextEngine());
         //asynchronous call
         GeneralResult result2 = sciEngine.execute(task2);
 

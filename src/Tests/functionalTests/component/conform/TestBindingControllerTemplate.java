@@ -30,6 +30,7 @@ public class TestBindingControllerTemplate extends TestBindingController {
         isTemplate = true;
     }
 
+    @Override
     protected void setUpComponents() throws Exception {
         c = gf.newFcInstance(t, flatPrimitiveTemplate, C.class.getName());
         d = gf.newFcInstance(t, flatPrimitiveTemplate, C.class.getName());

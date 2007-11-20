@@ -53,6 +53,7 @@ public class GroupGridBusParser extends AbstractGroupParser {
         return new GroupGridBus();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

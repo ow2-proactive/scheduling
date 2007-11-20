@@ -31,14 +31,12 @@
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
 import java.io.Serializable;
-import java.util.Vector;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.extensions.calcium.task.Task;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 

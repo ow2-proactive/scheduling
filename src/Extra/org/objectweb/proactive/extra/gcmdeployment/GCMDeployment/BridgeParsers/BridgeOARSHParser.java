@@ -59,6 +59,7 @@ public class BridgeOARSHParser extends BridgeSSHParser {
         return new BridgeOARSH();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

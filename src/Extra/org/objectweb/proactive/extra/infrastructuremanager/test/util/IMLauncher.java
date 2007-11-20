@@ -33,13 +33,10 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 import java.io.File;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
-import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
-import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
 
 
 public class IMLauncher {

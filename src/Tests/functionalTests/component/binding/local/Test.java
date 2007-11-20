@@ -147,8 +147,8 @@ public class Test extends ComponentTest {
 
     private void testGet() {
         Binding retreived1 = (Binding) bindings1.get("i2");
-        Object retreived2 = (Object) bindings2.get("i2");
-        Object retreived3 = (Object) bindings3.get("i202");
+        Object retreived2 = bindings2.get("i2");
+        Object retreived3 = bindings3.get("i202");
         Binding dummy = (Binding) bindings1.get("dummy");
         Assert.assertEquals(dummy, null);
 

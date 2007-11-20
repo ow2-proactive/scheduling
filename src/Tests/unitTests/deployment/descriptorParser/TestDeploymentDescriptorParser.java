@@ -108,6 +108,7 @@ public class TestDeploymentDescriptorParser {
             return "pauext:";
         }
 
+        @Override
         public String getBaseNodeName() {
             return "myGroup";
         }
@@ -134,6 +135,7 @@ public class TestDeploymentDescriptorParser {
             return "pauext:";
         }
 
+        @Override
         public String getBaseNodeName() {
             return "myBridge";
         }

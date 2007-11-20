@@ -81,6 +81,7 @@ public class ResultInternImpl implements ResultIntern<Serializable> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(final Object obj) {
         if (obj instanceof Identifiable) {
             return id == ((Identifiable) obj).getId();
@@ -113,6 +114,7 @@ public class ResultInternImpl implements ResultIntern<Serializable> {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int hashCode() {
         return (int) id;
     }
@@ -151,9 +153,10 @@ public class ResultInternImpl implements ResultIntern<Serializable> {
             throw new NullPointerException();
         }
 
-        return (int) (id - ((Identifiable) o).getId());
+        return (int) (id - (o).getId());
     }
 
+    @Override
     public String toString() {
         return "ID: " + id + " Result: " + result + " Exception: " + exception;
     }

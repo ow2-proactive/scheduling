@@ -72,6 +72,7 @@ public class TestProActiveCounter {
             this.results = results;
         }
 
+        @Override
         public void run() {
             for (int i = 0; i < (MAX / NB_THREAD); i++) {
                 l.add(ProActiveCounter.getUniqID());

@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.extra.logforwarder;
 
-import org.objectweb.proactive.core.util.URIBuilder;
-
-
 public class RemoteLogListener {
     public static final int LISTEN_PORT = 1988;
 

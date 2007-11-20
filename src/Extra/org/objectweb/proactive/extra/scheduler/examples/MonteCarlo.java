@@ -69,6 +69,7 @@ public class MonteCarlo extends ExecutableJavaTask {
         }
     }
 
+    @Override
     public Object execute(TaskResult... results) {
         Random rand = new Random(System.currentTimeMillis());
         long n = iterations;
@@ -79,7 +80,7 @@ public class MonteCarlo extends ExecutableJavaTask {
             if (print < 0) {
                 System.out.println("Calcul intermediaire (" +
                     (100 - ((n * 100) / iterations)) + "%) : Pi = " +
-                    (((double) 4 * res) / (((++nbPrint) * iterations) / steps)));
+                    ((4 * res) / (((++nbPrint) * iterations) / steps)));
                 print = iterations / steps;
             }
             double x = rand.nextDouble();

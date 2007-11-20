@@ -36,7 +36,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.Stream;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
-import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;

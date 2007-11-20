@@ -1082,7 +1082,7 @@ public class SciFrame extends javax.swing.JFrame {
         Iterator<String> it = listSort.iterator();
 
         while (it.hasNext()) {
-            sciEngineInfo = (SciEngineInfo) mapEngine.get(it.next());
+            sciEngineInfo = mapEngine.get(it.next());
             nodeEngine = new TreeEngineNode(sciEngineInfo.getIdEngine());
             nodeEngine.add(new TreeEngineNode(sciEngineInfo.getSciEngineUrl()));
             this.rootEngine.add(nodeEngine);

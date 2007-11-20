@@ -98,7 +98,7 @@ public class TestIMProxy {
             //			verif = new VerifyingScript(url);
             //			Get At Most 3 nodes not on fiacre (but there is only 2 nodes corresponding"
             nodes = proxy.getAtMostNodes(2, verif);
-            ProFuture.waitFor((Object) nodes);
+            ProFuture.waitFor(nodes);
             if (!nodes.isEmpty()) {
                 System.err.println("nodes obtained = " + nodes.size());
                 for (Node n : nodes)

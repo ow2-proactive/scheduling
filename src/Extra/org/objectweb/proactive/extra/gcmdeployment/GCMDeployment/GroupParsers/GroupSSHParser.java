@@ -66,6 +66,7 @@ public class GroupSSHParser extends AbstractGroupParser {
         return new GroupSSH();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

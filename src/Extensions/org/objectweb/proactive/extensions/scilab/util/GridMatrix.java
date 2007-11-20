@@ -66,8 +66,8 @@ public class GridMatrix {
                 nbBloc, res));
 
         AbstractGeneralTask sciTask;
-        int nbRow = (int) yres / nbBloc;
-        double sizeBloc = (double) ((ymax - ymin) / nbBloc);
+        int nbRow = yres / nbBloc;
+        double sizeBloc = ((ymax - ymin) / nbBloc);
 
         double y1 = ymin;
         double y2 = ymin + sizeBloc;

@@ -70,6 +70,7 @@ public class GroupLoadLevelerParser extends AbstractGroupParser {
         return new GroupLoadLeveler();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

@@ -47,6 +47,7 @@ public class Result implements Serializable {
         }
     }
 
+    @Override
     public String toString() {
         long total = 0;
         String res = "";

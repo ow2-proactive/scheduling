@@ -83,14 +83,14 @@ public class TestComponent extends Conformtest {
         assertEquals((char) 1, ca.getX3());
         ca.setX4((short) 1);
         assertEquals((short) 1, ca.getX4());
-        ca.setX5((int) 1);
-        assertEquals((int) 1, ca.getX5());
+        ca.setX5(1);
+        assertEquals(1, ca.getX5());
         ca.setX6(1);
         assertEquals((long) 1, ca.getX6());
         ca.setX7(1);
-        assertEquals((float) 1, ca.getX7(), 0);
+        assertEquals(1, ca.getX7(), 0);
         ca.setX8(1);
-        assertEquals((double) 1, ca.getX8(), 0);
+        assertEquals(1, ca.getX8(), 0);
         ca.setX9("1");
         assertEquals("1", ca.getX9());
         ca.setWriteOnlyX11(true);
@@ -108,7 +108,7 @@ public class TestComponent extends Conformtest {
         ca.setX2((byte) 1);
         ca.setX3((char) 1);
         ca.setX4((short) 1);
-        ca.setX5((int) 1);
+        ca.setX5(1);
         ca.setX6(1);
         ca.setX7(1);
         ca.setX8(1);
@@ -123,10 +123,10 @@ public class TestComponent extends Conformtest {
         assertEquals((byte) 1, ca.getX2());
         assertEquals((char) 1, ca.getX3());
         assertEquals((short) 1, ca.getX4());
-        assertEquals((int) 1, ca.getX5());
+        assertEquals(1, ca.getX5());
         assertEquals((long) 1, ca.getX6());
-        assertEquals((float) 1, ca.getX7(), 0);
-        assertEquals((double) 1, ca.getX8(), 0);
+        assertEquals(1, ca.getX7(), 0);
+        assertEquals(1, ca.getX8(), 0);
         assertEquals("1", ca.getX9());
         assertEquals(true, ((I) c.getFcInterface("server")).n(false, null));
     }

@@ -158,12 +158,13 @@ public class NativeTask implements Task<String[]> {
         while ((line = d.readLine()) != null) {
             lines.add(line);
         }
-        return (String[]) lines.toArray(new String[0]);
+        return lines.toArray(new String[0]);
     }
 
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
+    @Override
     public int hashCode() {
         return (int) id;
     }
@@ -171,6 +172,7 @@ public class NativeTask implements Task<String[]> {
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof NativeTask) {
             return id == ((NativeTask) obj).id;

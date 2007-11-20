@@ -79,7 +79,7 @@ public class SciTestSeqMandel {
             startTime = System.currentTimeMillis();
             Scilab.Exec(SciMath.formulaMandelbrot("Fract", xres, yres, xmin,
                     xmax, ymin, ymax, precision));
-            SciData sciFract = (SciData) Scilab.receiveDataByName("Fract");
+            SciData sciFract = Scilab.receiveDataByName("Fract");
             System.out.println(sciFract);
             endTime = System.currentTimeMillis();
 

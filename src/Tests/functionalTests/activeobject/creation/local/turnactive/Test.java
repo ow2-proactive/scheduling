@@ -30,8 +30,6 @@
  */
 package functionalTests.activeobject.creation.local.turnactive;
 
-import java.net.InetAddress;
-
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.URIBuilder;
 

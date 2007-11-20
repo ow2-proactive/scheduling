@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extensions.calcium.instructions;
 
-import java.lang.reflect.Method;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;

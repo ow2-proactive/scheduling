@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 import java.io.File;
 import java.util.Map;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;

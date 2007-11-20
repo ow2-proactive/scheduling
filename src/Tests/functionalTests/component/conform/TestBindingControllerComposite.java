@@ -43,6 +43,7 @@ public class TestBindingControllerComposite extends TestBindingController {
     public TestBindingControllerComposite() {
     }
 
+    @Override
     protected void setUpComponents() throws Exception {
         r = gf.newFcInstance(t, "composite", null);
         c = gf.newFcInstance(t, "primitive", C.class.getName());
@@ -189,6 +190,7 @@ public class TestBindingControllerComposite extends TestBindingController {
         }
     }
 
+    @Override
     @Test
     @Ignore
     public void testAlreadyBound() throws Exception {
@@ -208,6 +210,7 @@ public class TestBindingControllerComposite extends TestBindingController {
         }
     }
 
+    @Override
     @Test
     @Ignore
     public void testNotBound() throws Exception {

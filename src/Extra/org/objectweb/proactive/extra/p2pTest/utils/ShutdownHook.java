@@ -40,6 +40,7 @@ public class ShutdownHook extends Thread {
         this.pad = pad;
     }
 
+    @Override
     public void run() {
         try {
             pad.killall(false);

@@ -41,9 +41,7 @@ import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 
 
@@ -128,11 +126,13 @@ public class ResultDescriptorTool {
             setLayout(null);
         }
 
+        @Override
         public void paintComponent(Graphics g) {
             g.clearRect(0, 0, this.getWidth(), this.getHeight());
             g.drawImage(img, 0, 0, null);
         }
 
+        @Override
         public String toString() {
             return "Simple image panel for " + this.path;
         }
@@ -160,6 +160,7 @@ public class ResultDescriptorTool {
             setBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED));
         }
 
+        @Override
         public String toString() {
             return "Simple text panel for " + this.text;
         }

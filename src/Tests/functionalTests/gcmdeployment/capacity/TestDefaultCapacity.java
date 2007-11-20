@@ -42,6 +42,7 @@ public class TestDefaultCapacity extends FunctionalTest {
     @Test
     public void testCapacityAutoDetection() {
         new Thread() {
+                @Override
                 public void run() {
                     StartRuntime.main(new String[] {  });
                 }

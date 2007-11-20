@@ -57,6 +57,7 @@ public class GroupFuraParser extends AbstractGroupParser {
         return new GroupFura();
     }
 
+    @Override
     public String getBaseNodeName() {
         return NODE_NAME;
     }

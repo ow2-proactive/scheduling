@@ -50,6 +50,7 @@ public abstract class ExecutableJavaTask extends ExecutableTask {
      *
      * @param args a map containing the different variables names and values.
      */
+    @Override
     public void init(Map<String, Object> args) throws Exception {
         // TODO : automatic assignation ?
     }

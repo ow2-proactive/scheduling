@@ -64,13 +64,13 @@ public class StartP2P {
             e.printStackTrace();
         }
 
-        VirtualNode vn_local = (VirtualNode) pad.getVirtualNode("VN_LOCAL");
+        VirtualNode vn_local = pad.getVirtualNode("VN_LOCAL");
         vn_local.activate();
-        VirtualNode vn0 = (VirtualNode) pad.getVirtualNode("VN0");
+        VirtualNode vn0 = pad.getVirtualNode("VN0");
         vn0.activate();
-        VirtualNode vn1 = (VirtualNode) pad.getVirtualNode("VN1");
+        VirtualNode vn1 = pad.getVirtualNode("VN1");
         vn1.activate();
-        VirtualNode vn2 = (VirtualNode) pad.getVirtualNode("VN2");
+        VirtualNode vn2 = pad.getVirtualNode("VN2");
         vn2.activate();
 
         String arg0 = "-ttu 1000 -port 1099 -noa 5";
@@ -155,6 +155,7 @@ public class StartP2P {
             return result;
         }
 
+        @Override
         public String toString() {
             String res = "";
             for (String string : args) {
