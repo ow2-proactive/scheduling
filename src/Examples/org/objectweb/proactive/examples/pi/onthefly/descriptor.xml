@@ -42,7 +42,7 @@
 	<fileTransferDefinitions>
 		<fileTransfer id="ProActiveLite">
 			<!-- dir src="${PROACTIVE_LITE}" dest="${PROACTIVE_HOME}" /-->
-			<file src="${proactive.dir}/dist/ProActive/ProActive.jar"
+			<file src="${proactive.dir}/dist/lib/ProActive.jar"
 				dest="${PROACTIVE_HOME}/ProActive.jar" />
 			<file src="${proactive.dir}/dist/lib/log4j.jar"
 				dest="${PROACTIVE_HOME}/log4j.jar" />

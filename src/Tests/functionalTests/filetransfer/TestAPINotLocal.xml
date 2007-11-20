@@ -69,7 +69,7 @@
 					
 				<classpath>
 						<absolutePath value="${PROACTIVE_HOME}/classes/"/>
-						                                                <absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/>
+						                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
 
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>

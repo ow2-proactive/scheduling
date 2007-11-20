@@ -63,7 +63,7 @@
 				<extendedJvm refid="localJVM" overwriteParameters="yes"/>
 				<classpath>
                      <!-- classpath is transformed during the test in order to match the correct path -->
-				     <absolutePath value="proactive.home/dist/ProActive/ProActive.jar"/>
+				     <absolutePath value="proactive.home/dist/lib/ProActive.jar"/>
 				     <absolutePath value="proactive.home/classes"/>
 				     <absolutePath value="proactive.home/dist/lib/*"/>
 					</classpath>

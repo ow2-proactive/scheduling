@@ -80,7 +80,7 @@
 				<include name="**/GlueControlPort.class" />
 			</fileset>
 			<manifest>
-				<attribute name="Class-Path" value="${proactive.location}/dist/ProActive/ProActive.jar
+				<attribute name="Class-Path" value="${proactive.location}/dist/lib/ProActive.jar
 					${proactive.location}/lib/components/fractal.jar
 					${proactive.location}/lib/xercesImpl.jar 
 					${proactive.location}/lib/javassist.jar"/>

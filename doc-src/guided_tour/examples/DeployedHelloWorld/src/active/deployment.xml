@@ -49,7 +49,7 @@
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						<absolutePath
-							value="${REMOTE_PROACTIVE_HOME}/dist/ProActive/ProActive.jar" />
+							value="${REMOTE_PROACTIVE_HOME}/dist/lib/ProActive.jar" />
 						<absolutePath
 							value="${REMOTE_PROACTIVE_HOME}/lib/bouncycastle.jar" />
 						<absolutePath

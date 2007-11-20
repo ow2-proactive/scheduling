@@ -190,7 +190,7 @@
     following jar files :</para>
     <itemizedlist>
       <listitem>
-        <para><literal>dist/ProActive/ProActive.jar</literal> - main library</para>
+        <para><literal>dist/lib/ProActive.jar</literal> - main library</para>
       </listitem>
 
       <listitem>

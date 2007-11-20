@@ -63,7 +63,7 @@
 						<absolutePath value="${PROACTIVE_HOME}/classes/Tests"/>
 						<absolutePath value="${PROACTIVE_HOME}/classes/Utils"/>
 																								
-                         <!--absolutePath value="${PROACTIVE_HOME}/dist/ProActive/ProActive.jar"/-->
+                         <!--absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/-->
 
                         <absolutePath value="${PROACTIVE_HOME}/dist/lib/\*"/>                        
                         <!-- absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
