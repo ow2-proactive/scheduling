@@ -64,6 +64,11 @@
 <!ENTITY TimIt SYSTEM "timit/TimIt.xml">
 <!ENTITY IC2D_EclipsePlugin SYSTEM "ic2d/IC2D_EclipsePlugin.xml">
 <!ENTITY extendingIC2D SYSTEM "ic2d/extendingIC2D.xml">
+<!ENTITY MonteCarlo SYSTEM "monteCarlo.xml">
+<!ENTITY Workflow SYSTEM "workflow.xml">
+<!ENTITY glossary SYSTEM "glossary.xml">
+<!ENTITY reference SYSTEM "definitions.xml">
+
 ]>
 <book>
    &bookinfo;
@@ -73,14 +78,14 @@
     <title>Introduction</title>
     &Principles;
     &Installation;
-    &TroubleShooting;
+  &TroubleShooting;  
   </part>
  
   <part id="ProActiveGuidedTour">
    <title>Guided Tour and Tutorial</title>
    &guidedindex;
    &capabilities-intro;
-   &hands_on_programming;
+  &hands_on_programming; 
    &StepByStepPi;
    &OOSPMDJacobiexample;
    &nbody;
@@ -90,8 +95,8 @@
   
   <part id="ProActiveProgramming">
     <title>Programming</title>
-    &ProActiveBasis;
-    &AOCreation;
+     &ProActiveBasis; 
+    &AOCreation; 
     &TypedGroupCommunication;
     &Migration;
     &exceptions;
@@ -100,13 +105,16 @@
     <part id="HighLevelAPI">
    <title>High Level APIs</title>
     &MasterWorker;
+    &MonteCarlo;
     &bnb;
+    &Workflow;
     &Calcium;
     &OOSPMD;
+    &mpi;
   </part>
 
   <part id="ProActiveDeployment">
-    <title>Deploying</title>
+    <title>Deployment And Virtualization</title>
     &PAConfiguration;
     &Descriptor;
     &VariableContract;
@@ -125,9 +133,8 @@
     &examples;
     &perspectives;
    </part>
-   
    <part id="ProActiveAdvancedFeatures">
-    <title>Advanced Features</title>
+    <title>Services and Advanced Features</title>
     &p2p;
     &loadbalancing;
     &faultTolerance;
@@ -136,7 +143,7 @@
     &OSGi;
     &JMX;
    &JMXMBean;
-    &mpi;
+    
    </part>
 
    <part id="ProActiveTools">
@@ -145,7 +152,7 @@
     &scilab;
     &TimIt;
    </part>
-
+ 
    <part id="ExtendingProActive">
     <title>Extending ProActive</title>
     &writeDoc;
@@ -161,9 +168,11 @@
     <title>Back matters</title>
     &FAQ;   
     &referenceCard;
-    &srcCodeAppendix; 
-    &biblio;
     <index id="keywordIndex"/>
+    &srcCodeAppendix; 
+<!--     &glossary;  
+    &reference; -->
+    &biblio;
    </part>
 
  </book>
