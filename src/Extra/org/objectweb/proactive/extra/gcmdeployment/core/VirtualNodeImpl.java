@@ -117,7 +117,6 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         nodes.add(node);
     }
 
-    @Override
     public boolean doesNodeProviderNeed(Node node,
         GCMDeploymentDescriptor nodeProvider) {
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
@@ -131,7 +130,6 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return false;
     }
 
-    @Override
     public boolean doYouNeed(Node node, GCMDeploymentDescriptor nodeProvider) {
         if (!needNode()) {
             return false;
@@ -154,7 +152,6 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return false;
     }
 
-    @Override
     public boolean doYouWant(Node node, GCMDeploymentDescriptor nodeProvider) {
         if (!isGreedy()) {
             return false;
@@ -180,7 +177,6 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return null;
     }
 
-    @Override
     public boolean isGreedy() {
         return requiredCapacity == MAX_CAPACITY;
     }
