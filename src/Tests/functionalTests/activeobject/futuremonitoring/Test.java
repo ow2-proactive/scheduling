@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.node.Node;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
-
 /**
  * Test monitoring the futures
  */
