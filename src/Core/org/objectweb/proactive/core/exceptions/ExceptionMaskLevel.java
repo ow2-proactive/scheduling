@@ -153,10 +153,10 @@ public class ExceptionMaskLevel {
     /* A future has returned */
     synchronized void removeFuture(FutureProxy f) {
         nbFutures--;
-        MethodCallResult res = f.getFutureResult();
+        MethodCallResult res = f.getMethodCallResult();
 
         if (res != null) {
-            Throwable exception = f.getFutureResult().getException();
+            Throwable exception = f.getMethodCallResult().getException();
             if (exception != null) {
                 synchronized (caughtExceptions) {
                     caughtExceptions.add(exception);

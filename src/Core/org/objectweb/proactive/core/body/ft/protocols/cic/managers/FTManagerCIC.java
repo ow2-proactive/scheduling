@@ -417,7 +417,7 @@ public class FTManagerCIC extends org.objectweb.proactive.core.body.ft.protocols
                 //try {
                 //    toLog = new ReplyImpl(reply.getSourceBodyID(),
                 //            reply.getSequenceNumber(), reply.getMethodName(),
-                //            (FutureResult) Utils.makeDeepCopy(reply.getResult()),
+                //            (MethodCallResult) Utils.makeDeepCopy(reply.getResult()),
                 //            owner.getProActiveSecurityManager());
                 //} catch (SecurityNotAvailableException e1) {
                 toLog = new ReplyImpl(reply.getSourceBodyID(),

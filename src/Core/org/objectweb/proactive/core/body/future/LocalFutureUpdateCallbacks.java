@@ -118,7 +118,7 @@ public class LocalFutureUpdateCallbacks {
 
     void run() {
         ProActiveFuture[] args = new ProActiveFuture[] {
-                new ProActiveFuture(this.future.getFutureResult())
+                new ProActiveFuture(this.future.getMethodCallResult())
             };
 
         for (Method m : this.methods) {
