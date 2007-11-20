@@ -6,14 +6,13 @@
     <variables>
         <variable name="HOME" value="/user/fviale/home"/>
         <variable name="MATLAB_SCRIPTS" value="${HOME}/matlab"/>
-        <variable name="VERIF_SCRIPTS" value="${HOME}/scripts"/>
     </variables>
     <taskFlow>
         <task name="splitter">
             <description>Splits a big array</description>
             <selection>
                 <script>
-                    <file path="${VERIF_SCRIPTS}/matlab_test.js"/>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.MatlabSplitter">
@@ -31,7 +30,7 @@
             </depends>
             <selection>
                 <script>
-                    <file path="${VERIF_SCRIPTS}/matlab_test.js"/>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
@@ -48,7 +47,7 @@
             </depends>
             <selection>
                 <script>
-                    <file path="${VERIF_SCRIPTS}/matlab_test.js"/>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
@@ -65,7 +64,7 @@
             </depends>
             <selection>
                 <script>
-                    <file path="${VERIF_SCRIPTS}/matlab_test.js"/>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
@@ -82,7 +81,7 @@
             </depends>
             <selection>
                 <script>
-                    <file path="${VERIF_SCRIPTS}/matlab_test.js"/>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
@@ -99,7 +98,7 @@
             </depends>
             <selection>
                 <script>
-                    <file path="${VERIF_SCRIPTS}/matlab_test.js"/>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
@@ -116,7 +115,7 @@
             </depends>
             <selection>
                 <script>
-                    <file path="${VERIF_SCRIPTS}/matlab_test.js"/>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
@@ -138,7 +137,7 @@
             </depends>
             <selection>
                 <script>
-                    <file path="${VERIF_SCRIPTS}/matlab_test.js"/>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
             <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.MatlabCollector">
