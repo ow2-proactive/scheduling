@@ -209,23 +209,6 @@ public class FutureMonitoring implements Runnable {
     }
 
     /**
-     * Add a future to the list of monitored future. This is automatically done
-     * when waiting a future. If the active object serving the method for this
-     * future cannot be pinged, the future is updated with a RuntimeException.
-     * @param future the future object to monitor
-     */
-    @PublicAPI
-    public static void monitorFuture(Object future) {
-        if (!MOP.isReifiedObject(future)) {
-            throw new IllegalArgumentException(
-                "Parameter is not a future object (actual type is " +
-                future.getClass().getName() + ")");
-        }
-        FutureProxy fp = (FutureProxy) ((StubObject) future).getProxy();
-        monitorFutureProxy(fp);
-    }
-
-    /**
      * Heuristic to detect if the Fault Tolerance is enabled, in order to
      * disable the monitoring if FT is enabled.
      */

@@ -221,7 +221,7 @@ public class ProFuture {
 
         for (Object future : futures) {
             if (ProFuture.isAwaited(future)) {
-                FutureMonitoring.monitorFuture(future);
+                monitorFuture(future);
             }
         }
 
@@ -313,5 +313,21 @@ public class ProFuture {
         }
 
         f.addCallback(methodName);
+    }
+
+    /**
+     * Add a future to the list of monitored future. This is automatically done
+     * when waiting a future. If the active object serving the method for this
+     * future cannot be pinged, the future is updated with a RuntimeException.
+     * @param future the future object to monitor
+     */
+    public static void monitorFuture(Object future) {
+        if (!MOP.isReifiedObject(future)) {
+            throw new IllegalArgumentException(
+                "Parameter is not a future object (actual type is " +
+                future.getClass().getName() + ")");
+        }
+        FutureProxy fp = (FutureProxy) ((StubObject) future).getProxy();
+        FutureMonitoring.monitorFutureProxy(fp);
     }
 }

@@ -1980,9 +1980,16 @@
 
 			<para>
 				By default, ProActive continuously pings active objects
-				expected to update awaited futures. It is also possible
-				to manually trigger the continuous ping using the
-				FutureMonitoring.monitorFuture(future) API.
+				expected to update awaited futures. When such a ping fails,
+				the associated awaited future is updated with a runtime
+				exception. This means that accessing the future will throw
+				an exception.
+			</para>
+
+			<para>
+				The ping is started when the future is being awaited, but
+				it is also possible to start if beforehand using the
+				<emphasis>ProFuture.monitorFuture(future)</emphasis> API.
 			</para>
 
 			<para>
