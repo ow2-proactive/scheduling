@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
 public class A implements Itf, ComponentInitActive {
-    private boolean condition = true;
+    private volatile boolean condition = true;
 
     /**
      * Initialize the immediate service method in the initComponentActivity
@@ -64,8 +64,13 @@ public class A implements Itf, ComponentInitActive {
      */
     public void loopQueueMethod() {
         System.err.println("COMPONENT: loopQueueMethod: BEGINNING");
-        while (condition)
-            ;
+        while (condition) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
         System.err.println("COMPONENT: loopQueueMethod: END");
     }
 
