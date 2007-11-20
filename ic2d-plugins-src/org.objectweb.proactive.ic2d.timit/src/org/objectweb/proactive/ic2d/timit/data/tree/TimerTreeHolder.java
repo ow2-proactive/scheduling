@@ -69,8 +69,7 @@ public class TimerTreeHolder extends AbstractObject {
             this.chartObjectSources.add(source);
             // Add dummyRoot to current dummyRoots and attach the total
             TimerTreeNodeObject dummyRoot = new TimerTreeNodeObject(source.getAoObject()
-                                                                          .getName(),
-                    true);
+                                                                          .getName());
             dummyRoot.children.add(source.getRootTimer());
             dummyRoots.add(dummyRoot);
             firePropertyChange(P_ADD_SOURCE, null, null);

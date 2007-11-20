@@ -52,15 +52,35 @@ import org.objectweb.proactive.ic2d.timit.editparts.BasicChartContainerEditPart;
  * @author vbodnart
  */
 public class BasicChartContainerObject {
+
+    /**
+     * A list of children models
+     */
     protected List<BasicChartObject> childrenList;
+
+    /**
+     * A map view on children models
+     */
     protected Map<UniqueID, BasicChartObject> childrenMap;
+
+    /**
+     * The edit part of this model
+     */
     protected BasicChartContainerEditPart ep;
 
+    /**
+     * Constructor of the chart container object.
+     */
     public BasicChartContainerObject() {
         this.childrenList = new ArrayList<BasicChartObject>();
         this.childrenMap = new HashMap<UniqueID, BasicChartObject>();
     }
 
+    /**
+     * This method allows to automatically find potential active objects that are timer aware
+     * and create a chart from the gathered data.
+     * @param object an AbstractObject instance that can be ActiveObject, NodeObject, RuntimeObject, HostObject or WorldObject
+     */
     public final void recognizeAndCreateChart(final AbstractData object) {
         if (object == null) {
             return;
@@ -125,21 +145,34 @@ public class BasicChartContainerObject {
         }
 
         // Before ChartObject instanciation try to take a snapshot of timers
-        List<BasicTimer> timersCollection = BasicChartObject.performSnapshotInternal(aoObject,
+        BasicTimer[] timersCollection = BasicChartObject.performSnapshotInternal(aoObject,
                 BasicChartObject.BASIC_LEVEL);
         if (timersCollection != null) {
             new BasicChartObject(this, timersCollection, aoObject);
         }
     }
 
+    /**
+     * Since each children can be identified, this method returns a specific child
+     * @param id The id of the child
+     * @return The identified child
+     */
     public BasicChartObject getChartObjectById(UniqueID id) {
         return this.childrenMap.get(id);
     }
 
+    /**
+     * Returns the list of children of this container
+     * @return A list of children
+     */
     public List<BasicChartObject> getChildrenList() {
         return this.childrenList;
     }
 
+    /**
+     * Adds a child to this container
+     * @param child The child to add
+     */
     public void addChild(BasicChartObject child) {
         this.childrenList.add(child);
         if (!BasicChartObject.DEBUG) {
@@ -148,16 +181,28 @@ public class BasicChartContainerObject {
         this.update(false);
     }
 
+    /**
+     * Removes a child from this container.
+     * @param child The child object to remove
+     */
     public void removeChild(BasicChartObject child) {
         this.childrenList.remove(child);
         this.childrenMap.remove(child.aoObject.getUniqueID());
         this.update(false);
     }
 
+    /**
+     * A setter for the edit part of this model
+     * @param ep A new edit part
+     */
     public void setEp(BasicChartContainerEditPart ep) {
         this.ep = ep;
     }
 
+    /**
+     * This method is used to update the edit part of this model.
+     * @param forceRefresh If true each children model will be refreshed
+     */
     public void update(boolean forceRefresh) {
         if (forceRefresh) {
             for (BasicChartObject o : this.childrenList) {

@@ -56,12 +56,8 @@ public class TimerTreeNodeObject extends AbstractObject {
     protected BasicTimer currentTimer;
     protected List<TimerTreeNodeObject> children;
 
-    /** boolean used during the build of a chart **/
-    protected boolean isViewed;
-
-    public TimerTreeNodeObject(String name, boolean isViewed) {
+    public TimerTreeNodeObject(String name) {
         this.labelName = name;
-        this.isViewed = isViewed;
         this.children = new ArrayList<TimerTreeNodeObject>();
     }
 
@@ -70,7 +66,6 @@ public class TimerTreeNodeObject extends AbstractObject {
         this.parent = parent;
         this.currentTimer = currentTimer;
         this.labelName = currentTimer.getName();
-        this.isViewed = true;
         if (parent != null) {
             parent.children.add(this);
         }
@@ -121,29 +116,6 @@ public class TimerTreeNodeObject extends AbstractObject {
 
     public String toString() {
         return this.labelName;
-    }
-
-    public boolean isViewed() {
-        return isViewed;
-    }
-
-    public void setViewed(boolean isViewedNew) {
-        if (this.parent == null) {
-            return;
-        }
-        if (this.isViewed == true) {
-            if (isViewedNew == false) {
-                // Remove this from parent			
-                this.parent.children.remove(this);
-            }
-        } else {
-            if ((isViewedNew == true) && !this.parent.children.contains(this)) {
-                // Add this to parent
-                this.parent.children.add(this);
-            }
-        }
-
-        this.isViewed = isViewedNew;
     }
 
     public TimerTreeNodeObject getParent() {

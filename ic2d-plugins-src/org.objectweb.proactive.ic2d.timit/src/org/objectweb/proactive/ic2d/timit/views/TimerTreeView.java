@@ -51,7 +51,15 @@ import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 import org.objectweb.proactive.ic2d.timit.editparts.tree.TreeEditPartFactory;
 
 
-// TODO : FILTER ALL DEPENDANT COMPUTATIONS IF THIS VIEW IS NOT ACTIVE
+/**
+ * This class represents the timer tree view with sortable columns
+ * that allows the user to analyse the hierarchical representation
+ * of the timers data.<p>
+ * The user can save the data in an xml file.
+ *
+ * @author vbodnart
+ *
+ */
 public class TimerTreeView extends ViewPart {
     public static final int NUMBER_OF_COLUMNS = 5;
     public static final int NAME_COLUMN = 0;

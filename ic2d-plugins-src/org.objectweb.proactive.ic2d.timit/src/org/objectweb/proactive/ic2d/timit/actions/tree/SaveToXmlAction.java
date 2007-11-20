@@ -72,10 +72,10 @@ public class SaveToXmlAction extends Action {
             return;
         }
 
-        SafeSaveDialog safeSaveDialog = new SafeSaveDialog(Display.getDefault()
-                                                                  .getActiveShell());
+        final SafeSaveDialog safeSaveDialog = new SafeSaveDialog(Display.getDefault()
+                                                                        .getActiveShell());
 
-        String path = safeSaveDialog.open();
+        final String path = safeSaveDialog.open();
 
         // Bad path
         if ((path == null) || "".equals(path)) {
@@ -85,16 +85,17 @@ public class SaveToXmlAction extends Action {
         }
 
         // Create the global list of result bags
-        List<ResultBag> results = new java.util.ArrayList<ResultBag>(this.timerTreeHolder.getChartObjectSources()
-                                                                                         .size());
+        final List<ResultBag> results = new java.util.ArrayList<ResultBag>(this.timerTreeHolder.getChartObjectSources()
+                                                                                               .size());
 
-        for (BasicChartObject c : this.timerTreeHolder.getChartObjectSources()) {
-            List<BasicTimer> timersList = new ArrayList<BasicTimer>(c.getTimersList()
-                                                                     .size());
+        for (final BasicChartObject c : this.timerTreeHolder.getChartObjectSources()) {
+            final List<BasicTimer> timersList = new ArrayList<BasicTimer>(c.getTimersList()
+                                                                           .size());
 
             // Fill the timers list with original basic timers
-            for (TimerTreeNodeObject t : c.getTimersList()) {
-                if ((t.getCurrentTimer() != null) && t.isViewed()) {
+            for (final TimerTreeNodeObject t : c.getTimersList()) {
+                if ((t.getCurrentTimer() != null) &&
+                        (t.getCurrentTimer().getTotalTime() != 0L)) {
                     timersList.add(t.getCurrentTimer());
                 }
             }
@@ -106,14 +107,14 @@ public class SaveToXmlAction extends Action {
                     c.getAoObject().getParent().getName()));
         }
 
-        BasicResultWriter finalWriter = new BasicResultWriter(path);
+        final BasicResultWriter finalWriter = new BasicResultWriter(path);
 
         // Load date formatter
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
+        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
                 DateFormat.MEDIUM);
 
         // Get Current date
-        Date now = new Date();
+        final Date now = new Date();
         now.setTime(System.currentTimeMillis());
 
         // Can possibly add the current JVM version
@@ -121,7 +122,7 @@ public class SaveToXmlAction extends Action {
             "This XML file was generated : " + df.format(now));
 
         // Add results to the output writer
-        for (ResultBag resultBag : results) {
+        for (final ResultBag resultBag : results) {
             resultBag.addResultsTo(finalWriter);
         }
 

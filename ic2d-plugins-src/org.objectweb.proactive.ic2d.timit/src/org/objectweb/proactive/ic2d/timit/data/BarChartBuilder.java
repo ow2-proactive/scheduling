@@ -32,7 +32,9 @@ package org.objectweb.proactive.ic2d.timit.data;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.birt.chart.model.Chart;
 import org.eclipse.birt.chart.model.ChartWithAxes;
@@ -50,7 +52,6 @@ import org.eclipse.birt.chart.model.component.impl.SeriesImpl;
 import org.eclipse.birt.chart.model.data.NumberDataSet;
 import org.eclipse.birt.chart.model.data.SeriesDefinition;
 import org.eclipse.birt.chart.model.data.TextDataSet;
-import org.eclipse.birt.chart.model.data.impl.NumberDataElementImpl;
 import org.eclipse.birt.chart.model.data.impl.NumberDataSetImpl;
 import org.eclipse.birt.chart.model.data.impl.SeriesDefinitionImpl;
 import org.eclipse.birt.chart.model.data.impl.TextDataSetImpl;
@@ -79,15 +80,26 @@ public class BarChartBuilder {
      * Font size for all titles, labels, and values.
      */
     protected final static int FONT_SIZE = 8;
+
+    /**
+     *
+     */
     protected final static String USER_DEFINED_LABEL_VALUE = "User defined"; // "User
 
-    // defined";
+    /**
+     *
+     */
     protected final static double USER_DEFINED_ELEMENT_VALUE = -1d; // To detect
 
-    // "User
-    // defined";
+    /**
+     * A formatter for date
+     */
     protected final static DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
             DateFormat.MEDIUM);
+
+    /**
+     * The title for generated charts
+     */
     protected String title;
 
     /**
@@ -104,10 +116,27 @@ public class BarChartBuilder {
      * Chart instance.
      */
     protected Chart chart;
+
+    /**
+     * Used to provide the current date
+     */
     protected Date now = new Date();
+
+    /**
+     * An array of string that represents the series ie the values names
+     */
     protected String[] series;
+
+    /**
+     * An array of  double that represents the values of a chart
+     */
     protected double[] values;
 
+    /**
+     * The constructor of the CharChartBuilder.
+     *
+     * @param title The title that will be used for generated charts.
+     */
     public BarChartBuilder(String title) {
         this.title = title;
         this.series = new String[0];
@@ -119,19 +148,19 @@ public class BarChartBuilder {
      * Builds one chart.
      */
     protected void build() {
-        chart = ChartWithAxesImpl.create();
+        this.chart = ChartWithAxesImpl.create();
 
-        ((ChartWithAxes) chart).setOrientation(Orientation.HORIZONTAL_LITERAL);
+        ((ChartWithAxes) this.chart).setOrientation(Orientation.HORIZONTAL_LITERAL);
 
-        buildTitle();
-        buildXAxis();
-        buildYAxis();
+        this.buildTitle();
+        this.buildXAxis();
+        this.buildYAxis();
 
-        chart.getLegend().setItemType(LegendItemType.CATEGORIES_LITERAL);
-        chart.getLegend().setVisible(false);
-        chart.setDimension(ChartDimension.TWO_DIMENSIONAL_LITERAL);
+        this.chart.getLegend().setItemType(LegendItemType.CATEGORIES_LITERAL);
+        this.chart.getLegend().setVisible(false);
+        this.chart.setDimension(ChartDimension.TWO_DIMENSIONAL_LITERAL);
 
-        chart.setScript( // ///////////////////////////////////////////////////////
+        this.chart.setScript( // ///////////////////////////////////////////////////////
             "function adaptTime( timeInMillis ) {" + "form = null;" +
             "var result = 0;" // Check if seconds is not ok
              +"if ((timeInMillis / 1000) < 1) {" + "	    form = \"ms\";" +
@@ -214,82 +243,37 @@ public class BarChartBuilder {
     }
 
     /**
-     * Creates chart instance.
+     * Creates a new chart instance.
      *
-     * @param filter
-     *            Used to filter timers
+     * @param filter Used to filter timers
+     * @return The instance of the chart created from the list of tree node objects
      */
-    public Chart createChart(List<TimerTreeNodeObject> timerObjectList,
-        String[] filter) {
-        if (BasicChartObject.DEBUG) {
-            this.series = new String[] {
-                    "Total", "Serve", "SendRequest", "SendReply",
-                    "WaitForRequest", "WaitByNecessity", "User1", "User2",
-                    USER_DEFINED_LABEL_VALUE
-                };
-            this.values = new double[] {
-                    239930, 1, 23828, 3000, 27779, 5100, 6000, 13945,
-                    USER_DEFINED_ELEMENT_VALUE
-                };
-        } else {
-            int userTimersSize = 0;
-            int paLevelIndex = 0;
-            int userLevelIndex = 0;
-
-            for (TimerTreeNodeObject to : timerObjectList) {
-                if ((to.getCurrentTimer() != null) &&
-                        to.getCurrentTimer().isUserLevel()) {
-                    userTimersSize++;
-                }
-            }
-
-            if (userTimersSize == 0) {
-                if (this.series.length != filter.length) {
-                    this.series = new String[filter.length];
-                    this.values = new double[filter.length];
-                }
-            } else {
-                int realSize = filter.length + userTimersSize;
-
-                // If there is some user defined timers
-                // keep a space for an empty serie used as label
-                if (this.series.length != (realSize + 1)) {
-                    this.series = new String[realSize + 1];
-                    this.values = new double[realSize + 1];
-                }
-                paLevelIndex = userTimersSize + 1;
-                // Fill the space with the label
-                series[userTimersSize] = USER_DEFINED_LABEL_VALUE;
-                values[userTimersSize] = USER_DEFINED_ELEMENT_VALUE;
-            }
-
-            for (TimerTreeNodeObject t : timerObjectList) {
-                double value = 0;
-                if (t.getCurrentTimer().getTotalTime() == 0) {
-                    value = -1;
+    public final Chart createChart(
+        final List<TimerTreeNodeObject> timerTreeNodeObjectList,
+        final String[] filter) {
+        // That map will contain all collapsed timers except methodTimers
+        final Map<String, Double> collapsedTimersMap = new HashMap<String, Double>();
+        for (final TimerTreeNodeObject t : timerTreeNodeObjectList) {
+            if (BasicChartObject.contains(filter, t.getLabelName()) ||
+                    t.getCurrentTimer().isUserLevel()) {
+                Double d = collapsedTimersMap.get(t.getLabelName());
+                if (d == null) {
+                    d = new Double(t.getCurrentTotalTimeInMsInDouble());
                 } else {
-                    value = t.getCurrentTotalTimeInMsInDouble();
-                    //value = Math.ceil((double) t.currentTimer.getTotalTime() / 1000000d); // total
-                    // time
-                    // is
-                    // in
-                    // nanoseconds
+                    d += t.getCurrentTotalTimeInMsInDouble();
                 }
-
-                // Choose destination index
-                if (t.getCurrentTimer().isUserLevel()) {
-                    series[userLevelIndex] = t.getCurrentTimer().getName();
-                    values[userLevelIndex] = value;
-                    userLevelIndex++;
-                } else {
-                    if (t.isViewed()) {
-                        series[paLevelIndex] = t.getCurrentTimer().getName();
-                        values[paLevelIndex] = value;
-                        paLevelIndex++;
-                    }
-                }
+                collapsedTimersMap.put(t.getLabelName(), d);
             }
         }
+
+        final int size = collapsedTimersMap.size();
+        if (this.series.length != size) {
+            this.series = new String[size];
+            this.values = new double[size];
+        }
+
+        // Fill the series and values arrays
+        this.fillDataFromCollapsedMap(collapsedTimersMap, filter);
 
         this.cleanChart();
 
@@ -300,7 +284,30 @@ public class BarChartBuilder {
         return chart;
     }
 
-    public void updateTitle() {
+    /**
+     * Fills the data from a collapsed map of times.
+     * The data will contain the filtered times with the order defined by the filter.
+     *
+     * @param collapsedTimesMap The collapsed map of times
+     * @param filter An array of timers names
+     */
+    private final void fillDataFromCollapsedMap(
+        final java.util.Map<String, Double> collapsedTimesMap,
+        final String[] filter) {
+        String timerName = null;
+        Double value = null;
+        for (int i = 0; i < filter.length; i++) {
+            timerName = filter[i];
+            value = collapsedTimesMap.get(timerName);
+            this.series[i] = timerName;
+            this.values[i] = (((value == null) || (value == 0)) ? (-1) : value);
+        }
+    }
+
+    /**
+     * Updates the title of this chart. Prints the last refresh time.
+     */
+    public final void updateTitle() {
         this.now.setTime(System.currentTimeMillis());
         this.chart.getTitle().getLabel().getCaption()
                   .setValue(title + " \nLast Refresh : " +
@@ -348,9 +355,9 @@ public class BarChartBuilder {
         yAxis.getMajorGrid().setTickStyle(TickStyle.LEFT_LITERAL);
 
         yAxis.setType(AxisType.LOGARITHMIC_LITERAL);
-        yAxis.getOrigin().setType(IntersectionType.VALUE_LITERAL);
-        yAxis.getScale().setMin(NumberDataElementImpl.create(0));
-        yAxis.getScale().setMax(NumberDataElementImpl.create(90));
+        // yAxis.getOrigin().setType(IntersectionType.VALUE_LITERAL);
+        // yAxis.getScale().setMin(NumberDataElementImpl.create(0));
+        // yAxis.getScale().setMax(NumberDataElementImpl.create(90));
     }
 
     /**
