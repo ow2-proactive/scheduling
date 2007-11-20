@@ -467,7 +467,7 @@
   <xsl:template match="bookinfo/subtitle" mode="book.titlepage.recto.mode">
   <fo:inline color="#0010FF" >
    <xsl:attribute name="font-weight">bold</xsl:attribute>
-   <xsl:attribute name="font-size">44pt</xsl:attribute>
+   <xsl:attribute name="font-size">40pt</xsl:attribute>
      <xsl:apply-templates mode="titlepage.mode" /> 
   </fo:inline>
 
