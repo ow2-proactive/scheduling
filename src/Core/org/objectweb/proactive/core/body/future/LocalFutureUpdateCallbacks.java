@@ -43,6 +43,10 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
+/**
+ * An implementation of java.util.concurrent.Future wrapping a MethodCallResult.
+ * Passed as parameter to the user defined callback on future update.
+ */
 class ProActiveFuture implements java.util.concurrent.Future<Object> {
     private MethodCallResult result;
 

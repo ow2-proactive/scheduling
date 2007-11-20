@@ -63,8 +63,15 @@ public interface Future extends LocalFuture {
      */
     public void waitFor();
 
+    /**
+     * Returns the exception that would be thrown upon access to this future, null if no exception
+     * would be thrown. This call is blocking on the future update.
+     */
     public Throwable getRaisedException();
 
+    /**
+     * Returns the object wrapped by this future or throw the exception. This call is blocking on the future update.
+     */
     public Object getResult();
 
     /**
