@@ -34,13 +34,11 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.mop.MOP;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.runtime.LocalNode;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 

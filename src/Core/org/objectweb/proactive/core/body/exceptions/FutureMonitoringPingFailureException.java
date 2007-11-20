@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.body.future;
+package org.objectweb.proactive.core.body.exceptions;
 
 public class FutureMonitoringPingFailureException extends RuntimeException {
     public FutureMonitoringPingFailureException(Throwable cause) {
