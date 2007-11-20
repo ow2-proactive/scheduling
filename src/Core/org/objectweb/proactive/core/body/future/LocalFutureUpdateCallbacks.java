@@ -78,7 +78,7 @@ class ProActiveFuture implements java.util.concurrent.Future<Object> {
 
 
 /**
- * A callback is method declared as 'void myCallback(FutureResult fr)'
+ * A callback is method declared as 'void myCallback(java.util.concurrent.Future fr)'
  * It is added using addFutureCallback(myFuture, "myCallback"), and will be
  * queued when the future is updated on ProActive.getBodyOnThis()
  * Callbacks are local, so are not copied when a future is serialized.
