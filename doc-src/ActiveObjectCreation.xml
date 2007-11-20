@@ -1986,6 +1986,19 @@
 				an exception.
 			</para>
 
+			<programlisting lang="java">
+				public static void function() {
+					F future = ao.asyncCall();
+					String str;
+
+					try {
+						str = future.toString();
+					} catch (FutureMonitoringPingFailureException fmpfe) {
+						// The active object 'ao' had a failure
+					}
+				}
+			</programlisting>
+
 			<para>
 				The ping is started when the future is being awaited, but
 				it is also possible to start if beforehand using the
