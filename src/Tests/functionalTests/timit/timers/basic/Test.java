@@ -40,8 +40,6 @@ import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
-
-
 public class Test extends FunctionalTest {
     private ActiveObjectClass a1;
     private ActiveObjectClass a1bis;
