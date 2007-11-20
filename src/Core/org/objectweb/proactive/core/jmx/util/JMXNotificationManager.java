@@ -500,32 +500,29 @@ public class JMXNotificationManager implements NotificationListener {
         } //while
 
         //Removes the reference for the notificationlistener from the local registry(ies);
-        notificationlistener.unsubscribeFromRegistry();
+        try {
+            if (!notificationlistener.unsubscribeFromRegistry()) {
+                System.out.println(
+                    "could not unregister JMXNotificationListener");
+            }
+            ;
+
+            //System.out.println("Unregistered the JMXNotificationListener for IC2D from the regisrty.");
+        } catch (Exception e) {
+            System.out.println(
+                "Could not unregistered the JMXNotificationListener for IC2D from the regisrty.");
+            e.printStackTrace();
+        }
 
         //The localBody for this thread will be removed by the unregisterAllHalfBodiesFromRegistry()
         //So we don't need to run this code (even if we could)
-        /*
-             Body myBody=ProActiveObject.getBodyOnThis();
-        if (myBody instanceof AbstractBody)
-        {
-                RemoteObjectExposer roe=((AbstractBody)myBody).getRemoteObjectExposer();
-                roe.unregisterAll();
-        }
-        */
-        unregisterAllHalfBodiesFromRegistry();
-    }
-
-    private void unregisterAllHalfBodiesFromRegistry() {
-        BodyMap bm = LocalBodyStore.getInstance().getLocalHalfBodies();
-
-        Iterator<UniversalBody> halfBodies = bm.bodiesIterator();
-        {
-            UniversalBody universalBody = halfBodies.next();
-
-            if (universalBody instanceof AbstractBody) {
-                RemoteObjectExposer roe = ((AbstractBody) universalBody).getRemoteObjectExposer();
-                roe.unregisterAll();
-            }
-        }
+        //        Body myBody=ProActiveObject.getBodyOnThis();
+        //        if (myBody instanceof AbstractBody)
+        //        {
+        //           
+        //        	myBody.terminate();    
+        //        	RemoteObjectExposer roe=((AbstractBody)myBody).getRemoteObjectExposer();
+        //            roe.unregisterAll();
+        //        }
     }
 }

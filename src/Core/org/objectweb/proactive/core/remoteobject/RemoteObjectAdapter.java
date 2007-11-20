@@ -559,7 +559,8 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
-    public URI getURI() {
+    //TODO: write a public method which does't throw exception. 
+    protected URI getURI() throws ProActiveException {
         try {
             MethodCall mc = MethodCall.getMethodCall(internalRROMethods[2],
                     new Object[0], new HashMap());
@@ -569,19 +570,12 @@ public class RemoteObjectAdapter implements RemoteObject {
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
             return (URI) reply.getResult().getResult();
-        } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ProActiveException(e);
         } catch (RenegotiateSessionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ProActiveException(e);
         } catch (SecurityException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            throw new ProActiveException(e);
         }
-        return null;
     }
 }

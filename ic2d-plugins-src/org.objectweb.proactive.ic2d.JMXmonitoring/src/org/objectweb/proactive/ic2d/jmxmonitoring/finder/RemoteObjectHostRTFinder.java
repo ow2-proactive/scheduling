@@ -95,14 +95,25 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                     try {
 
                         /*RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);*/
-                        RemoteObject ro = RemoteObjectHelper.lookup(url);
-                        if (!validateRemoteObj(ro)) {
+                        RemoteObject ro = null;
+                        try {
+                            ro = RemoteObjectHelper.lookup(url);
+                        } catch (ProActiveException e) {
                             nbZombieStubs++;
+                            // System.out.println("Invalid url found :" + url);
                             continue;
                         }
 
-                        /*Object stub = ro.getObjectProxy();*/
-                        Object stub = RemoteObjectHelper.generatedObjectStub(ro);
+                        //* Object stub = ro.getObjectProxy(); */
+                        Object stub = null;
+                        try {
+                            stub = RemoteObjectHelper.generatedObjectStub(ro);
+                        } catch (ProActiveException e) {
+                            nbZombieStubs++;
+                            System.out.println("Could not generate stub for " +
+                                url);
+                            continue;
+                        }
 
                         if (stub instanceof ProActiveRuntime) {
                             ProActiveRuntime proActiveRuntime = (ProActiveRuntime) stub;
@@ -126,12 +137,13 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                             }
                             runtimeObjects.put(runtimeUrl, runtime);
                         }
-                    } catch (ProActiveException pae) {
+                    } catch (Exception e) {
                         // the lookup returned an active object, and an active object is
                         // not a remote object (for now...)
-                        pae.printStackTrace();
-                        console.warn("Found active object in registry at " +
+                        e.printStackTrace();
+                        console.warn("Error when getting remote object at : " +
                             url);
+                        continue;
                     }
                 }
             }
@@ -145,7 +157,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
         }
 
         if (nbZombieStubs > 0) {
-            console.warn(nbZombieStubs + " invalid stubs on host " +
+            console.log(nbZombieStubs + " invalid urls in registry at host " +
                 host.getHostName() + ":" + host.getPort());
         }
         return runtimeObjects.values();

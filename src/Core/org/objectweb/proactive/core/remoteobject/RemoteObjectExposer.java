@@ -189,15 +189,20 @@ public class RemoteObjectExposer implements Serializable {
     public void unregisterAll() {
         Enumeration<URI> uris = this.activatedProtocols.keys();
         URI uri = null;
-        int i = 0;
         while (uris.hasMoreElements()) {
             uri = uris.nextElement();
-            RemoteRemoteObject rro = this.activatedProtocols.get(uri);
+            //RemoteRemoteObject rro = this.activatedProtocols.get(uri);
             try {
                 RemoteObjectHelper.getRemoteObjectFactory(uri.getScheme())
                                   .unregister(uri);
             } catch (ProActiveException e) {
-                e.printStackTrace();
+                //  e.printStackTrace();
+                ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
+                               .debug("Could not unregister " + uri +
+                    ". Error message: " + e.getMessage());
+                //TODO: This print can be omitted. 
+                System.out.println("Could not unregister " + uri +
+                    ". Error message: " + e.getMessage());
             }
         }
     }

@@ -182,6 +182,17 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      *  Closing a connector server is a potentially slow operation. For example, if a client machine with an open connection has crashed, the close operation might have to wait for a network protocol timeout. Callers that do not want to block in a close operation should do it in a separate thread.
      */
     public void stop() {
+        try {
+            String path = this.address.getURLPath();
+            int index = path.indexOf(ProActiveJMXConstants.SERVER_REGISTERED_NAME);
+            String url = path.substring(index);
+            ProActiveObject.unregister(url);
+        } catch (IOException e) {
+            System.out.println(
+                "Could not unregister ProActiveServerImpl from the registry. " +
+                e.getMessage());
+        }
+
         this.paServer = null;
         this.state = STOPPED;
     }

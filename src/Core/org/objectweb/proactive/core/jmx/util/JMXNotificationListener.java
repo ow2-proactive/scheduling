@@ -131,11 +131,22 @@ public class JMXNotificationListener implements NotificationListener,
         logger = ProActiveLogger.getLogger(Loggers.JMX);
     }
 
-    public void unsubscribeFromRegistry() {
-        Body myBody = ProActiveObject.getBodyOnThis();
-        if (myBody instanceof AbstractBody) {
-            RemoteObjectExposer roe = ((AbstractBody) myBody).getRemoteObjectExposer();
-            roe.unregisterAll();
+    public boolean unsubscribeFromRegistry() {
+        try {
+            Body myBody = ProActiveObject.getBodyOnThis();
+            if (myBody instanceof AbstractBody) {
+                System.out.println("Unregistring JMXNotificationManager .... ");
+                RemoteObjectExposer roe = ((AbstractBody) myBody).getRemoteObjectExposer();
+                //  ProActiveObject.terminateActiveObject(ProActiveObject.getStubOnThis(), false);
+                roe.unregisterAll();
+                System.out.println(
+                    "Unregistered JMXNotificationListener from the registry (body:" +
+                    myBody.toString() + " )");
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }
