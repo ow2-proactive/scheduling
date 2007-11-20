@@ -95,6 +95,7 @@
 	
 	<path id="test.classpath">
 		<path refid="deploy.classpath"/>
+		<pathelement location="${base.dir}/compile/lib/junit-4.3.jar"/>
 		<pathelement location="${cl.test.dir}/" />
 	</path>
 
