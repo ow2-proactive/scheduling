@@ -32,9 +32,9 @@ package org.objectweb.proactive.ic2d.jmxmonitoring;
 
 import java.util.Iterator;
 
-import javassist.ClassClassPath;
-import javassist.ClassPool;
 
+//import javassist.ClassClassPath;
+//import javassist.ClassPool;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.BodyMap;
@@ -80,8 +80,8 @@ public class Activator extends AbstractUIPlugin {
         //RuntimeFactory.getDefaultRuntime().getURL();
 
         // add current classpath for javassist class pool
-        ClassPool pool = ClassPool.getDefault();
-        pool.insertClassPath(new ClassClassPath(this.getClass()));
+        //       ClassPool pool = ClassPool.getDefault();
+        //     pool.insertClassPath(new ClassClassPath(this.getClass()));
     }
 
     /*
