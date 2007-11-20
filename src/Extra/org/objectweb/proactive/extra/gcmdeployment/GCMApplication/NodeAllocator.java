@@ -46,7 +46,6 @@ public class NodeAllocator implements NotificationListener {
             this);
     }
 
-    @Override
     public void handleNotification(Notification notification, Object handback) {
         String type = notification.getType();
 
@@ -112,6 +111,7 @@ public class NodeAllocator implements NotificationListener {
 
     private void startGreedyThread() {
         Thread t = new Thread() {
+                @Override
                 public void run() {
                     while (true) {
                         try {
