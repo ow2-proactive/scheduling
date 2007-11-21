@@ -4,7 +4,7 @@
  * ProActive: The Java(TM) library for Parallel, Distributed,
  *            Concurrent computing with Security and Mobility
  *
- * Copyright (C) 2x1997-2007 INRIA/University of Nice-Sophia Antipolis
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
  * Contact: proactive@objectweb.org
  *
  * This library is free software; you can redistribute it and/or
@@ -19,7 +19,7 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02x111-1307
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
  *  Initial developer(s):               The ProActive Team
@@ -43,7 +43,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.xml.sax.SAXException;
 
 
-public class TestVirtualNode2x10 extends Abstract {
+public class TestVirtualNode10 extends Abstract {
     @Test
     public void test()
         throws IllegalArgumentException, XPathExpressionException,

@@ -1,6 +1,6 @@
-<?xml version="2x1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <pa:GCMDeployment xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:xsi="http://www.w3.org/2002x1/XMLSchema-instance"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"	
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                                     /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
 	                    http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
@@ -8,22 +8,22 @@
 	
 	<pa:resources>
 	                    
-		<pa:bridge refid="bLocalhost2x1">
-			<pa:host refid="hLocalhost2x1"/>
+		<pa:bridge refid="bLocalhost1">
+			<pa:host refid="hLocalhost1"/>
 		</pa:bridge>
 	</pa:resources>
 
 	<pa:infrastructure>
 		
 		<pa:hosts>
-			<pa:host id="hLocalhost2x1" os="unix" hostCapacity="1" vmCapacity="7">
+			<pa:host id="hLocalhost1" os="unix" hostCapacity="1" vmCapacity="7">
 				<pa:homeDirectory base="root" relpath="/user/cmathieu/home"/>				
 			</pa:host>
 		</pa:hosts>
 
 		<pa:bridges>
 			<paext:sshBridge
-				id="bLocalhost2x1"
+				id="bLocalhost1"
 				hostname="localhost"
 				commandOptions="-2" />
 		</pa:bridges>
