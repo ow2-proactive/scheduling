@@ -248,7 +248,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
      */
     @Override
-    public void newPendingJobEvent(InternalJob job) {
+    public void jobSubmittedEvent(InternalJob job) {
         // add job to the global jobs list
         jobs.add(job);
 
@@ -266,7 +266,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
-    public void pendingToRunningJobEvent(JobEvent event) {
+    public void jobPendingToRunningEvent(JobEvent event) {
         JobId jobId = event.getJobId();
         InternalJob job = getJobById(jobId);
         job.update(event);
@@ -308,7 +308,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
-    public void runningToFinishedJobEvent(JobEvent event) {
+    public void jobRunningToFinishedEvent(JobEvent event) {
         JobId jobId = event.getJobId();
         InternalJob job = getJobById(jobId);
         job.update(event);
@@ -350,7 +350,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
-    public void removeFinishedJobEvent(JobEvent event) {
+    public void jobRemoveFinishedEvent(JobEvent event) {
         JobId jobId = event.getJobId();
         getJobById(jobId).update(event);
 
@@ -381,7 +381,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
     @Override
-    public void pendingToRunningTaskEvent(TaskEvent event) {
+    public void taskPendingToRunningEvent(TaskEvent event) {
         JobId jobId = event.getJobId();
         getJobById(jobId).update(event);
 
@@ -417,7 +417,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
     @Override
-    public void runningToFinishedTaskEvent(TaskEvent event) {
+    public void taskRunningToFinishedEvent(TaskEvent event) {
         JobId jobId = event.getJobId();
         getJobById(jobId).update(event);
         final TaskEvent taskEvent = event;
@@ -816,7 +816,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
-    public void changeJobPriorityEvent(JobEvent event) {
+    public void jobChangePriorityEvent(JobEvent event) {
         getJobById(event.getJobId()).update(event);
         jobPriorityChangedEventInternal(event);
     }

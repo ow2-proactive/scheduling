@@ -885,7 +885,7 @@
 		<copy todir="${ic2d-plugin.dir}/${plugin.lib}/lib" includeemptydirs="no">
 			<fileset dir="${lib.dir}" />
 		</copy>
-		<copy file="${PAdist.dir}/ProActive.jar" todir="${ic2d-plugin.dir}/${plugin.lib}" />
+		<copy file="${deploy.lib.dir}/ProActive.jar" todir="${ic2d-plugin.dir}/${plugin.lib}" />
 	</target>
 
 	<target name="ic2dLibClean" description="Clean all needed libraries to IC2D">

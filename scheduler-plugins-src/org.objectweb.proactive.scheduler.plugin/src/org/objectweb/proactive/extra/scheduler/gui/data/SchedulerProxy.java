@@ -52,6 +52,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
 import org.objectweb.proactive.extra.scheduler.job.InternalJob;
+import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 
 
 /**
@@ -384,4 +385,11 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     public static void clearInstance() {
         instance = null;
     }
+
+	@Override
+	public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
+			throws SchedulerException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

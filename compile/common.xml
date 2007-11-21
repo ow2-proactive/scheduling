@@ -15,6 +15,7 @@
 	<property name="classlibs.dir"      value="${base.dir}/classlibs" />
 	<property name="dist.dir"           value="${base.dir}/dist" />
 	<property name="PAdist.dir"         value="${dist.dir}/ProActive" />
+	<property name="deploy.lib.dir"     value="${dist.dir}/lib" />
 	<property name="junit.dir"          value="${base.dir}/junitReports" />
 	<property name="emma.dir"           value="${base.dir}/emmaReports" />
 

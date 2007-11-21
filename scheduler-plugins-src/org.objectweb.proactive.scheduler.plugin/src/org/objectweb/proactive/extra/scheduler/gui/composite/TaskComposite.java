@@ -57,7 +57,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
-import org.objectweb.proactive.extra.scheduler.common.task.Status;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
@@ -275,7 +275,7 @@ public class TaskComposite extends Composite {
                         ResultPreview resultPreview = ResultPreview.getInstance();
                         if (resultPreview != null) {
                             // update its tasks informations if task is finished
-                            if (task.getStatus() == Status.FINISHED) {
+                            if (task.getStatus() == TaskState.FINISHED) {
                                 // get result from scheduler
                                 // TODO : NO ACCESS TO SCHED HERE ...
                                 // je vien de faire un copuier collé de ce code dans JobsController...
@@ -436,9 +436,9 @@ public class TaskComposite extends Composite {
                         (internalTask.getRerunnable() -
                         internalTask.getRerunnableLeft()) + "/" +
                         internalTask.getRerunnable());
-                } else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE)) {
-                    item.setText(i,
-                        Tools.getFormattedDate(internalTask.getRunTimeLimit()));
+//                } else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE)) {
+//                    item.setText(i,
+//                        Tools.getFormattedDate(internalTask.getRunTimeLimit()));
                 } else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
                     String hostName = internalTask.getExecutionHostName();
                     if (hostName == null) {
