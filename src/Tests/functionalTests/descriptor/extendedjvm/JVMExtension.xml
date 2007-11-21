@@ -58,7 +58,7 @@
 				<extendedJvm refid="localJVM" overwriteParameters="yes"/>
 				<classpath>
                      <!-- classpath is transformed during the test in order to match the correct path -->
-				     <absolutePath value="proactive.home/dist/ProActive.jar"/>
+				     <absolutePath value="proactive.home/dist/lib/ProActive.jar"/>
 				     <absolutePath value="proactive.home/dist/lib/fractal.jar"/>
                      <absolutePath value="proactive.home/dist/lib/ganymed-ssh2-build210.jar"/>
                      <absolutePath value="proactive.home/dist/lib/javassist.jar"/>

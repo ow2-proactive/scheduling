@@ -152,7 +152,7 @@
 		For now the application will be deployed on the local Node. To compile and run the application you need the 
 		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
 		include the following jar files: 
-		  	<literal>ProActive/dist/ProActive.jar</literal>,
+		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
           	<literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
@@ -271,7 +271,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	To compile and run the application you need the 
 		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
 		include the following jar files: 
-		  	<literal>ProActive/dist/ProActive.jar</literal>,
+		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
           	<literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
@@ -511,7 +511,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	To compile and run the application you need the 
 		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
 		include the following jar files: 
-		  	<literal>ProActive/dist/ProActive.jar</literal>,
+		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
           	<literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
@@ -666,7 +666,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	To compile and run the application you need the 
 		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
 		include the following jar files: 
-		  	<literal>ProActive/dist/ProActive.jar</literal>,
+		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
           	<literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
@@ -850,7 +850,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       	To compile and run the application you need the 
 		<literal> Main </literal>class, the <literal> HelloWorld </literal>class,  to
 		include the following jar files: 
-		  	<literal>ProActive/dist/ProActive.jar</literal>,
+		  	<literal>ProActive/dist/lib/ProActive.jar</literal>,
           	<literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
