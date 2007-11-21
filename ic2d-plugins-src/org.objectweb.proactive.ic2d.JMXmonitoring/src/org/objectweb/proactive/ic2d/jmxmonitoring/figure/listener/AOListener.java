@@ -30,24 +30,14 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener;
 
+import java.util.Iterator;
+
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.jface.action.IAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.HorizontalLayoutAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.KillVMAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshHostAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshJVMAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshNodeAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetDepthAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetTTRAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.SetUpdateFrequenceAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.StopMonitoringAction;
-import org.objectweb.proactive.ic2d.jmxmonitoring.action.VerticalLayoutAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
@@ -78,59 +68,73 @@ public class AOListener implements MouseListener, MouseMotionListener {
             dnd.setSourceFigure(figure);
             figure.setHighlight(ColorConstants.green);
 
-            // Manual handling of an action for timer snapshot ... needs improvement
-            IAction anAction = registry.getAction("Get timer snapshot");
-            if (anAction != null) {
-                ((IActionExtPoint) anAction).setActiveSelect(this.ao);
-            }
+            //			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
+            //				IAction act = action.next();
+            //				if (act instanceof IActionExtPoint) {
+            //					IActionExtPoint extensionAction = (IActionExtPoint) act;
+            //					extensionAction.setActiveSelect(this.ao);
+            //				}
+            //			}
+            //			// Manual handling of an action for timer snapshot ... needs improvement
+            //			IAction anAction = registry.getAction("Get timer snapshot");
+            //			if ( anAction != null ){
+            //				((IActionExtPoint)anAction).setActiveSelect(this.ao);
+            //			}
         } else if (me.button == 3) {
-            // Monitor a new host
-            registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
-
-            // Set depth control
-            registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(false);
-
-            // Refresh
-            registry.getAction(RefreshAction.REFRESH).setEnabled(false);
-
-            // Set time to refresh
-            registry.getAction(SetTTRAction.SET_TTR).setEnabled(false);
-
-            // Look for new JVM
-            registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
-
-            // Look for new Nodes
-            registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
-
-            // Look for new Active Objects
-            registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
-
-            // Stop monitoring this ...
-            registry.getAction(StopMonitoringAction.STOP_MONITORING)
-                    .setEnabled(false);
-
-            // Kill VM
-            registry.getAction(KillVMAction.KILLVM).setEnabled(false);
-
-            // Set update frequence...
-            registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE)
-                    .setEnabled(false);
-
-            // Vertical Layout
-            registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT)
-                    .setEnabled(false);
-
-            // Horizontal Layout
-            registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT)
-                    .setEnabled(false);
-
-            // Manual handling of an action for timer snapshot ... needs improvement
-            IAction anAction = registry.getAction("Get timer snapshot");
-            if (anAction != null) {
-                ((IActionExtPoint) anAction).setAbstractDataObject(this.ao);
-                anAction.setText("Get Timers Snapshot");
-                anAction.setEnabled(true);
+            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
+                    action.hasNext();) {
+                IAction act = action.next();
+                if (act instanceof IActionExtPoint) {
+                    IActionExtPoint extensionAction = (IActionExtPoint) act;
+                    extensionAction.setAbstractDataObject(this.ao);
+                } else {
+                    act.setEnabled(false);
+                }
             }
+
+            //			// Monitor a new host
+            //			registry.getAction(NewHostAction.NEW_HOST).setEnabled(false);
+            //			
+            //			// Set depth control
+            //			registry.getAction(SetDepthAction.SET_DEPTH).setEnabled(false);
+            //				
+            //			// Refresh
+            //			registry.getAction(RefreshAction.REFRESH).setEnabled(false);
+            //			
+            //			// Set time to refresh
+            //			registry.getAction(SetTTRAction.SET_TTR).setEnabled(false);
+            //
+            //			// Look for new JVM
+            //			registry.getAction(RefreshHostAction.REFRESH_HOST).setEnabled(false);
+            //			
+            //			// Look for new Nodes
+            //			registry.getAction(RefreshJVMAction.REFRESH_JVM).setEnabled(false);
+            //			
+            //			// Look for new Active Objects
+            //			registry.getAction(RefreshNodeAction.REFRESH_NODE).setEnabled(false);
+            //			
+            //			// Stop monitoring this ...
+            //			registry.getAction(StopMonitoringAction.STOP_MONITORING).setEnabled(false);
+            //			
+            //			// Kill VM
+            //			registry.getAction(KillVMAction.KILLVM).setEnabled(false);
+            //			
+            //			// Set update frequence...
+            //			registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE).setEnabled(false);
+            //			
+            //			// Vertical Layout
+            //			registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT).setEnabled(false);
+            //			
+            //			// Horizontal Layout
+            //			registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT).setEnabled(false);
+            //			
+            //			// Manual handling of an action for timer snapshot ... needs improvement
+            //			IAction anAction = registry.getAction("Get timer snapshot");
+            //			if ( anAction != null ){
+            //				((IActionExtPoint)anAction).setAbstractDataObject(this.ao);
+            //				anAction.setText("Get Timers Snapshot");
+            //				anAction.setEnabled(true);
+            //			}
         }
     }
 

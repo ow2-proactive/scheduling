@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
@@ -52,6 +53,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
@@ -279,15 +281,10 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         // security 
         ProActiveSecurityManager newNodeSecurityManager = null;
 
-        try {
-            newNodeSecurityManager = ((AbstractBody) ProActiveObject
-                                      .getBodyOnThis()).getProActiveSecurityManager()
-                                      .generateSiblingCertificate(P2PConstants.VN_NAME);
-        } catch (NullPointerException e) {
-            // well nothing to do except maybe log it
-            ProActiveLogger.getLogger(Loggers.SECURITY_NODE)
-                           .debug("Node created without security manager");
-        }
+        newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
+                                  .generateSiblingCertificate(EntityType.NODE,
+                P2PConstants.VN_NAME);
+
         Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
                 "_" + this.nodeCounter++, true, newNodeSecurityManager,
                 P2PConstants.VN_NAME, null);

@@ -78,7 +78,7 @@
 				<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class" />
 				<exclude name="functionalTests/loadbalancing/Test.class" />
-				
+
 				<!-- Disable GCM Deployment related unit tests -->
 				<exclude name="unitTests/deployment/**/*.class" />
 				<exclude name="functionalTests/gcmdeployment/**/*.class" />
@@ -889,8 +889,8 @@
 	</target>
 
 	<target name="ic2dLibClean" description="Clean all needed libraries to IC2D">
-		<delete dir="${ic2d-plugin.dir}/${plugin.lib}/lib" />
-		<delete file="${ic2d-plugin.dir}/${plugin.lib}/ProActive.jar" />
+		<delete dir="${ic2d-plugin.dir}/${plugin.lib}/lib"/>
+		<delete file="${ic2d-plugin.dir}/${plugin.lib}/ProActive.jar"/>
 	</target>
 	<!-- ================================================================ -->
 	<!--                      Compile JMX Connector                       -->

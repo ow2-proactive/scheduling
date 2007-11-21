@@ -1,6 +1,6 @@
 # the default logging level is INFO
 
-log4j.rootLogger=INFO, A1
+log4j.rootLogger=DEBUG, A1
 
 #A1 uses PatternLayout
 #and displays the associated message (%m)

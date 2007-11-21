@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.security.crypto;
 
-import java.io.*;
+import java.io.Serializable;
 import java.security.cert.X509Certificate;
 
 

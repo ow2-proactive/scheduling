@@ -6,50 +6,23 @@
          point="org.eclipse.ui.views">
       <category
             name="Security"
-            id="org.objectweb.proactive.ic2d.security">
+            id="org.objectweb.proactive.ic2d.security.views">
       </category>
       <view
-            name="Policy Editor"
+            allowMultiple="false"
+            category="Security"
+            class="org.objectweb.proactive.ic2d.security.views.PolicyEditorView"
             icon="icons/sample.gif"
-            category="org.objectweb.proactive.ic2d.security"
-            class="org.objectweb.proactive.ic2d.security.views.PolicyEditor"
-            id="org.objectweb.proactive.ic2d.security.views.PolicyEditor">
-      </view>
+            id="org.objectweb.proactive.ic2d.security.views.PolicyEditorView"
+            name="Policy Editor"/>
    </extension>
-   <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="org.objectweb.proactive.ic2d.security.form.SecurityEditorForm"
-            id="org.objectweb.proactive.ic2d.security.form.SecurityEditorForm"
-            name="Security Editor">
-      </editor>
-   </extension>
-   <extension
-         point="org.eclipse.ui.actionSets">
-      <actionSet
-            id="org.eclipse.ui.forms.article.actionSet"
-            label="security">
-         <menu
-               id="org.eclipse.ui.forms.article.menu"
-               label="securityLabel">
-            <groupMarker
-                  name="group">
-            </groupMarker>
-         </menu>
-         <action
-               class="org.eclipse.ui.forms.article.rcp.OpenSimpleFormEditorAction"
-               id="org.eclipse.ui.forms.article.simple"
-               label="securityactionLabel"
-               menubarPath="plop">
-         </action>
-      </actionSet>
-   </extension>
+
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
             targetID="org.eclipse.ui.resourcePerspective">
          <view
-               id="org.objectweb.proactive.ic2d.security.PolicyEditor"
+               id="org.objectweb.proactive.ic2d.security.views.PolicyEditorView"
                ratio="0.5"
                relationship="stack"
                relative="org.eclipse.ui.views.TaskList">
@@ -61,8 +34,19 @@
       <perspective
             class="org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective"
             id="org.objectweb.proactive.ic2d.security.perspectives.SecurityPerspective"
-            name="ProActive Security">
+            name="Security">
       </perspective>
    </extension>
-
+   <extension
+         point="org.eclipse.ui.editors">
+   </extension>
+   <extension
+         point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
+      <action_class class="org.objectweb.proactive.ic2d.security.actions.GetSecurityManager"/>
+    
+   </extension>
+    <extension
+         point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
+            <action_class class="org.objectweb.proactive.ic2d.security.actions.SetSecurityManager"/>
+  </extension>
 </plugin>

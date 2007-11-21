@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
 
 /**
@@ -62,7 +64,7 @@ import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolExcept
  *
  */
 public abstract class AbstractUniversalBody implements UniversalBody,
-    java.io.Serializable {
+    Serializable {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //

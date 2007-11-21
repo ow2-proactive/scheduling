@@ -60,12 +60,11 @@
 	<property name="osgi.res.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/res/"/>
 	<property name="manifest.connector.dir" value="${src.extensions.dir}/org/objectweb/proactive/extensions/osgi/connector/Manifest/"/>
 	<property name="manifest.example.management.dir" value="${src.examples.dir}/org/objectweb/proactive/examples/jmx/remote/management/osgi/Manifest/"/>
-	<property name="example.management.classes.dir" value="${classes.dir}/Examples/org/objectweb/proactive/examples/jmx/remote/management/"/>
-
+	<property name="example.management.classes.dir" value="${classes.dir}/Examples/org/objectweb/proactive/examples/jmx/remote/management/"/>	
+	
 	<!-- IC2d properties -->
 	<property name="ic2d-plugin.dir" value="${base.dir}/ic2d-plugins-src" />
 	<property name="plugin.lib" value="org.objectweb.proactive.ic2d.lib" />
-
 	
 	<!-- Scheduler/Infrastructure Manager properties -->
 	<property name="scheduler-plugin.dir" value="${base.dir}/scheduler-plugins-src" />

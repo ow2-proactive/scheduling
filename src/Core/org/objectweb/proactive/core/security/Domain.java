@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.security;
 
 import java.security.PublicKey;
-import java.security.cert.*;
+import java.security.cert.X509Certificate;
 
 
 public class Domain {
@@ -41,6 +41,6 @@ public class Domain {
     }
 
     public PublicKey getPublicKey() {
-        return certificate.getPublicKey();
+        return this.certificate.getPublicKey();
     }
 }

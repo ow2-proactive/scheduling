@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="ProActive.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ptolemy.jar"/>
+	<classpathentry exported="true" kind="lib" path="ProActive.jar" sourcepath="/ProActive"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/activation.jar"/>
@@ -12,6 +13,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/batik-svggen.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/batik-util.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/batik-xml.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/bouncycastle.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bundlerepository.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/classad.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/clibwrapper_jiio.jar"/>
@@ -30,6 +32,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/dtdparser.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fractal.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/fractal-adl.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/ganymed-ssh2-build210.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/glite-wms-jdlj.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/http.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ibis-1.4.jar"/>
@@ -39,6 +42,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jai_core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jai_imageio.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/javasci.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/javassist.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcommon-1.0.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jdom.jar"/>
@@ -48,7 +52,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/julia-mixins.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/julia-runtime.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jung-1.7.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mlibwrapper_jai.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/moduleloader.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/njs_client.jar"/>
@@ -71,6 +74,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/wsdl4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xml-apis.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/javassist.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/sunxacml.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xercesImpl.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

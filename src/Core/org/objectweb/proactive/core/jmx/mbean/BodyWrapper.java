@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.jmx.mbean;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
+import java.security.AccessControlException;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
@@ -59,6 +60,10 @@ import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.security.PolicyServer;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -330,11 +335,33 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                 " can't be registered on the MBean server during the deserialization of the MBean",
                 e);
         } catch (NotCompliantMBeanException e) {
-            logger.error("Execption throws during the deserialization of the MBean",
+            logger.error("Exception throws during the deserialization of the MBean",
                 e);
         }
 
         launchNotificationsThread();
+    }
+
+    public ProActiveSecurityManager getSecurityManager(Entity user) {
+        try {
+            return body.getProActiveSecurityManager(user);
+        } catch (AccessControlException e) {
+            e.printStackTrace();
+        } catch (SecurityNotAvailableException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public void setSecurityManager(Entity user, PolicyServer policyServer) {
+        try {
+            body.setProActiveSecurityManager(user, policyServer);
+        } catch (AccessControlException e) {
+            e.printStackTrace();
+        } catch (SecurityNotAvailableException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

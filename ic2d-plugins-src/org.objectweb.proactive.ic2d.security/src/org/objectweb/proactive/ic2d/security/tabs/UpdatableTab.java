@@ -28,17 +28,16 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.security.securityentity;
+package org.objectweb.proactive.ic2d.security.tabs;
 
-import org.objectweb.proactive.core.security.PolicyRule;
+import org.eclipse.swt.custom.CTabFolder;
+import org.eclipse.swt.custom.CTabItem;
 
 
-/**
- * @author acontes
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
- */
-public interface EntityPolicy {
-    public PolicyRule getPolicyTo();
+public abstract class UpdatableTab extends CTabItem {
+    public UpdatableTab(CTabFolder parent, int style) {
+        super(parent, style);
+    }
+
+    abstract public void update();
 }

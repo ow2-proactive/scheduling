@@ -30,8 +30,7 @@
  */
 package org.objectweb.proactive.core.security;
 
-public class SessionConstants {
-    public static final int HELLO = 1;
-    public static final int PUBLIC_KEY_EXCHANGE = 2;
-    public static final int SECRET_EXCHANGE = 3;
+public enum SessionConstants {HELLO,
+    PUBLIC_KEY_EXCHANGE,
+    SECRET_EXCHANGE;
 }

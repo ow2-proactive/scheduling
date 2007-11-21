@@ -51,6 +51,9 @@ import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.crypto.Session;
+import org.objectweb.proactive.core.security.crypto.Session.ActAs;
+import org.objectweb.proactive.core.security.crypto.SessionException;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
@@ -164,7 +167,8 @@ public class RequestImpl extends MessageImpl implements Request,
     // -- Implements Request -----------------------------------------------
     //
     public int send(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException {
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException {
         //System.out.println("RequestSender: sendRequest  " + methodName + " to destination");
         this.sendCounter++;
         return sendRequest(destinationBody);
@@ -271,12 +275,13 @@ public class RequestImpl extends MessageImpl implements Request,
                     logger.warn("sender is null but why ?");
                 }
 
-                byte[] certE = destinationBody.getCertificateEncoded();
-                X509Certificate cert = ProActiveSecurity.decodeCertificate(certE);
-                this.sessionID = psm.getSessionIDTo(cert);
-                if (this.sessionID != 0) {
-                    this.methodCallCiphered = psm.encrypt(this.sessionID,
-                            this.methodCall, Session.ACT_AS_CLIENT);
+                this.sessionID = psm.getSessionTo(destinationBody.getCertificate())
+                                    .getDistantSessionID();
+                long id = psm.getSessionIDTo(destinationBody.getCertificate());
+
+                if (id != 0) {
+                    this.methodCallCiphered = psm.encrypt(id, this.methodCall,
+                            ActAs.CLIENT);
                     this.ciphered = true;
                     this.methodCall = null;
                     if (logger.isDebugEnabled()) {
@@ -293,15 +298,30 @@ public class RequestImpl extends MessageImpl implements Request,
             logger.debug("Request : security disabled");
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (SessionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         return true;
     }
 
     protected int sendRequest(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException {
+        throws IOException, RenegotiateSessionException,
+            CommunicationForbiddenException {
         ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
         if (psm != null) {
+            try {
+                if (!psm.getSessionTo(destinationBody.getCertificate())
+                            .getSecurityContext().getSendRequest()
+                            .getCommunication()) {
+                    throw new CommunicationForbiddenException();
+                }
+            } catch (SecurityNotAvailableException e) {
+                throw new CommunicationForbiddenException();
+            } catch (SessionException e) {
+                throw new CommunicationForbiddenException();
+            }
             this.crypt(psm, destinationBody);
         }
 
@@ -326,10 +346,10 @@ public class RequestImpl extends MessageImpl implements Request,
             try {
                 ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
                                .debug("ReceiveRequest : this body is " +
-                    psm.getCertificate().getSubjectDN() + " " +
-                    psm.getCertificate().getPublicKey());
+                    psm.getCertificate().getCert().getSubjectDN() + " " +
+                    psm.getCertificate().getCert().getPublicKey());
                 byte[] decryptedMethodCall = psm.decrypt(this.sessionID,
-                        this.methodCallCiphered, Session.ACT_AS_SERVER);
+                        this.methodCallCiphered, ActAs.SERVER);
 
                 //ProActiveLogger.getLogger("security.request").debug("ReceiveRequest :method call apres decryption : " +  ProActiveSecurityManager.displayByte(decryptedMethodCall));
                 this.methodCall = (MethodCall) ByteToObjectConverter.MarshallStream.convert(decryptedMethodCall);

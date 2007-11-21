@@ -113,6 +113,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     public static final String XMLNS_PREFIX = "pa:";
     public static final String MAIN_DEFINITIONS = "//pa:mainDefinition";
 
+    // security
+    public static final String SECURITY_TAG = "//pa:security";
+    public static final String SECURITY_FILE = "pa:file";
+    public static final String SECURITY_FILE_URI = "uri";
+
     // variables
     public static final String VARIABLES_DESCRIPTOR = "//pa:descriptorVariable";
     public static final String VARIABLES_PROGRAM = "//pa:programVariable";
@@ -189,12 +194,16 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         String deploymentSchema = getClass()
                                       .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/deployment/3.3/deployment.xsd")
                                       .toString();
-        String securitySchema = getClass()
-                                    .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd")
-                                    .toString();
-
+        String securitySchemav1_0 = getClass()
+                                        .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd")
+                                        .toString();
+        String securitySchemav1_1 = getClass()
+                                        .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.1/security.xsd")
+                                        .toString();
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
-            new Object[] { deploymentSchema, securitySchema });
+            new Object[] {
+                deploymentSchema, securitySchemav1_0, securitySchemav1_1
+            });
         this.xmlDescriptorUrl = xmlDescriptorUrl;
         this.variableContract = variableContract;
     }
@@ -217,6 +226,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             handleVariables();
 
+            handleSecurity();
+
             handleMainDefinitions();
 
             handleComponentDefinitions();
@@ -230,6 +241,39 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             throw new ProActiveException(e);
         } catch (XPathExpressionException e) {
             throw new ProActiveException(e);
+        }
+    }
+
+    private void handleSecurity() throws SAXException, XPathExpressionException {
+        NodeList nodes = (NodeList) xpath.evaluate(SECURITY_TAG, document,
+                XPathConstants.NODESET);
+        Node securityNode = nodes.item(0);
+        if (securityNode != null) {
+            NodeList fileSubNodes = (NodeList) xpath.evaluate(SECURITY_FILE,
+                    securityNode, XPathConstants.NODESET);
+            if (fileSubNodes.getLength() == 1) {
+                String securityFile = getNodeExpandedValue(fileSubNodes.item(0)
+                                                                       .getAttributes()
+                                                                       .getNamedItem(SECURITY_FILE_URI));
+                if ((securityFile == null) || (securityFile.length() <= 0)) {
+                    throw new SAXException("Empty security file");
+                }
+
+                File f = new File(securityFile);
+                if (!f.isAbsolute()) {
+                    File descriptorPath = new File(this.proActiveDescriptor.getUrl());
+                    String descriptorDir = descriptorPath.getParent();
+                    if (descriptorDir != null) {
+                        securityFile = descriptorDir + File.separator +
+                            securityFile;
+                    }
+                }
+
+                logger.debug("creating ProActiveSecurityManager : " +
+                    securityFile);
+                proActiveDescriptor.createProActiveSecurityManager(securityFile);
+            } else { // TODO : Policy node
+            }
         }
     }
 

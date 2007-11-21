@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Policy
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd"
-	schemaVersion="1.0"
+	schemaVersion="1.1"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/SecuritySchema.xsd ../SecuritySchema.xsd">
 	<ApplicationName>Garden</ApplicationName>

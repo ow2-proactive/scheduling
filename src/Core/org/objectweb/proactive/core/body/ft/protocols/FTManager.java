@@ -52,6 +52,7 @@ import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -293,9 +294,10 @@ public abstract class FTManager implements java.io.Serializable {
      * @param destination the destination of the request
      * @return the value returned by the sending
      * @throws RenegotiateSessionException
+     * @throws CommunicationForbiddenException
      */
     public int sendRequest(Request r, UniversalBody destination)
-        throws RenegotiateSessionException {
+        throws RenegotiateSessionException, CommunicationForbiddenException {
         try {
             this.onSendRequestBefore(r);
             int res = r.send(destination);
@@ -391,9 +393,11 @@ public abstract class FTManager implements java.io.Serializable {
      * @param destination the destination body of request
      * @return depends on fault-tolerance protocol
      * @throws RenegotiateSessionException
+     * @throws CommunicationForbiddenException
      */
     public abstract int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination) throws RenegotiateSessionException;
+        UniversalBody destination)
+        throws RenegotiateSessionException, CommunicationForbiddenException;
 
     /**
      * This method is called before the service of a request

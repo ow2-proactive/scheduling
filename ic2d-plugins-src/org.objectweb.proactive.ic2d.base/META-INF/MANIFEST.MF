@@ -8,5 +8,6 @@ Bundle-Vendor: ProActive
 Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.update.ui
+ org.eclipse.update.ui,
+ org.objectweb.proactive.ic2d.lib
 Eclipse-LazyStart: true

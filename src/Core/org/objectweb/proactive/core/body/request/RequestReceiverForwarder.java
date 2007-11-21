@@ -34,6 +34,7 @@ import java.io.IOException;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
@@ -45,7 +46,8 @@ public class RequestReceiverForwarder implements RequestReceiver {
     }
 
     public int receiveRequest(Request request, Body bodyReceiver)
-        throws java.io.IOException, RenegotiateSessionException {
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException {
         return request.send(remoteBody);
     }
 

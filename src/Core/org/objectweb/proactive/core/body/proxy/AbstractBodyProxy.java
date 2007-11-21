@@ -53,6 +53,7 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.MethodCallInfo;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -288,9 +289,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     }
 
     protected abstract void sendRequest(MethodCall methodCall, Future future)
-        throws java.io.IOException, RenegotiateSessionException;
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException;
 
     protected abstract void sendRequest(MethodCall methodCall, Future future,
         Body sourceBody)
-        throws java.io.IOException, RenegotiateSessionException;
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException;
 }

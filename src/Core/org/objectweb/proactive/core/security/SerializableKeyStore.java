@@ -33,6 +33,8 @@ package org.objectweb.proactive.core.security;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -46,19 +48,27 @@ import java.security.cert.CertificateException;
  *
  */
 public class SerializableKeyStore implements Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 2632782516480112932L;
     protected transient KeyStore keyStore;
     protected byte[] encodedKeyStore;
+
+    public SerializableKeyStore() {
+        // TODO Auto-generated constructor stub
+    }
 
     public SerializableKeyStore(KeyStore keyStore) {
         this.keyStore = keyStore;
     }
 
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
+    private void writeObject(ObjectOutputStream out) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
 
         try {
-            keyStore.store(bout, "ha".toCharArray());
+            this.keyStore.store(bout, "ha".toCharArray());
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -69,19 +79,20 @@ public class SerializableKeyStore implements Serializable {
             e.printStackTrace();
         }
 
-        encodedKeyStore = bout.toByteArray();
+        this.encodedKeyStore = bout.toByteArray();
         bout.close();
 
         out.defaultWriteObject();
+        this.encodedKeyStore = null;
     }
 
-    private void readObject(java.io.ObjectInputStream in)
+    private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
         try {
-            keyStore = KeyStore.getInstance("PKCS12", "BC");
-            keyStore.load(new ByteArrayInputStream(encodedKeyStore),
+            this.keyStore = KeyStore.getInstance("PKCS12", "BC");
+            this.keyStore.load(new ByteArrayInputStream(this.encodedKeyStore),
                 "ha".toCharArray());
         } catch (KeyStoreException e) {
             // TODOSECURITYSECURITY Auto-generated catch block
@@ -102,6 +113,6 @@ public class SerializableKeyStore implements Serializable {
     }
 
     public KeyStore getKeyStore() {
-        return keyStore;
+        return this.keyStore;
     }
 }

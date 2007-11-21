@@ -177,7 +177,6 @@ public class AdminScheduler extends UserScheduler
     /**
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#changePolicy(java.lang.Class)
      */
-    @Override
     public BooleanWrapper changePolicy(
         Class<?extends PolicyInterface> newPolicyFile)
         throws SchedulerException {

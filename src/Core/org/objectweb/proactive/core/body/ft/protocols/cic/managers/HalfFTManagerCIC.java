@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -136,7 +137,8 @@ public class HalfFTManagerCIC extends FTManager {
 
     @Override
     public int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination) throws RenegotiateSessionException {
+        UniversalBody destination)
+        throws RenegotiateSessionException, CommunicationForbiddenException {
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
                 request.resetSendCounter();

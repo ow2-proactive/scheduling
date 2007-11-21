@@ -36,7 +36,6 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.message.MessageEventProducer;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
-import org.objectweb.proactive.core.security.PolicyServer;
 
 
 /**
@@ -129,11 +128,11 @@ public interface Body extends LocalBodyStrategy, UniversalBody,
      */
     public UniversalBody getShortcutTargetBody(ItfID functionalItfID);
 
-    /**
-     * set the policy server of the active object
-     * @param server the policy server
-     */
-    public void setPolicyServer(PolicyServer server);
+    //    /**
+    //     * set the policy server of the active object
+    //     * @param server the policy server
+    //     */
+    //    public void setPolicyServer(PolicyServer server);
 
     /**
      * Set the nodeURL of this body

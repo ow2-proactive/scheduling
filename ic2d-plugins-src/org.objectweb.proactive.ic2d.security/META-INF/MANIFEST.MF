@@ -8,5 +8,6 @@ Bundle-Localization: plugin
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.forms,
- org.objectweb.proactive.ic2d.lib
+ org.objectweb.proactive.ic2d.lib,
+ org.objectweb.proactive.ic2d.JMXmonitoring
 Eclipse-LazyStart: true

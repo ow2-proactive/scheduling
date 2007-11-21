@@ -30,15 +30,12 @@
  */
 package org.objectweb.proactive.core.security.securityentity;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.security.ProActiveSecurity;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
+import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.TypedCertificateList;
 
 
 /**
@@ -47,42 +44,55 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * To change the template for this generated type comment go to
  * Window>Preferences>Java>Code Generation>Code and Comments
  */
-public abstract class Entity implements Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
-    protected X509Certificate applicationCertificate;
-    protected byte[] encodedApplicationCertificate;
-    protected X509Certificate certificate;
+public class Entity implements Serializable {
 
-    public X509Certificate getApplicationCertificate() {
-        return applicationCertificate;
+    /**
+     *
+     */
+    private static final long serialVersionUID = -5134177585663270596L;
+
+    //	private static final Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
+    private final TypedCertificateList certChain;
+
+    //	public Entity() {
+    //		// needed for serializable ?
+    //	}
+    public Entity(TypedCertificateList certChain) {
+        this.certChain = certChain;
     }
 
-    public X509Certificate getCertificate() {
-        return certificate;
+    public EntityType getType() {
+        return this.certChain.get(0).getType();
     }
 
-    public abstract String getName();
+    public String getName() {
+        return this.certChain.get(0).getCert().getSubjectX500Principal()
+                             .getName();
+    }
 
-    public abstract boolean equals(Entity e);
+    public TypedCertificateList getCertificateChain() {
+        return this.certChain;
+    }
 
-    // implements Serializable
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
-        if (applicationCertificate != null) {
-            try {
-                encodedApplicationCertificate = applicationCertificate.getEncoded();
-            } catch (CertificateEncodingException e) {
-                e.printStackTrace();
-            }
+    public TypedCertificate getCertificate() {
+        if (this.certChain == null) {
+            return null;
         }
-        out.defaultWriteObject();
+        return this.certChain.get(0);
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        if (encodedApplicationCertificate != null) {
-            applicationCertificate = ProActiveSecurity.decodeCertificate(encodedApplicationCertificate);
+    @Override
+    public String toString() {
+        X509Certificate certificate = getCertificate().getCert();
+        String string = new String();
+        string = "\nType : " + getCertificate().getType();
+        string += "\nCertificate : ";
+
+        if (certificate != null) {
+            string += certificate.toString();
+        } else {
+            string += "*";
         }
+        return string;
     }
 }

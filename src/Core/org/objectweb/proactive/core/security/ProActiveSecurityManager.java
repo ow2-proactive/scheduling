@@ -30,15 +30,12 @@
  */
 package org.objectweb.proactive.core.security;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.AccessControlException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
-import java.security.Key;
-import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -47,22 +44,15 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.Security;
 import java.security.Signature;
 import java.security.SignatureException;
-import java.security.SignedObject;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.ArrayList;
-import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Random;
 
 import javax.crypto.BadPaddingException;
@@ -74,20 +64,20 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.body.UniversalBody;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.AuthenticationException;
-import org.objectweb.proactive.core.security.crypto.AuthenticationTicket;
-import org.objectweb.proactive.core.security.crypto.AuthenticationTicketProperty;
-import org.objectweb.proactive.core.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.core.security.crypto.RandomLongGenerator;
 import org.objectweb.proactive.core.security.crypto.Session;
+import org.objectweb.proactive.core.security.crypto.Session.ActAs;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
-import org.objectweb.proactive.core.security.securityentity.EntityVirtualNode;
+import org.objectweb.proactive.core.security.securityentity.RuleEntities;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -97,51 +87,58 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * The ProActiveSecurityManager handles all security related actions for
  * a given SecurityEntity.
  */
-public class ProActiveSecurityManager implements Serializable, SecurityEntity {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER);
+public class ProActiveSecurityManager implements Serializable /*, SecurityEntity*/ {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -7334116392720150964L;
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER);
 
     /* contains all active sessions for the current active object */
-    protected Hashtable<Long, Session> sessions;
+    private final Hashtable<Long, Session> sessions;
+    private final Hashtable<TypedCertificate, Long> sessionIDs;
 
     /* random generator used for generating sesssion key */
-    protected transient RandomLongGenerator randomLongGenerator;
+    //    private transient RandomLongGenerator randomLongGenerator;
 
     /* Policy server */
-    protected PolicyServer policyServer;
+    private PolicyServer policyServer;
 
     /* keystore containing entity certificate and key */
-    protected KeyStore keyStore;
+    //    protected KeyStore keyStore;
 
     //protected XMLPropertiesStore policiesRules;
-    protected transient UniversalBody myBody;
-    protected String VNName;
+    //    private transient UniversalBody myBody;
+    //    protected String VNName;
 
     // static private Object synchro = new Object();
 
     /* pointer to the wrapping SecurityEntity if exists */
-    protected transient SecurityEntity parent;
-    protected byte[] encodedKeyStore;
+    private transient SecurityEntity parent;
 
-    // indicates the type of the secured object (object, node, runtime)
-    protected int type;
+    //    protected byte[] encodedKeyStore;
+    private final EntityType type;
 
     /**
      * This a the default constructor to use with the ProActiveSecurityManager
      */
-    public ProActiveSecurityManager() {
+    public ProActiveSecurityManager(EntityType type) {
         this.sessions = new Hashtable<Long, Session>();
+        this.sessionIDs = new Hashtable<TypedCertificate, Long>();
         this.policyServer = null;
+        this.type = type;
     }
 
-    public ProActiveSecurityManager(String file)
-        throws java.io.IOException, InvalidPolicyFile {
-        Provider myProvider = new org.bouncycastle.jce.provider.BouncyCastleProvider();
+    public ProActiveSecurityManager(EntityType type, String file)
+        throws InvalidPolicyFile {
+        this(type);
+        Provider myProvider = new BouncyCastleProvider();
         Security.addProvider(myProvider);
-        this.sessions = new Hashtable<Long, Session>();
 
         if ((new File(file)).exists()) {
             this.policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
-            this.keyStore = this.policyServer.getKeyStore();
+            //            keyStore = policyServer.getKeyStore();
         }
         logger.debug("creating Security Manager using file " + file);
     }
@@ -149,261 +146,213 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     /**
      * @param server
      */
-    public ProActiveSecurityManager(PolicyServer server) {
-        this();
+    public ProActiveSecurityManager(EntityType type, PolicyServer server) {
+        this(type);
 
         this.policyServer = server;
-        this.keyStore = server.getKeyStore();
+        //        this.keyStore = server.getKeyStore();
     }
 
     /**
      * @param keyStore
      * @param policyServer
      */
-    public ProActiveSecurityManager(KeyStore keyStore, PolicyServer policyServer) {
-        this();
-        this.policyServer = policyServer;
-        this.keyStore = keyStore;
-    }
 
-    public void setBody(UniversalBody body) {
-        this.myBody = body;
-    }
+    //    public ProActiveSecurityManager(KeyStore keyStore, PolicyServer policyServer) {
+    //        this();
+    //        this.policyServer = policyServer;
+    //        this.keyStore = keyStore;
+    //    }
+    //    public void setBody(UniversalBody body) {
+    //        this.myBody = body;
+    //    }
 
     /**
-     * Method getPolicyTo.
+     * Method getPolicy.
      * @param securityContext the object certificate we want to get the policy from
      * @return Policy policy attributes
      */
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException {
+        // getting our policies 
+        SecurityContext securityContext = this.policyServer.getPolicy(local,
+                distant);
+
         // asking for our wrapping entity policies
         if (this.parent != null) {
             try {
-                securityContext = this.parent.getPolicy(securityContext);
+                securityContext = SecurityContext.mergeContexts(securityContext,
+                        this.parent.getPolicy(local, distant));
             } catch (SecurityNotAvailableException e) {
-                e.printStackTrace();
+                logger.debug("my parent entity " + this.parent.toString() +
+                    "has no security manager, I ignore him");
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.debug("cannot contact my parent entity " + this.parent);
             }
         }
-
-        // adding our policies
-        securityContext = this.policyServer.getPolicy(securityContext);
 
         return securityContext;
     }
 
-    /**
-     * Method getPolicyTo.
-     * @return Policy policy attributes
-     */
-    public Communication getPolicyTo(String type, String from, String to)
-        throws SecurityNotAvailableException {
-        if (this.policyServer == null) {
-            throw new SecurityNotAvailableException();
-        }
-        return this.policyServer.getPolicyTo(type, from, to);
-    }
+    //    /**
+    //     * Method getPolicyTo.
+    //     * @return Policy policy attributes
+    //     */
+    //    @Deprecated
+    //    public Communication getPolicyTo(String type, String from, String to)
+    //        throws SecurityNotAvailableException {
+    //        if (this.policyServer == null) {
+    //            throw new SecurityNotAvailableException();
+    //        }
+    //        return this.policyServer.getPolicyTo(type, from, to);
+    //    }
 
     /**
-     * Method initiateSession. This method is the entry point for an secured communication. We get local and distant policies,
+     * Method initiateSession. This method is the entry point for a secured communication. We get local and distant policies,
      * compute it, and generate the result policy, then if needed, we start an symmetric key exchange to encrypt the communication.
      * @param distantSecurityEntity
      * @throws CommunicationForbiddenException
      * @throws AuthenticationException
      */
-    public void initiateSession(int type, SecurityEntity distantSecurityEntity)
-        throws CommunicationForbiddenException,
-            org.objectweb.proactive.core.security.crypto.AuthenticationException,
-            RenegotiateSessionException, SecurityNotAvailableException {
-        // client side
-        Communication localPolicy = null;
-        Communication distantBodyPolicy = null;
-
-        //        PolicyServer runtimePolicyServer = null;
-        X509Certificate distantBodyCertificate = null;
+    public Session initiateSession(SecurityEntity distantSecurityEntity)
+        throws CommunicationForbiddenException, SecurityNotAvailableException {
+        TypedCertificate distantBodyCertificate = null;
         try {
-            distantBodyCertificate = ProActiveSecurity.decodeCertificate(distantSecurityEntity.getCertificateEncoded());
+            distantBodyCertificate = distantSecurityEntity.getCertificate();
         } catch (SecurityNotAvailableException e3) {
             e3.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //        Communication runtimePolicy;
-        //        Communication VNPolicy;
-        Communication distantPolicy;
+        // retrieves entities from source and destination
+        Entities local = this.getEntities();
 
-        //        runtimePolicy = VNPolicy = distantBodyPolicy = null;
-        ArrayList<Entity> arrayFrom = new ArrayList<Entity>();
-        ArrayList<Entity> arrayTo = new ArrayList<Entity>();
-
-        // retrienes entities from source
-        arrayFrom = this.getEntities();
-
+        Entities distant = null;
         try {
-            arrayTo = distantSecurityEntity.getEntities();
+            distant = distantSecurityEntity.getEntities();
         } catch (SecurityNotAvailableException e2) {
             e2.printStackTrace();
         } catch (IOException e2) {
             e2.printStackTrace();
         }
 
-        // retrieve distant policy from local object
-        SecurityContext sc = new SecurityContext(SecurityContext.COMMUNICATION_SEND_REQUEST_TO,
-                arrayFrom, arrayTo);
+        // retrieves communication policy for local object
+        SecurityContext scLocal = this.policyServer.getPolicy(local, distant);
 
-        sc = this.policyServer.getPolicy(sc);
-
-        localPolicy = sc.getSendRequest();
-
-        if (!localPolicy.isCommunicationAllowed()) {
+        if (scLocal.isEverythingForbidden()) {
             throw new CommunicationForbiddenException(
-                "Sending request is denied");
+                "No communication is allowed with the target.");
         }
 
-        // retrieve policy from distant object
-        SecurityContext scDistant = new SecurityContext(SecurityContext.COMMUNICATION_RECEIVE_REQUEST_FROM,
-                arrayFrom, arrayTo);
+        // retrieves communication policy for distant object
+        SecurityContext scDistant = null;
 
         try {
-            scDistant = distantSecurityEntity.getPolicy(scDistant);
+            scDistant = distantSecurityEntity.getPolicy(distant, local);
         } catch (SecurityNotAvailableException e1) {
             e1.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        distantPolicy = scDistant.getReceiveRequest();
-
-        if (!distantPolicy.isCommunicationAllowed()) {
+        if ((scDistant == null) || scDistant.isEverythingForbidden()) {
             throw new CommunicationForbiddenException(
-                "Receiving request denied ");
+                "The target doesn't allow any communication.");
         }
 
-        if (distantBodyPolicy == null) {
-            distantBodyPolicy = new Communication();
-        }
+        // compute policy
+        SecurityContext resultContext = SecurityContext.computeContext(scLocal,
+                scDistant);
 
-        //compute policy
-        Communication resultPolicy = Communication.computeCommunication(localPolicy,
-                distantBodyPolicy);
-
+        // create the session locally and on the distant entity
         long sessionID = 0;
+        long distantSessionID = 0;
         Session session = null;
-        boolean sessionAccepted = false;
-
         try {
-            while (!sessionAccepted) {
-                // getting sessionID from target entity
-                sessionID = distantSecurityEntity.startNewSession(resultPolicy);
-                Long longId = new Long(sessionID);
+            sessionID = startNewSession(0, resultContext, distantBodyCertificate);
 
-                if ((session = this.sessions.get(longId)) == null) {
-                    session = new Session(sessionID, resultPolicy);
-                    session.setDistantOACertificate(distantBodyCertificate);
-                    this.sessions.put(new Long(sessionID), session);
-                    sessionAccepted = true;
-                    ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
-                                   .debug("adding new session " + sessionID);
-                } else if (this.getCertificate().equals(distantBodyCertificate)) {
-                    // send a secured message to myself ... why not
-                    //session.distantSecureEntity = distantSecurityEntity;
-                    session.setDistantOACertificate(distantBodyCertificate);
-                    sessionAccepted = true;
-                    ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
-                                   .debug("adding new session : " + sessionID);
-                }
+            distantSessionID = distantSecurityEntity.startNewSession(sessionID,
+                    resultContext.otherSideContext(),
+                    this.getCertificate().noPrivateKey());
 
-                //   }
-            }
-        } catch (Exception e) {
-            logger.warn("can't start a new session");
-            e.printStackTrace();
-            throw new org.objectweb.proactive.core.security.crypto.AuthenticationException();
-        }
-
-        try {
-            if (distantBodyCertificate != null) {
-                session.setDistantOAPublicKey(distantBodyCertificate.getPublicKey());
-            } else {
-                ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
-                               .debug("WARNING remote object scertificate is null");
-                session.setDistantOAPublicKey(distantSecurityEntity.getPublicKey());
-            }
+            session = getSession(sessionID);
+            session.setDistantSessionID(distantSessionID);
 
             ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
                            .debug("adding new session " + sessionID +
                 " distant object is " +
-                distantSecurityEntity.getCertificate().getSubjectDN() +
-                "\n local object is " + this.getCertificate().getSubjectDN());
+                distantSecurityEntity.getCertificate().getCert().getSubjectDN() +
+                "\n local object is " +
+                this.getCertificate().getCert().getSubjectDN());
 
-            keyNegociationSenderSide(distantSecurityEntity, sessionID);
+            if (!session.isSessionValidated()) {
+                keyNegociationSenderSide(distantSecurityEntity, session);
+            }
 
             // session is ready, we can validate it
-            session.setSessionValidated(true);
+            //			session.validate();
+        } catch (SessionException se) {
+            se.printStackTrace();
+            throw new CommunicationForbiddenException(
+                "Cannot create a new session object.");
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            throw new CommunicationForbiddenException(
+                "Distant entity unreachable for session creation.");
         } catch (KeyExchangeException e) {
             logger.warn("Key exchange exception ");
             e.printStackTrace();
-            throw new CommunicationForbiddenException();
-        } catch (Exception e) {
-            e.printStackTrace();
+            throw new CommunicationForbiddenException("Key exchange exception.");
         }
+
+        return session;
     }
 
-    public X509Certificate getCertificate() {
-        try {
-            if (this.keyStore == null) {
-                return null;
-            }
-
-            return (X509Certificate) this.keyStore.getCertificate(SecurityConstants.KEYSTORE_ENTITY_PATH);
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
+    public TypedCertificate getCertificate() {
+        if ((this.policyServer == null) ||
+                (this.policyServer.getKeyStore() == null)) {
+            return null;
         }
-        return null;
+        return this.policyServer.getCertificate(this.getType()).noPrivateKey();
     }
 
-    public void terminateSession(UniversalBody body, long sessionID) {
-        terminateSession(sessionID);
-    }
-
+    //	public void terminateSession(UniversalBody body, long sessionID) {
+    //		terminateSession(sessionID);
+    //	}
     public void terminateSession(long sessionID) {
         synchronized (this.sessions) {
+            Session session = getSession(sessionID);
             this.sessions.remove(new Long(sessionID));
+            this.sessionIDs.remove(session.getDistantCertificate());
         }
     }
 
     /**
      * @param communicationPolicy
      * @return an identifier for the session
+     * @throws SessionException
      */
-    public synchronized long startNewSession(Communication communicationPolicy) {
-        long id = 0;
-
-        //        PolicyRule defaultPolicy = new PolicyRule();
-
-        //if (!defaultPolicy.equals(po)) {
+    public synchronized long startNewSession(long distantSessionID,
+        SecurityContext communicationPolicy, TypedCertificate distantCertificate)
+        throws SessionException {
         try {
-            boolean sessionAccepted = false;
-            Long longId;
-            do {
-                id = new Random().nextLong() + System.currentTimeMillis();
-                longId = new Long(id);
-                if (this.sessions.get(longId) == null) {
-
-                    /* sessionID doest not exist, so we can
-                     * create one
-                     */
-                    Session newSession = new Session(id, communicationPolicy);
-                    this.sessions.put(longId, newSession);
-                    sessionAccepted = true;
-                }
-            } while (!sessionAccepted);
-        } catch (Exception e) {
-            e.printStackTrace();
+            long id = getSessionIDTo(distantCertificate);
+            getSession(id).setDistantSessionID(distantSessionID);
+            return id;
+        } catch (SessionException e1) {
+            // create a new session, below
         }
+
+        long id;
+        do {
+            id = new Random().nextLong() + System.currentTimeMillis();
+        } while ((id == 0) || this.sessions.contains(new Long(id)));
+
+        Session newSession = new Session(distantSessionID, communicationPolicy,
+                distantCertificate);
+        this.sessions.put(new Long(id), newSession);
+        this.sessionIDs.put(distantCertificate, new Long(id));
 
         ProActiveLogger.getLogger(Loggers.SECURITY)
                        .debug("starting a new session : " + id);
@@ -416,9 +365,9 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      * @param object the object to encrypt
      * @return byte[][] encrypted result
      */
-    public byte[][] encrypt(long sessionID, Object object, int type)
+    public byte[][] encrypt(long sessionID, Object object, ActAs type)
         throws RenegotiateSessionException {
-        Session session = this.sessions.get(new Long(sessionID));
+        Session session = getSession(sessionID);
 
         if (session != null) {
             try {
@@ -438,12 +387,10 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                 throw new RenegotiateSessionException(
                     "Something wrong when I tried to crypt the message");
             }
-
-            //         return encryptionEngine.encrypt(message, ((Session) sessions.get(s)).getSessionKey(id));
-        } else {
-            throw new RenegotiateSessionException(
-                "Requested session was not found, need to negotiate another one");
         }
+
+        throw new RenegotiateSessionException(
+            "Requested session was not found, need to negotiate another one");
     }
 
     /**
@@ -452,9 +399,9 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      * @param message the message to decrypt
      * @return byte[] the decrypted message returns as byte array
      */
-    public byte[] decrypt(long sessionID, byte[][] message, int type)
+    public byte[] decrypt(long sessionID, byte[][] message, ActAs type)
         throws RenegotiateSessionException {
-        Session session = this.sessions.get(new Long(sessionID));
+        Session session = getSession(sessionID);
         if (session != null) {
             try {
                 int counterLimit = SecurityConstants.MAX_SESSION_VALIDATION_WAIT;
@@ -483,85 +430,85 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         return null;
     }
 
-    public boolean mutualAuthenticationSenderSide(UniversalBody distantBody,
-        X509Certificate distantBodyCertificate) throws AuthenticationException {
-        checkCertificate(distantBodyCertificate);
-        unilateralAuthenticationSenderSide(distantBody);
+    //    public boolean mutualAuthenticationSenderSide(UniversalBody distantBody,
+    //        X509Certificate distantBodyCertificate) throws AuthenticationException {
+    //        checkCertificate(distantBodyCertificate);
+    //        unilateralAuthenticationSenderSide(distantBody);
+    //
+    //        return true;
+    //    }
 
-        return true;
-    }
+    //    /**
+    //     * Method checkCertificate. Checks the validity of an certificate
+    //     * @param distantBodyCertificate the certificate to check
+    //     * @return boolean. returns true if the certificate is valid, false otherwise
+    //     */
+    //    private boolean checkCertificate(X509Certificate distantBodyCertificate) {
+    //        //  logger.info("Checking distant OA certificate validity");
+    //        try {
+    //            distantBodyCertificate.checkValidity();
+    //        } catch (CertificateExpiredException e) {
+    //            logger.warn(distantBodyCertificate.getSubjectDN() +
+    //                " has expired, negociation stopped");
+    //
+    //            return false;
+    //        } catch (CertificateNotYetValidException e) {
+    //            logger.warn(distantBodyCertificate.getSubjectDN() +
+    //                " is not yet valid, negociation stopped");
+    //
+    //            return false;
+    //        }
+    //
+    //        //     logger.info("Retrieving DistantOA Domain Server");
+    //        //        String domainLocation = distantBodyCertificate.getIssuerDN().getName();
+    //        return true;
+    //    }
 
-    /**
-     * Method checkCertificate. Checks the validity of an certificate
-     * @param distantBodyCertificate the certificate to check
-     * @return boolean. returns true if the certificate is valid, false otherwise
-     */
-    private boolean checkCertificate(X509Certificate distantBodyCertificate) {
-        //  logger.info("Checking distant OA certificate validity");
-        try {
-            distantBodyCertificate.checkValidity();
-        } catch (CertificateExpiredException e) {
-            logger.warn(distantBodyCertificate.getSubjectDN() +
-                " has expired, negociation stopped");
-
-            return false;
-        } catch (CertificateNotYetValidException e) {
-            logger.warn(distantBodyCertificate.getSubjectDN() +
-                " is not yet valid, negociation stopped");
-
-            return false;
-        }
-
-        //     logger.info("Retrieving DistantOA Domain Server");
-        //        String domainLocation = distantBodyCertificate.getIssuerDN().getName();
-        return true;
-    }
-
-    public boolean unilateralAuthenticationSenderSide(UniversalBody distantBody)
-        throws AuthenticationException {
-        long rb = this.randomLongGenerator.generateLong(32);
-        AuthenticationTicket authenticationTicket = new AuthenticationTicket();
-        String B = this.getCertificate().getIssuerDN().getName();
-        long ra = authenticationTicket.random;
-        String addresse = authenticationTicket.identity;
-
-        if (addresse.equals(B) == false) {
-            throw new AuthenticationException(
-                "SessionInitializer : WRONG IDENTITY");
-        }
-
-        // Emitter Certificate Checking
-        X509Certificate emitterCertificate = authenticationTicket.certificate;
-        //        String A = emitterCertificate.getIssuerDN().getName();
-
-        // A is the sessionInitializer
-        checkCertificate(emitterCertificate);
-
-        AuthenticationTicketProperty properties = new AuthenticationTicketProperty();
-
-        try {
-            properties = (AuthenticationTicketProperty) ((SignedObject) authenticationTicket.signedAuthenticationTicketProperty).getObject();
-        } catch (Exception e) {
-            System.out.println(
-                "SessionInitializer : Exception in AuthenticationTicketProperty extraction : " +
-                e);
-        }
-
-        if (properties.random1 != ra) {
-            throw new AuthenticationException("SessionInitializer : wrong ra");
-        }
-
-        if (properties.random2 != rb) {
-            throw new AuthenticationException("SessionInitializer : wrong rb");
-        }
-
-        if (properties.identity.equals(B) == false) {
-            throw new AuthenticationException("SessionInitializer : wrong B");
-        }
-
-        //    this.authentication = true;
-        return true;
-    }
+    //    public boolean unilateralAuthenticationSenderSide(UniversalBody distantBody)
+    //        throws AuthenticationException {
+    //        long rb = this.randomLongGenerator.generateLong(32);
+    //        AuthenticationTicket authenticationTicket = new AuthenticationTicket();
+    //        String B = this.getCertificate().getCert().getIssuerDN().getName();
+    //        long ra = authenticationTicket.random;
+    //        String addresse = authenticationTicket.identity;
+    //
+    //        if (addresse.equals(B) == false) {
+    //            throw new AuthenticationException(
+    //                "SessionInitializer : WRONG IDENTITY");
+    //        }
+    //
+    //        // Emitter Certificate Checking
+    //        X509Certificate emitterCertificate = authenticationTicket.certificate;
+    //        //        String A = emitterCertificate.getIssuerDN().getName();
+    //
+    //        // A is the sessionInitializer
+    //        checkCertificate(emitterCertificate);
+    //
+    //        AuthenticationTicketProperty properties = new AuthenticationTicketProperty();
+    //
+    //        try {
+    //            properties = (AuthenticationTicketProperty) ((SignedObject) authenticationTicket.signedAuthenticationTicketProperty).getObject();
+    //        } catch (Exception e) {
+    //            System.out.println(
+    //                "SessionInitializer : Exception in AuthenticationTicketProperty extraction : " +
+    //                e);
+    //        }
+    //
+    //        if (properties.random1 != ra) {
+    //            throw new AuthenticationException("SessionInitializer : wrong ra");
+    //        }
+    //
+    //        if (properties.random2 != rb) {
+    //            throw new AuthenticationException("SessionInitializer : wrong rb");
+    //        }
+    //
+    //        if (properties.identity.equals(B) == false) {
+    //            throw new AuthenticationException("SessionInitializer : wrong B");
+    //        }
+    //
+    //        //    this.authentication = true;
+    //        return true;
+    //    }
 
     /**
      * Method keyNegociationSenderSide. starts the challenge to negociate a session key.
@@ -570,11 +517,10 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      * @return boolean returns true if the negociation has succeed.
      * @throws KeyExchangeException
      */
-    public boolean keyNegociationSenderSide(
-        SecurityEntity distantSecurityEntity, long sessionID)
+    public synchronized boolean keyNegociationSenderSide(
+        SecurityEntity distantSecurityEntity, Session session)
         throws KeyExchangeException {
-        Session session = this.sessions.get(new Long(sessionID));
-
+        //        Session session = getSession(sessionID);
         if (session == null) {
             throw new KeyExchangeException("the session is null");
         }
@@ -589,7 +535,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             // the Server Random value.
             //
             session.sec_rand.nextBytes(session.cl_rand);
-            session.se_rand = distantSecurityEntity.randomValue(sessionID,
+            session.se_rand = distantSecurityEntity.randomValue(session.getDistantSessionID(),
                     session.cl_rand);
 
             // Next send my public key from the key pair that is only
@@ -605,7 +551,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
             Signature sig;
 
-            //   synchronized  (synchro) {
+            //   synchronized  (synchro) { 
             sig = Signature.getInstance("MD5withRSA", "BC");
 
             //
@@ -628,7 +574,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             //
             // Get my certificate (for sig validation and auth) as a byte array.
             //
-            my_cert = this.getCertificateEncoded();
+            my_cert = this.getCertificate().getCert().getEncoded();
 
             sig.update(my_pub); // Incorporate public key into signature.
             sig.update(my_cert); // Incorporate certificate into signature.
@@ -639,8 +585,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             //
             // complete the PDU and send it to the server
             //
-            byte[][] tab = distantSecurityEntity.publicKeyExchange(sessionID,
-                    my_pub, my_cert, sig_code);
+            byte[] tab = distantSecurityEntity.publicKeyExchange(session.getDistantSessionID(),
+                    sig_code);
 
             //
             // Now server should respond with its public key exchange message.
@@ -649,45 +595,45 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             //
             // Read in Server Public key.
             //
-            byte[] pub_key = tab[0];
+            //            byte[] pub_key = tab[0];
 
             //
             // Before we can use the public key we must convert it back
             // to a Key object by using the KeyFactory and the appropriate
             // KeySpec.. In this case the X509EncodedKeySpec is the correct one.
             //
-            X509EncodedKeySpec key_spec = new X509EncodedKeySpec(pub_key);
+            //            X509EncodedKeySpec key_spec = new X509EncodedKeySpec(pub_key);
 
             //synchronized (synchro) {
-            KeyFactory key_fact = KeyFactory.getInstance("RSA", "BC");
+            //            KeyFactory key_fact = KeyFactory.getInstance("RSA", "BC");
 
             //
             // Recover Servers Public key.
             //
-            session.distantOAPublicKey = key_fact.generatePublic(key_spec);
+            //            session.distantAOPublicKey = key_fact.generatePublic(key_spec);
 
             //  }
             //
             // Read in the encoded form of the X509Certificate that the
             // server uses. For authentication of its identity.
             //
-            byte[] cert = tab[1];
+            //            byte[] cert = tab[1];
 
             //
             // Set up a Certificate Factory to process the raw certificate
             // back into an X509 Certificate
             //
             // synchronized (synchro) {
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            //            CertificateFactory cf = CertificateFactory.getInstance("X.509");
 
             //
             // Recover Servers Certificate
             //
-            session.distantOACertificate = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
-                        cert));
+            //            session.setDistantOACertificate(new TypedCertificate((X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
+            //                        cert)), EntityType.UNKNOWN, null));
             //     }
             // NOTE:
-            // At this point it should be noted that the client must employ
+            // At this point it[] should be noted that the client must employ
             // some mechanism to validate and authenticate the servers
             // certificate.
             //              PublicKey se_public = distantOA.getPublicKey();
@@ -695,7 +641,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             //
             // Read in Signature code.
             //
-            sig_code = tab[2];
+            sig_code = tab;
 
             //
             // Now we must verify the data that we received against
@@ -704,18 +650,18 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             //
             // Using the authentication certificate sent by the server.
             //
-            sig.initVerify(session.distantOACertificate);
+            sig.initVerify(session.getDistantCertificate().getCert());
             sig.update(session.cl_rand); // Incorporate in Client Random.
             sig.update(session.se_rand); // Incorporate in Server Random.
-            sig.update(pub_key); // Incorporate in Public key (as sent in encoded form).
-            sig.update(cert); // Incorporate in Certificate. (as sent in encoded form).
+            sig.update(session.getDistantPublicKey().getEncoded()); // Incorporate in Public key (as sent in encoded form).
+            sig.update(session.getDistantCertificate().getCert().getEncoded()); // Incorporate in Certificate. (as sent in encoded form).
 
             if (!sig.verify(sig_code)) {
                 throw new Exception(
                     "(CLIENT)Signature failed on Public key exchange data unit");
             }
 
-            // ==== confidentiality part : secret key exchange
+            // ==== confidentiality part : secret key exchange 
             //
             // Now that we have successfully exchanged public keys
             // The client now needs to being a SecretKey Exchange process.
@@ -776,7 +722,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             // Set up RSA for encryption.
             //
             session.rsa_eng.init(Cipher.ENCRYPT_MODE,
-                session.distantOAPublicKey, session.sec_rand);
+                session.getDistantPublicKey(), session.sec_rand);
 
             //
             // Set up and instace of AES for the Signature locking data.
@@ -786,7 +732,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
                 session.cl_iv, session.sec_rand);
 
             //
-            //  Secret Keys Exchange. = confidentiality
+            //  Secret Keys Exchange. = confidentiality 
             //
             //
             // Set up Signature so that the server can validate our data.
@@ -810,7 +756,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             // send to server and get the results
             sigtab = sig.sign();
 
-            byte[][] tabresult = distantSecurityEntity.secretKeyExchange(sessionID,
+            byte[][] tabresult = distantSecurityEntity.secretKeyExchange(session.getDistantSessionID(),
                     aes_key, iv, mac, lock, sigtab);
 
             //
@@ -896,7 +842,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             IvParameterSpec ivspec = new IvParameterSpec(session.rsa_eng.doFinal(
                         iv_enc));
             aes_lock.init(Cipher.DECRYPT_MODE, sk, ivspec);
-            sig.initVerify(session.distantOACertificate); // Set up using server's certificate.
+            sig.initVerify(session.getDistantCertificate().getCert()); // Set up using server's certificate.
             sig.update(session.cl_rand);
             sig.update(session.se_rand);
             sig.update(aes_key_enc);
@@ -907,8 +853,6 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             if (!sig.verify(tabresult[4])) {
                 throw new Exception(
                     "Signature failed on Public key exchange data unit");
-            } else {
-                //   System.out.println("Client: Server PDU for secret key exchange signature passed");
             }
 
             //
@@ -916,7 +860,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             // So now we need to set up a Cipher class to allow us to
             // Decrypt data sent from the server to the client.
             //
-            //
+            // 
             session.se_aes_key = new SecretKeySpec(session.rsa_eng.doFinal(
                         aes_key_enc), "AES");
             session.se_iv = new IvParameterSpec(session.rsa_eng.doFinal(iv_enc));
@@ -939,6 +883,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             //
             // setup for sending and receiving are automaticly done if we succeed
             // the key echange
+            session.validate();
         } catch (Exception e) {
             e.printStackTrace();
             throw new KeyExchangeException(
@@ -948,10 +893,9 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         return true;
     }
 
-    protected PrivateKey getPrivateKey() {
+    private PrivateKey getPrivateKey() {
         try {
-            return (PrivateKey) this.keyStore.getKey(SecurityConstants.KEYSTORE_ENTITY_PATH,
-                null);
+            return KeyStoreTools.getSelfPrivateKey(this.policyServer.getKeyStore());
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -963,44 +907,43 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         return null;
     }
 
-    public AuthenticationTicket mutualAuthenticationReceiverSide(
-        AuthenticationTicket authenticationTicket, long randomID)
-        throws org.objectweb.proactive.core.security.crypto.AuthenticationException {
-        return null;
-    }
+    //    public AuthenticationTicket mutualAuthenticationReceiverSide(
+    //        AuthenticationTicket authenticationTicket, long randomID)
+    //        throws org.objectweb.proactive.core.security.crypto.AuthenticationException {
+    //        return null;
+    //    }
 
-    /**
-     * Method generateSessionKey. generates a session key using Rijndael algorithms.
-     * @return Key a symetric key used to encrypt/decrypt communications between active objects
-     */
-    private Key generateSessionKey() {
-        try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("Rijndael", "BC");
-            keyGen.init(128, new SecureRandom());
+    //    /**
+    //     * Method generateSessionKey. generates a session key using Rijndael algorithms.
+    //     * @return Key a symetric key used to encrypt/decrypt communications between active objects
+    //     */
+    //    private Key generateSessionKey() {
+    //        try {
+    //            KeyGenerator keyGen = KeyGenerator.getInstance("Rijndael", "BC");
+    //            keyGen.init(128, new SecureRandom());
+    //
+    //            return keyGen.generateKey();
+    //        } catch (java.security.NoSuchProviderException e) {
+    //            e.printStackTrace();
+    //        } catch (java.security.NoSuchAlgorithmException e) {
+    //            e.printStackTrace();
+    //        }
+    //
+    //        return null;
+    //    }
 
-            return keyGen.generateKey();
-        } catch (java.security.NoSuchProviderException e) {
-            e.printStackTrace();
-        } catch (java.security.NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+    //    public AuthenticationTicket unilateralAuthenticationReceiverSide(
+    //        long randomID, long rb, String emittor) throws AuthenticationException {
+    //        return null;
+    //    }
 
-        return null;
-    }
-
-    public AuthenticationTicket unilateralAuthenticationReceiverSide(
-        long randomID, long rb, String emittor) throws AuthenticationException {
-        return null;
-    }
-
-    public ConfidentialityTicket keyNegociationReceiverSide(
-        ConfidentialityTicket confidentialityTicket, long randomID)
-        throws KeyExchangeException {
-        return null;
-    }
-
+    //    public ConfidentialityTicket keyNegociationReceiverSide(
+    //        ConfidentialityTicket confidentialityTicket, long randomID)
+    //        throws KeyExchangeException {
+    //        return null;
+    //    }
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+        throws RenegotiateSessionException {
         // server side
         // Step one..
         // Upon receipt of client Hello the server process reads
@@ -1014,7 +957,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         //          System.out.println(e.nextElement());
         //      }
         //        System.out.println("++++++++++++++++++ End List opened sessions : ++++++++++++++++++++++++");
-        Session session = this.sessions.get(new Long(sessionID));
+        Session session = getSession(sessionID);
 
         //	System.out.println("fsdfsda session : " + session);
         if (session == null) {
@@ -1040,10 +983,8 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         return session.se_rand;
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] pub_key,
-        byte[] cert, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
+        throws KeyExchangeException {
         // server side
         // Step two..
         // 1. The server reads in the clients public key.
@@ -1060,7 +1001,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         // This would stop an attacker from replaying a previously
         // recorded exchange.
         //
-        Session session = this.sessions.get(new Long(sessionID));
+        Session session = getSession(sessionID);
 
         if (session == null) {
             throw new KeyExchangeException("Session not started");
@@ -1075,32 +1016,27 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             // Now we must take in the encoded public key and
             // use a KeyFactory to turn it back into a Key Object.
             //
-            X509EncodedKeySpec key_spec = new X509EncodedKeySpec(pub_key);
-            KeyFactory key_fact = KeyFactory.getInstance("RSA", "BC");
-            session.distantOAPublicKey = key_fact.generatePublic(key_spec); // Generate the public key.
+            //            X509EncodedKeySpec key_spec = new X509EncodedKeySpec(pub_key);
+            //            KeyFactory key_fact = KeyFactory.getInstance("RSA", "BC");
+            //            session.distantAOPublicKey = key_fact.generatePublic(key_spec); // Generate the public key.
 
-            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            //            CertificateFactory cf = CertificateFactory.getInstance("X.509");
 
             // System.out.println("certif :" + cert);
-            session.distantOACertificate = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
-                        cert)); // Convert.
-
-            Signature sig = null;
-
-            sig = Signature.getInstance("MD5withRSA", "BC"); // Set up Signer.
-            sig.initVerify(session.distantOAPublicKey); // Initialize with clients signing certificate.
+            //            session.setDistantOACertificate(new TypedCertificate((X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
+            //                        cert)), EntityType.UNKNOWN, null)); // Convert.
+            Signature sig = Signature.getInstance("MD5withRSA", "BC"); // Set up Signer.
+            sig.initVerify(session.getDistantPublicKey()); // Initialize with clients signing certificate.
             sig.update(session.cl_rand); // Incorporate client random.
             sig.update(session.se_rand); // Incorporate server random.
-            sig.update(pub_key); // Incorporate encoded public key.
-            sig.update(cert); // Incorporate encoded certificate.
+            sig.update(session.getDistantPublicKey().getEncoded()); // Incorporate encoded public key.
+            sig.update(session.getDistantCertificate().getCert().getEncoded()); // Incorporate encoded certificate.
 
             if (!sig.verify(signature)) {
                 System.out.println(session);
                 logger.warn("Signature failed on Public key exchange data unit");
                 throw new Exception(
                     "Signature failed on Public key exchange data unit");
-            } else {
-                //    System.out.println("Server: Client PDU signature passed");
             }
 
             //   System.out.println("Server: Sending my public key + cert + sig to client.");
@@ -1123,33 +1059,31 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             // Get my certificate (for sig validation and auth) as
             // a byte array.
             //
-            byte[] my_cert = this.getCertificateEncoded();
+            byte[] my_cert = this.getCertificate().getCert().getEncoded();
             sig.update(my_pub);
             sig.update(my_cert);
 
-            byte[][] result = new byte[4][];
-            result[0] = this.getPublicKey().getEncoded();
-            result[1] = this.getCertificateEncoded();
-            signature = sig.sign();
-            result[2] = signature;
+            //            result[0] = this.getPublicKey().getEncoded();
+            //            result[1] = this.getCertificate().getCert().getEncoded();
+            //            byte[] result = sig.sign();
 
             // return the results to the client
-            return result;
+            return sig.sign();
         } catch (Exception e) {
             e.printStackTrace();
             throw new KeyExchangeException(e.toString());
         }
     }
 
-    public static String displayByte(byte[] tab) {
-        String s = "";
-
-        for (int i = 0; i < tab.length; i++) {
-            s += tab[i];
-        }
-
-        return s;
-    }
+    //    public static String displayByte(byte[] tab) {
+    //        String s = "";
+    //
+    //        for (byte element : tab) {
+    //            s += element;
+    //        }
+    //
+    //        return s;
+    //    }
 
     /**
      * Method secretKeyExchange. exchange secret between objects
@@ -1223,7 +1157,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
 
             Signature sig = Signature.getInstance("MD5withRSA", "BC");
 
-            sig.initVerify(session.distantOACertificate);
+            sig.initVerify(session.getDistantCertificate().getCert());
 
             sig.update(session.cl_rand);
             sig.update(session.se_rand);
@@ -1271,7 +1205,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             key_gen.init(160, session.sec_rand);
             session.se_hmac_key = key_gen.generateKey();
 
-            // initialization of IV
+            // initialization of IV 
             session.se_iv = new IvParameterSpec(new byte[16]);
 
             session.se_cipher.init(Cipher.ENCRYPT_MODE, session.se_aes_key,
@@ -1291,7 +1225,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             sig.update(session.cl_rand);
             sig.update(session.se_rand);
             session.rsa_eng.init(Cipher.ENCRYPT_MODE,
-                session.distantOAPublicKey, session.sec_rand);
+                session.getDistantPublicKey(), session.sec_rand);
 
             //
             // Encrypt and send AES key.
@@ -1326,7 +1260,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             // can set up our PDU generators to send encrypted
             // messages.
             //
-            session.setSessionValidated(true);
+            session.validate();
         } catch (BadPaddingException e) {
             e.printStackTrace();
         } catch (InvalidKeyException e) {
@@ -1348,116 +1282,36 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
         return result;
     }
 
-    // implements Serializable
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
-        //	privateKeyEncoded = privateKey.getEncoded();
-        try {
-            if (this.keyStore != null) {
-                ByteArrayOutputStream bout = new ByteArrayOutputStream();
-                this.keyStore.store(bout, "ha".toCharArray());
-
-                this.encodedKeyStore = bout.toByteArray();
-                this.keyStore = null;
-                bout.close();
-            }
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        } catch (KeyStoreException e) {
-            e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+    public long getSessionIDTo(TypedCertificate cert) throws SessionException {
+        if (cert == null) {
+            throw new SessionException("Parameter is null.");
         }
-        out.defaultWriteObject();
-    }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        logger = ProActiveLogger.getLogger(Loggers.SECURITY);
-
-        this.randomLongGenerator = new RandomLongGenerator();
-
-        if (this.encodedKeyStore != null) {
-            try {
-                this.keyStore = KeyStore.getInstance("PKCS12", "BC");
-                this.keyStore.load(new ByteArrayInputStream(
-                        this.encodedKeyStore), "ha".toCharArray());
-                //   certificate = (X509Certificate) keyStore.getCertificate(SecurityConstants.KEYSTORE_ENTITY_PATH);
-                this.encodedKeyStore = null;
-            } catch (KeyStoreException e) {
-                // TODOSECURITYSECURITY Auto-generated catch block
-                e.printStackTrace();
-            } catch (NoSuchProviderException e) {
-                // TODOSECURITYSECURITY Auto-generated catch block
-                e.printStackTrace();
-            } catch (NoSuchAlgorithmException e) {
-                // TODOSECURITYSECURITY Auto-generated catch block
-                e.printStackTrace();
-            } catch (CertificateException e) {
-                // TODOSECURITYSECURITY Auto-generated catch block
-                e.printStackTrace();
-            } catch (IOException e) {
-                // TODOSECURITYSECURITY Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public long getSessionIDTo(X509Certificate cert) {
-
-        /*
-           Object o;
-           Object o1;
-           o = o1 = null;
-           if (myBody instanceof BodyImpl) {
-               o1 = ((BodyImpl) myBody).getReifiedObject();
-               if (o1 instanceof Flower) {
-                   o = ((Flower) o1).getName();
-               } else {
-                   o = o1;
-               }
-           }
-         */
-
-        //	System.out.println(o + "----------------------");
-        //		System.out.println(o + "Source :" + certificate.getSubjectDN());
-        //  	System.out.println(o + "Target :" + cert.getSubjectDN());
-        Session session = null;
         if (this.sessions == null) {
             ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO)
                            .debug("sessions field is null");
-            return 0;
+            throw new SessionException("session member of this psm is null.");
         }
 
-        for (Enumeration e = this.sessions.elements(); e.hasMoreElements();) {
-            session = (Session) e.nextElement();
-
-            /*   System.out.println("-----------------\nsession " + session);
-               System.out.println("session distantBody " + session.distantOACertificate.getSubjectDN());
-               System.out.println("distantBodyCertificate " + this.certificate.getSubjectDN());
-               System.out.println("-----------------\n");
-             */
-            if (session != null) {
-                //			System.out.println(o + "tested :" + session.distantOACertificate.getSubjectDN());
-                if ((cert != null) && (session.distantOACertificate != null) &&
-                        cert.equals(session.distantOACertificate)) {
-                    //     logger.info("found an already initialized session" + session);
-                    //certificate.equals(session.distantOACertificate);
-                    //				System.out.println(o+"=====yes========");
-                    return session.sessionID;
-                }
-            }
+        Long id = this.sessionIDs.get(cert);
+        if (id != null) {
+            return id.longValue();
         }
-
-        //	System.out.println("=======no======");
 
         /* We didn't find a session */
-        return 0;
+        throw new SessionException("Session not found.");
+    }
+
+    public Session getSessionTo(TypedCertificate cert)
+        throws SessionException {
+        long id = getSessionIDTo(cert);
+        Session session = getSession(id);
+        if (session != null) {
+            return session;
+        }
+
+        /* We didn't find a session */
+        throw new SessionException("Session not found.");
     }
 
     /**
@@ -1465,7 +1319,7 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
      * @return PublicKey the public key of the active object
      */
     public PublicKey getPublicKey() {
-        return getCertificate().getPublicKey();
+        return getCertificate().getCert().getPublicKey();
     }
 
     //    /**
@@ -1474,136 +1328,98 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     //    public void setParentCertificate(X509Certificate certificate) {
     //        parentCertificate = certificate;
     //    }
-    public Hashtable<Long, String> getOpenedConnexion() {
-        Hashtable<Long, String> table = null;
+    public HashSet<Long> getOpenedConnexion() {
         if (this.sessions == null) {
-            return table;
+            return null;
         }
 
-        table = new Hashtable<Long, String>();
-
-        for (Enumeration e = this.sessions.keys(); e.hasMoreElements();) {
-            Long l = (Long) e.nextElement();
-            table.put(l, l.toString());
-        }
-
-        return table;
+        return new HashSet<Long>(this.sessions.keySet());
     }
 
     /**
      * allows to set the name of the current virtual node
      * @param string the name of the current Virtual Node if any
      */
-    public void setVNName(String string) {
-        //  System.out.println("setting vn node name " + string);
-        this.VNName = string;
 
-        //policyServer.setVNName(string);
-    }
+    //    public void setVNName(String string) {
+    //        //  System.out.println("setting vn node name " + string);
+    //        this.VNName = string;
+    //
+    //        //policyServer.setVNName(string);
+    //    }
 
-    /**
-     * @return virtual node name where object has been created
-     */
-    public String getVNName() {
-        return this.VNName;
-    }
+    //    /**
+    //     * @return virtual node name where object has been created
+    //     */
+    //    public String getVNName() {
+    //        return this.VNName;
+    //    }
 
-    /**
-     * @return policy server
-     */
-    public PolicyServer getPolicyServer() {
-        return this.policyServer;
-    }
+    //    /**
+    //     * @return policy server
+    //     */
+    //    protected PolicyServer getPolicyServer() {
+    //        return this.policyServer;
+    //    }
 
-    /**
-     * This method returns the entity certificate as byte array. It should be used
-     * when the certificate will be serialized. Indeed, certificates like others java.security.* objects
-     * are not serializabled object
-     * @return certificate as byte array
-     */
-    public byte[] getCertificateEncoded() {
-        try {
-            X509Certificate cert = this.getCertificate();
-            if (cert != null) {
-                return cert.getEncoded();
-            }
-            return null;
-        } catch (CertificateEncodingException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
+    //    /**
+    //     * This method returns the entity certificate as byte array. It should be used
+    //     * when the certificate will be serialized. Indeed, certificates like others java.security.* objects
+    //     * are not serializabled object
+    //     * @return certificate as byte array
+    //     */
+    //    public byte[] getCertificateEncoded() {
+    //        try {
+    //            X509Certificate cert = this.getCertificate();
+    //            if (cert != null) {
+    //                return cert.getEncoded();
+    //            }
+    //            return null;
+    //        } catch (CertificateEncodingException e) {
+    //            e.printStackTrace();
+    //        }
+    //
+    //        return null;
+    //    }
 
     /**
      * Set entity policy server
      * @param policyServer
      */
-    public void setPolicyServer(PolicyServer policyServer) {
+    private void setPolicyServer(PolicyServer policyServer) {
         this.policyServer = policyServer;
-        //this.keyStore = policyServer.getKeyStore();
     }
 
     /**
      * @return entities that inforces security policy on the object
      */
-    public ArrayList<Entity> getEntities() {
-        Entity entity = null;
-        ArrayList<Entity> a = new ArrayList<Entity>();
-        switch (this.type) {
-        case SecurityConstants.ENTITY_TYPE_OBJECT:
-            //	Entity entity = new
-            break;
-        case SecurityConstants.ENTITY_TYPE_NODE:
-            entity = new EntityVirtualNode(this.getCertificate().getSubjectDN()
-                                               .toString().substring(3),
-                    this.policyServer.getApplicationCertificate(),
-                    this.getCertificate());
-            break;
-        default:
-            break;
-        }
-
-        if (entity != null) {
-            a.add(entity);
-        }
-
+    public Entities getEntities() {
+        Entities entities = null;
         if (this.parent != null) {
             try {
-                ArrayList<Entity> parentEntities = this.parent.getEntities();
-                if (parentEntities == null) {
-                    return null;
-                }
-                int parentSize = parentEntities.size();
-                for (int i = 0; i < parentSize; i++) {
-                    a.add(parentEntities.get(i));
-                }
+                entities = this.parent.getEntities();
             } catch (SecurityNotAvailableException e) {
                 // forget it
-                return null;
+                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        if (entities == null) {
+            entities = new Entities();
+        }
 
-        return a;
+        entities.add(new Entity(getMyCertificateChain()));
+
+        return entities;
     }
 
     public Session getSession(long id) {
         return this.sessions.get(new Long(id));
     }
 
-    public X509Certificate[] getMyCertificateChain() {
-        try {
-            return (X509Certificate[]) this.policyServer.getKeyStore()
-                                                        .getCertificateChain(SecurityConstants.KEYSTORE_ENTITY_PATH);
-        } catch (KeyStoreException e) {
-            return null;
-        }
-    }
-
-    public SecurityEntity getParent() {
-        return this.parent;
+    public TypedCertificateList getMyCertificateChain() {
+        return this.policyServer.getMyCertificateChain(this.type);
     }
 
     public void setParent(SecurityEntity parent) {
@@ -1611,46 +1427,36 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
     }
 
     public ProActiveSecurityManager generateSiblingCertificate(
-        String siblingName) {
-        ProActiveSecurityManager siblingPSM = new ProActiveSecurityManager();
+        EntityType type, String siblingName) {
+        ProActiveSecurityManager siblingPSM = new ProActiveSecurityManager(type);
 
-        try {
-            siblingPSM.setPolicyServer((PolicyServer) this.policyServer.clone());
-            siblingPSM.generateEntityCertificate(siblingName);
-        } catch (CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
+        siblingPSM.setPolicyServer((PolicyServer) this.policyServer.clone());
+        siblingPSM.generateEntityCertificate(siblingName);
 
         return siblingPSM;
     }
 
     protected void generateEntityCertificate(String siblingName) {
-        siblingName = "CN=" + siblingName;
+        String name = "CN=" + siblingName;
         try {
             KeyPair siblingKeyPair = KeyTools.genKeys(1024);
-            X509Certificate cert;
 
             ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
                            .debug("generate sibling security manager for " +
-                siblingName);
+                name);
 
-            cert = CertTools.genCert(siblingName, 65 * 24 * 360L, null,
-                    siblingKeyPair.getPrivate(), siblingKeyPair.getPublic(),
-                    true,
-                    ((X509Certificate) this.policyServer.getKeyStore()
-                     .getCertificate(SecurityConstants.KEYSTORE_APPLICATION_PATH)).getSubjectDN()
-                     .toString(),
-                    (PrivateKey) this.policyServer.getKeyStore()
-                                                  .getKey(SecurityConstants.KEYSTORE_APPLICATION_PATH,
-                        null),
-                    this.policyServer.getKeyStore()
-                                     .getCertificate(SecurityConstants.KEYSTORE_APPLICATION_PATH)
-                                     .getPublicKey());
+            KeyStore keystore = this.policyServer.getKeyStore();
+            TypedCertificate appCert = this.policyServer.getApplicationCertificate();
 
-            this.keyStore = KeyTools.createP12(SecurityConstants.KEYSTORE_ENTITY_PATH,
-                    siblingKeyPair.getPrivate(), cert,
-                    this.policyServer.getKeyStore()
-                                     .getCertificateChain(SecurityConstants.KEYSTORE_APPLICATION_PATH));
+            X509Certificate cert = CertTools.genCert(name, 65 * 24 * 360L,
+                    null, siblingKeyPair.getPrivate(),
+                    siblingKeyPair.getPublic(), true,
+                    appCert.getCert().getSubjectX500Principal().getName(),
+                    appCert.getPrivateKey(), appCert.getCert().getPublicKey());
+
+            KeyStoreTools.newEntity(keystore,
+                new TypedCertificate(cert, this.type,
+                    siblingKeyPair.getPrivate()));
         } catch (InvalidKeyException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -1659,14 +1465,59 @@ public class ProActiveSecurityManager implements Serializable, SecurityEntity {
             e.printStackTrace();
         } catch (KeyStoreException e) {
             e.printStackTrace();
-            //        } catch (UnrecoverableEntryException e) {
-            //            e.printStackTrace();
-        } catch (Exception e) {
+        } catch (CertificateEncodingException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
             e.printStackTrace();
         }
     }
 
-    public ProActiveSecurityManager getProActiveSecurityManager() {
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws AccessControlException {
+        accessControl(user);
         return this;
+    }
+
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer) throws AccessControlException {
+        accessControl(user);
+        this.sessions.clear();
+        this.policyServer = policyServer;
+    }
+
+    private boolean accessControl(Entity user) {
+        if (false && !this.policyServer.hasAccessRights(user)) { // TODO activate protection
+            throw new AccessControlException(
+                "User denied from accessing this security manager.");
+        }
+        return true;
+    }
+
+    public Hashtable<Long, Session> getSessions() {
+        return this.sessions;
+    }
+
+    public EntityType getType() {
+        return this.type;
+    }
+
+    public String getApplicationName() {
+        return this.policyServer.getApplicationName();
+    }
+
+    public List<PolicyRule> getPolicies() {
+        return this.policyServer.getPolicies();
+    }
+
+    public RuleEntities getAccessAuthorizations() {
+        return this.policyServer.getAccessAuthorizations();
+    }
+
+    public KeyStore getKeyStore() {
+        return this.policyServer.getKeyStore();
     }
 }

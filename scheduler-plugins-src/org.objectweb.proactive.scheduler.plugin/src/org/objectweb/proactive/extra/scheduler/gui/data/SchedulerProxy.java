@@ -386,10 +386,11 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         instance = null;
     }
 
-	@Override
-	public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
-			throws SchedulerException {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public BooleanWrapper changePolicy(
+        Class<?extends PolicyInterface> newPolicyFile)
+        throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

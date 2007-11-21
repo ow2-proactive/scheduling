@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.core.security.crypto;
 
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.Date;
 
 
 /**

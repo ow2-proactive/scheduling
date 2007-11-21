@@ -32,9 +32,8 @@ package org.objectweb.proactive.core.security;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
@@ -57,6 +56,7 @@ import org.objectweb.proactive.core.security.crypto.ConfidentialityTicket;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -66,6 +66,12 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  * used for transparency call.
  */
 public class EncryptedBody implements Body, Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 2305678362325921164L;
+
     // specify if this body is encrypted or not
     protected boolean isEncrypted = false;
 
@@ -84,7 +90,7 @@ public class EncryptedBody implements Body, Serializable {
     public EncryptedBody(byte[] encryptedBody, long sessionID) {
         this.encryptedBody = encryptedBody;
         this.sessionID = sessionID;
-        isEncrypted = (encryptedBody != null);
+        this.isEncrypted = (encryptedBody != null);
     }
 
     /* (non-Javadoc)
@@ -260,8 +266,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getCertificate()
      */
-    public X509Certificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
+    public TypedCertificate getCertificate() {
         return null;
     }
 
@@ -276,9 +281,8 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
-    public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, IOException,
-            RenegotiateSessionException {
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+        TypedCertificate distantCertificate) {
         return 0;
     }
 
@@ -309,8 +313,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#publicKeyExchange(long, org.objectweb.proactive.core.body.UniversalBody, byte[], byte[], byte[])
      */
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, IOException,
             RenegotiateSessionException {
         return null;
@@ -337,8 +340,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
      */
-    public SecurityContext getPolicy(SecurityContext securityContext)
-        throws SecurityNotAvailableException, IOException {
+    public SecurityContext getPolicy(Entities local, Entities distant) {
         return null;
     }
 
@@ -360,7 +362,7 @@ public class EncryptedBody implements Body, Serializable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getEntities()
      */
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return null;
     }
@@ -452,6 +454,18 @@ public class EncryptedBody implements Body, Serializable {
     }
 
     public void registerIncomingFutures() {
+        // TODO Auto-generated method stub
+    }
+
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException {
         // TODO Auto-generated method stub
     }
 }

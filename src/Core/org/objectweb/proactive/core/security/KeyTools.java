@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.security;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
 import java.security.KeyFactory;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -40,16 +40,22 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.cert.*;
-import java.security.interfaces.*;
-import java.security.spec.*;
-import java.util.*;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.RSAPrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.asn1.*;
-import org.bouncycastle.asn1.pkcs.*;
-import org.bouncycastle.asn1.x509.*;
-import org.bouncycastle.jce.interfaces.*;
+import org.bouncycastle.asn1.ASN1InputStream;
+import org.bouncycastle.asn1.ASN1Sequence;
+import org.bouncycastle.asn1.DERBMPString;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x509.SubjectKeyIdentifier;
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo;
+import org.bouncycastle.jce.interfaces.PKCS12BagAttributeCarrier;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -138,7 +144,7 @@ public class KeyTools {
             chain = null;
         } else {
             chain = new Certificate[cacerts.size()];
-            chain = (Certificate[]) cacerts.toArray(chain);
+            chain = cacerts.toArray(chain);
         }
         return createP12(alias, privKey, cert, chain);
     } // createP12
@@ -172,7 +178,7 @@ public class KeyTools {
 
         // To not get a ClassCastException we need to genereate a real new certificate with BC
         CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
-        chain[0] = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
+        chain[0] = cf.generateCertificate(new ByteArrayInputStream(
                     cert.getEncoded()));
 
         if (cachain != null) {
@@ -355,8 +361,8 @@ public class KeyTools {
         // If we came here, we have a cert which is not root cert in 'cert'
         ArrayList<Certificate> array = new ArrayList<Certificate>();
 
-        for (int i = 0; i < certchain.length; i++) {
-            array.add(certchain[i]);
+        for (Certificate element : certchain) {
+            array.add(element);
         }
 
         boolean stop = false;
@@ -379,11 +385,11 @@ public class KeyTools {
                     stop = true;
                 }
 
-                for (int j = 0; j < chain1.length; j++) {
-                    array.add(chain1[j]);
+                for (Certificate element : chain1) {
+                    array.add(element);
 
                     // If one cert is slefsigned, we have found a root certificate, we don't need to go on anymore
-                    if (CertTools.isSelfSigned((X509Certificate) chain1[j])) {
+                    if (CertTools.isSelfSigned((X509Certificate) element)) {
                         stop = true;
                     }
                 }
@@ -393,7 +399,7 @@ public class KeyTools {
         Certificate[] ret = new Certificate[array.size()];
 
         for (int i = 0; i < ret.length; i++) {
-            ret[i] = (X509Certificate) array.get(i);
+            ret[i] = array.get(i);
             System.out.println("Issuer='" +
                 CertTools.getIssuerDN((X509Certificate) ret[i]) + "'.");
             System.out.println("Subject='" +

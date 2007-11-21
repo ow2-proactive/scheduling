@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.timit.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
@@ -39,6 +40,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.extpoint.IActionExtPoint;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartContainerObject;
 import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
@@ -101,11 +103,19 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
      */
     public final void setAbstractDataObject(final AbstractData object) {
         this.object = object;
+
+        if (this.object instanceof WorldObject) {
+            if (this.object.getMonitoredChildrenSize() != 0) {
+                setText("Gather All Stats");
+                setEnabled(true);
+            }
+        }
     }
 
-    public final void setActiveSelect(final ActiveObject ref) {
-        if (this.container != null) {
-            BasicChartObject basicChartObject = this.container.getChartObjectById(ref.getUniqueID());
+    @Override
+    public void setActiveSelect(AbstractData ref) {
+        if ((this.container != null) && (ref instanceof ActiveObject)) {
+            BasicChartObject basicChartObject = this.container.getChartObjectById(((ActiveObject) ref).getUniqueID());
             if (basicChartObject != null) {
                 basicChartObject.getEp().handleSelection(true);
             }

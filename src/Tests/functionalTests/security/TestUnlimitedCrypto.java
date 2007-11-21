@@ -58,7 +58,7 @@ import static junit.framework.Assert.assertTrue;
     SecurityTestApplicationLifeCycle.class,
     SecurityTestContextPropagation.class
 })
-public class TestUnlimitedCrypto extends FunctionalTest {
+public class TestUnlimitedCrypto {
     static private final int KSIZE = 4096;
 
     @BeforeClass
@@ -79,7 +79,6 @@ public class TestUnlimitedCrypto extends FunctionalTest {
         } catch (InvalidKeyException e) {
             System.err.println(
                 "Strong Juridiction Policy Files detected, please install the Unlimited Juridiction Policy Files to be able to use ProActive' Security Framework");
-
             assertTrue(false);
         }
     }

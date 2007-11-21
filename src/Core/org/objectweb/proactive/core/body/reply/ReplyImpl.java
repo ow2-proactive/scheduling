@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.body.reply;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -42,14 +43,15 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.crypto.AuthenticationException;
 import org.objectweb.proactive.core.security.crypto.Session;
+import org.objectweb.proactive.core.security.crypto.Session.ActAs;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 
 
-public class ReplyImpl extends MessageImpl implements Reply,
-    java.io.Serializable {
+public class ReplyImpl extends MessageImpl implements Reply, Serializable {
 
     /**
      * The hypothetic result
@@ -107,28 +109,19 @@ public class ReplyImpl extends MessageImpl implements Reply,
 
         // security
         if (!ciphered && (psm != null)) {
-            long sessionID = 0;
-
             try {
-                sessionID = psm.getSessionIDTo(destinationBody.getCertificate());
-
-                if (sessionID == 0) {
-                    psm.initiateSession(SecurityContext.COMMUNICATION_SEND_REPLY_TO,
-                        destinationBody);
-                    sessionID = psm.getSessionIDTo(destinationBody.getCertificate());
+                Session session = this.psm.getSessionTo(destinationBody.getCertificate());
+                if (!session.getSecurityContext().getSendReply()
+                                .getCommunication()) {
+                    throw new CommunicationForbiddenException();
                 }
-
-                if (sessionID != 0) {
-                    encryptedResult = psm.encrypt(sessionID, result,
-                            Session.ACT_AS_SERVER);
-                    ciphered = true;
-                    this.sessionID = sessionID;
-                }
+                this.sessionID = session.getDistantSessionID();
+                long id = psm.getSessionIDTo(destinationBody.getCertificate());
+                encryptedResult = psm.encrypt(id, result, ActAs.SERVER);
+                ciphered = true;
             } catch (SecurityNotAvailableException e) {
                 // do nothing
             } catch (CommunicationForbiddenException e) {
-                e.printStackTrace();
-            } catch (AuthenticationException e) {
                 e.printStackTrace();
             } catch (RenegotiateSessionException e) {
                 psm.terminateSession(sessionID);
@@ -138,6 +131,9 @@ public class ReplyImpl extends MessageImpl implements Reply,
                     e.printStackTrace();
                 }
                 this.send(destinationBody);
+            } catch (SessionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
 
@@ -155,7 +151,7 @@ public class ReplyImpl extends MessageImpl implements Reply,
         throws RenegotiateSessionException {
         if ((sessionID != 0) && ciphered) {
             byte[] decryptedMethodCall = psm.decrypt(sessionID,
-                    encryptedResult, Session.ACT_AS_CLIENT);
+                    encryptedResult, ActAs.CLIENT);
             try {
                 result = (MethodCallResult) ByteToObjectConverter.ObjectStream.convert(decryptedMethodCall);
                 return true;

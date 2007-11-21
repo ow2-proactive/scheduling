@@ -68,6 +68,7 @@ import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
@@ -258,7 +259,13 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         // request queue length = number of requests in queue
         //							+ the one to add now
-        return this.requestReceiver.receiveRequest(request, this);
+        try {
+            return this.requestReceiver.receiveRequest(request, this);
+        } catch (CommunicationForbiddenException e) {
+            System.out.println("Weird shit is happening.");
+            e.printStackTrace();
+        }
+        return 0;
     }
 
     /**
@@ -581,7 +588,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         public void sendRequest(MethodCall methodCall, Future future,
             UniversalBody destinationBody)
-            throws java.io.IOException, RenegotiateSessionException {
+            throws IOException, RenegotiateSessionException,
+                CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             Request request = this.internalRequestFactory.newRequest(methodCall,
                     BodyImpl.this, future == null, sequenceID);
@@ -633,9 +641,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         /**
-         * Returns a unique identifier that can be used to tag a future, a request
-         * @return a unique identifier that can be used to tag a future, a request.
-         */
+                 * Returns a unique identifier that can be used to tag a future, a
+                 * request
+                 *
+                 * @return a unique identifier that can be used to tag a future, a
+                 *         request.
+                 */
         public synchronized long getNextSequenceID() {
             return BodyImpl.this.bodyID.toString().hashCode() +
             ++this.absoluteSequenceID;

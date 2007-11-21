@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 import functionalTests.FunctionalTest;
 import functionalTests.security.A;
@@ -68,7 +69,7 @@ public class SecurityTestContextPropagation extends FunctionalTest {
     public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestContextPropagation.class.getResource(
                     "/functionalTests/security/applicationPolicy.xml").getPath());
-        psm = new ProActiveSecurityManager(ps);
+        psm = new ProActiveSecurityManager(EntityType.OBJECT, ps);
 
         // set the default security manager
         ProActiveMetaObjectFactory.newInstance().setProActiveSecurityManager(psm);

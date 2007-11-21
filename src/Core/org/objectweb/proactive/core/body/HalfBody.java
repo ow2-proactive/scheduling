@@ -50,12 +50,21 @@ import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
+import org.objectweb.proactive.core.security.SecurityConstants;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class HalfBody extends AbstractBody {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 545137923222704906L;
+
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
@@ -87,9 +96,9 @@ public class HalfBody extends AbstractBody {
         }
 
         if (this.securityManager != null) {
-            this.securityManager = this.securityManager.generateSiblingCertificate(
+            this.securityManager = this.securityManager.generateSiblingCertificate(EntityType.OBJECT,
                     "HalfBody");
-            this.securityManager.setBody(this);
+            //            this.securityManager.setBody(this);
             this.isSecurityOn = this.securityManager.getCertificate() != null;
             this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
             ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
@@ -212,6 +221,11 @@ public class HalfBody extends AbstractBody {
     private class HalfLocalBodyStrategy implements LocalBodyStrategy,
         java.io.Serializable {
 
+        /**
+                 *
+                 */
+        private static final long serialVersionUID = 3183517822839330706L;
+
         /** A pool future that contains the pending future objects */
         protected FuturePool futures;
         protected RequestFactory internalRequestFactory;
@@ -257,7 +271,8 @@ public class HalfBody extends AbstractBody {
 
         public void sendRequest(MethodCall methodCall, Future future,
             UniversalBody destinationBody)
-            throws java.io.IOException, RenegotiateSessionException {
+            throws java.io.IOException, RenegotiateSessionException,
+                CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             Request request = this.internalRequestFactory.newRequest(methodCall,
                     HalfBody.this, future == null, sequenceID);
@@ -273,11 +288,17 @@ public class HalfBody extends AbstractBody {
 
             // FAULT TOLERANCE
             // System.out.println("a half body send a request: " + request.getMethodName());
+            //            try {
             if (HalfBody.this.ftmanager != null) {
                 HalfBody.this.ftmanager.sendRequest(request, destinationBody);
             } else {
                 request.send(destinationBody);
             }
+
+            //            } catch (CommunicationForbiddenException cfe) {
+            //            	System.out.println("wtf is happening ?");
+            //            	cfe.printStackTrace();
+            //            }
         }
 
         //

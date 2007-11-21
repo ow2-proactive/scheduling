@@ -31,12 +31,14 @@
 package org.objectweb.proactive.core.body.request;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
 public interface RequestReceiver {
     public int receiveRequest(Request r, Body bodyReceiver)
-        throws java.io.IOException, RenegotiateSessionException;
+        throws java.io.IOException, RenegotiateSessionException,
+            CommunicationForbiddenException;
 
     public boolean isInImmediateService() throws java.io.IOException;
 }

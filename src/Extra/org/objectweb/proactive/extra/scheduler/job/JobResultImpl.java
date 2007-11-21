@@ -136,7 +136,6 @@ public class JobResultImpl implements JobResult {
     /**
          * @see org.objectweb.proactive.extra.scheduler.common.job.JobResult#getExceptionResults()
          */
-    @Override
     public HashMap<String, TaskResult> getExceptionResults() {
         return exceptionResults;
     }
@@ -144,7 +143,6 @@ public class JobResultImpl implements JobResult {
     /**
      * @see org.objectweb.proactive.extra.scheduler.common.job.JobResult#getPreciousResults()
      */
-    @Override
     public HashMap<String, TaskResult> getPreciousResults() {
         return preciousResults;
     }
@@ -152,7 +150,6 @@ public class JobResultImpl implements JobResult {
     /**
      * @see org.objectweb.proactive.extra.scheduler.common.job.JobResult#hadException()
      */
-    @Override
     public boolean hadException() {
         return exceptionResults != null;
     }

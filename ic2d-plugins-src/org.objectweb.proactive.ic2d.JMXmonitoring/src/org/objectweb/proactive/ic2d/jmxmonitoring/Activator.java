@@ -82,6 +82,11 @@ public class Activator extends AbstractUIPlugin {
         // add current classpath for javassist class pool
         //       ClassPool pool = ClassPool.getDefault();
         //     pool.insertClassPath(new ClassClassPath(this.getClass()));
+
+        //        URL u = PAProperties.class.getResource("proactive-log4j");
+        //        Properties p = new Properties();
+        //        p.load(u.openStream());
+        //        PropertyConfigurator.configure(p);
     }
 
     /*

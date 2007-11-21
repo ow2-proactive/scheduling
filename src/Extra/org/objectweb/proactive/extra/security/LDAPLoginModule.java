@@ -129,7 +129,6 @@ public class LDAPLoginModule implements LoginModule {
         String username = null;
         String password = null;
         String urlLDAP = null;
-
         try {
             callbackHandler.handle(callbacks);
 
@@ -165,13 +164,11 @@ public class LDAPLoginModule implements LoginModule {
         // Get the UID of the user by an anonymous connection to the LDAP server
         // (null = not found)
         String userID = null;
-
         try {
             userID = getLDAPUserID(urlLDAP, username);
         } catch (NamingException e) {
             throw new FailedLoginException("Cannot connect to LDAP server");
         }
-
         if (userID != null) {
             usernameExists = true;
             // Check if the password match the username
@@ -186,7 +183,6 @@ public class LDAPLoginModule implements LoginModule {
             }
 
             succeeded = true;
-
             return true;
         } else {
             // authentication failed -- clean out state
@@ -194,10 +190,8 @@ public class LDAPLoginModule implements LoginModule {
                 System.out.println("\t\t[LDAPLoginModule] " +
                     "authentication failed");
             }
-
             succeeded = false;
             username = null;
-
             if (!usernameExists) {
                 throw new FailedLoginException("User Name Doesn't exists");
             } else {
@@ -246,7 +240,6 @@ public class LDAPLoginModule implements LoginModule {
     public boolean abort() throws LoginException {
         boolean result = succeeded;
         succeeded = false;
-
         return result;
     }
 
@@ -262,7 +255,6 @@ public class LDAPLoginModule implements LoginModule {
      */
     public boolean logout() throws LoginException {
         succeeded = false;
-
         return true;
     }
 
@@ -304,7 +296,6 @@ public class LDAPLoginModule implements LoginModule {
         String[] attrIDs = { "inriaLocalLogin", "uid" };
 
         String resultUsername = null;
-
         try {
             // Search for objects matching these attributes
             NamingEnumeration<SearchResult> answer = ctx.search("ou=People,dc=inria,dc=fr",
@@ -314,7 +305,6 @@ public class LDAPLoginModule implements LoginModule {
                 Attributes attr = answer.nextElement().getAttributes();
                 resultUsername = new String(attr.get("inriaLocalLogin").get()
                                                 .toString());
-
                 if (username.equals(resultUsername)) {
                     userID = new String(attr.get("uid").get().toString());
                 }
@@ -362,14 +352,12 @@ public class LDAPLoginModule implements LoginModule {
         env.put(Context.SECURITY_CREDENTIALS, password);
 
         DirContext ctx = null;
-
         try {
             // Create the initial directory context
             ctx = new InitialDirContext(env);
         } catch (NamingException e) {
             System.err.println("Problem connecting securely to LDAP server : " +
                 e);
-
             // Connexion failed, password is incorrect
             return false;
         }
@@ -380,7 +368,6 @@ public class LDAPLoginModule implements LoginModule {
         } catch (NamingException e) {
             System.err.println("Problem closing secure connection : " + e);
         }
-
         return true;
     }
 }

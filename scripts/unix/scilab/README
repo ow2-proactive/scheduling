@@ -1,8 +1,6 @@
-ProActive Extension for Scilab/Matlab.
+ProActive Extension for Scilab.
 
-Before being able to use the extension and launch the GUI (scilab.sh), please follow these installations steps.
-
---------------------------------        SCILAB          --------------------------------------
+Before being able to use the extension and launch the GUI (scilab.sh or scilab.bat), please follow these installations steps.
 
 
 STEP 1: Download Scilab 4.1.2 or above BINARY Version
@@ -12,13 +10,13 @@ If you can't download version 4.1.2 please follow step 2.
 
 STEP 2 (source version only): Download Scilab SOURCE version 4.1 or 4.1.1
 
-copy javasci_Scilab2.h and javasci_Scilab2.c from folder PROACTIVE/scripts/linux/scilab/c_sources to SCILAB/routines/Javasci/
+copy javasci_Scilab2.h and javasci_Scilab2.c from folder c_sources to SCILAB/routines/Javasci/
 
 make binaries of Scilab (procedure is explained  in SCILAB/Readme_Linux or SCILAB/Readme_Windows)
 
 
 STEP 3:
-Edit paths to your SCILAB installation in the scilab_env.sh file
+Edit paths to your SCILAB installation in the scilab_env.sh or scilab_env.bat file
 
 Comment out the following line if present in the SCILAB/scilab.star file (should be around line 190):
 show_startupinfo();
@@ -33,42 +31,15 @@ Edit paths inside the ProActiveScilab.xml descriptor if you want to use it to de
 
 
 STEP 5:
-Run scilab.sh. 
+Run scilab.sh or scilab.bat. 
 
 
---------------------------------        MATLAB          --------------------------------------
 
-STEP 1:
-Edit paths to your MATLAB installation in the scilab_env.sh file
+ATTENTION :
 
-STEP 2: 
-Read documentation on http://proactive.inria.fr/scilab.htm on how to use the GUI
+If you want to use the extension without the script, remember two things :
 
-Edit paths inside the ProActiveScilab.xml descriptor if you want to use it to deploy on remote machines, if you want to deploy locally use the ProActiveScilabLocal.xml descriptor
+Under Linux, the environment variables must be set according to the scilab_env.sh script AND the java property java_library_path must contain the directory where the libjavasci.so can be found
 
-STEP 3:
-Run scilab.sh. 
-
-
---------------------------------      STANDALONE USE    --------------------------------------
-
-If you want to use the extension without the script, remember several things :
-
-In order to run Scilab or Matlab from ProActive, several native libraries and jar files are needed. 
-
-**** Native libraries *****
-
-Scilab :          native libraries contained in SCILAB/bin (including libjavasci.so which is the Scilab/Java interface)
-
-Matlab : 		  libptmatlab.so contained in PROACTIVE/lib
-				  native libraries contained in MATLAB/bin/glnx86 and MATLAB/sys/os/glnx86
-				  
-The JVM must be executed with the java.library.path property set and containing these paths
-
-******** JAR files *********   
-
-Scilab: 
-	javasci.jar contained in PROACTIVE/lib
-
-Matlab:
-	ptolemy.jar contained in PROACTIVE/lib
+Under Windows, the System PATH environment variable(and not the user PATH) must contain the path to where the libjavasci.so can be found
+               OR, the application must be launched next to it  

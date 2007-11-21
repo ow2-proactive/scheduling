@@ -57,9 +57,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
 import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 import org.objectweb.proactive.extra.scheduler.gui.Colors;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
@@ -436,9 +436,9 @@ public class TaskComposite extends Composite {
                         (internalTask.getRerunnable() -
                         internalTask.getRerunnableLeft()) + "/" +
                         internalTask.getRerunnable());
-//                } else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE)) {
-//                    item.setText(i,
-//                        Tools.getFormattedDate(internalTask.getRunTimeLimit()));
+                    //                } else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE)) {
+                    //                    item.setText(i,
+                    //                        Tools.getFormattedDate(internalTask.getRunTimeLimit()));
                 } else if (title.equals(COLUMN_HOST_NAME_TITLE)) {
                     String hostName = internalTask.getExecutionHostName();
                     if (hostName == null) {

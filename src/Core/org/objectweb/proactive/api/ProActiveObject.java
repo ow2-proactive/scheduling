@@ -70,6 +70,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.NodeCreationListenerForAoCreation;
 import org.objectweb.proactive.core.util.NonFunctionalServices;
 import org.objectweb.proactive.core.util.ProcessForAoCreation;
@@ -279,7 +280,7 @@ public class ProActiveObject {
             }
 
             ProActiveSecurityManager psm = clonedFactory.getProActiveSecurityManager();
-            psm = psm.generateSiblingCertificate(classname);
+            psm = psm.generateSiblingCertificate(EntityType.OBJECT, classname);
             clonedFactory.setProActiveSecurityManager(psm);
         }
 
@@ -626,7 +627,8 @@ public class ProActiveObject {
             }
 
             clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
-                                                             .generateSiblingCertificate(nameOfTargetType));
+                                                             .generateSiblingCertificate(EntityType.OBJECT,
+                    nameOfTargetType));
 
             ProActiveLogger.getLogger(Loggers.SECURITY)
                            .debug("new active object with security manager");
@@ -797,8 +799,8 @@ public class ProActiveObject {
             }
 
             clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
-                                                             .generateSiblingCertificate(nameOfTargetType));
-
+                                                             .generateSiblingCertificate(EntityType.OBJECT,
+                    nameOfTargetType));
             ProActiveLogger.getLogger(Loggers.SECURITY)
                            .debug("new active object with security manager");
         }

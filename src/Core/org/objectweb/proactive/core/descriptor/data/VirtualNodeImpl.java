@@ -81,6 +81,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
@@ -104,6 +106,11 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  */
 public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     implements VirtualNodeInternal, Serializable, ServiceUser {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -4112836381808692922L;
 
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);
@@ -1082,7 +1089,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 ProActiveSecurityManager siblingPSM = null;
 
                 if (this.proactiveSecurityManager != null) {
-                    siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(this.name);
+                    siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(EntityType.NODE,
+                            this.name);
                 }
 
                 int registerAttempts = this.REGISTRATION_ATTEMPTS;
@@ -1228,7 +1236,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             ProActiveSecurityManager siblingPSM = null;
 
             if (this.proactiveSecurityManager != null) {
-                siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(this.name);
+                siblingPSM = this.proactiveSecurityManager.generateSiblingCertificate(EntityType.NODE,
+                        this.name);
             }
 
             int registrationAttempts = this.REGISTRATION_ATTEMPTS;

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.body.migration;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -47,14 +46,23 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.crypto.AuthenticationException;
+import org.objectweb.proactive.core.security.crypto.Session;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
+import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.core.security.securityentity.Entity;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class MigratableBody extends BodyImpl implements Migratable,
     java.io.Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -4176648945308840505L;
     protected static Logger bodyLogger = ProActiveLogger.getLogger(Loggers.BODY);
     protected static Logger migrationLogger = ProActiveLogger.getLogger(Loggers.MIGRATION);
 
@@ -102,19 +110,19 @@ public class MigratableBody extends BodyImpl implements Migratable,
     }
 
     public void addMigrationEventListener(MigrationEventListener listener) {
-        if (this.migrationManager != null) {
-            this.migrationManager.addMigrationEventListener(listener);
+        if (migrationManager != null) {
+            migrationManager.addMigrationEventListener(listener);
         }
     }
 
     public void removeMigrationEventListener(MigrationEventListener listener) {
-        if (this.migrationManager != null) {
-            this.migrationManager.removeMigrationEventListener(listener);
+        if (migrationManager != null) {
+            migrationManager.removeMigrationEventListener(listener);
         }
     }
 
     public MigrationManager getMigrationManager() {
-        return this.migrationManager;
+        return migrationManager;
     }
 
     //
@@ -129,18 +137,18 @@ public class MigratableBody extends BodyImpl implements Migratable,
         super.activityStarted();
 
         if (migrationLogger.isDebugEnabled()) {
-            migrationLogger.debug("Body run on node " + this.nodeURL +
-                " migration=" + this.hasJustMigrated);
+            migrationLogger.debug("Body run on node " + nodeURL +
+                " migration=" + hasJustMigrated);
         }
         if (bodyLogger.isDebugEnabled()) {
-            bodyLogger.debug("Body run on node " + this.nodeURL +
-                " migration=" + this.hasJustMigrated);
+            bodyLogger.debug("Body run on node " + nodeURL + " migration=" +
+                hasJustMigrated);
         }
-        if (this.hasJustMigrated) {
-            if (this.migrationManager != null) {
-                this.migrationManager.startingAfterMigration(this);
+        if (hasJustMigrated) {
+            if (migrationManager != null) {
+                migrationManager.startingAfterMigration(this);
             }
-            this.hasJustMigrated = false;
+            hasJustMigrated = false;
         }
     }
 
@@ -196,68 +204,59 @@ public class MigratableBody extends BodyImpl implements Migratable,
         }
 
         // get the name of the node
-        String saveNodeURL = this.nodeURL;
-        this.nodeURL = node.getNodeInformation().getURL();
+        String saveNodeURL = nodeURL;
+        nodeURL = node.getNodeInformation().getURL();
 
+        //      security checks
         try {
-            if (this.isSecurityOn) {
-                // security checks
-                try {
-                    ProActiveRuntime runtimeDestination = node.getProActiveRuntime();
+            ProActiveRuntime runtimeDestination = node.getProActiveRuntime();
 
-                    ArrayList<Entity> entitiesFrom = null;
-                    ArrayList<Entity> entitiesTo = null;
+            if (this.securityManager != null) {
+                Session session = this.securityManager.initiateSession(runtimeDestination);
 
-                    entitiesFrom = this.getEntities();
-                    entitiesTo = runtimeDestination.getEntities();
-
-                    SecurityContext sc = new SecurityContext(SecurityContext.MIGRATION_TO,
-                            entitiesFrom, entitiesTo);
-
-                    SecurityContext result = null;
-
-                    if (this.isSecurityOn) {
-                        result = this.securityManager.getPolicy(sc);
-
-                        if (!result.isMigration()) {
-                            ProActiveLogger.getLogger(Loggers.SECURITY)
-                                           .info("NOTE : Security manager forbids the migration");
-                            return this;
-                        }
-                    } else {
-                        // no local security but need to check if distant runtime accepts migration
-                        result = runtimeDestination.getPolicy(sc);
-
-                        if (!result.isMigration()) {
-                            ProActiveLogger.getLogger(Loggers.SECURITY)
-                                           .info("NOTE : Security manager forbids the migration");
-                            return this;
-                        }
-                    }
-                } catch (SecurityNotAvailableException e1) {
-                    bodyLogger.debug("Security not available");
-                    e1.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                if (!session.getSecurityContext().isMigration()) {
+                    ProActiveLogger.getLogger(Loggers.SECURITY)
+                                   .info("NOTE : Security manager forbids the migration");
+                    return this;
+                }
+            } else {
+                //  			no local security but need to check if distant runtime accepts migration
+                SecurityContext scDistant = runtimeDestination.getPolicy(this.getEntities(),
+                        runtimeDestination.getEntities());
+                if (!scDistant.isMigration()) {
+                    ProActiveLogger.getLogger(Loggers.SECURITY)
+                                   .info("NOTE : Security manager forbids the migration");
+                    return this;
                 }
             }
-            this.nodeURL = node.getNodeInformation().getURL();
+        } catch (SecurityNotAvailableException e1) {
+            bodyLogger.debug("Security not available");
+        } catch (CommunicationForbiddenException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        try {
+            nodeURL = node.getNodeInformation().getURL();
 
             // stop accepting communication
             blockCommunication();
 
             // save the id
-            savedID = this.bodyID;
+            savedID = bodyID;
             if (byCopy) {
                 // if moving by copy we have to create a new unique ID
                 // the bodyID will be automatically recreate when deserialized
-                this.bodyID = null;
+                bodyID = null;
             }
 
             // security
             // save opened sessions
             if (this.isSecurityOn) {
-                this.openedSessions = this.securityManager.getOpenedConnexion();
+                openedSessions = securityManager.getOpenedConnexion();
             }
 
             // Set copyMode tag in all futures
@@ -265,9 +264,9 @@ public class MigratableBody extends BodyImpl implements Migratable,
             this.getFuturePool().setCopyMode(true);
 
             // try to migrate
-            migratedBody = this.migrationManager.migrateTo(node, this);
+            migratedBody = migrationManager.migrateTo(node, this);
 
-            if (this.isSecurityOn) {
+            if (isSecurityOn) {
                 this.internalBodySecurity.setDistantBody(migratedBody);
             }
 
@@ -278,10 +277,10 @@ public class MigratableBody extends BodyImpl implements Migratable,
                 this.ftmanager.updateLocationAtServer(savedID, migratedBody);
             }
         } catch (MigrationException e) {
-            this.openedSessions = null;
-            this.nodeURL = saveNodeURL;
-            this.bodyID = savedID;
-            this.localBodyStrategy.getFuturePool().setCopyMode(false);
+            openedSessions = null;
+            nodeURL = saveNodeURL;
+            bodyID = savedID;
+            localBodyStrategy.getFuturePool().setCopyMode(false);
             if (this.isSecurityOn) {
                 this.internalBodySecurity.setDistantBody(null);
             }
@@ -293,8 +292,8 @@ public class MigratableBody extends BodyImpl implements Migratable,
             this.migrationManager.changeBodyAfterMigration(this, migratedBody);
             activityStopped(false);
         } else {
-            this.bodyID = savedID;
-            this.nodeURL = saveNodeURL;
+            bodyID = savedID;
+            nodeURL = saveNodeURL;
         }
         acceptCommunication();
 
@@ -318,10 +317,10 @@ public class MigratableBody extends BodyImpl implements Migratable,
             migrationLogger.debug("stream =  " + in);
         }
         in.defaultReadObject();
-        this.hasJustMigrated = true;
+        hasJustMigrated = true;
         if (this.isSecurityOn) {
-            this.internalBodySecurity = new InternalBodySecurity(null);
-            this.securityManager.setBody(this);
+            internalBodySecurity = new InternalBodySecurity(null);
+            //            securityManager.setBody(this);
         }
     }
 
@@ -329,6 +328,6 @@ public class MigratableBody extends BodyImpl implements Migratable,
      * @see org.objectweb.proactive.core.body.LocalBodyStrategy#getNextSequenceID()
      */
     public long getNextSequenceID() {
-        return this.localBodyStrategy.getNextSequenceID();
+        return localBodyStrategy.getNextSequenceID();
     }
 }

@@ -51,8 +51,8 @@ public interface IActionExtPoint extends IAction {
     public void setAbstractDataObject(AbstractData object);
 
     /**
-     * Sets the selected active object.
+     * Sets the selected object.
      * @param The reference on the active object
      */
-    public void setActiveSelect(ActiveObject ref);
+    public void setActiveSelect(AbstractData ref);
 }

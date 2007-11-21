@@ -33,9 +33,8 @@ package org.objectweb.proactive.core.remoteobject;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
@@ -43,10 +42,15 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.Communication;
+import org.objectweb.proactive.core.security.PolicyServer;
+import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
+import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
@@ -102,24 +106,19 @@ public class InternalRemoteRemoteObjectImpl
         return this.remoteObject.receiveMessage(message);
     }
 
-    public X509Certificate getCertificate()
+    public TypedCertificate getCertificate()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getCertificate();
     }
 
-    public byte[] getCertificateEncoded()
-        throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getCertificateEncoded();
-    }
-
-    public ArrayList<Entity> getEntities()
+    public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
     }
 
-    public SecurityContext getPolicy(SecurityContext securityContext)
+    public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException, IOException {
-        return this.remoteObject.getPolicy(securityContext);
+        return this.remoteObject.getPolicy(local, distant);
     }
 
     public PublicKey getPublicKey()
@@ -127,12 +126,10 @@ public class InternalRemoteRemoteObjectImpl
         return this.remoteObject.getPublicKey();
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
-        return this.remoteObject.publicKeyExchange(sessionID, myPublicKey,
-            myCertificate, signature);
+        return this.remoteObject.publicKeyExchange(sessionID, signature);
     }
 
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
@@ -151,10 +148,11 @@ public class InternalRemoteRemoteObjectImpl
             parametersSignature);
     }
 
-    public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.remoteObject.startNewSession(policy);
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+        TypedCertificate distantCertificate)
+        throws SessionException, SecurityNotAvailableException, IOException {
+        return this.remoteObject.startNewSession(distantSessionID, policy,
+            distantCertificate);
     }
 
     public void terminateSession(long sessionID)
@@ -186,5 +184,18 @@ public class InternalRemoteRemoteObjectImpl
             e.printStackTrace();
         }
         return null;
+    }
+
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        return this.remoteObject.getProActiveSecurityManager(user);
+    }
+
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException,
+            IOException {
+        this.remoteObject.setProActiveSecurityManager(user, policyServer);
     }
 }

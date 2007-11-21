@@ -40,9 +40,11 @@ package org.objectweb.proactive.core.security;
 public class DefaultPolicyServer extends PolicyServer {
 
     /**
-     * @param file
-     */
-    public DefaultPolicyServer(String file) {
+         *
+         */
+    private static final long serialVersionUID = -4393963783885047655L;
+
+    public DefaultPolicyServer() {
         super();
     }
 }

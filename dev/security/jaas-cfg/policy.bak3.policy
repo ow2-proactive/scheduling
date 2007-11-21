@@ -1,0 +1,184 @@
+// keystore
+//keystore ".keystore";
+
+grant codeBase "file:${{java.ext.dirs}}/*" {
+	permission java.security.AllPermission;
+};
+
+// "standard" properies that can be read by anyone
+grant {
+	permission java.util.PropertyPermission "java.version", "read";
+	permission java.util.PropertyPermission "java.vendor", "read";
+	permission java.util.PropertyPermission "java.vendor.url", "read";
+	permission java.util.PropertyPermission "java.class.version", "read";
+	permission java.util.PropertyPermission "os.name", "read";
+	permission java.util.PropertyPermission "os.version", "read";
+	permission java.util.PropertyPermission "os.arch", "read";
+	permission java.util.PropertyPermission "file.separator", "read";
+	permission java.util.PropertyPermission "path.separator", "read";
+	permission java.util.PropertyPermission "line.separator", "read";
+
+	permission java.util.PropertyPermission "java.specification.version", "read";
+	permission java.util.PropertyPermission "java.specification.vendor", "read";
+	permission java.util.PropertyPermission "java.specification.name", "read";
+
+	permission java.util.PropertyPermission "java.vm.specification.version", "read";
+	permission java.util.PropertyPermission "java.vm.specification.vendor", "read";
+	permission java.util.PropertyPermission "java.vm.specification.name", "read";
+	permission java.util.PropertyPermission "java.vm.version", "read";
+	permission java.util.PropertyPermission "java.vm.vendor", "read";
+	permission java.util.PropertyPermission "java.vm.name", "read";
+	
+	permission java.io.FilePermission "${user.home}/-", "read";
+	permission java.util.PropertyPermission "user.dir", "read";
+	permission java.util.PropertyPermission "java.home", "read";
+	permission java.util.PropertyPermission "user.name", "read";
+	permission java.util.PropertyPermission "java.class.path", "read";
+};
+
+// Permission for the blind login module
+grant codebase "file:classes/Tests/*" {
+    permission javax.security.auth.AuthPermission "modifyPrincipals";
+};
+
+// Permissions for the Launcher
+grant codebase "file:classes/Tests/*" {
+   permission javax.security.auth.AuthPermission "createLoginContext.BlindLoginMethod";
+   permission javax.security.auth.AuthPermission "doAsPrivileged";
+};
+
+// ProActive initialization permissions (lib/log4j.jar)
+grant codebase "file:lib/log4j.jar", principal functionalTests.security.jaas.GroupPrincipal "OASIS-sop" {
+	permission java.util.PropertyPermission "log4j.*", "read";
+};
+
+// ProActive initialization permissions continued (lib/xercesImpl.jar)
+grant codebase "file:lib/xercesImpl.jar" {
+	permission java.util.PropertyPermission "org.apache.xerces.xni.parser.XMLParserConfiguration", "read";
+	permission java.net.SocketPermission "www-sop.inria.fr:80", "connect, resolve";
+};
+
+/* Descriptor reading permissions (lib/bouncycastle.jar) */
+grant codebase "file:lib/bouncycastle.jar", principal functionalTests.security.jaas.GroupPrincipal "OASIS-sop" {
+	permission java.security.SecurityPermission "putProviderProperty.BC";
+};
+	
+// ProActive initialization permissions
+grant codebase "file:classes/Tests/*", principal functionalTests.security.jaas.GroupPrincipal "OASIS-sop" {
+	permission java.util.PropertyPermission "log4j.*", "read";
+	
+	permission java.util.PropertyPermission "proactive.*", "read, write";
+	permission java.util.PropertyPermission "user.home", "read";
+	
+	permission java.util.PropertyPermission "RemoteHostname", "read, write";
+	permission java.util.PropertyPermission "byteCodeManipulator", "read, write";
+	permission java.util.PropertyPermission "components.creation.timeout", "read, write";
+	permission java.util.PropertyPermission "fractal.provider", "read, write";
+	
+	permission java.util.PropertyPermission "ibis.*", "read, write";
+	
+	permission java.util.PropertyPermission "java.protocol.handler.pkgs", "read, write";
+	permission java.util.PropertyPermission "name_server", "read, write";
+	permission java.util.PropertyPermission "name_server_pool", "read, write";
+	permission java.util.PropertyPermission "pool_host_number", "read, write";
+	
+	permission java.util.PropertyPermission "schema.validation", "read, write";
+	
+	permission java.security.SecurityPermission "putProviderProperty.BC";
+	permission java.security.SecurityPermission "insertProvider.BC";
+	permission javax.management.MBeanServerPermission "createMBeanServer";
+	
+	permission java.net.SocketPermission "localhost:1024-", "listen, resolve";
+	permission java.util.PropertyPermission "java.rmi.server.codebase", "read, write";
+	permission javax.management.MBeanPermission "org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl#-[org.objectweb.proactive.runtime:type=//localhost.localdomain/PA_JVM*_localhost.localdomain]", "registerMBean";
+
+	permission java.lang.RuntimePermission "createClassLoader";
+	
+	permission java.lang.RuntimePermission "accessDeclaredMembers";
+	permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+	permission java.lang.RuntimePermission "getProtectionDomain";
+	permission java.util.PropertyPermission "dtm.debug", "read";
+	
+	permission java.util.PropertyPermission "java.system.class.loader", "read";
+	permission java.io.FilePermission "${java.home}/bin/java", "execute";
+};
+	
+// ProActive initialization permissions
+grant codebase "file:classes/Core/*", principal functionalTests.security.jaas.GroupPrincipal "OASIS-sop" {
+	permission java.util.PropertyPermission "log4j.*", "read";
+	
+	permission java.util.PropertyPermission "proactive.*", "read, write";
+	permission java.util.PropertyPermission "user.home", "read";
+	
+	permission java.util.PropertyPermission "RemoteHostname", "read, write";
+	permission java.util.PropertyPermission "byteCodeManipulator", "read, write";
+	permission java.util.PropertyPermission "components.creation.timeout", "read, write";
+	permission java.util.PropertyPermission "fractal.provider", "read, write";
+	
+	permission java.util.PropertyPermission "ibis.*", "read, write";
+	
+	permission java.util.PropertyPermission "java.protocol.handler.pkgs", "read, write";
+	permission java.util.PropertyPermission "name_server", "read, write";
+	permission java.util.PropertyPermission "name_server_pool", "read, write";
+	permission java.util.PropertyPermission "pool_host_number", "read, write";
+	
+	permission java.util.PropertyPermission "schema.validation", "read, write";
+	
+	permission java.security.SecurityPermission "putProviderProperty.BC";
+	permission java.security.SecurityPermission "insertProvider.BC";
+	permission javax.management.MBeanServerPermission "createMBeanServer";
+	
+	permission java.net.SocketPermission "localhost:1024-", "listen, resolve";
+	permission java.util.PropertyPermission "java.rmi.server.codebase", "read, write";
+	permission javax.management.MBeanPermission "org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl#-[org.objectweb.proactive.runtime:type=//localhost.localdomain/PA_JVM*_localhost.localdomain]", "registerMBean";
+
+	permission java.lang.RuntimePermission "createClassLoader";
+	permission java.lang.RuntimePermission "accessClassInPackage.sun.rmi.server";
+	
+	permission java.lang.RuntimePermission "accessDeclaredMembers";
+	permission java.lang.reflect.ReflectPermission "suppressAccessChecks";
+	permission java.lang.RuntimePermission "getProtectionDomain";
+	permission java.util.PropertyPermission "dtm.debug", "read";
+	
+	permission java.util.PropertyPermission "java.system.class.loader", "read";
+	permission java.io.FilePermission "${java.home}/bin/java", "execute";
+};
+
+grant codebase "file:classes/Core/*" {
+	permission javax.management.MBeanTrustPermission "register";
+	permission java.lang.RuntimePermission "accessClassInPackage.sun.rmi.server";
+};
+
+grant principal functionalTests.security.jaas.GroupPrincipal "OASIS-sop" {
+	//permission java.net.SocketPermission "localhost:1099", "connect, resolve";
+};
+
+//============================================================================================================
+//============================================================================================================
+//============================================================================================================
+//============================================================================================================
+//============================================================================================================
+
+grant codebase "file:classes/Core/*", principal functionalTests.security.jaas.GroupPrincipal "OASIS-sop" {
+	permission java.net.SocketPermission "naruto", "resolve";
+	permission javax.management.MBeanPermission "org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl#-[org.objectweb.proactive.runtime:type=//naruto.inria.fr/PA_JVM*_naruto.inria.fr]", "registerMBean";
+	permission java.net.SocketPermission "naruto:1099", "connect, resolve";
+	permission java.net.SocketPermission "www-sop.inria.fr:80", "connect, resolve";
+	
+	permission java.net.SocketPermission "naruto:1024-", "connect, resolve";
+	permission java.net.SocketPermission "naruto:1024-", "accept, resolve";
+};
+
+grant codebase "file:lib/log4j.jar", principal functionalTests.security.jaas.GroupPrincipal "OASIS-sop" {
+	permission java.net.SocketPermission "naruto", "resolve";
+};
+
+grant codebase "file:classes/Tests/*", principal functionalTests.security.jaas.GroupPrincipal "OASIS-sop" {
+	permission java.net.SocketPermission "naruto", "resolve";
+	permission javax.management.MBeanPermission "org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl#-[org.objectweb.proactive.runtime:type=//naruto.inria.fr/PA_JVM*_naruto.inria.fr]", "registerMBean";
+	permission java.net.SocketPermission "naruto:1099", "connect, resolve";
+	permission java.net.SocketPermission "www-sop.inria.fr:80", "connect, resolve";
+	
+	permission java.net.SocketPermission "naruto:1024-", "connect, resolve";
+	permission java.net.SocketPermission "naruto:1024-", "accept, resolve";
+};

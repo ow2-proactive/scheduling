@@ -76,6 +76,10 @@ public class Activator extends AbstractUIPlugin {
         String serviceClass = URLStreamHandlerService.class.getName();
         context.registerService(serviceClass, new IC2DHandler(), properties);
         /* --------------------------------------------------- */
+        //        URL u = PAProperties.class.getResource("proactive-log4j");
+        //        Properties p = new Properties();
+        //        p.load(u.openStream());
+        //        PropertyConfigurator.configure(p);
         super.start(context);
     }
 

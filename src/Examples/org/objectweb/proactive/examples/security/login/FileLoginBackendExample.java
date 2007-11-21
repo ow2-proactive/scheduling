@@ -60,8 +60,8 @@ public class FileLoginBackendExample {
 
         Map<String, Object> params = new HashMap<String, Object>(3);
 
-        params.put("username", "alexandre");
-        params.put("pw", "legrand");
+        params.put("username", "jules");
+        params.put("pw", "cesar");
         params.put("path", FileLogin.class.getResource("login.cfg").getFile());
         params.put("group", "user");
         params.put("groupsFilePath",

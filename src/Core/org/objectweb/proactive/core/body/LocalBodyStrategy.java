@@ -30,11 +30,14 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.io.IOException;
+
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 
 
@@ -82,10 +85,12 @@ public interface LocalBodyStrategy {
      * @param future the future associated to the request
      * @param destinationBody the body the request is sent to
      * @exception java.io.IOException if the request cannot be sent to the destination body
+     * @throws CommunicationForbiddenException
      */
     public void sendRequest(MethodCall methodCall, Future future,
         UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException;
+        throws IOException, RenegotiateSessionException,
+            CommunicationForbiddenException;
 
     /**
      * Serves the request <code>request</code> by the invoking the targeted method on the

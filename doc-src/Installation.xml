@@ -47,7 +47,7 @@
           		along with <literal>ProActive/lib/javassist.jar</literal>,
           		<literal>ProActive/lib/log4j.jar</literal>, 
           		<literal>ProActive/lib/xercesImpl.jar</literal>, 
-          		<literal>ProActive/lib/fractal.jar</literal>,  
+          		<literal>ProActive/lib/components/fractal.jar</literal>,  
           		and <literal>ProActive/lib/bouncycastle.jar</literal></para>
         </listitem>
 
@@ -348,7 +348,6 @@
           <para>script : <literal>philosophers.sh</literal> or
           <literal>philosophers.bat</literal></para>
         </listitem>
-
         <listitem>
           <para>source : <literal>examples/philosophers</literal></para>
         </listitem>

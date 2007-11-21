@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.core.security.crypto;
 
-import java.security.*;
+import java.security.SecureRandom;
 
 
 class FixedSecureRandom extends SecureRandom {

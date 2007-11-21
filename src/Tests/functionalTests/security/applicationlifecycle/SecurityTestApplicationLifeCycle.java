@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 
 import functionalTests.FunctionalTest;
@@ -52,7 +53,7 @@ public class SecurityTestApplicationLifeCycle extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        psm = psm.generateSiblingCertificate("subcert");
+        psm = psm.generateSiblingCertificate(EntityType.UNKNOWN, "subcert");
         psm2 = (ProActiveSecurityManager) MakeDeepCopy.WithObjectStream.makeDeepCopy(psm);
         assertNotNull(psm2);
     }
@@ -61,6 +62,6 @@ public class SecurityTestApplicationLifeCycle extends FunctionalTest {
     public void initTest() throws Exception {
         PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestApplicationLifeCycle.class.getResource(
                     "/functionalTests/security/applicationPolicy.xml").getPath());
-        psm = new ProActiveSecurityManager(ps);
+        psm = new ProActiveSecurityManager(EntityType.UNKNOWN, ps);
     }
 }

@@ -30,12 +30,10 @@
  */
 package org.objectweb.proactive.core.security.domain;
 
-import java.util.ArrayList;
-
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.core.security.securityentity.Entity;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 
 
 /**
@@ -45,13 +43,12 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  *
  */
 public interface SecurityDomain extends SecurityEntity {
-
-    /**
-     * @param securityContext
-     * @return returns the policy matching the corresponding securityContext
-     *
-     */
-    public SecurityContext getPolicy(SecurityContext securityContext);
+    //    /**
+    //     * @param securityContext
+    //     * @return returns the policy matching the corresponding securityContext
+    //     *
+    //     */
+    //    public SecurityContext getPolicy(SecurityContext securityContext);
 
     /**
      * @return returns the certificate of the entity corresponding to this domain
@@ -63,7 +60,7 @@ public interface SecurityDomain extends SecurityEntity {
      * @return returns the set of wrapping entities
      * @throws SecurityNotAvailableException
      */
-    public ArrayList<Entity> getEntities() throws SecurityNotAvailableException;
+    public Entities getEntities() throws SecurityNotAvailableException;
 
     /**
      * @return Returns the name of the domain.

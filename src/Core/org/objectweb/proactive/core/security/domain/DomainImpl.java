@@ -31,31 +31,36 @@
 package org.objectweb.proactive.core.security.domain;
 
 import java.io.IOException;
+import java.security.AccessControlException;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 
 import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityContext;
+import org.objectweb.proactive.core.security.TypedCertificate;
+import org.objectweb.proactive.core.security.TypedCertificateList;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
+import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 public class DomainImpl implements SecurityDomain {
     private PolicyServer policyServer;
+    private String name;
 
     // empty constructor
     public DomainImpl() {
     }
 
     // create policy Server
-    public DomainImpl(String securityFile) {
+    public DomainImpl(String securityFile, String name) {
         try {
             this.policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(securityFile);
         } catch (InvalidPolicyFile e) {
@@ -63,9 +68,9 @@ public class DomainImpl implements SecurityDomain {
         }
     }
 
-    public SecurityContext getPolicy(SecurityContext securityContext) {
+    public SecurityContext getPolicy(Entities local, Entities distant) {
         try {
-            return policyServer.getPolicy(securityContext);
+            return this.policyServer.getPolicy(local, distant);
         } catch (SecurityNotAvailableException e) {
             e.printStackTrace();
         }
@@ -82,8 +87,11 @@ public class DomainImpl implements SecurityDomain {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.ext.security.domain.Domain#getEntities()
      */
-    public ArrayList<Entity> getEntities() throws SecurityNotAvailableException {
-        return null;
+    public Entities getEntities() throws SecurityNotAvailableException {
+        Entities entities = new Entities();
+
+        //        entities.add(new Entity(new TypedCertificateList));
+        return entities;
     }
 
     /* (non-Javadoc)
@@ -97,8 +105,7 @@ public class DomainImpl implements SecurityDomain {
         throws IOException, SecurityNotAvailableException {
     }
 
-    public X509Certificate getCertificate()
-        throws SecurityNotAvailableException {
+    public TypedCertificate getCertificate() {
         return null;
     }
 
@@ -106,8 +113,8 @@ public class DomainImpl implements SecurityDomain {
         return null;
     }
 
-    public long startNewSession(Communication policy)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+    public long startNewSession(long distantSessionID, SecurityContext policy,
+        TypedCertificate distantCertificate) {
         return 0;
     }
 
@@ -120,8 +127,7 @@ public class DomainImpl implements SecurityDomain {
         return null;
     }
 
-    public byte[][] publicKeyExchange(long sessionID, byte[] myPublicKey,
-        byte[] myCertificate, byte[] signature)
+    public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException {
         return null;
@@ -136,5 +142,17 @@ public class DomainImpl implements SecurityDomain {
 
     public String getVNName() throws SecurityNotAvailableException {
         return null;
+    }
+
+    public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
+        throws SecurityNotAvailableException, AccessControlException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void setProActiveSecurityManager(Entity user,
+        PolicyServer policyServer)
+        throws SecurityNotAvailableException, AccessControlException {
+        // TODO Auto-generated method stub
     }
 }

@@ -39,6 +39,11 @@ import java.security.KeyStore;
  *
  */
 public class IdentityServer implements Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -7025721139822663502L;
     private KeyStore keyStore;
 
     public IdentityServer() {

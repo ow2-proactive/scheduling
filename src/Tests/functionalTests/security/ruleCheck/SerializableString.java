@@ -28,33 +28,33 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.security.securityentity;
+package functionalTests.security.ruleCheck;
 
 import java.io.Serializable;
 
 
-/**
- * @author acontes
- *
- * To change the template for this generated type comment go to
- * Window>Preferences>Java>Code Generation>Code and Comments
- */
-public class DefaultEntity extends Entity implements Serializable {
+public class SerializableString implements Serializable {
 
     /**
-     *
-     */
-    public DefaultEntity() {
-        super();
+         *
+         */
+    private static final long serialVersionUID = -3835590934233235875L;
+    private String v;
+
+    public SerializableString() {
+        this.v = "";
+    }
+
+    public SerializableString(String s) {
+        this.v = new String(s);
+    }
+
+    public String get() {
+        return this.v;
     }
 
     @Override
-    public String getName() {
-        return "defaultEntity";
-    }
-
-    @Override
-    public boolean equals(Entity e) {
-        return true;
+    public String toString() {
+        return this.v;
     }
 }

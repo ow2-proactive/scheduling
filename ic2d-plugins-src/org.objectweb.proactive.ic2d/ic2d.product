@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.1"?>
 
-<product name="IC2D" id="org.objectweb.proactive.ic2d.product" application="org.objectweb.proactive.ic2d.application" useFeatures="true">
+<product name="IC2D" id="org.objectweb.proactive.ic2d.product" application="org.objectweb.proactive.ic2d.application" useFeatures="false">
 
    <aboutInfo>
       <image path="/org.objectweb.proactive.ic2d/icons/alt_about.gif"/>
@@ -35,8 +35,8 @@
    </launcher>
 
    <plugins>
-      <plugin id="P2P"/>
       <plugin id="com.ibm.icu"/>
+      <plugin id="com.ibm.icu34.data.update" fragment="true"/>
       <plugin id="com.lowagie.itext"/>
       <plugin id="org.apache.ant"/>
       <plugin id="org.apache.batik"/>
@@ -143,13 +143,10 @@
       <plugin id="org.junit"/>
       <plugin id="org.mozilla.rhino"/>
       <plugin id="org.objectweb.proactive.ic2d"/>
+      <plugin id="org.objectweb.proactive.ic2d.JMXmonitoring"/>
       <plugin id="org.objectweb.proactive.ic2d.console"/>
-      <plugin id="org.objectweb.proactive.ic2d.dgc"/>
-      <plugin id="org.objectweb.proactive.ic2d.jobmonitoring"/>
-      <plugin id="org.objectweb.proactive.ic2d.launcher"/>
       <plugin id="org.objectweb.proactive.ic2d.lib"/>
-      <plugin id="org.objectweb.proactive.ic2d.monitoring"/>
-      <plugin id="org.objectweb.proactive.ic2d.timit"/>
+      <plugin id="org.objectweb.proactive.ic2d.security"/>
       <plugin id="org.w3c.sac"/>
    </plugins>
 

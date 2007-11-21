@@ -30,23 +30,24 @@
  */
 package org.objectweb.proactive.core.security.gui;
 
-import org.objectweb.proactive.core.security.CertTools;
-
-
-/**
- * @author acontes
- *
- */
-public class ProActiveCertificateGenerator {
-    public static void main(String[] args) {
-        CertTools.installBCProvider();
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    ProActiveCertificateGeneratorGUI g = new ProActiveCertificateGeneratorGUI();
-
-                    //   s.setDefaultCloseOperation(EXIT_ON_CLOSE);
-                    g.setVisible(true);
-                }
-            });
-    }
-}
+//
+//import org.objectweb.proactive.core.security.CertTools;
+//
+//
+///**
+// * @author acontes
+// *
+// */
+//public class ProActiveCertificateGenerator {
+//    public static void main(String[] args) {
+//        CertTools.installBCProvider();
+//        javax.swing.SwingUtilities.invokeLater(new Runnable() {
+//                public void run() {
+//                    ProActiveCertificateGeneratorGUI g = new ProActiveCertificateGeneratorGUI();
+//
+//                    //   s.setDefaultCloseOperation(EXIT_ON_CLOSE);
+//                    g.setVisible(true);
+//                }
+//            });
+//    }
+//}
