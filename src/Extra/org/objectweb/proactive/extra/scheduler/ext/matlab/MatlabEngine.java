@@ -71,6 +71,7 @@ public class MatlabEngine {
                 pw.println("Can't find the ptolemy classes");
                 pw.println("java.class.path=" +
                     System.getProperty("java.class.path"));
+
                 NoClassDefFoundError ne = new NoClassDefFoundError(error_message.toString());
                 ne.initCause(e);
                 throw ne;
@@ -93,6 +94,7 @@ public class MatlabEngine {
 
     public static Token get(String variableName) throws IllegalActionException {
         init();
+
         return eng.get(engineHandle, variableName);
     }
 

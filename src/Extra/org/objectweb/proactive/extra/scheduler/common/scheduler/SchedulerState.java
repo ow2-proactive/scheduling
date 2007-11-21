@@ -36,7 +36,7 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
  * The state and what you can do with the scheduler according to the current state
  * are best described below.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 26, 2007
  * @since ProActive 3.2
  */

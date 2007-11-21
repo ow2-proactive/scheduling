@@ -42,20 +42,22 @@ public class MatlabSplitter extends SimpleMatlab {
      *
      */
     private static final long serialVersionUID = -5667273368988117301L;
-    private int numberOfChildren;
     private static AOMatlabSplitter splitterWorker = null;
+    private int numberOfChildren;
 
     public MatlabSplitter() {
     }
 
-    @Override
-    public void init(Map<String, Object> args) throws Exception {
+    public void init(Map<String, String> args) throws Exception {
         super.init(args);
+
         Object nb = args.get("number_of_children");
+
         if (nb == null) {
             throw new IllegalArgumentException(
                 "\"number_of_children\" must be specified.");
         }
+
         numberOfChildren = Integer.parseInt((String) nb);
     }
 
@@ -69,9 +71,11 @@ public class MatlabSplitter extends SimpleMatlab {
                 inputScript, scriptLines, numberOfChildren);
         System.out.println("[" + host +
             " MATLAB TASK] Executing (MatlabSplitter)");
+
         Object res = splitterWorker.execute(results);
         res = ProFuture.getFutureValue(res);
         splitterWorker.terminate();
+
         return res;
     }
 }

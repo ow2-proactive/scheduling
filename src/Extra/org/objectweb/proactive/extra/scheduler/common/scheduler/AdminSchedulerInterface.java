@@ -32,17 +32,31 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 
 
 /**
  * Scheduler interface.
  * This interface represents what the AdminScheduler and the SchedulerFrontend should do.
+ * Here are the administrator functionality for a scheduler administrator to interact with the scheduler.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
 public interface AdminSchedulerInterface extends UserSchedulerInterface {
+
+    /**
+    * Change the policy of the scheduler.
+    * This method will immediately change the policy and so the whole scheduling process.
+    *
+    * @param newPolicyFile the new policy file as a string.
+    * @return true if the policy has been correctly change, false if not.
+    * @throws SchedulerException (can be due to insufficient permission)
+    */
+    public BooleanWrapper changePolicy(
+        Class<?extends PolicyInterface> newPolicyFile)
+        throws SchedulerException;
 
     /**
      * Start the scheduler.

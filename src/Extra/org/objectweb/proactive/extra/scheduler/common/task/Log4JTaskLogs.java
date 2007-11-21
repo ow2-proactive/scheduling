@@ -80,10 +80,12 @@ public class Log4JTaskLogs implements TaskLogs {
      */
     public String getAllLogs(boolean timeStamp) {
         StringBuffer logs = new StringBuffer(this.allEvents.size());
+
         for (LoggingEvent e : this.allEvents) {
             logs.append(timeStamp ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e)
                                   : e.getMessage());
         }
+
         return logs.toString();
     }
 
@@ -92,12 +94,14 @@ public class Log4JTaskLogs implements TaskLogs {
      */
     public String getStderrLogs(boolean timeStamp) {
         StringBuffer logs = new StringBuffer();
+
         for (LoggingEvent e : this.allEvents) {
             if (Log4JTaskLogs.STDERR_LEVEL.equals(e.getLevel())) {
                 logs.append(timeStamp
                     ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
             }
         }
+
         return logs.toString();
     }
 
@@ -106,12 +110,14 @@ public class Log4JTaskLogs implements TaskLogs {
      */
     public String getStdoutLogs(boolean timeStamp) {
         StringBuffer logs = new StringBuffer();
+
         for (LoggingEvent e : this.allEvents) {
             if (Log4JTaskLogs.STDOUT_LEVEL.equals(e.getLevel())) {
                 logs.append(timeStamp
                     ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
             }
         }
+
         return logs.toString();
     }
 }

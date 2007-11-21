@@ -38,7 +38,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSourceInterface;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
@@ -49,7 +49,7 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
  * @see P2PNodeSource
  * @see DynamicNodeSource
  *
- * @author proactive
+ * @author proActive team
  */
 public abstract class IMNodeSource implements NodeSourceInterface {
 
@@ -68,8 +68,10 @@ public abstract class IMNodeSource implements NodeSourceInterface {
     public boolean equals(Object o) {
         if (o instanceof IMNodeSource) {
             IMNodeSource o2 = (IMNodeSource) o;
+
             return getSourceId().equals(o2.getSourceId());
         }
+
         return false;
     }
 
@@ -99,7 +101,7 @@ public abstract class IMNodeSource implements NodeSourceInterface {
      * The way to to get free nodes in the structure, ordered (or not) with the script.
      * The more a Node has chances to verify the script, the less it's far in the list.
      */
-    public abstract ArrayList<IMNode> getNodesByScript(VerifyingScript script,
+    public abstract ArrayList<IMNode> getNodesByScript(SelectionScript script,
         boolean ordered);
 
     /**
@@ -109,28 +111,32 @@ public abstract class IMNodeSource implements NodeSourceInterface {
 
     /**
      * That's the way to say to the NodeManager that a Node verifies a script.
-     * This will help ordering nodes for future calls to {@link #getNodesByScript(VerifyingScript)}.
+     * This will help ordering nodes for future calls to {@link #getNodesByScript(SelectionScript)}.
      * @param imnode
      * @param script
      */
-    public void setVerifyingScript(IMNode imnode, VerifyingScript script) {
-        HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
+    public void setSelectionScript(IMNode imnode, SelectionScript script) {
+        HashMap<SelectionScript, Integer> verifs = imnode.getScriptStatus();
+
         if (verifs.containsKey(script)) {
             verifs.remove(script);
         }
+
         verifs.put(script, IMNode.VERIFIED_SCRIPT);
     }
 
     /**
      * That's the way to say to the NodeManager that a Node doesn't (or no longer) verifie a script.
-     * This will help ordering nodes for future calls to {@link #getNodesByScript(VerifyingScript)}.
+     * This will help ordering nodes for future calls to {@link #getNodesByScript(SelectionScript)}.
      * @param imnode
      * @param script
      */
-    public void setNotVerifyingScript(IMNode imnode, VerifyingScript script) {
-        HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
+    public void setNotSelectionScript(IMNode imnode, SelectionScript script) {
+        HashMap<SelectionScript, Integer> verifs = imnode.getScriptStatus();
+
         if (verifs.containsKey(script)) {
             int status = verifs.remove(script);
+
             if (status == IMNode.NOT_VERIFIED_SCRIPT) {
                 verifs.put(script, IMNode.NOT_VERIFIED_SCRIPT);
             } else {

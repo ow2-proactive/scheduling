@@ -89,9 +89,11 @@ public class SchedulerDB extends AbstractSchedulerDB {
             oos.writeObject(o);
             oos.flush();
             oos.close();
+
             return new ByteArrayInputStream(baos.toByteArray());
         } catch (IOException e) {
             e.printStackTrace();
+
             return null;
         }
     }
@@ -99,13 +101,18 @@ public class SchedulerDB extends AbstractSchedulerDB {
     private Object deserialize(Blob blob) {
         // FIXME ais-je le droit de laisser assert ???
         assert blob != null;
+
         ObjectInputStream ois = null;
+
         try {
             ois = new ObjectInputStream(blob.getBinaryStream());
+
             Object o = ois.readObject();
+
             return o;
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         } finally {
             if (ois != null) {
@@ -121,10 +128,12 @@ public class SchedulerDB extends AbstractSchedulerDB {
     private boolean alreadyExistInTaskTable(int jobid_hashcode,
         int taskid_hashcode) {
         ResultSet rs = null;
+
         try {
             rs = statement.executeQuery(
                     "SELECT 1 FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
                     jobid_hashcode + " AND taskid_hashcode=" + taskid_hashcode);
+
             if (rs.next()) {
                 return true;
             }
@@ -139,17 +148,20 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 // Nothing to do
             }
         }
+
         return false;
     }
 
     private boolean commit() {
         try {
             connection.commit();
+
             return true;
         } catch (SQLException e) {
             // TODO si il y a une exception la je suis mort donc que faire ?
             e.printStackTrace();
         }
+
         return false;
     }
 
@@ -174,13 +186,16 @@ public class SchedulerDB extends AbstractSchedulerDB {
             if (connection != null) {
                 connection.close();
             }
+
             if (preparedStatement != null) {
                 preparedStatement.close();
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
             // Nothing to do
         }
+
         DatabaseManager.getInstance().disconnect();
         System.out.println("[SCHEDULER-DATABASE] disconnect");
     }
@@ -191,11 +206,13 @@ public class SchedulerDB extends AbstractSchedulerDB {
     @Override
     public boolean addJob(InternalJob internalJob) {
         System.out.println("[SCHEDULER-DATABASE] addjob");
+
         try {
             preparedStatement = connection.prepareStatement(
                     "INSERT INTO JOB_AND_JOB_EVENTS(jobid_hashcode, job) VALUES (?,?)");
             preparedStatement.setInt(1, internalJob.getId().hashCode());
             preparedStatement.setBlob(2, serialize(internalJob));
+
             if (preparedStatement.executeUpdate() == 1) {
                 return commit();
             }
@@ -203,6 +220,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             e.printStackTrace();
             rollback();
         }
+
         return false;
     }
 
@@ -212,6 +230,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
     @Override
     public boolean removeJob(JobId jobId) {
         System.out.println("[SCHEDULER-DATABASE] remove");
+
         try {
             statement.execute(
                 "DELETE FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
@@ -219,11 +238,13 @@ public class SchedulerDB extends AbstractSchedulerDB {
             statement.execute(
                 "DELETE FROM JOB_AND_JOB_EVENTS WHERE jobid_hashcode=" +
                 jobId.hashCode());
+
             return commit();
         } catch (SQLException e) {
             e.printStackTrace();
             rollback();
         }
+
         return false;
     }
 
@@ -233,9 +254,11 @@ public class SchedulerDB extends AbstractSchedulerDB {
     @Override
     public boolean addTaskResult(TaskResult taskResult) {
         System.out.println("[SCHEDULER-DATABASE] addTaskResult");
+
         try {
             int jobid_hashcode = taskResult.getTaskId().getJobId().hashCode();
             int taskid_hashcode = taskResult.getTaskId().hashCode();
+
             if (alreadyExistInTaskTable(jobid_hashcode, taskid_hashcode)) {
                 preparedStatement = connection.prepareStatement(
                         "UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskresult=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
@@ -247,6 +270,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             preparedStatement.setBlob(1, serialize(taskResult));
             preparedStatement.setInt(2, jobid_hashcode);
             preparedStatement.setInt(3, taskid_hashcode);
+
             if (preparedStatement.executeUpdate() == 1) {
                 return commit();
             }
@@ -254,6 +278,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             e.printStackTrace();
             rollback();
         }
+
         return false;
     }
 
@@ -273,27 +298,33 @@ public class SchedulerDB extends AbstractSchedulerDB {
     @Override
     public RecoverableState getRecoverableState() {
         System.out.println("[SCHEDULER-DATABASE] getRecoverableState");
+
         ResultSet rs = null;
         Blob blob = null;
+
         try {
             List<InternalJob> internalJobList = new ArrayList<InternalJob>();
             List<JobResult> jobResultList = new ArrayList<JobResult>();
+            Map<JobId, InternalJob> internalHMJobList = new HashMap<JobId, InternalJob>();
             Map<JobId, JobResult> jobResultMap = new HashMap<JobId, JobResult>();
             Map<JobId, JobEvent> jobEventMap = new HashMap<JobId, JobEvent>();
             Map<TaskId, TaskEvent> taskEventMap = new HashMap<TaskId, TaskEvent>();
 
             rs = statement.executeQuery(
                     "SELECT job, jobevent FROM JOB_AND_JOB_EVENTS");
+
             while (rs.next()) {
                 //
                 InternalJob internalJob = (InternalJob) deserialize(rs.getBlob(
                             1));
+                internalHMJobList.put(internalJob.getId(), internalJob);
                 internalJobList.add(internalJob);
                 //
                 jobResultMap.put(internalJob.getId(),
                     new JobResultImpl(internalJob.getId(), internalJob.getName()));
                 //
                 blob = rs.getBlob(2);
+
                 if (blob != null) {
                     JobEvent jobEvent = (JobEvent) deserialize(blob);
                     jobEventMap.put(jobEvent.getJobId(), jobEvent);
@@ -302,19 +333,27 @@ public class SchedulerDB extends AbstractSchedulerDB {
 
             rs = statement.executeQuery(
                     "SELECT taskevent,taskresult FROM TASK_EVENTS_AND_TASK_RESULTS");
+
             while (rs.next()) {
                 blob = rs.getBlob(1);
+
                 if (blob != null) {
                     TaskEvent taskEvent = (TaskEvent) deserialize(blob);
                     taskEventMap.put(taskEvent.getTaskId(), taskEvent);
                 }
+
                 blob = rs.getBlob(2);
+
                 if (blob != null) {
                     TaskResult taskResult = ((TaskResult) deserialize(blob));
                     jobResultMap.get(taskResult.getTaskId().getJobId())
                                 .addTaskResult(taskResult.getTaskId()
                                                          .getReadableName(),
-                        taskResult);
+                        taskResult,
+                        internalHMJobList.get(taskResult.getTaskId().getJobId())
+                                         .getHMTasks()
+                                         .get(taskResult.getTaskId())
+                                         .isPreciousResult());
                 }
             }
 
@@ -325,6 +364,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             }
 
             Collection<JobResult> col = jobResultMap.values();
+
             for (JobResult jr : col)
                 jobResultList.add(jr);
 
@@ -343,6 +383,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                     // Nothing to do
                 }
             }
+
             if (blob != null) {
                 try {
                     blob.free();
@@ -351,6 +392,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 }
             }
         }
+
         return null;
     }
 
@@ -369,11 +411,13 @@ public class SchedulerDB extends AbstractSchedulerDB {
     @Override
     public boolean setJobEvent(JobEvent jobEvent) {
         System.out.println("[SCHEDULER-DATABASE] setJobEvent");
+
         try {
             preparedStatement = connection.prepareStatement(
                     "UPDATE JOB_AND_JOB_EVENTS SET jobevent=? WHERE jobid_hashcode=?");
             preparedStatement.setBlob(1, serialize(jobEvent));
             preparedStatement.setInt(2, jobEvent.getJobId().hashCode());
+
             if (preparedStatement.executeUpdate() == 1) {
                 return commit();
             }
@@ -381,6 +425,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             e.printStackTrace();
             rollback();
         }
+
         return false;
     }
 
@@ -390,6 +435,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
     @Override
     public boolean setTaskEvent(TaskEvent taskEvent) {
         System.out.println("[SCHEDULER-DATABASE] setTaskEvent");
+
         try {
             int jobid_hashcode = taskEvent.getJobId().hashCode();
             int taskid_hashcode = taskEvent.getTaskId().hashCode();
@@ -401,6 +447,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 preparedStatement = connection.prepareStatement(
                         "INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskevent,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
             }
+
             preparedStatement.setBlob(1, serialize(taskEvent));
             preparedStatement.setInt(2, jobid_hashcode);
             preparedStatement.setInt(3, taskid_hashcode);
@@ -412,6 +459,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
             e.printStackTrace();
             rollback();
         }
+
         return false;
     }
 
@@ -423,15 +471,18 @@ public class SchedulerDB extends AbstractSchedulerDB {
     public boolean setJobAndTasksEvents(JobEvent jobEvent,
         List<TaskEvent> tasksEvents) {
         System.out.println("[SCHEDULER-DATABASE] setJobAndTaskEvents");
+
         // TODO Factoriser le code....
         PreparedStatement updatePreparedStatement = null;
         PreparedStatement insertPreparedStatement = null;
         PreparedStatement tmpPreparedStatement = null;
+
         try {
             preparedStatement = connection.prepareStatement(
                     "UPDATE JOB_AND_JOB_EVENTS SET jobevent=? WHERE jobid_hashcode=?");
             preparedStatement.setBlob(1, serialize(jobEvent));
             preparedStatement.setInt(2, jobEvent.getJobId().hashCode());
+
             int nb = preparedStatement.executeUpdate();
             int count = 1;
 
@@ -473,9 +524,11 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 if (insertPreparedStatement != null) {
                     insertPreparedStatement.close();
                 }
+
                 if (updatePreparedStatement != null) {
                     updatePreparedStatement.close();
                 }
+
                 if (tmpPreparedStatement != null) {
                     tmpPreparedStatement.close();
                 }
@@ -483,6 +536,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 // Nothing to do
             }
         }
+
         return false;
     }
 }

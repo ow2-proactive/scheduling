@@ -51,15 +51,19 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 public class SimpleResourceManager implements GenericResourceManager,
     NodeCreationEventListener, InitActive {
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.RESOURCE_MANAGER);
     //holds the nodes
     Vector<Node> freeNodes;
-    private static Logger logger = ProActiveLogger.getLogger(Loggers.RESOURCE_MANAGER);
     //holds the virutal nodes, only used to kill the nodes when the active object is closed
     Vector<VirtualNode> vn;
+
+    public SimpleResourceManager() {
+    } //proactive no arg constructor
 
     public void initActivity(Body body) {
         freeNodes = new Vector<Node>();
         vn = new Vector<VirtualNode>();
+
         if (logger.isDebugEnabled()) {
             logger.debug("Resource Manager Initialized");
         }
@@ -77,7 +81,9 @@ public class SimpleResourceManager implements GenericResourceManager,
                 logger.debug(
                     "finished deactivating nodes, will terminate Resource Manager");
             }
+
             ProActiveObject.terminateActiveObject(true);
+
             //sucess
             return new BooleanWrapper(true);
         } catch (Exception e) {
@@ -93,10 +99,12 @@ public class SimpleResourceManager implements GenericResourceManager,
         try {
             ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(xmlURL);
             VirtualNode[] virtualNodes = pad.getVirtualNodes();
+
             for (int i = 0; i < virtualNodes.length; i++) {
                 ((VirtualNodeImpl) virtualNodes[i]).addNodeCreationEventListener(this);
                 virtualNodes[i].activate();
                 vn.add(virtualNodes[i]);
+
                 if (logger.isDebugEnabled()) {
                     logger.debug("Virtual Node " + virtualNodes[i].getName() +
                         " added to resource manager");
@@ -106,9 +114,6 @@ public class SimpleResourceManager implements GenericResourceManager,
             logger.error("Couldnt add the specified resources" + e.toString());
         }
     }
-
-    public SimpleResourceManager() {
-    } //proactive no arg constructor
 
     public Vector<Node> getAtMostNNodes(IntWrapper maxNodeNb) {
         Vector<Node> nodesToSend = new Vector<Node>();
@@ -128,6 +133,7 @@ public class SimpleResourceManager implements GenericResourceManager,
 
     public void freeNodes(Vector<Node> nodesToFree) {
         int nodesFreed = 0;
+
         while (!nodesToFree.isEmpty()) {
             try {
                 nodesToFree.get(0).killAllActiveObjects();
@@ -147,6 +153,7 @@ public class SimpleResourceManager implements GenericResourceManager,
     public void nodeCreated(NodeCreationEvent event) {
         // get the node
         freeNodes.add(event.getNode());
+
         if (logger.isDebugEnabled()) {
             logger.debug("Node at " +
                 event.getNode().getNodeInformation().getURL() +

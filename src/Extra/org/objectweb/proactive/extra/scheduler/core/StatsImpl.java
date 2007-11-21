@@ -40,7 +40,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
 /**
  * Stats class will be used to view some tips on the scheduler.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 25, 2007
  * @since ProActive 3.2
  */
@@ -63,6 +63,7 @@ public class StatsImpl implements Stats {
      */
     public void startTime() {
         String key = "Start Time";
+
         if (!properties.containsKey(key)) {
             properties.put(key,
                 Tools.getFormattedDate(System.currentTimeMillis()));
@@ -74,6 +75,7 @@ public class StatsImpl implements Stats {
      */
     public void stopTime() {
         String key = "Last Stop Time";
+
         if (!properties.containsKey(key)) {
             properties.put(key,
                 Tools.getFormattedDate(System.currentTimeMillis()));
@@ -85,6 +87,7 @@ public class StatsImpl implements Stats {
      */
     public void pauseTime() {
         String key = "Last Pause Time";
+
         if (!properties.containsKey(key)) {
             properties.put(key,
                 Tools.getFormattedDate(System.currentTimeMillis()));
@@ -98,11 +101,12 @@ public class StatsImpl implements Stats {
      */
     public void increaseSubmittedJobCount(JobType type) {
         increaseProperty("Jobs Submitted", 1);
+
         switch (type) {
         case PARAMETER_SWEEPING:
             increasePSJobCount();
             break;
-        case APPLI:
+        case PROACTIVE:
             increasePAJobCount();
             break;
         case TASKSFLOW:
@@ -131,10 +135,10 @@ public class StatsImpl implements Stats {
     }
 
     /**
-     * Increase the number of launched Appli jobs.
+     * Increase the number of launched ProActive jobs.
      */
     private void increasePAJobCount() {
-        increaseProperty("Appli jobs Submitted", 1);
+        increaseProperty("ProActive jobs Submitted", 1);
     }
 
     /**

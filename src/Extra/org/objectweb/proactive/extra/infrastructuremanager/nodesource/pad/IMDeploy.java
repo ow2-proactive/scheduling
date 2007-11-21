@@ -89,14 +89,17 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
      */
     public void run() {
         VirtualNode[] vns = null;
+
         if (vnNames == null) {
             vns = pad.getVirtualNodes();
         } else {
             vns = new VirtualNode[vnNames.length];
+
             for (int i = 0; i < this.vnNames.length; i++) {
                 vns[i] = pad.getVirtualNode(this.vnNames[i]);
             }
         }
+
         for (VirtualNode vn : vns) {
             ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
             vn.activate();
@@ -109,6 +112,7 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
                 logger.warn("NodeException : " + e, e);
             }
         }
+
         this.nodeSource.addPAD(padName, pad);
     }
 
@@ -120,6 +124,7 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
     public void nodeCreated(NodeCreationEvent event) {
         Node node = event.getNode();
         ProActiveRuntime par = node.getProActiveRuntime();
+
         try {
             String vnName = par.getVNName(node.getNodeInformation().getName());
             this.nodeSource.addNode(node, vnName, padName);

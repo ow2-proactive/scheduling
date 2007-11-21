@@ -60,6 +60,7 @@ public class SimpleTestIMMonitoring {
         mes += (imnode.getHostName() + " - ");
         mes += (imnode.getDescriptorVMName() + " - ");
         mes += (imnode.getNodeURL() + ".\n");
+
         return mes;
     }
 
@@ -78,7 +79,9 @@ public class SimpleTestIMMonitoring {
      */
     public void printAllIMNodes() {
         System.out.println("printAllIMNodes");
+
         ArrayList<IMNode> imNodes = imMonitoring.getListAllIMNodes();
+
         for (IMNode imNode : imNodes) {
             System.out.println(imNode);
         }
@@ -86,12 +89,16 @@ public class SimpleTestIMMonitoring {
 
     public void printDeployedVNodes() {
         System.out.println("printDeployedVNodes");
+
         HashMap<String, ArrayList<VirtualNode>> deployedVNodesByPad = imMonitoring.getDeployedVirtualNodeByPad();
+
         for (String padName : deployedVNodesByPad.keySet()) {
             System.out.println("padName : " + padName);
+
             ArrayList<VirtualNode> deployedVnodes = deployedVNodesByPad.get(padName);
             System.out.println("Number of deployed vn : " +
                 deployedVnodes.size());
+
             for (VirtualNode vn : deployedVnodes) {
                 System.out.println("Name of deployed vnode : " + vn.getName());
             }
@@ -150,6 +157,7 @@ public class SimpleTestIMMonitoring {
         System.out.println("\t\t+-- " + imnode.getHostName());
         System.out.println("\t\t\t+-- " + imnode.getDescriptorVMName());
         System.out.print("\t\t\t\t+-- " + imnode.getNodeURL());
+
         try {
             if (imnode.isFree()) {
                 System.out.println(" \tfree");
@@ -161,6 +169,7 @@ public class SimpleTestIMMonitoring {
         }
 
         boolean change = false;
+
         for (int i = 1; i < tableOfIMNodes.length; i++) {
             IMNode imnode1 = (IMNode) tableOfIMNodes[i - 1];
             IMNode imnode2 = (IMNode) tableOfIMNodes[i];
@@ -170,15 +179,18 @@ public class SimpleTestIMMonitoring {
                 System.out.println(" " + imnode2.getPADName());
                 change = true;
             }
+
             if (change |
                     !imnode1.getVNodeName().equals(imnode2.getVNodeName())) {
                 System.out.println("\t+-- " + imnode2.getVNodeName());
                 change = true;
             }
+
             if (change | !imnode1.getHostName().equals(imnode2.getHostName())) {
                 System.out.println("\t\t+-- " + imnode2.getHostName());
                 change = true;
             }
+
             if (change |
                     !imnode1.getDescriptorVMName()
                                 .equals(imnode2.getDescriptorVMName())) {
@@ -186,7 +198,9 @@ public class SimpleTestIMMonitoring {
                     imnode2.getDescriptorVMName());
                 change = true;
             }
+
             System.out.print("\t\t\t\t+-- " + imnode2.getNodeURL());
+
             try {
                 if (imnode2.isFree()) {
                     System.out.println(" \tfree");

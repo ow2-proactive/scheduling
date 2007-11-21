@@ -50,7 +50,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
@@ -89,16 +89,19 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
         ListIterator<IMNode> iterator = nodeManager.getBusyNodes().listIterator();
 
         String nodeURL = null;
+
         try {
             nodeURL = node.getNodeInformation().getURL();
         } catch (RuntimeException e) {
             logger.debug("A Runtime exception occured " +
                 "while obtaining information on the node," +
                 "the node must be down (it will be detected later)", e);
+
             // node is down,
             // will be detected later
             return;
         }
+
         while (iterator.hasNext()) {
             IMNode imnode = iterator.next();
 
@@ -106,6 +109,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             if (imnode.getNodeURL().equals(nodeURL)) {
                 imnode.clean(); // Nettoyage du noeud
                 nodeManager.setFree(imnode);
+
                 break;
             }
         }
@@ -118,8 +122,10 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
 
     public void freeNodes(VirtualNode vnode) {
         ListIterator<IMNode> iterator = nodeManager.getBusyNodes().listIterator();
+
         while (iterator.hasNext()) {
             IMNode imnode = iterator.next();
+
             if (imnode.getVNodeName().equals(vnode.getName())) {
                 imnode.clean(); // Cleaning the node
                 nodeManager.setFree(imnode);
@@ -128,7 +134,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
     }
 
     /**
-     * The {@link #getAtMostNodes(IntWrapper, VerifyingScript)} method has three way to handle the request :
+     * The {@link #getAtMostNodes(IntWrapper, SelectionScript)} method has three way to handle the request :
      * if there is no script, it returns at most the first nb free nodes.
      * If the script is a dynamic script, the method will test the resources,
      * until nb nodes verifies the script or if there is no node left.
@@ -136,27 +142,30 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
      * it will return in priority the nodes on which the given script
      * has already been verified.
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript) {
+    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript) {
         logger.info("[RESOURCE] Searching for " + nb + " nodes on " +
             this.nodeManager.getNbFreeNodes() + " free nodes.");
 
-        ArrayList<IMNode> nodes = nodeManager.getNodesByScript(verifyingScript,
+        ArrayList<IMNode> nodes = nodeManager.getNodesByScript(selectionScript,
                 true);
 
         // log
         StringBuffer order = new StringBuffer();
+
         for (IMNode n : nodes)
             order.append(n.getHostName() + " ");
+
         logger.info("[RESOURCE] Available nodes are : " + order);
 
         NodeSet result = new NodeSet();
         int found = 0;
 
-        // no verifying script
-        if (verifyingScript == null) {
+        // no selection script
+        if (selectionScript == null) {
             while (!nodes.isEmpty() && (found < nb.intValue())) {
                 IMNode node = nodes.remove(0);
                 node.clean();
+
                 try {
                     result.add(node.getNode());
                     nodeManager.setBusy(node);
@@ -167,14 +176,17 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             }
 
             // static verif script
-        } else if (!verifyingScript.isDynamic()) {
+        } else if (!selectionScript.isDynamic()) {
             logger.info("Static verif script");
+
             while (!nodes.isEmpty() && (found < nb.intValue())) {
                 IMNode node = nodes.remove(0);
-                if (node.getScriptStatus().containsKey(verifyingScript) &&
-                        node.getScriptStatus().get(verifyingScript)
+
+                if (node.getScriptStatus().containsKey(selectionScript) &&
+                        node.getScriptStatus().get(selectionScript)
                                 .equals(IMNode.VERIFIED_SCRIPT)) {
                     node.clean();
+
                     try {
                         result.add(node.getNode());
                         nodeManager.setBusy(node);
@@ -190,10 +202,12 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
             Vector<ScriptResult<Boolean>> scriptResults = new Vector<ScriptResult<Boolean>>();
             Vector<IMNode> nodeResults = new Vector<IMNode>();
             int launched = found;
+
             while (!nodes.isEmpty() && (launched++ < nb.intValue())) {
                 nodeResults.add(nodes.get(0));
+
                 ScriptResult<Boolean> sr = nodes.get(0)
-                                                .executeScript(verifyingScript);
+                                                .executeScript(selectionScript);
 
                 // if r is not a future, the script has not been executed
                 if (MOP.isReifiedObject(sr)) {
@@ -201,9 +215,10 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                 } else {
                     // script has not been executed on remote host
                     // nothing to do, just let the node in the free list
-                    logger.info("Error occured executing verifying script",
+                    logger.info("Error occured executing selection script",
                         sr.getException());
                 }
+
                 nodes.remove(0);
             }
 
@@ -214,36 +229,40 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                             MAX_VERIF_TIMEOUT);
                     IMNode imnode = nodeResults.remove(idx);
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
+
                     if (res.errorOccured()) {
                         // nothing to do, just let the node in the free list
-                        logger.info("Error occured executing verifying script",
+                        logger.info("Error occured executing selection script",
                             res.getException());
                     } else if (res.getResult()) {
                         // Result OK
-                        nodeManager.setVerifyingScript(imnode, verifyingScript);
+                        nodeManager.setSelectionScript(imnode, selectionScript);
                         imnode.clean();
+
                         try {
                             result.add(imnode.getNode());
                             nodeManager.setBusy(imnode);
                             found++;
                         } catch (NodeException e) {
                             nodeManager.setDown(imnode);
+
                             // try on a new node if any
                             if (!nodes.isEmpty()) {
                                 nodeResults.add(nodes.get(0));
                                 scriptResults.add(nodes.remove(0)
-                                                       .executeScript(verifyingScript));
+                                                       .executeScript(selectionScript));
                             }
                         }
                     } else {
                         // result is false
-                        nodeManager.setNotVerifyingScript(imnode,
-                            verifyingScript);
+                        nodeManager.setNotSelectionScript(imnode,
+                            selectionScript);
+
                         // try on a new node if any
                         if (!nodes.isEmpty()) {
                             nodeResults.add(nodes.get(0));
                             scriptResults.add(nodes.remove(0)
-                                                   .executeScript(verifyingScript));
+                                                   .executeScript(selectionScript));
                         }
                     }
                 } catch (ProActiveException e) {
@@ -256,15 +275,18 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     (found < nb.intValue()));
         } else {
             logger.info("[RESOURCE] Nodes with dynamic verif script");
+
             Vector<ScriptResult<Boolean>> scriptResults = new Vector<ScriptResult<Boolean>>();
             Vector<IMNode> nodeResults = new Vector<IMNode>();
 
             // lance la verif sur les nb premier
             int launched = 0;
+
             while (!nodes.isEmpty() && (launched++ < nb.intValue())) {
                 nodeResults.add(nodes.get(0));
+
                 ScriptResult<Boolean> r = nodes.get(0)
-                                               .executeScript(verifyingScript);
+                                               .executeScript(selectionScript);
 
                 // if r is not a future, the script has not been executed
                 if (MOP.isReifiedObject(r)) {
@@ -272,9 +294,10 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                 } else {
                     // script has not been executed on remote host
                     // nothing to do, just let the node in the free list
-                    logger.info("Error occured executing verifying script",
+                    logger.info("Error occured executing selection script",
                         r.getException());
                 }
+
                 nodes.remove(0);
             }
 
@@ -284,39 +307,43 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
                     //int idx = ProActive.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
                     int idx = ProFuture.waitForAny(scriptResults);
 
-                    // idx could be -1 if an error occured in wfa (or timeout expires)
+                    // idx could be -1 if an error occurred in wfa (or timeout expires)
                     IMNode imnode = nodeResults.remove(idx);
                     ScriptResult<Boolean> res = scriptResults.remove(idx);
+
                     if (res.errorOccured()) {
                         // nothing to do, just let the node in the free list
-                        logger.info("Error occured executing verifying script",
+                        logger.info("Error occured executing selection script",
                             res.getException());
                     } else if (res.getResult()) {
                         // Result OK
-                        nodeManager.setVerifyingScript(imnode, verifyingScript);
+                        nodeManager.setSelectionScript(imnode, selectionScript);
                         imnode.clean();
+
                         try {
                             result.add(imnode.getNode());
                             nodeManager.setBusy(imnode);
                             found++;
                         } catch (NodeException e) {
                             nodeManager.setDown(imnode);
+
                             // try on a new node if any
                             if (!nodes.isEmpty()) {
                                 nodeResults.add(nodes.get(0));
                                 scriptResults.add(nodes.remove(0)
-                                                       .executeScript(verifyingScript));
+                                                       .executeScript(selectionScript));
                             }
                         }
                     } else {
                         // result is false
-                        nodeManager.setNotVerifyingScript(imnode,
-                            verifyingScript);
+                        nodeManager.setNotSelectionScript(imnode,
+                            selectionScript);
+
                         // try on a new node if any 
                         if (!nodes.isEmpty()) {
                             nodeResults.add(nodes.get(0));
                             scriptResults.add(nodes.remove(0)
-                                                   .executeScript(verifyingScript));
+                                                   .executeScript(selectionScript));
                         }
                     }
                 } catch (Exception e) {
@@ -333,7 +360,7 @@ public class IMDataResourceImpl implements IMDataResource, Serializable {
     }
 
     public NodeSet getExactlyNodes(IntWrapper nb,
-        VerifyingScript verifyingScript) {
+        SelectionScript selectionScript) {
         // TODO Auto-generated method stub
         return null;
     }

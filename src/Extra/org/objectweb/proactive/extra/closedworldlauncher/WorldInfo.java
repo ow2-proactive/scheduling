@@ -80,9 +80,11 @@ public class WorldInfo {
     protected String[] stringToArray(String string) {
         ArrayList<String> tmp = new ArrayList<String>();
         StringTokenizer st = new StringTokenizer(string);
+
         while (st.hasMoreTokens()) {
             tmp.add(st.nextToken());
         }
+
         return tmp.toArray(new String[] { "" });
     }
 
@@ -94,9 +96,11 @@ public class WorldInfo {
         tmp.append(HOST_NUMBER_PROPERTY).append(" = ").append(currentHostNumber)
            .append("\n");
         tmp.append(HOST_LIST_PROPERTY).append(" = ");
+
         for (int i = 0; i < hostListAsArray.length; i++) {
             tmp.append(hostListAsArray[i]).append(" ");
         }
+
         return tmp.toString();
     }
 

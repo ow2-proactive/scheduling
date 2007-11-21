@@ -39,7 +39,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
  * Definition of a task identification. For the moment, it is represented by an
  * integer.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
@@ -70,6 +70,27 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
     private JobId jobId = null;
 
     /**
+     * Default constructor. Just set the id of the task.
+     *
+     * @param id the task id to set.
+     */
+    private TaskId(JobId jobId) {
+        this.jobId = jobId;
+        this.id = (jobId.hashCode() * JOB_FACTOR) + (++currentId);
+    }
+
+    /**
+     * Set id and name.
+     *
+     * @param id the task id to set.
+     * @param name the human readable task name.
+     */
+    private TaskId(JobId jobId, String name) {
+        this(jobId);
+        this.readableName = name;
+    }
+
+    /**
      * To reinitialize the initial id value
      */
     public static void initialize() {
@@ -92,27 +113,6 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      */
     public static synchronized TaskId nextId(JobId jobId, String readableName) {
         return new TaskId(jobId, readableName);
-    }
-
-    /**
-     * Default constructor. Just set the id of the task.
-     *
-     * @param id the task id to set.
-     */
-    private TaskId(JobId jobId) {
-        this.jobId = jobId;
-        this.id = (jobId.hashCode() * JOB_FACTOR) + (++currentId);
-    }
-
-    /**
-     * Set id and name.
-     *
-     * @param id the task id to set.
-     * @param name the human readable task name.
-     */
-    private TaskId(JobId jobId, String name) {
-        this(jobId);
-        this.readableName = name;
     }
 
     /**
@@ -148,6 +148,7 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
         if ((o != null) && o instanceof TaskId) {
             return ((TaskId) o).id == id;
         }
+
         return false;
     }
 

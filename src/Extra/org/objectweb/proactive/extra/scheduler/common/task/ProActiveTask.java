@@ -36,30 +36,33 @@ import java.util.Map;
 
 
 /**
- * Definition of an application task for the user.
+ * Definition of a ProActive task for the user.
+ * This allows you to create a ProActive task.
+ * You have to specify the number of nodes you need during the execution using the {@link #setNumberOfNodesNeeded(int)} method.
+ * You can also specify arguments to give to the task using the {@link #setArguments(Map)}
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
-public class ApplicationTask extends Task {
+public class ProActiveTask extends Task {
 
     /** Serial version UID */
     private static final long serialVersionUID = 4400146311851234189L;
 
     /** Task as an instance */
-    private ExecutableApplicationTask taskInstance = null;
+    private ProActiveExecutable taskInstance = null;
 
     /** or as a class */
-    private Class<ExecutableApplicationTask> taskClass = null;
+    private Class<ProActiveExecutable> taskClass = null;
 
     /** Arguments of the task as a map */
-    private Map<String, Object> args = new HashMap<String, Object>();
+    private Map<String, String> args = new HashMap<String, String>();
 
     /**
      * Empty constructor.
      */
-    public ApplicationTask() {
+    public ProActiveTask() {
     }
 
     /**
@@ -68,7 +71,7 @@ public class ApplicationTask extends Task {
     @Override
     public void addDependence(Task task) {
         throw new RuntimeException(
-            "ApplicationTask.addDependence(Task) Should be never used in this context !");
+            "ProActiveTask.addDependence(Task) Should be never used in this context !");
     }
 
     /**
@@ -77,7 +80,7 @@ public class ApplicationTask extends Task {
     @Override
     public void addDependences(List<Task> tasks) {
         throw new RuntimeException(
-            "ApplicationTask.addDependences(List<Task>) Should be never used in this context !");
+            "ProActiveTask.addDependences(List<Task>) Should be never used in this context !");
     }
 
     /**
@@ -90,6 +93,7 @@ public class ApplicationTask extends Task {
         if (numberOfNodesNeeded < 1) {
             numberOfNodesNeeded = 1;
         }
+
         this.numberOfNodesNeeded = numberOfNodesNeeded;
     }
 
@@ -98,17 +102,17 @@ public class ApplicationTask extends Task {
      *
      * @return the task Class.
      */
-    public Class<ExecutableApplicationTask> getTaskClass() {
+    public Class<ProActiveExecutable> getTaskClass() {
         return taskClass;
     }
 
     /**
      * To set the executable task class.
-     * It may be a class that extends {@link ExecutableApplicationTask}.
+     * It may be a class that extends {@link ProActiveExecutable}.
      *
      * @param taskClass the task Class to set.
      */
-    public void setTaskClass(Class<ExecutableApplicationTask> taskClass) {
+    public void setTaskClass(Class<ProActiveExecutable> taskClass) {
         this.taskClass = taskClass;
         this.taskInstance = null;
     }
@@ -118,17 +122,17 @@ public class ApplicationTask extends Task {
      *
      * @return the task Instance.
      */
-    public ExecutableApplicationTask getTaskInstance() {
+    public ProActiveExecutable getTaskInstance() {
         return taskInstance;
     }
 
     /**
      * To set the executable task instance.
-     * It may be an instance that extends {@link ExecutableApplicationTask}.
+     * It may be an instance that extends {@link ProActiveExecutable}.
      *
      * @param taskInstance the task Instance to set.
      */
-    public void setTaskInstance(ExecutableApplicationTask taskInstance) {
+    public void setTaskInstance(ProActiveExecutable taskInstance) {
         this.taskInstance = taskInstance;
         this.taskClass = null;
     }
@@ -138,7 +142,7 @@ public class ApplicationTask extends Task {
      *
      * @return the arguments list.
      */
-    public Map<String, Object> getArguments() {
+    public Map<String, String> getArguments() {
         return args;
     }
 
@@ -147,7 +151,7 @@ public class ApplicationTask extends Task {
      *
      * @param the arguments list to set
      */
-    public void setArguments(Map<String, Object> args) {
+    public void setArguments(Map<String, String> args) {
         this.args = args;
     }
 
@@ -157,7 +161,7 @@ public class ApplicationTask extends Task {
      * @param name the name of the argument to add.
      * @param value the associated value to add.
      */
-    public void addArgument(String name, Object value) {
+    public void addArgument(String name, String value) {
         args.put(name, value);
     }
 }

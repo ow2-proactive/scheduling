@@ -35,9 +35,9 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript
 
 /**
  * Definition of a native task for the user.
- * A native task includes a command line that can be set.
+ * A native task includes a command line that can be set using {@link #setCommandLine(String)}
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */

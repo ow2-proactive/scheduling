@@ -1,0 +1,469 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor xmlns="urn:proactive:deployment:3.3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+
+	<variables>
+		<descriptorVariable name="PROACTIVE_HOME"
+			value="/user/jfradj/home/WorkSpace/ProActive/" />
+		<descriptorVariable name="JAVA_HOME"
+			value="/user/jfradj/home/bin/jdk1.6.0_01/" />
+	</variables>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="SchedulerVN" property="multiple" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="SchedulerVN">
+				<jvmSet>
+					<vmName value="Jvm1" />
+					<vmName value="Jvm2" />
+					<vmName value="Jvm3" />
+					<vmName value="Jvm4" />
+					<vmName value="Jvm5" />
+					<vmName value="Jvm6" />
+					<vmName value="Jvm7" />
+					<vmName value="Jvm8" />
+					<vmName value="Jvm9" />
+					<vmName value="Jvm10" />
+					<vmName value="Jvm11" />
+					<vmName value="Jvm12" />
+					<vmName value="Jvm13" />
+					<vmName value="Jvm14" />
+					<vmName value="Jvm15" />
+					<vmName value="Jvm16" />
+					<vmName value="Jvm17" />
+					<vmName value="Jvm18" />
+					<vmName value="Jvm19" />
+					<vmName value="Jvm20" />
+					<vmName value="Jvm21" />
+					<vmName value="Jvm22" />
+					<vmName value="Jvm23" />
+					<vmName value="Jvm24" />
+					<vmName value="Jvm25" />
+					<vmName value="Jvm26" />
+					<vmName value="Jvm27" />
+					<vmName value="Jvm28" />
+					<vmName value="Jvm29" />
+					<vmName value="Jvm30" />
+					<vmName value="Jvm31" />
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="localJVM1" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<creation>
+					<processReference refid="localJVM2" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm3">
+				<creation>
+					<processReference refid="localJVM3" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm4">
+				<creation>
+					<processReference refid="localJVM4" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm5">
+				<creation>
+					<processReference refid="localJVM5" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm6">
+				<creation>
+					<processReference refid="localJVM6" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm7">
+				<creation>
+					<processReference refid="localJVM7" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm8">
+				<creation>
+					<processReference refid="localJVM8" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm9">
+				<creation>
+					<processReference refid="localJVM9" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm10">
+				<creation>
+					<processReference refid="localJVM10" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm11">
+				<creation>
+					<processReference refid="localJVM11" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm12">
+				<creation>
+					<processReference refid="localJVM12" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm13">
+				<creation>
+					<processReference refid="localJVM13" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm14">
+				<creation>
+					<processReference refid="localJVM14" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm15">
+				<creation>
+					<processReference refid="localJVM15" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm16">
+				<creation>
+					<processReference refid="localJVM16" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm17">
+				<creation>
+					<processReference refid="localJVM17" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm18">
+				<creation>
+					<processReference refid="localJVM18" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm19">
+				<creation>
+					<processReference refid="localJVM19" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm20">
+				<creation>
+					<processReference refid="localJVM20" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm21">
+				<creation>
+					<processReference refid="localJVM21" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm22">
+				<creation>
+					<processReference refid="localJVM22" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm23">
+				<creation>
+					<processReference refid="localJVM23" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm24">
+				<creation>
+					<processReference refid="localJVM24" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm25">
+				<creation>
+					<processReference refid="localJVM25" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm26">
+				<creation>
+					<processReference refid="localJVM26" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm27">
+				<creation>
+					<processReference refid="localJVM27" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm28">
+				<creation>
+					<processReference refid="localJVM28" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm29">
+				<creation>
+					<processReference refid="localJVM29" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm30">
+				<creation>
+					<processReference refid="localJVM30" />
+				</creation>
+			</jvm>
+			<jvm name="Jvm31">
+				<creation>
+					<processReference refid="localJVM31" />
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+
+		<processes>
+			<processDefinition id="localJVM1">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="pollux"><!-- apple -->
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+
+
+			<processDefinition id="localJVM2">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="cheypa"><!-- fiacre -->
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+
+
+			<processDefinition id="localJVM3">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="naruto">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+
+
+			<processDefinition id="localJVM4">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="petawawa">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+
+
+			<processDefinition id="localJVM5">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="schubby">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+
+
+			<processDefinition id="localJVM6">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="fidelity">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM7">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="heli">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM8">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="mac">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM9">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="nyx">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM10">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="pincoya">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM11">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="tche">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM12">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="thanglong">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM13">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="duff">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM14">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="gaudi">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM15">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="nahuel">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM16">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="amda">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM17">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="trinidad">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM18">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="anaconda">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM19">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="amstel">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM20">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="crusoe">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM21">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="macyavel">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM22">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="predadab">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM23">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="puravida">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			
+			<processDefinition id="localJVM24">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="sidonie">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM25">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="trans04">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM26">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="lo">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM27">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="meldie">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM28">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="meije">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM29">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="orchidee">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM30">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="mirage">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM31">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
+					hostname="bebita">
+					<processReference refid="JVM" />
+				</sshProcess>
+			</processDefinition>
+
+			<processDefinition id="JVM">
+				<jvmProcess
+					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				</jvmProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

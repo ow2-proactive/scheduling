@@ -41,6 +41,12 @@ import ptolemy.data.Token;
 
 
 public class AOSimpleMatlab implements Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = -933248120525832351L;
+    static String nl = System.getProperty("line.separator");
     private String inputScript = null;
     private ArrayList<String> scriptLines = new ArrayList<String>();
 
@@ -70,12 +76,15 @@ public class AOSimpleMatlab implements Serializable {
         if (results.length > 1) {
             throw new InvalidNumberOfParametersException(results.length);
         }
+
         if (results.length == 1) {
             TaskResult res = results[0];
+
             if (index != -1) {
                 if (!(res.value() instanceof SplittedResult)) {
                     throw new InvalidParameterException(res.value().getClass());
                 }
+
                 SplittedResult sr = (SplittedResult) res.value();
                 Token tok = sr.getResult(index);
                 MatlabEngine.put("in", tok);
@@ -83,11 +92,14 @@ public class AOSimpleMatlab implements Serializable {
                 if (!(res.value() instanceof Token)) {
                     throw new InvalidParameterException(res.value().getClass());
                 }
+
                 Token in = (Token) res.value();
                 MatlabEngine.put("in", in);
             }
         }
+
         executeScript();
+
         return MatlabEngine.get("out");
     }
 
@@ -97,6 +109,7 @@ public class AOSimpleMatlab implements Serializable {
      */
     public boolean terminate() {
         MatlabEngine.close();
+
         return true;
     }
 
@@ -109,6 +122,7 @@ public class AOSimpleMatlab implements Serializable {
             System.out.println("Feeding input");
             MatlabEngine.evalString(inputScript);
         }
+
         String execScript = prepareScript();
         System.out.println("Executing Script");
         MatlabEngine.evalString(execScript);
@@ -125,12 +139,7 @@ public class AOSimpleMatlab implements Serializable {
             script += line;
             script += nl;
         }
+
         return script;
     }
-
-    /**
-         *
-         */
-    private static final long serialVersionUID = -933248120525832351L;
-    static String nl = System.getProperty("line.separator");
 }

@@ -37,7 +37,7 @@ import java.util.HashMap;
 /**
  * Stats interface class will be used to view some tips on the scheduler.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 25, 2007
  * @since ProActive 3.2
  */

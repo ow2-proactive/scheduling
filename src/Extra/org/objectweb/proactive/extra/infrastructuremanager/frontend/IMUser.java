@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
@@ -45,26 +45,26 @@ public interface IMUser {
     public StringWrapper echo();
 
     /**
-     * Reserves nb nodes verifying the verifying script,
+     * Reserves nb nodes verifying the selection script,
      * if the infrastructure manager (IM) don't have nb free nodes
      * then it returns the max of valid free nodes
      * @param nb the number of nodes
-     * @param verifyingScript : script to be verified by the returned nodes
-     * @return an arraylist of nodes
+     * @param selectionScript : script to be verified by the returned nodes
+     * @return an array list of nodes
      */
     public NodeSet getAtMostNodes(IntWrapper nbNodes,
-        VerifyingScript verifyingScript);
+        SelectionScript selectionScript);
 
     /**
-     * Reserves nb nodes verifying the verifying script,
+     * Reserves nb nodes verifying the selection script,
      * if the infrastructure manager (IM) don't have nb free nodes
      * then it returns an empty node set.
      * @param nb the number of nodes
-     * @param verifyingScript : script to be verified by the returned nodes
-     * @return an arraylist of nodes
+     * @param selectionScript : script to be verified by the returned nodes
+     * @return an array list of nodes
      */
     public NodeSet getExactlyNodes(IntWrapper nbNodes,
-        VerifyingScript verifyingScript);
+        SelectionScript selectionScript);
 
     /**
      * Release the node reserve by the user

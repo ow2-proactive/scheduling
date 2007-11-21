@@ -47,6 +47,11 @@ import org.apache.log4j.Logger;
 public class LoggingOutputStream extends OutputStream {
 
     /**
+     * The default number of bytes in the buffer. =2048
+     */
+    public static final int DEFAULT_BUFFER_LENGTH = 2048;
+
+    /**
      * Used to maintain the contract of #close().
      */
     protected boolean hasBeenClosed = false;
@@ -68,11 +73,6 @@ public class LoggingOutputStream extends OutputStream {
      * Remembers the size of the buffer for speed.
      */
     private int bufLength;
-
-    /**
-     * The default number of bytes in the buffer. =2048
-     */
-    public static final int DEFAULT_BUFFER_LENGTH = 2048;
 
     /**
      * The category to write to.
@@ -99,6 +99,7 @@ public class LoggingOutputStream extends OutputStream {
         if (log == null) {
             throw new IllegalArgumentException("cat == null");
         }
+
         if (level == null) {
             throw new IllegalArgumentException("priority == null");
         }
@@ -178,6 +179,7 @@ public class LoggingOutputStream extends OutputStream {
         // don't print out blank lines; flushing from PrintStream puts out these
         if ((count == 1) && (((char) buf[0]) == '\n')) {
             reset();
+
             return;
         }
 

@@ -43,7 +43,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * The internal scheduler tasks are not sent to the policy.
  * Only a restricted number of properties on each tasks is sent to the policy.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 9, 2007
  * @since ProActive 3.2
  */
@@ -82,6 +82,7 @@ public class TaskDescriptor implements Serializable {
         if (children == null) {
             return new Vector<TaskDescriptor>();
         }
+
         return children;
     }
 
@@ -103,6 +104,7 @@ public class TaskDescriptor implements Serializable {
         if (parents == null) {
             return new Vector<TaskDescriptor>();
         }
+
         return parents;
     }
 
@@ -142,6 +144,7 @@ public class TaskDescriptor implements Serializable {
         if (parents == null) {
             parents = new Vector<TaskDescriptor>();
         }
+
         parents.add(task);
     }
 
@@ -154,6 +157,7 @@ public class TaskDescriptor implements Serializable {
         if (children == null) {
             children = new Vector<TaskDescriptor>();
         }
+
         children.add(task);
     }
 
@@ -165,6 +169,7 @@ public class TaskDescriptor implements Serializable {
         if (obj instanceof TaskDescriptor) {
             return ((TaskDescriptor) obj).id.equals(id);
         }
+
         return false;
     }
 

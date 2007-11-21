@@ -35,12 +35,12 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.common.job.ApplicationJob;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
+import org.objectweb.proactive.extra.scheduler.common.job.ProActiveJob;
 import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
-import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
 import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.NativeTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ProActiveTask;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalAbstractJavaTask;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalJavaTask;
@@ -53,7 +53,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * For the moment it performs a simple copy from userJob to InternalJob
  * and recreate the dependences if needed.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
@@ -70,56 +70,71 @@ public class InternalJobFactory implements Serializable {
      * @throws SchedulerException an exception if the factory cannot create the given job.
      */
     public static InternalJob createJob(Job job) throws SchedulerException {
+        InternalJob iJob = null;
+
         switch (job.getType()) {
         case PARAMETER_SWEEPING:
             throw new SchedulerException(
                 "The type of the given job is not yet implemented !");
-        case APPLI:
-            return createJob((ApplicationJob) job);
+        case PROACTIVE:
+            iJob = createJob((ProActiveJob) job);
+            break;
         case TASKSFLOW:
-            return createJob((TaskFlowJob) job);
+            iJob = createJob((TaskFlowJob) job);
+            break;
+        default:
+            throw new SchedulerException(
+                "The type of the given job is unknown !");
         }
-        throw new SchedulerException("The type of the given job is unknown !");
+
+        try {
+            iJob.setName(job.getName());
+            iJob.setPriority(job.getPriority());
+            iJob.setCancelOnError(job.isCancelOnError());
+            iJob.setDescription(job.getDescription());
+            iJob.setLogFile(job.getLogFile());
+
+            return iJob;
+        } catch (Exception e) {
+            throw new SchedulerException("Error while creating the internalJob !",
+                e);
+        }
     }
 
     /**
-     * Create an internalApplication job with the given Application job (user)
-     *
-     * @param job the user job that will be used to create the internal job.
-     * @return the created internal job.
-     * @throws SchedulerException an exception if the factory cannot create the given job.
-     */
-    private static InternalJob createJob(ApplicationJob userJob)
+         * Create an internal ProActive job with the given ProActive job (user)
+         *
+         * @param job
+         *            the user job that will be used to create the internal job.
+         * @return the created internal job.
+         * @throws SchedulerException
+         *             an exception if the factory cannot create the given job.
+         */
+    private static InternalJob createJob(ProActiveJob userJob)
         throws SchedulerException {
-        InternalApplicationJob job;
-        ApplicationTask userTask = userJob.getTask();
+        InternalProActiveJob job;
+        ProActiveTask userTask = userJob.getTask();
+
         if (userTask == null) {
-            throw new SchedulerException(
-                "You must specify an application task !");
+            throw new SchedulerException("You must specify a ProActive task !");
         }
 
-        // TODO cdelbe,jlscheef,jfradj : extremely UGLY "design" pattern...
         if (userTask.getTaskClass() != null) {
-            job = new InternalApplicationJob(userJob.getName(),
-                    userJob.getPriority(), userJob.getRuntimeLimit(),
-                    userJob.isCancelOnError(), userJob.getDescription(),
-                    userTask.getNumberOfNodesNeeded(), userTask.getTaskClass());
-            job.setLogFile(userJob.getLogFile());
+            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(),
+                    userTask.getTaskClass());
         } else if (userTask.getTaskInstance() != null) {
-            job = new InternalApplicationJob(userJob.getName(),
-                    userJob.getPriority(), userJob.getRuntimeLimit(),
-                    userJob.isCancelOnError(), userJob.getDescription(),
-                    userTask.getNumberOfNodesNeeded(),
+            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(),
                     userTask.getTaskInstance());
-            job.setLogFile(userJob.getLogFile());
         } else {
             throw new SchedulerException(
-                "You must specify your own executable application task to be launched (in the application task) !");
+                "You must specify your own executable ProActive task to be launched (in the application task) !");
         }
+
         InternalAbstractJavaTask iajt = job.getTask();
-        userTask.setFinalTask(true);
+        userTask.setPreciousResult(true);
         iajt.setArgs(userTask.getArguments());
         setProperties(userTask, iajt);
+
         return job;
     }
 
@@ -136,36 +151,37 @@ public class InternalJobFactory implements Serializable {
             throw new SchedulerException("This job must contains tasks !");
         }
 
-        // TODO cdelbe,jlscheef,jfradj : extremely UGLY "design" pattern...
-        InternalJob job = new InternalTaskFlowJob(userJob.getName(),
-                userJob.getPriority(), userJob.getRuntimeLimit(),
-                userJob.isCancelOnError(), userJob.getDescription());
-        job.setLogFile(userJob.getLogFile());
+        InternalJob job = new InternalTaskFlowJob();
         HashMap<Task, InternalTask> tasksList = new HashMap<Task, InternalTask>();
-        boolean hasFinalTask = false;
+        boolean hasPreciousResult = false;
+
         for (Task t : userJob.getTasks()) {
             tasksList.put(t, createTask(t));
-            if (hasFinalTask == false) {
-                hasFinalTask = t.isFinalTask();
+
+            if (hasPreciousResult == false) {
+                hasPreciousResult = t.isPreciousResult();
             }
         }
-        if (!hasFinalTask) {
+
+        if (!hasPreciousResult) {
             throw new SchedulerException(
-                "You must specify at least one final task in your job !");
+                "You must specify at least on precious result in your job !");
         }
+
         for (Entry<Task, InternalTask> entry : tasksList.entrySet()) {
             if (entry.getKey().getDependencesList() != null) {
                 for (Task t : entry.getKey().getDependencesList()) {
                     entry.getValue().addDependence(tasksList.get(t));
                 }
             }
+
             job.addTask(entry.getValue());
         }
+
         return job;
     }
 
     private static InternalTask createTask(Task task) throws SchedulerException {
-        //TODO jlscheef : change this instance of by better solutions, no time left for the moment
         if (task instanceof NativeTask) {
             return createTask((NativeTask) task);
         } else if (task instanceof JavaTask) {
@@ -186,6 +202,7 @@ public class InternalJobFactory implements Serializable {
     private static InternalTask createTask(JavaTask task)
         throws SchedulerException {
         InternalJavaTask javaTask;
+
         if (task.getTaskClass() != null) {
             javaTask = new InternalJavaTask(task.getTaskClass());
         } else if (task.getTaskInstance() != null) {
@@ -194,8 +211,10 @@ public class InternalJobFactory implements Serializable {
             throw new SchedulerException(
                 "You must specify your own executable task to be launched in every task !");
         }
+
         javaTask.setArgs(task.getArguments());
         setProperties(task, javaTask);
+
         return javaTask;
     }
 
@@ -213,9 +232,11 @@ public class InternalJobFactory implements Serializable {
             throw new SchedulerException(
                 "The command line is null or empty and not generated !!");
         }
+
         InternalNativeTask nativeTask = new InternalNativeTask(task.getCommandLine(),
                 task.getGenerationScript());
         setProperties(task, nativeTask);
+
         return nativeTask;
     }
 
@@ -227,13 +248,13 @@ public class InternalJobFactory implements Serializable {
      */
     private static void setProperties(Task task, InternalTask taskToSet) {
         taskToSet.setDescription(task.getDescription());
-        taskToSet.setFinalTask(task.isFinalTask());
+        taskToSet.setPreciousResult(task.isPreciousResult());
         taskToSet.setName(task.getName());
-        taskToSet.setPostTask(task.getPostTask());
-        taskToSet.setPreTask(task.getPreTask());
+        taskToSet.setPostScript(task.getPostScript());
+        taskToSet.setPreScript(task.getPreScript());
         taskToSet.setRerunnable(task.getRerunnable());
-        taskToSet.setRunTimeLimit(task.getRunTimeLimit());
-        taskToSet.setVerifyingScript(task.getVerifyingScript());
+        //taskToSet.setRunTimeLimit(task.getRunTimeLimit());
+        taskToSet.setSelectionScript(task.getSelectionScript());
         taskToSet.setResultDescriptor(task.getResultDescriptor());
     }
 }

@@ -46,7 +46,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
 
 
@@ -152,12 +152,11 @@ public class TaskDispatcher extends Thread {
             taskV.get(0).taskId.getParentId());
 
         for (Task task : taskV) {
-            ExecutableJavaTask schedInterp = new SchedulerInterpreter(task,
-                    fserver);
+            JavaExecutable schedInterp = new SchedulerInterpreter(task, fserver);
 
             JavaTask schedulerTask = new JavaTask();
             schedulerTask.setName(task.taskId.toString());
-            schedulerTask.setFinalTask(true);
+            schedulerTask.setPreciousResult(true);
             schedulerTask.setTaskInstance(schedInterp);
 
             job.addTask(schedulerTask);

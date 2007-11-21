@@ -37,12 +37,12 @@ import javax.script.*;
 
 
 /**
- * A Verifying Script : return true if the resource tested is correct.
+ * A selection Script : return true if the resource tested is correct.
  * @author ProActive Team
  * @version 1.0, Jun 8, 2007
  * @since ProActive 3.2
  */
-public class VerifyingScript extends Script<Boolean> {
+public class SelectionScript extends Script<Boolean> {
 
     /**  */
     private static final long serialVersionUID = 120693403230482727L;
@@ -57,49 +57,49 @@ public class VerifyingScript extends Script<Boolean> {
     private boolean dynamic = false;
 
     /** ProActive needed constructor */
-    public VerifyingScript() {
+    public SelectionScript() {
     }
 
     /** Directly create a script with a string. */
-    public VerifyingScript(String script, String engineName)
+    public SelectionScript(String script, String engineName)
         throws InvalidScriptException {
         super(script, engineName);
     }
 
     /** Directly create a script with a string. */
-    public VerifyingScript(String script, String engineName, boolean dynamic)
+    public SelectionScript(String script, String engineName, boolean dynamic)
         throws InvalidScriptException {
         super(script, engineName);
         this.dynamic = dynamic;
     }
 
     /** Create a script from a file. */
-    public VerifyingScript(File file, String[] parameters)
+    public SelectionScript(File file, String[] parameters)
         throws InvalidScriptException {
         super(file, parameters);
     }
 
     /** Create a script from a file. */
-    public VerifyingScript(File file, String[] parameters, boolean dynamic)
+    public SelectionScript(File file, String[] parameters, boolean dynamic)
         throws InvalidScriptException {
         super(file, parameters);
         this.dynamic = dynamic;
     }
 
     /** Create a script from an URL. */
-    public VerifyingScript(URL url, String[] parameters)
+    public SelectionScript(URL url, String[] parameters)
         throws InvalidScriptException {
         super(url, parameters);
     }
 
     /** Create a script from an URL. */
-    public VerifyingScript(URL url, String[] parameters, boolean dynamic)
+    public SelectionScript(URL url, String[] parameters, boolean dynamic)
         throws InvalidScriptException {
         super(url, parameters);
         this.dynamic = dynamic;
     }
 
-    public VerifyingScript(Script<?> script, boolean dynamic)
+    public SelectionScript(Script<?> script, boolean dynamic)
         throws InvalidScriptException {
         super(script);
         this.dynamic = dynamic;
@@ -121,7 +121,7 @@ public class VerifyingScript extends Script<Boolean> {
     }
 
     /**
-     * VerifyingScript must give its result in the 'result_script' variable.
+     * SelectionScript must give its result in the 'result_script' variable.
      *
      * @see org.objectweb.proactive.extra.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
@@ -129,6 +129,7 @@ public class VerifyingScript extends Script<Boolean> {
     protected ScriptResult<Boolean> getResult(Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
+
             if (result instanceof Boolean) {
                 return new ScriptResult<Boolean>((Boolean) result);
             } else if (result instanceof Integer) {
@@ -153,7 +154,7 @@ public class VerifyingScript extends Script<Boolean> {
     }
 
     /**
-     * There is no parameter to give to the verifying script.
+     * There is no parameter to give to the selection script.
      */
     @Override
     protected void prepareSpecialBindings(Bindings bindings) {
@@ -165,9 +166,11 @@ public class VerifyingScript extends Script<Boolean> {
         if (o == this) {
             return true;
         }
-        if (o instanceof VerifyingScript) {
-            return ((VerifyingScript) o).getId().equals(getId());
+
+        if (o instanceof SelectionScript) {
+            return ((SelectionScript) o).getId().equals(getId());
         }
+
         return false;
     }
 

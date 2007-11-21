@@ -38,8 +38,8 @@ import java.util.Map.Entry;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
-import org.objectweb.proactive.extra.scheduler.common.task.Status;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
 import org.objectweb.proactive.extra.scheduler.task.EligibleTaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
@@ -90,13 +90,14 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
         priority = job.getPriority();
         type = job.getType();
         numberOfTasks = job.getTasks().size();
+
         if (type == JobType.TASKSFLOW) {
             //build dependence tree
             makeTree(job);
         } else {
             //every tasks are eligible
             for (InternalTask td : job.getTasks()) {
-                if (td.getStatus() == Status.SUBMITTED) {
+                if (td.getStatus() == TaskState.SUBMITTED) {
                     eligibleTasks.put(td.getId(), new EligibleTaskDescriptor(td));
                 }
             }
@@ -115,9 +116,11 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
         for (InternalTask td : job.getTasks()) {
             //if this task is a first task, put it in eligible tasks list
             EligibleTaskDescriptor lt = new EligibleTaskDescriptor(td);
+
             if (!td.hasDependences()) {
                 eligibleTasks.put(td.getId(), lt);
             }
+
             mem.put(td, lt);
         }
 
@@ -125,10 +128,13 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
         for (InternalTask td : job.getTasks()) {
             if (td.getDependences() != null) {
                 TaskDescriptor taskDescriptor = mem.get(td);
+
                 for (InternalTask depends : td.getDependences()) {
                     taskDescriptor.addParent(mem.get(depends));
                 }
+
                 taskDescriptor.setCount(td.getDependences().size());
+
                 for (TaskDescriptor lt : taskDescriptor.getParents()) {
                     lt.addChild(taskDescriptor);
                 }
@@ -167,14 +173,17 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     void terminate(TaskId taskId) {
         if (type == JobType.TASKSFLOW) {
             TaskDescriptor lt = runningTasks.get(taskId);
+
             for (TaskDescriptor task : lt.getChildren()) {
                 task.setCount(task.getCount() - 1);
+
                 if (task.getCount() == 0) {
                     eligibleTasks.put(task.getId(),
                         (EligibleTaskDescriptor) task);
                 }
             }
         }
+
         runningTasks.remove(taskId);
     }
 
@@ -192,19 +201,21 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
      * Update the list of eligible tasks according to the status of each task.
      * This method is called only if user pause a job.
      *
-     * @param status the taskId with their current status.
+     * @param taskState the taskId with their current status.
      */
-    void update(HashMap<TaskId, Status> status) {
-        for (Entry<TaskId, Status> tid : status.entrySet()) {
-            if (tid.getValue() == Status.PAUSED) {
+    void update(HashMap<TaskId, TaskState> taskState) {
+        for (Entry<TaskId, TaskState> tid : taskState.entrySet()) {
+            if (tid.getValue() == TaskState.PAUSED) {
                 TaskDescriptor lt = eligibleTasks.get(tid.getKey());
+
                 if (lt != null) {
                     pausedTasks.put(tid.getKey(),
                         eligibleTasks.remove(tid.getKey()));
                 }
-            } else if ((tid.getValue() == Status.PENDING) ||
-                    (tid.getValue() == Status.SUBMITTED)) {
+            } else if ((tid.getValue() == TaskState.PENDING) ||
+                    (tid.getValue() == TaskState.SUBMITTED)) {
                 EligibleTaskDescriptor lt = (EligibleTaskDescriptor) pausedTasks.get(tid.getKey());
+
                 if (lt != null) {
                     eligibleTasks.put(tid.getKey(), lt);
                     pausedTasks.remove(tid.getKey());

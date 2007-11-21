@@ -78,6 +78,18 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
     public AOJobListener() {
     }
 
+    public AOJobListener(AOTaskPool taskpool,
+        SchedulerAuthenticationInterface auth, String user, String password) {
+        this.taskpool = taskpool;
+        this.processing = new HashMap<JobId, Collection<Task>>();
+        this.shutdown = false;
+
+        this.scheduler = null;
+        this.auth = auth;
+        this.password = password;
+        this.user = user;
+    }
+
     static protected AOJobListener createAOJobListener(Node frameworkNode,
         TaskPool taskpool, SchedulerAuthenticationInterface auth, String user,
         String password) throws ActiveObjectCreationException, NodeException {
@@ -89,18 +101,6 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
                 new Object[] { taskpool, auth, user, password }, frameworkNode);
 
         return monitor;
-    }
-
-    public AOJobListener(AOTaskPool taskpool,
-        SchedulerAuthenticationInterface auth, String user, String password) {
-        this.taskpool = taskpool;
-        this.processing = new HashMap<JobId, Collection<Task>>();
-        this.shutdown = false;
-
-        this.scheduler = null;
-        this.auth = auth;
-        this.password = password;
-        this.user = user;
     }
 
     public void initActivity(Body body) {
@@ -127,7 +127,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
 
     /**
      * This Event Listener will wait for relevant events from the scheduler.
-     * When an event is recieved proper action will be taken and transmitted to the skeleton-tasks
+     * When an event is received proper action will be taken and transmitted to the skeleton-tasks
      * encapsulated inside this job.
      *
      * @param jobId  The id of the job submitted to the scheduler.
@@ -160,7 +160,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
     /* **************************************************************************
      *                      BEGIN USEFUL EVENTS
      * *************************************************************************/
-    public void runningToFinishedJobEvent(JobEvent event) {
+    public void jobRunningToFinishedEvent(JobEvent event) {
         if (event == null) {
             return;
         }
@@ -190,7 +190,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
                     task.taskId.toString());
             }
 
-            TaskResult result = jResult.getTaskResults()
+            TaskResult result = jResult.getAllResults()
                                        .get(task.taskId.toString());
 
             if (result == null) {
@@ -217,6 +217,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
 
                     //Everything is OK
                     taskpool.putProcessedTask(computedTask);
+
                     continue;
                 } catch (Throwable e) {
                     task.setException(new Exception(e));
@@ -275,7 +276,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
     /* **********************************************************************
      *                  USELESS EVENTS
      ************************************************************************/
-    public void changeJobPriorityEvent(JobEvent event) {
+    public void jobChangePriorityEvent(JobEvent event) {
         // nothing to do
     }
 
@@ -287,23 +288,23 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
         // nothing to do
     }
 
-    public void newPendingJobEvent(InternalJob job) {
+    public void jobSubmittedEvent(InternalJob job) {
         // nothing to do
     }
 
-    public void pendingToRunningJobEvent(JobEvent event) {
+    public void jobPendingToRunningEvent(JobEvent event) {
         // nothing to do
     }
 
-    public void removeFinishedJobEvent(JobEvent event) {
+    public void jobRemoveFinishedEvent(JobEvent event) {
         // nothing to do
     }
 
-    public void pendingToRunningTaskEvent(TaskEvent event) {
+    public void taskPendingToRunningEvent(TaskEvent event) {
         // TODO Auto-generated method stub
     }
 
-    public void runningToFinishedTaskEvent(TaskEvent event) {
+    public void taskRunningToFinishedEvent(TaskEvent event) {
         // TODO Auto-generated method stub
     }
 
@@ -327,7 +328,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
         // nothing to do
     }
 
-    public void newPendingJobEvent(Job job) {
+    public void jobSubmittedEvent(Job job) {
         // TODO Auto-generated method stub
     }
 }

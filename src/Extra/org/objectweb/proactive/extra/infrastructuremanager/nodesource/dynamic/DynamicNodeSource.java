@@ -54,7 +54,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeComparat
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.DynamicNSInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.utils.Heap;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
@@ -207,7 +207,7 @@ public abstract class DynamicNodeSource extends IMNodeSource
     }
 
     @Override
-    public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
+    public ArrayList<IMNode> getNodesByScript(SelectionScript script,
         boolean ordered) {
         ArrayList<IMNode> result = getFreeNodes();
         if ((script != null) && ordered) {

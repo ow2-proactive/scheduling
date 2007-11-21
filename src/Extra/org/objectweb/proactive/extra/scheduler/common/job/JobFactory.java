@@ -73,13 +73,13 @@ import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.InvalidScriptException;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SimpleScript;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
-import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.NativeTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ProActiveExecutable;
+import org.objectweb.proactive.extra.scheduler.common.task.ProActiveTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.w3c.dom.Document;
@@ -102,16 +102,16 @@ public class JobFactory {
      */
     private static JobFactory factory = null;
 
+    private JobFactory() {
+        xpath = XPathFactory.newInstance().newXPath();
+        xpath.setNamespaceContext(new SchedulerNamespaceContext());
+    }
+
     public static JobFactory getFactory() {
         if (factory == null) {
             factory = new JobFactory();
         }
         return factory;
-    }
-
-    private JobFactory() {
-        xpath = XPathFactory.newInstance().newXPath();
-        xpath.setNamespaceContext(new SchedulerNamespaceContext());
     }
 
     /**
@@ -224,15 +224,15 @@ public class JobFactory {
         Node paNode = (Node) xpath.evaluate(addPrefixes("proActive"), jobNode,
                 XPathConstants.NODE);
         if (paNode != null) {
-            jt = JobType.APPLI;
+            jt = JobType.PROACTIVE;
         }
         if (jt == null) {
             throw new SAXException("Invalid XML : Job must have a valid type");
         }
 
         switch (jt) {
-        case APPLI:
-            job = new ApplicationJob();
+        case PROACTIVE:
+            job = new ProActiveJob();
             break;
 
         //	TODO	job = new ParameterSweepingJob();
@@ -247,7 +247,7 @@ public class JobFactory {
         // JOB PRIORITY
         String prio = xpath.evaluate("@priority", jobNode);
         if (!"".equals(prio)) {
-            job.setPriority(JobPriority.findPriority(prio));
+            job.setPriority(JobPriority.findPriority((String) prio));
         } else {
             job.setPriority(JobPriority.NORMAL);
         }
@@ -267,8 +267,9 @@ public class JobFactory {
         }
 
         // JOB DESCRIPTION
-        Object description = xpath.evaluate(addPrefixes("/job/description"),
-                rootNode, XPathConstants.STRING);
+        Object description = (String) xpath.evaluate(addPrefixes(
+                    "/job/description"), rootNode, XPathConstants.STRING);
+
         if (description != null) {
             System.out.println("Job description = " + description);
             job.setDescription((String) description);
@@ -309,7 +310,7 @@ public class JobFactory {
                 } else if ((process = (Node) xpath.evaluate(addPrefixes(
                                     "proActiveExecutable"), taskNode,
                                 XPathConstants.NODE)) != null) { // APPLICATION TASK
-                    task = createApplicationTask(process);
+                    task = createProActiveTask(process);
                 } else {
                     throw new RuntimeException("Unknow process !!");
                 }
@@ -317,8 +318,8 @@ public class JobFactory {
                 task = createTask(taskNode, task);
 
                 switch (job.getType()) {
-                case APPLI:
-                    ((ApplicationJob) job).setTask((ApplicationTask) task);
+                case PROACTIVE:
+                    ((ProActiveJob) job).setTask((ProActiveTask) task);
                     break;
                 default:
                     ((TaskFlowJob) job).addTask(task);
@@ -344,7 +345,7 @@ public class JobFactory {
 
         for (Task td : tasks.keySet())
             depends.put(td.getName(), td);
-        if (job.getType() != JobType.APPLI) {
+        if (job.getType() != JobType.PROACTIVE) {
             for (Entry<Task, ArrayList<String>> task : tasks.entrySet()) {
                 //task.getKey().setJobId(job.getId());
                 ArrayList<String> depListStr = task.getValue();
@@ -387,9 +388,9 @@ public class JobFactory {
         }
 
         // TASK PRECIOUS RESULT
-        task.setFinalTask(((String) xpath.evaluate("@preciousResult", taskNode,
-                XPathConstants.STRING)).equals("true"));
-        System.out.println("final = " + task.isFinalTask());
+        task.setPreciousResult(((String) xpath.evaluate("@preciousResult",
+                taskNode, XPathConstants.STRING)).equals("true"));
+        System.out.println("final = " + task.isPreciousResult());
 
         // TASK RETRIES
         String rerunnable = (String) xpath.evaluate("@retries", taskNode,
@@ -405,7 +406,7 @@ public class JobFactory {
         Node verifNode = (Node) xpath.evaluate(addPrefixes("selection/script"),
                 taskNode, XPathConstants.NODE);
         if (verifNode != null) {
-            task.setVerifyingScript(createVerifyingScript(verifNode));
+            task.setSelectionScript(createSelectionScript(verifNode));
         }
 
         // TASK PRE
@@ -413,7 +414,7 @@ public class JobFactory {
                 taskNode, XPathConstants.NODE);
         if (preNode != null) {
             System.out.println("PRE");
-            task.setPreTask(createScript(preNode));
+            task.setPreScript(createScript(preNode));
         }
 
         // TASK POST
@@ -421,7 +422,7 @@ public class JobFactory {
                 taskNode, XPathConstants.NODE);
         if (postNode != null) {
             System.out.println("POST");
-            task.setPostTask(createScript(postNode));
+            task.setPostScript(createScript(postNode));
         }
         return task;
     }
@@ -468,13 +469,14 @@ public class JobFactory {
     private JavaTask createJavaTask(Node process)
         throws XPathExpressionException, ClassNotFoundException, IOException {
         JavaTask desc = new JavaTask();
-        desc.setTaskClass((Class<ExecutableJavaTask>) Class.forName(
+        desc.setTaskClass((Class<JavaExecutable>) Class.forName(
                 (String) xpath.compile("@class")
                               .evaluate(process, XPathConstants.STRING)));
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(
                     "parameters/parameter"), process, XPathConstants.NODESET);
+
         if (args != null) {
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
@@ -482,28 +484,33 @@ public class JobFactory {
                         XPathConstants.STRING);
                 String value = (String) xpath.evaluate("@value", arg,
                         XPathConstants.STRING);
+
                 if ((name != null) && (value != null)) {
                     desc.getArguments().put(name, value);
                 }
             }
         }
-        for (Entry<String, Object> entry : desc.getArguments().entrySet())
+
+        for (Entry<String, String> entry : desc.getArguments().entrySet())
             System.out.println("arg: " + entry.getKey() + " = " +
                 entry.getValue());
+
         return desc;
     }
 
     @SuppressWarnings("unchecked")
-    private ApplicationTask createApplicationTask(Node process)
+    private ProActiveTask createProActiveTask(Node process)
         throws XPathExpressionException, ClassNotFoundException, IOException {
-        ApplicationTask desc = new ApplicationTask();
-        desc.setTaskClass((Class<ExecutableApplicationTask>) Class.forName(
+        ProActiveTask desc = new ProActiveTask();
+        desc.setTaskClass((Class<ProActiveExecutable>) Class.forName(
                 (String) xpath.compile("@class")
                               .evaluate(process, XPathConstants.STRING)));
         // TODO Verify that class extends Task
         System.out.println("task = " + desc.getTaskClass().getCanonicalName());
+
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(
                     "parameters/parameter"), process, XPathConstants.NODESET);
+
         if (args != null) {
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
@@ -517,14 +524,17 @@ public class JobFactory {
                             "/job/proActive/@neededNodes"), arg,
                         XPathConstants.NUMBER)).intValue();
                 desc.setNumberOfNodesNeeded(neededNodes);
+
                 if ((name != null) && (value != null)) {
                     desc.getArguments().put(name, value);
                 }
             }
         }
-        for (Entry<String, Object> entry : desc.getArguments().entrySet())
+
+        for (Entry<String, String> entry : desc.getArguments().entrySet())
             System.out.println("arg: " + entry.getKey() + " = " +
                 entry.getValue());
+
         return desc;
     }
 
@@ -532,8 +542,10 @@ public class JobFactory {
         String[] parameters = null;
         NodeList args = (NodeList) xpath.evaluate(addPrefixes(
                     "arguments/argument"), node, XPathConstants.NODESET);
+
         if (args != null) {
             parameters = new String[args.getLength()];
+
             for (int i = 0; i < args.getLength(); i++) {
                 Node arg = args.item(i);
                 String value = (String) xpath.evaluate("@value", arg,
@@ -541,6 +553,7 @@ public class JobFactory {
                 parameters[i] = value;
             }
         }
+
         return parameters;
     }
 
@@ -552,27 +565,35 @@ public class JobFactory {
                 XPathConstants.NODE);
         Node codeNode = (Node) xpath.evaluate(addPrefixes("code"), node,
                 XPathConstants.NODE);
+
         if (fileNode != null) {
             // file
             String url = (String) xpath.evaluate("@url", fileNode,
                     XPathConstants.STRING);
+
             if ((url != null) && (!url.equals(""))) {
                 System.out.println(url);
+
                 return new SimpleScript(new URL(url), getArguments(fileNode));
             }
+
             String path = (String) xpath.evaluate("@path", fileNode,
                     XPathConstants.STRING);
+
             if ((path != null) && (!path.equals(""))) {
                 System.out.println(path);
+
                 return new SimpleScript(new File(path), getArguments(fileNode));
             }
         } else {
             // code
             String engine = (String) xpath.evaluate("@language", codeNode,
                     XPathConstants.STRING);
+
             if (((engine != null) && (!engine.equals(""))) &&
                     (node.getTextContent() != null)) {
                 String script = node.getTextContent();
+
                 try {
                     return new SimpleScript(script, engine);
                 } catch (InvalidScriptException e) {
@@ -585,76 +606,27 @@ public class JobFactory {
         throw new InvalidScriptException("The script is not recognized");
     }
 
-    private VerifyingScript createVerifyingScript(Node node)
+    private SelectionScript createSelectionScript(Node node)
         throws XPathExpressionException, InvalidScriptException,
             MalformedURLException {
         Script<?> script = createScript(node);
-        return new VerifyingScript(script, true);
-    }
 
-    private class ValidatingErrorHandler implements ErrorHandler {
-        private int mistakes = 0;
-
-        public ValidatingErrorHandler() {
-        }
-
-        public void error(SAXParseException exception)
-            throws SAXException {
-            System.err.println("ERROR:" + exception.getMessage() + " at line " +
-                exception.getLineNumber() + ", column " +
-                exception.getColumnNumber());
-            mistakes++;
-        }
-
-        public void fatalError(SAXParseException exception)
-            throws SAXException {
-            System.err.println("ERROR:" + exception.getMessage() + " at line " +
-                exception.getLineNumber() + ", column " +
-                exception.getColumnNumber());
-            mistakes++;
-        }
-
-        public void warning(SAXParseException exception)
-            throws SAXException {
-            System.err.println("WARNING:" + exception.getMessage() +
-                " at line " + exception.getLineNumber() + ", column " +
-                exception.getColumnNumber());
-        }
-    }
-
-    private class SchedulerNamespaceContext implements NamespaceContext {
-        public String getNamespaceURI(String prefix) {
-            if ((prefix == null) || (prefix.length() == 0)) {
-                throw new NullPointerException("Null prefix");
-            } else if (prefix.equals(JOB_PREFIX)) {
-                return JOB_NAMESPACE;
-            } else if ("xml".equals(prefix)) {
-                return XMLConstants.XML_NS_URI;
-            }
-            return XMLConstants.DEFAULT_NS_PREFIX;
-        }
-
-        // This method isn't necessary for XPath processing.
-        public String getPrefix(String uri) {
-            throw new UnsupportedOperationException();
-        }
-
-        // This method isn't necessary for XPath processing either.
-        public Iterator<?> getPrefixes(String uri) {
-            throw new UnsupportedOperationException();
-        }
+        return new SelectionScript(script, true);
     }
 
     private static String addPrefixes(String unprefixedPath) {
         if ((JOB_PREFIX != null) || (JOB_PREFIX.length() > 0)) {
             String pr = JOB_PREFIX + ":";
             unprefixedPath = " " + unprefixedPath + " ";
+
             StringTokenizer st = new StringTokenizer(unprefixedPath, "/");
             StringBuilder sb = new StringBuilder();
             boolean slash_start = false;
             boolean in_the_middle = false;
+
             while (st.hasMoreElements()) {
                 String token = st.nextToken().trim();
+
                 if (token.length() > 0) {
                     if (in_the_middle || slash_start) {
                         if (!token.startsWith("@")) {
@@ -675,8 +647,67 @@ public class JobFactory {
                     slash_start = true;
                 }
             }
+
             return sb.toString();
         }
+
         return unprefixedPath;
+    }
+
+    private class ValidatingErrorHandler implements ErrorHandler {
+        private int mistakes = 0;
+
+        public ValidatingErrorHandler() {
+        }
+
+        @Override
+        public void error(SAXParseException exception)
+            throws SAXException {
+            System.err.println("ERROR:" + exception.getMessage() + " at line " +
+                exception.getLineNumber() + ", column " +
+                exception.getColumnNumber());
+            mistakes++;
+        }
+
+        @Override
+        public void fatalError(SAXParseException exception)
+            throws SAXException {
+            System.err.println("ERROR:" + exception.getMessage() + " at line " +
+                exception.getLineNumber() + ", column " +
+                exception.getColumnNumber());
+            mistakes++;
+        }
+
+        @Override
+        public void warning(SAXParseException exception)
+            throws SAXException {
+            System.err.println("WARNING:" + exception.getMessage() +
+                " at line " + exception.getLineNumber() + ", column " +
+                exception.getColumnNumber());
+        }
+    }
+
+    private class SchedulerNamespaceContext implements NamespaceContext {
+        public String getNamespaceURI(String prefix) {
+            if ((prefix == null) || (prefix.length() == 0)) {
+                throw new NullPointerException("Null prefix");
+            } else if (prefix.equals(JOB_PREFIX)) {
+                return JOB_NAMESPACE;
+            } else if ("xml".equals(prefix)) {
+                return XMLConstants.XML_NS_URI;
+            }
+
+            return XMLConstants.DEFAULT_NS_PREFIX;
+        }
+
+        // This method isn't necessary for XPath processing.
+        public String getPrefix(String uri) {
+            throw new UnsupportedOperationException();
+        }
+
+        // This method isn't necessary for XPath processing either.
+        public Iterator<?> getPrefixes(String uri) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

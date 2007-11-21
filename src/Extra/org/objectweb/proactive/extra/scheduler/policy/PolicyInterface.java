@@ -42,7 +42,7 @@ import org.objectweb.proactive.extra.scheduler.task.EligibleTaskDescriptor;
  * Policy interface for the scheduler.
  * Must be implemented in order to be used as a policy in the scheduler core.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 5, 2007
  * @since ProActive 3.2
  */

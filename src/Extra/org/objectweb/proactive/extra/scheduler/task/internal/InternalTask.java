@@ -39,11 +39,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
-import org.objectweb.proactive.extra.scheduler.common.task.Status;
+import org.objectweb.proactive.extra.scheduler.common.task.Executable;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
 
@@ -52,7 +52,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
  * This class contains all informations about the task to launch.
  * It also provides a method to create its own launcher.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 9, 2007
  * @since ProActive 3.2
  */
@@ -94,7 +94,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      * @throws TaskCreationException if the task cannot be created or initialized
      * @return the user task represented by this task descriptor.
      */
-    public abstract ExecutableTask getTask() throws TaskCreationException;
+    public abstract Executable getTask() throws TaskCreationException;
 
     /**
      * Create the launcher for this taskDescriptor.
@@ -107,11 +107,15 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     public TaskLauncher createLauncher(String host, int port, Node node)
         throws ActiveObjectCreationException, NodeException {
         TaskLauncher launcher;
-        launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
-                new Object[] { getId(), host, port, getPreTask(), getPostTask() },
-                node);
-
+        if (getPreScript() == null) {
+            launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
+                    new Object[] { getId(), host, port }, node);
+        } else {
+            launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
+                    new Object[] { getId(), host, port, getPreScript() }, node);
+        }
         setExecuterInformations(new ExecuterInformations(launcher, node));
+
         return launcher;
     }
 
@@ -172,10 +176,11 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
                     task.getRerunnable())))
             : (new Integer(task.getRerunnable()).compareTo(new Integer(
                     getRerunnable())));
-        case SORT_BY_RUN_TIME_LIMIT:
-            return (currentOrder == ASC_ORDER)
-            ? ((int) (getRunTimeLimit() - task.getRunTimeLimit()))
-            : ((int) (task.getRunTimeLimit() - getRunTimeLimit()));
+
+        //        case SORT_BY_RUN_TIME_LIMIT:
+        //            return (currentOrder == ASC_ORDER)
+        //            ? ((int) (getRunTimeLimit() - task.getRunTimeLimit()))
+        //            : ((int) (task.getRunTimeLimit() - getRunTimeLimit()));
         case SORT_BY_HOST_NAME:
             return (currentOrder == ASC_ORDER)
             ? (getExecutionHostName().compareTo(task.getExecutionHostName()))
@@ -197,6 +202,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
         if (dependences == null) {
             dependences = new ArrayList<InternalTask>();
         }
+
         dependences.add(task);
     }
 
@@ -343,17 +349,17 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      *
      * @return the status
      */
-    public Status getStatus() {
+    public TaskState getStatus() {
         return taskInfo.getStatus();
     }
 
     /**
      * To set the status
      *
-     * @param status the status to set
+     * @param taskState the status to set
      */
-    public void setStatus(Status status) {
-        taskInfo.setStatus(status);
+    public void setStatus(TaskState taskState) {
+        taskInfo.setStatus(taskState);
     }
 
     /**
@@ -372,6 +378,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
         if (InternalTask.class.isAssignableFrom(obj.getClass())) {
             return ((InternalTask) obj).getId().equals(getId());
         }
+
         return false;
     }
 

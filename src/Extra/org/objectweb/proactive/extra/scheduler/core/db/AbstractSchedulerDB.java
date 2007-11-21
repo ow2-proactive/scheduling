@@ -85,6 +85,7 @@ public abstract class AbstractSchedulerDB {
                 instance = new EmptySchedulerDB();
             }
         }
+
         return instance;
     }
 

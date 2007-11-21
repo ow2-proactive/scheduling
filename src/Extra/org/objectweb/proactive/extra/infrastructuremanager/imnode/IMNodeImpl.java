@@ -43,7 +43,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSour
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 public class IMNodeImpl implements IMNode, Serializable {
@@ -51,7 +51,7 @@ public class IMNodeImpl implements IMNode, Serializable {
     /**  */
     private static final long serialVersionUID = -7612176229370058091L;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.IM_DATARESOURCE);
-    private HashMap<VerifyingScript, Integer> scriptStatus;
+    private HashMap<SelectionScript, Integer> scriptStatus;
 
     // Attributes
     private Node node;
@@ -80,7 +80,7 @@ public class IMNodeImpl implements IMNode, Serializable {
                             .getHostName();
         this.vmName = node.getNodeInformation().getVMInformation()
                           .getDescriptorVMName();
-        this.scriptStatus = new HashMap<VerifyingScript, Integer>();
+        this.scriptStatus = new HashMap<SelectionScript, Integer>();
     }
 
     // ----------------------------------------------------------------------//
@@ -171,6 +171,7 @@ public class IMNodeImpl implements IMNode, Serializable {
     @Override
     public String toString() {
         String mes = "\n";
+
         try {
             mes += ("| Name of this Node  :  " + getNodeURL() + "\n");
             mes += "+-----------------------------------------------+\n";
@@ -185,6 +186,7 @@ public class IMNodeImpl implements IMNode, Serializable {
         } catch (NodeException e) {
             mes += "Node is down \n";
         }
+
         return mes;
     }
 
@@ -192,7 +194,7 @@ public class IMNodeImpl implements IMNode, Serializable {
      * If no script handler is define, create one, and execute the script.
      */
     @SuppressWarnings("unchecked")
-    public ScriptResult<Boolean> executeScript(VerifyingScript script) {
+    public ScriptResult<Boolean> executeScript(SelectionScript script) {
         if (handler == null) {
             try {
                 handler = ScriptLoader.createHandler(this.node);
@@ -201,6 +203,7 @@ public class IMNodeImpl implements IMNode, Serializable {
                         "Unable to create Script Handler on node ", e));
             }
         }
+
         return handler.handle(script);
     }
 
@@ -209,6 +212,7 @@ public class IMNodeImpl implements IMNode, Serializable {
      */
     public synchronized void clean() {
         handler = null;
+
         try {
             node.killAllActiveObjects();
         } catch (Exception e) {
@@ -221,16 +225,17 @@ public class IMNodeImpl implements IMNode, Serializable {
         if (imnode instanceof IMNode) {
             return this.nodeURL.equals(((IMNode) imnode).getNodeURL());
         }
+
         return false;
     }
-    ;
+
     @Override
     public int hashCode() {
         return nodeURL.hashCode();
     }
 
     @SuppressWarnings("unchecked")
-    public HashMap<VerifyingScript, Integer> getScriptStatus() {
+    public HashMap<SelectionScript, Integer> getScriptStatus() {
         return scriptStatus;
     }
 
@@ -260,6 +265,7 @@ public class IMNodeImpl implements IMNode, Serializable {
                 return this.getVNodeName().compareTo(imnode.getVNodeName());
             }
         }
+
         return this.getPADName().compareTo(imnode.getPADName());
     }
 }

@@ -121,6 +121,7 @@ public class GenerationScript extends Script<String> {
     protected ScriptResult<String> getResult(Bindings bindings) {
         if (bindings.containsKey(RESULT_VARIABLE)) {
             Object result = bindings.get(RESULT_VARIABLE);
+
             if (result instanceof String) {
                 return new ScriptResult<String>((String) result);
             } else {

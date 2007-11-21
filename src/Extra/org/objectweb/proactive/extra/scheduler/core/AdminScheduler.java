@@ -43,6 +43,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerIn
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.exception.AdminSchedulerException;
+import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 
 
@@ -83,13 +84,14 @@ public class AdminScheduler extends UserScheduler
         throws AdminSchedulerException {
         logger.info(
             "********************* STARTING NEW SCHEDULER *******************");
-        //verifying arguments...
+
+        //check arguments...
         if (imp == null) {
             throw new AdminSchedulerException(
                 "The Entity manager must be set !");
         }
 
-        //verifying that the scheduler is an active object
+        //check that the scheduler is an active object
         try {
             ProActiveObject.getActiveObjectNodeUrl(imp);
         } catch (ProActiveRuntimeException e) {
@@ -106,6 +108,7 @@ public class AdminScheduler extends UserScheduler
         AdminScheduler adminScheduler = new AdminScheduler();
         SchedulerFrontend schedulerFrontend;
         SchedulerAuthentication schedulerAuth;
+
         try {
             // creating the scheduler proxy.
             // if this fails then it will not continue.
@@ -125,6 +128,7 @@ public class AdminScheduler extends UserScheduler
             //    new NFEHandler("Scheduler authentication"));
             // registering the scheduler proxy at the given URL
             logger.info("Registering scheduler...");
+
             String schedulerUrl = "//localhost/" +
                 SchedulerConnection.SCHEDULER_DEFAULT_NAME;
             ProActiveObject.register(schedulerAuth, schedulerUrl);
@@ -164,8 +168,20 @@ public class AdminScheduler extends UserScheduler
         InfrastructureManagerProxy imp, String policyFullClassName)
         throws AdminSchedulerException, SchedulerException, LoginException {
         createScheduler(loginFile, groupFile, imp, policyFullClassName);
+
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
+
         return auth.logAsAdmin(login, password);
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface#changePolicy(java.lang.Class)
+     */
+    @Override
+    public BooleanWrapper changePolicy(
+        Class<?extends PolicyInterface> newPolicyFile)
+        throws SchedulerException {
+        return schedulerFrontend.changePolicy(newPolicyFile);
     }
 
     /**

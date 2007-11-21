@@ -56,7 +56,7 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Executable;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
@@ -79,7 +79,6 @@ public class TaskLauncher implements InitActive, Serializable {
     private static final long serialVersionUID = -9159607482957244049L;
     protected TaskId taskId;
     protected Script<?> pre;
-    protected Script<?> post;
     protected String host;
     protected Integer port;
 
@@ -95,21 +94,33 @@ public class TaskLauncher implements InitActive, Serializable {
     }
 
     /**
-     * Constructor with task identification
+     * Constructor with task identification.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
+     *
+     * @param taskId represents the task the launcher will execute.
+     * @param host the host on which to append the standard output/input.
+     * @param port the port number on which to send the standard output/input.
+     */
+    public TaskLauncher(TaskId taskId, String host, Integer port) {
+        this.taskId = taskId;
+        this.host = host;
+        this.port = port;
+    }
+
+    /**
+     * Constructor with task identification.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
      *
      * @param taskId represents the task the launcher will execute.
      * @param host the host on which to append the standard output/input.
      * @param port the port number on which to send the standard output/input.
      * @param pre the script executed before the task.
-     * @param post the script executed after the task.
      */
-    public TaskLauncher(TaskId taskId, String host, Integer port,
-        Script<?> pre, Script<?> post) {
+    public TaskLauncher(TaskId taskId, String host, Integer port, Script<?> pre) {
         this.taskId = taskId;
         this.host = host;
         this.port = port;
         this.pre = pre;
-        this.post = post;
     }
 
     /**
@@ -130,17 +141,20 @@ public class TaskLauncher implements InitActive, Serializable {
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, ExecutableTask executableTask,
+    public TaskResult doTask(SchedulerCore core, Executable executableTask,
         TaskResult... results) {
         // plug stdout/err into a socketAppender
         this.initLoggers();
+
         try {
             //launch pre script
             if (pre != null) {
                 this.executePreScript(null);
             }
+
             //init task
             executableTask.init();
+
             //launch task
             Object userResult = executableTask.execute(results);
 
@@ -164,6 +178,7 @@ public class TaskLauncher implements InitActive, Serializable {
                 // TODO : logger.warn
                 System.err.println("WARNING : Loggers are not shut down !");
             }
+
             //terminate the task
             core.terminate(taskId);
         }
@@ -176,10 +191,12 @@ public class TaskLauncher implements InitActive, Serializable {
     protected void initLoggers() {
         // error about log should not be logged
         LogLog.setQuietMode(true);
+
         // create logger
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
                 this.taskId.getJobId());
         l.setAdditivity(false);
+
         Appender out = new SocketAppender(this.host, this.port);
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
         l.removeAllAppenders();
@@ -216,13 +233,14 @@ public class TaskLauncher implements InitActive, Serializable {
      * Execute the preScript on the node n, or on the default node if n is null
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
-     * @throws UserException if an error occured during the execution of the script
+     * @throws UserException if an error occurred during the execution of the script
      * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
      */
     protected void executePreScript(Node n)
         throws ActiveObjectCreationException, NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(n);
         ScriptResult<String> res = handler.handle(pre);
+
         if (res.errorOccured()) {
             System.err.println("Error on pre-script occured : ");
             res.getException().printStackTrace();
@@ -242,6 +260,7 @@ public class TaskLauncher implements InitActive, Serializable {
     public NodeSet getNodes() throws NodeException {
         Collection<Node> nodes = new ArrayList<Node>();
         nodes.add(ProActiveObject.getNode());
+
         return new NodeSet(new ArrayList<Node>(nodes));
     }
 

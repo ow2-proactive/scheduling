@@ -44,7 +44,7 @@ import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
 
 
 /**
- *
+ * TODO bravo la javadoc en français !!
  * @author cvergoni
  * Main et CallBack pour TracerWithCallbackMessage
  * Main soit: -d�marre le dump de la topologie � partir d'une addresse
@@ -73,6 +73,7 @@ public class Tracer implements java.io.Serializable {
      */
     public static void dumpP2PNetwork(String addr) {
         Dumper dumper = null;
+
         try {
             dumper = (Dumper) ProActiveObject.newActive(Dumper.class.getName(),
                     new Object[] {  });
@@ -80,6 +81,7 @@ public class Tracer implements java.io.Serializable {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         dumper.dumpAsText();
     }
 
@@ -92,6 +94,7 @@ public class Tracer implements java.io.Serializable {
             for (int i = 0; i < MAX_NODE; i++) {
                 cache[i] = 0;
             }
+
             distP2PService.dumpAcquaintances(new TracerWithCallbackMessage(
                     TTL, UniversalUniqueID.randomUUID(),
                     (Tracer) ProActiveObject.getStubOnThis()));
@@ -102,9 +105,11 @@ public class Tracer implements java.io.Serializable {
 
     public void printCache() {
         int i = 0;
+
         while (i < MAX_NODE) {
             System.out.print(cache[i++] + " ");
         }
+
         System.out.println();
     }
 
@@ -115,11 +120,13 @@ public class Tracer implements java.io.Serializable {
      */
     public int getTabPositionOf(String addr) {
         int current;
+
         if (fileTabPosition.containsKey(addr)) {
             return fileTabPosition.get(addr);
         } else {
             current = currentTabPos++;
             fileTabPosition.put(addr, current);
+
             return current;
         }
     }
@@ -135,12 +142,14 @@ public class Tracer implements java.io.Serializable {
             System.out.println("addr [" + getTabPositionOf(addr) + "]:" + addr +
                 " Acquaintances :" + nbAcquaintances);
         }
+
         cache[getTabPositionOf(addr)] = nbAcquaintances;
     }
 
     public static void main(String[] args) {
         if (args.length < 2) {
             System.out.println("USAGE:" + USAGE);
+
             return;
         }
 
@@ -169,6 +178,7 @@ public class Tracer implements java.io.Serializable {
                 Node distNode = NodeFactory.getNode(addr);
                 P2PService p2p = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
                 System.out.println("DEBUT");
+
                 P2PNodeLookup lookup = p2p.getNodes(1, "test0", "test1");
                 System.out.println("FIN");
             } catch (Exception e) {

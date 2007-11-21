@@ -40,23 +40,23 @@ import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ProActiveExecutable;
 
 
 /**
  * @author jlscheef
  */
-public class ApplicationExample extends ExecutableApplicationTask {
+public class ProActiveExample extends ProActiveExecutable {
 
     /** Serial Version UID */
     private static final long serialVersionUID = -8328166769211310963L;
     private int numberToFind = 5003;
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask#init(java.util.Map)
+     * @see org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable#init(java.util.Map)
      */
     @Override
-    public void init(Map<String, Object> args) {
+    public void init(Map<String, String> args) {
         try {
             numberToFind = Integer.parseInt(args.get("numberToFind").toString());
         } catch (NumberFormatException e) { /* will stay to 5003 */
@@ -65,10 +65,11 @@ public class ApplicationExample extends ExecutableApplicationTask {
 
     @Override
     public Object execute(ArrayList<Node> nodes) {
-        System.out.println("Application started !!");
+        System.out.println("ProActive job started !!");
 
         // create workers (on local node)
         Vector<Worker> workers = new Vector<Worker>();
+
         for (Node node : nodes) {
             try {
                 Worker w = (Worker) ProActiveObject.newActive(Worker.class.getName(),
@@ -104,6 +105,7 @@ public class ApplicationExample extends ExecutableApplicationTask {
             BooleanWrapper flase = new BooleanWrapper(false);
             int found = 0;
             int n = 2;
+
             while (found < nth) {
                 Vector<BooleanWrapper> answers = new Vector<BooleanWrapper>();
 

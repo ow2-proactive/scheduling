@@ -96,6 +96,7 @@ public class IdentifyJob implements Serializable {
         if (userIdentification == null) {
             return false;
         }
+
         return userId.isAdmin() || userIdentification.equals(userId);
     }
 
@@ -133,6 +134,7 @@ public class IdentifyJob implements Serializable {
         if (obj instanceof IdentifyJob) {
             return jobId.equals(((IdentifyJob) obj).jobId);
         }
+
         return false;
     }
 }

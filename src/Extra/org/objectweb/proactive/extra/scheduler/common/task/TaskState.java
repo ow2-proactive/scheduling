@@ -32,13 +32,14 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 
 /**
- * The status of each task submitted by the user
+ * The state of each task submitted by the user.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.1, Jun 28, 2007
  * @since ProActive 3.2
  */
-public enum Status implements java.io.Serializable {
+public enum TaskState implements java.io.Serializable {
+
     /**
      *
      * The task has just been submitted by the user
@@ -86,7 +87,7 @@ public enum Status implements java.io.Serializable {
      *
      * @param name the name of the status.
      */
-    Status(String name) {
+    TaskState(String name) {
         this.name = name;
     }
 

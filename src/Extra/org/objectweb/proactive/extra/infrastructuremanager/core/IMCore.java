@@ -64,7 +64,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.Dy
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.DynamicNSInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PADNSInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 public class IMCore implements InitActive, IMConstants, Serializable {
@@ -97,6 +97,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
         if (logger.isDebugEnabled()) {
             logger.debug("IMCore constructor");
         }
+
         this.nodeIM = nodeIM;
     }
 
@@ -111,28 +112,33 @@ public class IMCore implements InitActive, IMConstants, Serializable {
         if (logger.isDebugEnabled()) {
             logger.debug("IMCore start : initActivity");
         }
+
         try {
             if (logger.isDebugEnabled()) {
                 logger.debug("active object IMAdmin");
             }
+
             admin = (IMAdminImpl) ProActiveObject.newActive(IMAdminImpl.class.getName(),
                     new Object[] { ProActiveObject.getStubOnThis() }, nodeIM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("active object IMMonitoring");
             }
+
             monitoring = (IMMonitoringImpl) ProActiveObject.newActive(IMMonitoringImpl.class.getName(),
                     new Object[] { ProActiveObject.getStubOnThis() }, nodeIM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("active object IMUser");
             }
+
             user = (IMUserImpl) ProActiveObject.newActive(IMUserImpl.class.getName(),
                     new Object[] { ProActiveObject.getStubOnThis() }, nodeIM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("instanciation IMDataResourceImpl");
             }
+
             this.nodeManager = new IMNodeSourceManager("NSManager", nodeIM);
             this.dataresource = new IMDataResourceImpl(nodeManager);
 
@@ -145,6 +151,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
         } catch (NodeException e) {
             e.printStackTrace();
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("IMCore end : initActivity");
         }
@@ -189,6 +196,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
                 node.getNodeInformation().getName() + "\t\t vnName=" + vnName +
                 "\t\t padName=" + padName);
         }
+
         padNS.addNode(node, vnName, padName);
     }
 
@@ -332,13 +340,13 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      * @return an arraylist of nodes
      * @throws NodeException
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript) {
-        return this.dataresource.getAtMostNodes(nb, verifyingScript);
+    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript) {
+        return this.dataresource.getAtMostNodes(nb, selectionScript);
     }
 
     public NodeSet getExactlyNodes(IntWrapper nb,
-        VerifyingScript verifyingScript) {
-        return this.dataresource.getExactlyNodes(nb, verifyingScript);
+        SelectionScript selectionScript) {
+        return this.dataresource.getExactlyNodes(nb, selectionScript);
     }
 
     /**
@@ -374,6 +382,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
      */
     public void shutdown() throws ProActiveException {
         BooleanWrapper bool = nodeManager.shutdown();
+
         try {
             if (bool.booleanValue()) {
                 logger.info("Infrastructure Manager successfully shut down.");
@@ -383,12 +392,14 @@ public class IMCore implements InitActive, IMConstants, Serializable {
         } catch (Exception e) {
             logger.error("Error during IM Shut down : ", e);
         }
+
         ProActive.exitSuccess();
     }
 
     public ArrayList<DynamicNSInterface> getDynamicNodeSources() {
         ArrayList<DynamicNSInterface> dns = new ArrayList<DynamicNSInterface>();
         dns.addAll(nodeManager.getDynamicNodeSources());
+
         return dns;
     }
 
@@ -402,6 +413,7 @@ public class IMCore implements InitActive, IMConstants, Serializable {
 
     public void addDynamicNodeSources(DynamicNodeSource dns) {
         ArrayList<DynamicNodeSource> dynNS = nodeManager.getDynamicNodeSources();
+
         if (!dynNS.contains(dns)) {
             nodeManager.addDynamicNodeSource(dns);
         }

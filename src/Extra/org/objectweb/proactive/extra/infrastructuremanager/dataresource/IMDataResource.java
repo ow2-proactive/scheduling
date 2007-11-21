@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
@@ -78,19 +78,19 @@ public interface IMDataResource {
     // GET NODE 
     /**
      * Return a maximum of nb Nodes in a {@link NodeSet},
-     * that verify the {@link VerifyingScript} if given.
+     * that verify the {@link SelectionScript} if given.
      * If no node is available, an empty NodeSet is returned.
      */
-    public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript);
+    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript);
 
     /**
      * Return nb Nodes in a {@link NodeSet},
-     * that verify the {@link VerifyingScript} if given.
+     * that verify the {@link SelectionScript} if given.
      * If no node is available, or if there is not enough nodes,
      * an empty NodeSet is returned.
      */
     public NodeSet getExactlyNodes(IntWrapper nb,
-        VerifyingScript verifyingScript);
+        SelectionScript selectionScript);
 
     /**
      * Notify that the given {@link IMNode} is down.

@@ -112,6 +112,7 @@ public class UserIdentification implements Serializable {
      */
     public void setUserEvents(SchedulerEvent[] events) {
         userEvents = new HashSet<SchedulerEvent>();
+
         for (SchedulerEvent e : events) {
             userEvents.add(e);
         }
@@ -127,6 +128,7 @@ public class UserIdentification implements Serializable {
         if (object instanceof UserIdentification) {
             return username.equals(((UserIdentification) object).username);
         }
+
         return false;
     }
 }

@@ -36,7 +36,7 @@ import java.io.Serializable;
 /**
  * Definition of a job identification.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
@@ -50,6 +50,21 @@ public final class JobId implements Comparable<JobId>, Serializable {
 
     /** current instance id */
     private int id;
+
+    /**
+     * ProActive empty constructor
+     */
+    public JobId() {
+    }
+
+    /**
+     * Default Job id constructor
+     *
+     * @param id the id to put in the jobId
+     */
+    private JobId(int id) {
+        this.id = id;
+    }
 
     /**
      * To set the initial id value
@@ -83,21 +98,6 @@ public final class JobId implements Comparable<JobId>, Serializable {
     }
 
     /**
-     * ProActive empty constructor
-     */
-    public JobId() {
-    }
-
-    /**
-     * Default Job id constructor
-     *
-     * @param id the id to put in the jobId
-     */
-    private JobId(int id) {
-        this.id = id;
-    }
-
-    /**
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(JobId jobId) {
@@ -112,6 +112,7 @@ public final class JobId implements Comparable<JobId>, Serializable {
         if ((o != null) && o instanceof JobId) {
             return ((JobId) o).id == id;
         }
+
         return false;
     }
 

@@ -136,8 +136,10 @@ public class BufferedAppender extends AppenderSkeleton {
         for (LoggingEvent e : this.buffer) {
             sink.doAppend(e);
         }
+
         // add sink to the sinks
         this.sinks.add(sink);
+
         // still fill in buffer if required
         if (!this.keepBuffer) {
             this.buffer = null;
@@ -172,9 +174,11 @@ public class BufferedAppender extends AppenderSkeleton {
      */
     private void fillInBuffer(LoggingEvent event) {
         assert (this.buffer.size() <= this.bufferSize);
+
         if (this.nbFiredEvents > this.bufferSize) {
             this.buffer.removeFirst();
         }
+
         this.buffer.addLast(event);
         this.nbFiredEvents++;
     }
@@ -195,12 +199,14 @@ public class BufferedAppender extends AppenderSkeleton {
         if (!this.keepBuffer) {
             this.buffer = null;
         }
+
         if (this.sinks.size() != 0) {
             for (Appender s : this.sinks) {
                 // close sink
                 s.close();
             }
         }
+
         this.closed = true;
     }
 

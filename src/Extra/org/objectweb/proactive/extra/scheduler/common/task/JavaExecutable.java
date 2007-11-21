@@ -36,12 +36,13 @@ import java.util.Map;
 /**
  * A java task is a task representing a java .class file.
  * Extends this abstract class if you want to create your own java task.
+ * This class provides an {@link #init(Map)} your arguments back for this task.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 4, 2007
  * @since ProActive 3.2
  */
-public abstract class ExecutableJavaTask extends ExecutableTask {
+public abstract class JavaExecutable extends Executable {
 
     /**
      * Initialization default method for a task.
@@ -50,8 +51,7 @@ public abstract class ExecutableJavaTask extends ExecutableTask {
      *
      * @param args a map containing the different variables names and values.
      */
-    @Override
-    public void init(Map<String, Object> args) throws Exception {
+    public void init(Map<String, String> args) throws Exception {
         // TODO : automatic assignation ?
     }
 }

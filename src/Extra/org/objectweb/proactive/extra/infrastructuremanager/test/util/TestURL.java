@@ -76,6 +76,7 @@ public class TestURL {
                 "-------------------------------------------------");
 
             System.out.println("Slitons un peu le path de l'uri : ");
+
             String path = uri.getPath();
             String[] chemin = path.split("/");
             String file = chemin[chemin.length - 1];
@@ -89,6 +90,7 @@ public class TestURL {
             System.out.println(file1);
 
             System.out.println("URI : HelloLocal.xml");
+
             URI uri2 = new URI("HelloLocal.xml");
 
             String path2 = uri2.getPath();

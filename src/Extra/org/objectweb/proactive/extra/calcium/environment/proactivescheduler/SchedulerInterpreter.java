@@ -34,11 +34,11 @@ import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.environment.Interpreter;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 import org.objectweb.proactive.extensions.calcium.task.Task;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
-public class SchedulerInterpreter extends ExecutableJavaTask {
+public class SchedulerInterpreter extends JavaExecutable {
     Task task;
     FileServerClient fserver;
 

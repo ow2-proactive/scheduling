@@ -35,7 +35,7 @@ package org.objectweb.proactive.extra.scheduler.common.job;
  * Class representing the type of the job.
  * Type are best describe below.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 11, 2007
  * @since ProActive 3.2
  */
@@ -45,7 +45,7 @@ public enum JobType implements java.io.Serializable {
      * Every tasks can communicate with each others.
      * So they all have to be executed in same time.
      */
-    APPLI("Job Application"),
+    PROACTIVE("ProActive Job"),
     /**
      * Tasks can be executed one by one or all in same time but
      * every task represents the same native or java task.
@@ -72,7 +72,7 @@ public enum JobType implements java.io.Serializable {
         if (typeName.equals("taskFlow")) {
             return TASKSFLOW;
         } else {
-            return APPLI;
+            return PROACTIVE;
         }
     }
 }

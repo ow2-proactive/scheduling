@@ -47,21 +47,25 @@ import org.objectweb.proactive.core.node.Node;
  * @since ProActive 3.2
  */
 public class NodeSet extends ArrayList<Node> {
+
+    /**  */
+    private static final long serialVersionUID = 4372709972508178428L;
+
     public NodeSet() {
         super();
+
         // TODO Auto-generated constructor stub
     }
 
     public NodeSet(Collection<?extends Node> c) {
         super(c);
+
         // TODO Auto-generated constructor stub
     }
 
     public NodeSet(int initialCapacity) {
         super(initialCapacity);
+
         // TODO Auto-generated constructor stub
     }
-
-    /**  */
-    private static final long serialVersionUID = 4372709972508178428L;
 }

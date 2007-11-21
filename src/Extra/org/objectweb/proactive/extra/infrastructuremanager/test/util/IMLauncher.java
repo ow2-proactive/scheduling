@@ -58,7 +58,7 @@ public class IMLauncher {
         IMUser user = IMFactory.getUser();
         IMMonitoring monitor = IMFactory.getMonitoring();
         admin.deployAllVirtualNodes(new File(
-                "../../../descriptors/scheduler/deployment/test.xml"), null);
+                "../../../descriptors/scheduler/deployment/test_all.xml"), null);
         // admin.deployAllVirtualNodes(new File(
         // "/user/jmartin/home/test.xml"),
         // null);

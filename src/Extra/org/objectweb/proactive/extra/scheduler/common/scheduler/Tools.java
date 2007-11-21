@@ -37,7 +37,7 @@ import java.util.Calendar;
 /**
  * Tools class.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 26, 2007
  * @since ProActive 3.2
  */
@@ -58,9 +58,11 @@ public class Tools implements Serializable {
      */
     public static String formatNChar(int toFormat, int nbChar) {
         String formatted = toFormat + "";
+
         while (formatted.length() < nbChar) {
             formatted = "0" + formatted;
         }
+
         return formatted;
     }
 
@@ -89,27 +91,35 @@ public class Tools implements Serializable {
         // Secondes
         tmp = (int) duration % 60;
         duration = duration / 60;
+
         if (tmp > 0) {
             formatted = tmp + "s " + formatted;
         }
+
         // Minutes
         tmp = (int) duration % 60;
         duration = duration / 60;
+
         if (tmp > 0) {
             formatted = tmp + "m " + formatted;
         }
+
         // Hours
         tmp = (int) duration % 24;
         duration = duration / 24;
+
         if (tmp > 0) {
             formatted = tmp + "h " + formatted;
         }
+
         // Days
         tmp = (int) duration;
+
         if (tmp > 0) {
             formatted = tmp + " day" + ((tmp > 1) ? "s" : "") + " - " +
                 formatted;
         }
+
         return formatted;
     }
 
@@ -123,8 +133,10 @@ public class Tools implements Serializable {
         if (time == -1) {
             return "Not yet";
         }
+
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(time);
+
         return String.format("%1$tT  %1$tD", calendar);
     }
 }

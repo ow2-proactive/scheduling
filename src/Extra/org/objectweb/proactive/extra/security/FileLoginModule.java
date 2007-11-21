@@ -78,6 +78,7 @@ public class FileLoginModule implements LoginModule {
         String reqGroup = null;
         String groupsFilePath = null;
         GroupHierarchy groupsHierarchy = null;
+
         try {
             callbackHandler.handle(callbacks);
 
@@ -111,6 +112,7 @@ public class FileLoginModule implements LoginModule {
         }
 
         Properties props = new Properties();
+
         try {
             props.load(new FileInputStream(new File(filePath)));
         } catch (FileNotFoundException e) {
@@ -130,6 +132,7 @@ public class FileLoginModule implements LoginModule {
 
         if (reqGroup != null) {
             Properties groups = new Properties();
+
             try {
                 groups.load(new FileInputStream(new File(groupsFilePath)));
             } catch (FileNotFoundException e) {
@@ -139,9 +142,11 @@ public class FileLoginModule implements LoginModule {
             }
 
             String group = (String) groups.get(username);
+
             if (group == null) {
                 throw new FailedLoginException("User doesn't belong to a group");
             }
+
             if (groupsHierarchy == null) {
                 throw new FailedLoginException("Groups hierarchy not found");
             }
@@ -157,6 +162,7 @@ public class FileLoginModule implements LoginModule {
         }
 
         succeeded = true;
+
         return true;
     }
 
@@ -167,11 +173,13 @@ public class FileLoginModule implements LoginModule {
     public boolean abort() throws LoginException {
         boolean result = succeeded;
         succeeded = false;
+
         return result;
     }
 
     public boolean logout() throws LoginException {
         succeeded = false;
+
         return true;
     }
 
@@ -185,15 +193,19 @@ public class FileLoginModule implements LoginModule {
         public boolean isAbove(String trueGroup, String reqGroup)
             throws FailedLoginException {
             int trueGroupLevel = groupLevel(trueGroup);
+
             if (trueGroupLevel == -1) {
                 throw new FailedLoginException(
                     "User group is not in groups hierarchy");
             }
+
             int reqGroupLevel = groupLevel(reqGroup);
+
             if (reqGroupLevel == -1) {
                 throw new FailedLoginException(
                     "Required group is not in groups hierarchy");
             }
+
             return trueGroupLevel >= reqGroupLevel;
         }
 
@@ -203,6 +215,7 @@ public class FileLoginModule implements LoginModule {
                     return i;
                 }
             }
+
             return -1;
         }
     }

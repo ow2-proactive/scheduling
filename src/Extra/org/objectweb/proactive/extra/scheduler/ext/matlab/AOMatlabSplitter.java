@@ -70,20 +70,27 @@ public class AOMatlabSplitter extends AOSimpleMatlab {
         if (results.length > 1) {
             throw new InvalidNumberOfParametersException(results.length);
         }
+
         if (results.length == 1) {
             TaskResult res = results[0];
+
             if (res.hadException()) {
                 throw res.getException();
             }
+
             if (!(res.value() instanceof Token)) {
                 throw new InvalidParameterException(res.value().getClass());
             }
+
             Token in = (Token) res.value();
             MatlabEngine.put("in", in);
         }
+
         MatlabEngine.put("nout", new IntToken(numberOfChildren));
         executeScript();
+
         Token result = MatlabEngine.get("out");
+
         if (!(result instanceof ArrayToken)) {
             throw new IllegalReturnTypeException(result.getClass());
         }

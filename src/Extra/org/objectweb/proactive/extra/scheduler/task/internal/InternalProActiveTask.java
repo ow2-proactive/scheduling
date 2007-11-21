@@ -35,49 +35,49 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableApplicationTask;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
-import org.objectweb.proactive.extra.scheduler.task.AppliTaskLauncher;
+import org.objectweb.proactive.extra.scheduler.common.task.Executable;
+import org.objectweb.proactive.extra.scheduler.common.task.ProActiveExecutable;
+import org.objectweb.proactive.extra.scheduler.task.ProActiveTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
 
 /**
- * Description of an application java task.
+ * Description of an ProActive java task.
  * See also @see AbstractJavaTaskDescriptor
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
-public class InternalAppliTask extends InternalAbstractJavaTask {
+public class InternalProActiveTask extends InternalAbstractJavaTask {
 
     /** Serial Version UID */
     private static final long serialVersionUID = -6946803819032140410L;
 
     /** the java task to launch */
-    private ExecutableApplicationTask task;
+    private ProActiveExecutable task;
 
     /**
      * ProActive empty constructor
      */
-    public InternalAppliTask() {
+    public InternalProActiveTask() {
     }
 
     /**
-     * Create a new Java application task descriptor using instantiated java task.
+     * Create a new Java ProActive task descriptor using instantiated java task.
      *
      * @param task the already instantiated java task.
      */
-    public InternalAppliTask(ExecutableApplicationTask task) {
+    public InternalProActiveTask(ProActiveExecutable task) {
         this.task = task;
     }
 
     /**
-     * Create a new Java application task descriptor using a specific Class.
+     * Create a new Java ProActive task descriptor using a specific Class.
      *
      * @param taskClass the class instance of the class to instantiate.
      */
-    public InternalAppliTask(Class<ExecutableApplicationTask> taskClass) {
+    public InternalProActiveTask(Class<ProActiveExecutable> taskClass) {
         super(taskClass);
     }
 
@@ -85,16 +85,16 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
      * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
      */
     @Override
-    public ExecutableTask getTask() throws TaskCreationException {
+    public Executable getTask() throws TaskCreationException {
         // create task from taskClass
         if (task == null) {
             try {
-                task = (ExecutableApplicationTask) taskClass.newInstance();
+                task = (ProActiveExecutable) taskClass.newInstance();
             } catch (InstantiationException e) {
-                throw new TaskCreationException("Cannot create applitask from task class ",
+                throw new TaskCreationException("Cannot create ProActive task from task class ",
                     e);
             } catch (IllegalAccessException e) {
-                throw new TaskCreationException("Cannot create applitask from task class ",
+                throw new TaskCreationException("Cannot create ProActive task from task class ",
                     e);
             }
         }
@@ -110,21 +110,27 @@ public class InternalAppliTask extends InternalAbstractJavaTask {
     @Override
     public TaskLauncher createLauncher(String host, int port, Node node)
         throws ActiveObjectCreationException, NodeException {
-        AppliTaskLauncher launcher;
-        launcher = (AppliTaskLauncher) ProActiveObject.newActive(AppliTaskLauncher.class.getName(),
-                new Object[] { getId(), host, port, getPreTask(), getPostTask() },
-                node);
+        ProActiveTaskLauncher launcher;
+
+        if (getPreScript() == null) {
+            launcher = (ProActiveTaskLauncher) ProActiveObject.newActive(ProActiveTaskLauncher.class.getName(),
+                    new Object[] { getId(), host, port }, node);
+        } else {
+            launcher = (ProActiveTaskLauncher) ProActiveObject.newActive(ProActiveTaskLauncher.class.getName(),
+                    new Object[] { getId(), host, port, getPreScript() }, node);
+        }
 
         setExecuterInformations(new ExecuterInformations(launcher, node));
+
         return launcher;
     }
 
     /**
-     * Set the instantiated java application task.
+     * Set the instantiated java ProActive task.
      *
-     * @param task the instantiated java application task.
+     * @param task the instantiated java ProActive task.
      */
-    public void setTask(ExecutableApplicationTask task) {
+    public void setTask(ProActiveExecutable task) {
         this.task = task;
     }
 

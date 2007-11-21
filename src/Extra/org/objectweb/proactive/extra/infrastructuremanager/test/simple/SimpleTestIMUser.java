@@ -79,7 +79,9 @@ public class SimpleTestIMUser {
             // GET NODE(S)
             System.out.println(
                 "#[SimpleTestIMUser] User ask to the IM One Node");
+
             NodeSet node = user.getAtMostNodes(new IntWrapper(1), null);
+
             if (!node.isEmpty()) {
                 afficheNodeInfo(node.get(0));
             }
@@ -87,8 +89,10 @@ public class SimpleTestIMUser {
             int nbAskedNodes = 2;
             System.out.println("#[SimpleTestIMUser] User ask to the IM " +
                 nbAskedNodes + " Nodes");
+
             NodeSet nodes = user.getAtMostNodes(new IntWrapper(nbAskedNodes),
                     null);
+
             for (Node aNode : nodes) {
                 afficheNodeInfo(aNode);
             }

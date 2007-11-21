@@ -36,11 +36,11 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.Random;
 
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
-public class MonteCarlo extends ExecutableJavaTask {
+public class MonteCarlo extends JavaExecutable {
 
     /**  */
     private static final long serialVersionUID = 6803732909189957274L;
@@ -51,51 +51,60 @@ public class MonteCarlo extends ExecutableJavaTask {
     private String file = null;
 
     @Override
-    public void init(Map<String, Object> args) {
+    public void init(Map<String, String> args) {
         if (args.containsKey("steps")) {
             try {
                 steps = Long.parseLong(args.get("steps").toString());
             } catch (NumberFormatException e) {
             }
         }
+
         if (args.containsKey("iterations")) {
             try {
                 iterations = Long.parseLong(args.get("iterations").toString());
             } catch (NumberFormatException e) {
             }
         }
+
         if (args.containsKey("file")) {
             file = args.get("file").toString();
         }
     }
 
-    @Override
     public Object execute(TaskResult... results) {
         Random rand = new Random(System.currentTimeMillis());
         long n = iterations;
         long print = iterations / steps;
         int nbPrint = 0;
         double res = 0;
+
         while (n > 0) {
             if (print < 0) {
                 System.out.println("Calcul intermediaire (" +
                     (100 - ((n * 100) / iterations)) + "%) : Pi = " +
-                    ((4 * res) / (((++nbPrint) * iterations) / steps)));
+                    (((double) 4 * res) / (((++nbPrint) * iterations) / steps)));
                 print = iterations / steps;
             }
+
             double x = rand.nextDouble();
             double y = rand.nextDouble();
+
             if (((x * x) + (y * y)) < 1) {
                 res++;
             }
+
             print--;
             n--;
         }
+
         Double result = new Double((4 * res) / iterations);
+
         if (file != null) {
             FileOutputStream f = null;
+
             try {
                 f = new FileOutputStream(file);
+
                 PrintStream ps = new PrintStream(f);
                 ps.println("Le resultat de Pi par Montecarlo est : " + result);
             } catch (Exception e) {
@@ -108,6 +117,7 @@ public class MonteCarlo extends ExecutableJavaTask {
                 }
             }
         }
+
         return result;
     }
 }

@@ -36,8 +36,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
-import org.objectweb.proactive.extra.scheduler.task.ExecutableNativeTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Executable;
+import org.objectweb.proactive.extra.scheduler.task.NativeExecutable;
 import org.objectweb.proactive.extra.scheduler.task.NativeTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
@@ -47,7 +47,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
  * This task include the process
  * see also {@link InternalTask}
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
@@ -82,15 +82,16 @@ public class InternalNativeTask extends InternalTask {
      * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
      */
     @Override
-    public ExecutableTask getTask() throws TaskCreationException {
+    public Executable getTask() throws TaskCreationException {
         //create the new task that will launch the command on execute.
-        ExecutableNativeTask executableNativeTask = null;
+        NativeExecutable executableNativeTask = null;
+
         try {
-            executableNativeTask = new ExecutableNativeTask(this.cmd,
-                    this.gscript);
+            executableNativeTask = new NativeExecutable(this.cmd, this.gscript);
         } catch (Exception e) {
             throw new TaskCreationException("Cannot create native task !!", e);
         }
+
         return executableNativeTask;
     }
 
@@ -101,11 +102,16 @@ public class InternalNativeTask extends InternalTask {
     public TaskLauncher createLauncher(String host, int port, Node node)
         throws ActiveObjectCreationException, NodeException {
         NativeTaskLauncher launcher;
-        launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                new Object[] { getId(), host, port, getPreTask(), getPostTask() },
-                node);
+        if (getPreScript() == null) {
+            launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
+                    new Object[] { getId(), host, port }, node);
+        } else {
+            launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
+                    new Object[] { getId(), host, port, getPreScript() }, node);
+        }
 
         setExecuterInformations(new ExecuterInformations(launcher, node));
+
         return launcher;
     }
 }

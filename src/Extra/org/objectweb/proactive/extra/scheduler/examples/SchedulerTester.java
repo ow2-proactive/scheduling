@@ -63,25 +63,32 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
  * @since 2.2
  */
 public class SchedulerTester {
-    public final static String DATA_HOME = "/proj/proactivep2p/home/scheduler/";
+    //public final static String DATA_HOME = "/proj/proactivep2p/home/scheduler/";
+    public final static String DATA_HOME = "/user/jlscheef/home/workspace/ProActiveScheduler/descriptors/scheduler/";
 
     //public final static String PROACTIVE_HOME = "/user/jlscheef/home/worspace/ProActiveScheduler/";
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     // scheduler connection
     private static final String DEFAULT_URL = null;
+
+    // submission period
+    private final static int DEFAULT_MSP = 120000;
+
+    // nb jobs
+    private final static int DEFAULT_MNJ = 3;
     private SchedulerAuthenticationInterface authentication;
 
     // users
     private Set<Thread> users;
-
-    // submission period
-    private final static int DEFAULT_MSP = 120000;
     private int maxSubmissionPeriod;
-
-    // nb jobs
-    private final static int DEFAULT_MNJ = 3;
     private int maxNbJobs;
+
+    public SchedulerTester(int msp, int mnj) {
+        this.users = new HashSet<Thread>();
+        this.maxNbJobs = mnj;
+        this.maxSubmissionPeriod = msp;
+    }
 
     /**
      * args[0] = [schedulerURL]
@@ -103,32 +110,31 @@ public class SchedulerTester {
         }
     }
 
-    public SchedulerTester(int msp, int mnj) {
-        this.users = new HashSet<Thread>();
-        this.maxNbJobs = mnj;
-        this.maxSubmissionPeriod = msp;
-    }
-
     public void randomizedTest() {
         HashMap<String, String> logins = new HashMap<String, String>();
         Vector<String> jobs = null;
+
         try {
             // read logins
             FileReader l = new FileReader(SchedulerTester.class.getResource(
                         "login.cfg").getFile());
             BufferedReader br = new BufferedReader(l);
             String current = br.readLine();
+
             while (current != null) {
                 StringTokenizer sep = new StringTokenizer(current, ":");
                 logins.put(sep.nextToken(), sep.nextToken());
                 current = br.readLine();
             }
+
             l.close();
 
             System.out.print("[SCHEDULER TEST] Used logins are : ");
+
             for (String s : logins.keySet()) {
                 System.out.print(s + ", ");
             }
+
             System.out.println();
 
             // read jobs
@@ -136,6 +142,7 @@ public class SchedulerTester {
             String[] jobsTmp = d.list();
             // remove non *xml
             jobs = new Vector<String>();
+
             for (int i = 0; i < jobsTmp.length; i++) {
                 if (jobsTmp[i].endsWith("xml")) {
                     jobs.add(jobsTmp[i]);
@@ -143,9 +150,11 @@ public class SchedulerTester {
             }
 
             System.out.print("[SCHEDULER TEST] Used jobs are : ");
+
             for (String s : jobs) {
                 System.out.print(s + ", ");
             }
+
             System.out.println();
 
             for (String s : logins.keySet()) {
@@ -229,6 +238,7 @@ public class SchedulerTester {
 
                 // Get results if any ...
                 Vector<JobId> resultsTmp = (Vector<JobId>) this.results.clone();
+
                 for (JobId id : resultsTmp) {
                     try {
                         if (scheduler.getJobResult(id) != null) {

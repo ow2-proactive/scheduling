@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * Class TaskFlowJob.
  * This is the definition of a tasks flow job.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
@@ -62,13 +62,14 @@ public class InternalTaskFlowJob extends InternalJob {
      *
      * @param name the current job name.
      * @param priority the priority of this job between 1 and 5.
-     * @param runtimeLimit the maximum execution time for this job given in millisecond.
      * @param cancelOnError true if the job has to run until its end or an user intervention.
      * @param description a short description of the job and what it will do.
      */
+
+    //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
     public InternalTaskFlowJob(String name, JobPriority priority,
-        long runtimeLimit, boolean cancelOnError, String description) {
-        super(name, priority, runtimeLimit, cancelOnError, description);
+        boolean cancelOnError, String description) {
+        super(name, priority, cancelOnError, description);
     }
 
     /**
@@ -84,6 +85,7 @@ public class InternalTaskFlowJob extends InternalJob {
                 return false;
             }
         }
+
         return true;
     }
 

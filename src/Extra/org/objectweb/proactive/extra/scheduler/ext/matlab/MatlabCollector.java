@@ -54,9 +54,11 @@ public class MatlabCollector extends SimpleMatlab {
                 AOMatlabCollector.class.getName(), matlabCommandName,
                 inputScript, scriptLines);
         System.out.println("[" + host + " MATLAB TASK] Executing (Collector)");
+
         Object res = collectorWorker.execute(results);
         res = ProFuture.getFutureValue(res);
         collectorWorker.terminate();
+
         return res;
     }
 }

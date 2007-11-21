@@ -71,6 +71,7 @@ public class IMAdminImpl implements IMAdmin, Serializable {
         if (logger.isInfoEnabled()) {
             logger.info("IMAdmin constructor");
         }
+
         this.imcore = imcore;
     }
 

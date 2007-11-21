@@ -58,17 +58,20 @@ public class RemoteTask {
         // redirect stdout
         System.setOut(new PrintStream(
                 new LoggingOutputStream(logger, Level.INFO), true));
+
         //        System.setErr(new PrintStream(new LoggingOutputStream(logger, Level.ERROR), true));
     }
 
     public void doTask() {
         System.out.println(" Message info 1 from " + this);
+
         try {
             Thread.sleep(2000);
         } catch (InterruptedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
         System.err.println(" Message error 2 from " + this);
     }
 
@@ -76,6 +79,7 @@ public class RemoteTask {
         System.out.println(" Terminating logger on " + this);
         //logger.removeAllAppenders();
         LogManager.shutdown();
+
         return 0;
     }
 }

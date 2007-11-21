@@ -55,14 +55,20 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.ext.matlab.exception.MatlabInitException;
 import org.objectweb.proactive.extra.scheduler.util.LinuxShellExecuter;
 import org.objectweb.proactive.extra.scheduler.util.Shell;
 
 
-public class SimpleMatlab extends ExecutableJavaTask {
+public class SimpleMatlab extends JavaExecutable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 1928510537227891918L;
+
     // This hostname, for debugging purpose
     protected String host;
 
@@ -107,13 +113,13 @@ public class SimpleMatlab extends ExecutableJavaTask {
     public SimpleMatlab() {
     }
 
-    @Override
     public Object execute(TaskResult... results) throws Throwable {
         for (TaskResult res : results) {
             if (res.hadException()) {
                 throw res.getException();
             }
         }
+
         // First we try to find MATLAB
         findMatlab();
 
@@ -133,10 +139,12 @@ public class SimpleMatlab extends ExecutableJavaTask {
         // We start the loggers thread
         Thread t1 = new Thread(isLogger);
         t1.start();
+
         Thread t2 = new Thread(esLogger);
         t2.start();
 
         System.out.println("[" + host + " MATLAB TASK] Executing the task");
+
         // finally we call the internal version of the execute method
         Object res = executeInternal(uri, results);
 
@@ -144,6 +152,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
         synchronized (isLogger.goon) {
             isLogger.goon = false;
         }
+
         synchronized (esLogger.goon) {
             esLogger.goon = false;
         }
@@ -151,12 +160,13 @@ public class SimpleMatlab extends ExecutableJavaTask {
         // Then we destroy the process and return the results
         process.destroy();
         process = null;
+
         return res;
     }
 
-    @Override
-    public void init(Map<String, Object> args) throws Exception {
+    public void init(Map<String, String> args) throws Exception {
         Object s = args.get("script");
+
         if (s != null) {
             scriptLines = new ArrayList<String>();
             scriptLines.add((String) s);
@@ -165,28 +175,34 @@ public class SimpleMatlab extends ExecutableJavaTask {
         URL scriptURL;
 
         Object u = args.get("scriptUrl");
+
         if (u != null) {
             scriptURL = new URI((String) u).toURL();
+
             InputStream is = scriptURL.openStream();
             scriptLines = getContentAsList(is);
         }
 
         Object f = args.get("scriptFile");
+
         if (f != null) {
             FileInputStream fis = new FileInputStream((String) f);
             scriptLines = getContentAsList(fis);
         }
+
         if (scriptLines.size() == 0) {
             throw new IllegalArgumentException(
                 "Either one of \"script\" \"scripturl\" \"scriptfile\" must be given");
         }
 
         Object input = args.get("input");
+
         if (input != null) {
             inputScript = (String) input;
         }
 
         Object ind = args.get("index");
+
         if (ind != null) {
             index = Integer.parseInt((String) ind);
         }
@@ -204,6 +220,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
         ProActiveException ex = null;
         AOSimpleMatlab worker = null;
         System.out.println("[" + host + " MATLAB TASK] Deploying the Worker");
+
         // We create an active object on the given node URI, the JVM corresponding to this node URI is starting,
         // so we retry for 30 seconds until the JVM has started and we can create the Active Object
         for (int i = 0; i < 30; i++) {
@@ -220,11 +237,13 @@ public class SimpleMatlab extends ExecutableJavaTask {
                 e.printStackTrace();
             }
         }
+
         if (worker == null) {
             System.err.println("[" + host +
                 " MATLAB TASK] Worker couldn't be deployed.");
             throw ex;
         }
+
         return worker;
     }
 
@@ -243,12 +262,14 @@ public class SimpleMatlab extends ExecutableJavaTask {
                 matlabCommandName, inputScript, scriptLines);
         System.out.println("[" + host +
             " MATLAB TASK] Executing (SimpleMatlab)");
+
         // We execute the task on the worker
         Object res = matlabWorker.execute(index, results);
         // We wait for the result
         res = ProFuture.getFutureValue(res);
         // We make a synchronous call to terminate
         matlabWorker.terminate();
+
         return res;
     }
 
@@ -269,11 +290,14 @@ public class SimpleMatlab extends ExecutableJavaTask {
         String libPath = env.get("LD_LIBRARY_PATH");
         libPath = addMatlabToPath(libPath);
         env.put("LD_LIBRARY_PATH", libPath);
+
         // we add matlab directories to PATH (Windows)
         String path = env.get("PATH");
+
         if (path == null) {
             path = env.get("Path");
         }
+
         env.put("PATH", addMatlabToPath(path));
 
         // javaCommandBuilder.setJavaPath(System.getenv("JAVA_HOME") +
@@ -293,6 +317,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
      */
     private String addMatlabToPath(String path) {
         String newPath;
+
         if (path == null) {
             newPath = "";
         } else {
@@ -306,6 +331,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
         newPath = newPath + os.pathSeparator() +
             (matlabHome + os.fileSeparator() + "sys" + os.fileSeparator() +
             "os" + os.fileSeparator() + matlabLibDirName);
+
         return newPath;
     }
 
@@ -319,7 +345,9 @@ public class SimpleMatlab extends ExecutableJavaTask {
         throws IOException, InterruptedException, MatlabInitException {
         System.out.println("[" + host +
             " MATLAB TASK] launching script to find Matlab");
+
         Process p1 = null;
+
         if (os.equals(OperatingSystem.unix)) {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
@@ -335,23 +363,28 @@ public class SimpleMatlab extends ExecutableJavaTask {
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = getContentAsList(is);
             File batchFile = new File("find_matlab_command.bat");
+
             if (batchFile.exists()) {
                 batchFile.delete();
             }
+
             batchFile.createNewFile();
             batchFile.deleteOnExit();
 
             if (batchFile.canWrite()) {
                 PrintWriter pw = new PrintWriter(new BufferedWriter(
                             new FileWriter(batchFile)));
+
                 for (String line : inputLines) {
                     pw.println(line);
                     pw.flush();
                 }
+
                 pw.close();
             } else {
                 throw new MatlabInitException("can't write in : " + batchFile);
             }
+
             // End of this code
 
             // finally we launch the batch file
@@ -375,6 +408,7 @@ public class SimpleMatlab extends ExecutableJavaTask {
             String full_command = lines.get(0);
             System.out.println("[" + host + " MATLAB TASK] Found Matlab at : " +
                 full_command);
+
             File file = new File(full_command);
             matlabCommandName = file.getName();
             matlabHome = file.getParentFile().getParentFile().getAbsolutePath();
@@ -383,9 +417,11 @@ public class SimpleMatlab extends ExecutableJavaTask {
             StringWriter error_message = new StringWriter();
             PrintWriter pw = new PrintWriter(error_message);
             pw.println("Error during find_matlab script execution:");
+
             for (String l : lines) {
                 pw.println(l);
             }
+
             throw new MatlabInitException(error_message.toString());
         }
     }
@@ -401,12 +437,14 @@ public class SimpleMatlab extends ExecutableJavaTask {
                     new BufferedInputStream(is)));
 
         String line = null;
+
         try {
             line = d.readLine();
         } catch (IOException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+
         while (line != null) {
             lines.add(line);
 
@@ -417,17 +455,14 @@ public class SimpleMatlab extends ExecutableJavaTask {
                 line = null;
             }
         }
+
         try {
             d.close();
         } catch (IOException e) {
         }
+
         return lines;
     }
-
-    /**
-         *
-         */
-    private static final long serialVersionUID = 1928510537227891918L;
 
     /**
      * An utility class to build the Java command
@@ -445,9 +480,11 @@ public class SimpleMatlab extends ExecutableJavaTask {
             String javaCommand = buildJavaCommand();
             List<String> javaCommandList = new ArrayList<String>();
             StringTokenizer st = new StringTokenizer(javaCommand, " ");
+
             while (st.hasMoreElements()) {
                 javaCommandList.add(st.nextToken());
             }
+
             return javaCommandList;
         }
     }
@@ -472,18 +509,22 @@ public class SimpleMatlab extends ExecutableJavaTask {
                         streamToLog));
             String line = null;
             ;
+
             try {
                 line = br.readLine();
             } catch (IOException e) {
             }
+
             while ((line != null) && goon) {
                 System.out.println(appendMessage + line);
                 System.out.flush();
+
                 try {
                     line = br.readLine();
                 } catch (IOException e) {
                 }
             }
+
             try {
                 br.close();
             } catch (IOException e) {

@@ -44,19 +44,20 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 /**
- * ResultRecup ...
+ * GetJobResult ...
  *
  * @author jlscheef - ProActiveTeam
  * @date 23 oct. 07
  * @version 3.2
  *
  */
-public class ResultRecup {
+public class GetJobResult {
     public static void main(String[] args) {
         try {
             //GET SCHEDULER
             UserSchedulerInterface scheduler;
             SchedulerAuthenticationInterface auth;
+
             if (args.length > 0) {
                 auth = SchedulerConnection.join("//" + args[0] + "/" +
                         SchedulerConnection.SCHEDULER_DEFAULT_NAME);
@@ -73,9 +74,11 @@ public class ResultRecup {
             String jID;
             System.out.print(
                 "\nPlease enter the job id to get its result or 'exit' to exit :  ");
+
             while (!(jID = buf.readLine()).equals("exit")) {
                 int begin = 0;
                 int end = 0;
+
                 if (jID.matches(".* to .*")) {
                     String[] TjID = jID.split(" to ");
                     begin = Integer.parseInt(TjID[0]);
@@ -84,15 +87,19 @@ public class ResultRecup {
                     begin = Integer.parseInt(jID);
                     end = Integer.parseInt(jID);
                 }
+
                 for (int i = begin; i <= end; i++) {
                     try {
                         JobResult result = scheduler.getJobResult(JobId.makeJobId(i +
                                     ""));
+
                         if (result != null) {
                             System.out.println("Job " + i + " Result => ");
-                            for (Entry<String, TaskResult> e : result.getTaskResults()
+
+                            for (Entry<String, TaskResult> e : result.getAllResults()
                                                                      .entrySet()) {
                                 TaskResult tRes = e.getValue();
+
                                 try {
                                     System.out.println("\t " + e.getKey() +
                                         " : " + tRes.value());
@@ -112,6 +119,7 @@ public class ResultRecup {
                             e.getMessage());
                     }
                 }
+
                 System.out.print(
                     "\nPlease enter the job id to get its result or 'exit' to exit :  ");
             }

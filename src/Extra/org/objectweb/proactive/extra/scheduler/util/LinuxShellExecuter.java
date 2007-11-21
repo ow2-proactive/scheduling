@@ -52,6 +52,7 @@ public class LinuxShellExecuter {
         if (!file.exists() || !file.canRead()) {
             throw new IOException("Read error on : " + file);
         }
+
         return executeShellScript(new FileInputStream(file), shell);
     }
 
@@ -62,23 +63,30 @@ public class LinuxShellExecuter {
         Process pshell = Runtime.getRuntime().exec(shell.command());
         PrintWriter out = new PrintWriter(new OutputStreamWriter(
                     pshell.getOutputStream()));
+
         try {
             String line;
+
             while ((line = in.readLine()) != null) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("[SHELL SCRIPT] " + line);
                 }
+
                 out.println(line);
             }
+
             in.close();
         } catch (IOException ex) {
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("[SHELL SCRIPT] exit");
         }
+
         out.println("exit");
         out.flush();
         out.close();
+
         return pshell;
     }
 }

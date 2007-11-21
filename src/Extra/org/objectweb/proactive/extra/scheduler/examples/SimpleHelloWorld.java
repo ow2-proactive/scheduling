@@ -46,7 +46,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
@@ -72,7 +72,7 @@ public class SimpleHelloWorld {
                     "//localhost/" +
                     SchedulerConnection.SCHEDULER_DEFAULT_NAME);
 
-            //Now you are connected you must log on with a couple username/password matching an entry in login and group files.
+            //Now you are connected you must log on with a couple of username/password matching an entry in login and group files.
             //(groups.cfg, login.cfg in the same directory)
             //you can also log on as admin if your username is in admin group. (it provides you more power ;) )
             UserSchedulerInterface scheduler = auth.logAsUser("chri", "chri");
@@ -80,8 +80,7 @@ public class SimpleHelloWorld {
             //if this point is reached, that's we are connected to the scheduler under "chri".
 
             //******************** CREATE A NEW JOB ***********************
-            //params are respectively : name, priority, runtimeLimit (not yet implemented), 
-            //							reUntilCancel  (not yet implemented), description.
+            //params are respectively : name, priority,cancelOnError, description.
             TaskFlowJob job = new TaskFlowJob();
             job.setName("job name");
             job.setPriority(JobPriority.NORMAL);
@@ -90,12 +89,12 @@ public class SimpleHelloWorld {
 
             //******************** CREATE A NEW TASK ***********************
             //creating a new task
-            ExecutableJavaTask task = new ExecutableJavaTask() {
+            JavaExecutable task = new JavaExecutable() {
                     private static final long serialVersionUID = 1938122426482626365L;
 
-                    @Override
                     public Object execute(TaskResult... results) {
                         System.out.println("Hello World !");
+
                         try {
                             return "HelloWorld Sample host : " +
                             URIBuilder.getLocalAddress().toString();
@@ -105,13 +104,14 @@ public class SimpleHelloWorld {
                     }
                 };
 
-            //Create the javatask
+            //Create the java task
             JavaTask desc = new JavaTask();
             desc.setName("toto");
             //adding the task to the job
             desc.setTaskInstance(task);
             //this task is final, it means that the job result will contain this task result.
-            desc.setFinalTask(true);
+            desc.setPreciousResult(true);
+
             //add the task to the job
             try {
                 job.addTask(desc);
@@ -126,6 +126,7 @@ public class SimpleHelloWorld {
 
             //******************** GET JOB OUTPUT ***********************
             SimpleLoggerServer simpleLoggerServer;
+
             try {
                 // it will launch a listener that will listen connection on any free port
                 simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
@@ -144,10 +145,12 @@ public class SimpleHelloWorld {
             // if you want the result as soon as possible we suggest this loop.
             // In the future you could get the result like a future in ProActive or with a listener.
             JobResult result = null;
+
             while (result == null) {
                 try {
                     Thread.sleep(2000);
                     result = scheduler.getJobResult(jobId);
+
                     //the result is null if the job is not finished.
                 } catch (SchedulerException se) {
                     se.printStackTrace();
@@ -155,7 +158,8 @@ public class SimpleHelloWorld {
                     e.printStackTrace();
                 }
             }
-            result.getTaskResults().get("toto");
+
+            result.getPreciousResults().get("toto");
             System.out.println("Result : " + result);
         } catch (SchedulerException e) {
             //the scheduler had a problem

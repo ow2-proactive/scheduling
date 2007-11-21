@@ -83,11 +83,13 @@ public class AdminCommunicator {
     public static void main(String[] args) {
         try {
             SchedulerAuthenticationInterface auth;
+
             if (args.length > 0) {
                 auth = SchedulerConnection.join(args[0]);
             } else {
                 auth = SchedulerConnection.join(null);
             }
+
             scheduler = auth.logAsAdmin("jl", "jl");
             stopCommunicator = false;
             startCommandListener();
@@ -114,6 +116,7 @@ public class AdminCommunicator {
         } else if (command.equals(START_CMD)) {
             try {
                 boolean success = scheduler.start().booleanValue();
+
                 if (success) {
                     output("Scheduler started.\n");
                 } else {
@@ -125,6 +128,7 @@ public class AdminCommunicator {
         } else if (command.equals(STOP_CMD)) {
             try {
                 boolean success = scheduler.stop().booleanValue();
+
                 if (success) {
                     output("Scheduler stopped.\n");
                 } else {
@@ -136,6 +140,7 @@ public class AdminCommunicator {
         } else if (command.equals(PAUSE_CMD)) {
             try {
                 boolean success = scheduler.pause().booleanValue();
+
                 if (success) {
                     output("Scheduler paused.\n");
                 } else {
@@ -147,6 +152,7 @@ public class AdminCommunicator {
         } else if (command.equals(PAUSE_IM_CMD)) {
             try {
                 boolean success = scheduler.pauseImmediate().booleanValue();
+
                 if (success) {
                     output("Scheduler freezed.\n");
                 } else {
@@ -159,6 +165,7 @@ public class AdminCommunicator {
         } else if (command.equals(RESUME_CMD)) {
             try {
                 boolean success = scheduler.resume().booleanValue();
+
                 if (success) {
                     output("Scheduler resumed.\n");
                 } else {
@@ -199,6 +206,7 @@ public class AdminCommunicator {
             try {
                 boolean success = scheduler.pause(JobId.makeJobId(
                             command.split(" ")[1])).booleanValue();
+
                 if (success) {
                     output("Job paused.\n");
                 } else {
@@ -212,6 +220,7 @@ public class AdminCommunicator {
             try {
                 boolean success = scheduler.resume(JobId.makeJobId(
                             command.split(" ")[1])).booleanValue();
+
                 if (success) {
                     output("Job resumed.\n");
                 } else {
@@ -225,6 +234,7 @@ public class AdminCommunicator {
             try {
                 boolean success = scheduler.kill(JobId.makeJobId(
                             command.split(" ")[1])).booleanValue();
+
                 if (success) {
                     output("Job killed.\n");
                 } else {
@@ -238,8 +248,10 @@ public class AdminCommunicator {
             try {
                 String jID = command.replaceFirst(GET_RESULT_CMD, "");
                 jID = jID.trim();
+
                 int begin = 0;
                 int end = 0;
+
                 if (jID.matches(".* to .*")) {
                     String[] TjID = jID.split(" to ");
                     begin = Integer.parseInt(TjID[0]);
@@ -248,15 +260,19 @@ public class AdminCommunicator {
                     begin = Integer.parseInt(jID);
                     end = Integer.parseInt(jID);
                 }
+
                 for (int i = begin; i <= end; i++) {
                     try {
                         JobResult result = scheduler.getJobResult(JobId.makeJobId(i +
                                     ""));
+
                         if (result != null) {
                             System.out.println("Job " + i + " Result => ");
-                            for (Entry<String, TaskResult> e : result.getTaskResults()
+
+                            for (Entry<String, TaskResult> e : result.getAllResults()
                                                                      .entrySet()) {
                                 TaskResult tRes = e.getValue();
+
                                 try {
                                     System.out.println("\t " + e.getKey() +
                                         " : " + tRes.value());
@@ -290,9 +306,12 @@ public class AdminCommunicator {
     private static void startCommandListener() throws Exception {
         BufferedReader reader = new BufferedReader(new InputStreamReader(
                     System.in));
+
         while (!stopCommunicator) {
             output(" > ");
+
             String line = reader.readLine();
+
             try {
                 handleCommand(line);
             } catch (NumberFormatException e) {
@@ -305,9 +324,11 @@ public class AdminCommunicator {
         try {
             HashMap<String, Object> stat = scheduler.getStats().getProperties();
             String out = "";
+
             for (Entry<String, Object> e : stat.entrySet()) {
                 out += (e.getKey() + " : " + e.getValue() + "\n");
             }
+
             output(out + "\n");
         } catch (SchedulerException e) {
             e.printStackTrace();

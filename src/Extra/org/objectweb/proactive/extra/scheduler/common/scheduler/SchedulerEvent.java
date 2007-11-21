@@ -37,7 +37,6 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
  * @author jlscheef - ProActiveTeam
  * @date 18 oct. 07
  * @version 3.2
- *
  */
 public enum SchedulerEvent {
     IMMEDIATE_PAUSED("schedulerImmediatePausedEvent"),
@@ -48,14 +47,14 @@ public enum SchedulerEvent {
     KILLED("schedulerKilledEvent"),
     JOB_KILLED("jobKilledEvent"),
     JOB_PAUSED("jobPausedEvent"),
-    PENDING_TO_RUNNING_JOB("pendingToRunningJobEvent"),
+    PENDING_TO_RUNNING_JOB("jobPendingToRunningEvent"),
     JOB_RESUMED("jobResumedEvent"),
-    NEW_PENDING_JOB("newPendingJobEvent"),
-    RUNNING_TO_FINISHED_JOB("runningToFinishedJobEvent"),
-    REMOVE_FINISHED_JOB("removeFinishedJobEvent"),
-    PENDING_TO_RUNNING_TASK("pendingToRunningTaskEvent"),
-    RUNNING_TO_FINISHED_TASK("runningToFinishedTaskEvent"),
-    CHANGE_JOB_PRIORITY("changeJobPriorityEvent"),
+    NEW_PENDING_JOB("jobSubmittedEvent"),
+    RUNNING_TO_FINISHED_JOB("jobRunningToFinishedEvent"),
+    REMOVE_FINISHED_JOB("jobRemoveFinishedEvent"),
+    PENDING_TO_RUNNING_TASK("taskPendingToRunningEvent"),
+    RUNNING_TO_FINISHED_TASK("taskRunningToFinishedEvent"),
+    CHANGE_JOB_PRIORITY("jobChangePriorityEvent"),
     PAUSED("schedulerPausedEvent");
     private String methodName;
 

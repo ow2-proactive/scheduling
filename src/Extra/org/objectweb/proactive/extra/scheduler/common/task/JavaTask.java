@@ -40,7 +40,7 @@ import java.util.Map;
  * a class or instance.
  * It also provides a method to add arguments to the task.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
@@ -50,13 +50,13 @@ public class JavaTask extends Task {
     private static final long serialVersionUID = -2327189450547547292L;
 
     /** Task as an instance */
-    private ExecutableJavaTask taskInstance = null;
+    private JavaExecutable taskInstance = null;
 
     /** or as a class */
-    private Class<ExecutableJavaTask> taskClass = null;
+    private Class<JavaExecutable> taskClass = null;
 
     /** Arguments of the task as a map */
-    private Map<String, Object> args = new HashMap<String, Object>();
+    private Map<String, String> args = new HashMap<String, String>();
 
     /**
      * Empty constructor.
@@ -69,17 +69,17 @@ public class JavaTask extends Task {
      *
      * @return the task Class.
      */
-    public Class<ExecutableJavaTask> getTaskClass() {
+    public Class<JavaExecutable> getTaskClass() {
         return taskClass;
     }
 
     /**
      * To set the executable task class.
-     * It may be a class that extends {@link ExecutableJavaTask}.
+     * It may be a class that extends {@link JavaExecutable}.
      *
      * @param taskClass the task Class to set.
      */
-    public void setTaskClass(Class<ExecutableJavaTask> taskClass) {
+    public void setTaskClass(Class<JavaExecutable> taskClass) {
         this.taskClass = taskClass;
         this.taskInstance = null;
     }
@@ -89,17 +89,17 @@ public class JavaTask extends Task {
      *
      * @return the task Instance.
      */
-    public ExecutableJavaTask getTaskInstance() {
+    public JavaExecutable getTaskInstance() {
         return taskInstance;
     }
 
     /**
      * To set the executable task instance.
-     * It may be an instance that extends {@link ExecutableJavaTask}.
+     * It may be an instance that extends {@link JavaExecutable}.
      *
      * @param taskInstance the task Instance to set.
      */
-    public void setTaskInstance(ExecutableJavaTask taskInstance) {
+    public void setTaskInstance(JavaExecutable taskInstance) {
         this.taskInstance = taskInstance;
         this.taskClass = null;
     }
@@ -109,7 +109,7 @@ public class JavaTask extends Task {
      *
      * @return the arguments list.
      */
-    public Map<String, Object> getArguments() {
+    public Map<String, String> getArguments() {
         return args;
     }
 
@@ -119,7 +119,7 @@ public class JavaTask extends Task {
      * @param name the name of the argument to add.
      * @param value the associated value to add.
      */
-    public void addArgument(String name, Object value) {
+    public void addArgument(String name, String value) {
         args.put(name, value);
     }
 }

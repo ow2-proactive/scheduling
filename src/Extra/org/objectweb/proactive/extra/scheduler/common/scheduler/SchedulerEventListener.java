@@ -46,10 +46,6 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
  * @since ProActive 3.2
  */
 public interface SchedulerEventListener<E extends Job> extends Serializable {
-    //TODO
-    /*        Ça ne me semble pas consistant, par exemple
-             runningToFinishedJobEvent(JobEvent)  ---> jobRunningToFinishedEvent
-            pour avoir toujours [job|task|scheduler] en premier. Fab.*/
 
     /**
      * Invoked when the scheduler has just been started.
@@ -65,7 +61,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      * Invoked when the scheduler has just been paused.
      *
      * @param event the scheduler informations about the status of every tasks.
-     *                 use <code>SchedulerEvent.update(Vector<<Job>>)</code> to update your job.
+     *                 use event.update method to update your job.
      */
     public void schedulerPausedEvent();
 
@@ -121,9 +117,9 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     /**
      * Invoked when the scheduler has received a new job to schedule.
      *
-     * @param job the new scheduled job.
+     * @param job the new job to schedule.
      */
-    public void newPendingJobEvent(E job);
+    public void jobSubmittedEvent(E job);
 
     /**
      * Invoked when the scheduling of a job has just started.
@@ -132,7 +128,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      *
      * @param event the event describing the job concerned.
      */
-    public void pendingToRunningJobEvent(JobEvent event);
+    public void jobPendingToRunningEvent(JobEvent event);
 
     /**
      * Invoked when the scheduling of a job has just been terminated.
@@ -141,7 +137,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      *
      * @param event the event describing the job concerned.
      */
-    public void runningToFinishedJobEvent(JobEvent event);
+    public void jobRunningToFinishedEvent(JobEvent event);
 
     /**
      * Invoked when the scheduler has removed a job due to result reclamation.
@@ -150,7 +146,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      *
      * @param event the event describing the job concerned.
      */
-    public void removeFinishedJobEvent(JobEvent event);
+    public void jobRemoveFinishedEvent(JobEvent event);
 
     /**
      * Invoked when the scheduling of a task has just started.
@@ -159,7 +155,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      *
      * @param event the event describing the task concerned.
      */
-    public void pendingToRunningTaskEvent(TaskEvent event);
+    public void taskPendingToRunningEvent(TaskEvent event);
 
     /**
      * Invoked when the scheduling of a task has just finished.
@@ -168,7 +164,7 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      *
      * @param event the event describing the task concerned.
      */
-    public void runningToFinishedTaskEvent(TaskEvent event);
+    public void taskRunningToFinishedEvent(TaskEvent event);
 
     /**
      * Invoked when the scheduler has changed the priority of a job.
@@ -177,5 +173,5 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
      *
      * @param event the event describing the job concerned.
      */
-    public void changeJobPriorityEvent(JobEvent event);
+    public void jobChangePriorityEvent(JobEvent event);
 }

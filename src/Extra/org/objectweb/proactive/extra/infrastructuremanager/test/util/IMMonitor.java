@@ -56,8 +56,10 @@ public class IMMonitor {
         //        IMMonitoring monitor = IMFactory.getMonitoring(new URI(
         //                    "rmi://localhost:1242/"));
         System.out.println("infos :");
+
         ArrayList<DynamicNSInterface> dynNS = admin.getDynamicNodeSources();
         System.out.println("" + dynNS.size() + " dyn nodesources");
+
         //        while(false) {
         //        	
         //        }

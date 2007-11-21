@@ -59,7 +59,7 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
@@ -108,6 +108,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
         throws ActiveObjectCreationException, IOException, NodeException {
         IMUser user = IMFactory.getUser(uriIM);
         IMMonitoring monitor = IMFactory.getMonitoring(uriIM);
+
         return (InfrastructureManagerProxy) ProActiveObject.newActive(InfrastructureManagerProxy.class.getCanonicalName(),
             new Object[] { monitor, user });
     }
@@ -128,6 +129,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
         if (logger.isInfoEnabled()) {
             logger.info("Node freed : " + node.getNodeInformation().getURL());
         }
+
         user.freeNode(node);
     }
 
@@ -146,6 +148,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
                 try {
                     ScriptHandler handler = ScriptLoader.createHandler(node);
                     nodes.put(node, handler.handle(postScript));
+
                     if (logger.isInfoEnabled()) {
                         logger.info("Post Script handled on node" +
                             node.getNodeInformation().getURL());
@@ -175,6 +178,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
         if (logger.isInfoEnabled()) {
             logger.info("Nodes freed : " + nodes.size() + " nodes");
         }
+
         user.freeNodes(nodes);
     }
 
@@ -194,6 +198,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
                     ScriptHandler handler = ScriptLoader.createHandler(node);
                     ScriptResult<?> res = handler.handle(postScript);
                     this.nodes.put(node, res);
+
                     if (logger.isInfoEnabled()) {
                         logger.info("Post Script handled on node" +
                             node.getNodeInformation().getURL());
@@ -214,12 +219,12 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
     }
 
     // GET NODES *********************************************
-    public NodeSet getAtMostNodes(int nbNodes, VerifyingScript verifyingScript) {
-        return user.getAtMostNodes(new IntWrapper(nbNodes), verifyingScript);
+    public NodeSet getAtMostNodes(int nbNodes, SelectionScript selectionScript) {
+        return user.getAtMostNodes(new IntWrapper(nbNodes), selectionScript);
     }
 
-    public NodeSet getExactlyNodes(int nbNodes, VerifyingScript verifyingScript) {
-        return user.getExactlyNodes(new IntWrapper(nbNodes), verifyingScript);
+    public NodeSet getExactlyNodes(int nbNodes, SelectionScript selectionScript) {
+        return user.getExactlyNodes(new IntWrapper(nbNodes), selectionScript);
     }
 
     // GET INFORMATIONS **************************************
@@ -242,6 +247,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
             ns.addAll(nodes.keySet());
             user.freeNodes(ns);
             running = false;
+
             if (logger.isInfoEnabled()) {
                 logger.info("IM Proxy Stopped");
             }
@@ -252,11 +258,13 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
         if (logger.isInfoEnabled()) {
             logger.info("Infrastructure Manager Proxy started");
         }
+
         nodes = new HashMap<Node, ScriptResult<?>>();
     }
 
     public void runActivity(Body body) {
         Service service = new Service(body);
+
         while (running) {
             // Verify all nodes already managed
             verify();
@@ -269,17 +277,21 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
         Iterator<Entry<Node, ScriptResult<?>>> iterator = nodes.entrySet()
                                                                .iterator();
         NodeSet ns = new NodeSet();
+
         while (iterator.hasNext()) {
             Entry<Node, ScriptResult<?>> entry = iterator.next();
+
             if (!ProFuture.isAwaited(entry.getValue())) { // !awaited = arrived
                 if (logger.isInfoEnabled()) {
                     logger.info("Post script successfull, node freed : " +
                         entry.getKey().getNodeInformation().getURL());
                 }
+
                 ns.add(entry.getKey());
                 iterator.remove();
             }
         }
+
         if (ns.size() > 0) {
             user.freeNodes(ns);
         }

@@ -71,6 +71,7 @@ public class DatabaseManager {
         Properties props = new Properties();
         URL urlPropertyFile = DatabaseManager.class.getResource(PROPERTY_FILE_NAME);
         BufferedInputStream bis = null;
+
         try {
             bis = new BufferedInputStream(urlPropertyFile.openStream());
             props.load(bis);
@@ -103,8 +104,10 @@ public class DatabaseManager {
             ((create) ? ";create=true" : ";");
 
         System.out.println("[SCHEDULER-DATABASE] url=" + url);
+
         try {
             Class.forName(driver).newInstance();
+
             return DriverManager.getConnection(url, user, password);
         } catch (InstantiationException e) {
             e.printStackTrace();
@@ -113,6 +116,7 @@ public class DatabaseManager {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -127,6 +131,7 @@ public class DatabaseManager {
         } catch (SQLException e) {
             return true;
         }
+
         return false;
     }
 
@@ -139,10 +144,12 @@ public class DatabaseManager {
     public static DatabaseManager getInstance() {
         try {
             instance = new DatabaseManager();
+
             return instance;
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 }

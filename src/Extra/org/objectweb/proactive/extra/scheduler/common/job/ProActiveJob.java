@@ -30,30 +30,31 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.job;
 
-import org.objectweb.proactive.extra.scheduler.common.task.ApplicationTask;
+import org.objectweb.proactive.extra.scheduler.common.task.ProActiveTask;
 
 
 /**
- * Definition of an application job for the user.
- * An application job is a job that contains a task that have a list of node in its parameters list.
- * To make this type of job, just use the default no params constructor,
+ * Definition of a ProActive job for the user.
+ * A ProActive job is a job that contains one task that has a list of nodes in its argument list.
+ * To make this type of job, just use the default no arg constructor,
  * and set the properties you want to set.
- * Then add your application task with the given method in order to fill the job with your own tasks.
+ * Then add your ProActive task using {@link #setTask(ProActiveTask)} with the given method in order to fill the job with your own task.
  * You must set the number of nodes you want in the task,
  * and also the task as a .class or instance.
  *
- * @author ProActive Team
+ *
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
  */
-public class ApplicationJob extends Job {
+public class ProActiveJob extends Job {
 
     /** Serial Version UID */
     private static final long serialVersionUID = 1623955669459590983L;
-    private ApplicationTask task = null;
+    private ProActiveTask task = null;
 
     /** Proactive Empty Constructor */
-    public ApplicationJob() {
+    public ProActiveJob() {
     }
 
     /**
@@ -61,7 +62,7 @@ public class ApplicationJob extends Job {
      */
     @Override
     public JobType getType() {
-        return JobType.APPLI;
+        return JobType.PROACTIVE;
     }
 
     /**
@@ -69,7 +70,7 @@ public class ApplicationJob extends Job {
      *
      * @return the unique task of this job.
      */
-    public ApplicationTask getTask() {
+    public ProActiveTask getTask() {
         return task;
     }
 
@@ -78,7 +79,7 @@ public class ApplicationJob extends Job {
      *
      * @param task the task to set
      */
-    public void setTask(ApplicationTask task) {
+    public void setTask(ProActiveTask task) {
         this.task = task;
     }
 

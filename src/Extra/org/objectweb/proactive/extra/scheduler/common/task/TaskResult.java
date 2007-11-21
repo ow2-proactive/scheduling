@@ -41,7 +41,7 @@ import javax.swing.JPanel;
  * Before getting the object it is recommended that you call the hadException() method.
  * It will tell you if an exception occurred in the task that generate this result.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Aug 3, 2007
  * @since ProActive 3.2
  */
@@ -77,24 +77,28 @@ public interface TaskResult extends Serializable {
 
     /**
      * Return the output of the execution, including stdout and stderr.
+     *
      * @return the output of the execution, including stdout and stderr.
      */
     public TaskLogs getOuput();
 
     /**
      * Set the class that is able to describe this result. See ResultDescriptor.
+     *
      * @param descClass the class that is able to describe this result.
      */
     public void setDescriptorClass(Class<?extends ResultDescriptor> descClass);
 
     /**
      * Return a swing panel describing this result.
+     *
      * @return a swing panel describing this result.
      */
     public JPanel getGraphicalDescription();
 
     /**
      * Return a string describing this result.
+     *
      * @return a string describing this result.
      */
     public String getTextualDescription();

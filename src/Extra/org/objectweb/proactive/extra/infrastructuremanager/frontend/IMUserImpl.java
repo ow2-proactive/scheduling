@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 public class IMUserImpl implements IMUser {
@@ -57,6 +57,7 @@ public class IMUserImpl implements IMUser {
         if (logger.isDebugEnabled()) {
             logger.debug("IMUser constructor");
         }
+
         this.imcore = imcore;
     }
 
@@ -69,37 +70,42 @@ public class IMUserImpl implements IMUser {
 
     //----------------------------------------------------------------------//
     // METHODS
-    public NodeSet getAtMostNodes(IntWrapper nb, VerifyingScript verifyingScript) {
+    public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript) {
         //        if (logger.isInfoEnabled()) {
         //            logger.info("getAtMostNodes, nb nodes : " + nb + " (dispo : " +
         //                imcore.getSizeListFreeIMNode() + ")");
         //        }
-        return imcore.getAtMostNodes(nb, verifyingScript);
+        return imcore.getAtMostNodes(nb, selectionScript);
     }
 
     public NodeSet getExactlyNodes(IntWrapper nb,
-        VerifyingScript verifyingScript) {
+        SelectionScript selectionScript) {
         if (logger.isInfoEnabled()) {
             logger.info("getExactlyNodes, nb nodes : " + nb);
         }
-        return imcore.getExactlyNodes(nb, verifyingScript);
+
+        return imcore.getExactlyNodes(nb, selectionScript);
     }
 
     public void freeNode(Node node) {
         if (logger.isInfoEnabled()) {
             logger.info("freeNode : " + node.getNodeInformation().getURL());
         }
+
         imcore.freeNode(node);
     }
 
     public void freeNodes(NodeSet nodes) {
         if (logger.isInfoEnabled()) {
             String freeNodes = "";
+
             for (Node node : nodes) {
                 freeNodes += (node.getNodeInformation().getName() + " ");
             }
+
             logger.info("freeNode : " + freeNodes);
         }
+
         imcore.freeNodes(nodes);
     }
 }

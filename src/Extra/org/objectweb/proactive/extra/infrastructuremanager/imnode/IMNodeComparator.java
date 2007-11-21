@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.imnode;
 
 import java.util.Comparator;
 
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
@@ -43,21 +43,25 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
  * @since ProActive 3.2
  */
 public class IMNodeComparator implements Comparator<IMNode> {
-    private VerifyingScript script;
+    private SelectionScript script;
 
-    public IMNodeComparator(VerifyingScript script) {
+    public IMNodeComparator(SelectionScript script) {
         this.script = script;
     }
 
     public int compare(IMNode o1, IMNode o2) {
         int status1 = IMNode.NEVER_TESTED;
+
         if (o1.getScriptStatus().containsKey(script)) {
             status1 = o1.getScriptStatus().get(script);
         }
+
         int status2 = IMNode.NEVER_TESTED;
+
         if (o2.getScriptStatus().containsKey(script)) {
             status2 = o2.getScriptStatus().get(script);
         }
+
         return status2 - status1;
     }
 }

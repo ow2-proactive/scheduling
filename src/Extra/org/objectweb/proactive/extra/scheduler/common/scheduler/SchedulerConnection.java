@@ -43,10 +43,10 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
 
 /**
  * Scheduler connection class provide method to join an existing scheduler.
- * The method return a scheduler authentification in order to permit the scheduler
+ * The method {@link #join(String)} returns a {@link SchedulerAuthenticationInterface} in order to permit the scheduler
  * to authenticate user that want to connect a scheduler.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 24, 2007
  * @since ProActive 3.2
  */
@@ -62,26 +62,29 @@ public class SchedulerConnection implements Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     /**
-     * Return the scheduler authentification at the specified URL.
+     * Return the scheduler authentication at the specified URL.
      *
      * @param schedulerURL the URL of the scheduler to join.
-     * @return the scheduler authentification at the specified URL.
+     * @return the scheduler authentication at the specified URL.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
     public static SchedulerAuthenticationInterface join(String schedulerURL)
         throws SchedulerException {
-        // Get the scheduler authentification at the specified URL
+        // Get the scheduler authentication at the specified URL
         SchedulerAuthenticationInterface schedulerAuth = null;
         logger.info(
             "******************* TRYING TO JOIN EXISTING SCHEDULER *****************");
+
         if (schedulerURL == null) {
             logger.info(
                 "Scheduler URL was null, looking for scheduler on localhost with the default scheduler name...");
             schedulerURL = "//localhost/" + SCHEDULER_DEFAULT_NAME;
         }
+
         try {
             schedulerAuth = (SchedulerAuthenticationInterface) (ProActiveObject.lookupActive(SchedulerAuthenticationInterface.class.getName(),
                     schedulerURL));
+
             return schedulerAuth;
         } catch (ActiveObjectCreationException e) {
             throw new SchedulerException("Error while getting scheduler interface !",

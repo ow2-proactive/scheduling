@@ -37,17 +37,17 @@ import java.util.Map;
 /**
  * This is the main entry point of a task execution.
  * Each executable java and native task may have to implements this method.
- * Only the application job will implement its own execute.
+ * Only the ProActive job will implement its own execute.
  * In this last case, the execute(TaskResult...) method will be forget.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Aug 24, 2007
  * @since ProActive 3.2
  */
-public abstract class ExecutableTask implements Serializable {
+public abstract class Executable implements Serializable {
 
     /** Arguments of the task as a map */
-    private Map<String, Object> args = null;
+    private Map<String, String> args = null;
 
     /**
      * The content of this method will be executed once or more if asked.
@@ -81,7 +81,7 @@ public abstract class ExecutableTask implements Serializable {
      * @param args the arguments as a map.
      * @throws Exception an exception that the user can throw if something goes wrong.
      */
-    public abstract void init(Map<String, Object> args)
+    public abstract void init(Map<String, String> args)
         throws Exception;
 
     /**
@@ -89,7 +89,7 @@ public abstract class ExecutableTask implements Serializable {
      *
      * @param args the arguments to set.
      */
-    public final void setArgs(Map<String, Object> args) {
+    public final void setArgs(Map<String, String> args) {
         if ((args != null) && (args.size() > 0)) {
             this.args = args;
         }
@@ -100,7 +100,7 @@ public abstract class ExecutableTask implements Serializable {
      *
      * @return the arguments map of this Executable object.
      */
-    public final Map<String, Object> getArgs() {
+    public final Map<String, String> getArgs() {
         return args;
     }
 }

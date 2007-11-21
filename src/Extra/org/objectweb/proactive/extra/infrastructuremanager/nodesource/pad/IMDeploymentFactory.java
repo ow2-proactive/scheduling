@@ -56,6 +56,7 @@ public class IMDeploymentFactory {
         if (logger.isInfoEnabled()) {
             logger.info("deployAllVirtualNodes");
         }
+
         IMDeploy d = new IMDeploy(nodeSource, padName, pad);
         executor.execute(d);
     }
@@ -72,6 +73,7 @@ public class IMDeploymentFactory {
         if (logger.isInfoEnabled()) {
             logger.info("deployVirtualNode : " + vnName);
         }
+
         deployVirtualNodes(nodeSource, padName, pad, new String[] { vnName });
     }
 
@@ -86,11 +88,14 @@ public class IMDeploymentFactory {
         String padName, ProActiveDescriptor pad, String[] vnNames) {
         if (logger.isInfoEnabled()) {
             String concatVnNames = "";
+
             for (String vnName : vnNames) {
                 concatVnNames += (vnName + " ");
             }
+
             logger.info("deployVirtualNodes : " + concatVnNames);
         }
+
         IMDeploy d = new IMDeploy(nodeSource, padName, pad, vnNames);
         executor.execute(d);
     }

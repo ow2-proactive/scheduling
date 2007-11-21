@@ -82,7 +82,7 @@ public class SimpleScript extends Script {
     }
 
     /**
-     * VerifyingScript must give its result in the 'result_script' variable.
+     * SelectionScript must give its result in the 'result_script' variable.
      *
      * @see org.objectweb.proactive.extra.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
@@ -96,7 +96,7 @@ public class SimpleScript extends Script {
     }
 
     /**
-     * There is no parameter to give to the verifying script.
+     * There is no parameter to give to the selection script.
      */
     @Override
     protected void prepareSpecialBindings(Bindings bindings) {

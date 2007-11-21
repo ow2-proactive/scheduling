@@ -39,7 +39,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * Class ParameterSweepingJob.
  * This is the definition of a Parameter Swipping Job.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
  */
@@ -55,18 +55,19 @@ public class InternalParameterSweepingJob extends InternalJob {
     }
 
     /**
-     * Create a new Parameter Swipping Job with the given parameters. It provides methods to add or
+     * Create a new Parameter Sweeping Job with the given parameters. It provides methods to add or
      * remove tasks.
      *
      * @param name the current job name.
      * @param priority the priority of this job between 1 and 5.
-     * @param runtimeLimit the maximum execution time for this job given in millisecond.
      * @param cancelOnError true if the job has to run until its end or an user intervention.
      * @param description a short description of the job and what it will do.
      */
+
+    //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
     public InternalParameterSweepingJob(String name, JobPriority priority,
-        long runtimeLimit, boolean cancelOnError, String description) {
-        super(name, priority, runtimeLimit, cancelOnError, description);
+        boolean cancelOnError, String description) {
+        super(name, priority, cancelOnError, description);
     }
 
     /**
@@ -80,6 +81,7 @@ public class InternalParameterSweepingJob extends InternalJob {
         if (getTasks().size() > 0) {
             return false;
         }
+
         return super.addTask(task);
     }
 

@@ -55,6 +55,7 @@ public class Worker implements java.io.Serializable {
                 return new BooleanWrapper(false);
             }
         }
+
         return new BooleanWrapper(true);
     }
 

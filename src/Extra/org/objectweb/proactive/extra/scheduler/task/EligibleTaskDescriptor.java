@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * will only be allowed to send EligibleLightTask to the scheduler
  * @see org.objectweb.proactive.extra.scheduler.job.TaskDescriptor
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 9, 2007
  * @since ProActive 3.2
  */

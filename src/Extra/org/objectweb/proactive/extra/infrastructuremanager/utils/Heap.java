@@ -55,6 +55,7 @@ public class Heap<E extends Comparable<?super E>> {
         if (capacity <= 0) {
             throw new IllegalArgumentException();
         }
+
         nodes_ = new Object[capacity];
         cmp_ = cmp;
     }
@@ -103,8 +104,10 @@ public class Heap<E extends Comparable<?super E>> {
 
         int k = count_;
         ++count_;
+
         while (k > 0) {
             int par = parent(k);
+
             if (compare(x, (E) nodes_[par]) < 0) {
                 nodes_[k] = nodes_[par];
                 k = par;
@@ -112,6 +115,7 @@ public class Heap<E extends Comparable<?super E>> {
                 break;
             }
         }
+
         nodes_[k] = x;
     }
 
@@ -127,16 +131,20 @@ public class Heap<E extends Comparable<?super E>> {
         int k = 0; // take element at root;
         Object least = nodes_[k];
         --count_;
+
         Object x = nodes_[count_];
         nodes_[count_] = null;
+
         for (;;) {
             int l = left(k);
+
             if (l >= count_) {
                 break;
             } else {
                 int r = right(k);
                 int child = ((r >= count_) ||
                     (compare((E) nodes_[l], (E) nodes_[r]) < 0)) ? l : r;
+
                 if (compare((E) x, (E) nodes_[child]) > 0) {
                     nodes_[k] = nodes_[child];
                     k = child;
@@ -145,7 +153,9 @@ public class Heap<E extends Comparable<?super E>> {
                 }
             }
         }
+
         nodes_[k] = x;
+
         return (E) least;
     }
 
@@ -168,6 +178,7 @@ public class Heap<E extends Comparable<?super E>> {
     public synchronized void clear() {
         for (int i = 0; i < count_; ++i)
             nodes_[i] = null;
+
         count_ = 0;
     }
 
@@ -178,11 +189,13 @@ public class Heap<E extends Comparable<?super E>> {
         int itemsPerRow = 1;
         int column = 0;
         int currentIndex = 0;
+
         while (count_ > 0) {
             if (column == 0) {
                 for (int k = 0; k < nBlanks; k++)
                     str.append(" ");
             }
+
             str.append(nodes_[currentIndex].toString());
 
             if (++currentIndex == count_) { // done?
@@ -200,6 +213,7 @@ public class Heap<E extends Comparable<?super E>> {
                     str.append(" "); // interim blanks
             }
         }
+
         return str.toString();
     }
 
@@ -216,6 +230,7 @@ public class Heap<E extends Comparable<?super E>> {
         heap.insert(8);
         heap.insert(4);
         System.out.println(heap);
+
         while (heap.size() > 0) {
             System.out.println("Prendre le plus petit: " + heap.extract());
             System.out.println(heap);
@@ -224,12 +239,14 @@ public class Heap<E extends Comparable<?super E>> {
 
     public boolean add(E e) {
         insert(e);
+
         return true;
     }
 
     public boolean addAll(Collection<?extends E> c) {
         for (E e : c)
             insert(e);
+
         return true;
     }
 
@@ -242,6 +259,7 @@ public class Heap<E extends Comparable<?super E>> {
             if (!contains(o)) {
                 return false;
             }
+
         return true;
     }
 

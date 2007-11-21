@@ -45,6 +45,7 @@ public class TaskCreationException extends SchedulerException {
     */
     public TaskCreationException(String arg0) {
         super(arg0);
+
         // TODO Auto-generated constructor stub
     }
 
@@ -61,6 +62,7 @@ public class TaskCreationException extends SchedulerException {
      */
     public TaskCreationException(String message, Throwable cause) {
         super(message, cause);
+
         // TODO Auto-generated constructor stub
     }
 
@@ -69,6 +71,7 @@ public class TaskCreationException extends SchedulerException {
      */
     public TaskCreationException(Throwable cause) {
         super(cause);
+
         // TODO Auto-generated constructor stub
     }
 }

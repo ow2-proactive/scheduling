@@ -40,7 +40,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.Job;
  * This class is a representation of the entire scheduler state.
  * It is represented by 3 lists of jobs.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
  */

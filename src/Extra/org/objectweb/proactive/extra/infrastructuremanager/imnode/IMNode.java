@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
@@ -52,7 +52,7 @@ public interface IMNode extends Comparable<IMNode> {
     public static final int NOT_VERIFIED_SCRIPT = 0;
 
     /**
-     * The script has allready responded by the negative,
+     * The script has already responded by the negative,
      * but something has been executed on the node since.
      */
     public static final int NO_LONGER_VERIFIED_SCRIPT = 1;
@@ -63,30 +63,30 @@ public interface IMNode extends Comparable<IMNode> {
     public static final int NEVER_TESTED = 2;
 
     /**
-     * The script is verifyied on this node,
+     * The script is verified on this node,
      * but something has been executed since the time it has been tested.
      */
     public static final int ALREADY_VERIFIED_SCRIPT = 3;
 
     /**
-     * The script is verifyied, and nothing
+     * The script is verified, and nothing
      * has been executed since the verification.
      */
     public static final int VERIFIED_SCRIPT = 4;
 
     // SCRIPTING
     /**
-     * Execute a {@link VerifyingScript} on this {@link IMNode}
+     * Execute a {@link SelectionScript} on this {@link IMNode}
      * @return the {@link ScriptResult} corresponding to the script execution.
      */
-    public ScriptResult<Boolean> executeScript(VerifyingScript script);
+    public ScriptResult<Boolean> executeScript(SelectionScript script);
 
     /**
-     * Get a map of all Verifying script allready tested on this node,
+     * Get a map of all selection script already tested on this node,
      * and the responses given.
      * @return the map of Script and status
      */
-    public HashMap<VerifyingScript, Integer> getScriptStatus();
+    public HashMap<SelectionScript, Integer> getScriptStatus();
 
     // ----------------------------------------------------------------------//
     // GET
@@ -151,8 +151,8 @@ public interface IMNode extends Comparable<IMNode> {
     public void setDown(boolean down);
 
     // OTHER SET in the case of the node can migrate.
-    // For exemple if the node migrate from other jvm, you must change
-    // the attribute Jvm, VNode, ...
+    // For example if the node migrate from other jvm, you must change
+    // the attribute JVM, VNode, ...
 
     // ----------------------------------------------------------------------//
     // TOSTRING

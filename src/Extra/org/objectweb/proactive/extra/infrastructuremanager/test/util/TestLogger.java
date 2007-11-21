@@ -55,6 +55,7 @@ public class TestLogger {
         if (logger.isInfoEnabled()) {
             logger.info("Info mode actif");
         }
+
         if (logger.isDebugEnabled()) {
             logger.debug("Debug mode actif");
         }
@@ -62,6 +63,7 @@ public class TestLogger {
         if (loggerTest.isInfoEnabled()) {
             loggerTest.info("Test Info mode actif");
         }
+
         if (loggerTest.isDebugEnabled()) {
             loggerTest.debug("Test Debug mode actif");
         }

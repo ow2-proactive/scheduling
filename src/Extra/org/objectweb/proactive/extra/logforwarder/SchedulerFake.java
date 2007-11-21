@@ -84,10 +84,12 @@ public class SchedulerFake {
         //        }
         IMUser imu = null;
         NodeSet nodes = null;
+
         try {
             IMCore imc = (IMCore) (ProActiveObject.lookupActive(IMCore.class.getName(),
                     "//localhost/IMCORE"));
             imu = imc.getUser();
+
             //            imu = IMFactory.getUser(new URI("rmi://duff.inria.fr:1099/"));
         } catch (ActiveObjectCreationException e1) {
             // TODO Auto-generated catch block
@@ -96,6 +98,7 @@ public class SchedulerFake {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
+
         //        catch (URISyntaxException e1) {
         //            // TODO Auto-generated catch block
         //            e1.printStackTrace();
@@ -109,6 +112,7 @@ public class SchedulerFake {
 
         // create tasks
         RemoteTask t2 = null;
+
         try {
             nodes = imu.getExactlyNodes(new IntWrapper(2), null);
 
@@ -160,6 +164,7 @@ public class SchedulerFake {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
         this.port = slf.getPort();
     }
 
@@ -175,6 +180,7 @@ public class SchedulerFake {
     public void listenLog(int id, String hostname, int port) {
         Logger.getLogger(LOGGER_PREFIX + id)
               .addAppender(new SocketAppender(hostname, port));
+
         //        this.loggers.get(id).addAppender(new SocketAppender(hostname,port));
     }
 

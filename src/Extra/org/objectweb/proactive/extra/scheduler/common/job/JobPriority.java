@@ -34,7 +34,7 @@ package org.objectweb.proactive.extra.scheduler.common.job;
 /**
  * This is the different job priorities.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 11, 2007
  * @since ProActive 3.2
  */
@@ -45,7 +45,7 @@ public enum JobPriority implements java.io.Serializable {
     LOWEST("Lowest", 1),
     /** Low priority */
     LOW("Low", 2),
-    /** Normal Prority */
+    /** Normal Priority */
     NORMAL("Normal", 3),
     /** High priority : administrator only */
     HIGH("High", 4),
@@ -87,18 +87,23 @@ public enum JobPriority implements java.io.Serializable {
         if (name.equalsIgnoreCase(IDLE.toString())) {
             return IDLE;
         }
+
         if (name.equalsIgnoreCase(LOWEST.toString())) {
             return LOWEST;
         }
+
         if (name.equalsIgnoreCase(LOW.toString())) {
             return LOW;
         }
+
         if (name.equalsIgnoreCase(HIGH.toString())) {
             return HIGH;
         }
+
         if (name.equalsIgnoreCase(HIGHEST.toString())) {
             return HIGHEST;
         }
+
         return NORMAL;
     }
 }

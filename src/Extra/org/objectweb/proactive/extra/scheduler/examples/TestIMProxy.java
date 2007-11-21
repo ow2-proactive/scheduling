@@ -38,7 +38,7 @@ import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
 
 
@@ -68,15 +68,15 @@ public class TestIMProxy {
 
     public void testPrincipal() {
         try {
-            // Verifying script
-            VerifyingScript verif = new VerifyingScript(new File(
+            // selection script
+            SelectionScript verif = new SelectionScript(new File(
                         "/user/jmartin/home/scripts/test.js"), null);
-            VerifyingScript post1 = new VerifyingScript(new File(
+            SelectionScript post1 = new SelectionScript(new File(
                         "/user/jmartin/home/scripts/clean2.js"), null);
-            VerifyingScript post2 = new VerifyingScript(new File(
+            SelectionScript post2 = new SelectionScript(new File(
                         "/user/jmartin/home/scripts/clean5.js"), null);
 
-            // Dispay total nodes
+            // Display total nodes
             int total = proxy.getNumberOfAllResources().intValue();
             System.err.println("total nodes = " + total);
 
@@ -86,6 +86,7 @@ public class TestIMProxy {
             //Vector<Node> nodes = (Vector<Node>) ProActive.getFutureValue(rm.getExactlyNodes(2, verif, null));
             if (!nodes.isEmpty()) {
                 System.err.println("nodes obtained = " + nodes.size());
+
                 for (Node n : nodes)
                     System.err.println(n.getNodeInformation().getURL());
 
@@ -95,17 +96,21 @@ public class TestIMProxy {
             }
 
             //			URL url = new URL("http://localhost:10080/test.js");
-            //			verif = new VerifyingScript(url);
+            //			verif = new SelectionScript(url);
             //			Get At Most 3 nodes not on fiacre (but there is only 2 nodes corresponding"
             nodes = proxy.getAtMostNodes(2, verif);
-            ProFuture.waitFor(nodes);
+            ProFuture.waitFor((Object) nodes);
+
             if (!nodes.isEmpty()) {
                 System.err.println("nodes obtained = " + nodes.size());
+
                 for (Node n : nodes)
                     System.err.println(n.getNodeInformation().getURL());
+
                 ProFuture.waitFor(nodes);
                 System.err.println("Free nodes = " +
                     proxy.getNumberOfFreeResource());
+
                 // Release thoose nodes
                 if (nodes.size() > 1) {
                     proxy.freeNode(nodes.remove(0), post1);
@@ -113,9 +118,11 @@ public class TestIMProxy {
                 } else {
                     proxy.freeNodes(nodes, post2);
                 }
+
                 int tot;
                 int free;
                 int max = 5;
+
                 while ((max-- > 0) &&
                         ((tot = proxy.getNumberOfAllResources().intValue()) != (free = proxy.getNumberOfFreeResource()
                                                                                                 .intValue()))) {

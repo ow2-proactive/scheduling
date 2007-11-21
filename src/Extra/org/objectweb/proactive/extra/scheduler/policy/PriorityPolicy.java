@@ -41,7 +41,7 @@ import org.objectweb.proactive.extra.scheduler.task.EligibleTaskDescriptor;
 /**
  * Implementation of the policy using FIFO prio ordering.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 5, 2007
  * @since ProActive 3.2
  */
@@ -60,9 +60,11 @@ public class PriorityPolicy implements PolicyInterface {
         Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();
         //sort jobs by priority
         Collections.sort(jobs);
+
         for (JobDescriptor lj : jobs) {
             toReturn.addAll(lj.getEligibleTasks());
         }
+
         return toReturn;
     }
 }

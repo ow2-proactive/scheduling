@@ -2,7 +2,7 @@
 <job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
 	name="Job_with_verif" priority="normal">
-	<description>8 tasks with variable durations and verifying process</description>
+	<description>8 tasks with variable durations and selection script process</description>
 	<variables>
 		<variable name="HOME" value="/user/jlscheef/home"/>
 	</variables>

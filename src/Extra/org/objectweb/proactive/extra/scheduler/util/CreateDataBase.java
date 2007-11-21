@@ -47,6 +47,7 @@ public class CreateDataBase {
     public static void createDataBase() {
         Connection conn = null;
         Statement stmt = null;
+
         try {
             System.out.println("Try to start the database and connect it");
             conn = DatabaseManager.getInstance().connect(true);
@@ -85,6 +86,7 @@ public class CreateDataBase {
                     // Nothing to do
                 }
             }
+
             if (conn != null) {
                 try {
                     conn.rollback();
@@ -103,6 +105,7 @@ public class CreateDataBase {
                     // Nothing to do
                 }
             }
+
             if (DatabaseManager.getInstance().disconnect()) {
                 System.out.println("Database shut down normally");
             } else {

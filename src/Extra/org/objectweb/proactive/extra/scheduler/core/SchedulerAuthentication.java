@@ -53,7 +53,7 @@ import org.objectweb.proactive.extra.security.Login;
 
 /**
  * This is the authentication class of the scheduler.
- * To get an instance of the scheduler you must ident yourselfwith this class.
+ * To get an instance of the scheduler you must ident yourself with this class.
  * Once authenticate, the <code>login</code> method returns a user/admin interface
  * in order to managed the scheduler.
  *
@@ -102,11 +102,13 @@ public class SchedulerAuthentication implements InitActive,
     public SchedulerAuthentication(String loginFile, String groupFile,
         SchedulerFrontend scheduler) {
         URL jaasConfig = Login.class.getResource("jaas.config");
+
         if (jaasConfig == null) {
             throw new RuntimeException(
                 "The file 'jaas.config' has not been found and have to be at the following directory :\n" +
                 "\tclasses/Extra/org/objectweb/proactive/extra/security/");
         }
+
         System.setProperty("java.security.auth.login.config",
             jaasConfig.getFile());
         this.loginFile = loginFile;
@@ -129,7 +131,8 @@ public class SchedulerAuthentication implements InitActive,
         isStarted();
         // Verify that this user//password can connect to this existing scheduler
         logger.info(user + " is trying to connect...");
-        logger.info("Verifying user name and password...");
+        logger.info("Checking user name and password...");
+
         Map<String, Object> params = new HashMap<String, Object>(6);
         params.put("username", user);
         params.put("pw", password);
@@ -141,12 +144,14 @@ public class SchedulerAuthentication implements InitActive,
         logger.info("Logging successfull for user : " + user);
         // create user scheduler interface
         logger.info("Connecting to the scheduler...");
+
         UserScheduler us = new UserScheduler();
         us.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
         scheduler.connect(ProActiveObject.getContext().getCurrentRequest()
                                          .getSourceBodyID(),
             new UserIdentification(user));
+
         // return the created interface
         return us;
     }
@@ -158,7 +163,8 @@ public class SchedulerAuthentication implements InitActive,
         throws LoginException, SchedulerException {
         isStarted();
         // Verify that this user//password can connect (as admin) to this existing scheduler.
-        logger.info("Verifying admin name and password...");
+        logger.info("Checking admin name and password...");
+
         Map<String, Object> params = new HashMap<String, Object>(6);
         params.put("username", user);
         params.put("pw", password);
@@ -170,12 +176,14 @@ public class SchedulerAuthentication implements InitActive,
         logger.info("Logging successfull for user : " + user);
         // create admin scheduler interface
         logger.info("Connecting to the scheduler...");
+
         AdminScheduler as = new AdminScheduler();
         as.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
         scheduler.connect(ProActiveObject.getContext().getCurrentRequest()
                                          .getSourceBodyID(),
             new UserIdentification(user, true));
+
         // return the created interface
         return as;
     }
@@ -201,6 +209,7 @@ public class SchedulerAuthentication implements InitActive,
     public boolean terminate() {
         ProActiveObject.terminateActiveObject(false);
         logger.info("Scheduler authentication is now shutdown !");
+
         return true;
     }
 }

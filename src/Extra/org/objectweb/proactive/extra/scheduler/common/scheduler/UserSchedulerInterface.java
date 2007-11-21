@@ -42,7 +42,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 /**
- * Scheduler user interface.
+ * User scheduler interface.
  * This interface provides methods to managed the user task and jobs on the scheduler.
  * A user will only be able to managed his jobs and tasks, and also see the entire scheduling process.
  *
@@ -58,7 +58,7 @@ public interface UserSchedulerInterface extends Serializable {
      * It will execute the tasks of the jobs as soon as resources are available.
      * The job will be considered as finished once the marked 'final' task has finished,
      * or when every tasks have finished.
-     * Thus, user could get the job result according to the final task result.
+     * Thus, user could get the job result according to the precious result.
      *
      * @param job the new job to submit.
      * @return the generated new job ID.

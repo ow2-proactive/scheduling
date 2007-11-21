@@ -33,23 +33,24 @@ package org.objectweb.proactive.extra.scheduler.examples;
 import java.util.Map;
 
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
-public class WaitAndPrint extends ExecutableJavaTask {
+public class WaitAndPrint extends JavaExecutable {
 
     /**  */
     private static final long serialVersionUID = 2518295052900092724L;
     public int sleepTime;
     public int number;
 
-    @Override
     public Object execute(TaskResult... results) throws Throwable {
         String message;
+
         try {
             System.err.println("Démarrage de la tache numero " + number);
             System.out.println("Parameters are : ");
+
             for (TaskResult tRes : results) {
                 if (tRes.hadException()) {
                     System.out.println("\t " + tRes.getTaskId() + " : " +
@@ -59,26 +60,31 @@ public class WaitAndPrint extends ExecutableJavaTask {
                         tRes.value());
                 }
             }
+
             message = URIBuilder.getLocalAddress().toString();
             //	            if (sleepTime == 5){
             //	            	Thread.sleep(sleepTime * 100);
             //	            	System.exit(1);
             //	            } else {
             Thread.sleep(sleepTime * 1000);
+
             //	            }
         } catch (Exception e) {
             message = "crashed";
             e.printStackTrace();
         }
+
         System.out.println("Terminaison de la tache numero " + number);
+
         return ("No." + this.number + " hi from " + message + "\t slept for " +
         sleepTime + "Seconds");
     }
 
     @Override
-    public void init(Map<String, Object> args) {
+    public void init(Map<String, String> args) {
         sleepTime = Integer.parseInt((String) args.get("sleepTime"));
         number = Integer.parseInt((String) args.get("number"));
+
         for (String key : args.keySet()) {
             System.out.println("INIT(" + number + ") : " + key + "=" +
                 args.get(key));

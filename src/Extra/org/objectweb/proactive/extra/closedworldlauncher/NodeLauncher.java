@@ -37,6 +37,7 @@ public class NodeLauncher extends AbstractLauncher {
     @Override
     public void run(int i) {
         System.out.println(wi);
+
         if (i == 0) {
             StartNode.main(new String[0]);
         } else {

@@ -35,7 +35,7 @@ package org.objectweb.proactive.extra.scheduler.common.job;
  * State of a job.
  * The differents job states are best described below.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Aug 10, 2007
  * @since ProActive 3.2
  */

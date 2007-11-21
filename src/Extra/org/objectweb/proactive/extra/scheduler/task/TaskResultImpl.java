@@ -45,7 +45,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptor
  * Before getting the object it is recommended that you call the hadException() method.
  * It will tell you if an exception occured in the task that generate this result.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Aug 3, 2007
  * @since ProActive 3.2
  */
@@ -153,6 +153,7 @@ public class TaskResultImpl implements TaskResult {
      */
     public JPanel getGraphicalDescription() {
         boolean instanciation = false;
+
         try {
             instanciation = this.instanciateDescriptor();
         } catch (InstantiationException e) {
@@ -162,6 +163,7 @@ public class TaskResultImpl implements TaskResult {
             return new SimpleTextPanel(
                 "[SCHEDULER] Cannot create descriptor : " + e.getMessage());
         }
+
         if (instanciation) {
             return this.descriptor.getGraphicalDescription(this);
         } else {
@@ -174,6 +176,7 @@ public class TaskResultImpl implements TaskResult {
      */
     public String getTextualDescription() {
         boolean instanciation = false;
+
         try {
             instanciation = this.instanciateDescriptor();
         } catch (InstantiationException e) {
@@ -181,6 +184,7 @@ public class TaskResultImpl implements TaskResult {
         } catch (IllegalAccessException e) {
             return "[SCHEDULER] Cannot create descriptor : " + e.getMessage();
         }
+
         if (instanciation) {
             return this.descriptor.getTextualDescription(this);
         } else if (!this.hadException()) {
@@ -202,6 +206,7 @@ public class TaskResultImpl implements TaskResult {
             return false;
         } else if (this.descriptor == null) {
             this.descriptor = this.descriptorClass.newInstance();
+
             return true;
         } else {
             return true;

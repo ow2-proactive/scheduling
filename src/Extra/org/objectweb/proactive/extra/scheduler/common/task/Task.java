@@ -35,16 +35,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
  * Definition of a task for the user. A task contains some properties that can
- * be set but also : A verifying script that can be used to select a specific
- * execution node for this task. A preTask that will be launched before the real
- * task (can be used to set environment vars). A postTask that will be launched
+ * be set but also : A selection script that can be used to select a specific
+ * execution node for this task. A preScript that will be launched before the real
+ * task (can be used to set environment vars). A postScript that will be launched
  * just after the end of the real task. (this can be used to unset vars you set
- * in the preTask). You will be also able to add dependences (if necessary) to
+ * in the preScript). You will be also able to add dependences (if necessary) to
  * this task. The dependences mechanism are best describe below.
  *
  * @see #addDependence(Task)
@@ -68,31 +68,31 @@ public abstract class Task implements Serializable {
     protected Class<?extends ResultDescriptor> resultDescriptor;
 
     /**
-     * Verifying script : can be launched before getting a node in order to
+     * selection script : can be launched before getting a node in order to
      * verify some computer specificity.
      */
-    protected VerifyingScript verifyingScript;
+    protected SelectionScript selectionScript;
 
     /**
-     * Pre-task script : can be used to launch script just before the task
+     * Prescript : can be used to launch script just before the task
      * execution.
      */
-    protected Script<?> preTask;
+    protected Script<?> preScript;
 
     /**
-     * Pre-task script : can be used to launch script just after the task
+     * Postscript : can be used to launch script just after the task
      * execution even if a problem occurs.
      */
-    protected Script<?> postTask;
+    protected Script<?> postScript;
 
     /** Maximum amount of time during which a task can be running. */
-    protected long runTimeLimit;
+    //protected long runTimeLimit;
 
     /** Is this task re-runnable and how many times ? (0 if not) */
     protected int rerunnable = 1;
 
-    /** Is this task a final task. */
-    protected boolean finalTask;
+    /** Is the result of this task precious ? */
+    protected boolean preciousResult;
 
     /** List of dependences if necessary */
     protected ArrayList<Task> dependences = null;
@@ -111,6 +111,7 @@ public abstract class Task implements Serializable {
         if (dependences == null) {
             dependences = new ArrayList<Task>();
         }
+
         dependences.add(task);
     }
 
@@ -125,6 +126,7 @@ public abstract class Task implements Serializable {
         if (dependences == null) {
             dependences = new ArrayList<Task>();
         }
+
         dependences.addAll(tasks);
     }
 
@@ -164,22 +166,21 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * To know if this task is a final one.
+     * To know if the result of this task is precious.
      *
-     * @return true if the task is final, false if not.
+     * @return true if the result is precious, false if not.
      */
-    public boolean isFinalTask() {
-        return finalTask;
+    public boolean isPreciousResult() {
+        return preciousResult;
     }
 
     /**
-     * Set if the task is final or not.
+     * Set if the result of this task is precious.
      *
-     * @param finalTask
-     *            true if the task is final, false if not.
+     * @param preciousResult true if the result of this task is precious, false if not.
      */
-    public void setFinalTask(boolean finalTask) {
-        this.finalTask = finalTask;
+    public void setPreciousResult(boolean preciousResult) {
+        this.preciousResult = preciousResult;
     }
 
     /**
@@ -202,41 +203,41 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * To get the post task of this task.
+     * To get the postScript of this task.
      *
-     * @return the postTask of this task.
+     * @return the postScript of this task.
      */
-    public Script<?> getPostTask() {
-        return postTask;
+    public Script<?> getPostScript() {
+        return postScript;
     }
 
     /**
-     * To set the post task of this task.
+     * To set the postScript of this task.
      *
-     * @param postTask
-     *            the postTask to set.
+     * @param postScript
+     *            the postScript to set.
      */
-    public void setPostTask(Script<?> postTask) {
-        this.postTask = postTask;
+    public void setPostScript(Script<?> postScript) {
+        this.postScript = postScript;
     }
 
     /**
-     * To get the pre task of this task.
+     * To get the preScript of this task.
      *
-     * @return the preTask of this task.
+     * @return the preScript of this task.
      */
-    public Script<?> getPreTask() {
-        return preTask;
+    public Script<?> getPreScript() {
+        return preScript;
     }
 
     /**
-     * To set the pre task of this task.
+     * To set the preScript of this task.
      *
-     * @param preTask
-     *            the preTask to set.
+     * @param preScript
+     *            the preScript to set.
      */
-    public void setPreTask(Script<?> preTask) {
-        this.preTask = preTask;
+    public void setPreScript(Script<?> preScript) {
+        this.preScript = preScript;
     }
 
     /**
@@ -264,9 +265,10 @@ public abstract class Task implements Serializable {
      * @return the the maximum amount of time during witch the task will be
      *         running.
      */
-    public long getRunTimeLimit() {
-        return runTimeLimit;
-    }
+
+    //    public long getRunTimeLimit() {
+    //        return runTimeLimit;
+    //    }
 
     /**
      * To set the maximum amount of time during witch the task will be running.
@@ -274,27 +276,28 @@ public abstract class Task implements Serializable {
      * @param runTimeLimit
      *            the runTimeLimit to set.
      */
-    public void setRunTimeLimit(long runTimeLimit) {
-        this.runTimeLimit = runTimeLimit;
+
+    //    public void setRunTimeLimit(long runTimeLimit) {
+    //        this.runTimeLimit = runTimeLimit;
+    //    }
+
+    /**
+     * To get the selection script. This is the script that will select a node.
+     *
+     * @return the selection Script.
+     */
+    public SelectionScript getSelectionScript() {
+        return selectionScript;
     }
 
     /**
-     * To get the verifying script. This is the script that will select a node.
+     * To set the selection script.
      *
-     * @return the verifying Script.
+     * @param selectionScript
+     *            the selectionScript to set.
      */
-    public VerifyingScript getVerifyingScript() {
-        return verifyingScript;
-    }
-
-    /**
-     * To set the verifying script.
-     *
-     * @param verifyingScript
-     *            the verifyingScript to set.
-     */
-    public void setVerifyingScript(VerifyingScript verifyingScript) {
-        this.verifyingScript = verifyingScript;
+    public void setSelectionScript(SelectionScript selectionScript) {
+        this.selectionScript = selectionScript;
     }
 
     /**

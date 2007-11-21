@@ -33,14 +33,14 @@ package org.objectweb.proactive.extra.scheduler.task.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Executable;
 
 
 /**
  * Abstract definition of a java task.
  * See also @see TaskDescriptor
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
@@ -50,10 +50,10 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
     private static final long serialVersionUID = 1340022492862249182L;
 
     /** Class instance of the class to instantiate. */
-    protected Class<?extends ExecutableTask> taskClass;
+    protected Class<?extends Executable> taskClass;
 
     /** Arguments of the task as a map */
-    protected Map<String, Object> args = new HashMap<String, Object>();
+    protected Map<String, String> args = new HashMap<String, String>();
 
     /**
      * ProActive empty constructor
@@ -66,7 +66,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @param taskClass the Class instance of the class to instantiate.
      */
-    public InternalAbstractJavaTask(Class<?extends ExecutableTask> taskClass) {
+    public InternalAbstractJavaTask(Class<?extends Executable> taskClass) {
         this.taskClass = taskClass;
     }
 
@@ -75,7 +75,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @return the task Class instance.
      */
-    public Class<?extends ExecutableTask> getTaskClass() {
+    public Class<?extends Executable> getTaskClass() {
         return taskClass;
     }
 
@@ -84,7 +84,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @param taskClass the task Class instance.
      */
-    public void setTaskClass(Class<?extends ExecutableTask> taskClass) {
+    public void setTaskClass(Class<?extends Executable> taskClass) {
         this.taskClass = taskClass;
     }
 
@@ -93,7 +93,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @return the task arguments.
      */
-    public Map<String, Object> getArgs() {
+    public Map<String, String> getArgs() {
         return args;
     }
 
@@ -102,7 +102,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @param args the task arguments.
      */
-    public void setArgs(Map<String, Object> args) {
+    public void setArgs(Map<String, String> args) {
         this.args = args;
     }
 }

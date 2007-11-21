@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 
 /**
- * This interface mst be implemented by log storage for scheduler jobs.
+ * This interface must be implemented by log storage for scheduler jobs.
  * @author ProActive Team
  * @version 1.0
  * @since ProActive 3.2.1

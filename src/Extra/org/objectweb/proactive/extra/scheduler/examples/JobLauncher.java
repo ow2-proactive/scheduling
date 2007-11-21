@@ -62,6 +62,7 @@ public class JobLauncher {
             SchedulerAuthenticationInterface auth = null;
             boolean logIt = false;
             int pos = 0;
+
             if ("-log".equals(args[0])) {
                 logIt = true;
                 pos++;
@@ -82,6 +83,7 @@ public class JobLauncher {
                 System.err.println("You must enter a job descriptor");
                 System.exit(0);
             }
+
             UserSchedulerInterface scheduler = auth.logAsUser("chri", "chri");
 
             //CREATE JOB
@@ -89,6 +91,7 @@ public class JobLauncher {
 
             //******************** GET JOB OUTPUT ***********************
             SimpleLoggerServer simpleLoggerServer = null;
+
             if (logIt) {
                 try {
                     // it will launch a listener that will listen connection on any free port
@@ -103,11 +106,13 @@ public class JobLauncher {
             for (int i = 0; i < nbJob; i++) {
                 // SUBMIT JOB
                 JobId id = scheduler.submit(j);
+
                 if (logIt) {
                     // next, this method will forward task output on the previous loggerServer
                     scheduler.listenLog(id,
                         URIBuilder.getLocalAddress().getHostName(),
                         simpleLoggerServer.getPort());
+
                     Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
                             id);
 
@@ -118,11 +123,13 @@ public class JobLauncher {
                             dateFormat.format(new Date()) + ".log", true);
                     l.addAppender(fa);
                 }
+
                 System.out.println("Here is your job id : " + id);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         System.exit(1);
     }
 }

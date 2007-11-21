@@ -39,8 +39,11 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
 
 /**
  * Scheduler Authentication Interface provides method to connect to the scheduler.
+ * Before using the scheduler communication interface {@link UserSchedulerInterface}, you have to connect it using a login/password using this interface.
+ * <p>
+ * You can get this interface by using the scheduler connection {@link SchedulerConnection}
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 24, 2007
  * @since ProActive 3.2
  */

@@ -31,15 +31,15 @@
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableJavaTask;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Executable;
+import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 
 
 /**
  * Description of a java task.
  * See also @see AbstractJavaTaskDescriptor
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 16, 2007
  * @since ProActive 3.2
  */
@@ -49,7 +49,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
     private static final long serialVersionUID = -6946803819032140410L;
 
     /** the java task to launch */
-    private ExecutableJavaTask task;
+    private JavaExecutable task;
 
     /**
      * ProActive empty constructor
@@ -62,7 +62,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      *
      * @param task the already instantiated java task.
      */
-    public InternalJavaTask(ExecutableJavaTask task) {
+    public InternalJavaTask(JavaExecutable task) {
         this.task = task;
     }
 
@@ -71,7 +71,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      *
      * @param taskClass the class instance of the class to instantiate.
      */
-    public InternalJavaTask(Class<ExecutableJavaTask> taskClass) {
+    public InternalJavaTask(Class<JavaExecutable> taskClass) {
         super(taskClass);
     }
 
@@ -79,11 +79,11 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      * @see org.objectweb.proactive.extra.scheduler.task.internal.InternalTask#getTask()
      */
     @Override
-    public ExecutableTask getTask() throws TaskCreationException {
+    public Executable getTask() throws TaskCreationException {
         // create task from taskClass
         if (task == null) {
             try {
-                task = (ExecutableJavaTask) taskClass.newInstance();
+                task = (JavaExecutable) taskClass.newInstance();
             } catch (InstantiationException e) {
                 throw new TaskCreationException("Cannot create javatask from task class ",
                     e);
@@ -103,7 +103,7 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
      *
      * @param task the instantiated java task.
      */
-    public void setTask(ExecutableJavaTask task) {
+    public void setTask(JavaExecutable task) {
         this.task = task;
     }
 }

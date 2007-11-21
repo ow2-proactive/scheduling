@@ -65,12 +65,15 @@ public class ScriptLoader {
             System.err.println("Usage : scriptloader script");
             System.exit(1);
         }
+
         String filename = args[0];
         String[] split = filename.split("\\.");
+
         if (split.length < 2) {
             System.err.println("Script must have an extension");
             System.exit(-2);
         }
+
         Reader reader = new FileReader(args[0]);
         ScriptEngineManager sem = new ScriptEngineManager();
         ScriptEngine engine = sem.getEngineByExtension(split[split.length - 1]);

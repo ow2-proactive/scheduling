@@ -38,7 +38,7 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.common.task.ExecutableTask;
+import org.objectweb.proactive.extra.scheduler.common.task.Executable;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
@@ -68,41 +68,53 @@ public class NativeTaskLauncher extends TaskLauncher {
 
     /**
      * Constructor of the native task launcher.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
      *
      * @param taskId the task identification.
      * @param jobId the job identification.
      * @param host the host on which the task is launched.
+     */
+    public NativeTaskLauncher(TaskId taskId, String host, Integer port) {
+        super(taskId, host, port);
+    }
+
+    /**
+     * Constructor of the native task launcher.
+     * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
+     *
+     * @param taskId the task identification.
+     * @param host the host on which the task is launched.
      * @param port the port on which the task is launched.
      * @param pre the script executed before the task.
-     * @param post the script executed after the task.
      */
     public NativeTaskLauncher(TaskId taskId, String host, Integer port,
-        Script<?> pre, Script<?> post) {
-        super(taskId, host, port, pre, post);
+        Script<?> pre) {
+        super(taskId, host, port, pre);
     }
 
     /**
      * Execute the user task as an active object.
      *
      * @param core The scheduler core to be notify
-     * @param executableTask the task to execute
+     * @param executable the task to execute
      * @param results the possible results from parent tasks.(if task flow)
      * @return a task result representing the result of this task execution.
      */
     @Override
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, ExecutableTask executableTask,
+    public TaskResult doTask(SchedulerCore core, Executable executable,
         TaskResult... results) {
         this.initLoggers();
-        try {
-            ExecutableNativeTask toBeLaunched = (ExecutableNativeTask) executableTask;
 
-            //launch pre script
+        try {
+            NativeExecutable toBeLaunched = (NativeExecutable) executable;
+
+            //launch generation script
             if (toBeLaunched.getGenerationScript() != null) {
                 String preScriptDefinedCommand = this.executeGenerationScript(toBeLaunched.getGenerationScript());
 
                 // if preScriptDefinedCommand is not null, a new command 
-                // has been defined by the prescript
+                // has been defined by the generation script
                 if ((preScriptDefinedCommand != null) &&
                         (!GenerationScript.DEFAULT_COMMAND_VALUE.equals(
                             preScriptDefinedCommand))) {
@@ -110,6 +122,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                     toBeLaunched.setCommand(preScriptDefinedCommand);
                 }
             }
+
             //get process
             process = toBeLaunched.getProcess();
 
@@ -136,6 +149,7 @@ public class NativeTaskLauncher extends TaskLauncher {
                 // TODO : logger.warn
                 System.err.println("WARNING : Loggers are not shut down !");
             }
+
             //terminate the task
             core.terminate(taskId);
         }
@@ -152,12 +166,14 @@ public class NativeTaskLauncher extends TaskLauncher {
         throws ActiveObjectCreationException, NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(null);
         ScriptResult<String> res = handler.handle(script);
+
         if (res.errorOccured()) {
             System.err.println("Error on pre-script occured : ");
             res.getException().printStackTrace();
             throw new UserException(
                 "PreTask script has failed on the current node");
         }
+
         return res.getResult();
     }
 

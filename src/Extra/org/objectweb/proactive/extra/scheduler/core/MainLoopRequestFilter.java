@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
  * This object is made with a list of method names and provide the acceptRequest method.
  * Each method name matching a string in the list will answer true to this method.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 17, 2007
  * @since ProActive 3.2
  */
@@ -74,6 +74,7 @@ public class MainLoopRequestFilter implements RequestFilter, Serializable {
                 return true;
             }
         }
+
         return false;
     }
 }

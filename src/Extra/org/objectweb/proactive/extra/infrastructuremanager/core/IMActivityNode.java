@@ -59,16 +59,19 @@ public class IMActivityNode implements Runnable {
             if (logger.isDebugEnabled()) {
                 logger.debug("Searching for down nodes...");
             }
+
             ArrayList<IMNode> imNodes = this.imCore.getListAllNodes();
             int free = 0;
             int busy = 0;
             int down = 0;
+
             for (IMNode imNode : imNodes) {
                 if (imNode.isDown()) {
                     down++;
                 } else {
                     try {
                         imNode.getNode().getNumberOfActiveObjects();
+
                         if (imNode.isFree()) {
                             free++;
                         } else {
@@ -85,6 +88,7 @@ public class IMActivityNode implements Runnable {
                 logger.info("[IMActivity] Status Report : free=" + free +
                     " busy=" + busy + " down=" + down);
             }
+
             try {
                 Thread.sleep(wait);
             } catch (InterruptedException e) {

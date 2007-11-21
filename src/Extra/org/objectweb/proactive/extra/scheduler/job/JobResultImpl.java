@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.scheduler.job;
 
 import java.util.HashMap;
 
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
@@ -53,7 +54,9 @@ public class JobResultImpl implements JobResult {
     private static final long serialVersionUID = 6287355063616273677L;
     private JobId id = null;
     private String name = null;
-    private HashMap<String, TaskResult> taskResults = null;
+    private HashMap<String, TaskResult> allResults = null;
+    private HashMap<String, TaskResult> preciousResults = null;
+    private HashMap<String, TaskResult> exceptionResults = null;
 
     /**
      * ProActive empty constructor
@@ -93,29 +96,65 @@ public class JobResultImpl implements JobResult {
     }
 
     /**
-     * Add a new task result to this job result.
-     *
-     * @param taskName
-     *            user define name (in XML) of the task.
-     * @param taskResult
-     *            the corresponding result of the task.
+     * @see org.objectweb.proactive.extra.scheduler.common.job.JobResult#addTaskResult(java.lang.String, org.objectweb.proactive.extra.scheduler.common.task.TaskResult, boolean)
      */
-    public void addTaskResult(String taskName, TaskResult taskResult) {
-        if (taskResults == null) {
-            taskResults = new HashMap<String, TaskResult>();
+    public void addTaskResult(String taskName, TaskResult taskResult,
+        boolean isPrecious) {
+        //allResults
+        if (allResults == null) {
+            allResults = new HashMap<String, TaskResult>();
         }
-        taskResults.put(taskName, taskResult);
+
+        allResults.put(taskName, taskResult);
+
+        //preciousResult
+        if (isPrecious) {
+            if (preciousResults == null) {
+                preciousResults = new HashMap<String, TaskResult>();
+            }
+
+            allResults.put(taskName, taskResult);
+        }
+
+        //exceptionResults
+        if (!ProFuture.isAwaited(taskResult) && taskResult.hadException()) {
+            if (exceptionResults == null) {
+                exceptionResults = new HashMap<String, TaskResult>();
+            }
+
+            exceptionResults.put(taskName, taskResult);
+        }
     }
 
     /**
-     * Return the task results of this job as a mapping between user task name
-     * (in XML jo description) and its task result. User that wants to get a
-     * specific result may get this map and ask for a specific mapping.
-     *
-     * @return the task result as a map.
+     * @see org.objectweb.proactive.extra.scheduler.common.job.JobResult#getAllResults()
      */
-    public HashMap<String, TaskResult> getTaskResults() {
-        return taskResults;
+    public HashMap<String, TaskResult> getAllResults() {
+        return allResults;
+    }
+
+    /**
+         * @see org.objectweb.proactive.extra.scheduler.common.job.JobResult#getExceptionResults()
+         */
+    @Override
+    public HashMap<String, TaskResult> getExceptionResults() {
+        return exceptionResults;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.job.JobResult#getPreciousResults()
+     */
+    @Override
+    public HashMap<String, TaskResult> getPreciousResults() {
+        return preciousResults;
+    }
+
+    /**
+     * @see org.objectweb.proactive.extra.scheduler.common.job.JobResult#hadException()
+     */
+    @Override
+    public boolean hadException() {
+        return exceptionResults != null;
     }
 
     /**
@@ -123,17 +162,20 @@ public class JobResultImpl implements JobResult {
      */
     @Override
     public String toString() {
-        if (taskResults == null) {
+        if (allResults == null) {
             return "No result available in this job !";
         }
+
         StringBuilder toReturn = new StringBuilder("\n");
-        for (TaskResult res : taskResults.values()) {
+
+        for (TaskResult res : allResults.values()) {
             try {
                 toReturn.append("\t" + res.value() + "\n");
             } catch (Throwable e) {
                 toReturn.append("\t" + res.getException().getMessage() + "\n");
             }
         }
+
         return toReturn.toString();
     }
 }

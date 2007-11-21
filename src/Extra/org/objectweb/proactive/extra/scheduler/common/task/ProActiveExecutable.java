@@ -36,16 +36,16 @@ import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * This is the execution entry point for the application task.
- * User may override the execute(ArrayList<Node>) method.
- * The content of this method will be executed. This method provides nodes to run activeObject on them.
+ * This is the execution entry point for the ProActive task.
+ * You may override the {@link #execute(ArrayList)} method.
+ * The content of this method will be executed. It provides nodes on which you can run activeObjects.
  * Note : the execute(TaskResult...) method is not used anymore from this class.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Aug 21, 2007
  * @since ProActive 3.2
  */
-public abstract class ExecutableApplicationTask extends ExecutableJavaTask {
+public abstract class ProActiveExecutable extends JavaExecutable {
 
     /**
      * <font color="red">Not used anymore in this context</font>
@@ -54,7 +54,6 @@ public abstract class ExecutableApplicationTask extends ExecutableJavaTask {
      * That's why it is final. User cannot override/implement this one anymore.
      * Instead, implement the execute(ArrayList<Node>) method.
      */
-    @Override
     public final Object execute(TaskResult... results) {
         throw new RuntimeException(
             "This method should have NEVER been called in this context !!");

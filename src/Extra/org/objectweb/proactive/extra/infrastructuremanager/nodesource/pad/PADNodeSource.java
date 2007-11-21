@@ -58,7 +58,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeComparat
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeImpl;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PADNSInterface;
-import org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript;
+import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.filetransfer.FileVector;
 
@@ -104,10 +104,10 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
      *                 -> Next, the nodes that haven't been tested ;
      *                 -> Next, the nodes that have allready verified the script, but no longer ;
      *                 -> To finish, the nodes that don't verify the script.
-     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNodesByScript(org.objectweb.proactive.extra.scheduler.common.scripting.VerifyingScript)
+     * @see org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeManager#getNodesByScript(org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript)
      */
     @Override
-    public ArrayList<IMNode> getNodesByScript(VerifyingScript script,
+    public ArrayList<IMNode> getNodesByScript(SelectionScript script,
         boolean ordered) {
         ArrayList<IMNode> result = getFreeNodes();
         if ((script != null) && ordered) {
@@ -175,8 +175,8 @@ public class PADNodeSource extends IMNodeSource implements Serializable,
             // A down node shouldn't by busied...
             e.printStackTrace();
         }
-        HashMap<VerifyingScript, Integer> verifs = imnode.getScriptStatus();
-        for (Entry<VerifyingScript, Integer> entry : verifs.entrySet()) {
+        HashMap<SelectionScript, Integer> verifs = imnode.getScriptStatus();
+        for (Entry<SelectionScript, Integer> entry : verifs.entrySet()) {
             if (entry.getKey().isDynamic() &&
                     (entry.getValue() == IMNode.VERIFIED_SCRIPT)) {
                 entry.setValue(IMNode.ALREADY_VERIFIED_SCRIPT);

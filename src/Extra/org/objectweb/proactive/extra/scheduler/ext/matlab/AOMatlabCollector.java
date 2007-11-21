@@ -67,26 +67,34 @@ public class AOMatlabCollector extends AOSimpleMatlab {
         }
 
         Token[] tokens = new Token[results.length];
+
         for (int i = 0; i < results.length; i++) {
             TaskResult res = results[i];
+
             if (res.hadException()) {
                 throw res.getException();
             }
+
             if (!(res.value() instanceof Token)) {
                 throw new InvalidParameterException(res.getClass());
             }
+
             Token token = (Token) res.value();
+
             if (i > 0) {
                 if (!tokens[i - 1].getType().equals(token.getType())) {
                     throw new InvalidParameterException(token.getType(),
                         tokens[i - 1].getType());
                 }
             }
+
             tokens[i] = token;
         }
+
         ArrayToken collectArray = new ArrayToken(tokens);
         MatlabEngine.put("in", collectArray);
         executeScript();
+
         return MatlabEngine.get("out");
     }
 }

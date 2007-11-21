@@ -32,11 +32,24 @@ package org.objectweb.proactive.extra.scheduler.common.job;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
+
 
 /**
  * Definition of a job for the user.
+ * You can create a job by using this class. Job will be used to set some properties,
+ * and give it the different tasks to run.
+ * <p>
+ * Here's a definition of the different parts of a job :<br>
+ * {@link #setName(String)} will be used to identified the job.<br>
+ * {@link #setDescription(String)} to set a short description of your job.<br>
+ * {@link #setPriority(JobPriority)} to set the priority for the job, see {@link JobPriority} for more details.<br>
+ * {@link #setCancelOnError(boolean)} used if you want to abort the job if an exception occurred in at least one of the task.<br>
+ * {@link #setLogFile(String)} allow you to save the output of the job tasks in a specific file.<br>
+ * <p>
+ * Once the job created, you can submit it to the scheduler using the {@link UserSchedulerInterface}.
  *
- * @author ProActive Team
+ * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 13, 2007
  * @since ProActive 3.2
  */
@@ -46,7 +59,7 @@ public abstract class Job implements Serializable {
     protected String name = "Default name";
 
     /** Maximum amount of running time that the job can not exceed */
-    protected long runtimeLimit = -1;
+    //protected long runtimeLimit = -1;
 
     /** Is this job has to cancel when an exception occurs in a task */
     protected boolean cancelOnError = false;
@@ -137,16 +150,18 @@ public abstract class Job implements Serializable {
      *
      * @return the runtimeLimit
      */
-    public long getRuntimeLimit() {
-        return runtimeLimit;
-    }
+
+    //    public long getRuntimeLimit() {
+    //        return runtimeLimit;
+    //    }
 
     /**
      * @param runtimeLimit the runtimeLimit to set
      */
-    public void setRuntimeLimit(long runtimeLimit) {
-        this.runtimeLimit = runtimeLimit;
-    }
+
+    //    public void setRuntimeLimit(long runtimeLimit) {
+    //        this.runtimeLimit = runtimeLimit;
+    //    }
 
     /**
      * To get the priority of the job.

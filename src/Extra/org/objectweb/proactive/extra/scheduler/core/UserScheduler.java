@@ -63,7 +63,7 @@ public class UserScheduler implements UserSchedulerInterface {
     /** Scheduler logger */
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
-    /** scheduler proxy as an active object */
+    /** Scheduler proxy as an active object */
     protected SchedulerFrontend schedulerFrontend;
 
     /**

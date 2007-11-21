@@ -62,14 +62,14 @@ public class TaskEvent implements Serializable {
     /** task started time */
     private long startTime = -1;
 
-    /** task finished time : IMPORTANT TO BE SET TO -1 */
+    /** task finished time : HAS TO BE SET TO -1 */
     private long finishedTime = -1;
 
     /** Number of reRunnable left */
     private int rerunnableLeft = 1;
 
-    /** Current status of the task */
-    private Status status = Status.SUBMITTED;
+    /** Current taskState of the task */
+    private TaskState taskState = TaskState.SUBMITTED;
 
     /** name of the host where the task is executed */
     private String executionHostName;
@@ -119,6 +119,7 @@ public class TaskEvent implements Serializable {
         if (jobEvent != null) {
             return jobEvent.getJobId();
         }
+
         return null;
     }
 
@@ -188,21 +189,21 @@ public class TaskEvent implements Serializable {
     }
 
     /**
-     * To get the status
+     * To get the taskState
      *
-     * @return the status
+     * @return the taskState
      */
-    public Status getStatus() {
-        return status;
+    public TaskState getStatus() {
+        return taskState;
     }
 
     /**
-     * To set the status
+     * To set the taskState
      *
-     * @param status the status to set
+     * @param taskState the taskState to set
      */
-    public void setStatus(Status status) {
-        this.status = status;
+    public void setStatus(TaskState taskState) {
+        this.taskState = taskState;
     }
 
     /**
