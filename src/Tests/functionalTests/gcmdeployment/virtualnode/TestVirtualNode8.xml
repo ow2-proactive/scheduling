@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="2x1.0" encoding="UTF-8"?>
 <GCMApplication
 	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsi="http://www.w3.org/2002x1/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 
 	<application>
@@ -12,20 +12,20 @@
 			</configuration>
 			
 			<virtualNode id="vn" capacity="5">
-				<resourceProvider refid="localhost1" />
-				<resourceProvider refid="localhost10" />
+				<resourceProvider refid="localhost2x1" />
+				<resourceProvider refid="localhost2x10" />
 			</virtualNode>
 		</proactive>
 		
 	</application>
 
 	<resources>
-		<resourceProvider id="localhost10">
-			<file path="localhost10.xml"/>
+		<resourceProvider id="localhost2x10">
+			<file path="localhost2x10.xml"/>
 		</resourceProvider>	
 
-		<resourceProvider id="localhost1">
-			<file path="localhost1.xml"/>
+		<resourceProvider id="localhost2x1">
+			<file path="localhost2x1.xml"/>
 		</resourceProvider>	
 	</resources>
 
