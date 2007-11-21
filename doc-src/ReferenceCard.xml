@@ -744,16 +744,16 @@ pad.killall(boolean softly);
     and which id deployed on a web server which location is
     http://localhost:8080.</para>
 
-    <programlisting lang="java">A a = (A) ProActive.newActive('A', new Object []{}); 
+    <programlisting lang="java">A a = (A) ProActiveObject.newActive('A', new Object []{}); 
        // Constructs an active object 
 
 String [] methods = new String [] {'foo',  'bar'}; 
 //A String array containing the exported methods
 
-ProActive.exposeAsWebService(a,'http://localhost:8080','a',methods);
+WebServices.exposeAsWebService(a,'http://localhost:8080','a',methods);
 //Export the active object as a web service
 
-ProActive.unExposeAsWebService('a', 'http://localhost:8080'); 
+WebServices.unExposeAsWebService('a', 'http://localhost:8080'); 
 //Undeploy the service 'a' on the web server located at http://localhost:8080</programlisting>
   </sect1>
 
