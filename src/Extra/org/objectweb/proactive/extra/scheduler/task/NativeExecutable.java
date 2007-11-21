@@ -146,7 +146,7 @@ public class NativeExecutable extends Executable {
      * @see org.objectweb.proactive.extra.scheduler.common.task.Executable#init(java.util.Map)
      */
     @Override
-    public final void init(Map<String, String> args) throws Exception {
+    public final void init(Map<String, Object> args) throws Exception {
         throw new RuntimeException(
             "This method should have NEVER been called in this context !!");
     }

@@ -53,7 +53,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
     protected Class<?extends Executable> taskClass;
 
     /** Arguments of the task as a map */
-    protected Map<String, String> args = new HashMap<String, String>();
+    protected Map<String, Object> args = new HashMap<String, Object>();
 
     /**
      * ProActive empty constructor
@@ -93,7 +93,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @return the task arguments.
      */
-    public Map<String, String> getArgs() {
+    public Map<String, Object> getArgs() {
         return args;
     }
 
@@ -102,7 +102,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @param args the task arguments.
      */
-    public void setArgs(Map<String, String> args) {
+    public void setArgs(Map<String, Object> args) {
         this.args = args;
     }
 }

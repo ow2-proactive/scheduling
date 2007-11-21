@@ -56,7 +56,7 @@ public class ProActiveExample extends ProActiveExecutable {
      * @see org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable#init(java.util.Map)
      */
     @Override
-    public void init(Map<String, String> args) {
+    public void init(Map<String, Object> args) {
         try {
             numberToFind = Integer.parseInt(args.get("numberToFind").toString());
         } catch (NumberFormatException e) { /* will stay to 5003 */

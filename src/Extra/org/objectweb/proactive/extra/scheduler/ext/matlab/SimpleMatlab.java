@@ -164,7 +164,7 @@ public class SimpleMatlab extends JavaExecutable {
         return res;
     }
 
-    public void init(Map<String, String> args) throws Exception {
+    public void init(Map<String, Object> args) throws Exception {
         Object s = args.get("script");
 
         if (s != null) {

@@ -81,7 +81,7 @@ public class WaitAndPrint extends JavaExecutable {
     }
 
     @Override
-    public void init(Map<String, String> args) {
+    public void init(Map<String, Object> args) {
         sleepTime = Integer.parseInt((String) args.get("sleepTime"));
         number = Integer.parseInt((String) args.get("number"));
 
