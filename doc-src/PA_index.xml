@@ -68,6 +68,8 @@
 <!ENTITY Workflow SYSTEM "workflow.xml">
 <!ENTITY glossary SYSTEM "glossary.xml">
 <!ENTITY reference SYSTEM "definitions.xml">
+<!ENTITY Scheduler_plugin SYSTEM "scheduler/Scheduler_EclipsePlugin.xml">
+
 
 ]>
 <book>
@@ -151,6 +153,7 @@
     &IC2D_EclipsePlugin;
     &scilab;
     &TimIt;
+    &Scheduler_plugin;
    </part>
  
    <part id="ExtendingProActive">
