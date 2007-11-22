@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 
 
 /**
@@ -49,8 +49,7 @@ public interface VirtualNodeInternal extends VirtualNode {
      * @param capacity the number of Node to be attached
      * @throws IllegalStateException if a contract with the provider already exists
      */
-    public void addNodeProviderContract(GCMDeploymentDescriptor provider,
-        long capacity);
+    public void addNodeProviderContract(NodeProvider provider, long capacity);
 
     /**
      * Offers the Node to the Virtual Node to satisfy a Node Provider Contract
@@ -68,8 +67,7 @@ public interface VirtualNodeInternal extends VirtualNode {
      * @param nodeProvider provider of the Node
      * @return true if the Node can satisfy a Node Provider Contract, false otherwise
      */
-    public boolean doesNodeProviderNeed(Node Node,
-        GCMDeploymentDescriptor nodeProvider);
+    public boolean doesNodeProviderNeed(Node Node, NodeProvider nodeProvider);
 
     /**
      *  Offers the Node to the Virtual Node to satisfy Virtual Node Capacity
@@ -84,7 +82,7 @@ public interface VirtualNodeInternal extends VirtualNode {
      * @param nodeProvider provider of the Node
      * @return true if the Node can satisfy Virtual Node capacity, false otherwise
      */
-    public boolean doYouNeed(Node node, GCMDeploymentDescriptor nodeProvider);
+    public boolean doYouNeed(Node node, NodeProvider nodeProvider);
 
     /**
      * Offers the Node to the Virtual Node to satisfy greedy Virtual Node
@@ -98,7 +96,7 @@ public interface VirtualNodeInternal extends VirtualNode {
      * @param nodeProvider provider of the Node
      * @return true if the Virtual Node is greedy, false otherwise
      */
-    public boolean doYouWant(Node node, GCMDeploymentDescriptor nodeProvider);
+    public boolean doYouWant(Node node, NodeProvider nodeProvider);
 
     /**
      * Indicates if the Virtual Node has a contract with this Node Provider
@@ -107,7 +105,7 @@ public interface VirtualNodeInternal extends VirtualNode {
      * @return true if a contract exists between the Virtual Node and the Node Provider, false
      * otherwise
      */
-    public boolean hasContractWith(GCMDeploymentDescriptor nodeProvider);
+    public boolean hasContractWith(NodeProvider nodeProvider);
 
     /**
      * Indicates if the Virtual Node has at lest one unsatisfied Node Provider Contract

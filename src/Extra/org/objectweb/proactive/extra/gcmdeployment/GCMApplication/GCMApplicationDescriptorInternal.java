@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 
 
 public interface GCMApplicationDescriptorInternal
@@ -49,6 +48,5 @@ public interface GCMApplicationDescriptorInternal
      * @param deploymentId a deployment ID
      * @return the Node Provider mapped to this deployment ID, or null if not found
      */
-    public GCMDeploymentDescriptor getNodeProviderFromDeploymentId(
-        Long deploymentId);
+    public NodeProvider getNodeProviderFromDeploymentId(Long deploymentId);
 }

@@ -36,7 +36,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
 public class VirtualNodeImpl implements VirtualNodeInternal {
 
@@ -158,18 +158,16 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     /* -------------------
      * VirtualNodeInternal interface
      */
-    public void addNodeProviderContract(GCMDeploymentDescriptor provider,
-        long capacity) {
+    public void addNodeProviderContract(NodeProvider provider, long capacity) {
         if (findNodeProviderContract(provider) != null) {
             throw new IllegalStateException("A contract with the provider " +
-                provider.getDescriptorFilePath() + " already exist for " + id);
+                provider.getId() + " already exist for " + id);
         }
 
         nodeProvidersContracts.add(new NodeProviderContract(provider, capacity));
     }
 
-    public boolean doesNodeProviderNeed(Node node,
-        GCMDeploymentDescriptor nodeProvider) {
+    public boolean doesNodeProviderNeed(Node node, NodeProvider nodeProvider) {
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
 
         if ((contract != null) && contract.doYouNeed(node, nodeProvider) &&
@@ -181,7 +179,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return false;
     }
 
-    public boolean doYouNeed(Node node, GCMDeploymentDescriptor nodeProvider) {
+    public boolean doYouNeed(Node node, NodeProvider nodeProvider) {
         if (!needNode()) {
             return false;
         }
@@ -196,7 +194,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return true;
     }
 
-    public boolean doYouWant(Node node, GCMDeploymentDescriptor nodeProvider) {
+    public boolean doYouWant(Node node, NodeProvider nodeProvider) {
         if (!isGreedy()) {
             return false;
         }
@@ -211,7 +209,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return false;
     }
 
-    public boolean hasContractWith(GCMDeploymentDescriptor nodeProvider) {
+    public boolean hasContractWith(NodeProvider nodeProvider) {
         return null != findNodeProviderContract(nodeProvider);
     }
 
@@ -267,7 +265,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     private NodeProviderContract findNodeProviderContract(
-        GCMDeploymentDescriptor nodeProvider) {
+        NodeProvider nodeProvider) {
         for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
             if (nodeProvider == nodeProviderContract.getNodeProvider()) {
                 return nodeProviderContract;
@@ -286,17 +284,17 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     class NodeProviderContract {
-        GCMDeploymentDescriptor nodeProvider;
+        NodeProvider nodeProvider;
         long capacity;
         long nodes;
 
-        NodeProviderContract(GCMDeploymentDescriptor nodeProvider, long capacity) {
+        NodeProviderContract(NodeProvider nodeProvider, long capacity) {
             this.nodeProvider = nodeProvider;
             this.capacity = capacity;
             this.nodes = 0;
         }
 
-        public boolean doYouNeed(Node node, GCMDeploymentDescriptor nodeProvider) {
+        public boolean doYouNeed(Node node, NodeProvider nodeProvider) {
             if (this.nodeProvider != nodeProvider) {
                 return false;
             }
@@ -321,7 +319,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
             return !isGreedy() && (this.nodes < this.capacity);
         }
 
-        public GCMDeploymentDescriptor getNodeProvider() {
+        public NodeProvider getNodeProvider() {
             return nodeProvider;
         }
 

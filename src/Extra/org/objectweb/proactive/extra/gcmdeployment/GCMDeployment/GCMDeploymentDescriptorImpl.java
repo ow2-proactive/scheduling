@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -52,7 +51,6 @@ import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
-    static Set<GCMDeploymentDescriptor> GCMDeploymentDescriptors = new HashSet<GCMDeploymentDescriptor>();
     private GCMDeploymentParser parser;
     private GCMDeploymentEnvironment environment;
     private GCMDeploymentResources resources;
@@ -62,12 +60,6 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         parser = new GCMDeploymentParserImpl(descriptor);
         environment = parser.getEnvironment();
         resources = parser.getResources();
-
-        GCMDeploymentDescriptors.add(this);
-    }
-
-    static public Set<GCMDeploymentDescriptor> getAllNodeProviders() {
-        return GCMDeploymentDescriptors;
     }
 
     /**

@@ -28,20 +28,30 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
+package functionalTests.gcmdeployment.virtualnode;
 
-import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
+import java.io.FileNotFoundException;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
 
-public interface GCMDeploymentDescriptor {
+public class TestVirtualNode13 extends Abstract {
+    @Test
+    public void test() throws FileNotFoundException, ProActiveException {
+        GCMApplicationDescriptor gcma = API.getGCMApplicationDescriptor(getDescriptor(
+                    this));
+        gcma.startDeployment();
+        waitAllocation();
 
-    /**
-     * Start the deployment
-     *
-     * The first step is to perform all required file transfers. Then
-     * Use the CommandBuilder to build the command to be launched.
-     */
-    public void start(CommandBuilder commandBuilder);
+        VirtualNode vn1 = gcma.getVirtualNode("vn1");
+        Assert.assertEquals(4, vn1.getCurrentNodes().size());
 
-    public String getDescriptorFilePath();
+        VirtualNode vn2 = gcma.getVirtualNode("vn2");
+        Assert.assertTrue(vn2.getCurrentNodes().size() > 0);
+    }
 }

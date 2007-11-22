@@ -39,7 +39,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderScript;
@@ -50,7 +50,7 @@ import org.xml.sax.SAXException;
 
 public class ApplicationParserExecutable extends AbstractApplicationParser {
     private static final String XPATH_PATH = "pa:path";
-    private static final String XPATH_RESOURCE_PROVIDER = "pa:nodeProvider";
+    private static final String XPATH_NODE_PROVIDER = "pa:nodeProvider";
     private static final String XPATH_COMMAND = "pa:command";
     private static final String XPATH_ARG = "pa:arg";
     private static final String XPATH_FILE_TRANSFER = "pa:fileTransfer";
@@ -81,18 +81,18 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
         }
 
         NodeList nodeProviderNodes;
-        nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_RESOURCE_PROVIDER,
+        nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER,
                 appNode, XPathConstants.NODESET);
-        Map<String, GCMDeploymentDescriptor> nodeProvidersMap = applicationParser.getNodeProviders();
+        Map<String, NodeProvider> nodeProvidersMap = applicationParser.getNodeProviders();
 
         // resource providers
         //
         for (int i = 0; i < nodeProviderNodes.getLength(); ++i) {
             Node rpNode = nodeProviderNodes.item(i);
             String refid = GCMParserHelper.getAttributeValue(rpNode, "refid");
-            GCMDeploymentDescriptor deploymentDescriptor = nodeProvidersMap.get(refid);
-            if (deploymentDescriptor != null) {
-                commandBuilderScript.addDescriptor(deploymentDescriptor);
+            NodeProvider nodeProvider = nodeProvidersMap.get(refid);
+            if (nodeProvider != null) {
+                commandBuilderScript.addDescriptor(nodeProvider);
             } else {
                 // TODO - log warning
             }

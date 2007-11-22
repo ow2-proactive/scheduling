@@ -60,10 +60,10 @@ public class NodeAllocator implements NotificationListener {
     private List<VirtualNodeInternal> virtualNodes;
 
     /** Nodes waiting in Stage 2 */
-    private Map<Node, GCMDeploymentDescriptor> stage2Pool;
+    private Map<Node, NodeProvider> stage2Pool;
 
     /** Nodes waiting in Stage 3 */
-    private Map<Node, GCMDeploymentDescriptor> stage3Pool;
+    private Map<Node, NodeProvider> stage3Pool;
 
     /** A Semaphore to activate stage 2/3 node dispatching on node arrival */
     private Object semaphore;
@@ -77,8 +77,8 @@ public class NodeAllocator implements NotificationListener {
 
         this.semaphore = new Object();
 
-        this.stage2Pool = new ConcurrentHashMap<Node, GCMDeploymentDescriptor>();
-        this.stage3Pool = new ConcurrentHashMap<Node, GCMDeploymentDescriptor>();
+        this.stage2Pool = new ConcurrentHashMap<Node, NodeProvider>();
+        this.stage3Pool = new ConcurrentHashMap<Node, NodeProvider>();
         subscribeJMXRuntimeEvent();
         startStage23Thread();
     }
@@ -98,7 +98,7 @@ public class NodeAllocator implements NotificationListener {
 
             if (NotificationType.GCMRuntimeRegistered.equals(type)) {
                 GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification.getUserData();
-                GCMDeploymentDescriptor nodeProvider = gcma.getNodeProviderFromDeploymentId(data.getDeploymentId());
+                NodeProvider nodeProvider = gcma.getNodeProviderFromDeploymentId(data.getDeploymentId());
 
                 for (Node node : data.getNodes()) {
                     gcma.addNode(node);
@@ -124,10 +124,10 @@ public class NodeAllocator implements NotificationListener {
      * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
      * @return returns true if a VirtualNode took the Node, false otherwise
      */
-    private boolean dispatchS1(Node node, GCMDeploymentDescriptor nodeProvider) {
+    private boolean dispatchS1(Node node, NodeProvider nodeProvider) {
         GCM_NODEALLOC_LOGGER.trace("Stage1: " +
             node.getNodeInformation().getURL() + " from " +
-            nodeProvider.getDescriptorFilePath());
+            nodeProvider.getId());
 
         for (VirtualNodeInternal virtualNode : virtualNodes) {
             if (virtualNode.doesNodeProviderNeed(node, nodeProvider)) {
@@ -145,10 +145,10 @@ public class NodeAllocator implements NotificationListener {
      * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
      * @return returns true if a VirtualNode took the Node, false otherwise
      */
-    private boolean dispatchS2(Node node, GCMDeploymentDescriptor nodeProvider) {
+    private boolean dispatchS2(Node node, NodeProvider nodeProvider) {
         GCM_NODEALLOC_LOGGER.trace("Stage2: " +
             node.getNodeInformation().getURL() + " from " +
-            nodeProvider.getDescriptorFilePath());
+            nodeProvider.getId());
 
         // Check this Node can be dispatched 
         for (VirtualNodeInternal virtualNode : virtualNodes) {
@@ -176,10 +176,10 @@ public class NodeAllocator implements NotificationListener {
      * @param nodeProvider The {@link GCMDeploymentDescriptor} who created the node
      * @return
      */
-    private boolean dispatchS3(Node node, GCMDeploymentDescriptor nodeProvider) {
+    private boolean dispatchS3(Node node, NodeProvider nodeProvider) {
         GCM_NODEALLOC_LOGGER.trace("Stage3: " +
             node.getNodeInformation().getURL() + " from " +
-            nodeProvider.getDescriptorFilePath());
+            nodeProvider.getId());
 
         for (VirtualNodeInternal virtualNode : virtualNodes) {
             if (virtualNode.doYouWant(node, nodeProvider)) {
