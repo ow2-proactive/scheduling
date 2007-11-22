@@ -50,7 +50,7 @@ import org.xml.sax.SAXException;
 
 public class ApplicationParserExecutable extends AbstractApplicationParser {
     private static final String XPATH_PATH = "pa:path";
-    private static final String XPATH_RESOURCE_PROVIDER = "pa:resourceProvider";
+    private static final String XPATH_RESOURCE_PROVIDER = "pa:nodeProvider";
     private static final String XPATH_COMMAND = "pa:command";
     private static final String XPATH_ARG = "pa:arg";
     private static final String XPATH_FILE_TRANSFER = "pa:fileTransfer";
@@ -80,17 +80,17 @@ public class ApplicationParserExecutable extends AbstractApplicationParser {
             commandBuilderScript.setInstances(instancesValue);
         }
 
-        NodeList resourceProviderNodes;
-        resourceProviderNodes = (NodeList) xpath.evaluate(XPATH_RESOURCE_PROVIDER,
+        NodeList nodeProviderNodes;
+        nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_RESOURCE_PROVIDER,
                 appNode, XPathConstants.NODESET);
-        Map<String, GCMDeploymentDescriptor> resourceProvidersMap = applicationParser.getResourceProviders();
+        Map<String, GCMDeploymentDescriptor> nodeProvidersMap = applicationParser.getNodeProviders();
 
         // resource providers
         //
-        for (int i = 0; i < resourceProviderNodes.getLength(); ++i) {
-            Node rpNode = resourceProviderNodes.item(i);
+        for (int i = 0; i < nodeProviderNodes.getLength(); ++i) {
+            Node rpNode = nodeProviderNodes.item(i);
             String refid = GCMParserHelper.getAttributeValue(rpNode, "refid");
-            GCMDeploymentDescriptor deploymentDescriptor = resourceProvidersMap.get(refid);
+            GCMDeploymentDescriptor deploymentDescriptor = nodeProvidersMap.get(refid);
             if (deploymentDescriptor != null) {
                 commandBuilderScript.addDescriptor(deploymentDescriptor);
             } else {

@@ -12,20 +12,20 @@
 			</configuration>
 				
 			<virtualNode id="vn" capacity="5">
-				<resourceProvider refid="localhost10" />
+				<nodeProvider refid="localhost10" />
 			</virtualNode>
 		</proactive>
 		
 	</application>
 
 	<resources>
-		<resourceProvider id="localhost10">
+		<nodeProvider id="localhost10">
 			<file path="localhost10.xml"/>
-		</resourceProvider>	
+		</nodeProvider>	
 
-		<resourceProvider id="localhost1">
+		<nodeProvider id="localhost1">
 			<file path="localhost1.xml"/>
-		</resourceProvider>	
+		</nodeProvider>	
 	</resources>
 
 </GCMApplication>

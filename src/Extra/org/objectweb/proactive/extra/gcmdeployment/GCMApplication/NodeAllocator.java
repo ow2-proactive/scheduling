@@ -96,7 +96,7 @@ public class NodeAllocator implements NotificationListener {
 
             if (NotificationType.GCMRuntimeRegistered.equals(type)) {
                 GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification.getUserData();
-                GCMDeploymentDescriptor nodeProvider = gcma.getGCMDeploymentDescriptorId(data.getDeploymentId());
+                GCMDeploymentDescriptor nodeProvider = gcma.getNodeProviderFromDeploymentId(data.getDeploymentId());
 
                 for (Node node : data.getNodes()) {
                     if (!dispatchS1(node, nodeProvider)) {

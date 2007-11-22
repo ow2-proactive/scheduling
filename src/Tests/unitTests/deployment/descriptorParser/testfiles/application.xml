@@ -12,11 +12,11 @@
 
     <ProActive>
         <virtualNode id="master" capacity="1">
-            <resourceProvider refid="INRIA_LAN"/>
+            <nodeProvider refid="INRIA_LAN"/>
         </virtualNode>
             
           <virtualNode id="slaves" capacity="max">
-              <resourceProvider refid="INRIA_LAN"/>
+              <nodeProvider refid="INRIA_LAN"/>
            </virtualNode>
     </ProActive>
     

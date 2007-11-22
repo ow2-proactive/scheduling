@@ -54,11 +54,11 @@ public interface GCMApplicationParser extends GCMParserConstants {
      * Returns all the Resources Providers
      * Descriptor
      *
-     * @return all the declared Resources Providers as ResourceProviderParams
+     * @return all the declared Resources Providers as NodeProviderParams
      * @throws IOException
      * @throws SAXException
      */
-    public Map<String, GCMDeploymentDescriptor> getResourceProviders()
+    public Map<String, GCMDeploymentDescriptor> getNodeProviders()
         throws SAXException, IOException;
 
     /**

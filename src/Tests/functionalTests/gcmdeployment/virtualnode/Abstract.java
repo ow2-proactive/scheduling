@@ -37,10 +37,10 @@ import functionalTests.FunctionalTest;
 
 
 public abstract class Abstract extends FunctionalTest {
-    protected File getDescriptor() throws FileNotFoundException {
-        String classname = this.getClass().getSimpleName();
-        String resource = this.getClass().getResource(classname + ".xml")
-                              .getFile();
+    static protected File getDescriptor(Class<?> cl)
+        throws FileNotFoundException {
+        String classname = cl.getSimpleName();
+        String resource = cl.getResource(classname + ".xml").getFile();
         File desc = new File(resource);
         if (!(desc.exists() && desc.isFile() && desc.canRead())) {
             throw new FileNotFoundException(desc.getAbsolutePath());
@@ -49,11 +49,15 @@ public abstract class Abstract extends FunctionalTest {
         return desc;
     }
 
-    protected void waitAllocation() {
+    static protected File getDescriptor(Object o) throws FileNotFoundException {
+        return getDescriptor(o.getClass());
+    }
+
+    static protected void waitAllocation() {
         wait(5000);
     }
 
-    protected void wait(int sec) {
+    static protected void wait(int sec) {
         try {
             Thread.sleep(sec);
         } catch (InterruptedException e) {

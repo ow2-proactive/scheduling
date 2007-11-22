@@ -7,7 +7,7 @@
 
 	<application>
 		<executable>
-			<resourceProvider refid="INRIA_LAN" />
+			<nodeProvider refid="INRIA_LAN" />
 			<command name="ls">
 				<arg>-l</arg>
 				<arg>-h</arg>
@@ -17,9 +17,9 @@
 		</executable>
 	</application>
 	<resources>
-		<resourceProvider id="INRIA_LAN">
+		<nodeProvider id="INRIA_LAN">
 			<file path="../deployment/deployment0.xml" />
-		</resourceProvider>
+		</nodeProvider>
 	</resources>
 
 </GCMApplication>

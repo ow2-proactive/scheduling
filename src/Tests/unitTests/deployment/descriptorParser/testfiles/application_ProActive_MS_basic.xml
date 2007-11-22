@@ -14,31 +14,31 @@
 	<application>
 		<proactive>
 			<virtualNode id="master" capacity="1">
-				<resourceProvider refid="INRIA_LAN" />
+				<nodeProvider refid="INRIA_LAN" />
 			</virtualNode>
 
 			<virtualNode id="slaves" capacity="max">
-				<resourceProvider refid="INRIA_LAN" />
-				<resourceProvider refid="INRIA_CLUSTERS" />
+				<nodeProvider refid="INRIA_LAN" />
+				<nodeProvider refid="INRIA_CLUSTERS" />
 			</virtualNode>
 
 			<virtualNode id="slaves2" capacity="max">
-				<resourceProvider refid="INRIA_LAN" />
-				<resourceProvider refid="INRIA_CLUSTERS" />
+				<nodeProvider refid="INRIA_LAN" />
+				<nodeProvider refid="INRIA_CLUSTERS" />
 			</virtualNode>
 
 		</proactive>
 	</application>
 
 	<resources>
-		<resourceProvider id="INRIA_CLUSTERS">
+		<nodeProvider id="INRIA_CLUSTERS">
 			<file path="deployment2.xml" />
 			<file path="deployment3.xml" />
-		</resourceProvider>
+		</nodeProvider>
 
-		<resourceProvider id="INRIA_LAN">
+		<nodeProvider id="INRIA_LAN">
 			<file path="deployment.xml" />
-		</resourceProvider>
+		</nodeProvider>
 	</resources>
 
 </GCMApplication>

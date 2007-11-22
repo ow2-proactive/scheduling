@@ -67,7 +67,7 @@ public class TestApplicationDescriptorParser {
 
             parser.getCommandBuilder();
             parser.getVirtualNodes();
-            parser.getResourceProviders();
+            parser.getNodeProviders();
         }
     }
 
@@ -121,7 +121,7 @@ public class TestApplicationDescriptorParser {
 
             parser.getCommandBuilder();
             parser.getVirtualNodes();
-            parser.getResourceProviders();
+            parser.getNodeProviders();
         }
     }
 

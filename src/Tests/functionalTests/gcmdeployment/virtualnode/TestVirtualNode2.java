@@ -48,14 +48,16 @@ public class TestVirtualNode2 extends Abstract {
     public void test()
         throws IllegalArgumentException, XPathExpressionException,
             FileNotFoundException, SAXException, IOException {
-        GCMApplicationDescriptor gcma = API.getGCMApplicationDescriptor(getDescriptor());
+        GCMApplicationDescriptor gcma = API.getGCMApplicationDescriptor(getDescriptor(
+                    this));
+        gcma.startDeployment();
         waitAllocation();
 
         VirtualNode vn1 = gcma.getVirtualNode("vn1");
         VirtualNode vn2 = gcma.getVirtualNode("vn2");
 
         boolean fairness = true;
-        int diff = vn1.getNodes().size() - vn2.getNodes().size();
+        int diff = vn1.getCurrentNodes().size() - vn2.getCurrentNodes().size();
         if ((diff < -1) || (diff > 1)) {
             fairness = false;
         }

@@ -4,18 +4,19 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 
+	<!-- broken sample descriptor - remove ? -->
+
 	<application>
 		
 		<proactive  relpath="ProActive">
 			<configuration>
 				<jvmarg value="-Dproactive.test=true"/>
 			</configuration>
-				
-			<virtualNode id="vn" capacity="7">
-				<nodeProvider refid="localhost1" />
-				<nodeProvider refid="localhost5"  capacity="3" />
-				<nodeProvider refid="localhost10" capacity="3" />
-			</virtualNode>
+			
+			<virtualNode id="greedy" />
+			
+			<virtualNode id="master" capacity="2" />
+						
 		</proactive>
 		
 	</application>

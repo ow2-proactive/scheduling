@@ -7,7 +7,7 @@
 
 	<application>
 		<executable>
-			<resourceProvider refid="INRIA_LAN" />
+			<nodeProvider refid="INRIA_LAN" />
 			<!--	<command name="hostname">
 				<arg>-f</arg>
 				</command>  -->
@@ -18,9 +18,9 @@
 	</application>
 
 	<resources>
-		<resourceProvider id="INRIA_LAN">
+		<nodeProvider id="INRIA_LAN">
 			<file path="../deployment/bridgeSSHgroupSSH.xml" />
-		</resourceProvider>
+		</nodeProvider>
 	</resources>
 
 </GCMApplication>

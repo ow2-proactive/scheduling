@@ -28,24 +28,24 @@
 			</configuration>
 
 			<virtualNode id="master" capacity="1">
-				<resourceProvider refid="INRIA_LAN" />
+				<nodeProvider refid="INRIA_LAN" />
 			</virtualNode>
 
 			<virtualNode id="slaves" capacity="max">
-				<resourceProvider refid="INRIA_LAN" />
+				<nodeProvider refid="INRIA_LAN" />
 			</virtualNode>
 		</proactive>
 	</application>
 
 	<resources>
-		<resourceProvider id="INRIA_LAN">
+		<nodeProvider id="INRIA_LAN">
 			<file path="deployment.xml" />
 
 			<fileTransfer>
 				<source path="/user/cmathieu/home/ProActive" />
 				<dest relpath="Scratch/ProActive" />
 			</fileTransfer>
-		</resourceProvider>
+		</nodeProvider>
 	</resources>
 
 </GCMApplication>

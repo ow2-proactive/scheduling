@@ -59,20 +59,31 @@ import org.xml.sax.SAXException;
 
 public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
-    /** The descriptor file */
-    private File gadFile = null;
+    /** descriptor file */
+    private File descriptor = null;
 
-    /** A parser dedicated to this GCM Application descriptor */
-    private GCMApplicationParser gadParser = null;
+    /** GCM Application parser (statefull) */
+    private GCMApplicationParser parser = null;
 
-    /** All the Virtual Nodes defined in this application */
+    /** All Node Providers referenced by the Application descriptor */
+    private Map<String, GCMDeploymentDescriptor> nodeProviders = null;
+
+    /** Defined Virtual Nodes */
     private Map<String, VirtualNodeInternal> virtualNodes = null;
+
+    /** The Deployment Tree*/
     private DeploymentTree deploymentTree;
-    private Map<String, GCMDeploymentDescriptor> selectedDeploymentDesc;
-    private Map<Long, GCMDeploymentDescriptor> gcmDeploymentDescriptorMap;
-    private ArrayList<String> currentDeploymentPath;
+
+    /** A mapping to associate deployment IDs to Node Provider */
+    private Map<Long, GCMDeploymentDescriptor> deploymentIdToNodeProviderMapping;
+
+    /** The Command builder to use to start the deployment */
+    private CommandBuilder commandBuilder;
+
+    /** The node allocator in charge of Node dispatching */
     @SuppressWarnings("unused")
     private NodeAllocator nodeAllocator;
+    private ArrayList<String> currentDeploymentPath;
 
     public GCMApplicationDescriptorImpl(String filename)
         throws IllegalArgumentException, SAXException, IOException,
@@ -84,45 +95,35 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         throws IllegalArgumentException, SAXException, IOException,
             XPathExpressionException {
         currentDeploymentPath = new ArrayList<String>();
+        deploymentIdToNodeProviderMapping = new HashMap<Long, GCMDeploymentDescriptor>();
 
-        gcmDeploymentDescriptorMap = new HashMap<Long, GCMDeploymentDescriptor>();
-
-        gadFile = Helpers.checkDescriptorFileExist(file);
+        descriptor = Helpers.checkDescriptorFileExist(file);
         try {
             // FIXME glaurent Handle XML errors ! When invalid content is
             // encountered an exception not always thrown
-            gadParser = new GCMApplicationParserImpl(gadFile);
+            parser = new GCMApplicationParserImpl(descriptor);
         } catch (IOException e) {
             throw new IllegalArgumentException(e);
         }
 
-        // 1. Load all GCM Deployment Descriptor
-        Map<String, GCMDeploymentDescriptor> gdds;
-        gdds = gadParser.getResourceProviders();
+        // Load all GCM Deployment Descriptor
+        nodeProviders = parser.getNodeProviders();
 
-        // 2. Get Virtual Node and Command Builder
-        virtualNodes = gadParser.getVirtualNodes();
+        //  Get Virtual Node and Command Builder
+        virtualNodes = parser.getVirtualNodes();
+        commandBuilder = parser.getCommandBuilder();
+    }
 
-        CommandBuilder commandBuilder = gadParser.getCommandBuilder();
-
-        // 3. Select the GCM Deployment Descriptors to be used
-        selectedDeploymentDesc = selectGCMD(virtualNodes, gdds);
-
-        // 4. Build the runtime tree
+    /* -----------------------------
+     *  GCMApplicationDescriptor interface
+     */
+    public void startDeployment() {
         buildDeploymentTree();
 
-        // 5. Start the deployment
         nodeAllocator = new NodeAllocator(this, virtualNodes.values());
-        for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {
+        for (GCMDeploymentDescriptor gdd : nodeProviders.values()) {
             gdd.start(commandBuilder);
         }
-
-        /**
-         * If this GCMA describes a distributed application. The Runtime has been started and will populate Virtual
-         * Nodes etc. We let the user code, interact with its Middleware.
-         *
-         * if a "script" is described. The command has been started on each machine/VM/core and we can safely return
-         */
     }
 
     protected void buildDeploymentTree() {
@@ -135,7 +136,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
                                                   // here
 
         try {
-            rootNode.setApplicationDescriptorPath(gadFile.getCanonicalPath());
+            rootNode.setApplicationDescriptorPath(descriptor.getCanonicalPath());
         } catch (IOException e) {
             rootNode.setApplicationDescriptorPath("");
         }
@@ -153,7 +154,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         deploymentTree.setRootNode(rootNode);
 
         // Build leaf nodes
-        for (GCMDeploymentDescriptor gdd : selectedDeploymentDesc.values()) {
+        for (GCMDeploymentDescriptor gdd : nodeProviders.values()) {
             GCMDeploymentDescriptorImpl gddi = (GCMDeploymentDescriptorImpl) gdd;
             GCMDeploymentResources resources = gddi.getResources();
 
@@ -187,7 +188,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         deploymentNode.setDeploymentDescriptorPath(rootNode.getDeploymentDescriptorPath());
         pushDeploymentPath(hostInfo.getId());
         hostInfo.setDeploymentId(deploymentNode.getId());
-        gcmDeploymentDescriptorMap.put(deploymentNode.getId(), gddi);
+        deploymentIdToNodeProviderMapping.put(deploymentNode.getId(), gddi);
         deploymentTree.addNode(deploymentNode, rootNode);
     }
 
@@ -198,7 +199,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         HostInfo hostInfo = group.getHostInfo();
         pushDeploymentPath(hostInfo.getId());
         hostInfo.setDeploymentId(deploymentNode.getId());
-        gcmDeploymentDescriptorMap.put(deploymentNode.getId(), gddi);
+        deploymentIdToNodeProviderMapping.put(deploymentNode.getId(), gddi);
         deploymentTree.addNode(deploymentNode, rootNode);
         popDeploymentPath();
     }
@@ -216,7 +217,7 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
             HostInfo hostInfo = bridge.getHostInfo();
             pushDeploymentPath(hostInfo.getId());
             hostInfo.setDeploymentId(deploymentNode.getId());
-            gcmDeploymentDescriptorMap.put(deploymentNode.getId(), gddi);
+            deploymentIdToNodeProviderMapping.put(deploymentNode.getId(), gddi);
             deploymentTree.addNode(deploymentNode, baseNode);
             popDeploymentPath();
         }
@@ -248,47 +249,13 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
         currentDeploymentPath.remove(currentDeploymentPath.size() - 1);
     }
 
-    public GCMDeploymentDescriptor getGCMDeploymentDescriptorId(
+    public GCMDeploymentDescriptor getNodeProviderFromDeploymentId(
         Long deploymentNodeId) {
-        return gcmDeploymentDescriptorMap.get(deploymentNodeId);
+        return deploymentIdToNodeProviderMapping.get(deploymentNodeId);
     }
 
-    /**
-     * Select the GCM Deployment descriptor to be used
-     *
-     * A Virtual Node is a consumer, and a GCM Deployment Descriptor a producer. We try to fulfill the consumers needs
-     * with as few as possible producer.
-     *
-     * @param vns
-     *            Virtual Nodes asking for some resources
-     * @param gdds
-     *            GCM Deployment Descriptor providing some resources
-     * @return A
-     */
-    static private Map<String, GCMDeploymentDescriptor> selectGCMD(
-        Map<String, VirtualNodeInternal> vns,
-        Map<String, GCMDeploymentDescriptor> gdds) {
-        // TODO: Implement this method
-        return gdds;
-    }
-
-    private long getRequiredCapacity() {
-        int cap = 0;
-        for (VirtualNodeInternal vn : virtualNodes.values()) {
-            cap += vn.getRequiredCapacity();
-        }
-
-        return cap;
-    }
-
-    public VirtualNode getVirtualNode(String vnName)
-        throws IllegalArgumentException {
-        VirtualNode ret = virtualNodes.get(vnName);
-        if (ret == null) {
-            throw new IllegalArgumentException("Virtual Node " + vnName +
-                " does not exist");
-        }
-        return ret;
+    public VirtualNode getVirtualNode(String vnName) {
+        return virtualNodes.get(vnName);
     }
 
     public Map<String, ?extends VirtualNode> getVirtualNodes() {
@@ -311,9 +278,5 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    @SuppressWarnings("unused")
-    static public class TestGCMApplicationDescriptorImpl {
     }
 }

@@ -77,11 +77,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String XPATH_GCMAPP = "/pa:GCMApplication/";
     private static final String XPATH_VIRTUAL_NODE = XPATH_GCMAPP +
         "pa:application/pa:proactive/pa:virtualNode";
-    private static final String XPATH_RESOURCE_PROVIDERS = XPATH_GCMAPP +
-        "pa:resources/pa:resourceProvider";
+    private static final String XPATH_NODE_PROVIDERS = XPATH_GCMAPP +
+        "pa:resources/pa:nodeProvider";
     private static final String XPATH_APPLICATION = XPATH_GCMAPP +
         "pa:application";
-    private static final String XPATH_RESOURCE_PROVIDER = "pa:resourceProvider";
+    private static final String XPATH_NODE_PROVIDER = "pa:nodeProvider";
     private static final String XPATH_FILETRANSFER = "pa:filetransfer";
     private static final String XPATH_FILE = "pa:file";
     public static final String ATTR_RP_CAPACITY = "capacity";
@@ -92,7 +92,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected XPath xpath;
     protected DocumentBuilder documentBuilder;
     protected CommandBuilder commandBuilder;
-    protected Map<String, GCMDeploymentDescriptor> resourceProvidersMap;
+    protected Map<String, GCMDeploymentDescriptor> nodeProvidersMap;
     protected Map<String, VirtualNodeInternal> virtualNodes;
     protected Map<String, ApplicationParser> applicationParsersMap;
 
@@ -103,7 +103,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     public GCMApplicationParserImpl(File descriptor, List<String> userSchemas)
         throws IOException {
         this.descriptor = descriptor;
-        resourceProvidersMap = null;
+        nodeProvidersMap = null;
         virtualNodes = null;
         schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas)
                                         : new ArrayList<String>();
@@ -168,28 +168,28 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         }
     }
 
-    synchronized public Map<String, GCMDeploymentDescriptor> getResourceProviders()
+    synchronized public Map<String, GCMDeploymentDescriptor> getNodeProviders()
         throws SAXException, IOException {
-        if (resourceProvidersMap != null) {
-            return resourceProvidersMap;
+        if (nodeProvidersMap != null) {
+            return nodeProvidersMap;
         }
 
-        resourceProvidersMap = new HashMap<String, GCMDeploymentDescriptor>();
+        nodeProvidersMap = new HashMap<String, GCMDeploymentDescriptor>();
 
         try {
             NodeList nodes;
 
-            nodes = (NodeList) xpath.evaluate(XPATH_RESOURCE_PROVIDERS,
-                    document, XPathConstants.NODESET);
+            nodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDERS, document,
+                    XPathConstants.NODESET);
 
             for (int i = 0; i < nodes.getLength(); ++i) {
                 Node node = nodes.item(i);
 
                 // get Id
                 //
-                GCMDeploymentDescriptorParams resourceProviderParams = new GCMDeploymentDescriptorParams();
+                GCMDeploymentDescriptorParams nodeProviderParams = new GCMDeploymentDescriptorParams();
                 String id = GCMParserHelper.getAttributeValue(node, "id");
-                resourceProviderParams.setId(id);
+                nodeProviderParams.setId(id);
 
                 // get GCMDescriptor file
                 //
@@ -202,11 +202,10 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                     // TODO support URL here
                     if (nodeValue.startsWith(File.separator)) {
                         // Absolute path
-                        resourceProviderParams.setGCMDescriptor(new File(
-                                nodeValue));
+                        nodeProviderParams.setGCMDescriptor(new File(nodeValue));
                     } else {
                         // Path is relative to this descriptor
-                        resourceProviderParams.setGCMDescriptor(new File(
+                        nodeProviderParams.setGCMDescriptor(new File(
                                 descriptor.getParent(), nodeValue));
                     }
                 }
@@ -222,15 +221,15 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                     fileTransferBlocks.add(fileTransferBlock);
                 }
 
-                resourceProvidersMap.put(resourceProviderParams.getId(),
+                nodeProvidersMap.put(nodeProviderParams.getId(),
                     GCMDeploymentDescriptorFactory.createDescriptor(
-                        resourceProviderParams));
+                        nodeProviderParams));
             }
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
         }
 
-        return resourceProvidersMap;
+        return nodeProvidersMap;
     }
 
     public CommandBuilder getCommandBuilder()
@@ -279,7 +278,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             virtualNodes = new HashMap<String, VirtualNodeInternal>();
 
             // make sure these are parsed
-            getResourceProviders();
+            getNodeProviders();
 
             NodeList nodes = (NodeList) xpath.evaluate(XPATH_VIRTUAL_NODE,
                     document, XPathConstants.NODESET);
@@ -292,42 +291,41 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                 VirtualNodeImpl virtualNode = new VirtualNodeImpl();
 
                 String id = GCMParserHelper.getAttributeValue(node, "id");
-                virtualNode.setId(id);
+                virtualNode.setName(id);
 
                 // get capacity
                 //
                 String capacity = GCMParserHelper.getAttributeValue(node,
                         ATTR_RP_CAPACITY);
 
-                virtualNode.setRequiredCapacity(capacityAsLong(capacity));
+                virtualNode.setNbRequiredNodes(capacityAsLong(capacity));
 
                 // get resource providers references
                 //
-                NodeList resourceProviderNodes = (NodeList) xpath.evaluate(XPATH_RESOURCE_PROVIDER,
+                NodeList nodeProviderNodes = (NodeList) xpath.evaluate(XPATH_NODE_PROVIDER,
                         node, XPathConstants.NODESET);
-                if (resourceProviderNodes.getLength() == 0) {
+                if (nodeProviderNodes.getLength() == 0) {
                     // Add all the Node Providers to this Virtual Node
                     for (GCMDeploymentDescriptor nodeProvider : GCMDeploymentDescriptorImpl.getAllNodeProviders()) {
-                        virtualNode.addProvider(nodeProvider,
+                        virtualNode.addNodeProviderContract(nodeProvider,
                             VirtualNode.MAX_CAPACITY);
                     }
                 } else {
-                    for (int j = 0; j < resourceProviderNodes.getLength();
-                            j++) {
-                        Node nodeProv = resourceProviderNodes.item(j);
+                    for (int j = 0; j < nodeProviderNodes.getLength(); j++) {
+                        Node nodeProv = nodeProviderNodes.item(j);
 
                         String refId = GCMParserHelper.getAttributeValue(nodeProv,
                                 "refid");
                         capacity = GCMParserHelper.getAttributeValue(nodeProv,
                                 ATTR_RP_CAPACITY);
 
-                        GCMDeploymentDescriptor nodeProvider = resourceProvidersMap.get(refId);
-                        virtualNode.addProvider(nodeProvider,
+                        GCMDeploymentDescriptor nodeProvider = nodeProvidersMap.get(refId);
+                        virtualNode.addNodeProviderContract(nodeProvider,
                             capacityAsLong(capacity));
                     }
                 }
 
-                virtualNodes.put(virtualNode.getId(), virtualNode);
+                virtualNodes.put(virtualNode.getName(), virtualNode);
             }
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);

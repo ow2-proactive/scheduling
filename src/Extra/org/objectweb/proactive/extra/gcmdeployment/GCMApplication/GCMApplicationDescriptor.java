@@ -49,21 +49,20 @@ import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
  */
 @PublicAPI
 public interface GCMApplicationDescriptor {
+    public void startDeployment();
 
     /**
      * Returns the Virtual Node associated to this name
      *
      * @param vnName a Virtual Node name declared inside the GCM Application Descriptor
-     * @return the VirtualNode associated to vnName
-     * @throws NoSuchElementException if vnName is not declared inside the GCM Application Descriptor
+     * @return the VirtualNode associated to vnName or null if the Virtual Node does not exist
      */
-    public VirtualNode getVirtualNode(String vnName)
-        throws IllegalArgumentException;
+    public VirtualNode getVirtualNode(String vnName);
 
     /**
-     * Returns all the Virtual Nodes declared inside this GCM Application Descriptor
+     * Returns all the Virtual Nodes declared inside a GCM Application Descriptor
      *
-     * Keys are the Virtual Node names. Values are the Virtual Nodes.
+     * Keys are the Virtual Node names and values the Virtual Nodes.
      *
      * @return All the Virtual Nodes declared inside the GCM Application Descriptor.
      */
@@ -71,6 +70,7 @@ public interface GCMApplicationDescriptor {
 
     /**
      * Kills all Nodes and JVMs(local or remote) created when activating the GCM Application Descriptor
+     *
      * @param softly if false, all JVMs created when activating the descriptor are killed abruptely
      * if true a JVM that originates the creation of  a rmi registry waits until registry is empty before
      * dying. To be more precise a thread is created to ask periodically the registry if objects are still

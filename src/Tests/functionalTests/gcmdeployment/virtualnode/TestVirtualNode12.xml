@@ -12,15 +12,15 @@
 			</configuration>
 			
 			<virtualNode id="vn1" capacity="7">
-				<resourceProvider refid="localhost5"  capacity="5" />
-				<resourceProvider refid="localhost7"  />
-				<resourceProvider refid="localhost10"  />
+				<nodeProvider refid="localhost5"  capacity="5" />
+				<nodeProvider refid="localhost7"  />
+				<nodeProvider refid="localhost10"  />
 			</virtualNode>
 			
 			
 			<virtualNode id="vn2" capacity="15">		
-				<resourceProvider refid="localhost7"  capacity="6" />
-				<resourceProvider refid="localhost10" capacity="9" />
+				<nodeProvider refid="localhost7"  capacity="6" />
+				<nodeProvider refid="localhost10" capacity="9" />
 			
 			</virtualNode>
 		</proactive>
@@ -28,17 +28,17 @@
 	</application>
 
 	<resources>
-		<resourceProvider id="localhost10">
+		<nodeProvider id="localhost10">
 			<file path="localhost10.xml"/>
-		</resourceProvider>	
+		</nodeProvider>	
 
-		<resourceProvider id="localhost7">
+		<nodeProvider id="localhost7">
 			<file path="localhost7.xml"/>
-		</resourceProvider>	
+		</nodeProvider>	
 
-		<resourceProvider id="localhost5">
+		<nodeProvider id="localhost5">
 			<file path="localhost5.xml"/>
-		</resourceProvider>	
+		</nodeProvider>	
 	</resources>
 
 </GCMApplication>
