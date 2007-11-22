@@ -149,9 +149,9 @@ public class JobFactory {
         // We use sun multi validator (msv)
         VerifierFactory vfactory = new com.sun.msv.verifier.jarv.TheFactoryImpl();
 
-        URL schemaURL = this.getClass().getResource(SCHEMA_LOCATION);
-        File schemaFile = new File(schemaURL.toURI());
-        Schema schema = vfactory.compileSchema(schemaFile);
+        InputStream schemaStream = this.getClass()
+                                       .getResourceAsStream(SCHEMA_LOCATION);
+        Schema schema = vfactory.compileSchema(schemaStream);
         Verifier verifier = schema.newVerifier();
         ValidatingErrorHandler veh = new ValidatingErrorHandler();
         verifier.setErrorHandler(veh);
