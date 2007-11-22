@@ -633,7 +633,7 @@
   </para>
 
   <para>
-    <email>proactive@objectweb.or</email>
+    <email>proactive@objectweb.org</email>
   </para>
 
   <para>
@@ -645,12 +645,12 @@
   </para>
 
   <para>
-    <emphasis role="bold">Bugs can be posted on the ProActive GForge
+    <emphasis role="bold">Bugs can be posted on the ProActive Jira
     bug-tracking system </emphasis>
   </para>
 
   <para>
-    <ulink url="http://gforge.inria.fr/tracker/?group_id=180" />
+    <ulink url="https://galpage-exp.inria.fr:8181/jira" />
   </para>
 
   <!-- List to be completed and kept up-to-date, sorted alphabeticly -->
