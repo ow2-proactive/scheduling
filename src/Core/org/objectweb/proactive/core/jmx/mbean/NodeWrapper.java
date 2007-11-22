@@ -136,6 +136,15 @@ public class NodeWrapper extends NotificationBroadcasterSupport
         return localNode.getJobId();
     }
 
+    /**
+     * @see org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean#getJobIdAndVirtualNodeName()
+     */
+    public String[] getJobIdAndVirtualNodeName() {
+        return new String[] {
+            this.localNode.getJobId(), this.localNode.getVirtualNodeName()
+        };
+    }
+
     public void sendNotification(String type) {
         sendNotification(type, null);
     }
