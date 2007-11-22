@@ -48,6 +48,7 @@ public class MatlabSplitter extends SimpleMatlab {
     public MatlabSplitter() {
     }
 
+    @Override
     public void init(Map<String, Object> args) throws Exception {
         super.init(args);
 

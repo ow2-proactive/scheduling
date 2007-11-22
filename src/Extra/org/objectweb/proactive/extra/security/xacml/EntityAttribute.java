@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.security.xacml;
 import java.net.URI;
 
 import org.objectweb.proactive.core.security.securityentity.Entity;
-import org.w3c.dom.Node;
 
 import com.sun.xacml.attr.AttributeValue;
 

@@ -30,10 +30,9 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment;
 
-import java.io.IOException;
-
 import javax.xml.xpath.XPathExpressionException;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
 import org.xml.sax.SAXException;
@@ -47,10 +46,9 @@ public class Main {
      * @throws SAXException
      * @throws IllegalArgumentException
      * @throws XPathExpressionException
+     * @throws ProActiveException
      */
-    public static void main(String[] args)
-        throws IOException, IllegalArgumentException, SAXException,
-            XPathExpressionException {
+    public static void main(String[] args) throws ProActiveException {
         // 1. Read a GCM Application descriptor
         GCMApplicationDescriptor gad = new GCMApplicationDescriptorImpl(GAD);
     }

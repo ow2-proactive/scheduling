@@ -113,6 +113,7 @@ public class SimpleMatlab extends JavaExecutable {
     public SimpleMatlab() {
     }
 
+    @Override
     public Object execute(TaskResult... results) throws Throwable {
         for (TaskResult res : results) {
             if (res.hadException()) {
@@ -164,6 +165,7 @@ public class SimpleMatlab extends JavaExecutable {
         return res;
     }
 
+    @Override
     public void init(Map<String, Object> args) throws Exception {
         Object s = args.get("script");
 

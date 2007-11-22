@@ -31,6 +31,7 @@
 package unitTests.deployment.descriptorParser;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +40,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Test;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.AbstractApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
@@ -125,9 +127,7 @@ public class TestApplicationDescriptorParser {
     }
 
     //    @Test
-    public void doit()
-        throws IOException, IllegalArgumentException, SAXException,
-            XPathExpressionException {
+    public void doit() throws ProActiveException, FileNotFoundException {
         for (File file : getApplicationDescriptors()) {
             if (!file.toString().contains("scriptHostname")) {
                 continue;

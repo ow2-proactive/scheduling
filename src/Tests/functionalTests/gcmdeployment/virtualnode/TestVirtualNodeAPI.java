@@ -39,6 +39,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
@@ -50,9 +51,7 @@ public class TestVirtualNodeAPI extends Abstract {
     static GCMApplicationDescriptor gcma;
 
     @BeforeClass
-    static public void setup()
-        throws IllegalArgumentException, XPathExpressionException,
-            FileNotFoundException, SAXException, IOException {
+    static public void setup() throws FileNotFoundException, ProActiveException {
         gcma = API.getGCMApplicationDescriptor(getDescriptor(
                     TestVirtualNodeAPI.class));
         gcma.startDeployment();

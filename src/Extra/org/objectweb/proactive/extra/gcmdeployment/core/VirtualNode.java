@@ -32,8 +32,6 @@ package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import java.util.Set;
 
-import javax.management.NotificationListener;
-
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 

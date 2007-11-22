@@ -52,7 +52,7 @@ public class TestRuleCombiningAlg extends RuleCombiningAlgorithm {
 
         while (it.hasNext()) {
             // get the next Rule, and evaluate it
-            Rule rule = (Rule) (it.next());
+            Rule rule = (it.next());
             Result result = rule.evaluate(context);
 
             // if it returns Permit, then the alg returns Permit
