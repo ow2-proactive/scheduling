@@ -162,6 +162,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     static {
         bodiesDestination = new ThreadLocal<ArrayList<UniversalBody>>();
         incomingFutures = new ThreadLocal<ArrayList<Future>>() {
+                    @Override
                     protected synchronized ArrayList<Future> initialValue() {
                         return new ArrayList<Future>();
                     }

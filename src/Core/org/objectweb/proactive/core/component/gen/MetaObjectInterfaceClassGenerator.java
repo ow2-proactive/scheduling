@@ -43,7 +43,6 @@ import javassist.CtClass;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewMethod;
-import javassist.LoaderClassPath;
 import javassist.Modifier;
 import javassist.NotFoundException;
 

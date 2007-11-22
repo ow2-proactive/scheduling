@@ -67,6 +67,6 @@ public class NFRequestFilterImpl implements RequestFilter, java.io.Serializable 
      * @return true if the request is a component controller request, false otherwise
      */
     public boolean acceptRequest(ComponentRequest request) {
-        return ((ComponentRequest) request).isControllerRequest();
+        return (request).isControllerRequest();
     }
 }

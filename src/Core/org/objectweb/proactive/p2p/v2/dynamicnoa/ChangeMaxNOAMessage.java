@@ -51,6 +51,7 @@ public class ChangeMaxNOAMessage extends Message {
     /**
      * Nothing to do, the message should not be transmited
      */
+    @Override
     public void transmit(P2PService acq) {
     }
 }

@@ -40,7 +40,6 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.RequestImpl;
-import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -125,7 +124,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
         if (server == null) {
             server = LocationServerFactory.getLocationServer();
         }
-        UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
+        UniversalBody mobile = server.searchObject(bodyID);
 
         logger.debug(
             "RequestWithLocationServer: backupSolution() server has sent an answer");

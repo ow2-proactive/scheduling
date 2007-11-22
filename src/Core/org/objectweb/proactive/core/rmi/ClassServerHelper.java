@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.rmi;
 
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.ssh.SshParameters;
 
 

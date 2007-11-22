@@ -89,7 +89,7 @@ public class RequestNodesMessage extends BreadthFirstMessage {
             if (numberOfNodes == P2PConstants.MAX_NODE) {
                 Vector<Node> nodes = target.nodeManager.askingAllNodes(nodeFamilyRegexp);
                 for (int i = 0; i < nodes.size(); i++) {
-                    Node current = (Node) nodes.get(i);
+                    Node current = nodes.get(i);
                     if (vnName != null) {
                         try {
                             current.getProActiveRuntime()

@@ -41,7 +41,6 @@ import java.util.List;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
-import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;

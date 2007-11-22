@@ -32,26 +32,12 @@ package org.objectweb.proactive.core.remoteobject.ibis;
 
 import java.io.IOException;
 import java.rmi.RemoteException;
-import java.security.AccessControlException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.security.Communication;
-import org.objectweb.proactive.core.security.PolicyServer;
-import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.security.SecurityContext;
-import org.objectweb.proactive.core.security.TypedCertificate;
-import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
-import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.core.security.securityentity.Entities;
-import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
 /**

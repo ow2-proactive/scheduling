@@ -203,7 +203,7 @@ public class Plan extends Line { // implements Topology2D {
         }
         Line result = null;
         try {
-            result = new Line((Group) tmp, this.getWidth());
+            result = new Line(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -239,7 +239,7 @@ public class Plan extends Line { // implements Topology2D {
         }
         Line result = null;
         try {
-            result = new Line((Group) tmp, this.getHeight());
+            result = new Line(tmp, this.getHeight());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }

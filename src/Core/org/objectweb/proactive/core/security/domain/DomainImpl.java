@@ -33,16 +33,12 @@ package org.objectweb.proactive.core.security.domain;
 import java.io.IOException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
-import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.TypedCertificate;
-import org.objectweb.proactive.core.security.TypedCertificateList;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;

@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.ssh;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.HostsInfos;
 
 

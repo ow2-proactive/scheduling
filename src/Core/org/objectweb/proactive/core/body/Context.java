@@ -100,6 +100,7 @@ public class Context implements Serializable {
     /**
      * Pretty printing.
      */
+    @Override
     public String toString() {
         StringBuffer res = new StringBuffer("Execution context for body " +
                 this.body.getID() + " : ");

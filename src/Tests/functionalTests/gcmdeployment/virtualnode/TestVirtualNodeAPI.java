@@ -31,10 +31,7 @@
 package functionalTests.gcmdeployment.virtualnode;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Set;
-
-import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -44,7 +41,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
-import org.xml.sax.SAXException;
 
 
 public class TestVirtualNodeAPI extends Abstract {

@@ -38,7 +38,6 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 
 
 /**

@@ -30,11 +30,8 @@
  */
 package org.objectweb.proactive.core.body.proxy;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public abstract class AbstractProxy implements Proxy, java.io.Serializable {

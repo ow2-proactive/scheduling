@@ -70,10 +70,10 @@ public class ProActiveMPIUtil {
      * @param startIndex the starting index of the place the int is stored
      */
     public static int bytesToInt(byte[] bytes, int startIndex) {
-        return (((int) bytes[startIndex] & 0xff) |
-        (((int) bytes[startIndex + 1] & 0xff) << 8) |
-        (((int) bytes[startIndex + 2] & 0xff) << 16) |
-        (((int) bytes[startIndex + 3] & 0xff) << 24));
+        return ((bytes[startIndex] & 0xff) |
+        ((bytes[startIndex + 1] & 0xff) << 8) |
+        ((bytes[startIndex + 2] & 0xff) << 16) |
+        ((bytes[startIndex + 3] & 0xff) << 24));
     }
 
     /** translate float into bytes, stored in byte array
@@ -113,8 +113,8 @@ public class ProActiveMPIUtil {
      * @param startIndex the starting index of the place the int is stored
      */
     public static short bytesToShort(byte[] bytes, int startIndex) {
-        return (short) (((int) bytes[startIndex] & 0xff) |
-        (((int) bytes[startIndex + 1] & 0xff) << 8));
+        return (short) ((bytes[startIndex] & 0xff) |
+        ((bytes[startIndex + 1] & 0xff) << 8));
     }
 
     /**
@@ -155,7 +155,7 @@ public class ProActiveMPIUtil {
      * @ret the string out of the byte array.
      */
     public static String bytesToString(byte[] bytes, int startIndex) {
-        int len = (int) (bytes[startIndex++]) & 0xff;
+        int len = (bytes[startIndex++]) & 0xff;
         return new String(bytes, startIndex, len);
     }
 

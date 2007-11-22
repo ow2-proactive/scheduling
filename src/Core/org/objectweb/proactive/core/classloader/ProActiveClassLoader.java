@@ -202,8 +202,7 @@ public class ProActiveClassLoader extends URLClassLoader {
         int count = 0;
         for (int i = 0; i < pathList.size(); i++) {
             try {
-                urlArray[i] = (new File((String) pathList.get(i))).toURI()
-                               .toURL();
+                urlArray[i] = (new File(pathList.get(i))).toURI().toURL();
                 count++;
             } catch (MalformedURLException e) {
                 System.out.println("MalformedURLException occured for " +

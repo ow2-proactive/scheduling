@@ -39,7 +39,6 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.RequestImpl;
-import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.StubObject;
 
@@ -169,7 +168,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
             server = LocationServerFactory.getLocationServer();
         }
 
-        UniversalBody mobile = (UniversalBody) server.searchObject(bodyID);
+        UniversalBody mobile = server.searchObject(bodyID);
         long endTimeBackupSolution = System.currentTimeMillis();
         System.out.println(
             "TimedRequestWithLocationServer: backupSolution() server has sent an answer after " +

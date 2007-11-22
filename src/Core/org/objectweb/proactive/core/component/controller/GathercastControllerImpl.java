@@ -76,7 +76,7 @@ public class GathercastControllerImpl extends AbstractProActiveController
     @Override
     public void init() {
         if (gatherRequestsHandler == null) {
-            gatherRequestsHandler = new GatherRequestsQueues((ProActiveComponent) owner);
+            gatherRequestsHandler = new GatherRequestsQueues(owner);
             List<Object> interfaces = Arrays.asList(owner.getFcInterfaces());
             Iterator<Object> it = interfaces.iterator();
 

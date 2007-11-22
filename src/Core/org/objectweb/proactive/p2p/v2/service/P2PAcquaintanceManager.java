@@ -265,15 +265,14 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     public void cleanAwaitedReplies() {
         //	System.out.println("P2PAcquaintanceManager.cleanAwaitedReplies() still " + awaitedReplies.size() );
         ArrayList<String> urls = new ArrayList<String>();
-        Set<Map.Entry<String, DatedRequest>> map = (Set<Map.Entry<String, DatedRequest>>) awaitedReplies.entrySet();
+        Set<Map.Entry<String, DatedRequest>> map = awaitedReplies.entrySet();
         Iterator it = map.iterator();
         while (it.hasNext()) {
             Map.Entry<String, DatedRequest> entry = (Map.Entry<String, DatedRequest>) it.next();
 
             //        System.out.println("P2PAcquaintanceManager.cleanAwaitedReplies() request sent at " + ((DatedRequest) entry.getValue()).getTime() );
             //        System.out.println("P2PAcquaintanceManager.cleanAwaitedReplies() now " + System.currentTimeMillis());
-            if ((System.currentTimeMillis() -
-                    ((DatedRequest) entry.getValue()).getTime()) > MAX_WAIT_TIME) {
+            if ((System.currentTimeMillis() - (entry.getValue()).getTime()) > MAX_WAIT_TIME) {
                 System.out.println("xxxxx Peer " + entry.getKey() +
                     " did not reply to our request");
                 //this guy did not reply so we should put it back in the preferedACQList
@@ -450,7 +449,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      */
     public P2PService randomPeer() {
         int random = this.randomizer.nextInt(this.acquaintances.size());
-        return (P2PService) this.acquaintances.get(random);
+        return this.acquaintances.get(random);
     }
 
     /**
@@ -593,13 +592,13 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         System.out.println("---------------------------------------------");
         System.out.println("----- Awaited Replies ---" +
             this.awaitedReplies.size());
-        Set<Map.Entry<String, DatedRequest>> map = (Set<Map.Entry<String, DatedRequest>>) awaitedReplies.entrySet();
+        Set<Map.Entry<String, DatedRequest>> map = awaitedReplies.entrySet();
         Iterator it2 = map.iterator();
         while (it2.hasNext()) {
             Map.Entry<String, DatedRequest> entry = (Map.Entry<String, DatedRequest>) it2.next();
 
             System.out.println(entry.getKey() + " requested at " +
-                ((DatedRequest) entry.getValue()).getTime());
+                (entry.getValue()).getTime());
         }
 
         System.out.println("---------------------------------------------");

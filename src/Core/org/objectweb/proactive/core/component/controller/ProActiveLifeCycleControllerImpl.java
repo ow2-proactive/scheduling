@@ -167,7 +167,7 @@ public class ProActiveLifeCycleControllerImpl
                 }
             }
 
-            String hierarchical_type = Fractive.getComponentParametersController((ProActiveComponent) getFcItfOwner())
+            String hierarchical_type = Fractive.getComponentParametersController(getFcItfOwner())
                                                .getComponentParameters()
                                                .getHierarchicalType();
             if (hierarchical_type.equals(Constants.COMPOSITE)) {

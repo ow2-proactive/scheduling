@@ -173,8 +173,8 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         AbstractInstanceProviderTask createTask = null;
 
         createTask = new CreateTask((ProActiveImplementationBuilder) builder,
-                container, name, definition,
-                (ControllerDescription) controllerDesc, contentDesc, n, context);
+                container, name, definition, controllerDesc, contentDesc, n,
+                context);
 
         FactoryProviderTask typeTask = (FactoryProviderTask) tasks.getTask("type",
                 container);

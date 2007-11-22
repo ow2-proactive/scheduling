@@ -47,6 +47,6 @@ public class MPI {
      * @return MPISpmd - an MPISpmd object
      */
     public static MPISpmd newMPISpmd(VirtualNode vn) {
-        return (MPISpmd) new MPISpmdProxy(vn);
+        return new MPISpmdProxy(vn);
     }
 }

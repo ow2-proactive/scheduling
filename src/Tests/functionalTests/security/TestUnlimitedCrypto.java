@@ -42,7 +42,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import functionalTests.FunctionalTest;
 import functionalTests.security.applicationlifecycle.SecurityTestApplicationLifeCycle;
 import functionalTests.security.dynamicsecuritypropagation.SecurityTestContextPropagation;
 import functionalTests.security.keygeneration.SecurityTestKeyGen;

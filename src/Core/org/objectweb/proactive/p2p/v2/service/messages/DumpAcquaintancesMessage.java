@@ -46,6 +46,7 @@ public class DumpAcquaintancesMessage extends BreadthFirstMessage
         super(ttl, id, sender);
     }
 
+    @Override
     public void execute(P2PService target) {
         //        try {
         System.out.println("***** " +
@@ -54,9 +55,8 @@ public class DumpAcquaintancesMessage extends BreadthFirstMessage
         //        } catch (UnknownHostException e) {
         //            e.printStackTrace();
         //        }
-        String[] v = (String[]) target.getAcquaintanceManager()
-                                      .getAcquaintancesURLs()
-                                      .toArray(new String[] {  });
+        String[] v = target.getAcquaintanceManager().getAcquaintancesURLs()
+                           .toArray(new String[] {  });
 
         for (int i = 0; i < v.length; i++) {
             System.out.println(v[i]);

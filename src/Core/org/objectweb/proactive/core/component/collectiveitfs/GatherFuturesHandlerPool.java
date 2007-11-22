@@ -93,8 +93,8 @@ public class GatherFuturesHandlerPool {
         if (unlocked.size() > 0) {
             Enumeration<GatherFuturesHandler> e = unlocked.keys();
             while (e.hasMoreElements()) {
-                handler = (GatherFuturesHandler) e.nextElement();
-                if ((now - ((Long) unlocked.get(handler)).longValue()) > expirationTime) {
+                handler = e.nextElement();
+                if ((now - (unlocked.get(handler)).longValue()) > expirationTime) {
                     // object has expired
                     unlocked.remove(handler);
                     expire(handler);

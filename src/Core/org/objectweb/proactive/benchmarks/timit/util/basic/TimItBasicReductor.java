@@ -82,6 +82,7 @@ public class TimItBasicReductor implements ProActiveInternalObject {
             return;
         }
         Runtime.getRuntime().addShutdownHook(new Thread() {
+                @Override
                 public void run() {
                     generateAllStatistics();
                 }

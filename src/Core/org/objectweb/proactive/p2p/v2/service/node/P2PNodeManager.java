@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
@@ -281,7 +280,8 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         // security 
         ProActiveSecurityManager newNodeSecurityManager = null;
 
-        newNodeSecurityManager = ((AbstractBody) ProActive.getBodyOnThis()).getProActiveSecurityManager()
+        newNodeSecurityManager = ((AbstractBody) ProActiveObject
+                                  .getBodyOnThis()).getProActiveSecurityManager()
                                   .generateSiblingCertificate(EntityType.NODE,
                 P2PConstants.VN_NAME);
 

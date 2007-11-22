@@ -158,7 +158,7 @@ public class CertTools {
     private static final String[] dNObjects = dNObjectsForward;
 
     private static DERObjectIdentifier getOid(String o) {
-        return (DERObjectIdentifier) oids.get(o.toLowerCase());
+        return oids.get(o.toLowerCase());
     } // getOid
 
     /**
@@ -622,7 +622,7 @@ public class CertTools {
         // bean is created.
         byte[] serno = new byte[8];
         SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-        random.setSeed((long) (new Date().getTime()));
+        random.setSeed((new Date().getTime()));
         random.nextBytes(serno);
         certgen.setSerialNumber((new java.math.BigInteger(serno)).abs());
         certgen.setNotBefore(firstDate);
@@ -700,7 +700,7 @@ public class CertTools {
         // bean is created.
         byte[] serno = new byte[8];
         SecureRandom random = SecureRandom.getInstance("SHA1PRNG");
-        random.setSeed((long) (new Date().getTime()));
+        random.setSeed((new Date().getTime()));
         random.nextBytes(serno);
         certgen.setSerialNumber((new java.math.BigInteger(serno)).abs());
         certgen.setNotBefore(firstDate);
@@ -841,7 +841,7 @@ public class CertTools {
                 Integer no = (Integer) listitem.get(0);
                 if (no.intValue() == 0) {
                     byte[] altName = (byte[]) listitem.get(1);
-                    DERObject oct = (DERObject) (new ASN1InputStream(new ByteArrayInputStream(
+                    DERObject oct = (new ASN1InputStream(new ByteArrayInputStream(
                                 altName)).readObject());
                     ASN1Sequence seq = ASN1Sequence.getInstance(oct);
                     ASN1TaggedObject obj = (ASN1TaggedObject) seq.getObjectAt(1);

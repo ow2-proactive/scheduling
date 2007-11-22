@@ -234,6 +234,7 @@ public class BasicTimer implements java.io.Serializable {
      * The toString method of this timer.
      * @return A description of the current timer.
      */
+    @Override
     public final String toString() {
         return "" + this.name + " " + "\t totalTime in milliseconds : " +
         (this.totalTime / 1000000L) + " " + "\t in nanoseconds : " +

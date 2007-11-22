@@ -46,6 +46,7 @@ public class AcquaintanceRequest extends Message implements Serializable {
     /**
      * Generates an acquaintance reply
      */
+    @Override
     public void execute(P2PService target) {
         if (!target.stubOnThis.equals(this.sender)) {
             Vector<String> result = target.acquaintanceManager_active.add(this.sender);
@@ -77,6 +78,7 @@ public class AcquaintanceRequest extends Message implements Serializable {
     /**
      * This is message should not be forwarded
      */
+    @Override
     public void transmit(P2PService acq) {
     }
 }

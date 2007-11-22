@@ -33,7 +33,6 @@ package unitTests.uri;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.util.URIBuilder;
 import static junit.framework.Assert.assertTrue;
 

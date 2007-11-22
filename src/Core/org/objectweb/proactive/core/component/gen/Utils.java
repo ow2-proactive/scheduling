@@ -229,8 +229,7 @@ public class Utils {
      * Retrieves the bytecode associated to the generated class of the given name
      */
     public static byte[] getClassData(String classname) {
-        byte[] bytecode = (byte[]) ClassDataCache.instance()
-                                                 .getClassData(classname);
+        byte[] bytecode = ClassDataCache.instance().getClassData(classname);
         if (bytecode != null) {
             return bytecode;
         }

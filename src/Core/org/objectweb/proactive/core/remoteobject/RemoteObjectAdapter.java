@@ -36,7 +36,6 @@ import java.lang.reflect.Method;
 import java.net.URI;
 import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.ProActiveException;
@@ -44,7 +43,6 @@ import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;

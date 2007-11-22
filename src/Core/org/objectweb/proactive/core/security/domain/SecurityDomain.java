@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.security.domain;
 
-import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entities;

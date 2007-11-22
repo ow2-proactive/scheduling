@@ -3299,8 +3299,9 @@ public class ProActive {
     /**
      * Call this method at the end of the application if it completed
      * successfully, for the launcher to be aware of it.
+     *
+     * XXX: PROACTIVE-102
      */
-    @Deprecated
     public static void exitSuccess() {
         System.exit(0);
     }
@@ -3308,8 +3309,9 @@ public class ProActive {
     /**
      * Call this method at the end of the application if it did not complete
      * successfully, for the launcher to be aware of it.
+     *
+     * XXX: PROACTIVE-102
      */
-    @Deprecated
     public static void exitFailure() {
         System.exit(1);
     }
@@ -3317,9 +3319,8 @@ public class ProActive {
     /**
      * Returns the version number
      *
-     * @return String
+     * XXX: PROACTIVE-102
      */
-    @Deprecated
     public static String getProActiveVersion() {
         return Main.getProActiveVersion();
     }

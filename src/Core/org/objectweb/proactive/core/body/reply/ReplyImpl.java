@@ -40,8 +40,6 @@ import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.security.SecurityContext;
-import org.objectweb.proactive.core.security.crypto.AuthenticationException;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.crypto.Session.ActAs;
 import org.objectweb.proactive.core.security.crypto.SessionException;

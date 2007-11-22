@@ -169,11 +169,11 @@ public class JacobiDispatcher {
 
     public JacobiDispatcher(String s1, String s2, String s3,
         P2PService serviceP2P) throws ProActiveException {
-        int globalSize = Integer.parseInt((String) s1);
-        int nbWorker = Integer.parseInt((String) s2);
-        int maxIter = Integer.parseInt((String) s3);
+        int globalSize = Integer.parseInt(s1);
+        int nbWorker = Integer.parseInt(s2);
+        int maxIter = Integer.parseInt(s3);
 
-        int workerGridSize = (int) Math.sqrt((double) (nbWorker));
+        int workerGridSize = (int) Math.sqrt((nbWorker));
         int submatrixSize = globalSize / workerGridSize;
         JacobiWorker[] workers = new JacobiWorker[nbWorker];
         nodesBooked = 0;

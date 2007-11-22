@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.ft.servers;
 
-import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.UnknownHostException;
 import java.rmi.Naming;

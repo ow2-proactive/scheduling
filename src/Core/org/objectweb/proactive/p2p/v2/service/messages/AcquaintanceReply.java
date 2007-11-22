@@ -54,6 +54,7 @@ public class AcquaintanceReply extends Message implements Serializable {
         this.senderURL = activeObjectNodeUrl;
     }
 
+    @Override
     public void execute(P2PService target) {
         if (urls == null) {
             target.acquaintanceManager_active.acqAccepted(senderURL, this.sender);
@@ -65,6 +66,7 @@ public class AcquaintanceReply extends Message implements Serializable {
     /**
      * Do nothing
      */
+    @Override
     public void transmit(P2PService acq) {
     }
 }

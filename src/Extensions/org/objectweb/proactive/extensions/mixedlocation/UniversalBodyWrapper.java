@@ -33,7 +33,6 @@ package org.objectweb.proactive.extensions.mixedlocation;
 import java.io.IOException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -45,7 +44,6 @@ import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.gc.GCMessage;
 import org.objectweb.proactive.core.gc.GCResponse;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
-import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;

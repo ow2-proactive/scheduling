@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.ssh;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
 import static org.objectweb.proactive.core.ssh.SSH.logger;

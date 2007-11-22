@@ -46,12 +46,9 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
 import org.objectweb.proactive.core.security.SecurityContext;
-import org.objectweb.proactive.core.security.crypto.AuthenticationException;
 import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
-import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
-import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

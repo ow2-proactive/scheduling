@@ -30,10 +30,8 @@
  */
 package org.objectweb.proactive.core.jmx.util;
 
-import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,7 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.management.InstanceNotFoundException;
-import javax.management.ListenerNotFoundException;
 import javax.management.Notification;
 import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
@@ -49,23 +46,14 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.body.AbstractUniversalBody;
-import org.objectweb.proactive.core.body.BodyMap;
-import org.objectweb.proactive.core.body.LocalBodyStore;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.UniversalBodyRemoteObjectAdapter;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;

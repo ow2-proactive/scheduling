@@ -226,7 +226,7 @@ public class TorusCube extends Torus { // implements Topology3D {
         }
         Ring result = null;
         try {
-            result = new Ring((Group) tmp, this.getWidth());
+            result = new Ring(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -256,7 +256,7 @@ public class TorusCube extends Torus { // implements Topology3D {
         }
         Ring result = null;
         try {
-            result = new Ring((Group) tmp, this.getWidth());
+            result = new Ring(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -287,7 +287,7 @@ public class TorusCube extends Torus { // implements Topology3D {
         }
         Ring result = null;
         try {
-            result = new Ring((Group) tmp, this.getWidth());
+            result = new Ring(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -316,7 +316,7 @@ public class TorusCube extends Torus { // implements Topology3D {
         }
         Torus result = null;
         try {
-            result = new Torus((Group) tmp, this.getWidth(), this.getDepth());
+            result = new Torus(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -345,7 +345,7 @@ public class TorusCube extends Torus { // implements Topology3D {
         }
         Torus result = null;
         try {
-            result = new Torus((Group) tmp, this.getWidth(), this.getDepth());
+            result = new Torus(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -371,7 +371,7 @@ public class TorusCube extends Torus { // implements Topology3D {
         }
         Torus result = null;
         try {
-            result = new Torus((Group) tmp, this.getWidth(), this.getDepth());
+            result = new Torus(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }

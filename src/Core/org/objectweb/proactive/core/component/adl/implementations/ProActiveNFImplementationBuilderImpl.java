@@ -71,7 +71,7 @@ public class ProActiveNFImplementationBuilderImpl
                 VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
                 controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
                 !contentDesc.uniqueInstance()) {
-            result = (Component) ((Group) ((ProActiveGenericFactory) Fractive.getGenericFactory(bootstrap)).newNFcInstanceAsList((ComponentType) type,
+            result = (Component) ((Group) (Fractive.getGenericFactory(bootstrap)).newNFcInstanceAsList((ComponentType) type,
                     controllerDesc, contentDesc, deploymentVN)).getGroupByType();
         } else {
             result = ((ProActiveGenericFactory) Fractal.getGenericFactory(bootstrap)).newNFcInstance((ComponentType) type,

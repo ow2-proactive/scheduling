@@ -284,7 +284,7 @@ public class ProxyFile extends File {
 
     @Override
     public URL toURL() throws MalformedURLException {
-        return getCurrent().toURL();
+        return getCurrent().toURI().toURL();
     }
 
     @Override

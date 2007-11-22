@@ -33,7 +33,7 @@ package functionalTests.security.ruleCheck;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.security.exceptions.RuntimeSecurityException;
@@ -81,7 +81,7 @@ public class SampleObject implements Serializable {
         System.out.println(this.name + " is asking " + targetString +
             " to do something.");
 
-        ProActive.setImmediateService("doSomething");
+        ProActiveObject.setImmediateService("doSomething");
         SerializableString result = null;
         try {
             result = target.doSomething();

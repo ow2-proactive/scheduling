@@ -222,7 +222,7 @@ public class ProActiveComponentRepresentativeImpl
     protected Object reifyCall(String className, String methodName,
         Class<?>[] parameterTypes, Object[] effectiveParameters, short priority) {
         try {
-            return proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
+            return proxy.reify(MethodCall.getComponentMethodCall(
                     Class.forName(className)
                          .getDeclaredMethod(methodName, parameterTypes),
                     effectiveParameters, null, (String) null, null, priority));
@@ -296,10 +296,10 @@ public class ProActiveComponentRepresentativeImpl
      *implements  org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        Interface[] nfInterfaces = (Interface[]) (nfInterfaceReferences.values()
-                                                                       .toArray(new Interface[nfInterfaceReferences.size()]));
-        Interface[] fcInterfaces = (Interface[]) (fcInterfaceReferences.values()
-                                                                       .toArray(new Interface[fcInterfaceReferences.size()]));
+        Interface[] nfInterfaces = (nfInterfaceReferences.values()
+                                                         .toArray(new Interface[nfInterfaceReferences.size()]));
+        Interface[] fcInterfaces = (fcInterfaceReferences.values()
+                                                         .toArray(new Interface[fcInterfaceReferences.size()]));
         Interface[] result = new Interface[nfInterfaces.length +
             fcInterfaces.length + 1];
         System.arraycopy(nfInterfaces, 0, result, 0, nfInterfaces.length);
@@ -371,7 +371,7 @@ public class ProActiveComponentRepresentativeImpl
         // reified as a standard invocation (not a component one)
         Object result;
         try {
-            result = proxy.reify((MethodCall) MethodCall.getMethodCall(
+            result = proxy.reify(MethodCall.getMethodCall(
                         Class.forName(Object.class.getName())
                              .getDeclaredMethod("hashCode", new Class<?>[] {  }),
                         new Object[] {  }, (Map<TypeVariable, Class<?>>) null));

@@ -41,7 +41,6 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiverForwarder;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverForwarder;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.event.AbstractEventProducer;
 import org.objectweb.proactive.core.event.MigrationEvent;
 import org.objectweb.proactive.core.event.MigrationEventListener;

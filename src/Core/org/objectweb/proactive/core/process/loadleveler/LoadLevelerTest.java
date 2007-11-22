@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.process.loadleveler;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.objectweb.proactive.api.ProDeployment;

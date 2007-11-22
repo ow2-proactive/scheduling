@@ -356,7 +356,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
         ranking = thisCPURanking.getRanking();
 
         try {
-            this.acquaintances = ((P2PService) P2PService.getLocalP2PService()).getAcquaintanceList();
+            this.acquaintances = (P2PService.getLocalP2PService()).getAcquaintanceList();
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -40,7 +40,6 @@ import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
-import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
 
 

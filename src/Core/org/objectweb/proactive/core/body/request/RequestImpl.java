@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.body.request;
 
 import java.io.IOException;
 import java.io.StreamCorruptedException;
-import java.security.cert.X509Certificate;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -47,10 +46,8 @@ import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
-import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityEntity;
-import org.objectweb.proactive.core.security.crypto.Session;
 import org.objectweb.proactive.core.security.crypto.Session.ActAs;
 import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;

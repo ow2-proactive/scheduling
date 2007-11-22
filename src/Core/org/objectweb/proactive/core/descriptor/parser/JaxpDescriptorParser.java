@@ -57,7 +57,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -163,11 +162,13 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         */
 
         // Start Error Handler code here
+        @Override
         public void warning(SAXParseException e) {
             logger.warn("Warning Line " + e.getLineNumber() + ": " +
                 e.getMessage() + "\n");
         }
 
+        @Override
         public void error(SAXParseException e) throws SAXParseException {
             errMessage = new String("Error Line " + e.getLineNumber() + ": " +
                     e.getMessage() + "\n");
@@ -175,6 +176,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             throw e;
         }
 
+        @Override
         public void fatalError(SAXParseException e) throws SAXParseException {
             errMessage = new String("Error Line " + e.getLineNumber() + ": " +
                     e.getMessage() + "\n");

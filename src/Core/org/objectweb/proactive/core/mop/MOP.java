@@ -570,8 +570,8 @@ public abstract class MOP {
         String nameOfClass = targetClass.getName();
 
         // Is it cached in Hashtable ?
-        stubConstructor = (Constructor) stubTable.get(new GenericStubKey(
-                    nameOfClass, genericParameters));
+        stubConstructor = stubTable.get(new GenericStubKey(nameOfClass,
+                    genericParameters));
 
         //System.out.println("xxxxxx targetClass is " + targetClass);
         // On cache miss, finds the constructor

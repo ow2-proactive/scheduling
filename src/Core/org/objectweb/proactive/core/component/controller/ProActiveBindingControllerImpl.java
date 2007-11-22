@@ -144,7 +144,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
 
             // ensure multicast interface of primitive component is initialized
             if (isPrimitive()) {
-                BindingController userBindingController = (BindingController) ((ProActiveComponent) owner).getReferenceOnBaseObject();
+                BindingController userBindingController = (BindingController) (owner).getReferenceOnBaseObject();
 
                 if ((userBindingController.lookupFc(clientItfName) == null) ||
                         !(ProGroup.isGroup(userBindingController.lookupFc(
@@ -338,10 +338,9 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
                     sItf);
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
-                Fractive.getGathercastController((ProActiveComponent) (sItf).getFcItfOwner())
+                Fractive.getGathercastController((sItf).getFcItfOwner())
                         .addedBindingOnServerItf(sItf.getFcItfName(),
-                    ((ProActiveComponent) owner).getRepresentativeOnThis(),
-                    clientItfName);
+                    (owner).getRepresentativeOnThis(), clientItfName);
             } else {
                 ((MulticastControllerImpl) Fractive.getMulticastController(owner)).bindFc(clientItfName,
                     sItf);
@@ -358,10 +357,9 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
                     getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
-                Fractive.getGathercastController((ProActiveComponent) (sItf).getFcItfOwner())
+                Fractive.getGathercastController((sItf).getFcItfOwner())
                         .addedBindingOnServerItf(sItf.getFcItfName(),
-                    ((ProActiveComponent) owner).getRepresentativeOnThis(),
-                    clientItfName);
+                    (owner).getRepresentativeOnThis(), clientItfName);
             } else {
                 primitiveBindFc(clientItfName, sItf);
             }
@@ -379,10 +377,9 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
                     getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
-                Fractive.getGathercastController((ProActiveComponent) (sItf).getFcItfOwner())
+                Fractive.getGathercastController((sItf).getFcItfOwner())
                         .addedBindingOnServerItf(sItf.getFcItfName(),
-                    ((ProActiveComponent) owner).getRepresentativeOnThis(),
-                    clientItfName);
+                    (owner).getRepresentativeOnThis(), clientItfName);
             } else {
                 compositeBindFc(clientItfName, client_itf_type, sItf);
             }
@@ -496,7 +493,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
                         (Interface) user_binding_controller.lookupFc(
                             clientItfName))) {
                 ProActiveInterface sItf = (ProActiveInterface) user_binding_controller.lookupFc(clientItfName);
-                Fractive.getGathercastController((ProActiveComponent) (sItf).getFcItfOwner())
+                Fractive.getGathercastController((sItf).getFcItfOwner())
                         .removedBindingOnServerItf(sItf.getFcItfName(),
                     (ProActiveComponent) sItf.getFcItfOwner(), clientItfName);
             }

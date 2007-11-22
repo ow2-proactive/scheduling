@@ -231,7 +231,7 @@ public class BasicResultWriter {
         // Set the name as an attribute
         newTimerElement.setAttribute(new Attribute("name",
                 currentTimer.getName()));
-        double totalTimeValueInMillis = ((double) currentTimer.getTotalTime()) / 1000000d;
+        double totalTimeValueInMillis = (currentTimer.getTotalTime()) / 1000000d;
         // Set the totalTime in millis of the timer as an attribute
         newTimerElement.setAttribute(new Attribute("totalTimeInMillis",
                 "" + totalTimeValueInMillis));

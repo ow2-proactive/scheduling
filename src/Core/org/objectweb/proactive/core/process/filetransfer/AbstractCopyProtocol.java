@@ -160,7 +160,7 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
                 aList.add(fd[j]);
         }
 
-        return (DirectoryDescription[]) aList.toArray(new DirectoryDescription[0]);
+        return aList.toArray(new DirectoryDescription[0]);
     }
 
     /**

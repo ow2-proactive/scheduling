@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.remoteobject.http.util;
 import java.util.HashMap;
 
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
-import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

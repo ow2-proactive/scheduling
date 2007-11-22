@@ -559,7 +559,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         ProxyForGroup p = ProGroup.findProxyForGroup(o);
         if (p != null) {
             // comparing with another group
-            return this.memberList.equals(((org.objectweb.proactive.core.group.ProxyForGroup) p).memberList);
+            return this.memberList.equals((p).memberList);
         } else {
             return false;
         }
@@ -1096,7 +1096,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     public void purgeExceptionAndNull() {
         Iterator it = this.memberList.iterator();
         while (it.hasNext()) {
-            Object element = (Object) it.next();
+            Object element = it.next();
             if ((element instanceof Throwable) || (element == null)) {
                 it.remove();
             }

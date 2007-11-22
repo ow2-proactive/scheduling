@@ -111,14 +111,14 @@ public class ProActiveComponentRepresentativeFactory {
     public ProActiveComponentRepresentative createComponentRepresentative(
         Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
-        proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
+        proxy.reify(MethodCall.getComponentMethodCall(
                 ComponentParametersController.class.getDeclaredMethod(
                     "setImmediateServices", new Class[] {  }),
                 new Object[] {  }, null,
                 Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
                 ComponentRequest.STRICT_FIFO_PRIORITY));
 
-        ComponentParameters componentParameters = (ComponentParameters) proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
+        ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall.getComponentMethodCall(
                     ComponentParametersController.class.getDeclaredMethod(
                         "getComponentParameters", new Class[] {  }),
                     new Object[] {  }, null,
@@ -126,7 +126,7 @@ public class ProActiveComponentRepresentativeFactory {
                     ComponentRequest.STRICT_FIFO_PRIORITY));
 
         //remove immediate service for getComponentParameters
-        proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
+        proxy.reify(MethodCall.getComponentMethodCall(
                 ComponentParametersController.class.getDeclaredMethod(
                     "removeImmediateServices", new Class[] {  }),
                 new Object[] {  }, null,
@@ -150,13 +150,13 @@ public class ProActiveComponentRepresentativeFactory {
     public ProActiveComponentRepresentative createNFComponentRepresentative(
         Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
-        proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
+        proxy.reify(MethodCall.getComponentMethodCall(
                 ComponentParametersController.class.getDeclaredMethod(
                     "setImmediateServices", new Class[] {  }),
                 new Object[] {  }, null,
                 Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
                 ComponentRequest.STRICT_FIFO_PRIORITY));
-        ComponentParameters componentParameters = (ComponentParameters) proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
+        ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall.getComponentMethodCall(
                     ComponentParametersController.class.getDeclaredMethod(
                         "getComponentParameters", new Class[] {  }),
                     new Object[] {  }, null,
@@ -164,7 +164,7 @@ public class ProActiveComponentRepresentativeFactory {
                     ComponentRequest.STRICT_FIFO_PRIORITY));
 
         //remove immediate service for getComponentParameters
-        proxy.reify((MethodCall) MethodCall.getComponentMethodCall(
+        proxy.reify(MethodCall.getComponentMethodCall(
                 ComponentParametersController.class.getDeclaredMethod(
                     "removeImmediateServices", new Class[] {  }),
                 new Object[] {  }, null,

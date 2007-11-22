@@ -102,7 +102,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
      * Make a deep copy of all arguments of the constructor
      */
     public void makeDeepCopyOfArguments() throws java.io.IOException {
-        effectiveArguments = (Object[]) Utils.makeDeepCopy(effectiveArguments);
+        effectiveArguments = Utils.makeDeepCopy(effectiveArguments);
     }
 
     /**

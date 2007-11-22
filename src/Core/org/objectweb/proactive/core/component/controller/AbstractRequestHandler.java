@@ -102,7 +102,7 @@ public abstract class AbstractRequestHandler implements RequestHandler,
 
     protected String getHierarchicalType() {
         try {
-            return Fractive.getComponentParametersController((ProActiveComponent) getFcItfOwner())
+            return Fractive.getComponentParametersController(getFcItfOwner())
                            .getComponentParameters().getHierarchicalType();
         } catch (NoSuchInterfaceException e) {
             throw new ProActiveRuntimeException(

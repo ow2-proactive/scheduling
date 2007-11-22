@@ -103,7 +103,7 @@ public abstract class AbstractInterfaceClassGenerator {
             CtClass super_itf;
             for (int j = 0; j < super_itfs.size(); j++) {
                 if (!interfaces.contains(super_itfs.get(j))) {
-                    super_itf = (CtClass) super_itfs.get(j);
+                    super_itf = super_itfs.get(j);
                     if (!(super_itf.equals(pool.get(
                                     ProActiveInterface.class.getName())) ||
                             super_itf.equals(pool.get(Interface.class.getName())))) {

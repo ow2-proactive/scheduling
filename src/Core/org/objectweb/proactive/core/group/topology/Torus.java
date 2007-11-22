@@ -145,7 +145,7 @@ public class Torus extends Ring { // implements Topology2D {
         }
         Ring result = null;
         try {
-            result = new Ring((Group) tmp, this.getWidth());
+            result = new Ring(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -182,7 +182,7 @@ public class Torus extends Ring { // implements Topology2D {
         }
         Ring result = null;
         try {
-            result = new Ring((Group) tmp, this.getWidth());
+            result = new Ring(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.core.descriptor.legacyparser;
 
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.xml.handler.BasicUnmarshaller;
 import org.objectweb.proactive.core.xml.io.Attributes;
 

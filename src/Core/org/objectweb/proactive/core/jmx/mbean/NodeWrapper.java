@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.jmx.mbean;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.security.AccessControlException;
@@ -52,7 +51,6 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 

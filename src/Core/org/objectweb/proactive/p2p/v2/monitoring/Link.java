@@ -50,6 +50,7 @@ public class Link {
         return source;
     }
 
+    @Override
     public boolean equals(Object o) {
         System.out.println("Link.equals()");
         Link l = (Link) o;

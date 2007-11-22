@@ -126,8 +126,7 @@ public class ComponentRequestImpl extends RequestImpl
 
         try {
             if (isControllerRequest()) {
-                result = ((ProActiveComponentImpl) ((ComponentBodyImpl) targetBody)
-                          .getProActiveComponentImpl()).getControllerRequestHandler()
+                result = (((ComponentBodyImpl) targetBody).getProActiveComponentImpl()).getControllerRequestHandler()
                           .handleRequest(this);
             } else {
                 if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
@@ -159,7 +158,7 @@ public class ComponentRequestImpl extends RequestImpl
                                 // TODO_M allow stopping shortcut here
                             }
                             // executing on connected server interface
-                            result = methodCall.execute((ProActiveInterface) (((ComponentBodyImpl) targetBody).getProActiveComponentImpl()).getFcInterface(
+                            result = methodCall.execute((((ComponentBodyImpl) targetBody).getProActiveComponentImpl()).getFcInterface(
                                         methodCall.getComponentMetadata()
                                                   .getComponentInterfaceName()));
                         } catch (IllegalArgumentException e) {

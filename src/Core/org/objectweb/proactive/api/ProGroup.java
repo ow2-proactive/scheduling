@@ -268,8 +268,7 @@ public class ProGroup {
         Class<?>[] genericParameters, Object[] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        Object result = ProGroup.newGroup(className,
-                (Class<?>[]) genericParameters);
+        Object result = ProGroup.newGroup(className, genericParameters);
         Group g = getGroup(result);
 
         if (params != null) {

@@ -229,7 +229,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
     //  returns MPI process 
     private MPIProcess getMPIProcess(ExternalProcess process) {
         while (!(process instanceof MPIProcess)) {
-            process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
+            process = (((AbstractExternalProcessDecorator) process).getTargetProcess());
         }
         return (MPIProcess) process;
     }
@@ -239,7 +239,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         int res = 0;
         while (!(process instanceof MPIProcess)) {
             res++;
-            process = ((ExternalProcess) ((AbstractExternalProcessDecorator) process).getTargetProcess());
+            process = (((AbstractExternalProcessDecorator) process).getTargetProcess());
         }
         return res;
     }

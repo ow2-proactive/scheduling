@@ -102,8 +102,8 @@ public class GatherRequestsQueue implements Serializable {
             if (!Void.TYPE.equals(itfTypeMethod.getReturnType())) {
                 oneWayCall = false;
 
-                futuresHandler = (GatherFuturesHandler) GatherFuturesHandlerPool.instance()
-                                                                                .borrowFuturesHandler();
+                futuresHandler = GatherFuturesHandlerPool.instance()
+                                                         .borrowFuturesHandler();
                 futuresHandler.setConnectedClientItfs(connectedClientItfs);
             }
         } catch (Exception e) {

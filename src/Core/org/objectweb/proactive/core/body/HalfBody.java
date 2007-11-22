@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.InternalBodySecurity;
-import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;

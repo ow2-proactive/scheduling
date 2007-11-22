@@ -237,15 +237,15 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
                 // its a ProSpmd Object
                 if (g != null) {
                     // extract the specified object from the group and call method on it
-                    ((Method) g.get(dest).getClass()
-                               .getDeclaredMethod(m_r.getMethod(),
+                    (g.get(dest).getClass()
+                      .getDeclaredMethod(m_r.getMethod(),
                         new Class[] { ProActiveMPIData.class })).invoke(g.get(dest),
                         new Object[] { m_r });
                 } else {
                     if (((Object[]) proSpmdByClasses.get(m_r.getClazz()))[dest] != null) {
-                        ((Method) ((Object[]) proSpmdByClasses
-                                                                                         .get(m_r.getClazz()))[dest].getClass()
-                                                                                         .getDeclaredMethod(m_r.getMethod(),
+                        (((Object[]) proSpmdByClasses
+                                                                                .get(m_r.getClazz()))[dest].getClass()
+                                                                                .getDeclaredMethod(m_r.getMethod(),
                             new Class[] { ProActiveMPIData.class })).invoke(((Object[]) proSpmdByClasses.get(
                                 m_r.getClazz()))[dest], new Object[] { m_r });
                     } else {

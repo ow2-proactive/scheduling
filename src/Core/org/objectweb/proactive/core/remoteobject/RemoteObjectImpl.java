@@ -35,7 +35,6 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.security.AccessControlException;
 import java.security.PublicKey;
-import java.security.cert.X509Certificate;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
@@ -47,7 +46,6 @@ import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.ReifiedCastException;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
-import org.objectweb.proactive.core.security.Communication;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;

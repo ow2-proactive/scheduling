@@ -34,11 +34,6 @@ import java.util.Hashtable;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.event.AbstractEventProducer;
-import org.objectweb.proactive.core.event.BodyEvent;
-//import org.objectweb.proactive.core.event.BodyEventListener;
-import org.objectweb.proactive.core.event.ProActiveEvent;
-import org.objectweb.proactive.core.event.ProActiveListener;
 
 
 /**

@@ -55,7 +55,6 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
-import org.objectweb.proactive.core.security.SecurityConstants;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.exceptions.InvalidPolicyFile;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -466,7 +465,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     public void addProcessToSequenceList(
         AbstractSequentialListProcessDecorator sequentialListProcess,
         String processID) {
-        ExternalProcess process = (ExternalProcess) getProcess(processID);
+        ExternalProcess process = getProcess(processID);
         if (process == null) {
             addSequentialPendingProcess(processID, sequentialListProcess);
         } else {
@@ -630,7 +629,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     }
 
     private void addExternalProcess(String processID, ExternalProcess process) {
-        ProcessUpdater processUpdater = (ProcessUpdater) pendingProcessMapping.remove(processID);
+        ProcessUpdater processUpdater = pendingProcessMapping.remove(processID);
 
         if (processUpdater != null) {
             if (logger.isDebugEnabled()) {
@@ -809,7 +808,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
             }
 
             // add the process in head of list
-            spd.addProcessToList(0, (ExternalProcessDecorator) p);
+            spd.addProcessToList(0, p);
         }
     }
 
@@ -827,7 +826,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
             }
 
             // add the process in head of list
-            spd.addServiceToList(0, (UniversalService) s);
+            spd.addServiceToList(0, s);
         }
     }
 
@@ -907,7 +906,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     public void addTechnicalService(TechnicalServiceXmlType tsParsed)
         throws Exception {
         TechnicalService ts = (TechnicalService) tsParsed.getType().newInstance();
-        ((TechnicalService) ts).init(tsParsed.getArgs());
+        (ts).init(tsParsed.getArgs());
         if (technicalServiceMapping.containsKey(tsParsed.getId())) {
             ((TechnicalServiceWrapper) this.technicalServiceMapping.get(tsParsed.getId())).setTs(ts);
         } else {

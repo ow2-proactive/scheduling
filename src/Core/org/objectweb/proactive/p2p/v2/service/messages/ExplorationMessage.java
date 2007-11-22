@@ -52,7 +52,7 @@ public class ExplorationMessage extends BreadthFirstMessage
             //because he might have received replies
             //and have reached its NOA
             try {
-                String[] result = (String[]) null; //this.sender.registerRequest(target.stubOnThis).toArray(new String[] {});
+                String[] result = null; //this.sender.registerRequest(target.stubOnThis).toArray(new String[] {});
 
                 if (result == null) {
                     logger.info("ExplorationMessage me = " +

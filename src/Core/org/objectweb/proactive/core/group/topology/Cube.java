@@ -232,7 +232,7 @@ public class Cube extends Plan { // implements Topology3D {
         }
         Line result = null;
         try {
-            result = new Line((Group) tmp, this.getWidth());
+            result = new Line(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -262,7 +262,7 @@ public class Cube extends Plan { // implements Topology3D {
         }
         Line result = null;
         try {
-            result = new Line((Group) tmp, this.getWidth());
+            result = new Line(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -293,7 +293,7 @@ public class Cube extends Plan { // implements Topology3D {
         }
         Line result = null;
         try {
-            result = new Line((Group) tmp, this.getWidth());
+            result = new Line(tmp, this.getWidth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -322,7 +322,7 @@ public class Cube extends Plan { // implements Topology3D {
         }
         Plan result = null;
         try {
-            result = new Plan((Group) tmp, this.getWidth(), this.getDepth());
+            result = new Plan(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -351,7 +351,7 @@ public class Cube extends Plan { // implements Topology3D {
         }
         Plan result = null;
         try {
-            result = new Plan((Group) tmp, this.getWidth(), this.getDepth());
+            result = new Plan(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }
@@ -377,7 +377,7 @@ public class Cube extends Plan { // implements Topology3D {
         }
         Plan result = null;
         try {
-            result = new Plan((Group) tmp, this.getWidth(), this.getDepth());
+            result = new Plan(tmp, this.getWidth(), this.getDepth());
         } catch (ConstructionOfReifiedObjectFailedException e) {
             e.printStackTrace();
         }

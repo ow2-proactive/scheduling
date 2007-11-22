@@ -140,7 +140,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         try {
             Node remoteNode = NodeFactory.getNode(node);
             ProActiveRuntime remoteRuntime = remoteNode.getProActiveRuntime();
-            P2PNodeManager remoteNodeManager = (P2PNodeManager) this.nodeManagerMap.get(node);
+            P2PNodeManager remoteNodeManager = this.nodeManagerMap.get(node);
 
             remoteRuntime.unregisterVirtualNode(vnName);
             remoteRuntime.rmAcquaintance(this.parUrl);
@@ -168,7 +168,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
     public void killAllNodes() {
         this.killAllFlag = true;
         while (this.nodesToKillList.size() > 0) {
-            String currentNode = (String) this.nodesToKillList.get(0);
+            String currentNode = this.nodesToKillList.get(0);
             this.killNode(currentNode);
         }
     }
@@ -221,7 +221,7 @@ public class P2PNodeLookup implements InitActive, RunActive, EndActive,
         // Get currrent nodes accessor
         this.waitingNodesList.addAll(givenNodes);
         for (int i = 0; i < givenNodes.size(); i++) {
-            Node current = (Node) givenNodes.get(i);
+            Node current = givenNodes.get(i);
             String nodeUrl = current.getNodeInformation().getURL();
             this.nodeManagerMap.put(nodeUrl, remoteNodeManager);
             this.acquiredNodes++;

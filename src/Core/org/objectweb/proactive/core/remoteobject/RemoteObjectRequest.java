@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.remoteobject;
 
-import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 
