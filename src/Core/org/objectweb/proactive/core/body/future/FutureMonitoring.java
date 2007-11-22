@@ -134,7 +134,11 @@ public class FutureMonitoring implements Runnable {
         return pinged;
     }
 
-    /* Arrange to ping a single body every TTM */
+    /**
+     * Arrange to ping a single body every TTM
+     * There is a single daemon thread running the monitoring, so
+     * it will end with the JVM.
+     */
     public void run() {
         for (;;) {
             boolean pingedOneBody = false;
