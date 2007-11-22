@@ -17,19 +17,23 @@ rem Set up the classpath using classes dir or jar files
 rem 
 
 IF DEFINED CLASSPATHEXT (
-SET CLASSPATH=%CLASSPATHEXT%
+	SET CLASSPATH=%CLASSPATHEXT%
 ) ELSE (
-SET CLASSPATH=.
+	SET CLASSPATH=.
 )
 
-IF EXIST "%PROACTIVE%\classes" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes\Core;%PROACTIVE%\classes\Extensions;%PROACTIVE%\classes\Extra;%PROACTIVE%\classes\Examples;%PROACTIVE%\classes\IC2D-old
-IF EXIST "%PROACTIVE%\ProActive.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive.jar
+
+IF EXIST "%PROACTIVE%\classes" ( 
+	SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes\Core;%PROACTIVE%\classes\Extensions;%PROACTIVE%\classes\Extra;%PROACTIVE%\classes\Examples;%PROACTIVE%\classes\IC2D-old
+	SET JARS=%PROACTIVE%\lib\
+	FOR %%j IN (%PROACTIVE%\lib\*.jar) DO SET JARS=!JARS!;%%j
+) ELSE (
+	SET JARS=%PROACTIVE%\dist\lib\
+	FOR %%j IN (%PROACTIVE%\dist\lib\*.jar) DO SET JARS=!JARS!;%%j
+)
+
+SET CLASSPATH=%CLASSPATH%;%JARS%
 IF EXIST "%PROACTIVE%\ProActive_examples.jar" set CLASSPATH=%CLASSPATH%;%PROACTIVE%\ProActive_examples.jar
-
-set JARS=
-FOR %%j IN (%PROACTIVE%\lib\*.jar) DO SET JARS=!JARS!;%%j
-SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\lib;%JARS%
-
 
 set JAVA_CMD="%JAVA_HOME%\bin\java.exe" -Djava.security.manager -Djava.security.policy="%PROACTIVE%\scripts\proactive.java.policy" -Dlog4j.configuration=file:"%PROACTIVE%\scripts\proactive-log4j"
 
