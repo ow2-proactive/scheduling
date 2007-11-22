@@ -29,7 +29,7 @@
             class="org.objectweb.proactive.extra.scheduler.gui.views.JobInfo"
             icon="icons/info.png"
             id="org.objectweb.proactive.extra.scheduler.gui.views.JobInfo"
-            name="Jobs Info">
+            name="Job Info">
       </view>
       <view
             allowMultiple="false"

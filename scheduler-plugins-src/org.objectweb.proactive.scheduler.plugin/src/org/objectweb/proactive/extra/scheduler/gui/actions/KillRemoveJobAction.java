@@ -84,8 +84,6 @@ public class KillRemoveJobAction extends Action {
 
         this.setText("Remove Job");
         this.setToolTipText("To remove definitely a job from the scheduler");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/killJob.png"));
     }
 
     public void setKillMode() {
@@ -94,8 +92,6 @@ public class KillRemoveJobAction extends Action {
         this.setText("Kill job");
         this.setToolTipText(
             "To kill a job (this will remove this job from the scheduler)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/killJob.png"));
     }
 
     public static KillRemoveJobAction newInstance(Shell shell) {

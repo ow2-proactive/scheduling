@@ -42,6 +42,7 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
@@ -109,6 +110,7 @@ public class PendingJobComposite extends AbstractJobComposite
         switch (JobsController.getSchedulerState()) {
         case SHUTTING_DOWN:
         case KILLED:
+            PriorityJobAction.getInstance().setEnabled(false);
             PriorityIdleJobAction.getInstance().setEnabled(false);
             PriorityLowestJobAction.getInstance().setEnabled(false);
             PriorityLowJobAction.getInstance().setEnabled(false);
@@ -120,6 +122,7 @@ public class PendingJobComposite extends AbstractJobComposite
             pauseResumeJobAction.setPauseResumeMode();
             break;
         default:
+            PriorityJobAction.getInstance().setEnabled(enabled);
             PriorityIdleJobAction.getInstance().setEnabled(enabled);
             PriorityLowestJobAction.getInstance().setEnabled(enabled);
             PriorityLowJobAction.getInstance().setEnabled(enabled);

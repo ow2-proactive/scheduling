@@ -1,30 +1,27 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ * Initial developer(s): The ProActive Team
+ * http://proactive.inria.fr/team_members.htm Contributor(s):
  *
  * ################################################################
  */
@@ -55,6 +52,7 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.PauseSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
@@ -453,7 +451,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
                                         resultPreview.update(tr.getGraphicalDescription());
                                     }
                                 } else {
-                                    // TODO throw new RuntimeException("Task " + taskId
+                                    // TODO throw new RuntimeException("Task " +
+                                    // taskId
                                     // + " is finished but result is null");
                                 }
                             }
@@ -474,6 +473,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
         if (job == null) {
             ObtainJobOutputAction.getInstance().setEnabled(false);
+            PriorityJobAction.getInstance().setEnabled(false);
             PriorityIdleJobAction.getInstance().setEnabled(false);
             PriorityLowestJobAction.getInstance().setEnabled(false);
             PriorityLowJobAction.getInstance().setEnabled(false);
@@ -487,6 +487,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             ObtainJobOutputAction.getInstance()
                                  .setEnabled(SchedulerProxy.getInstance()
                                                            .isItHisJob(job.getOwner()));
+            PriorityJobAction.getInstance().setEnabled(false);
             PriorityIdleJobAction.getInstance().setEnabled(false);
             PriorityLowestJobAction.getInstance().setEnabled(false);
             PriorityLowJobAction.getInstance().setEnabled(false);
@@ -502,6 +503,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             // enabling/disabling button permitted with this job
             ObtainJobOutputAction.getInstance().setEnabled(enabled);
 
+            PriorityJobAction.getInstance().setEnabled(enabled);
             PriorityIdleJobAction.getInstance().setEnabled(enabled);
             PriorityLowestJobAction.getInstance().setEnabled(enabled);
             PriorityLowJobAction.getInstance().setEnabled(enabled);
@@ -551,6 +553,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         }
 
         SubmitJobAction.getInstance().setEnabled(false);
+        PriorityJobAction.getInstance().setEnabled(false);
         PriorityIdleJobAction.getInstance().setEnabled(false);
         PriorityLowestJobAction.getInstance().setEnabled(false);
         PriorityLowJobAction.getInstance().setEnabled(false);
@@ -701,6 +704,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         PauseResumeJobAction.getInstance().setEnabled(false);
         KillRemoveJobAction.getInstance().setEnabled(false);
 
+        PriorityJobAction.getInstance().setEnabled(false);
         PriorityIdleJobAction.getInstance().setEnabled(false);
         PriorityLowestJobAction.getInstance().setEnabled(false);
         PriorityLowJobAction.getInstance().setEnabled(false);
@@ -939,7 +943,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             }
 
         // TODO a verifier...
-        // throw new IllegalArgumentException("there are no jobs with the id : " +
+        // throw new IllegalArgumentException("there are no jobs with the id : "
+        // +
         // id);
         System.err.println("Warning : there are no jobs with the id " + id +
             "\nMaybe this call arrived too late...");

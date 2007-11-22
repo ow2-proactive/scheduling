@@ -90,8 +90,8 @@ public class TaskComposite extends Composite {
     /** the unique id and the title for the column "Description" */
     public static final String COLUMN_DESCRIPTION_TITLE = "Description";
 
-    /** the unique id and the title for the column "Run time limit" */
-    public static final String COLUMN_RUN_TIME_LIMIT_TITLE = "Run time limit";
+    //    /** the unique id and the title for the column "Run time limit" */
+    //    public static final String COLUMN_RUN_TIME_LIMIT_TITLE = "Run time limit";
 
     /** the unique id and the title for the column "Re-runnable" */
     public static final String COLUMN_RERUN_TITLE = "Re-run";
@@ -160,7 +160,8 @@ public class TaskComposite extends Composite {
         TableColumn tc5 = new TableColumn(table, SWT.LEFT);
         TableColumn tc6 = new TableColumn(table, SWT.LEFT);
         TableColumn tc7 = new TableColumn(table, SWT.LEFT);
-        TableColumn tc8 = new TableColumn(table, SWT.LEFT);
+
+        //        TableColumn tc8 = new TableColumn(table, SWT.LEFT);
         TableColumn tc9 = new TableColumn(table, SWT.LEFT);
         // addSelectionListener
         tc1.addSelectionListener(new SelectionAdapter() {
@@ -205,12 +206,12 @@ public class TaskComposite extends Composite {
                     sort(event, InternalTask.SORT_BY_RERUNNABLE);
                 }
             });
-        tc8.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalTask.SORT_BY_RUN_TIME_LIMIT);
-                }
-            });
+        //        tc8.addSelectionListener(new SelectionAdapter() {
+        //                @Override
+        //                public void widgetSelected(SelectionEvent event) {
+        //                    sort(event, InternalTask.SORT_BY_RUN_TIME_LIMIT);
+        //                }
+        //            });
         tc9.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -225,7 +226,7 @@ public class TaskComposite extends Composite {
         tc5.setText(COLUMN_START_TIME_TITLE);
         tc6.setText(COLUMN_FINISHED_TIME_TITLE);
         tc7.setText(COLUMN_RERUN_TITLE);
-        tc8.setText(COLUMN_RUN_TIME_LIMIT_TITLE);
+        //        tc8.setText(COLUMN_RUN_TIME_LIMIT_TITLE);
         tc9.setText(COLUMN_DESCRIPTION_TITLE);
         // setWidth
         tc1.setWidth(50);
@@ -235,7 +236,7 @@ public class TaskComposite extends Composite {
         tc5.setWidth(130);
         tc6.setWidth(130);
         tc7.setWidth(50);
-        tc8.setWidth(130);
+        //        tc8.setWidth(130);
         tc9.setWidth(200);
         // setMoveable
         tc1.setMoveable(true);
@@ -245,7 +246,7 @@ public class TaskComposite extends Composite {
         tc5.setMoveable(true);
         tc6.setMoveable(true);
         tc7.setMoveable(true);
-        tc8.setMoveable(true);
+        //        tc8.setMoveable(true);
         tc9.setMoveable(true);
 
         table.addListener(SWT.Selection,

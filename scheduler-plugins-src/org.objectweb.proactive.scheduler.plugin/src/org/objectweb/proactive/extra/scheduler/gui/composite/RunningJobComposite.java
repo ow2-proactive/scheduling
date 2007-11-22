@@ -1,35 +1,34 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ * Initial developer(s): The ProActive Team
+ * http://proactive.inria.fr/team_members.htm Contributor(s):
  *
  * ################################################################
  */
 package org.objectweb.proactive.extra.scheduler.gui.composite;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
@@ -50,6 +49,7 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
@@ -78,6 +78,12 @@ public class RunningJobComposite extends AbstractJobComposite
     public static final String COLUMN_PROGRESS_TEXT_TITLE = "# Finished Tasks";
     public static final String COLUMN_PROGRESS_BAR_TITLE = "Progress";
 
+    /** This list is used to remember which table editor wasn't disposed */
+    private List<TableEditor> tableEditors = null;
+
+    /** This list is used to remember which progress bar weren't disposed */
+    private List<ProgressBar> progressBars = null;
+
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
@@ -94,6 +100,8 @@ public class RunningJobComposite extends AbstractJobComposite
         jobsController.addRunningJobsListener(this);
         jobsController.addEventTasksListener(this);
         jobsController.addEventJobsListener(this);
+        tableEditors = new ArrayList<TableEditor>();
+        progressBars = new ArrayList<ProgressBar>();
     }
 
     // -------------------------------------------------------------------- //
@@ -127,6 +135,7 @@ public class RunningJobComposite extends AbstractJobComposite
         switch (JobsController.getSchedulerState()) {
         case SHUTTING_DOWN:
         case KILLED:
+            PriorityJobAction.getInstance().setEnabled(false);
             PriorityIdleJobAction.getInstance().setEnabled(false);
             PriorityLowestJobAction.getInstance().setEnabled(false);
             PriorityLowJobAction.getInstance().setEnabled(false);
@@ -138,6 +147,7 @@ public class RunningJobComposite extends AbstractJobComposite
             pauseResumeJobAction.setPauseResumeMode();
             break;
         default:
+            PriorityJobAction.getInstance().setEnabled(enabled);
             PriorityIdleJobAction.getInstance().setEnabled(enabled);
             PriorityLowestJobAction.getInstance().setEnabled(enabled);
             PriorityLowJobAction.getInstance().setEnabled(enabled);
@@ -170,16 +180,12 @@ public class RunningJobComposite extends AbstractJobComposite
      */
     @Override
     public void clear() {
-        TableItem[] items = getTable().getItems();
-        for (TableItem item : items) {
-            ((ProgressBar) item.getData("bar")).dispose();
-            ((TableEditor) item.getData("editor")).dispose();
-        }
-
-        // TODO
-        // TableColumn[] cols = getTable().getColumns();
-        // for (TableColumn col : cols)
-        // col.notifyListeners(SWT.Move, null);
+        for (TableEditor te : tableEditors)
+            te.dispose();
+        tableEditors.clear();
+        for (ProgressBar pb : progressBars)
+            pb.dispose();
+        progressBars.clear();
     }
 
     /**
@@ -193,13 +199,13 @@ public class RunningJobComposite extends AbstractJobComposite
         tc.setText(COLUMN_PROGRESS_TEXT_TITLE);
         tc.setWidth(70);
         tc.setMoveable(true);
-        tc.setToolTipText("You can't sort by this column");
+        tc.setToolTipText("You cannot sort by this column");
 
         tc = new TableColumn(table, SWT.NONE, 2);
         tc.setText(COLUMN_PROGRESS_BAR_TITLE);
         tc.setWidth(70);
         tc.setMoveable(true);
-        tc.setToolTipText("You can't sort by this column");
+        tc.setToolTipText("You cannot sort by this column");
         return table;
     }
 
@@ -225,6 +231,8 @@ public class RunningJobComposite extends AbstractJobComposite
                 table.layout();
                 item.setData("bar", bar);
                 item.setData("editor", editor);
+                tableEditors.add(editor);
+                progressBars.add(bar);
             } else if (title.equals(COLUMN_PROGRESS_TEXT_TITLE)) {
                 item.setText(i,
                     job.getNumberOfFinishedTask() + "/" +
@@ -250,17 +258,6 @@ public class RunningJobComposite extends AbstractJobComposite
      */
     @Override
     public void removeRunningJob(JobId jobId) {
-        // removeJob(jobId);
-        // // TODO : deux problème ici :
-        // // - je ne dispose ni la progress ni le tableEditor
-        // // - j'envoi le notifyListeners sur toutes les colonnes...
-        // Display.getDefault().asyncExec(new Runnable() {
-        // public void run() {
-        // TableColumn[] cols = getTable().getColumns();
-        // for (TableColumn col : cols)
-        // col.notifyListeners(SWT.Move, null);
-        // }
-        // });
         if (!isDisposed()) {
             Vector<JobId> jobsId = getJobs();
             int tmp = -1;
@@ -271,7 +268,8 @@ public class RunningJobComposite extends AbstractJobComposite
                 }
             }
             if (tmp == -1) {
-                //TODO throw new IllegalArgumentException("jobId unknown : " + jobId);
+                // TODO throw new IllegalArgumentException("jobId unknown : " +
+                // jobId);
                 return;
             }
             final int i = tmp;
@@ -298,6 +296,7 @@ public class RunningJobComposite extends AbstractJobComposite
 
                             // enabling/disabling button permitted with this job
                             ObtainJobOutputAction.getInstance().setEnabled(false);
+                            PriorityJobAction.getInstance().setEnabled(false);
                             PriorityIdleJobAction.getInstance().setEnabled(false);
                             PriorityLowestJobAction.getInstance()
                                                    .setEnabled(false);
@@ -313,8 +312,13 @@ public class RunningJobComposite extends AbstractJobComposite
                             KillRemoveJobAction.getInstance().setEnabled(false);
                         }
                         TableItem item = getTable().getItem(i);
-                        ((ProgressBar) item.getData("bar")).dispose();
-                        ((TableEditor) item.getData("editor")).dispose();
+                        ProgressBar bar = ((ProgressBar) item.getData("bar"));
+                        TableEditor editor = ((TableEditor) item.getData(
+                                "editor"));
+                        bar.dispose();
+                        progressBars.remove(bar);
+                        editor.dispose();
+                        tableEditors.remove(editor);
                         getTable().remove(i);
                         TableColumn[] cols = getTable().getColumns();
                         for (TableColumn col : cols)
@@ -359,8 +363,9 @@ public class RunningJobComposite extends AbstractJobComposite
                             }
 
                         if (item == null) {
-                            //					TODO	throw new IllegalArgumentException("the item which represent the job : "
-                            //								+ taskEvent.getJobId() + " is unknown !");
+                            // TODO throw new IllegalArgumentException("the item
+                            // which represent the job : "
+                            // + taskEvent.getJobId() + " is unknown !");
                             return;
                         }
 

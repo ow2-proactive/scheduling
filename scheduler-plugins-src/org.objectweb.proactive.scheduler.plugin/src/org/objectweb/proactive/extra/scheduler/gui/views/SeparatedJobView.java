@@ -56,6 +56,7 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.PauseSchedulerAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
@@ -97,6 +98,7 @@ public class SeparatedJobView extends ViewPart {
     private static Action submitJob = null;
     private static Action pauseResumeJobAction = null;
     private static Action killJobAction = null;
+    private static Action priorityJobAction = null;
     private static Action priorityIdleJobAction = null;
     private static Action priorityLowestJobAction = null;
     private static Action priorityLowJobAction = null;
@@ -145,7 +147,8 @@ public class SeparatedJobView extends ViewPart {
         manager.add(new Separator());
         manager.add(submitJob);
         manager.add(pauseResumeJobAction);
-        IMenuManager subMenu = new MenuManager("Change job priority");
+        IMenuManager subMenu = new MenuManager("Change job priority") {
+            };
         manager.add(subMenu);
         if (SchedulerProxy.getInstance() != null) {
             if (SchedulerProxy.getInstance().isAnAdmin()) {
@@ -187,6 +190,7 @@ public class SeparatedJobView extends ViewPart {
         manager.add(new Separator());
         manager.add(submitJob);
         manager.add(pauseResumeJobAction);
+        manager.add(priorityJobAction);
         manager.add(obtainJobOutputAction);
         manager.add(killJobAction);
 
@@ -210,6 +214,7 @@ public class SeparatedJobView extends ViewPart {
         pauseResumeJobAction = PauseResumeJobAction.newInstance();
         killJobAction = KillRemoveJobAction.newInstance(shell);
 
+        priorityJobAction = PriorityJobAction.newInstance();
         priorityIdleJobAction = PriorityIdleJobAction.newInstance();
         priorityLowestJobAction = PriorityLowestJobAction.newInstance();
         priorityLowJobAction = PriorityLowJobAction.newInstance();
@@ -276,8 +281,16 @@ public class SeparatedJobView extends ViewPart {
         setVisible(false);
         ConnectDeconnectSchedulerAction.getInstance().setDisconnectionMode();
 
+        if (pendingJobComposite != null) {
+            pendingJobComposite.clear();
+        }
+
         if (runningJobComposite != null) {
             runningJobComposite.clear();
+        }
+
+        if (finishedJobComposite != null) {
+            finishedJobComposite.clear();
         }
 
         TaskView taskView = TaskView.getInstance();
@@ -313,6 +326,7 @@ public class SeparatedJobView extends ViewPart {
         PauseResumeJobAction.getInstance().setEnabled(false);
         SubmitJobAction.getInstance().setEnabled(false);
 
+        PriorityJobAction.getInstance().setEnabled(false);
         PriorityIdleJobAction.getInstance().setEnabled(false);
         PriorityLowestJobAction.getInstance().setEnabled(false);
         PriorityLowJobAction.getInstance().setEnabled(false);

@@ -62,6 +62,7 @@ import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
@@ -588,6 +589,7 @@ public abstract class AbstractJobComposite extends Composite {
 
                             // enabling/disabling button permitted with this job
                             ObtainJobOutputAction.getInstance().setEnabled(false);
+                            PriorityJobAction.getInstance().setEnabled(false);
                             PriorityIdleJobAction.getInstance().setEnabled(false);
                             PriorityLowestJobAction.getInstance()
                                                    .setEnabled(false);

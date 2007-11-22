@@ -48,971 +48,412 @@
 	<!-- ************************************************************************************ -->
 
 	<sect1 id="Scheduler_Plugin">
+		<title>The Scheduler perspective</title>
 
-		<title>Scheduler plugin</title>
-
-		<sect2>
-			<title>The Scheduler perspective</title>
-
-			<para>
-				The Scheduler plugin provides the
-				<emphasis role="bold">
-					Scheduler
-					<ulink
-						url="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
-						perspective
-					</ulink>
-				</emphasis>
-				displayed in the
-				<xref linkend="Scheduler_Perspective" />
-				.
-			</para>
-
-			<para>
-				This perspective defines the following set of
+		<para>
+			The Scheduler plugin provides the
+			<emphasis role="bold">
+				Scheduler
 				<ulink
-					url="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">
-					views
+					url="http://help.eclipse.org/help31/index.jsp?topic=/org.eclipse.platform.doc.user/gettingStarted/qs-43.htm">
+					perspective
 				</ulink>
-				:
-			</para>
+			</emphasis>
+			displayed in the
+			<xref linkend="schedulerPerspective" />
+			.
+		</para>
 
-			<itemizedlist>
-				<listitem>
-					<para>
-						The
-						<emphasis role="bold">Jobs</emphasis>
-						view: represents pending, running and finished
-						jobs in the scheduler.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						The
-						<emphasis role="bold">Console</emphasis>
-						view: contains log corresponding to the jobs
-						output logs.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						The
-						<emphasis role="bold">Tasks</emphasis>
-						view: displays all tasks informations of a job.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						The
-						<emphasis role="bold">Jobs Info</emphasis>
-						view: displays all job's informations.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						The
-						<emphasis role="bold">Result Preview</emphasis>
-						view: displays a graphical preview of a task
-						result.
-					</para>
-				</listitem>
-			</itemizedlist>
+		<para>
+			This perspective defines the following set of
+			<ulink
+				url="http://wiki.eclipse.org/index.php/FAQ_What_is_a_view%3F">
+				views
+			</ulink>
+			:
+		</para>
 
-			<figure id="schedulerPerspective">
-				<title>The Scheduler Perspective</title>
-				<mediaobject>
-					<imageobject>
-						<imagedata
-							fileref="scheduler/images/schedulerPerspective.png" format="PNG" />
-					</imageobject>
-				</mediaobject>
-			</figure>
+		<itemizedlist>
+			<listitem>
+				<para>
+					The
+					<emphasis role="bold">Jobs</emphasis>
+					view: represents pending, running and finished jobs
+					in the scheduler.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The
+					<emphasis role="bold">Console</emphasis>
+					view: contains log corresponding to the jobs output
+					logs.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The
+					<emphasis role="bold">Tasks</emphasis>
+					view: displays all tasks informations of a job.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The
+					<emphasis role="bold">Jobs Info</emphasis>
+					view: displays all job's informations.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					The
+					<emphasis role="bold">Result Preview</emphasis>
+					view: displays a graphical preview of a task result.
+				</para>
+			</listitem>
+		</itemizedlist>
 
-		</sect2><!-- The Scheduler perspective -->
+		<figure id="schedulerPerspective">
+			<title>The Scheduler Perspective</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="scheduler/images/eclipse_plugin/schedulerPerspective.png"
+						format="PNG" />
+				</imageobject>
+			</mediaobject>
+		</figure>
 
+	</sect1><!-- The Scheduler perspective -->
+
+	<sect1>
+
+		<title>Connect to a started scheduler</title>
+
+		<para>
+			In order to establish a connection to a started scheduler:
+		</para>
+
+		<orderedlist>
+			<listitem>
+				<para>
+					open the Scheduler Perspective:
+					<emphasis role="bold">
+						Window->Open Perspective->Other...->Scheduler
+					</emphasis>
+					(in the stand alone Scheduler, it should be already
+					opened because it is the default perspective).
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					select
+					<emphasis role="bold">
+						"Connect to a scheduler" in the Scheduler menu
+						or in the contextual menu (right click)
+					</emphasis>
+					, it opens the "Connect to scheduler" dialog
+					displayed in the
+					<xref linkend="connectToSchedulerDialog" />
+					.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<emphasis role="bold">
+						enter informations required
+					</emphasis>
+					about the remote scheduler, and click
+					<emphasis role="bold">OK</emphasis>
+					.
+				</para>
+			</listitem>
+		</orderedlist>
+
+
+		<figure id="connectToSchedulerDialog">
+			<title>Connect to scheduler</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="scheduler/images/eclipse_plugin/connectToSchedulerDialog.png"
+						format="PNG" />
+				</imageobject>
+			</mediaobject>
+		</figure>
+
+	</sect1><!-- Connect to a started scheduler -->
+
+	<sect1>
+		<title>The Scheduler perspective buttons</title>
 		<sect2>
+			<title>The Jobs view buttons in User Mode</title>
 
-			<title>Connect to a started scheduler</title>
-
-			<para>
-				In order to establish a connection to a started
-				scheduler:
-			</para>
-
-			<orderedlist>
-				<listitem>
-					<para>
-						open the Scheduler Perspective:
-						<emphasis role="bold">
-							Window->Open
-							Perspective->Other...->Scheduler
-						</emphasis>
-						(in the stand alone Scheduler, it should be
-						already opened because it is the default
-						perspective).
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						select
-						<emphasis role="bold">
-							"Connect to a scheduler" in the Scheduler
-							menu or in the contextual menu (right click)
-						</emphasis>
-						, it opens the "Connect to scheduler" dialog
-						displayed in the
-						<xref linkend="connectToSchedulerDialog" />
-						.
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis role="bold">
-							enter informations required
-						</emphasis>
-						about the remote scheduler, and click
-						<emphasis role="bold">OK</emphasis>
-						.
-					</para>
-				</listitem>
-			</orderedlist>
-
-
-			<figure id="connectToSchedulerDialog">
+			<figure id="connectToSchedulerButton">
 				<title>Connect to scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
-							fileref="scheduler/images/connectToSchedulerDialog.png"
+							fileref="scheduler/images/eclipse_plugin/connectToSchedulerButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Display the "Connect to scheduler" dialog in order to
+				establish a connection to a remote started scheduler.
+			</para>
+
+			<figure id="disconnectToSchedulerButton">
+				<title>Disconnect from scheduler</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/disconnectToSchedulerButton.png"
 							format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
 
-		</sect2><!-- Connect to a started scheduler -->
-
-		<sect2>
-			<title>The Scheduler perspective buttons</title>
-			<sect3>
-				<title>The Jobs view buttons in User Mode</title>
-
-				<figure id="connectToSchedulerButton">
-					<title>Connect to scheduler</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/connectToSchedulerButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					Display the "Connect to scheduler" dialog in order
-					to establish a connection to a remote started
-					scheduler.
-				</para>
-
-				<figure id="disconnectToSchedulerButton">
-					<title>Disconnect from scheduler</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/disconnectToSchedulerButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-
-				<figure id="changeViewVTHModeButton">
-					<title>Change view from Vertical to Horizontal mode</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/changeViewVTHModeButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					Allows to switch the job's display to Horizontal from
-					Vertical mode.
-				</para>
-
-				<figure id="changeViewHTVModeButton">
-					<title>Change view from Horizontal to Vertical mode</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/changeViewHTVModeButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					Allows to switch the job's display from Horizontal to
-					Vertical mode.
-				</para>
-
-				<figure id="submitJobButton">
-					<title>Submit a job</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/submitJobButton.png" format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					Display the "Choose file" dialog in order to submit
-					a job to the scheduler.
-				</para>
-
-				<figure id="pauseResumeJobButton">
-					<title>Pause/Resume a job</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/pauseResumeJobButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					Pause or resume a job (only if you are the job
-					owner).
-				</para>
-
-				<figure id="changeJobPriorityButton">
-					<title>Change job priority</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/changeJobPriorityButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					Change job priority (only if you are the job owner).
-					Priority allowed are:
-					<itemizedlist>
-						<listitem>
-							<para>Lowest.</para>
-						</listitem>
-						<listitem>
-							<para>Low.</para>
-						</listitem>
-						<listitem>
-							<para>Normal.</para>
-						</listitem>
-					</itemizedlist>
-				</para>
-
-				<figure id="getJobOutputButton">
-					<title>Get job output</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/getJobOutputButton.png" format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					To obtain the job output (only if you are the job
-					owner).
-				</para>
-
-				<figure id="killJobButton">
-					<title>Kill Job</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/killJobButton.png" format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					To kill a job (only if you are the job owner).
-				</para>
-			</sect3><!-- The Jobs view buttons in User Mode -->
-
-			<sect3>
+			<figure id="changeViewVTHModeButton">
 				<title>
-					The Jobs view buttons in Administrator Mode
+					Change view from Vertical to Horizontal mode
 				</title>
-				<para>
-					All buttons allowed in user mode are also allowed in
-					Administrator mode. Moreover you can execute any
-					action even you aren't the job owner.
-				</para>
-				<para>
-					In Administrator mode, you have 3 many choice for
-					job priority which are:
-					<itemizedlist>
-						<listitem>
-							<para>Idle.</para>
-						</listitem>
-						<listitem>
-							<para>High.</para>
-						</listitem>
-						<listitem>
-							<para>Highest.</para>
-						</listitem>
-					</itemizedlist>
-				</para>
-
-				<figure id="startSchedulerButton">
-					<title>Start scheduler</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/startSchedulerButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-
-				<figure id="stopSchedulerButton">
-					<title>Stop scheduler</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/stopSchedulerButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-
-				<figure id="freezeSchedulerButton">
-					<title>Freeze scheduler</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/freezeSchedulerButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					This will freeze the scheduler. When the scheduler
-					receives this event, it will pause all running jobs,
-					and no pending jobs will be scheduled.
-				</para>
-
-				<figure id="pauseSchedulerButton">
-					<title>Pause scheduler</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/pauseSchedulerButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					This will pause the scheduler. When the scheduler
-					receives this event, no pending jobs will be
-					scheduled, but all running jobs will stay running
-					until they finished.
-				</para>
-
-				<figure id="resumeSchedulerButton">
-					<title>Resume scheduler</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/resumeSchedulerButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-
-				<figure id="shutdownSchedulerButton">
-					<title>Shutdown scheduler</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/shutdownSchedulerButton.png"
-								format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					This will shutdown "properly" the scheduler. When
-					the scheduler receives this event, no new jobs will
-					be submitted, but all running jobs will stay running
-					until they finished. When all jobs will be finished,
-					the scheduler will shutdown.
-				</para>
-
-				<figure id="killSchedulerButton">
-					<title>Kill scheduler</title>
-					<mediaobject>
-						<imageobject>
-							<imagedata
-								fileref="scheduler/images/Button.png" format="PNG" />
-						</imageobject>
-					</mediaobject>
-				</figure>
-				<para>
-					This will shutdown NOT "properly" (immediately) the scheduler. When
-					the scheduler receives this event shutdown immediately.
-				</para>
-			</sect3><!-- The Jobs view buttons in Administrator Mode -->
-		</sect2><!-- The Scheduler perspective buttons -->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		<sect2>
-
-			<title>The Virtual Nodes list</title>
-
-			<para>
-				At the top of the Monitoring View, one can find the
-				<emphasis role="bold">Virtual Nodes list</emphasis>
-				. When some nodes are monirored, their virtual nodes are
-				added to this list. And when a virtual node is checked,
-				all its nodes are highlighted.
-			</para>
-
-			<figure id="virtualNodesList">
-				<title>Virtual nodes List</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
-							fileref="ic2d/images/features/virtualnodes.png" format="PNG" />
+							fileref="scheduler/images/eclipse_plugin/changeViewVTHModeButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Allows to switch the job's display to Horizontal from
+				Vertical mode.
+			</para>
+
+			<figure id="changeViewHTVModeButton">
+				<title>
+					Change view from Horizontal to Vertical mode
+				</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/changeViewHTVModeButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Allows to switch the job's display from Horizontal to
+				Vertical mode.
+			</para>
+
+			<figure id="submitJobButton">
+				<title>Submit a job</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/submitJobButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Display the "Choose file" dialog in order to submit a
+				job to the scheduler.
+			</para>
+
+			<figure id="pauseResumeJobButton">
+				<title>Pause/Resume a job</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/pauseResumeJobButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Pause or resume a job (only if you are the job owner).
+			</para>
+
+			<figure id="changeJobPriorityButton">
+				<title>Change job priority</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/changeJobPriorityButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				Change job priority (only if you are the job owner).
+				Priority allowed are:
+				<itemizedlist>
+					<listitem>
+						<para>Lowest.</para>
+					</listitem>
+					<listitem>
+						<para>Low.</para>
+					</listitem>
+					<listitem>
+						<para>Normal.</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+			<figure id="getJobOutputButton">
+				<title>Get job output</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/getJobOutputButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				To obtain the job output (only if you are the job
+				owner).
+			</para>
+
+			<figure id="killJobButton">
+				<title>Kill Job</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/killJobButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>To kill a job (only if you are the job owner).</para>
+		</sect2><!-- The Jobs view buttons in User Mode -->
+
+		<sect2>
+			<title>The Jobs view buttons in Administrator Mode</title>
+			<para>
+				All buttons allowed in user mode are also allowed in
+				Administrator mode. Moreover you can execute any action
+				even you aren't the job owner.
+			</para>
+			<para>
+				In Administrator mode, you have 3 many choice for job
+				priority which are:
+				<itemizedlist>
+					<listitem>
+						<para>Idle.</para>
+					</listitem>
+					<listitem>
+						<para>High.</para>
+					</listitem>
+					<listitem>
+						<para>Highest.</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+
+			<figure id="startSchedulerButton">
+				<title>Start scheduler</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/startSchedulerButton.png"
+							format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
 
-		</sect2><!-- The Virtual Nodes list -->
-
-		<sect2>
-
-			<title>Management of the communications display</title>
-
-			<para>
-				At the bottom of the Monitoring view, one can find a set
-				of buttons used to manage the communications display:
-			</para>
-			<orderedlist>
-				<listitem>
-					<para>
-						<emphasis role="bold">Auto Reset</emphasis>
-						: Automatic reset of communications, you can
-						specify the auto reset time
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis role="bold">
-							Display topology
-						</emphasis>
-						: show/hide communications
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis role="bold">Proportional</emphasis>
-						: arrows thickness is proportional to the number
-						of requests
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis role="bold">Ratio</emphasis>
-						: arrows thickness uses a ratio of the number of
-						requests
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis role="bold">Fixed</emphasis>
-						: arrows always have the same thickness whatever
-						the number of communications
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis role="bold">Topology</emphasis>
-						: show/hide communications, and erase all
-						communications
-					</para>
-				</listitem>
-				<listitem>
-					<para>
-						<emphasis role="bold">
-							Monitoring enable
-						</emphasis>
-						: listen or not communications between active
-						objects
-					</para>
-				</listitem>
-			</orderedlist>
-
-		</sect2><!-- The management of the communications display -->
-
-		<sect2>
-			<title>Example</title>
-			<para>
-				The
-				<xref linkend="monitoring" />
-				shows an example where 3 hosts are monitored. The
-				applications running are philosophers and C3D (
-				<xref linkend="C3D_example" />
-				).
-			</para>
-		</sect2>
-	</sect1><!-- The Scheduler plugin -->
-
-	<!-- ************************************************************************************ -->
-
-	<sect1 id="LauncherScheduler">
-
-		<title>Launcher and Scheduler</title>
-
-		<sect2>
-			<title>Launcher</title>
-
-			<sect3>
-				<title>Principles</title>
-
-				<para>
-					The launcher allows users to launch applications
-					directly from an XML descriptor file, without any
-					script. The new XML descriptor is nearly the same as
-					classical descriptor files, the syntax is only
-					extended. The deployment will be done in two
-					different phasis.
-				</para>
-
-				<para>
-					first, a new node, a "main node" will be created and
-					activated and then, it is this node that will deploy
-					the rest of the application.
-				</para>
-			</sect3>
-
-			<sect3>
-				<title>MainDefinition tag</title>
-
-				<para>
-					A new tag has been introduced, just before the
-					component definition tag. This tag is named
-					"mainDefinition" and its syntax is:
-				</para>
-
-				<screen>
-					&lt;mainDefinition id="mainID"
-					class="theClassToLaunchContainingAMainMethod"&gt;
-					&lt;arg value="param1"&gt; &lt;arg
-					value="param2"&gt; &lt;mapToVirtualNode
-					value="main-Node"/&gt; &lt;/mainDefinition&gt;
-				</screen>
-
-				<para>
-					Eventually, several mains might be defined so the
-					<emphasis role="bold">id</emphasis>
-					allows to identify all mainDefinitions.
-				</para>
-
-				<para>
-					The
-					<emphasis role="bold">class</emphasis>
-					attribute is the path where can be found the class
-					to launch.
-				</para>
-
-				<para>
-					<emphasis role="bold">
-						This class MUST contain a main method.
-					</emphasis>
-				</para>
-
-				<para>
-					Then any number of parameters can be declared in
-					<emphasis role="bold">arg</emphasis>
-					tags. The parameters will be given to the main
-					method in the same order the were declared.
-				</para>
-
-				<para>
-					And finally a
-					<emphasis role="bold">mapToVirtualNode</emphasis>
-					tag will link the main info to virtual node,
-					declared with the same name in the
-					virtualNodeDefinitions tag (in componentDefinition).
-				</para>
-
-				<screen>
-					&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-					&lt;ProActiveDescriptor
-					xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-					xsi:noNamespaceSchemaLocation=
-					"http://www-sop.inria.fr/oasis/proactive/schema/DescriptorSchema.xsd"&gt;
-					&lt;!-- &lt;security
-					file="../../descriptors/c3dPolicy.xml"&gt;&lt;/security&gt;
-					--&gt; &lt; componentDefinition&gt; &lt;
-					virtualNodesDefinition&gt; &lt; virtualNode
-					name="Dispatcher" property="unique_singleAO"/&gt;
-					&lt; virtualNode name="Renderer"/&gt; &lt;
-					/virtualNodesDefinition&gt; &lt;
-					/componentDefinition&gt; &lt; deployment&gt; &lt;
-					register virtualNode="Dispatcher"/&gt; &lt;
-					mapping&gt; &lt; map virtualNode="Dispatcher"&gt;
-					&lt; jvmSet&gt; &lt; currentJVM/&gt; &lt;
-					/jvmSet&gt; &lt; /map&gt; &lt; map
-					virtualNode="Renderer"&gt; &lt; jvmSet&gt; &lt;
-					vmName value="Jvm1"/&gt; &lt; vmName
-					value="Jvm2"/&gt; &lt; vmName value="Jvm3"/&gt; &lt;
-					vmName value="Jvm4"/&gt; &lt; /jvmSet&gt; &lt;
-					/map&gt; &lt; /mapping&gt; &lt; jvms&gt; &lt; jvm
-					name="Jvm1"&gt; &lt; creation&gt; &lt;
-					processReference refid="localJVM"/&gt; &lt;
-					/creation&gt; &lt; /jvm&gt; &lt; jvm name="Jvm2"&gt;
-					&lt; creation&gt; &lt; processReference
-					refid="localJVM"/&gt; &lt; /creation&gt; &lt;
-					/jvm&gt; &lt; jvm name="Jvm3"&gt; &lt; creation&gt;
-					&lt; processReference refid="localJVM"/&gt; &lt;
-					/creation&gt; &lt; /jvm&gt; &lt; jvm name="Jvm4"&gt;
-					&lt; creation&gt; &lt; processReference
-					refid="localJVM"/&gt; &lt; /creation&gt; &lt;
-					/jvm&gt; &lt; /jvms&gt; &lt; /deployment&gt; &lt;
-					infrastructure&gt; &lt; processes&gt; &lt;
-					processDefinition id="localJVM"&gt; &lt; jvmProcess
-					class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;&lt;/jvmProcess&gt;
-					&lt; /processDefinition&gt; &lt; /processes&gt; &lt;
-					/infrastructure&gt; &lt;/ProActiveDescriptor&gt;
-				</screen>
-			</sect3>
-
-			<sect3>
-				<title>API</title>
-
-				<para>
-					The Launcher class is located in the package
-					<emphasis role="bold">
-						org.objectweb.proactive.core.descriptor
-					</emphasis>
-					. To use it you will have to create a new instance
-					of the launcher with the path of the XML descriptor
-					(this descriptor must contain a
-					<emphasis role="bold">mainDefinition tag</emphasis>
-					). The constructor will parse the file and reify a
-					ProActiveDescriptor. You only have to call the
-					<emphasis role="bold">activate()</emphasis>
-					method on the launcher instance to launch the
-					application.
-				</para>
-
-				<para>
-					<emphasis role="underline">For example:</emphasis>
-				</para>
-				<para>
-					<literal>
-						Launcher launcher = new Launcher
-						("myDescriptor.xml") ;
-					</literal>
-				</para>
-
-				<para>
-					<literal>launcher.activate() ;</literal>
-				</para>
-
-				<para>
-					you can also get the ProActiveDescriptor built by
-					the launcher by calling the getDescriptor() method
-					on the launcher instance.
-				</para>
-
-				<para>
-					<literal>
-						ProActiveDescriptor pad =
-						launcher.getDescriptor() ;
-					</literal>
-				</para>
-			</sect3>
-
-			<sect3>
-				<title>The Launcher Plug-in</title>
-				<para>
-					In order to launch a
-					<emphasis role="bold">
-						deployment descriptor
-					</emphasis>
-					, you must open your file with the
-					<emphasis role="bold">IC2D XML Editor</emphasis>
-					.
-				</para>
-
-				<para>
-					To use this editor, you have two possibilities:
-				</para>
-
-				<sect4>
-					<title>First possibility</title>
-
-					<para>
-						Open the
-						<emphasis role="bold">
-							Launcher perspective
-						</emphasis>
-						. Select:
-						<emphasis role="bold">
-							Window > Open perspective > Other... >
-							Launcher
-						</emphasis>
-					</para>
-
-					<para>
-						<figure>
-							<title>The "Open Perspective" window</title>
-
-							<mediaobject>
-								<imageobject>
-									<imagedata
-										fileref="ic2d/images/features/perspectiveLauncher.png"
-										format="PNG" contentwidth="100" width="6in" />
-								</imageobject>
-							</mediaobject>
-						</figure>
-					</para>
-
-					<para>
-						Then select:
-						<emphasis role="bold">
-							File > Open File...
-						</emphasis>
-						and open your deployment descriptor, it will be
-						opened with the IC2D XML editor. And its name
-						will appear in the
-						<emphasis role="bold">
-							Deployment descriptors
-						</emphasis>
-						list.
-					</para>
-				</sect4>
-
-				<sect4>
-					<title>Second possibility</title>
-					<para>
-						In the Navigator view, or another similar, a
-						right click on the XML file allows you to open
-						your file with the
-						<emphasis role="bold">IC2D XML editor</emphasis>
-						.
-					</para>
-					<para>
-						<figure>
-							<title>The open with action</title>
-							<mediaobject>
-								<imageobject>
-									<imagedata
-										fileref="ic2d/images/features/openWith.png" format="PNG"
-										contentwidth="100" width="6in" />
-								</imageobject>
-							</mediaobject>
-						</figure>
-					</para>
-				</sect4>
-
-				<sect4>
-					<title>The Launcher perspective</title>
-
-					<para>
-						The
-						<xref linkend="launcherPerspective" />
-						represents the Launcher perspective containing
-						an
-						<emphasis role="bold">XML editor</emphasis>
-						, a
-						<emphasis role="bold">console</emphasis>
-						, and the
-						<emphasis role="bold">
-							list of deployment descriptors
-						</emphasis>
-						.
-					</para>
-
-					<para>
-						To
-						<emphasis role="bold">launch</emphasis>
-						an application, select your file in the
-						deployment descriptors list, and click on the
-						launch icon.
-					</para>
-
-					<para>
-						You can
-						<emphasis role="bold">kill</emphasis>
-						the applications launched from a popup-menu in
-						the "Deployment descriptors" list.
-					</para>
-
-					<para>
-						To see your application running, open the
-						"Monitoring perspective" and monitor the
-						corresponding host.
-					</para>
-
-					<para>
-						<figure id="launcherPerspective">
-							<title>The Launcher perspective</title>
-							<mediaobject>
-								<imageobject>
-									<imagedata align="center"
-										fileref="ic2d/images/features/LauncherPerspective.png"
-										format="PNG" contentwidth="100" width="6in" />
-								</imageobject>
-							</mediaobject>
-						</figure>
-					</para>
-
-				</sect4>
-			</sect3><!-- The Launcher plug-in -->
-		</sect2>
-
-		<sect2>
-			<title>The Scheduler plug-in</title>
-
-			<para>Coming soon ...</para>
-
-		</sect2><!-- The Scheduler plug-in -->
-
-	</sect1><!-- Launcher and Scheduler -->
-
-	<!-- ************************************************************************************ -->
-
-	<sect1 id="ProgrammingTools">
-
-		<title>Programming Tools</title>
-
-		<sect2>
-			<title>ProActive Wizards</title>
-			<para>
-				These wizards will guide developpers to make complex
-				operations with ProActive, such as installation,
-				integration, configuration, or execution :
-			</para>
-			<orderedlist>
-				<listitem>
-					<para>a ProActive installation wizard</para>
-				</listitem>
-				<listitem>
-					<para>
-						a wizard that create applications using
-						ProActive
-					</para>
-				</listitem>
-				<listitem>
-					<para>an active object creation wizard</para>
-				</listitem>
-				<listitem>
-					<para>a configuration and execution wizard</para>
-				</listitem>
-			</orderedlist>
-			<figure>
-				<title>A wizard popup</title>
+			<figure id="stopSchedulerButton">
+				<title>Stop scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
-							fileref="development/plugin_files/wizard_active.jpg" format="JPG"
-							contentwidth="100" width="6in" />
+							fileref="scheduler/images/eclipse_plugin/stopSchedulerButton.png"
+							format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
-		</sect2>
 
-		<sect2>
-			<title>The ProActive Editor</title>
-			<para>
-				This editor checks coding rules. It informs the
-				developper of error concerning ProActive in his classes
-				and can resolve some of these errors.
-			</para>
-			<figure>
-				<title>The editor error highlighting</title>
+			<figure id="freezeSchedulerButton">
+				<title>Freeze scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
-							fileref="development/plugin_files/editor.jpg" format="JPG"
-							contentwidth="100" width="6in" />
+							fileref="scheduler/images/eclipse_plugin/freezeSchedulerButton.png"
+							format="PNG" />
 					</imageobject>
 				</mediaobject>
 			</figure>
-		</sect2>
+			<para>
+				This will freeze the scheduler. When the scheduler
+				receives this event, it will pause all running jobs, and
+				no pending jobs will be scheduled.
+			</para>
 
-	</sect1><!-- Programming Tools-->
+			<figure id="pauseSchedulerButton">
+				<title>Pause scheduler</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/pauseSchedulerButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This will pause the scheduler. When the scheduler
+				receives this event, no pending jobs will be scheduled,
+				but all running jobs will stay running until they
+				finished.
+			</para>
 
-	<!-- ************************************************************************************ -->
+			<figure id="resumeSchedulerButton">
+				<title>Resume scheduler</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/resumeSchedulerButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
 
-	<sect1><!-- The Guided Tours as Plugin  -->
-		<title>The Guided Tour as Plugin</title>
-		<para>
-			The aim of the guided tour is to provide a step by step
-			explanation to the ProActive beginners.
-		</para>
-		<figure>
-			<title>The plugin's interface</title>
-			<mediaobject>
-				<imageobject>
-					<imagedata
-						fileref="development/plugin_files/guided_tour.jpg" format="JPG"
-						contentwidth="100" width="6in" />
-				</imageobject>
-			</mediaobject>
-		</figure>
-		<para>
-			This guided tour (that is actually eclipse cheat sheet)
-			purposes:
-		</para>
-		<itemizedlist>
-			<listitem>
-				<para>To Explain ProActive to beginners</para>
-			</listitem>
-			<listitem>
-				<para>
-					To make interactions with the user with simple
-					situations
-				</para>
-			</listitem>
-			<listitem>
-				<para>To Show the important points</para>
-			</listitem>
-		</itemizedlist>
-	</sect1>
+			<figure id="shutdownSchedulerButton">
+				<title>Shutdown scheduler</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/shutdownSchedulerButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This will shutdown "properly" the scheduler. When the
+				scheduler receives this event, no new jobs will be
+				submitted, but all running jobs will stay running until
+				they finished. When all jobs will be finished, the
+				scheduler will shutdown.
+			</para>
 
+			<figure id="killSchedulerButton">
+				<title>Kill scheduler</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/eclipse_plugin/killSchedulerButton.png"
+							format="PNG" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+			<para>
+				This will shutdown NOT "properly" (immediately) the
+				scheduler. When the scheduler receives this event
+				shutdown immediately.
+			</para>
+		</sect2><!-- The Jobs view buttons in Administrator Mode -->
+	</sect1><!-- The Scheduler perspective buttons -->
 </chapter>
