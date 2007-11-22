@@ -155,7 +155,7 @@
         </para>
         <para>
             The deployment mechanism CAN NOT ensure that a deployment will be able to fulfill GCM
-            Application requirements (eg. If a Virtual Node wants 10 Nodes but the LAN described by
+            Application requirements (ex: If a Virtual Node wants 10 Nodes but the LAN described by
             a GCM Deployment Descriptor has only 8 Nodes). The deployment mechanism DOES NOT try to
             address this issue, it's up to the deployer the check that GCM Application Descriptor
             and GCM Deployment Descriptor are compatible. However, if a mapping exists the
@@ -684,7 +684,7 @@ foreach VN in VirtualNodes {
             <title>Simple Master/Worker</title>
         </sect2>
         <sect2>
-            <title>Avanced Master/Worker</title>
+            <title>Advanced Master/Worker</title>
         </sect2>
         <sect2>
             <title>Hierarchical Master/Worker</title>

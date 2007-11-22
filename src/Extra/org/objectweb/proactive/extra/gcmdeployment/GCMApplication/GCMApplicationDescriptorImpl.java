@@ -33,17 +33,21 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import javax.xml.xpath.XPathExpressionException;
-
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.Executor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentResources;
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentTree;
@@ -54,10 +58,10 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
-import org.xml.sax.SAXException;
 
 
-public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
+public class GCMApplicationDescriptorImpl
+    implements GCMApplicationDescriptorInternal {
 
     /** descriptor file */
     private File descriptor = null;
@@ -81,51 +85,108 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
     private CommandBuilder commandBuilder;
 
     /** The node allocator in charge of Node dispatching */
-    @SuppressWarnings("unused")
     private NodeAllocator nodeAllocator;
     private ArrayList<String> currentDeploymentPath;
+    private Set<Node> nodes;
+    private boolean isStarted;
 
     public GCMApplicationDescriptorImpl(String filename)
-        throws IllegalArgumentException, SAXException, IOException,
-            XPathExpressionException {
+        throws ProActiveException {
         this(new File(filename));
     }
 
-    public GCMApplicationDescriptorImpl(File file)
-        throws IllegalArgumentException, SAXException, IOException,
-            XPathExpressionException {
-        currentDeploymentPath = new ArrayList<String>();
-        deploymentIdToNodeProviderMapping = new HashMap<Long, GCMDeploymentDescriptor>();
-
-        descriptor = Helpers.checkDescriptorFileExist(file);
+    public GCMApplicationDescriptorImpl(File file) throws ProActiveException {
         try {
-            // FIXME glaurent Handle XML errors ! When invalid content is
-            // encountered an exception not always thrown
+            currentDeploymentPath = new ArrayList<String>();
+            deploymentIdToNodeProviderMapping = new HashMap<Long, GCMDeploymentDescriptor>();
+            nodes = Collections.synchronizedSet(new HashSet<Node>());
+            isStarted = false;
+
+            descriptor = Helpers.checkDescriptorFileExist(file);
             parser = new GCMApplicationParserImpl(descriptor);
-        } catch (IOException e) {
-            throw new IllegalArgumentException(e);
+            nodeProviders = parser.getNodeProviders();
+            virtualNodes = parser.getVirtualNodes();
+            commandBuilder = parser.getCommandBuilder();
+            nodeAllocator = new NodeAllocator(this, virtualNodes.values());
+        } catch (Exception e) {
+            GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
+            throw new ProActiveException(e);
         }
-
-        // Load all GCM Deployment Descriptor
-        nodeProviders = parser.getNodeProviders();
-
-        //  Get Virtual Node and Command Builder
-        virtualNodes = parser.getVirtualNodes();
-        commandBuilder = parser.getCommandBuilder();
     }
 
     /* -----------------------------
      *  GCMApplicationDescriptor interface
      */
     public void startDeployment() {
+        if (isStarted) {
+            GCMA_LOGGER.warn("A GCM Application descriptor cannot be started twice",
+                new Exception());
+        }
+
+        isStarted = true;
         buildDeploymentTree();
 
-        nodeAllocator = new NodeAllocator(this, virtualNodes.values());
         for (GCMDeploymentDescriptor gdd : nodeProviders.values()) {
             gdd.start(commandBuilder);
         }
     }
 
+    public boolean isStarted() {
+        return isStarted;
+    }
+
+    public VirtualNode getVirtualNode(String vnName) {
+        return virtualNodes.get(vnName);
+    }
+
+    public Map<String, ?extends VirtualNode> getVirtualNodes() {
+        return virtualNodes;
+    }
+
+    public void kill() {
+        Set<ProActiveRuntime> cache = new HashSet<ProActiveRuntime>();
+
+        for (Node node : nodes) {
+            try {
+                ProActiveRuntime part = node.getProActiveRuntime();
+                if (!cache.contains(part)) {
+                    cache.add(part);
+                    part.killRT(false);
+                }
+            } catch (Exception e) {
+                // Miam Miam Miam
+            }
+        }
+    }
+
+    public Set<Node> getCurrentNodes() {
+        return new HashSet<Node>(nodes);
+    }
+
+    public DeploymentTree getCurrentTopology() {
+        // TODO cmathieu
+        return null;
+    }
+
+    public Set<Node> getCurrentUnusedNodes() {
+        return nodeAllocator.getUnusedNode();
+    }
+
+    /* -----------------------------
+     *  GCMApplicationDescriptorInternal interface
+     */
+    public GCMDeploymentDescriptor getNodeProviderFromDeploymentId(
+        Long deploymentNodeId) {
+        return deploymentIdToNodeProviderMapping.get(deploymentNodeId);
+    }
+
+    public void addNode(Node node) {
+        nodes.add(node);
+    }
+
+    /* -----------------------------
+     *  Internal Methods
+     */
     protected void buildDeploymentTree() {
         deploymentTree = new DeploymentTree();
 
@@ -247,36 +308,5 @@ public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptor {
 
     private void popDeploymentPath() {
         currentDeploymentPath.remove(currentDeploymentPath.size() - 1);
-    }
-
-    public GCMDeploymentDescriptor getNodeProviderFromDeploymentId(
-        Long deploymentNodeId) {
-        return deploymentIdToNodeProviderMapping.get(deploymentNodeId);
-    }
-
-    public VirtualNode getVirtualNode(String vnName) {
-        return virtualNodes.get(vnName);
-    }
-
-    public Map<String, ?extends VirtualNode> getVirtualNodes() {
-        return virtualNodes;
-    }
-
-    public void kill() {
-        // TODO Auto-generated method stub
-    }
-
-    public boolean allProcessExited() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public void awaitTermination() {
-        try {
-            Executor.getExecutor().awaitTermination();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 }

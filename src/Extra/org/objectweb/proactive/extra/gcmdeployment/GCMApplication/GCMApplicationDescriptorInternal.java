@@ -28,18 +28,27 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.gcmdeployment;
+package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
-import java.io.File;
-
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 
 
-public class API {
-    public static GCMApplicationDescriptor getGCMApplicationDescriptor(
-        File file) throws ProActiveException {
-        return new GCMApplicationDescriptorImpl(file);
-    }
+public interface GCMApplicationDescriptorInternal
+    extends GCMApplicationDescriptor {
+
+    /**
+     * Adds a Node to the application
+     * @param node a Node to be attached to the application
+     */
+    public void addNode(Node node);
+
+    /**
+     * Returns the Node Provider mapped to this deployment ID
+     *
+     * @param deploymentId a deployment ID
+     * @return the Node Provider mapped to this deployment ID, or null if not found
+     */
+    public GCMDeploymentDescriptor getNodeProviderFromDeploymentId(
+        Long deploymentId);
 }

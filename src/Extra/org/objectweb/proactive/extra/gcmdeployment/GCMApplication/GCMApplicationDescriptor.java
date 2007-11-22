@@ -31,25 +31,39 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentTree;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
 
 /**
- * GCM Application Descriptor public interface
+ * A GCM Application Descriptor
  *
- * This interface is exported to ProActive user and allow them to
- * control and manage a GCM Application Descriptor. For example, this
- * interface must be used to retrieve the Virtual Nodes.
- *
- * @author cmathieu
- *
+ * TODO cmathieu write documentation here
  */
 @PublicAPI
 public interface GCMApplicationDescriptor {
+
+    /**
+     * Starts the deployment process
+     *
+     * Creates remote ProActive Runtimes and Nodes.
+     *
+     * Applications should subscribe to event notification before calling
+     * this method.
+     *
+     *  @see VirtualNode
+     */
     public void startDeployment();
+
+    /**
+     * Indicates if the deployment has been started
+     * @return true if startDeployment has already been called, false otherwise
+     */
+    public boolean isStarted();
 
     /**
      * Returns the Virtual Node associated to this name
@@ -69,25 +83,44 @@ public interface GCMApplicationDescriptor {
     public Map<String, ?extends VirtualNode> getVirtualNodes();
 
     /**
-     * Kills all Nodes and JVMs(local or remote) created when activating the GCM Application Descriptor
-     *
-     * @param softly if false, all JVMs created when activating the descriptor are killed abruptely
-     * if true a JVM that originates the creation of  a rmi registry waits until registry is empty before
-     * dying. To be more precise a thread is created to ask periodically the registry if objects are still
-     * registered.
-     * @throws ProActiveException if a problem occurs when terminating all jvms
+     * Terminates all the ProActive Runtime started by this Application
      */
     public void kill();
 
     /**
+     * Returns all the Nodes currently available
      *
-     * @return true is returned if all processes started by GCM Deployment have
-     * exited. false is returned otherwise
+     * This method should not be used. Usage of the Virtual Node abstraction
+     * is strongly advised. You should not use it unless you have to getCurrentTopology()
+     *
+     * @return all currently available Nodes
      */
-    public boolean allProcessExited();
+    public Set<Node> getCurrentNodes();
 
     /**
-     * Wait for all process
+     * Returns all non attached Nodes
+     *
+     * Nodes are attached to Virtual Node by the Node Allocator. The Node Allocator
+     * follows the rules described inside the GCM Application Descriptor. This method
+     * returns all the Nodes started by this application but that have not been attached
+     * to a Virtual Node.
+     *
+     * @return all non attached Nodes
      */
-    public void awaitTermination();
+    public Set<Node> getCurrentUnusedNodes();
+
+    /**
+     * Returns the topology of all the Nodes currently available
+     *
+     * This method should not be used. Usage of the Virtual Node abstraction
+     * is strongly advised.
+     *
+     * This method only exists to allow application to perform smarter deployment than
+     * the Node Allocator and Virtual Nodes can do. If your application needs a fine
+     * control on where active objects are created (advanced coallocation for example),
+     * then you probably have to forget about Virtual Node.
+     *
+     * @return the current topology of all the nodes inside the application
+     */
+    public DeploymentTree getCurrentTopology();
 }

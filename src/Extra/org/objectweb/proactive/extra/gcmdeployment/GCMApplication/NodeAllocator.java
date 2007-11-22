@@ -31,9 +31,11 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.Notification;
@@ -52,7 +54,7 @@ import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 public class NodeAllocator implements NotificationListener {
 
     /** The GCM Application Descriptor associated to this Node Allocator*/
-    private GCMApplicationDescriptorImpl gcma;
+    private GCMApplicationDescriptorInternal gcma;
 
     /** All Virtual Nodes*/
     private List<VirtualNodeInternal> virtualNodes;
@@ -99,6 +101,7 @@ public class NodeAllocator implements NotificationListener {
                 GCMDeploymentDescriptor nodeProvider = gcma.getNodeProviderFromDeploymentId(data.getDeploymentId());
 
                 for (Node node : data.getNodes()) {
+                    gcma.addNode(node);
                     if (!dispatchS1(node, nodeProvider)) {
                         stage2Pool.put(node, nodeProvider);
                     }
@@ -215,5 +218,9 @@ public class NodeAllocator implements NotificationListener {
                     dispatchS3(node, stage3Pool.get(node));
             }
         }
+    }
+
+    public Set<Node> getUnusedNode() {
+        return new HashSet<Node>(stage3Pool.keySet());
     }
 }

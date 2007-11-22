@@ -40,7 +40,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Test;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.AbstractApplicationParser;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParserImpl;
@@ -135,8 +134,7 @@ public class TestApplicationDescriptorParser {
             }
             System.out.println(file);
 
-            GCMApplicationDescriptor gcma = new GCMApplicationDescriptorImpl(file);
-            gcma.awaitTermination();
+            new GCMApplicationDescriptorImpl(file);
         }
     }
 
