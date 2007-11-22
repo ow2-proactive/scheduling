@@ -777,8 +777,8 @@ public abstract class MOP {
 
             if (targetConstructor == null) {
                 throw new ConstructionOfReifiedObjectFailedException(
-                    "Cannot locate this constructor in class " + targetClass +
-                    " : " + targetConstructorArgs);
+                    "Cannot locate this constructor in " + targetClass + " : " +
+                    Arrays.asList(targetConstructorArgs));
             }
         }
         return new ConstructorCallImpl(targetConstructor, constructorParameters);
@@ -921,20 +921,21 @@ public abstract class MOP {
                 matchingConstructors.put(newSet, newSet);
             }
         }
-
-        HashSet<Constructor<?>> bestConstructors = matchingConstructors.lastKey();
-        if (bestConstructors.size() > 1) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            pw.println(
-                "Choice of a constructor is ambiguous, possible choices are :");
-            for (Constructor c : bestConstructors) {
-                pw.println(c);
+        if (matchingConstructors.size() > 0) {
+            HashSet<Constructor<?>> bestConstructors = matchingConstructors.lastKey();
+            if (bestConstructors.size() > 1) {
+                StringWriter sw = new StringWriter();
+                PrintWriter pw = new PrintWriter(sw);
+                pw.println(
+                    "Choice of a constructor is ambiguous, possible choices are :");
+                for (Constructor c : bestConstructors) {
+                    pw.println(c);
+                }
+                throw new ConstructionOfReifiedObjectFailedException(sw.toString());
             }
-            throw new ConstructionOfReifiedObjectFailedException(sw.toString());
-        }
-        if (bestConstructors.size() == 1) {
-            return bestConstructors.iterator().next();
+            if (bestConstructors.size() == 1) {
+                return bestConstructors.iterator().next();
+            }
         }
         return null;
     }
