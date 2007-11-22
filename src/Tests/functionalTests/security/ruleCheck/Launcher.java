@@ -49,19 +49,19 @@ import sun.security.provider.PolicyFile;
 public class Launcher {
     public static void main(String[] args) {
         Policy policy = null;
-        URL policyFile = Launcher.class.getResource("allPerm.policy");
 
-        // sets the policy to be used by the new jvms
-        System.setProperty("java.security.policy", policyFile.toString());
-
-        // sets the policy to be used for the current thread
-        policy = new PolicyFile(policyFile);
-
-        Policy.setPolicy(policy);
-
-        // enables security for the current thread
-        System.setSecurityManager(new SecurityManager());
-
+        //        URL policyFile = Launcher.class.getResource("allPerm.policy");
+        //
+        //        // sets the policy to be used by the new jvms
+        //        System.setProperty("java.security.policy", policyFile.toString());
+        //
+        //        // sets the policy to be used for the current thread
+        //        policy = new PolicyFile(policyFile);
+        //
+        //        Policy.setPolicy(policy);
+        //
+        //        // enables security for the current thread
+        //        System.setSecurityManager(new SecurityManager());
         try {
             ProActiveDescriptor descriptor1 = ProDeployment.getProactiveDescriptor(
                     "descriptors/security/simple1.xml");
