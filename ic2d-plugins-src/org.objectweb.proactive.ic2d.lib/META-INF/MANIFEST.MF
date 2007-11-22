@@ -1517,18 +1517,15 @@ Export-Package: .,
  pa.stub.org.objectweb.proactive.extra.masterslave.interfaces.internal,
  pa.stub.org.objectweb.proactive.extra.masterslave.tasks,
  pa.stub.org.objectweb.proactive.extra.masterslave.util,
-<<<<<<< .working
  pa.stub.org.objectweb.proactive.extra.scheduler,
  pa.stub.org.objectweb.proactive.extra.scheduler.exception,
  pa.stub.org.objectweb.proactive.extra.scheduler.policy,
-=======
  pa.stub.org.objectweb.proactive.extra.masterworker,
  pa.stub.org.objectweb.proactive.extra.masterworker.core,
  pa.stub.org.objectweb.proactive.extra.masterworker.interfaces,
  pa.stub.org.objectweb.proactive.extra.masterworker.interfaces.internal,
  pa.stub.org.objectweb.proactive.extra.masterworker.tasks,
  pa.stub.org.objectweb.proactive.extra.masterworker.util,
->>>>>>> .merge-right.r6967
  propertyTest,
  ptolemy.data,
  ptolemy.data.expr,
