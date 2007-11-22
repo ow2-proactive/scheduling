@@ -31,7 +31,7 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
                      <!-- classpath is transformed during the test in order to match the correct path -->
-				     <absolutePath value="proactive.home/dist/ProActive.jar"/>
+				     <absolutePath value="proactive.home/dist/lib/ProActive.jar"/>
 				     <absolutePath value="proactive.home/dist/lib/bouncycastle.jar"/>
 				     <absolutePath value="proactive.home/dist/lib/fractal.jar"/>
                      <absolutePath value="proactive.home/dist/lib/ganymed-ssh2-build210.jar"/>
