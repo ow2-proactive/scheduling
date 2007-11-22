@@ -103,30 +103,14 @@
 
   </sect1>
 
-  <sect1 id="dbdoclet.id.TroubleShooting_hostname_ip">
-    <title>Hostname And IP Address</title>
-
-    <para>To function properly, ProActive requires machines to have a
-    correctly configured hostname and domain name. If the name of a machines
-    is not properly configured, then remote nodes will be unable to locate the
-    machine.</para>
-
-    <para>To test if the involved machines are properly configured, in Linux/Unix
-    you can run the following commands:</para>
-
-	<programlisting lang="java"><textobject><textdata fileref="code_snippets/hostname_errors.txt"/></textobject></programlisting>
-
-    <para><literal>hostname</literal> should print the hostname
-    of the machine as known by the other hosts, and <literal
-    role="bold">hostname -i</literal> should return the network interface (IP number)
-    accessible by other machines.</para>
-  </sect1>
-
+  
   <sect1 id="dbdoclet.id.TroubleShooting_dns">
     <title>Domaine name resolution problems</title>
-
-    <para>To work around misconfigured domain names ProActive can be activated
-    to use IP adresses through the following java property:</para>
+	    <para>To function properly, ProActive requires machines to have a
+    correctly configured hostname and domain name. If the name of a machine
+    is not properly configured, then remote nodes will be unable to locate the
+    machine. To work around misconfigured domain names ProActive can be activated
+    to use IP addresses through the following java property:</para>
 
 	<programlisting lang="java"><textobject><textdata fileref="code_snippets/misconfigured_domains.txt"/></textobject></programlisting>
 
@@ -162,15 +146,5 @@
     </itemizedlist>
   </sect1>
 
-  <sect1 id="dbdoclet.id.TroubleShooting_public_remote_method_calls">
-    <title>Public remote method calls</title>
-
-    <para>Methods that will be called remotely on an Active Object must be
-    public. While Java will impose this restriction between classes of
-    different types, this problem usually takes place when invoking a remote
-    method on an object of the same type.</para>
-
-	<programlisting lang="java"><textobject><textdata fileref="code_snippets/public_method_requirement.txt"/></textobject></programlisting>
-
-  </sect1>
+ 
 </chapter>
