@@ -49,9 +49,9 @@
 		<title> First Active Object Class</title>
 	<para>
 		Welcome to your first ProActive program! This is the simplest application that can be
-		written. It is composed of two classes with a master-worker structure. 
+		written. It is composed of two classes with a client-server structure. 
 	</para>
-	<figure> <title> Master-Worker architecture</title>
+	<figure> <title> Client-Server architecture</title>
 		  <mediaobject>
           <imageobject>
             <imagedata contentwidth="100"
@@ -229,7 +229,7 @@ java -Djava.security.policy=proactive.java.policy -Dlog4j.configuration=file:pro
       Main class.</para>
 
       <para><figure>
-      		<title> Master-Worker architecture with initialization</title> 
+      		<title> Client-Server architecture with initialization</title> 
           <mediaobject>
             <imageobject>
               <imagedata contentwidth="100"
