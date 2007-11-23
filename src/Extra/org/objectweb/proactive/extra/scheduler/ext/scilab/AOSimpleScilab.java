@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.scheduler.ext.scilab;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.StringWriter;
@@ -45,7 +44,6 @@ import java.util.Map;
 import javasci.SciData;
 import javasci.Scilab;
 
-import org.objectweb.proactive.extensions.scilab.TaskException;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extra.scheduler.ext.matlab.exception.InvalidParameterException;
 
