@@ -869,7 +869,7 @@
 		<javac srcdir="${dev.dir}/scilab/src" destdir="${dev.dir}/scilab/classes" deprecation="on" source="${source}" debug="${debug}">
 			<include name="**/*.java" />
 		</javac>
-		<jar jarfile="${lib.dir}/scilab/javasci.jar" basedir="${dev.dir}/scilab/classes" />
+		<jar jarfile="${lib.dir}/javasci.jar" basedir="${dev.dir}/scilab/classes" />
 	</target>
 
 
