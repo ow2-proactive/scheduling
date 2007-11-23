@@ -163,7 +163,7 @@
 	<!-- ==================================================================== -->
 	<!--    Add some highlighting information to the docbook source code      -->
 	<!-- ==================================================================== -->
-	<target name="-docbookBeautify" depends="util">
+	<target name="-docbookBeautify" depends="compile.util">
 		
 		<java classname="doc.DocBookize" fork="true">
 			<classpath refid="project.classpath"/>

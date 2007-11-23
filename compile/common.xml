@@ -7,18 +7,24 @@
 	<property name="base.dir"           value="${basedir}/.." />
 	<property name="lib.dir"            value="${base.dir}/lib" />
 	<property name="src.dir"            value="${base.dir}/src" />
+	<property name="scripts.dir"         value="${base.dir}/scripts" />
+	<property name="compile.dir"         value="${base.dir}/compile" />
 	<property name="dev.dir"            value="${base.dir}/dev" />
 	<property name="descriptors.dir"    value="${base.dir}/descriptors" />
 	<property name="daemon.dir"         value="${base.dir}/p2p" />
 	<property name="classes.dir"        value="${base.dir}/classes" />
 	<property name="test.classes.dir"   value="${base.dir}/test-classes" />
 	<property name="classlibs.dir"      value="${base.dir}/classlibs" />
-	<property name="dist.dir"           value="${base.dir}/dist" />
-	<property name="PAdist.dir"         value="${dist.dir}/ProActive" />
-	<property name="deploy.lib.dir"     value="${dist.dir}/lib" />
+
 	<property name="junit.dir"          value="${base.dir}/junitReports" />
 	<property name="emma.dir"           value="${base.dir}/emmaReports" />
 
+	<property name="deploy.dir"         value="${base.dir}/dist" />
+	<property name="deploy.lib.dir"     value="${deploy.dir}/lib" />
+	<property name="deploy.scripts.dir" value="${deploy.dir}/scripts" />
+	
+	<property name="release.dir"        value="${base.dir}/release" />
+	
 	<property name="src.proactive.dir"  value="${src.dir}/Core" />
 	<property name="src.extensions.dir" value="${src.dir}/Extensions" />
 	<property name="src.extra.dir"      value="${src.dir}/Extra" />
@@ -75,6 +81,10 @@
 	<!-- junit properties -->
 	<property name="junit.showoutput" value="false"/>
 
+	<!-- Performance test properties -->
+	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest" />
+	<property name="config.dir" value="${cl.proactive.dir}/${proactive.core.path}/config" />
+
 	<!-- ================================================================ -->
 	<!--                   define the different classpaths                -->
 	<!--  =============================================================== -->
@@ -88,7 +98,7 @@
 	</path>
 	
 	<path id="deploy.classpath">
-		<fileset dir="${dist.dir}/lib">
+		<fileset dir="${deploy.lib.dir}">
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
