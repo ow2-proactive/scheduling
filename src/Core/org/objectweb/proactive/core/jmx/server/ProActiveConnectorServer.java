@@ -46,8 +46,6 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
 
-import com.sun.jmx.remote.util.EnvHelp;
-
 
 /**
  * This connector server is attached to an MBean server.
@@ -117,7 +115,6 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
                 this.attributes = new HashMap<String, Object>();
             } else {
                 this.attributes = Collections.unmodifiableMap(environment);
-                EnvHelp.checkAttributes(this.attributes);
             }
 
             this.address = url;
