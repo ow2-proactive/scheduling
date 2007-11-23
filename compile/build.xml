@@ -146,9 +146,8 @@
 				<include name="functionalTests/**/*.fractal" />
 				<include name="functionalTests/**/*.properties" />
 				<include name="functionalTests/**/*.xsd" />
-
+				<include name="functionalTests/**/*.p12" />
 				<include name="unitTests/**/*.txt" />
-
 				<include name="performanceTests/**/*.xml" />
 			</fileset>
 		</copy>
