@@ -46,6 +46,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
@@ -85,8 +87,15 @@ public class VirtualNodesGroup implements Observer {
     //
     public void update(Observable o, Object arg) {
         // <"Message",VNObject>
-        if (arg instanceof Hashtable) { //<"Add a virtual node",VNObject>
-            Hashtable<String, VNObject> table = (Hashtable<String, VNObject>) arg;
+        if (!(arg instanceof Notification)) {
+            return;
+        }
+
+        Notification notif = (Notification) arg;
+        Object data = notif.getData();
+        if ((notif.getNotification() == MVC_Notifications.WORLD_OBJECT_ADD_VIRTUAL_NODE) &&
+                (data instanceof Hashtable)) { //<"Add a virtual node",VNObject>
+            Hashtable<String, VNObject> table = (Hashtable<String, VNObject>) data;
             final VNObject vnAdded = table.get(WorldObject.ADD_VN_MESSAGE);
             if (vnAdded != null) {
                 Display.getDefault().asyncExec(new Runnable() {
@@ -100,23 +109,25 @@ public class VirtualNodesGroup implements Observer {
                             group.pack(true);
                         }
                     });
-            } else { //<"Remove a virtual node",VNObject>
-                final VNObject vnRemoved = table.get(WorldObject.REMOVE_VN_MESSAGE);
-                if (vnRemoved != null) {
-                    Display.getDefault().asyncExec(new Runnable() {
-                            public void run() {
-                                Button b = virtualNodes.get(vnRemoved);
-                                virtualNodes.remove(vnRemoved);
-                                buttons.remove(b);
-                                if (!b.isDisposed()) {
-                                    b.dispose();
-                                }
-                                if (!group.isDisposed()) {
-                                    group.pack();
-                                }
+            }
+        } else if ((notif.getNotification() == MVC_Notifications.WORLD_OBJECT_REMOVE_VIRTUAL_NODE) &&
+                (data instanceof Hashtable)) { //<"Remove a virtual node",VNObject>
+            Hashtable<String, VNObject> table = (Hashtable<String, VNObject>) data;
+            final VNObject vnRemoved = table.get(WorldObject.REMOVE_VN_MESSAGE);
+            if (vnRemoved != null) {
+                Display.getDefault().asyncExec(new Runnable() {
+                        public void run() {
+                            Button b = virtualNodes.get(vnRemoved);
+                            virtualNodes.remove(vnRemoved);
+                            buttons.remove(b);
+                            if (!b.isDisposed()) {
+                                b.dispose();
                             }
-                        });
-                }
+                            if (!group.isDisposed()) {
+                                group.pack();
+                            }
+                        }
+                    });
             }
         }
     }

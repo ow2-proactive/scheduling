@@ -38,6 +38,8 @@ import java.util.Set;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
@@ -111,10 +113,14 @@ public class AOEditPart extends AbstractMonitoringEditPart {
      */
     @Override
     public void update(Observable o, Object arg) {
-        if (arg != null) {
+        if ((arg != null) && (arg instanceof Notification)) {
+            MVC_Notifications mvcNotif = ((Notification) arg).getNotification();
+            Object notificationdata = ((Notification) arg).getData();
+
             // State updated
-            if (arg instanceof State) {
-                final State state = (State) arg;
+            switch (mvcNotif) {
+            case STATE_CHANGED: {
+                final State state = (State) notificationdata;
 
                 //final IFigure panel = getWorldEditPart().getFigure().getParent();
                 if (state == State.NOT_MONITORED) {
@@ -133,35 +139,27 @@ public class AOEditPart extends AbstractMonitoringEditPart {
                             }
                         });
                     /*this.figuresToUpdate.add(getCastedFigure());*/ addFigureToUpdtate(getCastedFigure());
-                }
+                } //if else NOT_MONITORED
+                break;
+            } //  case CTATE_CHANGED
 
-                /*Display.getDefault().asyncExec(new Runnable() {
-                        public void run () {
-                                if(state == State.NOT_MONITORED) {
-                                        getCastedFigure().removeConnections(panel);
-                                }
-                                else{
-                                        getCastedFigure().setState(state);
-                                }
-                        }
-                });*/
-            }
             // Add communication
-            else if (arg instanceof HashSet) {
-                final Set<ActiveObject> communications = (HashSet<ActiveObject>) arg;
-
+            //else if (arg instanceof HashSet) {
+            case ACTIVE_OBJECT_RESET_COMMUNICATIONS: {
                 final AOFigure destination = getCastedFigure();
-
                 final IFigure panel = getGlobalPanel();
-
-                if (communications.isEmpty()) {
-                    getViewer().getControl().getDisplay().syncExec(new Runnable() {
-                            public void run() {
-                                destination.removeConnections(panel);
-                            }
-                        });
-                }
-
+                getViewer().getControl().getDisplay().syncExec(new Runnable() {
+                        public void run() {
+                            destination.removeConnections(panel);
+                        }
+                    });
+                addFigureToUpdtate(panel);
+                break;
+            } //case ACTIVE_OBJECT_RESET_COMMUNICATIONS
+            case ACTIVE_OBJECT_ADD_COMMUNICATION: {
+                final Set<ActiveObject> communications = (HashSet<ActiveObject>) notificationdata;
+                final AOFigure destination = getCastedFigure();
+                final IFigure panel = getGlobalPanel();
                 for (ActiveObject aoSource : communications) {
                     AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
                     if (editPart != null) {
@@ -175,50 +173,86 @@ public class AOEditPart extends AbstractMonitoringEditPart {
                         }
                     }
                 }
-
-                /*this.figuresToUpdate.add(panel);*/ addFigureToUpdtate(panel);
-
-                /*
-                Display.getDefault().asyncExec(new Runnable() {
-                        public void run () {
-                                if (communications.isEmpty())
-                                        destination.removeConnections(panel);
-
-                                for (Iterator<ActiveObject> it = communications.iterator(); it.hasNext(); )
-                                {
-                                        ActiveObject  aoSource = it.next();
-                                        AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
-
-                                        if(editPart!=null){
-                                                AOFigure source = (AOFigure) editPart.getFigure();
-                                                if(source!=null){
-                                                        source.addConnection(destination, panel, getArrowColor());
-                                                }
-                                                else
-                                                        System.out.println("[Error] Unable to find the source");
-                                        }
-                                        else{
-                                                System.out.println("[Error] Unable to draw the arrow : "+aoSource.getName()+" -->  "+getCastedModel().getName());
-                                        }
-                                }
-                        }});*/
-            }
-            // Request queue length has changed
-            else if (arg instanceof Integer) {
-                length = (Integer) arg;
-
+                addFigureToUpdtate(panel);
+                break;
+            } // case ACTIVE_OBJECT_ADD_COMMUNICATION 
+            case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED: {
+                length = (Integer) notificationdata;
                 getCastedFigure().setRequestQueueLength(length);
-                /*this.figuresToUpdate.add(getCastedFigure());*/ addFigureToUpdtate(getCastedFigure());
+                break;
+            } //case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED:
+            default:super.update(o, arg);
+            } //switch 
+        } //if arg is Notification     
 
-                /*Display.getDefault().asyncExec(new Runnable() {
-                        public void run () {
-                                getCastedFigure().setRequestQueueLength(length);
-                        }
-                });*/
-            }
-        } else {
-            super.update(o, arg);
-        }
+        //            final Set<ActiveObject> communications = (HashSet<ActiveObject>) arg;
+        //                final IFigure panel = getGlobalPanel();
+        //
+        //                if (communications.isEmpty()) {
+        //                    getViewer().getControl().getDisplay().syncExec(new Runnable() {
+        //                            public void run() {
+        //                                destination.removeConnections(panel);
+        //                            }
+        //                        });
+        //                }
+        //
+        //                for (ActiveObject aoSource : communications) {
+        //                    AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
+        //                    if (editPart != null) {
+        //                        AOFigure source = (AOFigure) editPart.getFigure();
+        //                        if (source != null) {
+        //                            /*communicationsToDraw.add(*/ addGraphicalCommunication(new GraphicalCommunication(
+        //                                    source, destination, panel, getArrowColor()));
+        //                        } else {
+        //                            System.out.println(
+        //                                "[Error] Unable to find the source");
+        //                        }
+        //                    }
+        //                }
+        //
+        //                /*this.figuresToUpdate.add(panel);*/ //addFigureToUpdtate(panel);
+        //
+        //                /*
+        //                Display.getDefault().asyncExec(new Runnable() {
+        //                        public void run () {
+        //                                if (communications.isEmpty())
+        //                                        destination.removeConnections(panel);
+        //
+        //                                for (Iterator<ActiveObject> it = communications.iterator(); it.hasNext(); )
+        //                                {
+        //                                        ActiveObject  aoSource = it.next();
+        //                                        AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
+        //
+        //                                        if(editPart!=null){
+        //                                                AOFigure source = (AOFigure) editPart.getFigure();
+        //                                                if(source!=null){
+        //                                                        source.addConnection(destination, panel, getArrowColor());
+        //                                                }
+        //                                                else
+        //                                                        System.out.println("[Error] Unable to find the source");
+        //                                        }
+        //                                        else{
+        //                                                System.out.println("[Error] Unable to draw the arrow : "+aoSource.getName()+" -->  "+getCastedModel().getName());
+        //                                        }
+        //                                }
+        //                        }});*/
+        //            }
+        //            // Request queue length has changed
+        //            else if (arg instanceof Integer) {
+        //                length = (Integer) arg;
+        //
+        //                getCastedFigure().setRequestQueueLength(length);
+        //                /*this.figuresToUpdate.add(getCastedFigure());*/ addFigureToUpdtate(getCastedFigure());
+        //
+        //                /*Display.getDefault().asyncExec(new Runnable() {
+        //                        public void run () {
+        //                                getCastedFigure().setRequestQueueLength(length);
+        //                        }
+        //                });*/
+        //            }
+        //        } else {
+        //            super.update(o, arg);
+        //        }
     }
 
     //

@@ -888,6 +888,9 @@ public class ProActiveObject {
      */
     public static void terminateActiveObject(Object ao, boolean immediate) {
         if (MOP.isReifiedObject(ao)) {
+            //if ao is a future we need to obtain the real stub
+            ao = ProFuture.getFutureValue(ao);
+
             Proxy proxy = ((StubObject) ao).getProxy();
             try {
                 if (immediate) {
@@ -929,6 +932,9 @@ public class ProActiveObject {
      * @return true if the active object is reachable, false otherwise.
      */
     public static boolean pingActiveObject(Object target) {
+        //if target is a future we need to obtain the real stub
+        target = ProFuture.getFutureValue(target);
+
         UniversalBody targetedBody = null;
         try {
             // reified object is checked in getRemoteBody

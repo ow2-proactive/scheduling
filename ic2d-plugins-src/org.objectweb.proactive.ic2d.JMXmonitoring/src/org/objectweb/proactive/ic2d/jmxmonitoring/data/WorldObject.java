@@ -48,6 +48,8 @@ import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 
 
 /**
@@ -142,7 +144,9 @@ public class WorldObject extends AbstractData {
     public void addHost(String url, int rank) {
         try {
             addChild(new HostObject(this, url, rank));
-            notifyObservers();
+            //TODO emil: I have removed this line 
+            //check if it was here with a purpuse
+            //notifyObservers();
         } catch (MalformedObjectNameException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -151,10 +155,14 @@ public class WorldObject extends AbstractData {
             e.printStackTrace();
         }
         setChanged();
+
+        //this notification will be handled by the MonitorThread only for 
+        //the first child added. It will start a refreshing thread
         if (getMonitoredChildrenSize() == 1) {
-            notifyObservers(methodName.ADD_CHILD);
+            notifyObservers(new Notification(
+                    MVC_Notifications.WORLD_OBJECT_FIRST_CHILD_ADDED));
         }
-        notifyObservers();
+        notifyObservers(new Notification(MVC_Notifications.ADD_CHILD));
     }
 
     /**
@@ -169,10 +177,13 @@ public class WorldObject extends AbstractData {
     public void removeChild(AbstractData child) {
         super.removeChild(child);
         setChanged();
+        //this notification will be handled by the MonitorThread only for 
+        //the last child added. It will stop a refreshing thread
         if (getMonitoredChildrenSize() == 0) {
-            notifyObservers(methodName.REMOVE_CHILD);
+            notifyObservers(new Notification(
+                    MVC_Notifications.WORLD_OBJECT_LAST_CHILD_REMOVED));
         }
-        notifyObservers();
+        notifyObservers(new Notification(MVC_Notifications.REMOVE_CHILD));
     }
 
     /**
@@ -189,6 +200,7 @@ public class WorldObject extends AbstractData {
      * @param ao The active object to add.
      */
     public void addActiveObject(ActiveObject ao) {
+        //Note: until now, this method is only called in the constructor of an (ic2d) ActiveObject
         synchronized (activeObjects) {
             ActiveObject oldAO = this.activeObjects.get(ao.getUniqueID());
             if (oldAO != null) {
@@ -218,9 +230,11 @@ public class WorldObject extends AbstractData {
         }
 
         if (ao == null) {
-            System.out.println("Active Object " + id + " already removed.");
+            System.out.println("Represntation of Active Object " + id +
+                " already removed.");
         } else {
-            System.out.println("Removed  " + ao + ", on " + ao.getParent());
+            System.out.println("Stop monitoring " + ao + ", on " +
+                ao.getParent());
             ao.resetCommunications();
             ao.getParent().removeChild(ao);
         }
@@ -332,7 +346,9 @@ public class WorldObject extends AbstractData {
         setChanged();
         Hashtable<String, VNObject> data = new Hashtable<String, VNObject>();
         data.put(ADD_VN_MESSAGE, vn);
-        notifyObservers(data);
+        //VirtualNodesGroup object will use the information within data
+        notifyObservers(new Notification(
+                MVC_Notifications.WORLD_OBJECT_ADD_VIRTUAL_NODE, data));
     }
 
     /**
@@ -344,7 +360,8 @@ public class WorldObject extends AbstractData {
         setChanged();
         Hashtable<String, VNObject> data = new Hashtable<String, VNObject>();
         data.put(REMOVE_VN_MESSAGE, vn);
-        notifyObservers(data);
+        notifyObservers(new Notification(
+                MVC_Notifications.WORLD_OBJECT_REMOVE_VIRTUAL_NODE, data));
     }
 
     public VNObject getVirtualNode(String virtualNodeName) {

@@ -44,6 +44,8 @@ import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
 import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RemoteObjectHostRTFinder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder;
@@ -244,7 +246,9 @@ public class HostObject extends AbstractData {
             this.osVersion = proxyMXBean.getVersion();
 
             setChanged();
-            notifyObservers(this.toString());
+            notifyObservers(new Notification(
+                    MVC_Notifications.HOST_OBJECT_UPDATED_OSNAME_AND_VERSON,
+                    this.toString()));
         }
     }
 

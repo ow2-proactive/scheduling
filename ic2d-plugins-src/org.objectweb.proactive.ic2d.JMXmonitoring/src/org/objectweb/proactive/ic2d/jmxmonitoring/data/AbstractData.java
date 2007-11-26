@@ -47,6 +47,8 @@ import javax.management.ReflectionException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 
 
 /**
@@ -102,7 +104,7 @@ public abstract class AbstractData extends Observable {
         if (!this.monitoredChildren.containsKey(child.getKey())) {
             this.monitoredChildren.put(child.getKey(), child);
             setChanged();
-            notifyObservers();
+            notifyObservers(new Notification(MVC_Notifications.ADD_CHILD));
             child.explore();
         }
     }
@@ -119,7 +121,7 @@ public abstract class AbstractData extends Observable {
         monitoredChildren.remove(key);
         notMonitoredChildren.remove(key);
         setChanged();
-        notifyObservers();
+        notifyObservers(new Notification(MVC_Notifications.REMOVE_CHILD));
     }
 
     /**
@@ -130,7 +132,8 @@ public abstract class AbstractData extends Observable {
         monitoredChildren.remove(child.getKey());
         notMonitoredChildren.put(child.getKey(), child);
         setChanged();
-        notifyObservers();
+        notifyObservers(new Notification(
+                MVC_Notifications.REMOVE_CHILD_FROM_MONITORED_CHILDREN));
     }
 
     /**
@@ -253,8 +256,8 @@ public abstract class AbstractData extends Observable {
         }
         getParent().removeChildFromMonitoredChildren(this);
         setChanged();
-        notifyObservers( /*State.NOT_MONITORED*/
-        );
+        notifyObservers(new Notification(MVC_Notifications.STATE_CHANGED,
+                State.NOT_MONITORED));
     }
 
     /**

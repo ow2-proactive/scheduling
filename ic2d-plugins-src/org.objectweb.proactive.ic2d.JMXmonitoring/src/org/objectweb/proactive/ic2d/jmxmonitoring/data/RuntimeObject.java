@@ -162,7 +162,8 @@ public class RuntimeObject extends AbstractData {
 
 	public void runtimeKilled() {
 		setChanged();
-		notifyObservers(methodName.RUNTIME_KILLED);
+		notifyObservers(new Notification(
+                MVC_Notifications.RUNTIME_OBJECT_RUNTIME_KILLED));;
 		new Thread() {
 			@Override
 			public void run() {

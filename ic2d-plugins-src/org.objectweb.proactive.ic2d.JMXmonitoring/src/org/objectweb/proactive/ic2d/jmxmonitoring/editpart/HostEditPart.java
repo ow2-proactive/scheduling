@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
@@ -81,15 +83,26 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 
     @Override
     public void update(Observable o, Object arg) {
-        final Object param = arg;
+        if (!(arg instanceof Notification)) {
+            return;
+        }
 
-        if (param instanceof State && ((State) param == State.NOT_MONITORED)) {
-            deactivate();
+        final Notification notif = (Notification) arg;
+        MVC_Notifications mvcNotif = notif.getNotification();
+        Object data = notif.getData();
+        switch (mvcNotif) {
+        case STATE_CHANGED: {
+            if (data == State.NOT_MONITORED) {
+                deactivate();
+            }
         }
-        // OS have been updated
-        else if ((param instanceof String) && (o instanceof HostObject)) {
-            getCastedFigure().changeTitle((String) param);
+        case HOST_OBJECT_UPDATED_OSNAME_AND_VERSON: {
+            if (data instanceof String) {
+                getCastedFigure().changeTitle((String) data);
+            }
         }
+        } //switch
+
         getViewer().getControl().getDisplay().asyncExec(this);
     }
 

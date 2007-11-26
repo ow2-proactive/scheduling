@@ -36,6 +36,8 @@ import java.util.Observable;
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject.methodName;
@@ -59,21 +61,23 @@ public class VMEditPart extends AbstractMonitoringEditPart {
     //
     @Override
     public void update(Observable o, Object arg) {
-        final Object param = arg;
+        if (!(arg instanceof Notification)) {
+            return;
+        }
+
+        final MVC_Notifications mvcNotification = ((Notification) arg).getNotification();
         getViewer().getControl().getDisplay().asyncExec(new Runnable() {
                 public void run() {
-                    if (param instanceof methodName) {
-                        methodName method = (methodName) param;
-                        switch (method) {
-                        case RUNTIME_KILLED:
-                            Console.getInstance(Activator.CONSOLE_NAME)
-                                   .log(getModel() + " killed!");
-                            getCastedFigure().notResponding();
-                            break;
-                        default:
-                            break;
-                        }
+                    switch (mvcNotification) {
+                    case RUNTIME_OBJECT_RUNTIME_KILLED:
+                        Console.getInstance(Activator.CONSOLE_NAME)
+                               .log(getModel() + " killed!");
+                        getCastedFigure().notResponding();
+                        break;
+                    default:
+                        break;
                     }
+
                     /*
                     if(param instanceof State && (State)param == State.NOT_RESPONDING)
                             ((VMFigure)getFigure()).notResponding();

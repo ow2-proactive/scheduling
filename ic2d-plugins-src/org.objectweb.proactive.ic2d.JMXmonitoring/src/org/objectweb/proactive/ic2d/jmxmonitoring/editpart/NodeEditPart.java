@@ -35,6 +35,8 @@ import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
@@ -93,13 +95,25 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
      */
     @Override
     public void update(Observable o, Object arg) {
-        final Object param = arg;
+        //final Object param = arg;
+        if (!(arg instanceof Notification)) {
+            return;
+        }
+
+        final Notification notif = (Notification) arg;
+
         getViewer().getControl().getDisplay().asyncExec(new Runnable() {
                 public void run() {
-                    if (param instanceof State &&
-                            ((State) param == State.NOT_MONITORED)) {
+                    if ((notif.getNotification() == MVC_Notifications.STATE_CHANGED) &&
+                            (notif.getData() == State.NOT_MONITORED)) {
                         deactivate();
-                    } else if (param instanceof State) {
+                    } else if (notif.getNotification() == MVC_Notifications.STATE_CHANGED)//in this case we know we have changed highlight state
+                     {
+                        //method VirtualNodesGroup.getColor(virtualNode vn)
+                        //returns the color for the virtual node if the virtual node is selected
+                        //or null if it is not. 
+                        //if the collor is null, setHighlight(null) colors the figure 
+                        //node to the default color
                         getCastedFigure()
                             .setHighlight(getMonitoringView()
                                               .getVirtualNodesGroup()
@@ -111,6 +125,16 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
                     }
                 }
             });
+    }
+
+    @Override
+    public void refresh() {
+        //TODO: this might be costly. Only when we stop monitoring the parent may be null and 
+        //we have npe stak in the logs.  
+        if (this.getParent() == null) {
+            return;
+        }
+        super.refresh();
     }
 
     //

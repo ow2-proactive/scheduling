@@ -70,7 +70,10 @@ public class JMXNotificationListener implements NotificationListener,
      * @param oname The ObjectName of the MBean
      * @param filter A notification filter
      * @param handback A hanback
+     * This method is deprecated. Use subscribeObjectFromRemoteMBean(ProActiveConnection connection, ObjectName oname,
+            NotificationFilter filter, Object handback) instead
      */
+    @Deprecated
     public void subscribe(ProActiveConnection connection, ObjectName oname,
         NotificationFilter filter, Object handback) {
         try {
@@ -98,9 +101,19 @@ public class JMXNotificationListener implements NotificationListener,
      * @param oname The ObjectName of the MBean
      * @param filter A notification filter
      * @param handback A hanback
+     * this method is deprecated. Use JMXNotificationManager.unsubscribeObjectFromRemoteMBean(..) instead
      */
+    @Deprecated
     public void unsubscribe(ProActiveConnection connection, ObjectName oname,
         NotificationFilter filter, Object handback) {
+        if (!ProActiveObject.pingActiveObject(connection)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(
+                    "Trying to unregister listener on a connection with terminated body. Ping faild on the connection object: " +
+                    connection.toString());
+            }
+            return;
+        }
         try {
             if (connection.isRegistered(oname)) {
                 connection.removeNotificationListener(oname,

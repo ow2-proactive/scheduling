@@ -47,6 +47,8 @@ import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
 
 
@@ -169,7 +171,8 @@ public class ActiveObject extends AbstractData {
             break;
         }
         setChanged();
-        notifyObservers(this.currentState);
+        notifyObservers(new Notification(MVC_Notifications.STATE_CHANGED,
+                this.currentState));
     }
 
     /**
@@ -260,7 +263,8 @@ public class ActiveObject extends AbstractData {
         setChanged();
         Set<ActiveObject> comm = new HashSet<ActiveObject>();
         comm.add(aoSource);
-        notifyObservers(comm);
+        notifyObservers(new Notification(
+                MVC_Notifications.ACTIVE_OBJECT_ADD_COMMUNICATION, comm));
 
         /*synchronized (communications) {
                 communications.add(source);
@@ -303,26 +307,36 @@ public class ActiveObject extends AbstractData {
     @Override
     public void resetCommunications() {
         setChanged();
-        notifyObservers(new HashSet<ActiveObject>());
+        notifyObservers(new Notification(
+                MVC_Notifications.ACTIVE_OBJECT_RESET_COMMUNICATIONS,
+                new HashSet<ActiveObject>()));
     }
 
     public void addRequest() {
         this.requestQueueLength++;
         setChanged();
-        notifyObservers(requestQueueLength);
+        notifyObservers(new Notification(
+                MVC_Notifications.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+                requestQueueLength));
     }
 
     public void removeRequest() {
         this.requestQueueLength--;
         setChanged();
-        notifyObservers(requestQueueLength);
+        notifyObservers(new Notification(
+                MVC_Notifications.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+                requestQueueLength));
+        ;
     }
 
     public void setRequestQueueLength(int requestQueueLength) {
         if (this.requestQueueLength != requestQueueLength) {
             this.requestQueueLength = requestQueueLength;
             setChanged();
-            notifyObservers(requestQueueLength);
+            notifyObservers(new Notification(
+                    MVC_Notifications.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+                    requestQueueLength));
+            ;
         }
     }
 

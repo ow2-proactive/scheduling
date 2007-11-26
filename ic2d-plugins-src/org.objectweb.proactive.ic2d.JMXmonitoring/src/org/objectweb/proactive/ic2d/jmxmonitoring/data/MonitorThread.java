@@ -33,6 +33,9 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
+
 
 public class MonitorThread implements Observer {
     private final static int DEFAULT_TTR = 30;
@@ -103,11 +106,11 @@ public class MonitorThread implements Observer {
 
     public void update(Observable o, Object arg) {
         if ((arg != null) && o instanceof WorldObject &&
-                arg instanceof WorldObject.methodName) {
-            WorldObject.methodName method = (WorldObject.methodName) arg;
-            if (method == WorldObject.methodName.ADD_CHILD) {
+                arg instanceof Notification) {
+            MVC_Notifications notification = ((Notification) arg).getNotification();
+            if (notification == MVC_Notifications.WORLD_OBJECT_FIRST_CHILD_ADDED) {
                 startRefreshing((WorldObject) o);
-            } else if (method == WorldObject.methodName.REMOVE_CHILD) {
+            } else if (notification == MVC_Notifications.WORLD_OBJECT_LAST_CHILD_REMOVED) {
                 stopRefreshing();
             }
         }
@@ -124,9 +127,13 @@ public class MonitorThread implements Observer {
         refresh = true;
         if (refresher.getState() == Thread.State.TERMINATED) {
             refresher = new Thread(new MonitorThreadRefresher(world));
+            refresher.start();
         }
 
-        refresher.start();
+        //the thread has not yet been started. We start it now. 
+        if (refresher.getState() == Thread.State.NEW) {
+            refresher.start();
+        }
     }
 
     protected void stopRefreshing() {
