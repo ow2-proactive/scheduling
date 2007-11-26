@@ -48,7 +48,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.Dy
  * @author proactive team
  *
  */
-public interface DynamicNSInterface extends NodeSourceInterface {
+public interface DynamicNSInterface {
     // GETTERS
     public int getNbMaxNodes();
 
@@ -62,4 +62,6 @@ public interface DynamicNSInterface extends NodeSourceInterface {
     public void setTimeToRelease(int ttr);
 
     public void setNiceTime(int nice);
+
+    public void shutdown();
 }

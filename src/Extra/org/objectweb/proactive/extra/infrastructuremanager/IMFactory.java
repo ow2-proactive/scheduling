@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
+import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
@@ -51,7 +52,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 
 public class IMFactory implements IMConstants {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_FACTORY);
-    private static IMCore imcore = null;
+    private static IMCoreInterface imcore = null;
 
     /**
      * Start the infrastructure manager in the local host
@@ -65,9 +66,8 @@ public class IMFactory implements IMConstants {
             AlreadyBoundException, IOException {
         if (imcore == null) {
             Node nodeIM = NodeFactory.createNode(NAME_NODE_IM);
-            imcore = (IMCore) ProActiveObject.newActive(IMCore.class.getName(), // the class to deploy
-                    new Object[] { nodeIM }, nodeIM);
-
+            imcore = (IMCoreInterface) ProActiveObject.newActive(IMCore.class.getName(), // the class to deploy
+                    new Object[] { "IMCORE", nodeIM }, nodeIM);
             ProActiveObject.register(imcore,
                 "//localhost/" + NAME_ACTIVE_OBJECT_IMCORE);
 
@@ -92,7 +92,7 @@ public class IMFactory implements IMConstants {
      * @throws ActiveObjectCreationException
      * @throws NodeException
      */
-    private static IMCore getIMCore()
+    private static IMCoreInterface getIMCore()
         throws NodeException, ActiveObjectCreationException,
             AlreadyBoundException, IOException {
         if (imcore != null) {
@@ -109,14 +109,16 @@ public class IMFactory implements IMConstants {
      * @throws IOException
      * @throws ActiveObjectCreationException
      */
-    private static IMCore getIMCore(String urlIM)
+    private static IMCoreInterface getIMCore(String urlIM)
         throws ActiveObjectCreationException, IOException {
         if (logger.isInfoEnabled()) {
             logger.info("lookup of IMCore at the IM url node : " + urlIM);
         }
 
-        IMCore imcoreLookUp;
-        imcoreLookUp = (IMCore) ProActiveObject.lookupActive(IMCore.class.getName(),
+        IMCoreInterface imcoreLookUp;
+
+        //TODO GERMS lookup sur interface IMNodeManager ou sur IMNodeManagerImpl ?  
+        imcoreLookUp = (IMCoreInterface) ProActiveObject.lookupActive(IMCoreInterface.class.getName(),
                 urlIM);
 
         return imcoreLookUp;
@@ -130,7 +132,7 @@ public class IMFactory implements IMConstants {
      * @throws ActiveObjectCreationException
      * @throws IOException
      */
-    private static IMCore getIMCore(URI urlIM)
+    private static IMCoreInterface getIMCore(URI urlIM)
         throws ActiveObjectCreationException, IOException {
         String locationIM = urlIM.toString();
 
@@ -177,7 +179,7 @@ public class IMFactory implements IMConstants {
      */
     public static IMAdmin getAdmin(URI uriIM)
         throws ActiveObjectCreationException, IOException {
-        IMCore imcoreLookUp = getIMCore(uriIM);
+        IMCoreInterface imcoreLookUp = getIMCore(uriIM);
 
         return imcoreLookUp.getAdmin();
     }
@@ -211,7 +213,7 @@ public class IMFactory implements IMConstants {
      */
     public static IMMonitoring getMonitoring(URI uriIM)
         throws ActiveObjectCreationException, IOException {
-        IMCore imcoreLookUp = getIMCore(uriIM);
+        IMCoreInterface imcoreLookUp = getIMCore(uriIM);
 
         return imcoreLookUp.getMonitoring();
     }
@@ -245,7 +247,7 @@ public class IMFactory implements IMConstants {
      */
     public static IMUser getUser(URI uriIM)
         throws ActiveObjectCreationException, IOException {
-        IMCore imcoreLookUp = getIMCore(uriIM);
+        IMCoreInterface imcoreLookUp = getIMCore(uriIM);
 
         return imcoreLookUp.getUser();
     }

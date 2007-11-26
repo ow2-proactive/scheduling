@@ -39,7 +39,9 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.NodeState;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
@@ -61,17 +63,16 @@ public class IMNodeImpl implements IMNode, Serializable {
     private String padName;
     private String hostName;
     private String vmName;
-    private boolean free = true;
-    private boolean down = false;
     private ScriptHandler handler = null;
-    private IMNodeSource nodeSource;
+    private NodeSource nodeSource;
+    private NodeState status;
 
     // ----------------------------------------------------------------------//
     // CONSTRUCTOR
     public IMNodeImpl(Node node, String vnodeName, String padName,
-        IMNodeSource nodeSource) {
-        this.nodeSource = nodeSource;
+        NodeSource nodeSource) {
         this.node = node;
+        this.nodeSource = nodeSource;
         this.vnodeName = vnodeName;
         this.padName = padName;
         this.nodeName = node.getNodeInformation().getName();
@@ -81,32 +82,25 @@ public class IMNodeImpl implements IMNode, Serializable {
         this.vmName = node.getNodeInformation().getVMInformation()
                           .getDescriptorVMName();
         this.scriptStatus = new HashMap<SelectionScript, Integer>();
+        this.status = NodeState.FREE;
     }
 
     // ----------------------------------------------------------------------//
     // GET
-    public String getNodeURL() {
-        return this.nodeURL;
-    }
-
     public String getNodeName() {
         return this.nodeName;
     }
 
     public Node getNode() throws NodeException {
-        if (!isDown()) {
+        if (this.status != NodeState.DOWN) {
             return this.node;
         } else {
             throw new NodeException("The node is down");
         }
     }
 
-    public NodeInformation getNodeInformation() throws NodeException {
-        if (!isDown()) {
-            return this.node.getNodeInformation();
-        } else {
-            throw new NodeException("The node is down");
-        }
+    public NodeInformation getNodeInformation() {
+        return this.node.getNodeInformation();
     }
 
     public String getVNodeName() {
@@ -125,41 +119,80 @@ public class IMNodeImpl implements IMNode, Serializable {
         return this.vmName;
     }
 
-    // ----------------------------------------------------------------------//
-    // IS
-    public boolean isFree() throws NodeException {
-        // TODO Enlever cette Exception ne servant pas a grand chose
-        if (!isDown()) {
-            return this.free;
-        } else {
-            throw new NodeException("The node is down");
-        }
+    public String getNodeSourceId() {
+        return this.nodeSource.getSourceId();
     }
 
-    public boolean isDown() {
-        return this.down;
+    @Override
+    public String getNodeURL() {
+        return this.node.getNodeInformation().getURL();
     }
 
     // ----------------------------------------------------------------------//
     // SET
     public void setBusy() throws NodeException {
-        if (!isDown()) {
-            this.free = false;
+        if (this.status != NodeState.DOWN) {
+            this.status = NodeState.BUSY;
         } else {
             throw new NodeException("The node is down");
         }
     }
 
     public void setFree() throws NodeException {
-        if (!isDown()) {
-            this.free = true;
+        if (this.status != NodeState.DOWN) {
+            this.status = NodeState.FREE;
         } else {
             throw new NodeException("The node is down");
         }
     }
 
-    public void setDown(boolean down) {
-        this.down = down;
+    @Override
+    public void setDown() {
+        this.status = NodeState.DOWN;
+    }
+
+    @Override
+    public void setToRelease() throws NodeException {
+        if (this.status != NodeState.DOWN) {
+            this.status = NodeState.TO_BE_RELEASED;
+        } else {
+            throw new NodeException("The node is down");
+        }
+    }
+
+    // ----------------------------------------------------------------------//
+    // IS
+    public boolean isFree() {
+        if (this.status == NodeState.FREE) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isDown() {
+        if (this.status == NodeState.DOWN) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean isToRelease() {
+        if (this.status == NodeState.TO_BE_RELEASED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isBusy() {
+        if (this.status == NodeState.BUSY) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     // OTHER SET in the case of the node can migrate.
@@ -172,21 +205,15 @@ public class IMNodeImpl implements IMNode, Serializable {
     public String toString() {
         String mes = "\n";
 
-        try {
-            mes += ("| Name of this Node  :  " + getNodeURL() + "\n");
-            mes += "+-----------------------------------------------+\n";
-            mes += ("| Node is free ?  	: " + free + "\n");
-            mes += ("| Name of PAD	  	: " + padName + "\n");
-            mes += ("| VNode 		  	: " + vnodeName + "\n");
-            mes += ("| Host  		  	: " + getHostName() + "\n");
-            mes += ("| Name of the VM 	: " +
-            getNodeInformation().getVMInformation().getDescriptorVMName() +
-            "\n");
-            mes += "+-----------------------------------------------+\n";
-        } catch (NodeException e) {
-            mes += "Node is down \n";
-        }
-
+        mes += ("| Name of this Node  :  " + getNodeURL() + "\n");
+        mes += "+-----------------------------------------------+\n";
+        mes += ("| Node is free ?  	: " + this.isFree() + "\n");
+        mes += ("| Name of PAD	  	: " + padName + "\n");
+        mes += ("| VNode 		  	: " + vnodeName + "\n");
+        mes += ("| Host  		  	: " + getHostName() + "\n");
+        mes += ("| Name of the VM 	: " +
+        getNodeInformation().getVMInformation().getDescriptorVMName() + "\n");
+        mes += "+-----------------------------------------------+\n";
         return mes;
     }
 
@@ -239,14 +266,6 @@ public class IMNodeImpl implements IMNode, Serializable {
         return scriptStatus;
     }
 
-    public IMNodeSource getNodeSource() {
-        return nodeSource;
-    }
-
-    public void setNodeSource(IMNodeSource nodeSource) {
-        this.nodeSource = nodeSource;
-    }
-
     public int compareTo(IMNode imnode) {
         if (this.getPADName().equals(imnode.getPADName())) {
             if (this.getVNodeName().equals(imnode.getVNodeName())) {
@@ -267,5 +286,48 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
 
         return this.getPADName().compareTo(imnode.getPADName());
+    }
+
+    @Override
+    public NodeSource getNodeSource() {
+        return this.nodeSource;
+    }
+
+    @Override
+    public void setNodeSource(NodeSource ns) {
+        this.nodeSource = ns;
+    }
+
+    @Override
+    public void setVerifyingScript(SelectionScript script) {
+        if (scriptStatus.containsKey(script)) {
+            scriptStatus.remove(script);
+        }
+        scriptStatus.put(script, IMNode.VERIFIED_SCRIPT);
+    }
+
+    @Override
+    public void setNotVerifyingScript(SelectionScript script) {
+        if (scriptStatus.containsKey(script)) {
+            int status = scriptStatus.remove(script);
+            if (status == IMNode.NOT_VERIFIED_SCRIPT) {
+                scriptStatus.put(script, IMNode.NOT_VERIFIED_SCRIPT);
+            } else {
+                scriptStatus.put(script, IMNode.NO_LONGER_VERIFIED_SCRIPT);
+            }
+        } else {
+            scriptStatus.put(script, IMNode.NOT_VERIFIED_SCRIPT);
+        }
+    }
+
+    //	
+    //	public NodeEvent(String url, String nodeSource, 
+    //			String PADName, String VnName, String hostname,
+    //			String vm, NodeState state) {
+    @Override
+    public NodeEvent getNodeEvent() {
+        return new NodeEvent(this.nodeURL, this.getNodeSourceId(),
+            this.padName, this.vnodeName, this.hostName, this.vmName,
+            this.status);
     }
 }

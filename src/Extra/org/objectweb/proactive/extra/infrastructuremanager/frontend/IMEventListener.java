@@ -28,33 +28,39 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend;
+package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
-import java.util.HashMap;
-
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
 
 
 /**
- * communication Interface for IMCore and IMDeploy objects
+ * Interface for IM events monitoring
+ * @author gsigety
  *
  */
-public interface PADNSInterface {
+public interface IMEventListener {
+    public void imShutDownEvent();
 
-    /**
-     * add nodes by deploying a ProActive Descriptor, recover nodes created,
-     * adding them to the node Source and register nodes to the IMNodeManager
-     */
-    public void addNodes(ProActiveDescriptor pad, String padName);
+    public void imShuttingDownEvent();
 
-    /**
-     * @return the number of PADs handled by this {@link PADNodeSource}
-     */
-    public IntWrapper getSizeListPad();
+    public void imStartedEvent();
 
-    /**
-     * @return the list of PADs handled by this {@link PADNodeSource}
-     */
-    public HashMap<String, ProActiveDescriptor> getListPAD();
+    public void imKilledEvent();
+
+    public void nodeSourceAddedEvent(NodeSourceEvent ns);
+
+    public void nodeSourceRemovedEvent(NodeSourceEvent ns);
+
+    public void nodeAddedEvent(NodeEvent n);
+
+    public void nodeFreeEvent(NodeEvent n);
+
+    public void nodeBusyEvent(NodeEvent n);
+
+    public void nodeToReleaseEvent(NodeEvent n);
+
+    public void nodeDownEvent(NodeEvent n);
+
+    public void nodeRemovedEvent(NodeEvent n);
 }

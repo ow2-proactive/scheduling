@@ -28,33 +28,20 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend;
+package org.objectweb.proactive.extra.infrastructuremanager.common;
 
-import java.util.HashMap;
+public enum NodeState {FREE(0),
+    BUSY(1),
+    DOWN(2),
+    TO_BE_RELEASED(3);
+    private int state;
 
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+    NodeState(int nb) {
+        state = nb;
+    }
 
-
-/**
- * communication Interface for IMCore and IMDeploy objects
- *
- */
-public interface PADNSInterface {
-
-    /**
-     * add nodes by deploying a ProActive Descriptor, recover nodes created,
-     * adding them to the node Source and register nodes to the IMNodeManager
-     */
-    public void addNodes(ProActiveDescriptor pad, String padName);
-
-    /**
-     * @return the number of PADs handled by this {@link PADNodeSource}
-     */
-    public IntWrapper getSizeListPad();
-
-    /**
-     * @return the list of PADs handled by this {@link PADNodeSource}
-     */
-    public HashMap<String, ProActiveDescriptor> getListPAD();
+    @Override
+    public String toString() {
+        return String.valueOf(state);
+    }
 }

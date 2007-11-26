@@ -35,6 +35,8 @@ import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
@@ -73,10 +75,15 @@ public class LocalSchedulerExample {
             } else {
                 IMFactory.startLocal();
                 admin = IMFactory.getAdmin();
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
 
-                admin.deployAllVirtualNodes(new File(
-                        "../../../descriptors/scheduler/deployment/test.xml"),
-                    null);
+                ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
+                        "../../../descriptors/scheduler/deployment/test.xml");
+                admin.addNodes(pad);
 
                 //                Runtime.getRuntime().addShutdownHook(new Thread() {
                 //                        public void run() {

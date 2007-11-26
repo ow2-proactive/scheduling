@@ -31,21 +31,38 @@
 package org.objectweb.proactive.extra.infrastructuremanager.test.simple;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMEventListener;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 
-public class SimpleTestIMMonitoring {
+public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
+    Serializable {
+
+    /**
+         *
+         */
+    private static final long serialVersionUID = 1L;
     private IMMonitoring imMonitoring;
+
+    public SimpleTestIMMonitoring() {
+    }
 
     //----------------------------------------------------------------------//
     public SimpleTestIMMonitoring(IMMonitoring imMonitoring) {
@@ -158,14 +175,10 @@ public class SimpleTestIMMonitoring {
         System.out.println("\t\t\t+-- " + imnode.getDescriptorVMName());
         System.out.print("\t\t\t\t+-- " + imnode.getNodeURL());
 
-        try {
-            if (imnode.isFree()) {
-                System.out.println(" \tfree");
-            } else {
-                System.out.println(" \tbusy");
-            }
-        } catch (NodeException e) {
-            System.out.println(" \tdown");
+        if (imnode.isFree()) {
+            System.out.println(" \tfree");
+        } else {
+            System.out.println(" \tbusy");
         }
 
         boolean change = false;
@@ -201,14 +214,10 @@ public class SimpleTestIMMonitoring {
 
             System.out.print("\t\t\t\t+-- " + imnode2.getNodeURL());
 
-            try {
-                if (imnode2.isFree()) {
-                    System.out.println(" \tfree");
-                } else {
-                    System.out.println(" \tbusy");
-                }
-            } catch (NodeException e) {
-                System.out.println(" \tdown");
+            if (imnode2.isFree()) {
+                System.out.println(" \tfree");
+            } else {
+                System.out.println(" \tbusy");
             }
         }
     }
@@ -218,14 +227,15 @@ public class SimpleTestIMMonitoring {
 
         try {
             IMMonitoring imMonitoring = IMFactory.getMonitoring();
+            SimpleTestIMMonitoring test = (SimpleTestIMMonitoring) ProActiveObject.newActive(SimpleTestIMMonitoring.class.getName(),
+                    new Object[] { imMonitoring });
+
             System.out.println("#[SimpleTestIMMonitoring] Echo monitoring : " +
                 imMonitoring.echo());
 
-            SimpleTestIMMonitoring test = new SimpleTestIMMonitoring(imMonitoring);
-
             test.printAllIMNodes();
-            test.printDeployedVNodes();
-            test.printIMNodesByVNodeByPad();
+            //test.printDeployedVNodes();
+            //test.printIMNodesByVNodeByPad();
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
@@ -235,5 +245,84 @@ public class SimpleTestIMMonitoring {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void imKilledEvent() {
+        System.out.println("SimpleTestIMMonitoring.imKilledEvent()");
+    }
+
+    @Override
+    public void imShutDownEvent() {
+        System.out.println("SimpleTestIMMonitoring.imShutDownEvent()");
+    }
+
+    @Override
+    public void imShuttingDownEvent() {
+        System.out.println("SimpleTestIMMonitoring.imShuttingDownEvent()");
+    }
+
+    @Override
+    public void imStartedEvent() {
+        System.out.println("SimpleTestIMMonitoring.imStartedEvent()");
+    }
+
+    @Override
+    public void nodeAddedEvent(NodeEvent n) {
+        System.out.println("SimpleTestIMMonitoring.nodeAddedEvent() " +
+            n.getNodeUrl());
+    }
+
+    @Override
+    public void nodeBusyEvent(NodeEvent n) {
+        System.out.println("SimpleTestIMMonitoring.nodeBusyEvent() " +
+            n.getNodeUrl());
+    }
+
+    @Override
+    public void nodeDownEvent(NodeEvent n) {
+        System.out.println("SimpleTestIMMonitoring.nodeDownEvent() " +
+            n.getNodeUrl());
+    }
+
+    @Override
+    public void nodeFreeEvent(NodeEvent n) {
+        System.out.println("SimpleTestIMMonitoring.nodeFreeEvent()" +
+            n.getNodeUrl());
+    }
+
+    @Override
+    public void nodeToReleaseEvent(NodeEvent n) {
+        System.out.println("SimpleTestIMMonitoring.nodeToReleaseEvent() " +
+            n.getNodeUrl());
+    }
+
+    @Override
+    public void nodeRemovedEvent(NodeEvent n) {
+        System.out.println("SimpleTestIMMonitoring.nodeRemovedEvent() " +
+            n.getNodeUrl());
+    }
+
+    @Override
+    public void nodeSourceAddedEvent(NodeSourceEvent ns) {
+        System.out.println("SimpleTestIMMonitoring.nodeSourceAddedEvent() " +
+            ns.getSourceName());
+    }
+
+    @Override
+    public void nodeSourceRemovedEvent(NodeSourceEvent ns) {
+        System.out.println("SimpleTestIMMonitoring.nodeSourceRemovedEvent() " +
+            ns.getSourceName());
+    }
+
+    @Override
+    public void initActivity(Body body) {
+        System.out.println("SimpleTestIMMonitoring.initActivity()");
+        this.imMonitoring.addIMEventListener((IMEventListener) ProActiveObject.getStubOnThis(),
+            IMEvent.KILLED, IMEvent.NODE_ADDED, IMEvent.NODE_BUSY,
+            IMEvent.NODE_DOWN, IMEvent.NODE_FREE, IMEvent.NODE_REMOVED,
+            IMEvent.NODE_TO_RELEASE, IMEvent.NODESOURCE_CREATED,
+            IMEvent.NODESOURCE_REMOVED, IMEvent.SHUTDOWN,
+            IMEvent.SHUTTING_DOWN, IMEvent.STARTED);
     }
 }

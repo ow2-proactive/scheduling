@@ -42,7 +42,7 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
+import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 
@@ -86,7 +86,7 @@ public class SchedulerFake {
         NodeSet nodes = null;
 
         try {
-            IMCore imc = (IMCore) (ProActiveObject.lookupActive(IMCore.class.getName(),
+            IMCoreInterface imc = (IMCoreInterface) (ProActiveObject.lookupActive(IMCoreInterface.class.getName(),
                     "//localhost/IMCORE"));
             imu = imc.getUser();
 
@@ -104,7 +104,7 @@ public class SchedulerFake {
         //            e1.printStackTrace();
         //        }
 
-        // init logs
+        //Init logs
         this.initLogServer();
 
         // create tasks

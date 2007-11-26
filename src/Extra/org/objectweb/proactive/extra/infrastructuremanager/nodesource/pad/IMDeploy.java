@@ -42,6 +42,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PadDeployInterface;
 
 
 public class IMDeploy implements NodeCreationEventListener, Runnable {
@@ -51,7 +52,7 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
     private String padName = null;
     private ProActiveDescriptor pad = null;
     private String[] vnNames = null;
-    private PADNodeSource nodeSource = null;
+    private PadDeployInterface nodeSource = null;
 
     //----------------------------------------------------------------------//
     // Construtors
@@ -61,7 +62,7 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
      * @param padName : the name of the proactive descriptor
      * @param pad     : the proactive descriptor
      */
-    public IMDeploy(PADNodeSource nodeSource, String padName,
+    public IMDeploy(PadDeployInterface nodeSource, String padName,
         ProActiveDescriptor pad) {
         this.nodeSource = nodeSource;
         this.padName = padName;
@@ -74,7 +75,7 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
      * @param pad     : the proactive descriptor
      * @param vnNames : the name of the virtual nodes of this pad to deploy
      */
-    public IMDeploy(PADNodeSource nodeSource, String padName,
+    public IMDeploy(PadDeployInterface nodeSource, String padName,
         ProActiveDescriptor pad, String[] vnNames) {
         this.nodeSource = nodeSource;
         this.padName = padName;
@@ -88,18 +89,15 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
      * Implementation of the method run to interface Runnable
      */
     public void run() {
-        VirtualNode[] vns = null;
-
+        VirtualNode[] vns;
         if (vnNames == null) {
             vns = pad.getVirtualNodes();
         } else {
             vns = new VirtualNode[vnNames.length];
-
             for (int i = 0; i < this.vnNames.length; i++) {
                 vns[i] = pad.getVirtualNode(this.vnNames[i]);
             }
         }
-
         for (VirtualNode vn : vns) {
             ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
             vn.activate();
@@ -112,22 +110,19 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
                 logger.warn("NodeException : " + e, e);
             }
         }
-
-        this.nodeSource.addPAD(padName, pad);
     }
 
     /**
      * When a node is activated this method is call for saving
-     * the new activated nodes in the dataresource.
+     * the new activated nodes in the NodeSource.
      * @param event
      */
     public void nodeCreated(NodeCreationEvent event) {
         Node node = event.getNode();
         ProActiveRuntime par = node.getProActiveRuntime();
-
         try {
             String vnName = par.getVNName(node.getNodeInformation().getName());
-            this.nodeSource.addNode(node, vnName, padName);
+            this.nodeSource.receiveDeployedNode(node, vnName, padName);
         } catch (ProActiveException e) {
             logger.warn("ProActiveException : " + e, e);
         }

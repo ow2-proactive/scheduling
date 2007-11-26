@@ -30,85 +30,160 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic;
 
-import java.io.File;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
-import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
-import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PadDeployInterface;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.IMDeploymentFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
 
 
 /**
  * Simple implementation of what can be a {@link DynamicNodeSource}.
- * This Dummy class, create a {@link PADNodeSource}, deployes nodes,
+ * This Dummy class, create a {@link PADNodeSource}, deploys static nodes,
  * and acts as if it was a dynamic source...
- * @author proactive team
+ * @author ProActive team
  *
  */
-public class DummyNodeSource extends DynamicNodeSource {
+public class DummyNodeSource extends DynamicNodeSource
+    implements PadDeployInterface {
+    private static final long serialVersionUID = 8213062492772541033L;
+
+    // static nodes with their states (available=true - not available=false)
+    private HashMap<Node, Boolean> StaticNodes;
 
     /**
-     *
+     * empty constructor
      */
-    private static final long serialVersionUID = 8213062492772541033L;
-    private PADNodeSource manager;
-    private IMNodeSource stubOnThis;
-
-    public DummyNodeSource(String id, int nbMaxNodes, int nice, int ttr) {
-        super("Dummy:" + id, nbMaxNodes, nice, ttr);
-    }
-
     public DummyNodeSource() {
     }
 
-    @Override
-    public void initActivity(Body body) {
-        try {
-            stubOnThis = (IMNodeSource) ProActiveObject.getStubOnThis();
-            manager = (PADNodeSource) ProActiveObject.newActive(PADNodeSource.class.getCanonicalName(),
-                    new Object[] { "DummyPADNS" });
-            manager.deployAllVirtualNodes(new File(getClass()
-                                                       .getResource("/org/objectweb/proactive/examples/scheduler/test.xml")
-                                                       .getPath()), null);
-        } catch (ActiveObjectCreationException e) {
-            logger.error("Error while creating Dummy PADNodeSource", e);
-            e.printStackTrace();
-        } catch (NodeException e) {
-            logger.error("Error while creating Dummy PADNodeSource", e);
-            e.printStackTrace();
-        } catch (Exception e) {
-            logger.error("Error while creating Dummy PADNodeSource", e);
-            e.printStackTrace();
-        }
-        super.initActivity(body);
+    public DummyNodeSource(String id, IMCoreSourceInt nodeManager,
+        int nbMaxNodes, int nice, int ttr) {
+        super(id, nodeManager, nbMaxNodes, nice, ttr);
+        StaticNodes = new HashMap<Node, Boolean>();
     }
 
+    /** deploy a PAD
+     *
+     */
     @Override
-    protected IMNode getNode() {
-        ArrayList<IMNode> nodes = manager.getNodesByScript(null, false);
-        if (!nodes.isEmpty()) {
-            IMNode node = nodes.get(0);
-            manager.setBusy(node);
-            node.setNodeSource(stubOnThis);
-            return node;
+    public void initActivity(Body body) {
+        super.initActivity(body);
+        try {
+            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
+                    "/user/gsigety/home/pa_descriptors/nodes.xml");
+            String PADName = "Dummy_workers";
+            IMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) ProActiveObject.getStubOnThis(),
+                PADName, pad);
+        } catch (ProActiveException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ----------------------------------------------------------------------//
+    // definitions of abstract methods inherited from dynamicNodeSource 
+    // ----------------------------------------------------------------------//	
+
+    /**
+     * way to acquire a node from a dynamic source
+     * in this this example, just pick a free node
+     * from the static deployed nodes list
+     */
+    @Override
+    protected Node getNode() {
+        for (Entry<Node, Boolean> entry : this.StaticNodes.entrySet()) {
+            if (entry.getValue().booleanValue()) {
+                //Node is available
+                entry.setValue(false);
+                return entry.getKey();
+            }
         }
         return null;
     }
 
+    /**
+     * way to release a node
+     * set the node available in the deployed nodes list
+     * create a new nice time
+     */
     @Override
-    protected void releaseNode(IMNode node) {
-        node.setNodeSource(manager);
-        manager.setFree(node);
+    protected void releaseNode(Node node) {
+        String nodeUrl = node.getNodeInformation().getURL();
+        if (logger.isInfoEnabled()) {
+            logger.info("[" + this.SourceId + "] releaseNode " + nodeUrl);
+        }
+        //remove node from the list
+        removeFromList(node);
+        //indicate that a new node has to be got in a this.niceTime future
+        newNiceTime();
+        boolean found = false;
+        for (Entry<Node, Boolean> entry : this.StaticNodes.entrySet()) {
+            if (entry.getKey().getNodeInformation().getURL() == node.getNodeInformation()
+                                                                        .getURL()) {
+                //Node is available
+                entry.setValue(true);
+                found = true;
+            }
+        }
+        if (!found) {
+            logger.error("[" + this.SourceId +
+                "] dummy node source : an unknown node has been rendered !!");
+        }
     }
 
     @Override
-    public BooleanWrapper shutdown() {
-        manager.shutdown();
-        return super.shutdown();
+    public NodeSourceEvent getSourceEvent() {
+        return new NodeSourceEvent(this.getSourceId(), "Dummy Node Source");
+    }
+
+    // ----------------------------------------------------------------------//
+    // method called by the intern class Pinger 
+    // ----------------------------------------------------------------------//	
+    /**
+     * A down node has been detected
+     * remove the broken node from the list this.nodes
+     * remove node from the TTR list
+     * Inform the IMNode Manager about the broken node,
+     * create a new nice time
+     * remove node from the static node list
+     */
+    @Override
+    public void detectedPingedDownNode(String nodeUrl) {
+        Node node = getNodebyUrl(nodeUrl);
+        if (node != null) {
+            //remove node from the list
+            removeFromList(node);
+            //remove the node from the node_ttr HashMap
+            this.getNodesTtr_List().remove(nodeUrl);
+            //informing IMNode Manager about the broken node
+            this.imCore.setDownNode(nodeUrl);
+            //indicate that a new node has to be got in a this.niceTime future
+            newNiceTime();
+            if (this.StaticNodes.containsKey(node)) {
+                this.StaticNodes.remove(node);
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------//
+    // method inherited from PadDeployInterface 
+    // ----------------------------------------------------------------------//	
+    /**
+     * a new node is available in the NodeSource, register it to the internal list
+     * but not register it to the "true" node list neither to the IMNodeManager
+     * (where are in a dynamic node source)
+     */
+    @Override
+    public void receiveDeployedNode(Node node, String VnName, String PADName) {
+        this.StaticNodes.put(node, new Boolean(true));
     }
 }

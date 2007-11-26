@@ -28,33 +28,36 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend;
+package org.objectweb.proactive.extra.infrastructuremanager.core;
 
-import java.util.HashMap;
-
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 
 
-/**
- * communication Interface for IMCore and IMDeploy objects
- *
+/* interface for IMNodeSourceManager
+ * methods called by NodeSource objects
  */
-public interface PADNSInterface {
+public interface IMCoreSourceInt {
+
+    /** add a new node to the node Manager
+     *  the new node will be available for job
+     */
+    public void internalAddNode(Node node, String VNodeName, String PADName,
+        NodeSource nodeSource);
 
     /**
-     * add nodes by deploying a ProActive Descriptor, recover nodes created,
-     * adding them to the node Source and register nodes to the IMNodeManager
+     * adding a NodeSource to the core with its Id
      */
-    public void addNodes(ProActiveDescriptor pad, String padName);
+    public void addSource(NodeSource source, String sourceId);
+
+    /* release a node as soon as possible
+    * if the node is busy, waiting the job end
+    * a call back is awaited to confirm this node unregistering
+    */
+    public void internalRemoveNode(String nodeUrl, boolean preempt);
 
     /**
-     * @return the number of PADs handled by this {@link PADNodeSource}
+     * informing the nodeManager that the node is down
      */
-    public IntWrapper getSizeListPad();
-
-    /**
-     * @return the list of PADs handled by this {@link PADNodeSource}
-     */
-    public HashMap<String, ProActiveDescriptor> getListPAD();
+    public void setDownNode(String nodeUrl);
 }

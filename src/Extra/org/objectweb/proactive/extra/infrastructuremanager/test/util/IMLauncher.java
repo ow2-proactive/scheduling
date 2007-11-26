@@ -30,13 +30,13 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 
-import java.io.File;
+import java.util.Vector;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 
 
 public class IMLauncher {
@@ -49,33 +49,31 @@ public class IMLauncher {
     public static void main(String[] args) throws Exception {
         System.out.println(
             "STARTING INFRASTRUCTURE MANAGER: Press <ENTER> to Shutdown.");
+        System.out.println("IMLauncher.main()");
         IMFactory.startLocal();
         IMAdmin admin = IMFactory.getAdmin();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
-        //		DynamicNodeSource d = (DynamicNodeSource) ProActiveObject.newActive(P2PNodeSource.class
-        //				.getCanonicalName(), new Object[] { "Nodes on P2P", 3, 3000, 30000 });
-        //		admin.addDynamicNodeSources(d);
-        IMUser user = IMFactory.getUser();
-        IMMonitoring monitor = IMFactory.getMonitoring();
-        admin.deployAllVirtualNodes(new File(
-                "../../../descriptors/scheduler/deployment/test_all.xml"), null);
-        // admin.deployAllVirtualNodes(new File(
-        // "/user/jmartin/home/test.xml"),
-        // null);
-        // PADNSInterface padInterface = admin.getPADNodeSource();
-        // padInterface.
+        String urlPad;
+        if (args.length > 0) {
+            urlPad = args[0];
+        } else {
+            urlPad = "../../../descriptors/Workers.xml";
+        }
+
+        ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(urlPad);
+        admin.addNodes(pad);
+
+        Vector<String> v = new Vector<String>();
+        v.add("//macyavel:6444");
+        admin.createP2PNodeSource("P2P", 2, 10000, 50000, v);
+
         Thread.sleep(Integer.MAX_VALUE);
-        // System.out.println("Number of nodes : "+
-        // monitor.getNumberOfAllResources().intValue());
-        //        
-        // System.out.println("Asking for 2 nodes :");
-        // NodeSet ns = user.getAtMostNodes(new IntWrapper(3), null);
-        // System.out.println("Nodes obtained : "+ ns.size());
-        // System.out.println("Free nodes : "+
-        // monitor.getNumberOfFreeResource().intValue());
-        // System.out.println("Free nodes : "+
-        // monitor.getNumberOfFreeResource().intValue());
-        // System.in.read();
+
         try {
             IMFactory.getAdmin().shutdown();
         } catch (Exception e) {

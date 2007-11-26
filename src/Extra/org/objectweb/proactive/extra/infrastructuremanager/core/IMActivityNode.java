@@ -30,24 +30,21 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.core;
 
-import java.util.ArrayList;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 
 public class IMActivityNode implements Runnable {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_ACTIVITY_NODES);
     private boolean actif;
     private long wait;
-    private IMCore imCore;
+    private IMCoreInterface imCore;
 
-    public IMActivityNode(IMCore imCore) {
+    public IMActivityNode(IMCoreInterface imCore) {
         this.imCore = imCore;
         this.actif = true;
-        this.wait = 30000;
+        this.wait = 20000;
     }
 
     public void stop() {
@@ -59,34 +56,16 @@ public class IMActivityNode implements Runnable {
             if (logger.isDebugEnabled()) {
                 logger.debug("Searching for down nodes...");
             }
-
-            ArrayList<IMNode> imNodes = this.imCore.getListAllNodes();
-            int free = 0;
-            int busy = 0;
-            int down = 0;
-
-            for (IMNode imNode : imNodes) {
-                if (imNode.isDown()) {
-                    down++;
-                } else {
-                    try {
-                        imNode.getNode().getNumberOfActiveObjects();
-
-                        if (imNode.isFree()) {
-                            free++;
-                        } else {
-                            busy++;
-                        }
-                    } catch (Exception e) {
-                        System.out.println("IMActivityNode.run()");
-                        this.imCore.nodeIsDown(imNode);
-                    }
-                }
-            }
+            int totalNodes = imCore.getNbAllIMNode().intValue();
+            int free = imCore.getSizeListFreeIMNode().intValue();
+            int busy = imCore.getSizeListBusyIMNode().intValue();
+            int down = imCore.getSizeListDownIMNode().intValue();
+            int toRelease = imCore.getSizeListToReleaseIMNode().intValue();
 
             if (logger.isInfoEnabled()) {
-                logger.info("[IMActivity] Status Report : free=" + free +
-                    " busy=" + busy + " down=" + down);
+                logger.info("[IMActivity] Status Report : " + totalNodes +
+                    " nodes, free=" + free + " busy=" + busy + " down=" + down +
+                    " to release=" + toRelease);
             }
 
             try {

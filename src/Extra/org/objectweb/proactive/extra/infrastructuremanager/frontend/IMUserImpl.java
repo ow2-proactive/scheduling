@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
+import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
@@ -44,7 +44,7 @@ public class IMUserImpl implements IMUser {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_USER);
 
     // Attributes
-    private IMCore imcore;
+    private IMCoreInterface imcore;
 
     //----------------------------------------------------------------------//
     // CONSTRUCTORS
@@ -53,7 +53,7 @@ public class IMUserImpl implements IMUser {
     public IMUserImpl() {
     }
 
-    public IMUserImpl(IMCore imcore) {
+    public IMUserImpl(IMCoreInterface imcore) {
         if (logger.isDebugEnabled()) {
             logger.debug("IMUser constructor");
         }

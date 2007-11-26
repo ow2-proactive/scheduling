@@ -28,33 +28,35 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend;
+package org.objectweb.proactive.extra.infrastructuremanager.common;
 
-import java.util.HashMap;
-
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-
-
-/**
- * communication Interface for IMCore and IMDeploy objects
- *
- */
-public interface PADNSInterface {
-
-    /**
-     * add nodes by deploying a ProActive Descriptor, recover nodes created,
-     * adding them to the node Source and register nodes to the IMNodeManager
-     */
-    public void addNodes(ProActiveDescriptor pad, String padName);
+public enum IMEvent {SHUTDOWN("imShutDownEvent"),
+    SHUTTING_DOWN("imShuttingDownEvent"),
+    STARTED("imStartedEvent"),
+    KILLED("imKilledEvent"),
+    NODESOURCE_CREATED("nodeSourceAddedEvent"),
+    NODESOURCE_REMOVED("nodeSourceRemovedEvent"),
+    NODE_ADDED("nodeAddedEvent"),
+    NODE_FREE("nodeFreeEvent"),
+    NODE_BUSY("nodeBusyEvent"),
+    NODE_TO_RELEASE("nodeToReleaseEvent"),
+    NODE_DOWN("nodeDownEvent"),
+    NODE_REMOVED("nodeRemovedEvent");
+    private String methodName;
 
     /**
-     * @return the number of PADs handled by this {@link PADNodeSource}
+     * Default constructor.
+     * @param method the method to call as a string.
      */
-    public IntWrapper getSizeListPad();
+    IMEvent(String method) {
+        methodName = method;
+    }
 
     /**
-     * @return the list of PADs handled by this {@link PADNodeSource}
+     * @see java.lang.Enum#toString()
      */
-    public HashMap<String, ProActiveDescriptor> getListPAD();
+    @Override
+    public String toString() {
+        return methodName;
+    }
 }

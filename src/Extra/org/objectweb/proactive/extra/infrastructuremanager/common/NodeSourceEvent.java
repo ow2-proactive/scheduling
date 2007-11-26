@@ -28,33 +28,33 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend;
+package org.objectweb.proactive.extra.infrastructuremanager.common;
 
-import java.util.HashMap;
-
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import java.io.Serializable;
 
 
-/**
- * communication Interface for IMCore and IMDeploy objects
- *
- */
-public interface PADNSInterface {
+public class NodeSourceEvent implements Serializable {
 
     /**
-     * add nodes by deploying a ProActive Descriptor, recover nodes created,
-     * adding them to the node Source and register nodes to the IMNodeManager
+     *
      */
-    public void addNodes(ProActiveDescriptor pad, String padName);
+    private static final long serialVersionUID = -8939602445052143312L;
+    private String nodeSourceName = null;
+    private String nodeSourceType = null;
 
-    /**
-     * @return the number of PADs handled by this {@link PADNodeSource}
-     */
-    public IntWrapper getSizeListPad();
+    public NodeSourceEvent() {
+    }
 
-    /**
-     * @return the list of PADs handled by this {@link PADNodeSource}
-     */
-    public HashMap<String, ProActiveDescriptor> getListPAD();
+    public NodeSourceEvent(String name, String type) {
+        this.nodeSourceName = name;
+        this.nodeSourceType = type;
+    }
+
+    public String getSourceName() {
+        return this.nodeSourceName;
+    }
+
+    public String getSourceType() {
+        return this.nodeSourceType;
+    }
 }

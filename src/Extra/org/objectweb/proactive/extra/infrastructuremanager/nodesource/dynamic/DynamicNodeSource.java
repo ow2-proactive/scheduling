@@ -32,10 +32,8 @@ package org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -44,42 +42,37 @@ import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
+import org.objectweb.proactive.extra.infrastructuremanager.exception.AddingNodesException;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNodeComparator;
-import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.DynamicNSInterface;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.utils.Heap;
-import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
  * Abstract class that provide a way to simply create {@link DynamicNodeSource}
  * You just have to write the {@link #getNode()} and {@link #releaseNode(IMNode)}
  * methods to create a dynamic node source.
- *
  * WARNING : The {@link DynamicNodeSource} you will write must be an Active Object !
- * @author proactive team
+ * @author ProActive team
  *
  */
-public abstract class DynamicNodeSource extends IMNodeSource
+public abstract class DynamicNodeSource extends NodeSource
     implements DynamicNSInterface, Serializable, InitActive, RunActive,
         EndActive {
-    // nodes and when they must be released
-    private Map<IMNode, Long> nodes;
+    // nodes URL and when they must be released
+    private HashMap<String, Long> nodes_ttr;
 
     // Heap of the times to get a node.
     private Heap<Long> niceTimes;
-    private ArrayList<IMNode> freeNodes;
-    private ArrayList<IMNode> busyNodes;
-    private ArrayList<IMNode> downNodes;
 
-    // Id of the DNS
-    private String stringId;
+    //save nodeUrl that have to be killed on remove confirm
+    private ArrayList<String> nodesToKillOnConfirm;
 
     // 3 parameters, used by the DynamicNSInterface 
     private int nbMax;
@@ -89,28 +82,28 @@ public abstract class DynamicNodeSource extends IMNodeSource
     private int delay = 20000;
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.IM_CORE);
 
-    public DynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr) {
-        this.stringId = id;
-        this.nbMax = nbMaxNodes;
-        this.nice = nice;
-        this.ttr = ttr;
-    }
-
     public DynamicNodeSource() {
     }
 
+    public DynamicNodeSource(String id, IMCoreSourceInt nodeManager,
+        int nbMaxNodes, int nice, int ttr) {
+        super(id, nodeManager);
+        this.nbMax = nbMaxNodes;
+        this.nice = nice;
+        this.ttr = ttr;
+        this.nodesToKillOnConfirm = new ArrayList<String>();
+    }
+
     public void initActivity(Body body) {
-        freeNodes = new ArrayList<IMNode>();
-        busyNodes = new ArrayList<IMNode>();
-        downNodes = new ArrayList<IMNode>();
+        super.initActivity(body);
         niceTimes = new Heap<Long>(nbMax);
-        nodes = new HashMap<IMNode, Long>();
+        nodes_ttr = new HashMap<String, Long>();
         running = true;
         long currentTime = System.currentTimeMillis();
 
         // delaying the node adding.
         for (int i = 0; i < nbMax; i++) {
-            niceTimes.add(currentTime + ((i * delay) / nbMax));
+            niceTimes.add((long) currentTime + ((i * delay) / nbMax));
         }
     }
 
@@ -121,7 +114,6 @@ public abstract class DynamicNodeSource extends IMNodeSource
      */
     public void runActivity(Body body) {
         Service service = new Service(body);
-
         while (running) {
             service.blockingServeOldest(3000);
             cleanAndGet();
@@ -132,14 +124,9 @@ public abstract class DynamicNodeSource extends IMNodeSource
      * If not shutdown, do it.
      */
     public void endActivity(Body body) {
-        if (running) {
+        if (!running) {
             shutdown();
         }
-    }
-
-    @Override
-    public String getSourceId() {
-        return stringId;
     }
 
     public int getNbMaxNodes() {
@@ -166,134 +153,15 @@ public abstract class DynamicNodeSource extends IMNodeSource
         this.ttr = ttr;
     }
 
-    public ArrayList<IMNode> getAllNodes() {
-        ArrayList<IMNode> res = new ArrayList<IMNode>();
-        res.addAll(freeNodes);
-        res.addAll(busyNodes);
-        res.addAll(downNodes);
-        return res;
-    }
-
-    @SuppressWarnings("unchecked")
-    public ArrayList<IMNode> getBusyNodes() {
-        return (ArrayList<IMNode>) busyNodes.clone();
-    }
-
-    @SuppressWarnings("unchecked")
-    public ArrayList<IMNode> getDownNodes() {
-        return (ArrayList<IMNode>) downNodes.clone();
-    }
-
-    @SuppressWarnings("unchecked")
-    public ArrayList<IMNode> getFreeNodes() {
-        return (ArrayList<IMNode>) freeNodes.clone();
-    }
-
-    public IntWrapper getNbAllNodes() {
-        return new IntWrapper(freeNodes.size() + busyNodes.size() +
-            downNodes.size());
-    }
-
-    public IntWrapper getNbBusyNodes() {
-        return new IntWrapper(busyNodes.size());
-    }
-
-    public IntWrapper getNbDownNodes() {
-        return new IntWrapper(downNodes.size());
-    }
-
-    public IntWrapper getNbFreeNodes() {
-        return new IntWrapper(freeNodes.size());
-    }
-
-    @Override
-    public ArrayList<IMNode> getNodesByScript(SelectionScript script,
-        boolean ordered) {
-        ArrayList<IMNode> result = getFreeNodes();
-        if ((script != null) && ordered) {
-            Collections.sort(result, new IMNodeComparator(script));
-        }
-        return result;
-    }
-
-    @Override
-    public void setBusy(IMNode imnode) {
-        removeFromAllLists(imnode);
-        if (!nodes.containsKey(imnode)) {
-            throw new RuntimeException("Setting busy a removed node : " +
-                imnode.getNodeURL());
-        }
-        busyNodes.add(imnode);
-        try {
-            imnode.setBusy();
-        } catch (NodeException e1) {
-            // A down node shouldn't by busied...
-            e1.printStackTrace();
-        }
-    }
-
-    @Override
-    public void setDown(IMNode imnode) {
-        //TODO 
-        // peut etre rendre directement le noeud a la source dynamique ?
-        removeFromAllLists(imnode);
-        downNodes.add(imnode);
-        imnode.setDown(true);
-    }
-
-    @Override
-    public void setFree(IMNode imnode) {
-        removeFromAllLists(imnode);
-        if (isNodeToRelease(imnode)) {
-            nodes.remove(imnode);
-            niceTimes.insert(System.currentTimeMillis() + nice);
-            releaseNode(imnode);
-        } else {
-            if (!nodes.containsKey(imnode)) {
-                throw new RuntimeException("Freeing a removed node : " +
-                    imnode.getNodeURL());
-            }
-            assert (!nodes.containsKey(imnode));
-            freeNodes.add(imnode);
-            try {
-                imnode.setFree();
-            } catch (NodeException e1) {
-                // A down node shouldn't by busied...
-                e1.printStackTrace();
-            }
-        }
-    }
-
-    @Override
-    public BooleanWrapper shutdown() {
+    public void shutdown() {
         logger.info("Shutting down Node Source : " + getSourceId());
         running = false;
         try {
-            for (IMNode node : nodes.keySet())
+            for (Node node : this.getNodes())
                 releaseNode(node);
-            return new BooleanWrapper(true);
         } catch (Exception e) {
             e.printStackTrace();
-            return new BooleanWrapper(false);
         }
-    }
-
-    /**
-     * Remove the imnode from all the lists it can appears.
-     * @param imnode
-     * @return
-     */
-    protected boolean removeFromAllLists(IMNode imnode) {
-        // Free
-        boolean free = freeNodes.remove(imnode);
-
-        // Busy
-        boolean busy = busyNodes.remove(imnode);
-
-        // Down
-        boolean down = downNodes.remove(imnode);
-
-        return free || busy || down;
     }
 
     /**
@@ -301,13 +169,17 @@ public abstract class DynamicNodeSource extends IMNodeSource
      * @param node
      * @return
      */
-    protected boolean isNodeToRelease(IMNode node) {
-        Long stamp = nodes.get(node);
+    protected boolean isNodeToRelease(Node node) {
+        Long stamp = this.nodes_ttr.get(node.getNodeInformation().getURL());
         if (stamp == null) {
             return false;
         } else {
             return System.currentTimeMillis() > stamp;
         }
+    }
+
+    protected HashMap<String, Long> getNodesTtr_List() {
+        return this.nodes_ttr;
     }
 
     /**
@@ -316,53 +188,112 @@ public abstract class DynamicNodeSource extends IMNodeSource
      *
      */
     private void cleanAndGet() {
+        assert this.niceTimes.size() <= this.nbMax;
+        assert this.nodes_ttr.size() <= this.nbMax;
         long currentTime = System.currentTimeMillis();
 
         // cleaning part
-        Iterator<Entry<IMNode, Long>> iter = nodes.entrySet().iterator();
+        Iterator<Entry<String, Long>> iter = this.nodes_ttr.entrySet().iterator();
         long time = System.currentTimeMillis();
         while (iter.hasNext()) {
-            Entry<IMNode, Long> entry = iter.next();
-            try {
-                // release only free nodes !!
-                if ((time > entry.getValue()) &&
-                        (entry.getKey().isDown() || entry.getKey().isFree())) {
-                    iter.remove();
-                    removeFromAllLists(entry.getKey());
-                    releaseNode(entry.getKey());
-                    niceTimes.insert(currentTime + nice);
-                }
-            } catch (NodeException e) {
-                logger.warn("Exception occured", e);
-                e.printStackTrace();
+            Entry<String, Long> entry = iter.next();
+
+            // try soft release only free nodes !!
+            if (time > entry.getValue()) {
+                iter.remove();
+                this.imCore.internalRemoveNode(entry.getKey(), false);
             }
         }
 
         // Getting part
         while ((nodes.size() <= nbMax) && (niceTimes.peek() != null) &&
                 (niceTimes.peek() < currentTime)) {
-            IMNode node = getNode();
+            Node node = getNode();
             if (node == null) {
                 niceTimes.extract();
-                niceTimes.add(System.currentTimeMillis() + nice);
+                newNiceTime();
                 break;
-            }
-            nodes.put(node, currentTime + ttr);
-            freeNodes.add(node);
-            niceTimes.extract();
-            // log
-            try {
-                logger.info("[DYNAMIC SOURCE] get new node : " +
-                    node.getNodeInformation().getURL() + " (total = " +
-                    nodes.size() + ") while MAX is " + nbMax);
-            } catch (NodeException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            } else {
+                currentTime = System.currentTimeMillis();
+                nodes_ttr.put(node.getNodeInformation().getURL(),
+                    currentTime + ttr);
+                this.addNewAvailableNode(node, this.SourceId, this.SourceId);
+                niceTimes.extract();
             }
         }
     }
 
-    protected abstract IMNode getNode();
+    /**
+     * Create a new Nice time in the heap of nice times
+     */
+    protected void newNiceTime() {
+        long currentTime = System.currentTimeMillis();
+        niceTimes.insert(currentTime + nice);
+    }
 
-    protected abstract void releaseNode(IMNode node);
+    // ----------------------------------------------------------------------//
+    // definitions of abstract methods inherited from NodeSource, 
+    // called by IMNodeManager
+    // ----------------------------------------------------------------------//    
+    @Override
+    public void addNodes(ProActiveDescriptor pad, String padName)
+        throws AddingNodesException {
+        throw new AddingNodesException("Node source : " + this.SourceId +
+            " Node cannot be added to a dynamic source");
+    }
+
+    @Override
+    public void confirmRemoveNode(String nodeUrl) {
+        //verifying if node is already in the list,
+        //node could have fallen between remove request and the confirm
+        if (this.nodes.containsKey(nodeUrl)) {
+            if (this.nodesToKillOnConfirm.contains(nodeUrl)) {
+                this.nodesToKillOnConfirm.remove(nodeUrl);
+                //killing a dynamic node, what to do ?
+                releaseNode(this.getNodebyUrl(nodeUrl));
+            } else {
+                releaseNode(this.getNodebyUrl(nodeUrl));
+            }
+        }
+    }
+
+    @Override
+    public void forwardRemoveNode(String nodeUrl, boolean preempt) {
+        //verifying that node is already in the list,
+        //node could have been already released or
+        if (this.nodes.containsKey(nodeUrl)) {
+            //node in nodes List and node not in node_ttr list == node already in releasing state
+            if (!this.nodes_ttr.containsKey(nodeUrl)) {
+                if (preempt) {
+                    this.imCore.internalRemoveNode(nodeUrl, preempt);
+                }
+
+                //else nothing, softly remove request has already been send 
+            } else {
+                //node not in TTR list
+                this.nodes_ttr.remove(nodeUrl);
+                this.imCore.internalRemoveNode(nodeUrl, preempt);
+            }
+            if (preempt && !nodesToKillOnConfirm.contains(nodeUrl)) {
+                this.nodesToKillOnConfirm.add(nodeUrl);
+            }
+        }
+    }
+
+    // ----------------------------------------------------------------------//
+    // intern methods called by the dynamicNodesource
+    // to implements by dynamic source type
+    // ----------------------------------------------------------------------//    
+
+    /**
+     *  way to get a new dynamic node
+     */
+    protected abstract Node getNode();
+
+    /**
+     * way to give back a node which has reached his TTR
+     * and IMNodeManager has confirm the release
+     * @param node
+     */
+    protected abstract void releaseNode(Node node);
 }

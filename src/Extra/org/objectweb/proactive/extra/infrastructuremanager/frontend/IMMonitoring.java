@@ -37,6 +37,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 
@@ -101,4 +103,7 @@ public interface IMMonitoring {
      * @return the number of all resource IMNode
      */
     public IntWrapper getNumberOfAllResources();
+
+    public IMInitialState addIMEventListener(IMEventListener listener,
+        IMEvent... events);
 }

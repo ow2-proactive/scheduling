@@ -33,7 +33,9 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 import java.io.File;
 
 import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
@@ -60,9 +62,11 @@ public class Test1 extends TestCase {
         admin = IMFactory.getAdmin();
         monitor = IMFactory.getMonitoring();
         System.err.println("Deploying nodes...");
-        admin.deployAllVirtualNodes(new File(
-                "descriptors/scheduler/deployment/Descriptor_SSH_List.xml"),
-            null);
+
+        ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
+                "descriptors/scheduler/deployment/Descriptor_SSH_List.xml");
+        admin.createStaticNodesource("static source", pad);
+
         Thread.sleep(10000);
         System.err.println("Starting tests");
     }

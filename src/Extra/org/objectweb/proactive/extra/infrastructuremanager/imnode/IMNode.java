@@ -35,7 +35,8 @@ import java.util.HashMap;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
-import org.objectweb.proactive.extra.infrastructuremanager.nodesource.IMNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
@@ -44,7 +45,11 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
  * The <I>IMNode</I> is a object containing a node and its description.<BR/>
  */
 public interface IMNode extends Comparable<IMNode> {
-    // STATES
+    // nodes states
+    public static final int FREE = 0;
+    public static final int BUSY = 1;
+    public static final int DOWN = 2;
+    public static final int TO_BE_RELEASED = 3;
 
     /**
      * The script has been executed on this node, and the result was negative.
@@ -92,11 +97,6 @@ public interface IMNode extends Comparable<IMNode> {
     // GET
 
     /**
-     * @return the URL of the node
-     */
-    public String getNodeURL();
-
-    /**
      * @return the name of the node
      */
     public String getNodeName();
@@ -118,7 +118,7 @@ public interface IMNode extends Comparable<IMNode> {
     public String getVNodeName();
 
     /**
-     * @return the name of the proactive descriptor
+     * @return the name of the ProActive descriptor
      */
     public String getPADName();
 
@@ -136,11 +136,19 @@ public interface IMNode extends Comparable<IMNode> {
      */
     public String getDescriptorVMName();
 
+    public String getNodeSourceId();
+
+    public String getNodeURL();
+
     // ----------------------------------------------------------------------//
     // STATE
-    public boolean isFree() throws NodeException;
+    public boolean isFree();
 
     public boolean isDown();
+
+    public boolean isToRelease();
+
+    public boolean isBusy();
 
     // ----------------------------------------------------------------------//
     // SET
@@ -148,7 +156,9 @@ public interface IMNode extends Comparable<IMNode> {
 
     public void setBusy() throws NodeException;
 
-    public void setDown(boolean down);
+    public void setToRelease() throws NodeException;
+
+    public void setDown();
 
     // OTHER SET in the case of the node can migrate.
     // For example if the node migrate from other jvm, you must change
@@ -171,11 +181,19 @@ public interface IMNode extends Comparable<IMNode> {
     /**
      * The {@link IMNodeSource} from where the IMNode is issued.
      */
-    public IMNodeSource getNodeSource();
+    public NodeSource getNodeSource();
 
     /**
      * Change the {@link IMNodeSource} from where the node is.
      * @param nodeSource
      */
-    public void setNodeSource(IMNodeSource nodeSource);
+    public void setNodeSource(NodeSource nodeSource);
+
+    public void setVerifyingScript(SelectionScript script);
+
+    public void setNotVerifyingScript(SelectionScript script);
+
+    /**
+     *  build NodeEvent object for the IMNode */
+    public NodeEvent getNodeEvent();
 }
