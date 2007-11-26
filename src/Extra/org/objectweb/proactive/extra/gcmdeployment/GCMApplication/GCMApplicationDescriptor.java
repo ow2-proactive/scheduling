@@ -35,7 +35,7 @@ import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.gcmdeployment.core.DeploymentTree;
+import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
 
@@ -122,5 +122,5 @@ public interface GCMApplicationDescriptor {
      *
      * @return the current topology of all the nodes inside the application
      */
-    public DeploymentTree getCurrentTopology();
+    public Topology getCurrentTopology();
 }

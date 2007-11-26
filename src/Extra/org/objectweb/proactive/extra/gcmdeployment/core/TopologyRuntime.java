@@ -30,19 +30,22 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
 
-public class VMNodeList {
+@PublicAPI
+public class TopologyRuntime implements Serializable {
     protected VMInformation vmInfo;
     protected List<Node> nodes;
 
-    public VMNodeList(VMInformation vmInfo) {
+    public TopologyRuntime(VMInformation vmInfo) {
         super();
         this.vmInfo = vmInfo;
         this.nodes = new ArrayList<Node>();

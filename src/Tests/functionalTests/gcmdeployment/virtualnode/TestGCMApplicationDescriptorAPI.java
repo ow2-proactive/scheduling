@@ -66,6 +66,8 @@ public class TestGCMApplicationDescriptorAPI extends Abstract {
         Assert.assertNotNull(vn1);
         Set<Node> nodes = vn1.getCurrentNodes();
 
+        gcma.getCurrentTopology();
+
         // Check reachable
         for (Node node : nodes) {
             node.getActiveObjects();

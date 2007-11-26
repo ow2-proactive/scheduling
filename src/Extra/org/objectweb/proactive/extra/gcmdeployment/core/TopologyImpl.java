@@ -30,25 +30,34 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.objectweb.proactive.core.mop.Utils;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.ProActiveCounter;
+import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 
 
-public class DeploymentNode {
+public class TopologyImpl implements Topology, Serializable {
     protected long id;
     protected String applicationDescriptorPath;
     protected String deploymentDescriptorPath;
+    protected String nodeProvider;
     protected List<String> deploymentPath;
-    protected Set<VMNodeList> nodeMap;
-    protected List<DeploymentNode> children;
+    protected Set<TopologyRuntime> runtimesMap;
+    protected List<TopologyImpl> children;
 
-    public DeploymentNode() {
-        nodeMap = new HashSet<VMNodeList>();
-        children = new ArrayList<DeploymentNode>();
+    public TopologyImpl() {
+        runtimesMap = new HashSet<TopologyRuntime>();
+        children = new ArrayList<TopologyImpl>();
         id = ProActiveCounter.getUniqID();
     }
 
@@ -64,19 +73,23 @@ public class DeploymentNode {
         this.deploymentPath = deploymentPath;
     }
 
-    public Set<VMNodeList> getNodeMap() {
-        return nodeMap;
+    public Set<TopologyRuntime> getRuntimes() {
+        return runtimesMap;
     }
 
-    public void addVMNodes(VMNodeList vmNode) {
-        nodeMap.add(vmNode);
+    public void addRuntime(TopologyRuntime runtime) {
+        runtimesMap.add(runtime);
     }
 
-    public List<DeploymentNode> getChildren() {
+    public List<TopologyImpl> getChildren() {
         return children;
     }
 
-    public void addChildren(DeploymentNode node) {
+    public boolean hasChildren() {
+        return children.size() != 0;
+    }
+
+    public void addChildren(TopologyImpl node) {
         children.add(node);
     }
 
@@ -94,5 +107,43 @@ public class DeploymentNode {
 
     public void setDeploymentDescriptorPath(String deploymentDescriptorPath) {
         this.deploymentDescriptorPath = deploymentDescriptorPath;
+    }
+
+    public String getNodeProvider() {
+        return nodeProvider;
+    }
+
+    /* -------------
+     *  Only for the root node
+     */
+    static public Topology createTopology(TopologyRootImpl emptyTopology,
+        Set<Node> nodes) {
+        TopologyRootImpl topology;
+        try {
+            topology = (TopologyRootImpl) Utils.makeDeepCopy(emptyTopology);
+
+            // Group Node per Runtime
+            Map<VMInformation, Set<Node>> sorted = new HashMap<VMInformation, Set<Node>>();
+            for (Node node : nodes) {
+                VMInformation vmIformation = node.getVMInformation();
+                if (sorted.get(vmIformation) == null) {
+                    sorted.put(vmIformation, new HashSet<Node>());
+                }
+
+                sorted.get(vmIformation).add(node);
+            }
+
+            // Add each Runtime to the Topology
+            for (VMInformation vmInformation : sorted.keySet()) {
+                TopologyRuntime runtime = new TopologyRuntime(vmInformation);
+                runtime.addNodes(sorted.get(vmInformation));
+                TopologyImpl tn = topology.getNode(vmInformation.getDeploymentId());
+                tn.addRuntime(runtime);
+            }
+        } catch (IOException e) {
+            GCMA_LOGGER.error(e);
+            topology = null;
+        }
+        return topology;
     }
 }

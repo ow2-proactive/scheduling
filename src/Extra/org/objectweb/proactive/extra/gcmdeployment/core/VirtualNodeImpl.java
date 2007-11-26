@@ -38,6 +38,8 @@ import java.util.Set;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
+
+
 public class VirtualNodeImpl implements VirtualNodeInternal {
 
     /** unique name (declared by GCMA) */
@@ -52,6 +54,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     Set<Node> previousNodes;
     Set<Subscriber> nodeAttachmentSubscribers;
     Set<Subscriber> isReadySubscribers;
+    TopologyRootImpl deploymentTree;
 
     public VirtualNodeImpl() {
         nodeProvidersContracts = new HashSet<NodeProviderContract>();
@@ -150,9 +153,8 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         isReadySubscribers.remove(new Subscriber(client, methodeName));
     }
 
-    public DeploymentTree getCurrentTopology() {
-        // TODO cmathieu
-        return null;
+    public Topology getCurrentTopology() {
+        return TopologyImpl.createTopology(deploymentTree, nodes);
     }
 
     /* -------------------
@@ -228,6 +230,10 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
 
     public void setName(String id) {
         this.id = id;
+    }
+
+    public void setDeploymentTree(TopologyRootImpl deploymentTree) {
+        this.deploymentTree = deploymentTree;
     }
 
     /* -------------------

@@ -70,4 +70,6 @@ public interface LocalProActiveRuntime {
      * @return URLs of the created nodes
      */
     public Set<String> setCapacity(long capacity);
+
+    public void setDeploymentId(long deploymentId);
 }

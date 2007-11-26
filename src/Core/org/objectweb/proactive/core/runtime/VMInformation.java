@@ -101,4 +101,6 @@ public interface VMInformation extends java.io.Serializable {
      * Usually capacity corresponds to the number of cores on which the JVM runs.
      */
     public long getCapacity();
+
+    public long getDeploymentId();
 }

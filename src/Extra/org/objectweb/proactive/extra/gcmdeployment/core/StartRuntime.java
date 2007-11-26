@@ -208,6 +208,8 @@ public class StartRuntime {
             abort();
         }
 
+        localRuntimeImpl.setDeploymentId(deploymentID);
+
         Set<Node> nodes = new HashSet<Node>();
         for (String url : localRuntimeImpl.setCapacity(capacity)) {
             try {

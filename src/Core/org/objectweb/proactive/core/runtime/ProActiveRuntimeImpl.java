@@ -943,7 +943,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *
      * @param nodeName
      *            The name where to attached the body in the
-     *            <code>nodeMap</code>
+     *            <code>runtimesMap</code>
      * @param body
      *            The body to register
      */
@@ -972,14 +972,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private void unregisterBody(String nodeName, UniqueID bodyID) {
         // System.out.println("in remove id= "+ bodyID.toString());
         // System.out.println("array size
-        // "+((ArrayList)nodeMap.get(nodeName)).size());
+        // "+((ArrayList)runtimesMap.get(nodeName)).size());
         List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         synchronized (bodyList) {
             bodyList.remove(bodyID);
 
             // System.out.println("array size
-            // "+((ArrayList)nodeMap.get(nodeName)).size());
+            // "+((ArrayList)runtimesMap.get(nodeName)).size());
         }
     }
 
@@ -1030,15 +1030,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         return null;
 
-        // nodeMap.
+        // runtimesMap.
         // try {
         // System.out.println(" testing for securityentityID " +
         // securityEntity);
-        // for (Enumeration e = nodeMap.keys(); e.hasMoreElements();) {
+        // for (Enumeration e = runtimesMap.keys(); e.hasMoreElements();) {
         // String node = (String) e.nextElement();
         //
         // System.out.println("testing for node " + node);
-        // ArrayList listAO = (ArrayList) nodeMap.get(node);
+        // ArrayList listAO = (ArrayList) runtimesMap.get(node);
         //
         // for (int i = 0; i < listAO.size(); i++) {
         // UniqueID localBodyID = (UniqueID) listAO.get(i);
@@ -1388,6 +1388,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private String name;
         private long capacity;
         private final String hostName;
+        private long deploymentId;
 
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
@@ -1408,6 +1409,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             }
 
             this.capacity = -1;
+            this.deploymentId = -1;
         }
 
         //
@@ -1449,6 +1451,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         private void setCapacity(long capacity) {
             this.capacity = capacity;
+        }
+
+        public long getDeploymentId() {
+            return deploymentId;
+        }
+
+        private void setDeploymentId(long deploymentId) {
+            this.deploymentId = deploymentId;
         }
     }
 
@@ -1592,5 +1602,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         getMBean()
             .sendNotification(NotificationType.GCMRuntimeRegistered,
             notification);
+    }
+
+    public void setDeploymentId(long deploymentId) {
+        vmInformation.setDeploymentId(deploymentId);
     }
 }

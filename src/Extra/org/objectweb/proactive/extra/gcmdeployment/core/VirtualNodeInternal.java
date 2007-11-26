@@ -117,4 +117,6 @@ public interface VirtualNodeInternal extends VirtualNode {
     public void setNbRequiredNodes(long capacity);
 
     public void setName(String name);
+
+    public void setDeploymentTree(TopologyRootImpl deploymentTree);
 }

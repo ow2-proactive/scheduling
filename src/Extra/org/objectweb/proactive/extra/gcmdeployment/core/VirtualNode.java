@@ -172,5 +172,5 @@ public interface VirtualNode {
      *
      * @return
      */
-    public DeploymentTree getCurrentTopology();
+    public Topology getCurrentTopology();
 }

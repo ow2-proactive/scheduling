@@ -12,15 +12,15 @@
         <title>Introduction</title>
         <para>
             This document describes how
-            <glossterm linkend="Node">ProActive Nodes</glossterm>
-            are attributed to
-            <glossterm linkend="VN">ProActive Virtual Nodes</glossterm>.
+            ProActive Nodes are attached to ProActive Virtual Nodes.
         </para>
     </sect1>
+    <sect1>
+        <title>Glossary</title>
     <glossary>
         <title>Definitions</title>
         <glossentry>
-            <glossterm id="Node">Node</glossterm>
+            <glossterm>Node</glossterm>
             <glossdef>
                 <para>
                     A location to execute a computation. By default a Node is created for each CPU
@@ -29,7 +29,7 @@
             </glossdef>
         </glossentry>
         <glossentry>
-            <glossterm id="VN">Virtual Node</glossterm>
+            <glossterm>Virtual Node</glossterm>
             <acronym>VN</acronym>
             <glossdef>
                 <para>
@@ -42,7 +42,7 @@
             </glossdef>
         </glossentry>
         <glossentry>
-            <glossterm id="NA">Node Allocator</glossterm>
+            <glossterm>Node Allocator</glossterm>
             <acronym>NA</acronym>
             <glossdef>
                 <para>
@@ -51,7 +51,7 @@
             </glossdef>
         </glossentry>
         <glossentry>
-            <glossterm id="NP">Node Provider</glossterm>
+            <glossterm>Node Provider</glossterm>
             <glossdef>
                 <para>
                     A GCM Deployment Descriptor instance.
@@ -65,7 +65,7 @@
             </glossdef>
         </glossentry>
         <glossentry>
-            <glossterm id="NPC">Node Provider Contract</glossterm>
+            <glossterm>Node Provider Contract</glossterm>
             <acronym>NPC</acronym>
             <glossdef>
                 <para>
@@ -75,7 +75,7 @@
             </glossdef>
         </glossentry>
         <glossentry>
-            <glossterm id="Capacity">Capacity</glossterm>
+            <glossterm>Capacity</glossterm>
             <glossdef>
                 <para>
                     The number of Nodes asked by a Virtual Node or a Node Provider
@@ -83,7 +83,7 @@
             </glossdef>
         </glossentry>
         <glossentry>
-            <glossterm id="Greedy">Greedy</glossterm>
+            <glossterm>Greedy</glossterm>
             <glossdef>
                 <para>
                     A Virtual Node or a Node Provider Contract is Greedy when not Capacity is
@@ -91,7 +91,7 @@
             </glossdef>
         </glossentry>
         <glossentry>
-            <glossterm id="Greedy">Ready</glossterm>
+            <glossterm>Ready</glossterm>
             <glossdef>
                 <para>
                     A Virtual Node is Ready when its capacity and all its Node Provider Contracts
@@ -100,6 +100,7 @@
             </glossdef>
         </glossentry>
     </glossary>
+    </sect1>
     <sect1>
         <title>XML Schema</title>
         <para>
@@ -282,11 +283,14 @@ foreach VN in VirtualNodes {
         </para>
         <sect2>
             <title>Greedy Virtual Node</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1" />          
                 ]]>
             </code>
+            </para>
+            
             <itemizedlist>
                 <listitem>
                     <para>
@@ -307,11 +311,13 @@ foreach VN in VirtualNodes {
         </sect2>
         <sect2>
             <title>Virtual Node with defined capacity</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X" />      
                 ]]>
             </code>
+                </para>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -323,23 +329,26 @@ foreach VN in VirtualNodes {
                         Nodes from any Node Provider can be attached to it
                     </para>
                 </listitem>
+               
                 <listitem>
                     <para>
                         Is Ready when X Nodes are attached to it.
-                        <note>If less than X Nodes were created by the deployment then it will never
-                            be Ready</note>
+                        <note><para>If less than X Nodes were created by the deployment then it will never be Ready</para></note>
                     </para>
+                    
                 </listitem>
             </itemizedlist>
         </sect2>
         <sect2>
             <title>Two Greedy Virtual Nodes</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1" />
 <virtualNode id="vn2" />                
                 ]]>
             </code>
+                </para>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -375,6 +384,7 @@ foreach VN in VirtualNodes {
         </sect2>
         <sect2>
             <title>Greedy Virtual Node with Greedy Node Provider Contract</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1">
@@ -382,6 +392,7 @@ foreach VN in VirtualNodes {
 </virtualNode>
                 ]]>
             </code>
+                </para>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -405,6 +416,7 @@ foreach VN in VirtualNodes {
         </sect2>
         <sect2>
             <title>Greedy Virtual Node with Node Provider</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1">
@@ -412,6 +424,7 @@ foreach VN in VirtualNodes {
 </virtualNode>
                 ]]>
             </code>
+                </para>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -447,14 +460,17 @@ foreach VN in VirtualNodes {
                         Is Ready when X Nodes from
                         <varname>NP1</varname>
                         are attached to it
-                        <note>A Virtual Node is Ready when its Capacity requirement is fulfilled and
-                            all Node Provider Contracts are also satisfied</note>
+                        <note>
+                            <para>A Virtual Node is Ready when its Capacity requirement is fulfilled and
+                            all Node Provider Contracts are also satisfied</para>
+                        </note>
                     </para>
                 </listitem>
             </itemizedlist>
         </sect2>
         <sect2>
             <title>Virtual Node with a Greedy Node Provider Contract</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
@@ -462,6 +478,7 @@ foreach VN in VirtualNodes {
 </virtualNode>	
                 ]]>
             </code>
+                </para>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -485,6 +502,7 @@ foreach VN in VirtualNodes {
         </sect2>
         <sect2>
             <title>Virtual Node with a Node Provider</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
@@ -492,6 +510,7 @@ foreach VN in VirtualNodes {
 </virtualNode>
                 ]]>
             </code>
+                </para>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -512,13 +531,16 @@ foreach VN in VirtualNodes {
                         <function>min(X, Y)</function>
                         node have been attached by
                         <varname>NP1</varname>
-                        <note>If Y &lt; X then the Virtual Node cannot be ready</note>
+                        <note>
+                            <para>If Y &lt; X then the Virtual Node cannot be ready</para>
+                        </note>
                     </para>
                 </listitem>
             </itemizedlist>
         </sect2>
         <sect2>
             <title>Case</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
@@ -527,6 +549,7 @@ foreach VN in VirtualNodes {
 </virtualNode>
                 ]]>
             </code>
+                </para>
             <para>
                 Generalization of Use case 7 with X = Y + Z, X &lt; Y + Z and X &gt; Y + Z.
             </para>
@@ -536,6 +559,7 @@ foreach VN in VirtualNodes {
         </sect2>
         <sect2>
             <title>Virtual Node with several Greedy Node Providers</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
@@ -544,6 +568,7 @@ foreach VN in VirtualNodes {
 </virtualNode>
                 ]]>
             </code>
+                </para>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -570,6 +595,7 @@ foreach VN in VirtualNodes {
         </sect2>
         <sect2>
             <title>Greedy Virtual Node with Greedy and non Greedy Node Providers</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1">
@@ -579,6 +605,7 @@ foreach VN in VirtualNodes {
 </virtualNode>
                 ]]>
             </code>
+                </para>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -616,14 +643,17 @@ foreach VN in VirtualNodes {
                         and Z Nodes from
                         <varname>NP2</varname>
                         have been attached to it
-                        <note>Since the Virtual Node is Greedy nodes from NP3 can be attached as
-                            soon as they arrive</note>
+                        <note>
+                            <para>Since the Virtual Node is Greedy nodes from NP3 can be attached as
+                            soon as they arrive</para>
+                        </note>
                     </para>
                 </listitem>
             </itemizedlist>
         </sect2>
         <sect2>
             <title>Virtual Node with Greedy and non Greedy Node Providers</title>
+            <para>
             <code>
                 <![CDATA[
 <virtualNode id="vn1" capacity="X">
@@ -633,6 +663,7 @@ foreach VN in VirtualNodes {
 </virtualNode>
                 ]]>
             </code>
+                </para>
             <itemizedlist>
                 <listitem>
                     <para>
@@ -671,8 +702,10 @@ foreach VN in VirtualNodes {
                         and Z Nodes from
                         <varname>NP2</varname>
                         have been attached to it
-                        <note>Nodes from NP3 have to wait that NP1 and NP2 requirements are
-                            satisfied before to be attached to vn1</note>
+                        <note>
+                            <para>Nodes from NP3 have to wait that NP1 and NP2 requirements are
+                            satisfied before to be attached to vn1</para>
+                        </note>
                     </para>
                 </listitem>
             </itemizedlist>
@@ -682,9 +715,11 @@ foreach VN in VirtualNodes {
         <title>Use cases</title>
         <sect2>
             <title>Simple Master/Worker</title>
+            <para></para>
         </sect2>
         <sect2>
             <title>Advanced Master/Worker</title>
+            <para></para>
         </sect2>
         <sect2>
             <title>Hierarchical Master/Worker</title>
@@ -692,7 +727,9 @@ foreach VN in VirtualNodes {
                 In this use case we have several
                 <glossterm/>Node Providers
             </para>
-            <![CDATA[
+            <para>
+                <code>
+                <![CDATA[
              <virtualNode id="masters">
     <resourceProvider refid="1" capacity="1"/>
     <resourceProvider refid="2" capacity="1"/>
@@ -705,6 +742,9 @@ foreach VN in VirtualNodes {
     </virtualNode>	
             
             ]]>
+                </code>
+                </para>
         </sect2>
     </sect1>
+    
 </article>
