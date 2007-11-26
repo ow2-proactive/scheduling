@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.security.exceptions.RuntimeSecurityException
 
 public class Launcher {
     public static void main(String[] args) {
-        
         try {
             ProActiveDescriptor descriptor1 = ProDeployment.getProactiveDescriptor(
                     "descriptors/security/simple1.xml");
