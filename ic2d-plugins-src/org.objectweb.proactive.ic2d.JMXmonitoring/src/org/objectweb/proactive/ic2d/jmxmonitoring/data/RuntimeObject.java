@@ -45,6 +45,8 @@ import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
