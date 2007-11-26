@@ -38,8 +38,6 @@ import java.util.Set;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
-
-
 public class VirtualNodeImpl implements VirtualNodeInternal {
 
     /** unique name (declared by GCMA) */
