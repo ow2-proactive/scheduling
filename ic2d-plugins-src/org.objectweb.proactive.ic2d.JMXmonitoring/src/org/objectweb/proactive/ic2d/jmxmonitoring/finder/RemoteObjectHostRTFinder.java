@@ -52,148 +52,143 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
+
 public class RemoteObjectHostRTFinder implements RuntimeFinder {
+    private String localRuntimeUrl;
+    private String localDefaultNodeUrl;
 
-	private String localRuntimeUrl;
+    public RemoteObjectHostRTFinder() {
+        this.localRuntimeUrl = ProActiveRuntimeImpl.getProActiveRuntime()
+                                                   .getURL();
+        try {
+            this.localDefaultNodeUrl = NodeFactory.getDefaultNode()
+                                                  .getNodeInformation().getURL();
+        } catch (Exception e) {
+            Console.getInstance(Activator.CONSOLE_NAME)
+                   .err("Could not get local default node url on local runtime " +
+                this.localRuntimeUrl);
+        }
+    }
 
-	private String localDefaultNodeUrl;
+    //
+    // -- PUBLIC METHODS -----------------------------------------------
+    //
 
-	public RemoteObjectHostRTFinder() {
-		this.localRuntimeUrl = ProActiveRuntimeImpl.getProActiveRuntime()
-				.getURL();
-		try {
-			this.localDefaultNodeUrl = NodeFactory.getDefaultNode()
-					.getNodeInformation().getURL();
-		} catch (Exception e) {
-			Console.getInstance(Activator.CONSOLE_NAME).err(
-					"Could not get local default node url on local runtime "
-							+ this.localRuntimeUrl);
-		}
-	}
+    /**
+     * @see org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder#getRuntimeObjects(HostObject)
+     */
+    public Collection<RuntimeObject> getRuntimeObjects(HostObject host) {
+        int nbZombieStubs = 0;
 
-	//
-	// -- PUBLIC METHODS -----------------------------------------------
-	//
+        String hostUrl = host.getUrl();
 
-	/**
-	 * @see org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder#getRuntimeObjects(HostObject)
-	 */
-	public Collection<RuntimeObject> getRuntimeObjects(HostObject host) {
-		int nbZombieStubs = 0;
+        Map<String, RuntimeObject> runtimeObjects = new HashMap<String, RuntimeObject>();
 
-		String hostUrl = host.getUrl();
+        Console console = Console.getInstance(Activator.CONSOLE_NAME);
+        console.log("Exploring " + host + " with RMI on port " +
+            host.getPort());
 
-		Map<String, RuntimeObject> runtimeObjects = new HashMap<String, RuntimeObject>();
+        URI[] uris = null;
+        try {
+            URI target = URIBuilder.buildURI(host.getHostName(), null,
+                    host.getProtocol(), host.getPort());
+            try {
+                uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol())
+                                         .list(target);
+            } catch (ProActiveException e) {
+                if (e.getCause() instanceof ConnectException) {
+                    Console.getInstance(Activator.CONSOLE_NAME)
+                           .err("Connection refused to " + host);
+                    return runtimeObjects.values();
+                } else {
+                    throw e;
+                }
+            }
 
-		Console console = Console.getInstance(Activator.CONSOLE_NAME);
-		console
-				.log("Exploring " + host + " with RMI on port "
-						+ host.getPort());
+            if (uris != null) {
+                // Search all ProActive Runtimes
+                for (final URI url : uris) {
+                    final String urlString = url.toString();
 
-		URI[] uris = null;
-		try {
-			URI target = URIBuilder.buildURI(host.getHostName(), null, host
-					.getProtocol(), host.getPort());
-			try {
-				uris = RemoteObjectHelper.getRemoteObjectFactory(
-						host.getProtocol()).list(target);
-			} catch (ProActiveException e) {
-				if (e.getCause() instanceof ConnectException) {
-					Console.getInstance(Activator.CONSOLE_NAME).err(
-							"Connection refused to " + host);
-					return runtimeObjects.values();
-				} else {
-					throw e;
-				}
-			}
+                    // In order to avoid self-monitoring we must skip the local runtime url or the local node name 
+                    if (urlString.equals(this.localRuntimeUrl) ||
+                            urlString.equals(this.localDefaultNodeUrl)) {
+                        continue;
+                    }
 
-			if (uris != null) {
-				// Search all ProActive Runtimes
-				for (final URI url : uris) {
-					final String urlString = url.toString();
+                    try {
 
-					// In order to avoid self-monitoring we must skip the local runtime url or the local node name 
-					if (urlString.equals(this.localRuntimeUrl)
-							|| urlString.equals(this.localDefaultNodeUrl)) {
-						continue;
-					}
+                        /*RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);*/
+                        RemoteObject ro = null;
+                        try {
+                            ro = RemoteObjectHelper.lookup(url);
+                        } catch (ProActiveException e) {
+                            nbZombieStubs++;
+                            // System.out.println("Invalid url found :" + url);
+                            continue;
+                        }
 
-					try {
+                        //* Object stub = ro.getObjectProxy(); */
+                        Object stub = null;
+                        try {
+                            stub = RemoteObjectHelper.generatedObjectStub(ro);
+                        } catch (ProActiveException e) {
+                            nbZombieStubs++;
+                            System.out.println("Could not generate stub for " +
+                                url);
+                            continue;
+                        }
 
-						/*RemoteObject ro = RemoteObjectFactory.getRemoteObjectFactory(host.getProtocol()).lookup(url);*/
-						RemoteObject ro = null;
-						try {
-							ro = RemoteObjectHelper.lookup(url);
-						} catch (ProActiveException e) {
-							nbZombieStubs++;
-							// System.out.println("Invalid url found :" + url);
-							continue;
-						}
+                        if (stub instanceof ProActiveRuntime) {
+                            ProActiveRuntime proActiveRuntime = (ProActiveRuntime) stub;
 
-						//* Object stub = ro.getObjectProxy(); */
-						Object stub = null;
-						try {
-							stub = RemoteObjectHelper.generatedObjectStub(ro);
-						} catch (ProActiveException e) {
-							nbZombieStubs++;
-							System.out.println("Could not generate stub for "
-									+ url);
-							continue;
-						}
+                            String mbeanServerName = proActiveRuntime.getMBeanServerName();
 
-						if (stub instanceof ProActiveRuntime) {
-							ProActiveRuntime proActiveRuntime = (ProActiveRuntime) stub;
+                            String runtimeUrl = proActiveRuntime.getURL();
+                            runtimeUrl = FactoryName.getCompleteUrl(runtimeUrl);
 
-							String mbeanServerName = proActiveRuntime
-									.getMBeanServerName();
+                            ObjectName oname = FactoryName.createRuntimeObjectName(runtimeUrl);
 
-							String runtimeUrl = proActiveRuntime.getURL();
-							runtimeUrl = FactoryName.getCompleteUrl(runtimeUrl);
+                            if (runtimeObjects.containsKey(runtimeUrl)) {
+                                continue;
+                            }
 
-							ObjectName oname = FactoryName
-									.createRuntimeObjectName(runtimeUrl);
+                            RuntimeObject runtime = (RuntimeObject) host.getChild(runtimeUrl);
+                            if (runtime == null) {
+                                // This runtime is not yet monitored
+                                runtime = new RuntimeObject(host, runtimeUrl,
+                                        oname, hostUrl, mbeanServerName);
+                            }
+                            runtimeObjects.put(runtimeUrl, runtime);
+                        }
+                    } catch (Exception e) {
+                        // the lookup returned an active object, and an active object is
+                        // not a remote object (for now...)
+                        e.printStackTrace();
+                        console.warn("Error when getting remote object at : " +
+                            url);
+                        continue;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            if (e instanceof ConnectException ||
+                    e instanceof ConnectIOException) {
+                console.debug(e);
+            } else {
+                console.logException(e);
+            }
+        }
 
-							if (runtimeObjects.containsKey(runtimeUrl)) {
-								continue;
-							}
+        if (nbZombieStubs > 0) {
+            console.log(nbZombieStubs + " invalid urls in registry at host " +
+                host.getHostName() + ":" + host.getPort());
+        }
+        return runtimeObjects.values();
+    }
 
-							RuntimeObject runtime = (RuntimeObject) host
-									.getChild(runtimeUrl);
-							if (runtime == null) {
-								// This runtime is not yet monitored
-								runtime = new RuntimeObject(host, runtimeUrl,
-										oname, hostUrl, mbeanServerName);
-							}
-							runtimeObjects.put(runtimeUrl, runtime);
-						}
-					} catch (Exception e) {
-						// the lookup returned an active object, and an active object is
-						// not a remote object (for now...)
-						e.printStackTrace();
-						console.warn("Error when getting remote object at : "
-								+ url);
-						continue;
-					}
-				}
-			}
-		} catch (Exception e) {
-			if (e instanceof ConnectException
-					|| e instanceof ConnectIOException) {
-				console.debug(e);
-			} else {
-				console.logException(e);
-			}
-		}
-
-		if (nbZombieStubs > 0) {
-			console.log(nbZombieStubs + " invalid urls in registry at host "
-					+ host.getHostName() + ":" + host.getPort());
-		}
-		return runtimeObjects.values();
-	}
-
-	private boolean validateRemoteObj(RemoteObject ro) {
-		return (!((ro.getTargetClass() == null) || (ro.getClassName() == null) || (ro
-				.getClassName().equals(""))));
-	}
+    private boolean validateRemoteObj(RemoteObject ro) {
+        return (!((ro.getTargetClass() == null) || (ro.getClassName() == null) ||
+        (ro.getClassName().equals(""))));
+    }
 }

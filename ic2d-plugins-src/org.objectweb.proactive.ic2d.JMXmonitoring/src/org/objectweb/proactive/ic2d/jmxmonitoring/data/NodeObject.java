@@ -92,7 +92,7 @@ public class NodeObject extends AbstractData {
     }
 
     private NodeWrapperMBean getProxyNodeMBean() {
-        if (proxyNodeMBean == null) {        	
+        if (proxyNodeMBean == null) {
             proxyNodeMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
                     getObjectName(), NodeWrapperMBean.class, false);
         }
@@ -100,10 +100,10 @@ public class NodeObject extends AbstractData {
     }
 
     public void setProxyNodeMBean(NodeWrapperMBean proxyNodeMBean) {
-		this.proxyNodeMBean = proxyNodeMBean;
-	}
+        this.proxyNodeMBean = proxyNodeMBean;
+    }
 
-	@Override
+    @Override
     public void destroy() {
         this.vnParent.removeChild(this);
         super.destroy();
@@ -201,7 +201,7 @@ public class NodeObject extends AbstractData {
      * @return the virtual node name.
      */
     public String getVirtualNodeName() {
-    	return this.vnParent.getName();
+        return this.vnParent.getName();
         //return getProxyNodeMBean().getVirtualNodeName();
     }
 

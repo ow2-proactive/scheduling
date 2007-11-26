@@ -181,7 +181,8 @@ public class AOEditPart extends AbstractMonitoringEditPart {
                 getCastedFigure().setRequestQueueLength(length);
                 break;
             } //case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED:
-            default:super.update(o, arg);
+            default:
+                super.update(o, arg);
             } //switch 
         } //if arg is Notification     
 

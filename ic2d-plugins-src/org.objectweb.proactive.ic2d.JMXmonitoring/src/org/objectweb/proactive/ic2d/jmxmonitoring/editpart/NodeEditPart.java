@@ -107,7 +107,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
                     if ((notif.getNotification() == MVC_Notifications.STATE_CHANGED) &&
                             (notif.getData() == State.NOT_MONITORED)) {
                         deactivate();
-                    } else if (notif.getNotification() == MVC_Notifications.STATE_CHANGED)//in this case we know we have changed highlight state
+                    } else if (notif.getNotification() == MVC_Notifications.STATE_CHANGED) //in this case we know we have changed highlight state
                      {
                         //method VirtualNodesGroup.getColor(virtualNode vn)
                         //returns the color for the virtual node if the virtual node is selected
