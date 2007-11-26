@@ -44,8 +44,6 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
-
-
 public class TopologyImpl implements Topology, Serializable {
     protected long id;
     protected String applicationDescriptorPath;
