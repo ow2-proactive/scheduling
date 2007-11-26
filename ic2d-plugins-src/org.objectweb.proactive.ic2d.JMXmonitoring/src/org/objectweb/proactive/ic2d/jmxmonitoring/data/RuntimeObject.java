@@ -31,11 +31,9 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
@@ -50,233 +48,248 @@ import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
-
 /**
  * Represents a Runtime in the IC2D model.
  * @author ProActive Team
  */
 public class RuntimeObject extends AbstractData {
 
-    /**
-     * All the method names used to notify the observers
-     */
-    public enum methodName {RUNTIME_KILLED,
-        RUNTIME_NOT_RESPONDING,
-        RUNTIME_NOT_MONITORED;
-    }
-    ;
-    private HostObject parent;
-    private String url;
+	/**
+	 * All the method names used to notify the observers
+	 */
+	public enum methodName {
+		RUNTIME_KILLED, RUNTIME_NOT_RESPONDING, RUNTIME_NOT_MONITORED;
+	};
 
-    //private ProActiveConnection connection;
-    private String hostUrlServer;
-    private String serverName;
-    private ProActiveRuntimeWrapperMBean proxyMBean;
+	private final HostObject parent;
 
-    /** JMX Notification listener */
-    private javax.management.NotificationListener listener;
+	private final String url;
 
-    public RuntimeObject(HostObject parent, String runtimeUrl,
-        ObjectName objectName, String hostUrl, String serverName) {
-        super(objectName);
-        this.parent = parent;
+	//private ProActiveConnection connection;
+	private final String hostUrlServer;
 
-        this.url = FactoryName.getCompleteUrl(runtimeUrl);
+	private final String serverName;
 
-        this.hostUrlServer = hostUrl;
-        this.serverName = serverName;
+	private ProActiveRuntimeWrapperMBean proxyMBean;
 
-        this.listener = new RuntimeObjectListener(this);
-    }
+	/** JMX Notification listener */
+	private final javax.management.NotificationListener listener;
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public HostObject getParent() {
-        return this.parent;
-    }
+	public RuntimeObject(HostObject parent, String runtimeUrl,
+			ObjectName objectName, String hostUrl, String serverName) {
+		super(objectName);
+		this.parent = parent;
 
-    @Override
-    public void explore() {
-        findNodes();
-    }
+		this.url = FactoryName.getCompleteUrl(runtimeUrl);
 
-    @Override
-    public String getKey() {
-        return this.url;
-    }
+		this.hostUrlServer = hostUrl;
+		this.serverName = serverName;
 
-    @Override
-    public String getType() {
-        return "runtime object";
-    }
+		this.listener = new RuntimeObjectListener(this);
+	}
 
-    @Override
-    protected String getHostUrlServer() {
-        return this.hostUrlServer;
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public HostObject getParent() {
+		return this.parent;
+	}
 
-    @Override
-    protected String getServerName() {
-        return this.serverName;
-    }
+	@Override
+	public void explore() {
+		findNodes();
+	}
 
-    /**
-     * Returns the url of this object.
-     * @return An url.
-     */
-    public String getUrl() {
-        return this.url;
-    }
+	@Override
+	public String getKey() {
+		return this.url;
+	}
 
-    @Override
-    public void destroy() {
-        //    this.resetCommunications();
-        //    System.out.println("Destroying Runtime Representation Object "+this.getObjectName().getCanonicalName());
-        //      JMXNotificationManager.getInstance()
-        //      .unsubscribe(this.getObjectName(), this.getListener());
-        //    System.out.println("Runtime Listener unsubscribed");
-        //      
-        super.destroy();
-    }
+	@Override
+	public String getType() {
+		return "runtime object";
+	}
 
-    @Override
-    public void stopMonitoring(boolean log) {
-        super.stopMonitoring(log);
-        JMXNotificationManager.getInstance()
-                              .unsubscribe(this.getObjectName(),
-            this.getListener());
-    }
+	@Override
+	protected String getHostUrlServer() {
+		return this.hostUrlServer;
+	}
 
-    /**
-     * Kill this runtime.
-     */
-    public void killRuntime() {
-        new Thread() {
-                @Override
-                public void run() {
-                    Object[] params = {  };
-                    String[] signature = {  };
-                    invokeAsynchronous("killRuntime", params, signature);
-                    runtimeKilled();
-                }
-            }.start();
-    }
+	@Override
+	protected String getServerName() {
+		return this.serverName;
+	}
 
-    public void runtimeKilled() {
-        setChanged();
-        notifyObservers(methodName.RUNTIME_KILLED);
-        new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        sleep(3000);
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    RuntimeObject.this.destroy();
-                }
-            }.start();
-    }
+	/**
+	 * Returns the url of this object.
+	 * @return An url.
+	 */
+	public String getUrl() {
+		return this.url;
+	}
 
-    /**
-     * Finds all nodes of this Runtime.
-     */
-    @SuppressWarnings("unchecked")
-    private void findNodes() {
-        proxyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
-                getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
-        try {
-            if (!(getConnection().isRegistered(getObjectName()))) {
-                return;
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+	@Override
+	public void destroy() {
+		//    this.resetCommunications();
+		//    System.out.println("Destroying Runtime Representation Object "+this.getObjectName().getCanonicalName());
+		//      JMXNotificationManager.getInstance()
+		//      .unsubscribe(this.getObjectName(), this.getListener());
+		//    System.out.println("Runtime Listener unsubscribed");
+		//      
+		super.destroy();
+	}
 
-        List<ObjectName> nodeNames = null;
-        try {
-            nodeNames = nodeNames = proxyMBean.getNodes();
-        } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+	@Override
+	public void stopMonitoring(boolean log) {
+		super.stopMonitoring(log);
+		JMXNotificationManager.getInstance().unsubscribe(this.getObjectName(),
+				this.getListener());
+	}
 
-        Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
+	/**
+	 * Kill this runtime.
+	 */
+	public void killRuntime() {
+		new Thread() {
+			@Override
+			public void run() {
+				Object[] params = {};
+				String[] signature = {};
+				invokeAsynchronous("killRuntime", params, signature);
+				runtimeKilled();
+			}
+		}.start();
+	}
 
-        for (ObjectName name : nodeNames) {
-            // Search if the node is a P2P node
-            String nodeName = name.getKeyProperty(FactoryName.NODE_NAME_PROPERTY);
-            if (nodeName.startsWith(P2PConstants.P2P_NODE_NAME) &&
-                    getWorldObject().isP2PHidden()) {
-                // We have to skeep this node because it is a P2PNode
-                continue;
-            }
+	public void runtimeKilled() {
+		setChanged();
+		notifyObservers(methodName.RUNTIME_KILLED);
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					sleep(3000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				RuntimeObject.this.destroy();
+			}
+		}.start();
+	}
 
-            NodeWrapperMBean proxyNodeMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
-                    name, NodeWrapperMBean.class, false);
-            String url = proxyNodeMBean.getURL();
+	/**
+	 * Finds all nodes of this Runtime.
+	 */
+	@SuppressWarnings("unchecked")
+	private void findNodes() {
+		if (this.proxyMBean == null) {
+			this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(
+					getConnection(), getObjectName(),
+					ProActiveRuntimeWrapperMBean.class, false);
+		}
 
-            // We need to have a complete url protocol://host:port/name
-            url = FactoryName.getCompleteUrl(url);
+		try {
+			if (!(getConnection().isRegistered(getObjectName()))) {
+				return;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-            // If this child is a NOT monitored child.
-            if (containsChildInNOTMonitoredChildren(url)) {
-                continue;
-            }
+		List<ObjectName> nodeNames = null;
+		try {
+			nodeNames = proxyMBean.getNodes();
+		} catch (ProActiveException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
-            NodeObject child = (NodeObject) this.getMonitoredChild(url);
+		final Map<String, AbstractData> childrenToRemove = this
+				.getMonitoredChildrenAsMap();
 
-            // If this child is not monitored.
-            if (child == null) {
-                child = new NodeObject(this, url, name);
-                String virtualNodeName = child.getVirtualNodeName();
-                VNObject vn = getWorldObject().getVirtualNode(virtualNodeName);
+		for (final ObjectName name : nodeNames) {
+			// Search if the node is a P2P node
+			final String nodeName = name
+					.getKeyProperty(FactoryName.NODE_NAME_PROPERTY);
+			if (nodeName.startsWith(P2PConstants.P2P_NODE_NAME)
+					&& getWorldObject().isP2PHidden()) {
+				// We have to skeep this node because it is a P2PNode
+				continue;
+			}
 
-                // this virtual node is not monitored
-                if (vn == null) {
-                    vn = new VNObject(virtualNodeName, child.getJobId(),
-                            getWorldObject());
-                    getWorldObject().addVirtualNode(vn);
-                }
-                // Set to the node the parent virtual node.
-                child.setVirtualNode(vn);
-                vn.addChild(child);
-                addChild(child);
-            }
-            // This child is already monitored, but this child maybe contains some not monitord objects.
-            else {
-                child.explore();
-            }
-            // Removes from the model the not monitored or termined nodes.
-            childrenToRemoved.remove(child.getKey());
-        }
+			// Build the complete nodeUrl from the hostUrlServer and nodeName 
+			final String nodeUrl = this.hostUrlServer + nodeName;
 
-        // Some child have to be removed
-        for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator();
-                iter.hasNext();) {
-            NodeObject child = (NodeObject) iter.next();
-            child.destroy();
-        }
-    }
+			// If this child is a NOT monitored child.
+			if (containsChildInNOTMonitoredChildren(nodeUrl)) {
+				continue;
+			}
 
-    @Override
-    public String getName() {
-        return URIBuilder.getNameFromURI(getUrl());
-    }
+			NodeObject child = (NodeObject) this.getMonitoredChild(nodeUrl);
 
-    @Override
-    public ProActiveConnection getConnection() {
-        return JMXNotificationManager.getInstance().getConnection(getUrl());
-    }
+			// If this child is not monitored.
+			if (child == null) {
+				// Get the mbean proxy for the current node
+				final NodeWrapperMBean proxyNodeMBean = MBeanServerInvocationHandler
+						.newProxyInstance(getConnection(), name,
+								NodeWrapperMBean.class, false);
 
-    @Override
-    public String toString() {
-        return "Runtime: " + getUrl();
-    }
+				// Get the jobId and the virtualNodeName in one call
+				final String[] res = proxyNodeMBean
+						.getJobIdAndVirtualNodeName();
+				final String jobId = res[0];
+				final String virtualNodeName = res[1];
 
-    public NotificationListener getListener() {
-        return this.listener;
-    }
+				// Find the virtualNode if already monitored
+				VNObject vn = getWorldObject().getVirtualNode(virtualNodeName);
+
+				// This virtual node is not monitored
+				if (vn == null) {
+					vn = new VNObject(virtualNodeName, jobId, getWorldObject());
+					getWorldObject().addVirtualNode(vn);
+				}
+
+				// Once the virtualNode object has been created or found 
+				// Create the child node object
+				child = new NodeObject(this, nodeUrl, name);
+				// Set the already available proxy
+				child.setProxyNodeMBean(proxyNodeMBean);
+				// Set to the node the parent virtual node.
+				child.setVirtualNode(vn);
+				vn.addChild(child);
+				addChild(child);
+			}
+			// This child is already monitored, but this child maybe contains some not monitord objects.
+			else {
+				child.explore();
+			}
+			// Removes from the model the not monitored or terminated nodes.
+			childrenToRemove.remove(child.getKey());
+		}
+
+		// Some child have to be removed
+		for (final AbstractData child : childrenToRemove.values()) {
+			child.destroy();
+		}
+	}
+
+	@Override
+	public String getName() {
+		return URIBuilder.getNameFromURI(getUrl());
+	}
+
+	@Override
+	public ProActiveConnection getConnection() {
+		return JMXNotificationManager.getInstance().getConnection(getUrl());
+	}
+
+	@Override
+	public String toString() {
+		return "Runtime: " + getUrl();
+	}
+
+	public NotificationListener getListener() {
+		return this.listener;
+	}
 }
