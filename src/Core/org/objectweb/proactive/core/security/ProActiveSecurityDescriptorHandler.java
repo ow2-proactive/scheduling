@@ -77,6 +77,8 @@ public class ProActiveSecurityDescriptorHandler
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
     protected static final String PROACTIVE_SECURITY_TAG = "Policy";
     protected static final String RULE_TAG = "Rule";
+    protected static final String AES_KEYSIZE_TAG = "AESKeySize";
+    protected static final String MAC_KEYSIZE_TAG = "MacKeySize";
     protected static final String ENTITY_TAG = "Entity";
     protected static final String RULES_TAG = "Rules";
     protected static final String ACCESS_TAG = "AccessRights";
@@ -99,6 +101,8 @@ public class ProActiveSecurityDescriptorHandler
     private String applicationName;
     private List<RuleEntity> accessAuthorizations;
     protected KeyStore keystore;
+    protected int aesKeySize = 192;
+    protected int macKeySize = 160;
 
     static {
         ProActiveSecurity.loadProvider();
@@ -123,6 +127,8 @@ public class ProActiveSecurityDescriptorHandler
     public void startContextElement(String name, Attributes attributes) {
         addHandler(APPLICATION_NAME_TAG, new SingleValueUnmarshaller());
         addHandler(PKCS12_KEYSTORE, new SingleValueUnmarshaller());
+        addHandler(AES_KEYSIZE_TAG, new SingleValueUnmarshaller());
+        addHandler(MAC_KEYSIZE_TAG, new SingleValueUnmarshaller());
         addHandler(RULES_TAG, new RulesHandler());
         addHandler(ACCESS_TAG, new AccessHandler());
     }
@@ -178,6 +184,10 @@ public class ProActiveSecurityDescriptorHandler
         } else if (name.equals(ACCESS_TAG)) {
             RuleEntities entities = (RuleEntities) activeHandler.getResultObject();
             this.accessAuthorizations = entities;
+        } else if (name.equals(AES_KEYSIZE_TAG)) {
+            aesKeySize = Integer.parseInt((String) activeHandler.getResultObject());
+        } else if (name.equals(MAC_KEYSIZE_TAG)) {
+            macKeySize = Integer.parseInt((String) activeHandler.getResultObject());
         }
     }
 
@@ -194,9 +204,15 @@ public class ProActiveSecurityDescriptorHandler
             if (this.accessAuthorizations == null) {
                 this.accessAuthorizations = new ArrayList<RuleEntity>();
             }
-            return new PolicyServer(this.keystore, this.policyRules,
-                this.applicationName, this.descriptorUrl,
-                this.accessAuthorizations);
+
+            PolicyServer policyServer = new PolicyServer(this.keystore,
+                    this.policyRules, this.applicationName, this.descriptorUrl,
+                    this.accessAuthorizations);
+
+            policyServer.setAesKeySize(aesKeySize);
+            policyServer.setMacKeySize(macKeySize);
+
+            return policyServer;
         } catch (NullPointerException npe) {
             return null;
         }

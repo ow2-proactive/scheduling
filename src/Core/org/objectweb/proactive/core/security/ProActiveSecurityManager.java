@@ -120,6 +120,18 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
     //    protected byte[] encodedKeyStore;
     private final EntityType type;
 
+    /*
+     * Default Session Key size
+     * ( AES key )
+     */
+    protected int aesKeySize = 192;
+
+    /*
+     * Default Session Mac size
+     * ( Mac key )
+     */
+    protected int macKeySize = 160;
+
     /**
      * This a the default constructor to use with the ProActiveSecurityManager
      */
@@ -138,7 +150,8 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
 
         if ((new File(file)).exists()) {
             this.policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
-            //            keyStore = policyServer.getKeyStore();
+            this.aesKeySize = this.policyServer.getAesKeySize();
+            this.macKeySize = this.policyServer.getMacKeySize();
         }
         logger.debug("creating Security Manager using file " + file);
     }
@@ -150,22 +163,10 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
         this(type);
 
         this.policyServer = server;
+        this.aesKeySize = this.policyServer.getAesKeySize();
+        this.macKeySize = this.policyServer.getMacKeySize();
         //        this.keyStore = server.getKeyStore();
     }
-
-    /**
-     * @param keyStore
-     * @param policyServer
-     */
-
-    //    public ProActiveSecurityManager(KeyStore keyStore, PolicyServer policyServer) {
-    //        this();
-    //        this.policyServer = policyServer;
-    //        this.keyStore = keyStore;
-    //    }
-    //    public void setBody(UniversalBody body) {
-    //        this.myBody = body;
-    //    }
 
     /**
      * Method getPolicy.
@@ -673,10 +674,10 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
             //
             KeyGenerator key_gen = KeyGenerator.getInstance("AES", "BC"); // Get instance for AES
 
-            key_gen.init(192, session.sec_rand); // Use a 192 bit key size.
+            key_gen.init(this.aesKeySize, session.sec_rand); // Use a 192 bit key size.
             session.cl_aes_key = key_gen.generateKey(); // Generate the  SecretKey
 
-            key_gen.init(160, session.sec_rand); // Set up for a 160 bit key.
+            key_gen.init(this.macKeySize, session.sec_rand); // Set up for a 160 bit key.
             session.cl_hmac_key = key_gen.generateKey(); // Generate key for HMAC.
 
             //
@@ -1199,10 +1200,10 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
             // Generate my secrets.
             //
             KeyGenerator key_gen = KeyGenerator.getInstance("AES", "BC");
-            key_gen.init(192, session.sec_rand);
+            key_gen.init(this.aesKeySize, session.sec_rand);
             session.se_aes_key = key_gen.generateKey();
 
-            key_gen.init(160, session.sec_rand);
+            key_gen.init(this.macKeySize, session.sec_rand);
             session.se_hmac_key = key_gen.generateKey();
 
             // initialization of IV 

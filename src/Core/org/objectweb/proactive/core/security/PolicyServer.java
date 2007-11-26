@@ -74,6 +74,8 @@ public class PolicyServer implements Serializable, Cloneable {
     private final String policyRulesFileLocation;
     private final String applicationName;
     private final SerializableKeyStore keyStore;
+    private int aesKeySize;
+    private int macKeySize;
 
     public PolicyServer() {
         this.policyRules = new ArrayList<PolicyRule>();
@@ -448,5 +450,21 @@ public class PolicyServer implements Serializable, Cloneable {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public int getMacKeySize() {
+        return macKeySize;
+    }
+
+    public void setMacKeySize(int macKeySize) {
+        this.macKeySize = macKeySize;
+    }
+
+    public int getAesKeySize() {
+        return aesKeySize;
+    }
+
+    public void setAesKeySize(int aesKeySize) {
+        this.aesKeySize = aesKeySize;
     }
 }

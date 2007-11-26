@@ -21,7 +21,11 @@
 				<xs:element name="CertificationAuthority" minOccurs="0"
 					maxOccurs="1" type="CertificateOwnerType" />
 				<xs:element name="TrustedCertificationAuthority"
-					minOccurs="0" maxOccurs="1" type="CertificateOwnerType" />
+					minOccurs="0" maxOccurs="1" type="CertificateOwnerType" />		
+				<xs:element name="AESKeySize"
+					minOccurs="0" maxOccurs="1" type="xs:integer" />
+				<xs:element name="MacKeySize"
+					minOccurs="0" maxOccurs="1" type="xs:integer" />
 				<xs:element name="Rules" minOccurs="1" maxOccurs="1">
 					<xs:complexType>
 						<xs:sequence>
