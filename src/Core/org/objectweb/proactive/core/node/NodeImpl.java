@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.node;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -73,7 +72,6 @@ public class NodeImpl implements Node, Serializable {
     protected NodeInformation nodeInformation;
     protected ProActiveRuntime proActiveRuntime;
     protected String vnName;
-    protected ArrayList fileTransferServicePool;
 
     //
     // ----------Constructors--------------------
@@ -85,7 +83,6 @@ public class NodeImpl implements Node, Serializable {
         String protocol, String jobID) {
         this.proActiveRuntime = proActiveRuntime;
         this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID);
-        this.fileTransferServicePool = new ArrayList();
     }
 
     //
