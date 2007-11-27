@@ -28,10 +28,9 @@
  *
  * ################################################################
  */
-package functionalTests.gcmdeployment.virtualnode;
+package functionalTests.gcmdeployment.topology;
 
 import java.io.FileNotFoundException;
-import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,55 +38,67 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMHost;
+import org.objectweb.proactive.extra.gcmdeployment.core.GCMRuntime;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
-import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
 import functionalTests.gcmdeployment.Abstract;
 
 
-public class TestGCMApplicationDescriptorAPI extends Abstract {
+public class TestTopology extends Abstract {
     GCMApplicationDescriptor gcma;
 
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
         gcma = API.getGCMApplicationDescriptor(getDescriptor(this));
-
-        Assert.assertFalse(gcma.isStarted());
-        Assert.assertTrue(gcma.getCurrentNodes().size() == 0);
-        Assert.assertTrue(gcma.getCurrentUnusedNodes().size() == 0);
-        Assert.assertTrue(gcma.getVirtualNodes().size() == 2);
-
         gcma.startDeployment();
         waitAllocation();
-
-        Assert.assertTrue(gcma.isStarted());
-        Assert.assertTrue(gcma.getCurrentNodes().size() == 11);
-        Assert.assertTrue(gcma.getCurrentUnusedNodes().size() == 1);
-        Assert.assertTrue(gcma.getVirtualNodes().size() == 2);
-
-        VirtualNode vn1 = gcma.getVirtualNode("vn1");
-        Assert.assertNotNull(vn1);
-        Set<Node> nodes = vn1.getCurrentNodes();
+        waitAllocation();
 
         Topology topology = gcma.getCurrentTopology();
-        Assert.assertNotNull(topology);
+        Topology topology2 = gcma.getCurrentTopology();
 
-        // Check reachable
-        for (Node node : nodes) {
-            node.getActiveObjects();
+        Assert.assertNotSame(topology2, topology);
+        System.out.println("----------------------------");
+        Assert.assertEquals(3, topology.getChildren().size());
+        traverseTopology(topology);
+    }
+
+    static private void traverseTopology(Topology topology) {
+        printNode(topology);
+        if (!checkNode(topology)) {
+            throw new IllegalStateException(topology.getDeploymentPathStr());
         }
+        for (Topology child : topology.getChildren()) {
+            traverseTopology(child);
+        }
+    }
 
-        gcma.kill();
+    static private boolean checkNode(Topology topology) {
+        // TODO find something to test
+        return true;
+    }
 
-        // Check unreachable
-        for (Node node : nodes) {
-            boolean exception = false;
-            try {
-                node.getActiveObjects();
-            } catch (Throwable e) {
-                exception = true;
+    static private void printNode(Topology topology) {
+        System.out.println();
+        System.out.println("Deployment Path: " +
+            topology.getDeploymentPathStr());
+        System.out.println("App Desc Path: " +
+            topology.getApplicationDescriptorPath());
+        System.out.println("Dep Desc Path" +
+            topology.getApplicationDescriptorPath());
+        System.out.println("Node Provider:" + topology.getNodeProvider());
+        System.out.println("Children:" + topology.getChildren().size());
+
+        for (GCMHost host : topology.getHosts()) {
+            System.out.println("\t" + host.getHostname());
+            for (GCMRuntime runtime : host.getRuntimes()) {
+                System.out.println("\t\t" + runtime.getName());
+                for (Node node : runtime.getNodes()) {
+                    System.out.println("\t\t\t" +
+                        node.getNodeInformation().getName());
+                }
             }
-            Assert.assertTrue(exception);
         }
     }
 }

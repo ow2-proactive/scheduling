@@ -39,6 +39,8 @@ import org.objectweb.proactive.extra.gcmdeployment.API;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
+import functionalTests.gcmdeployment.Abstract;
+
 
 public class TestVirtualNode6 extends Abstract {
     @Test

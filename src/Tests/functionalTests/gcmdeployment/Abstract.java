@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package functionalTests.gcmdeployment.virtualnode;
+package functionalTests.gcmdeployment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -54,7 +54,7 @@ public abstract class Abstract extends FunctionalTest {
     }
 
     static protected void waitAllocation() {
-        wait(5000);
+        wait(7000);
     }
 
     static protected void wait(int sec) {
