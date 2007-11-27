@@ -943,7 +943,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *
      * @param nodeName
      *            The name where to attached the body in the
-     *            <code>runtimesMap</code>
+     *            <code>hostsMap</code>
      * @param body
      *            The body to register
      */
@@ -972,14 +972,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private void unregisterBody(String nodeName, UniqueID bodyID) {
         // System.out.println("in remove id= "+ bodyID.toString());
         // System.out.println("array size
-        // "+((ArrayList)runtimesMap.get(nodeName)).size());
+        // "+((ArrayList)hostsMap.get(nodeName)).size());
         List<UniqueID> bodyList = this.nodeMap.get(nodeName).getActiveObjectsId();
 
         synchronized (bodyList) {
             bodyList.remove(bodyID);
 
             // System.out.println("array size
-            // "+((ArrayList)runtimesMap.get(nodeName)).size());
+            // "+((ArrayList)hostsMap.get(nodeName)).size());
         }
     }
 
@@ -1030,15 +1030,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         return null;
 
-        // runtimesMap.
+        // hostsMap.
         // try {
         // System.out.println(" testing for securityentityID " +
         // securityEntity);
-        // for (Enumeration e = runtimesMap.keys(); e.hasMoreElements();) {
+        // for (Enumeration e = hostsMap.keys(); e.hasMoreElements();) {
         // String node = (String) e.nextElement();
         //
         // System.out.println("testing for node " + node);
-        // ArrayList listAO = (ArrayList) runtimesMap.get(node);
+        // ArrayList listAO = (ArrayList) hostsMap.get(node);
         //
         // for (int i = 0; i < listAO.size(); i++) {
         // UniqueID localBodyID = (UniqueID) listAO.get(i);
@@ -1459,6 +1459,37 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         private void setDeploymentId(long deploymentId) {
             this.deploymentId = deploymentId;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = (prime * result) +
+                ((uniqueVMID == null) ? 0 : uniqueVMID.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final VMInformationImpl other = (VMInformationImpl) obj;
+            if (uniqueVMID == null) {
+                if (other.uniqueVMID != null) {
+                    return false;
+                }
+            } else if (!uniqueVMID.equals(other.uniqueVMID)) {
+                return false;
+            }
+            return true;
         }
     }
 
