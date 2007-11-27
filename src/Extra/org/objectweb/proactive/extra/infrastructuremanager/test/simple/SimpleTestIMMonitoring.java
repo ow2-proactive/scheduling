@@ -279,7 +279,7 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
     }
 
     public void nodeFreeEvent(NodeEvent n) {
-        System.out.println("SimpleTestIMMonitoring.nodeFreeEvent()" +
+        System.out.println("SimpleTestIMMonitoring.nodeFreeEvent() " +
             n.getNodeUrl());
     }
 
