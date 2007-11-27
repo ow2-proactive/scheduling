@@ -124,12 +124,16 @@ public class AOEditPart extends AbstractMonitoringEditPart {
 
                 //final IFigure panel = getWorldEditPart().getFigure().getParent();
                 if (state == State.NOT_MONITORED) {
-                    getViewer().getControl().getDisplay().syncExec(new Runnable() {
+                    System.out.println("Active Object not monitored : " +
+                        AOEditPart.this.castedModel.toString());
+                    getCastedFigure().removeConnections(getGlobalPanel());
+                    /*getViewer().getControl().getDisplay().syncExec(new Runnable() {
                             public void run() {
                                 getCastedFigure()
                                     .removeConnections(getGlobalPanel());
                             }
                         });
+                    */
                     /*this.figuresToUpdate.add(getGlobalPanel());*/ addFigureToUpdtate(getGlobalPanel());
                 } else {
                     getViewer().getControl().getDisplay().syncExec(new Runnable() {
