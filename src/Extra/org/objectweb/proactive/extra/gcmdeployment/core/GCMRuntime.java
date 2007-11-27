@@ -58,4 +58,12 @@ public class GCMRuntime implements Serializable {
     public List<Node> getNodes() {
         return nodes;
     }
+
+    public void update(Set<Node> nodes) {
+        for (Node node : nodes) {
+            if (!this.nodes.contains(node)) {
+                this.nodes.add(node);
+            }
+        }
+    }
 }

@@ -156,7 +156,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     public void updateTopology(Topology topology) {
-        // TODO cmathieu
+        TopologyImpl.updateTopology(topology, nodes);
     }
 
     /* -------------------

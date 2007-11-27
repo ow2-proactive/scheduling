@@ -49,7 +49,6 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDe
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentResources;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMRuntime;
 import org.objectweb.proactive.extra.gcmdeployment.core.Topology;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.TopologyRootImpl;
@@ -173,6 +172,10 @@ public class GCMApplicationDescriptorImpl
 
     public Set<Node> getCurrentUnusedNodes() {
         return nodeAllocator.getUnusedNode();
+    }
+
+    public void updateTopology(Topology topology) {
+        TopologyImpl.updateTopology(topology, nodes);
     }
 
     /* -----------------------------

@@ -46,18 +46,14 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 @PublicAPI
 public class GCMHost implements Serializable {
     protected String hostname;
-    protected List<GCMRuntime> runtimes;
+    protected Map<VMInformation, GCMRuntime> runtimes;
 
     public GCMHost(String hostname, Set<Node> nodes) {
         super();
         this.hostname = hostname;
-        this.runtimes = new ArrayList<GCMRuntime>();
+        this.runtimes = new HashMap<VMInformation, GCMRuntime>();
 
-        Map<VMInformation, Set<Node>> byRuntime = groupByRutnime(nodes);
-        for (VMInformation vmi : byRuntime.keySet()) {
-            GCMRuntime runtime = new GCMRuntime(vmi, byRuntime.get(vmi));
-            runtimes.add(runtime);
-        }
+        update(nodes);
     }
 
     static private Map<VMInformation, Set<Node>> groupByRutnime(Set<Node> nodes) {
@@ -78,6 +74,18 @@ public class GCMHost implements Serializable {
     }
 
     public List<GCMRuntime> getRuntimes() {
-        return runtimes;
+        return new ArrayList<GCMRuntime>(runtimes.values());
+    }
+
+    public void update(Set<Node> nodes) {
+        Map<VMInformation, Set<Node>> byRuntime = groupByRutnime(nodes);
+        for (VMInformation vmi : byRuntime.keySet()) {
+            if (runtimes.containsKey(vmi)) {
+                runtimes.get(vmi).update(byRuntime.get(vmi));
+            } else {
+                GCMRuntime runtime = new GCMRuntime(vmi, byRuntime.get(vmi));
+                runtimes.put(vmi, runtime);
+            }
+        }
     }
 }

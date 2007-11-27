@@ -169,10 +169,18 @@ public interface VirtualNode {
     public void unsubscribeIsReady(Object client, String methodName);
 
     /**
+     * Returns the topology of all the Nodes currently available in the Virtual Node
      *
-     * @return
+     * @return the current topology of all the nodes inside the application
      */
     public Topology getCurrentTopology();
 
+    /**
+     * Updates the Topology passed in parameter
+     *
+     * Nodes present in the Application but not in the Topology are added to it.
+     *
+     * @param topology the topology to be updated
+     */
     public void updateTopology(Topology topology);
 }
