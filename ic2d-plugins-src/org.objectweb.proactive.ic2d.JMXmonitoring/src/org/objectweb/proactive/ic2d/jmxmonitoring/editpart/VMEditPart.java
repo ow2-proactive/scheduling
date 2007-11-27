@@ -76,7 +76,15 @@ public class VMEditPart extends AbstractMonitoringEditPart {
             getCastedFigure().notResponding();
             break;
         default:
-            break;
+            getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+                    public void run() {
+                        // Refresh only if this edit part is active
+                        if (VMEditPart.this.isActive()) {
+                            refresh();
+                        }
+                    }
+                });
+
         }
 
         /*
@@ -87,11 +95,6 @@ public class VMEditPart extends AbstractMonitoringEditPart {
         }*/
 
         //refresh();
-        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-                public void run() {
-                    refresh();
-                }
-            });
     }
 
     //

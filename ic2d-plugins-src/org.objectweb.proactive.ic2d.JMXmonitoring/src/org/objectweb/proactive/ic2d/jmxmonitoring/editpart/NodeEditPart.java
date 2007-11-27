@@ -108,25 +108,31 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
         if ((notif.getMVCNotification() == MVCNotificationTag.STATE_CHANGED) &&
                 (notif.getData() == State.NOT_MONITORED)) {
             deactivate();
-        } else if (notif.getMVCNotification() == MVCNotificationTag.STATE_CHANGED) //in this case we know we have changed highlight state
+        } else if ((notif.getMVCNotification() == MVCNotificationTag.STATE_CHANGED) &&
+                (notif.getData() != State.NOT_MONITORED)) //in this case we know we have changed highlight state
          {
             //method VirtualNodesGroup.getColor(virtualNode vn)
             //returns the color for the virtual node if the virtual node is selected
             //or null if it is not. 
             //if the collor is null, setHighlight(null) colors the figure 
             //node to the default color
-            getCastedFigure()
-                .setHighlight(getMonitoringView().getVirtualNodesGroup()
-                                  .getColor(getCastedModel().getVirtualNode()));
             getViewer().getControl().getDisplay().asyncExec(new Runnable() {
                     public void run() {
+                        getCastedFigure()
+                            .setHighlight(getMonitoringView()
+                                              .getVirtualNodesGroup()
+                                              .getColor(getCastedModel()
+                                                            .getVirtualNode()));
                         refresh();
                     }
                 });
         } else {
             getViewer().getControl().getDisplay().asyncExec(new Runnable() {
                     public void run() {
-                        refresh();
+                        // Refresh only if this edit part is active
+                        if (NodeEditPart.this.isActive()) {
+                            refresh();
+                        }
                     }
                 });
         }
