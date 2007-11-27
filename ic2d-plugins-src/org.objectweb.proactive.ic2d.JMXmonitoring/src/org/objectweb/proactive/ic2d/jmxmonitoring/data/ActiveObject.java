@@ -30,13 +30,10 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
-import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.ListenerNotFoundException;
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
@@ -66,19 +63,19 @@ public class ActiveObject extends AbstractData {
     ;
 
     /** The parent object. */
-    private NodeObject parent;
+    private final NodeObject parent;
 
     /** ID used to identify the active object globally, even in case of migration. */
-    private UniqueID id;
+    private final UniqueID id;
 
     /** The object's name (ex: ao#2) */
-    private String name;
+    private final String name;
 
     /** Name of the class used to created the active object. */
-    private String className;
+    private final String className;
 
     /** JMX Notification listener */
-    private NotificationListener listener;
+    private final NotificationListener listener;
 
     /** State of the object (ex: WAITING_BY_NECESSITY) */
     private State currentState = State.UNKNOWN;
@@ -87,7 +84,7 @@ public class ActiveObject extends AbstractData {
     private int requestQueueLength = -1; // -1 = not known
 
     /** Forwards methods in an MBean's management interface through the MBean server to the BodyWrapperMBean. */
-    private BodyWrapperMBean proxyMBean;
+    private final BodyWrapperMBean proxyMBean;
 
     // -------------------------------------------
     // --- Constructor ---------------------------
@@ -102,6 +99,19 @@ public class ActiveObject extends AbstractData {
      */
     public ActiveObject(NodeObject parent, UniqueID id, String className,
         ObjectName objectName) {
+        this(parent, id, className, objectName, null);
+    }
+
+    /**
+     * Creates a new AOObject.
+     * @param parent The NodeObject containing the active object
+     * @param id The active object's id
+     * @param className The active object's name
+     * @param objectName The object name associated to this active object.
+     * @param proxyMBean The mbean associated to this active object.
+     */
+    public ActiveObject(NodeObject parent, UniqueID id, String className,
+        ObjectName objectName, BodyWrapperMBean proxyMBean) {
         super(objectName);
         this.parent = parent;
         this.id = id;
@@ -109,11 +119,11 @@ public class ActiveObject extends AbstractData {
         this.className = className;
 
         // Used to have good performances.
-        getWorldObject().addActiveObject(this);
+        this.getWorldObject().addActiveObject(this);
 
         this.listener = new ActiveObjectListener(this);
 
-        proxyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
+        this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
                 getObjectName(), BodyWrapperMBean.class, false);
     }
 
@@ -308,8 +318,7 @@ public class ActiveObject extends AbstractData {
     public void resetCommunications() {
         setChanged();
         notifyObservers(new Notification(
-                MVCNotification.ACTIVE_OBJECT_RESET_COMMUNICATIONS,
-                new HashSet<ActiveObject>()));
+                MVCNotification.ACTIVE_OBJECT_RESET_COMMUNICATIONS, null));
     }
 
     public void addRequest() {

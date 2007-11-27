@@ -137,39 +137,41 @@ public class NodeObject extends AbstractData {
      */
     @SuppressWarnings("unchecked")
     private void findActiveObjects() {
-        Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
+        final Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
 
-        List<ObjectName> activeObjectNames = getProxyNodeMBean()
-                                                 .getActiveObjects();
-        for (ObjectName oname : activeObjectNames) {
-            BodyWrapperMBean proxyBodyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
+        final List<ObjectName> activeObjectNames = getProxyNodeMBean()
+                                                       .getActiveObjects();
+        for (final ObjectName oname : activeObjectNames) {
+            final BodyWrapperMBean proxyBodyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
                     oname, BodyWrapperMBean.class, false);
-            UniqueID id = proxyBodyMBean.getID();
-            String activeObjectName = proxyBodyMBean.getName();
+
+            // Since the id is already contained as a String in the ObjectName 
+            // this call can be avoid if the UniqueID can be built from a string
+            final UniqueID id = proxyBodyMBean.getID();
+            final String idString = id.toString();
 
             // If this child is a NOT monitored child.
-            if (containsChildInNOTMonitoredChildren(id.toString())) {
+            if (containsChildInNOTMonitoredChildren(idString)) {
                 continue;
             }
-            ActiveObject child = (ActiveObject) this.getMonitoredChild(id.toString());
+            ActiveObject child = (ActiveObject) this.getMonitoredChild(idString);
 
             // If this child is not yet monitored.
             if (child == null) {
-                child = new ActiveObject(this, id, activeObjectName, oname);
+                // Get the name of the active object
+                final String activeObjectName = proxyBodyMBean.getName();
+                child = new ActiveObject(this, id, activeObjectName, oname,
+                        proxyBodyMBean);
                 addChild(child);
-            } else {
-                child.explore();
             }
             // Removes from the model the not monitored or termined aos.
-            childrenToRemoved.remove(child.getKey());
+            childrenToRemoved.remove(idString);
         }
 
         // Some child have to be removed
-        for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator();
-                iter.hasNext();) {
-            ActiveObject child = (ActiveObject) iter.next();
-            child.stopMonitoring(true); //unsubscribes listener for this child object 
-                                        //and call destroy() on the child object
+        for (final AbstractData child : childrenToRemoved.values()) {
+            ((ActiveObject) child).stopMonitoring(true); //unsubscribes listener for this child object 
+                                                         //and call destroy() on the child object
         }
     }
 
