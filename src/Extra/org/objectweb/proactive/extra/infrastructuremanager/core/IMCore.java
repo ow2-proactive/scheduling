@@ -93,24 +93,30 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     private String id;
 
     // Attributes
+    // All sources are created on the same node
     private Node nodeIM;
+
+    // External interface of the RM
     private IMAdmin admin;
     private IMMonitoringImpl monitoring;
     private IMUser user;
-
-    // test mkris
-    IMActivityNode act;
 
     /* HashMaps of nodes and nodeSource */
     private HashMap<String, NodeSource> nodeSources;
     private HashMap<String, IMNode> allNodes;
 
     /* list of nodes sorted by states */
+    // TODO cdelbe, gsigety Those strcut can be HashSet ? 
+    // for efficient remove ?
     private ArrayList<IMNode> freeNodes;
     private ArrayList<IMNode> busyNodes;
     private ArrayList<IMNode> downNodes;
     private ArrayList<IMNode> toBeReleased;
+
+    /* Timeout for selection script result */
     private static final int MAX_VERIF_TIMEOUT = 120000;
+
+    /* Name of the default source node, created with the RM */
     private static final String DEFAULT_STATIC_SOURCE_NAME = "default";
 
     // ----------------------------------------------------------------------//
@@ -164,9 +170,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
                 logger.debug("instanciation IMNodeManager");
             }
 
-            act = new IMActivityNode((IMCoreInterface) (ProActiveObject.getStubOnThis()));
-            new Thread(act).start();
-
             this.createStaticNodesource(null, DEFAULT_STATIC_SOURCE_NAME);
 
             //Creating IM started event 
@@ -200,7 +203,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         assert this.busyNodes.contains(imnode);
         try {
             imnode.clean(); // cleaning the node, kill all active objects
-            this.removeFromAllLists(imnode);
+            this.busyNodes.remove(imnode);
             imnode.setFree();
             this.freeNodes.add(imnode);
             //create the event
@@ -228,7 +231,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         assert imnode.isFree();
         assert this.freeNodes.contains(imnode);
         imnode.clean();
-        removeFromAllLists(imnode);
+        this.freeNodes.remove(imnode);
         busyNodes.add(imnode);
         //create the event
         this.monitoring.nodeBusyEvent(imnode.getNodeEvent());
@@ -248,7 +251,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         //the node can only come from a busy state
         assert imnode.isBusy();
         assert this.busyNodes.contains(imnode);
-        this.removeFromAllLists(imnode);
+        this.busyNodes.remove(imnode);
         this.toBeReleased.add(imnode);
         //create the event
         this.monitoring.nodeToReleaseEvent(imnode.getNodeEvent());
@@ -267,6 +270,8 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     private void setDown(IMNode imnode) {
         logger.info("[IMCORE] down node : " + imnode.getNodeURL() +
             ", from Source : " + imnode.getNodeSourceId());
+        assert (this.busyNodes.contains(imnode) ||
+        this.freeNodes.contains(imnode) || this.toBeReleased.contains(imnode));
         removeFromAllLists(imnode);
         this.downNodes.add(imnode);
         //create the event
@@ -323,22 +328,16 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
 
     /**
      * Remove the imnode from all the lists it can appears.
-     * @param imnode
-     * @return
+     * @param imnode the node to be removed
+     * @return true if the node has been removed form one list, false otherwise
      */
+
+    // TODO gsigety, cdelbe TO BE REMOVED ?
     private boolean removeFromAllLists(IMNode imnode) {
-        // Free
         boolean free = this.freeNodes.remove(imnode);
-
-        // Busy
         boolean busy = this.busyNodes.remove(imnode);
-
-        // toBeReleased
         boolean toBeReleased = this.toBeReleased.remove(imnode);
-
-        // down
         boolean down = this.downNodes.remove(imnode);
-
         return free || busy || toBeReleased || down;
     }
 
@@ -496,9 +495,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         // testing script results
         do {
             try {
-                // int idx = ProActive.waitForAny(scriptResults,
-                // MAX_VERIF_TIMEOUT);
-                int idx = ProFuture.waitForAny(scriptResults);
+                int idx = ProFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
 
                 // idx could be -1 if an error occured in wfa (or timeout
                 // expires)
@@ -894,6 +891,9 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         }
     }
 
+    /**
+     *
+     */
     public void setDownNode(String nodeUrl) {
         System.out.println("IMCoreImpl.setDownNode() node Url" + nodeUrl);
         IMNode imnode = getNodebyUrl(nodeUrl);

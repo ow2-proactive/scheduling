@@ -85,6 +85,8 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     public void initActivity(Body body) {
         this.imCore.addSource((NodeSource) ProActiveObject.getStubOnThis(),
             this.SourceId);
+        // TODO gsigety, cdelbe : giving a stub on the source can 
+        // lead to a lock if source is blocked
         new Pinger((NodeSource) ProActiveObject.getStubOnThis());
     }
 

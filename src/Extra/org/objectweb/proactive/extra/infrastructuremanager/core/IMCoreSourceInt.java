@@ -34,7 +34,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 
 
-/* interface for IMNodeSourceManager
+/**
+ * Interface for IMNodeSourceManager
  * methods called by NodeSource objects
  */
 public interface IMCoreSourceInt {
@@ -50,7 +51,8 @@ public interface IMCoreSourceInt {
      */
     public void addSource(NodeSource source, String sourceId);
 
-    /* release a node as soon as possible
+    /**
+    * release a node as soon as possible.
     * if the node is busy, waiting the job end
     * a call back is awaited to confirm this node unregistering
     */

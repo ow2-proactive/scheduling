@@ -48,7 +48,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.AddingNodesException;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.DynamicNSInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.utils.Heap;
@@ -56,7 +55,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.utils.Heap;
 
 /**
  * Abstract class that provide a way to simply create {@link DynamicNodeSource}
- * You just have to write the {@link #getNode()} and {@link #releaseNode(IMNode)}
+ * You just have to write the {@link #getNode()} and {@link #releaseNode()}
  * methods to create a dynamic node source.
  * WARNING : The {@link DynamicNodeSource} you will write must be an Active Object !
  * @author ProActive team

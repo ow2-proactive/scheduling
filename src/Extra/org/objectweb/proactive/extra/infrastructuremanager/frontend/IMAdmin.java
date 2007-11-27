@@ -114,6 +114,12 @@ public interface IMAdmin extends Serializable {
      */
     public void shutdown() throws ProActiveException;
 
+    /**
+     *
+     * @param listener
+     * @param events
+     * @return
+     */
     public IMInitialState addIMEventListener(IMEventListener listener,
         IMEvent... events);
 }
