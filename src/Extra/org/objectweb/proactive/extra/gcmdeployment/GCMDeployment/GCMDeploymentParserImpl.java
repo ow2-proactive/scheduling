@@ -47,6 +47,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import static org.objectweb.proactive.core.mop.Utils.makeDeepCopy;
 import org.objectweb.proactive.core.util.OperatingSystem;
+import org.objectweb.proactive.core.xml.VariableContract;
+import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeOARSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeRSHParser;
@@ -85,11 +87,11 @@ import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
-    private static final String PA_HOST = GCM_DESCRIPTOR_NAMESPACE_PREFX +
+    private static final String PA_HOST = GCM_DESCRIPTOR_NAMESPACE_PREFIX +
         "host";
-    private static final String PA_GROUP = GCM_DESCRIPTOR_NAMESPACE_PREFX +
+    private static final String PA_GROUP = GCM_DESCRIPTOR_NAMESPACE_PREFIX +
         "group";
-    private static final String PA_BRIDGE = GCM_DESCRIPTOR_NAMESPACE_PREFX +
+    private static final String PA_BRIDGE = GCM_DESCRIPTOR_NAMESPACE_PREFIX +
         "bridge";
     private static final String XPATH_GCMDEPLOYMENT = "/pa:GCMDeployment/";
     private static final String XPATH_INFRASTRUCTURE = XPATH_GCMDEPLOYMENT +
@@ -113,8 +115,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected Map<String, GroupParser> groupParserMap;
     protected Map<String, BridgeParser> bridgeParserMap;
     protected GCMDeploymentInfrastructure infrastructure;
-    protected GCMDeploymentEnvironment environment;
+//    protected GCMDeploymentEnvironment environment;
     protected GCMDeploymentResources resources;
+    private VariableContract variableContract;
     private boolean parsedResource = false;
     private boolean parsedInfrastructure = false;
     protected List<String> schemas;
@@ -132,7 +135,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         resources = new GCMDeploymentResources();
         groupParserMap = new HashMap<String, GroupParser>();
         bridgeParserMap = new HashMap<String, BridgeParser>();
-        environment = new GCMDeploymentEnvironment();
+        variableContract = new VariableContract();
         schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas)
                                         : new ArrayList<String>();
 
@@ -228,20 +231,48 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         Node environmentNode = (Node) xpath.evaluate(XPATH_ENVIRONMENT,
                 document, XPathConstants.NODE);
 
-        NodeList descriptorVarNodes = (NodeList) xpath.evaluate(XPATH_DESCRIPTOR_VARIABLE,
-                environmentNode, XPathConstants.NODESET);
+        
+        String[][] pairs = new String[][] {
+                {
+                    VARIABLES_JAVAPROPERTY_DESCRIPTOR,
+                    VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG
+                },
+                {
+                    VARIABLES_JAVAPROPERTY_PROGRAM,
+                    VARIABLES_JAVAPROPERTY_PROGRAM_TAG
+                },
+                { VARIABLES_JAVAPROPERTY, VARIABLES_JAVAPROPERTY_TAG },
+                { VARIABLES_DESCRIPTOR, VARIABLES_DESCRIPTOR_TAG },
+                { VARIABLES_PROGRAM, VARIABLES_PROGRAM_TAG },
+                { VARIABLES_PROGRAM_DEFAULT, VARIABLES_PROGRAM_DEFAULT_TAG },
+                { VARIABLES_DESCRIPTOR_DEFAULT, VARIABLES_DESCRIPTOR_DEFAULT_TAG },
+            };
 
-        for (int i = 0; i < descriptorVarNodes.getLength(); ++i) {
-            Node descVarNode = descriptorVarNodes.item(i);
-            String varName = GCMParserHelper.getAttributeValue(descVarNode,
-                    "name");
-            String varValue = GCMParserHelper.getAttributeValue(descVarNode,
-                    "value");
-
-            environment.addValue(varName, varValue);
+        for (int i = 0; i < pairs.length; ++i) {
+            VariableContractType varContractType = VariableContractType.getType(pairs[i][1]);
+            processVariables(environmentNode, pairs[i][0], varContractType);
         }
+        
     }
 
+    private void processVariables(Node environmentNode, String expr,
+            VariableContractType varContractType)
+            throws XPathExpressionException {
+            Object result = xpath.evaluate(expr, environmentNode, XPathConstants.NODESET);
+            NodeList nodes = (NodeList) result;
+            for (int i = 0; i < nodes.getLength(); ++i) {
+                Node node = nodes.item(i);
+
+                String varName = GCMParserHelper.getAttributeValue(node, "name");
+
+                String varValue = GCMParserHelper.getAttributeValue(node, "value");
+
+                variableContract.setDescriptorVariable(varName, varValue,
+                    varContractType);
+            }
+        }
+
+    
     public void parseResources() throws XPathExpressionException, IOException {
         if (parsedResource) {
             throw new IllegalStateException(
@@ -485,8 +516,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         return hostInfo;
     }
 
-    public GCMDeploymentEnvironment getEnvironment() {
-        return environment;
+    public VariableContract getEnvironment() {
+        return variableContract;
     }
 
     public GCMDeploymentInfrastructure getInfrastructure() {

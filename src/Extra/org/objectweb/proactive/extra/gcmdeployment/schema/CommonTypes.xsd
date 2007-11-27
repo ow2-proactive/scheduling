@@ -156,7 +156,14 @@
 
 	<element name="abstractVariable" abstract="true" type="pa:variableType"></element>
 	<element name="descriptorVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="descriptorDefaultVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
 	<element name="javaPropertyVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="programVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="programDefaultVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="javaPropertyDescriptorDefault" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="javaPropertyProgramDefault" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="includeXMLFile" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="includePropertyFile" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
 
 	<complexType name="dummyType"></complexType>
 
