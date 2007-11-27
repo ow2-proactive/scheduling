@@ -31,6 +31,7 @@
 package functionalTests.filetransfer;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.After;
@@ -41,12 +42,12 @@ import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.filetransfer.FileVector;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -117,8 +118,6 @@ public class TestDeployRetrieve extends FunctionalTest {
         System.setProperty("schema.validation", "false");
 
         VariableContract vc = new VariableContract();
-        vc.setVariableFromProgram("JVM_PROCESS", jvmProcess,
-            VariableContractType.DescriptorDefaultVariable);
         vc.setVariableFromProgram("HOST_NAME", hostName,
             VariableContractType.DescriptorDefaultVariable);
 
@@ -128,8 +127,6 @@ public class TestDeployRetrieve extends FunctionalTest {
         System.setProperty("schema.validation", validatingProperyOld);
 
         VirtualNode testVNode = pad.getVirtualNode("test");
-        testVNode.getVirtualNodeInternal()
-                 .setFileTransferParams(testblocksize, testflyingblocks);
         long initDeployment = System.currentTimeMillis();
         testVNode.activate();
         if (logger.isDebugEnabled()) {
@@ -146,7 +143,7 @@ public class TestDeployRetrieve extends FunctionalTest {
                 (finitDeployment - initDeployment) + "[ms]");
         }
 
-        //Checking correc FileTransferDeploy
+        //Checking correct FileTransferDeploy
         if (logger.isDebugEnabled()) {
             logger.debug(
                 "Checking the integrity of the test file transfer at deployment time.");
@@ -159,18 +156,22 @@ public class TestDeployRetrieve extends FunctionalTest {
             logger.debug("Retrieving test files");
         }
         long initRetrieve = System.currentTimeMillis();
-        FileVector fileVector = testVNode.getVirtualNodeInternal()
+
+        List<RemoteFile> list = testVNode.getVirtualNodeInternal()
                                          .fileTransferRetrieve(); //async
-        fileVector.waitForAll(); //sync here
+        for (RemoteFile rfile : list) {
+            rfile.waitForFinishedTransfer(); //sync here
+        }
+
         long finitRetrieve = System.currentTimeMillis();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Retrieved " + fileVector.size() +
+            logger.debug("Retrieved " + list.size() +
                 " files from VirtualNode " + testVNode.getName() + " in " +
                 (finitRetrieve - initRetrieve) + "[ms]");
         }
 
-        assertTrue(fileVector.size() == 2);
+        assertTrue(list.size() == 2);
 
         fileRetrieved = new File(fileRetrieved.getAbsoluteFile() + "-" +
                 node[0].getNodeInformation().getName());

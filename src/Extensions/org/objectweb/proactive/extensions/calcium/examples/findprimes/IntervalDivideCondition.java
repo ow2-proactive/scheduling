@@ -34,8 +34,8 @@ import org.objectweb.proactive.extensions.calcium.muscle.Condition;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
-public class ChallengeDivideCondition implements Condition<Challenge> {
-    public boolean evalCondition(SkeletonSystem system, Challenge params) {
+public class IntervalDivideCondition implements Condition<Interval> {
+    public boolean evalCondition(SkeletonSystem system, Interval params) {
         return (params.max - params.min) > params.solvableSize;
     }
 }

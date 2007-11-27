@@ -28,33 +28,47 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.examples.findprimes;
+package org.objectweb.proactive.extensions.calcium.environment;
 
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
-import org.objectweb.proactive.extensions.calcium.muscle.Execute;
-import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
+import java.io.File;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class SolveChallenge implements Execute<Challenge, Primes> {
-    public Primes execute(SkeletonSystem system, Challenge param)
-        throws RuntimeException, EnvironmentException {
-        Primes primes = new Primes();
+public class StoredFile implements java.io.Serializable {
+    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
+    public long fileId;
+    public File location;
+    public long length;
+    public String md5sum;
 
-        for (int i = param.min; i <= param.max; i++) {
-            if (isPrime(i)) {
-                primes.primes.add(new Integer(i));
-            }
-        }
-
-        return primes;
+    public StoredFile(File location, long fileId, long length) {
+        this.location = location;
+        this.fileId = fileId;
+        this.length = length;
+        this.md5sum = null;
     }
 
-    private boolean isPrime(int p) {
-        for (int i = 2; i < p; i++) {
-            if ((p % i) == 0) {
-                return false;
-            }
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof StoredFile)) {
+            return false;
         }
-        return true;
+
+        return equals((StoredFile) o);
+    }
+
+    public boolean equals(StoredFile rf) {
+        return (this.fileId == rf.fileId) &&
+        this.location.getPath().equals(rf.location.getPath()) &&
+        (this.length == rf.length);
+    }
+
+    @Override
+    public String toString() {
+        return "id=" + fileId + " path=" + location + " length=" + length +
+        " md5sum=" + md5sum;
     }
 }

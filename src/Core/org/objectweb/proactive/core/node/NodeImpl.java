@@ -42,6 +42,7 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
@@ -340,23 +341,4 @@ public class NodeImpl implements Node, Serializable {
     public VMInformation getVMInformation() {
         return proActiveRuntime.getVMInformation();
     }
-
-    /**
-        public synchronized FileTransferService getFileTransferServiceFromPool() {
-                if(fileTransferServicePool.isEmpty()){
-                        try {
-                                return (FileTransferService) ProActive.newActive(FileTransferService.class.getName(),
-                                        null);
-                        } catch (Exception e) {
-                                return null;
-                        }
-                }
-                return (FileTransferService)fileTransferServicePool.get(0);
-        }
-
-        public synchronized void putFileTransferServiceInPool(FileTransferService fts) {
-
-                fileTransferServicePool.add(fts);
-        }
-        **/
 }

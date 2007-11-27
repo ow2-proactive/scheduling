@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.GCMRuntimeRegistrationNotificationData;
 import org.objectweb.proactive.core.jmx.server.ServerConnector;
@@ -437,4 +438,9 @@ public interface ProActiveRuntime extends SecurityEntity {
     public ServerConnector getJMXServerConnector();
 
     public void register(GCMRuntimeRegistrationNotificationData event);
+
+    /**
+     * @return the FileTransferEngine singleton active object.
+     */
+    public FileTransferEngine getFileTransferEngine();
 }

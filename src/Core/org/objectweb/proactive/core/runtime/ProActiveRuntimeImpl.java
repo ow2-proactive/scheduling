@@ -77,6 +77,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.descriptor.util.RefactorPAD;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEvent;
 import org.objectweb.proactive.core.event.RuntimeRegistrationEventProducerImpl;
+import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
 import org.objectweb.proactive.core.gc.GarbageCollector;
 import org.objectweb.proactive.core.jmx.mbean.JMXClassLoader;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapper;
@@ -1389,6 +1390,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private long capacity;
         private final String hostName;
         private long deploymentId;
+        private String vmName;
 
         public VMInformationImpl() throws java.net.UnknownHostException {
             this.uniqueVMID = UniqueID.getCurrentVMID();
@@ -1410,6 +1412,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
             this.capacity = -1;
             this.deploymentId = -1;
+            this.vmName = null;
         }
 
         //
@@ -1442,7 +1445,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
          * @see org.objectweb.proactive.core.runtime.VMInformation#getDescriptorVMName()
          */
         public String getDescriptorVMName() {
-            return this.name;
+            return this.vmName;
         }
 
         public long getCapacity() {
@@ -1635,7 +1638,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             notification);
     }
 
+    public FileTransferEngine getFileTransferEngine() {
+        return FileTransferEngine.getFileTransferEngine();
+    }
+
     public void setDeploymentId(long deploymentId) {
         vmInformation.setDeploymentId(deploymentId);
+    }
+
+    public void setVMName(String vmName) {
+        vmInformation.vmName = vmName;
     }
 }

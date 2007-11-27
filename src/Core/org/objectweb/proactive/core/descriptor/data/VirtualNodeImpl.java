@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,6 +57,8 @@ import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.descriptor.services.UniversalService;
 import org.objectweb.proactive.core.event.NodeCreationEvent;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
+import org.objectweb.proactive.core.filetransfer.RemoteFile;
+import org.objectweb.proactive.core.filetransfer.RemoteFileImpl;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.NodeNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -87,7 +90,6 @@ import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.FileTransfer;
-import org.objectweb.proactive.filetransfer.FileVector;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
@@ -148,9 +150,10 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     private java.util.ArrayList<FileTransferDefinition> fileTransferRetrieve;
 
     /** Holds the futures for the status of the deployed files using pftp */
-    private ConcurrentHashMap<String, FileVector> fileTransferDeployedStatus;
-    private int fileBlockSize;
-    private int overlapping;
+    private ConcurrentHashMap<String, List<RemoteFile>> fileTransferDeployedStatus;
+
+    /** Holds nodes that failed during file transfer */
+    private ConcurrentHashMap<String, NodeException> fileTransferNodeFailed;
 
     /** index of the last node used */
     private int lastNodeIndex;
@@ -243,11 +246,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         this.createdNodes = new java.util.ArrayList<Node>();
         this.awaitedVirtualNodes = new Hashtable<String, VirtualMachine>();
         this.fileTransferDeploy = new ArrayList<FileTransferDefinition>();
-        this.fileTransferDeployedStatus = new ConcurrentHashMap<String, FileVector>();
+        this.fileTransferDeployedStatus = new ConcurrentHashMap<String, List<RemoteFile>>();
+        this.fileTransferNodeFailed = new ConcurrentHashMap<String, NodeException>();
         this.fileTransferRetrieve = new ArrayList<FileTransferDefinition>();
         this.proActiveRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
-        this.fileBlockSize = org.objectweb.proactive.core.filetransfer.FileBlock.DEFAULT_BLOCK_SIZE;
-        this.overlapping = org.objectweb.proactive.core.filetransfer.FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS;
+
         //        this.roe = new RemoteObjectExposer(VirtualNode.class.getName(),this);
         if (logger.isDebugEnabled()) {
             logger.debug("vn " + this.name + " registered on " +
@@ -375,7 +378,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         while (it.hasNext()) {
             VirtualMachine vm = (VirtualMachine) it.next();
-
             if (vm.getName().equals(name)) {
                 return vm;
             }
@@ -745,13 +747,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             node = this.createdNodes.get(this.lastNodeIndex);
             increaseNodeIndex();
 
-            //wait for pending file transfer
-            FileVector fw = this.fileTransferDeployedStatus.get(node.getNodeInformation()
-                                                                    .getName());
-
-            if (fw != null) {
-                fw.waitForAll(); //wait-by-necessity
-            }
+            waitForNodeTransferFiles(node);
 
             return node;
         } else {
@@ -772,12 +768,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 "\".");
         }
 
-        FileVector fw = this.fileTransferDeployedStatus.get(node.getNodeInformation()
-                                                                .getName());
-
-        if (fw != null) {
-            fw.waitForAll(); //wait-by-necessity
-        }
+        waitForNodeTransferFiles(node);
 
         return node;
     }
@@ -1325,13 +1316,22 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             internalWait(tempNodeCount);
         }
 
-        //wait for the nodes to complete their deployment file transfer
-        Collection<FileVector> c = this.fileTransferDeployedStatus.values();
-        Iterator<FileVector> it = c.iterator();
+        Collection<NodeException> exCollection = this.fileTransferNodeFailed.values();
+        for (NodeException ex : exCollection) {
+            throw ex;
+        }
 
-        while (it.hasNext()) {
-            FileVector fw = it.next();
-            fw.waitForAll(); //wait-by-necessity
+        //wait for the nodes to complete their deployment file transfer
+        Collection<List<RemoteFile>> c = this.fileTransferDeployedStatus.values();
+        for (List<RemoteFile> list : c) {
+            for (RemoteFile rfile : list) {
+                try {
+                    rfile.waitForFinishedTransfer();
+                } catch (IOException e) {
+                    throw new NodeException("Unable to transfer files during node creation",
+                        e);
+                }
+            }
         }
 
         //        rrThreadpool.shutdown();
@@ -1670,9 +1670,14 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         }
 
         //Perform FileTransferDeploy (if needed)
-        FileVector fw = fileTransferDeploy(node);
-        this.fileTransferDeployedStatus.put(node.getNodeInformation().getName(),
-            fw);
+        try {
+            List<RemoteFile> rfiles = fileTransferDeploy(node);
+            this.fileTransferDeployedStatus.put(node.getNodeInformation()
+                                                    .getName(), rfiles);
+        } catch (Exception e) {
+            this.fileTransferNodeFailed.put(node.getNodeInformation().getName(),
+                new NodeException(e));
+        }
 
         if (this.technicalService != null) {
             this.technicalService.apply(node);
@@ -1698,10 +1703,11 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#fileTransferRetrieve()
      */
-    public FileVector fileTransferRetrieve()
+    public List<RemoteFile> fileTransferRetrieve()
         throws IOException, ProActiveException {
         Node[] nodes;
-        FileVector fileVector = new FileVector();
+
+        ArrayList<RemoteFile> list = new ArrayList<RemoteFile>();
 
         try {
             nodes = getNodes();
@@ -1761,8 +1767,8 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
 
             long init = System.currentTimeMillis();
-            fileVector.add(FileTransfer.pullFiles(nodes[i], srcFile, dstFile,
-                    this.fileBlockSize, this.overlapping));
+
+            list.addAll(FileTransfer.pull(nodes[i], srcFile, dstFile));
 
             if (FILETRANSFER_LOGGER.isDebugEnabled()) {
                 FILETRANSFER_LOGGER.debug("Returned pullFiles in:" +
@@ -1770,7 +1776,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             }
         }
 
-        return fileVector;
+        return list;
     }
 
     /**
@@ -1780,9 +1786,13 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
      * From the process the FileTransfer Deploy Workshop is extracted, and the file
      * is transfered using the FileTransfer API.
      * @param node The node that the files will be transfered to.
+     * @throws IOException
+     * @throws IOException
+     * @throws ProActiveException
      */
-    private FileVector fileTransferDeploy(Node node) {
-        FileVector fileWrapper = new FileVector();
+    private List<RemoteFile> fileTransferDeploy(Node node)
+        throws IOException, ProActiveException {
+        ArrayList<RemoteFile> list = new ArrayList<RemoteFile>();
 
         if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
             DEPLOYMENT_FILETRANSFER_LOGGER.debug(
@@ -1794,26 +1804,24 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         VirtualMachine vm = getVirtualMachine(vmName);
 
         if (vm == null) {
-            if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
-                DEPLOYMENT_FILETRANSFER_LOGGER.debug("No VM found with name: " +
-                    vmName + " for node: " +
-                    node.getNodeInformation().getName());
+            //throw new ProActiveException("No VM found with name: " + vmName + " for node: " + node.getNodeInformation().getName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("No VM found with name: " + vmName +
+                    " for node: " + node.getNodeInformation().getName());
             }
-
-            return fileWrapper;
+            return list;
         }
 
         //TODO We only get the VN for the first process in the chain. We should check if it is a SSH, SSH, etc...
         ExternalProcess eProcess = vm.getProcess();
 
         if (eProcess == null) {
-            if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
-                DEPLOYMENT_FILETRANSFER_LOGGER.debug(
-                    "No Process linked with VM: " + vmName + " for node: " +
-                    node.getNodeInformation().getName());
+            //throw new ProActiveException("No Process linked with VM: " +vmName + " for node: " + node.getNodeInformation().getName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("No VM found with name: " + vmName +
+                    " for node: " + node.getNodeInformation().getName());
             }
-
-            return fileWrapper;
+            return list;
         }
 
         //if the process handled the FileTransfer we have nothing to do
@@ -1823,7 +1831,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                     "No ProActive FileTransfer API is required for this node.");
             }
 
-            return fileWrapper;
+            return list;
         }
 
         FileTransferWorkShop ftwDeploy = eProcess.getFileTransferWorkShopDeploy();
@@ -1844,24 +1852,9 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             filesDst[j] = dstFile;
         }
 
-        try {
-            fileWrapper.add(FileTransfer.pushFiles(node, filesSrc, filesDst,
-                    this.fileBlockSize, this.overlapping));
-        } catch (Exception e) {
-            logger.error("Unable to pushFile files to node " +
-                node.getNodeInformation().getName());
+        list.addAll(FileTransfer.push(filesSrc, node, filesDst));
 
-            if (DEPLOYMENT_FILETRANSFER_LOGGER.isDebugEnabled()) {
-                DEPLOYMENT_FILETRANSFER_LOGGER.debug(e.getStackTrace());
-            }
-        }
-
-        return fileWrapper;
-    }
-
-    public void setFileTransferParams(int fileBlockSize, int overlapping) {
-        this.fileBlockSize = fileBlockSize;
-        this.overlapping = overlapping;
+        return list;
     }
 
     public void addTechnicalService(TechnicalService technicalWrapper) {
@@ -1870,5 +1863,24 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public VirtualNodeInternal getVirtualNodeInternal() {
         return this;
+    }
+
+    private void waitForNodeTransferFiles(Node node) throws NodeException {
+        if (fileTransferNodeFailed.containsKey(node.getNodeInformation()
+                                                       .getName())) {
+            throw fileTransferNodeFailed.get(node.getNodeInformation().getName());
+        }
+
+        List<RemoteFile> list = this.fileTransferDeployedStatus.get(node.getNodeInformation()
+                                                                        .getName());
+
+        for (RemoteFile rfile : list) {
+            try {
+                rfile.waitForFinishedTransfer();
+            } catch (IOException e) {
+                throw new NodeException(
+                    "Unable to transfer file during node creation" + e);
+            }
+        }
     }
 }

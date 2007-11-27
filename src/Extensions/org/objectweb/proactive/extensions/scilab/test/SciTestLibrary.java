@@ -39,6 +39,7 @@ import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.scilab.AbstractGeneralTask;
@@ -47,7 +48,6 @@ import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
 import org.objectweb.proactive.extensions.scilab.SciEngine;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 import org.objectweb.proactive.filetransfer.FileTransfer;
-import org.objectweb.proactive.filetransfer.FileVector;
 
 
 public class SciTestLibrary {
@@ -69,14 +69,13 @@ public class SciTestLibrary {
         //Transfer
         Object[] arrayKey = mapEngine.keySet().toArray();
         try {
-            FileVector fv;
             for (int i = 0; i < arrayKey.length; i++) {
                 Node node = SciDeployEngine.getEngineNode((String) arrayKey[i]);
                 System.out.println("Sending file to:" +
                     node.getNodeInformation().getURL());
-                fv = FileTransfer.pushFile(node, new File(localSource),
-                        new File(remoteDest));
-                fv.waitForAll();
+                RemoteFile rfile = FileTransfer.push(new File(localSource),
+                        node, new File(remoteDest));
+                rfile.waitForFinishedTransfer();
             }
         } catch (Exception e) {
             System.out.println("Printing exception");

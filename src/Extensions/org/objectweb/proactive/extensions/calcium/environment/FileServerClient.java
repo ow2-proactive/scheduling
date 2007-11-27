@@ -42,13 +42,13 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public interface FileServerClient {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
 
-    public RemoteFile store(File current, int refCount)
+    public StoredFile store(File current, int refCount)
         throws IOException;
 
-    public void fetch(RemoteFile rfile, File localDst)
+    public void fetch(StoredFile rfile, File localDst)
         throws IOException;
 
-    public RemoteFile store(URL current) throws IOException;
+    public StoredFile store(URL current) throws IOException;
 
     public void commit(long fileId, int refCountDelta);
 

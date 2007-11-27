@@ -34,12 +34,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.calcium.environment.FileServer;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
-import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
+import org.objectweb.proactive.extensions.calcium.environment.StoredFile;
 import org.objectweb.proactive.filetransfer.FileTransfer;
-import org.objectweb.proactive.filetransfer.FileVector;
 
 
 public class FileServerClientImpl implements FileServerClient,
@@ -57,7 +57,7 @@ public class FileServerClientImpl implements FileServerClient,
         fserver.commit(fileId, refCountDelta);
     }
 
-    public void fetch(RemoteFile rfile, File localDst)
+    public void fetch(StoredFile rfile, File localDst)
         throws IOException {
         fserver.canFetch(rfile);
 
@@ -66,27 +66,27 @@ public class FileServerClientImpl implements FileServerClient,
                 logger.debug("Pulling file:" + rfile.location + " -> " +
                     localDst);
             }
-            FileVector fv = FileTransfer.pullFile(node, rfile.location, localDst);
-            fv.waitForAll();
-            fv.getFile(0); //get the exceptions
+            RemoteFile fetchedFile = FileTransfer.pull(node, rfile.location,
+                    localDst);
+            fetchedFile.waitForFinishedTransfer();
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Unable to fetch remote file: " + rfile);
         }
     }
 
-    public RemoteFile store(File current, int refCount)
+    public StoredFile store(File current, int refCount)
         throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("Storing data for file:" + current);
         }
-        RemoteFile rfile = fserver.register();
+        StoredFile rfile = fserver.register();
 
         try {
             //SkeletonSystemImpl.copyFile(localFile, dst);
-            FileVector fv = FileTransfer.pushFile(node, current, rfile.location);
-            fv.waitForAll();
-            fv.getFile(0);
+            RemoteFile sentFile = FileTransfer.push(current, node,
+                    rfile.location);
+            sentFile.waitForFinishedTransfer();
         } catch (Exception e) {
             //If exception happens, then unstore the file.
             fserver.unregister(rfile.fileId);
@@ -99,7 +99,7 @@ public class FileServerClientImpl implements FileServerClient,
         return fserver.dataHasBeenStored(rfile, refCount);
     }
 
-    public RemoteFile store(URL current) throws IOException {
+    public StoredFile store(URL current) throws IOException {
         return fserver.registerAndStore(current);
     }
 

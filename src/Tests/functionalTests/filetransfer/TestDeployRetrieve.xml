@@ -5,16 +5,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME"
-			value="/user/mleyton/home/ProActive" />
+		<javaPropertyVariable name="proactive.dir"/>
 		<javaPropertyVariable name="java.home"/>
-		<descriptorDefaultVariable name="JVM_PROCESS" value="localJVM" />
 		<descriptorDefaultVariable name="HOST_NAME" value="localhost" />
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
-			<virtualNode name="test" fileTransferDeploy="testDeploy"
-				fileTransferRetrieve="testRetrieve" />
+			<virtualNode name="test" fileTransferDeploy="testDeploy" fileTransferRetrieve="testRetrieve" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -40,25 +37,20 @@
 	</deployment>
 	<fileTransferDefinitions>
 		<fileTransfer id="testRetrieve">
-			<file src="ProActiveTestFile.dat"
-				dest="ProActiveTestFileRetrieved.dat" />
-			<file src="ProActiveTestFile.dat"
-				dest="ProActiveTestFileRetrieved2.dat" />
+			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved.dat" />
+			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileRetrieved2.dat" />
 		</fileTransfer>
 		<fileTransfer id="testDeploy">
-			<file src="ProActiveTestFile.dat"
-				dest="ProActiveTestFileDeployed.dat" />
-			<file src="ProActiveTestFile.dat"
-				dest="ProActiveTestFileDeployed2.dat" />
+			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed.dat" />
+			<file src="ProActiveTestFile.dat" dest="ProActiveTestFileDeployed2.dat" />
 		</fileTransfer>
 	</fileTransferDefinitions>
 	<infrastructure>
 		<processes>
 			<processDefinition id="sshProcess">
 				<sshProcess
-					class="org.objectweb.proactive.core.process.ssh.SSHProcess"
-					hostname="${HOST_NAME}">
-					<processReference refid="${JVM_PROCESS}" />
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" hostname="${HOST_NAME}">
+					<processReference refid="localJVM" />
 					<!--localJVM  changed to remoteJVM when testing from eclipse to avoid "Word to long" error -->
 					<fileTransferDeploy refid="implicit">
 						<copyProtocol>rcp,pftp</copyProtocol>
@@ -72,34 +64,56 @@
 				</sshProcess>
 			</processDefinition>
 			<processDefinition id="remoteJVM">
-				<jvmProcess
-					class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<!-- javaPath><absolutePath value="${java.home}/bin/java"/></javaPath-->
-					<classpath>
-						<absolutePath
-							value="${PROACTIVE_HOME}/dist/lib/ProActive.jar" />
-						<absolutePath
-							value="${PROACTIVE_HOME}/dist/lib/*" />
-					</classpath>
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<classpath>
+						<absolutePath value="${proactive.dir}/classes/Core"/>
+						<absolutePath value="${proactive.dir}/classes/Examples"/>
+						<absolutePath value="${proactive.dir}/classes/Extensions"/>
+						<absolutePath value="${proactive.dir}/classes/Extra"/>
+						<absolutePath value="${proactive.dir}/classes/Tests"/>
+						<absolutePath value="${proactive.dir}/classes/Utils"/>
+																								
+                         <!--absolutePath value="${proactive.dir}/dist/lib/ProActive.jar"/-->
+
+                        <absolutePath value="${proactive.dir}/dist/lib/\*"/>
+				</classpath>
+					
+					<javaPath><absolutePath value="${java.home}/bin/java"/></javaPath>
 					<log4jpropertiesFile>
-						<absolutePath
-							value="${PROACTIVE_HOME}/compile/proactive-log4j" />
+					    <absolutePath value="${proactive.dir}/compile/proactive-log4j"/>
 					</log4jpropertiesFile>
-					<policyFile>
-						<absolutePath
-							value="${PROACTIVE_HOME}/scripts/proactive.java.policy" />
-					</policyFile>
 					<jvmParameters>
+						<parameter value="-Dproactive.rmi.port=7199" />
 						<parameter value="-Dproactive.test=true"/>
 					</jvmParameters>
+					<policyFile><absolutePath value="${proactive.dir}/scripts/proactive.java.policy"/></policyFile>
 				</jvmProcess>
 			</processDefinition>
 			<processDefinition id="localJVM">
 				<jvmProcess
 					class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				<classpath>
+						<absolutePath value="${proactive.dir}/classes/Core"/>
+						<absolutePath value="${proactive.dir}/classes/Examples"/>
+						<absolutePath value="${proactive.dir}/classes/Extensions"/>
+						<absolutePath value="${proactive.dir}/classes/Extra"/>
+						<absolutePath value="${proactive.dir}/classes/Tests"/>
+						<absolutePath value="${proactive.dir}/classes/Utils"/>
+																								
+                         <!--absolutePath value="${proactive.dir}/dist/lib/ProActive.jar"/-->
+
+                        <absolutePath value="${proactive.dir}/dist/lib/\*"/>
+				</classpath>
+					
+					<javaPath><absolutePath value="${java.home}/bin/java"/></javaPath>
+					<log4jpropertiesFile>
+					    <absolutePath value="${proactive.dir}/compile/proactive-log4j"/>
+					</log4jpropertiesFile>
 					<jvmParameters>
+						<parameter value="-Dproactive.rmi.port=7199" />
 						<parameter value="-Dproactive.test=true"/>
 					</jvmParameters>
+					<policyFile><absolutePath value="${proactive.dir}/scripts/proactive.java.policy"/></policyFile>
 				</jvmProcess>
 			</processDefinition>
 		</processes>

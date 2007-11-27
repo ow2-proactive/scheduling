@@ -35,6 +35,7 @@ import java.io.IOException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
@@ -128,19 +129,4 @@ public interface Node {
      * @throws ProActiveException
      */
     public String getProperty(String key) throws ProActiveException;
-
-    /**
-     * This method gets a FileTransferService object from a pool or,
-     * if none are available creates a new one.
-     * @return A FileTransferService object
-     */
-
-    //public FileTransferService getFileTransferServiceFromPool();
-
-    /**
-     * Registers the File Transfer Service in a pool for future use.
-     * @param fts The File Transfer Service that will be pooled.
-     */
-
-    //public void putFileTransferServiceInPool(FileTransferService fts);
 }

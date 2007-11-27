@@ -28,47 +28,31 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.calcium.environment;
+package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
-import java.io.File;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.muscle.Execute;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
-public class RemoteFile implements java.io.Serializable {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
-    public long fileId;
-    public File location;
-    public long length;
-    public String md5sum;
+public class SearchInterval implements Execute<Interval, Primes> {
+    public Primes execute(SkeletonSystem system, Interval param) {
+        Primes primes = new Primes();
 
-    public RemoteFile(File location, long fileId, long length) {
-        this.location = location;
-        this.fileId = fileId;
-        this.length = length;
-        this.md5sum = null;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof RemoteFile)) {
-            return false;
+        for (int i = param.min; i <= param.max; i++) {
+            if (isPrime(i)) {
+                primes.primes.add(new Integer(i));
+            }
         }
 
-        return equals((RemoteFile) o);
+        return primes;
     }
 
-    public boolean equals(RemoteFile rf) {
-        return (this.fileId == rf.fileId) &&
-        this.location.getPath().equals(rf.location.getPath()) &&
-        (this.length == rf.length);
-    }
-
-    @Override
-    public String toString() {
-        return "id=" + fileId + " path=" + location + " length=" + length +
-        " md5sum=" + md5sum;
+    private boolean isPrime(int p) {
+        for (int i = 2; i < p; i++) {
+            if ((p % i) == 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

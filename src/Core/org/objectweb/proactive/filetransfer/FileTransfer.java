@@ -32,16 +32,22 @@ package org.objectweb.proactive.filetransfer;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.filetransfer.FileBlock;
 import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
 import org.objectweb.proactive.core.filetransfer.FileTransferRequest;
 import org.objectweb.proactive.core.filetransfer.FileTransferService;
+import org.objectweb.proactive.core.filetransfer.FileTransferServiceReceive;
+import org.objectweb.proactive.core.filetransfer.FileTransferServiceSend;
 import org.objectweb.proactive.core.filetransfer.OperationStatus;
+import org.objectweb.proactive.core.filetransfer.RemoteFile;
+import org.objectweb.proactive.core.filetransfer.RemoteFileImpl;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -55,222 +61,129 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class FileTransfer {
     static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 
-    /**
-     * Pulls a file from a remote node. This method behaves asynchronously.
-     * @param node The remote ProActive node.
-     * @param srcFile The source file in the remote node.
-     * @param dstFile The destination file in the local node.
-     * @return A FileWrapper instance containing a File object. This return value is a future,
-     * and to wait on it simply call the FileWrapper.getFiles() method.
-     * @throws IOException Problem with permissions, files not found, etc.
-     * @throws ProActiveException Problems with communication like node unreachable, etc.
-     */
-    public static FileVector pullFile(Node node, File srcFile, File dstFile)
-        throws IOException, ProActiveException {
-        return pullFile(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
-            FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
+    protected static Node getLocalNode() throws IOException {
+        Node localNode;
+
+        try {
+            localNode = NodeFactory.getDefaultNode();
+        } catch (NodeException e) {
+            throw new IOException("Can't get local node", e);
+        }
+
+        return localNode;
     }
 
-    public static FileVector pullFile(Node node, File srcFile, File dstFile,
-        int bsize, int numFlyingBlocks) throws IOException, ProActiveException {
-        File[] src = new File[1];
-        File[] dst = new File[1];
-        src[0] = srcFile;
-        dst[0] = dstFile;
-
-        return pullFiles(node, src, dst, bsize, numFlyingBlocks);
+    public static List<RemoteFile> push(File[] srcFile, Node dstNode,
+        File[] dstFile) throws IOException {
+        return transfer(getLocalNode(), srcFile, dstNode, dstFile);
     }
 
-    /**
-     * This method behaves like pullFile(Node, File, File), with the difference that it transfers multiple files.
-     * When performing a FileWrapper.getFiles() on the returned object, the wait-by-necessity mechanism will block
-     * the calling thread until all files have been pulled.
-     */
-    public static FileVector pullFiles(Node node, File[] srcFile, File[] dstFile)
+    public static RemoteFile push(File srcFile, Node dstNode, File dstFile)
         throws IOException {
-        return pullFiles(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
+        return transfer(getLocalNode(), srcFile, dstNode, dstFile);
+    }
+
+    public static RemoteFile pull(Node srcNode, File srcFile, File dstFile)
+        throws IOException {
+        return transfer(srcNode, srcFile, getLocalNode(), dstFile);
+    }
+
+    public static List<RemoteFile> pull(Node srcNode, File[] srcFile,
+        File[] dstFile) throws IOException {
+        return transfer(srcNode, srcFile, getLocalNode(), dstFile);
+    }
+
+    public static RemoteFile transfer(Node srcNode, File srcFile, Node dstNode,
+        File dstFile) throws IOException {
+        List<RemoteFile> rfiles = transfer(srcNode, new File[] { srcFile },
+                dstNode, new File[] { dstFile });
+
+        return rfiles.get(0);
+    }
+
+    public static List<RemoteFile> transfer(Node srcNode, File[] srcFile,
+        Node dstNode, File[] dstFile) throws IOException {
+        return transfer(srcNode, srcFile, dstNode, dstFile,
+            FileBlock.DEFAULT_BLOCK_SIZE,
             FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
     }
 
-    public static FileVector pullFiles(Node node, File[] srcFile,
-        File[] dstFile, int bsize, int numFlyingBlocks)
+    public static List<RemoteFile> transfer(Node srcNode, File[] srcFile,
+        Node dstNode, File[] dstFile, int bsize, int numFlyingBlocks)
         throws IOException {
         if (srcFile.length != dstFile.length) {
             throw new IOException(
                 "Error, number destination and source file lists do not match in length");
         }
 
-        FileVector fileWrapper = new FileVector();
-        if (srcFile.length == 0) {
-            return fileWrapper;
-        }
+        Node localNode = getLocalNode();
 
+        ArrayList<RemoteFile> rfile = new ArrayList<RemoteFile>(srcFile.length);
+
+        // local side verifications
         for (int i = 0; i < srcFile.length; i++) {
-            // local verification
-            if (dstFile[i].exists() && !dstFile[i].canWrite()) {
-                logger.error("Can't write to " + dstFile[i].getAbsoluteFile());
-                throw new IOException("Can't write to " +
-                    dstFile[i].getAbsoluteFile());
+            //Case srcNode is local
+            if (FileTransferEngine.nodeEquals(srcNode, localNode)) {
+                if (!srcFile[i].canRead()) {
+                    logger.error("Can't read or doesn't exist: " +
+                        srcFile[i].getAbsoluteFile());
+                    throw new IOException("Can't read or doesn't exist: " +
+                        srcFile[i].getAbsoluteFile());
+                }
+            }
+
+            //Case dstNode is local
+            if (FileTransferEngine.nodeEquals(dstNode, localNode)) {
+                if (dstFile[i].exists() && !dstFile[i].canWrite()) {
+                    logger.error("Can't write to file: " +
+                        dstFile[i].getAbsoluteFile());
+                    throw new IOException("Can't overrite existant file: " +
+                        dstFile[i].getAbsoluteFile());
+                }
+            }
+
+            //Case srcNode == dstNode
+            if (FileTransferEngine.nodeEquals(srcNode, dstNode)) {
+                if (dstFile[i].equals(srcFile[i])) {
+                    logger.error(
+                        "Can't copy, src and destination are the same: " +
+                        srcFile[i].getAbsolutePath());
+                }
             }
         }
+
+        return internalTransfer(srcNode, srcFile, dstNode, dstFile, bsize,
+            numFlyingBlocks);
+    }
+
+    protected static List<RemoteFile> internalTransfer(Node srcNode,
+        File[] srcFile, Node dstNode, File[] dstFile, int bsize,
+        int numFlyingBlocks) throws IOException {
+        FileTransferServiceSend ftsSrc;
+        FileTransferServiceReceive ftsDst;
+
         try {
-            FileTransferService ftsRemote = FileTransferEngine.getFileTransferEngine()
-                                                              .getFTS(node);
-            FileTransferService ftsLocal = FileTransferEngine.getFileTransferEngine()
-                                                             .getFTS();
-
-            // We could ask the remote AO to send the file to us
-            // futureFile = ftsRemote.sendFile(ftsLocal, srcFile, dstFile,
-            // bsizem, numFlyingBlocks);
-            for (int i = 0; i < srcFile.length; i++) {
-                OperationStatus futureFile = ftsLocal.receiveFile(ftsRemote,
-                        srcFile[i], dstFile[i], bsize, numFlyingBlocks);
-                FileTransferRequest ftr = new FileTransferRequest(srcFile[i],
-                        dstFile[i], futureFile, ftsRemote, ftsLocal);
-                fileWrapper.add(ftr);
-            }
-
-            //ftsLocal.putInThePool(ftsLocal);
-            //TODO put the ftsRemote back into the pool
-            return fileWrapper;
+            ftsSrc = FileTransferEngine.getFileTransferEngine(srcNode).getFTS();
+            ftsDst = FileTransferEngine.getFileTransferEngine(dstNode).getFTS();
         } catch (Exception e) {
-            e.printStackTrace();
             throw new IOException("Unable to connect or use ProActive Node: " +
-                node);
-        }
-    }
-
-    /**
-     * Pushs a file from the local node to a remote node. This method behaves asynchronously.
-     * @param node The remote ProActive node.
-     * @param srcFile The source file in the local node.
-     * @param dstFile The destination file in the remote node.
-     * @return A future of a BooleanWrapper. Accessing this variable will cause the block of the calling thread
-     * until the file has been fully received at the remote node.
-     * @throws IOException Problem with permissions, files not found, etc.
-     * @throws ProActiveException Problems with communication like node unreachable, etc.
-     */
-    public static FileVector pushFile(Node node, File srcFile, File dstFile)
-        throws IOException {
-        return pushFile(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
-            FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
-    }
-
-    public static FileVector pushFile(Node node, File srcFile, File dstFile,
-        int bsize, int numFlyingBlocks) throws IOException {
-        File[] src = new File[1];
-        File[] dst = new File[1];
-        src[0] = srcFile;
-        dst[0] = dstFile;
-
-        return pushFiles(node, src, dst, bsize, numFlyingBlocks);
-    }
-
-    /**
-     * This method behaves like pushFile(Node, File, File),  with the difference that it transfers multiple files.
-     * Accessing the future BooleanWrapper will block the thread, until all files have been pushed to the remote node.
-     */
-    public static FileVector pushFiles(Node node, File[] srcFile, File[] dstFile)
-        throws IOException {
-        return pushFiles(node, srcFile, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
-            FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
-    }
-
-    public static FileVector pushFiles(Node node, File[] srcFile,
-        File[] dstFile, int bsize, int numFlyingBlocks)
-        throws IOException {
-        if (srcFile.length != dstFile.length) {
-            throw new IOException(
-                "Error, destination and source file lists do not match in length");
+                srcNode + " -> " + dstNode, e);
         }
 
-        FileVector fileVector = new FileVector();
+        ArrayList<RemoteFile> rfile = new ArrayList<RemoteFile>(srcFile.length);
 
-        if (srcFile.length == 0) {
-            return fileVector;
-        }
-
+        // Alternative: ask the remote AO to send the file to us futureFile = ftsRemote.sendFile(ftsLocal, srcFile, dstFile, bsize, numFlyingBlocks);
         for (int i = 0; i < srcFile.length; i++) {
-            // local verification
-            if (!srcFile[i].canRead()) {
-                logger.error("Can't read or doesn't exist: " +
-                    srcFile[i].getAbsoluteFile());
-                throw new IOException("Can't read or doesn't exist: " +
-                    srcFile[i].getAbsoluteFile());
-            }
-        }
-        try {
-            FileTransferService ftsLocal = FileTransferEngine.getFileTransferEngine()
-                                                             .getFTS();
-            FileTransferService ftsRemote = FileTransferEngine.getFileTransferEngine()
-                                                              .getFTS(node);
+            // OperationStatus status = ftsDst.receiveFile(ftsSrc, srcFile[i], dstFile[i], bsize, numFlyingBlocks);
+            OperationStatus status = ftsSrc.sendFile(srcFile[i], ftsDst,
+                    dstFile[i], bsize, numFlyingBlocks);
 
-            // We ask the local AO to send the file to the remote AO
-            for (int i = 0; i < srcFile.length; i++) {
-                OperationStatus f = ftsLocal.sendFile(ftsRemote, srcFile[i],
-                        dstFile[i], bsize, numFlyingBlocks); // this call is asynchronous
-                fileVector.add(new FileTransferRequest(srcFile[i], dstFile[i],
-                        f, ftsLocal, ftsRemote));
-            }
+            FileTransferRequest request = new FileTransferRequest(srcFile[i],
+                    dstFile[i], status, ftsSrc, ftsDst);
 
-            //ftsLocal.putInThePool(ftsLocal);
-            //TODO put the ftsRemote back into the pool
-            return fileVector;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new IOException("Unable to connect or use ProActive Node: " +
-                node);
-        }
-    }
-
-    static public FileVector pushFile(Node node, FileVector srcFile, File dst)
-        throws IOException, ProActiveException {
-        File[] f = new File[1];
-        f[0] = dst;
-
-        return pushFiles(node, srcFile, f);
-    }
-
-    /**
-     * Pushes a File to the node, while the file is being transferred from a previous operation.
-     * This methods is HIGHLY EXPERIMENTAL, and should be used with caution.
-     *
-     * @param node The node to where the file will be transferred/
-     * @param srcFile The source files which correspond to the result of another file transfer operation.
-     * @param dst The destination names of the files.
-     * @return A vector holding the futures of the files being transferred. The futures will be updated once this operation is finished.
-     * @throws ProActiveException If the srcFile vector and the dst array length do not match.
-     */
-    static public FileVector pushFiles(Node node, FileVector srcFile, File[] dst)
-        throws ProActiveException {
-        if (srcFile.size() != dst.length) {
-            throw new ProActiveException(
-                "Error, destination and source file lists do not match in length");
+            rfile.add(new RemoteFileImpl(dstNode, dstFile[i], request));
         }
 
-        FileTransferService ftsLocal = FileTransferEngine.getFileTransferEngine()
-                                                         .getFTS();
-        FileTransferService ftsRemote = FileTransferEngine.getFileTransferEngine()
-                                                          .getFTS(node);
-
-        //For each file, send
-        Vector requests = srcFile.getFilesRequest();
-        FileVector fileWrapper = new FileVector();
-        for (int i = 0; i < requests.size(); i++) {
-            FileTransferRequest ftr = (FileTransferRequest) requests.get(i);
-
-            /* The source file is the previous operation's destination.
-             * The future of the previous operation is passed to know
-             * when the previous operation has finished.
-             */
-            FileTransferRequest newFTR = new FileTransferRequest(ftr.getDstFile(),
-                    dst[i], null, ftr.getDestinationFTS(), ftsRemote);
-            OperationStatus future = ftsLocal.submitFileTransferRequest(ftsLocal,
-                    newFTR, ftr.getOperationFuture()); //async call
-            newFTR.setDstFuture(future); //we keep a future on the remote file
-            fileWrapper.add(newFTR);
-        }
-
-        return fileWrapper;
+        return rfile;
     }
 }

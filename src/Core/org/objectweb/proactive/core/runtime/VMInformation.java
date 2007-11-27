@@ -86,12 +86,6 @@ public interface VMInformation extends java.io.Serializable {
      * @return The java virtual machine name if created with a descriptor file, null otherwise.
      *
      */
-
-    /* TODO cmathieu, mleyton: Remove this method ?
-     *         Implementations of this method are utterly broken and wrong.
-     *         Basically, they all return the same result than getName()
-     *         See why FT use it & fix or delete this method
-     */
     public String getDescriptorVMName();
 
     /**

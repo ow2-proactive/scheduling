@@ -36,7 +36,6 @@ import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.Stream;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
-//import org.objectweb.proactive.extra.calcium.environment.proactivescheduler.ProActiveSchedulerEnvironment;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.DivideBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.SolveBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt2.DivideBT2;
@@ -82,11 +81,11 @@ public class NQueens implements Serializable {
 
     public void solve(int boardSize, int solvableSize, int times,
         String descriptor, String virtualNode) throws Exception {
-        //EnvironmentFactory manager = new MultiThreadedEnvironment(2);
-        EnvironmentFactory manager = new ProActiveEnvironment(descriptor);
+        //EnvironmentFactory environment = new MultiThreadedEnvironment(2);
+        EnvironmentFactory environment = new ProActiveEnvironment(descriptor);
 
-        //EnvironmentFactory manager = new ProActiveSchedulerEnvironment("localhost","chri", "chri");
-        Calcium calcium = new Calcium(manager);
+        //EnvironmentFactory environment = new ProActiveSchedulerEnvironment("localhost","chri", "chri");
+        Calcium calcium = new Calcium(environment);
         Monitor monitor = new SimpleLogMonitor(calcium, 1);
         monitor.start();
         calcium.boot();

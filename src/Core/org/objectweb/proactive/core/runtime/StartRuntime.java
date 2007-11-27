@@ -132,11 +132,13 @@ public class StartRuntime {
      */
     private void run() {
         ProActiveRuntimeImpl impl = ProActiveRuntimeImpl.getProActiveRuntime();
+        impl.setVMName(this.vmName);
 
         if (this.defaultRuntimeURL != null) {
             ProActiveRuntime PART;
             try {
                 PART = RuntimeFactory.getRuntime(this.defaultRuntimeURL);
+
                 register(PART);
                 impl.setParent(PART);
 

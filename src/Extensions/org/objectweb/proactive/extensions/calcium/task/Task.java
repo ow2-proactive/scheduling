@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
  * Users should never know that this class exists.
  *
  * Among others, this class: provides a wrapper for the user
- * parameters, holds the intstruction stack for this task, handles the creation
+ * parameters, holds the instruction stack for this task, handles the creation
  * and conquer of child tasks (subtasks).
  *
  * @author The ProActive Team (mleyton)

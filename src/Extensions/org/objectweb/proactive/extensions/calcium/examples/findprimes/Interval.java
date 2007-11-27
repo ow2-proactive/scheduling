@@ -30,21 +30,28 @@
  */
 package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
-import java.util.Collections;
-
-import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
-import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
+import java.io.Serializable;
 
 
-public class ConquerChallenge implements Conquer<Primes, Primes> {
-    public Primes conquer(SkeletonSystem system, Primes[] p) {
-        Primes conquered = new Primes();
+class Interval implements Serializable {
+    public int min;
+    public int max;
+    public int solvableSize;
 
-        for (Primes param : p) {
-            conquered.primes.addAll(param.primes);
-        }
+    /**
+     * Creates a new interval to search for primes.
+     * @param min  Beginning of interval
+     * @param max  End of interval
+     * @param solvableSize Acceptable size of search interval
+     */
+    public Interval(int min, int max, int solvableSize) {
+        this.min = min;
+        this.max = max;
+        this.solvableSize = solvableSize;
+    }
 
-        Collections.sort(conquered.primes);
-        return conquered;
+    @Override
+    public String toString() {
+        return "Params: " + min + "<?<" + max;
     }
 }

@@ -31,16 +31,17 @@
 package org.objectweb.proactive.core.descriptor.data;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.filetransfer.FileVector;
 
 
 /**
@@ -139,7 +140,7 @@ public interface VirtualNodeInternal extends VirtualNode, NotificationListener {
      *
      * @return An array of FileWrapper (Futures) with the retrieved files.
      */
-    public FileVector fileTransferRetrieve()
+    public List<RemoteFile> fileTransferRetrieve()
         throws ProActiveException, IOException;
 
     /**
@@ -153,13 +154,4 @@ public interface VirtualNodeInternal extends VirtualNode, NotificationListener {
      * @return true if it exists an MPI process with this VN - false otherwise.
      */
     public boolean hasMPIProcess();
-
-    /**
-     * Set Filetransfer API parameters to use when Deploying and Retrieving files.
-     * @param fileBlockSize The file will be splitted into blocks and transfered. This paramter
-     * sets the size of the blocks in MB. The default value is 1MB. Increase this value to improove performance, decrease the value if the file transfer uses to much memory.
-     * @param overlapping Says home many blocks to send in burst mode. Increase this value to improove performance,
-     * decrase it to save memmory. The default value is 8.
-     */
-    public void setFileTransferParams(int fileBlockSize, int overlapping);
 }

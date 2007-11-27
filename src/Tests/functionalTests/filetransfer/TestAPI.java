@@ -45,10 +45,10 @@ import org.junit.Test;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.filetransfer.FileTransfer;
-import org.objectweb.proactive.filetransfer.FileVector;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -69,7 +69,6 @@ public class TestAPI extends FunctionalTest {
     File filePushed = new File("/tmp/ProActiveTestPushed.dat");
     File filePulled = new File("/tmp/ProActiveTestPulled.dat");
     File fileFuturePushed = new File("/tmp/ProActiveTestFuturePushed.dat");
-    FileVector filePulledWrapper;
 
     @Before
     public void initTest() throws Exception {
@@ -110,23 +109,32 @@ public class TestAPI extends FunctionalTest {
         Node[] testnode = testVNode.getNodes();
         Node[] testnodePush = testVNodePush.getNodes();
 
-        FileVector fw = FileTransfer.pushFile(testnode[0], fileTest, filePushed);
-        assertTrue(fw.getFile(0).equals(filePushed)); //wait-by-necessity
+        RemoteFile rfilePushed = FileTransfer.push(fileTest, testnode[0],
+                filePushed);
+        rfilePushed.waitForFinishedTransfer();
+        assertTrue(rfilePushed.getRemoteFilePath().equals(filePushed)); //wait-by-necessity
 
-        filePulledWrapper = FileTransfer.pullFile(testnode[0], filePushed,
+        RemoteFile rfilePulled = FileTransfer.pull(testnode[0], filePushed,
                 filePulled);
 
         //Thread.sleep(1000);
         //filePulledWrapper.waitForAll(); //sync line
-        //System.out.println("Finished wiating");
-        FileVector pushedWhilePulling = FileTransfer.pushFile(testnodePush[0],
-                filePulledWrapper, fileFuturePushed);
+        //System.out.println("Finished waiting");
+        RemoteFile pushedWhilePulling = rfilePulled.push(testnodePush[0],
+                fileFuturePushed);
+        if (pushedWhilePulling == null) {
+            throw new IOException("NUlll remote file");
+        }
+        if (pushedWhilePulling.getRemoteFilePath() == null) {
+            throw new IOException("NUlll remote file");
+        }
 
-        assertTrue(filePulledWrapper.size() == 1);
-        assertTrue(filePulledWrapper.getFile(0).equals(filePulled)); //wait-by-necessity
+        assertTrue(rfilePulled.getRemoteFilePath().equals(filePulled)); //wait-by-necessity
+        assertTrue(pushedWhilePulling.getRemoteFilePath()
+                                     .equals(fileFuturePushed)); //wait-by-necessity
 
-        assertTrue(pushedWhilePulling.size() == 1);
-        assertTrue(pushedWhilePulling.getFile(0).equals(fileFuturePushed)); //wait-by-necessity
+        rfilePulled.waitForFinishedTransfer();
+        pushedWhilePulling.waitForFinishedTransfer();
 
         long fileTestSum = checkSum(fileTest);
         long filePulledSum = checkSum(filePulled);

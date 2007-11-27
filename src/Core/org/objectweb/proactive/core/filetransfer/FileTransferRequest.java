@@ -46,23 +46,16 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
  *
  */
 public class FileTransferRequest implements Serializable {
-    private FileTransferService sourceFTS;
-    private FileTransferService destinationFTS;
+    private FileTransferServiceSend sourceFTS;
+    private FileTransferServiceReceive destinationFTS;
     private File srcFile;
     private File dstFile;
     private OperationStatus operationFuture;
     private int id;
 
-    /*
-    public FileTransferRequest(File srcFile, File dstFile, File futureDstFile,
-                    FileTransferService localFTS, FileTransferService remoteFTS) {
-
-            this(srcFile, dstFile, new OperationFuture(futureDstFile), localFTS, remoteFTS);
-    }
-    */
     public FileTransferRequest(File srcFile, File dstFile,
-        OperationStatus futureDstFile, FileTransferService srcFTS,
-        FileTransferService dstFTS) {
+        OperationStatus futureDstFile, FileTransferServiceSend srcFTS,
+        FileTransferServiceReceive dstFTS) {
         this.srcFile = srcFile;
         this.dstFile = dstFile;
         this.operationFuture = futureDstFile;
@@ -87,11 +80,11 @@ public class FileTransferRequest implements Serializable {
         return dstFile;
     }
 
-    public FileTransferService getSourceFTS() {
+    public FileTransferServiceSend getSourceFTS() {
         return sourceFTS;
     }
 
-    public FileTransferService getDestinationFTS() {
+    public FileTransferServiceReceive getDestinationFTS() {
         return destinationFTS;
     }
 

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns="urn:proactive:deployment:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+	<variables>
+ 	    <javaPropertyVariable name="proactive.dir"/>
+ 	    <javaPropertyVariable name="java.home"/>
+    </variables>
+    
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="test"/>
@@ -36,16 +41,63 @@
 		<processes>
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				
+				<classpath>
+						<absolutePath value="${proactive.dir}/classes/Core"/>
+						<absolutePath value="${proactive.dir}/classes/Examples"/>
+						<absolutePath value="${proactive.dir}/classes/Extensions"/>
+						<absolutePath value="${proactive.dir}/classes/Extra"/>
+						<absolutePath value="${proactive.dir}/classes/Tests"/>
+						<absolutePath value="${proactive.dir}/classes/Utils"/>
+																								
+                         <!--absolutePath value="${proactive.dir}/dist/lib/ProActive.jar"/-->
+
+                        <absolutePath value="${proactive.dir}/dist/lib/*"/>
+                                                 
+                        <!-- absolutePath value="${proactive.dir}/dist/lib/bouncycastle.jar"/>
+                        <absolutePath value="${proactive.dir}/dist/lib/ganymed-ssh2-build210.jar"/>
+                        <absolutePath value="${proactive.dir}/dist/lib/fractal.jar"/>
+                        <absolutePath value="${proactive.dir}/dist/lib/javassist.jar"/>
+                        <absolutePath value="${proactive.dir}/dist/lib/log4j.jar"/>
+                        <absolutePath value="${proactive.dir}/dist/lib/xercesImpl.jar"/-->
+				</classpath>
+					
+					<javaPath><absolutePath value="${java.home}/bin/java"/></javaPath>
+					<log4jpropertiesFile>
+					    <absolutePath value="${proactive.dir}/compile/proactive-log4j"/>
+					</log4jpropertiesFile>
 					<jvmParameters>
+						<parameter value="-Dproactive.rmi.port=7199" />
 						<parameter value="-Dproactive.test=true"/>
 					</jvmParameters>
+					<policyFile><absolutePath value="${proactive.dir}/scripts/proactive.java.policy"/></policyFile>
 				</jvmProcess>
 			</processDefinition>	
 			<processDefinition id="localJVMPush">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+				
+				<classpath>
+						<absolutePath value="${proactive.dir}/classes/Core"/>
+						<absolutePath value="${proactive.dir}/classes/Examples"/>
+						<absolutePath value="${proactive.dir}/classes/Extensions"/>
+						<absolutePath value="${proactive.dir}/classes/Extra"/>
+						<absolutePath value="${proactive.dir}/classes/Tests"/>
+						<absolutePath value="${proactive.dir}/classes/Utils"/>
+																								
+                         <!--absolutePath value="${proactive.dir}/dist/lib/ProActive.jar"/-->
+
+                        <absolutePath value="${proactive.dir}/dist/lib/*"/>
+				</classpath>
+					
+					<javaPath><absolutePath value="${java.home}/bin/java"/></javaPath>
+					<log4jpropertiesFile>
+					    <absolutePath value="${proactive.dir}/compile/proactive-log4j"/>
+					</log4jpropertiesFile>
 					<jvmParameters>
+						<parameter value="-Dproactive.rmi.port=7199" />
 						<parameter value="-Dproactive.test=true"/>
 					</jvmParameters>
+					<policyFile><absolutePath value="${proactive.dir}/scripts/proactive.java.policy"/></policyFile>
 				</jvmProcess>
 			</processDefinition>
 		</processes>

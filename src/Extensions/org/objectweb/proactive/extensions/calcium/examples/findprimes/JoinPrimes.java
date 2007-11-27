@@ -30,24 +30,21 @@
  */
 package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
-import java.util.Vector;
+import java.util.Collections;
 
-import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
-public class ChallengeDivide implements Divide<Challenge, Challenge> {
-    public Vector<Challenge> divide(SkeletonSystem system, Challenge param) {
-        Challenge ttUp = new Challenge(1 + param.min +
-                ((param.max - param.min) / 2), param.max, param.solvableSize);
+public class JoinPrimes implements Conquer<Primes, Primes> {
+    public Primes conquer(SkeletonSystem system, Primes[] p) {
+        Primes conquered = new Primes();
 
-        Challenge ttDown = new Challenge(param.min,
-                param.min + ((param.max - param.min) / 2), param.solvableSize);
+        for (Primes param : p) {
+            conquered.primes.addAll(param.primes);
+        }
 
-        Vector<Challenge> v = new Vector<Challenge>();
-        v.add(ttUp);
-        v.add(ttDown);
-
-        return v;
+        Collections.sort(conquered.primes);
+        return conquered;
     }
 }

@@ -41,13 +41,12 @@ import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.futures.Future;
 import org.objectweb.proactive.extensions.calcium.skeletons.DaC;
-import org.objectweb.proactive.extensions.calcium.skeletons.Seq;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
 
 
 public class FindPrimes implements Serializable {
-    public Skeleton<Challenge, Primes> root;
+    public Skeleton<Interval, Primes> root;
 
     public static void main(String[] args)
         throws InterruptedException, PanicException {
@@ -56,29 +55,28 @@ public class FindPrimes implements Serializable {
     }
 
     public FindPrimes() {
-        root = new DaC<Challenge, Primes>(new ChallengeDivide(),
-                new ChallengeDivideCondition(),
-                new Seq<Challenge, Primes>(new SolveChallenge()),
-                new ConquerChallenge());
+        root = new DaC<Interval, Primes>(new IntervalDivide(),
+                new IntervalDivideCondition(), new SearchInterval(),
+                new JoinPrimes());
     }
 
     public void solve() throws InterruptedException, PanicException {
         String descriptor = FindPrimes.class.getResource("LocalDescriptor.xml")
                                             .getPath();
 
-        EnvironmentFactory manager = new MultiThreadedEnvironment(1);
+        EnvironmentFactory enviroment = new MultiThreadedEnvironment(1);
 
         //new MonoThreadedManager();
         //new MultiThreadedManager(5);
         //new ProActiveManager(descriptor, "local");
-        Calcium calcium = new Calcium(manager);
+        Calcium calcium = new Calcium(enviroment);
 
-        Stream<Challenge, Primes> stream = calcium.newStream(root);
+        Stream<Interval, Primes> stream = calcium.newStream(root);
 
         Vector<Future<Primes>> futures = new Vector<Future<Primes>>(3);
-        futures.add(stream.input(new Challenge(1, 6400, 300)));
-        futures.add(stream.input(new Challenge(1, 100, 20)));
-        futures.add(stream.input(new Challenge(1, 640, 64)));
+        futures.add(stream.input(new Interval(1, 6400, 300)));
+        futures.add(stream.input(new Interval(1, 100, 20)));
+        futures.add(stream.input(new Interval(1, 640, 64)));
 
         calcium.boot();
 

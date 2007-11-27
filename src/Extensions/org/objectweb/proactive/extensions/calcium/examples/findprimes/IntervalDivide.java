@@ -30,29 +30,24 @@
  */
 package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
-import java.io.Serializable;
+import java.util.Vector;
+
+import org.objectweb.proactive.extensions.calcium.muscle.Divide;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
-class Challenge implements Serializable {
-    public int max;
-    public int min;
-    public int solvableSize;
+public class IntervalDivide implements Divide<Interval, Interval> {
+    public Vector<Interval> divide(SkeletonSystem system, Interval param) {
+        Interval ttUp = new Interval(1 + param.min +
+                ((param.max - param.min) / 2), param.max, param.solvableSize);
 
-    /**
-     * Creates a new finding primes challenge.
-     * @param min  Number from which to start.
-     * @param max  Maximum number to stop
-     * @param solvableSize Size of problems to solve
-     */
-    public Challenge(int min, int max, int solvableSize) {
-        this.min = min;
-        this.max = max;
-        this.solvableSize = solvableSize;
-        ;
-    }
+        Interval ttDown = new Interval(param.min,
+                param.min + ((param.max - param.min) / 2), param.solvableSize);
 
-    @Override
-    public String toString() {
-        return "Params: " + min + "<?<" + max;
+        Vector<Interval> v = new Vector<Interval>();
+        v.add(ttUp);
+        v.add(ttDown);
+
+        return v;
     }
 }

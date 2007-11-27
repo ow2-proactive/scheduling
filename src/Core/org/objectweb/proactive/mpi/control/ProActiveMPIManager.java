@@ -41,6 +41,7 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -104,9 +105,9 @@ public class ProActiveMPIManager implements Serializable {
                         "/libProActiveMPIComm.so");
                 File localSource = new File(u.getFile());
 
-                FileVector filePushed = FileTransfer.pushFile(allNodes[0],
-                        localSource, remoteDest);
-                filePushed.waitForAll();
+                RemoteFile filePushed = FileTransfer.push(localSource,
+                        allNodes[0], remoteDest);
+                filePushed.waitForFinishedTransfer();
 
                 ackToStart[i] = allNodes.length - 1;
                 ackToRecv[i] = allNodes.length - 1;

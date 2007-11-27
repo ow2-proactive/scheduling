@@ -36,7 +36,7 @@ import java.net.URL;
 
 import org.objectweb.proactive.extensions.calcium.environment.FileServer;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
-import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
+import org.objectweb.proactive.extensions.calcium.environment.StoredFile;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 
 
@@ -51,7 +51,7 @@ public class FileServerClientImpl implements FileServerClient {
         fserver.commit(fileId, refCountDelta);
     }
 
-    public void fetch(RemoteFile rfile, File localDst)
+    public void fetch(StoredFile rfile, File localDst)
         throws IOException {
         fserver.canFetch(rfile);
 
@@ -62,9 +62,9 @@ public class FileServerClientImpl implements FileServerClient {
         fserver.shutdown();
     }
 
-    public RemoteFile store(File current, int refCount)
+    public StoredFile store(File current, int refCount)
         throws IOException {
-        RemoteFile rfile = fserver.register();
+        StoredFile rfile = fserver.register();
 
         SkeletonSystemImpl.copyFile(current, rfile.location);
 
@@ -72,7 +72,7 @@ public class FileServerClientImpl implements FileServerClient {
         return fserver.dataHasBeenStored(rfile, refCount);
     }
 
-    public RemoteFile store(URL current) throws IOException {
+    public StoredFile store(URL current) throws IOException {
         return fserver.registerAndStore(current);
     }
 }

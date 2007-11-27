@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.filetransfer;
 
+import java.io.IOException;
 import java.io.Serializable;
 
 
@@ -38,17 +39,16 @@ import java.io.Serializable;
  * or encountered some problems.
  *
  * @author The ProActive Team (mleyton)
- *
  */
 public class OperationStatus implements Serializable {
-    private Exception e = null;
+    private IOException e = null;
     private boolean p = false;
 
     /**
      * ProActive empty constructor.
      * Can also be used if the operation finished successfully
      */
-    public OperationStatus() { //default is succesfull operation
+    public OperationStatus() { //default is successful operation
     }
 
     /**
@@ -64,7 +64,7 @@ public class OperationStatus implements Serializable {
      * while processing.
      * @param e The exception that was encountered
      */
-    public OperationStatus(Exception e) { //operation encountered problems
+    public OperationStatus(IOException e) { //operation encountered problems
         this.e = e;
     }
 
@@ -80,7 +80,7 @@ public class OperationStatus implements Serializable {
      * Returns the exception that was encountered
      * @return The exception or null if no exception took place.
      */
-    public Exception getException() {
+    public IOException getException() {
         return e;
     }
 

@@ -39,7 +39,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
+import org.objectweb.proactive.extensions.calcium.environment.StoredFile;
 import org.objectweb.proactive.extensions.calcium.system.HashSum;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 
@@ -48,7 +48,7 @@ public class FileServer {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
     private File rootDir;
     long nextId;
-    HashMap<Long, RemoteFile> unstored;
+    HashMap<Long, StoredFile> unstored;
     HashMap<Long, Long> stored;
 
     /**
@@ -85,11 +85,11 @@ public class FileServer {
 
         this.nextId = 0;
 
-        this.unstored = new HashMap<Long, RemoteFile>();
+        this.unstored = new HashMap<Long, StoredFile>();
         this.stored = new HashMap<Long, Long>();
     }
 
-    public synchronized RemoteFile register() throws IOException {
+    public synchronized StoredFile register() throws IOException {
         long fileId = getNewId();
 
         File dst = new File(rootDir, fileId + ".dat");
@@ -98,13 +98,13 @@ public class FileServer {
             logger.debug("FileServer registering " + dst);
         }
 
-        RemoteFile rfile = new RemoteFile(dst, fileId, dst.length());
+        StoredFile rfile = new StoredFile(dst, fileId, dst.length());
         unstored.put(fileId, rfile);
 
         return rfile;
     }
 
-    public synchronized RemoteFile dataHasBeenStored(RemoteFile rfile, int count)
+    public synchronized StoredFile dataHasBeenStored(StoredFile rfile, int count)
         throws IOException {
         if (count <= 0) {
             throw new IllegalArgumentException(
@@ -121,7 +121,7 @@ public class FileServer {
                 "RemoteFile is already marked as stored" + rfile.fileId);
         }
 
-        RemoteFile rf = unstored.remove(rfile.fileId);
+        StoredFile rf = unstored.remove(rfile.fileId);
 
         if (!rfile.equals(rf)) {
             throw new IllegalArgumentException("RemoteFile was modified " +
@@ -140,7 +140,7 @@ public class FileServer {
         return rf;
     }
 
-    public synchronized void canFetch(RemoteFile rfile)
+    public synchronized void canFetch(StoredFile rfile)
         throws IOException {
         if (!stored.containsKey(rfile.fileId)) {
             throw new IllegalArgumentException("RemoteFile in stored list: " +
@@ -160,14 +160,14 @@ public class FileServer {
         }
     }
 
-    public synchronized RemoteFile registerAndStore(URL remoteURL)
+    public synchronized StoredFile registerAndStore(URL remoteURL)
         throws IOException {
         long fileId = getNewId();
         File dst = new File(rootDir, fileId + ".dat");
 
         SkeletonSystemImpl.download(remoteURL, dst);
 
-        RemoteFile rfile = new RemoteFile(dst, fileId, dst.length());
+        StoredFile rfile = new StoredFile(dst, fileId, dst.length());
         try {
             rfile.md5sum = HashSum.md5sum(rfile.location);
         } catch (NoSuchAlgorithmException e) {

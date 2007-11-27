@@ -42,7 +42,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
-import org.objectweb.proactive.extensions.calcium.environment.RemoteFile;
+import org.objectweb.proactive.extensions.calcium.environment.StoredFile;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
 
 
@@ -56,7 +56,7 @@ public class ProxyFile extends File {
     File wspace;
     public File relative;
     File current; //current = wspace+"/"+relative
-    RemoteFile remote;
+    StoredFile remote;
     FileServerClient fserver;
     long lastmodified;
     long cachedSize;

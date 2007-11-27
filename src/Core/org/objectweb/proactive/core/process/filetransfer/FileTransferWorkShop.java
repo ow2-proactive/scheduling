@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.process.filetransfer;
 import java.io.File;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -279,8 +280,6 @@ public class FileTransferWorkShop implements Serializable {
      * problem.
      */
     public boolean check() {
-        FileTransferDefinition ft;
-
         if (fileTransfers.size() <= 0) {
             if (logger.isDebugEnabled()) {
                 logger.debug("No file transfer required.");
@@ -290,9 +289,8 @@ public class FileTransferWorkShop implements Serializable {
 
         //Checking FileTransfer definitions
         boolean retval = false;
-        Iterator<String> it = fileTransfers.keySet().iterator();
-        while (it.hasNext()) {
-            ft = fileTransfers.get(it.next());
+        Collection<FileTransferDefinition> list = fileTransfers.values();
+        for (FileTransferDefinition ft : list) {
             if (ft.isEmpty()) {
                 logger.warn("Warning: FileTransfer definition id=" +
                     ft.getId() + " is empty or undefined.");

@@ -34,32 +34,67 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * This class is ment to be a service active object. It provides a mechanism
+ * This class is meant to be a service active object. It provides a mechanism
  * to create FileTransferService objects on remote and local nodes.
  *
  * @author The ProActive Team 06/06 (mleyton)
- *
  */
-public class FileTransferEngine implements ProActiveInternalObject {
-    //Not serializable on purpose: This is a service AO that cannot migrate!!
+public class FileTransferEngine implements ProActiveInternalObject, InitActive,
+    RunActive {
+    //Not Serializable on purpose: This is a service AO that cannot migrate!!
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
+    static public final int DEFAULT_MAX_FILE_TRANSFER_SERVICES = 16;
     static FileTransferEngine singletonFTE = getFileTransferEngine();
-    public Vector<FileTransferService> ftsPool;
+    Vector<FileTransferService> ftsPool;
+    int maxFTS;
 
+    /**
+     * This is an empty constructor for ProActive's MOP. Don't use directly.
+     */
+    @Deprecated
     public FileTransferEngine() {
     }
 
-    public void init() {
+    public FileTransferEngine(int maxFTS) {
+        this.maxFTS = maxFTS;
+    }
+
+    //@Override
+    public void initActivity(Body body) {
         ftsPool = new Vector<FileTransferService>();
+    }
+
+    //Producer-Consumer
+    //@Override
+    public void runActivity(Body body) {
+        Service service = new Service(body);
+
+        while (true) {
+            String allowedMethodNames = "putFTS";
+
+            if ((ftsPool.size() > 0) || (maxFTS > 0)) {
+                allowedMethodNames += "getFTS|getFTS";
+            }
+
+            service.blockingServeOldest(new RequestFilterOnAllowedMethods(
+                    allowedMethodNames));
+        }
     }
 
     public FileTransferService getFTS()
@@ -70,60 +105,52 @@ public class FileTransferEngine implements ProActiveInternalObject {
 
         FileTransferService localFTS = (FileTransferService) ProActiveObject.newActive(FileTransferService.class.getName(),
                 null);
-        setImmediateServices(localFTS);
+        --maxFTS;
 
         return localFTS;
-    }
-
-    //TODO improove this method to getFTS on remote nodes from a pool
-    public FileTransferService getFTS(Node node)
-        throws ActiveObjectCreationException, NodeException {
-        FileTransferService remoteFTS = (FileTransferService) ProActiveObject.newActive(FileTransferService.class.getName(),
-                null, node);
-
-        setImmediateServices(remoteFTS);
-        return remoteFTS;
-    }
-
-    public FileTransferService getFTS(String srcNodeURL)
-        throws ActiveObjectCreationException, NodeException {
-        FileTransferService remoteFTS = (FileTransferService) ProActiveObject.newActive(FileTransferService.class.getName(),
-                null, srcNodeURL);
-
-        setImmediateServices(remoteFTS);
-        return remoteFTS;
-    }
-
-    private void setImmediateServices(FileTransferService fts) {
-        fts.setImmediateSevices();
     }
 
     public void putFTS(FileTransferService fts) {
         ftsPool.add(fts);
     }
 
-    //TODO improove this method using ProActive
+    //TODO improve this method using ProActive
     static synchronized public FileTransferEngine getFileTransferEngine() {
         if (singletonFTE == null) {
             try {
                 singletonFTE = (FileTransferEngine) ProActiveObject.newActive(FileTransferEngine.class.getName(),
-                        null);
+                        new Object[] { DEFAULT_MAX_FILE_TRANSFER_SERVICES });
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            singletonFTE.init();
         }
         return singletonFTE;
     }
 
     public synchronized static FileTransferEngine getFileTransferEngine(
         Node node) {
-        try {
-            return (FileTransferEngine) ProActiveObject.lookupActive(FileTransferEngine.class.getName(),
-                node.getNodeInformation().getURL());
-        } catch (Exception e) {
-            e.printStackTrace();
+        ProActiveRuntime runtime = node.getProActiveRuntime();
+
+        FileTransferEngine fte = runtime.getFileTransferEngine();
+
+        return fte;
+    }
+
+    public static boolean nodeEquals(Node a, Node b) {
+        return a.getNodeInformation().getName()
+                .equals(b.getNodeInformation().getName());
+    }
+
+    protected class RequestFilterOnAllowedMethods implements RequestFilter,
+        java.io.Serializable {
+        private String allowedMethodNames;
+
+        public RequestFilterOnAllowedMethods(String allowedMethodNames) {
+            this.allowedMethodNames = allowedMethodNames;
         }
-        return null;
+
+        public boolean acceptRequest(Request request) {
+            return allowedMethodNames.indexOf(request.getMethodName()) >= 0;
+        }
     }
 }

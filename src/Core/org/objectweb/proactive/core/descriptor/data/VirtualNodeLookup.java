@@ -30,17 +30,19 @@
  */
 package org.objectweb.proactive.core.descriptor.data;
 
+import java.util.List;
+
 import javax.management.Notification;
 
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.filetransfer.FileVector;
 
 
 /**
@@ -412,7 +414,7 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
      */
-    public FileVector fileTransferRetrieve() throws ProActiveException {
+    public List<RemoteFile> fileTransferRetrieve() throws ProActiveException {
         throw new ProActiveException(
             "No File Transfer Retrieve support from VirtualNodeLookup");
     }
