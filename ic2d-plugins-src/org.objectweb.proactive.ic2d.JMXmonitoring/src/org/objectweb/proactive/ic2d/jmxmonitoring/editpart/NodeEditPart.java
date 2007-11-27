@@ -35,13 +35,13 @@ import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.NodeListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 public class NodeEditPart extends AbstractMonitoringEditPart {
@@ -94,46 +94,42 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
      * @param arg an argument passed to the notifyObservers  method.
      */
     @Override
+    //TODO: this method was taken out from a dedicated Thread 
+    //which means that the observable (NodeObject) will be blocked
+    //on the notifyObservers method.
     public void update(Observable o, Object arg) {
         //final Object param = arg;
-        if (!(arg instanceof Notification)) {
+        if (!(arg instanceof MVCNotification)) {
             return;
         }
 
-        final Notification notif = (Notification) arg;
-
-        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-                public void run() {
-                    if ((notif.getMVCNotification() == MVCNotification.STATE_CHANGED) &&
-                            (notif.getData() == State.NOT_MONITORED)) {
-                        deactivate();
-                    } else if (notif.getMVCNotification() == MVCNotification.STATE_CHANGED) //in this case we know we have changed highlight state
-                     {
-                        //method VirtualNodesGroup.getColor(virtualNode vn)
-                        //returns the color for the virtual node if the virtual node is selected
-                        //or null if it is not. 
-                        //if the collor is null, setHighlight(null) colors the figure 
-                        //node to the default color
-                        getCastedFigure()
-                            .setHighlight(getMonitoringView()
-                                              .getVirtualNodesGroup()
-                                              .getColor(getCastedModel()
-                                                            .getVirtualNode()));
-                        refresh();
-                    } else {
-                        refresh();
-                    }
-                }
-            });
+        final MVCNotification notif = (MVCNotification) arg;
+        if ((notif.getMVCNotification() == MVCNotificationTag.STATE_CHANGED) &&
+                (notif.getData() == State.NOT_MONITORED)) {
+            deactivate();
+        } else if (notif.getMVCNotification() == MVCNotificationTag.STATE_CHANGED) //in this case we know we have changed highlight state
+         {
+            //method VirtualNodesGroup.getColor(virtualNode vn)
+            //returns the color for the virtual node if the virtual node is selected
+            //or null if it is not. 
+            //if the collor is null, setHighlight(null) colors the figure 
+            //node to the default color
+            getCastedFigure()
+                .setHighlight(getMonitoringView().getVirtualNodesGroup()
+                                  .getColor(getCastedModel().getVirtualNode()));
+            refresh();
+        } else {
+            refresh();
+        }
     }
 
     @Override
     public void refresh() {
         //TODO: this might be costly. Only when we stop monitoring the parent may be null and 
         //we have npe stak in the logs.  
-        if (this.getParent() == null) {
-            return;
-        }
+        //        if (this.getParent() == null) {
+        //            return;
+        //        }
         super.refresh();
     }
 

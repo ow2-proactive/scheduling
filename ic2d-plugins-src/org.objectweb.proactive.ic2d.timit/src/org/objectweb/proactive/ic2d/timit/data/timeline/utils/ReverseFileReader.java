@@ -36,7 +36,7 @@ import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 /**

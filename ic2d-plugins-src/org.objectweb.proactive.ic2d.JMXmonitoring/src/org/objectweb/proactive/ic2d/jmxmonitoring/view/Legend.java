@@ -43,11 +43,11 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.HostFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VMFigure;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 public class Legend extends ViewPart {

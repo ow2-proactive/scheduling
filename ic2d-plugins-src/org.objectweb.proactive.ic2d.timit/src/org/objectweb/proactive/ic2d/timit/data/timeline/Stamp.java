@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.timit.data.timeline;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 public class Stamp {

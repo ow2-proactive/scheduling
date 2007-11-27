@@ -38,14 +38,14 @@ import java.util.Set;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.AOFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.NodeFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.AOListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 public class AOEditPart extends AbstractMonitoringEditPart {
@@ -113,9 +113,9 @@ public class AOEditPart extends AbstractMonitoringEditPart {
      */
     @Override
     public void update(Observable o, Object arg) {
-        if ((arg != null) && (arg instanceof Notification)) {
-            MVCNotification mvcNotif = ((Notification) arg).getMVCNotification();
-            Object notificationdata = ((Notification) arg).getData();
+        if ((arg != null) && (arg instanceof MVCNotification)) {
+            MVCNotificationTag mvcNotif = ((MVCNotification) arg).getMVCNotification();
+            Object notificationdata = ((MVCNotification) arg).getData();
 
             // State updated
             switch (mvcNotif) {

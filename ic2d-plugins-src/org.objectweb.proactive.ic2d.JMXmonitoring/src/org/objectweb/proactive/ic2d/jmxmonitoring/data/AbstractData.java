@@ -47,8 +47,9 @@ import javax.management.ReflectionException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 /**
@@ -104,7 +105,7 @@ public abstract class AbstractData extends Observable {
         if (!this.monitoredChildren.containsKey(child.getKey())) {
             this.monitoredChildren.put(child.getKey(), child);
             setChanged();
-            notifyObservers(new Notification(MVCNotification.ADD_CHILD,
+            notifyObservers(new MVCNotification(MVCNotificationTag.ADD_CHILD,
                     child.getKey()));
             child.explore();
         }
@@ -122,7 +123,7 @@ public abstract class AbstractData extends Observable {
         monitoredChildren.remove(key);
         notMonitoredChildren.remove(key);
         setChanged();
-        notifyObservers(new Notification(MVCNotification.REMOVE_CHILD, key));
+        notifyObservers(new MVCNotification(MVCNotificationTag.REMOVE_CHILD, key));
     }
 
     /**
@@ -133,8 +134,8 @@ public abstract class AbstractData extends Observable {
         monitoredChildren.remove(child.getKey());
         notMonitoredChildren.put(child.getKey(), child);
         setChanged();
-        notifyObservers(new Notification(
-                MVCNotification.REMOVE_CHILD_FROM_MONITORED_CHILDREN,
+        notifyObservers(new MVCNotification(
+                MVCNotificationTag.REMOVE_CHILD_FROM_MONITORED_CHILDREN,
                 child.getKey()));
     }
 
@@ -258,7 +259,7 @@ public abstract class AbstractData extends Observable {
         }
         getParent().removeChildFromMonitoredChildren(this);
         setChanged();
-        notifyObservers(new Notification(MVCNotification.STATE_CHANGED,
+        notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED,
                 State.NOT_MONITORED));
     }
 

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -47,8 +46,9 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 public class NodeObject extends AbstractData {
@@ -222,11 +222,11 @@ public class NodeObject extends AbstractData {
     public void setHighlight(boolean highlighted) {
         this.setChanged();
         if (highlighted) {
-            this.notifyObservers(new Notification(
-                    MVCNotification.STATE_CHANGED, State.HIGHLIGHTED));
+            this.notifyObservers(new MVCNotification(
+                    MVCNotificationTag.STATE_CHANGED, State.HIGHLIGHTED));
         } else {
-            this.notifyObservers(new Notification(
-                    MVCNotification.STATE_CHANGED, State.NOT_HIGHLIGHTED));
+            this.notifyObservers(new MVCNotification(
+                    MVCNotificationTag.STATE_CHANGED, State.NOT_HIGHLIGHTED));
         }
     }
 }

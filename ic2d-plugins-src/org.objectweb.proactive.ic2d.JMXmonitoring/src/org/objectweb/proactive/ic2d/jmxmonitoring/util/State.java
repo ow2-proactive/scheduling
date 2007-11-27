@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.jmxmonitoring.data;
+package org.objectweb.proactive.ic2d.jmxmonitoring.util;
 
 public enum State {UNKNOWN,
 

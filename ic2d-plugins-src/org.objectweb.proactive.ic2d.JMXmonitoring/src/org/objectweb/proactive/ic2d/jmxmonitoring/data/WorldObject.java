@@ -48,8 +48,8 @@ import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
 /**
@@ -159,8 +159,8 @@ public class WorldObject extends AbstractData {
         //this notification will be handled by the MonitorThread only for 
         //the first child added. It will start a refreshing thread
         if (getMonitoredChildrenSize() == 1) {
-            notifyObservers(new Notification(
-                    MVCNotification.WORLD_OBJECT_FIRST_CHILD_ADDED));
+            notifyObservers(new MVCNotification(
+                    MVCNotificationTag.WORLD_OBJECT_FIRST_CHILD_ADDED));
         }
 
         // notifyObservers(new Notification(MVCNotifications.ADD_CHILD));
@@ -181,10 +181,10 @@ public class WorldObject extends AbstractData {
         //this notification will be handled by the MonitorThread only for 
         //the last child added. It will stop a refreshing thread
         if (getMonitoredChildrenSize() == 0) {
-            notifyObservers(new Notification(
-                    MVCNotification.WORLD_OBJECT_LAST_CHILD_REMOVED));
+            notifyObservers(new MVCNotification(
+                    MVCNotificationTag.WORLD_OBJECT_LAST_CHILD_REMOVED));
         }
-        notifyObservers(new Notification(MVCNotification.REMOVE_CHILD));
+        notifyObservers(new MVCNotification(MVCNotificationTag.REMOVE_CHILD));
     }
 
     /**
@@ -348,8 +348,8 @@ public class WorldObject extends AbstractData {
         Hashtable<String, VNObject> data = new Hashtable<String, VNObject>();
         data.put(ADD_VN_MESSAGE, vn);
         //VirtualNodesGroup object will use the information within data
-        notifyObservers(new Notification(
-                MVCNotification.WORLD_OBJECT_ADD_VIRTUAL_NODE, data));
+        notifyObservers(new MVCNotification(
+                MVCNotificationTag.WORLD_OBJECT_ADD_VIRTUAL_NODE, data));
     }
 
     /**
@@ -361,8 +361,8 @@ public class WorldObject extends AbstractData {
         setChanged();
         Hashtable<String, VNObject> data = new Hashtable<String, VNObject>();
         data.put(REMOVE_VN_MESSAGE, vn);
-        notifyObservers(new Notification(
-                MVCNotification.WORLD_OBJECT_REMOVE_VIRTUAL_NODE, data));
+        notifyObservers(new MVCNotification(
+                MVCNotificationTag.WORLD_OBJECT_REMOVE_VIRTUAL_NODE, data));
     }
 
     public VNObject getVirtualNode(String virtualNodeName) {

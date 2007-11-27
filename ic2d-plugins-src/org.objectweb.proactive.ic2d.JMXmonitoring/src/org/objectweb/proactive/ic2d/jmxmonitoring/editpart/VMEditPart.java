@@ -36,13 +36,12 @@ import java.util.Observable;
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject.methodName;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VMFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.JVMListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
 public class VMEditPart extends AbstractMonitoringEditPart {
@@ -60,33 +59,39 @@ public class VMEditPart extends AbstractMonitoringEditPart {
     // -- PUBLICS METHODS -----------------------------------------------
     //
     @Override
+    //TODO: this method was taken out from a dedicated Thread 
+    //which means that the observable (VMObject) will be blocked
+    //on the notifyObservers method.
     public void update(Observable o, Object arg) {
-        if (!(arg instanceof Notification)) {
+        if (!(arg instanceof MVCNotification)) {
             return;
         }
 
-        final MVCNotification mvcNotification = ((Notification) arg).getMVCNotification();
-        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-                public void run() {
-                    switch (mvcNotification) {
-                    case RUNTIME_OBJECT_RUNTIME_KILLED:
-                        Console.getInstance(Activator.CONSOLE_NAME)
-                               .log(getModel() + " killed!");
-                        getCastedFigure().notResponding();
-                        break;
-                    default:
-                        break;
-                    }
+        final MVCNotificationTag mvcNotification = ((MVCNotification) arg).getMVCNotification();
 
-                    /*
-                    if(param instanceof State && (State)param == State.NOT_RESPONDING)
-                            ((VMFigure)getFigure()).notResponding();
-                    else if(param instanceof State && (State)param == State.NOT_MONITORED) {
-                            deactivate();
-                    }*/
-                    refresh();
-                }
-            });
+        switch (mvcNotification) {
+        case RUNTIME_OBJECT_RUNTIME_KILLED:
+            Console.getInstance(Activator.CONSOLE_NAME)
+                   .log(getModel() + " killed!");
+            getCastedFigure().notResponding();
+            break;
+        default:
+            break;
+        }
+
+        /*
+        if(param instanceof State && (State)param == State.NOT_RESPONDING)
+                ((VMFigure)getFigure()).notResponding();
+        else if(param instanceof State && (State)param == State.NOT_MONITORED) {
+                deactivate();
+        }*/
+        refresh();
+
+        //        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+        //                public void run() {
+        //
+        //                }
+        //            });
     }
 
     //

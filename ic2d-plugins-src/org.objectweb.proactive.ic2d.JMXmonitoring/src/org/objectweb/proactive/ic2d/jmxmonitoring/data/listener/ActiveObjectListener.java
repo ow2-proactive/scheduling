@@ -75,7 +75,7 @@ public class ActiveObjectListener implements NotificationListener {
                 } else if (type.equals(NotificationType.waitForRequest)) {
                     logger.debug(
                         "...............................Wait for request");
-                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.data.State.WAITING_FOR_REQUEST);
+                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.WAITING_FOR_REQUEST);
                     ao.setRequestQueueLength(0);
                 }
                 // --- MessageEvent ---------------------
@@ -86,7 +86,7 @@ public class ActiveObjectListener implements NotificationListener {
                 } else if (type.equals(NotificationType.replySent)) {
                     logger.debug("...............................Reply sent : " +
                         ao.getName());
-                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.data.State.ACTIVE);
+                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.ACTIVE);
                     Integer requestQueueLength = (Integer) notification.getUserData();
                     ao.setRequestQueueLength(requestQueueLength);
                 } else if (type.equals(NotificationType.requestSent)) {
@@ -99,14 +99,14 @@ public class ActiveObjectListener implements NotificationListener {
                     logger.debug(
                         "...............................Serving started : " +
                         ao.getName());
-                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.data.State.SERVING_REQUEST);
+                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.SERVING_REQUEST);
                     Integer requestQueueLength = (Integer) notification.getUserData();
                     ao.setRequestQueueLength(requestQueueLength);
                 } else if (type.equals(NotificationType.voidRequestServed)) {
                     logger.debug(
                         "...............................Void request served : " +
                         ao.getName());
-                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.data.State.ACTIVE);
+                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.ACTIVE);
                     Integer requestQueueLength = (Integer) notification.getUserData();
                     ao.setRequestQueueLength(requestQueueLength);
                 }
@@ -119,7 +119,7 @@ public class ActiveObjectListener implements NotificationListener {
                     logger.debug(
                         "...............................Migration about to start " +
                         ao + ", node=" + ao.getParent());
-                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.data.State.MIGRATING);
+                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.MIGRATING);
                 } else if (type.equals(
                             NotificationType.migrationExceptionThrown)) {
                     logger.debug(
@@ -136,12 +136,12 @@ public class ActiveObjectListener implements NotificationListener {
                     logger.debug(
                         "...............................Wait By Necessity : " +
                         ao.getName());
-                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.data.State.WAITING_BY_NECESSITY);
+                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.WAITING_BY_NECESSITY);
                 } else if (type.equals(NotificationType.receivedFutureResult)) {
                     logger.debug(
                         "...............................Received Future Result : " +
                         ao.getName());
-                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.data.State.RECEIVED_FUTURE_RESULT);
+                    ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.RECEIVED_FUTURE_RESULT);
                 } else {
                     System.out.println(ao.getName() + " => " + type);
                 }

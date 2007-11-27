@@ -44,9 +44,10 @@ import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 /**
@@ -181,7 +182,7 @@ public class ActiveObject extends AbstractData {
             break;
         }
         setChanged();
-        notifyObservers(new Notification(MVCNotification.STATE_CHANGED,
+        notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED,
                 this.currentState));
     }
 
@@ -194,8 +195,8 @@ public class ActiveObject extends AbstractData {
     }
 
     /**
-     * Returns a JMX notification listener.
-     * @return a JMX notification listener.
+     * Returns a JMX Notification listener.
+     * @return a JMX Notification listener.
      */
     public NotificationListener getListener() {
         return this.listener;
@@ -273,8 +274,8 @@ public class ActiveObject extends AbstractData {
         setChanged();
         Set<ActiveObject> comm = new HashSet<ActiveObject>();
         comm.add(aoSource);
-        notifyObservers(new Notification(
-                MVCNotification.ACTIVE_OBJECT_ADD_COMMUNICATION, comm));
+        notifyObservers(new MVCNotification(
+                MVCNotificationTag.ACTIVE_OBJECT_ADD_COMMUNICATION, comm));
 
         /*synchronized (communications) {
                 communications.add(source);
@@ -317,23 +318,23 @@ public class ActiveObject extends AbstractData {
     @Override
     public void resetCommunications() {
         setChanged();
-        notifyObservers(new Notification(
-                MVCNotification.ACTIVE_OBJECT_RESET_COMMUNICATIONS, null));
+        notifyObservers(new MVCNotification(
+                MVCNotificationTag.ACTIVE_OBJECT_RESET_COMMUNICATIONS, null));
     }
 
     public void addRequest() {
         this.requestQueueLength++;
         setChanged();
-        notifyObservers(new Notification(
-                MVCNotification.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+        notifyObservers(new MVCNotification(
+                MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
                 requestQueueLength));
     }
 
     public void removeRequest() {
         this.requestQueueLength--;
         setChanged();
-        notifyObservers(new Notification(
-                MVCNotification.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+        notifyObservers(new MVCNotification(
+                MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
                 requestQueueLength));
         ;
     }
@@ -342,8 +343,8 @@ public class ActiveObject extends AbstractData {
         if (this.requestQueueLength != requestQueueLength) {
             this.requestQueueLength = requestQueueLength;
             setChanged();
-            notifyObservers(new Notification(
-                    MVCNotification.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+            notifyObservers(new MVCNotification(
+                    MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
                     requestQueueLength));
             ;
         }

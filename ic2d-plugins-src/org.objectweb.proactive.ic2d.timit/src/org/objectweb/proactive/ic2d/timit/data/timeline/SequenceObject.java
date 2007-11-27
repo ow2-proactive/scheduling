@@ -44,7 +44,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 import org.objectweb.proactive.ic2d.timit.data.timeline.utils.ReverseFileReader;
 import org.objectweb.proactive.ic2d.timit.editparts.timeline.SequenceEditPart;
 

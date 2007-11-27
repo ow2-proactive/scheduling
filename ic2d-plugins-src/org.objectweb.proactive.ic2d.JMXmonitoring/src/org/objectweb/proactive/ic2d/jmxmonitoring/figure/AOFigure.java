@@ -50,7 +50,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 public class AOFigure extends AbstractFigure {

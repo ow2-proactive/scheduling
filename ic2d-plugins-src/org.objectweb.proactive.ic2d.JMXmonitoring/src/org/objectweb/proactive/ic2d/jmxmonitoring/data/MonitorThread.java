@@ -33,8 +33,8 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 import java.util.Observable;
 import java.util.Observer;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
 public class MonitorThread implements Observer {
@@ -106,11 +106,11 @@ public class MonitorThread implements Observer {
 
     public void update(Observable o, Object arg) {
         if ((arg != null) && o instanceof WorldObject &&
-                arg instanceof Notification) {
-            MVCNotification notification = ((Notification) arg).getMVCNotification();
-            if (notification == MVCNotification.WORLD_OBJECT_FIRST_CHILD_ADDED) {
+                arg instanceof MVCNotification) {
+            MVCNotificationTag notification = ((MVCNotification) arg).getMVCNotification();
+            if (notification == MVCNotificationTag.WORLD_OBJECT_FIRST_CHILD_ADDED) {
                 startRefreshing((WorldObject) o);
-            } else if (notification == MVCNotification.WORLD_OBJECT_LAST_CHILD_REMOVED) {
+            } else if (notification == MVCNotificationTag.WORLD_OBJECT_LAST_CHILD_REMOVED) {
                 stopRefreshing();
             }
         }

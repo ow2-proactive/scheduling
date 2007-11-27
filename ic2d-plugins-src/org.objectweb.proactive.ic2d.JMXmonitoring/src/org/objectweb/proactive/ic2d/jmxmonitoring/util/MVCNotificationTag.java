@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.ic2d.jmxmonitoring;
+package org.objectweb.proactive.ic2d.jmxmonitoring.util;
 
 
 /**
@@ -37,22 +37,22 @@ package org.objectweb.proactive.ic2d.jmxmonitoring;
  * Each time an event occurs in an AbstractData object,
  * a notification of type <code> Notification </code> is sent.
  * A Notification includes a notification message (a constant defined in this enum)
- * and an object Data which depends on the notification message
+ * and an object Data which depends on the notification message.
  *
  * @author ProActiveTeam
  *
  */
-public enum MVCNotification {
+public enum MVCNotificationTag {
     //---------- General messages ----------
     /**
      * Notification message sent when a child has been added to an
-     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData </code> object
+     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData </code> object.
      * Use the key corresponding to the child as data in the Notification object.
      */
     ADD_CHILD,
     /**
      * Notification message sent when a child has been removed from an
-     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData </code> object
+     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData </code> object.
      * Use the key corresponding to the child as data in the Notification object.
      */
     REMOVE_CHILD,
@@ -69,15 +69,29 @@ public enum MVCNotification {
      * has been changed.
      * Use the a constant from <code>State</code> enum which describes the new state.
      */
-    STATE_CHANGED,WORLD_OBJECT_ADD_HOST,
-
-    /*
-     * Notification sent When the first host is added. It is used to start a refreshing thread
+    STATE_CHANGED,
+    /**
+     * Notification message sent when the first child is added to a
+     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject </code> object
      */
-    WORLD_OBJECT_FIRST_CHILD_ADDED,WORLD_OBJECT_LAST_CHILD_REMOVED,
+    WORLD_OBJECT_FIRST_CHILD_ADDED,
+    /**
+     * Notification message sent when the last child is removed from a
+     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject </code> object
+     */
+    WORLD_OBJECT_LAST_CHILD_REMOVED,
+    /**
+     * Notification message sent when a <code> VirtualNode </code> is added to a
+     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject </code> object
+     * Use the key corresponding to the virtual node as data in the Notification object.
+     */
     WORLD_OBJECT_ADD_VIRTUAL_NODE,
-    WORLD_OBJECT_REMOVE_VIRTUAL_NODE,
-    HOST_OBJECT_UPDATED_OSNAME_AND_VERSON,
+    /**
+     * Notification message sent when a <code> VirtualNode </code> is removed from a
+     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject </code> object
+     * Use the key corresponding to the virtual node as data in the Notification object.
+     */
+    WORLD_OBJECT_REMOVE_VIRTUAL_NODE,HOST_OBJECT_UPDATED_OSNAME_AND_VERSON,
     RUNTIME_OBJECT_RUNTIME_KILLED,
     RUNTIME_OBJECT_RUNTIME_NOT_RESPONDING,
     RUNTIME_OBJECT_RUNTIME_NOT_MONITORED,

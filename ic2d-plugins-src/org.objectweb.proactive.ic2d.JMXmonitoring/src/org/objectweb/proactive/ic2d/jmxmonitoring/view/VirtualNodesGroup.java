@@ -46,13 +46,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VNColors;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
 public class VirtualNodesGroup implements Observer {
@@ -87,13 +87,13 @@ public class VirtualNodesGroup implements Observer {
     //
     public void update(Observable o, Object arg) {
         // <"Message",VNObject>
-        if (!(arg instanceof Notification)) {
+        if (!(arg instanceof MVCNotification)) {
             return;
         }
 
-        Notification notif = (Notification) arg;
+        MVCNotification notif = (MVCNotification) arg;
         Object data = notif.getData();
-        if ((notif.getMVCNotification() == MVCNotification.WORLD_OBJECT_ADD_VIRTUAL_NODE) &&
+        if ((notif.getMVCNotification() == MVCNotificationTag.WORLD_OBJECT_ADD_VIRTUAL_NODE) &&
                 (data instanceof Hashtable)) { //<"Add a virtual node",VNObject>
             Hashtable<String, VNObject> table = (Hashtable<String, VNObject>) data;
             final VNObject vnAdded = table.get(WorldObject.ADD_VN_MESSAGE);
@@ -110,7 +110,7 @@ public class VirtualNodesGroup implements Observer {
                         }
                     });
             }
-        } else if ((notif.getMVCNotification() == MVCNotification.WORLD_OBJECT_REMOVE_VIRTUAL_NODE) &&
+        } else if ((notif.getMVCNotification() == MVCNotificationTag.WORLD_OBJECT_REMOVE_VIRTUAL_NODE) &&
                 (data instanceof Hashtable)) { //<"Remove a virtual node",VNObject>
             Hashtable<String, VNObject> table = (Hashtable<String, VNObject>) data;
             final VNObject vnRemoved = table.get(WorldObject.REMOVE_VN_MESSAGE);

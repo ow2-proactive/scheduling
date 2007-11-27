@@ -34,13 +34,13 @@ import java.util.List;
 import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
-import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.State;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.HostFigure;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.listener.HostListener;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 public class HostEditPart extends AbstractMonitoringEditPart {
@@ -83,12 +83,12 @@ public class HostEditPart extends AbstractMonitoringEditPart {
 
     @Override
     public void update(Observable o, Object arg) {
-        if (!(arg instanceof Notification)) {
+        if (!(arg instanceof MVCNotification)) {
             return;
         }
 
-        final Notification notif = (Notification) arg;
-        MVCNotification mvcNotif = notif.getMVCNotification();
+        final MVCNotification notif = (MVCNotification) arg;
+        MVCNotificationTag mvcNotif = notif.getMVCNotification();
         Object data = notif.getData();
         switch (mvcNotif) {
         case STATE_CHANGED: {
