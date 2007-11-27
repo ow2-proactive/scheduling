@@ -53,6 +53,9 @@ public class RuntimeObjectListener implements NotificationListener {
     }
 
     public void handleNotification(Notification notification, Object handback) {
+        if (true) {
+            return;
+        }
         String type = notification.getType();
         if (type.equals(NotificationType.bodyCreated)) {
             BodyNotificationData notificationData = (BodyNotificationData) notification.getUserData();
@@ -97,6 +100,8 @@ public class RuntimeObjectListener implements NotificationListener {
         // --- NodeEvent ----------------
         else if (type.equals(NotificationType.nodeCreated)) {
             System.out.println("...............................Node Created");
+            //  if (!(notification.getUserData() instanceof Node))
+            // 	return;
             Node node = (Node) notification.getUserData();
             String nodeUrl = node.getNodeInformation().getURL();
             ObjectName oname = FactoryName.createNodeObjectName(runtimeObject.getUrl(),

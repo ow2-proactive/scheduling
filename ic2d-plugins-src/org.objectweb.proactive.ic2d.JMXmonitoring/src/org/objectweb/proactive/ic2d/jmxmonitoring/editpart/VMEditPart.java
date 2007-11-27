@@ -85,13 +85,13 @@ public class VMEditPart extends AbstractMonitoringEditPart {
         else if(param instanceof State && (State)param == State.NOT_MONITORED) {
                 deactivate();
         }*/
-        refresh();
 
-        //        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-        //                public void run() {
-        //
-        //                }
-        //            });
+        //refresh();
+        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    refresh();
+                }
+            });
     }
 
     //

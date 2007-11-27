@@ -104,6 +104,7 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
         }
 
         final MVCNotification notif = (MVCNotification) arg;
+
         if ((notif.getMVCNotification() == MVCNotificationTag.STATE_CHANGED) &&
                 (notif.getData() == State.NOT_MONITORED)) {
             deactivate();
@@ -117,9 +118,17 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
             getCastedFigure()
                 .setHighlight(getMonitoringView().getVirtualNodesGroup()
                                   .getColor(getCastedModel().getVirtualNode()));
-            refresh();
+            getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+                    public void run() {
+                        refresh();
+                    }
+                });
         } else {
-            refresh();
+            getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+                    public void run() {
+                        refresh();
+                    }
+                });
         }
     }
 
