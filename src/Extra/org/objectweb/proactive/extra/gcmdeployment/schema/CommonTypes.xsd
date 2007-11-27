@@ -55,7 +55,7 @@
 
 	<simpleType name="idType">
 		<restriction base="string">
-			<pattern value="[0-9a-zA-Z_]+"></pattern>
+			<pattern value="[0-9a-zA-Z_-]+"></pattern>
 			<whiteSpace value="collapse"></whiteSpace>
 		</restriction>
 	</simpleType>
