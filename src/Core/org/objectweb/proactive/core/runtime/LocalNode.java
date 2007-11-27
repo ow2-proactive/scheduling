@@ -285,7 +285,7 @@ public class LocalNode implements SecurityEntity {
     }
 
     public void terminate() {
-        List activeObjects = this.getActiveObjectsId();
+        List<UniqueID> activeObjects = this.getActiveObjectsId();
 
         for (int i = 0; i < activeObjects.size(); i++) {
             UniqueID bodyID = (UniqueID) activeObjects.get(i);
