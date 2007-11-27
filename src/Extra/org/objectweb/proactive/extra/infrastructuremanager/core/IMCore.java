@@ -135,7 +135,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         toBeReleased = new ArrayList<IMNode>();
     }
 
-    @Override
     public void initActivity(Body body) {
         if (logger.isDebugEnabled()) {
             logger.debug("IMCore start : initActivity");
@@ -549,12 +548,10 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     // ----------------------------------------------------------------------//
     // methods called by IMAdmin, override interface IMCore
     // ----------------------------------------------------------------------//
-    @Override
     public String getId() {
         return this.id;
     }
 
-    @Override
     public void createStaticNodesource(ProActiveDescriptor pad,
         String sourceName) {
         logger.info("[IMCORE] Creating a Static source : " + sourceName);
@@ -578,7 +575,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     }
 
     //temporary method, to remove when dynamic source creation methds will be defined
-    @Override
     public void createP2PNodeSource(String id, int nbMaxNodes, int nice,
         int ttr, Vector<String> peerUrls) {
         logger.info("[IMCORE] Creating a P2P source " + id);
@@ -596,7 +592,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     }
 
     //temporary method, to remove when dynamic source creation methds will be defined
-    @Override
     public void createDummyNodeSource(String id, int nbMaxNodes, int nice,
         int ttr) {
         logger.info("[IMCORE] Creating a Dummy node source " + id);
@@ -613,7 +608,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         }
     }
 
-    @Override
     public void addNodes(ProActiveDescriptor pad, String sourceName) {
         if (this.nodeSources.containsKey(sourceName)) {
             try {
@@ -624,7 +618,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         }
     }
 
-    @Override
     public void addNodes(ProActiveDescriptor pad) {
         try {
             this.nodeSources.get(DEFAULT_STATIC_SOURCE_NAME)
@@ -634,7 +627,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         }
     }
 
-    @Override
     public void removeNode(String nodeUrl, boolean killNode) {
         if (this.allNodes.containsKey(nodeUrl)) {
             IMNode imnode = this.allNodes.get(nodeUrl);
@@ -651,19 +643,16 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         }
     }
 
-    @Override
     public BooleanWrapper shutdown() {
         //Germs TODO remove all NodeSources
         //kill all nodes, softly or not 
         return null;
     }
 
-    @Override
     public void removeSource(String sourceName, boolean killNodes) {
         //TODO Germs
     }
 
-    @Override
     public ArrayList<NodeSource> getNodeSources() {
         ArrayList<NodeSource> res = new ArrayList<NodeSource>();
         for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
@@ -672,47 +661,38 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         return res;
     }
 
-    @Override
     public IntWrapper getNbAllIMNode() {
         return new IntWrapper(this.allNodes.size());
     }
 
-    @Override
     public IntWrapper getSizeListFreeIMNode() {
         return new IntWrapper(this.freeNodes.size());
     }
 
-    @Override
     public IntWrapper getSizeListBusyIMNode() {
         return new IntWrapper(this.busyNodes.size());
     }
 
-    @Override
     public IntWrapper getSizeListDownIMNode() {
         return new IntWrapper(this.downNodes.size());
     }
 
-    @Override
     public IntWrapper getSizeListToReleaseIMNode() {
         return new IntWrapper(this.toBeReleased.size());
     }
 
-    @Override
     public ArrayList<IMNode> getListFreeIMNode() {
         return this.freeNodes;
     }
 
-    @Override
     public ArrayList<IMNode> getListBusyIMNode() {
         return this.busyNodes;
     }
 
-    @Override
     public ArrayList<IMNode> getListToReleasedIMNodes() {
         return this.toBeReleased;
     }
 
-    @Override
     public ArrayList<IMNode> getListAllNodes() {
         ArrayList<IMNode> res = new ArrayList<IMNode>();
         for (Entry<String, IMNode> entry : this.allNodes.entrySet()) {
@@ -721,7 +701,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         return res;
     }
 
-    @Override
     public IMInitialState getIMInitialState() {
         Vector<NodeEvent> freeNodesVector = new Vector<NodeEvent>();
         for (IMNode imnode : this.freeNodes) {
@@ -777,7 +756,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     * find which {@link IMNode} correspond to the {@link Node} given in
     * parameter and change its state to 'free'.
     */
-    @Override
     public void freeNode(Node node) {
         String nodeURL = null;
         try {
@@ -806,13 +784,11 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         }
     }
 
-    @Override
     public void freeNodes(NodeSet nodes) {
         for (Node node : nodes)
             freeNode(node);
     }
 
-    @Override
     public void freeNodes(VirtualNode vnode) {
         ListIterator<IMNode> iterator = this.busyNodes.listIterator();
         while (iterator.hasNext()) {
@@ -831,7 +807,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
          * node left. In the case of a static script, it will return in priority the
          * nodes on which the given script has already been verified.
          */
-    @Override
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript) {
         ArrayList<IMNode> nodes = getNodesSortedByScript(selectionScript);
         NodeSet result;
@@ -862,7 +837,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         return result;
     }
 
-    @Override
     public NodeSet getExactlyNodes(IntWrapper nb,
         SelectionScript selectionScript) {
         // TODO Auto-generated method stub
@@ -877,7 +851,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     /**
      * adding a NodeSource to the core with its Id
      */
-    @Override
     public void addSource(NodeSource source, String sourceId) {
         this.nodeSources.put(sourceId, source);
         System.out.println("IMCore.addSource() " + sourceId);
@@ -885,7 +858,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         this.monitoring.nodeSourceAddedEvent(source.getSourceEvent());
     }
 
-    @Override
     public void internalAddNode(Node node, String VNodeName, String PADName,
         NodeSource nodeSource) {
         IMNode imnode = new IMNodeImpl(node, VNodeName, PADName, nodeSource);
@@ -911,7 +883,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     * if the node is busy, waiting the job end
     * a call back is awaited by the node source to confirm this node unregistering
     */
-    @Override
     public void internalRemoveNode(String nodeUrl, boolean preempt) {
         IMNode imnode = getNodebyUrl(nodeUrl);
         if (preempt) {
@@ -923,7 +894,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         }
     }
 
-    @Override
     public void setDownNode(String nodeUrl) {
         System.out.println("IMCoreImpl.setDownNode() node Url" + nodeUrl);
         IMNode imnode = getNodebyUrl(nodeUrl);

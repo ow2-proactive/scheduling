@@ -71,7 +71,6 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
     // definitions of abstract methods inherited from NodeSource, 
     // called by IMNodeManager
     // ----------------------------------------------------------------------//
-    @Override
     public void confirmRemoveNode(String nodeUrl) {
         if (logger.isInfoEnabled()) {
             logger.info("[" + this.SourceId + "] removing Node : " + nodeUrl);
@@ -90,7 +89,6 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
         }
     }
 
-    @Override
     public void forwardRemoveNode(String nodeUrl, boolean preempt) {
         assert this.nodes.containsKey(nodeUrl);
         this.imCore.internalRemoveNode(nodeUrl, preempt);
@@ -100,7 +98,6 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * add nodes by deploying a ProActive Descriptor, recover nodes created,
      * adding them to the node Source and register nodes to the IMNodeManager
      */
-    @Override
     public void addNodes(ProActiveDescriptor pad, String PADName) {
         this.listPad.put(PADName, pad);
         IMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) ProActiveObject.getStubOnThis(),
@@ -116,7 +113,6 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * Inform the IMNode Manager about the broken node,
      * remove the broken node from the list this.nodes
      */
-    @Override
     public void detectedPingedDownNode(String nodeUrl) {
         Node node = getNodebyUrl(nodeUrl);
         if (node != null) {
@@ -125,17 +121,14 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
         }
     }
 
-    @Override
     public HashMap<String, ProActiveDescriptor> getListPAD() {
         return listPad;
     }
 
-    @Override
     public IntWrapper getSizeListPad() {
         return new IntWrapper(listPad.size());
     }
 
-    @Override
     public NodeSourceEvent getSourceEvent() {
         return new NodeSourceEvent(this.getSourceId(), "PAD Node Source");
     }
@@ -148,7 +141,6 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * called by IMDeploy
      * receive a new node Deployed
      */
-    @Override
     public void receiveDeployedNode(Node node, String VnName, String PADName) {
         this.addNewAvailableNode(node, VnName, PADName);
     }

@@ -63,44 +63,47 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
  * @since 2.2
  */
 public class SchedulerTester {
-    //public final static String DATA_HOME = "/proj/proactivep2p/home/scheduler/";
-    public final static String DATA_HOME = "/user/jlscheef/home/workspace/ProActiveScheduler/descriptors/scheduler/";
-
-    //public final static String PROACTIVE_HOME = "/user/jlscheef/home/worspace/ProActiveScheduler/";
+    // directory containing jobs to be submitted
+    public static String JOBS_HOME;
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     // scheduler connection
     private static final String DEFAULT_URL = null;
-
-    // submission period
-    private final static int DEFAULT_MSP = 120000;
-
-    // nb jobs
-    private final static int DEFAULT_MNJ = 3;
     private SchedulerAuthenticationInterface authentication;
 
     // users
     private Set<Thread> users;
+
+    // submission period
+    private final static int DEFAULT_MSP = 120000;
     private int maxSubmissionPeriod;
+
+    // nb jobs
+    private final static int DEFAULT_MNJ = 3;
     private int maxNbJobs;
 
-    public SchedulerTester(int msp, int mnj) {
-        this.users = new HashSet<Thread>();
-        this.maxNbJobs = mnj;
-        this.maxSubmissionPeriod = msp;
-    }
+    // nb jobs
+    private final static int DEFAULT_TOTAL_NL = 30;
+    public static int totalMaxJobs;
+    public static int currentNBjobs = 0;
+    public static Object synchro = new Object();
 
     /**
      * args[0] = [schedulerURL]
-     * args[1] = [submission period]
-     * args[2] = [nb jobs]
+     * args[1] = [jobs directory]
+     * args[2] = [submission period]
+     * args[3] = [nb jobs]
+     * args[4] = [nb total jobs]
      */
     public static void main(String[] args) {
         try {
             // almost optional arguments...
+            JOBS_HOME = args[1];
             SchedulerTester jl = new SchedulerTester((args.length > 1)
-                    ? Integer.parseInt(args[1]) : DEFAULT_MSP,
-                    (args.length > 2) ? Integer.parseInt(args[2]) : DEFAULT_MNJ);
+                    ? Integer.parseInt(args[2]) : DEFAULT_MSP,
+                    (args.length > 3) ? Integer.parseInt(args[3]) : DEFAULT_MNJ);
+            totalMaxJobs = (args.length > 4) ? Integer.parseInt(args[4])
+                                             : DEFAULT_TOTAL_NL;
             jl.authentication = SchedulerConnection.join((args.length > 0)
                     ? args[0] : DEFAULT_URL);
             jl.randomizedTest();
@@ -110,39 +113,40 @@ public class SchedulerTester {
         }
     }
 
+    public SchedulerTester(int msp, int mnj) {
+        this.users = new HashSet<Thread>();
+        this.maxNbJobs = mnj;
+        this.maxSubmissionPeriod = msp;
+    }
+
     public void randomizedTest() {
         HashMap<String, String> logins = new HashMap<String, String>();
         Vector<String> jobs = null;
-
         try {
             // read logins
             FileReader l = new FileReader(SchedulerTester.class.getResource(
                         "login.cfg").getFile());
             BufferedReader br = new BufferedReader(l);
             String current = br.readLine();
-
             while (current != null) {
                 StringTokenizer sep = new StringTokenizer(current, ":");
                 logins.put(sep.nextToken(), sep.nextToken());
                 current = br.readLine();
             }
-
             l.close();
 
             System.out.print("[SCHEDULER TEST] Used logins are : ");
-
             for (String s : logins.keySet()) {
                 System.out.print(s + ", ");
             }
-
             System.out.println();
 
             // read jobs
-            File d = new File(DATA_HOME + "jobs/");
+            File d = new File(JOBS_HOME);
+            System.out.println("===> " + JOBS_HOME);
             String[] jobsTmp = d.list();
             // remove non *xml
             jobs = new Vector<String>();
-
             for (int i = 0; i < jobsTmp.length; i++) {
                 if (jobsTmp[i].endsWith("xml")) {
                     jobs.add(jobsTmp[i]);
@@ -150,11 +154,9 @@ public class SchedulerTester {
             }
 
             System.out.print("[SCHEDULER TEST] Used jobs are : ");
-
             for (String s : jobs) {
                 System.out.print(s + ", ");
             }
-
             System.out.println();
 
             for (String s : logins.keySet()) {
@@ -177,6 +179,7 @@ public class SchedulerTester {
         private UserSchedulerInterface scheduler;
         private boolean isActive;
         private Vector<JobId> results = new Vector<JobId>();
+        private boolean submit = true;
 
         /**
          *
@@ -214,15 +217,25 @@ public class SchedulerTester {
 
                     //Create job
                     Job j = JobFactory.getFactory()
-                                      .createJob(DATA_HOME + "jobs/" +
-                            jobs.get(job));
+                                      .createJob(JOBS_HOME + jobs.get(job));
                     System.out.println("[SCHEDULER TEST] Submitting " +
                         jobs.get(job) + " (" + nbJob + " instances) by " +
                         this.login);
 
                     for (int i = 0; i < nbJob; i++) {
                         // Submit job
-                        results.add(scheduler.submit(j));
+                        synchronized (synchro) {
+                            if (currentNBjobs < totalMaxJobs) {
+                                currentNBjobs++;
+                            } else {
+                                this.submit = false;
+                            }
+                        }
+                        if (submit) {
+                            results.add(scheduler.submit(j));
+                        } else {
+                            break;
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -238,7 +251,6 @@ public class SchedulerTester {
 
                 // Get results if any ...
                 Vector<JobId> resultsTmp = (Vector<JobId>) this.results.clone();
-
                 for (JobId id : resultsTmp) {
                     try {
                         if (scheduler.getJobResult(id) != null) {

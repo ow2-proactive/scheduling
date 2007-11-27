@@ -123,7 +123,6 @@ public class IMNodeImpl implements IMNode, Serializable {
         return this.nodeSource.getSourceId();
     }
 
-    @Override
     public String getNodeURL() {
         return this.node.getNodeInformation().getURL();
     }
@@ -146,12 +145,10 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
-    @Override
     public void setDown() {
         this.status = NodeState.DOWN;
     }
 
-    @Override
     public void setToRelease() throws NodeException {
         if (this.status != NodeState.DOWN) {
             this.status = NodeState.TO_BE_RELEASED;
@@ -178,7 +175,6 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
-    @Override
     public boolean isToRelease() {
         if (this.status == NodeState.TO_BE_RELEASED) {
             return true;
@@ -201,7 +197,6 @@ public class IMNodeImpl implements IMNode, Serializable {
 
     // ----------------------------------------------------------------------//
     // TOSTRING
-    @Override
     public String toString() {
         String mes = "\n";
 
@@ -247,7 +242,6 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
-    @Override
     public boolean equals(Object imnode) {
         if (imnode instanceof IMNode) {
             return this.nodeURL.equals(((IMNode) imnode).getNodeURL());
@@ -256,7 +250,6 @@ public class IMNodeImpl implements IMNode, Serializable {
         return false;
     }
 
-    @Override
     public int hashCode() {
         return nodeURL.hashCode();
     }
@@ -288,17 +281,14 @@ public class IMNodeImpl implements IMNode, Serializable {
         return this.getPADName().compareTo(imnode.getPADName());
     }
 
-    @Override
     public NodeSource getNodeSource() {
         return this.nodeSource;
     }
 
-    @Override
     public void setNodeSource(NodeSource ns) {
         this.nodeSource = ns;
     }
 
-    @Override
     public void setVerifyingScript(SelectionScript script) {
         if (scriptStatus.containsKey(script)) {
             scriptStatus.remove(script);
@@ -306,7 +296,6 @@ public class IMNodeImpl implements IMNode, Serializable {
         scriptStatus.put(script, IMNode.VERIFIED_SCRIPT);
     }
 
-    @Override
     public void setNotVerifyingScript(SelectionScript script) {
         if (scriptStatus.containsKey(script)) {
             int status = scriptStatus.remove(script);
@@ -324,7 +313,6 @@ public class IMNodeImpl implements IMNode, Serializable {
     //	public NodeEvent(String url, String nodeSource, 
     //			String PADName, String VnName, String hostname,
     //			String vm, NodeState state) {
-    @Override
     public NodeEvent getNodeEvent() {
         return new NodeEvent(this.nodeURL, this.getNodeSourceId(),
             this.padName, this.vnodeName, this.hostName, this.vmName,

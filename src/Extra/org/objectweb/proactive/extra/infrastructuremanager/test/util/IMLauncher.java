@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 
-import java.util.Vector;
-
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -48,8 +46,7 @@ public class IMLauncher {
      */
     public static void main(String[] args) throws Exception {
         System.out.println(
-            "STARTING INFRASTRUCTURE MANAGER: Press <ENTER> to Shutdown.");
-        System.out.println("IMLauncher.main()");
+            "STARTING INFRASTRUCTURE MANAGER: Press 'e' to shutdown.");
         IMFactory.startLocal();
         IMAdmin admin = IMFactory.getAdmin();
         try {
@@ -58,22 +55,42 @@ public class IMLauncher {
             e.printStackTrace();
         }
 
-        String urlPad;
         if (args.length > 0) {
-            urlPad = args[0];
+            for (String desc : args) {
+                ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(desc);
+                admin.addNodes(pad);
+            }
         } else {
-            urlPad = "../../../descriptors/Workers.xml";
+            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
+                    "../../../descriptors/scheduler/deployment/Local4JVM.xml");
+            admin.addNodes(pad);
         }
 
-        ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(urlPad);
-        admin.addNodes(pad);
+        //        Vector<String> v = new Vector<String>();
+        //        v.add("//macyavel:6444");
+        //        admin.createP2PNodeSource("P2P", 2, 10000, 50000, v);
 
-        Vector<String> v = new Vector<String>();
-        v.add("//macyavel:6444");
-        admin.createP2PNodeSource("P2P", 2, 10000, 50000, v);
+        //DynamicNodeSource d = (DynamicNodeSource) ProActiveObject.newActive(P2PNodeSource.class.getCanonicalName(),
+        //new Object[] { "Nodes on P2P", 4, 6, 60000000 });
+        //admin.addDynamicNodeSources(d);
+        //IMUser user = IMFactory.getUser();
+        //IMMonitoring monitor = IMFactory.getMonitoring();
 
-        Thread.sleep(Integer.MAX_VALUE);
-
+        // Thread.sleep(Integer.MAX_VALUE);
+        // System.out.println("Number of nodes : "+
+        // monitor.getNumberOfAllResources().intValue());
+        //        
+        // System.out.println("Asking for 2 nodes :");
+        // NodeSet ns = user.getAtMostNodes(new IntWrapper(3), null);
+        // System.out.println("Nodes obtained : "+ ns.size());
+        // System.out.println("Free nodes : "+
+        // monitor.getNumberOfFreeResource().intValue());
+        // System.out.println("Free nodes : "+
+        // monitor.getNumberOfFreeResource().intValue());
+        System.out.println("[RESSOUCE MANAGER] Press e+enter to exit...");
+        char typed = 'x';
+        while ((typed = (char) System.in.read()) != 'e') {
+        }
         try {
             IMFactory.getAdmin().shutdown();
         } catch (Exception e) {

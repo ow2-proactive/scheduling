@@ -247,75 +247,62 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
         }
     }
 
-    @Override
     public void imKilledEvent() {
         System.out.println("SimpleTestIMMonitoring.imKilledEvent()");
     }
 
-    @Override
     public void imShutDownEvent() {
         System.out.println("SimpleTestIMMonitoring.imShutDownEvent()");
     }
 
-    @Override
     public void imShuttingDownEvent() {
         System.out.println("SimpleTestIMMonitoring.imShuttingDownEvent()");
     }
 
-    @Override
     public void imStartedEvent() {
         System.out.println("SimpleTestIMMonitoring.imStartedEvent()");
     }
 
-    @Override
     public void nodeAddedEvent(NodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeAddedEvent() " +
             n.getNodeUrl());
     }
 
-    @Override
     public void nodeBusyEvent(NodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeBusyEvent() " +
             n.getNodeUrl());
     }
 
-    @Override
     public void nodeDownEvent(NodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeDownEvent() " +
             n.getNodeUrl());
     }
 
-    @Override
     public void nodeFreeEvent(NodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeFreeEvent()" +
             n.getNodeUrl());
     }
 
-    @Override
     public void nodeToReleaseEvent(NodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeToReleaseEvent() " +
             n.getNodeUrl());
     }
 
-    @Override
     public void nodeRemovedEvent(NodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeRemovedEvent() " +
             n.getNodeUrl());
     }
 
-    @Override
     public void nodeSourceAddedEvent(NodeSourceEvent ns) {
         System.out.println("SimpleTestIMMonitoring.nodeSourceAddedEvent() " +
             ns.getSourceName());
     }
 
-    @Override
     public void nodeSourceRemovedEvent(NodeSourceEvent ns) {
         System.out.println("SimpleTestIMMonitoring.nodeSourceRemovedEvent() " +
             ns.getSourceName());
     }
 
-    @Override
     public void initActivity(Body body) {
         System.out.println("SimpleTestIMMonitoring.initActivity()");
         this.imMonitoring.addIMEventListener((IMEventListener) ProActiveObject.getStubOnThis(),

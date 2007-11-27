@@ -81,7 +81,6 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener {
 
     // ----------------------------------------------------------------------//
     // Events handling
-    @Override
     public IMInitialState addIMEventListener(IMEventListener listener,
         IMEvent... events) {
         UniqueID id = ProActiveObject.getContext().getCurrentRequest()
@@ -187,63 +186,51 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener {
     /** inherited from IMEventListener
      * events generation
      */
-    @Override
     public void imKilledEvent() {
         dispatch(IMEvent.KILLED, null);
     }
 
-    @Override
     public void imShutDownEvent() {
         dispatch(IMEvent.SHUTDOWN, null);
     }
 
-    @Override
     public void imShuttingDownEvent() {
         dispatch(IMEvent.SHUTTING_DOWN, null);
     }
 
-    @Override
     public void imStartedEvent() {
         dispatch(IMEvent.STARTED, null);
     }
 
-    @Override
     public void nodeAddedEvent(NodeEvent n) {
         dispatch(IMEvent.NODE_ADDED, new Class<?>[] { NodeEvent.class }, n);
     }
 
-    @Override
     public void nodeBusyEvent(NodeEvent n) {
         dispatch(IMEvent.NODE_BUSY, new Class<?>[] { NodeEvent.class }, n);
     }
 
-    @Override
     public void nodeDownEvent(NodeEvent n) {
         dispatch(IMEvent.NODE_DOWN, new Class<?>[] { NodeEvent.class }, n);
     }
 
-    @Override
     public void nodeFreeEvent(NodeEvent n) {
         dispatch(IMEvent.NODE_FREE, new Class<?>[] { NodeEvent.class }, n);
     }
 
-    @Override
     public void nodeRemovedEvent(NodeEvent n) {
         dispatch(IMEvent.NODE_REMOVED, new Class<?>[] { NodeEvent.class }, n);
     }
 
-    @Override
     public void nodeToReleaseEvent(NodeEvent n) {
         dispatch(IMEvent.NODE_TO_RELEASE, new Class<?>[] { NodeEvent.class }, n);
     }
 
-    @Override
     public void nodeSourceAddedEvent(NodeSourceEvent ns) {
         dispatch(IMEvent.NODESOURCE_CREATED,
             new Class<?>[] { NodeSourceEvent.class }, ns);
     }
 
-    @Override
     public void nodeSourceRemovedEvent(NodeSourceEvent ns) {
         dispatch(IMEvent.NODESOURCE_REMOVED,
             new Class<?>[] { NodeSourceEvent.class }, ns);

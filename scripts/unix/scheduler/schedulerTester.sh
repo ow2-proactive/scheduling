@@ -12,7 +12,7 @@ CLASSPATH=.
 
 echo $JAVACMD
 
-$JAVACMD org.objectweb.proactive.extra.scheduler.examples.SchedulerTester $1 $2 $3
+$JAVACMD org.objectweb.proactive.extra.scheduler.examples.SchedulerTester $@
 
 echo
 

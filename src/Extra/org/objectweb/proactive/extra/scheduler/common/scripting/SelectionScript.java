@@ -51,7 +51,7 @@ public class SelectionScript extends Script<Boolean> {
      * The variable name which must be set after the evaluation
      * of a verifiying script.
      */
-    public static final String RESULT_VARIABLE = "script_result";
+    public static final String RESULT_VARIABLE = "selected";
 
     /** If true, script result is not cached */
     private boolean dynamic = false;

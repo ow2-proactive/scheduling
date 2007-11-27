@@ -78,45 +78,37 @@ public class IMAdminImpl implements IMAdmin, Serializable {
         return new StringWrapper("Je suis le IMAdmin");
     }
 
-    @Override
     public void createStaticNodesource(String SourceName,
         ProActiveDescriptor pad) {
         this.imcore.createStaticNodesource(pad, SourceName);
     }
 
-    @Override
     public void createP2PNodeSource(String id, int nbMaxNodes, int nice,
         int ttr, Vector<String> peerUrls) {
         this.imcore.createP2PNodeSource(id, nbMaxNodes, nice, ttr, peerUrls);
     }
 
-    @Override
     public void createDummyNodeSource(String id, int nbMaxNodes, int nice,
         int ttr) {
         this.imcore.createDummyNodeSource(id, nbMaxNodes, nice, ttr);
     }
 
-    @Override
     public void addNodes(ProActiveDescriptor pad, String sourceName) {
         this.imcore.addNodes(pad, sourceName);
     }
 
-    @Override
     public void addNodes(ProActiveDescriptor pad) {
         this.imcore.addNodes(pad);
     }
 
-    @Override
     public void removeNode(String nodeUrl, boolean killNode) {
         this.imcore.removeNode(nodeUrl, killNode);
     }
 
-    @Override
     public void removeSource(String sourceName, boolean killNodes) {
         this.imcore.removeSource(sourceName, killNodes);
     }
 
-    @Override
     public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad() {
         return null;
     }
@@ -128,12 +120,10 @@ public class IMAdminImpl implements IMAdmin, Serializable {
      * @throws ProActiveException
      * @see the IMAdmin interface
      */
-    @Override
     public void shutdown() throws ProActiveException {
         this.imcore.shutdown();
     }
 
-    @Override
     public IMInitialState addIMEventListener(IMEventListener listener,
         IMEvent... events) {
         return this.imcore.getMonitoring().addIMEventListener(listener, events);

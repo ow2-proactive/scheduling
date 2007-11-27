@@ -82,17 +82,11 @@ public class SimpleScript extends Script {
     }
 
     /**
-     * SelectionScript must give its result in the 'result_script' variable.
-     *
      * @see org.objectweb.proactive.extra.scheduler.common.scripting.Script#getResult(javax.script.Bindings)
      */
     @Override
     protected ScriptResult<Object> getResult(Bindings bindings) {
-        if (bindings.containsKey("script_result")) {
-            return new ScriptResult<Object>(bindings.get("script_result"));
-        } else {
-            return new ScriptResult<Object>(0);
-        }
+        return null;
     }
 
     /**

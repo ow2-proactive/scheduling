@@ -182,7 +182,6 @@ public class DummyNodeSource extends DynamicNodeSource
      * but not register it to the "true" node list neither to the IMNodeManager
      * (where are in a dynamic node source)
      */
-    @Override
     public void receiveDeployedNode(Node node, String VnName, String PADName) {
         this.StaticNodes.put(node, new Boolean(true));
     }

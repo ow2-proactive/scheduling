@@ -67,7 +67,8 @@ public class LocalSchedulerExample {
                 try {
                     imp = InfrastructureManagerProxy.getProxy(new URI(args[0]));
 
-                    logger.info("Connect to ResourceManager on " + args[0]);
+                    logger.info("[SCHEDULER] Connect to ResourceManager on " +
+                        args[0]);
                 } catch (Exception e) {
                     throw new Exception("ResourceManager doesn't exist on " +
                         args[0]);
@@ -75,6 +76,8 @@ public class LocalSchedulerExample {
             } else {
                 IMFactory.startLocal();
                 admin = IMFactory.getAdmin();
+                logger.info(
+                    "[SCHEDULER] Start local Resource Manager with 4 local nodes.");
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
@@ -82,7 +85,7 @@ public class LocalSchedulerExample {
                 }
 
                 ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
-                        "../../../descriptors/scheduler/deployment/test.xml");
+                        "../../../descriptors/scheduler/deployment/Local4JVM.xml");
                 admin.addNodes(pad);
 
                 //                Runtime.getRuntime().addShutdownHook(new Thread() {
