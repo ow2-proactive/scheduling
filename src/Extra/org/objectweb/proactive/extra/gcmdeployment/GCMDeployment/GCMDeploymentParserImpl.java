@@ -115,7 +115,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected Map<String, GroupParser> groupParserMap;
     protected Map<String, BridgeParser> bridgeParserMap;
     protected GCMDeploymentInfrastructure infrastructure;
-//    protected GCMDeploymentEnvironment environment;
+
+    //    protected GCMDeploymentEnvironment environment;
     protected GCMDeploymentResources resources;
     private VariableContract variableContract;
     private boolean parsedResource = false;
@@ -231,7 +232,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         Node environmentNode = (Node) xpath.evaluate(XPATH_ENVIRONMENT,
                 document, XPathConstants.NODE);
 
-        
         String[][] pairs = new String[][] {
                 {
                     VARIABLES_JAVAPROPERTY_DESCRIPTOR,
@@ -252,27 +252,25 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             VariableContractType varContractType = VariableContractType.getType(pairs[i][1]);
             processVariables(environmentNode, pairs[i][0], varContractType);
         }
-        
     }
 
     private void processVariables(Node environmentNode, String expr,
-            VariableContractType varContractType)
-            throws XPathExpressionException {
-            Object result = xpath.evaluate(expr, environmentNode, XPathConstants.NODESET);
-            NodeList nodes = (NodeList) result;
-            for (int i = 0; i < nodes.getLength(); ++i) {
-                Node node = nodes.item(i);
+        VariableContractType varContractType) throws XPathExpressionException {
+        Object result = xpath.evaluate(expr, environmentNode,
+                XPathConstants.NODESET);
+        NodeList nodes = (NodeList) result;
+        for (int i = 0; i < nodes.getLength(); ++i) {
+            Node node = nodes.item(i);
 
-                String varName = GCMParserHelper.getAttributeValue(node, "name");
+            String varName = GCMParserHelper.getAttributeValue(node, "name");
 
-                String varValue = GCMParserHelper.getAttributeValue(node, "value");
+            String varValue = GCMParserHelper.getAttributeValue(node, "value");
 
-                variableContract.setDescriptorVariable(varName, varValue,
-                    varContractType);
-            }
+            variableContract.setDescriptorVariable(varName, varValue,
+                varContractType);
         }
+    }
 
-    
     public void parseResources() throws XPathExpressionException, IOException {
         if (parsedResource) {
             throw new IllegalStateException(
