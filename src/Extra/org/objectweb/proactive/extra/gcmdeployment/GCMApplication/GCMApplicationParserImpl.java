@@ -54,6 +54,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDe
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
@@ -197,14 +198,16 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
                                 j), "path");
 
                     // TODO support URL here
+                    File desc = null;
                     if (file.startsWith(File.separator)) {
                         // Absolute path
-                        gcmdParams.setGCMDescriptor(new File(file));
+                        desc = new File(file);
                     } else {
                         // Path is relative to this descriptor
-                        gcmdParams.setGCMDescriptor(new File(
-                                descriptor.getParent(), file));
+                        desc = new File(descriptor.getParent(), file);
                     }
+                    Helpers.checkDescriptorFileExist(desc);
+                    gcmdParams.setGCMDescriptor(desc);
 
                     GCMDeploymentDescriptor gcmd = GCMDeploymentDescriptorFactory.createDescriptor(gcmdParams);
                     nodeProvider.addGCMDeploymentDescriptor(gcmd);
@@ -225,6 +228,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             }
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
+        } catch (IOException e) {
+            // TODO: handle exception
         }
 
         return nodeProvidersMap;

@@ -32,8 +32,11 @@ package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
@@ -41,21 +44,40 @@ import org.objectweb.proactive.core.runtime.VMInformation;
 
 
 @PublicAPI
-public class TopologyRuntime implements Serializable {
-    protected VMInformation vmInfo;
-    protected List<Node> nodes;
+public class GCMHost implements Serializable {
+    protected String hostname;
+    protected List<GCMRuntime> runtimes;
 
-    public TopologyRuntime(VMInformation vmInfo) {
+    public GCMHost(String hostname, Set<Node> nodes) {
         super();
-        this.vmInfo = vmInfo;
-        this.nodes = new ArrayList<Node>();
+        this.hostname = hostname;
+        this.runtimes = new ArrayList<GCMRuntime>();
+
+        Map<VMInformation, Set<Node>> byRuntime = groupByRutnime(nodes);
+        for (VMInformation vmi : byRuntime.keySet()) {
+            GCMRuntime runtime = new GCMRuntime(vmi, byRuntime.get(vmi));
+            runtimes.add(runtime);
+        }
     }
 
-    public void addNode(Node node) {
-        nodes.add(node);
+    static private Map<VMInformation, Set<Node>> groupByRutnime(Set<Node> nodes) {
+        Map<VMInformation, Set<Node>> ret = new HashMap<VMInformation, Set<Node>>();
+        for (Node node : nodes) {
+            VMInformation vmi = node.getVMInformation();
+            if (ret.get(vmi) == null) {
+                ret.put(vmi, new HashSet<Node>());
+            }
+            Set<Node> nodeSet = ret.get(vmi);
+            nodeSet.add(node);
+        }
+        return ret;
     }
 
-    public void addNodes(Collection<Node> nodes) {
-        this.nodes.addAll(nodes);
+    public String getHostname() {
+        return hostname;
+    }
+
+    public List<GCMRuntime> getRuntimes() {
+        return runtimes;
     }
 }

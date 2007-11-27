@@ -173,4 +173,6 @@ public interface VirtualNode {
      * @return
      */
     public Topology getCurrentTopology();
+
+    public void updateTopology(Topology topology);
 }

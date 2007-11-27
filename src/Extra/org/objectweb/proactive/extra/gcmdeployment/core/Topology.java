@@ -10,7 +10,9 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public interface Topology {
     public List<String> getDeploymentPath();
 
-    public Set<TopologyRuntime> getRuntimes();
+    public String getDeploymentPathStr();
+
+    public Set<GCMHost> getHosts();
 
     public List<TopologyImpl> getChildren();
 

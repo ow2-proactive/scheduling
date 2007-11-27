@@ -41,7 +41,6 @@ import java.util.Set;
 
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.runtime.VMInformation;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
 public class TopologyImpl implements Topology, Serializable {
@@ -50,11 +49,11 @@ public class TopologyImpl implements Topology, Serializable {
     protected String deploymentDescriptorPath;
     protected String nodeProvider;
     protected List<String> deploymentPath;
-    protected Set<TopologyRuntime> runtimesMap;
+    protected Set<GCMHost> hostsMap;
     protected List<TopologyImpl> children;
 
     public TopologyImpl() {
-        runtimesMap = new HashSet<TopologyRuntime>();
+        hostsMap = new HashSet<GCMHost>();
         children = new ArrayList<TopologyImpl>();
         id = ProActiveCounter.getUniqID();
     }
@@ -67,16 +66,30 @@ public class TopologyImpl implements Topology, Serializable {
         return deploymentPath;
     }
 
+    public String getDeploymentPathStr() {
+        StringBuilder sb = new StringBuilder();
+        for (String path : deploymentPath) {
+            sb.append(path);
+            sb.append(':');
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return new String(sb);
+    }
+
     public void setDeploymentPath(List<String> deploymentPath) {
         this.deploymentPath = deploymentPath;
     }
 
-    public Set<TopologyRuntime> getRuntimes() {
-        return runtimesMap;
+    public Set<GCMHost> getHosts() {
+        return hostsMap;
     }
 
-    public void addRuntime(TopologyRuntime runtime) {
-        runtimesMap.add(runtime);
+    public void setNodes(Set<Node> nodes) {
+        Map<String, Set<Node>> byHost = groupByHost(nodes);
+        for (String host : byHost.keySet()) {
+            GCMHost gcmHost = new GCMHost(host, byHost.get(host));
+            hostsMap.add(gcmHost);
+        }
     }
 
     public List<TopologyImpl> getChildren() {
@@ -111,35 +124,52 @@ public class TopologyImpl implements Topology, Serializable {
         return nodeProvider;
     }
 
+    public void setNodeProvider(String nodeProvider) {
+        this.nodeProvider = nodeProvider;
+    }
+
     /* -------------
      *  Only for the root node
      */
+    static private Map<Long, Set<Node>> groupByDeploymentId(Set<Node> nodes) {
+        Map<Long, Set<Node>> ret = new HashMap<Long, Set<Node>>();
+        for (Node node : nodes) {
+            long id = node.getVMInformation().getDeploymentId();
+            if (ret.get(id) == null) {
+                ret.put(id, new HashSet<Node>());
+            }
+            Set<Node> nodeSet = ret.get(id);
+            nodeSet.add(node);
+        }
+        return ret;
+    }
+
+    static private Map<String, Set<Node>> groupByHost(Set<Node> nodes) {
+        Map<String, Set<Node>> ret = new HashMap<String, Set<Node>>();
+        for (Node node : nodes) {
+            String hostname = node.getVMInformation().getHostName();
+            if (ret.get(hostname) == null) {
+                ret.put(hostname, new HashSet<Node>());
+            }
+            Set<Node> nodeSet = ret.get(hostname);
+            nodeSet.add(node);
+        }
+        return ret;
+    }
+
     static public Topology createTopology(TopologyRootImpl emptyTopology,
         Set<Node> nodes) {
         TopologyRootImpl topology;
         try {
             topology = (TopologyRootImpl) Utils.makeDeepCopy(emptyTopology);
 
-            // Group Node per Runtime
-            Map<VMInformation, Set<Node>> sorted = new HashMap<VMInformation, Set<Node>>();
-            for (Node node : nodes) {
-                VMInformation vmIformation = node.getVMInformation();
-                if (sorted.get(vmIformation) == null) {
-                    sorted.put(vmIformation, new HashSet<Node>());
-                }
-
-                sorted.get(vmIformation).add(node);
-            }
-
-            // Add each Runtime to the Topology
-            for (VMInformation vmInformation : sorted.keySet()) {
-                TopologyRuntime runtime = new TopologyRuntime(vmInformation);
-                runtime.addNodes(sorted.get(vmInformation));
-                TopologyImpl tn = topology.getNode(vmInformation.getDeploymentId());
-                tn.addRuntime(runtime);
+            Map<Long, Set<Node>> groupById = groupByDeploymentId(nodes);
+            for (Long id : groupById.keySet()) {
+                TopologyImpl node = topology.getNode(id);
+                node.setNodes(groupById.get(id));
             }
         } catch (IOException e) {
-            GCMA_LOGGER.error(e);
+            GCMA_LOGGER.warn(e);
             topology = null;
         }
         return topology;

@@ -35,9 +35,6 @@ import java.util.Set;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
-import org.objectweb.proactive.extra.gcmdeployment.Helpers;
-
-
 public class GCMDeploymentDescriptorParams {
 
     /** The GCM Descriptor describing the resources to be used */
@@ -66,13 +63,7 @@ public class GCMDeploymentDescriptorParams {
     }
 
     public void setGCMDescriptor(File descriptor) {
-        try {
-            Helpers.checkDescriptorFileExist(descriptor);
-            GCMDescriptor = descriptor;
-        } catch (IllegalArgumentException e) {
-            GCMD_LOGGER.warn(getClass().getName() +
-                ".setGCMDescriptor called with a bad descriptor", e);
-        }
+        GCMDescriptor = descriptor;
     }
 
     public void setId(String id) {

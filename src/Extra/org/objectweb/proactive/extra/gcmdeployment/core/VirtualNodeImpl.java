@@ -155,6 +155,10 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return TopologyImpl.createTopology(deploymentTree, nodes);
     }
 
+    public void updateTopology(Topology topology) {
+        // TODO cmathieu
+    }
+
     /* -------------------
      * VirtualNodeInternal interface
      */
