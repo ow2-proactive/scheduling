@@ -36,6 +36,8 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.gef.ui.actions.ZoomInAction;
+import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshJVMAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.StopMonitoringAction;
@@ -71,20 +73,23 @@ public class JVMListener implements MouseListener, MouseMotionListener {
             //				}
             //			}
         } else if (me.button == 3) {
-            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
-                    action.hasNext();) {
-                IAction act = action.next();
-                if (act instanceof RefreshJVMAction) {
+            final Iterator it = registry.getActions();
+            while (it.hasNext()) {
+                final IAction act = (IAction) it.next();
+                final Class<?> actionClass = act.getClass();
+                if (actionClass == RefreshJVMAction.class) {
                     RefreshJVMAction refreshJVMAction = (RefreshJVMAction) act;
                     refreshJVMAction.setJVM(jvm);
                     refreshJVMAction.setEnabled(true);
-                } else if (act instanceof StopMonitoringAction) {
+                } else if (actionClass == StopMonitoringAction.class) {
                     StopMonitoringAction stopMonitoringAction = (StopMonitoringAction) act;
                     stopMonitoringAction.setObject(jvm);
                     stopMonitoringAction.setEnabled(true);
                 } else if (act instanceof IActionExtPoint) {
-                    IActionExtPoint extensionAction = (IActionExtPoint) act;
-                    extensionAction.setAbstractDataObject(this.jvm);
+                    ((IActionExtPoint) act).setAbstractDataObject(this.jvm);
+                } else if (act instanceof ZoomOutAction ||
+                        act instanceof ZoomInAction) {
+                    act.setEnabled(true);
                 } else {
                     act.setEnabled(false);
                 }

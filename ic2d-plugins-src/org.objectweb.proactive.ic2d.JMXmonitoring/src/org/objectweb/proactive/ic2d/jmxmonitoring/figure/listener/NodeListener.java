@@ -37,6 +37,8 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.gef.ui.actions.ZoomInAction;
+import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
@@ -72,24 +74,27 @@ public class NodeListener implements MouseListener, MouseMotionListener {
         if (me.button == 1) {
             dnd.reset();
         } else if (me.button == 3) {
-            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
-                    action.hasNext();) {
-                IAction act = action.next();
-                if (act instanceof RefreshNodeAction) {
+            final Iterator it = registry.getActions();
+            while (it.hasNext()) {
+                final IAction act = (IAction) it.next();
+                final Class<?> actionClass = act.getClass();
+                if (actionClass == RefreshNodeAction.class) {
                     RefreshNodeAction refreshNodeAction = (RefreshNodeAction) act;
                     refreshNodeAction.setNode(node);
                     refreshNodeAction.setEnabled(true);
-                } else if (act instanceof StopMonitoringAction) {
+                } else if (actionClass == StopMonitoringAction.class) {
                     StopMonitoringAction stopMonitoringAction = (StopMonitoringAction) act;
                     stopMonitoringAction.setObject(node);
                     stopMonitoringAction.setEnabled(true);
-                } else if (act instanceof SetUpdateFrequenceAction) {
+                } else if (actionClass == SetUpdateFrequenceAction.class) {
                     SetUpdateFrequenceAction setUpdateFrequenceAction = (SetUpdateFrequenceAction) act;
                     setUpdateFrequenceAction.setNode(node);
                     setUpdateFrequenceAction.setEnabled(true);
                 } else if (act instanceof IActionExtPoint) {
-                    IActionExtPoint extensionAction = (IActionExtPoint) act;
-                    extensionAction.setAbstractDataObject(this.node);
+                    ((IActionExtPoint) act).setAbstractDataObject(this.node);
+                } else if (act instanceof ZoomOutAction ||
+                        act instanceof ZoomInAction) {
+                    act.setEnabled(true);
                 } else {
                     act.setEnabled(false);
                 }
@@ -102,6 +107,11 @@ public class NodeListener implements MouseListener, MouseMotionListener {
             final ActiveObject source = dnd.getSource();
             NodeObject sourceNode = dnd.getSourceNode();
             if (source != null) {
+                if (sourceNode.equals(this.node)) {
+                    figure.setHighlight(null);
+                    dnd.reset();
+                    return;
+                }
                 if ((sourceNode.getParent().equals(node.getParent())) ||
                         (node.getChild(source.getKey()) != null)) {
                     Console.getInstance(Activator.CONSOLE_NAME)

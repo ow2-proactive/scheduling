@@ -36,6 +36,8 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.gef.ui.actions.ZoomInAction;
+import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.HorizontalLayoutAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshHostAction;
@@ -72,25 +74,26 @@ public class HostListener implements MouseListener, MouseMotionListener {
             dnd.reset();
             dragHost.mousePressed(me);
         } else if (me.button == 3) {
-            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
-                    action.hasNext();) {
-                IAction act = action.next();
-                if (act instanceof RefreshHostAction) {
+            final Iterator it = registry.getActions();
+            while (it.hasNext()) {
+                final IAction act = (IAction) it.next();
+                final Class<?> actionClass = act.getClass();
+                if (actionClass == RefreshHostAction.class) {
                     RefreshHostAction refreshHostAction = (RefreshHostAction) act;
                     refreshHostAction.setHost(host);
                     refreshHostAction.setEnabled(true);
-                } else if (act instanceof StopMonitoringAction) {
+                } else if (actionClass == StopMonitoringAction.class) {
                     StopMonitoringAction stopMonitoringAction = (StopMonitoringAction) act;
                     stopMonitoringAction.setObject(host);
                     stopMonitoringAction.setEnabled(true);
-                } else if (act instanceof VerticalLayoutAction) {
+                } else if (actionClass == VerticalLayoutAction.class) {
                     VerticalLayoutAction verticalLayoutAction = (VerticalLayoutAction) act;
                     verticalLayoutAction.setHost(figure);
                     if (figure.isVerticalLayout()) {
                         verticalLayoutAction.setChecked(true);
                     }
                     verticalLayoutAction.setEnabled(true);
-                } else if (act instanceof HorizontalLayoutAction) {
+                } else if (actionClass == HorizontalLayoutAction.class) {
                     HorizontalLayoutAction horizontalLayoutAction = (HorizontalLayoutAction) act;
                     horizontalLayoutAction.setHost(figure);
                     if (figure.isVerticalLayout()) {
@@ -98,8 +101,10 @@ public class HostListener implements MouseListener, MouseMotionListener {
                     }
                     horizontalLayoutAction.setEnabled(true);
                 } else if (act instanceof IActionExtPoint) {
-                    IActionExtPoint extensionAction = (IActionExtPoint) act;
-                    extensionAction.setAbstractDataObject(this.host);
+                    ((IActionExtPoint) act).setAbstractDataObject(this.host);
+                } else if (act instanceof ZoomOutAction ||
+                        act instanceof ZoomInAction) {
+                    act.setEnabled(true);
                 } else {
                     act.setEnabled(false);
                 }

@@ -37,6 +37,8 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.gef.ui.actions.ZoomInAction;
+import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.dnd.DragAndDrop;
@@ -63,30 +65,29 @@ public class AOListener implements MouseListener, MouseMotionListener {
     }
 
     public void mousePressed(MouseEvent me) {
+        // Left button click
         if (me.button == 1) {
             dnd.setSource(ao);
             dnd.setSourceFigure(figure);
             figure.setHighlight(ColorConstants.green);
-
-            //			for(Iterator<IAction> action = (Iterator<IAction>) registry.getActions() ; action.hasNext() ;) {
-            //				IAction act = action.next();
-            //				if (act instanceof IActionExtPoint) {
-            //					IActionExtPoint extensionAction = (IActionExtPoint) act;
-            //					extensionAction.setActiveSelect(this.ao);
-            //				}
-            //			}
-            //			// Manual handling of an action for timer snapshot ... needs improvement
-            //			IAction anAction = registry.getAction("Get timer snapshot");
-            //			if ( anAction != null ){
-            //				((IActionExtPoint)anAction).setActiveSelect(this.ao);
-            //			}
+            // All actions that implements IActionExtPoint selects the current active object
+            final Iterator it = registry.getActions();
+            while (it.hasNext()) {
+                final IAction act = (IAction) it.next();
+                if (act instanceof IActionExtPoint) {
+                    ((IActionExtPoint) act).setActiveSelect(this.ao);
+                }
+            }
         } else if (me.button == 3) {
-            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
-                    action.hasNext();) {
-                IAction act = action.next();
+            final Iterator it = registry.getActions();
+            while (it.hasNext()) {
+                final IAction act = (IAction) it.next();
                 if (act instanceof IActionExtPoint) {
                     IActionExtPoint extensionAction = (IActionExtPoint) act;
                     extensionAction.setAbstractDataObject(this.ao);
+                } else if (act instanceof ZoomOutAction ||
+                        act instanceof ZoomInAction) {
+                    act.setEnabled(true);
                 } else {
                     act.setEnabled(false);
                 }
@@ -147,11 +148,11 @@ public class AOListener implements MouseListener, MouseMotionListener {
     }
 
     public void mouseExited(MouseEvent me) {
-        // Disable Timer Snapshot		
-        IAction anAction = registry.getAction("Get timers snapshot");
-        if (anAction != null) {
-            anAction.setEnabled(false);
-        }
+        //        // Disable Timer Snapshot		
+        //        IAction anAction = registry.getAction("Get timers snapshot");
+        //        if (anAction != null) {
+        //            anAction.setEnabled(false);
+        //        }
         parentFigure.handleMouseMoved(me);
     }
 

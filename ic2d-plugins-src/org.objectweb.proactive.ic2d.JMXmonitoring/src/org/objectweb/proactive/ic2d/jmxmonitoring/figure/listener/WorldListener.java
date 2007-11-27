@@ -36,6 +36,8 @@ import org.eclipse.draw2d.MouseEvent;
 import org.eclipse.draw2d.MouseListener;
 import org.eclipse.draw2d.MouseMotionListener;
 import org.eclipse.gef.ui.actions.ActionRegistry;
+import org.eclipse.gef.ui.actions.ZoomInAction;
+import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshAction;
@@ -67,17 +69,19 @@ public class WorldListener implements MouseListener, MouseMotionListener {
         if (me.button == 1) {
             dnd.reset();
         } else if (me.button == 3) {
-            for (Iterator<IAction> action = (Iterator<IAction>) registry.getActions();
-                    action.hasNext();) {
-                IAction act = action.next();
-                if (act instanceof NewHostAction ||
-                        act instanceof SetDepthAction ||
-                        act instanceof RefreshAction ||
-                        act instanceof SetTTRAction) {
+            final Iterator it = registry.getActions();
+            while (it.hasNext()) {
+                final IAction act = (IAction) it.next();
+                final Class<?> actionClass = act.getClass();
+                if ((actionClass == NewHostAction.class) ||
+                        (actionClass == SetDepthAction.class) ||
+                        (actionClass == RefreshAction.class) ||
+                        (actionClass == SetTTRAction.class) ||
+                        (actionClass == ZoomInAction.class) ||
+                        (actionClass == ZoomOutAction.class)) {
                     act.setEnabled(true);
                 } else if (act instanceof IActionExtPoint) {
-                    IActionExtPoint extensionAction = (IActionExtPoint) act;
-                    extensionAction.setAbstractDataObject(this.world);
+                    ((IActionExtPoint) act).setAbstractDataObject(this.world);
                 } else {
                     act.setEnabled(false);
                 }
