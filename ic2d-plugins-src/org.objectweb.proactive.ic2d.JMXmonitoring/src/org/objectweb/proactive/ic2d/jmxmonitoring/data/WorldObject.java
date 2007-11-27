@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 
 
@@ -160,9 +160,10 @@ public class WorldObject extends AbstractData {
         //the first child added. It will start a refreshing thread
         if (getMonitoredChildrenSize() == 1) {
             notifyObservers(new Notification(
-                    MVC_Notifications.WORLD_OBJECT_FIRST_CHILD_ADDED));
+                    MVCNotification.WORLD_OBJECT_FIRST_CHILD_ADDED));
         }
-        notifyObservers(new Notification(MVC_Notifications.ADD_CHILD));
+
+        // notifyObservers(new Notification(MVCNotifications.ADD_CHILD));
     }
 
     /**
@@ -181,9 +182,9 @@ public class WorldObject extends AbstractData {
         //the last child added. It will stop a refreshing thread
         if (getMonitoredChildrenSize() == 0) {
             notifyObservers(new Notification(
-                    MVC_Notifications.WORLD_OBJECT_LAST_CHILD_REMOVED));
+                    MVCNotification.WORLD_OBJECT_LAST_CHILD_REMOVED));
         }
-        notifyObservers(new Notification(MVC_Notifications.REMOVE_CHILD));
+        notifyObservers(new Notification(MVCNotification.REMOVE_CHILD));
     }
 
     /**
@@ -348,7 +349,7 @@ public class WorldObject extends AbstractData {
         data.put(ADD_VN_MESSAGE, vn);
         //VirtualNodesGroup object will use the information within data
         notifyObservers(new Notification(
-                MVC_Notifications.WORLD_OBJECT_ADD_VIRTUAL_NODE, data));
+                MVCNotification.WORLD_OBJECT_ADD_VIRTUAL_NODE, data));
     }
 
     /**
@@ -361,7 +362,7 @@ public class WorldObject extends AbstractData {
         Hashtable<String, VNObject> data = new Hashtable<String, VNObject>();
         data.put(REMOVE_VN_MESSAGE, vn);
         notifyObservers(new Notification(
-                MVC_Notifications.WORLD_OBJECT_REMOVE_VIRTUAL_NODE, data));
+                MVCNotification.WORLD_OBJECT_REMOVE_VIRTUAL_NODE, data));
     }
 
     public VNObject getVirtualNode(String virtualNodeName) {

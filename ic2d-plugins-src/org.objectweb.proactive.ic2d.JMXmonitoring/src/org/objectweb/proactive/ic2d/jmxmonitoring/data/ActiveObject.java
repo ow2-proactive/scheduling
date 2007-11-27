@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.ActiveObjectListener;
 
@@ -171,7 +171,7 @@ public class ActiveObject extends AbstractData {
             break;
         }
         setChanged();
-        notifyObservers(new Notification(MVC_Notifications.STATE_CHANGED,
+        notifyObservers(new Notification(MVCNotification.STATE_CHANGED,
                 this.currentState));
     }
 
@@ -264,7 +264,7 @@ public class ActiveObject extends AbstractData {
         Set<ActiveObject> comm = new HashSet<ActiveObject>();
         comm.add(aoSource);
         notifyObservers(new Notification(
-                MVC_Notifications.ACTIVE_OBJECT_ADD_COMMUNICATION, comm));
+                MVCNotification.ACTIVE_OBJECT_ADD_COMMUNICATION, comm));
 
         /*synchronized (communications) {
                 communications.add(source);
@@ -308,7 +308,7 @@ public class ActiveObject extends AbstractData {
     public void resetCommunications() {
         setChanged();
         notifyObservers(new Notification(
-                MVC_Notifications.ACTIVE_OBJECT_RESET_COMMUNICATIONS,
+                MVCNotification.ACTIVE_OBJECT_RESET_COMMUNICATIONS,
                 new HashSet<ActiveObject>()));
     }
 
@@ -316,7 +316,7 @@ public class ActiveObject extends AbstractData {
         this.requestQueueLength++;
         setChanged();
         notifyObservers(new Notification(
-                MVC_Notifications.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+                MVCNotification.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
                 requestQueueLength));
     }
 
@@ -324,7 +324,7 @@ public class ActiveObject extends AbstractData {
         this.requestQueueLength--;
         setChanged();
         notifyObservers(new Notification(
-                MVC_Notifications.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+                MVCNotification.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
                 requestQueueLength));
         ;
     }
@@ -334,7 +334,7 @@ public class ActiveObject extends AbstractData {
             this.requestQueueLength = requestQueueLength;
             setChanged();
             notifyObservers(new Notification(
-                    MVC_Notifications.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+                    MVCNotification.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
                     requestQueueLength));
             ;
         }

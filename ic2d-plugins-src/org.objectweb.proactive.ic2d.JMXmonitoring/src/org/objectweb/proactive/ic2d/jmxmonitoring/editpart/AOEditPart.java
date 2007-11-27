@@ -38,7 +38,7 @@ import java.util.Set;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
@@ -114,7 +114,7 @@ public class AOEditPart extends AbstractMonitoringEditPart {
     @Override
     public void update(Observable o, Object arg) {
         if ((arg != null) && (arg instanceof Notification)) {
-            MVC_Notifications mvcNotif = ((Notification) arg).getNotification();
+            MVCNotification mvcNotif = ((Notification) arg).getMVCNotification();
             Object notificationdata = ((Notification) arg).getData();
 
             // State updated

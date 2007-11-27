@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
@@ -93,7 +93,7 @@ public class VirtualNodesGroup implements Observer {
 
         Notification notif = (Notification) arg;
         Object data = notif.getData();
-        if ((notif.getNotification() == MVC_Notifications.WORLD_OBJECT_ADD_VIRTUAL_NODE) &&
+        if ((notif.getMVCNotification() == MVCNotification.WORLD_OBJECT_ADD_VIRTUAL_NODE) &&
                 (data instanceof Hashtable)) { //<"Add a virtual node",VNObject>
             Hashtable<String, VNObject> table = (Hashtable<String, VNObject>) data;
             final VNObject vnAdded = table.get(WorldObject.ADD_VN_MESSAGE);
@@ -110,7 +110,7 @@ public class VirtualNodesGroup implements Observer {
                         }
                     });
             }
-        } else if ((notif.getNotification() == MVC_Notifications.WORLD_OBJECT_REMOVE_VIRTUAL_NODE) &&
+        } else if ((notif.getMVCNotification() == MVCNotification.WORLD_OBJECT_REMOVE_VIRTUAL_NODE) &&
                 (data instanceof Hashtable)) { //<"Remove a virtual node",VNObject>
             Hashtable<String, VNObject> table = (Hashtable<String, VNObject>) data;
             final VNObject vnRemoved = table.get(WorldObject.REMOVE_VN_MESSAGE);

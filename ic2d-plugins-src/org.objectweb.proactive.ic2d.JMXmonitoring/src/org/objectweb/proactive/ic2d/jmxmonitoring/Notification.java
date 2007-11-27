@@ -1,23 +1,20 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
-
-
 public class Notification {
-    private MVC_Notifications notification;
+    private MVCNotification notification;
     private Object data;
 
-    public Notification(MVC_Notifications notif, Object data) {
+    public Notification(MVCNotification notif, Object data) {
         this.notification = notif;
         this.data = data;
     }
 
-    public Notification(MVC_Notifications notif) {
+    public Notification(MVCNotification notif) {
         this.notification = notif;
         this.data = null;
     }
 
-    public MVC_Notifications getNotification() {
+    public MVCNotification getMVCNotification() {
         return notification;
     }
 

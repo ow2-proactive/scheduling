@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.server.ProActiveServerImpl;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 
 
@@ -221,10 +221,10 @@ public class NodeObject extends AbstractData {
         this.setChanged();
         if (highlighted) {
             this.notifyObservers(new Notification(
-                    MVC_Notifications.STATE_CHANGED, State.HIGHLIGHTED));
+                    MVCNotification.STATE_CHANGED, State.HIGHLIGHTED));
         } else {
             this.notifyObservers(new Notification(
-                    MVC_Notifications.STATE_CHANGED, State.NOT_HIGHLIGHTED));
+                    MVCNotification.STATE_CHANGED, State.NOT_HIGHLIGHTED));
         }
     }
 }

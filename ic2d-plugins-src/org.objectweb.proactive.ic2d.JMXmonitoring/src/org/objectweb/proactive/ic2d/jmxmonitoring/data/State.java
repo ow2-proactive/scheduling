@@ -31,8 +31,11 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 public enum State {UNKNOWN,
-    MIGRATING,
-    NOT_RESPONDING,
+
+    /**SOME DOC HERE
+     *
+     */
+    MIGRATING,NOT_RESPONDING,
     HIGHLIGHTED,
     NOT_HIGHLIGHTED,
     NOT_MONITORED,

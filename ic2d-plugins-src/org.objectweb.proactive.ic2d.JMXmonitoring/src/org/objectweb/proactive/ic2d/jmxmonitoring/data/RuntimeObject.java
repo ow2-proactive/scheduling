@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
@@ -165,7 +165,7 @@ public class RuntimeObject extends AbstractData {
     public void runtimeKilled() {
         setChanged();
         notifyObservers(new Notification(
-                MVC_Notifications.RUNTIME_OBJECT_RUNTIME_KILLED));
+                MVCNotification.RUNTIME_OBJECT_RUNTIME_KILLED));
         ;
         new Thread() {
                 @Override

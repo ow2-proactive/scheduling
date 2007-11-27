@@ -36,7 +36,7 @@ import java.util.Observable;
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
@@ -65,7 +65,7 @@ public class VMEditPart extends AbstractMonitoringEditPart {
             return;
         }
 
-        final MVC_Notifications mvcNotification = ((Notification) arg).getNotification();
+        final MVCNotification mvcNotification = ((Notification) arg).getMVCNotification();
         getViewer().getControl().getDisplay().asyncExec(new Runnable() {
                 public void run() {
                     switch (mvcNotification) {

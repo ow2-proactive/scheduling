@@ -35,7 +35,7 @@ import java.util.Observable;
 
 import org.eclipse.draw2d.IFigure;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotifications.MVC_Notifications;
+import org.objectweb.proactive.ic2d.jmxmonitoring.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Notification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
@@ -104,10 +104,10 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
 
         getViewer().getControl().getDisplay().asyncExec(new Runnable() {
                 public void run() {
-                    if ((notif.getNotification() == MVC_Notifications.STATE_CHANGED) &&
+                    if ((notif.getMVCNotification() == MVCNotification.STATE_CHANGED) &&
                             (notif.getData() == State.NOT_MONITORED)) {
                         deactivate();
-                    } else if (notif.getNotification() == MVC_Notifications.STATE_CHANGED) //in this case we know we have changed highlight state
+                    } else if (notif.getMVCNotification() == MVCNotification.STATE_CHANGED) //in this case we know we have changed highlight state
                      {
                         //method VirtualNodesGroup.getColor(virtualNode vn)
                         //returns the color for the virtual node if the virtual node is selected
