@@ -1,0 +1,31 @@
+!---------------------------------------------!
+!        Matlab interface to ProActive        !
+!---------------------------------------------!
+
+The Matlab interface to ProActive allows you to schedule Matlab scripts on a distributed environment using either:
+
+1) The standalone Matlab/Scilab ProActive GUI
+2) The ProActive scheduler
+
+You need to compile a native libary called Ptolemy that will link against the native libaries of your Matlab intallation.
+
+The scripts in this directory can be run on Linux or Cygwin(Windows)
+
+In order to build the libraries, first set the MATLAB environment variable to the full path of your Matlab command.
+
+On the prompt run:
+
+> configure
+> make
+
+This will copy the Ptolemy library to Proactive's lib directory. Please note that this library depends on two things:
+1) The Matlab version
+2) Your architecture (Linux, 32 or 64 bit, Windows, Sun Solaris, etc...)
+
+Therefore:
+1) If you want to connect ProActive to another Matlab version you'll need to provide a MATLAB variable that will point to this other version and relaunch the scripts.
+2) If you want to connect ProActive to a Matlab installed on a different architecure, you'll need to relaunch the scripts on this architecture.
+
+
+Please note that after you've run the scripts for each version/architecture you will be able to launch Matlab jobs that can run on heterogeneous systems.
+

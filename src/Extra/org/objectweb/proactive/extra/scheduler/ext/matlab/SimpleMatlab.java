@@ -41,7 +41,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.net.JarURLConnection;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -108,6 +110,7 @@ public class SimpleMatlab extends JavaExecutable {
 
     // The process holding the spanwned JVM
     private Process process = null;
+    private String matlabVersion;
 
     // ProActive No Arg Constructor    
     public SimpleMatlab() {
@@ -167,6 +170,9 @@ public class SimpleMatlab extends JavaExecutable {
 
     @Override
     public void init(Map<String, Object> args) throws Exception {
+        // Retrieving task parameters
+
+        // main script to execute (embedded, url or file)
         Object s = args.get("script");
 
         if (s != null) {
@@ -197,12 +203,14 @@ public class SimpleMatlab extends JavaExecutable {
                 "Either one of \"script\" \"scripturl\" \"scriptfile\" must be given");
         }
 
+        // an input script, launched before the main script (embedded only)
         Object input = args.get("input");
 
         if (input != null) {
             inputScript = (String) input;
         }
 
+        // index when doing fork/join taskflows
         Object ind = args.get("index");
 
         if (ind != null) {
@@ -275,6 +283,12 @@ public class SimpleMatlab extends JavaExecutable {
         return res;
     }
 
+    /**
+     * Starts the java process on the given Node uri
+     * @param uri
+     * @return
+     * @throws Throwable
+     */
     private final Process startProcess(String uri) throws Throwable {
         System.out.println("[" + host + " MATLAB TASK] Starting a new JVM");
         // Build java command
@@ -288,9 +302,14 @@ public class SimpleMatlab extends JavaExecutable {
         // Setting Environment variables
         Map<String, String> env = pb.environment();
 
+        // Classpath specific
+        String classpath = prependPtolemyLibDirToClassPath(javaCommandBuilder.getClasspath());
+        javaCommandBuilder.setClasspath(classpath);
+
         // we add matlab directories to LD_LIBRARY_PATH
         String libPath = env.get("LD_LIBRARY_PATH");
         libPath = addMatlabToPath(libPath);
+
         env.put("LD_LIBRARY_PATH", libPath);
 
         // we add matlab directories to PATH (Windows)
@@ -302,14 +321,57 @@ public class SimpleMatlab extends JavaExecutable {
 
         env.put("PATH", addMatlabToPath(path));
 
-        // javaCommandBuilder.setJavaPath(System.getenv("JAVA_HOME") +
-        //     "/bin/java");
         // we set as well the java.library.path property (precaution)
         javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath +
             "\"");
+
         pb.command(javaCommandBuilder.getJavaCommand());
 
         return pb.start();
+    }
+
+    /**
+     * Finds where the ptolemy library is installed for this specific architecture
+     * @return a path to ptolemy libraries
+     * @throws IOException
+     * @throws URISyntaxException
+     * @throws MatlabInitException
+     */
+    private File findPtolemyLibDir()
+        throws IOException, URISyntaxException, MatlabInitException {
+        JarURLConnection conn = (JarURLConnection) this.getClass()
+                                                       .getResource("/ptolemy/matlab")
+                                                       .openConnection();
+        URL jarFileURL = conn.getJarFileURL();
+
+        File jarFile = new File(jarFileURL.toURI());
+        File libDirFile = jarFile.getParentFile();
+        URI ptolemyLibDirURI = libDirFile.toURI()
+                                         .resolve(matlabVersion +
+                os.fileSeparator() + matlabLibDirName);
+        File answer = new File(ptolemyLibDirURI);
+        if (!answer.exists() || !answer.canRead()) {
+            throw new MatlabInitException(
+                "Can't find ptolemy native library at " + answer +
+                ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab_scilab/matlab_interface. Refer to README file.");
+        } else {
+            File libraryFile = new File(ptolemyLibDirURI.resolve(
+                        System.mapLibraryName("ptmatlab")));
+            if (!libraryFile.exists() || !libraryFile.canRead()) {
+                throw new MatlabInitException(
+                    "Can't find ptolemy native library at " + libraryFile +
+                    ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab_scilab/matlab_interface. Refer to README file.");
+            }
+        }
+        return answer;
+    }
+
+    private String prependPtolemyLibDirToClassPath(String classPath)
+        throws IOException, URISyntaxException, MatlabInitException {
+        String newcp = classPath;
+        File ptolemyLibDir = findPtolemyLibDir();
+        newcp = ptolemyLibDir.getAbsolutePath() + os.pathSeparator() + newcp;
+        return newcp;
     }
 
     /**
@@ -326,13 +388,21 @@ public class SimpleMatlab extends JavaExecutable {
             newPath = path + os.pathSeparator();
         }
 
+        String lastDir = null;
+        int lastIndex = matlabLibDirName.lastIndexOf(os.fileSeparator());
+        if (lastIndex != -1) {
+            lastDir = matlabLibDirName.substring(lastIndex);
+        } else {
+            lastDir = matlabLibDirName;
+        }
+
         newPath = newPath + (matlabHome + os.fileSeparator() + "bin");
         newPath = newPath + os.pathSeparator() +
-            (matlabHome + os.fileSeparator() + "bin" + os.fileSeparator() +
+            (matlabHome + os.fileSeparator() + os.fileSeparator() +
             matlabLibDirName);
         newPath = newPath + os.pathSeparator() +
             (matlabHome + os.fileSeparator() + "sys" + os.fileSeparator() +
-            "os" + os.fileSeparator() + matlabLibDirName);
+            "os" + os.fileSeparator() + lastDir);
 
         return newPath;
     }
@@ -415,6 +485,8 @@ public class SimpleMatlab extends JavaExecutable {
             matlabCommandName = file.getName();
             matlabHome = file.getParentFile().getParentFile().getAbsolutePath();
             matlabLibDirName = lines.get(1);
+            matlabVersion = lines.get(2);
+            System.out.println("MATLAB VERSION:" + matlabVersion);
         } else {
             StringWriter error_message = new StringWriter();
             PrintWriter pw = new PrintWriter(error_message);
@@ -430,8 +502,8 @@ public class SimpleMatlab extends JavaExecutable {
 
     /**
      * Return the content read through the given text input stream as a list of file
-     * @param is
-     * @return
+     * @param is input stream to read
+     * @return content as list of strings
      */
     private List<String> getContentAsList(InputStream is) {
         ArrayList<String> lines = new ArrayList<String>();
