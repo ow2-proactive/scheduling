@@ -30,11 +30,13 @@
  */
 package org.objectweb.proactive.api;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
+@PublicAPI
 public class ProLauncher {
 
     /**

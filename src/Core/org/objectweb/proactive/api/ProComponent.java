@@ -37,6 +37,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ContentDescription;
@@ -47,6 +48,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
 
+@PublicAPI
 public class ProComponent {
 
     /**

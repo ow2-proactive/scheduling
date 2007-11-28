@@ -32,6 +32,7 @@ package org.objectweb.proactive.api;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
@@ -43,6 +44,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+@PublicAPI
 public class ProMobileAgent {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 

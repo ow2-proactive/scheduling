@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.api;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FutureMonitoring;
@@ -40,6 +41,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
 
 
+@PublicAPI
 public class ProFuture {
 
     /**

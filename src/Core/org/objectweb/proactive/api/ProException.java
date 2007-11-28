@@ -32,12 +32,14 @@ package org.objectweb.proactive.api;
 
 import java.util.Collection;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 
 
+@PublicAPI
 public class ProException {
 
     /*** <Exceptions> See ExceptionHandler.java for the documentation ***/

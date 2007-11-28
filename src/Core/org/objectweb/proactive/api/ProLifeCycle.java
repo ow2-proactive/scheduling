@@ -30,9 +30,11 @@
  */
 package org.objectweb.proactive.api;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.gc.HalfBodies;
 
 
+@PublicAPI
 public class ProLifeCycle {
 
     /**

@@ -35,19 +35,60 @@
 		<!-- ================================================================ -->
 		<!--                     Create javadoc                               -->
 		<!-- ================================================================ -->
-		<target name="javadoc" description="Use javadoc to build information on the ProActive classes">
-			<!-- Create the javadoc directory -->
-			<mkdir dir="${docs.dir}/api" />
-			<copy todir="${docs.dir}/api">
-				<fileset dir="${src.proactive.dir}" includes="**/*.jpg"/>
-				<fileset dir="${src.extensions.dir}"   includes="**/*.jpg"/>
-			</copy>
-			<javadoc  destdir="${docs.dir}/api" verbose="true" author="true" version="true" source="${source}" use="true" windowtitle="ProActive API" breakiterator="yes" additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> <!-- -docfilessubdirs -excludedocfilessubdir  -->
-			    <packageset dir="${src.proactive.dir}" />
-				<packageset dir="${src.extensions.dir}" />
-				<packageset dir="${src.extra.dir}" />
 	
-				<classpath refid="project.classpath" />
+		<target name="javadoc">
+			
+			<javadoc source="${source}"	classpathref="compile.libs">
+				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
+					<param name="-file" value="${compile.dir}/publishedCoreClasses" />
+				</doclet>
+				<packageset dir="${src.proactive.dir}"/>
+			</javadoc>
+			
+			<javadoc source="${source}">
+				<classpath>
+					<path refid="compile.libs"/>
+					<pathelement path="${cl.proactive.dir}"/>
+				</classpath>
+				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
+					<param name="-file" value="${compile.dir}/publishedExtensionsClasses" />
+				</doclet>
+				<packageset dir="${src.extensions.dir}"/>
+			</javadoc>
+						
+			<javadoc source="${source}">
+				<classpath>
+						<path refid="compile.libs"/>
+						<pathelement path="${cl.proactive.dir}"/>
+						<pathelement path="${cl.extensions.dir}"/>
+				</classpath>
+				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
+					<param name="-file" value="${compile.dir}/publishedExtraClasses" />
+				</doclet>
+				<packageset dir="${src.extra.dir}"/>
+			</javadoc>
+						
+			<javadoc  
+				destdir="${docs.dir}/api" 
+				author="true" 
+				version="true" 
+				source="${source}" 
+				use="true" 
+				windowtitle="ProActive API" 
+				breakiterator="yes" 
+				additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> 
+
+				<classpath>
+						<path refid="compile.libs"/>
+						<pathelement path="${cl.proactive.dir}"/>
+						<pathelement path="${cl.extensions.dir}"/>
+				</classpath>
+
+				
+				<fileset dir="${src.proactive.dir}" includesfile="${compile.dir}/publishedCoreClasses"/>
+				<fileset dir="${src.extensions.dir}" includesfile="${compile.dir}/publishedExtensionsClasses"/>
+				<fileset dir="${src.extra.dir}" includesfile="${compile.dir}/publishedExtraClasses"/>
+
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
 				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
@@ -66,7 +107,7 @@
 				<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
 				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
 				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
-			</javadoc>
+			</javadoc>			
 		</target>
 
 	<!-- ==================================================================== -->

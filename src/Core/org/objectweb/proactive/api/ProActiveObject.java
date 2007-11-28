@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicManager;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -80,6 +81,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 
 
+@PublicAPI
 public class ProActiveObject {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
     private final static Heartbeat hb = new Heartbeat();

@@ -35,6 +35,7 @@ import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
@@ -52,6 +53,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
 
 
+@PublicAPI
 public class ProDeployment {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 
