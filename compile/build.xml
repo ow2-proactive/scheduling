@@ -105,19 +105,19 @@
 		Backward Compatibility		
 	-->
 
-	<target name="compile" depends="compile.all" description="TODO"/>
-	<target name="core" depends="compile.core" description="TODO"/>
-	<target name="examples" depends="compile.examples" description="TODO"/>
-	<target name="extensions" depends="compile.extensions" description="TODO"/>
-	<target name="extra" depends="compile.extra" description="TODO"/>
-	<target name="microTimer" depends="compile.microTimer" description="TODO"/>
-	<target name="p2p_daemon" depends="compile.p2p_daemon" description="TODO"/>
-	<target name="stubGenerator" depends="compile.stubGenerator" description="TODO"/>
-	<target name="tests" depends="compile.tests" description="TODO"/>
-	<target name="proActiveJar" depends="deploy" description="TODO"/>
+	<target name="compile" depends="compile.all" description="Deprecated, see compile.all"/>
+	<target name="core" depends="compile.core" description="Deprecated, see compile.core"/>
+	<target name="examples" depends="compile.examples" description="Deprecated, see compile.examples"/>
+	<target name="extensions" depends="compile.extensions" description="Deprecated, see compile.extensions"/>
+	<target name="extra" depends="compile.extra" description="Deprecated, see compile.extra"/>
+	<target name="microTimer" depends="compile.microTimer" description="Deprecated, see compile.microTimer"/>
+	<target name="p2p_daemon" depends="compile.p2p_daemon"/>
+	<target name="stubGenerator" depends="compile.stubGenerator" description="Deprecated, see compile.stubGenerator"/>
+	<target name="tests" depends="compile.tests"/>
+	<target name="proActiveJar" depends="deploy" description="Deprecated, see proActiveJar"/>
 	<target name="all" depends="compile,docs" description="build the class files and the documentation" />
-	<target name="ic2dLibClean" depends="ic2d.libClean" />
-	<target name="ic2dLib" depends="ic2d.libCopy" />
+	<target name="ic2dLibClean" depends="ic2d.libClean" description="Deprecated, see ic2d.libClean"/>
+	<target name="ic2dLib" depends="ic2d.libCopy" description="Deprecated, see ic2d.libCopy" />
 
 
 
@@ -127,10 +127,13 @@
 		Compilation		
 	-->
 
-	<target name="compile.all" depends="compile.core, compile.extensions, compile.extra, compile.util, compile.examples, compile.tests" description="build the class files" />
+	<target 
+		name="compile.all" 
+		depends="compile.core, compile.extensions, compile.extra, compile.util, compile.examples, compile.tests" 
+		description="Build class files (ProActive + Extensions + Extra + Examples + Utils + Tests)" />
 
 
-	<target name="compile.core" depends="-configurationCopy" description="Compile the ProActive core classes">
+	<target name="compile.core" depends="-configurationCopy" description="Compile ProActive core classes">
 		<!-- If it is a release, update ProActive.getVersion() -->
 		<if name="version" value="${TODAY}">
 			<else>
@@ -227,21 +230,21 @@
 	</target>
 
 
-	<target name="compile.extensions" depends="compile.core" description="Compile the ProActive extensions classes">
+	<target name="compile.extensions" depends="compile.core" description="Compile ProActive Extensions classes">
 		<subant target="-compile" inheritall="yes" failonerror="true">
 			<fileset dir="${src.extensions.dir}" includes="**/build.xml" />
 		</subant>
 	</target>
 
 
-	<target name="compile.extra" depends="compile.core" description="Compile the ProActive extensions classes">
+	<target name="compile.extra" depends="compile.core" description="Compile ProActive Extensions classes">
 		<subant target="-compile" inheritall="yes" failonerror="true">
 			<fileset dir="${src.extra.dir}" includes="**/build.xml" />
 		</subant>
 	</target>
 
 
-	<target name="compile.tests" depends="compile.core, compile.extra, compile.extensions" description="Compiles functional and unit tests">
+	<target name="compile.tests" depends="compile.core, compile.extra, compile.extensions" description="Compile functional and unit tests classes">
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
@@ -278,7 +281,7 @@
 	</target>
 
 
-	<target name="compile.examples" depends="compile.core, compile.extensions, compile.extra" description="Compile all the examples">
+	<target name="compile.examples" depends="compile.core, compile.extensions, compile.extra" description="Compile all examples classes">
 		<!-- XXX, MicroTimer should be in core or not used by examples-->
 		<javac srcdir="${src.examples.dir}:${src.utils.dir}" destdir="${cl.examples.dir}" includes="**/*.java" excludes="${proactive.path}/examples/nbody/common/NBody3DFrame.java" deprecation="on" source="${source}" debug="${debug}" encoding="UTF-8">
 			<classpath refid="examples.classpath" />
@@ -303,7 +306,7 @@
 	</target>
 
 
-	<target name="compile.util" depends="-init, compile.core">
+	<target name="compile.util" depends="-init, compile.core" description="Compile ProActive Utils classes">
 		<!-- XXX Timer is in core.util.Profiling -->
 		<javac srcdir="${src.utils.dir}" destdir="${cl.utils.dir}" includes="**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
@@ -311,12 +314,12 @@
 	</target>
 
 
-	<target name="compile.trywithcatch" depends="-init">
+	<target name="compile.trywithcatch" depends="-init" description="Compile ProActive Try With Catch classes">
 		<javac srcdir="${src.utils.dir}" destdir="${cl.utils.dir}" includes="trywithcatch/**" deprecation="on" source="${source}" debug="${debug}" />
 	</target>
 
 
-	<target name="compile.stubGenerator" depends="-init">
+	<target name="compile.stubGenerator" depends="-init" description="Compile Stub Generator Classes">
 		<javac srcdir="${src.dir}" destdir="${classes.dir}" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 			<include name="${proactive.path}/ext/util/StubGenerator.java" />
@@ -338,7 +341,7 @@
 		Deployment		
 	-->
 
-	<target name="deploy" depends="compile.all, -deploy.mkdir">
+	<target name="deploy" depends="compile.all, -deploy.mkdir" description="Populate dist/ with all needed file">
 		<!-- Update Implementation-Version -->
 		<if name="version" value="${TODAY}">
 			<else>
@@ -381,20 +384,21 @@
 	</target>
 
 
-	<target name="deploy.examples" depends="examples, deploy" description="Create the example.jar inside dist/ directory">
+	<target name="deploy.examples" depends="examples, deploy" description="Add examples.jar to the dist/ directory">
 		<jar destfile="${deploy.lib.dir}/examples.jar">
 			<fileset dir="${cl.examples.dir}"/>
 		</jar>
 	</target>
 
-	<target name="-deploy.mkdir" description="Make deploy directory">
+	<target name="-deploy.mkdir">
+		<!-- Make deploy directories -->
 		<mkdir dir="${deploy.dir}" />
 		<mkdir dir="${deploy.lib.dir}" />
 		<mkdir dir="${deploy.scripts.dir}" />
 	</target>
 
 
-	<target name="deploy.all" depends="deploy.examples" description="TODO" />
+	<target name="deploy.all" depends="deploy.examples" description="Populate dist/ (with examples.jar)" />
 
 
 
@@ -572,11 +576,12 @@
 		Release		
 	-->
 
-	<target name="-release.mkdir" description="Make release directories">
+	<target name="-release.mkdir">
+		<!-- Make release directories -->
 		<mkdir dir="${release.dir}" />
 	</target>
 
-	<target name="release.bin" depends="deploy.all, docs, -release.mkdir" description="Create zip with only jars">
+	<target name="release.bin" depends="deploy.all, docs, -release.mkdir" description="Binary Release: dist + docs">
 		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
 		<zip destfile="${release.dir}/ProActive-bin_${version}.zip">
 			<fileset dir="${base.dir}">
@@ -591,7 +596,7 @@
 		</zip>
 	</target>
 
-	<target name="release.src" depends="-release.mkdir, docs" description="Create zip with only sources and libs">
+	<target name="release.src" depends="-release.mkdir, docs" description="Source Release: sources + docs">
 		<zip destfile="${release.dir}/ProActive-src_${version}.zip">
 			<fileset dir="${base.dir}">
 				<include name="compile/**"/>
@@ -613,10 +618,10 @@
 	</target>
 
 
-	<target name="release" depends="release.bin, release.src" description="Create zips for release" />
+	<target name="release" depends="release.bin, release.src" description="Source and Binary Releases" />
 
 
-	<target name="release.all" depends="release" description="TODO" />
+	<target name="release.all" depends="release" description="Source and Binary Releases" />
 
 
 
