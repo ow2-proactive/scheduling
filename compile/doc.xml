@@ -6,7 +6,7 @@
 	<!-- ================================================================ -->
 		<!--            Create docs, which is the javadoc + manual            -->
 		<!--  =============================================================== -->
-		<target name="docs" depends="javadoc, manual" description="Construct the javadoc and the manual" />
+		<target name="docs" depends="javadoc.published, manual" description="Construct the javadoc and the manual" />
 	
 		<!-- ================================================================ -->
 		<!--            Make the java files readable on the web               -->
@@ -35,8 +35,51 @@
 		<!-- ================================================================ -->
 		<!--                     Create javadoc                               -->
 		<!-- ================================================================ -->
+		<target name="javadoc.all" depends="javadoc.published,javadoc.complete"/>
+
+		<target name="javadoc.complete" depends="compile.util, deploy">
+			<javadoc  
+				destdir="${docs.dir}/api.complete" 
+				author="true" 
+				version="true" 
+				source="${source}" 
+				use="true" 
+				windowtitle="ProActive complete API" 
+				breakiterator="yes" 
+				additionalparam="-docfilessubdirs -excludedocfilessubdir CVS:test_documentation"> 
+
+				<classpath>
+						<path refid="compile.libs"/>
+						<pathelement path="${cl.proactive.dir}"/>
+						<pathelement path="${cl.extensions.dir}"/>
+				</classpath>
+
+				<packageset dir="${src.proactive.dir}" />
+				<packageset dir="${src.extensions.dir}" />
+				<packageset dir="${src.extra.dir}" />
+
+				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
+				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
+				<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
+				<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
+				<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
+				<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
+				<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*" />
+				<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
+				<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
+				<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
+				<group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />
+				<group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />
+				<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
+				<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
+				<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
+				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
+				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
+			</javadoc>			
+		</target>
 	
-		<target name="javadoc" depends="compile.util">
+		<target name="javadoc.published" depends="compile.util, deploy">
 			
 			<javadoc source="${source}"	classpathref="compile.libs">
 				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
