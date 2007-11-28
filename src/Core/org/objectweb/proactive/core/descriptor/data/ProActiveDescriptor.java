@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.descriptor.data;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.xml.VariableContract;
 
@@ -49,6 +50,7 @@ import org.objectweb.proactive.core.xml.VariableContract;
  * @see ProActiveDescriptorInternal
  * @see VirtualNodeInternal
  */
+@PublicAPI
 public interface ProActiveDescriptor extends Serializable {
 
     /**

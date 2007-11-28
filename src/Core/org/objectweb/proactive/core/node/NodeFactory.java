@@ -34,6 +34,7 @@ import java.net.URISyntaxException;
 import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -75,6 +76,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 0.9
  *
  */
+@PublicAPI
 public class NodeFactory {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
     private static final String DEFAULT_NODE_NAME;

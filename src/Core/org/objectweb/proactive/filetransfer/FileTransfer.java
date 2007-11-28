@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.filetransfer.FileBlock;
 import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
 import org.objectweb.proactive.core.filetransfer.FileTransferRequest;
@@ -58,6 +59,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team (mleyton)
  * @since ProActive 3.0.2 (Feb 2006)
  */
+@PublicAPI
 public class FileTransfer {
     static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 

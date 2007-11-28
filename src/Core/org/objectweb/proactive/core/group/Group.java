@@ -34,6 +34,8 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * This interface presents the group abilities extending java.util.Collection.
@@ -44,6 +46,7 @@ import java.util.Set;
  * @author Laurent Baduel
  *
  */
+@PublicAPI
 public interface Group<E> extends List<E> {
 
     /**

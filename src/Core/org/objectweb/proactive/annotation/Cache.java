@@ -42,5 +42,6 @@ import java.lang.annotation.Target;
  * this annotation indicates that in tte stub generated for the method, caching must be turn on
  *
  */
+@PublicAPI
 public @interface Cache {
 }

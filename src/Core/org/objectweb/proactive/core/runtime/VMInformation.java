@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.runtime;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * <p>
@@ -41,6 +43,7 @@ package org.objectweb.proactive.core.runtime;
  * @since   ProActive 0.9
  *
  */
+@PublicAPI
 public interface VMInformation extends java.io.Serializable {
 
     /**

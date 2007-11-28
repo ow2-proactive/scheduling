@@ -39,6 +39,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.legacyparser.VariablesHandler;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -50,6 +51,7 @@ import org.xml.sax.SAXException;
  * Variables can be defined of different types, thus inforcing different requirements to the contract.
  * @author The ProActive Team
  */
+@PublicAPI
 public class VariableContract implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
     public static VariableContract xmlproperties = null;

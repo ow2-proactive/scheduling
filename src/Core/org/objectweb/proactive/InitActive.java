@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * <P>
@@ -52,6 +54,7 @@ package org.objectweb.proactive;
  * @version 1.0,  2002/06
  * @since   ProActive 0.9.3
  */
+@PublicAPI
 public interface InitActive extends Active {
 
     /**

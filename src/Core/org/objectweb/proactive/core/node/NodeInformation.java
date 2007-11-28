@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.node;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Job;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.runtime.VMInformation;
 
 
@@ -47,6 +48,7 @@ import org.objectweb.proactive.core.runtime.VMInformation;
  *
  * @See {@link VMInformation}
  */
+@PublicAPI
 public interface NodeInformation extends Serializable, Job {
 
     /**

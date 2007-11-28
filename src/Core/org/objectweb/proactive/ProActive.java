@@ -47,6 +47,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicManager;
@@ -219,6 +220,7 @@ import org.objectweb.proactive.core.xml.VariableContract;
  * @see ProActiveDescriptorInternal
  * @see ProActiveGroup
  */
+@PublicAPI
 public class ProActive {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
     public final static Logger loggerGroup = ProActiveLogger.getLogger(Loggers.GROUPS);

@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.descriptor.data;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Job;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -48,6 +49,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * @see ProActiveDescriptor
  * @see VirtualMachine
  */
+@PublicAPI
 public interface VirtualNode extends Job, Serializable {
 
     /**
