@@ -7,13 +7,16 @@
 
 
 	<para>
-		<emphasis role="bold">The scheduler plugin</emphasis>
+		<emphasis role="bold">The Scheduler Eclipse Plugin</emphasis>
 		is a
-		<emphasis role="bold">graphical environment</emphasis>
-		for remote monitoring a scheduler and scheduling jobs on
-		<emphasis role="bold">grid applications.</emphasis>
+		<emphasis role="bold">graphical client</emphasis>
+		for remote monitoring and control of the ProActive scheduler
+		(See ***LINK TO SCHEDULER DOC***), including remote submission
+		of XML-defined jobs (**LINK**).
 	</para>
-	<para>Scheduler plugin is available in two forms :</para>
+	<para>
+		The Scheduler Eclipse Plugin is available in two forms :
+	</para>
 	<itemizedlist>
 		<listitem>
 			<para>
@@ -39,8 +42,7 @@
 				</emphasis>
 				: with all the functionalities within the stand alone
 				application, enhanced with a tool that makes easier the
-				scheduling and monitoring of scheduled Grid
-				Applications.
+				scheduling and monitoring of jobs and applications.
 			</para>
 		</listitem>
 	</itemizedlist>
@@ -78,37 +80,39 @@
 				<para>
 					The
 					<emphasis role="bold">Jobs</emphasis>
-					view: represents pending, running and finished jobs
-					in the scheduler.
+					view: shows pending, running and finished jobs in
+					the scheduler.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
 					The
 					<emphasis role="bold">Console</emphasis>
-					view: contains log corresponding to the jobs output
-					logs.
+					view: shows jobs standard and error output (on
+					demand).
 				</para>
 			</listitem>
 			<listitem>
 				<para>
 					The
 					<emphasis role="bold">Tasks</emphasis>
-					view: displays all tasks informations of a job.
+					view: displays detailled informations on tasks
+					contained in the selected job.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
 					The
 					<emphasis role="bold">Jobs Info</emphasis>
-					view: displays all job's informations.
+					view: displays all informations of the selected job.
 				</para>
 			</listitem>
 			<listitem>
 				<para>
 					The
 					<emphasis role="bold">Result Preview</emphasis>
-					view: displays a graphical preview of a task result.
+					view: displays a textual or graphical preview of the
+					result of the selected task (**LINK**).
 				</para>
 			</listitem>
 		</itemizedlist>
@@ -131,7 +135,7 @@
 		<title>Connect to a started scheduler</title>
 
 		<para>
-			In order to establish a connection to a started scheduler:
+			In order to establish a connection to a ProActive Scheduler:
 		</para>
 
 		<orderedlist>
@@ -141,8 +145,8 @@
 					<emphasis role="bold">
 						Window->Open Perspective->Other...->Scheduler
 					</emphasis>
-					(in the stand alone Scheduler, it should be already
-					opened because it is the default perspective).
+					(it could be already opened as it is the default
+					perspective).
 				</para>
 			</listitem>
 			<listitem>
@@ -168,6 +172,12 @@
 					.
 				</para>
 			</listitem>
+
+			<para>
+				TODO : Should explain the two connections type : user
+				and admin. You talk about "user mode" later on.
+			</para>
+
 		</orderedlist>
 
 
@@ -201,11 +211,11 @@
 			</figure>
 			<para>
 				Display the "Connect to scheduler" dialog in order to
-				establish a connection to a remote started scheduler.
+				establish a connection to a remote ProActive scheduler.
 			</para>
 
 			<figure id="disconnectToSchedulerButton">
-				<title>Disconnect from scheduler</title>
+				<title>Disconnect from the scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
@@ -261,7 +271,7 @@
 			</figure>
 			<para>
 				Display the "Choose file" dialog in order to submit a
-				job to the scheduler.
+				XML-defined job to the scheduler.
 			</para>
 
 			<figure id="pauseResumeJobButton">
@@ -275,7 +285,8 @@
 				</mediaobject>
 			</figure>
 			<para>
-				Pause or resume a job (only if you are the job owner).
+				Pause or resume the selected job (only if you are the
+				job owner) TODO : OR ADMIN ?.
 			</para>
 
 			<figure id="changeJobPriorityButton">
@@ -305,7 +316,7 @@
 			</para>
 
 			<figure id="getJobOutputButton">
-				<title>Get job output</title>
+				<title>Display job output</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
@@ -315,8 +326,8 @@
 				</mediaobject>
 			</figure>
 			<para>
-				To obtain the job output (only if you are the job
-				owner).
+				To display the selected job's standard and error output
+				(only if you are the job owner).
 			</para>
 
 			<figure id="killJobButton">
@@ -329,7 +340,10 @@
 					</imageobject>
 				</mediaobject>
 			</figure>
-			<para>To kill a job (only if you are the job owner).</para>
+			<para>
+				To kill the selected job (only if you are the job
+				owner).
+			</para>
 		</sect2><!-- The Jobs view buttons in User Mode -->
 
 		<sect2>
@@ -340,23 +354,32 @@
 				even you aren't the job owner.
 			</para>
 			<para>
-				In Administrator mode, you have 3 many choice for job
-				priority which are:
+				In Administrator mode, 3 other choices for job priority
+				are available :
 				<itemizedlist>
 					<listitem>
-						<para>Idle.</para>
+						<para>
+							Idle, lower priority than the 3 User Mode
+							priorities
+						</para>
 					</listitem>
 					<listitem>
-						<para>High.</para>
+						<para>
+							High, higher priority than the 3 User Mode
+							priorities
+						</para>
 					</listitem>
 					<listitem>
-						<para>Highest.</para>
+						<para>
+							Highest, higher priority than the 3 User
+							Mode priorities and than High
+						</para>
 					</listitem>
 				</itemizedlist>
 			</para>
 
 			<figure id="startSchedulerButton">
-				<title>Start scheduler</title>
+				<title>Start the scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
@@ -367,7 +390,7 @@
 			</figure>
 
 			<figure id="stopSchedulerButton">
-				<title>Stop scheduler</title>
+				<title>Stop the scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
@@ -378,7 +401,7 @@
 			</figure>
 
 			<figure id="freezeSchedulerButton">
-				<title>Freeze scheduler</title>
+				<title>Freeze the scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
@@ -388,13 +411,13 @@
 				</mediaobject>
 			</figure>
 			<para>
-				This will freeze the scheduler. When the scheduler
-				receives this event, it will pause all running jobs, and
-				no pending jobs will be scheduled.
+				This freezes the scheduler. When the scheduler receives
+				this event, it pauses all running jobs, and no other
+				pending jobs will be scheduled.
 			</para>
 
 			<figure id="pauseSchedulerButton">
-				<title>Pause scheduler</title>
+				<title>Pause the scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
@@ -404,14 +427,13 @@
 				</mediaobject>
 			</figure>
 			<para>
-				This will pause the scheduler. When the scheduler
-				receives this event, no pending jobs will be scheduled,
-				but all running jobs will stay running until they
-				finished.
+				This pauses the scheduler. When the scheduler receives
+				this event, no pending jobs will be scheduled, but all
+				running jobs complete.
 			</para>
 
 			<figure id="resumeSchedulerButton">
-				<title>Resume scheduler</title>
+				<title>Resume the scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
@@ -422,7 +444,7 @@
 			</figure>
 
 			<figure id="shutdownSchedulerButton">
-				<title>Shutdown scheduler</title>
+				<title>Shutdown the scheduler</title>
 				<mediaobject>
 					<imageobject>
 						<imagedata
@@ -432,11 +454,10 @@
 				</mediaobject>
 			</figure>
 			<para>
-				This will shutdown "properly" the scheduler. When the
-				scheduler receives this event, no new jobs will be
-				submitted, but all running jobs will stay running until
-				they finished. When all jobs will be finished, the
-				scheduler will shutdown.
+				This shutdowns the scheduler. When the scheduler
+				receives this event, job submission is no more allowed,
+				but all running jobs complete. When all jobs are
+				finished, the scheduler is shutdown.
 			</para>
 
 			<figure id="killSchedulerButton">
@@ -450,9 +471,8 @@
 				</mediaobject>
 			</figure>
 			<para>
-				This will shutdown NOT "properly" (immediately) the
-				scheduler. When the scheduler receives this event
-				shutdown immediately.
+				This shutdown immediately the scheduler, without waiting
+				for any job completion.
 			</para>
 		</sect2><!-- The Jobs view buttons in Administrator Mode -->
 	</sect1><!-- The Scheduler perspective buttons -->
