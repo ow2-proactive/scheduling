@@ -36,7 +36,7 @@
 		<!--                     Create javadoc                               -->
 		<!-- ================================================================ -->
 	
-		<target name="javadoc">
+		<target name="javadoc" depends="compile.util">
 			
 			<javadoc source="${source}"	classpathref="compile.libs">
 				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
