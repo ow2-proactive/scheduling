@@ -30,7 +30,10 @@
  */
 package org.objectweb.proactive;
 
+import java.net.UnknownHostException;
+
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 public class Main {
@@ -45,15 +48,24 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        System.out.println("ProActive " + getProActiveVersion());
+        System.out.println("\t\t--------------------");
+        System.out.println("\t\tProActive " + ProActive.getProActiveVersion());
+        System.out.println("\t\t--------------------");
+        System.out.println();
+        System.out.println();
 
+        String localAddress = null;
+        try {
+            localAddress = URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
+        } catch (UnknownHostException e) {
+            localAddress = null;
+        }
+        System.out.println("Local IP Address: " + localAddress);
         System.out.println("Available properties:");
-
         for (PAProperties p : PAProperties.values()) {
             String type = p.isBoolean() ? "Boolean" : "String";
-            System.out.println(type + " " + p.getKey() + " [" + p.getValue() +
-                "]");
-            // TODO Add a short description here
+            System.out.println("\t" + type + "\t" + p.getKey() + " [" +
+                p.getValue() + "]");
         }
     }
 }

@@ -339,7 +339,18 @@
 	-->
 
 	<target name="deploy" depends="compile.all, -deploy.mkdir">
-		<jar manifest="${manifest.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
+		<!-- Update Implementation-Version -->
+		<if name="version" value="${TODAY}">
+			<else>
+				<replaceregexp file="${compile.dir}/Manifest-base.mf" match="\$ID.*\$" replace="${version}" byline="true" />
+			</else>
+		</if>
+		<concat destfile="${compile.dir}/Manifest.mf">
+			<fileset dir="${compile.dir}" includes="Manifest-base.mf"/>
+			<fileset dir="${osgi.manifest.dir}" includes="Manifest.mf"/>	
+		</concat>
+	
+		<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
 			<fileset dir="${cl.proactive.dir}" includes="**" />
 			<fileset dir="${cl.extensions.dir}" includes="**" />
 			<fileset dir="${cl.extra.dir}" includes="**" />
@@ -676,18 +687,32 @@
 	<target name="eclipseformat" description="hibernate's eclipse-based formatter">
 		<taskdef name="javaformatter" classname="org.hibernate.tool.ant.JavaFormatterTask">
 			<classpath>
-				<fileset dir="${lib.dir}">
+				<fileset dir="${dev.dir}/lib">
 					<include name="*.jar" />
 				</fileset>
 			</classpath>
 		</taskdef>
 		
+		<copy 
+			file="${compile.dir}/eclipse_formatter_config.xml"
+			tofile="${compile.dir}/eclipse_formatter_config.properties" />
+
+		<replaceregexp 
+			file="${compile.dir}/eclipse_formatter_config.properties" 
+			match='^&lt;(.xml|/?profile).*' 
+			replace="" 
+			byline="true" />
+
+		<replaceregexp 
+			file="${compile.dir}/eclipse_formatter_config.properties" 
+			match='.*\"(.*)\".*\"(.*)\".*' 
+			replace="\1=\2" 
+			byline="true" />
+
 		<javaformatter configurationFile="eclipse_formatter_config.properties">
-			<fileset dir="${src.dir}">
-				<include name="**/*.java" />
-			</fileset>
+			<fileset dir="${src.dir}" includes="**/*.java"/>
+
 		</javaformatter>
-		
 	</target>
 
 
@@ -866,7 +891,7 @@
 	<!--  =============================================================== -->
 	<target name="librariesBundle">
 		<mkdir dir="${bundle.dir}" />
-		<jar manifest="${manifest.dir}/ManifestLibraries.mf" jarfile="${bundle.dir}/librariesBundle.jar">
+		<jar manifest="${osgi.manifest.dir}/ManifestLibraries.mf" jarfile="${bundle.dir}/librariesBundle.jar">
 			<fileset dir="${lib.dir}/">
 				<include name="javassist.jar" />
 				<include name="log4j.jar" />
