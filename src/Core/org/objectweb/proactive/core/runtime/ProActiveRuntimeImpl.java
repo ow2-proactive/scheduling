@@ -1389,7 +1389,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private String name;
         private long capacity;
         private final String hostName;
-        private long deploymentId;
+        private long topologyId;
         private String vmName;
 
         public VMInformationImpl() throws java.net.UnknownHostException {
@@ -1411,7 +1411,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             }
 
             this.capacity = -1;
-            this.deploymentId = -1;
+            this.topologyId = -1;
             this.vmName = null;
         }
 
@@ -1456,12 +1456,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.capacity = capacity;
         }
 
-        public long getDeploymentId() {
-            return deploymentId;
+        public long getTopologyId() {
+            return topologyId;
         }
 
-        private void setDeploymentId(long deploymentId) {
-            this.deploymentId = deploymentId;
+        private void setTopologyId(long topologyId) {
+            this.topologyId = topologyId;
         }
 
         @Override
@@ -1642,8 +1642,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return FileTransferEngine.getFileTransferEngine();
     }
 
-    public void setDeploymentId(long deploymentId) {
-        vmInformation.setDeploymentId(deploymentId);
+    public void setTopologyId(long toplogyId) {
+        vmInformation.setTopologyId(toplogyId);
     }
 
     public void setVMName(String vmName) {

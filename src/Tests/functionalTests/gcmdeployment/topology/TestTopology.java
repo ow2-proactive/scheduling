@@ -62,6 +62,7 @@ public class TestTopology extends Abstract {
         System.out.println("----------------------------");
         Assert.assertEquals(3, topology.getChildren().size());
         traverseTopology(topology);
+        gcma.updateTopology(topology);
     }
 
     static private void traverseTopology(Topology topology) {

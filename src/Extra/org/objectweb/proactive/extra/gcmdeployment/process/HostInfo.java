@@ -121,10 +121,10 @@ public interface HostInfo extends Serializable {
      *
      * @return the deployment ID
      */
-    public long getDeploymentId();
+    public long getToplogyId();
 
     /**
      * Set the deployment id of this HostInfo
      */
-    public void setDeploymentId(long deploymentId);
+    public void setTopologyId(long topologyId);
 }

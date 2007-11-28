@@ -79,7 +79,7 @@ public class GCMApplicationDescriptorImpl
     private TopologyRootImpl deploymentTree;
 
     /** A mapping to associate deployment IDs to Node Provider */
-    private Map<Long, NodeProvider> deploymentIdToNodeProviderMapping;
+    private Map<Long, NodeProvider> topologyIdToNodeProviderMapping;
 
     /** The Command builder to use to start the deployment */
     private CommandBuilder commandBuilder;
@@ -98,7 +98,7 @@ public class GCMApplicationDescriptorImpl
     public GCMApplicationDescriptorImpl(File file) throws ProActiveException {
         try {
             currentDeploymentPath = new ArrayList<String>();
-            deploymentIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
+            topologyIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
             nodes = Collections.synchronizedSet(new HashSet<Node>());
             isStarted = false;
 
@@ -181,8 +181,8 @@ public class GCMApplicationDescriptorImpl
     /* -----------------------------
      *  GCMApplicationDescriptorInternal interface
      */
-    public NodeProvider getNodeProviderFromDeploymentId(Long deploymentNodeId) {
-        return deploymentIdToNodeProviderMapping.get(deploymentNodeId);
+    public NodeProvider getNodeProviderFromTopologyId(Long topologyId) {
+        return topologyIdToNodeProviderMapping.get(topologyId);
     }
 
     public void addNode(Node node) {
@@ -255,8 +255,8 @@ public class GCMApplicationDescriptorImpl
         node.setApplicationDescriptorPath(rootNode.getApplicationDescriptorPath());
         node.setDeploymentPath(getCurrentdDeploymentPath());
         node.setNodeProvider(nodeProvider.getId());
-        hostInfo.setDeploymentId(node.getId());
-        deploymentIdToNodeProviderMapping.put(node.getId(), nodeProvider);
+        hostInfo.setTopologyId(node.getId());
+        topologyIdToNodeProviderMapping.put(node.getId(), nodeProvider);
         rootNode.addNode(node, parentNode);
         popDeploymentPath(); // ???
         return node;

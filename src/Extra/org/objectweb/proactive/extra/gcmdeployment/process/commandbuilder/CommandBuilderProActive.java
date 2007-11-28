@@ -333,8 +333,8 @@ public class CommandBuilderProActive implements CommandBuilder {
             command.append(" ");
         }
 
-        command.append("-" + StartRuntime.Params.deploymentID.shortOpt() + " " +
-            hostInfo.getDeploymentId());
+        command.append("-" + StartRuntime.Params.topologyId.shortOpt() + " " +
+            hostInfo.getToplogyId());
         command.append(" ");
 
         for (int i = 1; i < hostInfo.getHostCapacity(); i++) {
@@ -343,7 +343,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         }
 
         // TODO cmathieu pass deployment ID here    	
-        //command.append("-" + StartRuntime.Params.deploymentID.shortOpt() + " " + deploymentID);
+        //command.append("-" + StartRuntime.Params.topologyId.shortOpt() + " " + topologyId);
 
         // TODO cdelbe Check FT properties here
         // was this.ftService.buildParamsLine();

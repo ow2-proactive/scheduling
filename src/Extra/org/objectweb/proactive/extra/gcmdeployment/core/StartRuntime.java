@@ -71,7 +71,7 @@ public class StartRuntime {
     private String parentURL;
 
     /** An uniq identifier for the deployment framework */
-    private long deploymentID;
+    private long topologyId;
 
     /** Capacity of this runtime */
     private long capacity;
@@ -143,8 +143,8 @@ public class StartRuntime {
             Params.parent.desc);
         options.addOption(Params.capacity.sOpt, Params.capacity.toString(),
             true, Params.capacity.desc);
-        options.addOption(Params.deploymentID.sOpt,
-            Params.deploymentID.toString(), true, Params.deploymentID.desc);
+        options.addOption(Params.topologyId.sOpt, Params.topologyId.toString(),
+            true, Params.topologyId.desc);
 
         CommandLine line = null;
 
@@ -164,11 +164,11 @@ public class StartRuntime {
                 capacity = new Long(arg);
             }
 
-            arg = line.getOptionValue(Params.deploymentID.sOpt);
+            arg = line.getOptionValue(Params.topologyId.sOpt);
             if (arg != null) {
-                deploymentID = new Long(arg);
+                topologyId = new Long(arg);
             } else {
-                deploymentID = -1;
+                topologyId = -1;
             }
         } catch (ParseException e) {
             logger.warn("Cannot parse command line arguments", e);
@@ -208,7 +208,7 @@ public class StartRuntime {
             abort();
         }
 
-        localRuntimeImpl.setDeploymentId(deploymentID);
+        localRuntimeImpl.setTopologyId(topologyId);
 
         Set<Node> nodes = new HashSet<Node>();
         for (String url : localRuntimeImpl.setCapacity(capacity)) {
@@ -230,7 +230,7 @@ public class StartRuntime {
 
                 // Register
                 GCMRuntimeRegistrationNotificationData notification = new GCMRuntimeRegistrationNotificationData(localRuntime.getURL(),
-                        deploymentID, nodes);
+                        topologyId, nodes);
                 parentRuntime.register(notification);
 
                 waitUntilInterupted();
@@ -256,7 +256,7 @@ public class StartRuntime {
         }
     }
     public enum Params {parent("p", "URL of the parent ProActive Runtime"),
-        deploymentID("i", "An uniq ID for the deployment framework"),
+        topologyId("i", "An uniq ID for the deployment framework"),
         capacity("c", "Number of Node to be created");
         protected String sOpt;
         protected String desc;

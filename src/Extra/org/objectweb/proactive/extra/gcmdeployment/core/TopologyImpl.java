@@ -123,10 +123,10 @@ public class TopologyImpl implements Topology, Serializable {
     /* -------------
      *  Only for the root node
      */
-    static private Map<Long, Set<Node>> groupByDeploymentId(Set<Node> nodes) {
+    static private Map<Long, Set<Node>> groupByTopologyId(Set<Node> nodes) {
         Map<Long, Set<Node>> ret = new HashMap<Long, Set<Node>>();
         for (Node node : nodes) {
-            long id = node.getVMInformation().getDeploymentId();
+            long id = node.getVMInformation().getTopologyId();
             if (ret.get(id) == null) {
                 ret.put(id, new HashSet<Node>());
             }
@@ -165,7 +165,7 @@ public class TopologyImpl implements Topology, Serializable {
     static public void updateTopology(Topology topology, Set<Node> nodes) {
         TopologyRootImpl root = (TopologyRootImpl) topology;
 
-        Map<Long, Set<Node>> groupById = groupByDeploymentId(nodes);
+        Map<Long, Set<Node>> groupById = groupByTopologyId(nodes);
         for (Long id : groupById.keySet()) {
             TopologyImpl node = root.getNode(id);
             node.updateNodes(groupById.get(id));

@@ -45,8 +45,8 @@ public interface GCMApplicationDescriptorInternal
     /**
      * Returns the Node Provider mapped to this deployment ID
      *
-     * @param deploymentId a deployment ID
+     * @param topologyId a deployment ID
      * @return the Node Provider mapped to this deployment ID, or null if not found
      */
-    public NodeProvider getNodeProviderFromDeploymentId(Long deploymentId);
+    public NodeProvider getNodeProviderFromTopologyId(Long topologyId);
 }

@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.node.Node;
 
 public class GCMRuntimeRegistrationNotificationData implements Serializable {
     private String childURL;
-    private long deploymentId;
+    private long topologyId;
     private Set<Node> nodes;
 
     public GCMRuntimeRegistrationNotificationData() {
@@ -46,9 +46,9 @@ public class GCMRuntimeRegistrationNotificationData implements Serializable {
     }
 
     public GCMRuntimeRegistrationNotificationData(String childURL,
-        long deploymentId, Set<Node> nodes) {
+        long topologyId, Set<Node> nodes) {
         this.childURL = childURL;
-        this.deploymentId = deploymentId;
+        this.topologyId = topologyId;
         this.nodes = nodes;
     }
 
@@ -60,12 +60,12 @@ public class GCMRuntimeRegistrationNotificationData implements Serializable {
         this.childURL = childURL;
     }
 
-    public long getDeploymentId() {
-        return deploymentId;
+    public long getTopologyId() {
+        return topologyId;
     }
 
-    public void setDeploymentId(long deploymentId) {
-        this.deploymentId = deploymentId;
+    public void setTopologyId(long topologyId) {
+        this.topologyId = topologyId;
     }
 
     public Set<Node> getNodes() {

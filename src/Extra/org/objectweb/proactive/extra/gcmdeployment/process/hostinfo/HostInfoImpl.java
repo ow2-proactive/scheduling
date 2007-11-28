@@ -49,7 +49,7 @@ public class HostInfoImpl implements HostInfo {
     private int vmCapacity;
     private OperatingSystem os;
     private Set<Tool> tools;
-    private long deploymentId;
+    private long topologyId;
 
     public HostInfoImpl() {
         username = null;
@@ -59,7 +59,7 @@ public class HostInfoImpl implements HostInfo {
         vmCapacity = 0;
         os = null;
         tools = new HashSet<Tool>();
-        deploymentId = 0;
+        topologyId = 0;
     }
 
     public HostInfoImpl(String id) {
@@ -110,7 +110,7 @@ public class HostInfoImpl implements HostInfo {
         sb.append(" homeDir=" + homeDirectory);
         sb.append(" VMCapacity=" + vmCapacity);
         sb.append(" HostCapacity=" + hostCapacity);
-        sb.append(" deploymentId=" + deploymentId);
+        sb.append(" topologyId=" + topologyId);
 
         sb.append("\n");
         for (Tool tool : tools) {
@@ -224,13 +224,13 @@ public class HostInfoImpl implements HostInfo {
         return vmCapacity;
     }
 
-    public long getDeploymentId() {
-        return deploymentId;
+    public long getToplogyId() {
+        return topologyId;
     }
 
-    public void setDeploymentId(long nodeId) {
+    public void setTopologyId(long nodeId) {
         GCMD_LOGGER.trace("HostInfo " + id + ".nodeId <-- " + nodeId);
-        this.deploymentId = nodeId;
+        this.topologyId = nodeId;
         GCMD_LOGGER.trace(toString());
     }
 

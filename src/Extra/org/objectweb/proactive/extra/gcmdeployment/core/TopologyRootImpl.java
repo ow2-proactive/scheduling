@@ -20,7 +20,7 @@ public class TopologyRootImpl extends TopologyImpl {
         nodeMap.put(node.getId(), node);
     }
 
-    public TopologyImpl getNode(Long deploymentId) {
-        return nodeMap.get(deploymentId);
+    public TopologyImpl getNode(Long topologyId) {
+        return nodeMap.get(topologyId);
     }
 }
