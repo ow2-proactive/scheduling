@@ -112,37 +112,39 @@ public class AOEditPart extends AbstractMonitoringEditPart {
      *            an argument passed to the notifyObservers method.
      */
     @Override
-    public void update(Observable o, Object arg) {
+    public final void update(Observable o, Object arg) {
         if ((arg != null) && (arg instanceof MVCNotification)) {
-            MVCNotificationTag mvcNotif = ((MVCNotification) arg).getMVCNotification();
-            Object notificationdata = ((MVCNotification) arg).getData();
+            final MVCNotificationTag mvcNotif = ((MVCNotification) arg).getMVCNotification();
+            final Object notificationdata = ((MVCNotification) arg).getData();
 
             // State updated
             switch (mvcNotif) {
             case STATE_CHANGED: {
                 final State state = (State) notificationdata;
-
-                //final IFigure panel = getWorldEditPart().getFigure().getParent();
                 if (state == State.NOT_MONITORED) {
-                    System.out.println("Active Object not monitored : " +
-                        AOEditPart.this.castedModel.toString());
-                    getCastedFigure().removeConnections(getGlobalPanel());
-                    /*getViewer().getControl().getDisplay().syncExec(new Runnable() {
-                            public void run() {
+                    // System.out.println("Active Object not monitored : " +
+                    //     AOEditPart.this.castedModel.toString());
+                    // Invoke the removeConnections at the next reasonable opportunity 
+                    getViewer().getControl().getDisplay().syncExec(new Runnable() {
+                            public final void run() {
                                 getCastedFigure()
                                     .removeConnections(getGlobalPanel());
                             }
                         });
-                    */
-                    /*this.figuresToUpdate.add(getGlobalPanel());*/ addFigureToUpdtate(getGlobalPanel());
+                    // If this clear is too brutal just filter on this (source||tagret) on clear
+                    getWorldEditPart().clearCommunicationsAndRepaintFigure();
                 } else {
+                    // COMMON REFRESH IE THE AO IS MONITORED JUST DO A REPAINT
+                    // Set the new state directly
+                    getCastedFigure().setState(state);
+                    // The state of this controller has changed repaint at the next 
+                    // reasonable opportunity
                     getViewer().getControl().getDisplay().syncExec(new Runnable() {
-                            public void run() {
-                                getCastedFigure().setState(state);
-                                getCastedFigure().refresh();
+                            public final void run() {
+                                //getCastedFigure().refresh();
+                                getCastedFigure().repaint();
                             }
                         });
-                    /*this.figuresToUpdate.add(getCastedFigure());*/ addFigureToUpdtate(getCastedFigure());
                 } //if else NOT_MONITORED
                 break;
             } //  case CTATE_CHANGED
@@ -153,11 +155,11 @@ public class AOEditPart extends AbstractMonitoringEditPart {
                 final AOFigure destination = getCastedFigure();
                 final IFigure panel = getGlobalPanel();
                 getViewer().getControl().getDisplay().syncExec(new Runnable() {
-                        public void run() {
+                        public final void run() {
                             destination.removeConnections(panel);
                         }
                     });
-                addFigureToUpdtate(panel);
+                getWorldEditPart().clearCommunications();
                 break;
             } //case ACTIVE_OBJECT_RESET_COMMUNICATIONS
             case ACTIVE_OBJECT_ADD_COMMUNICATION: {
@@ -177,7 +179,6 @@ public class AOEditPart extends AbstractMonitoringEditPart {
                         }
                     }
                 }
-                addFigureToUpdtate(panel);
                 break;
             } // case ACTIVE_OBJECT_ADD_COMMUNICATION 
             case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED: {

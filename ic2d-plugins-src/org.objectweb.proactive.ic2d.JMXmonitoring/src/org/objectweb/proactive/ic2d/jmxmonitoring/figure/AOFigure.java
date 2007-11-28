@@ -30,10 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.figure;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.draw2d.BorderLayout;
@@ -97,10 +93,10 @@ public class AOFigure extends AbstractFigure {
     private boolean isSecure = false;
 
     /** All connections whose target is this and source is the key */
-    private Map<AOFigure, RoundedLineConnection> sourceConnections;
+    private final Map<AOFigure, RoundedLineConnection> sourceConnections;
 
     /** All connections whose source is this and target is the key */
-    private Map<AOFigure, RoundedLineConnection> targetConnections;
+    private final Map<AOFigure, RoundedLineConnection> targetConnections;
     private MouseListener mouseListener;
 
     //
@@ -114,8 +110,8 @@ public class AOFigure extends AbstractFigure {
     public AOFigure(String text) {
         super(text);
         this.requestQueueLength = 0;
-        this.sourceConnections = Collections.synchronizedMap(new Hashtable<AOFigure, RoundedLineConnection>());
-        this.targetConnections = Collections.synchronizedMap(new Hashtable<AOFigure, RoundedLineConnection>());
+        this.sourceConnections = new java.util.concurrent.ConcurrentHashMap<AOFigure, RoundedLineConnection>(); // Collections.synchronizedMap(new Hashtable<AOFigure, RoundedLineConnection>());
+        this.targetConnections = new java.util.concurrent.ConcurrentHashMap<AOFigure, RoundedLineConnection>(); //Collections.synchronizedMap(new Hashtable<AOFigure, RoundedLineConnection>());
     }
 
     /**
@@ -127,6 +123,8 @@ public class AOFigure extends AbstractFigure {
         this.setState(state);
         this.requestQueueLength = requestQueueLength;
         this.isSecure = secure;
+        this.sourceConnections = null;
+        this.targetConnections = null;
     }
 
     //
@@ -205,7 +203,7 @@ public class AOFigure extends AbstractFigure {
         }
 
         // Cleanups
-        graphics.restoreState();
+        //graphics.restoreState();
     }
 
     /**
@@ -277,13 +275,14 @@ public class AOFigure extends AbstractFigure {
      * @param target the target of the connection
      * @param panel the connection is added to this panel
      */
-    public void addConnection(AOFigure target, IFigure panel, Color color) {
-        if (targetConnections.get(target) != null) {
-            targetConnections.get(target).addOneCommunication();
+    public final void addConnection(final AOFigure target, final IFigure panel,
+        final Color color) {
+        RoundedLineConnection connection = targetConnections.get(target);
+        if (connection != null) {
+            connection.addOneCommunication();
             return;
         }
-        RoundedLineConnection connection = AOConnection.createConnection(this,
-                target, color);
+        connection = AOConnection.createConnection(this, target, color);
         this.targetConnections.put(target, connection);
         target.sourceConnections.put(this, connection);
         panel.add(connection);
@@ -298,26 +297,46 @@ public class AOFigure extends AbstractFigure {
             return;
         }
 
-        List<AOFigure> targetList = new ArrayList<AOFigure>(targetConnections.keySet());
-        for (int i = 0; i < targetList.size(); i++) {
-            AOFigure target = targetList.get(i);
+        // Remove me from all AOFigures where i am the source etc ...
+        for (final AOFigure target : targetConnections.keySet()) {
             final Connection connection = targetConnections.get(target);
             if ((connection != null) && (connection.getParent() == panel)) {
                 panel.remove(connection);
             }
+            target.sourceConnections.remove(this);
             this.targetConnections.remove(target);
         }
 
-        List<AOFigure> sourceList = new ArrayList<AOFigure>(sourceConnections.keySet());
-        for (int i = 0; i < sourceList.size(); i++) {
-            AOFigure source = sourceList.get(i);
-            source.targetConnections.remove(this);
-            Connection connection = sourceConnections.get(source);
+        // Remove me from all AOFigures where i am the target etc ...
+        for (final AOFigure source : sourceConnections.keySet()) {
+            final Connection connection = sourceConnections.get(source);
             if ((connection != null) && (connection.getParent() == panel)) {
                 panel.remove(connection);
             }
+            source.targetConnections.remove(this);
             this.sourceConnections.remove(source);
         }
+
+        //        List<AOFigure> targetList = new ArrayList<AOFigure>(targetConnections.keySet());
+        //        for (int i = 0; i < targetList.size(); i++) {
+        //            AOFigure target = targetList.get(i);
+        //            final Connection connection = targetConnections.get(target);
+        //            if ((connection != null) && (connection.getParent() == panel)) {            	
+        //                panel.remove(connection);
+        //            }
+        //            this.targetConnections.remove(target);
+        //        }
+
+        //        List<AOFigure> sourceList = new ArrayList<AOFigure>(sourceConnections.keySet());
+        //        for (int i = 0; i < sourceList.size(); i++) {
+        //            AOFigure source = sourceList.get(i);
+        //            source.targetConnections.remove(this);
+        //            Connection connection = sourceConnections.get(source);
+        //            if ((connection != null) && (connection.getParent() == panel)) {            	
+        //                panel.remove(connection);
+        //            }
+        //            this.sourceConnections.remove(source);
+        //        }        
     }
 
     @Override

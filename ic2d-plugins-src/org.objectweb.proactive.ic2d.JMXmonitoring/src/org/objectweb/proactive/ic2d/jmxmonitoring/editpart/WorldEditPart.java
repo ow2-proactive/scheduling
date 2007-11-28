@@ -30,10 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.draw2d.FlowLayout;
 import org.eclipse.draw2d.FreeformLayer;
@@ -51,7 +48,8 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     private MonitoringView monitoringView;
     private WorldObject castedModel;
     private IFigure castedFigure;
-    private final Set<IFigure> figuresToUpdate;
+
+    //private final Set<IFigure> figuresToUpdate;
     private final java.util.Map<Integer, GraphicalCommunication> communicationsToDraw;
     private boolean shouldRepaint = true;
     private final Runnable drawRunnable = new Runnable() {
@@ -59,7 +57,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
                 for (final GraphicalCommunication communication : communicationsToDraw.values()) {
                     communication.draw();
                 }
-                communicationsToDraw.clear();
+                //communicationsToDraw.clear();
                 getFigure().repaint();
             }
         };
@@ -71,7 +69,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
         super(model);
         this.monitoringView = monitoringView;
 
-        this.figuresToUpdate = Collections.synchronizedSet(new HashSet<IFigure>());
+        //this.figuresToUpdate = Collections.synchronizedSet(new HashSet<IFigure>());
         this.communicationsToDraw = new java.util.concurrent.ConcurrentHashMap<Integer, GraphicalCommunication>(); //Collections.synchronizedSet(new HashSet<GraphicalCommunication>());
 
         new Thread() {
@@ -85,7 +83,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
                             control = getViewer().getControl();
                             if (control != null) {
                                 control.getDisplay()
-                                       .asyncExec(WorldEditPart.this.drawRunnable);
+                                       .syncExec(WorldEditPart.this.drawRunnable);
                             }
                         }
                     } catch (InterruptedException e) {
@@ -99,17 +97,18 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     // -- PUBLICS METHODS -----------------------------------------------
     //
     @Override
-    public void addGraphicalCommunication(GraphicalCommunication communication) {
+    public final void addGraphicalCommunication(
+        final GraphicalCommunication communication) {
         if (!communicationsToDraw.containsKey(communication.hashCode())) {
             this.communicationsToDraw.put(communication.hashCode(),
                 communication);
         }
     }
 
-    @Override
-    public void addFigureToUpdtate(IFigure figure) {
-        figuresToUpdate.add(figure);
-    }
+    //    @Override
+    //    public void addFigureToUpdtate(IFigure figure) {
+    //        //figuresToUpdate.add(figure);
+    //    }
 
     /**
      * Convert the result of EditPart.getModel()
@@ -137,6 +136,30 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
     @Override
     public IFigure getContentPane() {
         return layer;
+    }
+
+    public void clearCommunicationsAndRepaintFigure() {
+        // Clear the communications
+        this.communicationsToDraw.clear();
+        final IFigure f = getFigure();
+
+        // Since the edit part has changed first force
+        // calling threads to execute the repaint one-by-one
+        // Each calling thread will execute the repaint at a reasonable opportunity
+        synchronized (f) {
+            getViewer().getControl().getDisplay().syncExec(new Runnable() {
+                    public final void run() {
+                        f.repaint();
+                    }
+                });
+        }
+    }
+
+    /**
+     * Clears all communications to draw
+     */
+    public void clearCommunications() {
+        this.communicationsToDraw.clear();
     }
 
     @Override

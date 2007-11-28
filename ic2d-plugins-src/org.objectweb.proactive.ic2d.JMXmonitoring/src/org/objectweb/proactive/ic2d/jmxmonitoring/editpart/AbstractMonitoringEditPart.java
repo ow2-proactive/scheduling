@@ -127,7 +127,7 @@ public abstract class AbstractMonitoringEditPart
     }
 
     public void addFigureToUpdtate(IFigure figure) {
-        getWorldEditPart().addFigureToUpdtate(figure);
+        //getWorldEditPart().addFigureToUpdtate(figure);
     }
 
     /**
