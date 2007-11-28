@@ -37,7 +37,7 @@
 		<!-- ================================================================ -->
 		<target name="javadoc.all" depends="javadoc.published,javadoc.complete"/>
 
-		<target name="javadoc.complete" depends="compile.util, deploy">
+		<target name="javadoc.complete" depends="compile.util, deploy" description="Make complete Javadoc">
 			<javadoc  
 				destdir="${docs.dir}/api.complete" 
 				author="true" 
@@ -79,7 +79,7 @@
 			</javadoc>			
 		</target>
 	
-		<target name="javadoc.published" depends="compile.util, deploy">
+		<target name="javadoc.published" depends="compile.util, deploy" description="Make published Javadoc">
 			
 			<javadoc source="${source}"	classpathref="compile.libs">
 				<doclet name="doc.PublishedAPIDoclet" path="${cl.utils.dir}">
