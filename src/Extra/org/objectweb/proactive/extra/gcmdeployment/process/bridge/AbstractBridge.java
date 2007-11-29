@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
@@ -140,19 +141,20 @@ public abstract class AbstractBridge implements Bridge {
         hostInfo.check();
     }
 
-    public List<String> buildCommands(CommandBuilder commandBuilder) {
+    public List<String> buildCommands(CommandBuilder commandBuilder,
+        GCMApplicationDescriptor gcma) {
         List<String> commands = new ArrayList<String>();
 
         if (hostInfo != null) {
-            commands.add(commandBuilder.buildCommand(hostInfo));
+            commands.add(commandBuilder.buildCommand(hostInfo, gcma));
         }
 
         for (Group group : groups) {
-            commands.addAll(group.buildCommands(commandBuilder));
+            commands.addAll(group.buildCommands(commandBuilder, gcma));
         }
 
         for (Bridge bridge : bridges) {
-            commands.addAll(bridge.buildCommands(commandBuilder));
+            commands.addAll(bridge.buildCommands(commandBuilder, gcma));
         }
 
         // Prefix each command with this bridge

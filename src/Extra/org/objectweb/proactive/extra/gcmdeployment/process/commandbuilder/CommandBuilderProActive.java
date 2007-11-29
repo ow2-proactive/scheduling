@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
@@ -264,7 +265,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         return sb.substring(0, sb.length() - 1);
     }
 
-    public String buildCommand(HostInfo hostInfo) {
+    public String buildCommand(HostInfo hostInfo, GCMApplicationDescriptor gcma) {
         if ((proActivePath == null) &&
                 (hostInfo.getTool(Tools.PROACTIVE.id) == null)) {
             throw new IllegalStateException(
@@ -335,6 +336,10 @@ public class CommandBuilderProActive implements CommandBuilder {
 
         command.append("-" + StartRuntime.Params.topologyId.shortOpt() + " " +
             hostInfo.getToplogyId());
+        command.append(" ");
+
+        command.append("-" + StartRuntime.Params.deploymentId.shortOpt() + " " +
+            gcma.getDeploymentId());
         command.append(" ");
 
         for (int i = 1; i < hostInfo.getHostCapacity(); i++) {

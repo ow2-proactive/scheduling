@@ -71,7 +71,11 @@ public interface LocalProActiveRuntime {
      */
     public Set<String> setCapacity(long capacity);
 
+    public void setDeploymentId(long deploymentId);
+
     public void setTopologyId(long topologyId);
 
     public void setVMName(String vmName);
+
+    public void addDeployment(long deploymentId);
 }

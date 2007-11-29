@@ -42,7 +42,7 @@ public class TestSpecifiedCapacity extends FunctionalTest {
     final static long askedCapacity = 12;
 
     @Test
-    public void testSpecifiedCapacity() {
+    public void testSpecifiedCapacity() throws InterruptedException {
         new Thread() {
                 @Override
                 public void run() {
@@ -55,8 +55,7 @@ public class TestSpecifiedCapacity extends FunctionalTest {
         /* Be sure that the StartRuntime thread has been scheduled
          * Otherwise getCapacity will return -1 due to a race condition
          */
-        Thread.yield();
-
+        Thread.sleep(2000);
         ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
 
         long cap = part.getVMInformation().getCapacity();

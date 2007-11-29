@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
@@ -86,7 +87,7 @@ public class CommandBuilderScript implements CommandBuilder {
         providers.add(nodeProvider);
     }
 
-    public String buildCommand(HostInfo hostInfo) {
+    public String buildCommand(HostInfo hostInfo, GCMApplicationDescriptor gcma) {
         StringBuilder sb = new StringBuilder();
         if (path != null) {
             sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this),

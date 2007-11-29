@@ -99,5 +99,7 @@ public interface VMInformation extends java.io.Serializable {
      */
     public long getCapacity();
 
+    public long getDeploymentId();
+
     public long getTopologyId();
 }

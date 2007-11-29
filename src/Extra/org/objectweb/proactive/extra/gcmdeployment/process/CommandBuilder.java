@@ -30,6 +30,9 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.process;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+
+
 public interface CommandBuilder {
 
     /**
@@ -37,7 +40,7 @@ public interface CommandBuilder {
      * @param hostInfo Host information to customize the command according to this host type
      * @return The command to be used to start the application
      */
-    public String buildCommand(HostInfo hostInfo);
+    public String buildCommand(HostInfo hostInfo, GCMApplicationDescriptor gcma);
 
     /**
      * Returns the base path associated to this command builder

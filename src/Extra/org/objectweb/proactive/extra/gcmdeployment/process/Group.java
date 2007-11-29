@@ -34,6 +34,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+
 
 public interface Group extends Serializable {
     public String getId();
@@ -78,5 +80,6 @@ public interface Group extends Serializable {
      * @param commandBuilder The final command builder
      * @return The command to be used to start this group
      */
-    public List<String> buildCommands(CommandBuilder commandBuilder);
+    public List<String> buildCommands(CommandBuilder commandBuilder,
+        GCMApplicationDescriptor gcma);
 }

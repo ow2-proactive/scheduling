@@ -70,8 +70,11 @@ public class StartRuntime {
     /** The URL of the parent ProActive Runtime */
     private String parentURL;
 
-    /** An uniq identifier for the deployment framework */
+    /** identify the topology node which created this runtime */
     private long topologyId;
+
+    /** identify the GCM Application */
+    private long deploymendId;
 
     /** Capacity of this runtime */
     private long capacity;
@@ -143,6 +146,8 @@ public class StartRuntime {
             Params.parent.desc);
         options.addOption(Params.capacity.sOpt, Params.capacity.toString(),
             true, Params.capacity.desc);
+        options.addOption(Params.deploymentId.sOpt,
+            Params.deploymentId.toString(), true, Params.deploymentId.desc);
         options.addOption(Params.topologyId.sOpt, Params.topologyId.toString(),
             true, Params.topologyId.desc);
 
@@ -169,6 +174,13 @@ public class StartRuntime {
                 topologyId = new Long(arg);
             } else {
                 topologyId = -1;
+            }
+
+            arg = line.getOptionValue(Params.deploymentId.sOpt);
+            if (arg != null) {
+                deploymendId = new Long(arg);
+            } else {
+                deploymendId = -1;
             }
         } catch (ParseException e) {
             logger.warn("Cannot parse command line arguments", e);
@@ -207,7 +219,7 @@ public class StartRuntime {
             logger.warn("Cannot get the local ProActive Runtime", e1);
             abort();
         }
-
+        localRuntimeImpl.setDeploymentId(deploymendId);
         localRuntimeImpl.setTopologyId(topologyId);
 
         Set<Node> nodes = new HashSet<Node>();
@@ -230,7 +242,7 @@ public class StartRuntime {
 
                 // Register
                 GCMRuntimeRegistrationNotificationData notification = new GCMRuntimeRegistrationNotificationData(localRuntime.getURL(),
-                        topologyId, nodes);
+                        deploymendId, topologyId, nodes);
                 parentRuntime.register(notification);
 
                 waitUntilInterupted();
@@ -256,7 +268,8 @@ public class StartRuntime {
         }
     }
     public enum Params {parent("p", "URL of the parent ProActive Runtime"),
-        topologyId("i", "An uniq ID for the deployment framework"),
+        topologyId("i", "Topology Node"),
+        deploymentId("d", "GCM Application identifier"),
         capacity("c", "Number of Node to be created");
         protected String sOpt;
         protected String desc;

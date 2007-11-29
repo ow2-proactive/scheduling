@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.mop.Utils;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
@@ -119,12 +120,13 @@ public abstract class AbstractGroup implements Group {
         this.hostInfo = hostInfo;
     }
 
-    public List<String> buildCommands(CommandBuilder commandBuilder) {
+    public List<String> buildCommands(CommandBuilder commandBuilder,
+        GCMApplicationDescriptor gcma) {
         List<String> commands = internalBuildCommands();
         List<String> ret = new ArrayList<String>();
         for (String comnand : commands) {
             ret.add(comnand + " " +
-                Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo)));
+                Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo, gcma)));
         }
 
         return ret;

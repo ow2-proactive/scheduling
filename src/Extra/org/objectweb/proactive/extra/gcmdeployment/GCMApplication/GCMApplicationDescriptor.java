@@ -132,4 +132,6 @@ public interface GCMApplicationDescriptor {
      * @param topology the topology to be updated
      */
     public void updateTopology(Topology topology);
+
+    public long getDeploymentId();
 }

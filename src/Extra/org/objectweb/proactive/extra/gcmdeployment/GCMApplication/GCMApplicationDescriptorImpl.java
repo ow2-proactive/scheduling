@@ -44,6 +44,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentResources;
@@ -62,6 +63,9 @@ import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 public class GCMApplicationDescriptorImpl
     implements GCMApplicationDescriptorInternal {
+
+    /** An unique identifier for this deployment*/
+    private long deploymentId;
 
     /** descriptor file */
     private File descriptor = null;
@@ -97,6 +101,8 @@ public class GCMApplicationDescriptorImpl
 
     public GCMApplicationDescriptorImpl(File file) throws ProActiveException {
         try {
+            deploymentId = Math.abs(ProActiveRandom.nextLong());
+
             currentDeploymentPath = new ArrayList<String>();
             topologyIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
             nodes = Collections.synchronizedSet(new HashSet<Node>());
@@ -129,8 +135,8 @@ public class GCMApplicationDescriptorImpl
             virtualNode.setDeploymentTree(deploymentTree);
         }
 
-        for (NodeProvider gdd : nodeProviders.values()) {
-            gdd.start(commandBuilder);
+        for (NodeProvider nodeProvider : nodeProviders.values()) {
+            nodeProvider.start(commandBuilder, this);
         }
     }
 
@@ -181,6 +187,10 @@ public class GCMApplicationDescriptorImpl
     /* -----------------------------
      *  GCMApplicationDescriptorInternal interface
      */
+    public long getDeploymentId() {
+        return deploymentId;
+    }
+
     public NodeProvider getNodeProviderFromTopologyId(Long topologyId) {
         return topologyIdToNodeProviderMapping.get(topologyId);
     }

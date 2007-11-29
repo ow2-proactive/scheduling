@@ -83,7 +83,9 @@ public class NodeAllocator implements NotificationListener {
         startStage23Thread();
     }
 
-    public void subscribeJMXRuntimeEvent() {
+    private void subscribeJMXRuntimeEvent() {
+        ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
+        part.addDeployment(gcma.getDeploymentId());
         JMXNotificationManager.getInstance()
                               .subscribe(ProActiveRuntimeImpl.getProActiveRuntime()
                                                              .getMBean()
@@ -98,8 +100,11 @@ public class NodeAllocator implements NotificationListener {
 
             if (NotificationType.GCMRuntimeRegistered.equals(type)) {
                 GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification.getUserData();
-                NodeProvider nodeProvider = gcma.getNodeProviderFromTopologyId(data.getTopologyId());
+                if (data.getDeploymentId() != gcma.getDeploymentId()) {
+                    return;
+                }
 
+                NodeProvider nodeProvider = gcma.getNodeProviderFromTopologyId(data.getTopologyId());
                 for (Node node : data.getNodes()) {
                     gcma.addNode(node);
                     if (!dispatchS1(node, nodeProvider)) {

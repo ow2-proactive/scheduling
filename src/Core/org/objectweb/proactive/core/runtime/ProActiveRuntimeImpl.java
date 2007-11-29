@@ -192,6 +192,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     /** The MBean representing this ProActive Runtime */
     private ProActiveRuntimeWrapperMBean mbean;
+    private RegistrationForwarder registrationForwarder;
 
     //
     // -- CONSTRUCTORS
@@ -1389,6 +1390,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         private String name;
         private long capacity;
         private final String hostName;
+        private long deploymentId;
         private long topologyId;
         private String vmName;
 
@@ -1411,6 +1413,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             }
 
             this.capacity = -1;
+            this.deploymentId = -1;
             this.topologyId = -1;
             this.vmName = null;
         }
@@ -1462,6 +1465,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         private void setTopologyId(long topologyId) {
             this.topologyId = topologyId;
+        }
+
+        public long getDeploymentId() {
+            return deploymentId;
+        }
+
+        private void setDeploymentId(long deploymentId) {
+            this.deploymentId = deploymentId;
         }
 
         @Override
@@ -1633,6 +1644,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     public void register(GCMRuntimeRegistrationNotificationData notification) {
+        createRegistrationForwarder();
         getMBean()
             .sendNotification(NotificationType.GCMRuntimeRegistered,
             notification);
@@ -1640,6 +1652,21 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     public FileTransferEngine getFileTransferEngine() {
         return FileTransferEngine.getFileTransferEngine();
+    }
+
+    public void addDeployment(long deploymentId) {
+        createRegistrationForwarder();
+        registrationForwarder.doNotForward(deploymentId);
+    }
+
+    synchronized private void createRegistrationForwarder() {
+        if (registrationForwarder == null) {
+            this.registrationForwarder = new RegistrationForwarder();
+        }
+    }
+
+    public void setDeploymentId(long deploymentId) {
+        vmInformation.setDeploymentId(deploymentId);
     }
 
     public void setTopologyId(long toplogyId) {

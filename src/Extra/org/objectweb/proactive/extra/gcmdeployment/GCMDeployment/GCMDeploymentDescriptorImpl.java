@@ -39,6 +39,7 @@ import java.util.Set;
 import org.junit.Test;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
@@ -69,19 +70,21 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private GCMDeploymentDescriptorImpl() {
     }
 
-    public void start(CommandBuilder commandBuilder) {
+    public void start(CommandBuilder commandBuilder,
+        GCMApplicationDescriptor gcma) {
         // Start Local JVMs
-        startLocal(commandBuilder);
+        startLocal(commandBuilder, gcma);
 
-        startGroups(commandBuilder);
-        startBridges(commandBuilder);
+        startGroups(commandBuilder, gcma);
+        startBridges(commandBuilder, gcma);
     }
 
-    private void startLocal(CommandBuilder commandBuilder) {
+    private void startLocal(CommandBuilder commandBuilder,
+        GCMApplicationDescriptor gcma) {
         HostInfo hostInfo = resources.getHostInfo();
         if (hostInfo != null) {
             // Something needs to be started on this host
-            String command = commandBuilder.buildCommand(hostInfo);
+            String command = commandBuilder.buildCommand(hostInfo, gcma);
 
             GCMD_LOGGER.info("Starting a process on localhost");
             GCMD_LOGGER.debug("command= " + command);
@@ -89,10 +92,11 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
-    private void startGroups(CommandBuilder commandBuilder) {
+    private void startGroups(CommandBuilder commandBuilder,
+        GCMApplicationDescriptor gcma) {
         List<Group> groups = resources.getGroups();
         for (Group group : groups) {
-            List<String> commands = group.buildCommands(commandBuilder);
+            List<String> commands = group.buildCommands(commandBuilder, gcma);
             GCMD_LOGGER.info("Starting group id=" + group.getId() +
                 " #commands=" + commands.size());
 
@@ -104,10 +108,11 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
-    private void startBridges(CommandBuilder commandBuilder) {
+    private void startBridges(CommandBuilder commandBuilder,
+        GCMApplicationDescriptor gcma) {
         List<Bridge> bridges = resources.getBridges();
         for (Bridge bridge : bridges) {
-            List<String> commands = bridge.buildCommands(commandBuilder);
+            List<String> commands = bridge.buildCommands(commandBuilder, gcma);
 
             GCMD_LOGGER.info("Starting bridge id=" + bridge.getId() +
                 " #commands=" + commands.size());
@@ -163,7 +168,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
             gcmd.resources = resources;
 
             GCMD_LOGGER.warn("Starting...");
-            gcmd.start(commandBuilder);
+            gcmd.start(commandBuilder, null);
         }
 
         public static void main(String[] args) {
