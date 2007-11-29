@@ -47,7 +47,6 @@ import functionalTests.FunctionalTest;
 import functionalTests.masterworker.A;
 import static junit.framework.Assert.assertTrue;
 
-
 /**
  * Test load balancing
  */
