@@ -44,6 +44,6 @@ public interface FileTransferServiceSend {
     public OperationStatus sendFile(File srcFile,
         FileTransferServiceReceive ftsRemote, File dstFile, int bsize,
         int numFlyingBlocks);
-    
+
     public void putBackInPool(FileTransferServiceReceive ftsDst);
 }

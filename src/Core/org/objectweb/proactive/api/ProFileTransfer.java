@@ -55,22 +55,22 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class provides a standard entry point for FileTransfer API tools.
- * 
+ *
  * Transfer between the calling thread's node and a remote node is supported
  * through the <code>pull</code> and <code>push</code> methods.
- * 
+ *
  * Transfer between third party nodes is supported using the <code>transfer</code> family methods
  *
  * All file transfer operations are performed asynchronously, and return a {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instance which can
  * be queried for termination.
  *
  * Note that an active objec's node can be obtained with:
- * 
+ *
  * <pre>
- * 		String nodeURL = ProActiveObject.getActiveObjectNodeUrl(Object activeobject);
- * 		Node node = NodeFactory.getNode(nodeURL);
+ *                 String nodeURL = ProActiveObject.getActiveObjectNodeUrl(Object activeobject);
+ *                 Node node = NodeFactory.getNode(nodeURL);
  * </pre>
- * 
+ *
  * @author The ProActive Team (mleyton)
  * @since ProActive 3.9 (November 2007)
  */
@@ -84,9 +84,9 @@ public class ProFileTransfer {
         try {
             localNode = NodeFactory.getDefaultNode();
         } catch (NodeException e) {
-        	//TODO change when moving to Java 1.6
+            //TODO change when moving to Java 1.6
             //throw new IOException("Can't get local node", e);
-            throw new IOException("Can't get local node "+ e.getMessage());
+            throw new IOException("Can't get local node " + e.getMessage());
         }
 
         return localNode;
@@ -94,10 +94,10 @@ public class ProFileTransfer {
 
     /**
      * Push a list of local files to a remote Node with the specified destinations.
-     *  
+     *
      * @param srcFile The list of local, existent, <code>File</code>s.
      * @param dstNode The destination node.
-     * @param dstFile The list of remote, writable, <code>File<code>s. 
+     * @param dstFile The list of remote, writable, <code>File<code>s.
      * @return A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instances representing the file transfer operation of each file.
      * @throws IOException If an initialization error was detected.
      */
@@ -117,7 +117,7 @@ public class ProFileTransfer {
 
     /**
      * Pull a list of remote files on a Node to the local node.
-     * 
+     *
      * @param srcNode
      * @param srcFile
      * @param dstFile
@@ -152,7 +152,7 @@ public class ProFileTransfer {
 
     /**
      * Transfers a list of files on a remote Node to another remote node.
-     * 
+     *
      * @param srcNode
      * @param srcFile
      * @param dstNode
@@ -169,10 +169,10 @@ public class ProFileTransfer {
 
     /**
      * Transfers a list of files, with parameters different than default.
-     * 
-     * @param bsize The size of each file block. 
+     *
+     * @param bsize The size of each file block.
      * @param numFlyingBlocks The maximum number of blocks to send before synchronizing.
-     * 
+     *
      * @see #transfer(Node, File[], Node, File[])
      */
     public static List<RemoteFile> transfer(Node srcNode, File[] srcFile,
@@ -225,7 +225,7 @@ public class ProFileTransfer {
 
     /**
      * This is the real method that invokes the file transfer.
-     * 
+     *
      * @param srcNode The source node.
      * @param srcFile The list of source files locations.
      * @param dstNode The destination node.
@@ -235,7 +235,9 @@ public class ProFileTransfer {
      * @return  A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instances representing the file transfer operation of each file.
      * @throws IOException  If an initialization error was detected.
      */
-    protected static List<RemoteFile> internalTransfer(Node srcNode, File[] srcFile, Node dstNode, File[] dstFile, int bsize, int numFlyingBlocks) throws IOException {
+    protected static List<RemoteFile> internalTransfer(Node srcNode,
+        File[] srcFile, Node dstNode, File[] dstFile, int bsize,
+        int numFlyingBlocks) throws IOException {
         FileTransferServiceSend ftsSrc;
         FileTransferServiceReceive ftsDst;
 
@@ -243,24 +245,26 @@ public class ProFileTransfer {
             ftsSrc = FileTransferEngine.getFileTransferEngine(srcNode).getFTS();
             ftsDst = FileTransferEngine.getFileTransferEngine(dstNode).getFTS();
         } catch (Exception e) {
-        	//TODO change when moving to Java 1.6
+            //TODO change when moving to Java 1.6
             //throw new IOException("Unable to connect or use ProActive Node: " + srcNode + " -> " + dstNode, e);
-            throw new IOException("Unable to connect or use ProActive Node: " + srcNode + " -> " + dstNode+" "+ e.getMessage());
+            throw new IOException("Unable to connect or use ProActive Node: " +
+                srcNode + " -> " + dstNode + " " + e.getMessage());
         }
 
         ArrayList<RemoteFile> rfile = new ArrayList<RemoteFile>(srcFile.length);
 
         for (int i = 0; i < srcFile.length; i++) {
+            OperationStatus status = ftsSrc.sendFile(srcFile[i], ftsDst,
+                    dstFile[i], bsize, numFlyingBlocks);
 
-            OperationStatus status = ftsSrc.sendFile(srcFile[i], ftsDst, dstFile[i], bsize, numFlyingBlocks);
-
-            FileTransferRequest request = new FileTransferRequest(srcFile[i], dstFile[i], status, ftsSrc, ftsDst);
+            FileTransferRequest request = new FileTransferRequest(srcFile[i],
+                    dstFile[i], status, ftsSrc, ftsDst);
 
             rfile.add(new RemoteFileImpl(dstNode, dstFile[i], request));
         }
-       
+
         ftsSrc.putBackInPool(ftsDst);
-        
+
         return rfile;
     }
 }

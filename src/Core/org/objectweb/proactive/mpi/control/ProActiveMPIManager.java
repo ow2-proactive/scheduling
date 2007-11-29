@@ -30,15 +30,17 @@
  */
 package org.objectweb.proactive.mpi.control;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProFileTransfer;
 import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProFileTransfer;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
@@ -49,8 +51,8 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.filetransfer.*;
-import org.objectweb.proactive.mpi.*;
+import org.objectweb.proactive.mpi.MPIResult;
+import org.objectweb.proactive.mpi.MPISpmd;
 
 
 public class ProActiveMPIManager implements Serializable {

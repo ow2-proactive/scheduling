@@ -43,7 +43,8 @@ public interface FileTransferServiceReceive {
     public void saveFileBlock(File dstFile, FileBlock block)
         throws IOException;
 
-    public void saveFileBlockWithoutThrowingException(File dstFile, FileBlock block);
-    
+    public void saveFileBlockWithoutThrowingException(File dstFile,
+        FileBlock block);
+
     public void putBackInLocalPool();
 }

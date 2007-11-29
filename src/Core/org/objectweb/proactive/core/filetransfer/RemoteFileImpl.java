@@ -56,9 +56,9 @@ public class RemoteFileImpl implements RemoteFile {
         try {
             localNode = NodeFactory.getDefaultNode();
         } catch (NodeException e) {
-        	//TODO change when moving to Java 1.6
-        	//throw new IOException("Can't get local node", e);
-        	throw new IOException("Can't get local node "+ e.getMessage());
+            //TODO change when moving to Java 1.6
+            //throw new IOException("Can't get local node", e);
+            throw new IOException("Can't get local node " + e.getMessage());
         }
 
         return ProFileTransfer.transfer(node, file, localNode, localDst);
@@ -85,17 +85,16 @@ public class RemoteFileImpl implements RemoteFile {
 
     //@Override
     public boolean isTransferFinished() {
-        return request.getOperationFuture().getException() != null || !request.isAwaited();
+        return (request.getOperationFuture().getException() != null) ||
+        !request.isAwaited();
     }
 
     //@Override
     public void waitForFinishedTransfer() throws IOException {
-        
         if (request != null) {
             request.waitForOperation();
         }
-        
-    	
+
         if (request.getOperationFuture().getException() != null) {
             throw request.getOperationFuture().getException();
         }

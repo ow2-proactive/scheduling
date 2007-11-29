@@ -45,9 +45,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.Notification;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProFileTransfer;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProFileTransfer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
