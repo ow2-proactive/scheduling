@@ -105,7 +105,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         vns.put(id, vn);
     }
 
-    synchronized public void addProActivePath(PathElement pe) {
+    public void addProActivePath(PathElement pe) {
         if (proactiveClasspath == null) {
             proactiveClasspath = new ArrayList<PathElement>();
         }
@@ -113,11 +113,11 @@ public class CommandBuilderProActive implements CommandBuilder {
         proactiveClasspath.add(pe);
     }
 
-    synchronized public void setProActiveClasspath(List<PathElement> pe) {
+    public void setProActiveClasspath(List<PathElement> pe) {
         proactiveClasspath = pe;
     }
 
-    synchronized public void addApplicationPath(PathElement pe) {
+    public void addApplicationPath(PathElement pe) {
         if (applicationClasspath == null) {
             applicationClasspath = new ArrayList<PathElement>();
         }
@@ -125,7 +125,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         applicationClasspath.add(pe);
     }
 
-    synchronized public void setApplicationClasspath(List<PathElement> pe) {
+    public void setApplicationClasspath(List<PathElement> pe) {
         if (GCMD_LOGGER.isTraceEnabled()) {
             GCMD_LOGGER.trace(" Set ApplicationClasspath to:");
             for (PathElement e : pe) {

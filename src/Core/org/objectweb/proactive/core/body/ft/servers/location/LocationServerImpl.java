@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class LocationServerImpl implements LocationServer {
     //logger
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
+    final protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // global server
     private FTServer server;

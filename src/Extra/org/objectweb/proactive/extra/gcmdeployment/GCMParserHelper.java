@@ -74,8 +74,6 @@ public class GCMParserHelper implements GCMParserConstants {
     }
 
     static public class MyDefaultHandler extends DefaultHandler {
-        private String errMessage = "";
-
         @Override
         public void warning(SAXParseException e) throws SAXParseException {
             //            System.err.println("Warning Line " + e.getLineNumber() + ": " +

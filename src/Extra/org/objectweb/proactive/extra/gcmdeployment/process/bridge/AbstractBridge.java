@@ -116,7 +116,6 @@ public abstract class AbstractBridge implements Bridge {
     }
 
     public void setHostInfo(HostInfo hostInfo) {
-        assert (hostInfo == null);
         this.hostInfo = hostInfo;
     }
 

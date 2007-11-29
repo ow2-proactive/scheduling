@@ -62,7 +62,7 @@ public class FileTransferWorkShop implements Serializable {
             PROCESSDEFAULT_KEYWORD, "scp", "unicore", "rcp", "nordugrid", "pftp"
         };
     private static final String[] URLPROTOCOLS = { "file://", "http://", "ftp://" };
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
+    final protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
 
     /* Reference to filetransfer definitions */
     private HashMap<String, FileTransferDefinition> fileTransfers;

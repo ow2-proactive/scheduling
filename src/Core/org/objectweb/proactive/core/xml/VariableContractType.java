@@ -86,12 +86,29 @@ public class VariableContractType implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        return equals((VariableContractType) o);
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) + type;
+        return result;
     }
 
-    public boolean equals(VariableContractType b) {
-        return this.type == b.type;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (!(obj instanceof VariableContractType)) {
+            return false;
+        }
+        final VariableContractType other = (VariableContractType) obj;
+        if (type != other.type) {
+            return false;
+        }
+        return true;
     }
 
     @Override

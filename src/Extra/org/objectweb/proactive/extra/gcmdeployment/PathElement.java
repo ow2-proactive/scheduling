@@ -129,6 +129,7 @@ public class PathElement implements Cloneable, Serializable {
 
     @Override
     public Object clone() throws CloneNotSupportedException {
+        super.clone();
         PathElement res = new PathElement(this.relPath);
         res.setBase(this.base);
         return res;

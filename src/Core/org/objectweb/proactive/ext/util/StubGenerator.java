@@ -228,8 +228,7 @@ public class StubGenerator {
                     "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
                 System.err.println(
                     "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
-                stubClassName = null;
-                data = null;
+                return;
             }
 
             char sep = File.separatorChar;

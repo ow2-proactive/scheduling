@@ -89,7 +89,7 @@ public class Executor {
     private enum MonitorType {STDOUT,
         STDERR;
     }
-    private class InputStreamMonitor extends Thread {
+    static private class InputStreamMonitor extends Thread {
         MonitorType type;
         InputStream stream;
         String cmd;

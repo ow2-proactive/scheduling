@@ -199,16 +199,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-        String deploymentSchema = getClass()
-                                      .getResource(DEPLOYMENT_DESC_LOCATION)
-                                      .toString();
+        String deploymentSchema = GCMDeploymentParserImpl.class.getClass()
+                                                               .getResource(DEPLOYMENT_DESC_LOCATION)
+                                                               .toString();
 
-        String commonTypesSchema = getClass().getResource(COMMON_TYPES_LOCATION)
-                                       .toString();
+        String commonTypesSchema = GCMDeploymentParserImpl.class.getClass()
+                                                                .getResource(COMMON_TYPES_LOCATION)
+                                                                .toString();
 
-        String extensionSchemas = getClass()
-                                      .getResource(EXTENSION_SCHEMAS_LOCATION)
-                                      .toString();
+        String extensionSchemas = GCMDeploymentParserImpl.class.getClass()
+                                                               .getResource(EXTENSION_SCHEMAS_LOCATION)
+                                                               .toString();
 
         schemas.add(0, extensionSchemas);
         schemas.add(0, deploymentSchema);

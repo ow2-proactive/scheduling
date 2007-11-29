@@ -129,7 +129,7 @@ public class GroupARCParser extends AbstractGroupParser {
         return arcGroup;
     }
 
-    public class FileTransfer {
+    static public class FileTransfer {
         private static final String ATTR_LOCATION = "location";
         private static final String ATTR_FILENAME = "filename";
         public String filename;

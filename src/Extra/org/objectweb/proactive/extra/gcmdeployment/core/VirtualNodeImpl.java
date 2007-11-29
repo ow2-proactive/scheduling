@@ -66,7 +66,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
      * ------------------- VirtualNode interface
      */
     public String getName() {
-        return new String(id);
+        return id;
     }
 
     public boolean isGreedy() {
@@ -291,7 +291,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         return needNode() || isGreedy();
     }
 
-    class NodeProviderContract {
+    static class NodeProviderContract {
         NodeProvider nodeProvider;
         long capacity;
         long nodes;
@@ -336,7 +336,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         }
     }
 
-    private class Subscriber {
+    static private class Subscriber {
         private Object client;
         private String method;
 

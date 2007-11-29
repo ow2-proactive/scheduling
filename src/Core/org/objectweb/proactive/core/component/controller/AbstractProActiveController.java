@@ -59,7 +59,7 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
     implements Interface, Serializable, ProActiveController {
     private boolean isInternal = true;
     private InterfaceType interfaceType;
-    protected static Logger controllerLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
+    final protected static Logger controllerLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
     /**
      * Constructor for AbstractProActiveController.

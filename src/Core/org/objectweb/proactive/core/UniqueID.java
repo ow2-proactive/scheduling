@@ -53,7 +53,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
 
     //the Unique ID of the JVM
     private static java.rmi.dgc.VMID uniqueVMID = new java.rmi.dgc.VMID();
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
+    final protected static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 
     // Optim
     private transient String cachedShortString;

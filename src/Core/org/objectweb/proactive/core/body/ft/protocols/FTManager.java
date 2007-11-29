@@ -65,7 +65,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public abstract class FTManager implements java.io.Serializable {
     //logger
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
+    final protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     /** This value is sent by an active object that is not fault tolerant*/
     public static final int NON_FT = -30;

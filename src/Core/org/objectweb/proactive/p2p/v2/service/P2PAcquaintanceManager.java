@@ -614,7 +614,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         protected long time;
 
         DatedRequest(P2PService s, long t) {
-            this.service = service;
+            this.service = s;
             this.time = t;
         }
 

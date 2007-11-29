@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 2.3
  */
 public abstract class AbstractCopyProtocol implements CopyProtocol {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
+    final protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
     protected boolean isDefaultProtocol = false;
     protected String name;
     protected FileTransferDefinition[] fileTransfer;

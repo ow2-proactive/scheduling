@@ -60,8 +60,7 @@ public abstract class AbstractGroup implements Group {
         try {
             this.hostInfo = (HostInfo) ((group.hostInfo != null)
                 ? Utils.makeDeepCopy(group.hostInfo) : null);
-            this.commandPath = (group.commandPath != null)
-                ? new String(group.commandPath) : null;
+            this.commandPath = group.commandPath;
             this.env = (group.env != null)
                 ? new HashMap<String, String>(group.env) : null;
             this.id = (group.id != null) ? new String(group.id) : null;
@@ -102,13 +101,10 @@ public abstract class AbstractGroup implements Group {
 
     public void check() throws IllegalStateException {
         // 1- hostInfo must be set
-        synchronized (hostInfo) {
-            if (hostInfo == null) {
-                throw new IllegalStateException("hostInfo is not set in " +
-                    this);
-            }
-            hostInfo.check();
+        if (hostInfo == null) {
+            throw new IllegalStateException("hostInfo is not set in " + this);
         }
+        hostInfo.check();
 
         if (id == null) {
             throw new IllegalStateException("id is not set in " + this);
@@ -120,10 +116,7 @@ public abstract class AbstractGroup implements Group {
     }
 
     public void setHostInfo(HostInfo hostInfo) {
-        synchronized (hostInfo) {
-            assert (hostInfo == null);
-            this.hostInfo = hostInfo;
-        }
+        this.hostInfo = hostInfo;
     }
 
     public List<String> buildCommands(CommandBuilder commandBuilder) {

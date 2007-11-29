@@ -82,12 +82,12 @@ public class GroupOAR extends AbstractGroup {
 
         if (stdout != null) {
             commandBuf.append(" --stdout=");
-            commandBuf.append(stdout.toString());
+            commandBuf.append(stdout);
         }
 
         if (stderr != null) {
             commandBuf.append(" --stderr=");
-            commandBuf.append(stderr.toString());
+            commandBuf.append(stderr);
         }
 
         // argument - must be last append

@@ -102,11 +102,33 @@ public class SynchronousProxy implements Proxy, Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof SynchronousProxy) {
-            return this.remoteObject.equals(((SynchronousProxy) o).remoteObject);
-        }
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) +
+            ((remoteObject == null) ? 0 : remoteObject.hashCode());
+        return result;
+    }
 
-        return false;
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SynchronousProxy other = (SynchronousProxy) obj;
+        if (remoteObject == null) {
+            if (other.remoteObject != null) {
+                return false;
+            }
+        } else if (!remoteObject.equals(other.remoteObject)) {
+            return false;
+        }
+        return true;
     }
 }

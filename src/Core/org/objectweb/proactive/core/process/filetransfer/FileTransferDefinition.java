@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 2.3
  */
 public class FileTransferDefinition implements Serializable {
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
+    final protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
     private ArrayList<FileDescription> all;
     private ArrayList<FileDescription> files;
     private ArrayList<FileDescription> homonymousFiles;

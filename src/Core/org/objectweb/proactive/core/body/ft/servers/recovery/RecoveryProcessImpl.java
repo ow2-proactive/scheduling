@@ -55,7 +55,7 @@ public abstract class RecoveryProcessImpl implements RecoveryProcess {
     public static final int MAX_ACTIVE_QUEUES = 50;
 
     //logger
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
+    final protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // global server
     protected FTServer server;

@@ -136,6 +136,7 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
     }
 
     public void updateLocation(UniqueID i, UniversalBody s, int version) {
-        this.updateLocation(i, s, 0);
+        // Commented an obviously broken piece of code
+        // this.updateLocation(i, s, 0);
     }
 }

@@ -56,7 +56,7 @@ public class FaultToleranceService implements UniversalService {
     public static final String DEFAULT_PARAM_LINE = "-Dproactive.ft=false";
 
     // logger
-    protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
+    final protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
     // protocol Type
     private String protocolType;

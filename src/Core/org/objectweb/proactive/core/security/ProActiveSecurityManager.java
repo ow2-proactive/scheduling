@@ -78,6 +78,7 @@ import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableExce
 import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 import org.objectweb.proactive.core.security.securityentity.RuleEntities;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -347,7 +348,7 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
 
         long id;
         do {
-            id = new Random().nextLong() + System.currentTimeMillis();
+            id = ProActiveRandom.nextLong() + System.currentTimeMillis();
         } while ((id == 0) || this.sessions.contains(new Long(id)));
 
         Session newSession = new Session(distantSessionID, communicationPolicy,

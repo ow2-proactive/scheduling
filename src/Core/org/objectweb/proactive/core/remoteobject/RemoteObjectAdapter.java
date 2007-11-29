@@ -493,11 +493,34 @@ public class RemoteObjectAdapter implements RemoteObject {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o instanceof RemoteObjectAdapter) {
-            return remoteObject.equals(((RemoteObjectAdapter) o).remoteObject);
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) +
+            ((remoteObject == null) ? 0 : remoteObject.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
         }
-        return false;
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final RemoteObjectAdapter other = (RemoteObjectAdapter) obj;
+        if (remoteObject == null) {
+            if (other.remoteObject != null) {
+                return false;
+            }
+        } else if (!remoteObject.equals(other.remoteObject)) {
+            return false;
+        }
+        return true;
     }
 
     public Class<?> getTargetClass() {

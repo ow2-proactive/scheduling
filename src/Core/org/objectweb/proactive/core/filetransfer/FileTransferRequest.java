@@ -97,10 +97,47 @@ public class FileTransferRequest implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        FileTransferRequest ftr = (FileTransferRequest) o;
-        return getDstFile().equals(ftr.getDstFile()) &&
-        getSrcFile().equals(ftr.getSrcFile()) && (getId() == ftr.getId());
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = (prime * result) +
+            ((dstFile == null) ? 0 : dstFile.hashCode());
+        result = (prime * result) + id;
+        result = (prime * result) +
+            ((srcFile == null) ? 0 : srcFile.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final FileTransferRequest other = (FileTransferRequest) obj;
+        if (dstFile == null) {
+            if (other.dstFile != null) {
+                return false;
+            }
+        } else if (!dstFile.equals(other.dstFile)) {
+            return false;
+        }
+        if (id != other.id) {
+            return false;
+        }
+        if (srcFile == null) {
+            if (other.srcFile != null) {
+                return false;
+            }
+        } else if (!srcFile.equals(other.srcFile)) {
+            return false;
+        }
+        return true;
     }
 
     public int getId() {
