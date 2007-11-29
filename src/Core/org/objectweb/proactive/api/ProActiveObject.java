@@ -1013,6 +1013,12 @@ public class ProActiveObject {
         return body.getNodeURL();
     }
 
+    public static Node getActiveObjectNode(Object activeObject)
+        throws NodeException {
+        Node node = NodeFactory.getNode(getActiveObjectNodeUrl(activeObject));
+        return node;
+    }
+
     /**
      * Unregisters an active object previously registered into a registry.
      * @param url the url under which the active object is registered.
@@ -1082,7 +1088,6 @@ public class ProActiveObject {
      */
     public static Node getNode() throws NodeException {
         BodyProxy destProxy = (BodyProxy) (getStubOnThis()).getProxy();
-
         return NodeFactory.getNode(destProxy.getBody().getNodeURL());
     }
 
