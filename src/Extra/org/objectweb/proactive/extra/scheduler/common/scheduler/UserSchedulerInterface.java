@@ -42,22 +42,24 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 /**
- * User scheduler interface.
- * This interface provides methods to managed the user task and jobs on the scheduler.
+ * Scheduler interface for someone connected to the scheduler as user.<br>
+ * This interface provides methods to managed the user task and jobs on the scheduler.<br>
  * A user will only be able to managed his jobs and tasks, and also see the entire scheduling process.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 7, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public interface UserSchedulerInterface extends Serializable {
 
     /**
      * Submit a new job to the scheduler.
      * A user can only managed their jobs.
+     * <p>
      * It will execute the tasks of the jobs as soon as resources are available.
-     * The job will be considered as finished once the marked 'final' task has finished,
-     * or when every tasks have finished.
+     * The job will be considered as finished once every tasks have finished.
+     * </p>
      * Thus, user could get the job result according to the precious result.
      *
      * @param job the new job to submit.
@@ -67,7 +69,7 @@ public interface UserSchedulerInterface extends Serializable {
     public JobId submit(Job job) throws SchedulerException;
 
     /**
-     * Get the result for the given jobId.
+     * Get the result for the given jobId.<br>
      * A user can only get HIS result back.
      *
      * @param jobId the job on which the result will be send
@@ -77,7 +79,7 @@ public interface UserSchedulerInterface extends Serializable {
     public JobResult getJobResult(JobId jobId) throws SchedulerException;
 
     /**
-     * Get the result for the given task name in the given jobId.
+     * Get the result for the given task name in the given jobId.<br>
      * A user can only get HIS result back.
      *
      * @param jobId the job in which the task result is.
@@ -89,7 +91,7 @@ public interface UserSchedulerInterface extends Serializable {
         throws SchedulerException;
 
     /**
-     * Listen for the tasks user log.
+     * Listen for the tasks user log.<br>
      * A user can only listen to HIS jobs.
      *
      * @param jobId the id of the job to listen to.
@@ -102,7 +104,10 @@ public interface UserSchedulerInterface extends Serializable {
 
     /**
      * Add a scheduler event Listener. this listener provides method to notice of
-     * new coming job, started task, finished task, running job, finished job.
+     * new coming job, started task, finished task, running job, finished job, etc...<br>
+     * You may use this method once by thread or active object.<br>
+     * Every call to this method will remove your previous listening settings.<br>
+     * For example, if you want to get 2 events, add the 2 events you want at the end of this method.
      *
      * @param sel a SchedulerEventListener on which the scheduler will talk.
      * @return the scheduler current state containing the different lists of jobs.
@@ -113,7 +118,7 @@ public interface UserSchedulerInterface extends Serializable {
         throws SchedulerException;
 
     /**
-     * Return the scheduler statistics.
+     * Return the scheduler statistics.<br>
      * It will be possible to get an HashMap of all properties set in the stats class.
      *
      * @return the scheduler statistics.
@@ -129,8 +134,8 @@ public interface UserSchedulerInterface extends Serializable {
     public void disconnect() throws SchedulerException;
 
     /**
-     * kill the job represented by jobId.
-     * This method will kill every running tasks of this job, and remove it from the scheduler.
+     * kill the job represented by jobId.<br>
+     * This method will kill every running tasks of this job, and remove it from the scheduler.<br>
      * The job won't be terminated, it won't have result.
      *
      * @param jobId the job to kill.
@@ -140,8 +145,8 @@ public interface UserSchedulerInterface extends Serializable {
     public BooleanWrapper kill(JobId jobId) throws SchedulerException;
 
     /**
-     * Pause the job represented by jobId.
-     * This method will finish every running tasks of this job, and then pause the job.
+     * Pause the job represented by jobId.<br>
+     * This method will finish every running tasks of this job, and then pause the job.<br>
      * The job will have to be resumed in order to finish.
      *
      * @param jobId the job to pause.
@@ -151,7 +156,7 @@ public interface UserSchedulerInterface extends Serializable {
     public BooleanWrapper pause(JobId jobId) throws SchedulerException;
 
     /**
-     * Resume the job represented by jobId.
+     * Resume the job represented by jobId.<br>
      * This method will restart every non-finished tasks of this job.
      *
      * @param jobId the job to resume.

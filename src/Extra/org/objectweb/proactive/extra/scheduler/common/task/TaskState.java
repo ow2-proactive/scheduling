@@ -32,21 +32,22 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 
 /**
- * The state of each task submitted by the user.
+ * This class represents every state that a task is able to be in.<br>
+ * Each state are best describe below.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.1, Jun 28, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public enum TaskState implements java.io.Serializable {
 
     /**
-     *
-     * The task has just been submitted by the user
+     * The task has just been submitted by the user.
      */
     SUBMITTED("Submitted"),
     /**
-     * The task is in the scheduler pending queue
+     * The task is in the scheduler pending queue.
      */
     PENDING("Pending"),
     /**
@@ -54,16 +55,16 @@ public enum TaskState implements java.io.Serializable {
      */
     PAUSED("Paused"),
     /**
-     * The task is executing
+     * The task is executing.
      */
     RUNNNING("Running"),
     /**
-     * The task is failed
+     * The task is failed.
      */
     FAILED("Failed"),
     /**
-     * The task could not be started.
-     * Warning, it means that the task could not be started due to
+     * The task could not be started.<br>
+     * It means that the task could not be started due to
      * dependences failure.
      */
     NOT_STARTED("Could not start"),
@@ -72,11 +73,11 @@ public enum TaskState implements java.io.Serializable {
      */
     CANCELLED("Canceled"),
     /**
-     * The task has been aborted by an exception on an other task
+     * The task has been aborted by an exception on an other task.
      */
     ABORTED("Aborted"),
     /**
-     * The task has finished execution
+     * The task has finished execution.
      */
     FINISHED("Finished");
     /** The name of the current status. */

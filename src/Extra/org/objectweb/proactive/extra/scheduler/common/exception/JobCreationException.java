@@ -30,13 +30,25 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.exception;
 
+
+/**
+ * Exceptions Generated if a problem occurred while creating a job.
+ *
+ * @author jlscheef - ProActive Team
+ * @version 1.0, Jun 29, 2007
+ * @since ProActive 3.2
+ */
 public class JobCreationException extends Exception {
 
-    /**
-         *
-         */
+    /** Serial version UID */
     private static final long serialVersionUID = -3426241467389188582L;
 
+    /**
+     * Create a new instance of JobCreationException with the given message and cause
+     *
+     * @param msg the message to attach.
+     * @param cause the cause of the exception.
+     */
     public JobCreationException(String string, Exception e) {
         super(string, e);
     }

@@ -32,11 +32,14 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 
 /**
- * SchedulerEvent is an Enumeration of all different events that scheduler can invoke.
+ * Enumeration of all different events that scheduler can invoke.<br>
+ * This is also used to choose which events you want to received from the scheduler.
+ * See {@link UserSchedulerInterface}.addSchedulerEventListener for more details.
  *
  * @author jlscheef - ProActiveTeam
  * @date 18 oct. 07
  * @version 3.2
+ * @publicAPI
  */
 public enum SchedulerEvent {
     IMMEDIATE_PAUSED("schedulerImmediatePausedEvent"),
@@ -47,19 +50,20 @@ public enum SchedulerEvent {
     KILLED("schedulerKilledEvent"),
     JOB_KILLED("jobKilledEvent"),
     JOB_PAUSED("jobPausedEvent"),
-    PENDING_TO_RUNNING_JOB("jobPendingToRunningEvent"),
+    JOB_PENDING_TO_RUNNING("jobPendingToRunningEvent"),
     JOB_RESUMED("jobResumedEvent"),
-    NEW_PENDING_JOB("jobSubmittedEvent"),
-    RUNNING_TO_FINISHED_JOB("jobRunningToFinishedEvent"),
-    REMOVE_FINISHED_JOB("jobRemoveFinishedEvent"),
-    PENDING_TO_RUNNING_TASK("taskPendingToRunningEvent"),
-    RUNNING_TO_FINISHED_TASK("taskRunningToFinishedEvent"),
-    CHANGE_JOB_PRIORITY("jobChangePriorityEvent"),
+    JOB_SUBMITTED("jobSubmittedEvent"),
+    JOB_RUNNING_TO_FINISHED("jobRunningToFinishedEvent"),
+    JOB_REMOVE_FINISHED("jobRemoveFinishedEvent"),
+    TASK_PENDING_TO_RUNNING("taskPendingToRunningEvent"),
+    TASK_RUNNING_TO_FINISHED("taskRunningToFinishedEvent"),
+    JOB_CHANGE_PRIORITY("jobChangePriorityEvent"),
     PAUSED("schedulerPausedEvent");
     private String methodName;
 
     /**
-     * Default constructor.
+     * Default implicit constructor.
+     *
      * @param method the method to call as a string.
      */
     SchedulerEvent(String method) {

@@ -86,7 +86,7 @@ public class SchedulerTester {
     private final static int DEFAULT_TOTAL_NL = 30;
     public static int totalMaxJobs;
     public static int currentNBjobs = 0;
-    public static Object synchro = new Object();
+    public final static Object synchro = new Object();
 
     /**
      * args[0] = [schedulerURL]

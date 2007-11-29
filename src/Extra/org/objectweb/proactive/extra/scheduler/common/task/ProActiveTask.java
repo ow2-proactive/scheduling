@@ -34,16 +34,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.proactive.extra.scheduler.common.job.ProActiveJob;
+
 
 /**
- * Definition of a ProActive task for the user.
- * This allows you to create a ProActive task.
- * You have to specify the number of nodes you need during the execution using the {@link #setNumberOfNodesNeeded(int)} method.
- * You can also specify arguments to give to the task using the {@link #setArguments(Map)}
+ * Use this class to build a ProActive task that will use a {@link ProActiveExecutable} and be integrated in a {@link ProActiveJob}.<br>
+ * You have to specify the number of nodes you need during the execution using the {@link #setNumberOfNodesNeeded(int)} method.<br>
+ * You can also specify arguments to give to the task using the {@link #setArguments(Map)} as the java task does it.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class ProActiveTask extends Task {
 
@@ -66,7 +68,7 @@ public class ProActiveTask extends Task {
     }
 
     /**
-     * Should be never used in this context.
+     * <font color="red">Should be never used in this context.</font>
      */
     @Override
     public void addDependence(Task task) {
@@ -75,7 +77,7 @@ public class ProActiveTask extends Task {
     }
 
     /**
-     * Should be never used in this context.
+     * <font color="red">Should be never used in this context.</font>
      */
     @Override
     public void addDependences(List<Task> tasks) {
@@ -127,7 +129,7 @@ public class ProActiveTask extends Task {
     }
 
     /**
-     * To set the executable task instance.
+     * To set the executable task instance.<br>
      * It may be an instance that extends {@link ProActiveExecutable}.
      *
      * @param taskInstance the task Instance to set.

@@ -160,7 +160,7 @@ public class StatsImpl implements Stats {
      */
     private void increaseProperty(String propertyName, int inc) {
         if (!properties.containsKey(propertyName)) {
-            properties.put(propertyName, new Integer(inc));
+            properties.put(propertyName, Integer.valueOf(inc));
         } else {
             properties.put(propertyName,
                 ((Integer) properties.get(propertyName)) + inc);

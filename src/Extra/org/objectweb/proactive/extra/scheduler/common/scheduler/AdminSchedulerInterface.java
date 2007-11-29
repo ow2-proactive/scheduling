@@ -36,18 +36,18 @@ import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 
 
 /**
- * Scheduler interface.
- * This interface represents what the AdminScheduler and the SchedulerFrontend should do.
- * Here are the administrator functionality for a scheduler administrator to interact with the scheduler.
+ * Scheduler interface for someone connected to the scheduler as administrator.<br>
+ * This interface represents what a scheduler administrator should do.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public interface AdminSchedulerInterface extends UserSchedulerInterface {
 
     /**
-    * Change the policy of the scheduler.
+    * Change the policy of the scheduler.<br>
     * This method will immediately change the policy and so the whole scheduling process.
     *
     * @param newPolicyFile the new policy file as a string.
@@ -67,7 +67,8 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
     public BooleanWrapper start() throws SchedulerException;
 
     /**
-     * Stop the scheduler.
+     * Stop the scheduler.<br>
+     * Once done, you won't be able to submit job, and the scheduling will be stopped.
      *
      * @return true if success, false if not.
      * @throws SchedulerException (can be due to insufficient permission)
@@ -99,7 +100,9 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
     public BooleanWrapper resume() throws SchedulerException;
 
     /**
-     * Shutdown the scheduler.
+     * Shutdown the scheduler.<br>
+     * It will terminate every submitted jobs but won't accept new submit.<br>
+     * Use {@link #kill()} if you want to stop the scheduling and exit the scheduler.
      *
      * @return true if success, false if not.
      * @throws SchedulerException (can be due to insufficient permission)
@@ -107,7 +110,8 @@ public interface AdminSchedulerInterface extends UserSchedulerInterface {
     public BooleanWrapper shutdown() throws SchedulerException;
 
     /**
-     * kill the scheduler.
+     * kill the scheduler.<br>
+     * Will stop the scheduling, and shutdown the scheduler.
      *
      * @return true if success, false if not.
      * @throws SchedulerException (can be due to insufficient permission)

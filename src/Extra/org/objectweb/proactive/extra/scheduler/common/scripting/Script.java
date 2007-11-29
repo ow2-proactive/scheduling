@@ -52,6 +52,7 @@ import javax.script.ScriptEngineManager;
  * @author ProActive Team
  * @version 1.0, Jun 4, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public abstract class Script<E> implements Serializable {
 

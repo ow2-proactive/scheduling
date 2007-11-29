@@ -52,7 +52,7 @@ public interface PolicyInterface extends Serializable {
      * The tasks must be in the desired scheduling order.
      * The first task to be schedule must be the first in the returned Vector.
      *
-     * @param jobs the list of light pending or running jobs.
+     * @param jobs the list of pending or running job descriptors.
      * @return a vector of every tasks that are ready to be schedule.
      */
     Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs);

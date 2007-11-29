@@ -39,12 +39,14 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
- * Definition of a task for the user. A task contains some properties that can
- * be set but also : A selection script that can be used to select a specific
- * execution node for this task. A preScript that will be launched before the real
- * task (can be used to set environment vars). A postScript that will be launched
- * just after the end of the real task. (this can be used to unset vars you set
- * in the preScript). You will be also able to add dependences (if necessary) to
+ * This class is the super class of the every task that can be integrated in a job.<br>
+ * A task contains some properties that can be set but also : <ul>
+ * <li>A selection script that can be used to select a specific execution node for this task.</li>
+ * <li>A preScript that will be launched before the real task (can be used to set environment vars).</li>
+ * <li>A postScript that will be launched just after the end of the real task.
+ * (this can be used to unset vars you set in the preScript).</li>
+ * </ul>
+ * You will also be able to add dependences (if necessary) to
  * this task. The dependences mechanism are best describe below.
  *
  * @see #addDependence(Task)
@@ -52,6 +54,7 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public abstract class Task implements Serializable {
 
@@ -74,13 +77,13 @@ public abstract class Task implements Serializable {
     protected SelectionScript selectionScript;
 
     /**
-     * Prescript : can be used to launch script just before the task
+     * PreScript : can be used to launch script just before the task
      * execution.
      */
     protected Script<?> preScript;
 
     /**
-     * Postscript : can be used to launch script just after the task
+     * PostScript : can be used to launch script just after the task
      * execution even if a problem occurs.
      */
     protected Script<?> postScript;
@@ -88,20 +91,20 @@ public abstract class Task implements Serializable {
     /** Maximum amount of time during which a task can be running. */
     //protected long runTimeLimit;
 
-    /** Is this task re-runnable and how many times ? (0 if not) */
+    /** Tell whether or not this task is re-runnable and how many times (0 if not, default 1) */
     protected int rerunnable = 1;
 
-    /** Is the result of this task precious ? */
+    /** Tell whether this task has a precious result or not. */
     protected boolean preciousResult;
 
-    /** List of dependences if necessary */
+    /** List of dependences if necessary. */
     protected ArrayList<Task> dependences = null;
 
     /**
-     * Add a dependence to the task. Warning : the dependence order is very
-     * important. In fact, it is in this order that you will get back the result
-     * in the child task. For example : if you add to the task t3, the
-     * dependences t1 then t2 The parents of t3 will be t1 and t2 in this order
+     * Add a dependence to the task. <font color="red">Warning : the dependence order is very
+     * important.</font><br>
+     * In fact, it is in this order that you will get back the result in the children task.<br>
+     * For example : if you add to the task t3, the dependences t1 then t2, the parents of t3 will be t1 and t2 in this order
      * and the parameters of t3 will be the results of t1 and t2 in this order.
      *
      * @param task
@@ -116,8 +119,7 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * Same as the {@link #addDependence(Task) AddDependence} method in the same
-     * class, but for a list of dependences.
+     * Same as the {@link #addDependence(Task)} method, but for a list of dependences.
      *
      * @param tasks
      *            the parent list of tasks to add to this task.
@@ -150,15 +152,19 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * @return the resultDescriptor
+     * Return the result descriptor of this task.
+     *
+     * @return the result descriptor of this task.
      */
     public Class<?extends ResultDescriptor> getResultDescriptor() {
         return resultDescriptor;
     }
 
     /**
+     * Set the result descriptor of this task.
+     *
      * @param resultDescriptor
-     *            the resultDescriptor to set
+     *            the result descriptor  to set.
      */
     public void setResultDescriptor(
         Class<?extends ResultDescriptor> resultDescriptor) {

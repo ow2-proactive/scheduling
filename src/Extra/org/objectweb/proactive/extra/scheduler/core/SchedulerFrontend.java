@@ -88,7 +88,7 @@ public class SchedulerFrontend implements InitActive,
     private static final long serialVersionUID = -7843011649407086298L;
 
     /** Scheduler logger */
-    public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     /** A repeated  warning message */
     private static final String ACCESS_DENIED = "Access denied !";
@@ -97,7 +97,7 @@ public class SchedulerFrontend implements InitActive,
     private HashMap<UniqueID, UserIdentification> identifications = new HashMap<UniqueID, UserIdentification>();
 
     /** Implementation of Resource Manager */
-    private InfrastructureManagerProxy resourceManager;
+    private transient InfrastructureManagerProxy resourceManager;
 
     /** Authentication Interface */
     private SchedulerAuthentication authenticationInterface;
@@ -106,7 +106,7 @@ public class SchedulerFrontend implements InitActive,
     private String policyFullName;
 
     /** Implementation of scheduler main structure */
-    private SchedulerCore scheduler;
+    private transient SchedulerCore scheduler;
 
     /** Job identification management */
     private HashMap<JobId, IdentifyJob> jobs;
@@ -812,15 +812,14 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.JobU)
      */
     public void jobSubmittedEvent(InternalJob job) {
-        dispatch(SchedulerEvent.NEW_PENDING_JOB, new Class<?>[] { Job.class },
-            job);
+        dispatch(SchedulerEvent.JOB_SUBMITTED, new Class<?>[] { Job.class }, job);
     }
 
     /**
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.common.job.JobEvent)
      */
     public void jobPendingToRunningEvent(JobEvent event) {
-        dispatch(SchedulerEvent.PENDING_TO_RUNNING_JOB,
+        dispatch(SchedulerEvent.JOB_PENDING_TO_RUNNING,
             new Class<?>[] { JobEvent.class }, event);
     }
 
@@ -828,7 +827,7 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.common.job.JobEvent)
      */
     public void jobRunningToFinishedEvent(JobEvent event) {
-        dispatch(SchedulerEvent.RUNNING_TO_FINISHED_JOB,
+        dispatch(SchedulerEvent.JOB_RUNNING_TO_FINISHED,
             new Class<?>[] { JobEvent.class }, event);
         jobs.get(event.getJobId()).setFinished(true);
         //stats
@@ -839,7 +838,7 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.common.job.JobEvent)
      */
     public void jobRemoveFinishedEvent(JobEvent event) {
-        dispatch(SchedulerEvent.REMOVE_FINISHED_JOB,
+        dispatch(SchedulerEvent.JOB_REMOVE_FINISHED,
             new Class<?>[] { JobEvent.class }, event);
     }
 
@@ -847,7 +846,7 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.common.task.TaskEvent)
      */
     public void taskPendingToRunningEvent(TaskEvent event) {
-        dispatch(SchedulerEvent.PENDING_TO_RUNNING_TASK,
+        dispatch(SchedulerEvent.TASK_PENDING_TO_RUNNING,
             new Class<?>[] { TaskEvent.class }, event);
     }
 
@@ -855,7 +854,7 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.common.task.TaskEvent)
      */
     public void taskRunningToFinishedEvent(TaskEvent event) {
-        dispatch(SchedulerEvent.RUNNING_TO_FINISHED_TASK,
+        dispatch(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
             new Class<?>[] { TaskEvent.class }, event);
     }
 
@@ -863,7 +862,7 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.common.job.JobEvent)
      */
     public void jobChangePriorityEvent(JobEvent event) {
-        dispatch(SchedulerEvent.CHANGE_JOB_PRIORITY,
+        dispatch(SchedulerEvent.JOB_CHANGE_PRIORITY,
             new Class<?>[] { JobEvent.class }, event);
     }
 }

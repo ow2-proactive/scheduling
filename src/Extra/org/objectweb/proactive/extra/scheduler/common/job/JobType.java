@@ -38,6 +38,7 @@ package org.objectweb.proactive.extra.scheduler.common.job;
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 11, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public enum JobType implements java.io.Serializable {
 

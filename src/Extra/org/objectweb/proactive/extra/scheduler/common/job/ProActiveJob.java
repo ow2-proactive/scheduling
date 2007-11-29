@@ -34,18 +34,19 @@ import org.objectweb.proactive.extra.scheduler.common.task.ProActiveTask;
 
 
 /**
- * Definition of a ProActive job for the user.
+ * Use this class to create your job if you want to define a ProActive application job.<br>
  * A ProActive job is a job that contains one task that has a list of nodes in its argument list.
- * To make this type of job, just use the default no arg constructor,
- * and set the properties you want to set.
- * Then add your ProActive task using {@link #setTask(ProActiveTask)} with the given method in order to fill the job with your own task.
- * You must set the number of nodes you want in the task,
- * and also the task as a .class or instance.
+ * To make this type of job, just use the default no argument constructor,
+ * and set the properties you want to set.<br>
+ * Then add your ProActive task using {@link #setTask(ProActiveTask)} with the given method in order to fill the job with your own task.<br>
+ * <b>You must set the number of nodes you want in the task,
+ * and also the task as a .class or instance.</b>
  *
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class ProActiveJob extends Job {
 
@@ -53,7 +54,7 @@ public class ProActiveJob extends Job {
     private static final long serialVersionUID = 1623955669459590983L;
     private ProActiveTask task = null;
 
-    /** Proactive Empty Constructor */
+    /** ProActive Empty Constructor */
     public ProActiveJob() {
     }
 

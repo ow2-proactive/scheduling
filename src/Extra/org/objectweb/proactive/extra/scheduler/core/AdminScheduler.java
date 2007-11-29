@@ -67,7 +67,7 @@ public class AdminScheduler extends UserScheduler
     private static final long serialVersionUID = -8799427055681878266L;
 
     /** Logger to be used for all messages related to the scheduler */
-    public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     /**
      * Create a new scheduler at the specified URL plugged on the given resource manager.

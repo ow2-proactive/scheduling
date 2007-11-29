@@ -3,7 +3,7 @@
 echo
 echo --- SCHEDULER STRESS TEST ---------------------------------------------
 
-echo shedulerTester [schedulerURL] [MaxSubmissionPeriod] [MaxNbJobs]
+echo shedulerTester [schedulerURL] [jobsFolder] [MaxSubmissionPeriod] [MaxNbJobs]
 
 workingDir=..
 PROACTIVE=$workingDir/../..

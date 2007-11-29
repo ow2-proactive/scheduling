@@ -44,6 +44,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public interface SchedulerEventListener<E extends Job> extends Serializable {
 
@@ -60,13 +61,11 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     /**
      * Invoked when the scheduler has just been paused.
      *
-     * @param event the scheduler informations about the status of every tasks.
-     *                 use event.update method to update your job.
      */
     public void schedulerPausedEvent();
 
     /**
-     * Invoked when the scheduler has received a paused immediate signal.
+     * Invoked when the scheduler has received a immediate paused signal.
      */
     public void schedulerImmediatePausedEvent();
 
@@ -82,13 +81,11 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
 
     /**
      * Invoked when the scheduler has just been shutdown.
-     *
-     * @param job the new scheduled job.
      */
     public void schedulerShutDownEvent();
 
     /**
-     * Invoked when the scheduler has just been killed.
+     * Invoked when the scheduler has just been killed.<br>
      * Scheduler is not reachable anymore.
      */
     public void schedulerKilledEvent();
@@ -122,8 +119,8 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     public void jobSubmittedEvent(E job);
 
     /**
-     * Invoked when the scheduling of a job has just started.
-     * The description of the job is contained in the jobEvent given.
+     * Invoked when the scheduling of a job has just started.<br>
+     * The description of the job is contained in the jobEvent given.<br>
      * Use Job.update(JobEvent) to update your job.
      *
      * @param event the event describing the job concerned.
@@ -131,45 +128,45 @@ public interface SchedulerEventListener<E extends Job> extends Serializable {
     public void jobPendingToRunningEvent(JobEvent event);
 
     /**
-     * Invoked when the scheduling of a job has just been terminated.
-     * The description of the job is contained in the jobEvent given.
-     * Use Job.update(JobEvent) to update your job.
+     * Invoked when the scheduling of a job has just been terminated.<br>
+     * The description of the job is contained in the jobEvent given.<br>
+     * Use {@link JOB}.update(JobEvent) to update your job.
      *
      * @param event the event describing the job concerned.
      */
     public void jobRunningToFinishedEvent(JobEvent event);
 
     /**
-     * Invoked when the scheduler has removed a job due to result reclamation.
-     * The description of the job is contained in the jobEvent given.
-     * Use Job.update(JobEvent) to update your job.
+     * Invoked when the scheduler has removed a job due to result reclamation.<br>
+     * The description of the job is contained in the jobEvent given.<br>
+     * Use {@link JOB}.update(JobEvent) to update your job.
      *
      * @param event the event describing the job concerned.
      */
     public void jobRemoveFinishedEvent(JobEvent event);
 
     /**
-     * Invoked when the scheduling of a task has just started.
-     * The description of the task is contained in the TaskEvent given.
-     * Use Job.update(TaskEvent) to update your job.
+     * Invoked when the scheduling of a task has just started.<br>
+     * The description of the task is contained in the TaskEvent given.<br>
+     * Use {@link JOB}.update(TaskEvent) to update your job.
      *
      * @param event the event describing the task concerned.
      */
     public void taskPendingToRunningEvent(TaskEvent event);
 
     /**
-     * Invoked when the scheduling of a task has just finished.
-     * The description of the task is contained in the TaskEvent given.
-     * Use Job.update(TaskEvent) to update your job.
+     * Invoked when the scheduling of a task has just finished.<br>
+     * The description of the task is contained in the TaskEvent given.<br>
+     * Use {@link JOB}.update(TaskEvent) to update your job.
      *
      * @param event the event describing the task concerned.
      */
     public void taskRunningToFinishedEvent(TaskEvent event);
 
     /**
-     * Invoked when the scheduler has changed the priority of a job.
-     * The description of the job is contained in the jobEvent given.
-     * Use Job.update(JobEvent) to update your job.
+     * Invoked when the scheduler has changed the priority of a job.<br>
+     * The description of the job is contained in the jobEvent given.<br>
+     * Use {@link JOB}.update(JobEvent) to update your job.
      *
      * @param event the event describing the job concerned.
      */

@@ -38,16 +38,16 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
 
 
 /**
- * JobEvent provides some informations about a job.
+ * JobEvent provides some informations about a job.<br>
  * These informations and only them are able to change,
- * that's what the scheduler will send to each listener.event.getJobEvent();
-        tasks.get(event.getTaskID()).update(event);
- * To have the jog up to date, user must use Job.setJobInfo(JobEvent); .
+ * that's what the scheduler will send to each listener.<br>
+ * To have the job up to date, you must use Job.setJobInfo(JobEvent);<br>.
  * This will automatically put the job up to date.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 25, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class JobEvent implements Serializable {
 

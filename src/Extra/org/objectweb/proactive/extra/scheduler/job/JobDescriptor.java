@@ -80,10 +80,12 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     private HashMap<TaskId, TaskDescriptor> pausedTasks = new HashMap<TaskId, TaskDescriptor>();
 
     /**
-     * Constructor of light job.
-     * Just make a mapping between some fields of the two type of job.
+     * Create a new instance of job descriptor using an internal job.
+     * Just make a mapping between some fields of the two type of job in order to
+     * give it to the policy.
+     * It ensures that the policy won't have bad activities on the real internal job.
      *
-     * @param job the entire job to be lighted.
+     * @param job the internal job to be lighted.
      */
     public JobDescriptor(InternalJob job) {
         id = job.getId();
@@ -112,7 +114,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     private void makeTree(InternalJob job) {
         HashMap<InternalTask, TaskDescriptor> mem = new HashMap<InternalTask, TaskDescriptor>();
 
-        //create lightTask list
+        //create task descriptor list
         for (InternalTask td : job.getTasks()) {
             //if this task is a first task, put it in eligible tasks list
             EligibleTaskDescriptor lt = new EligibleTaskDescriptor(td);
@@ -290,6 +292,6 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
      */
     @Override
     public String toString() {
-        return "LightJob(" + getId() + ")";
+        return "JobDescriptor(" + getId() + ")";
     }
 }

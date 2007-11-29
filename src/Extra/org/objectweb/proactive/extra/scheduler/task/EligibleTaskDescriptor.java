@@ -35,10 +35,10 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
 /**
- * This class represents an elligible task for the policy.
+ * This class represents an eligible task for the policy.
  * It is a sort of tag class that will avoid user from giving non-eligible task to the scheduler.
- * In fact policy will handle LightTask and EligibleLightTask but
- * will only be allowed to send EligibleLightTask to the scheduler
+ * In fact policy will handle TaskDescriptor and EligibleTaskDescriptor but
+ * will only be allowed to send EligibleTaskDescriptor to the scheduler
  * @see org.objectweb.proactive.extra.scheduler.job.TaskDescriptor
  *
  * @author jlscheef - ProActiveTeam
@@ -51,8 +51,8 @@ public class EligibleTaskDescriptor extends TaskDescriptor {
     private static final long serialVersionUID = 8461969956605719440L;
 
     /**
-     * Get a new eligible light task using a taskDescriptor.
-     * Same constructor as LightTask
+     * Get a new eligible task descriptor using a taskDescriptor.
+     * Same constructor as TaskDescriptor
      *
      * @param td the taskDescriptor to shrink.
      */

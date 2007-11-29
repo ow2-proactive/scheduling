@@ -35,11 +35,12 @@ import java.util.Calendar;
 
 
 /**
- * Tools class.
+ * Provides some methods used by the scheduler or the GUI to display some tips properly.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 26, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class Tools implements Serializable {
 

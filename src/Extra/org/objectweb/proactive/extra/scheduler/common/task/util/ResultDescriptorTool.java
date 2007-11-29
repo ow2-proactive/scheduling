@@ -49,6 +49,7 @@ import javax.swing.border.EtchedBorder;
  * Static util methods for result descriptor definition
  * @author cdelbe
  * @since 3.9
+ * @publicAPI
  */
 public class ResultDescriptorTool {
 
@@ -108,7 +109,7 @@ public class ResultDescriptorTool {
      * @since 3.9
      */
     public static class SimpleImagePanel extends JPanel {
-        private Image img;
+        private transient Image img;
         private String path;
 
         public SimpleImagePanel(String path) {

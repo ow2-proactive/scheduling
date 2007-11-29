@@ -110,15 +110,17 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
             AOJobListener stubOnThis = (AOJobListener) ProActiveObject.getStubOnThis();
 
             this.scheduler.addSchedulerEventListener(stubOnThis,
-                SchedulerEvent.JOB_KILLED); //JOB_KILLED("jobKilledEvent"),
-            this.scheduler.addSchedulerEventListener(stubOnThis,
-                SchedulerEvent.RUNNING_TO_FINISHED_JOB); //RUNNING_TO_FINISHED_JOB("runningToFinishedJobEvent")
-            this.scheduler.addSchedulerEventListener(stubOnThis,
-                SchedulerEvent.KILLED); //KILLED("schedulerKilledEvent"),
-            this.scheduler.addSchedulerEventListener(stubOnThis,
-                SchedulerEvent.SHUTDOWN); //SHUTDOWN("schedulerShutDownEvent"),
-            this.scheduler.addSchedulerEventListener(stubOnThis,
-                SchedulerEvent.SHUTTING_DOWN); //SHUTTING_DOWN("schedulerShuttingDownEvent"),
+                SchedulerEvent.JOB_KILLED,
+                SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED,
+                SchedulerEvent.SHUTDOWN, SchedulerEvent.SHUTTING_DOWN); //JOB_KILLED("jobKilledEvent"),
+                                                                        //            this.scheduler.addSchedulerEventListener(stubOnThis,
+                                                                        //                SchedulerEvent.JOB_RUNNING_TO_FINISHED); //RUNNING_TO_FINISHED_JOB("runningToFinishedJobEvent")
+                                                                        //            this.scheduler.addSchedulerEventListener(stubOnThis,
+                                                                        //                SchedulerEvent.KILLED); //KILLED("schedulerKilledEvent"),
+                                                                        //            this.scheduler.addSchedulerEventListener(stubOnThis,
+                                                                        //                SchedulerEvent.SHUTDOWN); //SHUTDOWN("schedulerShutDownEvent"),
+                                                                        //            this.scheduler.addSchedulerEventListener(stubOnThis,
+                                                                        //                SchedulerEvent.SHUTTING_DOWN); //SHUTTING_DOWN("schedulerShuttingDownEvent"),
         } catch (Exception e) {
             taskpool.panic(new PanicException(e));
             shutdown = true;

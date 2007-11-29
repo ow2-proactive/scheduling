@@ -37,13 +37,14 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 
 
 /**
- * Informations about the task that is able to change.
- * These informations are in an other class in order to permit
+ * Informations about the task that is able to change.<br>
+ * These informations are not in the {@link Task} class in order to permit
  * the scheduler listener to send this class as event.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 25, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class TaskEvent implements Serializable {
 

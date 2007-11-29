@@ -172,10 +172,10 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
             : ((int) (task.getFinishedTime() - getFinishedTime()));
         case SORT_BY_RERUNNABLE:
             return (currentOrder == ASC_ORDER)
-            ? (new Integer(getRerunnable()).compareTo(new Integer(
-                    task.getRerunnable())))
-            : (new Integer(task.getRerunnable()).compareTo(new Integer(
-                    getRerunnable())));
+            ? (Integer.valueOf(getRerunnable())
+                      .compareTo(Integer.valueOf(task.getRerunnable())))
+            : (Integer.valueOf(task.getRerunnable())
+                      .compareTo(Integer.valueOf(getRerunnable())));
 
         //        case SORT_BY_RUN_TIME_LIMIT:
         //            return (currentOrder == ASC_ORDER)
@@ -375,6 +375,9 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      */
     @Override
     public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
         if (InternalTask.class.isAssignableFrom(obj.getClass())) {
             return ((InternalTask) obj).getId().equals(getId());
         }

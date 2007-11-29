@@ -56,7 +56,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
 public class LocalSchedulerExample {
     //shows how to run the scheduler
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
-    protected static IMAdmin admin;
+    private static IMAdmin admin;
 
     public static void main(String[] args) {
         //get the path of the file

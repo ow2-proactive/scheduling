@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extra.scheduler.core;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
@@ -43,7 +41,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
  */
-public interface SchedulerCoreInterface extends Serializable {
+public interface SchedulerCoreInterface {
 
     /**
      * Start the scheduler.

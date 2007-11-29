@@ -39,16 +39,17 @@ import org.objectweb.proactive.extra.scheduler.common.task.Task;
 
 
 /**
- * Definition of a task flow job for the user.
+ * Use this class to create your job if you want to define a task flow job.<br>
  * A task flow job or data flow job, is a job that can contain
- * one or more task with the dependencies you want.
+ * one or more task(s) with the dependencies you want.<br>
  * To make this type of job, just use the default no arg constructor,
- * and set the properties you want to set.
+ * and set the properties you want to set.<br>
  * Then add tasks with the given method {@link #addTask(Task)} in order to fill the job with your own tasks.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class TaskFlowJob extends Job {
 

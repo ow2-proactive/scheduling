@@ -75,7 +75,7 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
  * @version 1.0, Jul 10, 2007
  * @since ProActive 3.2
  */
-public class TaskLauncher implements InitActive, Serializable {
+public class TaskLauncher implements InitActive {
     private static final long serialVersionUID = -9159607482957244049L;
     protected TaskId taskId;
     protected Script<?> pre;

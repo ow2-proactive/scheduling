@@ -56,7 +56,7 @@ public class NativeExecutable extends Executable {
     private static final long serialVersionUID = -8244644159419804669L;
 
     /** Process that start the native task */
-    private Process process;
+    private transient Process process;
 
     /** Command that should be executed */
     private String command;

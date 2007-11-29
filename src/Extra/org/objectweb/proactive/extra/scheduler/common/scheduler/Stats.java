@@ -35,11 +35,14 @@ import java.util.HashMap;
 
 
 /**
- * Stats interface class will be used to view some tips on the scheduler.
+ * It will be used to view some tips on the scheduler.<br>
+ * You can find inside, a map of every instances on which statistics can be done.
+ *
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 25, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public interface Stats extends Serializable {
 

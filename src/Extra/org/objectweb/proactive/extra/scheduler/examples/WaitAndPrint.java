@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.examples;
 
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
@@ -85,6 +86,11 @@ public class WaitAndPrint extends JavaExecutable {
     public void init(Map<String, Object> args) {
         sleepTime = Integer.parseInt((String) args.get("sleepTime"));
         number = Integer.parseInt((String) args.get("number"));
+
+        for (Entry<String, Object> e : args.entrySet()) {
+            System.out.println("INIT(" + number + ") : " + e.getKey() + "=" +
+                e.getValue());
+        }
 
         for (String key : args.keySet()) {
             System.out.println("INIT(" + number + ") : " + key + "=" +

@@ -34,11 +34,12 @@ import java.io.Serializable;
 
 
 /**
- * Definition of a job identification.
+ * Definition of a job identification, this will be used during scheduling to identify your job.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public final class JobId implements Comparable<JobId>, Serializable {
 
@@ -101,7 +102,7 @@ public final class JobId implements Comparable<JobId>, Serializable {
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(JobId jobId) {
-        return new Integer(id).compareTo(new Integer(jobId.id));
+        return Integer.valueOf(id).compareTo(Integer.valueOf(jobId.id));
     }
 
     /**

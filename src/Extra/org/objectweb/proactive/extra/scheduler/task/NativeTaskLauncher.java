@@ -47,7 +47,6 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
 
 /**
- * Native Task Launcher.
  * This launcher is the class that will launch a native class.
  *
  * @author jlscheef - ProActiveTeam

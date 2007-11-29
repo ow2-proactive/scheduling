@@ -36,14 +36,15 @@ import javax.swing.JPanel;
 
 
 /**
- * Interface representing the task result.
- * A task result can be an exception or an object that you have to cast into your own type.
- * Before getting the object it is recommended that you call the hadException() method.
+ * Interface representing the task result.<br>
+ * A task result can be an exception or an object that you have to cast into your own type.<br>
+ * Before getting the object it is recommended to call the {@link #hadException()} method.<br>
  * It will tell you if an exception occurred in the task that generate this result.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Aug 3, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public interface TaskResult extends Serializable {
 

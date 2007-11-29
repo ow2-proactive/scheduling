@@ -36,23 +36,24 @@ import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * This is the execution entry point for the ProActive task.
+ * Extends this abstract class if you want to create your own ProActive application task.<br>
  * You may override the {@link #execute(ArrayList)} method.
- * The content of this method will be executed. It provides nodes on which you can run activeObjects.
- * Note : the execute(TaskResult...) method is not used anymore from this class.
+ * The content of this method will be executed. It provides nodes on which you can run activeObjects.<br>
+ * <i>Note</i> : the {@link #execute(TaskResult...)} method is not used anymore from this class.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Aug 21, 2007
  * @since ProActive 3.2
+ * @public API
  */
 public abstract class ProActiveExecutable extends JavaExecutable {
 
     /**
      * <font color="red">Not used anymore in this context</font>
-     * This method should never be called.
+     * This method should never be called.<br>
      * It is the last point for this method implementation.
-     * That's why it is final. User cannot override/implement this one anymore.
-     * Instead, implement the execute(ArrayList<Node>) method.
+     * That's why it is final. User cannot override/implement this one anymore.<br>
+     * <b>Instead, implement the {@link #execute(ArrayList)} method.</b>
      */
     @Override
     public final Object execute(TaskResult... results) {
@@ -62,9 +63,10 @@ public abstract class ProActiveExecutable extends JavaExecutable {
 
     /**
      * The content of this method will be execute by the scheduler.
-     * Make your own ProActive implementation using the given nodes.
-     * Note : if you asked for 10 nodes, one will be used to start the task
-     * and the other will be sent to you as parameters.
+     * Make your own ProActive implementation using the given nodes.<br>
+     * <i>Note</i> : if you asked for 10 nodes, one will be used to start the task
+     * and the other will be sent to you as parameters. So you will have 9 executions nodes.<br>
+     * Ask for 11 if you need 10.
      *
      * @param nodes the nodes you asked for.
      * @throws any exception thrown by the user's code

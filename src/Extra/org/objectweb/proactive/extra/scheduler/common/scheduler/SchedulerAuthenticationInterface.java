@@ -38,21 +38,21 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
 
 
 /**
- * Scheduler Authentication Interface provides method to connect to the scheduler.
- * Before using the scheduler communication interface {@link UserSchedulerInterface}, you have to connect it using a login/password using this interface.
- * <p>
+ * Scheduler Authentication Interface provides method to connect to the scheduler.<br>
+ * Before using the scheduler communication interface {@link UserSchedulerInterface}, you have to connect it using a login/password using this interface.<br>
  * You can get this interface by using the scheduler connection {@link SchedulerConnection}
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 24, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public interface SchedulerAuthenticationInterface extends Serializable {
 
     /**
-     * Connect the user interface to a scheduler with the given scheduler URL.
+     * Connect the user interface to a scheduler with the given scheduler URL.<br>
      * If the login or/and password do not match an allowed one,
-     * it will throw an LoginException.
+     * it will throw an LoginException.<br>
      * If the authentication succeed, it will return a new scheduler user API to managed job.
      *
      * @param user the user name of the user to connect.
@@ -65,11 +65,11 @@ public interface SchedulerAuthenticationInterface extends Serializable {
         throws LoginException, SchedulerException;
 
     /**
-     * Connect the admin interface to a scheduler with the given scheduler URL.
+     * Connect the administrator interface to a scheduler with the given scheduler URL.<br>
      * If the login or/and password do not match an allowed one,
-     * it will throw an LoginException.
-     * If the authentication succeed, it will return a new scheduler admin API.
-     * This authentication requires that the user has admin rights.
+     * it will throw an LoginException.<br>
+     * If the authentication succeed, it will return a new scheduler administrator API.<br>
+     * This authentication requires that the user has administrator rights.
      *
      * @param user the user name of the user to connect.
      * @param password the password of the user to connect.

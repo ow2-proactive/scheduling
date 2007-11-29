@@ -37,12 +37,13 @@ import org.objectweb.proactive.extra.scheduler.common.job.Job;
 
 
 /**
- * This class is a representation of the entire scheduler state.
- * It is represented by 3 lists of jobs.
+ * This class is a representation of the whole scheduler initial jobs list state.<br>
+ * It is basically represented by 3 lists of jobs, and its scheduling state.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 12, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public final class SchedulerInitialState<E extends Job> implements Serializable {
 

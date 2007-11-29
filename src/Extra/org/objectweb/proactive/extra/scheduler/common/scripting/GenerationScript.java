@@ -45,6 +45,7 @@ import javax.script.ScriptEngineManager;
  * @see ExecutableNativeTask
  * @author cdelbe
  * @since 3.9
+ * @publicAPI
  */
 public class GenerationScript extends Script<String> {
 

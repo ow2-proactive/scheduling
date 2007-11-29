@@ -111,7 +111,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     private static final long serialVersionUID = 1581139478784832488L;
 
     /** Scheduler logger */
-    public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     /** Scheduler main loop time out */
     private static final int SCHEDULER_TIME_OUT = 2000;
@@ -120,7 +120,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     private static final int SCHEDULER_NODE_PING_FREQUENCY = 45000;
 
     /** Host name of the scheduler for logger system. */
-    private static String host = null;
+    private String host = null;
 
     /** Selected port for connection logger system */
     private int port;
@@ -350,22 +350,22 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * Schedule computing method
      */
     private void schedule() {
-        //get light job list with eligible jobs (running and pending)
-        ArrayList<JobDescriptor> LightJobList = new ArrayList<JobDescriptor>();
+        //get job Descriptor list with eligible jobs (running and pending)
+        ArrayList<JobDescriptor> jobDescriptorList = new ArrayList<JobDescriptor>();
 
         for (InternalJob j : runningJobs) {
-            LightJobList.add(j.getJobDescriptor());
+            jobDescriptorList.add(j.getJobDescriptor());
         }
 
         //if scheduler is paused it only finishes running jobs
         if (state != SchedulerState.PAUSED) {
             for (InternalJob j : pendingJobs) {
-                LightJobList.add(j.getJobDescriptor());
+                jobDescriptorList.add(j.getJobDescriptor());
             }
         }
 
         //ask the policy all the tasks to be schedule according to the jobs list.
-        Vector<?extends TaskDescriptor> taskRetrivedFromPolicy = policy.getOrderedTasks(LightJobList);
+        Vector<?extends TaskDescriptor> taskRetrivedFromPolicy = policy.getOrderedTasks(jobDescriptorList);
 
         while (!taskRetrivedFromPolicy.isEmpty() &&
                 resourceManager.hasFreeResources().booleanValue()) {
@@ -394,7 +394,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
                     TaskLauncher launcher = null;
 
-                    //if the job is an ProActive job and if all nodes can be launched at the same time
+                    //if the job is a ProActive job and if all nodes can be launched at the same time
                     if ((currentJob.getType() == JobType.PROACTIVE) &&
                             (nodeSet.size() >= internalTask.getNumberOfNodesNeeded())) {
                         nodeSet.remove(0);
@@ -1504,7 +1504,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      * @version 3.2
      *
      */
-    private class FinishTimeComparator implements Comparator<InternalTask> {
+    private static class FinishTimeComparator implements Comparator<InternalTask> {
         public int compare(InternalTask o1, InternalTask o2) {
             return (int) (o1.getFinishedTime() - o2.getFinishedTime());
         }

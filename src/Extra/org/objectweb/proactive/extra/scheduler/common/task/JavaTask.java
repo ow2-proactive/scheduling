@@ -33,16 +33,18 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
+
 
 /**
- * Definition of a java task for the user.
- * A java task includes an executable task that can be set as
- * a class or instance.
- * It also provides a method to add arguments to the task.
+ * Use this class to build a java task that will use a {@link JavaExecutable} and be integrated in a {@link TaskFlowJob}.<br>
+ * A java task includes an {@link JavaExecutable} that can be set as a .class file or instance.<br>
+ * It also provides method to personalize it.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class JavaTask extends Task {
 

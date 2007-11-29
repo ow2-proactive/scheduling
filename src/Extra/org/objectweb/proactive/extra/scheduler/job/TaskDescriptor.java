@@ -65,7 +65,7 @@ public class TaskDescriptor implements Serializable {
     private Vector<TaskDescriptor> children;
 
     /**
-     * Get a new light task using a taskDescriptor.
+     * Get a new task descriptor using a taskDescriptor.
      *
      * @param td the taskDescriptor to shrink.
      */
@@ -186,6 +186,6 @@ public class TaskDescriptor implements Serializable {
      */
     @Override
     public String toString() {
-        return "LightTask(" + getId() + ")";
+        return "TaskDescriptor(" + getId() + ")";
     }
 }

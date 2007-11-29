@@ -33,16 +33,24 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.objectweb.proactive.extra.scheduler.task.NativeExecutable;
+
 
 /**
- * This is the main entry point of a task execution.
- * Each executable java and native task may have to implements this method.
- * Only the ProActive job will implement its own execute.
- * In this last case, the execute(TaskResult...) method will be forget.
+ * Extends this class if you want to create your own task.<br>
+ * Executable is the superclass of every personal executable task that will be scheduled.<br>
+ * Some classes are provide like :<ul>
+ * <li>{@link JavaExecutable} : to make your own java task.</li>
+ * <li>{@link NativeExecutable} : to use your own native task.</li>
+ * <li>{@link ProActiveExecutable} : to make your own ProActive application task.</li></ul><br>
+ * Each java executable and native executable may have to implements the {@link #execute(TaskResult...)} method.<br>
+ * Only the ProActive executable will implement its own execute.
+ * In this last case, this {@link #execute(TaskResult...)} method will be forgot.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Aug 24, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public abstract class Executable implements Serializable {
 
@@ -50,8 +58,9 @@ public abstract class Executable implements Serializable {
     private Map<String, Object> args = null;
 
     /**
-     * The content of this method will be executed once or more if asked.
-     * This may generate an Object result. It can be whatever you want.
+     * The content of this method will be executed once after being scheduled.<br>
+     * This may generate a result as an {@link Object}. It can be whatever you want.<br>
+     * The results list order correspond to the order in the dependence list.
      *
      * @param results the results (as a taskResult) from parent tasks.
      * @throws any exception thrown by the user's code
@@ -61,11 +70,12 @@ public abstract class Executable implements Serializable {
         throws Throwable;
 
     /**
-     * Initialize the task with the arguments given to the constructor.
+     * Initialize the task with the arguments given in the constructor.<br>
      * If args is not null, then the {@link #init(Map)} method is called.
-     * If args is null, the {@link #init(Map)} method is not called.
+     * If args is null, the {@link #init(Map)} method is not called.<br>
+     * It allows you to override the {@link #init(Map)} method in order to do your own initialization process with the arguments hashMap.
      *
-     * @throws Exception
+     * @throws Exception an exception that the user can throw if something goes wrong.
      */
     public final void init() throws Exception {
         if (args != null) {
@@ -74,7 +84,7 @@ public abstract class Executable implements Serializable {
     }
 
     /**
-     * Initialize the task with the given arguments.
+     * Initialize the task with the given arguments.<br>
      * By default this method do nothing.
      * You can override this method to make your own initialization.
      *
@@ -85,7 +95,7 @@ public abstract class Executable implements Serializable {
         throws Exception;
 
     /**
-     * Set the arguments map to this Executable object.
+     * Set the arguments map to this Executable task.
      *
      * @param args the arguments to set.
      */
@@ -96,9 +106,9 @@ public abstract class Executable implements Serializable {
     }
 
     /**
-     * Get the arguments map of this Executable object.
+     * Get the arguments map of this Executable task.
      *
-     * @return the arguments map of this Executable object.
+     * @return the arguments map of this Executable task.
      */
     public final Map<String, Object> getArgs() {
         return args;

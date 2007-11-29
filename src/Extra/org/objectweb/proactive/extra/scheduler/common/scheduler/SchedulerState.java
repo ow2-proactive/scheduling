@@ -39,6 +39,7 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 26, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public enum SchedulerState implements java.io.Serializable {
 

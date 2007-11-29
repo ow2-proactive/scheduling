@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
-import java.io.Serializable;
-
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
@@ -45,7 +43,7 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
  * @version 1.0, Sept 10, 2007
  * @since ProActive 3.2
  */
-public class ExecuterInformations implements Serializable {
+public class ExecuterInformations {
 
     /** Serial Version UID */
     private static final long serialVersionUID = 7710839621630737064L;
@@ -60,7 +58,7 @@ public class ExecuterInformations implements Serializable {
     private String nodeName;
 
     /**
-     * Create a new excuter informations with the given infos.
+     * Create a new executer informations with the given info.
      *
      * @param launcher the active object on which the task has been launched
      * @param node the node on which the active object has been launched.
@@ -72,21 +70,27 @@ public class ExecuterInformations implements Serializable {
     }
 
     /**
-     * @return the launcher
+     * Returns the launcher.
+     *
+     * @return the launcher.s
      */
     public TaskLauncher getLauncher() {
         return launcher;
     }
 
     /**
-     * @return the node
+     * Returns the node.
+     *
+     * @return the node.
      */
     public Node getNode() {
         return node;
     }
 
     /**
-     * @return the nodeName
+     * Returns the node name
+     *
+     * @return the node name.
      */
     public String getNodeName() {
         return nodeName;

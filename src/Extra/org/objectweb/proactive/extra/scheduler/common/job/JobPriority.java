@@ -37,6 +37,7 @@ package org.objectweb.proactive.extra.scheduler.common.job;
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 11, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public enum JobPriority implements java.io.Serializable {
     /** Lowest priority : administrator only */
@@ -60,7 +61,7 @@ public enum JobPriority implements java.io.Serializable {
     /**
      * Implicit constructor of job priority.
      *
-     * @param name the name of the prority.
+     * @param name the name of the priority.
      * @param priority the integer representing the priority.
      */
     JobPriority(String name, int priority) {
@@ -77,12 +78,20 @@ public enum JobPriority implements java.io.Serializable {
     }
 
     /**
+     * Return the integer representing the priority.
+     *
      * @return the integer representing the priority.
      */
     public int getPriority() {
         return priority;
     }
 
+    /**
+     * Get the priority associated with the given name.
+     *
+     * @param name the name of the priority to find as a string.
+     * @return the job priority corresponding to the string or the NORMAL priority if not found.
+     */
     public static JobPriority findPriority(String name) {
         if (name.equalsIgnoreCase(IDLE.toString())) {
             return IDLE;

@@ -42,13 +42,14 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
 
 
 /**
- * Scheduler connection class provide method to join an existing scheduler.
- * The method {@link #join(String)} returns a {@link SchedulerAuthenticationInterface} in order to permit the scheduler
- * to authenticate user that want to connect a scheduler.
+ * It provides a method to join an existing scheduler.<br>
+ * The method {@link #join(String)} returns a {@link SchedulerAuthenticationInterface} in order to give the scheduler
+ * the possibility to authenticate user that wants to connect a scheduler.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jul 24, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class SchedulerConnection implements Serializable {
 
@@ -62,7 +63,7 @@ public class SchedulerConnection implements Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     /**
-     * Return the scheduler authentication at the specified URL.
+     * Return the {@link SchedulerAuthenticationInterface} from the specified URL.
      *
      * @param schedulerURL the URL of the scheduler to join.
      * @return the scheduler authentication at the specified URL.

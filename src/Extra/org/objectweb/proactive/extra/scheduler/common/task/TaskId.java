@@ -42,6 +42,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Jun 29, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public final class TaskId implements Comparable<TaskId>, Serializable {
 
@@ -137,7 +138,7 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
     public int compareTo(TaskId taskId) {
-        return new Integer(id).compareTo(new Integer(taskId.id));
+        return Integer.valueOf(id).compareTo(Integer.valueOf(taskId.id));
     }
 
     /**

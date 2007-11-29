@@ -108,6 +108,7 @@ public class MonteCarlo extends JavaExecutable {
 
                 PrintStream ps = new PrintStream(f);
                 ps.println("Le resultat de Pi par Montecarlo est : " + result);
+                ps.close();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

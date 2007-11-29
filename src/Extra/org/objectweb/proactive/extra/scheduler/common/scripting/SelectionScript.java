@@ -41,6 +41,7 @@ import javax.script.*;
  * @author ProActive Team
  * @version 1.0, Jun 8, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class SelectionScript extends Script<Boolean> {
 

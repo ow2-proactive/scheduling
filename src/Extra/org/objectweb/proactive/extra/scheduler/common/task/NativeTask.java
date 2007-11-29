@@ -30,16 +30,19 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.task;
 
+import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
 import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript;
 
 
 /**
- * Definition of a native task for the user.
- * A native task includes a command line that can be set using {@link #setCommandLine(String)}
+ * Use this class to build a native task that will use a {@link NativeExecutable} and be integrated in a {@link TaskFlowJob}.<br>
+ * A native task just includes a command line that can be set using {@link #setCommandLine(String)}.<br>
+ * You don't have to extend this class to launch your own native executable.
  *
  * @author jlscheef - ProActiveTeam
  * @version 1.0, Sept 14, 2007
  * @since ProActive 3.2
+ * @publicAPI
  */
 public class NativeTask extends Task {
 

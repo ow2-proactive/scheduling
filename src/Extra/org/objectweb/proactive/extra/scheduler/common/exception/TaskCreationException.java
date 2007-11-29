@@ -32,8 +32,11 @@ package org.objectweb.proactive.extra.scheduler.common.exception;
 
 
 /**
- * @author jlscheef - ProActiveTeam
- * @since 2.2
+ * Exceptions Generated if a problem occurred while creating a task.
+ *
+ * @author jlscheef - ProActive Team
+ * @version 1.0, Jun 29, 2007
+ * @since ProActive 3.2
  */
 public class TaskCreationException extends SchedulerException {
 
@@ -41,37 +44,37 @@ public class TaskCreationException extends SchedulerException {
     private static final long serialVersionUID = 7699281034780102890L;
 
     /**
-    * @param arg0
-    */
-    public TaskCreationException(String arg0) {
-        super(arg0);
-
-        // TODO Auto-generated constructor stub
+     * Attaches a message to the Exception.
+     *
+     * @param msg message attached.
+     */
+    public TaskCreationException(String msg) {
+        super(msg);
     }
 
     /**
-     *
+     * Create a new instance of TaskCreationException.
      */
     public TaskCreationException() {
-        // TODO Auto-generated constructor stub
+        super();
     }
 
     /**
-     * @param message
-     * @param cause
+     * Create a new instance of TaskCreationException with the given message and cause
+     *
+     * @param msg the message to attach.
+     * @param cause the cause of the exception.
      */
-    public TaskCreationException(String message, Throwable cause) {
-        super(message, cause);
-
-        // TODO Auto-generated constructor stub
+    public TaskCreationException(String msg, Throwable cause) {
+        super(msg, cause);
     }
 
     /**
-     * @param cause
+     * Create a new instance of TaskCreationException with the given cause.
+     *
+     * @param cause the cause of the exception.
      */
     public TaskCreationException(Throwable cause) {
         super(cause);
-
-        // TODO Auto-generated constructor stub
     }
 }

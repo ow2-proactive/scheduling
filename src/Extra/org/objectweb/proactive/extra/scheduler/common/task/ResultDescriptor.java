@@ -37,13 +37,16 @@ import javax.swing.JPanel;
 
 /**
  * This class defines a way to represent the result of a given task.
+ *
  * @author cdelbe
  * @since 2.2
+ * @publicAPI
  */
 public abstract class ResultDescriptor implements Serializable {
 
     /**
      * Create a textual representation of the result.
+     *
      * @param result the result to be described.
      * @return the textual representation.
      */
@@ -51,6 +54,7 @@ public abstract class ResultDescriptor implements Serializable {
 
     /**
      * Create a graphical representation of the result.
+     *
      * @param result the result to be described.
      * @return the graphical representation.
      */

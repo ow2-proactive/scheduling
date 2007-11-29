@@ -1,0 +1,320 @@
+?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="viewDocbook.css"?>
+
+<chapter id="ProActive_Scheduler">
+
+	<title>ProActive Grid Scheduler</title>
+	<sect1 id="overview">
+		<title>Overview</title>
+
+		<para>
+			The execution of parallel tasks on a pool of distributed resources, such as
+			network of desktops or clusters, requires a main element for managing resources
+			and handling task execution, this system is typically <emphasis role="bold">a batch scheduler</emphasis>.
+			A batch scheduler provides an abstraction of resources to users; users submit jobs containing tasks to
+			the scheduler who is in charge to execute these tasks on managed
+			resources. Hence, a scheduler allows several users to share a same pool of
+			resources and also to manage all issues related to distributed environment, such
+			as faulted resources.
+		</para>
+		<para>
+			In addition, the scheduler <emphasis role="bold">offers a shell based command submitter
+			and a graphical user or admin interface </emphasis>(Eclipse Plugin, see <xref linkend="Scheduler_Eclipse_Plugin" />) that
+			can be plugged on the scheduler main application.
+		</para>
+		<para>
+			In this chapter, we will expose how the scheduler works, what policies govern the job management,
+			how to create a job and how to get the jobs and the nodes state using either the shell communicator or the GUI.
+		</para>
+	</sect1>
+	
+	<sect1 id="scheduler_concept">
+		<title>Scheduler Concept</title>
+		
+			<sect3 id="what_is_task">
+				<title>What is a task ?</title>
+				<para>
+					The task is the entity that is schedule.
+				</para>
+			</sect3>
+			
+			<sect3 id="what_is_job">
+				<title>What is a job ?</title>
+				<para>
+					
+				</para>
+			</sect3>
+			
+			<sect3 id="how_dependences">
+				<title>What can be done with dependences ?</title>
+				<para>
+					
+				</para>
+			</sect3>
+			
+			<sect3 id="scheduling_policy">
+		
+				<title>Scheduling Policy</title>
+				
+				<para>
+					<emphasis role="bold">By default</emphasis>, the scheduler schedules tasks according to the default <emphasis role="bold">FIFO (First In First Out) with job priority</emphasis> policy.
+					We'll see later that the policy can be easily change just by implementing an interface. (<xref linkend="add_policy"/>)
+				</para>
+			</sect3>
+		
+	</sect1>
+	
+	<sect1 id="scheduler_architecture">
+		<title>Scheduler Architecture</title>
+		<sect2 id="Scheduler_Global_Architecture">
+			<title>Scheduler Global Architecture</title>
+			
+			<para>
+				The scheduler service is the result of a collaboration between 2 entities (the Scheduler and the Resource Manager)
+				each of them has its own functionality.
+			</para>
+			<para>
+				The Scheduler is the main entity and is a non GUI daemon that is connected to the resources manager.
+				It is in charge to schedule submitted job according to the current associated policy.
+			</para>
+			<para>
+				In order to launch jobs, the scheduler must obtain nodes (resources) from the resources manager.
+				As describe below (<xref linkend="scheduler2entities" />), the user interact only with the scheduler entity and managed resources can be
+				simple or complex.
+			</para>
+			
+			<figure id="scheduler2entities">
+				<title>The Scheduler Entities</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/core/scheduler2entities.jpg" format="JPG" align="center"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			
+			<para>
+				<emphasis role="bold">In this chapter</emphasis> we will explain how the <emphasis role="bold">scheduler entity works and how it can be used.</emphasis>
+			</para>
+		</sect2>
+		
+		<sect2 id="Scheduler_entity_Architecture">
+			<title>Scheduler Entity Architecture</title>
+			
+			<para>
+				<xref linkend="schedulerEntity">The architecture of the scheduler</xref> is build around 3 Active Objects :
+				<itemizedlist>
+					<listitem>
+						<para>
+							<emphasis role="bold">The Authentication interface</emphasis> which is the
+							first object that the user may have to contact. It is in charge to authenticate
+							the user and allow him to access or not to the scheduler. The authentication security system
+							can interact with files or LDAP.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">The Front-end</emphasis> which is the interface returned by
+							the authentication interface in order to interact with the scheduler.
+							This interface allows users to submit jobs, get scheduling state, retrieves job result
+							and more...
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							<emphasis role="bold">The Core</emphasis> which is the main entity of the scheduler.
+							It is in charge to schedule job according to the policy (which is FIFO with priority
+							by default), retrieve scheduling events to the user and make storage in dataBase.
+						</para>
+					</listitem>
+				</itemizedlist>
+			</para>
+			<para>
+				Users cannot interact directly with the Scheduler Core, the Front-end is the gateway between them and the Core.
+				It is a good way to reduce useless communications from users to the core and for events dispatching.
+			</para>
+			
+			<figure id="schedulerEntity">
+				<title>The Scheduler Entity</title>
+				<mediaobject>
+					<imageobject>
+						<imagedata
+							fileref="scheduler/images/core/schedulerEntity.jpg" format="JPG" align="center"/>
+					</imageobject>
+				</mediaobject>
+			</figure>
+			
+		</sect2>
+	</sect1>
+	
+	<sect1 id="scheduler_API">
+		<title>Scheduler API and Usecase</title>
+		
+		<sect2 id="start_scheduler">
+			<title>Starting the scheduler</title>
+			<para>
+				
+			</para>
+		</sect2>
+		
+		<sect2 id="task_creation">
+			<title>Task Creation</title>
+			<para>
+				
+			</para>
+		</sect2>
+		
+		<sect2 id="job_creation">
+			<title>Job Creation</title>
+			<para>
+				
+			</para>
+		</sect2>
+		
+		<sect2 id="user_interface">
+			<title>User Interface</title>
+		
+		
+		<sect3 id="User_Connection">
+			<title>User Connection</title>
+			
+			<para>
+				A user can connect to the scheduler only if he is known.
+				That's the goal of the authentication interface which is able to authenticate users.
+				<xref linkend="userConnection">The user connection</xref> shows how the scheduler 
+				connect a user.
+				
+				<figure id="userConnection">
+					<title>A user connection</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="scheduler/images/core/userConnection.jpg" format="JPG" align="center"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+				<orderedlist>
+					<listitem>
+						<para>
+							First of all, user tries to join the authentication interface using the
+							<emphasis role="bold">SchedulerConnection.join</emphasis> static method.
+							<para>
+								<programlisting lang="java">
+	SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+								</programlisting>
+								Then, with the <emphasis role="bold">SchedulerAuthenticationInterface</emphasis>, user can be connected
+								as user or administrator using the <emphasis role="bold">logAsUser</emphasis> or
+								<emphasis role="bold">logAsAdmin</emphasis> methods.
+								<programlisting lang="java">
+	UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+	// OR
+	AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");
+								</programlisting>
+							</para>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Next, the authentication object checks the right and if user is authorized to connect
+							the scheduler. If not, an exception will be thrown.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Once connected, the authentication object sends the right and username/password
+							to the scheduler front-end which will be able to authenticate user on its own.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							If nothing goes wrong, the authentication interface will return a <emphasis role="bold">AdminSchedulerInterface</emphasis>
+							which is in fact a direct link to the <emphasis role="bold">Front-end</emphasis>.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							User is now able to interact with the scheduler using the returned interface.
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+		</sect3>
+		<sect3 id="Job_submission">
+		
+			<title>Job Submission</title>
+			
+			<para>
+				User is now able to submit jobs. <emphasis role="bold">Authentication interface is no longer used</emphasis>
+				for this connected user.
+				<xref linkend="jobSubmission">The job submission</xref> shows how it works when the scheduler received a new job
+				to schedule. How to write a job will be explain further in <xref linkend="job_creation"/>.
+			
+				<figure id="jobSubmission">
+					<title>A job submission</title>
+					<mediaobject>
+						<imageobject>
+							<imagedata
+								fileref="scheduler/images/core/jobSubmission.jpg" format="JPG" align="center"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				
+				<orderedlist>
+					<listitem>
+						<para>
+							First, user submits a job using his <emphasis role="bold">UserSchedulerInterface</emphasis> retrieved
+							by the <emphasis role="bold">logAsUser</emphasis> method.
+							<programlisting lang="java">
+	// connecting to the scheduler
+	SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+	// checking username and password
+	UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+	// submitting a new job
+	scheduler.submit(job);
+							</programlisting>
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							The Scheduler Front-end verify the integrity of the job, and build it in order to be ready
+							to be managed by the Scheduler Core. If there is a problem, an exception is thrown explaining
+							what is the cause.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Finally, the job is transmit to the Core that can schedule it.
+						</para>
+					</listitem>
+				</orderedlist>
+			</para>
+		</sect3>
+		</sect2>
+		
+		<sect2 id="admin_interface">
+			<title>Administrator Interface</title>
+			<para>
+				
+			</para>
+			<sect3 id="communicator">
+				<title>Communicator</title>
+				<para>
+						
+				</para>
+			</sect3>
+		</sect2>
+	
+	</sect1>
+	
+	
+	<sect1 id="scheduler_extension">
+		<title>Extend the Scheduler</title>
+		<sect2 id="add_policy">
+			<title>How to add a new policy</title>
+			<para>
+				
+			</para>
+		</sect2>
+	</sect1>
+</chapter>
