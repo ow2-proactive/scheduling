@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.node;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 
 
@@ -47,6 +48,7 @@ import org.objectweb.proactive.core.ProActiveException;
  * @since   ProActive 0.9
  *
  */
+@PublicAPI
 public class NodeException extends ProActiveException {
 
     /**

@@ -30,9 +30,11 @@
  */
 package org.objectweb.proactive.core.body.migration;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 
 
+@PublicAPI
 public class MigrationException extends ProActiveException {
     public MigrationException() {
         super();

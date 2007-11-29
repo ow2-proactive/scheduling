@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 
 
@@ -44,6 +45,7 @@ import org.objectweb.proactive.core.ProActiveException;
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  */
+@PublicAPI
 public class ActiveObjectCreationException extends ProActiveException {
 
     /**
