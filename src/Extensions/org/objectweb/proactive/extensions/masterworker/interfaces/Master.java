@@ -35,6 +35,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
@@ -48,6 +49,7 @@ import org.objectweb.proactive.extensions.masterworker.TaskException;
  * @param <T> Task of result R
  * @param <R> Result Object
  */
+@PublicAPI
 public interface Master<T extends Task<R>, R extends Serializable> {
 
     /**

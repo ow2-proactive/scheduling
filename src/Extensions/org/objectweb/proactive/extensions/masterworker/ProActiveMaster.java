@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.api.ProFuture;
@@ -87,6 +88,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Resul
  * @param <T> Task of result R
  * @param <R> Result Object
  */
+@PublicAPI
 public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     implements Master<T, R>, Serializable {
 

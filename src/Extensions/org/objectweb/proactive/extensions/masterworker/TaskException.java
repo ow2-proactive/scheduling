@@ -30,12 +30,15 @@
  */
 package org.objectweb.proactive.extensions.masterworker;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * A user exception thrown by a task during its execution
  * @author fviale
  *
  */
+@PublicAPI
 public class TaskException extends Exception {
 
     /**

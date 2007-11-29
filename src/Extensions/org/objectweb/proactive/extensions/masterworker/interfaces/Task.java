@@ -32,6 +32,8 @@ package org.objectweb.proactive.extensions.masterworker.interfaces;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Definition of a Task (to be executed by the framework) <br/>
@@ -39,6 +41,7 @@ import java.io.Serializable;
  *
  * @param <R> the result type of this task
  */
+@PublicAPI
 public interface Task<R extends Serializable> extends Serializable {
 
     /**

@@ -30,12 +30,15 @@
  */
 package org.objectweb.proactive.extensions.masterworker;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * An Exception thrown when a task has already been submitted
  * @author fviale
  *
  */
+@PublicAPI
 public class TaskAlreadySubmittedException extends Exception {
 
     /**

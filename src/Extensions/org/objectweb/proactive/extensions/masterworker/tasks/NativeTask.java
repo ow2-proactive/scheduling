@@ -38,6 +38,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
@@ -48,6 +49,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
  * @author fviale
  *
  */
+@PublicAPI
 public class NativeTask implements Task<String[]> {
 
     /**
