@@ -78,7 +78,8 @@ public class Launcher {
         String filePathWithoutSpaces = fileDescriptorPath.replaceAll(" ", "%20");
 
         // parse and reify the descriptor
-        pad = ProDeployment.getProactiveDescriptor(filePathWithoutSpaces);
+        pad = ProDeployment.getProactiveDescriptor(filePathWithoutSpaces)
+                           .getProActiveDescriptorInternal();
         activated = false;
     }
 

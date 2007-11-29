@@ -197,20 +197,6 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         return targetProcess.getFinalProcess();
     }
 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-        try {
-            ProActiveDescriptorInternal pad = ProDeployment.getProactiveDescriptor(
-                    "/user/rquilici/home/ProActive/descriptors/nqueen.xml");
-            pad.activateMappings();
-        } catch (ProActiveException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
     public void setExecutable(String exec) {
         this.executable_path = exec;
     }

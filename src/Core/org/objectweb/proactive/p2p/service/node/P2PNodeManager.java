@@ -46,7 +46,7 @@ import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -79,7 +79,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
 
     //    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
     private final String descriptorPath = System.getProperty(PAProperties.PA_P2P_XML_PATH.getKey());
-    private ProActiveDescriptorInternal pad = null;
+    private ProActiveDescriptor pad = null;
 
     //--------------------------------------------------------------------------
     // Class Constructors

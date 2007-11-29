@@ -35,10 +35,11 @@ import java.util.LinkedList;
 
 import javax.naming.directory.InvalidAttributeValueException;
 
-import org.glite.wms.jdlj.*; // /lib/glite/glite-wms-jdlj.jar
+import org.glite.wms.jdlj.Ad;
+import org.glite.wms.jdlj.Jdl;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.process.AbstractExternalProcessDecorator;
 import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcess;
@@ -138,7 +139,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     }
 
     public static void main(String[] args) {
-        ProActiveDescriptorInternal pad;
+        ProActiveDescriptor pad;
         try {
             pad = ProDeployment.getProactiveDescriptor(args[0]);
             pad.activateMappings();

@@ -38,7 +38,7 @@ import java.util.List;
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
@@ -46,6 +46,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import functionalTests.FunctionalTest;
 import functionalTests.masterworker.A;
 import static junit.framework.Assert.assertTrue;
+
 
 /**
  * Test load balancing
@@ -55,7 +56,7 @@ public class Test extends FunctionalTest {
             "/functionalTests/masterworker/faulttolerance/MasterWorkerFT.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
-    private ProActiveDescriptorInternal pad;
+    private ProActiveDescriptor pad;
     private VirtualNode vn1;
     private VirtualNode vn2;
     public static final int NB_TASKS = 4;

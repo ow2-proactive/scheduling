@@ -36,12 +36,13 @@ import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
+
 
 /**
  * Test the creation of the JMX MBean.
@@ -52,7 +53,7 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
     private URL descriptor = Test.class.getResource(
             "/functionalTests/jmx/mbean/MBeanDescriptor.xml");
-    private ProActiveDescriptorInternal pad;
+    private ProActiveDescriptor pad;
     private VirtualNode vn;
     private A ao;
 

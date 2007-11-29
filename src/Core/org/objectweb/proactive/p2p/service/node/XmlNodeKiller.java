@@ -31,7 +31,7 @@
 package org.objectweb.proactive.p2p.service.node;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 
 /**
@@ -40,9 +40,9 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
  * Created on Mar 25, 2005
  */
 class XmlNodeKiller implements Runnable {
-    private ProActiveDescriptorInternal pad;
+    private ProActiveDescriptor pad;
 
-    public XmlNodeKiller(ProActiveDescriptorInternal pad) {
+    public XmlNodeKiller(ProActiveDescriptor pad) {
         this.pad = pad;
     }
 

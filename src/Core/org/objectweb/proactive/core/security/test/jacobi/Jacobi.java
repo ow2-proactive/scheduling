@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.security.test.jacobi;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -71,7 +71,7 @@ public class Jacobi {
     public static final double DEFAULT_BORDER_VALUE = 0;
 
     public static void main(String[] args) {
-        ProActiveDescriptorInternal proActiveDescriptor = null;
+        ProActiveDescriptor proActiveDescriptor = null;
         String[] nodes = null;
         try {
             proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
