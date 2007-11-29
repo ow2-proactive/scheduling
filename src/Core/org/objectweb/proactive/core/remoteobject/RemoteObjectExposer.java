@@ -198,10 +198,7 @@ public class RemoteObjectExposer implements Serializable {
             } catch (ProActiveException e) {
                 //  e.printStackTrace();
                 ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                               .debug("Could not unregister " + uri +
-                    ". Error message: " + e.getMessage());
-                //TODO: This print can be omitted. 
-                System.out.println("Could not unregister " + uri +
+                               .info("Could not unregister " + uri +
                     ". Error message: " + e.getMessage());
             }
         }

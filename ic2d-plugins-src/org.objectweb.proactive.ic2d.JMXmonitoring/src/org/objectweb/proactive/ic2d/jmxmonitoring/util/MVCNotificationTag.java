@@ -51,6 +51,12 @@ public enum MVCNotificationTag {
      */
     ADD_CHILD,
     /**
+     * Notification message sent when a set of children (ActieObject(s)) has been added to an
+     * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject </code> object.
+     * Use a list with the keys corresponding to the child as data in the Notification object.
+     */
+    ADD_CHILDREN,
+    /**
      * Notification message sent when a child has been removed from an
      * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData </code> object.
      * Use the key corresponding to the child as data in the Notification object.

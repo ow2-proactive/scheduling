@@ -57,7 +57,7 @@ public class WorldEditPart extends AbstractMonitoringEditPart {
                 for (final GraphicalCommunication communication : communicationsToDraw.values()) {
                     communication.draw();
                 }
-                //communicationsToDraw.clear();
+                communicationsToDraw.clear();
                 getFigure().repaint();
             }
         };

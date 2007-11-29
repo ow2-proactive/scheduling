@@ -37,6 +37,7 @@ import javax.management.ObjectName;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.BodyNotificationData;
+import org.objectweb.proactive.core.jmx.notification.NodeNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RuntimeNotificationData;
 import org.objectweb.proactive.core.node.Node;
@@ -53,9 +54,6 @@ public class RuntimeObjectListener implements NotificationListener {
     }
 
     public void handleNotification(Notification notification, Object handback) {
-        if (true) {
-            return;
-        }
         String type = notification.getType();
         if (type.equals(NotificationType.bodyCreated)) {
             BodyNotificationData notificationData = (BodyNotificationData) notification.getUserData();
@@ -84,13 +82,17 @@ public class RuntimeObjectListener implements NotificationListener {
             System.out.println(
                 "...............................Runtime Registered " +
                 notification.getSource());
+            this.runtimeObject.getParent().explore();
+            // this lines don't actually do anything  
+            //TODO: remove them        	
             RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
             runtimeObject.getParent().proposeChild();
         } else if (type.equals(NotificationType.runtimeUnregistered)) {
             System.out.println(
                 "...............................Runtime Unregistered " +
                 notification.getSource());
-            RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
+            this.runtimeObject.getParent().explore();
+            //   RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
         } else if (type.equals(NotificationType.runtimeDestroyed)) {
             System.out.println(
                 "...............................Runtime destroyed " +
@@ -100,22 +102,23 @@ public class RuntimeObjectListener implements NotificationListener {
         // --- NodeEvent ----------------
         else if (type.equals(NotificationType.nodeCreated)) {
             System.out.println("...............................Node Created");
-            //  if (!(notification.getUserData() instanceof Node))
-            // 	return;
-            Node node = (Node) notification.getUserData();
-            String nodeUrl = node.getNodeInformation().getURL();
-            ObjectName oname = FactoryName.createNodeObjectName(runtimeObject.getUrl(),
-                    node.getNodeInformation().getName());
-            NodeObject child = new NodeObject(runtimeObject, nodeUrl, oname);
-            runtimeObject.addChild(child);
+            this.runtimeObject.getParent().explore();
+            //            
+            //            Node node = ((NodeNotificationData) notification.getUserData()).getNode();
+            //            String nodeUrl = node.getNodeInformation().getURL();
+            //            ObjectName oname = FactoryName.createNodeObjectName(runtimeObject.getUrl(),
+            //                    node.getNodeInformation().getName());
+            //            NodeObject child = new NodeObject(runtimeObject, nodeUrl, oname);
+            //            runtimeObject.addChild(child);
         } else if (type.equals(NotificationType.nodeDestroyed)) {
+            this.runtimeObject.getParent().explore();
             String nodeUrl = (String) notification.getUserData();
             System.out.println(
                 "...............................Node Destroyed : " + nodeUrl);
-            NodeObject node = (NodeObject) runtimeObject.getChild(nodeUrl);
-            if (node != null) {
-                node.destroy();
-            }
+            //            NodeObject node = (NodeObject) runtimeObject.getChild(nodeUrl);
+            //            if (node != null) {
+            //                node.destroy();
+            //            }
         } else {
             System.out.println(runtimeObject + " => " + type);
         }

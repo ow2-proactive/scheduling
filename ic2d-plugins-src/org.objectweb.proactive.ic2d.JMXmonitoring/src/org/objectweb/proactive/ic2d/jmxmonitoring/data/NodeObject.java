@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -137,6 +138,7 @@ public class NodeObject extends AbstractData {
      */
     @SuppressWarnings("unchecked")
     private void findActiveObjects() {
+        List<ActiveObject> childrentoAdd = new ArrayList<ActiveObject>();
         final Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
 
         final List<ObjectName> activeObjectNames = getProxyNodeMBean()
@@ -162,12 +164,15 @@ public class NodeObject extends AbstractData {
                 final String activeObjectName = proxyBodyMBean.getName();
                 child = new ActiveObject(this, id, activeObjectName, oname,
                         proxyBodyMBean);
-                addChild(child);
+                // addChild(child);
+                childrentoAdd.add(child);
             }
             // Removes from the model the not monitored or termined aos.
             childrenToRemoved.remove(idString);
         }
 
+        //add all children 
+        this.addChildren(childrentoAdd);
         // Some child have to be removed
         for (final AbstractData child : childrenToRemoved.values()) {
             ((ActiveObject) child).stopMonitoring(true); //unsubscribes listener for this child object 
@@ -196,6 +201,29 @@ public class NodeObject extends AbstractData {
                                   .subscribe(oname, child.getListener(),
                 getParent().getUrl());
         }
+    }
+
+    private synchronized void addChildren(List<ActiveObject> children) {
+        ArrayList<String> childrenKeys = new ArrayList<String>();
+        for (ActiveObject child : children) {
+            if (!this.monitoredChildren.containsKey(child.getKey())) {
+                this.monitoredChildren.put(child.getKey(), child);
+                childrenKeys.add(child.getKey());
+                child.explore();
+                String name = child.getClassName();
+                if ((!name.equals(ProActiveConnection.class.getName()) &&
+                        (!name.equals(ProActiveServerImpl.class.getName())))) {
+                    ObjectName oname = child.getObjectName();
+
+                    JMXNotificationManager.getInstance()
+                                          .subscribe(oname,
+                        child.getListener(), getParent().getUrl());
+                }
+            }
+        }
+        setChanged();
+        notifyObservers(new MVCNotification(MVCNotificationTag.ADD_CHILDREN,
+                childrenKeys));
     }
 
     /**

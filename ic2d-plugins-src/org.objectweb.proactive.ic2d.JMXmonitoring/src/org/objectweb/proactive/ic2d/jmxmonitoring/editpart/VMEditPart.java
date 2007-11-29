@@ -68,24 +68,19 @@ public class VMEditPart extends AbstractMonitoringEditPart {
         }
 
         final MVCNotificationTag mvcNotification = ((MVCNotification) arg).getMVCNotification();
-
-        switch (mvcNotification) {
-        case RUNTIME_OBJECT_RUNTIME_KILLED:
-            Console.getInstance(Activator.CONSOLE_NAME)
-                   .log(getModel() + " killed!");
-            getCastedFigure().notResponding();
-            break;
-        default:
-            getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-                    public void run() {
-                        // Refresh only if this edit part is active
-                        if (VMEditPart.this.isActive()) {
-                            refresh();
-                        }
+        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+                public void run() {
+                    switch (mvcNotification) {
+                    case RUNTIME_OBJECT_RUNTIME_KILLED:
+                        Console.getInstance(Activator.CONSOLE_NAME)
+                               .log(getModel() + " killed!");
+                        getCastedFigure().notResponding();
+                        break;
+                    default:
+                        refresh();
                     }
-                });
-
-        }
+                }
+            });
 
         /*
         if(param instanceof State && (State)param == State.NOT_RESPONDING)

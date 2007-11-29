@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 public abstract class AbstractMonitoringEditPart
     extends AbstractGraphicalEditPart implements Observer, Runnable {
-    protected static Map<AbstractData, AbstractMonitoringEditPart> registry = new HashMap<AbstractData, AbstractMonitoringEditPart>();
+    protected static Map<AbstractData, AbstractMonitoringEditPart> registry = new java.util.concurrent.ConcurrentHashMap<AbstractData, AbstractMonitoringEditPart>();
     private WorldEditPart worldEditPart;
 
     //

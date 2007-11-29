@@ -112,7 +112,7 @@ public class AOEditPart extends AbstractMonitoringEditPart {
      *            an argument passed to the notifyObservers method.
      */
     @Override
-    public final void update(Observable o, Object arg) {
+    public void update(Observable o, Object arg) {
         if ((arg != null) && (arg instanceof MVCNotification)) {
             final MVCNotificationTag mvcNotif = ((MVCNotification) arg).getMVCNotification();
             final Object notificationdata = ((MVCNotification) arg).getData();

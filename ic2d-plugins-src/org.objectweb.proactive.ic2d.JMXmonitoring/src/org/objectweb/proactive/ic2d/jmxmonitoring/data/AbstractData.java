@@ -32,6 +32,7 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -144,7 +145,11 @@ public abstract class AbstractData extends Observable {
      * @return The list of monitored children
      */
     public List<AbstractData> getMonitoredChildrenAsList() {
-        return new ArrayList<AbstractData>(monitoredChildren.values());
+        Collection<AbstractData> c = monitoredChildren.values();
+        ArrayList<AbstractData> arr = new ArrayList<AbstractData>(c);
+
+        //	System.out.println("AbstractData.getMonitoredChildrenAsList() ---> collection " + c.size() + " arr " + arr.size());
+        return arr;
     }
 
     /**
