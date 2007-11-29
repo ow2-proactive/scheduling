@@ -30,10 +30,10 @@ package org.objectweb.proactive.core.filetransfer;
 import java.io.File;
 import java.io.IOException;
 
+import org.objectweb.proactive.api.ProFileTransfer;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.filetransfer.FileTransfer;
 
 
 public class RemoteFileImpl implements RemoteFile {
@@ -56,10 +56,12 @@ public class RemoteFileImpl implements RemoteFile {
         try {
             localNode = NodeFactory.getDefaultNode();
         } catch (NodeException e) {
-            throw new IOException("Can't get local node", e);
+        	//TODO change when moving to Java 1.6
+        	//throw new IOException("Can't get local node", e);
+        	throw new IOException("Can't get local node "+ e.getMessage());
         }
 
-        return FileTransfer.transfer(node, file, localNode, localDst);
+        return ProFileTransfer.transfer(node, file, localNode, localDst);
     }
 
     //@Override
@@ -67,7 +69,7 @@ public class RemoteFileImpl implements RemoteFile {
         throws IOException {
         waitForFinishedTransfer();
 
-        return FileTransfer.transfer(getRemoteNode(), getRemoteFilePath(),
+        return ProFileTransfer.transfer(getRemoteNode(), getRemoteFilePath(),
             dstNode, dstFile);
     }
 
@@ -83,15 +85,17 @@ public class RemoteFileImpl implements RemoteFile {
 
     //@Override
     public boolean isTransferFinished() {
-        return !request.isAwaited();
+        return request.getOperationFuture().getException() != null || !request.isAwaited();
     }
 
     //@Override
     public void waitForFinishedTransfer() throws IOException {
+        
         if (request != null) {
             request.waitForOperation();
         }
-
+        
+    	
         if (request.getOperationFuture().getException() != null) {
             throw request.getOperationFuture().getException();
         }

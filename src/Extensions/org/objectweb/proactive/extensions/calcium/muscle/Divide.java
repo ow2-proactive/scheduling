@@ -30,21 +30,24 @@
  */
 package org.objectweb.proactive.extensions.calcium.muscle;
 
-import java.util.Collection;
+import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 /**
- * This class is used to divide a parameter
- * into a vector of parameteres. It is used
- * in skeletons such as: divide&conquer, and map
+ * This interface is used to divide a parameter
+ * into a list of parameters.
+ * 
+ * It is used in {@link org.objectweb.proactive.extensions.calcium.skeletons.Skeletons} such as: {@link org.objectweb.proactive.extensions.calcium.skeletons.DaC }, {@link org.objectweb.proactive.extensions.calcium.skeletons.Map}, and {@link org.objectweb.proactive.extensions.calcium.skeletons.Fork}.
  *
  * @author The ProActive Team (mleyton)
  *
- * @param <P,X>
  */
-public interface Divide<P, X> extends Muscle<P, Collection<X>> {
-    public Collection<X> divide(SkeletonSystem system, P param)
+@PublicAPI
+public interface Divide<P, X> extends Muscle<P, List<X>> {
+	
+    public List<X> divide(SkeletonSystem system, P param)
         throws Exception;
 }

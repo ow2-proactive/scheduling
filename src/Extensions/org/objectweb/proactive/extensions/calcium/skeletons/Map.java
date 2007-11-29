@@ -35,18 +35,16 @@ import java.io.Serializable;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
-
+import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
 /**
- * Map is only a special case of Divide and Conquer, and therfore
- * represents data parallelism.
+ * Map represents data parallelism SIMD (Single Instruction Multiple Data).
  *
- * A taks is Divided once into subtaks (without evaluating a condition),
- * the subtasks are then executed using the child skeleton, and then the
- * results are conquered using the Conquer object.
- *
- * @author The ProActive Team (mleyton)
- *
+ * A parameter is {@link Divide}d into several parameters, and the same 
+ * nested {@link Skeleton} is executed on each parameter. 
+ * (As oposed to {@link Fork} where each parameter is executed on a different nested {@link Skeleton}).
+ * 
+ *  @author The ProActive Team (mleyton)
  */
 @PublicAPI
 public class Map<P extends java.io.Serializable, R extends java.io.Serializable>
@@ -55,14 +53,37 @@ public class Map<P extends java.io.Serializable, R extends java.io.Serializable>
     Skeleton<?, ?> child;
     Conquer<?, R> conq;
 
-    @SuppressWarnings("unchecked")
-    public <X extends Serializable, Y extends Serializable>Map(
-        Divide<P, X> div, Skeleton<X, Y> child, Conquer<Y, R> conq) {
+    /**
+     * The main constructor.
+     * 
+     * @param div The custom {@link Divide} behavior.
+     * @param nested The nested {@ link Skeleton} to execute on each class.
+     * @param conq The custom {@link Conquer} behavior.
+     */
+    public <X extends Serializable, Y extends Serializable> Map(
+        Divide<P, X> div, Skeleton<X, Y> nested, Conquer<Y, R> conq) {
         this.div = div;
-        this.child = child;
+        this.child = nested;
         this.conq = conq;
     }
 
+    /**
+     * Like the main constructor, but accepts an {@link Execute} object instead of a {@link Seq}. 
+     * 
+     * @param div The custom {@link Divide} behavior.
+     * @param msucle The muscle function that will be nested in a {@link Seq} {@link Skeleton}.
+     * @param conq The custom {@link Conquer} behavior.
+     */
+    public <X extends Serializable, Y extends Serializable> Map(
+        Divide<P, X> div, Execute<X, Y> muscle, Conquer<Y, R> conq) {
+        this.div = div;
+        this.child = new Seq<X, Y>(muscle);
+        this.conq = conq;
+    }
+    
+    /**
+     * @see Skeleton#accept(SkeletonVisitor)
+     */
     public void accept(SkeletonVisitor visitor) {
         visitor.visit(this);
     }

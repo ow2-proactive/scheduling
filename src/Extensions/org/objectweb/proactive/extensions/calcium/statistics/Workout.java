@@ -44,7 +44,6 @@ import org.objectweb.proactive.extensions.calcium.muscle.Divide;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
 
-
 public class Workout implements Serializable {
     public HashMap<Class<?>, Exercise> muscleWorkout;
     public static ClassSorterByName classSorterByName = new ClassSorterByName();

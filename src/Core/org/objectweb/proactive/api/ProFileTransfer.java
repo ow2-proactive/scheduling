@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.filetransfer;
+package org.objectweb.proactive.api;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,13 +54,28 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * This class provides a standard entry point for API FileTransfer tools.
+ * This class provides a standard entry point for FileTransfer API tools.
+ * 
+ * Transfer between the calling thread's node and a remote node is supported
+ * through the <code>pull</code> and <code>push</code> methods.
+ * 
+ * Transfer between third party nodes is supported using the <code>transfer</code> family methods
  *
+ * All file transfer operations are performed asynchronously, and return a {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instance which can
+ * be queried for termination.
+ *
+ * Note that an active objec's node can be obtained with:
+ * 
+ * <pre>
+ * 		String nodeURL = ProActiveObject.getActiveObjectNodeUrl(Object activeobject);
+ * 		Node node = NodeFactory.getNode(nodeURL);
+ * </pre>
+ * 
  * @author The ProActive Team (mleyton)
- * @since ProActive 3.0.2 (Feb 2006)
+ * @since ProActive 3.9 (November 2007)
  */
 @PublicAPI
-public class FileTransfer {
+public class ProFileTransfer {
     static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 
     protected static Node getLocalNode() throws IOException {
@@ -69,32 +84,64 @@ public class FileTransfer {
         try {
             localNode = NodeFactory.getDefaultNode();
         } catch (NodeException e) {
-            throw new IOException("Can't get local node", e);
+        	//TODO change when moving to Java 1.6
+            //throw new IOException("Can't get local node", e);
+            throw new IOException("Can't get local node "+ e.getMessage());
         }
 
         return localNode;
     }
 
+    /**
+     * Push a list of local files to a remote Node with the specified destinations.
+     *  
+     * @param srcFile The list of local, existent, <code>File</code>s.
+     * @param dstNode The destination node.
+     * @param dstFile The list of remote, writable, <code>File<code>s. 
+     * @return A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instances representing the file transfer operation of each file.
+     * @throws IOException If an initialization error was detected.
+     */
     public static List<RemoteFile> push(File[] srcFile, Node dstNode,
         File[] dstFile) throws IOException {
         return transfer(getLocalNode(), srcFile, dstNode, dstFile);
     }
 
+    /**
+     * Push a single local file to the remote node/location.
+     * @see  #push(File[], Node,  File[])
+     */
     public static RemoteFile push(File srcFile, Node dstNode, File dstFile)
         throws IOException {
         return transfer(getLocalNode(), srcFile, dstNode, dstFile);
     }
 
+    /**
+     * Pull a list of remote files on a Node to the local node.
+     * 
+     * @param srcNode
+     * @param srcFile
+     * @param dstFile
+     * @return A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instances representing the file transfer operation of each file.
+     * @throws IOException If an initialization error was detected.
+     */
     public static RemoteFile pull(Node srcNode, File srcFile, File dstFile)
         throws IOException {
         return transfer(srcNode, srcFile, getLocalNode(), dstFile);
     }
 
+    /**
+     * Pull a single remote file to the local node and location.
+     * @see  #pull(File[], Node,  File[])
+     */
     public static List<RemoteFile> pull(Node srcNode, File[] srcFile,
         File[] dstFile) throws IOException {
         return transfer(srcNode, srcFile, getLocalNode(), dstFile);
     }
 
+    /**
+     * Transfers a single file between third parties.
+     * @see #transfer(Node, File[], Node, File[])
+     */
     public static RemoteFile transfer(Node srcNode, File srcFile, Node dstNode,
         File dstFile) throws IOException {
         List<RemoteFile> rfiles = transfer(srcNode, new File[] { srcFile },
@@ -103,6 +150,16 @@ public class FileTransfer {
         return rfiles.get(0);
     }
 
+    /**
+     * Transfers a list of files on a remote Node to another remote node.
+     * 
+     * @param srcNode
+     * @param srcFile
+     * @param dstNode
+     * @param dstFile
+     * @return A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile}.
+     * @throws IOException  If an initialization error was detected.
+     */
     public static List<RemoteFile> transfer(Node srcNode, File[] srcFile,
         Node dstNode, File[] dstFile) throws IOException {
         return transfer(srcNode, srcFile, dstNode, dstFile,
@@ -110,6 +167,14 @@ public class FileTransfer {
             FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
     }
 
+    /**
+     * Transfers a list of files, with parameters different than default.
+     * 
+     * @param bsize The size of each file block. 
+     * @param numFlyingBlocks The maximum number of blocks to send before synchronizing.
+     * 
+     * @see #transfer(Node, File[], Node, File[])
+     */
     public static List<RemoteFile> transfer(Node srcNode, File[] srcFile,
         Node dstNode, File[] dstFile, int bsize, int numFlyingBlocks)
         throws IOException {
@@ -158,9 +223,19 @@ public class FileTransfer {
             numFlyingBlocks);
     }
 
-    protected static List<RemoteFile> internalTransfer(Node srcNode,
-        File[] srcFile, Node dstNode, File[] dstFile, int bsize,
-        int numFlyingBlocks) throws IOException {
+    /**
+     * This is the real method that invokes the file transfer.
+     * 
+     * @param srcNode The source node.
+     * @param srcFile The list of source files locations.
+     * @param dstNode The destination node.
+     * @param dstFile The list of destination locations.
+     * @param bsize The block size to be used
+     * @param numFlyingBlocks The maximum number of blocks to send before synchronizing
+     * @return  A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instances representing the file transfer operation of each file.
+     * @throws IOException  If an initialization error was detected.
+     */
+    protected static List<RemoteFile> internalTransfer(Node srcNode, File[] srcFile, Node dstNode, File[] dstFile, int bsize, int numFlyingBlocks) throws IOException {
         FileTransferServiceSend ftsSrc;
         FileTransferServiceReceive ftsDst;
 
@@ -168,24 +243,24 @@ public class FileTransfer {
             ftsSrc = FileTransferEngine.getFileTransferEngine(srcNode).getFTS();
             ftsDst = FileTransferEngine.getFileTransferEngine(dstNode).getFTS();
         } catch (Exception e) {
-            throw new IOException("Unable to connect or use ProActive Node: " +
-                srcNode + " -> " + dstNode, e);
+        	//TODO change when moving to Java 1.6
+            //throw new IOException("Unable to connect or use ProActive Node: " + srcNode + " -> " + dstNode, e);
+            throw new IOException("Unable to connect or use ProActive Node: " + srcNode + " -> " + dstNode+" "+ e.getMessage());
         }
 
         ArrayList<RemoteFile> rfile = new ArrayList<RemoteFile>(srcFile.length);
 
-        // Alternative: ask the remote AO to send the file to us futureFile = ftsRemote.sendFile(ftsLocal, srcFile, dstFile, bsize, numFlyingBlocks);
         for (int i = 0; i < srcFile.length; i++) {
-            // OperationStatus status = ftsDst.receiveFile(ftsSrc, srcFile[i], dstFile[i], bsize, numFlyingBlocks);
-            OperationStatus status = ftsSrc.sendFile(srcFile[i], ftsDst,
-                    dstFile[i], bsize, numFlyingBlocks);
 
-            FileTransferRequest request = new FileTransferRequest(srcFile[i],
-                    dstFile[i], status, ftsSrc, ftsDst);
+            OperationStatus status = ftsSrc.sendFile(srcFile[i], ftsDst, dstFile[i], bsize, numFlyingBlocks);
+
+            FileTransferRequest request = new FileTransferRequest(srcFile[i], dstFile[i], status, ftsSrc, ftsDst);
 
             rfile.add(new RemoteFileImpl(dstNode, dstFile[i], request));
         }
-
+       
+        ftsSrc.putBackInPool(ftsDst);
+        
         return rfile;
     }
 }

@@ -36,10 +36,10 @@ import java.util.Vector;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
-
 /**
- * The Pipe skeleton represents staged computation.
- * A Pipe will execute each skeleton in sequence of the next.
+ * The <code>Pipe</code> {@link Skeleton} represents staged computation.
+ * 
+ * Each element of the pipe will be executed sequentially for each {@link Skeleton} element.
  *
  * @author The ProActive Team (mleyton)
  */
@@ -48,22 +48,46 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
     implements Skeleton<P, R> {
     Vector<Skeleton<?, ?>> stages;
 
-    public <X extends Serializable>Pipe(Skeleton<P, X> child1,
-        Skeleton<X, R> child2) {
+    /**
+     * The basic constructor. Will execute <code>stage1</code> and the result of 
+     * <code>stage1</code> will be passed as parameter to <code>stage2</code> 
+	 *
+     * @param stage1 The first stage to execute.
+     * @param stage2 The second stage to execute.
+     */
+    public <X extends Serializable>Pipe(Skeleton<P, X> stage1,
+        Skeleton<X, R> stage2) {
         stages = new Vector<Skeleton<?, ?>>();
 
-        stages.add(child1);
-        stages.add(child2);
+        stages.add(stage1);
+        stages.add(stage2);
     }
 
-    public <X extends Serializable>Pipe(Execute<P, X> child1,
-        Execute<X, R> child2) {
+    /**
+     * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
+     * an {@link Execute} instead of a {@link Skeleton}.
+     * 
+     * Each {@link Execute} will be wrapped in a {@link Seq} {@link Skeleton}.
+     * 
+     * @param stage1 The first stage of computation.
+     * @param stage2 The second stage of computation.
+     */
+    public <X extends Serializable>Pipe(Execute<P, X> stage1,
+        Execute<X, R> stage2) {
         stages = new Vector<Skeleton<?, ?>>();
 
-        stages.add(new Seq<P, X>(child1));
-        stages.add(new Seq<X, R>(child2));
+        stages.add(new Seq<P, X>(stage1));
+        stages.add(new Seq<X, R>(stage2));
     }
 
+    /**
+     * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
+     * three stages instead of two.
+     * 
+     * @param stage1 The first stage of computation.
+     * @param stage2 The second stage of computation.
+     * @param child3 The third stage of computation.
+     */
     public <X extends Serializable, Y extends Serializable>Pipe(
         Skeleton<P, X> child1, Skeleton<X, Y> child2, Skeleton<Y, R> child3) {
         stages = new Vector<Skeleton<?, ?>>();
@@ -73,6 +97,16 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
         stages.add(child3);
     }
 
+    /**
+     * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
+     * three stages of {@link Execute} instead of two.
+     * 
+     * Each {@link Execute} will be wrapped in a {@link Seq} {@link Skeleton}.
+     * 
+     * @param stage1 The first stage of computation.
+     * @param stage2 The second stage of computation.
+     * @param child3 The third stage of computation.
+     */
     public <X extends Serializable, Y extends Serializable>Pipe(
         Execute<P, X> child1, Execute<X, Y> child2, Execute<Y, R> child3) {
         stages = new Vector<Skeleton<?, ?>>();
@@ -82,6 +116,17 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
         stages.add(new Seq<Y, R>(child3));
     }
 
+    /**
+     * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
+     * four stages instead of two.
+     * 
+     * For building <code>Pipe</code>s with more than four stages, a <code>Pipe</code> nesting other <code>Pipe</code>'s can be used. 
+     * 
+     * @param stage1 The first stage of computation.
+     * @param stage2 The second stage of computation.
+     * @param child3 The third stage of computation.
+     * @param child4 The third stage of computation.
+     */
     public <X extends Serializable, Y extends Serializable, Z extends Serializable>Pipe(
         Skeleton<P, X> child1, Skeleton<X, Y> child2, Skeleton<Y, Z> child3,
         Skeleton<Z, R> child4) {
@@ -93,6 +138,17 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
         stages.add(child4);
     }
 
+    /**
+     * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
+     * four stages of {@link Execute} instead of two.
+     * 
+     * Each {@link Execute} will be wrapped in a {@link Seq} {@link Skeleton}. 
+     * 
+     * @param stage1 The first stage of computation.
+     * @param stage2 The second stage of computation.
+     * @param child3 The third stage of computation.
+     * @param child4 The third stage of computation.
+     */
     public <X extends Serializable, Y extends Serializable, Z extends Serializable>Pipe(
         Execute<P, X> child1, Execute<X, Y> child2, Execute<Y, Z> child3,
         Execute<Z, R> child4) {
@@ -104,6 +160,9 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
         stages.add(new Seq<Z, R>(child4));
     }
 
+    /**
+     * @see Skeleton#accept(SkeletonVisitor)
+     */
     public void accept(SkeletonVisitor visitor) {
         visitor.visit(this);
     }

@@ -35,6 +35,7 @@ import java.net.URI;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -48,7 +49,17 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 
-
+/**
+ * This class provides distributed execution environment for {@link org.objectweb.proactive.extensions.calcium.Calcium Calcium}.
+ * The environment is based on a ProActive Scheduler which is in charge of executing sub parts of a skeleton program.
+ * 
+ * File Server is not supported on the current version of the ProActiveSchedulerEnvironment.
+ * 
+ * This environment is under development, and is this subject to bugs and substantial changes in the future.
+ * 
+ * @author The ProActive Team (mleyton)
+ */
+@PublicAPI
 public class ProActiveSchedulerEnvironment implements EnvironmentFactory {
     AOTaskPool taskpool;
     TaskDispatcher dispatcher;
@@ -101,19 +112,33 @@ public class ProActiveSchedulerEnvironment implements EnvironmentFactory {
                     this.scheduler.addSchedulerEventListener(joblistener, SchedulerEvent.SHUTTING_DOWN);           //SHUTTING_DOWN("schedulerShuttingDownEvent"),
             }
             */
+    
+    /**
+     * File server is not supported on the current version of the ProActiveSchedulerEnvironment.
+     *  @see EnvironmentFactory#getFileServer()
+     */
     public FileServerClient getFileServer() {
         return fserver;
     }
 
+    /**
+     *  @see EnvironmentFactory#getTaskPool()
+     */
     public TaskPool getTaskPool() {
         return taskpool;
     }
 
+    /**
+     *  @see EnvironmentFactory#shutdown()
+     */
     public void shutdown() {
         dispatcher.shutdown();
         fserver.shutdown();
     }
 
+    /**
+     *  @see EnvironmentFactory#start()
+     */
     public void start() {
         this.dispatcher.start();
     }

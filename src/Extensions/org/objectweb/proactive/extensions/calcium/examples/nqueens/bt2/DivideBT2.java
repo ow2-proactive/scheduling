@@ -84,7 +84,7 @@ public class DivideBT2 implements Divide<Board, Board> {
             bitmap ^= board.sidemask;
         } else if (board.row == board.bound2) {
             if ((board.down & board.sidemask) == 0) {
-                // "return;" original alogirithm is converted into
+                // "return;" original algorithm is converted into
                 v.add(new Board(board.n, board.solvableSize)); //dummy child task
                 return v; // no more search is required in this branch
             }
@@ -99,7 +99,7 @@ public class DivideBT2 implements Divide<Board, Board> {
                     (board.right | bit) >> 1, board.bound1, board.bound2,
                     board.sidemask, board.lastmask, board.topbit, board.mask,
                     board.endbit, board.board));
-        } // while-generando
+        } // while-generating
 
         return v;
     }

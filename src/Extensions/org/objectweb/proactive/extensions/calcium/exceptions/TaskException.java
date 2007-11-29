@@ -30,6 +30,15 @@
  */
 package org.objectweb.proactive.extensions.calcium.exceptions;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+/**
+ * Task exceptions are exceptions that where generated inside the framework
+ * related with the execution or transfer of a Task.
+ * 
+ * @author The ProActive Team (mleyton)
+ */
+@PublicAPI
 public class TaskException extends Exception {
     public TaskException(String msg) {
         super(msg);

@@ -30,18 +30,18 @@
  */
 package org.objectweb.proactive.extensions.calcium.muscle;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 /**
- * Classes implementing this interface can be executed.
- * The object of providing this method is indicating
- * what is the sequential code that must be run.
- *
+ * This interface is used to execute a function on a parameter and return the result.
+ * 
+ * This interface is used in {@link org.objectweb.proactive.extensions.calcium.skeletons.Skeleton}s such as: {@link org.objectweb.proactive.extensions.calcium.skeletons.Seq}, {@link org.objectweb.proactive.extensions.calcium.skeletons.Farm}, {@link org.objectweb.proactive.extensions.calcium.skeletons.Pipe}, etc...
+ * 
  * @author The ProActive Team (mleyton)
- *
- * @param <T>
  */
+@PublicAPI
 public interface Execute<P, R> extends Muscle<P, R> {
     public R execute(SkeletonSystem system, P param) throws Exception;
 }

@@ -30,40 +30,72 @@
  */
 package org.objectweb.proactive.extensions.calcium.statistics;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+/**
+ * This method provides global statistics snapshot of the framework.
+ * 
+ * @author The ProActive Team (mleyton)
+ */
+@PublicAPI
 public interface StatsGlobal {
+	/**
+	 * @return The current length of the ready queue.
+	 */
     public int getReadyQueueLength();
 
+    /**
+     * @return The current length of the processing queue.
+     */
     public int getProccessingQueueLength();
 
+    /**
+     * @return The current length of the waiting queue.
+     */
     public int getWaitingQueueLength();
 
+    /**
+     * @return The current length of the waiting queue.
+     */
     public int getResultsQueueLength();
 
+    /**
+     * @return The current number of solved tasks since the boot of the framework.
+     */
     public int getSolvedNumberOfTasks();
 
+    /**
+    * @return The current number of solved root-tasks since the boot of the framework.
+    */
     public int getSolvedNumberOfRootTasks();
 
+    /**
+     * @return The average time spent by tasks on the processing state.
+     */
     public long getAverageProcessingTime();
 
+    /**
+     * @return The average time spent by tasks on the waiting state.
+     */
     public long getAverageWaitingTime();
 
+    /**
+     * @return The average time spent by tasks on the results state.
+     */
     public long getAverageResultsTime();
 
+    /**
+     * @return The average time spent by tasks on the ready state.
+     */
     public long getAverageReadyTime();
 
+    /**
+     * @return The average wallclock time of finished tasks
+     */
     public long getAverageWallClockTime();
 
+    /**
+     * @return The average computation time of all tasks
+     */
     public long getAverageComputationTime();
-
-    /*
-    public int getMaxWallclockTime();
-    public int getMaxProcessingTime();
-    public int getMaxWaitingTime();
-    public int getMaxResultsTime();
-
-    public int getMinWallclockTime();
-    public int getMinProcessingTime();
-    public int getMinWaitingTime();
-    public int getMinResultsTime();
-    */
 }

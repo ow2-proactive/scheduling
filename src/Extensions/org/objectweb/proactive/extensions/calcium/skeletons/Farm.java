@@ -35,8 +35,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
 
 /**
- * This class provides Farm parallelism (also known as Master/Slave).
- * A task will execute the child skeleton.
+ * This class provides <code>Farm</code> replication (also known as Master/Slave).
  *
  * @author The ProActive Team (mleyton)
  */
@@ -45,14 +44,28 @@ public class Farm<P extends java.io.Serializable, R extends java.io.Serializable
     implements Skeleton<P, R> {
     Skeleton<P, R> child;
 
+    /**
+     * The main constructor.
+     * 
+     * @param child The {@link Skeleton} to replicate.
+     */
     public Farm(Skeleton<P, R> child) {
         this.child = child;
     }
 
+    /**
+     * This constructor wraps the {@link Execute} parameter in a {@link Seq}
+     * skeleton and invokes the main constructor: {@link Farm#Farm(Skeleton)}.
+     * 
+     * @param muscle The muscle to wrap in a {@link Seq} {@link Skeleton}
+     */
     public Farm(Execute<P, R> muscle) {
         this.child = new Seq<P, R>(muscle);
     }
 
+    /**
+     * @see Skeleton#accept(SkeletonVisitor)
+     */
     public void accept(SkeletonVisitor visitor) {
         visitor.visit(this);
     }

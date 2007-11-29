@@ -42,13 +42,13 @@ import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.objectweb.proactive.api.ProFileTransfer;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.filetransfer.FileTransfer;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -109,12 +109,12 @@ public class TestAPI extends FunctionalTest {
         Node[] testnode = testVNode.getNodes();
         Node[] testnodePush = testVNodePush.getNodes();
 
-        RemoteFile rfilePushed = FileTransfer.push(fileTest, testnode[0],
+        RemoteFile rfilePushed = ProFileTransfer.push(fileTest, testnode[0],
                 filePushed);
         rfilePushed.waitForFinishedTransfer();
         assertTrue(rfilePushed.getRemoteFilePath().equals(filePushed)); //wait-by-necessity
 
-        RemoteFile rfilePulled = FileTransfer.pull(testnode[0], filePushed,
+        RemoteFile rfilePulled = ProFileTransfer.pull(testnode[0], filePushed,
                 filePulled);
 
         //Thread.sleep(1000);

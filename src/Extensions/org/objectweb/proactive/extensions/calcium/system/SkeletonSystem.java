@@ -34,15 +34,22 @@ import java.io.File;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
+import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
 
-
+/**
+ * This class provides system dependent functionalities which can be accessed from
+ * inside {@link Muscle} function implementations.
+ * 
+ * @author The ProActive Team (mleyton)
+ *
+ */
 @PublicAPI
 public interface SkeletonSystem {
 
     /**
      * The working space is a directory to which files can be written and read.
      *
-     * The files stored in this directory are distroyed after the execution
+     * The files stored in this directory are destroyed after the execution
      * of the muscle function. To keep files persistent use the method {@link #newPersistent(File) registerAsPersistent}.
      *
      * @return A File object representing the location of the working space.
@@ -50,5 +57,12 @@ public interface SkeletonSystem {
      */
     public WSpace getWorkingSpace() throws EnvironmentException;
 
+    /**
+     * This method executes the specified command, with the specified arguments.
+     * Before invoking the command, the current working directory is configured to the local workspace.
+     * 
+     * @param command The command to execute.
+     * @param arguments The arguments that must be given to the command.
+     */
     public void execCommand(File command, String arguments);
 }

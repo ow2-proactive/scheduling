@@ -30,21 +30,39 @@
  */
 package org.objectweb.proactive.extensions.calcium.environment.multithreaded;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.FileServer;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 
 
+/**
+ * This class provides parallel execution environment for {@link org.objectweb.proactive.extensions.calcium.Calcium Calcium}.
+ * The environment is based on threads, which are executed on the local machine.
+ * 
+ * @author The ProActive Team (mleyton)
+ */
+@PublicAPI
 public class MultiThreadedEnvironment implements EnvironmentFactory {
     TaskDispatcher dispatcher;
     TaskPool taskpool;
     FileServerClient fserver;
 
+    /**
+     * This constructors instantiates a default FileServer based on the temporary directory
+     * of the machine.
+     * @param numThreads Maximum number of threads to be used.
+     */
     public MultiThreadedEnvironment(int numThreads) {
         this(numThreads, new FileServer());
     }
 
+    /**
+     * 
+     * @param numThreads Maximum number of threads to be used.
+     * @param fserver A previously instantiated FileServer.
+     */
     public MultiThreadedEnvironment(int numThreads, FileServer fserver) {
         fserver.initFileServer();
         this.taskpool = new TaskPool();
@@ -52,19 +70,31 @@ public class MultiThreadedEnvironment implements EnvironmentFactory {
         this.dispatcher = new TaskDispatcher(taskpool, this.fserver, numThreads);
     }
 
+    /**
+     * @see EnvironmentFactory#getTaskPool();
+     */
     public TaskPool getTaskPool() {
         return taskpool;
     }
 
+    /**
+     * @see EnvironmentFactory#start();
+     */
     public void start() {
         dispatcher.start();
     }
-
+    
+    /**
+     * @see EnvironmentFactory#shutdown();
+     */
     public void shutdown() {
         dispatcher.shutdown();
         fserver.shutdown();
     }
 
+    /**
+     * @see EnvironmentFactory#getFileServer();
+     */
     public FileServerClient getFileServer() {
         return fserver;
     }

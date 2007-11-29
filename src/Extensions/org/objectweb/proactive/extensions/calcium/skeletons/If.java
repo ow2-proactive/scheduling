@@ -35,13 +35,12 @@ import org.objectweb.proactive.extensions.calcium.muscle.Condition;
 
 
 /**
- * This class provides If conditioning.
- * Depending on the result of the Condition, either
- * one child skeletal structure will be executed, or the other.
+ * This class provides a conditional branching {@link Skeleton}.
+ * 
+ * Depending on the result of the {@link Condition}, either
+ * one nested {@link Skeleton} is executed or the other.
  *
  * @author The ProActive Team (mleyton)
- *
- * @param <P,R>
  */
 @PublicAPI
 public class If<P extends java.io.Serializable, R extends java.io.Serializable>
@@ -50,6 +49,13 @@ public class If<P extends java.io.Serializable, R extends java.io.Serializable>
     Skeleton<P, ?> ifChild;
     Skeleton<P, ?> elseChild;
 
+    /**
+     * This is the main constructor. 
+     * 
+     * @param cond The {@link Condition} to evaluate. 
+     * @param ifChild The <code>true</code> case {@link Skeleton}. 
+     * @param elseChild The <code>false</code> case {@link Skeleton}.
+     */
     public If(Condition<P> cond, Skeleton<P, R> ifChild,
         Skeleton<P, R> elseChild) {
         this.cond = cond;
@@ -57,6 +63,9 @@ public class If<P extends java.io.Serializable, R extends java.io.Serializable>
         this.elseChild = elseChild;
     }
 
+    /**
+     * @see Skeleton#accept(SkeletonVisitor)
+     */
     public void accept(SkeletonVisitor visitor) {
         visitor.visit(this);
     }

@@ -45,6 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.Notification;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.ProFileTransfer;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
@@ -89,7 +90,6 @@ import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.filetransfer.FileTransfer;
 import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
@@ -1768,7 +1768,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             long init = System.currentTimeMillis();
 
-            list.addAll(FileTransfer.pull(nodes[i], srcFile, dstFile));
+            list.addAll(ProFileTransfer.pull(nodes[i], srcFile, dstFile));
 
             if (FILETRANSFER_LOGGER.isDebugEnabled()) {
                 FILETRANSFER_LOGGER.debug("Returned pullFiles in:" +
@@ -1852,7 +1852,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             filesDst[j] = dstFile;
         }
 
-        list.addAll(FileTransfer.push(filesSrc, node, filesDst));
+        list.addAll(ProFileTransfer.push(filesSrc, node, filesDst));
 
         return list;
     }

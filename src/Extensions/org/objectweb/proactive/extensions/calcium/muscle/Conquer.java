@@ -30,18 +30,19 @@
  */
 package org.objectweb.proactive.extensions.calcium.muscle;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 /**
- * This class is used to conquer a vector of parameters
- * into a single parameters. It is usefull for skeletons
- * such as: divide&conquer and map.
+ * This interface is used to reduce a list of parameters
+ * into a single one. It is useful for {@link org.objectweb.proactive.extensions.calcium.skeletons.Skeleton}s
+ * such as: {@link org.objectweb.proactive.extensions.calcium.skeletons.DaC}), {@link org.objectweb.proactive.extensions.calcium.skeletons.Map}, and {@link org.objectweb.proactive.extensions.calcium.skeletons.Fork}.
  *
  * @author The ProActive Team (mleyton)
  *
- * @param <P,R>
  */
+@PublicAPI
 public interface Conquer<Y, R> extends Muscle<Y[], R> {
     public R conquer(SkeletonSystem system, Y[] param)
         throws Exception;

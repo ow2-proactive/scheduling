@@ -97,7 +97,7 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
         } catch (IOException e) {
             return new BooleanWrapper(false);
         }
-
+        
         return new BooleanWrapper(true);
     }
 
@@ -143,11 +143,6 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
     }
 
     /* ***************** BEGIN FILETRANSFER SERVICE SEND  ***************************/
-    public OperationStatus sendFile(File srcFile,
-        FileTransferServiceReceive remoteFTS, File dstFile) {
-        return sendFile(srcFile, remoteFTS, dstFile,
-            FileBlock.DEFAULT_BLOCK_SIZE, DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
-    }
 
     /**
      * This method handles the sending of a file.
@@ -158,8 +153,7 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
      * @param numFlyingBlocks The number of simultaneous blocks that will be sent.
      * @return The result status of the operation.
      */
-    public OperationStatus sendFile(File srcFile,
-        FileTransferServiceReceive ftsRemote, File dstFile, int bsize,
+    public OperationStatus sendFile(File srcFile, FileTransferServiceReceive ftsRemote, File dstFile, int bsize,
         int numFlyingBlocks) {
         long init = System.currentTimeMillis();
         long numBlocks = 0;
@@ -167,11 +161,12 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
         //Open the local reading buffer
         BufferedInputStream bis;
         try {
-            bis = new BufferedInputStream(new FileInputStream(
-                        srcFile.getAbsolutePath()), DEFAULT_BUFFER_SIZE);
+            bis = new BufferedInputStream(new FileInputStream( srcFile.getAbsolutePath()), DEFAULT_BUFFER_SIZE);
         } catch (Exception e) {
-            return new OperationStatus(new IOException(
-                    "Cannot open for sending:" + srcFile.getAbsoluteFile(), e));
+        	
+        	//TODO change when moving to Java 1.6
+            //return new OperationStatus(new IOException( "Cannot open for sending:" + srcFile.getAbsoluteFile(), e));
+        	return new OperationStatus(new IOException( "Cannot open for sending:" + srcFile.getAbsoluteFile() + " "+ e.getMessage()));
         }
 
         long totalNumBlocks = Math.round(Math.ceil(
@@ -219,8 +214,7 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
             ftsRemote.saveFileBlock(dstFile, fileBlock);
             numBlocks++;
         } catch (IOException e) {
-            return new OperationStatus(new IOException("Cannot send File to:" +
-                    ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e));
+            return new OperationStatus(new IOException("Cannot send File to:" + ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e));
         }
 
         //Close the remote/local buffers
@@ -234,10 +228,6 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
                 numBlocks + " blocks,  in: " + delta + "[ms]");
         }
 
-        //Done transferring file, put this object back in the pool
-        FileTransferEngine.getFileTransferEngine()
-                          .putFTS((FileTransferService) ProActiveObject.getStubOnThis());
-
         return new OperationStatus();
     }
 
@@ -247,5 +237,22 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
         } catch (IOException e) {
             //We don't care about closing exceptions
         }
+    }
+    
+    /**
+     * Put this active object back in the local pool
+     */
+    public void putBackInLocalPool(){
+    	
+        FileTransferEngine.getFileTransferEngine().putFTS((FileTransferService) ProActiveObject.getStubOnThis());
+    }
+    
+    /**
+     * Put the FileTransferServiceReceive destination object back on its local pool,
+     * and put my self (the source) on my local pool.
+     */
+    public void putBackInPool(FileTransferServiceReceive ftsDst){
+    	putBackInLocalPool();
+    	ftsDst.putBackInLocalPool();
     }
 }

@@ -30,19 +30,40 @@
  */
 package org.objectweb.proactive.extensions.calcium.futures;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.TaskException;
 import org.objectweb.proactive.extensions.calcium.statistics.Stats;
 
+/**
+ * This class represents a future result on a parameter submitted to the Calcium framework via a {@link org.objectweb.proactive.extensions.calcium.Stream Stream}.
+ * 
+ * The ProActive Team (mleyton)
+ */
+@PublicAPI
+public interface CalFuture<R> {
 
-public interface Future<R> {
-    //public boolean cancel(boolean mayInterruptIfRunning);
-    //public boolean isCancelled();
+	/**
+	 * @return true if the result is available
+	 */
     public boolean isDone();
-
-    //public T get(long timeout, TimeUnit unit) throws InterruptedException, MuscleException, TimeoutException;
+    
+    /**
+     * Waits if necessary for the computation to complete, and then retrieves its result.
+     * 
+     * @return the computed result
+     * 
+     * @throws InterruptedException
+     * @throws MuscleException
+     * @throws TaskException
+     */
     public R get() throws InterruptedException, MuscleException, TaskException;
-
-    public Stats getStats() throws InterruptedException;
-    //public Stats getStatus();
+    
+    /**
+     * Retrieves the computation statistics.
+     * 
+     * @return <code>null</code> if the result is not available. The stats otherwise. 
+     * @throws InterruptedException
+     */
+    public Stats getStats();
 }

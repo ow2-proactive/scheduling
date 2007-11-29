@@ -33,7 +33,17 @@ package org.objectweb.proactive.extensions.calcium.statistics;
 import java.io.Serializable;
 import java.util.Comparator;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
+/**
+ * This class provides profiling on a Muscle function. After
+ * the execution of the program, this class says how many times
+ * a muscle function was invoked, and how much time was spent in the computation
+ * of this class.
+ * 
+ * @author The ProActive Team (mleyton)
+ */
+@PublicAPI
 public class Exercise implements Serializable {
     public final static Comparator<Exercise> compareByComputationTime = new CompareByComputationTime();
     public final static Comparator<Exercise> compareByInvokedTimes = new CompareByInvokedTimes();
@@ -54,7 +64,7 @@ public class Exercise implements Serializable {
     }
 
     /**
-     * @return The Class of the muscle code that corresponds to this exercise.
+     * @return The Class of the muscle that corresponds to this exercise.
      */
     public Class<?> getMuscleClass() {
         return c;

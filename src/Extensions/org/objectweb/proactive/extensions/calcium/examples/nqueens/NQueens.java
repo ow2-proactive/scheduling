@@ -41,7 +41,7 @@ import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt1.SolveBT1;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt2.DivideBT2;
 import org.objectweb.proactive.extensions.calcium.examples.nqueens.bt2.SolveBT2;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
-import org.objectweb.proactive.extensions.calcium.futures.Future;
+import org.objectweb.proactive.extensions.calcium.futures.CalFuture;
 import org.objectweb.proactive.extensions.calcium.monitor.Monitor;
 import org.objectweb.proactive.extensions.calcium.monitor.SimpleLogMonitor;
 import org.objectweb.proactive.extensions.calcium.skeletons.DaC;
@@ -98,7 +98,7 @@ public class NQueens implements Serializable {
 
         try {
             for (; times > 0; times--) {
-                Future<Result> future = stream.retrieve();
+                CalFuture<Result> future = stream.retrieve();
                 Result res = future.get();
                 System.out.println(res);
                 System.out.println(future.getStats());

@@ -30,18 +30,19 @@
  */
 package org.objectweb.proactive.extensions.calcium.muscle;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 /**
- * This interfaces is used to provide evaulation
- * conditions in skeletons like: divide & conquer,
- * if, and while.
+ * This interface is used to provide evaluation
+ * conditions in {@link org.objectweb.proactive.extensions.calcium.skeletons.Skeleton}s like: {@link org.objectweb.proactive.extensions.calcium.skeletons.DaC},
+ * {@link org.objectweb.proactive.extensions.calcium.skeletons.If}, and {@link org.objectweb.proactive.extensions.calcium.skeletons.While}.
+ * 
  * @author The ProActive Team (mleyton)
  *
- * @param <T>
- *
  */
+@PublicAPI
 public interface Condition<P> extends Muscle<P, Boolean> {
     public boolean evalCondition(SkeletonSystem system, P param)
         throws Exception;

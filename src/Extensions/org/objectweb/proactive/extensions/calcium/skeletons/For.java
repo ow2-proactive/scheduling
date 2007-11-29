@@ -34,21 +34,41 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
 
+
+/**
+ * The <code>For</code> {@link Skeleton} represents iteration. It is used
+ * to execute a nested {@link Skeleton} a specific number of times.
+ */
 @PublicAPI
 public class For<P extends java.io.Serializable> implements Skeleton<P, P> {
     Skeleton<P, P> child;
     int times;
 
-    public For(int times, Skeleton<P, P> child) {
-        this.child = child;
+    /**
+     * This is the main constructor.  
+     * 
+     * @param times The number of times to execute the nested {@link Skeleton}
+     * @param nested The nested {@link Skeleton}.
+     */
+    public For(int times, Skeleton<P, P> nested) {
+        this.child = nested;
         this.times = times;
     }
 
+    /**
+     * This constructor wraps the {@link Execute} parameter in a {@link Seq}
+     * skeleton and invokes the main constructor: {@link For#For(int, Skeleton)}.
+     * 
+     * @param muscle The muscle to wrap in a {@link Seq} {@link Skeleton}.
+     */
     public For(int times, Execute<P, P> muscle) {
         this.child = new Seq<P, P>(muscle);
         this.times = times;
     }
 
+    /**
+     * @see Skeleton#accept(SkeletonVisitor)
+     */
     public void accept(SkeletonVisitor visitor) {
         visitor.visit(this);
     }

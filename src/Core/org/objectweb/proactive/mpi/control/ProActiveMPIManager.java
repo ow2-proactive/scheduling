@@ -37,6 +37,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.api.ProFileTransfer;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.ProActiveException;
@@ -105,7 +106,7 @@ public class ProActiveMPIManager implements Serializable {
                         "/libProActiveMPIComm.so");
                 File localSource = new File(u.getFile());
 
-                RemoteFile filePushed = FileTransfer.push(localSource,
+                RemoteFile filePushed = ProFileTransfer.push(localSource,
                         allNodes[0], remoteDest);
                 filePushed.waitForFinishedTransfer();
 

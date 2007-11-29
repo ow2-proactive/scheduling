@@ -39,13 +39,15 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
 /**
  * This skeleton represents Divide and Conquer parallelism (data parallelism).
- * To function, a Divide, Condition, and Conquer objects must be passed as
+ * A {@link Divide}, {@link Condition}, and {@link Conquer} objects must be passed as
  * parameter.
  *
- * If the Condition is met, a Task will be divided using the Divide object. If
- * the Condition is not met, the child skeleton will be executed. If the task
- * has subchilds, then the Conquer object will be used to conquer the child
- * tasks into the parent task.
+ * If the {@link Condition} is met (<code>true</code>), a parameter <code>P</code> will 
+ * be divided using the {@link Divide} object. If the {@link Condition} is not met (<code>false</code>),
+ * the nested skeleton will be executed. 
+ * 
+ * Once the nested skeleton has finished its execution, the {@link Conquer} object will be invoked to reduce
+ * the results into a single one.
  *
  * @author The ProActive Team (mleyton)
  */
@@ -58,17 +60,16 @@ public class DaC<P extends java.io.Serializable, R extends java.io.Serializable>
     Skeleton<P, R> child;
 
     /**
-     * Creates a Divide and Conquer skeleton structure
+     * Creates a Divide and Conquer {@link Skeleton}.
      *
      * @param div
-     *            Divides a task into subtasks
+     *            {@link Divide}s a single parameter into several
      * @param cond
-     *            True if divide should be applied to the task. False if it
-     *            should be solved.
+     *            <code>true</code> if {@link Divide} should be applied to the parameter, <code>false</code> if not.
      * @param child
-     *            The skeleton that should be applied to the subtasks.
+     *            The nested {@link Skeleton} that will be invoked.
      * @param conq
-     *            Conqueres the computed subtasks into a single task.
+     *            {@link Conquer}s the results of the nested {@link Skeleton} into a single task.
      */
     public DaC(Divide<P, P> div, Condition<P> cond, Skeleton<P, R> child,
         Conquer<R, R> conq) {
@@ -78,6 +79,12 @@ public class DaC<P extends java.io.Serializable, R extends java.io.Serializable>
         this.conq = conq;
     }
 
+    /**
+     * This method wraps the {@link Execute} parameter into a {@link Seq}, and then invokes the
+     * other constructor {@link #DaC(Divide, Condition, Skeleton, Conquer)}}.
+     * 
+     * @param muscle The muscle to wrap in a {@link Seq} {@link Skeleton}
+     */
     public DaC(Divide<P, P> div, Condition<P> cond, Execute<P, R> muscle,
         Conquer<R, R> conq) {
         this.div = div;
@@ -91,6 +98,9 @@ public class DaC<P extends java.io.Serializable, R extends java.io.Serializable>
         return "DaC";
     }
 
+    /**
+     * @see Skeleton#accept(SkeletonVisitor)
+     */
     public void accept(SkeletonVisitor visitor) {
         visitor.visit(this);
     }

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.calcium.examples.findprimes;
 
+import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
@@ -37,7 +38,8 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class IntervalDivide implements Divide<Interval, Interval> {
-    public Vector<Interval> divide(SkeletonSystem system, Interval param) {
+	
+    public List<Interval> divide(SkeletonSystem system, Interval param) {
         Interval ttUp = new Interval(1 + param.min +
                 ((param.max - param.min) / 2), param.max, param.solvableSize);
 

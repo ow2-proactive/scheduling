@@ -30,14 +30,16 @@
  */
 package org.objectweb.proactive.extensions.calcium.exceptions;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * A panic exception indicates that all the execution must
  * be halted as a result of this error.
  *
  * @author The ProActive Team (mleyton)
- *
  */
+@PublicAPI
 public class PanicException extends Exception {
     public PanicException(String msg) {
         super(msg);

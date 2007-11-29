@@ -30,27 +30,46 @@
  */
 package org.objectweb.proactive.extensions.calcium.monitor;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.Calcium;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
 
-
+/**
+ * This class provides a simple monitor that periodically queries the Calcium
+ * framework and prints the results.
+ *  
+ *  * @author The ProActive Team (mleyton)
+ */
+@PublicAPI
 public class SimpleLogMonitor implements Monitor {
     Calcium calcium;
     int frequency;
     MonitoringThread thread;
 
+    /**
+     * The constructor.
+     * 
+     * @param calcium The framework to query.
+     * @param frequency The number of seconds to wait between each query.
+     */
     public SimpleLogMonitor(Calcium calcium, int frequency) {
         this.calcium = calcium;
         this.frequency = frequency;
         thread = null;
     }
 
+    /**
+     * @see {@link Monitor#stop()}
+     */
     public void stop() {
         thread.myStop();
         thread.interrupt();
         thread = null;
     }
 
+    /**
+     * @see {@link Monitor#start()}
+     */
     public void start() {
         if (thread != null) {
             return;

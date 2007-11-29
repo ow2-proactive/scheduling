@@ -52,14 +52,14 @@ import org.objectweb.proactive.extensions.calcium.task.TaskId;
  *
  * @param <R> The type of the parameter for which this future stands.
  */
-public class FutureImpl<R> implements Future<R> {
+public class CalFutureImpl<R> implements CalFuture<R> {
     Task<R> task;
     TaskId taskId;
-    BlockingQueue<Future<R>> callback;
+    BlockingQueue<CalFuture<R>> callback;
     FileServerClient fserver;
     File outDir;
 
-    public FutureImpl(TaskId taskId, FileServerClient fserver, File outRootDir) {
+    public CalFutureImpl(TaskId taskId, FileServerClient fserver, File outRootDir) {
         this.task = null;
         this.taskId = taskId;
         this.fserver = fserver;
@@ -138,7 +138,7 @@ public class FutureImpl<R> implements Future<R> {
         notifyAll();
     }
 
-    public synchronized void setCallBackQueue(BlockingQueue<Future<R>> callback) {
+    public synchronized void setCallBackQueue(BlockingQueue<CalFuture<R>> callback) {
         this.callback = callback;
     }
 

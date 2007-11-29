@@ -43,7 +43,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class is the interface for creating files on the computation node.
- * This class is not serializable on purpose, since it is environment dependant.
+ * 
+ * This class is not Serializable on purpose, since it is environment dependent.
  *
  * @author The ProActive Team (mleyton)
  */

@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.calcium;
 
 import java.io.File;
 import java.util.Vector;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -42,8 +43,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
-import org.objectweb.proactive.extensions.calcium.futures.Future;
-import org.objectweb.proactive.extensions.calcium.futures.FutureImpl;
+import org.objectweb.proactive.extensions.calcium.futures.CalFuture;
+import org.objectweb.proactive.extensions.calcium.futures.CalFutureImpl;
 import org.objectweb.proactive.extensions.calcium.skeletons.InstructionBuilderVisitor;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
@@ -51,7 +52,15 @@ import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 import org.objectweb.proactive.extensions.calcium.task.TaskPriority;
 
-
+/**
+ * A <code>Stream</code> is used to input parameters into the Calcium framework, 
+ * and collect results.
+ * 
+ * All parameters inputed into the framework will execute the skeleton program
+ * specified during the creation of the <code>Stream</code>.
+ *  
+ * @author The ProActive Team (mleyton)
+ */
 @PublicAPI
 public class Stream<T extends java.io.Serializable, R extends java.io.Serializable> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
@@ -60,9 +69,8 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
     private Skeleton<T, R> skeleton;
     private int streamPriority;
     private FileServerClient fserver;
-    private static File DEFAULT_OUTPUT_ROOT_DIR = SkeletonSystemImpl.newDirInTmp(
-            "calcium-output");
-    BlockingQueue<Future<R>> list;
+    private static File DEFAULT_OUTPUT_ROOT_DIR = SkeletonSystemImpl.newDirInTmp( "calcium-output");
+    BlockingQueue<CalFuture<R>> list;
 
     Stream(Facade facade, FileServerClient fserver, Skeleton<T, R> skeleton) {
         this.streamId = (int) (Math.random() * Integer.MAX_VALUE);
@@ -71,10 +79,10 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
         this.fserver = fserver;
 
         this.streamPriority = TaskPriority.DEFAULT_PRIORITY;
-        this.list = new LinkedBlockingQueue<Future<R>>();
+        this.list = new LinkedBlockingQueue<CalFuture<R>>();
     }
 
-    public Future<R> input(T param) throws PanicException {
+    public CalFuture<R> input(T param) throws PanicException {
         return input(param, DEFAULT_OUTPUT_ROOT_DIR);
     }
 
@@ -85,7 +93,7 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @throws PanicException
      */
     @SuppressWarnings("unchecked")
-    public Future<R> input(T param, File outputRootDir)
+    public CalFuture<R> input(T param, File outputRootDir)
         throws PanicException {
         //Put the parameters in a Task container
         Task<T> task = new Task<T>(param);
@@ -101,28 +109,30 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
         task.setStack(builder.stack);
         task.setPriority(new TaskPriority(streamPriority));
 
-        FutureImpl<R> future = new FutureImpl<R>(task.taskId, fserver,
+        CalFutureImpl<R> future = new CalFutureImpl<R>(task.taskId, fserver,
                 outputRootDir);
         facade.putTask(task, future);
 
         return future;
     }
 
-    public Vector<Future<R>> input(Vector<T> paramV)
+    public List<CalFuture<R>> input(List<T> paramV)
         throws InterruptedException, PanicException {
         return input(paramV, DEFAULT_OUTPUT_ROOT_DIR);
     }
 
     /**
-     * Inputs a vector of T to be computed.
-     * @param paramV A vector containing the T.
+     * Inputs a list of T to be computed.
+     * 
+     * @param paramV A list containing the T.
      * @param outputRootDir The root directory where files resulting from the computation are to be stored.
+     * @return A list of futures {@link CalFuture} that will be updated with the results. 
      * @throws PanicException
      * @throws InterruptedException
      */
-    public Vector<Future<R>> input(Vector<T> paramV, File outputRootDir)
+    public List<CalFuture<R>> input(List<T> paramV, File outputRootDir)
         throws InterruptedException, PanicException {
-        Vector<Future<R>> vector = new Vector<Future<R>>(paramV.size());
+        Vector<CalFuture<R>> vector = new Vector<CalFuture<R>>(paramV.size());
         for (T param : paramV)
             vector.add(input(param, outputRootDir));
 
@@ -136,18 +146,18 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @param param The parameter to compute
      * @param queue  The queue to put the future once the result is available.
      * @param outputRootDir The root directory where files resulting from the computation are to be stored.
-     * @return The future that will hold the result.
+     * @return The future  {@link CalFuture}  that will hold the result.
      *
      * @throws PanicException
      */
     @SuppressWarnings("unchecked")
-    public void input(T param, BlockingQueue<Future<R>> queue,
+    public void input(T param, BlockingQueue<CalFuture<R>> queue,
         File outputRootDir) throws PanicException {
-        FutureImpl<R> future = (FutureImpl) this.input(param, outputRootDir);
+        CalFutureImpl<R> future = (CalFutureImpl) this.input(param, outputRootDir);
         future.setCallBackQueue(queue);
     }
 
-    public void input(T param, BlockingQueue<Future<R>> queue)
+    public void input(T param, BlockingQueue<CalFuture<R>> queue)
         throws PanicException {
         input(param, queue, DEFAULT_OUTPUT_ROOT_DIR);
     }
@@ -161,7 +171,7 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @throws PanicException
      */
     public void submit(T param, File outputRootDir) throws PanicException {
-        FutureImpl<R> future = (FutureImpl) this.input(param, outputRootDir);
+        CalFutureImpl<R> future = (CalFutureImpl) this.input(param, outputRootDir);
         future.setCallBackQueue(list);
     }
 
@@ -171,7 +181,7 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
 
     /**
      * This method can be used to block for a future holding a result.
-     * For each parameter submited into the stream using the {@link #submit(T) submit} method,
+     * For each parameter submitted into the stream using the {@link #submit(T) submit} method,
      * a future holding the already available result can be obtained with this method.
      * @param timeout how long to wait before giving up, in units of
      * <tt>unit</tt>
@@ -180,15 +190,15 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @return The first available result.
      * @throws InterruptedException
      */
-    public Future<R> retrieve(long timeout, TimeUnit unit)
+    public CalFuture<R> retrieve(long timeout, TimeUnit unit)
         throws InterruptedException {
         return list.poll(timeout, unit);
     }
 
     /**
-     * Like {@link #retrieve(long, TimeUnit) retrieve} but waits indefenetly.
+     * Like {@link #retrieve(long, TimeUnit) retrieve} but waits indefinitely.
      */
-    public Future<R> retrieve() throws InterruptedException {
+    public CalFuture<R> retrieve() throws InterruptedException {
         return list.take();
     }
 }

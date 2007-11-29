@@ -51,15 +51,6 @@ public class SolveBT1 extends SolveBoard {
         return mixBoard(res, n1, n2);
     }
 
-    /**
-    * Metodo que calcula las tareas de tipo BT1
-     * @param res
-    * @param y
-    * @param left
-    * @param down
-    * @param right
-    * @return
-    */
     private void backtrack1(Result res, BoardBT1 board, int y, int left,
         int down, int right) {
         int bitmap = board.mask & ~(left | down | right);

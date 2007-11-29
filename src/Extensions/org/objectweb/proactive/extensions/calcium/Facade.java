@@ -37,7 +37,7 @@ import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
-import org.objectweb.proactive.extensions.calcium.futures.FutureImpl;
+import org.objectweb.proactive.extensions.calcium.futures.CalFutureImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 import org.objectweb.proactive.extensions.calcium.task.TaskId;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
@@ -48,7 +48,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
  * Since the kernel handles tasks for multiple streams at the same
  * time, this class is in charge of redirecting:
  *  -Tasks from streams into the taskpool
- *  -Tasks comming out from the taskpool into their respective streams.
+ *  -Tasks coming out from the taskpool into their respective streams.
  *
  * @author The ProActive Team (mleyton)
  */
@@ -66,7 +66,7 @@ class Facade {
         this.counter = 0;
     }
 
-    synchronized void putTask(Task<?> task, FutureImpl<?> future)
+    synchronized void putTask(Task<?> task, CalFutureImpl<?> future)
         throws PanicException {
         task.taskId.setFamilyId(counter * (-1));
         counter++;
@@ -86,11 +86,11 @@ class Facade {
      * @author The ProActive Team (mleyton)
      */
     class FutureUpdateThread extends Thread {
-        Hashtable<TaskId, FutureImpl<?>> pending;
+        Hashtable<TaskId, CalFutureImpl<?>> pending;
         boolean shutdown;
 
         public FutureUpdateThread() {
-            pending = new Hashtable<TaskId, FutureImpl<?>>();
+            pending = new Hashtable<TaskId, CalFutureImpl<?>>();
             shutdown = false;
         }
 
@@ -99,7 +99,7 @@ class Facade {
          * The stream id must be stored inside the task before storing it.
          * @param task The task to store.
          */
-        synchronized void put(FutureImpl<?> future) {
+        synchronized void put(CalFutureImpl<?> future) {
             TaskId taskId = future.getTaskId();
 
             if (pending.containsKey(taskId)) {
@@ -117,7 +117,7 @@ class Facade {
                 return;
             }
 
-            FutureImpl<?> future = pending.remove(task.taskId);
+            CalFutureImpl<?> future = pending.remove(task.taskId);
             future.setFinishedTask(task);
         }
 

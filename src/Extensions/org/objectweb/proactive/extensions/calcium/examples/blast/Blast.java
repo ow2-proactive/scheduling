@@ -38,7 +38,7 @@ import org.objectweb.proactive.extensions.calcium.Stream;
 import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
-import org.objectweb.proactive.extensions.calcium.futures.Future;
+import org.objectweb.proactive.extensions.calcium.futures.CalFuture;
 import org.objectweb.proactive.extensions.calcium.skeletons.DaC;
 import org.objectweb.proactive.extensions.calcium.skeletons.Pipe;
 import org.objectweb.proactive.extensions.calcium.skeletons.Seq;
@@ -88,7 +88,7 @@ public class Blast {
         //EnvironmentFactory envfactory = new MultiThreadedEnvironment(10);
         Calcium calcium = new Calcium(envfactory);
         Stream<BlastParams, File> stream = calcium.newStream(root);
-        Future<File> future = stream.input(parameters);
+        CalFuture<File> future = stream.input(parameters);
         calcium.boot();
 
         try {

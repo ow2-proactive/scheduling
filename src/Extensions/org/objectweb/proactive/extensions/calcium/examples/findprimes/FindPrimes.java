@@ -39,11 +39,10 @@ import org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory
 import org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment;
 import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
-import org.objectweb.proactive.extensions.calcium.futures.Future;
+import org.objectweb.proactive.extensions.calcium.futures.CalFuture;
 import org.objectweb.proactive.extensions.calcium.skeletons.DaC;
 import org.objectweb.proactive.extensions.calcium.skeletons.Skeleton;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
-
 
 public class FindPrimes implements Serializable {
     public Skeleton<Interval, Primes> root;
@@ -73,7 +72,7 @@ public class FindPrimes implements Serializable {
 
         Stream<Interval, Primes> stream = calcium.newStream(root);
 
-        Vector<Future<Primes>> futures = new Vector<Future<Primes>>(3);
+        Vector<CalFuture<Primes>> futures = new Vector<CalFuture<Primes>>(3);
         futures.add(stream.input(new Interval(1, 6400, 300)));
         futures.add(stream.input(new Interval(1, 100, 20)));
         futures.add(stream.input(new Interval(1, 640, 64)));
@@ -81,7 +80,7 @@ public class FindPrimes implements Serializable {
         calcium.boot();
 
         try {
-            for (Future<Primes> future : futures) {
+            for (CalFuture<Primes> future : futures) {
                 Primes res = future.get();
                 for (Integer i : res.primes) {
                     System.out.print(i + " ");

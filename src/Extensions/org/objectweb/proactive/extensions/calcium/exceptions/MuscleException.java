@@ -30,14 +30,16 @@
  */
 package org.objectweb.proactive.extensions.calcium.exceptions;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
- * A Parameter Exception indicates that the execution of the task related with this parameter
- * can not continue, and the execution of related tasks (parent, brothers, children) must
- * also be stoped.
+ * A Muscle Exception indicates that the execution of a skeleton program cannot conitnue
+ * due to erros generated from inside @{link org.objectweb.proactive.extensions.calcium.muscle.Muscle} functions.
  *
  * @author The ProActive Team (mleyton)
  */
+@PublicAPI
 public class MuscleException extends RuntimeException {
     public MuscleException(String msg) {
         super(msg);

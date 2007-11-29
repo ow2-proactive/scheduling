@@ -38,19 +38,51 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-
+/**
+ * This class provides reference that can access a remote FileServer 
+ * on the execution environment, from the execution nodes.
+ * 
+ * @author The ProActive Team (mleyton)
+ */
 public interface FileServerClient {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
 
-    public StoredFile store(File current, int refCount)
-        throws IOException;
+    /**
+     * Stores a file on the FileServer.
+     * 
+     * @param current The local location of the file
+     * @param refCount The number of references on this file
+     * @return A {@link StoredFile StoredFile} object representing the file on the FileServer.
+     * @throws IOException if an error is detected
+     */
+    public StoredFile store(File current, int refCount) throws IOException;
 
-    public void fetch(StoredFile rfile, File localDst)
-        throws IOException;
+    /**
+     * Retrieves a file from the FileServer
+     *  
+     * @param rfile The reference of the file on the FileServer
+     * @param localDst The local destination of the file.
+     * @throws IOException if an error is detected.
+     */
+    public void fetch(StoredFile rfile, File localDst) throws IOException;
 
+    /**
+     * Stores a file reachable through an URL on the FileServer.
+     * 
+     * @see #store(File, int)
+     */
     public StoredFile store(URL current) throws IOException;
 
+    /**
+     * Commits a reference count modification
+     * 
+     * @param fileId The file's unique id on the remote server
+     * @param refCountDelta The reference count difference on the server. Can be a positive or negative value. 
+     */
     public void commit(long fileId, int refCountDelta);
 
+    /**
+     * Shuts down the file server.
+     */
     public void shutdown();
 }
