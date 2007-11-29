@@ -59,7 +59,8 @@ public class CalFutureImpl<R> implements CalFuture<R> {
     FileServerClient fserver;
     File outDir;
 
-    public CalFutureImpl(TaskId taskId, FileServerClient fserver, File outRootDir) {
+    public CalFutureImpl(TaskId taskId, FileServerClient fserver,
+        File outRootDir) {
         this.task = null;
         this.taskId = taskId;
         this.fserver = fserver;
@@ -138,7 +139,8 @@ public class CalFutureImpl<R> implements CalFuture<R> {
         notifyAll();
     }
 
-    public synchronized void setCallBackQueue(BlockingQueue<CalFuture<R>> callback) {
+    public synchronized void setCallBackQueue(
+        BlockingQueue<CalFuture<R>> callback) {
         this.callback = callback;
     }
 

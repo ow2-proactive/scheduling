@@ -34,6 +34,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.muscle.Condition;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
+
 /**
  * The <code>While</code> {@link Skeleton} represents conditioned iteration.
  * The nested {@link Skeleton} will be executed while the {@link Condition} holds <code>true</code>.
@@ -48,7 +49,7 @@ public class While<P extends java.io.Serializable> implements Skeleton<P, P> {
 
     /**
      * The main constructor.
-     *  
+     *
      * @param cond The {@link Condition} that will be evaluated on each iteration.
      * @param nested The nested skeleton that will be invoked.
      */
@@ -57,12 +58,11 @@ public class While<P extends java.io.Serializable> implements Skeleton<P, P> {
         this.child = nested;
     }
 
-    
     /**
      * Like the main constructor, but accepts {@link Execute} objects.
-     * 
+     *
      * The {@link Execute} object will be wrapped in a {@link Seq} {@link Skeleton}.
-     *  
+     *
      * @param cond The {@link Condition} that will be evaluated on each iteration.
      * @param muscle The {@link Execute} that will be invoked on each iteration.
      */

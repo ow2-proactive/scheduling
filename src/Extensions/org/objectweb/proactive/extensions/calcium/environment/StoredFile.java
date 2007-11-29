@@ -36,9 +36,10 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * A <code>StoredFile</code> is a reference on a file stored in a {@link FileServer}.
- * 
+ *
  * @author The ProActive Team (mleyton)
  */
 public class StoredFile implements java.io.Serializable {

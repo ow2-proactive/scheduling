@@ -36,8 +36,8 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
 /**
  * The <code>Seq</code> skeleton is a wrapper for {@link Execute} muscle ibjects.
- * It is mainly used as a terminal {@link Skeleton}, ie it does not nest other {@link Skeleton}s. 
- * 
+ * It is mainly used as a terminal {@link Skeleton}, ie it does not nest other {@link Skeleton}s.
+ *
  * @author The ProActive Team (mleyton)
  *
  */
@@ -48,7 +48,7 @@ public class Seq<P extends java.io.Serializable, R extends java.io.Serializable>
 
     /**
      * The constructor.
-     * 
+     *
      * @param secCode The {@link Execute} muscle that will be wrapped in this {@link Skeleton}
      */
     public Seq(Execute<P, R> secCode) {

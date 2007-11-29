@@ -41,7 +41,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This is the main interface that marks an object as a <code>Skeleton</code>.
  * All <code>Skeleton</code>s supported by the framework implement this class.
- * 
+ *
  * A <code>Skeleton</code> is a visitable object (see Visitor Pattern).
  *
  * @author The ProActive Team (mleyton)
@@ -52,9 +52,9 @@ public interface Skeleton<P extends Serializable, R extends Serializable> {
 
     /**
      * This method accepts a <code>SkeletonVisitor</code>.
-     * 
+     *
      * It is used to navigate the skeleton program tree.
-     * 
+     *
      * @param visitor The visitor.
      */
     void accept(SkeletonVisitor visitor);

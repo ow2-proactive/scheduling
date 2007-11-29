@@ -32,18 +32,19 @@ package org.objectweb.proactive.extensions.calcium.monitor;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
- * A monitor provides a simple way to log messages from the 
+ * A monitor provides a simple way to log messages from the
  * skeleton framework.
- * 
+ *
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
 public interface Monitor {
 
-	/**
-	 * Start the monitoring
-	 */
+    /**
+     * Start the monitoring
+     */
     public void start();
 
     /**

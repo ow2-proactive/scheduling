@@ -36,9 +36,10 @@ import java.util.Vector;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 
+
 /**
  * The <code>Pipe</code> {@link Skeleton} represents staged computation.
- * 
+ *
  * Each element of the pipe will be executed sequentially for each {@link Skeleton} element.
  *
  * @author The ProActive Team (mleyton)
@@ -49,9 +50,9 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
     Vector<Skeleton<?, ?>> stages;
 
     /**
-     * The basic constructor. Will execute <code>stage1</code> and the result of 
-     * <code>stage1</code> will be passed as parameter to <code>stage2</code> 
-	 *
+     * The basic constructor. Will execute <code>stage1</code> and the result of
+     * <code>stage1</code> will be passed as parameter to <code>stage2</code>
+         *
      * @param stage1 The first stage to execute.
      * @param stage2 The second stage to execute.
      */
@@ -66,9 +67,9 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
     /**
      * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
      * an {@link Execute} instead of a {@link Skeleton}.
-     * 
+     *
      * Each {@link Execute} will be wrapped in a {@link Seq} {@link Skeleton}.
-     * 
+     *
      * @param stage1 The first stage of computation.
      * @param stage2 The second stage of computation.
      */
@@ -83,7 +84,7 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
     /**
      * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
      * three stages instead of two.
-     * 
+     *
      * @param stage1 The first stage of computation.
      * @param stage2 The second stage of computation.
      * @param child3 The third stage of computation.
@@ -100,9 +101,9 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
     /**
      * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
      * three stages of {@link Execute} instead of two.
-     * 
+     *
      * Each {@link Execute} will be wrapped in a {@link Seq} {@link Skeleton}.
-     * 
+     *
      * @param stage1 The first stage of computation.
      * @param stage2 The second stage of computation.
      * @param child3 The third stage of computation.
@@ -119,9 +120,9 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
     /**
      * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
      * four stages instead of two.
-     * 
-     * For building <code>Pipe</code>s with more than four stages, a <code>Pipe</code> nesting other <code>Pipe</code>'s can be used. 
-     * 
+     *
+     * For building <code>Pipe</code>s with more than four stages, a <code>Pipe</code> nesting other <code>Pipe</code>'s can be used.
+     *
      * @param stage1 The first stage of computation.
      * @param stage2 The second stage of computation.
      * @param child3 The third stage of computation.
@@ -141,9 +142,9 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
     /**
      * Like the {@link Pipe#Pipe(Skeleton, Skeleton) basic} constructor, but accepts
      * four stages of {@link Execute} instead of two.
-     * 
-     * Each {@link Execute} will be wrapped in a {@link Seq} {@link Skeleton}. 
-     * 
+     *
+     * Each {@link Execute} will be wrapped in a {@link Seq} {@link Skeleton}.
+     *
      * @param stage1 The first stage of computation.
      * @param stage2 The second stage of computation.
      * @param child3 The third stage of computation.

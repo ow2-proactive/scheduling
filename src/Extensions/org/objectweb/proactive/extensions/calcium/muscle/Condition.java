@@ -38,7 +38,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  * This interface is used to provide evaluation
  * conditions in {@link org.objectweb.proactive.extensions.calcium.skeletons.Skeleton}s like: {@link org.objectweb.proactive.extensions.calcium.skeletons.DaC},
  * {@link org.objectweb.proactive.extensions.calcium.skeletons.If}, and {@link org.objectweb.proactive.extensions.calcium.skeletons.While}.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  */

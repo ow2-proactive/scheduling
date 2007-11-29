@@ -46,7 +46,7 @@ public class Farm<P extends java.io.Serializable, R extends java.io.Serializable
 
     /**
      * The main constructor.
-     * 
+     *
      * @param child The {@link Skeleton} to replicate.
      */
     public Farm(Skeleton<P, R> child) {
@@ -56,7 +56,7 @@ public class Farm<P extends java.io.Serializable, R extends java.io.Serializable
     /**
      * This constructor wraps the {@link Execute} parameter in a {@link Seq}
      * skeleton and invokes the main constructor: {@link Farm#Farm(Skeleton)}.
-     * 
+     *
      * @param muscle The muscle to wrap in a {@link Seq} {@link Skeleton}
      */
     public Farm(Execute<P, R> muscle) {

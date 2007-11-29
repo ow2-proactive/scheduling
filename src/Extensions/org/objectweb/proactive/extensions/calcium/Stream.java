@@ -31,8 +31,8 @@
 package org.objectweb.proactive.extensions.calcium;
 
 import java.io.File;
-import java.util.Vector;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -52,13 +52,14 @@ import org.objectweb.proactive.extensions.calcium.system.files.FileStaging;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 import org.objectweb.proactive.extensions.calcium.task.TaskPriority;
 
+
 /**
- * A <code>Stream</code> is used to input parameters into the Calcium framework, 
+ * A <code>Stream</code> is used to input parameters into the Calcium framework,
  * and collect results.
- * 
+ *
  * All parameters inputed into the framework will execute the skeleton program
  * specified during the creation of the <code>Stream</code>.
- *  
+ *
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
@@ -69,7 +70,8 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
     private Skeleton<T, R> skeleton;
     private int streamPriority;
     private FileServerClient fserver;
-    private static File DEFAULT_OUTPUT_ROOT_DIR = SkeletonSystemImpl.newDirInTmp( "calcium-output");
+    private static File DEFAULT_OUTPUT_ROOT_DIR = SkeletonSystemImpl.newDirInTmp(
+            "calcium-output");
     BlockingQueue<CalFuture<R>> list;
 
     Stream(Facade facade, FileServerClient fserver, Skeleton<T, R> skeleton) {
@@ -123,10 +125,10 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
 
     /**
      * Inputs a list of T to be computed.
-     * 
+     *
      * @param paramV A list containing the T.
      * @param outputRootDir The root directory where files resulting from the computation are to be stored.
-     * @return A list of futures {@link CalFuture} that will be updated with the results. 
+     * @return A list of futures {@link CalFuture} that will be updated with the results.
      * @throws PanicException
      * @throws InterruptedException
      */
@@ -153,7 +155,8 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
     @SuppressWarnings("unchecked")
     public void input(T param, BlockingQueue<CalFuture<R>> queue,
         File outputRootDir) throws PanicException {
-        CalFutureImpl<R> future = (CalFutureImpl) this.input(param, outputRootDir);
+        CalFutureImpl<R> future = (CalFutureImpl) this.input(param,
+                outputRootDir);
         future.setCallBackQueue(queue);
     }
 
@@ -171,7 +174,8 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @throws PanicException
      */
     public void submit(T param, File outputRootDir) throws PanicException {
-        CalFutureImpl<R> future = (CalFutureImpl) this.input(param, outputRootDir);
+        CalFutureImpl<R> future = (CalFutureImpl) this.input(param,
+                outputRootDir);
         future.setCallBackQueue(list);
     }
 

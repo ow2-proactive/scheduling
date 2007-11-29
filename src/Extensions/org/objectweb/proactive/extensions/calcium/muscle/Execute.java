@@ -36,9 +36,9 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 /**
  * This interface is used to execute a function on a parameter and return the result.
- * 
+ *
  * This interface is used in {@link org.objectweb.proactive.extensions.calcium.skeletons.Skeleton}s such as: {@link org.objectweb.proactive.extensions.calcium.skeletons.Seq}, {@link org.objectweb.proactive.extensions.calcium.skeletons.Farm}, {@link org.objectweb.proactive.extensions.calcium.skeletons.Pipe}, etc...
- * 
+ *
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI

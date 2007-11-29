@@ -48,10 +48,10 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 /**
  * This skeleton represents data parallelism: multiple data multiple instructions (MIMD).
- * 
+ *
  * By default, a parameter inputed into this {@link Skeleton} is copied, and each sub-parameter is then
  * inputed into a different nested {@link Skeleton}. (MISD: Multiple Instruction Single Data)
- * 
+ *
  * Additionally, a divide method can be provided to divide the parameter into sub-parameters.
  * Each sub-parameter will be inputed into a different nested {@link Skeleton}. (MIMD)
  *
@@ -69,10 +69,10 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
 
     /**
      * This constructor uses the <code>Fork</code>'s default {@link Divide} and {@link Conquer}.
-     * 
+     *
      * The default {@link Divide} behavior is to copy the input parameter.
      * The default {@link Conquer} behavior is to return the first result of the array.
-     * 
+     *
      * @see org.objectweb.proactive.extensions.calcium.skeletons.Fork.ForkDefaultDivide
      * @see org.objectweb.proactive.extensions.calcium.skeletons.Fork.ForkDefaultConquer
      *
@@ -106,9 +106,9 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
     }
 
     /**
-     * This constructor uses a default {@link Divide} object, and 
+     * This constructor uses a default {@link Divide} object, and
      * uses the customized {@link Conquer} object provided as parameter to reduce the results.
-     * 
+     *
      * @see org.objectweb.proactive.extensions.calcium.skeletons.Fork.ForkDefaultDivide
      *
      * @param conq
@@ -116,7 +116,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
      * @param args
      *            The nested {@link Skeleton}s that will be executed, in parallel, on one of the parameter copies.
      */
-    public <X extends Serializable> Fork(Conquer<X, R> conq,
+    public <X extends Serializable>Fork(Conquer<X, R> conq,
         Skeleton<P, X>... args) {
         forkInit(new ForkDefaultDivide<P>(args.length), Arrays.asList(args),
             conq);
@@ -124,7 +124,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
 
     /**
      * This constructor allows for a customized {@link Divide} and {@link Conquer} skeletons.
-     * 
+     *
      * The number of elements returned by the {@link Divide} object must be the same as
      * the number of <code>skelList</code>, or a MuscleException error will be generated at runtime.
      *
@@ -170,10 +170,10 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
     /**
      * This is the default {@link Divide} behavor for <code>Fork</code>. It deep-copies the input
      * parameter into N copies.
-     * 
+     *
      * The copy corresponds to a deep-copy, ie each nested skeleton receives a copy of the
      * parameter. The deep-copy can be inefficient (because relies in serialization).
-     * 
+     *
      * @author The ProActive Team (mleyton)
      */
     @StateFul(value = false)
@@ -182,7 +182,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
 
         /**
          * The constructor specifying the number of copies to generate.
-         * 
+         *
          * @param number The number of copies.
          */
         public ForkDefaultDivide(int number) {
@@ -191,7 +191,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
 
         /**
          * Divides the parameter into <number> copies.
-         * 
+         *
          * @see Divide#divide(SkeletonSystem, Object)
          */
         public List<T> divide(SkeletonSystem system, T param)
@@ -209,17 +209,17 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
 
     /**
      * This class is the default {@link Conquer} method for <code>Fork</code>.
-     * 
+     *
      * The reduction of results simply chooses the first result of the array.
      *
      * @author The ProActive Team (mleyton)
      *
      */
     static public class ForkDefaultConquer<T> implements Conquer<T, T> {
-    	
-    	/**
-    	 * @see Conquer#conquer(SkeletonSystem, Object[])
-    	 */
+
+        /**
+             * @see Conquer#conquer(SkeletonSystem, Object[])
+             */
         public T conquer(SkeletonSystem system, T[] param)
             throws RuntimeException, EnvironmentException {
             return param[0];

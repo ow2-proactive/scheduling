@@ -48,7 +48,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
 /**
  * This class provides distributed execution environment for {@link org.objectweb.proactive.extensions.calcium.Calcium Calcium}.
  * The environment is based on ProActive's deployment and active object models.
- * 
+ *
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
@@ -63,22 +63,22 @@ public class ProActiveEnvironment implements EnvironmentFactory {
     /**
      * Constructs an environment using the specified descriptor.
      * The descriptor must satisfy a contract with the following variables:
-     * 
+     *
      *  <pre>
-     * 	&lt;variables&gt;
- 	     &lt;descriptorVariable name="SKELETON_FRAMEWORK_VN" value="framework" /&gt     	
-		 &lt;descriptorVariable name="INTERPRETERS_VN" value="interpreters" /&gt
-    	&lt;/variables&gt
-    	</pre>
-     * 
-     * 
+     *         &lt;variables&gt;
+              &lt;descriptorVariable name="SKELETON_FRAMEWORK_VN" value="framework" /&gt
+                 &lt;descriptorVariable name="INTERPRETERS_VN" value="interpreters" /&gt
+            &lt;/variables&gt
+            </pre>
+     *
+     *
      * The variable <code>SKELETON_FRAMEWORK_VN</code> specifies the virtual node that will be used to store the
      * main active objects, such as taskpool, file server, etc.
-     * 
-     * The <code>INTERPRETERS_VN</code> variable specifies the virtual node that will be used to execute the computation. 
-     * 
+     *
+     * The <code>INTERPRETERS_VN</code> variable specifies the virtual node that will be used to execute the computation.
+     *
      * And optionally with:<![CDATA[ <programDefaultVariable name="MAX_CINTERPRETERS" value="3"/> ]]>.
-     * 
+     *
      * @param descriptor The local descriptor path.
      * @throws ProActiveException If an error is detected.
      */
@@ -105,8 +105,8 @@ public class ProActiveEnvironment implements EnvironmentFactory {
                 frameworkNode, nodes, maxCInterp);
 
         dispatcher = new TaskDispatcher(taskpool, interpool);
-    }  
-    
+    }
+
     /**
      * This method returns an active object version of the taskpool.
      * @see EnvironmentFactory#getTaskPool()

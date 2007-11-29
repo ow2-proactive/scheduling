@@ -42,10 +42,10 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  * A {@link Divide}, {@link Condition}, and {@link Conquer} objects must be passed as
  * parameter.
  *
- * If the {@link Condition} is met (<code>true</code>), a parameter <code>P</code> will 
+ * If the {@link Condition} is met (<code>true</code>), a parameter <code>P</code> will
  * be divided using the {@link Divide} object. If the {@link Condition} is not met (<code>false</code>),
- * the nested skeleton will be executed. 
- * 
+ * the nested skeleton will be executed.
+ *
  * Once the nested skeleton has finished its execution, the {@link Conquer} object will be invoked to reduce
  * the results into a single one.
  *
@@ -82,7 +82,7 @@ public class DaC<P extends java.io.Serializable, R extends java.io.Serializable>
     /**
      * This method wraps the {@link Execute} parameter into a {@link Seq}, and then invokes the
      * other constructor {@link #DaC(Divide, Condition, Skeleton, Conquer)}}.
-     * 
+     *
      * @param muscle The muscle to wrap in a {@link Seq} {@link Skeleton}
      */
     public DaC(Divide<P, P> div, Condition<P> cond, Execute<P, R> muscle,

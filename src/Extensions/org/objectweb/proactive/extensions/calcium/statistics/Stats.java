@@ -35,13 +35,14 @@ import java.io.Serializable;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
 
+
 /**
  * This class provides statistics on the computation of a task.
- * 
+ *
  * The statistics presented are the aggregation of all sub-tasks spawned from this tasks.
- * That is to say, for example, that the computation time represents the time computed by 
+ * That is to say, for example, that the computation time represents the time computed by
  * all subtasks and this task.
- * 
+ *
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI

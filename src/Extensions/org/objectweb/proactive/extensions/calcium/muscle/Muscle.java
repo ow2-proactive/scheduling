@@ -32,10 +32,11 @@ package org.objectweb.proactive.extensions.calcium.muscle;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * This is the parent interface for muscle functions. All muscle interfaces: {@link org.objectweb.proactive.extensions.calcium.skeletons.Condition}, {@link org.objectweb.proactive.extensions.calcium.skeletons.Conquer},
  * {@link org.objectweb.proactive.extensions.calcium.skeletons.Divide}, {@link org.objectweb.proactive.extensions.calcium.skeletons.Execute} inherit from this interface.
- * 
+ *
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI

@@ -43,13 +43,13 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPool;
  * This class corresponds to the main entry point of the skeleton framework.
  *
  * To instantiate this class, an {@link org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory  EnvironmentFactory}  must be provided.
- * The skeleton framework can be used with different EnvironmentFactories, for example: 
+ * The skeleton framework can be used with different EnvironmentFactories, for example:
  * <ul>
  * <li>{@link org.objectweb.proactive.extensions.calcium.environment.multithreaded.MultiThreadedEnvironment MultiThreadedEnvironment} Executes the framework using threads on the local machine.</li>
  * <li>{@link org.objectweb.proactive.extensions.calcium.environment.proactive.ProActiveEnvironment ProActiveEnvironment} Executes the framework using ProActive.</li>
  * <li>{@link org.objectweb.proactive.extra.calcium.environment.proactivescheduler.ProActiveSchedulerEnvironment ProActiveSchedulerEnvironment} Executes the framework using ProActive Scheduler.</li>
  * </ul>
- * 
+ *
  *
  * @author The ProActive Team (mleyton)
  */
@@ -62,7 +62,7 @@ public class Calcium {
 
     /**
      * The main construction method
-     * 
+     *
      * @param environment An EnvironmentFactory that will be used to execute the framework
      */
     public Calcium(EnvironmentFactory environment) {
@@ -82,7 +82,7 @@ public class Calcium {
      *
      * @param <T> The type of the T this stream will accept.
      * @param root The skeleton program that will be computed on each T inputed into the framework
-     * @param <R> The result type of the skeleton program. 
+     * @param <R> The result type of the skeleton program.
      * @return A {@link Stream Stream} that can input T and output  from the framework.
      */
     public <T extends java.io.Serializable, R extends java.io.Serializable> Stream<T, R> newStream(
@@ -99,7 +99,7 @@ public class Calcium {
     }
 
     /**
-     * Shuts down the framework by calling shutdown, among others, shutdown on the {@link org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory  EnvironmentFactory}. 
+     * Shuts down the framework by calling shutdown, among others, shutdown on the {@link org.objectweb.proactive.extensions.calcium.environment.EnvironmentFactory  EnvironmentFactory}.
      */
     public void shutdown() {
         facade.shutdown();
@@ -109,7 +109,7 @@ public class Calcium {
     /**
      * This method can be used to get a snapshot on the global statistics of the framework.
      * To get an updated version of the statistics, the method must be re-invoked.
-     *  
+     *
      * @return The current status of the global statistics.
      */
     public StatsGlobal getStatsGlobal() {

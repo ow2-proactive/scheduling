@@ -32,16 +32,18 @@ package org.objectweb.proactive.extensions.calcium.statistics;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * This method provides global statistics snapshot of the framework.
- * 
+ *
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
 public interface StatsGlobal {
-	/**
-	 * @return The current length of the ready queue.
-	 */
+
+    /**
+     * @return The current length of the ready queue.
+     */
     public int getReadyQueueLength();
 
     /**

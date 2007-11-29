@@ -36,10 +36,11 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Muscle;
 
+
 /**
  * This class provides system dependent functionalities which can be accessed from
  * inside {@link Muscle} function implementations.
- * 
+ *
  * @author The ProActive Team (mleyton)
  *
  */
@@ -60,7 +61,7 @@ public interface SkeletonSystem {
     /**
      * This method executes the specified command, with the specified arguments.
      * Before invoking the command, the current working directory is configured to the local workspace.
-     * 
+     *
      * @param command The command to execute.
      * @param arguments The arguments that must be given to the command.
      */
