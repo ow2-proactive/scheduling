@@ -47,7 +47,7 @@ import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 /**
  * This class allow to assert that are only one item selected in all table managed.
  *
- * @author ProActive Team
+ * @author FRADJ Johann
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */

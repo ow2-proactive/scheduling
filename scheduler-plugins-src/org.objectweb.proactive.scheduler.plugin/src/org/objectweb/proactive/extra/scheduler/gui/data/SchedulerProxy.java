@@ -58,7 +58,7 @@ import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
 /**
  *
  *
- * @author ProActive Team
+ * @author FRADJ Johann
  * @version 1.0, Aug 1, 2007
  * @since ProActive 3.2
  */
@@ -321,6 +321,14 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         }
     }
 
+    @Override
+    public BooleanWrapper changePolicy(
+        Class<?extends PolicyInterface> newPolicyFile)
+        throws SchedulerException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
     // -------------------------------------------------------------------- //
@@ -384,13 +392,5 @@ public class SchedulerProxy implements AdminSchedulerInterface {
 
     public static void clearInstance() {
         instance = null;
-    }
-
-    @Override
-    public BooleanWrapper changePolicy(
-        Class<?extends PolicyInterface> newPolicyFile)
-        throws SchedulerException {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

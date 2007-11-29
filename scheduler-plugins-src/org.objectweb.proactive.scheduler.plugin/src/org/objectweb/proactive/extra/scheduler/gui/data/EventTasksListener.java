@@ -36,7 +36,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 /**
  * Class providing events for finished tasks.
  *
- * @author ProActive Team
+ * @author FRADJ Johann
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */

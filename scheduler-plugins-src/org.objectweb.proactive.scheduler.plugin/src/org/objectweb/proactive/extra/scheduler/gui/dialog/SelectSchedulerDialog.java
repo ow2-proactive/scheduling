@@ -1,30 +1,27 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive: The Java(TM) library for Parallel, Distributed, Concurrent
+ * computing with Security and Mobility
  *
- * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@objectweb.org
+ * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis Contact:
+ * proactive@objectweb.org
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * This library is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or any later version.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * This library is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this library; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
- * USA
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA 02111-1307 USA
  *
- *  Initial developer(s):               The ProActive Team
- *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ * Initial developer(s): The ProActive Team
+ * http://proactive.inria.fr/team_members.htm Contributor(s):
  *
  * ################################################################
  */
@@ -59,14 +56,13 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.core.util.UrlBuilder;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 
 
 /**
  * This class allow to pop up a dialogue to connect a scheduler.
  *
- * @author ProActive Team
+ * @author FRADJ Johann
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
@@ -300,9 +296,10 @@ public class SelectSchedulerDialog extends Dialog {
      */
     private static void recordUrls() {
         BufferedWriter bw = null;
+        PrintWriter pw = null;
         try {
             bw = new BufferedWriter(new FileWriter(URL_FILE, false));
-            PrintWriter pw = new PrintWriter(bw, true);
+            pw = new PrintWriter(bw, true);
 
             // Record urls
             if (urls != null) {
@@ -322,6 +319,9 @@ public class SelectSchedulerDialog extends Dialog {
             try {
                 if (bw != null) {
                     bw.close();
+                }
+                if (pw != null) {
+                    pw.close();
                 }
             } catch (IOException e) {
 
@@ -376,9 +376,10 @@ public class SelectSchedulerDialog extends Dialog {
      */
     private static void recordLogins() {
         BufferedWriter bw = null;
+        PrintWriter pw = null;
         try {
             bw = new BufferedWriter(new FileWriter(LOGIN_FILE, false));
-            PrintWriter pw = new PrintWriter(bw, true);
+            pw = new PrintWriter(bw, true);
 
             // Record logins
             if (logins != null) {
@@ -399,6 +400,9 @@ public class SelectSchedulerDialog extends Dialog {
                 if (bw != null) {
                     bw.close();
                 }
+                if (pw != null) {
+                    pw.close();
+                }
             } catch (IOException e) {
 
                 /* Do-Nothing */
@@ -413,7 +417,8 @@ public class SelectSchedulerDialog extends Dialog {
      * This method pop up a dialog for trying to connect a scheduler.
      *
      * @param parent the parent
-     * @return a SelectSchedulerDialogResult which contain all needed informations.
+     * @return a SelectSchedulerDialogResult which contain all needed
+     *         informations.
      */
     public static SelectSchedulerDialogResult showDialog(Shell parent) {
         new SelectSchedulerDialog(parent);

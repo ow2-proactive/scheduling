@@ -37,6 +37,9 @@ import org.eclipse.swt.layout.FillLayout;
 import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class ChangeViewModeAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;
     private static ChangeViewModeAction instance = null;

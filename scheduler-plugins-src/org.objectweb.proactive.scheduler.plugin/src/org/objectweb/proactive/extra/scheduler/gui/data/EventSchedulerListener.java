@@ -30,6 +30,11 @@
  */
 package org.objectweb.proactive.extra.scheduler.gui.data;
 
+
+/**
+ * @author FRADJ Johann
+ *
+ */
 public interface EventSchedulerListener {
 
     /**

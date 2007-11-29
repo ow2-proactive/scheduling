@@ -37,6 +37,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class KillSchedulerAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;
     private static KillSchedulerAction instance = null;

@@ -42,6 +42,9 @@ import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogR
 import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class ConnectDeconnectSchedulerAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = true;
     private static ConnectDeconnectSchedulerAction instance = null;

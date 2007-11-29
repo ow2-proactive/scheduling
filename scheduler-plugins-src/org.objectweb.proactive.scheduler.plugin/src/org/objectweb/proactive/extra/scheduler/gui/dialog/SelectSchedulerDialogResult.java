@@ -33,6 +33,10 @@ package org.objectweb.proactive.extra.scheduler.gui.dialog;
 import java.io.Serializable;
 
 
+/**
+ * @author FRADJ Johann
+ *
+ */
 public class SelectSchedulerDialogResult implements Serializable {
     private static final long serialVersionUID = 2636651259848701997L;
     private String url = null;

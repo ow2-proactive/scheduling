@@ -40,6 +40,9 @@ import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class KillRemoveJobAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;
     private static KillRemoveJobAction instance = null;

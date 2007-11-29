@@ -77,7 +77,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 /**
  *
  *
- * @author ProActive Team
+ * @author FRADJ Johann
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */

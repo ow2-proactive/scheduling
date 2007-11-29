@@ -35,6 +35,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class FreezeSchedulerAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;
     private static FreezeSchedulerAction instance = null;

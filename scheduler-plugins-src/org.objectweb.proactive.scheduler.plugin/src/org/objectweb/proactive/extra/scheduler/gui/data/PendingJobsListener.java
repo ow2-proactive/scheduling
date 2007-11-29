@@ -36,7 +36,7 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 /**
  * Class providing events for pending jobs.
  *
- * @author ProActive Team
+ * @author FRADJ Johann
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */

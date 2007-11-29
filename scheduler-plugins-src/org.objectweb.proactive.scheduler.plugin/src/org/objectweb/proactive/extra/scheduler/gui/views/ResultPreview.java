@@ -42,6 +42,9 @@ import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class ResultPreview extends ViewPart {
 
     /** an id */

@@ -37,6 +37,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class ShutdownSchedulerAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;
     private static ShutdownSchedulerAction instance = null;

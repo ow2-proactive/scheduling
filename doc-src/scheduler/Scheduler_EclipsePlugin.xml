@@ -10,9 +10,9 @@
 		<emphasis role="bold">The Scheduler Eclipse Plugin</emphasis>
 		is a
 		<emphasis role="bold">graphical client</emphasis>
-		for remote monitoring and control of the ProActive scheduler
-		(See ***LINK TO SCHEDULER DOC***), including remote submission
-		of XML-defined jobs (**LINK**).
+		for remote monitoring and control of the ProActive Grid
+		Scheduler (See ***LINK TO SCHEDULER DOC***), including remote
+		submission of XML-defined jobs (**LINK**).
 	</para>
 	<para>
 		The Scheduler Eclipse Plugin is available in two forms :
@@ -129,6 +129,79 @@
 		</figure>
 
 	</sect1><!-- The Scheduler perspective -->
+
+	<sect1>
+		<title>Views composing the perspective</title>
+
+		<figure id="jobsView">
+			<title>The Jobs view</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="scheduler/images/eclipse_plugin/jobsView.png"
+						format="PNG" />
+				</imageobject>
+			</mediaobject>
+		</figure>
+		<para>
+			All buttons (on upper right) are describe in the
+			<xref linkend="schedulerPerspectiveButtons" />
+		</para>
+		<para>
+			This view is composed of 3 tables which represents pending,
+			running and finished jobs. In each table you can watch many
+			different informations about jobs, as their state, their
+			name, their id...
+		</para>
+
+		<figure id="consoleView">
+			<title>The Console view</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="scheduler/images/eclipse_plugin/consoleView.png"
+						format="PNG" />
+				</imageobject>
+			</mediaobject>
+		</figure>
+		<para>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</para>
+
+		<figure id="tasksView">
+			<title>The Tasks view</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="scheduler/images/eclipse_plugin/tasksView.png"
+						format="PNG" />
+				</imageobject>
+			</mediaobject>
+		</figure>
+		<para>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</para>
+
+		<figure id="jobInfoView">
+			<title>The Job Info view</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="scheduler/images/eclipse_plugin/jobInfoView.png"
+						format="PNG" />
+				</imageobject>
+			</mediaobject>
+		</figure>
+		<para>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</para>
+
+		<figure id="resultPreviewView">
+			<title>The Result Preview view</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="scheduler/images/eclipse_plugin/resultPreviewView.png"
+						format="PNG" />
+				</imageobject>
+			</mediaobject>
+		</figure>
+		<para>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</para>
+	</sect1>
 
 	<sect1>
 

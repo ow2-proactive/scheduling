@@ -34,6 +34,10 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 
 
+/**
+ * @author FRADJ Johann
+ *
+ */
 public interface EventJobsListener {
 
     /**

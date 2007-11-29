@@ -42,6 +42,9 @@ import org.objectweb.proactive.extra.scheduler.gui.data.EventSchedulerListener;
 import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class StatusLabel implements EventSchedulerListener {
     public static final int FONT_SIZE = 10;
     public static final int FONT_STYLE = SWT.BOLD;

@@ -35,6 +35,9 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class JobComposite extends Composite {
     public JobComposite(Composite parent) {
         super(parent, SWT.NONE);

@@ -40,6 +40,9 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobFactory;
 import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
 
 
+/**
+ * @author FRADJ Johann
+ */
 public class SubmitJobAction extends Action {
     public static final boolean ENABLED_AT_CONSTRUCTION = false;
     private static SubmitJobAction instance = null;

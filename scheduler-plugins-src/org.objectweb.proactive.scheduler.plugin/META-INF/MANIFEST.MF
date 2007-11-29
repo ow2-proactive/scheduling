@@ -30,7 +30,7 @@ Export-Package: .,
    org.eclipse.swt.widgets,
    org.objectweb.proactive.extra.scheduler.userAPI",
  org.objectweb.proactive.extra.scheduler.gui.dialog;uses:="org.eclipse.swt.widgets",
- org.objectweb.proactive.extra.scheduler.gui.perspective;uses:="org.eclipse.ui",
+ org.objectweb.proactive.extra.scheduler.gui;uses:="org.eclipse.ui",
  org.objectweb.proactive.extra.scheduler.gui.views;
   uses:="org.eclipse.ui.console,
    org.objectweb.proactive.extra.scheduler.gui.composites,

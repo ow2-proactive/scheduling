@@ -46,7 +46,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 /**
  * This view display many informations about tasks contains in a job.
  *
- * @author ProActive Team
+ * @author FRADJ Johann
  * @version 1.0, Jul 11, 2007
  * @since ProActive 3.2
  */
