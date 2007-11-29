@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -64,7 +65,7 @@ public class ProDeployment {
      * @throws ProActiveException
      * @throws RemoteException
      */
-    public static ProActiveDescriptorInternal getProactiveDescriptor()
+    public static ProActiveDescriptor getProactiveDescriptor()
         throws ProActiveException, IOException {
         String padURL = PAProperties.PA_PAD.getValue();
 
@@ -87,7 +88,7 @@ public class ProDeployment {
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
      */
-    public static ProActiveDescriptorInternal getProactiveDescriptor(
+    public static ProActiveDescriptor getProactiveDescriptor(
         String xmlDescriptorUrl) throws ProActiveException {
         return getProActiveDescriptor(xmlDescriptorUrl, new VariableContract(),
             false);
@@ -103,7 +104,7 @@ public class ProDeployment {
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
      */
-    public static ProActiveDescriptorInternal getProactiveDescriptor(
+    public static ProActiveDescriptor getProactiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract)
         throws ProActiveException {
         if (variableContract == null) {
@@ -114,7 +115,7 @@ public class ProDeployment {
         return getProActiveDescriptor(xmlDescriptorUrl, variableContract, false);
     }
 
-    public static ProActiveDescriptorInternal getProActiveDescriptor(
+    public static ProActiveDescriptor getProActiveDescriptor(
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
         //Get lock on XMLProperties global static variable
