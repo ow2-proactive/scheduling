@@ -44,6 +44,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.api.ProGroup;
@@ -66,6 +67,7 @@ import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
+@PublicAPI
 public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     java.io.Serializable {
 

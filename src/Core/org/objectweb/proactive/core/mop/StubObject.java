@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.mop;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * References on an active object are indirect link to the active object. There
@@ -42,6 +44,7 @@ package org.objectweb.proactive.core.mop;
  * class of the active object allowing to perform method call as if the method
  * call was made on the active object
  */
+@PublicAPI
 public interface StubObject {
 
     /**

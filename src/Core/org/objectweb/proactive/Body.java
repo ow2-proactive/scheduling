@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStrategy;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -66,6 +67,7 @@ import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
  * @version 1.0,  2001/10/23
  * @since   ProActive 0.9
  */
+@PublicAPI
 public interface Body extends LocalBodyStrategy, UniversalBody,
     MessageEventProducer {
 

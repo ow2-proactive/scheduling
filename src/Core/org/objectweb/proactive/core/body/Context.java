@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.body;
 import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MOP;
@@ -46,6 +47,7 @@ import org.objectweb.proactive.core.mop.MOPException;
  * @author cdelbe
  * @since 3.2.1
  */
+@PublicAPI
 public class Context implements Serializable {
 
     /** Body associated to this context */
