@@ -31,13 +31,10 @@
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
@@ -91,19 +88,6 @@ public interface IMAdmin extends Serializable {
      * @param killNodes
      */
     public void removeSource(String sourceName, boolean killNodes);
-
-    //---------------------------------------------------------------------//
-    // old functions what to do with this ?
-    //---------------------------------------------------------------------//
-
-    /**
-     * This method serve to get all deployed virtualnodes by proactive
-     * descriptor.<BR/>
-     * It's used before calling methods <I>kill</I> or <I>redeploy</I> for
-     * getting the name of the pad and the names of deployed virtualnodes.
-     * @return hashmap < String padName, ArrayList<VirtualNode> list of deployed virtualnodes >
-     */
-    public HashMap<String, ArrayList<VirtualNode>> getDeployedVirtualNodeByPad();
 
     //----------------------------------------------------------------------//
     // SHUTDOWN

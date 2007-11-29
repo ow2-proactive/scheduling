@@ -37,6 +37,9 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 
@@ -72,19 +75,17 @@ public class SimpleTestIMUser {
         System.out.println("# --oOo-- Simple Test User --oOo-- ");
 
         try {
-            IMUser user = IMFactory.getUser();
+            String url;
+            if (args.length > 0) {
+                url = args[0];
+            } else {
+                url = "rmi://localhost:1099/" +
+                    IMConstants.NAME_ACTIVE_OBJECT_IMUSER;
+            }
+
+            IMUser user = IMConnection.connectAsUser(url);
             System.out.println("#[SimpleTestIMUser] Echo user : " +
                 user.echo());
-
-            // GET NODE(S)
-            System.out.println(
-                "#[SimpleTestIMUser] User ask to the IM One Node");
-
-            NodeSet node = user.getAtMostNodes(new IntWrapper(1), null);
-
-            if (!node.isEmpty()) {
-                afficheNodeInfo(node.get(0));
-            }
 
             int nbAskedNodes = 2;
             System.out.println("#[SimpleTestIMUser] User ask to the IM " +
@@ -98,12 +99,7 @@ public class SimpleTestIMUser {
             }
 
             // FREE NODE(S)
-
-            /*
-            System.out.println("#[SimpleTestIMUser] User free the node");
-            user.freeNode(node);
             user.freeNodes(nodes);
-            */
         } catch (Exception e) {
             System.out.println("##[TestIMUser-catch] Pas de node dispo");
         }

@@ -30,10 +30,9 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.test.simple;
 
-import java.net.URI;
-
-import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
 
 
 public class SimpleTestRemove {
@@ -41,8 +40,9 @@ public class SimpleTestRemove {
         System.out.println("# --oOo-- Simple Test remove --oOo-- ");
 
         try {
-            URI uriIM = new URI("rmi://localhost:1099/");
-            IMAdmin admin = IMFactory.getAdmin(uriIM);
+            String url = "rmi://localhost:1099/" +
+                IMConstants.NAME_ACTIVE_OBJECT_IMADMIN;
+            IMAdmin admin = IMConnection.connectAsAdmin(url);
 
             for (String toRemoveUrl : args) {
                 System.out.println("removing " + toRemoveUrl);

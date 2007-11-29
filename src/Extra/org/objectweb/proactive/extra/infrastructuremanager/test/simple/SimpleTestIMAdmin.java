@@ -30,31 +30,29 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.test.simple;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
 
 
 public class SimpleTestIMAdmin {
-    //public static String URL_PAD_LOCAL  = "/home/ellendir/ProActive/infrastructuremanager/descriptors/3VNodes-3Jvms-10Nodes.xml";
-    public static String URL_PAD_LOCAL = "/workspace/ProActive-New2/infrastructuremanager/descriptors/3VNodes-3Jvms-10Nodes.xml";
+    public static String URL_PAD_LOCAL = "../../../descriptors/Workers2.xml";
     public static String[] vnodesName = new String[] { "Idefix", "Asterix" };
 
     public static void main(String[] args) {
         System.out.println("# --oOo-- Simple Test  Admin --oOo-- ");
-
         try {
-            URI uriIM = new URI("rmi://localhost:1099/");
-            IMAdmin admin = IMFactory.getAdmin(uriIM);
-            // OR
-            // IMAdmin admin = IMFactory.getAdmin();
-            // to get admin from the local IM
+            String url;
+            if (args.length > 0) {
+                url = args[0];
+            } else {
+                url = "rmi://localhost:1099/" +
+                    IMConstants.NAME_ACTIVE_OBJECT_IMADMIN;
+            }
+
+            IMAdmin admin = IMConnection.connectAsAdmin(url);
             System.out.println("#[SimpleTestIMAdmin] Echo admin : " +
                 admin.echo());
 
@@ -65,14 +63,6 @@ public class SimpleTestIMAdmin {
             admin.createStaticNodesource("static source", pad);
             System.out.println("Sleep 12s");
             Thread.sleep(12000);
-
-            HashMap<String, ArrayList<VirtualNode>> deployedVNodesByPad = admin.getDeployedVirtualNodeByPad();
-
-            //System.out.println("hashNext : " + deployedVNodesByPad.keySet().iterator().hasNext());
-            String padName = deployedVNodesByPad.keySet().iterator().next();
-            System.out.println("padName : " + padName);
-
-            System.out.println("#[SimpleTestIMAdmin] killPAD : vnode Idefix");
             admin.removeSource("static source", true);
         } catch (Exception e) {
             e.printStackTrace();

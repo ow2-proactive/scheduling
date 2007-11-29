@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.infrastructuremanager.core.IMConstants;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;

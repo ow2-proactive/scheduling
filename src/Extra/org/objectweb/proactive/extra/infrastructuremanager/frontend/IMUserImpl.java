@@ -30,17 +30,23 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
+import java.io.IOException;
+
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
-public class IMUserImpl implements IMUser {
+public class IMUserImpl implements IMUser, InitActive {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_USER);
 
     // Attributes
@@ -107,5 +113,14 @@ public class IMUserImpl implements IMUser {
         }
 
         imcore.freeNodes(nodes);
+    }
+
+    public void initActivity(Body body) {
+        try {
+            ProActiveObject.register((IMUser) ProActiveObject.getStubOnThis(),
+                "//localhost/" + IMConstants.NAME_ACTIVE_OBJECT_IMUSER);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

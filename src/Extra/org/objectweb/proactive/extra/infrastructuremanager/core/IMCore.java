@@ -850,7 +850,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
      */
     public void addSource(NodeSource source, String sourceId) {
         this.nodeSources.put(sourceId, source);
-        System.out.println("IMCore.addSource() " + sourceId);
         //create the event
         this.monitoring.nodeSourceAddedEvent(source.getSourceEvent());
     }
@@ -895,7 +894,6 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
      *
      */
     public void setDownNode(String nodeUrl) {
-        System.out.println("IMCoreImpl.setDownNode() node Url" + nodeUrl);
         IMNode imnode = getNodebyUrl(nodeUrl);
         if (imnode != null) {
             this.setDown(imnode);

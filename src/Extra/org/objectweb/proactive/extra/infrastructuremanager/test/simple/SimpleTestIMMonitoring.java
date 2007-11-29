@@ -43,10 +43,12 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMEventListener;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
@@ -226,7 +228,16 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
         System.out.println("# --oOo-- Simple Test  Monitoring --oOo-- ");
 
         try {
-            IMMonitoring imMonitoring = IMFactory.getMonitoring();
+            String url;
+            if (args.length > 0) {
+                url = args[0];
+            } else {
+                url = "rmi://localhost:1099/" +
+                    IMConstants.NAME_ACTIVE_OBJECT_IMMONITORING;
+            }
+
+            IMMonitoring imMonitoring = IMConnection.connectAsMonitor(url);
+
             SimpleTestIMMonitoring test = (SimpleTestIMMonitoring) ProActiveObject.newActive(SimpleTestIMMonitoring.class.getName(),
                     new Object[] { imMonitoring });
 
@@ -240,9 +251,7 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
             e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
-        } catch (AlreadyBoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (IMException e) {
             e.printStackTrace();
         }
     }

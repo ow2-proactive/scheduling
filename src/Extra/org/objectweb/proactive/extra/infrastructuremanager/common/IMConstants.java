@@ -28,9 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.infrastructuremanager.core;
+package org.objectweb.proactive.extra.infrastructuremanager.common;
 
 public interface IMConstants {
     public static final String NAME_NODE_IM = "IMNODE";
     public static final String NAME_ACTIVE_OBJECT_IMCORE = "IMCORE";
+    public static final String NAME_ACTIVE_OBJECT_IMADMIN = "IMADMIN";
+    public static final String NAME_ACTIVE_OBJECT_IMUSER = "IMUSER";
+    public static final String NAME_ACTIVE_OBJECT_IMMONITORING = "IMMONITORING";
 }

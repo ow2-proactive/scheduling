@@ -30,24 +30,29 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
 
 
-public class IMAdminImpl implements IMAdmin, Serializable {
+public class IMAdminImpl implements IMAdmin, Serializable, InitActive {
     private static final long serialVersionUID = 320085562179242055L;
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_ADMIN);
 
@@ -127,5 +132,14 @@ public class IMAdminImpl implements IMAdmin, Serializable {
     public IMInitialState addIMEventListener(IMEventListener listener,
         IMEvent... events) {
         return this.imcore.getMonitoring().addIMEventListener(listener, events);
+    }
+
+    public void initActivity(Body body) {
+        try {
+            ProActiveObject.register((IMAdmin) ProActiveObject.getStubOnThis(),
+                "//localhost/" + IMConstants.NAME_ACTIVE_OBJECT_IMADMIN);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

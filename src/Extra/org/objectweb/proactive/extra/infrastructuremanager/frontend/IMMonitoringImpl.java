@@ -30,12 +30,15 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -44,6 +47,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
 import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
@@ -56,7 +60,8 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
  * @author Ellendir
  *
  */
-public class IMMonitoringImpl implements IMMonitoring, IMEventListener {
+public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
+    InitActive {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_MONITORING);
 
     // Attributes
@@ -234,5 +239,14 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener {
     public void nodeSourceRemovedEvent(NodeSourceEvent ns) {
         dispatch(IMEvent.NODESOURCE_REMOVED,
             new Class<?>[] { NodeSourceEvent.class }, ns);
+    }
+
+    public void initActivity(Body body) {
+        try {
+            ProActiveObject.register((IMMonitoring) ProActiveObject.getStubOnThis(),
+                "//localhost/" + IMConstants.NAME_ACTIVE_OBJECT_IMMONITORING);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

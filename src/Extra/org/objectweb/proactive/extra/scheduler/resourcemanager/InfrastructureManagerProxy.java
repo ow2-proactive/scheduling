@@ -51,7 +51,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
+import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
+import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
@@ -72,7 +74,8 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
  * @version 1.0, Jun 15, 2007
  * @since ProActive 3.2
  */
-public class InfrastructureManagerProxy implements InitActive, RunActive {
+public class InfrastructureManagerProxy implements InitActive, RunActive,
+    IMConstants {
     private static final long VERIF_TIMEOUT = 10000;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
     private IMMonitoring monitoring;
@@ -106,11 +109,16 @@ public class InfrastructureManagerProxy implements InitActive, RunActive {
      */
     public static InfrastructureManagerProxy getProxy(URI uriIM)
         throws ActiveObjectCreationException, IOException, NodeException {
-        IMUser user = IMFactory.getUser(uriIM);
-        IMMonitoring monitor = IMFactory.getMonitoring(uriIM);
-
-        return (InfrastructureManagerProxy) ProActiveObject.newActive(InfrastructureManagerProxy.class.getCanonicalName(),
-            new Object[] { monitor, user });
+        try {
+            IMUser user = IMConnection.connectAsUser(uriIM.toString() +
+                    NAME_ACTIVE_OBJECT_IMUSER);
+            IMMonitoring monitor = IMConnection.connectAsMonitor(uriIM.toString() +
+                    NAME_ACTIVE_OBJECT_IMMONITORING);
+            return (InfrastructureManagerProxy) ProActiveObject.newActive(InfrastructureManagerProxy.class.getCanonicalName(),
+                new Object[] { monitor, user });
+        } catch (IMException e) {
+            throw new ActiveObjectCreationException(e);
+        }
     }
 
     public StringWrapper echo() {
