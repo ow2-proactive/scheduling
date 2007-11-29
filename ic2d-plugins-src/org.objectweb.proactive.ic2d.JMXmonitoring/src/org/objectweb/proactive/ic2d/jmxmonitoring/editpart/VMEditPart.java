@@ -77,7 +77,12 @@ public class VMEditPart extends AbstractMonitoringEditPart {
                         getCastedFigure().notResponding();
                         break;
                     default:
-                        refresh();
+                        // Refresh only if this editpart is active
+                        // remember edit parts are active after activate() is called
+                        // and until deactivate() is called.
+                        if (isActive()) {
+                            refresh();
+                        }
                     }
                 }
             });

@@ -49,6 +49,12 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
 public class AOEditPart extends AbstractMonitoringEditPart {
+
+    /**
+     * An empty list used to feed GEF for all instances of AO edit parts
+     * This list is empty beacause AO model has no children !
+     */
+    private static final List<AbstractData> emptyList = new java.util.ArrayList<AbstractData>(0);
     private Integer length;
 
     /*private Set<IFigure> figuresToUpdate;
@@ -288,7 +294,8 @@ public class AOEditPart extends AbstractMonitoringEditPart {
      * @return the List of children
      */
     protected List<AbstractData> getModelChildren() {
-        return getCastedModel().getMonitoredChildrenAsList();
+        // NO CHILDREN FOR THIS MODEL !!!
+        return emptyList;
     }
 
     @Override

@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
@@ -64,25 +63,56 @@ public abstract class AbstractData extends Observable {
     /**
      * The monitored children
      */
-    protected Map<String, AbstractData> monitoredChildren;
+    protected final Map<String, AbstractData> monitoredChildren;
 
     /**
      * The NOT monitored children
      */
-    protected Map<String, AbstractData> notMonitoredChildren;
+    protected final Map<String, AbstractData> notMonitoredChildren;
 
     /**
      * The object name associated to this object.
      */
-    private ObjectName objectName;
+    private final ObjectName objectName;
 
     // -------------------------------------------
     // --- Constructor ---------------------------
     // -------------------------------------------
-    public AbstractData(ObjectName objectName) {
+
+    /**
+     * The standard contructor for this model. Only object name have to be provided.
+     * A HashMap<String, AbstractData> is used for monitored children and not monitored ones.
+     * @param objectName An instance of ObjectName for this model
+     */
+    public AbstractData(final ObjectName objectName) {
+        this(objectName, new HashMap<String, AbstractData>(),
+            new HashMap<String, AbstractData>());
+    }
+
+    /**
+     * This constructor is provided to allow subclasses to specify their own map implementations
+     * for monitored children.
+     * @param objectName An instance of ObjectName for this model
+     * @param monitoredChildren An instance of map for monitored children
+     */
+    public AbstractData(final ObjectName objectName,
+        final Map<String, AbstractData> monitoredChildren) {
+        this(objectName, monitoredChildren, new HashMap<String, AbstractData>());
+    }
+
+    /**
+     * This constructor is provided to allow subclasses to specify their own map implementations
+     * for monitored children and not monitored children.
+     * @param objectName An instance of ObjectName for this model
+     * @param monitoredChildren An instance of map for monitored children
+     * @param notMonitoredChildren An instance of map for not monitored children
+     */
+    public AbstractData(final ObjectName objectName,
+        final Map<String, AbstractData> monitoredChildren,
+        final Map<String, AbstractData> notMonitoredChildren) {
         this.objectName = objectName;
-        this.monitoredChildren = new HashMap<String, AbstractData>();
-        this.notMonitoredChildren = new HashMap<String, AbstractData>();
+        this.monitoredChildren = monitoredChildren;
+        this.notMonitoredChildren = notMonitoredChildren;
     }
 
     // -------------------------------------------
@@ -147,8 +177,6 @@ public abstract class AbstractData extends Observable {
     public List<AbstractData> getMonitoredChildrenAsList() {
         Collection<AbstractData> c = monitoredChildren.values();
         ArrayList<AbstractData> arr = new ArrayList<AbstractData>(c);
-
-        //	System.out.println("AbstractData.getMonitoredChildrenAsList() ---> collection " + c.size() + " arr " + arr.size());
         return arr;
     }
 
@@ -257,10 +285,10 @@ public abstract class AbstractData extends Observable {
             Console.getInstance(Activator.CONSOLE_NAME)
                    .log("Stop monitoring the " + getType() + " " + getName());
         }
-        List<AbstractData> children = getMonitoredChildrenAsList();
-        for (Iterator<AbstractData> iter = children.iterator(); iter.hasNext();) {
-            AbstractData child = iter.next();
-            child.stopMonitoring(false);
+        if (this.monitoredChildren != null) {
+            for (final AbstractData child : this.getMonitoredChildrenAsList()) {
+                child.stopMonitoring(false);
+            }
         }
         getParent().removeChildFromMonitoredChildren(this);
         setChanged();

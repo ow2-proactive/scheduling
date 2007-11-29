@@ -130,9 +130,10 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
         } else {
             getViewer().getControl().getDisplay().syncExec(new Runnable() {
                     public void run() {
-                        // Refresh only if this edit part is active
-                        //if (NodeEditPart.this.isActive()) 
-                        {
+                        // Refresh only if this editpart is active
+                        // remember edit parts are active after activate() is called
+                        // and until deactivate() is called.
+                        if (NodeEditPart.this.isActive()) {
                             refresh();
                         }
                     }
@@ -144,10 +145,10 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
     public void refresh() {
         //TODO: this might be costly. Only when we stop monitoring the parent may be null and 
         //we have npe stak in the logs.  
-                if (this.getParent() == null) {
-                    return;
-                }
-       // System.out.println("refreshing " + getCastedModel().getName());
+        //                if (this.getParent() == null) {
+        //                    return;
+        //                }
+        // System.out.println("refreshing " + getCastedModel().getName());
         super.refresh();
     }
 
@@ -182,8 +183,6 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
     @Override
     protected List<AbstractData> getModelChildren() {
         List<AbstractData> mc = getCastedModel().getMonitoredChildrenAsList();
-
-        //System.out.println(this.getCastedModel() + " monitored cildren: "+mc.size() );
         return mc;
     }
 

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -61,13 +60,13 @@ public class NodeObject extends AbstractData {
     private NodeWrapperMBean proxyNodeMBean;
 
     public NodeObject(RuntimeObject parent, String url, ObjectName objectName) {
-        super(objectName);
+        // Call super contructor in order to specify a TreeMap<String, AbstractData> for monitored children
+        super(objectName,
+            new TreeMap<String, AbstractData>(
+                new ActiveObject.ActiveObjectComparator()));
         this.parent = parent;
 
         this.url = FactoryName.getCompleteUrl(url);
-
-        Comparator<String> comparator = new ActiveObject.ActiveObjectComparator();
-        this.monitoredChildren = new TreeMap<String, AbstractData>(comparator);
     }
 
     @SuppressWarnings("unchecked")

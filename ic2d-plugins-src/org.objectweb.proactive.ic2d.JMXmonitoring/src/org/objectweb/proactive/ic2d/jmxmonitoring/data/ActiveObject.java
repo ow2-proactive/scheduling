@@ -113,7 +113,8 @@ public class ActiveObject extends AbstractData {
      */
     public ActiveObject(NodeObject parent, UniqueID id, String className,
         ObjectName objectName, BodyWrapperMBean proxyMBean) {
-        super(objectName);
+        // Since this active object model doesn't have children use the adequate constructor    
+        super(objectName, null, null);
         this.parent = parent;
         this.id = id;
         this.name = NamesFactory.getInstance().associateName(id, className);
