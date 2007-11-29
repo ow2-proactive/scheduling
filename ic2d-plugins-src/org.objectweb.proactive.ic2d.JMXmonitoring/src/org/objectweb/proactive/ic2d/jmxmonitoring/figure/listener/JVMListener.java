@@ -39,6 +39,7 @@ import org.eclipse.gef.ui.actions.ActionRegistry;
 import org.eclipse.gef.ui.actions.ZoomInAction;
 import org.eclipse.gef.ui.actions.ZoomOutAction;
 import org.eclipse.jface.action.IAction;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.KillVMAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.RefreshJVMAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.action.StopMonitoringAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
@@ -85,6 +86,10 @@ public class JVMListener implements MouseListener, MouseMotionListener {
                     StopMonitoringAction stopMonitoringAction = (StopMonitoringAction) act;
                     stopMonitoringAction.setObject(jvm);
                     stopMonitoringAction.setEnabled(true);
+                } else if (actionClass == KillVMAction.class) {
+                    KillVMAction killVMAction = (KillVMAction) act;
+                    killVMAction.setVM(jvm);
+                    killVMAction.setEnabled(true);
                 } else if (act instanceof IActionExtPoint) {
                     ((IActionExtPoint) act).setAbstractDataObject(this.jvm);
                 } else if (act instanceof ZoomOutAction ||
