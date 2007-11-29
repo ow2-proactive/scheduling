@@ -67,8 +67,11 @@ typedef long long __int64;
 
 // Declare an integer type that correctly casts a pointer
 typedef int ptrint;
+
+#ifndef tmwtypes_h
 typedef int mwSize;
 typedef int mwIndex;
+#endif
 
 #include <stdio.h>
 #include <stdlib.h>
