@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.masterworker;
 
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,9 +53,9 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 public class BasicPrimeExample extends AbstractExample {
     private static final long DEFAULT_PRIME_NUMBER = 1397812341;
     private static final int DEFAULT_NUMBER_OF_INTERVALS = 15;
-    public int number_of_intervals;
-    public long prime_to_find;
-    public ProActiveMaster<FindPrimeTask, Boolean> master;
+    public static int number_of_intervals;
+    public static long prime_to_find;
+    public static ProActiveMaster<FindPrimeTask, Boolean> master;
 
     /**
      * Displays result of this test
@@ -65,8 +64,8 @@ public class BasicPrimeExample extends AbstractExample {
      * @param endTime ending time of the test
      * @param nbWorkers number of workers used during the test
      */
-    public void displayResult(Collection<Boolean> results, long startTime,
-        long endTime, int nbWorkers) {
+    public static void displayResult(Collection<Boolean> results,
+        long startTime, long endTime, int nbWorkers) {
         // Post processing, calculates the statistics
         boolean prime = true;
 
@@ -86,7 +85,7 @@ public class BasicPrimeExample extends AbstractExample {
      * Creates the prime computation tasks to be solved
      * @return
      */
-    public List<FindPrimeTask> createTasks() {
+    public static List<FindPrimeTask> createTasks() {
         List<FindPrimeTask> tasks = new ArrayList<FindPrimeTask>();
 
         // We don't need to check numbers greater than the square-root of the candidate in this algorithm
@@ -115,41 +114,53 @@ public class BasicPrimeExample extends AbstractExample {
     public static void main(String[] args)
         throws TaskException, MalformedURLException,
             TaskAlreadySubmittedException {
-        BasicPrimeExample instance = new BasicPrimeExample();
         //   Getting command line parameters and creating the master (see AbstractExample)
-        instance.init(args);
+        init(args);
 
-        System.out.println("Primality test launched for n=" +
-            instance.prime_to_find + " with " + instance.number_of_intervals +
-            " intervals, using descriptor " + instance.descriptor_url);
+        // Creating the Master
+        master = new ProActiveMaster<FindPrimeTask, Boolean>();
+
+        registerShutdownHook(new Runnable() {
+                public void run() {
+                    master.terminate(true);
+                }
+            });
+
+        // Adding ressources
+        if (vn_name == null) {
+            master.addResources(descriptor_url);
+        } else {
+            master.addResources(descriptor_url, vn_name);
+        }
+
+        System.out.println("Primality test launched for n=" + prime_to_find +
+            " with " + number_of_intervals + " intervals, using descriptor " +
+            descriptor_url);
 
         long startTime = System.currentTimeMillis();
         // Creating and Submitting the tasks
-        instance.master.solve(instance.createTasks());
+        master.solve(createTasks());
 
         // Collecting the results
-        List<Boolean> results = instance.master.waitAllResults();
+        List<Boolean> results = master.waitAllResults();
         long endTime = System.currentTimeMillis();
 
         // Displaying results, the slavepoolSize method displays the number of workers used by the master
-        instance.displayResult(results, startTime, endTime,
-            instance.master.workerpoolSize());
+        displayResult(results, startTime, endTime, master.workerpoolSize());
 
         System.exit(0);
     }
 
-    @Override
-    protected void before_init() {
+    protected static void init(String[] args) throws MalformedURLException {
         command_options.addOption("p", true, "number to check for primality");
         command_options.addOption("i", true, "number of dividing intervals");
 
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("BasicPrimeExample", command_options);
-    }
 
-    @Override
-    protected void after_init() {
+        AbstractExample.init(args);
+
         String primeString = cmd.getOptionValue("p");
         if (primeString == null) {
             prime_to_find = DEFAULT_PRIME_NUMBER;
@@ -163,12 +174,6 @@ public class BasicPrimeExample extends AbstractExample {
         } else {
             number_of_intervals = Integer.parseInt(intervalString);
         }
-    }
-
-    @Override
-    protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> creation() {
-        master = new ProActiveMaster<FindPrimeTask, Boolean>();
-        return (ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable>) master;
     }
 
     /**

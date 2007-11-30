@@ -31,7 +31,11 @@
 package org.objectweb.proactive.extensions.masterworker.core;
 
 import java.io.Serializable;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.Queue;
+import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
@@ -102,6 +106,12 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
     protected Map<String, Object> memory;
 
     /**
+     * The current list of tasks to compute
+     */
+    protected Queue<TaskIntern<Serializable>> pendingTasks;
+    protected Queue<Queue<TaskIntern<Serializable>>> pendingTasksFutures;
+
+    /**
      * ProActive no arg contructor
      */
     public AOWorker() {
@@ -119,6 +129,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
         this.name = name;
         this.provider = provider;
         this.memory = initialMemory;
+        this.pendingTasksFutures = new LinkedList<Queue<TaskIntern<Serializable>>>();
     }
 
     /**
@@ -186,17 +197,14 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
      * @return initial task to solve
      */
     @SuppressWarnings("unchecked")
-    protected TaskIntern<Serializable> initialGetTask() {
+    protected void initialGetTask() {
         if (logger.isDebugEnabled()) {
             logger.debug(name + " asks a new task...");
         }
 
         // InitialTask
-        TaskIntern<Serializable> currentTask = provider.getTask((Worker) stubOnThis,
-                name);
-        // we make sure that we have the real task object and not a future)
-        currentTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(currentTask);
-        return currentTask;
+        pendingTasks = (Queue<TaskIntern<Serializable>>) ProFuture.getFutureValue(provider.getTasks(
+                    (Worker) stubOnThis, name));
     }
 
     /**
@@ -234,10 +242,22 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
 
         while (body.isActive()) {
             while (!isSleeping) {
-                TaskIntern<Serializable> newTask = initialGetTask();
+                initialGetTask();
+
                 while (!isSleeping) {
-                    // We verify that the task is not a null task (otherwise, we sleep)
-                    if (!newTask.isNull()) {
+                    while ((pendingTasks.size() == 0) &&
+                            (pendingTasksFutures.size() > 0)) {
+                        pendingTasks.addAll(pendingTasksFutures.remove());
+                    }
+                    if (pendingTasks.size() == 0) {
+                        // if there is nothing to do we sleep
+                        isSleeping = true;
+                        if (logger.isDebugEnabled()) {
+                            logger.debug(name + " sleeps...");
+                        }
+                    } else {
+                        TaskIntern<Serializable> newTask = pendingTasks.remove();
+
                         ResultIntern<Serializable> result = handleTask(newTask);
 
                         if (logger.isDebugEnabled()) {
@@ -248,14 +268,16 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
                         newTask = null;
 
                         // We send the result back to the master
-                        newTask = provider.sendResultAndGetTask(result, name);
-                        newTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(newTask);
-                    } else {
-                        // if the task is null, we automatically sleep
-                        isSleeping = true;
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(name + " sleeps...");
+                        Queue<TaskIntern<Serializable>> newTasks;
+                        if ((pendingTasks.size() == 0) &&
+                                (pendingTasksFutures.size() == 0)) {
+                            newTasks = provider.sendResultAndGetTasks(result,
+                                    name, true);
+                        } else {
+                            newTasks = provider.sendResultAndGetTasks(result,
+                                    name, false);
                         }
+                        pendingTasksFutures.offer(newTasks);
                     }
                 }
             }

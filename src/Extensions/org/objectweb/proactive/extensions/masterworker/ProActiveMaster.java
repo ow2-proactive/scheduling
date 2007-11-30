@@ -293,6 +293,13 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /**
      * {@inheritDoc}
      */
+    public void setInitialTaskFlooding(int number_of_tasks) {
+        aomaster.setInitialTaskFlooding(number_of_tasks);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public int workerpoolSize() {
         return aomaster.workerpoolSize();
     }

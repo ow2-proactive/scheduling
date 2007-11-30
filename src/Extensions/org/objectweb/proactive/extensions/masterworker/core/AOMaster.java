@@ -32,11 +32,14 @@ package org.objectweb.proactive.extensions.masterworker.core;
 
 import java.io.Serializable;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
@@ -90,6 +93,16 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     * log4j logger for the master
     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
+
+    /**
+     * How many tasks do we initially send to each worker, default value
+     */
+    protected static final int DEFAULT_INITIAL_TASK_FLOODING = 2;
+
+    /**
+     * How many tasks do we initially send to each worker
+     */
+    protected int initial_task_flooding = DEFAULT_INITIAL_TASK_FLOODING;
 
     // Global variables
 
@@ -159,7 +172,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
      * Activity of workers, which workers is doing which task
      */
-    protected HashMap<String, Long> workersActivity;
+    protected HashMap<String, List<Long>> workersActivity;
 
     // Task Queues :
 
@@ -246,40 +259,71 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         return pendingTasks.isEmpty();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
-    public TaskIntern<Serializable> getTask(final Worker worker,
-        final String workerName) {
+    private Queue<TaskIntern<Serializable>> getTasksInternal(
+        final Worker worker, final String workerName, boolean flooding) {
         // if we don't know him, we record the worker in our system
         if (!workersByName.containsKey(workerName)) {
             recordWorker(worker, workerName);
         }
 
         if (emptyPending()) {
-            workersActivity.put(workerName, TaskIntern.NULL_TASK_ID);
-            sleepingGroup.add(worker);
-            // we return the null task, this will cause the worker to sleep for a while
-            return new TaskWrapperImpl();
+            // We say that the worker is sleeping if we don't know it yet or if it's not doing a task
+            if (workersActivity.containsKey(workerName)) {
+                if (workersActivity.get(workerName).size() == 0) {
+                    sleepingGroup.add(worker);
+                }
+            } else {
+                workersActivity.put(workerName, new ArrayList<Long>());
+                sleepingGroup.add(worker);
+            }
+
+            // we return an empty queue, this will cause the worker to sleep for a while
+            return new LinkedList<TaskIntern<Serializable>>();
         } else {
             if (sleepingGroup.contains(worker)) {
                 sleepingGroup.remove(worker);
             }
-
+            Queue<TaskIntern<Serializable>> tasksToDo = new LinkedList<TaskIntern<Serializable>>();
             Iterator<Long> it = pendingTasks.iterator();
-            long taskId = it.next();
-            // We remove the task from the pending list
-            it.remove();
-            // We add the task inside the launched list
-            launchedTasks.add(taskId);
-            workersActivity.put(workerName, taskId);
-            TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId);
-            TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(taskfuture);
-            repository.saveTask(taskId);
 
-            return realTask;
+            // If we are in a flooding scenario, we send at most initial_task_flooding tasks
+            int flooding_value = flooding ? initial_task_flooding : 1;
+            for (int i = 0; i < flooding_value; i++) {
+                if (it.hasNext()) {
+                    long taskId = it.next();
+                    // We remove the task from the pending list
+                    it.remove();
+
+                    // We add the task inside the launched list
+                    launchedTasks.add(taskId);
+                    // We record the worker activity
+                    if (workersActivity.containsKey(workerName)) {
+                        List<Long> wact = workersActivity.get(workerName);
+                        wact.add(taskId);
+                    } else {
+                        ArrayList<Long> wact = new ArrayList<Long>();
+                        wact.add(taskId);
+                        workersActivity.put(workerName, wact);
+                    }
+                    TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId);
+                    TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(taskfuture);
+                    repository.saveTask(taskId);
+                    tasksToDo.offer(realTask);
+                }
+            }
+
+            return tasksToDo;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
+    public Queue<TaskIntern<Serializable>> getTasks(final Worker worker,
+        final String workerName) {
+        return getTasksInternal(worker, workerName, true);
     }
 
     /**
@@ -303,7 +347,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             // Group of sleeping workers
             sleepingGroupStub = (Worker) ProGroup.newGroup(AOWorker.class.getName());
             sleepingGroup = ProGroup.getGroup(sleepingGroupStub);
-            workersActivity = new HashMap<String, Long>();
+            workersActivity = new HashMap<String, List<Long>>();
             workersByName = new HashMap<String, Worker>();
             workersByNameRev = new HashMap<Worker, String>();
         } catch (ClassNotReifiableException e) {
@@ -345,25 +389,25 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
             workersByNameRev.remove(worker);
             workersByName.remove(workerName);
-            // if the worker was handling a task we put the task back to the pending queue
-            Long taskId = workersActivity.get(workerName);
-            if ((taskId != TaskIntern.NULL_TASK_ID) &&
-                    launchedTasks.contains(taskId)) {
-                launchedTasks.remove(taskId);
-                if (pendingTasks.isEmpty()) {
-                    // if the queue was empty before the task is rescheduled, we wake-up all sleeping workers
-                    if (sleepingGroup.size() > 0) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("Waking up sleeping workers...");
+            // if the worker was handling tasks we put the tasks back to the pending queue
+            for (Long taskId : workersActivity.get(workerName)) {
+                if (launchedTasks.contains(taskId)) {
+                    launchedTasks.remove(taskId);
+                    if (pendingTasks.isEmpty()) {
+                        // if the queue was empty before the task is rescheduled, we wake-up all sleeping workers
+                        if (sleepingGroup.size() > 0) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("Waking up sleeping workers...");
+                            }
+
+                            // We wake up the sleeping guys
+                            sleepingGroupStub.wakeup();
                         }
 
-                        // We wake up the sleeping guys
-                        sleepingGroupStub.wakeup();
+                        pendingTasks.add(taskId);
+                    } else {
+                        pendingTasks.add(taskId);
                     }
-
-                    pendingTasks.add(taskId);
-                } else {
-                    pendingTasks.add(taskId);
                 }
             }
         }
@@ -412,8 +456,8 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             }
 
             // we serve directly every methods from the workers
-            service.serveAll("getTask");
-            service.serveAll("sendResultAndGetTask");
+            service.serveAll("getTasks");
+            service.serveAll("sendResultAndGetTasks");
             service.serveAll("isDead");
 
             // we serve everything else which is not a waitXXX method
@@ -435,8 +479,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
      * {@inheritDoc}
      */
-    public TaskIntern<Serializable> sendResultAndGetTask(
-        final ResultIntern<Serializable> result, final String originatorName) {
+    public Queue<TaskIntern<Serializable>> sendResultAndGetTasks(
+        final ResultIntern<Serializable> result, final String originatorName,
+        boolean reflooding) {
         long taskId = result.getId();
         if (launchedTasks.contains(taskId)) {
             if (logger.isDebugEnabled()) {
@@ -451,9 +496,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         }
 
         // We assign a new task to the worker
-        TaskIntern<Serializable> newTask = getTask(workersByName.get(
-                    originatorName), originatorName);
-        return newTask;
+        Queue<TaskIntern<Serializable>> newTasks = getTasksInternal(workersByName.get(
+                    originatorName), originatorName, reflooding);
+        return newTasks;
     }
 
     /**
@@ -501,6 +546,13 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      */
     public void setResultReceptionOrder(final Master.OrderingMode mode) {
         resultQueue.setMode(mode);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setInitialTaskFlooding(final int number_of_tasks) {
+        initial_task_flooding = number_of_tasks;
     }
 
     /**

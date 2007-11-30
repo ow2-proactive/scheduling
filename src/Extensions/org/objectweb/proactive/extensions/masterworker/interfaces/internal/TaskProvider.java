@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
 import java.io.Serializable;
+import java.util.Queue;
 
 
 /**
@@ -42,18 +43,20 @@ import java.io.Serializable;
  */
 public interface TaskProvider<R extends Serializable> {
     /**
-     * Returns a task which needs to be executed
+     * Returns an array of tasks which need to be executed
      * @param worker the worker object which asks the tasks (stub)
      * @param workerName the name of the worker which asks the tasks
-     * @return a new task to compute
+     * @return a list of new tasks to compute
      */
-    TaskIntern<R> getTask(Worker worker, String workerName);
+    Queue<TaskIntern<R>> getTasks(Worker worker, String workerName);
 
     /**
      * Returns the result of a task to the provider
      * @param result the result of the completed task
      * @param workerName the name of the worker sending the result
-     * @return a new task to compute
+     * @param reflooding that means the worker's stack is empty and it asks for a set a tasks bigger than one
+     * @return a list of new tasks to compute
      */
-    TaskIntern<R> sendResultAndGetTask(ResultIntern<R> result, String workerName);
+    Queue<TaskIntern<R>> sendResultAndGetTasks(ResultIntern<R> result,
+        String workerName, boolean reflooding);
 }

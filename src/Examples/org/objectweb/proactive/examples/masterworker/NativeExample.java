@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.masterworker;
 
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +39,6 @@ import org.apache.commons.cli.HelpFormatter;
 import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
 import org.objectweb.proactive.extensions.masterworker.TaskAlreadySubmittedException;
 import org.objectweb.proactive.extensions.masterworker.TaskException;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 import org.objectweb.proactive.extensions.masterworker.tasks.NativeTask;
 
 
@@ -51,7 +49,7 @@ import org.objectweb.proactive.extensions.masterworker.tasks.NativeTask;
  *
  */
 public class NativeExample extends AbstractExample {
-    ProActiveMaster<SimpleNativeTask, String[]> master;
+    static ProActiveMaster<SimpleNativeTask, String[]> master;
 
     /**
      * @param args
@@ -59,10 +57,17 @@ public class NativeExample extends AbstractExample {
      */
     public static void main(String[] args)
         throws MalformedURLException, TaskAlreadySubmittedException {
-        NativeExample instance = new NativeExample();
-
         //   Getting command line parameters and creating the master (see AbstractExample)
-        instance.init(args);
+        init(args);
+
+        master = new ProActiveMaster<SimpleNativeTask, String[]>();
+
+        // Adding ressources
+        if (vn_name == null) {
+            master.addResources(descriptor_url);
+        } else {
+            master.addResources(descriptor_url, vn_name);
+        }
 
         // Creating the tasks to be solved
         List<SimpleNativeTask> tasks = new ArrayList<SimpleNativeTask>();
@@ -71,12 +76,12 @@ public class NativeExample extends AbstractExample {
         }
 
         // Submitting the tasks
-        instance.master.solve(tasks);
+        master.solve(tasks);
         Collection<String[]> results = null;
 
         // Collecting the results
         try {
-            results = instance.master.waitAllResults();
+            results = master.waitAllResults();
         } catch (TaskException e) {
             // We catch user exceptions
             e.printStackTrace();
@@ -107,21 +112,10 @@ public class NativeExample extends AbstractExample {
         }
     }
 
-    @Override
-    protected void before_init() {
+    protected static void init(String[] args) throws MalformedURLException {
         // automatically generate the help statement
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("NativeExample", command_options);
-    }
-
-    @Override
-    protected void after_init() {
-        // nothing to do
-    }
-
-    @Override
-    protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> creation() {
-        master = new ProActiveMaster<SimpleNativeTask, String[]>();
-        return (ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable>) master;
+        AbstractExample.init(args);
     }
 }

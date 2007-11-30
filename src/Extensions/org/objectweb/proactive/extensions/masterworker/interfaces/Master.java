@@ -164,6 +164,13 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     void setResultReceptionOrder(OrderingMode mode);
 
     /**
+     * Sets the number of tasks initially sent to each worker
+     * default is 2 tasks
+     * @param number_of_tasks number of task to send
+     */
+    void setInitialTaskFlooding(final int number_of_tasks);
+
+    /**
      * Sets the period at which ping messages are sent to the workers <br/>
      * @param periodMillis the new ping period
      */

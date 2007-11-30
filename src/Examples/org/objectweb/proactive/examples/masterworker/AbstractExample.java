@@ -45,16 +45,14 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 
 
 public abstract class AbstractExample {
-    protected Options command_options;
-    protected URL descriptor_url;
-    protected String vn_name;
-    protected String usage_message = "Usage: <java_command> descriptor_path virtual_node_name";
-    protected ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> abstract_master;
-    protected CommandLine cmd = null;
+    protected static Options command_options = new Options();
+    protected static URL descriptor_url;
+    protected static String vn_name;
+    protected static String usage_message = "Usage: <java_command> descriptor_path virtual_node_name";
+    protected static CommandLine cmd = null;
     public static final String DEFAULT_DESCRIPTOR = "/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml";
 
-    public AbstractExample() {
-        command_options = new Options();
+    static {
         command_options.addOption("d", true, "descriptor in use");
         command_options.addOption("n", true, "virtual node name");
     }
@@ -96,9 +94,7 @@ public abstract class AbstractExample {
      * @param args command line arguments
      * @throws MalformedURLException
      */
-    protected void init(String[] args) throws MalformedURLException {
-        before_init();
-
+    protected static void init(String[] args) throws MalformedURLException {
         CommandLineParser parser = new PosixParser();
 
         try {
@@ -136,55 +132,13 @@ public abstract class AbstractExample {
         }
 
         // get vn option value
-        String vn_name = cmd.getOptionValue("n");
-
-        //      Creating the Master
-        abstract_master = creation();
-
-        registerShutdownHook();
-
-        if (vn_name == null) {
-            abstract_master.addResources(descriptor_url);
-        } else {
-            abstract_master.addResources(descriptor_url, vn_name);
-        }
-
-        after_init();
+        vn_name = cmd.getOptionValue("n");
     }
 
     /**
      * Register a shutdown hook on this example which will terminate the master
      */
-    protected void registerShutdownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new ShutdownThread()));
-    }
-
-    /**
-     * A method to be launched before the init method
-     */
-    protected abstract void before_init();
-
-    /**
-     * A method to be launched to create the master
-     */
-    protected abstract ProActiveMaster<?extends Task<?extends Serializable>, ?extends Serializable> creation();
-
-    /**
-     * A method to be launched after the init method
-     */
-    protected abstract void after_init();
-
-    /**
-     * Internal class which handles shutdown of Master/Worker applications
-     * @author fviale
-     *
-     */
-    protected class ShutdownThread implements Runnable {
-        public ShutdownThread() {
-        }
-
-        public void run() {
-            abstract_master.terminate(true);
-        }
+    protected static void registerShutdownHook(Runnable shHook) {
+        Runtime.getRuntime().addShutdownHook(new Thread(shHook));
     }
 }
