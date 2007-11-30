@@ -31,11 +31,13 @@
 package org.objectweb.proactive.core.component.adl.types;
 
 import org.objectweb.fractal.adl.types.TypeInterface;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
  * An AST node interface to define typed interfaces.
  */
+@PublicAPI
 public interface ProActiveTypeInterface extends TypeInterface {
     String MULTICAST_CARDINALITY = "multicast";
     String GATHER_CARDINALITY = "gathercast";

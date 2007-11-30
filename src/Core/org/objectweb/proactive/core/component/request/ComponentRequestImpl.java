@@ -126,8 +126,8 @@ public class ComponentRequestImpl extends RequestImpl
 
         try {
             if (isControllerRequest()) {
-                result = (((ComponentBodyImpl) targetBody).getProActiveComponentImpl()).getControllerRequestHandler()
-                          .handleRequest(this);
+                result = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
+                          .getControllerRequestHandler().handleRequest(this);
             } else {
                 if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
                     interceptBeforeInvocation(targetBody);

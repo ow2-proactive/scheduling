@@ -185,15 +185,15 @@ serverSideMethodsLoop:
 
         if (mode.equals(ParamDispatchMode.CUSTOM)) {
             try {
-                mode = (ParamDispatch) (a).customMode().newInstance();
+                mode = (ParamDispatch) a.customMode().newInstance();
             } catch (InstantiationException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                    (a).customMode(), e);
+                    a.customMode(), e);
             } catch (IllegalAccessException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                    (a).customMode(), e);
+                    a.customMode(), e);
             }
         }
 

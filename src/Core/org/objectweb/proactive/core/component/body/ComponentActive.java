@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.component.body;
 
 import org.objectweb.proactive.Active;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -54,5 +55,6 @@ import org.objectweb.proactive.Active;
  *
  * @author Matthieu Morel
  */
+@PublicAPI
 public interface ComponentActive extends Active {
 }

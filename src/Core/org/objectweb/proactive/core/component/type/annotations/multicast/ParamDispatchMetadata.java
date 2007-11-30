@@ -34,15 +34,37 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
- * Annotation for specifying the dispatch strategy of a given parameter.
+ * Annotation for specifying the dispatch strategy of a given parameter. You
+ * could use it directly in the method's parameter declaration or inside
+ * {@link MethodDispatchMode} and {@link ClassDispatchMode} annotations.
+ * <br>
+ * Examples:
+ * <br>
+ * Dispatch the <code>args</code> parameter using the ROUND_ROBIN mode:
+ * <pre>
+ * void compute(&#064;ParamDispatchMetadata(mode = ParamDispatchMode.ROUND_ROBIN) List<String> args, String other);
+ *</pre>
+ *<br>
+ * Dispatch all the parameter in the class' declared methods with the ONE_TO_ONE mode:
+ * <pre>
+ * &#064;ClassDispatchMetadata(mode = &#064;ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE))
+ * public interface SlaveMulticast {
+ *     ...
+ * }
+ *</pre>
+ *
+ * @see org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode
  *
  * @author Matthieu Morel
- *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
+@PublicAPI
 public @interface ParamDispatchMetadata {
     /**
      * Selection of dispatch strategy from the {@link ParamDispatchMode} enumeration.

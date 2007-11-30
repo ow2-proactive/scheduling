@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.component.interception;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
@@ -65,6 +66,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  *
  * @author Matthieu Morel
  */
+@PublicAPI
 public interface InputInterceptor {
 
     /**

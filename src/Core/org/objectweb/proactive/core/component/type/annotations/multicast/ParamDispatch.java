@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.component.type.annotations.multicast;
 import java.lang.reflect.Type;
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 
 
@@ -42,6 +43,7 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
  * @author Matthieu Morel
  *
  */
+@PublicAPI
 public interface ParamDispatch {
 
     /**

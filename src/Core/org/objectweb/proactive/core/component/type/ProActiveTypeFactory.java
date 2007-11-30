@@ -33,8 +33,17 @@ package org.objectweb.proactive.core.component.type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
+/**
+ * The ProActiveTypeFactory extends the
+ * <code>org.objectweb.fractal.api.type.TypeFactory</code> to support the
+ * cardinality parameter.
+ *
+ * @see org.objectweb.fractal.api.type.TypeFactory
+ */
+@PublicAPI
 public interface ProActiveTypeFactory extends TypeFactory {
     public static final String SINGLETON_CARDINALITY = "singleton";
     public static final String COLLECTION_CARDINALITY = "collection";

@@ -31,8 +31,17 @@
 package org.objectweb.proactive.core.component.type;
 
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
+/**
+ * The ProActiveTypeFactory extends the
+ * <code>org.objectweb.fractal.api.type.InterfaceType</code> to support the
+ * cardinality parameter.
+ *
+ * @see org.objectweb.fractal.api.type.InterfaceType
+ */
+@PublicAPI
 public interface ProActiveInterfaceType extends InterfaceType {
 
     /**

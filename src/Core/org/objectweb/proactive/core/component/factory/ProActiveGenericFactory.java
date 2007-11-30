@@ -36,6 +36,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -48,6 +49,7 @@ import org.objectweb.proactive.core.node.Node;
  * @author Matthieu Morel
  *
  */
+@PublicAPI
 public interface ProActiveGenericFactory extends GenericFactory {
 
     /**

@@ -34,15 +34,35 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.util.List;
+
+import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
- * Annotation used for specifying the dispatch mode for all parameters of all methods of the annotated interface
+ * Annotation used for specifying the dispatch mode for all parameters of all
+ * methods of the annotated interface.
+ * <br>
+ * Example:
+ * <br>
+ * All parameters of the declared method are dispatched using the ONO_TO_ONE mode:
+ * <pre>
+ * &#064;ClassDispatchMetadata(mode = &#064;ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE))
+ * public interface MyItf {
+ *    void compute(List&lt;String&gt; args, String other);
+ *    List&lt;String&gt; computeSync(List&lt;String&gt; args, String other);
+ *    ...
+ * }
+ * </pre>
+ *
+ * @see org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode
+ * @see org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata
  *
  * @author Matthieu Morel
  *
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
+@PublicAPI
 public @interface ClassDispatchMetadata {
     /**
      * Specifies the dispatch mode

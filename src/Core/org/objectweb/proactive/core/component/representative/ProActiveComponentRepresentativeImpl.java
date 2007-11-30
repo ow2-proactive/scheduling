@@ -296,10 +296,10 @@ public class ProActiveComponentRepresentativeImpl
      *implements  org.objectweb.fractal.api.Component#getFcInterfaces()}
      */
     public Object[] getFcInterfaces() {
-        Interface[] nfInterfaces = (nfInterfaceReferences.values()
-                                                         .toArray(new Interface[nfInterfaceReferences.size()]));
-        Interface[] fcInterfaces = (fcInterfaceReferences.values()
-                                                         .toArray(new Interface[fcInterfaceReferences.size()]));
+        Interface[] nfInterfaces = nfInterfaceReferences.values()
+                                                        .toArray(new Interface[nfInterfaceReferences.size()]);
+        Interface[] fcInterfaces = fcInterfaceReferences.values()
+                                                        .toArray(new Interface[fcInterfaceReferences.size()]);
         Interface[] result = new Interface[nfInterfaces.length +
             fcInterfaces.length + 1];
         System.arraycopy(nfInterfaces, 0, result, 0, nfInterfaces.length);

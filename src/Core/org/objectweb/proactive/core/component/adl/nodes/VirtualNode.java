@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.component.adl.nodes;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * This interface adds a cardinality attribute to the virtual node (compared to the VirtualNode interface
@@ -42,6 +44,7 @@ package org.objectweb.proactive.core.component.adl.nodes;
  *
  * @author Matthieu Morel
  */
+@PublicAPI
 public interface VirtualNode extends org.objectweb.fractal.adl.nodes.VirtualNode {
     public static String SINGLE = "single";
     public static String MULTIPLE = "multiple";

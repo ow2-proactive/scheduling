@@ -111,7 +111,7 @@ public class ProActiveImplementationBuilderImpl
             null;
         Component bootstrap = null;
         if (context != null) {
-            bootstrap = (Component) (context).get("bootstrap");
+            bootstrap = (Component) context.get("bootstrap");
         }
         if (bootstrap == null) {
             bootstrap = Fractal.getBootstrapComponent();

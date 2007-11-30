@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.component.body;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 
 
@@ -38,6 +39,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
  *
  * @author Matthieu Morel
  */
+@PublicAPI
 public interface ComponentBody {
 
     /**
