@@ -34,23 +34,23 @@ import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.monitor.GenTaskInfo;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEvent;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEventListener;
+import org.objectweb.proactive.extensions.scilab.monitor.MSService;
 
 
 /**
  * This class is a listener for Mandelbrot events in order to retrieve the result of the parallel computation
  */
-public class MandelbrotEventListener implements SciEventListener {
+public class MandelbrotEventListener implements MSEventListener {
     private FutureDoubleMatrix res;
-    private ScilabService service;
+    private MSService service;
     private int nbBloc;
     private int sizeBloc;
     private int count;
     private double[] matrixResult;
 
-    public MandelbrotEventListener(ScilabService service, int nbBloc,
+    public MandelbrotEventListener(MSService service, int nbBloc,
         FutureDoubleMatrix res) {
         this.service = service;
         this.res = res;
@@ -59,7 +59,7 @@ public class MandelbrotEventListener implements SciEventListener {
         matrixResult = new double[res.getNbRow() * res.getNbCol()];
     }
 
-    public void actionPerformed(SciEvent evt) {
+    public void actionPerformed(MSEvent evt) {
         GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
 
         if (sciTaskInfo.getState() != GenTaskInfo.SUCCEEDED) {

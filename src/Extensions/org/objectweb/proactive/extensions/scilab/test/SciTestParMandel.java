@@ -36,14 +36,14 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 
-import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.monitor.MSService;
 import org.objectweb.proactive.extensions.scilab.util.FutureDoubleMatrix;
 import org.objectweb.proactive.extensions.scilab.util.GridMatrix;
 
 
 public class SciTestParMandel {
     public static void main(String[] args) throws Exception {
-        ScilabService service = new ScilabService();
+        MSService service = new MSService();
 
         if (args.length != 11) {
             System.out.println("Invalid number of parameter : " + args.length);

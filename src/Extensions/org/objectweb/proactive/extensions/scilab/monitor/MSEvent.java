@@ -30,29 +30,22 @@
  */
 package org.objectweb.proactive.extensions.scilab.monitor;
 
+import java.util.EventObject;
+
 
 /**
  *
- * This class is a source of Scilab events
+ * This class represents a Scilab event
  *
  */
-public class SciEventSource {
-    protected javax.swing.event.EventListenerList listListener = new javax.swing.event.EventListenerList();
+public class MSEvent extends EventObject {
 
-    public void addSciEventListener(SciEventListener listener) {
-        listListener.add(SciEventListener.class, listener);
-    }
+    /**
+         *
+         */
+    private static final long serialVersionUID = 3662815599418919180L;
 
-    public void removeSciEventListener(SciEventListener listener) {
-        listListener.remove(SciEventListener.class, listener);
-    }
-
-    void fireSciEvent(SciEvent evt) {
-        Object[] listeners = listListener.getListenerList();
-        for (int i = 0; i < listeners.length; i += 2) {
-            if (listeners[i] == SciEventListener.class) {
-                ((SciEventListener) listeners[i + 1]).actionPerformed(evt);
-            }
-        }
+    public MSEvent(Object source) {
+        super(source);
     }
 }

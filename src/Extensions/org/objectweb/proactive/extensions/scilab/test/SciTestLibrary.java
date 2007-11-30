@@ -45,19 +45,19 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.scilab.AbstractGeneralTask;
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
-import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
-import org.objectweb.proactive.extensions.scilab.SciEngine;
+import org.objectweb.proactive.extensions.scilab.MSDeployEngine;
+import org.objectweb.proactive.extensions.scilab.MSEngine;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
 public class SciTestLibrary {
-    private HashMap<String, SciEngine> mapEngine;
+    private HashMap<String, MSEngine> mapEngine;
 
     public SciTestLibrary(String nameVN, String pathDescriptor,
         String[] arrayEngine, String localSource, String remoteDest)
         throws ProActiveException {
         //Deployment
-        mapEngine = SciDeployEngine.deploy(nameVN, pathDescriptor, arrayEngine);
+        mapEngine = MSDeployEngine.deploy(nameVN, pathDescriptor, arrayEngine);
 
         //Activation
         Vector<BooleanWrapper> listStateEngine = new Vector<BooleanWrapper>();
@@ -70,7 +70,7 @@ public class SciTestLibrary {
         Object[] arrayKey = mapEngine.keySet().toArray();
         try {
             for (int i = 0; i < arrayKey.length; i++) {
-                Node node = SciDeployEngine.getEngineNode((String) arrayKey[i]);
+                Node node = MSDeployEngine.getEngineNode((String) arrayKey[i]);
                 System.out.println("Sending file to:" +
                     node.getNodeInformation().getURL());
                 RemoteFile rfile = ProFileTransfer.push(new File(localSource),
@@ -84,7 +84,7 @@ public class SciTestLibrary {
 
         //Loading
         AbstractGeneralTask sciTaskEnv;
-        SciEngine sciEngine;
+        MSEngine sciEngine;
         for (int i = 0; i < arrayKey.length; i++) {
             sciTaskEnv = new SciTask("sciEnv" + arrayKey[i]);
             sciTaskEnv.setJob("exec('" + remoteDest + "');");

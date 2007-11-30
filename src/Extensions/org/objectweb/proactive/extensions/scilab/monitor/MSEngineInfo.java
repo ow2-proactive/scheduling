@@ -30,14 +30,52 @@
  */
 package org.objectweb.proactive.extensions.scilab.monitor;
 
-import java.util.EventListener;
+import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.scilab.MSEngine;
 
 
 /**
- *
- * This interface is a listener for Scilab events
- *
+ * MSEngineInfo contains all methods to access to informations about a Scilab Engine
  */
-public interface SciEventListener extends EventListener {
-    public void actionPerformed(SciEvent evt);
+public class MSEngineInfo {
+    private String idEngine;
+    private String idCurrentTask;
+    private MSEngine mSEngine;
+    private BooleanWrapper isActivate; //a future to test if the Scilab engine is activated
+
+    public MSEngineInfo(String idEngine, MSEngine mSEngine,
+        BooleanWrapper isActivate) {
+        this.idEngine = idEngine;
+        this.mSEngine = mSEngine;
+        this.isActivate = isActivate;
+    }
+
+    public String getIdEngine() {
+        return idEngine;
+    }
+
+    public MSEngine getMSEngine() {
+        return mSEngine;
+    }
+
+    public String getSciEngineUrl() {
+        return ProActiveObject.getActiveObjectNodeUrl(this.mSEngine);
+    }
+
+    public BooleanWrapper getIsActivate() {
+        return isActivate;
+    }
+
+    public void setIsActivate(BooleanWrapper isActivate) {
+        this.isActivate = isActivate;
+    }
+
+    public String getIdCurrentTask() {
+        return idCurrentTask;
+    }
+
+    public void setIdCurrentTask(String idCurrentTask) {
+        this.idCurrentTask = idCurrentTask;
+    }
 }

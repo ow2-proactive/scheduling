@@ -38,7 +38,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class SciEngineWorker implements Serializable {
+public class MSEngineWorker implements Serializable {
 
     /**
          *
@@ -51,7 +51,7 @@ public class SciEngineWorker implements Serializable {
     private boolean isStateFull = false;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_TASK);
 
-    public SciEngineWorker() {
+    public MSEngineWorker() {
     }
 
     /**
@@ -62,7 +62,7 @@ public class SciEngineWorker implements Serializable {
      */
     public GeneralResult execute(GeneralTask genTask) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->SciEngineWorker In:execute:" + genTask.getId());
+            logger.debug("->MSEngineWorker In:execute:" + genTask.getId());
         }
 
         this.genTask = genTask;
@@ -74,7 +74,7 @@ public class SciEngineWorker implements Serializable {
             this.sendInputDataToEngine();
             if (executeJob()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("->SciEngineWorker :execute : success\n");
+                    logger.debug("->MSEngineWorker :execute : success\n");
                 }
                 this.genResult.setMessage(genTask.getLastMessage());
                 receiveOutputFromEngine();
@@ -90,7 +90,7 @@ public class SciEngineWorker implements Serializable {
                         genTask.getLastMessage());
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug("->SciEngineWorker :execute : abort\n");
+                    logger.debug("->MSEngineWorker :execute : abort\n");
                 }
             }
         } catch (TaskException e) {
@@ -137,7 +137,7 @@ public class SciEngineWorker implements Serializable {
 
         for (AbstractData data : datas) {
             if (logger.isDebugEnabled()) {
-                logger.debug("->SciEngineWorker :ReceiveData : " +
+                logger.debug("->MSEngineWorker :ReceiveData : " +
                     data.getName());
             }
 

@@ -46,12 +46,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * SciDeployEngine contains all methods to deploy Scilab Engines from
+ * MSDeployEngine contains all methods to deploy Scilab Engines from
  * a deployment descriptor
  * @author amangin
  *
  */
-public class SciDeployEngine {
+public class MSDeployEngine {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_DEPLOY);
     private static HashMap<String, Node> mapNode = new HashMap<String, Node>(); // List of deployed VNs 
 
@@ -61,7 +61,7 @@ public class SciDeployEngine {
      */
     public static String[] getListVirtualNode(String pathDescriptor) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->SciDeployEngine In:getListVirtualNode:" +
+            logger.debug("->MSDeployEngine In:getListVirtualNode:" +
                 pathDescriptor);
         }
 
@@ -106,17 +106,17 @@ public class SciDeployEngine {
      * @param arrayIdEngine
      * @return HashMap of deployed Scilab Engines
      */
-    public synchronized static HashMap<String, SciEngine> deploy(
+    public synchronized static HashMap<String, MSEngine> deploy(
         String nameVirtualNode, String pathDescriptor, String[] arrayIdEngine) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->SciDeployEngine In:deploy:" + pathDescriptor);
+            logger.debug("->MSDeployEngine In:deploy:" + pathDescriptor);
         }
 
         ProActiveDescriptor desc;
         VirtualNode vn;
         Node[] nodes;
-        SciEngine sciEngine;
-        HashMap<String, SciEngine> mapEngine = new HashMap<String, SciEngine>();
+        MSEngine mSEngine;
+        HashMap<String, MSEngine> mapEngine = new HashMap<String, MSEngine>();
 
         try {
             desc = ProDeployment.getProactiveDescriptor("file:" +
@@ -129,8 +129,8 @@ public class SciDeployEngine {
                 ? arrayIdEngine.length : nodes.length;
 
             for (int i = 0; i < length; i++) {
-                sciEngine = deploy(arrayIdEngine[i], nodes[i]);
-                mapEngine.put(arrayIdEngine[i], sciEngine);
+                mSEngine = deploy(arrayIdEngine[i], nodes[i]);
+                mapEngine.put(arrayIdEngine[i], mSEngine);
             }
         } catch (ProActiveException e) {
             e.printStackTrace();
@@ -147,14 +147,14 @@ public class SciDeployEngine {
      * @throws ActiveObjectCreationException
      * @throws NodeException
      */
-    private synchronized static SciEngine deploy(String idEngine,
+    private synchronized static MSEngine deploy(String idEngine,
         Node currentNode) throws ActiveObjectCreationException, NodeException {
         Object[] param = new Object[] { idEngine };
-        SciEngine sciEngine = (SciEngine) ProActiveObject.newActive(SciEngine.class.getName(),
+        MSEngine mSEngine = (MSEngine) ProActiveObject.newActive(MSEngine.class.getName(),
                 param, currentNode);
         mapNode.put(idEngine, currentNode);
-        sciEngine.setImmediateServices();
-        return sciEngine;
+        mSEngine.setImmediateServices();
+        return mSEngine;
     }
 
     /**
@@ -164,17 +164,17 @@ public class SciDeployEngine {
      * @throws ActiveObjectCreationException
      * @throws NodeException
      */
-    public static SciEngine deploy(String idEngine)
+    public static MSEngine deploy(String idEngine)
         throws ActiveObjectCreationException, NodeException {
         if (logger.isDebugEnabled()) {
-            logger.debug("->SciDeployEngine In:deploy");
+            logger.debug("->MSDeployEngine In:deploy");
         }
 
         Object[] param = new Object[] { idEngine };
-        SciEngine sciEngine = (SciEngine) ProActiveObject.newActive(SciEngine.class.getName(),
+        MSEngine mSEngine = (MSEngine) ProActiveObject.newActive(MSEngine.class.getName(),
                 param);
-        sciEngine.setImmediateServices();
-        return sciEngine;
+        mSEngine.setImmediateServices();
+        return mSEngine;
     }
 
     public static Node getEngineNode(String idEngine) {

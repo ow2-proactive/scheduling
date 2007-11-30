@@ -50,13 +50,13 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  * This class activates a new JVM which wraps the Scilab Engine and forwards the Scilab tasks
  *
  */
-public class SciEngine implements Serializable {
+public class MSEngine implements Serializable {
 
     /**
          *
          */
     private static final long serialVersionUID = -5906306770453347764L;
-    private SciEngineWorker sciEngineWorker;
+    private MSEngineWorker mSEngineWorker;
     private String idEngine;
     private JVMProcessImpl process;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_WORKER);
@@ -64,13 +64,13 @@ public class SciEngine implements Serializable {
     /**
      * default constructor
      */
-    public SciEngine() {
+    public MSEngine() {
     }
 
     /**
      * @param idEngine
      */
-    public SciEngine(String idEngine) {
+    public MSEngine(String idEngine) {
         this.idEngine = idEngine;
     }
 
@@ -84,7 +84,7 @@ public class SciEngine implements Serializable {
     }
 
     public void exit() {
-        //logger.debug("->SciEngineWorker In:exit");
+        //logger.debug("->MSEngineWorker In:exit");
         this.killWorker();
         System.exit(0);
     }
@@ -96,10 +96,10 @@ public class SciEngine implements Serializable {
      */
     public GeneralResult execute(GeneralTask genTask) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->SciEngine In:execute:" + genTask.getId());
+            logger.debug("->MSEngine In:execute:" + genTask.getId());
         }
 
-        GeneralResult genResult = this.sciEngineWorker.execute(genTask);
+        GeneralResult genResult = this.mSEngineWorker.execute(genTask);
         return genResult;
     }
 
@@ -109,7 +109,7 @@ public class SciEngine implements Serializable {
      */
     public BooleanWrapper activate() {
         if (logger.isDebugEnabled()) {
-            logger.debug("->SciEngine In:activate");
+            logger.debug("->MSEngine In:activate");
         }
 
         String uri = URIBuilder.buildURI("localhost",
@@ -126,7 +126,7 @@ public class SciEngine implements Serializable {
         for (int i = 0; i < 30; i++) {
             try {
                 try {
-                    sciEngineWorker = (SciEngineWorker) ProActiveObject.newActive(SciEngineWorker.class.getName(),
+                    mSEngineWorker = (MSEngineWorker) ProActiveObject.newActive(MSEngineWorker.class.getName(),
                             null, uri);
                     return new BooleanWrapper(true);
                 } catch (ProActiveException e) {

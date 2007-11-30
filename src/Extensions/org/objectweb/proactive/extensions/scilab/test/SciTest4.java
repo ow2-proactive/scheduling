@@ -41,7 +41,7 @@ import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
-import org.objectweb.proactive.extensions.scilab.SciEngineWorker;
+import org.objectweb.proactive.extensions.scilab.MSEngineWorker;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
@@ -56,7 +56,7 @@ public class SciTest4 {
             return;
         }
 
-        SciEngineWorker sciEngineWorker = (SciEngineWorker) ProActiveObject.newActive(SciEngineWorker.class.getName(),
+        MSEngineWorker mSEngineWorker = (MSEngineWorker) ProActiveObject.newActive(MSEngineWorker.class.getName(),
                 null);
 
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));
@@ -106,7 +106,7 @@ public class SciTest4 {
 
             startTime = System.currentTimeMillis();
 
-            GeneralResult sciResult = sciEngineWorker.execute(sciTask);
+            GeneralResult sciResult = mSEngineWorker.execute(sciTask);
             SciData sciMatrix3 = (SciData) sciResult.getList().get(0).getData();
 
             endTime = System.currentTimeMillis();

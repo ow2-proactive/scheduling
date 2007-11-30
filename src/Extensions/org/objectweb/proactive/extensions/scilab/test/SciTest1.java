@@ -38,8 +38,8 @@ import javasci.SciDoubleMatrix;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.scilab.AbstractData;
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
-import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
-import org.objectweb.proactive.extensions.scilab.SciEngine;
+import org.objectweb.proactive.extensions.scilab.MSDeployEngine;
+import org.objectweb.proactive.extensions.scilab.MSEngine;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
@@ -58,7 +58,7 @@ public class SciTest1 {
         task.setJob("x = a+b;");
 
         // local deployment
-        SciEngine engine = SciDeployEngine.deploy("ScilabEngine");
+        MSEngine engine = MSDeployEngine.deploy("ScilabEngine");
         BooleanWrapper isActivate = engine.activate();
 
         if (isActivate.booleanValue()) {

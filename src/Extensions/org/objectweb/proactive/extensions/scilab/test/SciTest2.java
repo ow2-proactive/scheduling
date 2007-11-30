@@ -37,13 +37,13 @@ import org.objectweb.proactive.extensions.scilab.AbstractGeneralTask;
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 import org.objectweb.proactive.extensions.scilab.monitor.GenTaskInfo;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEvent;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEventListener;
+import org.objectweb.proactive.extensions.scilab.monitor.MSService;
 
 
 public class SciTest2 {
-    private ScilabService scilab;
+    private MSService scilab;
 
     public void displayResult(GenTaskInfo scitaskInfo) {
         GeneralResult sciResult = scitaskInfo.getResult();
@@ -58,11 +58,11 @@ public class SciTest2 {
     }
 
     public SciTest2(String nameVN, String pathVN) throws Exception {
-        scilab = new ScilabService();
+        scilab = new MSService();
         scilab.deployEngine(nameVN, pathVN, new String[] { "Scilab" });
 
-        scilab.addEventListenerTask(new SciEventListener() {
-                public void actionPerformed(SciEvent evt) {
+        scilab.addEventListenerTask(new MSEventListener() {
+                public void actionPerformed(MSEvent evt) {
                     GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
 
                     if (sciTaskInfo.getState() == GenTaskInfo.SUCCEEDED) {

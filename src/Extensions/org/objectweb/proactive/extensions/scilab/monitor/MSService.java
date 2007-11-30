@@ -44,9 +44,9 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.scilab.AbstractGeneralTask;
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.GeneralTask;
+import org.objectweb.proactive.extensions.scilab.MSDeployEngine;
+import org.objectweb.proactive.extensions.scilab.MSEngine;
 import org.objectweb.proactive.extensions.scilab.MatlabTask;
-import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
-import org.objectweb.proactive.extensions.scilab.SciEngine;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 
 
@@ -58,36 +58,36 @@ import org.objectweb.proactive.extensions.scilab.SciTask;
  * 4. to notify the user application of each event.
  * @author ProActive Team (amangin)
  */
-public class ScilabService implements Serializable {
+public class MSService implements Serializable {
 
     /**
          *
          */
     private static final long serialVersionUID = -2572074681533287826L;
-    private HashMap<String, SciEngineInfo> mapEngine;
+    private HashMap<String, MSEngineInfo> mapEngine;
     private ArrayList<String> listIdEngineFree;
     private ArrayList<GenTaskInfo> listTaskWait;
     private HashMap<String, GenTaskInfo> mapTaskRun;
     private HashMap<String, GenTaskInfo> mapTaskEnd;
     private long countIdTask;
     private long countIdEngine;
-    private SciEventSource taskObservable;
-    private SciEventSource engineObservable;
+    private MSEventSource taskObservable;
+    private MSEventSource engineObservable;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_SERVICE);
 
     /**
      * constructor
      */
-    public ScilabService() {
-        this.mapEngine = new HashMap<String, SciEngineInfo>();
+    public MSService() {
+        this.mapEngine = new HashMap<String, MSEngineInfo>();
         this.listIdEngineFree = new ArrayList<String>();
 
         this.listTaskWait = new ArrayList<GenTaskInfo>();
         this.mapTaskRun = new HashMap<String, GenTaskInfo>();
         this.mapTaskEnd = new HashMap<String, GenTaskInfo>();
 
-        this.taskObservable = new SciEventSource();
-        this.engineObservable = new SciEventSource();
+        this.taskObservable = new MSEventSource();
+        this.engineObservable = new MSEventSource();
 
         (new Thread() {
                 @Override
@@ -114,30 +114,30 @@ public class ScilabService implements Serializable {
     public synchronized int deployEngine(String nameVirtualNode,
         String pathDescriptor, String[] arrayIdEngine) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:deployEngine:" + nameVirtualNode);
+            logger.debug("->MSService In:deployEngine:" + nameVirtualNode);
         }
 
-        HashMap<String, SciEngine> mapNewEngine = SciDeployEngine.deploy(nameVirtualNode,
+        HashMap<String, MSEngine> mapNewEngine = MSDeployEngine.deploy(nameVirtualNode,
                 pathDescriptor, arrayIdEngine);
-        SciEngine sciEngine;
+        MSEngine mSEngine;
         String idEngine;
         BooleanWrapper isActivate;
 
         for (int i = 0; i < arrayIdEngine.length; i++) {
             idEngine = arrayIdEngine[i];
-            sciEngine = mapNewEngine.get(idEngine);
+            mSEngine = mapNewEngine.get(idEngine);
 
-            if (sciEngine == null) {
+            if (mSEngine == null) {
                 continue;
             }
 
-            isActivate = sciEngine.activate();
+            isActivate = mSEngine.activate();
             mapEngine.put(idEngine,
-                new SciEngineInfo(idEngine, sciEngine, isActivate));
+                new MSEngineInfo(idEngine, mSEngine, isActivate));
         }
 
         this.listIdEngineFree.addAll(mapNewEngine.keySet());
-        this.engineObservable.fireSciEvent(null);
+        this.engineObservable.fireMSEvent(null);
         notifyAll();
         return mapNewEngine.size();
     }
@@ -145,7 +145,7 @@ public class ScilabService implements Serializable {
     public synchronized int deployEngine(String nameVirtualNode,
         String pathDescriptor) {
         long countTmp = this.countIdEngine;
-        int nbEngine = SciDeployEngine.getNbMappedNodes(nameVirtualNode,
+        int nbEngine = MSDeployEngine.getNbMappedNodes(nameVirtualNode,
                 pathDescriptor);
         String[] arrayIdEngine = new String[nbEngine];
         for (int i = 0; i < arrayIdEngine.length; i++) {
@@ -179,13 +179,13 @@ public class ScilabService implements Serializable {
      */
     public synchronized void sendTask(AbstractGeneralTask sciTask) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:sendTask:" + sciTask.getId());
+            logger.debug("->MSService In:sendTask:" + sciTask.getId());
         }
 
         GenTaskInfo sciTaskInfo = new GenTaskInfo(sciTask);
         sciTaskInfo.setState(GenTaskInfo.PENDING);
         this.listTaskWait.add(sciTaskInfo);
-        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+        this.taskObservable.fireMSEvent(new MSEvent(sciTaskInfo));
         notifyAll();
     }
 
@@ -197,7 +197,7 @@ public class ScilabService implements Serializable {
     public synchronized void sendTask(File scriptFile, String jobInit,
         String[] dataOut, int Priority) throws IOException {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:sendTask");
+            logger.debug("->MSService In:sendTask");
         }
 
         String name = scriptFile.getName();
@@ -207,18 +207,18 @@ public class ScilabService implements Serializable {
         if (ext.equals(".m")) {
             task = new MatlabTask("Task" + this.countIdTask++);
             if (logger.isDebugEnabled()) {
-                logger.debug("->ScilabService :sendTask MatlabTask");
+                logger.debug("->MSService :sendTask MatlabTask");
             }
         } else {
             task = new SciTask("Task" + this.countIdTask++);
             if (logger.isDebugEnabled()) {
-                logger.debug("->ScilabService :sendTask SciTask");
+                logger.debug("->MSService :sendTask SciTask");
             }
         }
 
         for (int i = 0; i < dataOut.length; i++) {
             if (logger.isDebugEnabled()) {
-                logger.debug("->ScilabService :sendTask DataOut:" + dataOut[i]);
+                logger.debug("->MSService :sendTask DataOut:" + dataOut[i]);
             }
 
             if (dataOut[i].trim().equals("")) {
@@ -238,7 +238,7 @@ public class ScilabService implements Serializable {
         sciTaskInfo.setPriority(Priority);
 
         this.listTaskWait.add(sciTaskInfo);
-        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+        this.taskObservable.fireMSEvent(new MSEvent(sciTaskInfo));
         notifyAll();
     }
 
@@ -248,7 +248,7 @@ public class ScilabService implements Serializable {
      */
     public synchronized void killTask(String idTask) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:killTask:" + idTask);
+            logger.debug("->MSService In:killTask:" + idTask);
         }
 
         GenTaskInfo sciTaskInfo = this.mapTaskRun.remove(idTask);
@@ -258,19 +258,19 @@ public class ScilabService implements Serializable {
         }
 
         String idEngine = sciTaskInfo.getIdEngine();
-        SciEngineInfo sciEngineInfo = mapEngine.get(idEngine);
+        MSEngineInfo mSEngineInfo = mapEngine.get(idEngine);
 
-        SciEngine sciEngine = sciEngineInfo.getSciEngine();
-        sciEngine.killWorker();
+        MSEngine mSEngine = mSEngineInfo.getMSEngine();
+        mSEngine.killWorker();
 
-        BooleanWrapper isActivate = sciEngine.activate();
-        sciEngineInfo.setIsActivate(isActivate);
-        sciEngineInfo.setIdCurrentTask(null);
+        BooleanWrapper isActivate = mSEngine.activate();
+        mSEngineInfo.setIsActivate(isActivate);
+        mSEngineInfo.setIdCurrentTask(null);
 
         sciTaskInfo.setState(GenTaskInfo.KILLED);
 
         this.listIdEngineFree.add(idEngine);
-        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+        this.taskObservable.fireMSEvent(new MSEvent(sciTaskInfo));
     }
 
     /**
@@ -279,30 +279,30 @@ public class ScilabService implements Serializable {
      */
     public synchronized void restartEngine(String idEngine) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:restartEngine:" + idEngine);
+            logger.debug("->MSService In:restartEngine:" + idEngine);
         }
 
-        SciEngineInfo sciEngineInfo = this.mapEngine.get(idEngine);
+        MSEngineInfo mSEngineInfo = this.mapEngine.get(idEngine);
 
-        if (sciEngineInfo == null) {
+        if (mSEngineInfo == null) {
             return;
         }
 
-        String idTask = sciEngineInfo.getIdCurrentTask();
+        String idTask = mSEngineInfo.getIdCurrentTask();
         GenTaskInfo sciTaskInfo;
 
         if (idTask != null) {
             sciTaskInfo = this.mapTaskRun.remove(idTask);
             sciTaskInfo.setState(GenTaskInfo.KILLED);
-            sciEngineInfo.setIdCurrentTask(null);
+            mSEngineInfo.setIdCurrentTask(null);
             this.listIdEngineFree.add(idEngine);
-            this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+            this.taskObservable.fireMSEvent(new MSEvent(sciTaskInfo));
         }
 
-        SciEngine sciEngine = sciEngineInfo.getSciEngine();
-        sciEngine.killWorker();
-        BooleanWrapper isActivate = sciEngine.activate();
-        sciEngineInfo.setIsActivate(isActivate);
+        MSEngine mSEngine = mSEngineInfo.getMSEngine();
+        mSEngine.killWorker();
+        BooleanWrapper isActivate = mSEngine.activate();
+        mSEngineInfo.setIsActivate(isActivate);
     }
 
     /**
@@ -311,7 +311,7 @@ public class ScilabService implements Serializable {
      */
     public synchronized void cancelTask(String idTask) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:cancelTask:" + idTask);
+            logger.debug("->MSService In:cancelTask:" + idTask);
         }
 
         GenTaskInfo sciTaskInfo;
@@ -321,7 +321,7 @@ public class ScilabService implements Serializable {
             if (idTask.equals(sciTaskInfo.getIdTask())) {
                 this.listTaskWait.remove(i);
                 sciTaskInfo.setState(GenTaskInfo.CANCELLED);
-                this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+                this.taskObservable.fireMSEvent(new MSEvent(sciTaskInfo));
                 break;
             }
         }
@@ -333,23 +333,23 @@ public class ScilabService implements Serializable {
      */
     public synchronized void removeTask(String idTask) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:removeTask:" + idTask);
+            logger.debug("->MSService In:removeTask:" + idTask);
         }
 
         GenTaskInfo sciTaskInfo = this.mapTaskEnd.remove(idTask);
         sciTaskInfo.setState(GenTaskInfo.REMOVED);
-        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+        this.taskObservable.fireMSEvent(new MSEvent(sciTaskInfo));
     }
 
     private synchronized void retrieveResults() {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:retrieveResult");
+            logger.debug("->MSService In:retrieveResult");
         }
 
         GeneralResult sciResult;
         GenTaskInfo sciTaskInfo;
         String idEngine;
-        SciEngineInfo sciEngineInfo;
+        MSEngineInfo mSEngineInfo;
         Object[] keys;
 
         while (true) {
@@ -359,7 +359,7 @@ public class ScilabService implements Serializable {
                 sciResult = sciTaskInfo.getResult();
                 if (!ProFuture.isAwaited(sciResult)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("->ScilabService loop:retrieveResult:" +
+                        logger.debug("->MSService loop:retrieveResult:" +
                             keys[i]);
                     }
 
@@ -367,13 +367,13 @@ public class ScilabService implements Serializable {
                     sciTaskInfo.setState(sciResult.getState());
 
                     idEngine = sciTaskInfo.getIdEngine();
-                    sciEngineInfo = mapEngine.get(idEngine);
+                    mSEngineInfo = mapEngine.get(idEngine);
 
-                    sciEngineInfo.setIdCurrentTask(null);
+                    mSEngineInfo.setIdCurrentTask(null);
                     this.listIdEngineFree.add(idEngine);
                     sciTaskInfo.setDateEnd();
                     this.mapTaskEnd.put(sciTaskInfo.getIdTask(), sciTaskInfo);
-                    this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+                    this.taskObservable.fireMSEvent(new MSEvent(sciTaskInfo));
                     notifyAll();
                 }
             }
@@ -387,7 +387,7 @@ public class ScilabService implements Serializable {
 
     private GenTaskInfo getNextTask() {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService loop:getNextTask");
+            logger.debug("->MSService loop:getNextTask");
         }
 
         GenTaskInfo sciTaskInfo;
@@ -415,48 +415,45 @@ public class ScilabService implements Serializable {
         return this.listTaskWait.remove(0);
     }
 
-    private SciEngineInfo getNextEngine() {
+    private MSEngineInfo getNextEngine() {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService loop:getNextEngine");
+            logger.debug("->MSService loop:getNextEngine");
         }
 
         String idEngine;
-        SciEngineInfo sciEngineInfo;
+        MSEngineInfo mSEngineInfo;
         BooleanWrapper isActivate;
         int i = 0;
         int count = this.listIdEngineFree.size();
 
         while (i < count) {
             idEngine = this.listIdEngineFree.remove(0);
-            sciEngineInfo = mapEngine.get(idEngine);
-            isActivate = sciEngineInfo.getIsActivate();
+            mSEngineInfo = mapEngine.get(idEngine);
+            isActivate = mSEngineInfo.getIsActivate();
             if (logger.isDebugEnabled()) {
-                logger.debug("->ScilabService test0:getNextEngine:" + idEngine);
+                logger.debug("->MSService test0:getNextEngine:" + idEngine);
             }
 
             if (ProFuture.isAwaited(isActivate)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("->ScilabService test1:getNextEngine:" +
-                        idEngine);
+                    logger.debug("->MSService test1:getNextEngine:" + idEngine);
                 }
 
                 this.listIdEngineFree.add(idEngine);
             } else if (isActivate.booleanValue()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("->ScilabService test2:getNextEngine:" +
-                        idEngine);
+                    logger.debug("->MSService test2:getNextEngine:" + idEngine);
                 }
 
-                return sciEngineInfo;
+                return mSEngineInfo;
             } else {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("->ScilabService test3:getNextEngine:" +
-                        idEngine);
+                    logger.debug("->MSService test3:getNextEngine:" + idEngine);
                 }
 
                 this.listIdEngineFree.add(idEngine);
-                SciEngine sciEngine = sciEngineInfo.getSciEngine();
-                sciEngineInfo.setIsActivate(sciEngine.activate());
+                MSEngine mSEngine = mSEngineInfo.getMSEngine();
+                mSEngineInfo.setIsActivate(mSEngine.activate());
             }
 
             i++;
@@ -467,17 +464,17 @@ public class ScilabService implements Serializable {
 
     private synchronized void executeTasks() {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:executeTasks");
+            logger.debug("->MSService In:executeTasks");
         }
 
         GenTaskInfo sciTaskInfo;
-        SciEngineInfo sciEngineInfo;
+        MSEngineInfo mSEngineInfo;
 
         while (true) {
             if (this.listTaskWait.size() == 0) {
                 try {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("->ScilabService test0:executeTask");
+                        logger.debug("->MSService test0:executeTask");
                     }
 
                     wait();
@@ -487,11 +484,11 @@ public class ScilabService implements Serializable {
                 continue;
             }
 
-            sciEngineInfo = this.getNextEngine();
-            if (sciEngineInfo == null) {
+            mSEngineInfo = this.getNextEngine();
+            if (mSEngineInfo == null) {
                 try {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("->ScilabService test1:executeTask");
+                        logger.debug("->MSService test1:executeTask");
                     }
 
                     wait(1000);
@@ -505,7 +502,7 @@ public class ScilabService implements Serializable {
             if (sciTaskInfo == null) {
                 try {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("->ScilabService test2:executeTask");
+                        logger.debug("->MSService test2:executeTask");
                     }
 
                     wait(1000);
@@ -515,59 +512,58 @@ public class ScilabService implements Serializable {
                 continue;
             }
 
-            this.executeTask(sciEngineInfo, sciTaskInfo);
+            this.executeTask(mSEngineInfo, sciTaskInfo);
         }
     }
 
-    private synchronized void executeTask(SciEngineInfo sciEngineInfo,
+    private synchronized void executeTask(MSEngineInfo mSEngineInfo,
         GenTaskInfo sciTaskInfo) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:executeTask");
+            logger.debug("->MSService In:executeTask");
         }
 
         GeneralResult genResult;
-        SciEngine sciEngine;
+        MSEngine mSEngine;
 
-        sciEngineInfo.setIdCurrentTask(sciTaskInfo.getIdTask());
+        mSEngineInfo.setIdCurrentTask(sciTaskInfo.getIdTask());
 
-        sciEngine = sciEngineInfo.getSciEngine();
-        sciTaskInfo.setIdEngine(sciEngineInfo.getIdEngine());
+        mSEngine = mSEngineInfo.getMSEngine();
+        sciTaskInfo.setIdEngine(mSEngineInfo.getIdEngine());
         sciTaskInfo.setState(GenTaskInfo.RUNNING);
-        genResult = sciEngine.execute(sciTaskInfo.getTask());
+        genResult = mSEngine.execute(sciTaskInfo.getTask());
 
         sciTaskInfo.setResult(genResult);
         this.mapTaskRun.put(sciTaskInfo.getIdTask(), sciTaskInfo);
-        this.taskObservable.fireSciEvent(new SciEvent(sciTaskInfo));
+        this.taskObservable.fireMSEvent(new MSEvent(sciTaskInfo));
         notifyAll();
     }
 
-    public synchronized void addEventListenerTask(SciEventListener evtListener) {
-        taskObservable.addSciEventListener(evtListener);
+    public synchronized void addEventListenerTask(MSEventListener evtListener) {
+        taskObservable.addMSEventListener(evtListener);
     }
 
-    public synchronized void addEventListenerEngine(
-        SciEventListener evtListener) {
-        engineObservable.addSciEventListener(evtListener);
+    public synchronized void addEventListenerEngine(MSEventListener evtListener) {
+        engineObservable.addMSEventListener(evtListener);
     }
 
     public synchronized void removeEventListenerTask(
-        SciEventListener evtListener) {
-        taskObservable.removeSciEventListener(evtListener);
+        MSEventListener evtListener) {
+        taskObservable.removeMSEventListener(evtListener);
     }
 
     public synchronized void removeAllEventListenerTask() {
         taskObservable = null;
-        taskObservable = new SciEventSource();
+        taskObservable = new MSEventSource();
     }
 
     public synchronized void removeAllEventListenerEngine() {
         engineObservable = null;
-        engineObservable = new SciEventSource();
+        engineObservable = new MSEventSource();
     }
 
     public synchronized void removeEventListenerEngine(
-        SciEventListener evtListener) {
-        engineObservable.removeSciEventListener(evtListener);
+        MSEventListener evtListener) {
+        engineObservable.removeMSEventListener(evtListener);
     }
 
     /**
@@ -606,8 +602,8 @@ public class ScilabService implements Serializable {
      * @return a Map of Deployed Engine
      */
     @SuppressWarnings("unchecked")
-    public synchronized HashMap<String, SciEngineInfo> getMapEngine() {
-        return (HashMap<String, SciEngineInfo>) mapEngine.clone();
+    public synchronized HashMap<String, MSEngineInfo> getMapEngine() {
+        return (HashMap<String, MSEngineInfo>) mapEngine.clone();
     }
 
     /**
@@ -624,19 +620,19 @@ public class ScilabService implements Serializable {
      */
     public synchronized void exit() {
         if (logger.isDebugEnabled()) {
-            logger.debug("->ScilabService In:exit");
+            logger.debug("->MSService In:exit");
         }
 
-        SciEngineInfo sciEngineInfo;
-        SciEngine sciEngine;
+        MSEngineInfo mSEngineInfo;
+        MSEngine mSEngine;
 
         Object[] keys = mapEngine.keySet().toArray();
         for (int i = 0; i < keys.length; i++) {
-            sciEngineInfo = mapEngine.get(keys[i]);
-            sciEngine = sciEngineInfo.getSciEngine();
+            mSEngineInfo = mapEngine.get(keys[i]);
+            mSEngine = mSEngineInfo.getMSEngine();
             try {
-                sciEngine.exit();
-            } catch (RuntimeException e) {
+                mSEngine.exit();
+            } catch (Exception e) {
             }
         }
     }

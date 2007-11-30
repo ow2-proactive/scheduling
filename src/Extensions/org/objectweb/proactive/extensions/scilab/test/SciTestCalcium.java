@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.calcium.proactive.ProActiveManager;
 import org.objectweb.proactive.extensions.calcium.skeletons.Farm;
 import org.objectweb.proactive.extensions.calcium.skeletons.Seq;
 import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
-import org.objectweb.proactive.extensions.scilab.SciEngineWorker;
+import org.objectweb.proactive.extensions.scilab.MSEngineWorker;
 import org.objectweb.proactive.extensions.scilab.SciResult;
 import org.objectweb.proactive.extensions.scilab.SciTask;
 */
@@ -67,7 +67,7 @@ public class SciTestCalcium implements Serializable {
 
             private class SciExecute implements Execute<SciTask>{
                     public SciTask execute(SciTask sciTask) {
-                            SciResult sciResult = SciEngineWorker.executeTask(sciTask);
+                            SciResult sciResult = MSEngineWorker.executeTask(sciTask);
                             sciTask.setListDataOut(sciResult.getList());
                             return sciTask;
                     }

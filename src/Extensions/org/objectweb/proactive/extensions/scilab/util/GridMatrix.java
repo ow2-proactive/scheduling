@@ -34,8 +34,8 @@ import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.extensions.scilab.AbstractGeneralTask;
 import org.objectweb.proactive.extensions.scilab.SciTask;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEventListener;
+import org.objectweb.proactive.extensions.scilab.monitor.MSService;
 
 
 /**
@@ -57,7 +57,7 @@ public class GridMatrix {
      * @param nbBloc number of blocks
      * @return future of the matrix result
      */
-    public static FutureDoubleMatrix calMandelbrot(ScilabService service,
+    public static FutureDoubleMatrix calMandelbrot(MSService service,
         String name, int xres, int yres, double xmin, double xmax, double ymin,
         double ymax, int precision, int nbBloc) {
         FutureDoubleMatrix res = new FutureDoubleMatrix(name, xres, yres);
@@ -92,7 +92,7 @@ public class GridMatrix {
      * @param nbBloc number of blocks
      * @return future of the matrix result
      */
-    public static FutureDoubleMatrix calPi(ScilabService service, String name,
+    public static FutureDoubleMatrix calPi(MSService service, String name,
         int precision, int nbBloc) {
         FutureDoubleMatrix res = new FutureDoubleMatrix(name, 1, 1);
         int sizeBloc = precision / nbBloc;
@@ -121,12 +121,12 @@ public class GridMatrix {
      * @param nbCol2
      * @return future of the matrix result
      */
-    public static FutureDoubleMatrix mult(ScilabService service, String name,
+    public static FutureDoubleMatrix mult(MSService service, String name,
         double[] matrix1, int nbRow1, int nbCol1, double[] matrix2, int nbRow2,
         int nbCol2) {
         FutureDoubleMatrix res = new FutureDoubleMatrix(name, nbRow2, nbCol2);
 
-        SciEventListener eventListener = new MultEventListener(service, res);
+        MSEventListener eventListener = new MultEventListener(service, res);
         service.addEventListenerTask(eventListener);
         int nbTask = service.getNbEngine();
 

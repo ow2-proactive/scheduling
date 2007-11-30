@@ -1,7 +1,9 @@
-ProActive Extension for Scilab.
+ProActive GUI for Matlab/Scilab.
 
 Before being able to use the extension and launch the GUI (scilab.sh or scilab.bat), please follow these installations steps.
 
+---------------------------------------------  SCILAB --------------------------------------------------
+For every machines that you will be using:
 
 STEP 1: Download Scilab 4.1.2 or above BINARY Version
 
@@ -14,7 +16,15 @@ copy javasci_Scilab2.h and javasci_Scilab2.c from folder c_sources to SCILAB/rou
 
 make binaries of Scilab (procedure is explained  in SCILAB/Readme_Linux or SCILAB/Readme_Windows)
 
+---------------------------------------------- MATLAB ---------------------------------------------------
+For every machines that you will be using:
 
+STEP 1: If you plan to use Matlab, you must have Matlab installed and a valid licence.
+
+STEP 2: you need to compile and install Matlab Java Interface libraries, in order to do that, follow the guidelines in PROACTIVE/scripts/unix/matlab/README
+ 
+
+--------------------------------------------- For Both ---------------------------------------------------
 STEP 3:
 Edit paths to your SCILAB installation in the scilab_env.sh or scilab_env.bat file
 
@@ -41,5 +51,4 @@ If you want to use the extension without the script, remember two things :
 
 Under Linux, the environment variables must be set according to the scilab_env.sh script AND the java property java_library_path must contain the directory where the libjavasci.so can be found
 
-Under Windows, the System PATH environment variable(and not the user PATH) must contain the path to where the libjavasci.so can be found
-               OR, the application must be launched next to it  
+Under Windows, the Class PATH environment variable must contain the path to where the javasci.dll can be found

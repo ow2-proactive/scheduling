@@ -30,22 +30,14 @@
  */
 package org.objectweb.proactive.extensions.scilab.monitor;
 
-import java.util.EventObject;
+import java.util.EventListener;
 
 
 /**
  *
- * This class represents a Scilab event
+ * This interface is a listener for Scilab events
  *
  */
-public class SciEvent extends EventObject {
-
-    /**
-         *
-         */
-    private static final long serialVersionUID = 3662815599418919180L;
-
-    public SciEvent(Object source) {
-        super(source);
-    }
+public interface MSEventListener extends EventListener {
+    public void actionPerformed(MSEvent evt);
 }

@@ -34,24 +34,24 @@ import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.monitor.GenTaskInfo;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEvent;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEventListener;
+import org.objectweb.proactive.extensions.scilab.monitor.MSService;
 
 
 /**
  * This class is a listener for matrix multiplication events in order to retrieve
  * the result of the parallel computation
  */
-public class MultEventListener implements SciEventListener {
+public class MultEventListener implements MSEventListener {
     private FutureDoubleMatrix res;
-    private ScilabService service;
+    private MSService service;
     private int count;
     private double[] matrixResult;
     private int nbTask;
     private int sizeSubMatrix;
 
-    public MultEventListener(ScilabService service, FutureDoubleMatrix res) {
+    public MultEventListener(MSService service, FutureDoubleMatrix res) {
         this.service = service;
         this.res = res;
         this.nbTask = service.getNbEngine();
@@ -59,7 +59,7 @@ public class MultEventListener implements SciEventListener {
         sizeSubMatrix = (res.getNbRow() * res.getNbCol()) / nbTask;
     }
 
-    public void actionPerformed(SciEvent evt) {
+    public void actionPerformed(MSEvent evt) {
         GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
         if (sciTaskInfo.getState() != GenTaskInfo.SUCCEEDED) {
             if (sciTaskInfo.getState() == GenTaskInfo.ABORTED) {

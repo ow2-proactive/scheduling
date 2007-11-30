@@ -83,15 +83,15 @@ import javax.swing.table.DefaultTableModel;
 
 import org.objectweb.proactive.extensions.scilab.AbstractData;
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
-import org.objectweb.proactive.extensions.scilab.SciDeployEngine;
+import org.objectweb.proactive.extensions.scilab.MSDeployEngine;
 import org.objectweb.proactive.extensions.scilab.monitor.GenTaskInfo;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEngineInfo;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEngineInfo;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEvent;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEventListener;
+import org.objectweb.proactive.extensions.scilab.monitor.MSService;
 
 
-public class SciFrame extends javax.swing.JFrame {
+public class MSFrame extends javax.swing.JFrame {
 
     /**
          *
@@ -153,7 +153,7 @@ public class SciFrame extends javax.swing.JFrame {
     private DefaultTableModel tableTaskRunModel;
     private DefaultTableModel tableTaskEndModel;
     private TreeEngineNode rootEngine;
-    private ScilabService service;
+    private MSService service;
     private DialogTask dialogTask;
     private DialogResult dialogResult;
     private String pathDescriptor;
@@ -171,11 +171,11 @@ public class SciFrame extends javax.swing.JFrame {
      * Auto-generated main method to display this JFrame
      */
     public static void main(String[] args) {
-        SciFrame inst = new SciFrame();
+        MSFrame inst = new MSFrame();
         inst.setVisible(true);
     }
 
-    public SciFrame() {
+    public MSFrame() {
         super();
         initGUI();
 
@@ -188,10 +188,10 @@ public class SciFrame extends javax.swing.JFrame {
         dialogLegend = new DialogLegend(this);
         dialogLegend.setModal(true);
 
-        service = new ScilabService();
+        service = new MSService();
 
-        service.addEventListenerTask(new SciEventListener() {
-                public void actionPerformed(SciEvent evt) {
+        service.addEventListenerTask(new MSEventListener() {
+                public void actionPerformed(MSEvent evt) {
                     GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
 
                     if (sciTaskInfo.getState() == GenTaskInfo.PENDING) {
@@ -222,8 +222,8 @@ public class SciFrame extends javax.swing.JFrame {
                 }
             });
 
-        service.addEventListenerEngine(new SciEventListener() {
-                public void actionPerformed(SciEvent evt) {
+        service.addEventListenerEngine(new MSEventListener() {
+                public void actionPerformed(MSEvent evt) {
                     refreshTreeEngine();
                 }
             });
@@ -742,7 +742,7 @@ public class SciFrame extends javax.swing.JFrame {
                                 if (newFile != null) {
                                     String path = newFile.getAbsolutePath();
 
-                                    String[] arrayNameVn = SciDeployEngine.getListVirtualNode(path);
+                                    String[] arrayNameVn = MSDeployEngine.getListVirtualNode(path);
 
                                     if (listPreviewModel == null) {
                                         txtLog.append(
@@ -1058,22 +1058,22 @@ public class SciFrame extends javax.swing.JFrame {
     }
 
     private void refreshTreeEngine() {
-        HashMap<String, SciEngineInfo> mapEngine = this.service.getMapEngine();
-        SciEngineInfo sciEngineInfo;
+        HashMap<String, MSEngineInfo> mapEngine = this.service.getMapEngine();
+        MSEngineInfo mSEngineInfo;
         TreeEngineNode nodeEngine;
 
         int i = 0;
         int count = this.rootEngine.getChildCount();
         while (i < count) {
             nodeEngine = (TreeEngineNode) this.rootEngine.getChildAt(i);
-            sciEngineInfo = mapEngine.remove(nodeEngine.toString());
-            if (sciEngineInfo == null) {
+            mSEngineInfo = mapEngine.remove(nodeEngine.toString());
+            if (mSEngineInfo == null) {
                 nodeEngine.removeFromParent();
                 count--;
             } else {
                 nodeEngine.removeAllChildren();
                 nodeEngine.add(new TreeEngineNode(
-                        sciEngineInfo.getSciEngineUrl()));
+                        mSEngineInfo.getSciEngineUrl()));
                 i++;
             }
         }
@@ -1082,9 +1082,9 @@ public class SciFrame extends javax.swing.JFrame {
         Iterator<String> it = listSort.iterator();
 
         while (it.hasNext()) {
-            sciEngineInfo = mapEngine.get(it.next());
-            nodeEngine = new TreeEngineNode(sciEngineInfo.getIdEngine());
-            nodeEngine.add(new TreeEngineNode(sciEngineInfo.getSciEngineUrl()));
+            mSEngineInfo = mapEngine.get(it.next());
+            nodeEngine = new TreeEngineNode(mSEngineInfo.getIdEngine());
+            nodeEngine.add(new TreeEngineNode(mSEngineInfo.getSciEngineUrl()));
             this.rootEngine.add(nodeEngine);
         }
 

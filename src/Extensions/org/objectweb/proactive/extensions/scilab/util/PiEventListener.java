@@ -34,29 +34,28 @@ import javasci.SciDoubleMatrix;
 
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.monitor.GenTaskInfo;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEvent;
-import org.objectweb.proactive.extensions.scilab.monitor.SciEventListener;
-import org.objectweb.proactive.extensions.scilab.monitor.ScilabService;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEvent;
+import org.objectweb.proactive.extensions.scilab.monitor.MSEventListener;
+import org.objectweb.proactive.extensions.scilab.monitor.MSService;
 
 
 /**
  * This class is a listener for Pi calculation events in order to retrieve the result of the parallel computation
  */
-public class PiEventListener implements SciEventListener {
+public class PiEventListener implements MSEventListener {
     private FutureDoubleMatrix res;
     private int nbBloc;
     private int count;
     private double pi;
-    private ScilabService service;
+    private MSService service;
 
-    public PiEventListener(ScilabService service, int nbBloc,
-        FutureDoubleMatrix res) {
+    public PiEventListener(MSService service, int nbBloc, FutureDoubleMatrix res) {
         this.service = service;
         this.res = res;
         this.nbBloc = nbBloc;
     }
 
-    public void actionPerformed(SciEvent evt) {
+    public void actionPerformed(MSEvent evt) {
         GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
 
         if (sciTaskInfo.getState() != GenTaskInfo.SUCCEEDED) {

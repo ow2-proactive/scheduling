@@ -30,52 +30,29 @@
  */
 package org.objectweb.proactive.extensions.scilab.monitor;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extensions.scilab.SciEngine;
-
 
 /**
- * SciEngineInfo contains all methods to access to informations about a Scilab Engine
+ *
+ * This class is a source of Scilab events
+ *
  */
-public class SciEngineInfo {
-    private String idEngine;
-    private String idCurrentTask;
-    private SciEngine sciEngine;
-    private BooleanWrapper isActivate; //a future to test if the Scilab engine is activated
+public class MSEventSource {
+    protected javax.swing.event.EventListenerList listListener = new javax.swing.event.EventListenerList();
 
-    public SciEngineInfo(String idEngine, SciEngine sciEngine,
-        BooleanWrapper isActivate) {
-        this.idEngine = idEngine;
-        this.sciEngine = sciEngine;
-        this.isActivate = isActivate;
+    public void addMSEventListener(MSEventListener listener) {
+        listListener.add(MSEventListener.class, listener);
     }
 
-    public String getIdEngine() {
-        return idEngine;
+    public void removeMSEventListener(MSEventListener listener) {
+        listListener.remove(MSEventListener.class, listener);
     }
 
-    public SciEngine getSciEngine() {
-        return sciEngine;
-    }
-
-    public String getSciEngineUrl() {
-        return ProActiveObject.getActiveObjectNodeUrl(this.sciEngine);
-    }
-
-    public BooleanWrapper getIsActivate() {
-        return isActivate;
-    }
-
-    public void setIsActivate(BooleanWrapper isActivate) {
-        this.isActivate = isActivate;
-    }
-
-    public String getIdCurrentTask() {
-        return idCurrentTask;
-    }
-
-    public void setIdCurrentTask(String idCurrentTask) {
-        this.idCurrentTask = idCurrentTask;
+    void fireMSEvent(MSEvent evt) {
+        Object[] listeners = listListener.getListenerList();
+        for (int i = 0; i < listeners.length; i += 2) {
+            if (listeners[i] == MSEventListener.class) {
+                ((MSEventListener) listeners[i + 1]).actionPerformed(evt);
+            }
+        }
     }
 }
