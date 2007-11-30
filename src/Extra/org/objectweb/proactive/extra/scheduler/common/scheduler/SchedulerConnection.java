@@ -43,7 +43,7 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
 
 
 /**
- * It provides a method to join an existing scheduler.<br>
+ * <b>Start here</b>, it provides a method to join an existing scheduler.<br>
  * The method {@link #join(String)} returns a {@link SchedulerAuthenticationInterface} in order to give the scheduler
  * the possibility to authenticate user that wants to connect a scheduler.
  *

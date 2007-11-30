@@ -36,7 +36,7 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript;
-import org.objectweb.proactive.extra.scheduler.common.task.Executable;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extra.scheduler.task.NativeExecutable;
 import org.objectweb.proactive.extra.scheduler.task.NativeTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;

@@ -28,12 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.common.task;
+package org.objectweb.proactive.extra.scheduler.common.task.executable;
 
 import java.util.ArrayList;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 /**

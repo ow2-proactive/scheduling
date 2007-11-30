@@ -36,8 +36,8 @@ import java.io.PrintStream;
 import java.util.Map;
 import java.util.Random;
 
-import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.JavaExecutable;
 
 
 public class MonteCarlo extends JavaExecutable {

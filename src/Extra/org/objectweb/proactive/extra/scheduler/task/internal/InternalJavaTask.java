@@ -31,8 +31,8 @@
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
-import org.objectweb.proactive.extra.scheduler.common.task.Executable;
-import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.Executable;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.JavaExecutable;
 
 
 /**

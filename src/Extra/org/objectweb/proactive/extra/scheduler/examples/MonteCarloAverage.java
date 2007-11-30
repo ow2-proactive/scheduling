@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.examples;
 
-import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.JavaExecutable;
 
 
 public class MonteCarloAverage extends JavaExecutable {

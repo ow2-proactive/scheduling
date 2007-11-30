@@ -28,13 +28,13 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.common.task;
+package org.objectweb.proactive.extra.scheduler.common.task.executable;
 
 import java.io.Serializable;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extra.scheduler.task.NativeExecutable;
+import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
 /**
@@ -42,7 +42,6 @@ import org.objectweb.proactive.extra.scheduler.task.NativeExecutable;
  * Executable is the superclass of every personal executable task that will be scheduled.<br>
  * Some classes are provide like :<ul>
  * <li>{@link JavaExecutable} : to make your own java task.</li>
- * <li>{@link NativeExecutable} : to use your own native task.</li>
  * <li>{@link ProActiveExecutable} : to make your own ProActive application task.</li></ul><br>
  * Each java executable and native executable may have to implements the {@link #execute(TaskResult...)} method.<br>
  * Only the ProActive executable will implement its own execute.

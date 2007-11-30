@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.common.task;
+package org.objectweb.proactive.extra.scheduler.common.task.executable;
 
 import java.util.Map;
 

@@ -9,7 +9,7 @@
 
 		<para>
 			The execution of parallel tasks on a pool of distributed resources, such as
-			network of desktops or clusters, requires a main element for managing resources
+			network of desktop or clusters, requires a main element for managing resources
 			and handling task execution, this system is typically <emphasis role="bold">a batch scheduler</emphasis>.
 			A batch scheduler provides an abstraction of resources to users; users submit jobs containing tasks to
 			the scheduler who is in charge to execute these tasks on managed
@@ -34,7 +34,32 @@
 			<sect3 id="what_is_task">
 				<title>What is a task ?</title>
 				<para>
-					The task is the entity that is schedule.
+					The task is the smallest scheduled entity. 
+					It is included in a <xref linkend="what_is_job">job</xref> and will be executed 
+					in accordance with the <xref linkend="add_policy">policy</xref>wishes, 
+					and when resources becomes available.
+				</para>
+				<para>
+					There are three types of tasks :
+					<itemizedlist>
+						<listitem>
+							JAVA, its execution can be all java classes extending the 'JavaExecutable' class.
+						</listitem>
+						<listitem>
+							NATIVE, its execution can be any user programs specified by a (shell) command line.
+						</listitem>
+						<listitem>
+							PROACTIVE, its execution can be all java classes extending the 'ProActiveExecutable' class.
+							Coding this last one requires a knowledge base on the use of ProActive.
+						</listitem>
+					</itemizedlist>
+					At its execution a task may crash due to host failure or user bugs,
+					the task can be then re-started a parameterizable number of time.
+				</para>
+				<para>
+					Pre +
+					Post +
+					+ Selection
 				</para>
 			</sect3>
 			

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extra.scheduler.examples;
 
-import java.io.File;
 import java.net.URI;
 
 import org.apache.log4j.Logger;

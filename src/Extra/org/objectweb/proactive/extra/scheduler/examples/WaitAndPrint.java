@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.JavaExecutable;
 
 
 public class WaitAndPrint extends JavaExecutable {

@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.scheduler.job;
 
 import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
 import org.objectweb.proactive.extra.scheduler.common.job.JobType;
-import org.objectweb.proactive.extra.scheduler.common.task.ProActiveExecutable;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.ProActiveExecutable;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalProActiveTask;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 

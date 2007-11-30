@@ -36,11 +36,11 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
-import org.objectweb.proactive.extra.scheduler.common.task.Executable;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
-import org.objectweb.proactive.extra.scheduler.common.task.ProActiveExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.Executable;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.ProActiveExecutable;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
 

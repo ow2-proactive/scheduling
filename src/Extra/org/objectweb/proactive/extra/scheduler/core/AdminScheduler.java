@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.core;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -48,10 +49,10 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
 
 
 /**
- * Scheduler Admin interface.
- * With this interface, you will be able to create a new scheduler without connecting yourself,
- * or create it with your admin properties, groupfile and loginFile in order to give the scheduler
- * the right to only accept predefined user.
+ * <b>Start here</b>, it provides method to create a new ProActive Scheduler and manage it.<br>
+ * With this interface, you will be able to create a new scheduler with or without connecting yourself,
+ * or create it with your administrator properties, group-file and login-File in order to give the scheduler
+ * the right to only accept predefined user.<br>
  * A resources manager may have been launched before creating a new scheduler.
  * This class provides methods to managed jobs as an administrator.
  *
@@ -60,6 +61,7 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
  * @version 3.9, Jun 28, 2007
  * @since ProActive 3.9
  */
+@PublicAPI
 public class AdminScheduler extends UserScheduler
     implements AdminSchedulerInterface {
 
@@ -70,8 +72,8 @@ public class AdminScheduler extends UserScheduler
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
     /**
-     * Create a new scheduler at the specified URL plugged on the given resource manager.
-     * This will provide a connection interface to allow the access to a restricted number of user.
+     * Create a new scheduler at the specified URL plugged on the given resource manager.<br>
+     * This will provide a connection interface to allow the access to a restricted number of user.<br>
      * It will return an admin scheduler able to managed the scheduler.
      *
      * @param loginFile the path where are stored the allowed login//password.
@@ -144,13 +146,14 @@ public class AdminScheduler extends UserScheduler
     }
 
     /**
-     * Create a new scheduler at the specified URL plugged on the given resource manager.
-     * This constructor also requires the username//password of the admin to connect.
+     * Create a new scheduler at the specified URL plugged on the given resource manager.<br>
+     * This constructor also requires the username//password of the admin to connect.<br>
      * This will provide a connection interface to allow the access to a restricted number of user.
      * It will return an admin scheduler able to managed the scheduler.
-     * WARNING this method provides a way to connect the scheduler after its creation,
+     * <font color="red">WARNING :</font> this method provides a way to connect to the scheduler after its creation,
      * BUT if the scheduler is restarting after failure, this method will create the scheduler
-     * but will throw a SchedulerException due to the failure of admin connection.
+     * but will throw a SchedulerException due to the failure of admin connection.<br>
+     * In fact, while the scheduler is restarting after a crash, no one can connect it during the whole restore process.
      *
      * @param loginFile the path where are stored the allowed login//password.
      * @param groupFile the path where to check the membership of a user.

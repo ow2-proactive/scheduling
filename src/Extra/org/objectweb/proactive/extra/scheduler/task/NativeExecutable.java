@@ -37,8 +37,8 @@ import java.io.PrintStream;
 import java.util.Map;
 
 import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript;
-import org.objectweb.proactive.extra.scheduler.common.task.Executable;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.Executable;
 
 
 /**
@@ -112,7 +112,7 @@ public class NativeExecutable extends Executable {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.common.task.Executable#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
+     * @see org.objectweb.proactive.extra.scheduler.common.task.executable.Executable#execute(org.objectweb.proactive.extra.scheduler.task.TaskResult[])
      */
     @Override
     public Object execute(TaskResult... results) {
@@ -144,7 +144,7 @@ public class NativeExecutable extends Executable {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.common.task.Executable#init(java.util.Map)
+     * @see org.objectweb.proactive.extra.scheduler.common.task.executable.Executable#init(java.util.Map)
      */
     @Override
     public final void init(Map<String, Object> args) throws Exception {

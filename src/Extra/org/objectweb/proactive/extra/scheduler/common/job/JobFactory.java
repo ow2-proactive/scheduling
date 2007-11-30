@@ -75,13 +75,13 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.InvalidScriptExc
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SimpleScript;
-import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.NativeTask;
-import org.objectweb.proactive.extra.scheduler.common.task.ProActiveExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.ProActiveTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.JavaExecutable;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.ProActiveExecutable;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

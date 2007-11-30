@@ -39,11 +39,11 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.task.Executable;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 
 

@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.scheduler.task.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.extra.scheduler.common.task.Executable;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.Executable;
 
 
 /**

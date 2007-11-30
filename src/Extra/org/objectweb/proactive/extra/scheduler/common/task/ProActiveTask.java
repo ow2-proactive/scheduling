@@ -36,6 +36,7 @@ import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.job.ProActiveJob;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.ProActiveExecutable;
 
 
 /**

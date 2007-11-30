@@ -40,7 +40,7 @@ import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.scheduler.common.task.ProActiveExecutable;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.ProActiveExecutable;
 
 
 /**
@@ -58,7 +58,7 @@ public class ProActiveExample extends ProActiveExecutable {
     private int numberToFind = 5003;
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable#init(java.util.Map)
+     * @see org.objectweb.proactive.extra.scheduler.common.task.executable.JavaExecutable#init(java.util.Map)
      */
     @Override
     public void init(Map<String, Object> args) {

@@ -56,11 +56,11 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
-import org.objectweb.proactive.extra.scheduler.common.task.Executable;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extra.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
 
 
