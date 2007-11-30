@@ -1,184 +1,514 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="ScilabDoc">
-  <title>Interface with Scilab</title>
+    <title>Interface with Matlab/Scilab</title>
 
-  <sect1 id="Scilab_Overwiew">
-    <title>Presentation</title>
+    <sect1 id="Scilab_Overwiew">
+        <title>Presentation</title>
 
-    <para>Scilab is a scientific software for numerical computations.
-    Developped since 1990 by researchers from INRIA and ENPC, it is now
-    maintained and developed by Scilab Consortium since its creation in May
-    2003. Scilab includes hundreds of mathematical functions with the
-    possibility to add interactively programs from various languages (C,
-    Fortran...). It has sophisticated data structures (including lists,
-    polynomials, rational functions, linear systems...), an interpreter and a
-    high level programming language. Scilab works on most Unix systems
-    (including GNU/Linux) and Windows (9X/2000/XP).</para>
+        <para>
+            Scilab is a scientific software for numerical computations.
+            Developed since 1990 by researchers from INRIA and ENPC, it
+            is now maintained and developed by Scilab Consortium since
+            its creation in May 2003. Scilab includes hundreds of
+            mathematical functions with the possibility to add
+            interactively programs from various languages (C,
+            Fortran...). It has sophisticated data structures (including
+            lists, polynomials, rational functions, linear systems...),
+            an interpreter and a high level programming language. Scilab
+            works on most Unix systems (including GNU/Linux) and Windows
+            (9X/2000/XP).
+        </para>
 
-    <para>The goal of the ProActive Interface is to equip Scilab with a
-    generic interface to Grid computing. This extension has to allow the
-    deployment of Scilab instances on several nodes of the grid (and to use
-    these instances like computing engines) and the submital of Scilab tasks
-    over the grid. These Scilab engines are monitored by a central ProActive
-    API. A natural condition is to deploy an application (based on this
-    interface) strictly on hosts where the Scilab software is intsalled. To
-    install Scilab and find some documentation about it <ulink
-    url="http://www.scilab.org/download/index_download.php?page=release.html">on
-    the scilab website</ulink>. This ProActive interface supports the release
-    4.0 and manipulates the following types: Double, String, Double Matrix,
-    String Matrix.</para>
-  </sect1>
+        <para>
+            MATLAB is a numerical computing environment and programming
+            language. Created by The MathWorks, MATLAB allows easy
+            matrix manipulation, plotting of functions and data,
+            implementation of algorithms, creation of user interfaces,
+            and interfacing with programs in other languages. Although
+            it specializes in numerical computing, an optional toolbox
+            interfaces with the Maple symbolic engine, allowing it to be
+            part of a full computer algebra system.
 
-  <sect1>
-    <title>Scilab Interface Architecture</title>
+            As of 2004, MATLAB was used by more than one million people
+            in industry and academia.[2].
+        </para>
 
-    <para>The interface architecture is based on the Master-Slaves model. In
-    this communication model, the master entity monitors the slaves entities.
-    In our case:</para>
+        <para>
+            The goal of the ProActive Interface is to equip Scilab and
+            Matlab with a generic interface to Grid computing. This
+            extension allows the deployment of Scilab/Matlab instances
+            on several nodes of the grid (and to use these instances
+            like computing engines) and submitting of Scilab/Matlab
+            tasks over the grid. These engines are monitored by a
+            central ProActive API. A natural condition is to deploy an
+            application (based on this interface) strictly on hosts
+            where the Scilab or Matlab software is installed.
+        </para>
 
-    <itemizedlist>
-      <listitem>
-        <para>The role of the master is to deploy the topology of scilab
-        instances (slaves) and to distribute tasks (between the different
-        engines);</para>
-      </listitem>
-    </itemizedlist>
+    </sect1>
 
-    <itemizedlist>
-      <listitem>
-        <para>The role of the slave is to perform the submitted tasks (by the
-        master).</para>
-      </listitem>
-    </itemizedlist>
+    <sect1 id="Scilab_Installation">
+        <title>Installation</title>
+        <para>
+            Before starting to use the interface with Scilab, you need
+            to follow the steps described in
+            PROACTIVE/scripts/unix/scilab/README
+        </para>
+        <para>
+            To install Scilab and find some documentation about it
+            <ulink
+                url="http://www.scilab.org/download/index_download.php?page=release.html">
+                on the scilab website
+            </ulink>
 
-      <para>There are four classes which are intented for the user:</para>
+        </para>
+        <para>
+            This ProActive interface supports Scilab's release 4.1.2 and
+            manipulates the following types: Double, String, Double
+            Matrix, String Matrix, Complex, Complex Matrix.
+        </para>
+        <para>
+            To install Matlab you need a commercial licence that you can
+            obtain from Mathworks
+            <ulink url="http://www.mathworks.com">
+                on their website
+            </ulink>
 
-      <para>The Class <literal>ScilabService</literal> implememts all
-      functionnalities to deploy engines, to distribute tasks, and to retrieve
-      results (of computed tasks).</para>
+        </para>
+        <para>
+            This ProActive interface supports many Matlab releases (from
+            6.5 on) and manipulates the following types: Double
+            Matrixes, String Matrixes, Complex Matrixes, Integer
+            Matrixes, Cells and Records.
+        </para>
+    </sect1>
+    <sect1>
+        <title>
+            Graphical User Interface (Matlab/Scilab Grid ToolBox)
+        </title>
 
-      <itemizedlist>
-        <listitem>
-          <para>The depoyment is made thank to a ProActive descriptor. This
-          deployment descriptor describes the different nodes of the grid
-          taking part at the computation. One of particularities of this
-          descriptor is the declaration of specific scilab environment
-          variables for each node. The deployment is achieved by a call of the
-          method "deployEngine". This method takes in parameters the
-          VirtualNode id, the descriptor path, and the number of engines to
-          create.</para>
-        </listitem>
+        <para>
+            This interface allows to manipulate the functionalities of
+            the API in a user friendly way.
+        </para>
 
-        <listitem>
-          <para>The distribution of a Scilab task is made thanks to the call
-          of the method "sendTask". After the call, the task is set in pending
-          queue. This queue is managed like a FIFO with priority. The task is
-          in head of the queue is sent when a engine is available.</para>
-        </listitem>
+        <sect2>
+            <title>Launching Matlab/Scilab Grid ToolBox</title>
 
-        <listitem>
-          <para>After the compution of a task, the scilab engine returns the
-          result. To retrieve this result, it is necessary to listen the event
-          "SciEventTask" thank to the method "addEnventListenerTask".</para>
-        </listitem>
+            <para>
+                To launch the application, you have to execute the
+                script:
+            </para>
 
-        <listitem>
-          <para>This class offers also the possibilities to cancel a pending
-          task, to kill a running task , and to restart a engine.</para>
-        </listitem>
-      </itemizedlist>
+            <para>On Unix:</para>
 
-      <para>The Class <literal>SciTaskInfo</literal> contains all informations
-      about a Scilab task. Among these informations, there are:</para>
+            <screen>cd scripts/unix scilab.sh</screen>
 
-      <itemizedlist>
-        <listitem>
-          <para>The state of the tasks:</para>
+            <para>On Windows:</para>
 
-          <itemizedlist>
+            <screen>cd scripts\windows scilab.bat</screen>
+
+            <para>
+                if you use a local version of Matlab or Scilab, you must
+                declare the environment variables in the file:
+            </para>
+
+            <screen>scripts/[unix|windows]/scilab_env.[sh|bat]</screen>
+
+            <para>
+                Once the application is started, the main frame is
+                displayed. This frame is composed in three parts:
+            </para>
+
+            <itemizedlist>
+                <listitem>
+                    <para>The tree of Matlab/Scilab engines .</para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        The ltables of pending, running, and terminated
+                        tasks.
+                    </para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        The text area to display the log of user
+                        operations.
+                    </para>
+                </listitem>
+            </itemizedlist>
+
+            <figure>
+                <title>Main frame</title>
+
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="scilab/pics/ScilabToolBox.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </sect2>
+
+        <sect2>
+            <title>Deployment of the application</title>
+
+            <para>
+                The first step is to deploy the topology of the
+                application. A dialog enables to choice the descriptor
+                and to select the virtual node. The button "deploy"
+                launches the deployment of Matlab/Scilab engines over
+                the nodes.
+            </para>
+
+            <figure>
+                <title>Deployment of the application</title>
+
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="scilab/pics/ScilabToolBox1.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </sect2>
+
+        <sect2>
+            <title>Task launching</title>
+
+            <para>
+                The next step is the task launching. A dialog enables to
+                select the script and possibly to define the script
+                initialization, the return values, and the task
+                priority. The button start creates and sends the task.
+            </para>
+
+            <figure>
+                <title>Creation of a task</title>
+
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="scilab/pics/ScilabToolBox2.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </sect2>
+
+        <sect2>
+            <title>Display of results</title>
+
+            <para>
+                The last step is the display of results. A double click
+                on a task in the table of terminated tasks sets visible
+                a dialog. This dialog displays the tasks properties and
+                the result (with the possibility to save it in a file)
+            </para>
+
+            <figure>
+                <title>Display a result</title>
+
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="scilab/pics/ScilabToolBox4.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </sect2>
+
+        <sect2>
+            <title>Task monitoring</title>
+
+            <para>
+                In the main frame, several tables of tasks (pending,
+                executing , terminated) allow to monitor the
+                application. These tables allows to show just for each
+                task the relevant informations. A double click on a task
+                in these tables sets visible a dialog. This dialog
+                displays the tasks properties (path, script
+                initialization, results).
+            </para>
+
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        The table of pending tasks enables to cancel
+                        selected tasks and to clear all cancelled tasks
+                    </para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        The table of executing tasks enables to kill
+                        selected tasks and to clear all killed tasks
+                    </para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        The table of terminated tasks enables to get the
+                        status of tasks (SUCCESS or ABORT), to save the
+                        first selected task in file the result, to
+                        remove selected tasks.
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+
+        <sect2>
+            <title>Engine monitoring</title>
+
+            <para>
+                In the main frame, a tree describes all nodes used by
+                the application. Over the execution of the application,
+                if a task is aborted, the engine of this task may be
+                unstable ( this one is displayed with a red foreground).
+                A rigth-click on it show a popup menu to restart it.
+            </para>
+
+            <figure>
+                <title>State of Engines</title>
+
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="scilab/pics/ScilabToolBox3.png" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </sect2>
+    </sect1>
+
+    <sect1>
+        <title>Matlab/Scilab Interface Architecture</title>
+
+        <para>
+            The interface architecture is based on the Master-Workers
+            model. In this communication model, the master entity
+            monitors the workers entities. In our case:
+        </para>
+
+        <itemizedlist>
             <listitem>
-              <para><emphasis>WAIT</emphasis>: The task is in the pending
-              queue</para>
+                <para>
+                    The role of the master is to deploy the topology of
+                    matlab/scilab instances (slaves) and to distribute
+                    tasks (between the different engines);
+                </para>
             </listitem>
-          </itemizedlist>
+        </itemizedlist>
 
-          <itemizedlist>
+        <itemizedlist>
             <listitem>
-              <para><emphasis>RUN</emphasis>: The task is computing by a
-              scilab engine</para>
+                <para>
+                    The role of the worker is to perform the submitted
+                    tasks (by the master).
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <para>
+            There are four classes which are intented for the user:
+        </para>
+
+        <para>
+            The Class
+            <literal>MSService</literal>
+            implements all functionalities to deploy engines, to
+            distribute tasks, and to retrieve results (of computed
+            tasks).
+        </para>
+
+        <itemizedlist>
+            <listitem>
+                <para>
+                    The deployment is made thank to a ProActive
+                    descriptor. This deployment descriptor describes the
+                    different nodes of the grid taking part at the
+                    computation. A singularity of this descriptor is the
+                    declaration of specific matlab/scilab environment
+                    variables for each node. The deployment is achieved
+                    by a call of the method "deployEngine". This method
+                    takes in parameters the VirtualNode id, the
+                    descriptor path, and the number of engines to
+                    create.
+                </para>
             </listitem>
 
             <listitem>
-              <para><emphasis>SUCCES</emphasis>: The computation of the task
-              is terminated with success</para>
+                <para>
+                    The distribution of a Matlab/Scilab task is made
+                    thanks to the call of the method "sendTask". After
+                    the call, the task is set in pending queue. This
+                    queue is managed like a FIFO with priority. The task
+                    is in head of the queue is sent when a engine is
+                    available.
+                </para>
             </listitem>
 
             <listitem>
-              <para><emphasis>ABORT</emphasis>: The computation of the task
-              was avorted</para>
+                <para>
+                    After the computation of a task, the matlab/scilab
+                    engine returns the result. To retrieve this result,
+                    it is necessary to listen the event "SciEventTask"
+                    thank to the method "addEnventListenerTask".
+                </para>
             </listitem>
 
             <listitem>
-              <para><emphasis>KILL</emphasis>: The task was killed by the user
-              during the computation</para>
+                <para>
+                    This class offers also the possibilities to cancel a
+                    pending task, to kill a running task , and to
+                    restart a engine.
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <para>
+            The Class
+            <literal>GenTaskInfo</literal>
+            contains all informations about a Matlab/Scilab task. Among
+            these informations, there are:
+        </para>
+
+        <itemizedlist>
+            <listitem>
+                <para>The state of the tasks:</para>
+
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis>WAIT</emphasis>
+                            : The task is in the pending queue
+                        </para>
+                    </listitem>
+                </itemizedlist>
+
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis>RUN</emphasis>
+                            : The task is computing by an engine
+                        </para>
+                    </listitem>
+
+                    <listitem>
+                        <para>
+                            <emphasis>SUCCES</emphasis>
+                            : The computation of the task is terminated
+                            with success
+                        </para>
+                    </listitem>
+
+                    <listitem>
+                        <para>
+                            <emphasis>ABORT</emphasis>
+                            : The computation of the task was avorted
+                        </para>
+                    </listitem>
+
+                    <listitem>
+                        <para>
+                            <emphasis>KILL</emphasis>
+                            : The task was killed by the user during the
+                            computation
+                        </para>
+                    </listitem>
+
+                    <listitem>
+                        <para>
+                            <emphasis>CANCEL</emphasis>
+                            : The Task was cancelled by the user before
+                            its computation
+                        </para>
+                    </listitem>
+                </itemizedlist>
             </listitem>
 
             <listitem>
-              <para><emphasis>CANCEL</emphasis>: The Task was cancelled by the
-              user before its computation</para>
+                <para>The global and execution time</para>
             </listitem>
-          </itemizedlist>
-        </listitem>
 
-        <listitem>
-          <para>The global and execution time</para>
-        </listitem>
+            <listitem>
+                <para>
+                    The priority of the task (
+                    <emphasis>LOW</emphasis>
+                    ,
+                    <emphasis>NORMAL</emphasis>
+                    ,
+                    <emphasis>HIGH</emphasis>
+                    )
+                </para>
+            </listitem>
 
-        <listitem>
-          <para>The priority of the task (<emphasis>LOW</emphasis>,
-          <emphasis>NORMAL</emphasis>, <emphasis>HIGH</emphasis>)</para>
-        </listitem>
+            <listitem>
+                <para>The task itself</para>
+            </listitem>
 
-        <listitem>
-          <para>The task itself</para>
-        </listitem>
+            <listitem>
+                <para>
+                    The result of the associated task ( It is available
+                    when the state is
+                    <emphasis>ABORT</emphasis>
+                    or
+                    <emphasis>SUCCESS</emphasis>
+                    )
+                </para>
+            </listitem>
+        </itemizedlist>
 
-        <listitem>
-          <para>The result of the assiciated task ( It is available when the
-          state is <emphasis>ABORT</emphasis> or
-          <emphasis>SUCCESS</emphasis>)</para>
-        </listitem>
-      </itemizedlist>
+        <para>
+            The class
+            <literal>SciTask</literal>
+            describes a scilab task. It defines In and Out data, the job
+            and the job initialization. A job is a scilab script
+            (*.sce), it contains all instructions executed by a remote
+            engine. In data and the job initialization allow to
+            customize the execution and Out data define the values to
+            return after the execution.
+        </para>
+        <para>
+            The class
+            <literal>MatlabTask</literal>
+            describes a matlab task. It defines similar data as the
+            scilab task. A job is a scilab script (*.m).
+        </para>
 
-      <para>The class <literal>SciTask</literal> describes a scilab task. It
-      defines In and Out data, the job and the job initialization. A job is a
-      scilab script (*.sce), it contains all instructions executed by a remote
-      engine. In data and the job initialization allow to customize the
-      execution and Out data define the values to return after the
-      execution.</para>
+        <para>
+            The class
+            <literal>GeneralResult</literal>
+            describes a result of a Scilab or Matlab task. A result is
+            the list of return values (defining in the task).
+        </para>
 
-      <para>The class <literal>SciResult</literal> describes a scilab result.
-      A result is the list of return values (defining in the task).</para>
+        <para>
+            The following example
+            <xref linkend="sciex1" />
+            presents how to compute a basic scilab task and to display
+            the result. In our case the task initializes the variable
+            <literal>"n"</literal>
+            and increments it. The next example shows a possibly
+            deployment descriptor
+            <xref linkend="sciex2" />
+            .
+        </para>
 
-      <para>The following example <xref linkend="sciex1" /> presents how to
-      compute a basic task and to display the result. In our case the task
-      initializes the variable <literal>"n"</literal> and increments it. The
-      next example shows a possibly deployment descriptor <xref
-      linkend="sciex2" />.</para>
+        <example id="sciex1">
+            <title>Example: Interface Matlab/Scilab</title>
 
-      <example id="sciex1">
-        <title>Example: Interface Scilab</title>
-
-        <programlisting lang="java">public class SciTest {
+            <programlisting lang="java"><![CDATA[public class SciTest {
 
 	SciTask task;
-	ScilabService scilab;
+	MSService scilab;
 	
-	public void  displayResult(SciTaskInfo scitaskInfo){
+	public void  displayResult(GenTaskInfo scitaskInfo){
 		// scilab result
-		SciResult sciResult = scitaskInfo.getSciResult();
-		// list of retrun values
+		GeneralResult sciResult = scitaskInfo.getResult();
+		// list of return values
 		ArrayList listResult = sciResult.getList();
 		
 		for (int i = 0; i &lt; listResult.size(); i++) {
@@ -196,14 +526,14 @@
 		task.setJob("n = n+1;");
 		
 		//a new scilab service
-		ScilabService scilab = new ScilabService();
+		MSService scilab = new MSService();
 		
 		//add task event listener
-		scilab.addEventListenerTask( new SciEventListener(){
-			public void actionPerformed(SciEvent evt){
-				SciTaskInfo sciTaskInfo = (SciTaskInfo) evt.getSource();
+		scilab.addEventListenerTask( new MSEventListener(){
+			public void actionPerformed(MSEvent evt){
+				MSTaskInfo sciTaskInfo = (MSTaskInfo) evt.getSource();
 				
-				if(sciTaskInfo.getState() == SciTaskInfo.SUCCESS){
+				if(sciTaskInfo.getState() == MSTaskInfo.SUCCESS){
 					 displayResult(sciTaskInfo);
 					return;
 				}
@@ -220,276 +550,116 @@
 	public static void main(String[] args) throws Exception {
 		new SciTest(args[0], args[1]);
 	}
-}</programlisting>
-      </example>
+}]]></programlisting>
+        </example>
 
-      <example id="sciex2">
-        <title>Descriptor deployment</title>
+        <example id="sciex2">
+            <title>Descriptor deployment</title>
 
-        <programlisting lang="xml">
-&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            <programlisting lang="xml"><![CDATA[
+<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation=
-"http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd"&gt;
-	&lt;variables&gt;
-		&lt;descriptorVariable name="PROACTIVE_HOME" value="****"/&gt; 
-		&lt;descriptorVariable name="REMOTE_HOME" value="****"/&gt;
-		&lt;descriptorVariable name="SCILAB_HOME" value="****"/&gt;
-	&lt;/variables&gt;
-	&lt;componentDefinition&gt;
-		&lt;virtualNodesDefinition&gt;
-			&lt;virtualNode name="ScilabVN" property="multiple"/&gt;
-		&lt;/virtualNodesDefinition&gt;
-	&lt;/componentDefinition&gt;
-	&lt;deployment&gt;
-		&lt;mapping&gt;
-			&lt;map virtualNode="ScilabVN"&gt;
-				&lt;jvmSet&gt;
-					&lt;vmName value="Jvm0"/&gt; 
-					&lt;vmName value="Jvm1"/&gt;
-					&lt;vmName value="Jvm2"/&gt;
-					&lt;vmName value="Jvm3"/&gt;   
-				&lt;/jvmSet&gt;
-			&lt;/map&gt;
-		&lt;/mapping&gt;
-		&lt;jvms&gt;
-			&lt;/jvm&gt;
-			&lt;jvm name="Jvm1"&gt;
-				&lt;creation&gt;
-					&lt;processReference refid="rsh_predadab"/&gt; 
-				&lt;/creation&gt;
-			&lt;/jvm&gt;
-			&lt;jvm name="Jvm2"&gt;
-				&lt;creation&gt;
-					&lt;processReference refid="rsh_trinidad"/&gt;
-				&lt;/creation&gt;
-			&lt;/jvm&gt;
-			&lt;jvm name="Jvm3"&gt;
-				&lt;creation&gt;
-					 &lt;processReference refid="rsh_apple"/&gt;                                         
-				&lt;/creation&gt;
-			&lt;/jvm&gt;
-		&lt;/jvms&gt;
-	&lt;/deployment&gt;
-	&lt;infrastructure&gt;
-		&lt;processes&gt;
-			&lt;processDefinition id="localJVM"&gt;
-				&lt;jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"&gt;
-					&lt;classpath&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar" /&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar" /&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar" /&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" /&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/xercesImpl.jar" /&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/bouncycastle.jar" /&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" /&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/javassist.jar" /&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/classes" /&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${SCILAB_HOME}/bin/javasci.jar" /&gt;
-					&lt;/classpath&gt;
-					&lt;javaPath&gt;
-						&lt;absolutePath value="****" /&gt;
-					&lt;/javaPath&gt;
-					&lt;policyFile&gt;
-						&lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive.java.policy" /&gt;
-					&lt;/policyFile&gt;
-					&lt;log4jpropertiesFile&gt;
-						 &lt;absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive-log4j" /&gt;
-				&lt;/log4jpropertiesFile&gt;                          
-			&lt;/processDefinition&gt;
-			&lt;processDefinition id="rsh_predadab"&gt;
-				&lt;rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab"&gt;
-					&lt;environment&gt;
-						&lt;variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/&gt;
-						&lt;variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/&gt;
-						&lt;variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/&gt;
-					&lt;/environment&gt;
-					&lt;processReference refid="localJVM"/&gt;
-				&lt;/rshProcess&gt;
-			&lt;/processDefinition&gt;
-			&lt;processDefinition id="rsh_trinidad"&gt;
-				&lt;rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="trinidad"&gt;
-					&lt;environment&gt;
-						&lt;variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/&gt;
-						&lt;variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/&gt;
-						&lt;variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/&gt;
-					&lt;/environment&gt;
-					&lt;processReference refid="localJVM"/&gt;
-				&lt;/rshProcess&gt;
-			&lt;/processDefinition&gt;
-			&lt;processDefinition id="rsh_apple"&gt;
-				&lt;rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="apple"&gt;
-					&lt;environment&gt;
-						&lt;variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/&gt;
-						&lt;variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/&gt;
-						&lt;variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/&gt;
-					&lt;/environment&gt;
-					&lt;processReference refid="localJVM"/&gt;
-				&lt;/rshProcess&gt;
-			&lt;/processDefinition&gt;                        
-		&lt;/processes&gt;
-	&lt;/infrastructure&gt;
-&lt;/ProActiveDescriptor&gt;</programlisting>
-      </example>
-  </sect1>
-
-  <sect1>
-    <title>Graphical User Interface (Scilab Grid ToolBox)</title>
-
-    <para>This interface allows to manipulate the functionnalities of the API
-    in a user friendly way.</para>
-
-    <sect2>
-      <title>Launching Scilab Grid ToolBox</title>
-
-      <para>To launch the application, you have to execute the script: </para>
-
-      <para>On Unix:</para>
-
-      <screen>cd scripts/unix
-scilab.sh</screen>
-
-      <para>On Windows:</para>
-
-      <screen>cd scripts\windows
-scilab.bat</screen>
-
-      <para>if you use a local version of Scilab, you must declare the
-      environment variables in the file: </para>
-
-      <screen>scripts/[unix|windows]/scilab_env.[sh|bat]</screen>
-
-      <para>Once the application is started, the main frame is displayed. This
-      frame is composed in three parts:</para>
-
-      <itemizedlist>
-        <listitem>
-          <para>The tree of Scilab engines .</para>
-        </listitem>
-
-        <listitem>
-          <para>The ltables of pending, running, and terminated tasks.</para>
-        </listitem>
-
-        <listitem>
-          <para>The text area to display the log of user operations.</para>
-        </listitem>
-      </itemizedlist>
-
-      <figure>
-        <title>Main frame</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="scilab/pics/ScilabToolBox.png" />
-          </imageobject>
-        </mediaobject>
-      </figure>
-    </sect2>
-
-    <sect2>
-      <title>Deployment of the application</title>
-
-      <para>The first step is to deploy the topology of the application. A
-      dialog enables to choice the descriptor and to select the virtual node.
-      The button "deploy" launches the deployment of scilab engine over the
-      nodes.</para>
-
-      <figure>
-        <title>Deployment of the application</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="scilab/pics/ScilabToolBox1.png" />
-          </imageobject>
-        </mediaobject>
-      </figure>
-    </sect2>
-
-    <sect2>
-      <title>Task launching</title>
-
-      <para>The next step is the task launching. A dialog enables to select
-      the script and possibly to define the script initialization, the return
-      values, and the task priority. The button start creates and sends the
-      task.</para>
-
-      <figure>
-        <title>Creation of a task</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="scilab/pics/ScilabToolBox2.png" />
-          </imageobject>
-        </mediaobject>
-      </figure>
-    </sect2>
-
-    <sect2>
-      <title>Display of results</title>
-
-      <para>The last step is the display of results. A double click on a task
-      in the table of terminated tasks sets visible a dialog. This dialog
-      displays the tasks properties and the result (with the possibility to
-      save it in a file)</para>
-
-      <figure>
-        <title>Display a result</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="scilab/pics/ScilabToolBox4.png" />
-          </imageobject>
-        </mediaobject>
-      </figure>
-    </sect2>
-
-    <sect2>
-      <title>Task monitoring</title>
-
-      <para>In the main frame, several tables of tasks (pending, executing ,
-      terminated) allow to monitor the application. These tables allows to
-      show just for each task the relevant informations. A double click on a
-      task in these tables sets visible a dialog. This dialog displays the
-      tasks properties (path, script initialization, results).</para>
-
-      <itemizedlist>
-        <listitem>
-          <para>The table of pending tasks enables to cancel selected tasks
-          and to clear all cancelled tasks</para>
-        </listitem>
-
-        <listitem>
-          <para>The table of executing tasks enables to kill selected tasks
-          and to clear all killed tasks</para>
-        </listitem>
-
-        <listitem>
-          <para>The table of terminated tasks enables to get the status of
-          tasks (SUCCESS or ABORT), to save the first selected task in file
-          the result, to remove selected tasks.</para>
-        </listitem>
-      </itemizedlist>
-    </sect2>
-
-    <sect2>
-      <title>Engine monitoring</title>
-
-      <para>In the main frame, a tree describes all nodes used by the
-      application. Over the execution of the application, if a task is
-      aborted, the engine of this task may be unstable ( this one is displayed
-      with a red foreground). A rigth-click on it show a popup menu to restart
-      it.</para>
-
-      <figure>
-        <title>State of Engines</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata fileref="scilab/pics/ScilabToolBox3.png" />
-          </imageobject>
-        </mediaobject>
-      </figure>
-    </sect2>
-  </sect1>
+"http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
+	<variables>
+		<descriptorVariable name="PROACTIVE_HOME" value="****"/> 
+		<descriptorVariable name="REMOTE_HOME" value="****"/>
+		<descriptorVariable name="SCILAB_HOME" value="****"/>
+	</variables>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="ScilabVN" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="ScilabVN">
+				<jvmSet>
+					<vmName value="Jvm0"/> 
+					<vmName value="Jvm1"/>
+					<vmName value="Jvm2"/>
+					<vmName value="Jvm3"/>   
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			</jvm>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="rsh_predadab"/> 
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<creation>
+					<processReference refid="rsh_trinidad"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm3">
+				<creation>
+					 <processReference refid="rsh_apple"/>                                         
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<classpath>
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar" />
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar" />
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar" />
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/xercesImpl.jar" />
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/bouncycastle.jar" />
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/javassist.jar" />
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/classes" />
+						<absolutePath value="${REMOTE_HOME}/${SCILAB_HOME}/bin/javasci.jar" />
+					</classpath>
+					<javaPath>
+						<absolutePath value="****" />
+					</javaPath>
+					<policyFile>
+						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive.java.policy" />
+					</policyFile>
+					<log4jpropertiesFile>
+						 <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive-log4j" />
+				    </log4jpropertiesFile>
+                 </jvmProcess>                       
+			</processDefinition>
+			<processDefinition id="rsh_predadab">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab">
+					<environment>
+						<variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+						<variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+						<variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
+					</environment>
+					<processReference refid="localJVM"/>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh_trinidad">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="trinidad">
+					<environment>
+						<variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+						<variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+						<variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
+					</environment>
+					<processReference refid="localJVM"/>
+				</rshProcess>
+			</processDefinition>
+			<processDefinition id="rsh_apple">
+				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="apple">
+					<environment>
+						<variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+						<variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
+						<variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
+					</environment>
+					<processReference refid="localJVM"/>
+				</rshProcess>
+			</processDefinition>                        
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>]]></programlisting>
+        </example>
+    </sect1>
 </chapter>
