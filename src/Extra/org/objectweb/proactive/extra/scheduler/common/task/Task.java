@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
@@ -52,10 +53,10 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
  * @see #addDependence(Task)
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Sept 14, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Sept 14, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public abstract class Task implements Serializable {
 
     /** Number of nodes asked by the user. */

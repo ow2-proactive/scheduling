@@ -57,8 +57,8 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
  *
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 28, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jun 28, 2007
+ * @since ProActive 3.9
  */
 public class AdminScheduler extends UserScheduler
     implements AdminSchedulerInterface {

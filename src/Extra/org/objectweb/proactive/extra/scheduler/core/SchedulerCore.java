@@ -102,8 +102,8 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * to insert and get jobs from the queue.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 27, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jun 27, 2007
+ * @since ProActive 3.9
  */
 public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
@@ -917,11 +917,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         if (job != null) {
             result = job.getJobResult().getAllResults().get(taskName);
 
-            if (!ProFuture.isAwaited(result)) {
+            if ((result != null) && !ProFuture.isAwaited(result)) {
                 logger.info("[SCHEDULER] Get '" + taskName +
                     "' task result for job " + jobId);
-            } else {
-                return null;
             }
         }
 

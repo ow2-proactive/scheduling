@@ -60,6 +60,8 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * TaskDescriptor may also be removed from user view.
  *
  * @author jlscheef - ProActiveTeam
+ * @version 3.9, Jul 17, 2007
+ * @since ProActive 3.9
  *
  */
 public class SimpleHelloWorld {

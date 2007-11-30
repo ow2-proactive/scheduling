@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 
@@ -42,10 +43,10 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
  * the scheduler listener to send this class as event.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 25, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 25, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class TaskEvent implements Serializable {
 
     /** Serial version UID */

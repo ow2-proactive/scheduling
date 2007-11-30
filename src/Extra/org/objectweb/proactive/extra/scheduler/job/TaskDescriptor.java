@@ -44,8 +44,8 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * Only a restricted number of properties on each tasks is sent to the policy.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 9, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 9, 2007
+ * @since ProActive 3.9
  */
 public class TaskDescriptor implements Serializable {
 

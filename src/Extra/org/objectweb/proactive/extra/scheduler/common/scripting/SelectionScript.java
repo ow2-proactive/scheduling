@@ -35,14 +35,16 @@ import java.net.URL;
 
 import javax.script.*;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * A selection Script : return true if the resource tested is correct.
  * @author ProActive Team
- * @version 1.0, Jun 8, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 8, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class SelectionScript extends Script<Boolean> {
 
     /**  */
@@ -50,7 +52,7 @@ public class SelectionScript extends Script<Boolean> {
 
     /**
      * The variable name which must be set after the evaluation
-     * of a verifiying script.
+     * of a verifying script.
      */
     public static final String RESULT_VARIABLE = "selected";
 

@@ -77,8 +77,8 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * in {@link SchedulerConnection} .
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 28, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jun 28, 2007
+ * @since ProActive 3.9
  */
 public class SchedulerFrontend implements InitActive,
     SchedulerEventListener<InternalJob>, UserSchedulerInterface,
@@ -303,7 +303,7 @@ public class SchedulerFrontend implements InitActive,
 
         if (result == null) {
             throw new SchedulerException(
-                "Error while getting the result of this task !");
+                "Error while getting the result of this task !\nProblems may be :\n\t The task name you try to join is incorrect,\n\t the task you want to join is not finished.");
         }
 
         return result;

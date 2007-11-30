@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
@@ -47,10 +48,10 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * A user will only be able to managed his jobs and tasks, and also see the entire scheduling process.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 7, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 7, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public interface UserSchedulerInterface extends Serializable {
 
     /**
@@ -69,8 +70,11 @@ public interface UserSchedulerInterface extends Serializable {
     public JobId submit(Job job) throws SchedulerException;
 
     /**
-     * Get the result for the given jobId.<br>
-     * A user can only get HIS result back.
+     * Get the result for the given jobId.
+     * A user can only get HIS result back.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.<br>
+     * So, if you have the right to get the job result represented by the given jobId and if the job exists,
+     * so you will receive the result. In any other cases a schedulerException will be thrown.
      *
      * @param jobId the job on which the result will be send
      * @return a job Result containing information about the result.
@@ -79,8 +83,11 @@ public interface UserSchedulerInterface extends Serializable {
     public JobResult getJobResult(JobId jobId) throws SchedulerException;
 
     /**
-     * Get the result for the given task name in the given jobId.<br>
-     * A user can only get HIS result back.
+     * Get the result for the given task name in the given jobId.
+     * A user can only get HIS result back.<br>
+     * If the job does not exist, a schedulerException is sent with the proper message.<br>
+     * So, if you have the right to get the task result that is in the job represented by the given jobId and if the job and task name exist,
+     * so you will receive the result. In any other cases a schedulerException will be thrown.<br>
      *
      * @param jobId the job in which the task result is.
      * @param taskName the name of the task in which the result is.

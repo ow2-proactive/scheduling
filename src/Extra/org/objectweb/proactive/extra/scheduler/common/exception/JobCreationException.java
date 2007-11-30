@@ -35,8 +35,8 @@ package org.objectweb.proactive.extra.scheduler.common.exception;
  * Exceptions Generated if a problem occurred while creating a job.
  *
  * @author jlscheef - ProActive Team
- * @version 1.0, Jun 29, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jun 29, 2007
+ * @since ProActive 3.9
  */
 public class JobCreationException extends Exception {
 

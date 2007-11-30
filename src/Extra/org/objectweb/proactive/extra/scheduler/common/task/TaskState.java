@@ -30,16 +30,17 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.task;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * This class represents every state that a task is able to be in.<br>
  * Each state are best describe below.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.1, Jun 28, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 28, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public enum TaskState implements java.io.Serializable {
 
     /**

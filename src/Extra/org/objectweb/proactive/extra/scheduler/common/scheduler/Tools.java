@@ -33,15 +33,17 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Provides some methods used by the scheduler or the GUI to display some tips properly.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 26, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 26, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class Tools implements Serializable {
 
     /** Serial version UID */

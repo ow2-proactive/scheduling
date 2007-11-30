@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 
 
@@ -40,10 +41,10 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
  * integer.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 29, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 29, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public final class TaskId implements Comparable<TaskId>, Serializable {
 
     /** Default task name */

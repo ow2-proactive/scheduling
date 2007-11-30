@@ -34,6 +34,7 @@ import java.io.Serializable;
 
 import javax.security.auth.login.LoginException;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 
 
@@ -43,10 +44,10 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
  * You can get this interface by using the scheduler connection {@link SchedulerConnection}
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 24, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jul 24, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public interface SchedulerAuthenticationInterface extends Serializable {
 
     /**

@@ -32,15 +32,17 @@ package org.objectweb.proactive.extra.scheduler.common.job;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Definition of a job identification, this will be used during scheduling to identify your job.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 29, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 29, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public final class JobId implements Comparable<JobId>, Serializable {
 
     /** Serial version UID */

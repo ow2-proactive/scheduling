@@ -42,8 +42,8 @@ import org.objectweb.proactive.extra.scheduler.task.EligibleTaskDescriptor;
  * Implementation of the policy using FIFO prio ordering.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 5, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 5, 2007
+ * @since ProActive 3.9
  */
 public class PriorityPolicy implements PolicyInterface {
 

@@ -45,15 +45,17 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 import javax.script.ScriptEngineManager;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * A simple script to evaluate using java 6 scripting API.
  *
  * @author ProActive Team
- * @version 1.0, Jun 4, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 4, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public abstract class Script<E> implements Serializable {
 
     /** Variable name for script arguments */

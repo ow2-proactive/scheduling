@@ -47,8 +47,8 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * This class provide a getProcess method that will return the current running native process.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Aug 21, 2007
- * @since ProActive 3.2
+ * @version 3.9, Aug 21, 2007
+ * @since ProActive 3.9
  */
 public class NativeExecutable extends Executable {
 

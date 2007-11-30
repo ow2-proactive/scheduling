@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 
@@ -47,10 +48,10 @@ import org.objectweb.proactive.extra.scheduler.common.task.Task;
  * Then add tasks with the given method {@link #addTask(Task)} in order to fill the job with your own tasks.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Sept 14, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Sept 14, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class TaskFlowJob extends Job {
 
     /** Serial Version UID */
@@ -59,7 +60,7 @@ public class TaskFlowJob extends Job {
     /** List of task for the task flow job */
     private HashMap<String, Task> tasks = new HashMap<String, Task>();
 
-    /** Proactive Empty Constructor */
+    /** ProActive Empty Constructor */
     public TaskFlowJob() {
     }
 

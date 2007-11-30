@@ -46,8 +46,8 @@ import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptor
  * It will tell you if an exception occured in the task that generate this result.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Aug 3, 2007
- * @since ProActive 3.2
+ * @version 3.9, Aug 3, 2007
+ * @since ProActive 3.9
  */
 public class TaskResultImpl implements TaskResult {
 

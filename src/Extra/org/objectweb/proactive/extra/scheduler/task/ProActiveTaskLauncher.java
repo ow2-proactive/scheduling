@@ -48,8 +48,8 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
  * ProActive task Launcher will be able to launch an application task
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 10, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 10, 2007
+ * @since ProActive 3.9
  */
 public class ProActiveTaskLauncher extends TaskLauncher {
 

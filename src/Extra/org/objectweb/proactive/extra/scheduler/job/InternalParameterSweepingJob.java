@@ -40,8 +40,8 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * This is the definition of a Parameter Swipping Job.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 7, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jun 7, 2007
+ * @since ProActive 3.9
  */
 public class InternalParameterSweepingJob extends InternalJob {
 

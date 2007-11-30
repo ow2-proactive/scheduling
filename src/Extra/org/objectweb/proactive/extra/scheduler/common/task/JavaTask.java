@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
 
 
@@ -42,10 +43,10 @@ import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
  * It also provides method to personalize it.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Sept 14, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Sept 14, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class JavaTask extends Task {
 
     /** Serial version UID */

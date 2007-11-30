@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * State of the scheduler.
@@ -37,10 +38,10 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
  * are best described below.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 26, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jul 26, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public enum SchedulerState implements java.io.Serializable {
 
     /**

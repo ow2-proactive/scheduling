@@ -52,8 +52,8 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * This class provides method to managed jobs for a user.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 12, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jun 12, 2007
+ * @since ProActive 3.9
  */
 public class UserScheduler implements UserSchedulerInterface {
 

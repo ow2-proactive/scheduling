@@ -60,7 +60,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
  * Stress test for the scheduler.
  * Creates several virtual users which randomly submit jobs and retreive results.
  * @author cdelbe
- * @since 2.2
+ * @since ProActive 3.9
  */
 public class SchedulerTester {
     // directory containing jobs to be submitted

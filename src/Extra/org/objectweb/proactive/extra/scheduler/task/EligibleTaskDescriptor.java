@@ -42,8 +42,8 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * @see org.objectweb.proactive.extra.scheduler.job.TaskDescriptor
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 9, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 9, 2007
+ * @since ProActive 3.9
  */
 public class EligibleTaskDescriptor extends TaskDescriptor {
 

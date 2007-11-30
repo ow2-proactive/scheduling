@@ -30,16 +30,17 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.job;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * Scheduling state of a job.
  * The different job states are best described below.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Aug 10, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Aug 10, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public enum JobState implements java.io.Serializable {
     /**
      * The job is waiting to be scheduled.

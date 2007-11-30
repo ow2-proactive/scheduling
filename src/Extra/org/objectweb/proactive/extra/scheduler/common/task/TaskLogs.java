@@ -30,14 +30,16 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.task;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * This interface must be implemented by log storage for scheduler jobs.
  * @author cdelbe
- * @version 1.0
- * @since ProActive 3.2.1
- * @publicAPI
+ * @version 3.9
+ * @since ProActive 3.9
  */
+@PublicAPI
 public interface TaskLogs extends java.io.Serializable {
 
     /**

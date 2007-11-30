@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.job;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.task.ProActiveTask;
 
 
@@ -44,10 +45,10 @@ import org.objectweb.proactive.extra.scheduler.common.task.ProActiveTask;
  *
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Sept 14, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Sept 14, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class ProActiveJob extends Job {
 
     /** Serial Version UID */

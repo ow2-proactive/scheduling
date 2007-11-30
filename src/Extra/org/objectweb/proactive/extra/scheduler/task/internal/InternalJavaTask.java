@@ -40,8 +40,8 @@ import org.objectweb.proactive.extra.scheduler.common.task.JavaExecutable;
  * See also @see AbstractJavaTaskDescriptor
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 16, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 16, 2007
+ * @since ProActive 3.9
  */
 public class InternalJavaTask extends InternalAbstractJavaTask {
 

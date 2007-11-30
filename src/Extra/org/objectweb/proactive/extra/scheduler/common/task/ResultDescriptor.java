@@ -34,14 +34,16 @@ import java.io.Serializable;
 
 import javax.swing.JPanel;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * This class defines a way to represent the result of a given task.
  *
  * @author cdelbe
- * @since 2.2
- * @publicAPI
+ * @since 3.9
  */
+@PublicAPI
 public abstract class ResultDescriptor implements Serializable {
 
     /**

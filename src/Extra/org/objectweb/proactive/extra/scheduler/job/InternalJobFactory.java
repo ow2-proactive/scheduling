@@ -54,8 +54,8 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * and recreate the dependences if needed.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Sept 14, 2007
- * @since ProActive 3.2
+ * @version 3.9, Sept 14, 2007
+ * @since ProActive 3.9
  */
 public class InternalJobFactory implements Serializable {
 

@@ -39,14 +39,16 @@ import javax.script.Bindings;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * This script can return the command that have to be executed as Task.
  * @see ExecutableNativeTask
  * @author cdelbe
  * @since 3.9
- * @publicAPI
  */
+@PublicAPI
 public class GenerationScript extends Script<String> {
 
     /**

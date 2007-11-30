@@ -34,6 +34,8 @@ import java.io.Serializable;
 
 import javax.swing.JPanel;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Interface representing the task result.<br>
@@ -42,10 +44,10 @@ import javax.swing.JPanel;
  * It will tell you if an exception occurred in the task that generate this result.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Aug 3, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Aug 3, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public interface TaskResult extends Serializable {
 
     /**

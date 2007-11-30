@@ -72,8 +72,8 @@ import org.objectweb.proactive.extra.scheduler.core.SchedulerCore;
  * With this default launcher, you can get the node on which the task is running and kill the task.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 10, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 10, 2007
+ * @since ProActive 3.9
  */
 public class TaskLauncher implements InitActive {
     private static final long serialVersionUID = -9159607482957244049L;

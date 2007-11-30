@@ -40,8 +40,8 @@ import org.objectweb.proactive.extra.scheduler.common.job.JobId;
  * It is what the scheduler should be able to managed.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 4, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 4, 2007
+ * @since ProActive 3.9
  */
 public class IdentifyJob implements Serializable {
 

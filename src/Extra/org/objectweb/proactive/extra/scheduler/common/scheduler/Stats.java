@@ -33,6 +33,8 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * It will be used to view some tips on the scheduler.<br>
@@ -40,10 +42,10 @@ import java.util.HashMap;
  *
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 25, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jul 25, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public interface Stats extends Serializable {
 
     /**

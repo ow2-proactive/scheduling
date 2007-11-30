@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.common.job;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
 
@@ -45,10 +46,10 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
  * This will automatically put the job up to date.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 25, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 25, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class JobEvent implements Serializable {
 
     /** Serial version UID */

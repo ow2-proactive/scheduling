@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.scheduler.common.job;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
 
 
@@ -50,10 +51,10 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInt
  * Once the job created, you can submit it to the scheduler using the {@link UserSchedulerInterface}.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Sept 13, 2007
+ * @version 3.9, Sept 13, 2007
  * @since ProActive 3.2
- * @publicAPI
  */
+@PublicAPI
 public abstract class Job implements Serializable {
 
     /** Name of the job */

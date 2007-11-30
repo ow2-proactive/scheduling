@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.common.job;
 import java.io.Serializable;
 import java.util.HashMap;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
@@ -47,10 +48,10 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * <ul>
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 5, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jul 5, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public interface JobResult extends Serializable {
 
     /**

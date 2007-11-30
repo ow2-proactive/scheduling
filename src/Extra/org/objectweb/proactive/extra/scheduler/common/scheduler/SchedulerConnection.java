@@ -35,6 +35,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -47,10 +48,10 @@ import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerExcepti
  * the possibility to authenticate user that wants to connect a scheduler.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 24, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jul 24, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class SchedulerConnection implements Serializable {
 
     /** Serial version UID */

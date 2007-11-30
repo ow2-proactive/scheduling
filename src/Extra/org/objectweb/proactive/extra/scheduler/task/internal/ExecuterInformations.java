@@ -40,8 +40,8 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
  * It also provides a method to create its own launcher.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Sept 10, 2007
- * @since ProActive 3.2
+ * @version 3.9, Sept 10, 2007
+ * @since ProActive 3.9
  */
 public class ExecuterInformations {
 

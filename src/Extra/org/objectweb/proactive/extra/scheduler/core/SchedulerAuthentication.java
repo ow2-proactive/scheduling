@@ -58,8 +58,8 @@ import org.objectweb.proactive.extra.security.Login;
  * in order to managed the scheduler.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 23, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 23, 2007
+ * @since ProActive 3.9
  *
  */
 public class SchedulerAuthentication implements InitActive,

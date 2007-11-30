@@ -36,7 +36,11 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 /**
- * @author jlscheef
+ * Worker prime.
+ *
+ * @author jlscheef - ProActiveTeam
+ * @version 3.9, Jul 17, 2007
+ * @since ProActive 3.9
  *
  */
 public class Worker implements java.io.Serializable {

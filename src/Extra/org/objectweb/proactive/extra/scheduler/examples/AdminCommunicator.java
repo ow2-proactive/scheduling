@@ -48,8 +48,8 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
  * AdminCommunicator ...
  *
  * @author jlscheef - ProActiveTeam
- * @date 24 oct. 07
- * @version 3.2
+ * @version 3.9, Jul 17, 2007
+ * @since ProActive 3.9
  *
  */
 public class AdminCommunicator {

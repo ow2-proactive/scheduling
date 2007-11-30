@@ -44,13 +44,15 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.border.EtchedBorder;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Static util methods for result descriptor definition
  * @author cdelbe
- * @since 3.9
- * @publicAPI
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class ResultDescriptorTool {
 
     /**

@@ -32,6 +32,8 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 import java.util.Map;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Extends this abstract class if you want to create your own java task.<br>
@@ -40,10 +42,10 @@ import java.util.Map;
  * By default, this method does nothing.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 4, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 4, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public abstract class JavaExecutable extends Executable {
 
     /**

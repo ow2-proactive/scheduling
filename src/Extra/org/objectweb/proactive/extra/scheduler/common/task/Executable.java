@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.task.NativeExecutable;
 
 
@@ -48,10 +49,10 @@ import org.objectweb.proactive.extra.scheduler.task.NativeExecutable;
  * In this last case, this {@link #execute(TaskResult...)} method will be forgot.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Aug 24, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Aug 24, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public abstract class Executable implements Serializable {
 
     /** Arguments of the task as a map */

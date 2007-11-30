@@ -43,8 +43,8 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
  * The nodes use is under user responsibility.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 7, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jun 7, 2007
+ * @since ProActive 3.9
  */
 public class InternalProActiveJob extends InternalJob {
 

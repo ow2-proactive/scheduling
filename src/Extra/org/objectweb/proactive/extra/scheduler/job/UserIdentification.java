@@ -41,8 +41,8 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEvent;
  * Two userIdentification are equals if there username are the same.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 4, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 4, 2007
+ * @since ProActive 3.9
  */
 public class UserIdentification implements Serializable {
 

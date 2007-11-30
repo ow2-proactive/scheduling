@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.job.ProActiveJob;
 
 
@@ -43,10 +44,10 @@ import org.objectweb.proactive.extra.scheduler.common.job.ProActiveJob;
  * You can also specify arguments to give to the task using the {@link #setArguments(Map)} as the java task does it.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Sept 14, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Sept 14, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class ProActiveTask extends Task {
 
     /** Serial version UID */

@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 
 import java.util.ArrayList;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -42,10 +43,10 @@ import org.objectweb.proactive.core.node.Node;
  * <i>Note</i> : the {@link #execute(TaskResult...)} method is not used anymore from this class.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Aug 21, 2007
- * @since ProActive 3.2
- * @public API
+ * @version 3.9, Aug 21, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public abstract class ProActiveExecutable extends JavaExecutable {
 
     /**

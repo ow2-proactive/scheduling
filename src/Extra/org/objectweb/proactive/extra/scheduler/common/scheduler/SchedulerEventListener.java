@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
@@ -42,10 +43,10 @@ import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
  * Class providing events that the scheduler is able to send using the described listener.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 12, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 12, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public interface SchedulerEventListener<E extends Job> extends Serializable {
 
     /**

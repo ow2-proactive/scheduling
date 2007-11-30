@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.task;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
 import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript;
 
@@ -40,10 +41,10 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.GenerationScript
  * You don't have to extend this class to launch your own native executable.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Sept 14, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Sept 14, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public class NativeTask extends Task {
 
     /** Serial version UID */

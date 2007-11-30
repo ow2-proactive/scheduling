@@ -30,15 +30,16 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.job;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * This is the different job priorities.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 11, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 11, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public enum JobPriority implements java.io.Serializable {
     /** Lowest priority : administrator only */
     IDLE("Idle", 0),

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
@@ -40,10 +41,10 @@ import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
  * This interface represents what a scheduler administrator should do.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 29, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 29, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public interface AdminSchedulerInterface extends UserSchedulerInterface {
 
     /**

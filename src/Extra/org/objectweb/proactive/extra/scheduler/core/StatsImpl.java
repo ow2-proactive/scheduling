@@ -41,8 +41,8 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
  * Stats class will be used to view some tips on the scheduler.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 25, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 25, 2007
+ * @since ProActive 3.9
  */
 public class StatsImpl implements Stats {
 

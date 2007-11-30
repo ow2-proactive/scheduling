@@ -38,8 +38,8 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  * This interface represents what the schedulerCore should do.
  *
  * @author ProActive Team
- * @version 1.0, Jun 29, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jun 29, 2007
+ * @since ProActive 3.9
  */
 public interface SchedulerCoreInterface {
 

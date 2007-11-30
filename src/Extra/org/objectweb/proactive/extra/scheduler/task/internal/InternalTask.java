@@ -53,8 +53,8 @@ import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
  * It also provides a method to create its own launcher.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jul 9, 2007
- * @since ProActive 3.2
+ * @version 3.9, Jul 9, 2007
+ * @since ProActive 3.9
  */
 public abstract class InternalTask extends Task implements Comparable<InternalTask> {
 

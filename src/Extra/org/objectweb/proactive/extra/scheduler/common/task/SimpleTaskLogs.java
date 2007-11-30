@@ -34,7 +34,7 @@ package org.objectweb.proactive.extra.scheduler.common.task;
 /**
  * A simple String based implementation of TaskLogs.
  * @author cdelbe
- * @since 2.2
+ * @since ProActive 3.9
  */
 public class SimpleTaskLogs implements TaskLogs {
     // logs on standard output

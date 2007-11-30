@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.scheduler;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * Enumeration of all different events that scheduler can invoke.<br>
@@ -38,9 +39,10 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
  *
  * @author jlscheef - ProActiveTeam
  * @date 18 oct. 07
- * @version 3.2
- * @publicAPI
+ * @version 3.9
+ * @since ProActive 3.9
  */
+@PublicAPI
 public enum SchedulerEvent {
     IMMEDIATE_PAUSED("schedulerImmediatePausedEvent"),
     RESUMED("schedulerResumedEvent"),SHUTDOWN("schedulerShutDownEvent"),

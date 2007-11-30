@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.scheduler.common.scheduler;
 import java.io.Serializable;
 import java.util.Vector;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 
 
@@ -41,10 +42,10 @@ import org.objectweb.proactive.extra.scheduler.common.job.Job;
  * It is basically represented by 3 lists of jobs, and its scheduling state.
  *
  * @author jlscheef - ProActiveTeam
- * @version 1.0, Jun 12, 2007
- * @since ProActive 3.2
- * @publicAPI
+ * @version 3.9, Jun 12, 2007
+ * @since ProActive 3.9
  */
+@PublicAPI
 public final class SchedulerInitialState<E extends Job> implements Serializable {
 
     /** serial version UID */

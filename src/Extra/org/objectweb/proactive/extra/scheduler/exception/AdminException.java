@@ -37,7 +37,7 @@ package org.objectweb.proactive.extra.scheduler.exception;
  *
  * @author ProActive Team
  * @version 1.0, Jun 28, 2007
- * @since ProActive 3.2
+ * @since ProActive 3.9
  *
  */
 public class AdminException extends Exception {

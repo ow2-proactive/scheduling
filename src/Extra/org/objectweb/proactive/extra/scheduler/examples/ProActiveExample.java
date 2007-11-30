@@ -44,7 +44,12 @@ import org.objectweb.proactive.extra.scheduler.common.task.ProActiveExecutable;
 
 
 /**
- * @author jlscheef
+ * ProActiveExample.
+ *
+ * @author jlscheef - ProActiveTeam
+ * @version 3.9, Jul 17, 2007
+ * @since ProActive 3.9
+ *
  */
 public class ProActiveExample extends ProActiveExecutable {
 
