@@ -255,7 +255,7 @@ public class CommandBuilderProActive implements CommandBuilder {
         }
 
         if (applicationClasspath != null) {
-            for (PathElement pe : proactiveClasspath) {
+            for (PathElement pe : applicationClasspath) {
                 sb.append(pe.getFullPath(hostInfo, this));
                 sb.append(hostInfo.getOS().pathSeparator());
             }
