@@ -35,8 +35,8 @@
 				<title>What is a task ?</title>
 				<para>
 					The task is the smallest scheduled entity. 
-					It is included in a <xref linkend="what_is_job">job</xref> and will be executed 
-					in accordance with the <xref linkend="add_policy">policy</xref>wishes, 
+					It is included in a job (see <xref linkend="what_is_job" />) and will be executed 
+					in accordance with the policy (see <xref linkend="scheduling_policy"/>) wishes, 
 					and when resources becomes available.
 				</para>
 				<para>
@@ -53,20 +53,44 @@
 							Coding this last one requires a knowledge base on the use of ProActive.
 						</listitem>
 					</itemizedlist>
+				</para>
+				<para>
 					At its execution a task may crash due to host failure or user bugs,
 					the task can be then re-started a parameterizable number of time.
 				</para>
 				<para>
-					Pre +
-					Post +
-					+ Selection
+					A task may optionally be accompanied by 3 kinds of scripts (preScript, postScript and selectionScript)
+					whose explanations are provided in the documentation of resource manager (<xref linkend="resources_manager"/>)
+				</para>
+				<para>
+					Dependences between the tasks can also be possible, it will be explain in <xref linkend="how_dependences" />.
 				</para>
 			</sect3>
 			
 			<sect3 id="what_is_job">
 				<title>What is a job ?</title>
 				<para>
-					
+					A job is the entity to be given to the scheduler.
+					It can contains one or more tasks and can be of several types :
+					<itemizedlist>
+						<listitem>
+							TASKSFLOW, represents a job that contains a bag of tasks that
+							can be execute in parallel or according to a dependence tree. The tasks inside this job
+							can be java or native.
+						</listitem>
+						<listitem>
+							PROACTIVE,represents a job that contains only one ProActive application task.
+							Its execution will start with a given predefined number of nodes on which you can start process.
+							This kind of job requires to use ProActive API in order to use the given nodes.
+						</listitem>
+						<listitem>
+							PARAMETER SWEEPING, is a job that represents multiple executions of one type of task
+							with different given parameters. It is typically executed in parallel.
+							The tasks inside this job can also be java or native.
+						</listitem>
+					</itemizedlist>
+				</para>
+				<para>
 				</para>
 			</sect3>
 			

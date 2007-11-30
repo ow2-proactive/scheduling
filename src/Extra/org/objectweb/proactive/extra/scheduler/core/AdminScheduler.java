@@ -149,7 +149,7 @@ public class AdminScheduler extends UserScheduler
      * Create a new scheduler at the specified URL plugged on the given resource manager.<br>
      * This constructor also requires the username//password of the admin to connect.<br>
      * This will provide a connection interface to allow the access to a restricted number of user.
-     * It will return an admin scheduler able to managed the scheduler.
+     * It will return an admin scheduler able to managed the scheduler.<br>
      * <font color="red">WARNING :</font> this method provides a way to connect to the scheduler after its creation,
      * BUT if the scheduler is restarting after failure, this method will create the scheduler
      * but will throw a SchedulerException due to the failure of admin connection.<br>
