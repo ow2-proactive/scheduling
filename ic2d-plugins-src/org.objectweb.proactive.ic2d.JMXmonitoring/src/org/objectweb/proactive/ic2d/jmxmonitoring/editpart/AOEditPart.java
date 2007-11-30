@@ -30,10 +30,8 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Observable;
-import java.util.Set;
 
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.swt.graphics.Color;
@@ -175,20 +173,33 @@ public class AOEditPart extends AbstractMonitoringEditPart {
                 break;
             } //case ACTIVE_OBJECT_RESET_COMMUNICATIONS
             case ACTIVE_OBJECT_ADD_COMMUNICATION: {
-                final Set<ActiveObject> communications = (HashSet<ActiveObject>) notificationdata;
+                //                final Set<ActiveObject> communications = (HashSet<ActiveObject>) notificationdata;
+                //                final AOFigure destination = getCastedFigure();
+                //                final IFigure panel = getGlobalPanel();
+                //                for (ActiveObject aoSource : communications) {
+                //                    AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
+                //                    if (editPart != null) {
+                //                        AOFigure source = (AOFigure) editPart.getFigure();
+                //                        if (source != null) {
+                //                            /*communicationsToDraw.add(*/ addGraphicalCommunication(new GraphicalCommunication(
+                //                                    source, destination, panel, getArrowColor()));
+                //                        } else {
+                //                            System.out.println(
+                //                                "[Error] Unable to find the source");
+                //                        }
+                //                    }
+                //                }
+                final ActiveObject aoSource = (ActiveObject) notificationdata;
                 final AOFigure destination = getCastedFigure();
                 final IFigure panel = getGlobalPanel();
-                for (ActiveObject aoSource : communications) {
-                    AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
-                    if (editPart != null) {
-                        AOFigure source = (AOFigure) editPart.getFigure();
-                        if (source != null) {
-                            /*communicationsToDraw.add(*/ addGraphicalCommunication(new GraphicalCommunication(
-                                    source, destination, panel, getArrowColor()));
-                        } else {
-                            System.out.println(
-                                "[Error] Unable to find the source");
-                        }
+                final AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
+                if (editPart != null) {
+                    AOFigure source = (AOFigure) editPart.getFigure();
+                    if (source != null) {
+                        addGraphicalCommunication(new GraphicalCommunication(
+                                source, destination, panel, getArrowColor()));
+                    } else {
+                        System.out.println("[Error] Unable to find the source");
                     }
                 }
                 break;

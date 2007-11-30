@@ -31,8 +31,6 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
@@ -272,15 +270,11 @@ public class ActiveObject extends AbstractData {
      * @param aoSource Source active object.
      */
     public void addCommunication(ActiveObject aoSource) {
+        // Set<ActiveObject> comm = new HashSet<ActiveObject>();
+        // comm.add(aoSource);
         setChanged();
-        Set<ActiveObject> comm = new HashSet<ActiveObject>();
-        comm.add(aoSource);
         notifyObservers(new MVCNotification(
-                MVCNotificationTag.ACTIVE_OBJECT_ADD_COMMUNICATION, comm));
-
-        /*synchronized (communications) {
-                communications.add(source);
-        }*/
+                MVCNotificationTag.ACTIVE_OBJECT_ADD_COMMUNICATION, aoSource));
     }
 
     /**
