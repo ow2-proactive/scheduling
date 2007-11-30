@@ -39,7 +39,8 @@ import java.util.regex.Pattern;
 
 
 public class ListGenerator {
-    final static protected Pattern plainHostname = Pattern.compile("[a-z0-9]+");
+    final static protected Pattern plainHostname = Pattern.compile(
+            "[a-zA-Z0-9\\-.:]+");
     final static protected Pattern simpleInterval = Pattern.compile(
             "\\[([\\d\\-,; ]+)\\]");
     final static protected Pattern subInterval = Pattern.compile(
