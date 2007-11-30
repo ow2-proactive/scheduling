@@ -32,10 +32,15 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.net.URL;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 
 
+/**
+ * The migration controller allows to move a component to another node.
+ */
+@PublicAPI
 public interface MigrationController {
     public void migrateDependentActiveObjectsTo(Node node)
         throws MigrationException;

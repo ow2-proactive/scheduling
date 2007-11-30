@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.component.controller;
 
 import org.objectweb.fractal.api.control.BindingController;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -39,6 +40,7 @@ import org.objectweb.fractal.api.control.BindingController;
  * @author Matthieu Morel
  *
  */
+@PublicAPI
 public interface ProActiveBindingController extends BindingController {
 
     /**

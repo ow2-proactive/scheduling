@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component.controller;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.SuperController;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -39,6 +40,7 @@ import org.objectweb.fractal.api.control.SuperController;
  *
  * @author Matthieu Morel
  */
+@PublicAPI
 public interface ProActiveSuperController extends SuperController {
     public abstract void addParent(final Component parent);
 

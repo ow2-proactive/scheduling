@@ -35,6 +35,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.exceptions.NoSuchComponentException;
 
 
@@ -43,6 +44,7 @@ import org.objectweb.proactive.core.component.exceptions.NoSuchComponentExceptio
  * @author Paul Naoumenko
  *
  */
+@PublicAPI
 public interface MembraneController {
 
     /**

@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 
@@ -39,6 +40,7 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
  * @author Matthieu Morel
  *
  */
+@PublicAPI
 public interface CollectiveInterfaceController {
     public void ensureCompatibility(ProActiveInterfaceType itfType,
         ProActiveInterface itf)

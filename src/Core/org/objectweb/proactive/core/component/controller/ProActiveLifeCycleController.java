@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.component.controller;
 
 import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -42,6 +43,7 @@ import org.objectweb.fractal.api.control.LifeCycleController;
  * @author Matthieu Morel
  *
  */
+@PublicAPI
 public interface ProActiveLifeCycleController extends LifeCycleController {
     public String getFcState(short priority);
 

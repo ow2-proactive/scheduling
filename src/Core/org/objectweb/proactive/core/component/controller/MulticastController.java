@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.util.Map;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
@@ -45,8 +46,9 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * @author Matthieu Morel
  *
  */
+@PublicAPI
 public interface MulticastController extends CollectiveInterfaceController {
-    //	
+
     /**
      * Transforms an invocation on a multicast interface into a list of invocations which will be
      * transferred to client interfaces. These invocations are inferred from the annotations of the

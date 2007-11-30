@@ -34,6 +34,7 @@ import java.util.List;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.ContentController;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.exceptions.ContentControllerExceptionListException;
 
 
@@ -46,6 +47,7 @@ import org.objectweb.proactive.core.component.exceptions.ContentControllerExcept
  * @author Matthieu Morel
  *
  */
+@PublicAPI
 public interface ProActiveContentController extends ContentController {
 
     /**
