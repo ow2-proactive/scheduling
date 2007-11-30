@@ -55,6 +55,12 @@ public class AOEditPart extends AbstractMonitoringEditPart {
      * This list is empty beacause AO model has no children !
      */
     private static final List<AbstractData> emptyList = new java.util.ArrayList<AbstractData>(0);
+
+    /**
+     * The default color of an arrow used in getArrowColor() method
+     */
+    private static final Color DEFAULT_ARROW_COLOR = new Color(Display.getCurrent(),
+            108, 108, 116);
     private Integer length;
 
     /*private Set<IFigure> figuresToUpdate;
@@ -285,8 +291,9 @@ public class AOEditPart extends AbstractMonitoringEditPart {
         return figure;
     }
 
-    protected Color getArrowColor() {
-        return new Color(Display.getCurrent(), 108, 108, 116);
+    protected final Color getArrowColor() {
+        // Avoid creating a new instance of color by returning a default one
+        return DEFAULT_ARROW_COLOR; //new Color(Display.getCurrent(), 108, 108, 116);
     }
 
     /**
