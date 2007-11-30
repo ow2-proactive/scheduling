@@ -34,6 +34,7 @@ import java.io.FileInputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,14 +78,14 @@ public class VariableContract implements Serializable {
         }
     }
 
-    private HashMap list;
+    private HashMap<String, PropertiesDatas> variablesMap;
 
     /**
      * Constructor of the class. Creates a new instance.
      *
      */
     public VariableContract() {
-        list = new HashMap();
+        variablesMap = new HashMap<String, PropertiesDatas>();
         closed = false;
     }
 
@@ -128,10 +129,10 @@ public class VariableContract implements Serializable {
      */
     public void setJavaPropertiesValues() {
         //before closing we set the JavaProperties values
-        java.util.Iterator it = list.keySet().iterator();
+        java.util.Iterator<String> it = variablesMap.keySet().iterator();
         while (it.hasNext()) {
-            String name = (String) it.next();
-            PropertiesDatas data = (PropertiesDatas) list.get(name);
+            String name = it.next();
+            PropertiesDatas data = variablesMap.get(name);
             setFromJavaProperty(name, data.type);
         } // while
     }
@@ -196,8 +197,8 @@ public class VariableContract implements Serializable {
                 " can not be set empty from " + from + " for type: " + type);
         }
 
-        if (list.containsKey(name)) {
-            PropertiesDatas var = (PropertiesDatas) list.get(name);
+        if (variablesMap.containsKey(name)) {
+            PropertiesDatas var = variablesMap.get(name);
 
             if (!type.hasPriority(var.setFrom, from)) {
                 if (logger.isDebugEnabled()) {
@@ -297,8 +298,8 @@ public class VariableContract implements Serializable {
      * @return The value of the variable.
      */
     public String getValue(String name) {
-        if (list.containsKey(name)) {
-            PropertiesDatas var = (PropertiesDatas) list.get(name);
+        if (variablesMap.containsKey(name)) {
+            PropertiesDatas var = variablesMap.get(name);
 
             return var.value;
         }
@@ -376,11 +377,11 @@ public class VariableContract implements Serializable {
             throw new NullPointerException("Variable Type is null.");
         }
 
-        if (list.containsKey(name) &&
-                !((PropertiesDatas) list.get(name)).type.equals(type)) {
+        if (variablesMap.containsKey(name) &&
+                !variablesMap.get(name).type.equals(type)) {
             throw new IllegalArgumentException("Variable " + name +
                 " is already defined with type: " +
-                ((PropertiesDatas) list.get(name)).type);
+                variablesMap.get(name).type);
         }
     }
 
@@ -406,8 +407,8 @@ public class VariableContract implements Serializable {
         }
 
         PropertiesDatas data;
-        if (list.containsKey(name)) {
-            data = (PropertiesDatas) list.get(name);
+        if (variablesMap.containsKey(name)) {
+            data = variablesMap.get(name);
             if (logger.isDebugEnabled()) {
                 logger.debug("...Modifying variable registry: " + name + "=" +
                     value);
@@ -423,7 +424,7 @@ public class VariableContract implements Serializable {
         data.type = type;
         data.value = value;
         data.setFrom = setFrom;
-        list.put(name, data);
+        variablesMap.put(name, data);
     }
 
     /**
@@ -434,10 +435,10 @@ public class VariableContract implements Serializable {
     public boolean checkContract() {
         boolean retval = true;
         String name;
-        java.util.Iterator it = list.keySet().iterator();
+        java.util.Iterator<String> it = variablesMap.keySet().iterator();
         while (it.hasNext()) {
-            name = (String) it.next();
-            PropertiesDatas data = (PropertiesDatas) list.get(name);
+            name = it.next();
+            PropertiesDatas data = variablesMap.get(name);
 
             if (data.value.length() <= 0) {
                 logger.error(data.type.getEmptyErrorMessage(name));
@@ -454,15 +455,31 @@ public class VariableContract implements Serializable {
 
         PropertiesDatas var;
         String name;
-        java.util.Iterator it = list.keySet().iterator();
+        java.util.Iterator<String> it = variablesMap.keySet().iterator();
         while (it.hasNext()) {
-            name = (String) it.next();
-            var = (PropertiesDatas) list.get(name);
+            name = it.next();
+            var = variablesMap.get(name);
 
             sb.append(name).append("=").append(var).append("\n");
         }
 
         return sb.toString();
+    }
+
+    public Map<String, String> toMap() {
+        Map<String, String> res = new HashMap<String, String>();
+
+        PropertiesDatas var;
+        String name;
+        java.util.Iterator<String> it = variablesMap.keySet().iterator();
+        while (it.hasNext()) {
+            name = it.next();
+            var = variablesMap.get(name);
+
+            res.put(name, var.value);
+        }
+
+        return res;
     }
 
     /**

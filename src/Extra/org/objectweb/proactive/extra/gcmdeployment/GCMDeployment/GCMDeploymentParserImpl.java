@@ -111,7 +111,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected DocumentBuilderFactory domFactory;
     protected XPath xpath;
     protected DocumentBuilder documentBuilder;
-    protected CommandBuilder commandBuilder;
+    protected List<String> schemas;
     protected Map<String, GroupParser> groupParserMap;
     protected Map<String, BridgeParser> bridgeParserMap;
     protected GCMDeploymentInfrastructure infrastructure;
@@ -121,7 +121,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private VariableContract variableContract;
     private boolean parsedResource = false;
     private boolean parsedInfrastructure = false;
-    protected List<String> schemas;
     private File descriptor;
 
     public GCMDeploymentParserImpl(File descriptor)
@@ -229,7 +228,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    public void parseEnvironment() throws XPathExpressionException {
+    protected void parseEnvironment() throws XPathExpressionException {
         Node environmentNode = (Node) xpath.evaluate(XPATH_ENVIRONMENT,
                 document, XPathConstants.NODE);
 
