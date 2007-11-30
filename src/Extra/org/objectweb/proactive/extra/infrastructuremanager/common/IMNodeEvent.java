@@ -32,8 +32,10 @@ package org.objectweb.proactive.extra.infrastructuremanager.common;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.extra.scheduler.job.IdentifyJob;
 
-public class NodeEvent implements Serializable {
+
+public class IMNodeEvent implements Serializable {
     private static final long serialVersionUID = -7781655355601704944L;
     private String nodeUrl = null;
     private String nodeSource = null;
@@ -43,10 +45,10 @@ public class NodeEvent implements Serializable {
     private String VMName = null;
     private NodeState nodeState;
 
-    public NodeEvent() {
+    public IMNodeEvent() {
     }
 
-    public NodeEvent(String url, String nodeSource, String PADName,
+    public IMNodeEvent(String url, String nodeSource, String PADName,
         String VnName, String hostname, String vm, NodeState state) {
         this.nodeUrl = url;
         this.nodeSource = nodeSource;
@@ -55,6 +57,13 @@ public class NodeEvent implements Serializable {
         this.hostName = hostname;
         this.VnName = vm;
         nodeState = state;
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof IMNodeEvent) {
+            return ((IMNodeEvent) obj).nodeUrl.equals(this.nodeUrl);
+        }
+        return false;
     }
 
     public String getNodeUrl() {

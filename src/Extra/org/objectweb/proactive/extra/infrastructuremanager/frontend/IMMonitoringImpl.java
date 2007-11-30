@@ -50,8 +50,8 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
@@ -207,38 +207,39 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
         dispatch(IMEvent.STARTED, null);
     }
 
-    public void nodeAddedEvent(NodeEvent n) {
-        dispatch(IMEvent.NODE_ADDED, new Class<?>[] { NodeEvent.class }, n);
+    public void nodeAddedEvent(IMNodeEvent n) {
+        dispatch(IMEvent.NODE_ADDED, new Class<?>[] { IMNodeEvent.class }, n);
     }
 
-    public void nodeBusyEvent(NodeEvent n) {
-        dispatch(IMEvent.NODE_BUSY, new Class<?>[] { NodeEvent.class }, n);
+    public void nodeBusyEvent(IMNodeEvent n) {
+        dispatch(IMEvent.NODE_BUSY, new Class<?>[] { IMNodeEvent.class }, n);
     }
 
-    public void nodeDownEvent(NodeEvent n) {
-        dispatch(IMEvent.NODE_DOWN, new Class<?>[] { NodeEvent.class }, n);
+    public void nodeDownEvent(IMNodeEvent n) {
+        dispatch(IMEvent.NODE_DOWN, new Class<?>[] { IMNodeEvent.class }, n);
     }
 
-    public void nodeFreeEvent(NodeEvent n) {
-        dispatch(IMEvent.NODE_FREE, new Class<?>[] { NodeEvent.class }, n);
+    public void nodeFreeEvent(IMNodeEvent n) {
+        dispatch(IMEvent.NODE_FREE, new Class<?>[] { IMNodeEvent.class }, n);
     }
 
-    public void nodeRemovedEvent(NodeEvent n) {
-        dispatch(IMEvent.NODE_REMOVED, new Class<?>[] { NodeEvent.class }, n);
+    public void nodeRemovedEvent(IMNodeEvent n) {
+        dispatch(IMEvent.NODE_REMOVED, new Class<?>[] { IMNodeEvent.class }, n);
     }
 
-    public void nodeToReleaseEvent(NodeEvent n) {
-        dispatch(IMEvent.NODE_TO_RELEASE, new Class<?>[] { NodeEvent.class }, n);
+    public void nodeToReleaseEvent(IMNodeEvent n) {
+        dispatch(IMEvent.NODE_TO_RELEASE, new Class<?>[] { IMNodeEvent.class },
+            n);
     }
 
-    public void nodeSourceAddedEvent(NodeSourceEvent ns) {
+    public void nodeSourceAddedEvent(IMNodeSourceEvent ns) {
         dispatch(IMEvent.NODESOURCE_CREATED,
-            new Class<?>[] { NodeSourceEvent.class }, ns);
+            new Class<?>[] { IMNodeSourceEvent.class }, ns);
     }
 
-    public void nodeSourceRemovedEvent(NodeSourceEvent ns) {
+    public void nodeSourceRemovedEvent(IMNodeSourceEvent ns) {
         dispatch(IMEvent.NODESOURCE_REMOVED,
-            new Class<?>[] { NodeSourceEvent.class }, ns);
+            new Class<?>[] { IMNodeSourceEvent.class }, ns);
     }
 
     public void initActivity(Body body) {

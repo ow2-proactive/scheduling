@@ -31,9 +31,16 @@
 package org.objectweb.proactive.extra.infrastructuremanager.common;
 
 public interface IMConstants {
+
+    /** constants for active objects registered in RMI register */
     public static final String NAME_NODE_IM = "IMNODE";
     public static final String NAME_ACTIVE_OBJECT_IMCORE = "IMCORE";
     public static final String NAME_ACTIVE_OBJECT_IMADMIN = "IMADMIN";
     public static final String NAME_ACTIVE_OBJECT_IMUSER = "IMUSER";
     public static final String NAME_ACTIVE_OBJECT_IMMONITORING = "IMMONITORING";
+
+    /** constants for NodeSource objects types */
+    public static final String PAD_NODE_SOURCE_TYPE = "PAD_NODE_SOURCE";
+    public static final String P2P_NODE_SOURCE_TYPE = "P2P_NODE_SOURCE";
+    public static final String DUMMY_NODE_SOURCE_TYPE = "DUMMY_NODE_SOURCE";
 }

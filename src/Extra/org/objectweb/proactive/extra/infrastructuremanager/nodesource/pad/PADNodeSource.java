@@ -37,7 +37,8 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PADNSInterface;
@@ -129,8 +130,9 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
         return new IntWrapper(listPad.size());
     }
 
-    public NodeSourceEvent getSourceEvent() {
-        return new NodeSourceEvent(this.getSourceId(), "PAD Node Source");
+    public IMNodeSourceEvent getSourceEvent() {
+        return new IMNodeSourceEvent(this.getSourceId(),
+            IMConstants.PAD_NODE_SOURCE_TYPE);
     }
 
     // ----------------------------------------------------------------------//

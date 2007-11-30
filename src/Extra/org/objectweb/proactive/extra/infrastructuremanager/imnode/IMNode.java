@@ -35,7 +35,7 @@ import java.util.HashMap;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
@@ -195,5 +195,5 @@ public interface IMNode extends Comparable<IMNode> {
 
     /**
      *  build NodeEvent object for the IMNode */
-    public NodeEvent getNodeEvent();
+    public IMNodeEvent getNodeEvent();
 }

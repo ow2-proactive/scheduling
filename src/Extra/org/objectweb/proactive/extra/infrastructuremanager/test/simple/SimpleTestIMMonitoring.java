@@ -45,8 +45,8 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMEventListener;
@@ -272,42 +272,42 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
         System.out.println("SimpleTestIMMonitoring.imStartedEvent()");
     }
 
-    public void nodeAddedEvent(NodeEvent n) {
+    public void nodeAddedEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeAddedEvent() " +
             n.getNodeUrl());
     }
 
-    public void nodeBusyEvent(NodeEvent n) {
+    public void nodeBusyEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeBusyEvent() " +
             n.getNodeUrl());
     }
 
-    public void nodeDownEvent(NodeEvent n) {
+    public void nodeDownEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeDownEvent() " +
             n.getNodeUrl());
     }
 
-    public void nodeFreeEvent(NodeEvent n) {
+    public void nodeFreeEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeFreeEvent() " +
             n.getNodeUrl());
     }
 
-    public void nodeToReleaseEvent(NodeEvent n) {
+    public void nodeToReleaseEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeToReleaseEvent() " +
             n.getNodeUrl());
     }
 
-    public void nodeRemovedEvent(NodeEvent n) {
+    public void nodeRemovedEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeRemovedEvent() " +
             n.getNodeUrl());
     }
 
-    public void nodeSourceAddedEvent(NodeSourceEvent ns) {
+    public void nodeSourceAddedEvent(IMNodeSourceEvent ns) {
         System.out.println("SimpleTestIMMonitoring.nodeSourceAddedEvent() " +
             ns.getSourceName());
     }
 
-    public void nodeSourceRemovedEvent(NodeSourceEvent ns) {
+    public void nodeSourceRemovedEvent(IMNodeSourceEvent ns) {
         System.out.println("SimpleTestIMMonitoring.nodeSourceRemovedEvent() " +
             ns.getSourceName());
     }

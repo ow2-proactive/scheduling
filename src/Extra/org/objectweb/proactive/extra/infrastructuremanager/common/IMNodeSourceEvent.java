@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.common;
 import java.io.Serializable;
 
 
-public class NodeSourceEvent implements Serializable {
+public class IMNodeSourceEvent implements Serializable {
 
     /**
      *
@@ -42,12 +42,20 @@ public class NodeSourceEvent implements Serializable {
     private String nodeSourceName = null;
     private String nodeSourceType = null;
 
-    public NodeSourceEvent() {
+    public IMNodeSourceEvent() {
     }
 
-    public NodeSourceEvent(String name, String type) {
+    public IMNodeSourceEvent(String name, String type) {
         this.nodeSourceName = name;
         this.nodeSourceType = type;
+    }
+
+    public boolean equals(Object obj) {
+        if (obj instanceof IMNodeSourceEvent) {
+            return ((IMNodeSourceEvent) obj).nodeSourceName.equals(this.nodeSourceName) &&
+            ((IMNodeSourceEvent) obj).nodeSourceType.equals(this.nodeSourceType);
+        }
+        return false;
     }
 
     public String getSourceName() {

@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
 
 
 /**
@@ -48,19 +48,19 @@ public interface IMEventListener {
 
     public void imKilledEvent();
 
-    public void nodeSourceAddedEvent(NodeSourceEvent ns);
+    public void nodeSourceAddedEvent(IMNodeSourceEvent ns);
 
-    public void nodeSourceRemovedEvent(NodeSourceEvent ns);
+    public void nodeSourceRemovedEvent(IMNodeSourceEvent ns);
 
-    public void nodeAddedEvent(NodeEvent n);
+    public void nodeAddedEvent(IMNodeEvent n);
 
-    public void nodeFreeEvent(NodeEvent n);
+    public void nodeFreeEvent(IMNodeEvent n);
 
-    public void nodeBusyEvent(NodeEvent n);
+    public void nodeBusyEvent(IMNodeEvent n);
 
-    public void nodeToReleaseEvent(NodeEvent n);
+    public void nodeToReleaseEvent(IMNodeEvent n);
 
-    public void nodeDownEvent(NodeEvent n);
+    public void nodeDownEvent(IMNodeEvent n);
 
-    public void nodeRemovedEvent(NodeEvent n);
+    public void nodeRemovedEvent(IMNodeEvent n);
 }

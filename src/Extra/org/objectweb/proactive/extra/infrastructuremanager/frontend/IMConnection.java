@@ -59,6 +59,7 @@ public class IMConnection implements IMConstants {
         if (url == null) {
             url = "//localhost/" + NAME_ACTIVE_OBJECT_IMUSER;
         }
+        System.out.println("IMConnection.connectAsUser() " + url);
 
         try {
             IMUser user = (IMUser) ProActiveObject.lookupActive(IMUser.class.getName(),

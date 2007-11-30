@@ -55,8 +55,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMDataResource;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.AddingNodesException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
@@ -699,33 +699,33 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     }
 
     public IMInitialState getIMInitialState() {
-        Vector<NodeEvent> freeNodesVector = new Vector<NodeEvent>();
+        ArrayList<IMNodeEvent> freeNodesList = new ArrayList<IMNodeEvent>();
         for (IMNode imnode : this.freeNodes) {
-            freeNodesVector.add(imnode.getNodeEvent());
+            freeNodesList.add(imnode.getNodeEvent());
         }
 
-        Vector<NodeEvent> busyNodesVector = new Vector<NodeEvent>();
+        ArrayList<IMNodeEvent> busyNodesList = new ArrayList<IMNodeEvent>();
         for (IMNode imnode : this.busyNodes) {
-            busyNodesVector.add(imnode.getNodeEvent());
+            busyNodesList.add(imnode.getNodeEvent());
         }
 
-        Vector<NodeEvent> toReleaseNodesVector = new Vector<NodeEvent>();
+        ArrayList<IMNodeEvent> toReleaseNodesList = new ArrayList<IMNodeEvent>();
         for (IMNode imnode : this.toBeReleased) {
-            toReleaseNodesVector.add(imnode.getNodeEvent());
+            toReleaseNodesList.add(imnode.getNodeEvent());
         }
 
-        Vector<NodeEvent> downNodesVector = new Vector<NodeEvent>();
+        ArrayList<IMNodeEvent> downNodeslist = new ArrayList<IMNodeEvent>();
         for (IMNode imnode : this.downNodes) {
-            downNodesVector.add(imnode.getNodeEvent());
+            downNodeslist.add(imnode.getNodeEvent());
         }
 
-        Vector<NodeSourceEvent> nodeSourcesVector = new Vector<NodeSourceEvent>();
+        ArrayList<IMNodeSourceEvent> nodeSourcesList = new ArrayList<IMNodeSourceEvent>();
         for (NodeSource s : this.nodeSources.values()) {
-            nodeSourcesVector.add(s.getSourceEvent());
+            nodeSourcesList.add(s.getSourceEvent());
         }
 
-        return new IMInitialState(freeNodesVector, busyNodesVector,
-            toReleaseNodesVector, downNodesVector, nodeSourcesVector);
+        return new IMInitialState(freeNodesList, busyNodesList,
+            toReleaseNodesList, downNodeslist, nodeSourcesList);
     }
 
     // ACCESSORS

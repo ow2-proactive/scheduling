@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.NodeState;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
@@ -313,8 +313,8 @@ public class IMNodeImpl implements IMNode, Serializable {
     //	public NodeEvent(String url, String nodeSource, 
     //			String PADName, String VnName, String hostname,
     //			String vm, NodeState state) {
-    public NodeEvent getNodeEvent() {
-        return new NodeEvent(this.nodeURL, this.getNodeSourceId(),
+    public IMNodeEvent getNodeEvent() {
+        return new IMNodeEvent(this.nodeURL, this.getNodeSourceId(),
             this.padName, this.vnodeName, this.hostName, this.vmName,
             this.status);
     }

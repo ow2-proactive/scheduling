@@ -35,9 +35,11 @@ import java.util.Vector;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.p2p.service.P2PService;
@@ -105,8 +107,9 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
         p2pNodeLookup.killNode(nodeUrl);
         //remove node from the list
         removeFromList(node);
-        //remove node and its lookup form lookup HM
-        this.lookups.remove(nodeUrl);
+        //terminate AOs, remove node and its lookup form lookup HM
+        ProActiveObject.terminateActiveObject(this.lookups.remove(nodeUrl),
+            false);
         //indicate that a new node has to be got in a [niceTime] future
         newNiceTime();
     }
@@ -126,9 +129,9 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     }
 
     @Override
-    public NodeSourceEvent getSourceEvent() {
-        return new NodeSourceEvent(this.getSourceId(),
-            "Peer to peer Node Source");
+    public IMNodeSourceEvent getSourceEvent() {
+        return new IMNodeSourceEvent(this.getSourceId(),
+            IMConstants.P2P_NODE_SOURCE_TYPE);
     }
 
     // ----------------------------------------------------------------------//

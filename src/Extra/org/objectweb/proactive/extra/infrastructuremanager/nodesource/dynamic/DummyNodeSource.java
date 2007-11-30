@@ -39,7 +39,8 @@ import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.infrastructuremanager.common.NodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PadDeployInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.IMDeploymentFactory;
@@ -140,9 +141,9 @@ public class DummyNodeSource extends DynamicNodeSource
         }
     }
 
-    @Override
-    public NodeSourceEvent getSourceEvent() {
-        return new NodeSourceEvent(this.getSourceId(), "Dummy Node Source");
+    public IMNodeSourceEvent getSourceEvent() {
+        return new IMNodeSourceEvent(this.getSourceId(),
+            IMConstants.DUMMY_NODE_SOURCE_TYPE);
     }
 
     // ----------------------------------------------------------------------//

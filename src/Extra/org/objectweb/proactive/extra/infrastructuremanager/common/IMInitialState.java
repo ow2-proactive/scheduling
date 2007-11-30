@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.infrastructuremanager.common;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Vector;
 
 
@@ -39,75 +40,77 @@ public class IMInitialState implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     /** Free Nodes */
-    private Vector<NodeEvent> freeNodes = new Vector<NodeEvent>();
+    private ArrayList<IMNodeEvent> freeNodes = new ArrayList<IMNodeEvent>();
 
     /** busy Nodes */
-    private Vector<NodeEvent> busyNodes = new Vector<NodeEvent>();
+    private ArrayList<IMNodeEvent> busyNodes = new ArrayList<IMNodeEvent>();
 
     /** toRelease Nodes */
-    private Vector<NodeEvent> toReleaseNodes = new Vector<NodeEvent>();
+    private ArrayList<IMNodeEvent> toReleaseNodes = new ArrayList<IMNodeEvent>();
 
     /** down Nodes */
-    private Vector<NodeEvent> downNodes = new Vector<NodeEvent>();
-    private Vector<NodeSourceEvent> nodeSources = new Vector<NodeSourceEvent>();
+    private ArrayList<IMNodeEvent> downNodes = new ArrayList<IMNodeEvent>();
+
+    /** Nodes sources AO living in IM */
+    private ArrayList<IMNodeSourceEvent> nodeSources = new ArrayList<IMNodeSourceEvent>();
 
     public IMInitialState() {
     }
 
-    public IMInitialState(Vector<NodeEvent> freeNodesVector,
-        Vector<NodeEvent> busyNodesVector,
-        Vector<NodeEvent> toReleaseNodesVector,
-        Vector<NodeEvent> downNodesVector,
-        Vector<NodeSourceEvent> nodeSourcesVector) {
-        this.freeNodes = freeNodesVector;
-        this.busyNodes = busyNodesVector;
-        this.toReleaseNodes = toReleaseNodesVector;
-        this.downNodes = downNodesVector;
-        this.nodeSources = nodeSourcesVector;
+    public IMInitialState(ArrayList<IMNodeEvent> freeNodesList,
+        ArrayList<IMNodeEvent> busyNodesList,
+        ArrayList<IMNodeEvent> toReleaseNodesList,
+        ArrayList<IMNodeEvent> downNodesList,
+        ArrayList<IMNodeSourceEvent> nodeSourcesList) {
+        this.freeNodes = freeNodesList;
+        this.busyNodes = busyNodesList;
+        this.toReleaseNodes = toReleaseNodesList;
+        this.downNodes = downNodesList;
+        this.nodeSources = nodeSourcesList;
     }
 
     // SETTERS
-    public void setFreeNodes(Vector<NodeEvent> v) {
+    public void setFreeNodes(ArrayList<IMNodeEvent> v) {
         this.freeNodes = v;
     }
 
-    public void setBusyNodes(Vector<NodeEvent> v) {
+    public void setBusyNodes(ArrayList<IMNodeEvent> v) {
         this.busyNodes = v;
     }
 
-    public void setDownNodes(Vector<NodeEvent> v) {
+    public void setDownNodes(ArrayList<IMNodeEvent> v) {
         this.downNodes = v;
     }
 
-    public void setToReleaseNodes(Vector<NodeEvent> v) {
+    public void setToReleaseNodes(ArrayList<IMNodeEvent> v) {
         this.toReleaseNodes = v;
     }
 
-    public void setNodeSource(Vector<NodeSourceEvent> v) {
+    public void setNodeSource(ArrayList<IMNodeSourceEvent> v) {
         this.nodeSources = v;
     }
 
     // GETTERS
-    public Vector<NodeEvent> getFreeNodes() {
+    public ArrayList<IMNodeEvent> getFreeNodes() {
         return this.freeNodes;
     }
 
-    public Vector<NodeEvent> getBusyNodes() {
+    public ArrayList<IMNodeEvent> getBusyNodes() {
         return this.busyNodes;
     }
 
-    public Vector<NodeEvent> getDownNodes() {
+    public ArrayList<IMNodeEvent> getDownNodes() {
         return this.downNodes;
     }
 
-    public Vector<NodeEvent> getToReleaseNodes() {
+    public ArrayList<IMNodeEvent> getToReleaseNodes() {
         return this.toReleaseNodes;
     }
 
-    public Vector<NodeSourceEvent> getNodeSource() {
+    public ArrayList<IMNodeSourceEvent> getNodeSource() {
         return this.nodeSources;
     }
 }
