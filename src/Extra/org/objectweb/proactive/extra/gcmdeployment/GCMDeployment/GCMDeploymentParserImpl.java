@@ -228,7 +228,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         }
     }
 
-    protected void parseEnvironment() throws XPathExpressionException {
+    public void parseEnvironment() throws XPathExpressionException {
         Node environmentNode = (Node) xpath.evaluate(XPATH_ENVIRONMENT,
                 document, XPathConstants.NODE);
 
