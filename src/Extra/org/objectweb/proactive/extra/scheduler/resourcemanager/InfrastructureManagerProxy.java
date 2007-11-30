@@ -110,9 +110,13 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
     public static InfrastructureManagerProxy getProxy(URI uriIM)
         throws ActiveObjectCreationException, IOException, NodeException {
         try {
-            IMUser user = IMConnection.connectAsUser(uriIM.toString() +
+            String url = uriIM.toString();
+            if (!url.endsWith("/")) {
+                url += "/";
+            }
+            IMUser user = IMConnection.connectAsUser(url +
                     NAME_ACTIVE_OBJECT_IMUSER);
-            IMMonitoring monitor = IMConnection.connectAsMonitor(uriIM.toString() +
+            IMMonitoring monitor = IMConnection.connectAsMonitor(url +
                     NAME_ACTIVE_OBJECT_IMMONITORING);
             return (InfrastructureManagerProxy) ProActiveObject.newActive(InfrastructureManagerProxy.class.getCanonicalName(),
                 new Object[] { monitor, user });
