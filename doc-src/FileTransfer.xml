@@ -6,7 +6,7 @@
   <sect1 id="FileTransfer_html_intro">
     <title>Introduction and Concepts</title>
 
-    <para>Currently we provide support for the following type of
+    <para>Currently ProActive provide support for the following type of
     transfers:</para>
 
     <itemizedlist>
@@ -59,58 +59,112 @@
     <sect2>
       <title>API Definition</title>
 
-      <programlisting lang="java">import org.objectweb.proactive.filetransfer.*;
+      <programlisting lang="java">package org.objectweb.proactive.api.ProFileTransfer;
 
-static public FileVector <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File source, File destination);
-static public FileVector <emphasis role="bold">FileTransfer.pushFile</emphasis>(Node n, File<emphasis
-          role="bold">[]</emphasis> source, File<emphasis role="bold">[]</emphasis> destination);
-static public FileVector <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File source, File destination);
-static public FileVector <emphasis role="bold">FileTransfer.pullFile</emphasis>(Node n, File<emphasis
-          role="bold">[]</emphasis> source, File<emphasis role="bold">[]</emphasis> destination);</programlisting>
+static <emphasis role="bold">      RemoteFile</emphasis> <emphasis role="bold">pull</emphasis>(<emphasis
+          role="bold">Node</emphasis> srcNode, <emphasis role="bold">File</emphasis> srcFile, <emphasis
+          role="bold">File</emphasis> dstFile) throws IOException;
+static List&lt;<emphasis role="bold">RemoteFile</emphasis>&gt; <emphasis
+          role="bold">pull</emphasis>(<emphasis role="bold">Node</emphasis> srcNode, <emphasis
+          role="bold">File[]</emphasis> srcFile, <emphasis role="bold">File[]</emphasis> dstFile) throws IOException;
 
-      <para>These methods can be used to put and get files on a remote Node
-      while the user's application is running. Note that these methods behave
-      <emphasis role="bold">asynchronously</emphasis>, and in the case of the
-      <emphasis role="bold">pullFile</emphasis> method, the returned <emphasis
-      role="bold">File</emphasis> is a future. For further information on
-      asynchronism and futures, please refer to the <emphasis>Asynchronous
-      calls and futures</emphasis> section of this manual.</para>
+static       <emphasis role="bold">RemoteFile</emphasis> <emphasis role="bold">push</emphasis>(<emphasis
+          role="bold">File</emphasis> srcFile, <emphasis role="bold">Node</emphasis> dstNode, <emphasis
+          role="bold">File</emphasis> dstFile) throws IOException;
+static List&lt;<emphasis role="bold">RemoteFile</emphasis>&gt; <emphasis
+          role="bold">push</emphasis>(<emphasis role="bold">File[]</emphasis> srcFile, <emphasis
+          role="bold">Node</emphasis> dstNode, <emphasis role="bold">File[]</emphasis> dstFile) throws IOException;
+
+static       <emphasis role="bold">RemoteFile</emphasis> <emphasis role="bold">transfer</emphasis>(<emphasis
+          role="bold">Node</emphasis> srcNode, <emphasis role="bold">File</emphasis> srcFile, <emphasis
+          role="bold">Node</emphasis> dstNode, <emphasis role="bold">File</emphasis> dstFile) throws IOException;
+static List&lt;<emphasis role="bold">RemoteFile</emphasis>&gt; <emphasis
+          role="bold">transfer</emphasis>(<emphasis role="bold">Node</emphasis> srcNode, <emphasis
+          role="bold">File[]</emphasis> srcFile, <emphasis role="bold">Node</emphasis> dstNode, <emphasis
+          role="bold">File[]</emphasis> dstFile) throws IOException;
+static List&lt;<emphasis role="bold">RemoteFile</emphasis>&gt; <emphasis
+          role="bold">transfer</emphasis>(<emphasis role="bold">Node</emphasis> srcNode, <emphasis
+          role="bold">File[]</emphasis> srcFile, <emphasis role="bold">Node</emphasis> dstNode, <emphasis
+          role="bold">File[]</emphasis> dstFile, int bsize, int numFlyingBlocks) throws IOException;</programlisting>
+
+      <para>These methods are static, and handle the transfer of file between
+      ProActive <emphasis role="bold">Node</emphasis>s. The pull methods
+      retrieve a file located on a remote machine to the local machine. The
+      push methods transfer a file available on the local node to the
+      specified remote node. And the transfer methods allow transfer between
+      third party nodes. </para>
+
+      <para>The file transfers are performed in an asynchronous fashion. Each
+      of these methods returns at <emphasis role="bold">RemoteFile</emphasis>
+      object which represents the file transfer operation and the remote
+      file's node/location. When these methods are invoked a <emphasis
+      role="bold">RemoteFile</emphasis> instance is immediately returned,
+      before the file transfer operation has been completed. The <emphasis
+      role="bold">RemoteFile</emphasis> object provides a way to monitor the
+      status of the file transfer:</para>
+
+      <screen>public interface <emphasis role="bold">RemoteFile</emphasis> extends Serializable {
+
+  public boolean <emphasis role="bold">isTransferFinished</emphasis>();
+
+  public void <emphasis role="bold">waitForFinishedTransfer</emphasis>() throws IOException;
+
+  public RemoteFile <emphasis role="bold">pull</emphasis>(File localDst) throws IOException;
+
+  public RemoteFile <emphasis role="bold">push</emphasis>(Node dstNode, File dstRemote) throws IOException;
+
+  public Node <emphasis role="bold">getRemoteNode</emphasis>();
+
+  public File <emphasis role="bold">getRemoteFilePath</emphasis>();
+
+}</screen>
+
+      <para>The <emphasis role="bold">isTransferFinished</emphasis> and
+      <emphasis role="bold">waitForFinishedTransfer</emphasis> can be invoked
+      to query and wait on the file transfer status. The <emphasis
+      role="bold">pull</emphasis> method can be used to fetch the <emphasis
+      role="bold">RemoteFile</emphasis> from the remote node, into the local
+      <emphasis role="bold">Node</emphasis>, and the <emphasis
+      role="bold">push</emphasis> methods can be used to send the <emphasis
+      role="bold">RemoteFile</emphasis> to another <emphasis
+      role="bold">Node</emphasis>.</para>
     </sect2>
 
     <sect2>
-      <title>How to use the API</title>
+      <title>How to use the API Example</title>
 
-      <para>In the following example, a Node is deployed using a descriptor
-      file. A <emphasis>file</emphasis> is then pushed from
-      <emphasis>localhost</emphasis>@<emphasis
-      role="bold">localSource</emphasis> to
-      <emphasis>nodehost</emphasis>@<emphasis
-      role="bold">remoteDest</emphasis>, using the <emphasis>paths</emphasis>
-      specified in a j<emphasis>ava.io.File</emphasis> type object.
-      Afterwards, a <emphasis>file</emphasis> is pulled from
-      <emphasis>nodehost</emphasis>@<emphasis
-      role="bold">remoteSource</emphasis> and saved at
-      <emphasis>localhost</emphasis>@<emphasis
-      role="bold">localDest</emphasis>, in the same fashion.</para>
+      <para>In the following example, a <emphasis role="bold">Node</emphasis>
+      is deployed using a descriptor file. A <emphasis
+      role="bold">File</emphasis> is then pushed from the local <emphasis
+      role="bold">Node</emphasis> to a remote <emphasis
+      role="bold">Node</emphasis>. Then the file is pulled from the Remote
+      <emphasis role="bold">Node</emphasis>, and the computation is blocked
+      waiting for the file transfer operation to finish.</para>
 
-      <programlisting lang="java">import org.objectweb.proactive.filetransfer.*;
+      <programlisting lang="java">ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(XML_LOCATION);
 
-pad = ProActive.getProactiveDescriptor(XML_LOCATION);
-
-VirtualNode testVNode = pad.getVirtualNode("example");
+VirtualNode testVNode = pad.getVirtualNode("test");
 testVNode.activate();
-Node[] examplenode = testVNode.getNodes();
+Node testnode = testVNode.getNode();
 
-File localSource = new File("/local/source/path/file");
-File remoteDest = new File("/remote/destination/path/file");
-<emphasis role="bold">FileVector filePushed =FileTransfer.pushFile(examplenode[0],localSource, remoteDest);</emphasis>
-<emphasis role="bold">filePushed.waitForAll();</emphasis>  //wait for push to finish
+<emphasis role="bold">RemoteFile</emphasis> remoteFileA = <emphasis
+          role="bold">ProFileTransfer.push</emphasis>(new File("/tmp/test.dat"), testnode, new File("/tmp/test.dat"));
+<emphasis role="bold">RemoteFile</emphasis> remoteFileB = <emphasis
+          role="bold">remoteFileA.pull</emphasis>(new File("/tmp/test2.dat"));
 
-File remoteSource = new File("/remote/source/path/file");
-File localDest = new File("/local/destination/path/file");
-<emphasis role="bold">FileVector filePulled = FileTransfer.pullFile(examplenode[0], remoteSource, localDest);
-File  file = filePulled.getFile(0); <emphasis>//wait for pull to finish
-</emphasis></emphasis></programlisting>
+
+<emphasis role="bold">remoteFileB.waitForFinishedTransfer</emphasis>(); //blocking method</programlisting>
+
+      <sect3>
+        <title>How to obtain a Node from an Active Object reference</title>
+
+        <para>The Node where an Active Object resides can be obtained in the
+        following way:</para>
+
+        <screen>Object o  =  ProActiveObject.newActive(...);
+...
+<emphasis role="bold">Node node = ProActiveObject.getActiveObjectNode(o);</emphasis></screen>
+      </sect3>
     </sect2>
   </sect1>
 
