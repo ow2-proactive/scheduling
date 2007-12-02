@@ -31,27 +31,68 @@
 package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
 import java.util.List;
+import java.util.Observable;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
 
 
 /**
- * @author Mich&egrave;le Reynier and Jean-Michael Legait
+ * This class represents the controller part of the HostObject model.
+ * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
  *
  */
-public class HostTreeEditPart extends JobMonitoringTreeEditPart {
+public class HostTreeEditPart extends JobMonitoringTreeEditPart<HostObject> {
+    public static final Image HOST_IMAGE = new Image(Display.getCurrent(),
+            HostTreeEditPart.class.getResourceAsStream("host_icon.png"));
+
     //
     // -- CONSTRUCTOR ------------------------------------------------
     //
 
     /**
-     * @param model
+     * The contructor of this controller part.
+     * @param model The instance HostObject model associated to this controller
      */
-    public HostTreeEditPart(AbstractData model) {
+    public HostTreeEditPart(HostObject model) {
         super(model);
+    }
+
+    /**
+     * @see java.util.Observer#update(Observable, Object)
+     */
+    @Override
+    public final void update(final Observable o, final Object arg) {
+        if (arg.getClass() != MVCNotification.class) {
+            return;
+        }
+        final MVCNotification notif = (MVCNotification) arg;
+        final MVCNotificationTag mvcNotificationTag = notif.getMVCNotification();
+        final Object data = notif.getData();
+        switch (mvcNotificationTag) {
+        case STATE_CHANGED:
+            if (data == State.NOT_MONITORED) {
+                this.deactivate();
+                return;
+            }
+            break;
+        case HOST_OBJECT_UPDATED_OSNAME_AND_VERSON:
+            if (data.getClass() == String.class) {
+                setWidgetText((String) data);
+            }
+            break;
+        default:
+        } //switch
+
+        // Asynchronous refresh
+        getViewer().getControl().getDisplay().asyncExec(this);
     }
 
     //
@@ -59,18 +100,19 @@ public class HostTreeEditPart extends JobMonitoringTreeEditPart {
     //
 
     /**
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getImage()
+     */
+    @Override
+    protected final Image getImage() {
+        return HOST_IMAGE;
+    }
+
+    /**
      * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
      */
     @Override
-    protected List getModelChildren() {
+    protected final List<RuntimeObject> getModelChildren() {
         return JobMonitoringTreeUtil.getHostChildren(getCastedModel(),
             (VNObject) getParent().getModel());
-    }
-
-    //
-    // -- PRIVATE METHODS -------------------------------------------
-    //
-    private HostObject getCastedModel() {
-        return (HostObject) getModel();
     }
 }

@@ -31,25 +31,36 @@
 package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
 import java.util.List;
+import java.util.Observable;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 
 /**
- * @author Mich&egrave;le Reynier and Jean-Michael Legait
+ * This class represents the controller part of the WorldObject model.
+ * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
  *
  */
-public class WorldTreeEditPart extends JobMonitoringTreeEditPart {
+public class WorldTreeEditPart extends JobMonitoringTreeEditPart<WorldObject> {
     //
     // -- CONSTRUCTOR ------------------------------------------------
     //
 
     /**
-     * @param model
+     * The contructor of this controller part.
+     * @param model The instance WorldObject model associated to this controller
      */
-    public WorldTreeEditPart(AbstractData model) {
+    public WorldTreeEditPart(final WorldObject model) {
         super(model);
+    }
+
+    /**
+     * @see java.util.Observer#update(Observable, Object)
+     */
+    @Override
+    public final void update(final Observable o, final Object arg) {
+        getViewer().getControl().getDisplay().syncExec(this);
     }
 
     //
@@ -60,15 +71,7 @@ public class WorldTreeEditPart extends JobMonitoringTreeEditPart {
      * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
      */
     @Override
-    protected List getModelChildren() {
-        //		return getCastedModel().getVNChildren();
-        return getCastedModel().getVNChildren();
-    }
-
-    //
-    // -- PRIVATE METHODS -------------------------------------------
-    //
-    private WorldObject getCastedModel() {
-        return (WorldObject) getModel();
+    protected final List<VNObject> getModelChildren() {
+        return super.getCastedModel().getVNChildren();
     }
 }

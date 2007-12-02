@@ -30,32 +30,80 @@
  */
 package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
+import java.util.List;
+import java.util.Observable;
+
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.editpart.AOEditPart;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 
-public class AOTreeEditPart extends JobMonitoringTreeEditPart {
+/**
+ * This class represents the controller part of the ActiveObject model.
+ * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
+ *
+ */
+public class AOTreeEditPart extends JobMonitoringTreeEditPart<ActiveObject> {
+    public static final Image AO_IMAGE = new Image(Display.getCurrent(),
+            AOTreeEditPart.class.getResourceAsStream("ao_icon.png"));
 
     /**
-     * @param model
+     * The contructor of this controller part.
+     * @param model The instance ActiveObject model associated to this controller
      */
-    public AOTreeEditPart(AbstractData model) {
+    public AOTreeEditPart(final ActiveObject model) {
         super(model);
+    }
+
+    /**
+     * @see java.util.Observer#update(Observable, Object)
+     */
+    @Override
+    public final void update(final Observable o, final Object arg) {
+        if (arg.getClass() != MVCNotification.class) {
+            return;
+        }
+        final MVCNotification notif = (MVCNotification) arg;
+        final MVCNotificationTag mvcNotificationTag = notif.getMVCNotification();
+        final Object data = notif.getData();
+        if ((mvcNotificationTag == MVCNotificationTag.STATE_CHANGED) &&
+                (data == State.NOT_MONITORED)) {
+            deactivate();
+            return;
+        }
+    }
+
+    //
+    // -- PROTECTED METHODS -------------------------------------------
+    //
+
+    /**
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getImage()
+     */
+    @Override
+    protected final Image getImage() {
+        return AO_IMAGE;
+    }
+
+    /**
+     * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
+     */
+    @Override
+    protected final List<AbstractData> getModelChildren() {
+        return AOEditPart.emptyList;
     }
 
     /**
      * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
      */
     @Override
-    protected String getText() {
+    protected final String getText() {
         return getCastedModel().getName() + "(" + getCastedModel().getJobId() +
         ")";
-    }
-
-    //
-    // -- PRIVATE METHODS -------------------------------------------
-    //
-    private ActiveObject getCastedModel() {
-        return (ActiveObject) getModel();
     }
 }

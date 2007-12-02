@@ -30,12 +30,10 @@
  */
 package org.objectweb.proactive.ic2d.jobmonitoring.views;
 
-import java.util.Observable;
-import java.util.Observer;
-
 import org.eclipse.gef.editparts.RootTreeEditPart;
 import org.eclipse.gef.ui.parts.TreeViewer;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
@@ -55,11 +53,11 @@ import org.objectweb.proactive.ic2d.jobmonitoring.editparts.JobMonitoringTreePar
 
 
 /**
- *
- * @author Jean-Michael Legait and Michèle Reynier
+ * This class represents the JobMonitoring tree based view.<p>
+ * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
  *
  */
-public class JobMonitoringView extends ViewPart implements Observer {
+public class JobMonitoringView extends ViewPart {
     private TreeViewer treeViewer;
     private IMenuManager dropDownMenu;
 
@@ -78,6 +76,7 @@ public class JobMonitoringView extends ViewPart implements Observer {
         // configure the viewer
         Tree tree = new Tree(parent, SWT.SINGLE);
         ((RootTreeEditPart) treeViewer.getRootEditPart()).setWidget(tree);
+        treeViewer.setEditPartFactory(new JobMonitoringTreePartFactory());
 
         // hide an empty part in the view
         FormData formData1 = new FormData();
@@ -103,7 +102,9 @@ public class JobMonitoringView extends ViewPart implements Observer {
         // configure the menu
         IActionBars actionBars = getViewSite().getActionBars();
         dropDownMenu = actionBars.getMenuManager();
-        ModelRecorder.getInstance().addObserver(this);
+
+        // Create a new menu listener
+        dropDownMenu.addMenuListener(new CustomMenuListener());
 
         // Monitor a new model
         Action newHost = new NewHostJobMonitoringAction(parent);
@@ -111,30 +112,14 @@ public class JobMonitoringView extends ViewPart implements Observer {
         Separator separator = new Separator();
         dropDownMenu.add(separator);
 
-        // The list of existing models
-        Object[] titles = ModelRecorder.getInstance().getNames().toArray();
-        for (int i = 0, size = titles.length; i < size; i++) {
-            dropDownMenu.add(new ViewAction((String) titles[i]));
+        // The list of existing models    
+        for (final String s : ModelRecorder.getInstance().getNames()) {
+            dropDownMenu.add(new ViewAction(s));
         }
-
-        /*****************************/
-
-        //		ContextMenuProvider contextMenu = new JobMonitoringContextMenuProvider(treeViewer);
-        //		treeViewer.setContextMenu(contextMenu);
-        //		getSite().registerContextMenu(contextMenu, treeViewer);
     }
 
     @Override
     public void setFocus() {
-        // TODO Auto-generated method stub
-    }
-
-    public void update(Observable o, Object arg) {
-        // A view has been added to the viewRecorder, this view contains a model (WorldObject)
-        if (o instanceof ModelRecorder) {
-            dropDownMenu.add(new ViewAction((String) arg));
-            dropDownMenu.updateAll(true);
-        }
     }
 
     //
@@ -168,15 +153,33 @@ public class JobMonitoringView extends ViewPart implements Observer {
         public ViewAction(String title) {
             super(title);
             this.setToolTipText(title);
+            this.setId(title);
         }
 
         @Override
         public void run() {
             WorldObject world = ModelRecorder.getInstance().getModel(getText());
             if (world != null) {
-                treeViewer.setEditPartFactory(new JobMonitoringTreePartFactory());
+                //treeViewer.setEditPartFactory(new JobMonitoringTreePartFactory());
                 treeViewer.setContents(world);
                 dropDownMenu.updateAll(true);
+            }
+        }
+    }
+
+    /**
+     * A menu listener used to check new available models from
+     * the ModelRecorder.
+     *
+     * @author vbodnart
+     */
+    public class CustomMenuListener implements IMenuListener {
+        public final void menuAboutToShow(final IMenuManager manager) {
+            for (final String s : ModelRecorder.getInstance().getNames()) {
+                // Before adding a new action check if already added
+                if (manager.find(s) == null) {
+                    manager.add(new ViewAction(s));
+                }
             }
         }
     }

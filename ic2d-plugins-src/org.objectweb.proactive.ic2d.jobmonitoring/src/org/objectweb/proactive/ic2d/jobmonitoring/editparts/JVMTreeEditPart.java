@@ -31,27 +31,57 @@
 package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
 import java.util.List;
+import java.util.Observable;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
+import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
 
 
 /**
- * @author Mich&egrave;le Reynier and Jean-Michael Legait
+ * This class represents the controller part of the RuntimeObject model.
+ * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
  *
  */
-public class JVMTreeEditPart extends JobMonitoringTreeEditPart {
+public class JVMTreeEditPart extends JobMonitoringTreeEditPart<RuntimeObject> {
+    public static final Image JVM_IMAGE = new Image(Display.getCurrent(),
+            JVMTreeEditPart.class.getResourceAsStream("jvm_icon.png"));
+
     //
     // -- CONSTRUCTOR ------------------------------------------------
     //
 
     /**
-     * @param model
+     * The contructor of this controller part.
+     * @param model The instance RuntimeObject model associated to this controller
      */
-    public JVMTreeEditPart(AbstractData model) {
+    public JVMTreeEditPart(final RuntimeObject model) {
         super(model);
+    }
+
+    /**
+     * @see java.util.Observer#update(Observable, Object)
+     */
+    @Override
+    public final void update(final Observable o, final Object arg) {
+        if (arg.getClass() != MVCNotification.class) {
+            return;
+        }
+        final MVCNotification notif = (MVCNotification) arg;
+        final MVCNotificationTag mvcNotificationTag = notif.getMVCNotification();
+        switch (mvcNotificationTag) {
+        case RUNTIME_OBJECT_RUNTIME_KILLED:
+            this.deactivate();
+            return;
+        default:
+        }
+        // Asynchronous refresh
+        getViewer().getControl().getDisplay().syncExec(this);
     }
 
     //
@@ -59,26 +89,27 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart {
     //
 
     /**
-     * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getImage()
      */
     @Override
-    protected List getModelChildren() {
-        return JobMonitoringTreeUtil.getJVMChildren(getCastedModel(),
-            (VNObject) getParent().getParent().getModel());
+    protected final Image getImage() {
+        return JVM_IMAGE;
     }
 
     /**
-     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
+     * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
      */
     @Override
-    protected String getText() {
-        return getCastedModel().getName();
-    }
-
-    //
-    // -- PRIVATE METHODS -------------------------------------------
-    //
-    private RuntimeObject getCastedModel() {
-        return (RuntimeObject) getModel();
+    protected final List<NodeObject> getModelChildren() {
+        List<NodeObject> res;
+        if ((getParent() != null) && (getParent().getParent() != null) &&
+                (getParent().getParent().getModel() != null)) {
+            res = JobMonitoringTreeUtil.getJVMChildren(getCastedModel(),
+                    (VNObject) getParent().getParent().getModel());
+        } else {
+            // Return an empty list to avoid NullPointerException
+            res = new java.util.ArrayList<NodeObject>(0);
+        }
+        return res;
     }
 }

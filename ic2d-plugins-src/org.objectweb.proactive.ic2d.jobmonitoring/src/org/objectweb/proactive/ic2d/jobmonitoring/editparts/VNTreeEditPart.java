@@ -33,43 +33,40 @@ package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 import java.util.List;
 import java.util.Observable;
 
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
 
 
 /**
- * @author Mich&egrave;le Reynier and Jean-Michael Legait
+ * This class represents the controller part of the VNObject model.
+ * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
  *
  */
-public class VNTreeEditPart extends JobMonitoringTreeEditPart {
+public class VNTreeEditPart extends JobMonitoringTreeEditPart<VNObject> {
+    public static final Image VN_IMAGE = new Image(Display.getCurrent(),
+            VNTreeEditPart.class.getResourceAsStream("vn_icon.png"));
+
     //
     // -- CONSTRUCTOR ------------------------------------------------
     //
 
     /**
-     * @param model
+     * The contructor of this controller part.
+     * @param model The instance VNObject model associated to this controller
      */
-    public VNTreeEditPart(AbstractData model) {
+    public VNTreeEditPart(final VNObject model) {
         super(model);
     }
 
     /**
-     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     * @see java.util.Observer#update(Observable, Object)
      */
-    public void update(Observable o, Object arg) {
-        final Observable obs = o;
-        final Object obj = arg;
-        Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    ((WorldTreeEditPart) getParent()).update(obs, obj);
-                    //				((JobMonitoringTreeEditPart)getParent()).refreshVisuals();
-                    //				refreshChildren();
-                    //				refreshVisuals();
-                    refresh();
-                }
-            });
+    public final void update(final Observable o, final Object arg) {
+        // No need to do a full refresh just refresh the children
+        this.refreshChildren();
     }
 
     //
@@ -77,10 +74,18 @@ public class VNTreeEditPart extends JobMonitoringTreeEditPart {
     //
 
     /**
+     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getImage()
+     */
+    @Override
+    protected final Image getImage() {
+        return VN_IMAGE;
+    }
+
+    /**
      * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
      */
     @Override
-    protected List getModelChildren() {
+    protected final List<HostObject> getModelChildren() {
         return JobMonitoringTreeUtil.getVNChildren(getCastedModel());
     }
 
@@ -88,15 +93,8 @@ public class VNTreeEditPart extends JobMonitoringTreeEditPart {
      * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getText()
      */
     @Override
-    protected String getText() {
+    protected final String getText() {
         return getCastedModel().getName() + " (" + getCastedModel().getJobID() +
         ")";
-    }
-
-    //
-    // -- PRIVATE METHODS -------------------------------------------
-    //
-    private VNObject getCastedModel() {
-        return (VNObject) getModel();
     }
 }

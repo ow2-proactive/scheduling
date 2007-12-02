@@ -30,27 +30,25 @@
  */
 package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 
-import java.util.List;
-import java.util.Observable;
 import java.util.Observer;
 
 import org.eclipse.gef.editparts.AbstractTreeEditPart;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Tree;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 
 
 /**
- * @author Jean-Michael Legait and Michèle Reynier
+ * This abstract class represents a controller part of the JobMonitoring plugin.<p>
+ * The generic parameter <code>T</code> represents a model associated to this controller (see MVC pattern).
+ * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
  *
  */
-public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart
-    implements Observer {
+public abstract class JobMonitoringTreeEditPart<T extends AbstractData>
+    extends AbstractTreeEditPart implements Observer, Runnable {
     //
     // -- CONSTRUCTOR ------------------------------------------------
     //
-    public JobMonitoringTreeEditPart(AbstractData model) {
+    public JobMonitoringTreeEditPart(T model) {
         super(model);
     }
 
@@ -59,16 +57,10 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart
     //
 
     /**
-     * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+     * @see java.lang.Runnable#run()
      */
-    public void update(Observable o, Object arg) {
-        Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    //				refreshChildren();
-                    //				refreshVisuals();
-                    refresh();
-                }
-            });
+    public void run() {
+        this.refresh();
     }
 
     /**
@@ -77,7 +69,7 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart
     @Override
     public void activate() {
         if (!isActive()) {
-            ((AbstractData) getModel()).addObserver(this);
+            this.getCastedModel().addObserver(this);
         }
         super.activate();
     }
@@ -88,7 +80,7 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart
     @Override
     public void deactivate() {
         if (isActive()) {
-            ((AbstractData) getModel()).deleteObserver(this);
+            this.getCastedModel().deleteObserver(this);
         }
         super.deactivate();
     }
@@ -102,18 +94,7 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart
      */
     @Override
     protected String getText() {
-        return getCastedModel().getName();
-    }
-
-    /**
-     * @see org.eclipse.gef.editparts.AbstractTreeEditPart#getImage()
-     */
-    @Override
-    protected Image getImage() {
-        return new Image(Display.getCurrent(),
-            this.getClass()
-                .getResourceAsStream(getCastedModel().getType().toLowerCase() +
-                "_icon.png"));
+        return this.getCastedModel().getName();
     }
 
     /**
@@ -121,36 +102,19 @@ public abstract class JobMonitoringTreeEditPart extends AbstractTreeEditPart
      */
     @Override
     protected void refreshVisuals() {
-        //		System.out.println("JobMonitoringTreeEditPart.refreshVisuals() "+
-        //				getCastedModel().getFullName()+" "+getWidget().getClass().getName());
         if (getWidget() instanceof Tree) {
             return;
         }
-        //		TreeItem item = (TreeItem)getWidget();
-        //		if (image != null)
-        //			image.setBackground(item.getParent().getBackground());
         setWidgetImage(getImage());
         setWidgetText(getText());
-        //		((TreeItem)getWidget()).getParent().redraw();
-    }
-
-    protected void refreshChildren() {
-        //		System.out.println("JobMonitoringTreeEditPart.refreshChildren() "+getCastedModel().getFullName());
-        super.refreshChildren();
     }
 
     /**
-     * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
+     * Returns the casted model associated to this controller.
+     * @return The the casted model
      */
-    @Override
-    protected List getModelChildren() {
-        return getCastedModel().getMonitoredChildrenAsList();
-    }
-
-    //
-    // -- PRIVATE METHODS -------------------------------------------
-    //
-    private AbstractData getCastedModel() {
-        return (AbstractData) getModel();
+    @SuppressWarnings("unchecked")
+    protected final T getCastedModel() {
+        return (T) super.getModel();
     }
 }
