@@ -52,7 +52,7 @@ public class AOEditPart extends AbstractMonitoringEditPart {
      * An empty list used to feed GEF for all instances of AO edit parts
      * This list is empty beacause AO model has no children !
      */
-    private static final List<AbstractData> emptyList = new java.util.ArrayList<AbstractData>(0);
+    public static final List<AbstractData> emptyList = new java.util.ArrayList<AbstractData>(0);
 
     /**
      * The default color of an arrow used in getArrowColor() method
