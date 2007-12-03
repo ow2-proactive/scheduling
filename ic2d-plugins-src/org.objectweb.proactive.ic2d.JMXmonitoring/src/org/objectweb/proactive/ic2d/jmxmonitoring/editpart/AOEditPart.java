@@ -302,7 +302,7 @@ public class AOEditPart extends AbstractMonitoringEditPart {
         return figure;
     }
 
-    protected final Color getArrowColor() {
+    protected Color getArrowColor() {
         // Avoid creating a new instance of color by returning a default one
         return DEFAULT_ARROW_COLOR; //new Color(Display.getCurrent(), 108, 108, 116);
     }
