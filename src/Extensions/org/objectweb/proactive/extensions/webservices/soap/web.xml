@@ -31,7 +31,7 @@
   <servlet>
     <servlet-name>wsdlServlet</servlet-name>
     <display-name>ProActive WSDL Servlet</display-name>
-    <servlet-class>webservices.soap.WsdlServlet</servlet-class>
+    <servlet-class>org.objectweb.proactive.extensions.webservices.soap.WsdlServlet</servlet-class>
     <init-param>
       <param-name>faultListener</param-name>
       <param-value>org.apache.soap.server.DOMFaultListener</param-value>
