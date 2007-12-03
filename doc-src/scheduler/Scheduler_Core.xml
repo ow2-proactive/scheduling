@@ -24,8 +24,8 @@
         <para>
             In addition, the scheduler
             <emphasis role="bold">
-                offers a shell based command submitter and a graphical
-                user or admin interface
+                offers a shell-based job launcher and a graphical user
+                or administrator interface
             </emphasis>
             (Eclipse Plugin, see
             <xref linkend="Scheduler_Eclipse_Plugin" />
@@ -51,7 +51,7 @@
                 ) and will be executed in accordance with the policy
                 (see
                 <xref linkend="scheduling_policy" />
-                ) wishes, and when resources becomes available.
+                ) wishes, and when resources become available.
             </para>
             <para>
                 There are three types of tasks :
@@ -67,27 +67,27 @@
                     <listitem>
                         PROACTIVE, its execution can be all java classes
                         extending the 'ProActiveExecutable' class.
-                        Coding this last one requires a knowledge base
+                        Coding this last one requires a basic knowledge
                         on the use of ProActive.
                     </listitem>
                 </itemizedlist>
             </para>
             <para>
-                At its execution a task may crash due to host failure or
-                user bugs, the task can be then re-started a
+                At its execution, a task may crash due to host failure
+                or user bugs, the task can be then re-started a
                 parameterizable number of time.
             </para>
             <para>
-                A task may optionally be accompanied by 3 kinds of
-                scripts (preScript, postScript and selectionScript)
-                whose explanations are provided in the documentation of
-                resource manager (
+                A task may optionally be associated with 3 kinds of
+                scripts (preScript, postScript and selectionScript).
+                Further information is provided in the documentation of
+                the Resource Manager (
                 <xref linkend="resources_manager" />
                 )
             </para>
             <para>
-                Dependences between the tasks can also be possible, it
-                will be explain in
+                Dependencies between tasks can also be possible, it is
+                explained in
                 <xref linkend="how_dependences" />
                 .
             </para>
@@ -96,29 +96,23 @@
         <sect3 id="what_is_job">
             <title>What is a job ?</title>
             <para>
-                A job is the entity to be given to the scheduler. It can
-                contains one or more tasks and can be of several types :
+                A job is a general entity in the scheduler language
+                representing an user application. It can contain one or
+                more tasks and can be one of several types :
                 <itemizedlist>
                     <listitem>
-                        TASKSFLOW, represents a job that contains a bag
-                        of tasks that can be execute in parallel or
-                        according to a dependence tree. The tasks inside
-                        this job can be java or native.
+                        TASKSFLOW, represents a job which contains a bag
+                        of tasks that can be executed in parallel or
+                        according to a dependency tree. The tasks inside
+                        this job can be either java or native.
                     </listitem>
                     <listitem>
-                        PROACTIVE,represents a job that contains only
+                        PROACTIVE, represents a job which contains only
                         one ProActive application task. Its execution
                         will start with a given predefined number of
-                        nodes on which you can start process. This kind
-                        of job requires to use ProActive API in order to
-                        use the given nodes.
-                    </listitem>
-                    <listitem>
-                        PARAMETER SWEEPING, is a job that represents
-                        multiple executions of one type of task with
-                        different given parameters. It is typically
-                        executed in parallel. The tasks inside this job
-                        can also be java or native.
+                        node resources on which you can start processes.
+                        This kind of job requires to use the ProActive
+                        API in order to use the given nodes.
                     </listitem>
                 </itemizedlist>
             </para>
@@ -126,7 +120,7 @@
         </sect3>
 
         <sect3 id="how_dependences">
-            <title>What can be done with dependences ?</title>
+            <title>What can be done with dependencies ?</title>
             <para>
 
             </para>
@@ -143,7 +137,7 @@
                     FIFO (First In First Out) with job priority
                 </emphasis>
                 policy. We'll see later that the policy can be easily
-                change just by implementing an interface. (
+                changed just by implementing an interface. (
                 <xref linkend="add_policy" />
                 )
             </para>
@@ -159,20 +153,20 @@
             <para>
                 The scheduler service is the result of a collaboration
                 between 2 entities (the Scheduler and the Resource
-                Manager) each of them has its own functionality.
+                Manager). Each of them has its own functionality.
             </para>
             <para>
                 The Scheduler is the main entity and is a non GUI daemon
-                that is connected to the resources manager. It is in
-                charge to schedule submitted job according to the
+                that is connected to the Resource Manager. It is in
+                charge of scheduling submitted job according to the
                 current associated policy.
             </para>
             <para>
                 In order to launch jobs, the scheduler must obtain nodes
-                (resources) from the resources manager. As describe
+                (resources) from the Resource Manager. As described
                 below (
                 <xref linkend="scheduler2entities" />
-                ), the user interact only with the scheduler entity and
+                ), the user interacts only with the scheduler entity and
                 managed resources can be simple or complex.
             </para>
 
@@ -203,19 +197,19 @@
                 <xref linkend="schedulerEntity">
                     The architecture of the scheduler
                 </xref>
-                is build around 3 Active Objects :
+                is built around 3 Active Objects :
                 <itemizedlist>
                     <listitem>
                         <para>
                             <emphasis role="bold">
                                 The Authentication interface
                             </emphasis>
-                            which is the first object that the user may
-                            have to contact. It is in charge to
-                            authenticate the user and allow him to
-                            access or not to the scheduler. The
+                            is the first object that the user may have
+                            to contact. It is in charge of
+                            authenticating the user and allowing him to
+                            access the scheduler or not. The
                             authentication security system can interact
-                            with files or LDAP.
+                            with password files or an external LDAP.
                         </para>
                     </listitem>
                     <listitem>
@@ -223,21 +217,22 @@
                             <emphasis role="bold">
                                 The Front-end
                             </emphasis>
-                            which is the interface returned by the
+                            is the interface returned by the
                             authentication interface in order to
                             interact with the scheduler. This interface
                             allows users to submit jobs, get scheduling
-                            state, retrieves job result and more...
+                            state, retrieve job result and more...
                         </para>
                     </listitem>
                     <listitem>
                         <para>
                             <emphasis role="bold">The Core</emphasis>
                             which is the main entity of the scheduler.
-                            It is in charge to schedule job according to
-                            the policy (which is FIFO with priority by
-                            default), retrieve scheduling events to the
-                            user and make storage in dataBase.
+                            It is in charge of scheduling job according
+                            to the policy (which is FIFO with priority
+                            by default), retrieving scheduling events to
+                            the user and storing information in a data
+                            base.
                         </para>
                     </listitem>
                 </itemizedlist>
@@ -264,7 +259,7 @@
     </sect1>
 
     <sect1 id="scheduler_API">
-        <title>Scheduler API and Usecase</title>
+        <title>Scheduler API and use case</title>
 
         <sect2 id="start_scheduler">
             <title>Starting the scheduler</title>
@@ -348,15 +343,15 @@
                         <listitem>
                             <para>
                                 Next, the authentication object checks
-                                the right and if user is authorized to
-                                connect the scheduler. If not, an
-                                exception will be thrown.
+                                the user rights and if the user is
+                                authorized to connect to the scheduler.
+                                If not, an exception will be thrown.
                             </para>
                         </listitem>
                         <listitem>
                             <para>
                                 Once connected, the authentication
-                                object sends the right and
+                                object sends the rights and
                                 username/password to the scheduler
                                 front-end which will be able to
                                 authenticate user on its own.
@@ -399,8 +394,8 @@
                         The job submission
                     </xref>
                     shows how it works when the scheduler received a new
-                    job to schedule. How to write a job will be explain
-                    further in
+                    job to schedule. How to write a job will be
+                    explained further in
                     <xref linkend="job_creation" />
                     .
 
@@ -437,18 +432,17 @@
                         </listitem>
                         <listitem>
                             <para>
-                                The Scheduler Front-end verify the
-                                integrity of the job, and build it in
-                                order to be ready to be managed by the
-                                Scheduler Core. If there is a problem,
-                                an exception is thrown explaining what
-                                is the cause.
+                                The Scheduler Front-end verifies the
+                                integrity of the job, and builds it in
+                                order to make it ready to be managed by
+                                the Scheduler Core. If a problem arises,
+                                an exception is thrown detailing it.
                             </para>
                         </listitem>
                         <listitem>
                             <para>
-                                Finally, the job is transmit to the Core
-                                that can schedule it.
+                                Finally, the job is transmitted to the
+                                Core which can schedule it.
                             </para>
                         </listitem>
                     </orderedlist>
