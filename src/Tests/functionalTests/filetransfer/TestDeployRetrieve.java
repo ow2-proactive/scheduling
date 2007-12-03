@@ -104,7 +104,6 @@ public class TestDeployRetrieve extends FunctionalTest {
         cleanIfNecessary(this.fileRetrieved);
     }
 
-    @Ignore
     @Test
     public void action() throws Exception {
         long fileTestSum = TestAPI.checkSum(fileTest);
