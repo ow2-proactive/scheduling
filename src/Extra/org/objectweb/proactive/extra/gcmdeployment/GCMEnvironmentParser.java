@@ -208,8 +208,9 @@ public class GCMEnvironmentParser implements GCMParserConstants {
         Transformer transformer = null;
         try {
             transformer = tfactory.newTransformer(stylesheetSource);
+            transformer.setParameter("nameList", nameList);
+            transformer.setParameter("valueList", valueList);
         } catch (TransformerConfigurationException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
         StreamResult result = new StreamResult(output);
@@ -217,7 +218,6 @@ public class GCMEnvironmentParser implements GCMParserConstants {
         try {
             transformer.transform(domSource, result);
         } catch (TransformerException e1) {
-            // TODO Auto-generated catch block
             e1.printStackTrace();
         }
     }
