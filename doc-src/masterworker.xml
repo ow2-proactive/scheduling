@@ -671,7 +671,7 @@
             are added using a deployment descriptor .
         </para>
 
-        <programlisting lang="java"><![CDATA[    	// creation of the master
+        <programlisting lang="java"><![CDATA[        // creation of the master
         ProActiveMaster<ComputePIMonteCarlo, Long> master = new ProActiveMaster<ComputePIMonteCarlo, Long>();
         
         // adding resources
