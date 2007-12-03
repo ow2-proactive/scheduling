@@ -45,7 +45,6 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
@@ -71,7 +70,7 @@ public class GCMEnvironmentParser implements GCMParserConstants {
     protected DocumentBuilder documentBuilder;
     protected List<String> schemas = new ArrayList<String>();
     protected VariableContract variableContract;
-    private static final String XPATH_ENVIRONMENT = "pa:/GCM*/pa:environment";
+    private static final String XPATH_ENVIRONMENT = "/*/pa:environment";
 
     public GCMEnvironmentParser(File descriptor)
         throws IOException, SAXException {
@@ -142,8 +141,8 @@ public class GCMEnvironmentParser implements GCMParserConstants {
 
     protected void parseEnvironment()
         throws XPathExpressionException, SAXException {
-        Node environmentNode = (Node) xpath.evaluate(XPATH_ENVIRONMENT,
-                document, XPathConstants.NODE);
+        NodeList environmentNodes = (NodeList) xpath.evaluate(XPATH_ENVIRONMENT,
+                document, XPathConstants.NODESET);
 
         String[][] pairs = new String[][] {
                 {
@@ -161,9 +160,12 @@ public class GCMEnvironmentParser implements GCMParserConstants {
                 { VARIABLES_DESCRIPTOR_DEFAULT, VARIABLES_DESCRIPTOR_DEFAULT_TAG },
             };
 
-        for (int i = 0; i < pairs.length; ++i) {
-            VariableContractType varContractType = VariableContractType.getType(pairs[i][1]);
-            processVariables(environmentNode, pairs[i][0], varContractType);
+        if (environmentNodes.getLength() == 1) {
+            for (int i = 0; i < pairs.length; ++i) {
+                VariableContractType varContractType = VariableContractType.getType(pairs[i][1]);
+                processVariables(environmentNodes.item(0), pairs[i][0],
+                    varContractType);
+            }
         }
     }
 
@@ -222,10 +224,8 @@ public class GCMEnvironmentParser implements GCMParserConstants {
 
     public static void main(String[] args)
         throws IOException, SAXException, XPathExpressionException {
-        File descriptor = new File(
-                "/home/fviale/eclipse_workspace/ProActive_Latest/src/Tests/functionalTests/gcmdeployment/topology/gcmd1.xml");
+        File descriptor = new File("/user/glaurent/home/gcmd1.xml");
         GCMEnvironmentParser gp = new GCMEnvironmentParser(descriptor);
-        gp.transform(new File(
-                "/home/fviale/eclipse_workspace/ProActive_Latest/src/Tests/functionalTests/gcmdeployment/topology/testOutput1.xml"));
+        gp.transform(new File("/user/glaurent/home/testOutput1.xml"));
     }
 }
