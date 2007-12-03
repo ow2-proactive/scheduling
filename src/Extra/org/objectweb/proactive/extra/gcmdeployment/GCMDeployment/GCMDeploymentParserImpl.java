@@ -149,8 +149,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         try {
             document = documentBuilder.parse(inputSource);
         } catch (SAXException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-            throw e;
+            String msg = "parsing problem with document " +
+                descriptor.getCanonicalPath();
+            GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " +
+                e.getMessage());
+            throw new SAXException(msg, e);
         }
     }
 
