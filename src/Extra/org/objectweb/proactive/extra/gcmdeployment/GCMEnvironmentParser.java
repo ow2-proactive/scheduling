@@ -33,12 +33,22 @@ package org.objectweb.proactive.extra.gcmdeployment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMResult;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -59,7 +69,7 @@ public class GCMEnvironmentParser implements GCMParserConstants {
     protected DocumentBuilderFactory domFactory;
     protected XPath xpath;
     protected DocumentBuilder documentBuilder;
-    protected List<String> schemas;
+    protected List<String> schemas = new ArrayList<String>();
     protected VariableContract variableContract;
     private static final String XPATH_ENVIRONMENT = "pa:/GCM*/pa:environment";
 
@@ -174,5 +184,48 @@ public class GCMEnvironmentParser implements GCMParserConstants {
             variableContract.setDescriptorVariable(varName, varValue,
                 varContractType);
         }
+    }
+
+    public void transform(File output)
+        throws XPathExpressionException, SAXException {
+        Map<String, String> vmap = getVariableMap();
+        String[] nameList = vmap.keySet().toArray(new String[0]);
+        String[] valueList = new String[nameList.length];
+        for (int i = 0; i < nameList.length; i++) {
+            valueList[i] = vmap.get(nameList[i]);
+        }
+
+        System.setProperty("javax.xml.transform.TransformerFactory",
+            "net.sf.saxon.TransformerFactoryImpl");
+        DOMSource domSource = new DOMSource(document);
+        TransformerFactory tfactory = TransformerFactory.newInstance();
+
+        Source stylesheetSource = new StreamSource(this.getClass()
+                                                       .getResourceAsStream("variables.xsl"));
+
+        Transformer transformer = null;
+        try {
+            transformer = tfactory.newTransformer(stylesheetSource);
+        } catch (TransformerConfigurationException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        StreamResult result = new StreamResult(output);
+
+        try {
+            transformer.transform(domSource, result);
+        } catch (TransformerException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args)
+        throws IOException, SAXException, XPathExpressionException {
+        File descriptor = new File(
+                "/home/fviale/eclipse_workspace/ProActive_Latest/src/Tests/functionalTests/gcmdeployment/topology/gcmd1.xml");
+        GCMEnvironmentParser gp = new GCMEnvironmentParser(descriptor);
+        gp.transform(new File(
+                "/home/fviale/eclipse_workspace/ProActive_Latest/src/Tests/functionalTests/gcmdeployment/topology/testOutput1.xml"));
     }
 }
