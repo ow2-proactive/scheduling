@@ -38,6 +38,7 @@ import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
+import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean;
@@ -190,6 +191,12 @@ public class RuntimeObject extends AbstractData {
         if (this.proxyMBean == null) {
             this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
                     getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
+        }
+
+        if (!ProActiveObject.pingActiveObject(getConnection())) {
+            System.out.println("Connection to runtime closed: " +
+                this.getName());
+            return;
         }
 
         try {
