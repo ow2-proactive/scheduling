@@ -74,6 +74,7 @@ import org.objectweb.proactive.core.process.ExternalProcess;
 import org.objectweb.proactive.core.process.ExternalProcessDecorator;
 import org.objectweb.proactive.core.process.JVMProcess;
 import org.objectweb.proactive.core.process.JVMProcess.PriorityLevel;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.glite.GLiteProcess;
 import org.objectweb.proactive.core.process.globus.GlobusProcess;
@@ -235,6 +236,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             handleComponentDefinitions();
 
             handleDeployment();
+
+            handleFileTransfer();
 
             handleInfrastructure();
 
@@ -448,6 +451,45 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
+    private void handleFileTransfer()
+        throws XPathExpressionException, SAXException {
+        NodeList nodes = (NodeList) xpath.evaluate("//pa:fileTransferDefinitions/pa:fileTransfer",
+                document, XPathConstants.NODESET);
+
+        for (int i = 0; i < nodes.getLength(); ++i) {
+            Node node = nodes.item(i);
+
+            String fileTransferId = getNodeExpandedValue(node.getAttributes()
+                                                             .getNamedItem("id"));
+
+            FileTransferDefinition fileTransfer = proActiveDescriptor.getFileTransfer(fileTransferId);
+
+            NodeList childNodes = node.getChildNodes();
+
+            for (int j = 0; j < childNodes.getLength(); ++j) {
+                Node transferNode = childNodes.item(j);
+                if (transferNode.getNodeType() != Node.ELEMENT_NODE) {
+                    continue;
+                }
+                NamedNodeMap attributes = transferNode.getAttributes();
+                String src = getNodeExpandedValue(attributes.getNamedItem("src"));
+                String dest = getNodeExpandedValue(attributes.getNamedItem(
+                            "dest"));
+
+                if (transferNode.getNodeName().equals(FILE_TRANSFER_FILE_TAG)) {
+                    fileTransfer.addFile(src, dest);
+                } else if (transferNode.getNodeName()
+                                           .equals(FILE_TRANSFER_DIR_TAG)) {
+                    String include = getNodeExpandedValue(attributes.getNamedItem(
+                                "include"));
+                    String exclude = getNodeExpandedValue(attributes.getNamedItem(
+                                "exclude"));
+                    fileTransfer.addDir(src, dest, include, exclude);
+                }
+            }
+        }
+    }
+
     private void handleComponentDefinitions()
         throws XPathExpressionException, SAXException {
         NodeList nodes = (NodeList) xpath.evaluate(VIRTUAL_NODES_DEFINITIONS,
@@ -502,6 +544,13 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             s = getNodeExpandedValue(fileTransferDeploy);
             if (s != null) {
                 vn.addFileTransferDeploy(proActiveDescriptor.getFileTransfer(s));
+            }
+
+            Node fileTransferRetrieve = attributes.getNamedItem(FILE_TRANSFER_RETRIEVE_TAG);
+            s = getNodeExpandedValue(fileTransferRetrieve);
+            if (s != null) {
+                vn.addFileTransferRetrieve(proActiveDescriptor.getFileTransfer(
+                        s));
             }
 
             Node techServiceId = attributes.getNamedItem(TECHNICAL_SERVICE_ID);
@@ -958,7 +1007,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 } else if (nodeName.equals(FILE_TRANSFER_DEPLOY_TAG)) {
                     getFileTransfer("deploy", targetProcess, child);
                 } else if (nodeName.equals(FILE_TRANSFER_RETRIEVE_TAG)) {
-                    getFileTransfer("copy", targetProcess, child);
+                    getFileTransfer("retrieve", targetProcess, child);
                 }
             }
         }
