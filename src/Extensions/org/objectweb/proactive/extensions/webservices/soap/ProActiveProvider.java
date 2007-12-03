@@ -78,7 +78,7 @@ public class ProActiveProvider extends WSConstants implements Provider {
 
     /**
      * This method is responsible for locating the active object.
-     * First, we make a lookup active in order to retrieve the active object and then store it in the private field tqrgetObject
+     * First, we make a lookup active in order to retrieve the active object and then store it in the private field targetObject
      * @see org.apache.soap.util.Provider
      */
     public void locate(DeploymentDescriptor dd, Envelope env, Call call,
@@ -148,7 +148,6 @@ public class ProActiveProvider extends WSConstants implements Provider {
         System.out.println("In ProActiveProvider.invoke()");
 
         //  System.out.println("targetObject = " + targetObject);
-        String reponse = null;
 
         //dd.setProviderClass(targetObject.getClass().getName());
         // Add logic to invoke the service and get back the result here
