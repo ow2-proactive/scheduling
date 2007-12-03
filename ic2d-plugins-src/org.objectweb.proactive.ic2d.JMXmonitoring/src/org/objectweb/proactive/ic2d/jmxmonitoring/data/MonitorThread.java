@@ -155,8 +155,8 @@ public class MonitorThread implements Observer {
 
         public void run() {
             while (refresh) {
+                world.explore();
                 try {
-                    world.explore();
                     Thread.sleep(ttr * 1000);
                 } catch (InterruptedException e) { /* Do nothing */
                     System.out.println(
