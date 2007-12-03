@@ -15,15 +15,15 @@
             <xsl:when test="$index > count($accumulated)">
                 <xsl:value-of select="$value"/>
             </xsl:when>
-            <xsl:when test="matches($accumulated[$index], &quot;.*\$\{[A-Za-z_0-9]+\}.*&quot;)">
+            <xsl:when test="matches($accumulated[$index], '.*\$\{[A-Za-z_0-9]+\}.*')">
                 <!-- <xsl:value-of select='QName($nameList[$index],"RecursiveDef")'></xsl:value-of>-->
                 <xsl:value-of
-                    select="error(QName($nameList[$index],&quot;RecursiveDef&quot;),concat(&quot;The variable definition is recursive : &quot;&quot;&quot;,$nameList[$index],&quot;&quot;&quot; with value &quot;&quot;&quot;,$accumulated[$index],&quot;&quot;&quot;&quot;))"/>
+                    select="error(QName($nameList[$index],'RecursiveDef'),concat('The variable definition is recursive : ''',$nameList[$index],''' with value ''',$accumulated[$index],''''))"/>
 
             </xsl:when>
             <xsl:otherwise>
                 <xsl:value-of
-                    select="my:replaceAll(replace($value, concat(&quot;\$\{&quot;,$nameList[$index],&quot;\}&quot;), $accumulated[$index]), $index + 1, $accumulated)"
+                    select="my:replaceAll(replace($value, concat('\$\{',$nameList[$index],'\}'), $accumulated[$index]), $index + 1, $accumulated)"
                 />
             </xsl:otherwise>
         </xsl:choose>

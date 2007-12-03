@@ -221,11 +221,4 @@ public class GCMEnvironmentParser implements GCMParserConstants {
             e1.printStackTrace();
         }
     }
-
-    public static void main(String[] args)
-        throws IOException, SAXException, XPathExpressionException {
-        File descriptor = new File("/user/glaurent/home/gcmd1.xml");
-        GCMEnvironmentParser gp = new GCMEnvironmentParser(descriptor);
-        gp.transform(new File("/user/glaurent/home/testOutput1.xml"));
-    }
 }
