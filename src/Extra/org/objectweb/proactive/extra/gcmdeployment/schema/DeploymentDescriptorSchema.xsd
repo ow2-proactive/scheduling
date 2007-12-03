@@ -77,12 +77,6 @@
 		</sequence>
 	</complexType>
 
-	<simpleType name="refType">
-		<restriction base="string">
-			<whiteSpace value="collapse"></whiteSpace>
-		</restriction>
-	</simpleType>
-
 	<complexType name="abstractResourceType"></complexType>
 
 	<complexType name="groupRefType">
