@@ -82,7 +82,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         }
 
         //creates a new 2MB test file
-        TestAPI.createRandomContentFile(fileTest.getAbsolutePath(), filesize);
+        TestAPI.createRandomContentFile(fileTest, filesize);
 
         try {
             hostName = URIBuilder.getLocalAddress().getHostName();

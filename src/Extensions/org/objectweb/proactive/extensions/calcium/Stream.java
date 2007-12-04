@@ -65,7 +65,6 @@ import org.objectweb.proactive.extensions.calcium.task.TaskPriority;
 @PublicAPI
 public class Stream<T extends java.io.Serializable, R extends java.io.Serializable> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_KERNEL);
-    private int streamId;
     private Facade facade;
     private Skeleton<T, R> skeleton;
     private int streamPriority;
@@ -75,7 +74,6 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
     BlockingQueue<CalFuture<R>> list;
 
     Stream(Facade facade, FileServerClient fserver, Skeleton<T, R> skeleton) {
-        this.streamId = (int) (Math.random() * Integer.MAX_VALUE);
         this.skeleton = skeleton;
         this.facade = facade;
         this.fserver = fserver;
@@ -179,6 +177,10 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
         future.setCallBackQueue(list);
     }
 
+    /**
+     * Like {@link #submit(java.io.Serializable, File)},
+     * but uses the default output directory.
+     */
     public void submit(T param) throws PanicException {
         submit(param, DEFAULT_OUTPUT_ROOT_DIR);
     }

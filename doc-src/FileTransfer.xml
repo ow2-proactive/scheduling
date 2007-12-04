@@ -89,10 +89,10 @@ static List&lt;<emphasis role="bold">RemoteFile</emphasis>&gt; <emphasis
 
       <para>These methods are static, and handle the transfer of file between
       ProActive <emphasis role="bold">Node</emphasis>s. The pull methods
-      retrieve a file located on a remote machine to the local machine. The
-      push methods transfer a file available on the local node to the
-      specified remote node. And the transfer methods allow transfer between
-      third party nodes. </para>
+      retrieve a file/directory located on a remote machine to the local
+      machine. The push methods transfer a file/directory available on the
+      local node to the specified remote node. And the transfer methods allow
+      transfer between third party nodes.</para>
 
       <para>The file transfers are performed in an asynchronous fashion. Each
       of these methods returns at <emphasis role="bold">RemoteFile</emphasis>

@@ -72,7 +72,7 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
     public FileTransferService() {
     }
 
-    //@Override
+    //TODO Java 1.6: @Override
     public void initActivity(Body body) {
         writeBufferMap = new HashMap<File, BufferedOutputStream>();
 
@@ -80,12 +80,8 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
     }
 
     /* ***************** BEGIN FILETRANSFER SERVICE RECIEVE  ***************************/
-    public BooleanWrapper openWrite(File file) {
-        return new BooleanWrapper(getWritingBuffer(file, false) != null);
-    }
-
-    public BooleanWrapper canWrite(File file, boolean append) {
-        return new BooleanWrapper(getWritingBuffer(file, append) != null);
+    public void openWrite(File file) throws IOException {
+        getWritingBuffer(file, false);
     }
 
     public synchronized BooleanWrapper closeWrite(File f) {
@@ -104,7 +100,8 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
     /**
      * This method will save the specified FileBlock.
      *
-     * @param block
+     * @param dstFile The destination file.
+     * @param block The block to append to the file.
      */
     public void saveFileBlock(File dstFile, FileBlock block)
         throws IOException {
@@ -122,12 +119,29 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
         }
     }
 
-    protected BufferedOutputStream getWritingBuffer(File f) {
+    public void createDir(File dstFile) throws IOException {
+        if (!dstFile.exists() && !dstFile.mkdirs()) {
+            throw new IOException("Cannot creat directory: " + dstFile);
+        }
+
+        if (!dstFile.isDirectory()) {
+            throw new IOException("Not a directory: " + dstFile);
+        }
+
+        if (!dstFile.canWrite()) {
+            throw new IOException("Cannot write to: " + dstFile);
+        }
+    }
+
+    protected BufferedOutputStream getWritingBuffer(File f)
+        throws IOException {
         return getWritingBuffer(f, false);
     }
 
     protected synchronized BufferedOutputStream getWritingBuffer(File f,
-        boolean append) {
+        boolean append) throws IOException {
+        createDir(f.getParentFile());
+
         if (!writeBufferMap.containsKey(f)) {
             try {
                 BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(
@@ -143,6 +157,39 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
     }
 
     /* ***************** BEGIN FILETRANSFER SERVICE SEND  ***************************/
+    /**
+     * This method is the entry point for sending files. It can handle both directories or files.
+     */
+    public OperationStatus send(File srcFile,
+        FileTransferServiceReceive ftsRemote, File dstFile, int bsize,
+        int numFlyingBlocks) {
+        try {
+            internalSend(srcFile, ftsRemote, dstFile, bsize, numFlyingBlocks);
+        } catch (IOException ex) {
+            return new OperationStatus(ex);
+        }
+
+        return new OperationStatus();
+    }
+
+    protected void internalSend(File srcFile,
+        FileTransferServiceReceive ftsRemote, File dstFile, int bsize,
+        int numFlyingBlocks) throws IOException {
+        if (srcFile.isFile()) {
+            internalSendFile(srcFile, ftsRemote, dstFile, bsize, numFlyingBlocks);
+        } else if (srcFile.isDirectory()) {
+            ftsRemote.createDir(dstFile);
+            File[] files = srcFile.listFiles();
+            for (File f : files) {
+                internalSend(f, ftsRemote, new File(dstFile, f.getName()),
+                    bsize, numFlyingBlocks);
+            }
+        } else {
+            throw new IOException(
+                "Cannot transfer, not directory nor regular file: " +
+                srcFile.getPath());
+        }
+    }
 
     /**
      * This method handles the sending of a file.
@@ -153,9 +200,9 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
      * @param numFlyingBlocks The number of simultaneous blocks that will be sent.
      * @return The result status of the operation.
      */
-    public OperationStatus sendFile(File srcFile,
+    protected boolean internalSendFile(File srcFile,
         FileTransferServiceReceive ftsRemote, File dstFile, int bsize,
-        int numFlyingBlocks) {
+        int numFlyingBlocks) throws IOException {
         long init = System.currentTimeMillis();
         long numBlocks = 0;
 
@@ -166,26 +213,29 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
                         srcFile.getAbsolutePath()), DEFAULT_BUFFER_SIZE);
         } catch (Exception e) {
             //TODO change when moving to Java 1.6
-            //return new OperationStatus(new IOException( "Cannot open for sending:" + srcFile.getAbsoluteFile(), e));
-            return new OperationStatus(new IOException(
-                    "Cannot open for sending:" + srcFile.getAbsoluteFile() +
-                    " " + e.getMessage()));
+            //throw new IOException( "Cannot open for sending:" + srcFile.getAbsoluteFile(), e);
+            throw new IOException("Cannot open for sending:" +
+                srcFile.getAbsoluteFile() + " " + e.getMessage());
         }
 
         long totalNumBlocks = Math.round(Math.ceil(
                     (double) srcFile.length() / bsize));
         if (totalNumBlocks == 0) {
             close(bis);
-            return new OperationStatus(new IOException(
-                    "Cannot send an empty File:" + srcFile.getAbsolutePath()));
+            //TODO change when moving to Java 1.6
+            //throw new IOException( "Cannot send an empty File:" + srcFile.getAbsolutePath(),e);
+            throw new IOException("Cannot send an empty File:" +
+                srcFile.getAbsolutePath());
         }
 
-        BooleanWrapper bw = ftsRemote.openWrite(dstFile);
-        if (bw.booleanValue() != true) {
+        try {
+            ftsRemote.openWrite(dstFile);
+        } catch (Exception e) {
             close(bis);
-            return new OperationStatus(new IOException(
-                    "Unable to open remote file for writting: " +
-                    dstFile.getAbsolutePath()));
+            //TODO change when moving to Java 1.6
+            //throw new IOException( "Unable to open remote file for writing: " + dstFile.getAbsolutePath(), e);
+            throw new IOException("Unable to open remote file for writing: " +
+                dstFile.getAbsolutePath() + e.getMessage());
         }
 
         FileBlock fileBlock = new FileBlock(0, bsize);
@@ -205,13 +255,9 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
                     numBlocks++;
                 } catch (IOException e) {
                     //TODO change when moving to Java 1.6
-                    return new OperationStatus(new IOException(
-                            "Cannot send file block to:" +
-                            ProActiveObject.getActiveObjectNodeUrl(ftsRemote) +
-                            e));
-                    //                    return new OperationStatus(new IOException(
-                    //                            "Cannot send file block to:" +
-                    //                            ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e));
+                    //throw new IOException("Cannot send file block to:" + ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e);
+                    throw new IOException("Cannot send file block to:" +
+                        ProActiveObject.getActiveObjectNodeUrl(ftsRemote) + e);
                 }
             }
         }
@@ -223,9 +269,9 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
             numBlocks++;
         } catch (IOException e) {
             //TODO change when moving to Java 1.6
-            //return new OperationStatus(new IOException("Cannot send File to:" + ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e));
-            return new OperationStatus(new IOException("Cannot send File to:" +
-                    ProActiveObject.getActiveObjectNodeUrl(ftsRemote) + e));
+            //throw new IOException("Cannot send File to:" + ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e);
+            throw new IOException("Cannot send File to:" +
+                ProActiveObject.getActiveObjectNodeUrl(ftsRemote) + e);
         }
 
         //Close the remote/local buffers
@@ -239,7 +285,7 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
                 numBlocks + " blocks,  in: " + delta + "[ms]");
         }
 
-        return new OperationStatus();
+        return true;
     }
 
     protected void close(BufferedInputStream bis) {

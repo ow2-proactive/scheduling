@@ -46,7 +46,7 @@ import org.objectweb.proactive.extensions.calcium.task.TaskId;
 
 /**
  * This class is an implementation of an simple future object.
- * The class is not serializable on purpose.
+ * The class is not Serializable on purpose.
  *
  * @author The ProActive Team (mleyton)
  *
@@ -99,11 +99,12 @@ public class CalFutureImpl<R> implements CalFuture<R> {
             wait();
         }
 
-        //TODO fix this exception cast!!!
         if (task.hasException()) {
             Exception ex = task.getException();
             if (ex instanceof MuscleException) {
                 throw (MuscleException) ex;
+            } else if (ex instanceof TaskException) {
+                throw (TaskException) ex;
             } else {
                 throw new TaskException(ex);
             }

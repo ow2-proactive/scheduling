@@ -254,7 +254,7 @@ public class ProFileTransfer {
         ArrayList<RemoteFile> rfile = new ArrayList<RemoteFile>(srcFile.length);
 
         for (int i = 0; i < srcFile.length; i++) {
-            OperationStatus status = ftsSrc.sendFile(srcFile[i], ftsDst,
+            OperationStatus status = ftsSrc.send(srcFile[i], ftsDst,
                     dstFile[i], bsize, numFlyingBlocks);
 
             FileTransferRequest request = new FileTransferRequest(srcFile[i],

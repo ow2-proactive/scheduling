@@ -49,9 +49,12 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 
 import functionalTests.FunctionalTest;
-import static junit.framework.Assert.assertTrue;
+
+import junit.framework.Assert;
+
 
 /**
  * Tests the two main methods of the File Transfer API
@@ -61,39 +64,18 @@ public class TestAPI extends FunctionalTest {
     private static Logger logger = ProActiveLogger.getLogger("functionalTests");
     private static String XML_LOCATION = TestAPI.class.getResource(
             "/functionalTests/filetransfer/TestAPI.xml").getPath();
-
-    //private static String XML_LOCATION = TestAPI.class.getResource("/functionalTests/filetransfer/TestAPINotLocal.xml").getPath();
     private static int FILE_SIZE = 16; //MB
     ProActiveDescriptor pad;
-    File fileTest = new File("/tmp/ProActiveTestFile.dat");
-    File filePushed = new File("/tmp/ProActiveTestPushed.dat");
-    File filePulled = new File("/tmp/ProActiveTestPulled.dat");
-    File fileFuturePushed = new File("/tmp/ProActiveTestFuturePushed.dat");
+    Node testnode;
+    Node testnodePush;
+    File dirTest = new File(System.getProperty("java.io.tmpdir"),
+            "ProActive-TestAPI");
 
     @Before
     public void initTest() throws Exception {
         cleanIfNecessary();
+        Assert.assertFalse(dirTest.exists());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Creating " + FILE_SIZE +
-                "MB random test file in /tmp");
-        }
-
-        //creates a new 10MB test file
-        createRandomContentFile(fileTest.getAbsolutePath(), FILE_SIZE);
-    }
-
-    @After
-    public void endTest() throws Exception {
-        if (pad != null) {
-            pad.killall(false);
-        }
-
-        cleanIfNecessary();
-    }
-
-    @Test
-    public void action() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Loading descriptor from: " + XML_LOCATION);
         }
@@ -106,32 +88,61 @@ public class TestAPI extends FunctionalTest {
         testVNode.activate();
         testVNodePush.activate();
 
-        Node[] testnode = testVNode.getNodes();
-        Node[] testnodePush = testVNodePush.getNodes();
+        testnode = testVNode.getNode();
+        testnodePush = testVNodePush.getNode();
 
-        RemoteFile rfilePushed = ProFileTransfer.push(fileTest, testnode[0],
+        Assert.assertTrue(dirTest.mkdirs());
+        Assert.assertTrue(dirTest.exists());
+        Assert.assertTrue(dirTest.isDirectory());
+        Assert.assertTrue(dirTest.canWrite());
+    }
+
+    @After
+    public void endTest() throws Exception {
+        if (pad != null) {
+            pad.killall(false);
+        }
+
+        cleanIfNecessary();
+    }
+
+    @Test
+    public void theTest() throws Exception {
+        //testPushPullFile();
+        testPushPullDir();
+    }
+
+    public void testPushPullFile() throws Exception {
+        File fileTest = new File(dirTest, "ProActiveTestFile.dat");
+        File filePushed = new File(dirTest, "b/ProActiveTestPushed.dat");
+        File filePulled = new File(dirTest, "c/ProActiveTestPulled.dat");
+        File fileFuturePushed = new File(dirTest,
+                "d/ProActiveTestFuturePushed.dat");
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Creating " + FILE_SIZE + "MB random test file: " +
+                fileTest);
+        }
+
+        //creates a new test file
+        //Assert.assertTrue(SkeletonSystemImpl.checkWritableDirectory(dirTest));
+        Assert.assertTrue(dirTest.exists());
+        createRandomContentFile(fileTest, FILE_SIZE);
+
+        RemoteFile rfilePushed = ProFileTransfer.push(fileTest, testnode,
                 filePushed);
         rfilePushed.waitForFinishedTransfer();
-        assertTrue(rfilePushed.getRemoteFilePath().equals(filePushed)); //wait-by-necessity
+        Assert.assertTrue(rfilePushed.getRemoteFilePath().equals(filePushed)); //wait-by-necessity
 
-        RemoteFile rfilePulled = ProFileTransfer.pull(testnode[0], filePushed,
+        RemoteFile rfilePulled = ProFileTransfer.pull(testnode, filePushed,
                 filePulled);
 
-        //Thread.sleep(1000);
-        //filePulledWrapper.waitForAll(); //sync line
-        //System.out.println("Finished waiting");
-        RemoteFile pushedWhilePulling = rfilePulled.push(testnodePush[0],
+        RemoteFile pushedWhilePulling = rfilePulled.push(testnodePush,
                 fileFuturePushed);
-        if (pushedWhilePulling == null) {
-            throw new IOException("NUlll remote file");
-        }
-        if (pushedWhilePulling.getRemoteFilePath() == null) {
-            throw new IOException("NUlll remote file");
-        }
 
-        assertTrue(rfilePulled.getRemoteFilePath().equals(filePulled)); //wait-by-necessity
-        assertTrue(pushedWhilePulling.getRemoteFilePath()
-                                     .equals(fileFuturePushed)); //wait-by-necessity
+        Assert.assertTrue(rfilePulled.getRemoteFilePath().equals(filePulled)); //wait-by-necessity
+        Assert.assertTrue(pushedWhilePulling.getRemoteFilePath()
+                                            .equals(fileFuturePushed)); //wait-by-necessity
 
         rfilePulled.waitForFinishedTransfer();
         pushedWhilePulling.waitForFinishedTransfer();
@@ -149,14 +160,73 @@ public class TestAPI extends FunctionalTest {
                 fileFuturePushedSum);
         }
 
-        assertTrue(fileTestSum == filePushedSum);
-        assertTrue(fileTestSum == filePulledSum);
-        assertTrue(fileTestSum == fileFuturePushedSum);
+        Assert.assertTrue(fileTestSum == filePushedSum);
+        Assert.assertTrue(fileTestSum == filePulledSum);
+        Assert.assertTrue(fileTestSum == fileFuturePushedSum);
+    }
+
+    public void testPushPullDir() throws Exception {
+        String theFile = "file.dat";
+        String empty = "empty";
+
+        File dirTestSrc = new File(dirTest, "src");
+        File dirTestSrcFile = new File(dirTestSrc, theFile);
+        File dirTestSrcEmpty = new File(dirTestSrc, empty);
+
+        File dirTestPushed = new File(dirTest, "pushed");
+        File dirTestPushedFile = new File(dirTestPushed, theFile);
+        File dirTestPushedEmpty = new File(dirTestPushed, empty);
+
+        File dirTestPulled = new File(dirTest, "pulled");
+        File dirTestPulledFile = new File(dirTestPulled, theFile);
+        File dirTestPulledEmpty = new File(dirTestPulled, empty);
+
+        Assert.assertTrue(dirTestSrc.mkdir());
+        Assert.assertTrue(dirTestSrc.exists());
+        Assert.assertTrue(dirTestSrc.isDirectory());
+        Assert.assertTrue(dirTestSrc.canWrite());
+        Assert.assertTrue(dirTestSrcEmpty.mkdir());
+        Assert.assertTrue(dirTestSrcEmpty.exists());
+
+        Assert.assertFalse(dirTestPushed.exists());
+        Assert.assertFalse(dirTestPulled.exists());
+
+        createRandomContentFile(dirTestSrcFile, FILE_SIZE);
+
+        RemoteFile rdirPushed = ProFileTransfer.push(dirTestSrc, testnode,
+                dirTestPushed);
+        RemoteFile rdirPulled = ProFileTransfer.push(dirTestSrc, testnode,
+                dirTestPulled);
+
+        rdirPushed.waitForFinishedTransfer();
+        rdirPulled.waitForFinishedTransfer();
+
+        long fileTestSum = checkSum(dirTestSrcFile);
+
+        //Check correct push
+        Assert.assertTrue(dirTestPushed.exists());
+        Assert.assertTrue(dirTestPushed.isDirectory());
+        long filePushedSum = checkSum(dirTestPushedFile);
+
+        Assert.assertTrue(fileTestSum == filePushedSum);
+        Assert.assertTrue(dirTestPushedEmpty.exists());
+        Assert.assertTrue(dirTestPushedEmpty.isDirectory());
+        Assert.assertTrue(dirTestPushedEmpty.listFiles().length == 0);
+
+        //Check correct pull
+        Assert.assertTrue(dirTestPulled.exists());
+        Assert.assertTrue(dirTestPulled.isDirectory());
+        long filePulledSum = checkSum(dirTestPulledFile);
+
+        Assert.assertTrue(fileTestSum == filePulledSum);
+        Assert.assertTrue(dirTestPulledEmpty.exists());
+        Assert.assertTrue(dirTestPulledEmpty.isDirectory());
+        Assert.assertTrue(dirTestPulledEmpty.listFiles().length == 0);
     }
 
     /**
      * Gets a checksum on the specified file
-     * @param file The file to be checksumed.
+     * @param file The file to be check-summed.
      * @return
      * @throws IOException
      */
@@ -178,16 +248,16 @@ public class TestAPI extends FunctionalTest {
      * @return
      * @throws IOException
      */
-    static void createRandomContentFile(String path, int size)
+    static void createRandomContentFile(File file, int size)
         throws IOException {
         SecureRandom psrg = new SecureRandom();
         byte[] b = new byte[1024 * 1024]; //1 * MB
         psrg.nextBytes(b);
 
-        FileOutputStream fos = new FileOutputStream(path, false);
-        for (int i = 0; i < size; i++) //size times
-
+        FileOutputStream fos = new FileOutputStream(file);
+        for (int i = 0; i < size; i++) { //size times
             fos.write(b, 0, b.length); //not really random, but good enough for this test
+        }
         fos.flush();
         fos.close();
     }
@@ -196,21 +266,9 @@ public class TestAPI extends FunctionalTest {
      * Cleans test files
      *
      */
-    private void cleanIfNecessary() {
-        if (filePushed.exists()) {
-            filePushed.delete();
-        }
-
-        if (filePulled.exists()) {
-            filePulled.delete();
-        }
-
-        if (fileFuturePushed.exists()) {
-            fileFuturePushed.delete();
-        }
-
-        if (fileTest.exists()) {
-            fileTest.delete();
+    private void cleanIfNecessary() throws IOException {
+        if (dirTest.exists() && !SkeletonSystemImpl.deleteDirectory(dirTest)) {
+            throw new IOException("Cannot delete directory test:" + dirTest);
         }
     }
 
@@ -223,7 +281,7 @@ public class TestAPI extends FunctionalTest {
             System.out.println("InitTest");
             test.initTest();
             System.out.println("Action");
-            test.action();
+            test.theTest();
             System.out.println("postConditions");
             System.out.println("endTest");
             test.endTest();

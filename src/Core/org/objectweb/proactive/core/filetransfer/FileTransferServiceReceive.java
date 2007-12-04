@@ -37,9 +37,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 public interface FileTransferServiceReceive {
-    public BooleanWrapper canWrite(File file, boolean append);
-
-    public BooleanWrapper openWrite(File file);
+    public void openWrite(File file) throws IOException;
 
     public BooleanWrapper closeWrite(File f);
 
@@ -50,4 +48,6 @@ public interface FileTransferServiceReceive {
         FileBlock block);
 
     public void putBackInLocalPool();
+
+    public void createDir(File dstFile) throws IOException;
 }

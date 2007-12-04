@@ -35,14 +35,13 @@ import java.io.Serializable;
 
 
 /**
- * This class is used to determine if an operation has finished, is pending
- * or encountered some problems.
+ * This class is used to determine if an operation finished successfully or with
+ * an exception.
  *
  * @author The ProActive Team (mleyton)
  */
 public class OperationStatus implements Serializable {
     private IOException e = null;
-    private boolean p = false;
 
     /**
      * ProActive empty constructor.
@@ -52,15 +51,7 @@ public class OperationStatus implements Serializable {
     }
 
     /**
-     * If the operation was never processed, then this constructor can be used
-     * @param isPending True if the operation was never processed. False otherwise.
-     */
-    public OperationStatus(boolean isPending) { //operation was never performed
-        p = isPending;
-    }
-
-    /**
-     * This constructor can be used if the operation experienced problems
+     * This constructor can be used if the operation encountered problems
      * while processing.
      * @param e The exception that was encountered
      */
@@ -82,9 +73,5 @@ public class OperationStatus implements Serializable {
      */
     public IOException getException() {
         return e;
-    }
-
-    public boolean isPending() {
-        return p;
     }
 }

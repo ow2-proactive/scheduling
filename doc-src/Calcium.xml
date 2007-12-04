@@ -257,7 +257,7 @@ Stream</emphasis>&lt;Interval, Primes&gt; stream = calcium.<emphasis
 
       <para></para>
 
-      <screen>Vector&lt;Future&lt;Primes&gt;&gt; futures = new Vector&lt;Future&lt;Primes&gt;&gt;();
+      <screen>Vector&lt;CalFuture&lt;Primes&gt;&gt; futures = new Vector&lt;Future&lt;Primes&gt;&gt;();
 
 futures.add(<emphasis role="bold">stream.input</emphasis>(new Interval(1,6400,300)));
 futures.add(<emphasis role="bold">stream.input</emphasis>(new Interval(1,100,20)));
@@ -269,7 +269,7 @@ calcium.<emphasis role="bold">boot</emphasis>(); //begin the evaluation</screen>
     <sect2>
       <title>Collect the results</title>
 
-      <screen>for(Future&lt;Primes&gt; future:futures){
+      <screen>for(CalFuture&lt;Primes&gt; future:futures){
     Primes res=future.get();
     System.out.print(res);
 }
@@ -380,7 +380,7 @@ class <emphasis role="bold">Seq</emphasis>&lt;P,R&gt; implements Skeleton&lt;P,R
 
     <screen>interface <emphasis role="bold">Execute</emphasis>&lt;P,R&gt;  extends Muscle&lt;P,R&gt;       { public R exec(P param); }
 interface <emphasis role="bold">Condition</emphasis>&lt;P&gt;  extends Muscle&lt;P,Boolean&gt; { public boolean evalCondition(P param); }
-interface <emphasis role="bold">Divide</emphasis>&lt;P,X&gt;   extends Muscle&lt;P,X[]&gt;     { public X[] divide(P param); }
+interface <emphasis role="bold">Divide</emphasis>&lt;P,X&gt;   extends Muscle&lt;P,X[]&gt;     { public List&lt;X&gt; divide(P param); }
 interface <emphasis role="bold">Conquer</emphasis>&lt;Y,R&gt;  extends Muscle&lt;Y[],R&gt;     { public R conquer(Y[] param); }</screen>
   </sect1>
 
@@ -484,7 +484,7 @@ interface <emphasis role="bold">Conquer</emphasis>&lt;Y,R&gt;  extends Muscle&lt
           role="bold">ProActiveSchedulerEnvironment</emphasis>("schedulerURL","user", "password");</screen>
 
       <para>To use the scheduler, a URL with its location, a username and a
-      password must be provided. </para>
+      password must be provided.</para>
 
       <para>The ProActiveSchedulerEnvironment is currently under development
       and as such represents an unstable version of the framework, thus it is
@@ -499,7 +499,7 @@ interface <emphasis role="bold">Conquer</emphasis>&lt;Y,R&gt;  extends Muscle&lt
 
     <para>Calcium provides a transparent support for file data access, based
     on the Proxy Pattern. The <emphasis role="bold">BLAST</emphasis> example
-    is implemented using this support in: </para>
+    is implemented using this support in:</para>
 
     <screen>package org.objectweb.proactive.extensions.calcium.examples.blast;</screen>
 
@@ -600,7 +600,7 @@ interface <emphasis role="bold">Conquer</emphasis>&lt;Y,R&gt;  extends Muscle&lt
     </sect2>
 
     <sect2>
-      <title>Muscle Function Example </title>
+      <title>Muscle Function Example</title>
 
       <para>The following example is taken from the BLAST skeleton program.
       The muscle function presented here conquers the results of several
@@ -645,7 +645,7 @@ public class <emphasis role="bold">ConquerResults implements Conquer&lt;File, Fi
       <screen><emphasis role="bold">Stream</emphasis>&lt;<emphasis role="bold">File</emphasis>, <emphasis
           role="bold">File</emphasis>&gt; stream = ...;
 
-Future&lt;<emphasis role="bold">File</emphasis>&gt; future = <emphasis
+CalFuture&lt;<emphasis role="bold">File</emphasis>&gt; future = <emphasis
           role="bold">stream.input</emphasis>(new <emphasis role="bold">File</emphasis>("/home/user/input.data")); //input.data is copied and imported into the framework.
 
 ...
@@ -653,7 +653,7 @@ Future&lt;<emphasis role="bold">File</emphasis>&gt; future = <emphasis
 
 <emphasis role="bold">File</emphasis> result = future.get(); //The data referenced by result is downloaded into the local machine before result is returned.</screen>
 
-      <para> Then when the result is available, all <emphasis
+      <para>Then when the result is available, all <emphasis
       role="bold">File</emphasis> typed referenced in the result object are
       copied into the local machine, before the result is returned to the
       user.</para>
