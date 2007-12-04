@@ -30,198 +30,54 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.test.simple;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.rmi.AlreadyBoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMEventListener;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
-import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 
 public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
     Serializable {
-
-    /**
-         *
-         */
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
     private IMMonitoring imMonitoring;
 
+    /**
+     * ProActive empty constructor
+     */
     public SimpleTestIMMonitoring() {
     }
 
-    //----------------------------------------------------------------------//
     public SimpleTestIMMonitoring(IMMonitoring imMonitoring) {
         this.imMonitoring = imMonitoring;
     }
 
-    //----------------------------------------------------------------------//
-    public String descriptionIMNode(IMNode imnode) {
-        String mes = "";
-        mes += (imnode.getPADName() + " - ");
-        mes += (imnode.getVNodeName() + " - ");
-        mes += (imnode.getHostName() + " - ");
-        mes += (imnode.getDescriptorVMName() + " - ");
-        mes += (imnode.getNodeURL() + ".\n");
-
-        return mes;
-    }
-
-    /*
-     * IMNode's ToString :
-     *
-     *  | Name of this Node  :  Asterix-1623542303
-     *  +-----------------------------------------------+
-     *  | Node is free ?    : true
-     *  | Name of PAD               : 3VNodes-3Jvms-10Nodes19412.xml
-     *  | VNode                     : Asterix
-     *  | Host                      : r5p6
-     *  | Name of the VM    : Jvm1
-     *  +-----------------------------------------------+
-    *
+    /**
+     * Initialization part of NodeSource Active Object.
+     * register itself to IMMonitoring as events listener
      */
-    public void printAllIMNodes() {
-        System.out.println("printAllIMNodes");
+    public void initActivity(Body body) {
+        System.out.println("SimpleTestIMMonitoring.initActivity()");
+        IMInitialState initState = this.imMonitoring.addIMEventListener((IMEventListener) ProActiveObject.getStubOnThis(),
+                IMEvent.KILLED, IMEvent.NODE_ADDED, IMEvent.NODE_BUSY,
+                IMEvent.NODE_DOWN, IMEvent.NODE_FREE, IMEvent.NODE_REMOVED,
+                IMEvent.NODE_TO_RELEASE, IMEvent.NODESOURCE_CREATED,
+                IMEvent.NODESOURCE_REMOVED, IMEvent.SHUTDOWN,
+                IMEvent.SHUTTING_DOWN, IMEvent.STARTED);
 
-        ArrayList<IMNode> imNodes = imMonitoring.getListAllIMNodes();
-
-        for (IMNode imNode : imNodes) {
-            System.out.println(imNode);
-        }
-    }
-
-    public void printDeployedVNodes() {
-        System.out.println("printDeployedVNodes");
-
-        HashMap<String, ArrayList<VirtualNode>> deployedVNodesByPad = imMonitoring.getDeployedVirtualNodeByPad();
-
-        for (String padName : deployedVNodesByPad.keySet()) {
-            System.out.println("padName : " + padName);
-
-            ArrayList<VirtualNode> deployedVnodes = deployedVNodesByPad.get(padName);
-            System.out.println("Number of deployed vn : " +
-                deployedVnodes.size());
-
-            for (VirtualNode vn : deployedVnodes) {
-                System.out.println("Name of deployed vnode : " + vn.getName());
-            }
-        }
-    }
-
-    /*
-     * PAD
-     *           +-- VirtualNode
-     *                        +-- Hostname
-     *                                +-- VirtualMachine
-     *                                                  +-- Node                                    state
-     *
-     * state : {"free","busy","down"}
-     *
-     *
-     * example :
-     *
-     * 3VNodes-3Jvms-10Nodes19412.xml
-    *      +-- Asterix
-    *              +-- r5p6
-    *                     +-- Jvm1
-    *                             +-- Asterix-1623542303        busy
-    *                             +-- Asterix-951276804        free
-    *                             +-- Asterix390993068                busy
-    *     +-- Idefix
-    *              +-- r5p6
-    *                     +-- Jvm3
-    *                             +-- Idefix-1717183521        down
-    *                             +-- Idefix-347200095                free
-    *                             +-- Idefix1522374025                free
-    *                             +-- Idefix1823860328                busy
-    *                             +-- Idefix485990567                free
-    *
-     * For sorting a list or a table see :
-     *                 Arrays.sort(Object[], Comparator)
-     * or
-     *                 Collections.sort(List, Comparator)
-     */
-    @SuppressWarnings("unchecked")
-    public void printIMNodesByVNodeByPad() {
-        ArrayList<IMNode> imNodes = imMonitoring.getListAllIMNodes();
-        Object[] tableOfIMNodes = imNodes.toArray();
-        Arrays.sort(tableOfIMNodes);
-        /*
-        for(int i = 0 ; i < tableOfIMNodes.length ; i ++ ) {
-                System.out.println(i + ". " + descriptionIMNode((IMNode)tableOfIMNodes[i]));
-        }*/
-        System.out.println("printTree :  ");
-        System.out.println("-----------\n");
-
-        IMNode imnode = (IMNode) tableOfIMNodes[0];
-
-        System.out.println(" " + imnode.getPADName());
-        System.out.println("\t+-- " + imnode.getVNodeName());
-        System.out.println("\t\t+-- " + imnode.getHostName());
-        System.out.println("\t\t\t+-- " + imnode.getDescriptorVMName());
-        System.out.print("\t\t\t\t+-- " + imnode.getNodeURL());
-
-        if (imnode.isFree()) {
-            System.out.println(" \tfree");
-        } else {
-            System.out.println(" \tbusy");
-        }
-
-        boolean change = false;
-
-        for (int i = 1; i < tableOfIMNodes.length; i++) {
-            IMNode imnode1 = (IMNode) tableOfIMNodes[i - 1];
-            IMNode imnode2 = (IMNode) tableOfIMNodes[i];
-            change = false;
-
-            if (!imnode1.getPADName().equals(imnode2.getPADName())) {
-                System.out.println(" " + imnode2.getPADName());
-                change = true;
-            }
-
-            if (change |
-                    !imnode1.getVNodeName().equals(imnode2.getVNodeName())) {
-                System.out.println("\t+-- " + imnode2.getVNodeName());
-                change = true;
-            }
-
-            if (change | !imnode1.getHostName().equals(imnode2.getHostName())) {
-                System.out.println("\t\t+-- " + imnode2.getHostName());
-                change = true;
-            }
-
-            if (change |
-                    !imnode1.getDescriptorVMName()
-                                .equals(imnode2.getDescriptorVMName())) {
-                System.out.println("\t\t\t+-- " +
-                    imnode2.getDescriptorVMName());
-                change = true;
-            }
-
-            System.out.print("\t\t\t\t+-- " + imnode2.getNodeURL());
-
-            if (imnode2.isFree()) {
-                System.out.println(" \tfree");
-            } else {
-                System.out.println(" \tbusy");
-            }
-        }
+        printInitialState(initState);
     }
 
     public static void main(String[] args) {
@@ -240,13 +96,6 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
 
             SimpleTestIMMonitoring test = (SimpleTestIMMonitoring) ProActiveObject.newActive(SimpleTestIMMonitoring.class.getName(),
                     new Object[] { imMonitoring });
-
-            System.out.println("#[SimpleTestIMMonitoring] Echo monitoring : " +
-                imMonitoring.echo());
-
-            test.printAllIMNodes();
-            //test.printDeployedVNodes();
-            //test.printIMNodesByVNodeByPad();
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
@@ -256,6 +105,46 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
         }
     }
 
+    private void printInitialState(IMInitialState state) {
+        System.out.println("\n\n\t Infrastructure Manager - Initial state : ");
+        ArrayList<IMNodeSourceEvent> nsList = state.getNodeSource();
+
+        System.out.println("\n" + nsList.size() + " node sources :");
+        for (IMNodeSourceEvent ns : nsList) {
+            System.out.println("\ttype : " + ns.getSourceType() + " name : " +
+                ns.getSourceName());
+        }
+
+        ArrayList<IMNodeEvent> freeNodes = state.getFreeNodes();
+        ArrayList<IMNodeEvent> busyNodes = state.getBusyNodes();
+        ArrayList<IMNodeEvent> toReleaseNodes = state.getToReleaseNodes();
+        ArrayList<IMNodeEvent> downNodes = state.getDownNodes();
+
+        System.out.println(freeNodes.size() + busyNodes.size() +
+            toReleaseNodes.size() + downNodes.size() + " nodes :");
+
+        for (IMNodeEvent ne : freeNodes) {
+            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " +
+                ne.getNodeSource() + ", Status : " + ne.getState());
+        }
+
+        for (IMNodeEvent ne : busyNodes) {
+            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " +
+                ne.getNodeSource() + ", Status : " + ne.getState());
+        }
+
+        for (IMNodeEvent ne : toReleaseNodes) {
+            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " +
+                ne.getNodeSource() + ", Status : " + ne.getState());
+        }
+
+        for (IMNodeEvent ne : downNodes) {
+            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " +
+                ne.getNodeSource() + ", Status : " + ne.getState());
+        }
+    }
+
+    //----------------Events handling ---------------//    
     public void imKilledEvent() {
         System.out.println("SimpleTestIMMonitoring.imKilledEvent()");
     }
@@ -310,15 +199,5 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
     public void nodeSourceRemovedEvent(IMNodeSourceEvent ns) {
         System.out.println("SimpleTestIMMonitoring.nodeSourceRemovedEvent() " +
             ns.getSourceName());
-    }
-
-    public void initActivity(Body body) {
-        System.out.println("SimpleTestIMMonitoring.initActivity()");
-        this.imMonitoring.addIMEventListener((IMEventListener) ProActiveObject.getStubOnThis(),
-            IMEvent.KILLED, IMEvent.NODE_ADDED, IMEvent.NODE_BUSY,
-            IMEvent.NODE_DOWN, IMEvent.NODE_FREE, IMEvent.NODE_REMOVED,
-            IMEvent.NODE_TO_RELEASE, IMEvent.NODESOURCE_CREATED,
-            IMEvent.NODESOURCE_REMOVED, IMEvent.SHUTDOWN,
-            IMEvent.SHUTTING_DOWN, IMEvent.STARTED);
     }
 }
