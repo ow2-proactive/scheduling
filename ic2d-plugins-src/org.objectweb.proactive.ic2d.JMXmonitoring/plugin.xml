@@ -64,14 +64,6 @@
                tooltip="Add a new Monitoring view"/>
       </actionSet>
    </extension>
-   <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="org.objectweb.proactive.ic2d.jmxmonitoring.editor.MonitoringEditor"
-            default="false"
-            id="org.objectweb.proactive.ic2d.jmxmonitoring.editor.MonitoringEditor"
-            name="MonitoringEditor"/>
-   </extension>
 
 </plugin>
 
