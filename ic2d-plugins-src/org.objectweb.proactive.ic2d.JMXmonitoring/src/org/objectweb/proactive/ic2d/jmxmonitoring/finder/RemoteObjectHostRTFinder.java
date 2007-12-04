@@ -187,8 +187,8 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
         return runtimeObjects.values();
     }
 
-    private boolean validateRemoteObj(RemoteObject ro) {
-        return (!((ro.getTargetClass() == null) || (ro.getClassName() == null) ||
-        (ro.getClassName().equals(""))));
-    }
+    //    private boolean validateRemoteObj(RemoteObject ro) {
+    //        return (!((ro.getTargetClass() == null) || (ro.getClassName() == null) ||
+    //        (ro.getClassName().equals(""))));
+    //    }
 }

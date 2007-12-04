@@ -59,7 +59,6 @@ import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.Constants;
@@ -72,7 +71,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 public class MonitorNewHostDialog extends Dialog {
     private Shell shell = null;
-    private Shell parent = null;
+
+    //private Shell parent = null;
     private Combo hostCombo;
     private Text portText;
     private Combo protocolCombo;
@@ -98,7 +98,7 @@ public class MonitorNewHostDialog extends Dialog {
         // Pass the default styles here
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
-        this.parent = parent;
+        //this.parent = parent;
         this.world = world;
 
         String port = "";
@@ -284,18 +284,19 @@ public class MonitorNewHostDialog extends Dialog {
      * Logs in the IC2D's console, and show a pop-up.
      * @param message
      */
-    private void displayMessage(final String message) {
-        System.out.println("MonitorNewHostDialog.displayMessage()");
-        // Print the message in the UI Thread in async mode
-        Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    Console.getInstance("IC2D").warn(message);
-                    MessageBox mb = new MessageBox(parent);
-                    mb.setMessage(message);
-                    mb.open();
-                }
-            });
-    }
+
+    //    private void displayMessage(final String message) {
+    //        System.out.println("MonitorNewHostDialog.displayMessage()");
+    //        // Print the message in the UI Thread in async mode
+    //        Display.getDefault().asyncExec(new Runnable() {
+    //                public void run() {
+    //                    Console.getInstance("IC2D").warn(message);
+    //                    MessageBox mb = new MessageBox(parent);
+    //                    mb.setMessage(message);
+    //                    mb.open();
+    //                }
+    //            });
+    //    }
 
     /**
      * Load Urls

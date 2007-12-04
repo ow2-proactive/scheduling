@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.editpart;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;

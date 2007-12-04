@@ -151,14 +151,15 @@ public class ActiveObjectListener implements NotificationListener {
 
     ////////  End -- Task for handling notifications ///////
     private ActiveObject ao;
-    private String name;
 
+    //private String name;
     public ActiveObjectListener(ActiveObject ao) {
         this.ao = ao;
     }
 
+    @SuppressWarnings("unchecked")
     public void handleNotification(Notification notifications, Object handback) {
-        ConcurrentLinkedQueue<Notification> notifs = (ConcurrentLinkedQueue<Notification>) notifications.getUserData();
+        ConcurrentLinkedQueue notifs = (ConcurrentLinkedQueue<Notification>) notifications.getUserData();
         IC2DThreadPool.execute(new Task(notifs));
     }
 
@@ -179,8 +180,7 @@ public class ActiveObjectListener implements NotificationListener {
         String nodeUrlToDiscovered;
 
         // MethodName
-        String methodName = request.getMethodName();
-
+        //String methodName = request.getMethodName();
         if (type == Type.SENDER) {
             if (!sourceID.equals(ao.getUniqueID())) {
                 System.err.println(

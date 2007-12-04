@@ -71,7 +71,7 @@ public class MonitoringLayout extends ToolbarLayout {
      */
     @Override
     public void layout(IFigure parent) {
-        List<IFigure> children = parent.getChildren();
+        List children = parent.getChildren();
         int numChildren = children.size();
         Rectangle clientArea = transposer.t(parent.getClientArea());
         int x = clientArea.x;
@@ -110,7 +110,7 @@ public class MonitoringLayout extends ToolbarLayout {
         int prefMinSumHeight = 0;
 
         for (int i = 0; i < numChildren; i++) {
-            child = children.get(i);
+            child = (IFigure) children.get(i);
 
             prefSizes[i] = transposer.t(child.getPreferredSize(wHint, hHint));
             minSizes[i] = transposer.t(child.getMinimumSize(wHint, hHint));
@@ -145,7 +145,7 @@ public class MonitoringLayout extends ToolbarLayout {
             int minWidth = minSizes[i].width;
             Rectangle newBounds = new Rectangle(x, y, prefWidth, prefHeight);
 
-            child = children.get(i);
+            child = (IFigure) children.get(i);
             if (prefMinSumHeight != 0) {
                 amntShrinkCurrentHeight = ((prefHeight - minHeight) * amntShrinkHeight) / (prefMinSumHeight);
             }

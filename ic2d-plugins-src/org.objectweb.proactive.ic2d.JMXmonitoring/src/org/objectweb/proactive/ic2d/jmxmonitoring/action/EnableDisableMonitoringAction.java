@@ -45,14 +45,15 @@ public class EnableDisableMonitoringAction extends Action
     implements IWorkbenchWindowActionDelegate {
     public static final String ENABLE_DISABLE_MONITORING = "EnableDisbaleMonitoring";
     public static final boolean DEFAULT_IS_MONITORING = true;
-    private WorldObject world;
+
+    //private WorldObject world;
     private boolean monitoring = DEFAULT_IS_MONITORING;
     private String enableMessage = "The Monitoring is Enabled";
     private String disableMessage = "The Monitoring is Disabled";
 
     public EnableDisableMonitoringAction(WorldObject world) {
         super("Enable/Disable Monitoring", AS_PUSH_BUTTON);
-        this.world = world;
+        //this.world = world;
         this.setId(ENABLE_DISABLE_MONITORING);
         updateMonitoringState();
     }

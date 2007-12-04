@@ -32,7 +32,6 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.extpoint;
 
 import org.eclipse.jface.action.IAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 
 
 /**

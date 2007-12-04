@@ -113,10 +113,10 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
             }
         }
 
-        Iterator<IAction> it = registry.getActions();
+        Iterator it = registry.getActions();
 
         while (it.hasNext()) {
-            action = it.next();
+            action = (IAction) it.next();
 
             if (!action.isEnabled() || this.actions.contains(action)) {
                 continue;

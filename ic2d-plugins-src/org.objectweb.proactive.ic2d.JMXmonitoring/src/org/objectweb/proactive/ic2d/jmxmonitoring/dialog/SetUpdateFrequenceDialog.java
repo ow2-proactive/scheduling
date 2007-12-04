@@ -46,7 +46,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 
 
 public class SetUpdateFrequenceDialog extends Dialog {
-    private NodeObject node;
+    //private NodeObject node;
     private Shell shell = null;
     private Text text;
     private Button okButton;
@@ -55,7 +55,7 @@ public class SetUpdateFrequenceDialog extends Dialog {
     public SetUpdateFrequenceDialog(Shell parent, NodeObject node) {
         super(parent, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 
-        this.node = node;
+        //this.node = node;
 
         /* Init the display */
         Display display = getParent().getDisplay();
@@ -128,9 +128,9 @@ public class SetUpdateFrequenceDialog extends Dialog {
     private class SetUpdateFrequenceListener extends SelectionAdapter {
         public void widgetSelected(SelectionEvent e) {
             if (e.widget == okButton) {
-                long updateFrequence = Long.parseLong(text.getText());
+                // long updateFrequence = Long.parseLong(text.getText());
 
-                // TODO A faire ?
+                // TODO A faire ?                
                 /*node.getSpy().setUpdateFrequence(updateFrequence);*/
             }
             shell.close();

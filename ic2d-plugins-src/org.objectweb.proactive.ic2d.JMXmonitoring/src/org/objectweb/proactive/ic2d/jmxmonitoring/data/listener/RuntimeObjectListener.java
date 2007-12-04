@@ -37,10 +37,7 @@ import javax.management.ObjectName;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.BodyNotificationData;
-import org.objectweb.proactive.core.jmx.notification.NodeNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
-import org.objectweb.proactive.core.jmx.notification.RuntimeNotificationData;
-import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
@@ -85,7 +82,7 @@ public class RuntimeObjectListener implements NotificationListener {
             this.runtimeObject.getParent().explore();
             // this lines don't actually do anything  
             //TODO: remove them        	
-            RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
+            //RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
             runtimeObject.getParent().proposeChild();
         } else if (type.equals(NotificationType.runtimeUnregistered)) {
             System.out.println(
