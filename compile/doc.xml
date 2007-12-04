@@ -61,21 +61,8 @@
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
 				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
-				<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
-				<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
-				<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
-				<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
-				<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*" />
-				<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
-				<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
-				<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
-				<group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />
-				<group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />
-				<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
-				<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
-				<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
-				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
-				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
+
+				
 			</javadoc>			
 		</target>
 	
@@ -109,6 +96,23 @@
 					<param name="-file" value="${compile.dir}/publishedExtraClasses" />
 				</doclet>
 				<packageset dir="${src.extra.dir}"/>
+				
+				<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
+				<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
+				<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
+				<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
+				<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*" />
+				<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
+				<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
+				<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
+				<group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />
+				<group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />
+				<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
+				<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
+				<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
+				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
+				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
+						
 			</javadoc>
 						
 			<javadoc  
@@ -135,21 +139,24 @@
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
 				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
-				<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
-				<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
-				<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
-				<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
-				<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*" />
-				<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
-				<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
-				<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
-				<group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />
-				<group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />
-				<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
-				<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
-				<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
-				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
-				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
+				
+				<group title="ProActive Core">
+					<package name="org.objectweb.proactive.core*" />
+					<package name="org.objectweb.proactive.api" />
+					<package name="org.objectweb.proactive.filetransfer*" />
+					<package name="org.objectweb.proactive.ext.*" />
+					<package name="org.objectweb.proactive" />
+						<package name="org.objectweb.proactive.annotation" />
+				</group>
+								
+				<group title="ProActive Extensions">
+					<package name="org.objectweb.proactive.extensions*" />
+				</group>
+							
+				<group title="ProActive Extra">
+					<package name="org.objectweb.proactive.extra*" />
+				</group>
+				
 			</javadoc>			
 		</target>
 
