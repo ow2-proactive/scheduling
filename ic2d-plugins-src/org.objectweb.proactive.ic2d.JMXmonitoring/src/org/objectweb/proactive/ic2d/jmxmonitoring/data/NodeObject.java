@@ -110,7 +110,7 @@ public class NodeObject extends AbstractData {
     }
 
     @Override
-    public void explore() {
+    public synchronized void explore() {
         findActiveObjects();
     }
 
@@ -142,6 +142,9 @@ public class NodeObject extends AbstractData {
 
         final List<ObjectName> activeObjectNames = getProxyNodeMBean()
                                                        .getActiveObjects();
+
+        // System.out.println("Node "  +this.getName()+" has: " + activeObjectNames.size()+" ao's");
+        // int count=0;
         for (final ObjectName oname : activeObjectNames) {
             final BodyWrapperMBean proxyBodyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
                     oname, BodyWrapperMBean.class, false);
@@ -163,12 +166,16 @@ public class NodeObject extends AbstractData {
                 final String activeObjectName = proxyBodyMBean.getName();
                 child = new ActiveObject(this, id, activeObjectName, oname,
                         proxyBodyMBean);
-                // addChild(child);
+                //addChild(child);
+                //count++;
                 childrentoAdd.add(child);
             }
+
             // Removes from the model the not monitored or termined aos.
             childrenToRemoved.remove(idString);
         }
+
+        //System.out.println(this.getName()+" "+count+ " children addded.");
 
         //add all children 
         this.addChildren(childrentoAdd);
@@ -177,6 +184,10 @@ public class NodeObject extends AbstractData {
             ((ActiveObject) child).stopMonitoring(true); //unsubscribes listener for this child object 
                                                          //and call destroy() on the child object
         }
+
+        //    setChanged();
+        //    notifyObservers(new MVCNotification(MVCNotificationTag.ADD_CHILDREN,
+        //            new ArrayList()));
     }
 
     @Override
@@ -200,6 +211,10 @@ public class NodeObject extends AbstractData {
                                   .subscribe(oname, child.getListener(),
                 getParent().getUrl());
         }
+
+        //    	ArrayList<ActiveObject> childrenToADD=new ArrayList<ActiveObject>();
+        //    	childrenToADD.add(child);
+        //    	this.addChildren(childrenToADD);
     }
 
     private synchronized void addChildren(List<ActiveObject> children) {
