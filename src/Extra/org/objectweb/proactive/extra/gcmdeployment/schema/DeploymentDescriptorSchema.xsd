@@ -85,7 +85,7 @@
 				<sequence>
 					<element name="host" type="pa:hostRefType"></element>
 				</sequence>
-				<attribute name="refid" type="pa:refType" use="required" />
+				<attribute name="refid" type="pa:idType" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -102,7 +102,7 @@
 					<element name="bridge" type="pa:bridgeRefType" minOccurs="0" maxOccurs="unbounded"></element>
 					<element name="host" type="pa:hostRefType" minOccurs="0" maxOccurs="1" />
 				</sequence>
-				<attribute name="refid" type="pa:refType" use="required" />
+				<attribute name="refid" type="pa:idType" use="required" />
 				<attribute name="relay" type="string"></attribute>
 			</extension>
 		</complexContent>
@@ -149,7 +149,7 @@
 	</complexType>
 
 	<complexType name="hostRefType">
-		<attribute name="refid" type="pa:refType" use="required" />
+		<attribute name="refid" type="pa:idType" use="required" />
 	</complexType>
 
 	<complexType name="abstractInfrastructureType"></complexType>

@@ -54,7 +54,7 @@
 				</complexType>
 			</element>
 		</sequence>
-		<attribute name="id" type="pa:refType"></attribute>
+		<attribute name="id" type="pa:idType"></attribute>
 	</complexType>
 
 	<complexType name="virtualNodeType">
@@ -62,7 +62,7 @@
 			<element name="fileTranfer" type="pa:fileTransferType" minOccurs="0" maxOccurs="unbounded"></element>
 			<element name="nodeProvider" minOccurs="0" maxOccurs="unbounded">
 				<complexType>
-					<attribute name="refid" type="pa:refType"></attribute>
+					<attribute name="refid" type="pa:idType"></attribute>
 					<attribute name="capacity" type="pa:capacityType" />
 				</complexType>
 			</element>
