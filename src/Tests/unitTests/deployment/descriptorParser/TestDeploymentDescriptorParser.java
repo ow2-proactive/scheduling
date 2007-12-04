@@ -192,7 +192,9 @@ public class TestDeploymentDescriptorParser {
             Assert.fail(e.getMessage());
         } catch (SAXException e) {
             e.printStackTrace();
-            gotException = e.getMessage().contains("Duplicate key value");
+            final String errMsg = "Duplicate key value";
+            gotException = e.getMessage().contains(errMsg) ||
+                e.getException().getMessage().contains(errMsg);
         }
 
         Assert.assertTrue(gotException);
@@ -227,8 +229,9 @@ public class TestDeploymentDescriptorParser {
             Assert.fail(e.getMessage());
         } catch (SAXException e) {
             e.printStackTrace();
-            gotException = e.getMessage()
-                            .contains("not found for identity constraint");
+            final String errMsg = "not found for identity constraint";
+            gotException = e.getMessage().contains(errMsg) ||
+                e.getException().getMessage().contains(errMsg);
         }
 
         Assert.assertTrue(gotException);
