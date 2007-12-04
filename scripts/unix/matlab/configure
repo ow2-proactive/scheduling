@@ -1227,11 +1227,27 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 PTII=`pwd`
 
+# We must have MATLAB set before running configure.
+echo "$as_me:$LINENO: checking Testing Matlab environment variable" >&5
+echo $ECHO_N "checking Testing Matlab environment variable... $ECHO_C" >&6
+
+if test -n "$MATLAB"; then
+	if (test -f "$MATLAB" -a -x "$MATLAB"); then
+		echo "$as_me:$LINENO: result: $MATLAB" >&5
+echo "${ECHO_T}$MATLAB" >&6
+	else
+		echo "$MATLAB is not a normal file or is not executable"
+		exit 3
+	fi
+else
+	echo "You must set the MATLAB environment variable before running configure"
+	exit 3
+fi
+
+
 echo "$as_me:$LINENO: checking Finding ProActive" >&5
 echo $ECHO_N "checking Finding ProActive... $ECHO_C" >&6
 PROACTIVE=$(readlink -f $PTII/../../../)
-echo "$as_me:$LINENO: checking Finding ProActive" >&5
-echo $ECHO_N "checking Finding ProActive... $ECHO_C" >&6
 echo "$as_me:$LINENO: result: $PROACTIVE" >&5
 echo "${ECHO_T}$PROACTIVE" >&6
 

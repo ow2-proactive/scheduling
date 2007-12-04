@@ -52,9 +52,24 @@ dnl else we won't be able to rebuild after make extraclean.
 AC_INIT(ptII.mk.in)
 PTII=`pwd`
 
+# We must have MATLAB set before running configure.
+AC_MSG_CHECKING([Testing Matlab environment variable])
+
+if test -n "$MATLAB"; then
+	if (test -f "$MATLAB" -a -x "$MATLAB"); then
+		AC_MSG_RESULT([$MATLAB])
+	else
+		echo "$MATLAB is not a normal file or is not executable"
+		exit 3
+	fi
+else
+	echo "You must set the MATLAB environment variable before running configure"
+	exit 3
+fi
+
+
 AC_MSG_CHECKING([Finding ProActive])
 PROACTIVE=$(readlink -f $PTII/../../../)
-AC_MSG_CHECKING([Finding ProActive])
 AC_MSG_RESULT([$PROACTIVE])
 
 # We must have PTII set before running configure.
