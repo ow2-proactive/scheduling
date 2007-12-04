@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.descriptor.data;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.services.ServiceUser;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
@@ -63,7 +62,6 @@ import org.objectweb.proactive.core.xml.VariableContract;
  * @see VirtualNodeInternal
  * @see VirtualMachine
  */
-@PublicAPI
 public interface ProActiveDescriptorInternal extends ProActiveDescriptor {
     public void setMainDefined(boolean mainDefined);
 
