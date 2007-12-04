@@ -268,9 +268,9 @@ public class RuntimeObject extends AbstractData {
                 addChild(child);
             }
             // This child is already monitored, but this child maybe contains some not monitord objects.
-            else {
-                child.explore();
-            }
+            //else {
+            child.explore();
+            //}
             // Removes from the model the not monitored or terminated nodes.
             childrenToRemove.remove(child.getKey());
         }

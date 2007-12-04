@@ -210,10 +210,10 @@ public class HostObject extends AbstractData {
                 child = runtimeObject;
                 addChild(runtimeObject);
                 updateOSNameAndVersion(runtimeObject.getConnection());
-            } else {
-                // This child is already monitored, but this child maybe contains some not monitord objects.
-                child.explore();
             }
+            // This child is already monitored, but this child maybe contains some not monitord objects.
+            child.explore();
+
             // Removes from the model the not monitored or termined runtimes.
             childrenToRemoved.remove(child.getKey());
         }
