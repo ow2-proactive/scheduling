@@ -64,7 +64,8 @@ public class MonitorThread implements Observer {
         this.ttr = DEFAULT_TTR;
 
         this.refresh = false;
-        this.refresher = new Thread(new MonitorThreadRefresher(world));
+        this.refresher = new Thread(new MonitorThreadRefresher(world),
+                "Ic2d refresh thread");
     }
 
     //
