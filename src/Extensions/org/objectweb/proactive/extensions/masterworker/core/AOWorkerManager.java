@@ -315,7 +315,8 @@ public class AOWorkerManager implements WorkerManager,
             for (Entry<String, Worker> worker : workers.entrySet()) {
                 try {
                     BooleanWrapper term = worker.getValue().terminate();
-                    ProFuture.waitFor(term);
+                    // as it is a termination algorithm we wait a bit, but not forever
+                    ProFuture.waitFor(term, 3 * 1000);
                     if (logger.isDebugEnabled()) {
                         logger.debug(worker.getKey() + " freed.");
                     }
