@@ -19,13 +19,15 @@
 			active object. To see how to start the nodes, JVMs, and
 			virtual nodes on which objects can be instantiated read
 			<xref linkend="Configuration" />
+			
+			
 		</para>
 
 		<para>
 			In
 			<emphasis role="bold">ProActive</emphasis>
 			there are two ways to create active objects: instantiation
-			based creation and by using an existing object. Instation
+			based creation and by using an existing object. Instantion
 			based creation is done through
 			<literal>ProActiveObject.newActive(...)</literal>
 			and
@@ -56,6 +58,13 @@
 				</imageobject>
 			</mediaobject>
 		</figure>
+
+		<para>	
+			For the examples  in this chapter we will be using the following
+			class that can be instantiated as an active	object:
+		</para>	
+		<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/ActiveWorker.txt" /></textobject></programlisting>
 
 	</sect1>
 
@@ -544,7 +553,7 @@
 				</title>
 
 				<para>
-					The algorithms that decide for each phase what to do
+					The algorithms for each running phase 
 					are the following (
 					<literal>activity</literal>
 					is the eventual object passed as a parameter to
@@ -578,6 +587,22 @@
 				<programlisting><textobject><textdata
 							fileref="code_snippets/EndActiveAlgorithm.txt" /></textobject></programlisting>
 
+
+
+		<para>
+			//TODO add explanation
+			
+		</para>
+		<figure>
+			<title>Activity algorithm</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="images/init_run_end_Activity.png" />
+
+				</imageobject>
+			</mediaobject>
+		</figure>
 
 
 			</sect3>
@@ -835,7 +860,7 @@
 
 	<sect1 id="ActiveObjectCreation_html_elementRole">
 		<title>
-			Advanced: Role of the elements of an active object
+			Elements of an active object and futures
 		</title>
 
 		<para>
@@ -849,34 +874,29 @@
 			Consider that some code in an instance of class
 			<literal>A</literal>
 			creates an active object of class
-			<literal>B</literal>
+			<literal>Worker</literal>
 			using a piece of code like this:
 		</para>
 
-		<para>
-			<programlisting lang="java">
-				B b; Object[] params = {&lt;some parameters for the
-				constructor&gt;}; try { // We create an active instance
-				of B on the current node b = (B)
-				ProActive.newActive("B", params); } catch (Exception e)
-				{ e.printStackTrace () ; }
-			</programlisting>
-		</para>
+	<programlisting lang="java"><textobject><textdata fileref="code_snippets/ProActive.newActive.txt" /></textobject></programlisting>
 
 		<para>
 			If the creation of the active instance of B is successful,
 			the graph of objects is as described in figure below (with
 			arrows denoting references).
 		</para>
+		
+		
+		
 
 		<para>
 			<figure>
-				<title>The components of an active object</title>
+				<title>The components of an active object and of a referencing object</title>
 
 				<mediaobject>
 					<imageobject>
 						<imagedata contentwidth="100"
-							fileref="images/activeObjectComponents.png" format="PNG"
+							fileref="images/workerActiveObject.png" format="PNG"
 							width="6in" />
 					</imageobject>
 				</mediaobject>
@@ -884,26 +904,9 @@
 		</para>
 
 		<para>
-			The active instance of B is actually composed of 4 objects:
+			The active instance of Worker is composed of 2 objects:
 		</para>
-
-		<itemizedlist>
-			<listitem>
-				<para>
-					a stub (
-					<literal>Stub_B</literal>
-					)
-				</para>
-			</listitem>
-
-			<listitem>
-				<para>
-					a proxy (
-					<literal>BodyProxy</literal>
-					)
-				</para>
-			</listitem>
-
+	<itemizedlist>
 			<listitem>
 				<para>
 					a body (
@@ -915,47 +918,48 @@
 			<listitem>
 				<para>
 					an instance of
-					<literal>B</literal>
+					<literal>Worker</literal>
 				</para>
 			</listitem>
 		</itemizedlist>
-
+		<para> Besides the active object composed of a body and an object there is 
+		also a proxy and a stub for each active or passive object referencing the active object. 
+		
+		</para>
+		
 		<sect2>
 			<title>Role of the stub</title>
-
+			
 			<indexterm>
 				<primary>Stub</primary>
 			</indexterm>
 
 			<para>
 				The role of the class
-				<literal>Stub_B</literal>
+				<literal>Stub_Worker</literal>
 				is to reify all method calls that can be performed
 				through a reference of type
-				<literal>B</literal>
-				, and only these as calling a method declared in a
-				subclass of
-				<literal>B</literal>
-				through downcasting would result in a runtime error).
-				Reifying a call simply means constructing an object (in
+				<literal>Worker</literal>.
+				Reifying a call simply means constructing an object 
+				that represents the call(in
 				our case, all reified calls are instance of class
-				<literal>MethodCall</literal>
-				) that represents the call, so that it can be
-				manipulated as any other object. This reified call is
+				<literal>org.objectweb.proactive.core.mop.MethodCall</literal>),
+				so it can be
+				manipulated as any other object. The reified call is
 				then processed by the other components of the active
 				object in order to achieve the behavior we expect from
 				an active object.
 			</para>
 
 			<para>
-				The idea of using a standard object for representing
+				Using a standard object for representing
 				elements of the language that are not normally objects
 				(such as method calls, constructor calls, references,
-				types,...) is what
-				<emphasis>metaobject programming</emphasis>
-				is all about. The metaobject protocol (MOP) ProActive is
+				types,...) is at the core of
+				<emphasis>metaobject programming</emphasis>.
+				The metaobject protocol (MOP) ProActive is
 				built on is described in
-				<xref linkend="MOP" />
+				<xref linkend="MOP" /> 
 				but it is not a prerequisite for understanding and using
 				ProActive.
 			</para>
@@ -963,32 +967,31 @@
 			<para>
 				As one of our objectives is to provide transparent
 				active objects, references to active objects of class
-				<literal>B</literal>
+				<literal>Worker</literal>
 				need to be of the same type as references to passive
 				instances of
-				<literal>B</literal>
+				<literal>Worker</literal>
 				(this feature is called
 				<emphasis>polymorphism</emphasis>
 				between passive and active instances of the same class).
-				This is why, by construction,
-				<literal>Stub_B</literal>
+				This is why
+				<literal>Stub_Worker</literal>
 				is a subclass of class
-				<literal>B</literal>
-				, therefore allowing instances of class
-				<literal>Stub_B</literal>
+				<literal>Worker</literal> by construction,
+				 therefore allowing instances of class
+				<literal>Stub_Worker</literal>
 				to be assigned to variables of type
-				<literal>B</literal>
-				.
+				<literal>Worker</literal>.
 			</para>
 
 			<para>
 				Class
-				<literal>Stub_B</literal>
+				<literal>Stub_Worker</literal>
 				redefines each of the methods inherited from its
 				superclasses. The code of each method of class
-				<literal>Stub_B</literal>
-				actually builds an instance of class
-				<literal>MethodCall</literal>
+				<literal>Stub_Worker</literal>
+				builds an instance of class
+				<literal>org.objectweb.proactive.core.mop.MethodCall</literal>
 				in order to represent the call to this method. This
 				object is then passed to the
 				<literal>BodyProxy</literal>
@@ -996,7 +999,7 @@
 				of the method call. From the caller's point of view,
 				everything looks like if the call had been performed on
 				an instance of
-				<literal>B</literal>
+				<literal>Worker</literal>
 				.
 			</para>
 
@@ -1009,23 +1012,21 @@
 				<listitem>
 					<para>
 						Obviously,
-						<literal>Stub_B</literal>
+						<literal>Stub_Worker</literal>
 						cannot redefine
 						<literal>final</literal>
 						methods inherited from class
-						<literal>B</literal>
-						. Therefore, calls to these methods are not
+						<literal>Worker</literal>.
+						If the methods are final, calls to these methods are not
 						reified but are executed on the stub, which may
-						lead to unexplainable behavior if the programmer
-						does not carefully avoid calling
-						<literal>final</literal>
-						methods on active objects.
+						lead to unpredictable behavior.
 					</para>
 
 					<para>
 						As there are 6 final methods in the base class
-						<literal>Object</literal>
-						, one may wonder how to live without them. In
+						<literal>Object</literal>,
+						there is the question of how ProActive deals with these
+						methods. In
 						fact, 5 out of this 6 methods deal with thread
 						synchronization (
 						<literal>notify()</literal>
@@ -1033,13 +1034,12 @@
 						<literal>notifyAll()</literal>
 						and the 3 versions of
 						<literal>wait()</literal>
-						). Those method should not be used since an
+						). Those methods should not be used since an
 						active object provides thread synchronization.
-						Indeed, using the standard thread
+						Using the standard thread
 						synchronization mechanism and ProActive thread
 						synchronization mechanism at the same time might
-						conflict and result in an absolute debugger's
-						nightmare.
+						conflict and result in an very hard to debug behaviour.
 					</para>
 
 					<para>
@@ -1053,33 +1053,33 @@
 						stub object, which returns an object of class
 						<literal>Class</literal>
 						that represents the class of the stub (
-						<literal>Stub_B</literal>
+						<literal>Stub_Worker</literal>
 						in our example) and not the class of the active
 						object itself (
-						<literal>B</literal>
+						<literal>Worker</literal>
 						in our example). However, this method is seldom
 						used in standard applications and it doesn't
 						prevent the operator
 						<literal>instanceof</literal>
-						to work thanks to its polymorphic behavior.
+						from working thanks to its polymorphic behavior.
 						Therefore the expression
-						<literal>(foo instanceof B)</literal>
-						has the same value whether B is active or not.
+						<literal>(foo instanceof Worker)</literal>
+						has the same value whether Worker is active or not.
 					</para>
 				</listitem>
 
 				<listitem>
 					<para>
 						Getting or setting instance variables directly
-						(not through a getter or a setter) must be
-						avoided in the case of active objects because it
+						(not through a get or a set method) must be
+						avoided for active objects because it
 						results in getting or setting the value on the
 						stub object and not on the instance of the class
-						<literal>B</literal>
-						. This problem is usually worked around by using
+						<literal>Worker</literal>. 
+						This problem is usually worked around by using
 						get/set methods for setting or reading
 						attributes. This rule of strict encapsulation
-						may also be found in JavaBeans or in most
+						can also be found in JavaBeans or in most
 						distributed object systems like RMI or CORBA.
 					</para>
 				</listitem>
@@ -1092,7 +1092,7 @@
 			<para>
 				The role of the proxy is to handle asynchronism in calls
 				to active object. More specifically, it creates future
-				objects if possible and needed, forwards calls to bodies
+				objects if possible and needed, forwards calls to bodies,
 				and returns future objects to the stubs. As this class
 				operates on
 				<literal>MethodCall</literal>
@@ -1114,28 +1114,29 @@
 				<literal>Request</literal>
 				objects) in a queue of pending requests and processing
 				these request according to a given synchronization
-				policy, whose default behavior is FIFO. The Body has its
-				own thread, which alternatively chooses a request in the
-				queue of pending ones and executes the associated call.
+				policy. The default behaviour for the synchronization policy is FIFO.
+				The Body has its
+				own thread which chooses requests from the
+				queue of request and executes the associated call.
 			</para>
 		</sect2>
 
 		<sect2>
-			<title>Role of the instance of class B</title>
+			<title>Role of the instance of class Worker</title>
 
 			<para>
-				This is a standard instance of class
-				<literal>B</literal>
+				There is also a standard instance of class
+				<literal>Worker</literal>
 				. It may contain some synchronized information in its
 				<literal>live</literal>
 				method, if any. As the body executes calls one by one,
 				there cannot be any concurrent execution of two portions
-				of code of this object by two different threads. This
-				enables the use of pre- and post-conditions and class
+				of code for this object by two different threads. This
+				enables the use of pre and post-conditions and class
 				invariants. As a consequence, the use of the keyword
 				<literal>synchronized</literal>
 				in class
-				<literal>B</literal>
+				<literal>Worker</literal>
 				should not be necessary. Any synchronization scheme that
 				can be expressed through monitors and
 				<literal>synchronized</literal>
@@ -1154,6 +1155,7 @@
 			<title>Creation of a Future Object</title>
 
 			<para>
+				//TODO Explain asynchronous request
 				Whenever possible a method call on an active object is
 				reified as an asynchronous request. If not possible the
 				call is synchronous and blocks until the reply is
@@ -1347,19 +1349,18 @@
 				As we can see, the creation of a future depends not only
 				on the caller type, but also on the return object type.
 				Creating a future is only possible if the object is
-				reifiable. Note although having a quite similar
-				structure as an active object, a future object is not
+				reifiable. Although a future has a similar structure
+				to an active object, a future object is not
 				active. It only has a Stub and a Proxy as shown in
-				figure below:
+				the figure below:
 			</para>
 
 			<para>
 				<figure>
 					<title>A future object</title>
-
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/futureObject.png"
+							<imagedata fileref="images/stubProxyFuture.png"
 								format="PNG" />
 						</imageobject>
 					</mediaobject>
@@ -1369,28 +1370,21 @@
 			<para>
 				During its lifetime, an active object can create many
 				future objects. There are all automatically kept in a
-				FuturePool.
+				FuturePool. 
+
 			</para>
 
 			<para>
 				Each time a future is created, it is inserted in the
 				future pool of the corresponding active object. When the
 				result becomes available, the future object is removed
-				from the pool. Although most of the methods of the
-				FuturePool are for internal use only and are directly
-				called by the proactive library we provide a method to
-				wait until a result becomes available. Instead of
-				blocking until a specific future is available, the call
-				to
-				<literal>waitForReply()</literal>
-				blocks until any of the current futures become
-				available. An application can be found in the FutureList
-				class.
+				from the pool. There are several methods in 
+				<literal>org.objectweb.proactive.api.ProFuture</literal>
+				which provide control over the way futures are returned. 
 			</para>
-
-			<sect3>
-				<title>HashCode and equals</title>
-
+			</sect2>
+			<sect2>
+				<title>Methods affected by futures </title>
 				<para>
 					Any call to a future object is reified in order to
 					be blocked if the future is not yet available and
@@ -1403,32 +1397,6 @@
 					user. This can lead very easily to deadlocks if they
 					are called on a not yet available object.
 				</para>
-			</sect3>
-
-			<sect3>
-				<title>hashCode()</title>
-
-				<para>
-					Instead of returning the hashcode of the object, it
-					returns the hashcode of its proxy. Since there is
-					only one proxy per future object, there is a unique
-					equivalence between them.
-				</para>
-			</sect3>
-
-			<sect3>
-				<title>equals()</title>
-
-				<para>
-					The default implementation of
-					<literal>equals()</literal>
-					in the Object class is to compare the references of
-					two objects. In ProActive it is redefined to compare
-					the hashcode of two proxies. As a consequence it is
-					only possible to compare two future object, and not
-					a future object with a normal object.
-				</para>
-
 				<para>
 					There are some drawbacks with this technique, the
 					main one being the impossibility to have a user
@@ -1438,12 +1406,36 @@
 					<literal>equals()</literal>
 					methods.
 				</para>
-			</sect3>
 
-			<sect3>
-				<title>toString()</title>
+			<itemizedlist>
+				<listitem>
+				
+				<para>
+					<emphasis role="bold">hashCode()</emphasis>
+					Instead of returning the hashcode of the object, it
+					returns the hashcode of its proxy. Since there is
+					only one proxy per future object, there is a unique
+					equivalence between them.
+				</para>
+				</listitem>
+
+				<listitem>
 
 				<para>
+				<emphasis role="bold">equals()</emphasis>
+					The default implementation of
+					<literal>equals()</literal>
+					in the Object class is to compare the references of
+					two objects. In ProActive it is redefined to compare
+					the hashcode of two proxies. As a consequence it is
+					only possible to compare two future object, and not
+					a future object with a normal object.
+				</para>
+				</listitem>
+
+				<listitem>
+				<para>
+					<emphasis role="bold">toString()</emphasis>
 					The
 					<literal>toString()</literal>
 					method is most of the time called with
@@ -1458,7 +1450,9 @@
 					future object, you might consider displaying its
 					hashCode.
 				</para>
-			</sect3>
+				</listitem>
+				</itemizedlist>
+				
 		</sect2>
 
 		<sect2>
@@ -1475,18 +1469,24 @@
 					calls method
 					<literal>foo</literal>
 					on an active instance of class
-					<literal>B</literal>
-					. This call is asynchronous and returns a future
+					<literal>Worker</literal>.
+					This call is asynchronous and returns a future
 					object of class
-					<literal>V</literal>
-					. Then, possibly after having executed some other
+					<literal>Value</literal>.
+					Then, possibly after having executed some other
 					code, the same thread that issued the call calls
 					method
 					<literal>bar</literal>
 					on the future object returned by the call to
-					<literal>foo</literal>
-					.
+					<literal>foo</literal>.
+					
 				</para>
+				<para>
+					The code for the following example is: 
+				</para>
+				
+					<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/flowExampleCode.txt" /></textobject></programlisting>
 			</sect3>
 
 			<sect3>
@@ -1496,25 +1496,22 @@
 
 				<para>
 					In a sequential, single-threaded version of the same
-					application, the thread would have executed the code
-					of the calling method in class
-					<literal>A</literal>
-					up to the call of
-					<literal>foo</literal>
-					, then the code of
-					<literal>foo</literal>
+					application, the thread would have executed the code 
+
+					of the caller object <literal>A</literal>
+					up to the call of <literal>foo</literal>, then the code of
+					<literal>foo()</literal>
 					in class
-					<literal>B</literal>
-					, then back to the code of the calling method in
-					class
-					<literal>A</literal>
+					<literal>Worker</literal>,
+					 then the code of the calling method in
+					object	<literal>A</literal>
 					up to the call to
 					<literal>bar</literal>
 					, then the code of
 					<literal>bar</literal>
 					in class
 					<literal>V</literal>
-					, and finally back to the code of the calling method
+					, and finally the code of the calling method
 					in class
 					<literal>A</literal>
 					until its end. The sequence diagram below summarizes
@@ -1526,14 +1523,13 @@
 				<para>
 					<figure>
 						<title>
-							Sequence Diagram - single-threaded version
-							of the program
+							Single-threaded version	of the program
 						</title>
 
 						<mediaobject>
 							<imageobject>
 								<imagedata
-									fileref="images/sequentialCallUMLDiagram.png" format="PNG" />
+									fileref="images/sequentialCall.png" format="PNG" />
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1555,45 +1551,36 @@
 						<para>
 							Before calling
 							<literal>foo</literal>
-							, we have exactly the same setup as after
+							 we have exactly the same setup as after
 							the creation of the active instance of
-							<literal>B</literal>
-							and summarized in the figure below: an
+							<literal>worker</literal>: an
 							instance of class
 							<literal>A</literal>
 							and an active instance of class
-							<literal>B</literal>
-							. As all active objects, the instance of
-							class
-							<literal>B</literal>
-							is composed of a stub (an instance of class
-							<literal>Stub_B</literal>
-							, which actually inherits directly from
-							<literal>B</literal>
-							), a
-							<literal>BodyProxy</literal>
-							, a
-							<literal>Body</literal>
+							<literal>Worker</literal>
+							. As with all active objects, the instance of
+							the class
+							<literal>Worker</literal>
+							is composed a
+							<literal>Body</literal> with a request queue
 							and the actual instance of
-							<literal>B</literal>
-							.
+							<literal>Worker</literal>. 
 						</para>
 
-						<para>
-							<figure>
-								<title>
-									The components of an active object
-								</title>
+		<para>
+			<figure>
+				<title>The components of an active object and of a referencing object</title>
 
-								<mediaobject>
-									<imageobject>
-										<imagedata contentwidth="100"
-											fileref="images/activeObjectComponents.png" format="PNG"
-											width="6in" />
-									</imageobject>
-								</mediaobject>
-							</figure>
-						</para>
+				<mediaobject>
+					<imageobject>
+						<imagedata contentwidth="100"
+							fileref="images/workerActiveObject.png" format="PNG"
+							width="6in" />
+					</imageobject>
+				</mediaobject>
+			</figure>
+		</para>
+
 					</listitem>
 
 					<listitem>
@@ -1603,9 +1590,9 @@
 							has returned,
 							<literal>A</literal>
 							now holds a reference onto a future object
-							representing the not-yet-available result of
+							representing the not yet available result of
 							the call. It is actually composed of a
-							<literal>Stub_V</literal>
+							<literal>Stub_Value</literal>
 							and a
 							<literal>FutureProxy</literal>
 							as shown on the figure below.
@@ -1621,7 +1608,7 @@
 								<mediaobject>
 									<imageobject>
 										<imagedata contentwidth="100"
-											fileref="images/futureObjectComponents.png" format="PNG"
+											fileref="images/workerActiveObjectWithFuture.png" format="PNG"
 											width="6in" />
 									</imageobject>
 								</mediaobject>
@@ -1634,14 +1621,14 @@
 							Right after having executed
 							<literal>foo</literal>
 							on the instance of
-							<literal>B</literal>
+							<literal>Worker</literal>
 							, the thread of the
 							<literal>Body</literal>
 							sets the result in the future, which results
 							in the
 							<literal>FutureProxy</literal>
 							having a reference onto a
-							<literal>V</literal>
+							<literal>Value</literal>
 							(see figure below).
 						</para>
 
@@ -1654,7 +1641,7 @@
 								<mediaobject>
 									<imageobject>
 										<imagedata contentwidth="100"
-											fileref="images/futureObjectAllComponents.png" format="PNG"
+											fileref="images/workerActiveObjectWithUpdatedFuture.png" format="PNG"
 											width="6in" />
 									</imageobject>
 								</mediaobject>
@@ -1668,126 +1655,108 @@
 				<title>Sequence Diagram</title>
 
 				<para>
-					Let us now concentrate on how and when and by which
-					thread the different methods are called. We have two
-					threads: the thread that belongs to the subsystem
-					<literal>A</literal>
-					is part of (let's call it the
-					<emphasis>first thread</emphasis>
-					), and the thread that belongs to the subsystem
-					<literal>B</literal>
-					is part of (the
-					<emphasis>second thread</emphasis>
-					).
-				</para>
+					The sequence of calls is more complex for the active object
+					case.	We have now two
+					threads: the thread that belongs to object's <literal>A</literal>
+					subsystem,  and the thread that belongs to
+					 the <literal>Worker</literal>'s subsystem. 
+					We will call these the first and second threads. 
+			</para>
 
 				<para>
 					The first thread invokes
 					<literal>foo</literal>
 					on an instance of
-					<literal>Stub_B</literal>
+					<literal>Stub_Worker</literal>
 					, which builds a
 					<literal>MethodCall</literal>
 					object and passes it to the
 					<literal>BodyProxy</literal>
-					as a parameter of the call to
-					<literal>reify</literal>
+					as a parameter of the call to be
+					<literal>reified</literal>
 					. The proxy then checks the return type of the call
 					(in this case
-					<literal>V</literal>
+					<literal>Value</literal>
 					) and generates a future object of type
-					<literal>V</literal>
+					<literal>Value</literal>
 					for representing the result of the method
 					invocation. The future object is actually composed
 					of a
 					<literal>Stub_V</literal>
 					and a
-					<literal>FutureProxy</literal>
-					. A reference onto this future object is set in the
+					<literal>FutureProxy</literal>.
+					A reference onto this future object is set in the
 					<literal>MethodCall</literal>
-					object, which will prove useful once the call is
-					executed. Now that the
+					object. This reference will be used to set the value 
+					after the call has executed. When the
 					<literal>MethodCall</literal>
-					object is ready, it is passed as a Request to the
+					object is ready, it is passed as a parameter for a Request to the
 					<literal>Body</literal>
-					of the Active Object as a parameter. The body simply
+					of the <literal>Worker</literal> active object. The 
+					<literal>Body</literal> simply
 					appends this request to the queue of pending
 					requests and returns immediately. The call to
-					<literal>foo</literal>
-					that an
-					<literal>A</literal>
-					issued now returns a future object of type
-					<literal>Stub_V</literal>
-					, that is a subclass of
-					<literal>V</literal>
-					.
+					<literal>foo</literal> issued by <literal>A</literal>
+					returns a future object of type	<literal>Stub_Value</literal>,
+					that is a subclass of
+					<literal>Value</literal>.
 				</para>
 
 				<para>
 					At some point, possibly after having served some
 					other requests, the
-					<emphasis>second thread</emphasis>
-					(the active thread) picks up the request issued by
-					the
-					<emphasis>first thread</emphasis>
-					some time ago. It then executes the embedded call by
+					second thread
+					(the active object's thread) picks up the previous request issued by
+					the	first thread. It then executes the embedded call by
 					calling
 					<literal>foo</literal>
 					on the instance of
-					<literal>B</literal>
+					<literal>Worker</literal>
 					with the actual parameters stored in the
 					<literal>MethodCall</literal>
 					object. As specified in its signature, this call
 					returns an object of type
-					<literal>V</literal>
-					. The
-					<emphasis>second thread</emphasis>
-					is then responsible for setting this object in the
+					<literal>Value</literal>. The second thread
+					is responsible for setting this object in the
 					future object (which is the reason why
 					<literal>MethodCall</literal>
 					objects hold a reference on the future object
-					created by the
-					<literal>FutureProxy</literal>
-					). The execution of the call is now over, and the
-					<emphasis>second thread</emphasis>
-					can select another request to serve in the queue and
-					execute it.
+					created by the <literal>FutureProxy</literal>).
+					The execution of the call is now over, and the
+					second thread can select and serve another request from
+					the queue.
 				</para>
 
 				<para>
 					In the meantime, the
-					<emphasis>first thread</emphasis>
+					first thread
 					has continued executing the code of the calling
 					method in class
-					<literal>A</literal>
-					. At some point, it calls
+					<literal>A</literal>.
+					At some point, it calls
 					<literal>bar</literal>
 					on the object of type
-					<literal>Stub_V</literal>
+					<literal>Stub_Value</literal>
 					that was returned by the call to
-					<literal>foo</literal>
-					. This call is reified thanks to the
-					<literal>Stub_V</literal>
-					and processed by the
-					<literal>FutureProxy</literal>
-					. If the object the future represents is available
-					(the
-					<emphasis>second thread</emphasis>
-					has already set it in the future object, which is
-					described in figure below, the call is executed on
-					it and returns a value to the calling code in
-					<literal>A</literal>
-					.
+					<literal>foo</literal>. This call is reified thanks to the
+					<literal> Stub_Value </literal>and processed by the
+					<literal> FutureProxy</literal>. If the object the
+					 future represents is available
+					(the second thread	has already set it in the future object),
+					the call is executed and returns a value to the calling code in
+					<literal>A</literal>. The sequence diagram below presents the
+					process graphically. 
+				
 				</para>
 
 				<para>
 					<figure>
-						<title>Sequence Diagram</title>
+						<title>Call flow when a future is set before being used</title>
 
 						<mediaobject>
 							<imageobject>
 								<imagedata contentwidth="100"
-									fileref="images/usingFutureAfterGettingResultDiagram.png"
+									fileref="images/threadedCallWithFuture.png"
 									format="PNG" width="6in" />
 							</imageobject>
 						</mediaobject>
@@ -1795,21 +1764,21 @@
 				</para>
 
 				<para>
-					If it is not yet available, the first thread is
-					suspended in
-					<literal>FutureProxy</literal>
+					If the value in the future it is not yet available, the first thread is
+					suspended in <literal>FutureProxy</literal>
 					until the second thread sets the result in the
-					future object (see figure below).
+					future object (see figure below). This is called 
+					<literal> wait-by-necessity</literal>.
 				</para>
 
 				<para>
 					<figure>
-						<title>Sequence Diagram</title>
+						<title>Call flow when the future is not set before being used (wait-by-necessity)</title>
 
 						<mediaobject>
 							<imageobject>
 								<imagedata contentwidth="100"
-									fileref="images/usingFutureBeforeGettingResultDiagram.png"
+									fileref="images/threadedCallWithWaitForFuture.png"
 									format="PNG" width="6in" />
 							</imageobject>
 						</mediaobject>
@@ -1819,11 +1788,11 @@
 		</sect2>
 
 		<sect2 id="FutureObjectCreation_commonerror">
-			<title>Important Notes: Errors to avoid</title>
+			<title>Good ProActive programming practices</title>
 
 			<para>
-				There are few things to remember with asynchronous
-				method calls and futures, in order to avoid annoying
+				There are few things to remember with active objects, futures, and
+				asynchronous method calls, in order to avoid annoying
 				debugging sessions:
 			</para>
 
@@ -1831,15 +1800,15 @@
 				<listitem>
 					<para>
 						<emphasis role="bold">
-							Constructor with no-args:
+							 A constructor with no-args
 						</emphasis>
-						this constructor will be used either for the
+						needs to be used either for the
 						Active Objects creation(if not present, an
 						exception might be thrown) or Future creation
 						for a method call (if not present, the method
-						call is synchronous). Avoid to put
-						initialization stuff in this constructor, as it
-						might lead to unexpected behavior. Indeed this
+						call is synchronous). Avoid placing
+						initialization code in this constructor, as it
+						may lead to unexpected behavior because this
 						constructor is called for the stub creation.
 					</para>
 				</listitem>
@@ -1849,7 +1818,7 @@
 						Make your classes implement
 						<emphasis role="bold">Serializable</emphasis>
 						interface since ProActive deals with objects
-						that cross the network
+						that will be sent across networks.
 					</para>
 				</listitem>
 
@@ -1861,143 +1830,108 @@
 					</indexterm>
 
 					<para>
-						Think to use
+						Use
 						<emphasis role="bold">wrappers</emphasis>
 						instead of primitive types or final classes for
-						methods result type otherwise you will loose the
+						methods result types. Otherwise you will loose the
 						asynchronism capabilities. For instance if one
 						of your object has a method
 					</para>
 
 					<programlisting lang="java">
-						<emphasis role="bold">int</emphasis>
-						giveSolution(parameter)
-					</programlisting>
+<emphasis role="bold">int</emphasis> giveSolution(parameter)</programlisting>
 
 					<para>
 						calling this method with ProActive is
-						sychronous. So to keep the asynchronism it is
-						advised to use
+						synchronous. To have asynchronous calls use
 					</para>
 
-					<programlisting lang="java">
-						<emphasis role="bold">IntWrapper</emphasis>
-						giveSolution(parameter)
-					</programlisting>
+					<programlisting lang="java"><emphasis role="bold">IntWrapper</emphasis> giveSolution(parameter)</programlisting>
 
-					<para>
-						In that case call to this method is
-						asynchronous.
-					</para>
-
-					<para>
+				<para>
 						All wrappers are in the package:
-						<emphasis role="bold">
+						<literal>
 							org.objectweb.proactive.core.util.wrapper
-						</emphasis>
+						</literal>
 					</para>
 
 					<para>
-						ProActive provides more used primitive type
-						wrappers, there are 2 versions of each, one
-						<emphasis role="bold">mutable</emphasis>
-						, and the other which is
-						<emphasis role="bold">immutable</emphasis>
-						.
+						ProActive provides several primitive type
+						wrappers, with 2 versions of each, one
+						<emphasis role="bold">mutable</emphasis>,
+						and another	<emphasis role="bold">immutable</emphasis>.
 					</para>
 
 					<para>
-						Only the methods return type are concerned not
-						the parameters.
+						To make the call asynchronous only the methods return types
+						have to use wrappers. The parameters can use the regular
+						Java types.
 					</para>
 				</listitem>
 
 				<listitem>
 					<para>
-						<emphasis role="bold">Avoid</emphasis>
-						to return null in Active Object methods: on the
-						<emphasis role="bold">caller</emphasis>
-						side the test
-						<emphasis role="bold">
-							if(result_from_method == null)
-						</emphasis>
-						has no sense. Indeed result_from_method is a
-						couple Stub-FutureProxy as explained above, so
-						even if the method returns null,
-						result_from_method cannot be null:
+						Avoid
+						to return <literal>null</literal> in Active Object methods:
+						on the caller side the test
+						
+						<programlisting lang="java">if(result_from_method == null)</programlisting>
+						
+						has no sense. <literal>Result_from_method</literal> is a
+						couple Stub - FutureProxy as explained above, so
+						even if the method returns <literal>null</literal>,
+						result_from_method cannot be <literal>null</literal>:
 					</para>
 
-					<programlisting lang="java">
-						public class MyObject{ public MyObject(){
-						//empty constructor with no-args }
-
-						public Object getObject{ if(.....) { return new
-						Object(); } else { return null; --&gt; to avoid
-						in ProActive } }
-
-						}
-					</programlisting>
+			<programlisting lang="java"><textobject><textdata 
+						fileref="code_snippets/avoidNull.txt"/></textobject></programlisting>
 
 					<para>On the caller side:</para>
+			<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/callerSideAvoidNull.txt" /></textobject></programlisting>
 
-					<programlisting lang="java">
-						MyObject o = new MyObject(); Object
-						result_from_method = o.getObject();
-						if(result_from_method == null){ ...... }
-					</programlisting>
 
 					<para>
-						This test is never true, indeed,
+						This test is never true because 
 						result_from_method is
-						<emphasis role="bold">
+						<literal>
 							Stub--&gt;Proxy--&gt;null
-						</emphasis>
+						</literal>
 						if the future is not yet available or the method
-						returns null or
-						<emphasis role="bold">
+						returns <literal>null</literal> or
+						<literal>
 							Stub--&gt;Proxy--&gt;Object
-						</emphasis>
+						</literal>
 						if the future is available, but
-						result_from_method is
-						<emphasis role="bold">never null</emphasis>
-						.
+						<literal>result_from_method</literal> is never <literal>null</literal>.
 					</para>
 				</listitem>
 			</itemizedlist>
 		</sect2>
 		<sect2>
-			<title>Lightweight Failure detection</title>
+			<title>Lightweight failure detection</title>
 
 			<para>
 				Waiting for the update of a future in a ProActive
-				application could freeze it if the node responsible for
-				updating the future experiences a failure. To this end,
-				ProActive has a comprehensive solution with the generic
-				fault tolerance mechanism, but it can be too expensive
-				to checkpoint active objects, when only fault detection
-				of stateless active objects is needed for example.
+				application could freeze the application  if the node
+				responsible for
+				updating the future experiences a failure. To prevent this,
+				ProActive has a comprehensive generic
+				fault tolerance mechanism. However, it can be too expensive
+				to checkpoint all the active objects, when fault detection 
+				is only needed for certain objects.
+				//TODO AMBIGOUS ASK
 			</para>
 
 			<para>
 				By default, ProActive continuously pings active objects
 				expected to update awaited futures. When such a ping fails,
 				the associated awaited future is updated with a runtime
-				exception. This means that accessing the future will throw
+				exception. Accessing the future will throw
 				an exception.
 			</para>
 
-			<programlisting lang="java">
-				public static void function() {
-					F future = ao.asyncCall();
-					String str;
-
-					try {
-						str = future.toString();
-					} catch (FutureMonitoringPingFailureException fmpfe) {
-						// The active object 'ao' had a failure
-					}
-				}
-			</programlisting>
+			<programlisting lang="java"><textobject><textdata fileref="code_snippets/futureException.txt"></textdata></textobject></programlisting>
 
 			<para>
 				The ping is started when the future is being awaited, but
@@ -2013,40 +1947,7 @@
 			</para>
 		</sect2>
 	</sect1>
-	<sect1 id="ActiveObjectCreation_html_events">
-		<title>Event based programming</title>
-
-		<para>//TODO add immediateService maybe ?</para>
-		<para>
-			ProActive supports an event based programming model. That
-			is, an active object can schedule one of its method to be
-			called when a future is updated. This method will be
-			enqueued into the active object adding the callback. Here is
-			an excerpt from a class using the mechanism:
-		</para>
-
-		<programlisting lang="java">
-			public class MyActiveObject { public void
-			myCallback(Future&lt;StringWrapper&gt; future) { try {
-			String s = future.get().stringValue();
-			System.out.println("Got this value: " + s); } catch
-			(InterruptedException e) { /* This cannot happen */ return;
-			} catch (ExecutionException e) { System.out.println("Got an
-			exception instead of the future: " + e.getCause()); return;
-			} }
-
-			public void someRunningMethod(SomeActiveObjectClass ao) {
-			StringWrapper result = ao.foo();
-			ProFuture.addActionOnFuture(result, "myCallback"); } }
-		</programlisting>
-
-		<para>
-			As seen in the example, the callback method takes the Future
-			as parameter, it is the java.util.concurrent.Future one. It
-			is also possible to set the callback method to an immediate
-			service method.
-		</para>
-	</sect1>
+	
 	<sect1 id="AC">
 		<title>Automatic Continuation in ProActive</title>
 
@@ -2054,144 +1955,97 @@
 			<primary>Automatic Continuation</primary>
 		</indexterm>
 
-		<sect2>
-			<title>Objectives</title>
-
+	
 			<para>
-				An Automatic Continuation is due to the propagation of a
+				Automatic continuation is the propagation of a
 				future outside the activity that has sent the
 				corresponding request.
 			</para>
 
 			<para>
-				Automatic Continuations allow to pass in parameter or
-				return as a result future objects(or objects containing
-				a future) without blocking to wait the result object of
-				the future. When the result is available on the object
+				Automatic continuations allows for using 
+				still not updated future in the normal program flow without 
+				blocking to wait for updating the result in the future.  
+								
+				When the result is available on the object
 				that originated the creation of the future, this object
-				must update the result in all objects to which it passed
+				updates the result in all the objects to which it passed
 				the future.
 			</para>
-		</sect2>
-
+	
 		<sect2>
-			<title>Principles</title>
+			<title>Sending Futures</title>
 
-			<itemizedlist>
-				<listitem>
 					<para>
-						<emphasis role="bold">Message sending</emphasis>
-					</para>
-				</listitem>
-
-				<listitem>
-					<para>
-						Automatic Continuations can occur when sending a
+						An automatic continuation can occur when sending a
 						request (parameter of the request is a future or
 						contains a future) or when sending a reply (the
 						result is a future or contains a future).
-					</para>
-
-					<para>
 						Outgoing futures are registered in the
-						<emphasis role="bold">FuturePool</emphasis>
-						of the Active Object sending this future(request
-						or reply). Registration for
-						couple(Future,BodyDestination) as an Automatic
-						Continuation occurs when the future is
-						serialized(indeed every request or reply are
+						<literal>FuturePool</literal>
+						of the Active Object sending the future.
+						Registration for the couple Future - destination Body 
+						as an automatic	continuation occurs when the future is
+						serialized. Every request or reply are
 						serialized before being sent, and the future is
-						part of the request or the reply). More
-						precisely, a thread
-						<emphasis role="bold">T</emphasis>
-						sending the message(request or
-						reply)---therefore the thread doing the
-						serialization---, keeps in a static table (
-						<emphasis role="bold">
-							FuturePool.bodyDestination
-						</emphasis>
-						) a reference of the destination body. Hence
+						part of the request or the reply. 
+						
+						
+						A thread
+						<literal>Thread</literal>
+						sending the message keeps in a static table (<literal>FuturePool.bodyDestination</literal>)
+						 a reference to the destination body. Hence
 						when a future
-						<emphasis role="bold">F</emphasis>
-						is serialized by the same thread
-						<emphasis role="bold">T</emphasis>
-						(since futures are part of request or reply, it
-						is the same thread serializing the request --or
-						reply-- and the future), it looks up in the
-						static table, if there is a destination
-						<emphasis role="bold">D</emphasis>
+						<literal>Future</literal>
+						is serialized by the same thread, looks up in the
+						static table the destination
+						<literal>Destination</literal>
 						registered for the thread
-						<emphasis role="bold">T</emphasis>
-						. If true, the future notifies its
-						<emphasis role="bold">FuturePool</emphasis>
-						(that it is going to leave), which in turn
-						registers couple (F,D) as an Automatic
-						Continuation
+						<literal>Thread</literal>>.
+						 If it finds a destination for the future, the future notifies the
+						<literal>FuturePool</literal>
+						that it is going to leave, which in turn
+						registers the couple Future - Destination Body as an automatic
+						continuation
 					</para>
 
 					<para>
-						When value
-						<emphasis role="bold">V</emphasis>
-						is available for the future
-						<emphasis role="bold">F</emphasis>
-						,
-						<emphasis role="bold">V</emphasis>
+						When the value	is available for the future, it is 
 						is propagated to all objects that received the
-						fututre
-						<emphasis role="bold">F</emphasis>
-						. This Update is realized by a particular thread
-						located in the
-						<emphasis role="bold">FuturePool</emphasis>
-						.
+						future <literal>Future</literal>.
+						This type of update is realized by a thread
+						located in the	<literal>FuturePool</literal>.
 					</para>
-				</listitem>
-
-				<listitem>
-					<para>
-						<emphasis role="bold">
-							Message reception
-						</emphasis>
-					</para>
-				</listitem>
-
-				<listitem>
-					<para>
-						When a message is received(request or reply) by
-						an Active Object, this message can contain a
-						future. So the Active Object registers this
+			</sect2>		
+			<sect2>
+					<title>Receiving Futures</title>
+			
+							<para>
+						When a message containing a future is received by
+						an active object  the active object registers the
 						future in the
 						<emphasis role="bold">FuturePool</emphasis>
 						to be able to update it when the value will be
 						available. This registration takes place in two
 						steps:
 					</para>
-
-					<itemizedlist>
-						<listitem>
 							<para>
 								When the future is deserialized, it
-								registers in a static table (
-								<emphasis role="bold">
+								registers in a static table 
+								<literal>
 									FuturePool.incomingFutures
-								</emphasis>
+								</literal>>
 							</para>
-						</listitem>
-
-						<listitem>
 							<para>
-								In Receive[Request-Reply] method, it is
+								In Receive [Request-Reply] method, it is
 								checked if one or many futures are
-								registerd in that table, then, if true
-								these futures are registerd in the
+								registered in that table, then, if true
+								these futures are registered in the
 								<emphasis role="bold">
 									FuturePool
 								</emphasis>
-								in a standart way.
+								in a standard way. //TODO WHAT THE HELL ?
 							</para>
-						</listitem>
-					</itemizedlist>
-				</listitem>
-			</itemizedlist>
 		</sect2>
 
 		<sect2>
@@ -2203,34 +2057,16 @@
 			</para>
 
 			<para>
-				<programlisting lang="java">
-					class C { .... public static void main(String[]
-					args){ ...... A a = newActive(A); A b =
-					newActive(B); Result r1 = a.foo(); //r1 is a future
-					Result r2 = b.bar(r1); //r1 is passed as parameter
-					Result r3 = b.bar2(); // see
-					<emphasis role="bold">**</emphasis>
-					........ } //end of main ... } //end of class C
-				</programlisting>
+				<programlisting lang="java"><textobject><textdata fileref="code_snippets/futurePassing.txt"></textdata></textobject></programlisting>
 			</para>
 
 			<para>where</para>
 
-			<programlisting lang="java">
-				class A { ... public Result foo(){ ... } ... } //end of
-				class A
-			</programlisting>
+			<programlisting lang="java"><textobject><textdata fileref="code_snippets/futurePasserClassA.txt"></textdata></textobject></programlisting>
 
 			<para>and</para>
 
-			<programlisting lang="java">
-				class B { ... public Result bar (Result r) { ... }
-
-				public Result bar2 () { A a = newActive(A); return
-				a.foo(); //
-				<emphasis role="bold">**</emphasis>
-				future is sent as a result } } //end of class B
-			</programlisting>
+			<programlisting lang="java"><textobject><textdata fileref="code_snippets/futurePasserClassB.txt"></textdata></textobject></programlisting>
 		</sect2>
 
 		<sect2>
@@ -2241,15 +2077,15 @@
 			</indexterm>
 
 			<para>
-				We will illustrate here how a future is first created,
-				then passed as parameter to a method later on.
+				We will illustrate how a future is first created, and
+				then passed as parameter to a method.
 			</para>
 
 			<para>
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/e1.png"
+							<imagedata fileref="images/automaticContinuation1.png"
 								format="PNG" />
 						</imageobject>
 					</mediaobject>
@@ -2267,7 +2103,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/e2.png"
+							<imagedata fileref="images/automaticContinuation2.png"
 								format="PNG" />
 						</imageobject>
 					</mediaobject>
@@ -2284,7 +2120,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/e3.png"
+							<imagedata fileref="images/automaticContinuation3.png"
 								format="PNG" />
 						</imageobject>
 					</mediaobject>
@@ -2303,7 +2139,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/e4.png"
+							<imagedata fileref="images/automaticContinuation4.png"
 								format="PNG" />
 						</imageobject>
 					</mediaobject>
@@ -2325,7 +2161,7 @@
 				<informalfigure>
 					<mediaobject>
 						<imageobject>
-							<imagedata fileref="images/e5.png"
+							<imagedata fileref="images/automaticContinuation5.png"
 								format="PNG" />
 						</imageobject>
 					</mediaobject>
@@ -2344,7 +2180,7 @@
 					<mediaobject>
 						<imageobject>
 							<imagedata contentwidth="100"
-								fileref="images/e6.png" format="PNG" width="6in" />
+								fileref="images/automaticContinuation6.png" format="PNG" width="6in" />
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2361,7 +2197,7 @@
 					<mediaobject>
 						<imageobject>
 							<imagedata contentwidth="100"
-								fileref="images/e7.png" format="PNG" width="6in" />
+								fileref="images/automaticContinuation7.png" format="PNG" width="6in" />
 						</imageobject>
 					</mediaobject>
 				</informalfigure>
@@ -2374,6 +2210,21 @@
 				<emphasis role="bold">Future_r2</emphasis>
 				for C
 			</para>
+			
+			
+			
+			<para>
+				<informalfigure>
+					<mediaobject>
+						<imageobject>
+							<imagedata contentwidth="100"
+								fileref="images/automaticContinuation8.png" format="PNG" width="6in" />
+						</imageobject>
+					</mediaobject>
+				</informalfigure>
+			</para>
+			
+			
 		</sect2>
 	</sect1>
 
@@ -2824,5 +2675,38 @@
 				</note>
 			</sect3>
 		</sect2>
+	</sect1><sect1 id="ActiveObjectCreation_html_events">
+		<title>Event based programming</title>
+
+		<para>//TODO add immediateService maybe ?</para>
+		<para>
+			ProActive supports an event based programming model. That
+			is, an active object can schedule one of its method to be
+			called when a future is updated. This method will be
+			enqueued into the active object adding the callback. Here is
+			an excerpt from a class using the mechanism:
+		</para>
+
+		<programlisting lang="java">
+			public class MyActiveObject { public void
+			myCallback(Future&lt;StringWrapper&gt; future) { try {
+			String s = future.get().stringValue();
+			System.out.println("Got this value: " + s); } catch
+			(InterruptedException e) { /* This cannot happen */ return;
+			} catch (ExecutionException e) { System.out.println("Got an
+			exception instead of the future: " + e.getCause()); return;
+			} }
+
+			public void someRunningMethod(SomeActiveObjectClass ao) {
+			StringWrapper result = ao.foo();
+			ProFuture.addActionOnFuture(result, "myCallback"); } }
+		</programlisting>
+
+		<para>
+			As seen in the example, the callback method takes the Future
+			as parameter, it is the java.util.concurrent.Future one. It
+			is also possible to set the callback method to an immediate
+			service method.
+		</para>
 	</sect1>
 </chapter>
