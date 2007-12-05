@@ -487,8 +487,12 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
             if (logger.isDebugEnabled()) {
                 logger.debug("Result of task " + taskId + " received.");
             }
-
             launchedTasks.remove(taskId);
+            // We remove the task from the worker activity
+            if (workersActivity.containsKey(originatorName)) {
+                List<Long> wact = workersActivity.get(originatorName);
+                wact.remove(taskId);
+            }
             // We add the result in the result queue
             resultQueue.addCompletedTask(result);
             // We remove the task from the repository (it won't be needed anymore)
