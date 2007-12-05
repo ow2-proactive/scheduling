@@ -45,4 +45,20 @@ public class ProLifeCycle {
     public static void userThreadTerminated() {
         HalfBodies.end();
     }
+
+    /**
+     * Call this method at the end of the application if it completed
+     * successfully, for the launcher to be aware of it.
+     */
+    public static void exitSuccess() {
+        System.exit(0);
+    }
+
+    /**
+     * Call this method at the end of the application if it did not complete
+     * successfully, for the launcher to be aware of it.
+     */
+    public static void exitFailure() {
+        System.exit(1);
+    }
 }
