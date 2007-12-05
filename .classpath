@@ -5,7 +5,7 @@
 	<classpathentry kind="src" output="classes/Extensions" path="src/Extensions"/>
 	<classpathentry kind="src" output="classes/Extra" path="src/Extra"/>
 	<classpathentry kind="src" output="classes/Tests" path="src/Tests"/>
-	<classpathentry kind="src" output="classes/Utils" path="src/Utils"/>
+	<classpathentry excluding="doc/PublishedAPIDoclet.java" kind="src" output="classes/Utils" path="src/Utils"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib/activation.jar"/>
 	<classpathentry kind="lib" path="lib/ajo.jar"/>
