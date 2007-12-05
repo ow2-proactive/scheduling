@@ -32,8 +32,6 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 
 import java.io.File;
 
-import junit.framework.TestCase;
-
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.api.ProLifeCycle;
@@ -46,6 +44,8 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
+
+import junit.framework.TestCase;
 
 
 public class Test1 extends TestCase {
