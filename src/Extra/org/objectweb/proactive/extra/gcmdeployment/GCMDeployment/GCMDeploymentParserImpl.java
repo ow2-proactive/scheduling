@@ -185,11 +185,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " +
                 e.getMessage());
             throw new SAXException(msg, e);
-        } catch (XPathExpressionException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-        } /*catch (TransformerException e) {
+        } /* catch (XPathExpressionException e) {
           GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-          ;
+        } catch (TransformerException e) {
+        GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
+        ;
         } */}
 
     protected void registerDefaultGroupParsers() {
