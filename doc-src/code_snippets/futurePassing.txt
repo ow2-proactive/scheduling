@@ -1,0 +1,12 @@
+Class FuturePasser {
+ .... 
+	public static void main(String[] args){
+		...... 
+		A a = newActive(A); 
+		A b = newActive(B); 
+		Result r1 = a.foo(); //r1 is a future
+		Result r2 = b.bar(r1); //r1 is passed as parameter
+		Result r3 = b.bar2(); // see
+		........
+	}	//end of main
+} //end of class FuturePasser

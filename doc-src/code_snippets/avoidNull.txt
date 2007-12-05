@@ -1,0 +1,11 @@
+public class MyObject {
+	public MyObject() {} 	//empty constructor with no-args
+	public Object getObject{ 
+		if(.....) {
+	 		return new Object(); 
+		}
+		else {
+			return null; //to avoid in ProActive 
+		}
+	}
+}
