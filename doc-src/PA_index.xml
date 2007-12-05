@@ -69,7 +69,7 @@
 <!ENTITY glossary SYSTEM "glossary.xml">
 <!ENTITY reference SYSTEM "definitions.xml">
 <!ENTITY Scheduler_EclipsePlugin SYSTEM "scheduler/Scheduler_EclipsePlugin.xml">
-
+<!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
 
 ]>
 <book>
@@ -153,6 +153,7 @@
     &IC2D_EclipsePlugin;
     &scilab;
     &TimIt;
+    &ProActive_Scheduler;
     &Scheduler_EclipsePlugin;
    </part>
  

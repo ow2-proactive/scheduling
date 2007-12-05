@@ -78,24 +78,24 @@ public class AdminScheduler extends UserScheduler
      *
      * @param loginFile the path where are stored the allowed login//password.
      * @param groupFile the path where to check the membership of a user.
-     * @param imp the resource manager to plug on the scheduler.
+     * @param rm the resource manager to plug on the scheduler.
      * @param policyFullClassName the full policy class name for the scheduler.
      */
     public static void createScheduler(String loginFile, String groupFile,
-        InfrastructureManagerProxy imp, String policyFullClassName)
+        InfrastructureManagerProxy rm, String policyFullClassName)
         throws AdminSchedulerException {
         logger.info(
             "********************* STARTING NEW SCHEDULER *******************");
 
         //check arguments...
-        if (imp == null) {
+        if (rm == null) {
             throw new AdminSchedulerException(
                 "The Entity manager must be set !");
         }
 
         //check that the scheduler is an active object
         try {
-            ProActiveObject.getActiveObjectNodeUrl(imp);
+            ProActiveObject.getActiveObjectNodeUrl(rm);
         } catch (ProActiveRuntimeException e) {
             logger.warn(
                 "The infrastructure manager is not an active object, this will decrease the scheduler performance.");
@@ -116,7 +116,7 @@ public class AdminScheduler extends UserScheduler
             // if this fails then it will not continue.
             logger.info("Creating scheduler frontend...");
             schedulerFrontend = (SchedulerFrontend) ProActiveObject.newActive(SchedulerFrontend.class.getName(),
-                    new Object[] { imp, policyFullClassName });
+                    new Object[] { rm, policyFullClassName });
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger.info("Creating scheduler authentication interface...");
@@ -159,7 +159,7 @@ public class AdminScheduler extends UserScheduler
      * @param groupFile the path where to check the membership of a user.
      * @param login the admin login.
      * @param password the admin password.
-     * @param imp the resource manager to plug on the scheduler.
+     * @param rm the resource manager to plug on the scheduler.
      * @param policyFullClassName the full policy class name for the scheduler.
      * @return an admin scheduler interface to manage the scheduler.
      * @throws SchedulerException if the scheduler cannot be created.
@@ -168,9 +168,9 @@ public class AdminScheduler extends UserScheduler
      */
     public static AdminSchedulerInterface createScheduler(String loginFile,
         String groupFile, String login, String password,
-        InfrastructureManagerProxy imp, String policyFullClassName)
+        InfrastructureManagerProxy rm, String policyFullClassName)
         throws AdminSchedulerException, SchedulerException, LoginException {
-        createScheduler(loginFile, groupFile, imp, policyFullClassName);
+        createScheduler(loginFile, groupFile, rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
 

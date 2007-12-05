@@ -3,8 +3,6 @@
 echo
 echo --- Scheduler----------------------------------------------
 
-
-  SCHEDULER_URL=$2
 	RM=$1
 
 workingDir=..
@@ -18,7 +16,7 @@ echo $JAVACMD
 
 yjp=-agentlib:yjpagent
 
-$JAVACMD -Xmx512m -Xms512m org.objectweb.proactive.extra.scheduler.examples.LocalSchedulerExample $RM $SCHEDULER_URL
+$JAVACMD -Xmx512m -Xms512m org.objectweb.proactive.extra.scheduler.examples.LocalSchedulerExample $RM
 
 echo
 

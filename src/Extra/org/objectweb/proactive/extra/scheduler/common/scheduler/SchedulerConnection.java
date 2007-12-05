@@ -79,9 +79,17 @@ public class SchedulerConnection implements Serializable {
 
         if (schedulerURL == null) {
             logger.info(
-                "Scheduler URL was null, looking for scheduler on localhost with the default scheduler name...");
-            schedulerURL = "//localhost/" + SCHEDULER_DEFAULT_NAME;
+                "Scheduler URL was null, looking for scheduler on localhost with the default port and scheduler name...");
+            schedulerURL = "//localhost/";
+        } else {
+            if (!schedulerURL.endsWith("/")) {
+                schedulerURL += "/";
+            }
         }
+
+        schedulerURL += SCHEDULER_DEFAULT_NAME;
+        logger.info("Trying to join ProActive Scheduler at '" + schedulerURL +
+            "'");
 
         try {
             schedulerAuth = (SchedulerAuthenticationInterface) (ProActiveObject.lookupActive(SchedulerAuthenticationInterface.class.getName(),
