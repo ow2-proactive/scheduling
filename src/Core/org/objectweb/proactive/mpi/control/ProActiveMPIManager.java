@@ -110,7 +110,7 @@ public class ProActiveMPIManager implements Serializable {
 
                 RemoteFile filePushed = ProFileTransfer.push(localSource,
                         allNodes[0], remoteDest);
-                filePushed.waitForFinishedTransfer();
+                filePushed.waitFor();
 
                 ackToStart[i] = allNodes.length - 1;
                 ackToRecv[i] = allNodes.length - 1;

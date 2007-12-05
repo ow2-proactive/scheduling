@@ -431,8 +431,6 @@ interface <emphasis role="bold">Conquer</emphasis>&lt;Y,R&gt;  extends Muscle&lt
           role="bold">SKELETON_FRAMEWORK_VN</emphasis>" value="framework" /&gt;
   &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis
           role="bold">INTERPRETERS_VN</emphasis>" value="interpreters" /&gt;
-  &lt;<emphasis role="bold">descriptorVariable</emphasis> name="<emphasis
-          role="bold">FILE_RESULT_OUTDIR_PATH</emphasis>" value="/tmp/calcium-output" /&gt;
   &lt;<emphasis role="bold">programDefaultVariable</emphasis> name="<emphasis
           role="bold">MAX_CINTERPRETERS</emphasis>" value="3"/&gt;
 &lt;/variables&gt;</screen>
@@ -453,13 +451,6 @@ interface <emphasis role="bold">Conquer</emphasis>&lt;Y,R&gt;  extends Muscle&lt
           virtual-node pointing to the nodes that will be used for
           computation. It is important that this nodes can communicate with
           the nodes identified in SKELETON_FRAMEWORK_VN.</para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">FILE_RESULT_OUTDIR_PATH</emphasis>
-          Represents a directory on the local machine where output file
-          results can be stored. The directory must have read and write
-          permissions for the local side of the application.</para>
         </listitem>
 
         <listitem>

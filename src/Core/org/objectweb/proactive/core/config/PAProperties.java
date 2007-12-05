@@ -43,7 +43,7 @@ import trywithcatch.Catch;
  * A Java Properties factory for ProActive
  *
  * All Java properties supported by ProActive must be declared and documented in
- * this enumeration. Provided methods provided must be used in place
+ * this enumeration. Provided methods must be used in place
  * of System.(get|set)property() or the ProActiveConfiguration class.
  *
  * TODO Add integer properties
@@ -317,6 +317,34 @@ public enum PAProperties {
      * before changing it.
      */
     PA_DGC_TTB("proactive.dgc.ttb", PAPropertiesType.INTEGER),
+
+    // -------------- FileTransfer
+
+    /**
+     * The maximum number of {@link FileTransferService} objects that can be spawned
+     * on a Node to handle file transfer requests in parallel.
+     */
+    PA_FILETRANSFER_MAX_SERVICES("proactive.filetransfer.services_number",
+        PAPropertiesType.INTEGER),
+
+    /**
+     * When sending a file, the maximum number of file blocks (parts) that can
+     * be sent asynchronously before blocking for their arrival.
+     */
+    PA_FILETRANSFER_MAX_SIMULTANEOUS_BLOCKS("proactive.filetransfer.blocks_number",
+        PAPropertiesType.INTEGER),
+
+    /**
+     * The size, in [KB], of file blocks (parts) used to send files.
+     */
+    PA_FILETRANSFER_MAX_BLOCK_SIZE("proactive.filetransfer.blocks_size_kb",
+        PAPropertiesType.INTEGER),
+
+    /**
+     * The size, in [KB], of the buffers to use when reading and writing a file.
+     */
+    PA_FILETRANSFER_MAX_BUFFER_SIZE("proactive.filetransfer.buffer_size_kb",
+        PAPropertiesType.INTEGER),
 
     // -------------- Misc
 

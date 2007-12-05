@@ -85,14 +85,20 @@ static List&lt;<emphasis role="bold">RemoteFile</emphasis>&gt; <emphasis
 static List&lt;<emphasis role="bold">RemoteFile</emphasis>&gt; <emphasis
           role="bold">transfer</emphasis>(<emphasis role="bold">Node</emphasis> srcNode, <emphasis
           role="bold">File[]</emphasis> srcFile, <emphasis role="bold">Node</emphasis> dstNode, <emphasis
-          role="bold">File[]</emphasis> dstFile, int bsize, int numFlyingBlocks) throws IOException;</programlisting>
+          role="bold">File[]</emphasis> dstFile, int bsize, int numFlyingBlocks) throws IOException;
+
+static <emphasis role="bold">      RemoteFile mkdirs</emphasis>(<emphasis
+          role="bold">Node</emphasis> node, <emphasis role="bold">File</emphasis> file);</programlisting>
 
       <para>These methods are static, and handle the transfer of file between
-      ProActive <emphasis role="bold">Node</emphasis>s. The pull methods
-      retrieve a file/directory located on a remote machine to the local
-      machine. The push methods transfer a file/directory available on the
-      local node to the specified remote node. And the transfer methods allow
-      transfer between third party nodes.</para>
+      ProActive <emphasis role="bold">Node</emphasis>s. The <emphasis
+      role="bold">pull</emphasis> methods retrieve a file/directory located on
+      a remote machine to the local machine. The <emphasis
+      role="bold">push</emphasis> methods transfer a file/directory available
+      on the local node to the specified remote node. The <emphasis
+      role="bold">transfer</emphasis> methods allow transfer between third
+      party nodes. The mkdirs method creates a directory on the remote
+      machine.</para>
 
       <para>The file transfers are performed in an asynchronous fashion. Each
       of these methods returns at <emphasis role="bold">RemoteFile</emphasis>
@@ -105,9 +111,9 @@ static List&lt;<emphasis role="bold">RemoteFile</emphasis>&gt; <emphasis
 
       <screen>public interface <emphasis role="bold">RemoteFile</emphasis> extends Serializable {
 
-  public boolean <emphasis role="bold">isTransferFinished</emphasis>();
+  public boolean <emphasis role="bold">isFinished</emphasis>();
 
-  public void <emphasis role="bold">waitForFinishedTransfer</emphasis>() throws IOException;
+  public void <emphasis role="bold">waitFor</emphasis>() throws IOException;
 
   public RemoteFile <emphasis role="bold">pull</emphasis>(File localDst) throws IOException;
 
@@ -117,14 +123,21 @@ static List&lt;<emphasis role="bold">RemoteFile</emphasis>&gt; <emphasis
 
   public File <emphasis role="bold">getRemoteFilePath</emphasis>();
 
+  public boolean <emphasis role="bold">delete</emphasis>() throws IOException;
+    
+  public boolean <emphasis role="bold">exists</emphasis>() throws IOException;
+    
+  public boolean <emphasis role="bold">isDirectory</emphasis>() throws IOException;
+    
+  public boolean <emphasis role="bold">isFile</emphasis>() throws IOException;
 }</screen>
 
-      <para>The <emphasis role="bold">isTransferFinished</emphasis> and
-      <emphasis role="bold">waitForFinishedTransfer</emphasis> can be invoked
-      to query and wait on the file transfer status. The <emphasis
-      role="bold">pull</emphasis> method can be used to fetch the <emphasis
-      role="bold">RemoteFile</emphasis> from the remote node, into the local
-      <emphasis role="bold">Node</emphasis>, and the <emphasis
+      <para>The <emphasis role="bold">isFinished</emphasis> and <emphasis
+      role="bold">waitFor</emphasis> can be invoked to query and wait on the
+      file transfer status. The <emphasis role="bold">pull</emphasis> method
+      can be used to fetch the <emphasis role="bold">RemoteFile</emphasis>
+      from the remote node, into the local <emphasis
+      role="bold">Node</emphasis>, and the <emphasis
       role="bold">push</emphasis> methods can be used to send the <emphasis
       role="bold">RemoteFile</emphasis> to another <emphasis
       role="bold">Node</emphasis>.</para>
@@ -153,7 +166,7 @@ Node testnode = testVNode.getNode();
           role="bold">remoteFileA.pull</emphasis>(new File("/tmp/test2.dat"));
 
 
-<emphasis role="bold">remoteFileB.waitForFinishedTransfer</emphasis>(); //blocking method</programlisting>
+<emphasis role="bold">remoteFileB.waitFor</emphasis>(); //blocking method</programlisting>
 
       <sect3>
         <title>How to obtain a Node from an Active Object reference</title>

@@ -34,18 +34,18 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * A Muscle Exception indicates that the execution of a skeleton program cannot conitnue
- * due to erros generated from inside @{link org.objectweb.proactive.extensions.calcium.muscle.Muscle} functions.
+ * A <code>MuscleException</code> wraps exceptions that where generated during the execution of a {@link org.objectweb.proactive.extensions.calcium.muscle.Muscle} function,
+ * which caused the program to halt its execution.
  *
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
-public class MuscleException extends RuntimeException {
+public class MuscleException extends Exception {
     public MuscleException(String msg) {
         super(msg);
     }
 
-    public MuscleException(Exception e) {
+    public MuscleException(String smg, Throwable e) {
         super(e);
     }
 }

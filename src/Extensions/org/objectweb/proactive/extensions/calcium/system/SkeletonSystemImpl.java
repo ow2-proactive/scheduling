@@ -47,12 +47,11 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.exceptions.MuscleException;
 
 
 /**
  * This class is not serializable on purpose. It is very dependant on the
- * environmente where it lives.
+ * environment where it lives.
  *
  * @author The ProActive Team (mleyton)
  */
@@ -79,52 +78,49 @@ public class SkeletonSystemImpl implements SkeletonSystem, java.io.Serializable 
      * This methods creates or returns an already created working space for the
      * calling thread.
      *
-     * @see org.objectweb.proactive.extensions.calcium.SkeletonSystem#getWorkingSpace()
+     * @see org.objectweb.proactive.extensions.calcium.system.SkeletonSystem#getWorkingSpace()
      */
     public synchronized WSpaceImpl getWorkingSpace() {
         return wspace;
     }
 
-    public void execCommand(File command, String arguments) {
+    /**
+     * @see org.objectweb.proactive.extensions.calcium.system.SkeletonSystem#execCommand(File, String)
+     */
+    public int execCommand(File command, String arguments)
+        throws IOException, InterruptedException {
         if (logger.isDebugEnabled()) {
             logger.debug("Executing Command: " + command.toString() + " " +
                 arguments);
         }
 
-        try {
-            //TODO change this with JAVA 1.6 chmod features
-            Process process = execCommandInternal(wspace,
-                    new File("/bin/chmod"),
-                    ("+x " + command.getPath()).split(" "), "");
-            if (process.waitFor() != 0) {
-                String msg = "Command did not finish successfully: " + command +
-                    " " + arguments;
-                logger.error(msg);
-                throw new MuscleException(msg);
-            }
-
-            process = execCommandInternal(wspace, command,
-                    arguments.split(" "), "");
-            if (process.waitFor() != 0) {
-                BufferedReader err = new BufferedReader(new InputStreamReader(
-                            process.getErrorStream()));
-                String msg = "Command did not finish successfully: " + command +
-                    " " + arguments + System.getProperty("line.separator");
-                logger.error(msg);
-
-                String line = err.readLine();
-                while (line != null) {
-                    logger.error(line);
-                    line = err.readLine();
-                }
-
-                throw new MuscleException(msg);
-            }
-
-            // TODO perhaps do some verification here?
-        } catch (Exception e) {
-            throw new MuscleException(e);
+        //TODO change this with JAVA 1.6 chmod features
+        Process process = execCommandInternal(wspace, new File("/bin/chmod"),
+                ("+x " + command.getPath()).split(" "), "");
+        if (process.waitFor() != 0) {
+            process.exitValue();
+            String msg = "Command did not finish successfully: " + command +
+                " " + arguments;
+            logger.error(msg);
+            return process.exitValue();
         }
+
+        process = execCommandInternal(wspace, command, arguments.split(" "), "");
+        if (process.waitFor() != 0) {
+            BufferedReader err = new BufferedReader(new InputStreamReader(
+                        process.getErrorStream()));
+            String msg = "Command did not finish successfully: " + command +
+                " " + arguments + System.getProperty("line.separator");
+            logger.error(msg);
+
+            String line = err.readLine();
+            while (line != null) {
+                logger.error(line);
+                line = err.readLine();
+            }
+        }
+
+        return process.exitValue();
     }
 
     @Override

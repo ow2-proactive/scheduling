@@ -75,7 +75,7 @@ public class SciTestLibrary {
                     node.getNodeInformation().getURL());
                 RemoteFile rfile = ProFileTransfer.push(new File(localSource),
                         node, new File(remoteDest));
-                rfile.waitForFinishedTransfer();
+                rfile.waitFor();
             }
         } catch (Exception e) {
             System.out.println("Printing exception");

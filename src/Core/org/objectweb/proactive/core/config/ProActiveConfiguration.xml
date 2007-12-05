@@ -80,5 +80,12 @@
 		<!-- Workaround to fix rmissh/unicore conflict -->
 		<prop key="proactive.unicore.forkclient" value="true" />
 		<prop key="proactive.runtime.stayalive" value="true" />		
+
+		<!-- File Transfer Properties -->
+		<prop key="proactive.filetransfer.services_number" value="16"/>
+		<prop key="proactive.filetransfer.blocks_number" value="8"/>
+		<prop key="proactive.filetransfer.blocks_size_kb" value="512"/>
+		<prop key="proactive.filetransfer.buffer_size_kb" value="256"/>
+		
 	</properties>
 </ProActiveUserProperties>

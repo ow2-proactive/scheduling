@@ -35,7 +35,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 import org.objectweb.proactive.extensions.calcium.stateness.StateFul;
 import org.objectweb.proactive.extensions.calcium.system.PrefetchFilesMatching;
@@ -48,7 +47,7 @@ public class ExecuteFormatDB implements Execute<BlastParams, BlastParams> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
     public BlastParams execute(SkeletonSystem system, BlastParams param)
-        throws EnvironmentException, IOException {
+        throws IOException, InterruptedException {
         if (logger.isDebugEnabled()) {
             logger.debug("Executing FormatDB");
         }

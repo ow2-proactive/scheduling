@@ -53,7 +53,7 @@ import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
 /**
- * Tests that both schems work using the ProActive FileTransfer API
+ * Tests that both schemes work using the ProActive FileTransfer API
  */
 public class TestDeployRetrieve extends FunctionalTest {
     static final long serialVersionUID = 1;
@@ -159,7 +159,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         List<RemoteFile> list = testVNode.getVirtualNodeInternal()
                                          .fileTransferRetrieve(); //async
         for (RemoteFile rfile : list) {
-            rfile.waitForFinishedTransfer(); //sync here
+            rfile.waitFor(); //sync here
         }
 
         long finitRetrieve = System.currentTimeMillis();

@@ -57,14 +57,14 @@ public interface RemoteFile extends Serializable {
     /**
     * @return true if the file transfer operation that spawned this RemoteFile instance has finished, or an exception. false otherwise.
      */
-    public boolean isTransferFinished();
+    public boolean isFinished();
 
     /**
      * This method blocks the calling thread until the file transfer operation is
      * finished, or failed. If the operation failed, the exception is raised.
      * @throws IOException The cause of the file transfer operation failure.
      */
-    public void waitForFinishedTransfer() throws IOException;
+    public void waitFor() throws IOException;
 
     /**
      * Pulls the remote file represented by this instance into the local destination.
@@ -95,4 +95,37 @@ public interface RemoteFile extends Serializable {
      * @return The destination File where the data is stored on the remote node (or was meant to be stored, if an error took place).
      */
     public File getRemoteFilePath();
+
+    /**
+     * Deletes a remote file or directory recursively (i.e. deletes non-empty directories) represented by this RemoteFile instance.
+     * This methods is synchronous.
+     *
+     * @return true if the delete was successful, false otherwise.
+     * @throws IOException If an error was encountered while deleting the file
+     */
+    public boolean delete() throws IOException;
+
+    /**
+     * Queries the existence of a RemoteFile. This method is synchronous (blocking).
+     *
+     * @return true if the remote file exists, false otherwise.
+     * @throws IOException If an error is encountered while querying the remote file.
+     */
+    public boolean exists() throws IOException;
+
+    /**
+     * Queries if the RemoteFile is a directory. This method is synchronous (blocking).
+     *
+     * @return true if the remote file is a directory, false otherwise.
+     * @throws IOException If an error is encountered while querying the remote file.
+     */
+    public boolean isDirectory() throws IOException;
+
+    /**
+     * Queries if the RemoteFile is a File. This method is synchronous (blocking).
+     *
+     * @return true if the remote file is a file, false otherwise
+     * @throws IOException If an error is encountered while querying the remote file.
+     */
+    public boolean isFile() throws IOException;
 }

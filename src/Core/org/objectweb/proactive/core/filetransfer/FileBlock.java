@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -50,7 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FileBlock implements Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
-    public static final int DEFAULT_BLOCK_SIZE = 256 * 1024; //Bytes
+    public static final int DEFAULT_BLOCK_SIZE = PAProperties.PA_FILETRANSFER_MAX_BLOCK_SIZE.getValueAsInt() * 1024; //Bytes
     private byte[] buffer;
     private int usage;
     private long offset;

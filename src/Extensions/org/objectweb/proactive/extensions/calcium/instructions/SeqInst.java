@@ -32,7 +32,6 @@ package org.objectweb.proactive.extensions.calcium.instructions;
 
 import java.lang.annotation.Annotation;
 
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
 import org.objectweb.proactive.extensions.calcium.stateness.Stateness;
 import org.objectweb.proactive.extensions.calcium.statistics.Timer;
@@ -49,7 +48,7 @@ public class SeqInst<P, R> implements Instruction<P, R> {
     }
 
     public Task<R> compute(SkeletonSystemImpl system, Task<P> t)
-        throws Exception, EnvironmentException {
+        throws Exception {
         Timer timer = new Timer();
         R resultObject = secCode.execute(system, t.getObject());
         timer.stop();

@@ -131,7 +131,7 @@ public class TestAPI extends FunctionalTest {
 
         RemoteFile rfilePushed = ProFileTransfer.push(fileTest, testnode,
                 filePushed);
-        rfilePushed.waitForFinishedTransfer();
+        rfilePushed.waitFor();
         Assert.assertTrue(rfilePushed.getRemoteFilePath().equals(filePushed)); //wait-by-necessity
 
         RemoteFile rfilePulled = ProFileTransfer.pull(testnode, filePushed,
@@ -144,8 +144,8 @@ public class TestAPI extends FunctionalTest {
         Assert.assertTrue(pushedWhilePulling.getRemoteFilePath()
                                             .equals(fileFuturePushed)); //wait-by-necessity
 
-        rfilePulled.waitForFinishedTransfer();
-        pushedWhilePulling.waitForFinishedTransfer();
+        rfilePulled.waitFor();
+        pushedWhilePulling.waitFor();
 
         long fileTestSum = checkSum(fileTest);
         long filePulledSum = checkSum(filePulled);
@@ -163,6 +163,13 @@ public class TestAPI extends FunctionalTest {
         Assert.assertTrue(fileTestSum == filePushedSum);
         Assert.assertTrue(fileTestSum == filePulledSum);
         Assert.assertTrue(fileTestSum == fileFuturePushedSum);
+
+        //Check remote file delete
+        Assert.assertTrue(rfilePushed.exists());
+        Assert.assertTrue(rfilePushed.isFile());
+        Assert.assertFalse(rfilePushed.isDirectory());
+        Assert.assertTrue(rfilePushed.delete());
+        Assert.assertFalse(rfilePushed.exists());
     }
 
     public void testPushPullDir() throws Exception {
@@ -198,8 +205,8 @@ public class TestAPI extends FunctionalTest {
         RemoteFile rdirPulled = ProFileTransfer.push(dirTestSrc, testnode,
                 dirTestPulled);
 
-        rdirPushed.waitForFinishedTransfer();
-        rdirPulled.waitForFinishedTransfer();
+        rdirPushed.waitFor();
+        rdirPulled.waitFor();
 
         long fileTestSum = checkSum(dirTestSrcFile);
 
@@ -222,6 +229,13 @@ public class TestAPI extends FunctionalTest {
         Assert.assertTrue(dirTestPulledEmpty.exists());
         Assert.assertTrue(dirTestPulledEmpty.isDirectory());
         Assert.assertTrue(dirTestPulledEmpty.listFiles().length == 0);
+
+        //Check delete directory
+        Assert.assertTrue(rdirPushed.exists());
+        Assert.assertTrue(rdirPushed.isDirectory());
+        Assert.assertFalse(rdirPushed.isFile());
+        Assert.assertTrue(rdirPushed.delete());
+        Assert.assertFalse(rdirPushed.exists());
     }
 
     /**

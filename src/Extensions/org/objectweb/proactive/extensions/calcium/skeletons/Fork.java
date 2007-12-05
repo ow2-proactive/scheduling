@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.calcium.skeletons;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,7 +38,6 @@ import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
 import org.objectweb.proactive.extensions.calcium.muscle.Conquer;
 import org.objectweb.proactive.extensions.calcium.muscle.Divide;
 import org.objectweb.proactive.extensions.calcium.muscle.Execute;
@@ -191,18 +191,17 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
 
         /**
          * Divides the parameter into <number> copies.
+         * @throws ClassNotFoundException
+         * @throws IOException
          *
          * @see Divide#divide(SkeletonSystem, Object)
          */
         public List<T> divide(SkeletonSystem system, T param)
-            throws EnvironmentException {
+            throws IOException, ClassNotFoundException {
             Vector<T> vector;
-            try {
-                vector = Stateness.deepCopy(param, number);
-            } catch (Exception e) {
-                logger.error("Unable to make a deep copy:" + e.getMessage());
-                throw new EnvironmentException(e);
-            }
+
+            vector = Stateness.deepCopy(param, number);
+
             return vector;
         }
     }
@@ -220,8 +219,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
         /**
              * @see Conquer#conquer(SkeletonSystem, Object[])
              */
-        public T conquer(SkeletonSystem system, T[] param)
-            throws RuntimeException, EnvironmentException {
+        public T conquer(SkeletonSystem system, T[] param) {
             return param[0];
         }
     }

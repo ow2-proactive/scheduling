@@ -3,7 +3,6 @@
 	<variables>
  	    <descriptorVariable name="SKELETON_FRAMEWORK_VN" value="framework" />     	
 		<descriptorVariable name="INTERPRETERS_VN" value="interpreters" />
-     	<descriptorVariable name="FILE_RESULT_OUTDIR_PATH" value="/tmp/calcium-output" />
  	    <programDefaultVariable name="MAX_CINTERPRETERS" value="3"/>
     </variables>
 	

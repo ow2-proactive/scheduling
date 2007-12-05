@@ -68,7 +68,7 @@ public class FileServerClientImpl implements FileServerClient,
             }
             RemoteFile fetchedFile = ProFileTransfer.pull(node, rfile.location,
                     localDst);
-            fetchedFile.waitForFinishedTransfer();
+            fetchedFile.waitFor();
         } catch (Exception e) {
             e.printStackTrace();
             throw new IOException("Unable to fetch remote file: " + rfile);
@@ -86,7 +86,7 @@ public class FileServerClientImpl implements FileServerClient,
             //SkeletonSystemImpl.copyFile(localFile, dst);
             RemoteFile sentFile = ProFileTransfer.push(current, node,
                     rfile.location);
-            sentFile.waitForFinishedTransfer();
+            sentFile.waitFor();
         } catch (Exception e) {
             //If exception happens, then unstore the file.
             fserver.unregister(rfile.fileId);

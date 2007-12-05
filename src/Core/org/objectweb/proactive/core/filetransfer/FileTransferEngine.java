@@ -42,6 +42,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -59,7 +60,7 @@ public class FileTransferEngine implements ProActiveInternalObject, InitActive,
     RunActive {
     //Not Serializable on purpose: This is a service AO that cannot migrate!!
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
-    static public final int DEFAULT_MAX_FILE_TRANSFER_SERVICES = 16;
+    static public final int DEFAULT_MAX_FILE_TRANSFER_SERVICES = PAProperties.PA_FILETRANSFER_MAX_SERVICES.getValueAsInt();
     static FileTransferEngine singletonFTE = getFileTransferEngine();
     Vector<FileTransferService> ftsPool;
     int maxFTS;
@@ -114,7 +115,6 @@ public class FileTransferEngine implements ProActiveInternalObject, InitActive,
         ftsPool.add(fts);
     }
 
-    //TODO improve this method using ProActive
     static synchronized public FileTransferEngine getFileTransferEngine() {
         if (singletonFTE == null) {
             try {

@@ -49,5 +49,13 @@ public interface FileTransferServiceReceive {
 
     public void putBackInLocalPool();
 
-    public void createDir(File dstFile) throws IOException;
+    public OperationStatus mkdirs(File dstFile);
+
+    public boolean remove(File file);
+
+    public boolean exists(File path);
+
+    public boolean isDirectory(File path);
+
+    public boolean isFile(File path);
 }

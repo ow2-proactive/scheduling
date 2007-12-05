@@ -1326,7 +1326,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         for (List<RemoteFile> list : c) {
             for (RemoteFile rfile : list) {
                 try {
-                    rfile.waitForFinishedTransfer();
+                    rfile.waitFor();
                 } catch (IOException e) {
                     throw new NodeException("Unable to transfer files during node creation",
                         e);
@@ -1876,7 +1876,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
         for (RemoteFile rfile : list) {
             try {
-                rfile.waitForFinishedTransfer();
+                rfile.waitFor();
             } catch (IOException e) {
                 throw new NodeException(
                     "Unable to transfer file during node creation" + e);

@@ -55,8 +55,8 @@ public interface CalFuture<R> {
      * @return the computed result
      *
      * @throws InterruptedException
-     * @throws MuscleException
-     * @throws TaskException
+     * @throws MuscleException If an exception was thrown by a muscle code
+     * @throws TaskException If an internal exception was thrown by Calcium.
      */
     public R get() throws InterruptedException, MuscleException, TaskException;
 

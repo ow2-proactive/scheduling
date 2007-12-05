@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.calcium.system;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.calcium.exceptions.EnvironmentException;
@@ -59,11 +60,17 @@ public interface SkeletonSystem {
     public WSpace getWorkingSpace() throws EnvironmentException;
 
     /**
-     * This method executes the specified command, with the specified arguments.
-     * Before invoking the command, the current working directory is configured to the local workspace.
+     * This method executes the specified command, with the specified arguments,
+     * and blocks until the command is finished.
+     *
+     * Before invoking the command, the current working directory is the once represented by the {@link WSpace}.
      *
      * @param command The command to execute.
      * @param arguments The arguments that must be given to the command.
+     * @return The exit value of the command, where <code>0</code> indicates normal termination.
+     * @throws IOException If an exception takes place.
+     * @throws InterruptedException If the thread was interrupted while waiting for the command's execution.
      */
-    public void execCommand(File command, String arguments);
+    public int execCommand(File command, String arguments)
+        throws IOException, InterruptedException;
 }

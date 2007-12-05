@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.filetransfer.FileBlock;
 import org.objectweb.proactive.core.filetransfer.FileTransferEngine;
-import org.objectweb.proactive.core.filetransfer.FileTransferRequest;
 import org.objectweb.proactive.core.filetransfer.FileTransferService;
 import org.objectweb.proactive.core.filetransfer.FileTransferServiceReceive;
 import org.objectweb.proactive.core.filetransfer.FileTransferServiceSend;
@@ -257,14 +256,34 @@ public class ProFileTransfer {
             OperationStatus status = ftsSrc.send(srcFile[i], ftsDst,
                     dstFile[i], bsize, numFlyingBlocks);
 
-            FileTransferRequest request = new FileTransferRequest(srcFile[i],
-                    dstFile[i], status, ftsSrc, ftsDst);
-
-            rfile.add(new RemoteFileImpl(dstNode, dstFile[i], request));
+            rfile.add(new RemoteFileImpl(dstNode, dstFile[i], status));
         }
 
         ftsSrc.putBackInPool(ftsDst);
 
         return rfile;
+    }
+
+    /**
+     * Recursively creates a remote directory.
+     *
+     * @return true if the remote file is a file, false otherwise
+     * @throws IOException If an initialization error was detected.
+     */
+    public RemoteFile mkdirs(Node node, File path) throws IOException {
+        FileTransferServiceReceive ftsDst;
+
+        try {
+            ftsDst = FileTransferEngine.getFileTransferEngine(node).getFTS();
+        } catch (Exception e) {
+            //TODO change when moving to Java 1.6
+            //throw new IOException("Unable to connect or use ProActive Node: " + node, e);
+            throw new IOException("Unable to connect or use ProActive Node: " +
+                node + e.getMessage());
+        }
+
+        OperationStatus status = ftsDst.mkdirs(path);
+
+        return new RemoteFileImpl(node, path, status);
     }
 }

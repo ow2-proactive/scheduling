@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.objectweb.proactive.api.ProFileTransfer;
+import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -42,17 +43,17 @@ import org.objectweb.proactive.core.node.NodeFactory;
 public class RemoteFileImpl implements RemoteFile {
     Node node;
     File file;
-    FileTransferRequest request;
+    OperationStatus status;
 
-    public RemoteFileImpl(Node node, File file, FileTransferRequest request) {
+    public RemoteFileImpl(Node node, File file, OperationStatus status) {
         this.node = node;
         this.file = file;
-        this.request = request;
+        this.status = status;
     }
 
     //@Override
     public RemoteFile pull(File localDst) throws IOException {
-        waitForFinishedTransfer();
+        waitFor();
 
         Node localNode;
 
@@ -70,7 +71,7 @@ public class RemoteFileImpl implements RemoteFile {
     //@Override
     public RemoteFile push(Node dstNode, File dstFile)
         throws IOException {
-        waitForFinishedTransfer();
+        waitFor();
 
         return ProFileTransfer.transfer(getRemoteNode(), getRemoteFilePath(),
             dstNode, dstFile);
@@ -87,19 +88,56 @@ public class RemoteFileImpl implements RemoteFile {
     }
 
     //@Override
-    public boolean isTransferFinished() {
-        return (request.getOperationFuture().getException() != null) ||
-        !request.isAwaited();
+    public boolean isFinished() {
+        return !ProFuture.isAwaited(status);
     }
 
     //@Override
-    public void waitForFinishedTransfer() throws IOException {
-        if (request != null) {
-            request.waitForOperation();
-        }
+    public void waitFor() throws IOException {
+        ProFuture.waitFor(status);
 
-        if (request.getOperationFuture().getException() != null) {
-            throw request.getOperationFuture().getException();
+        if (status.hasException()) {
+            throw status.getException();
+        }
+    }
+
+    public boolean exists() throws IOException {
+        waitFor();
+        FileTransferServiceReceive ftsDst = getRemoteFileTransferService();
+
+        return ftsDst.exists(file);
+    }
+
+    public boolean isDirectory() throws IOException {
+        waitFor();
+        FileTransferServiceReceive ftsDst = getRemoteFileTransferService();
+
+        return ftsDst.isDirectory(file);
+    }
+
+    public boolean isFile() throws IOException {
+        waitFor();
+        FileTransferServiceReceive ftsDst = getRemoteFileTransferService();
+
+        return ftsDst.isFile(file);
+    }
+
+    public boolean delete() throws IOException {
+        waitFor();
+        FileTransferServiceReceive ftsDst = getRemoteFileTransferService();
+
+        return ftsDst.remove(file);
+    }
+
+    protected FileTransferServiceReceive getRemoteFileTransferService()
+        throws IOException {
+        try {
+            return FileTransferEngine.getFileTransferEngine(node).getFTS();
+        } catch (Exception e) {
+            //TODO change when moving to Java 1.6
+            //throw new IOException("Unable to connect or use ProActive Node: " + node, e);
+            throw new IOException("Unable to connect or use ProActive Node: " +
+                node + e.getMessage());
         }
     }
 }

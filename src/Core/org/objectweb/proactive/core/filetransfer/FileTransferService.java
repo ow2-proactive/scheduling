@@ -45,6 +45,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -61,8 +62,8 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public class FileTransferService implements ProActiveInternalObject, InitActive,
     FileTransferServiceSend, FileTransferServiceReceive {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
-    public final static int DEFAULT_MAX_SIMULTANEOUS_BLOCKS = 8;
-    public static final int DEFAULT_BUFFER_SIZE = 512 * 1024; //Bytes
+    public final static int DEFAULT_MAX_SIMULTANEOUS_BLOCKS = PAProperties.PA_FILETRANSFER_MAX_SIMULTANEOUS_BLOCKS.getValueAsInt();
+    public static final int DEFAULT_BUFFER_SIZE = PAProperties.PA_FILETRANSFER_MAX_BUFFER_SIZE.getValueAsInt() * 1024; //Bytes
     protected HashMap<File, BufferedOutputStream> writeBufferMap; //Map for storing the opened output sockets
 
     /**
@@ -119,20 +120,6 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
         }
     }
 
-    public void createDir(File dstFile) throws IOException {
-        if (!dstFile.exists() && !dstFile.mkdirs()) {
-            throw new IOException("Cannot creat directory: " + dstFile);
-        }
-
-        if (!dstFile.isDirectory()) {
-            throw new IOException("Not a directory: " + dstFile);
-        }
-
-        if (!dstFile.canWrite()) {
-            throw new IOException("Cannot write to: " + dstFile);
-        }
-    }
-
     protected BufferedOutputStream getWritingBuffer(File f)
         throws IOException {
         return getWritingBuffer(f, false);
@@ -140,7 +127,7 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
 
     protected synchronized BufferedOutputStream getWritingBuffer(File f,
         boolean append) throws IOException {
-        createDir(f.getParentFile());
+        mkdirs(f.getParentFile());
 
         if (!writeBufferMap.containsKey(f)) {
             try {
@@ -154,6 +141,64 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
         }
 
         return writeBufferMap.get(f);
+    }
+
+    public OperationStatus mkdirs(File dstFile) {
+        if (!dstFile.exists() && !dstFile.mkdirs()) {
+            return new OperationStatus(new IOException(
+                    "Cannot creat directory: " + dstFile));
+        }
+
+        if (!dstFile.isDirectory()) {
+            return new OperationStatus(new IOException("Not a directory: " +
+                    dstFile));
+        }
+
+        if (!dstFile.canWrite()) {
+            return new OperationStatus(new IOException("Cannot write to: " +
+                    dstFile));
+        }
+
+        return new OperationStatus();
+    }
+
+    public boolean remove(File path) {
+        if ((path == null) || !path.exists()) {
+            return false;
+        }
+
+        if (!path.isDirectory()) {
+            return path.delete();
+        }
+
+        boolean retval = true;
+        File[] files = path.listFiles();
+        if (files == null) {
+            return false;
+        }
+
+        for (File f : files) {
+            if (f.isDirectory()) {
+                retval = remove(f) && retval;
+            } else {
+                retval = f.delete() && retval;
+            }
+        }
+
+        retval = path.delete() && retval;
+        return retval;
+    }
+
+    public boolean exists(File path) {
+        return path.exists();
+    }
+
+    public boolean isDirectory(File path) {
+        return path.isDirectory();
+    }
+
+    public boolean isFile(File path) {
+        return path.isFile();
     }
 
     /* ***************** BEGIN FILETRANSFER SERVICE SEND  ***************************/
@@ -178,7 +223,7 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
         if (srcFile.isFile()) {
             internalSendFile(srcFile, ftsRemote, dstFile, bsize, numFlyingBlocks);
         } else if (srcFile.isDirectory()) {
-            ftsRemote.createDir(dstFile);
+            ftsRemote.mkdirs(dstFile);
             File[] files = srcFile.listFiles();
             for (File f : files) {
                 internalSend(f, ftsRemote, new File(dstFile, f.getName()),

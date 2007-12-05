@@ -50,7 +50,7 @@ public class ExecuteBlast implements Execute<BlastParams, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
     public File execute(SkeletonSystem system, BlastParams param)
-        throws EnvironmentException, IOException {
+        throws IOException, InterruptedException, EnvironmentException {
         if (logger.isDebugEnabled()) {
             logger.debug("Executing Blast");
         }

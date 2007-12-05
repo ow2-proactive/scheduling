@@ -166,7 +166,7 @@ public class TaskFamily<T> implements Serializable {
             String msg = "Number of parameters (" + param.length +
                 ") does not match number of subtasks (" + queue.size() + ")";
             logger.error(msg);
-            throw new MuscleException(msg);
+            throw new IllegalArgumentException(msg);
         }
 
         Collections.sort(queue);
@@ -181,7 +181,7 @@ public class TaskFamily<T> implements Serializable {
         if (queue.size() <= 0) {
             String msg = "Need at least one child to get parameters!";
             logger.error(msg);
-            throw new MuscleException(msg);
+            throw new IllegalArgumentException(msg);
         }
 
         Collections.sort(queue);
