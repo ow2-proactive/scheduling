@@ -47,9 +47,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Configuration parameters may be overriden according to the following priorities:</br>
- * ">" meaning "configuration parameters defined on the left override those defined on the right", we have: </br>
- * JVM > custom config file > default config file
+ * Configuration parameters may be overriden according to the following priorities:</br> ">"
+ * meaning "configuration parameters defined on the left override those defined on the right", we
+ * have: </br> JVM > custom config file > default config file
  *
  */
 public class ProActiveConfiguration {
@@ -74,18 +74,16 @@ public class ProActiveConfiguration {
     }
 
     /**
-     * Load the configuration, first look for user defined configuration files, firstly in
-     * the system property Constants.PROPERTY_PA_CONFIGURATION_FILE, then a file called
-     * .ProActiveConfiguration.xml at the user homedir.
-     * The default file is located in the same directory as the ProActiceConfiguration
-     * class with the name proacticeConfiguration
-     * It is obtained using Class.geressource
-     * If the property proactive.configuration is set then its value is used
-     * as the configuration file
+     * Load the configuration, first look for user defined configuration files, firstly in the
+     * system property Constants.PROPERTY_PA_CONFIGURATION_FILE, then a file called
+     * .ProActiveConfiguration.xml at the user homedir. The default file is located in the same
+     * directory as the ProActiceConfiguration class with the name proacticeConfiguration It is
+     * obtained using Class.geressource If the property proactive.configuration is set then its
+     * value is used as the configuration file
      */
     public synchronized static void load() {
         if (!isLoaded) {
-            // loading  default values
+            // loading default values
             String filename = ProActiveConfiguration.class.getResource(PROACTIVE_CONFIG_FILENAME)
                                                           .toString();
 
@@ -122,7 +120,7 @@ public class ProActiveConfiguration {
             setProperties(properties);
 
             if (System.getProperty(PAProperties.LOG4J.getKey()) == null) {
-                //if logger is not defined create default logger with level info that logs
+                // if logger is not defined create default logger with level info that logs
                 // on the console
                 Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
                 logger.setAdditivity(false);
@@ -149,8 +147,19 @@ public class ProActiveConfiguration {
             String value = properties.getProperty(key);
 
             if (System.getProperty(key) == null) {
-                logger.debug("key:" + key + " --> value:" + value);
-                System.setProperty(key, value);
+                PAProperties prop = PAProperties.getProperty(key);
+                if (prop != null) {
+                    if (prop.isValid(value)) {
+                        logger.debug("key:" + key + " --> value:" + value);
+                        System.setProperty(key, value);
+                    } else {
+                        logger.warn("Invalid value, " + value + " for key " +
+                            key + ". Must be a " + prop.getType().toString());
+                    }
+                } else {
+                    logger.warn("Property " + key + " is not declared inside " +
+                        PAProperties.class.getSimpleName() + " , ignoring");
+                }
             } else {
                 logger.debug("do not override " + key + ":" +
                     System.getProperty(key) + " with value:" + value);
@@ -160,7 +169,9 @@ public class ProActiveConfiguration {
 
     /**
      * returns the value of a property or null
-     * @param property the property
+     *
+     * @param property
+     *            the property
      * @return the value of the property
      */
     public String getProperty(String property) {
@@ -169,7 +180,9 @@ public class ProActiveConfiguration {
 
     /**
      * returns the value of a property or the default value
-     * @param property the property
+     *
+     * @param property
+     *            the property
      * @return the value of the property or the default value if the property does not exist
      */
     public String getProperty(String property, String defaultValue) {
@@ -177,10 +190,12 @@ public class ProActiveConfiguration {
     }
 
     /**
-     * set the value 'value' for the property key 'key'.
-     * <i>override any previous value</i>
-     * @param key the of the property
-     * @param value the value of the property
+     * set the value 'value' for the property key 'key'. <i>override any previous value</i>
+     *
+     * @param key
+     *            the of the property
+     * @param value
+     *            the value of the property
      */
     protected void setProperty(String key, String value) {
         properties.setProperty(key, value);

@@ -398,8 +398,7 @@ public class ProActiveObject {
 
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(new Integer(
-                    PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
+            threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -451,8 +450,7 @@ public class ProActiveObject {
         }
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(new Integer(
-                    PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
+            threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
