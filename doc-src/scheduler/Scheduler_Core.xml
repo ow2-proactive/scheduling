@@ -17,104 +17,113 @@
     all issues related to distributed environment, such as faulted
     resources.</para>
 
-    <para>In addition, the scheduler <emphasis role="bold">offers a shell
-    based command submitter and a graphical user or admin interface
-    </emphasis>(Eclipse Plugin, see <xref
-    linkend="Scheduler_Eclipse_Plugin" />) that can be plugged on the
-    scheduler main application.</para>
+    <para>In this chapter we present a ProActive based Scheduler which offers:
+    <emphasis role="bold">a JAVA programming API</emphasis>, <emphasis
+    role="bold">a shell based command submitter</emphasis>, <emphasis
+    role="bold">and a graphical user or admin interface</emphasis> (Eclipse
+    Plugin, see <xref linkend="Scheduler_Eclipse_Plugin" />) which can be
+    plugged on the scheduler main application.</para>
 
-    <para>In this chapter, we will expose how the scheduler works, what
-    policies govern the job management, how to create a job and how to get the
-    jobs and the nodes state using either the shell communicator or the
-    GUI.</para>
+    <para>In the rest of this chapter, we will expose how the scheduler works,
+    what policies govern the job management, how to create a job and how to
+    get the jobs and the nodes state using either the shell communicator or
+    the GUI.</para>
   </sect1>
 
   <sect1 id="scheduler_concept">
     <title>Scheduler Concept</title>
 
-    <sect2 id="what_is_task">
-      <title>What is a task ?</title>
-
-      <para>The task is the smallest scheduled entity. It is included in a job
-      (see <xref linkend="what_is_job" />) and will be executed in accordance
-      with the policy (see <xref linkend="scheduling_policy" />) wishes, and
-      when resources becomes available.</para>
-
-      <para>There are three types of tasks : <itemizedlist>
-          <listitem>
-            <para>JAVA, its execution can be all java classes extending the
-            'JavaExecutable' class. </para>
-          </listitem>
-
-          <listitem>
-            <para>NATIVE, its execution can be any user programs specified by
-            a (shell) command line.</para>
-          </listitem>
-
-          <listitem>
-            <para>PROACTIVE, its execution can be all java classes extending
-            the 'ProActiveExecutable' class. Coding this last one requires a
-            knowledge base on the use of ProActive.</para>
-          </listitem>
-        </itemizedlist></para>
-
-      <para>During its execution a task may crash due to host failure or user
-      bugs, the task can be then re-started a parameterizable number of
-      time.</para>
-
-      <para>A task may optionally be accompanied by 3 kinds of scripts
-      (preScript, postScript and selectionScript) whose explanations are
-      provided in the documentation of resource manager (<xref
-      linkend="resources_manager" />)</para>
-
-      <para>Dependences between the tasks can also be possible, it will be
-      explain in <xref linkend="how_dependences" />.</para>
-
-      <para>The result of a task can be marked as precious that means the
-      result is important to be retrieve.</para>
-    </sect2>
-
     <sect2 id="what_is_job">
-      <title>What is a job ?</title>
+      <title>What is a Job ?</title>
 
-      <para>A job is the entity to be given to the scheduler. It can contains
-      one or more tasks and can be of several types : <itemizedlist>
+      <para>A <emphasis role="bold">Job</emphasis> is the entity to be given
+      to the scheduler, and is composed of one or more <emphasis
+      role="bold">Tasks</emphasis>. A Job can have one of the following types
+      : <itemizedlist>
           <listitem>
-            <para>TASKSFLOW, represents a job that contains a bag of tasks
-            that can be execute in parallel or according to a dependence tree.
-            The tasks inside this job can be java or native. </para>
+            <para><emphasis role="bold">TASKSFLOW</emphasis>, represents a Job
+            that contains a bag of Tasks, which can be execute in parallel or
+            according to a dependence tree. The Tasks inside this Job type can
+            be either Java or Native. </para>
           </listitem>
 
           <listitem>
-            <para>PROACTIVE,represents a job that contains only one ProActive
-            application task. Its execution will start with a given predefined
-            number of nodes on which you can start process. This kind of job
-            requires to use ProActive API in order to use the given
+            <para><emphasis role="bold">PROACTIVE</emphasis>, represents a Job
+            that contains a ProActive application (only one ProActive Task).
+            Its execution will start with a given predefined number of nodes
+            on which you can start the computation. This kind of Job requires
+            the usage of the ProActive API, in order to use the given
             nodes.</para>
           </listitem>
 
           <listitem>
-            <para>PARAMETER SWEEPING, is a job that represents multiple
-            executions of one type of task with different given parameters. It
-            is typically executed in parallel. The tasks inside this job can
-            also be java or native. </para>
+            <para><emphasis role="bold">PARAMETER SWEEPING</emphasis>, is a
+            Job that represents multiple executions of one type of Task with
+            different given parameters. It is typically executed in parallel.
+            The Tasks inside this job can also be Java or Native. </para>
           </listitem>
         </itemizedlist></para>
 
-      <para>A finished job contains a result that contains every tasks results
-      generated during job execution. You'd be able to retrieve the whole task
-      results or just the one you mark as precious and even the exception of
-      failed tasks. We will see further (<xref linkend="job_creation" />) how
-      to create a job and the different options to set.</para>
+      <para>A finished Job contains a result, which in turn contains all of
+      its tasks' results or only those marked as <emphasis
+      role="bold">precious</emphasis>. In the event of a failure, the finished
+      Job contains the responsible Exceptions. Further detailes on how to
+      create a Job and the different options can be foun in: <xref
+      linkend="job_creation" />.</para>
+    </sect2>
+
+    <sect2 id="what_is_task">
+      <title>What is a Task ?</title>
+
+      <para>The <emphasis role="bold">Task</emphasis> is the smallest
+      schedulable entity. It is included in a <emphasis
+      role="bold">Job</emphasis> (see <xref linkend="what_is_job" />) and will
+      be executed in accordance with the scheduling policy (see <xref
+      linkend="scheduling_policy" />), and with the available
+      resources.</para>
+
+      <para>There are three types of Tasks : <itemizedlist>
+          <listitem>
+            <para><emphasis role="bold">JAVA</emphasis>, its execution can be
+            a java class extending the 'JavaExecutable' class. </para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">NATIVE</emphasis>, its execution can
+            be any user program specified by a (shell) command line.</para>
+          </listitem>
+
+          <listitem>
+            <para><emphasis role="bold">PROACTIVE</emphasis>, its execution
+            can be any java class extending the 'ProActiveExecutable' class.
+            Coding this last one requires a knowledge base on the use of
+            ProActive.</para>
+          </listitem>
+        </itemizedlist></para>
+
+      <para>During its execution, a Task may crash due to host failure or user
+      bugs. A Task can re-started a parameterizable number of time.</para>
+
+      <para>A Task may optionally be accompanied by 3 kinds of scripts
+      (preScript, postScript and selectionScript) whose explanations are
+      provided in the documentation of resource manager (<xref
+      linkend="resources_manager" />).</para>
+
+      <para>Dependencies between Tasks is also possible, and is detailed in
+      <xref linkend="how_dependences" />.</para>
+
+      <para>The result of a Task can be marked as <emphasis
+      role="bold">precious</emphasis>, to make it available in the Job
+      Result.</para>
     </sect2>
 
     <sect2 id="how_dependences">
-      <title>What can be done with dependences ?</title>
+      <title>What can be done with dependencies ?</title>
 
-      <para>Dependences can be set between tasks in a taskFlow job. It
-      provides a way to execute your tasks using the temporal dependence but
-      also to forward the results of a task to another. An example is better
-      than a thousand words :</para>
+      <para>Dependencies can be set between Tasks in a TaskFlow Job. It
+      provides a way to execute your tasks in an ordered fashion, but also to
+      forward the results of a task to another one. An example is better than
+      a thousand words :</para>
 
       <figure id="scheduler_job_img">
         <title>Task flow job example</title>
@@ -128,26 +137,28 @@
         </mediaobject>
       </figure>
 
-      <para>In this example we made a 8 tasks job (type of job is TaskFlow).
-      As you can see, task 4 depends of task 1, task 5 depends of tasks 2 and
-      3, etc... It means that the task 4 will wait for task 1 before starting,
-      task 5 will wait for task 2 <emphasis>AND</emphasis> 3, etc... In
-      addition, the order in which you set that task 5 depends of task 2 and 3
-      is very important. Indeed, if you set the list of dependences for task 5
-      as : 2 then 3, the result of these two task will be given to task 5 in
-      this order.</para>
+      <para>In this example we made an 8 Task Job (where the Job's type is
+      TaskFlow). As you can see, Task 4 depends on Task 1, Task 5 depends on
+      Tasks 2 and 3, etc... In other words, Task 4 will wait for Task 1 to
+      finish before starting, Task 5 will wait for Task 2
+      <emphasis>AND</emphasis> 3, etc... In addition, the order in which you
+      specify that Task 5 depends of Task 2 and 3 is very important. Indeed,
+      if you set the list of dependencies for Task 5 as : 2 then 3, the result
+      of these two task will be given to Task 5 in this order. (TODO missing
+      example comparing both cases )</para>
 
-      <para>As shown in the following lines, the given array of task results
-      (<emphasis>results</emphasis>) will be an array of two results (task
-      result 2 and 3) in this order. Therefore you can use them to perform
-      task 5 process. <programlisting lang="java">@Override
+      <para>As shown in the following lines, the given array of TaskResults
+      (<emphasis>results</emphasis>) will be an array of two results
+      (TaskResult 2 and 3) in this order. Therefore you can use them to
+      perform Task 5 process. <programlisting lang="java">@Override
 public Object execute(TaskResult... results) throws Throwable {
     //user code for task 5...
 }</programlisting></para>
 
-      <para>We will see how to define the dependences and the order when we
-      create our first job (<xref linkend="job_creation" />). In this example,
-      result of task 7 and 8 could be precious, it means that you can retrieve
+      <para>We will see how to define the dependencies and the order when we
+      create our first job in <xref linkend="job_creation" />. In this
+      example, result of Task 7 and 8 could be <emphasis
+      role="bold">precious</emphasis>, which means that you can retrieve
       easily this two results.</para>
     </sect2>
 
@@ -157,8 +168,8 @@ public Object execute(TaskResult... results) throws Throwable {
       <para><emphasis role="bold">By default</emphasis>, the scheduler
       schedules tasks according to the default <emphasis role="bold">FIFO
       (First In First Out) with job priority</emphasis> policy. We'll see
-      later that the policy can be easily change just by implementing an
-      interface. (<xref linkend="add_policy" />)</para>
+      later that the policy can be changed by implementing an interface.
+      (<xref linkend="add_policy" />)</para>
     </sect2>
   </sect1>
 
@@ -168,18 +179,20 @@ public Object execute(TaskResult... results) throws Throwable {
     <sect2 id="Scheduler_Global_Architecture">
       <title>Scheduler Global Architecture</title>
 
-      <para>The scheduler service is the result of a collaboration between 2
-      entities (the Scheduler and the Resource Manager) each of them has its
-      own functionality.</para>
+      <para>The Scheduler Service is the result of a collaboration between 2
+      entities (the Scheduler and the Resource Manager) each one of them has
+      its own functionality.</para>
 
-      <para>The Scheduler is the main entity and is a non GUI daemon that is
-      connected to the resources manager. It is in charge to schedule
-      submitted job according to the current associated policy.</para>
+      <para>The Scheduler is the main entity and is a non GUI daemon which is
+      connected to the Resources Manager. It is in charge of scheduling
+      submitted Jobs, in accordance with the scheduling policy.</para>
 
-      <para>In order to launch jobs, the scheduler must obtain nodes
-      (resources) from the resources manager. As describe below (<xref
-      linkend="scheduler2entities" />), the user interact only with the
-      scheduler entity and managed resources can be simple or complex.</para>
+      <para>In order to launch Jobs, the Scheduler must obtain nodes
+      (resources) from the Resources Manager. As describe below (<xref
+      linkend="scheduler2entities" />), the user interacts only with the
+      Scheduler entity and the managed resources can be simple or complex
+      (TODO dont understand "and the managed resources can be simpel or
+      complex").</para>
 
       <figure id="scheduler2entities">
         <title>The Scheduler Entities</title>
@@ -193,7 +206,7 @@ public Object execute(TaskResult... results) throws Throwable {
         </mediaobject>
       </figure>
 
-      <para><emphasis role="bold">In this chapter</emphasis> we will explain
+      <para><emphasis role="bold">In this section</emphasis> we will explain
       how the <emphasis role="bold">scheduler entity works and how it can be
       used.</emphasis></para>
     </sect2>
@@ -203,35 +216,34 @@ public Object execute(TaskResult... results) throws Throwable {
 
       <para><xref linkend="schedulerEntity">
           The architecture of the scheduler
-        </xref> is build around 3 Active Objects : <itemizedlist>
+        </xref> is built around 3 Active Objects : <itemizedlist>
           <listitem>
             <para><emphasis role="bold">The Authentication
             interface</emphasis> which is the first object that the user may
-            have to contact. It is in charge to authenticate the user and
-            allow him to access or not to the scheduler. The authentication
+            have to contact. It is in charge of authenticatubg the user and
+            allowing him access (or not) to the Scheduler. The authentication
             security system can interact with files or LDAP.</para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">The Front-end</emphasis> which is the
-            interface returned by the authentication interface in order to
-            interact with the scheduler. This interface allows users to submit
-            jobs, get scheduling state, retrieves job result and
-            more...</para>
+            interface returned by the Authentication Interface and allows
+            interaction with the scheduler. This interface allows users to
+            submit jobs, get scheduling state, retrieves job result
+            etc...</para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">The Core</emphasis> which is the main
-            entity of the scheduler. It is in charge to schedule job according
-            to the policy (which is FIFO with priority by default), retrieve
-            scheduling events to the user and make storage in dataBase.</para>
+            entity of the Scheduler. It is in charge of scheduling Jobs
+            according with the policy (which is FIFO by default), retrieve
+            scheduling events to the user and make storages in data base (TODO
+            link reference to details on data base).</para>
           </listitem>
         </itemizedlist></para>
 
-      <para>Users cannot interact directly with the Scheduler Core, the
-      Front-end is the gateway between them and the Core. It is a good way to
-      reduce useless communications from users to the core and for events
-      dispatching.</para>
+      <para>Users cannot interact directly with the Scheduler Core and must
+      use the Front-end gateway.</para>
 
       <figure id="schedulerEntity">
         <title>The Scheduler Entity</title>
@@ -253,12 +265,12 @@ public Object execute(TaskResult... results) throws Throwable {
     <sect2 id="start_scheduler">
       <title>Starting the scheduler</title>
 
-      <para>To start the scheduler, run the <emphasis>scheduler.sh</emphasis>
-      script in scripts/scheduler directory. Without arguments, the scheduler
-      will start on the local host and create its own resources
-      manager.</para>
+      <para>To start a local scheduler, run the
+      <emphasis>scheduler.sh</emphasis> script in scripts/scheduler directory.
+      Without arguments, the scheduler will start on the local host and create
+      its own Resources Manager.</para>
 
-      <para><emphasis>scheduler.sh</emphasis> can be start with 1 optional
+      <para><emphasis>scheduler.sh</emphasis> can be started with 1 optional
       argument : <itemizedlist>
           <listitem>
             <para>The URL of a resources manager already started. (ie:
@@ -266,50 +278,50 @@ public Object execute(TaskResult... results) throws Throwable {
           </listitem>
         </itemizedlist></para>
 
-      <para>You can also start the scheduler using the java API. Considering
-      that a resources manager is already started (see RM documentation <xref
-      linkend="resources_manager" />), here's the explanation to do that
-      :</para>
+      <para>You can also start the scheduler using the java API. Supposing
+      that a Resources Manager is already started (see Resource Manager
+      documentation <xref linkend="resources_manager" />), this can be done in
+      the following way:</para>
 
       <programlisting lang="java">AdminScheduler.createScheduler(
     LocalSchedulerExample.class.getResource("login.cfg").getFile(),
                 LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
-                imp,
+                rm,
                 "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");</programlisting>
 
       <para>Arguments are respectively : <orderedlist>
           <listitem>
-            <para><emphasis>loginFile</emphasis> : A file describing the
-            user//pass authorized to connect the scheduler.</para>
+            <para><emphasis>loginFile</emphasis> : A file describing the users
+            and passwords authorized to connect to the scheduler.</para>
           </listitem>
 
           <listitem>
             <para><emphasis>groupFile</emphasis> : A file describing the group
             on which each user belongs. These groups will be used to identify
-            admin or user right. </para>
+            admin or user rights. </para>
           </listitem>
 
           <listitem>
-            <para><emphasis>rm</emphasis> : The started Resources manager as
-            an instance. </para>
+            <para><emphasis>rm</emphasis> : A reference on an already started
+            Resources Manager instance. </para>
           </listitem>
 
           <listitem>
             <para><emphasis>policyFullClassName</emphasis> : The scheduling
-            policy to use as a string representing the complete name of the
+            policy to use, as a string representing the complete name of the
             class. </para>
           </listitem>
         </orderedlist></para>
 
-      <para>An other method is provide to start the scheduler AND connect an
-      administrator at the same time :</para>
+      <para>Another way is to start the scheduler AND connect an administrator
+      at the same time :</para>
 
       <programlisting lang="java">AdminScheduler.createScheduler(
    LocalSchedulerExample.class.getResource("login.cfg").getFile(),
                 LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
                 "login",
                 "password",
-                imp,
+                rm,
                 "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");</programlisting>
 
       <para>Where arguments are the same plus a <emphasis>login</emphasis> and
@@ -335,11 +347,11 @@ public Object execute(TaskResult... results) throws Throwable {
       <sect3 id="User_Connection">
         <title>User Connection</title>
 
-        <para>A user can connect to the scheduler only if he is known. That's
-        the goal of the authentication interface which is able to authenticate
-        users. <xref linkend="userConnection">
+        <para>A user can connect to the Scheduler only if he/she is known.
+        That's the goal of the authentication interface which is able to
+        authenticate users. <xref linkend="userConnection">
             The user connection
-          </xref> shows how the scheduler connect a user. <figure
+          </xref> shows how the Scheduler connects a user. <figure
             id="userConnection">
             <title>A user connection</title>
 
@@ -352,17 +364,17 @@ public Object execute(TaskResult... results) throws Throwable {
             </mediaobject>
           </figure> <orderedlist>
             <listitem>
-              <para>First of all, user tries to join the authentication
+              <para>First of all, a user tries to join the authentication
               interface using the <emphasis
-              role="bold">SchedulerConnection.join</emphasis> static method.
-              </para>
+              role="bold">SchedulerConnection.join(...)</emphasis> static
+              method. </para>
 
               <programlisting>SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");</programlisting>
 
               <para> Then, with the <emphasis
-              role="bold">SchedulerAuthenticationInterface</emphasis>, user
-              can be connected as user or administrator using the <emphasis
-              role="bold">logAsUser</emphasis> or <emphasis
+              role="bold">SchedulerAuthenticationInterface</emphasis>, users
+              can be connected as user or administrator roles using the
+              <emphasis role="bold">logAsUser</emphasis> or <emphasis
               role="bold">logAsAdmin</emphasis> methods. </para>
 
               <programlisting>UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
@@ -371,9 +383,9 @@ AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");</p
             </listitem>
 
             <listitem>
-              <para>Next, the authentication object checks the right and if
-              user is authorized to connect the scheduler. If not, an
-              exception will be thrown.</para>
+              <para>Next, the authentication object checks the users rights
+              and wether the user is authorized to connect the scheduler. If
+              not, an exception will be thrown.</para>
             </listitem>
 
             <listitem>
@@ -391,8 +403,8 @@ AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");</p
             </listitem>
 
             <listitem>
-              <para>User is now able to interact with the scheduler using the
-              returned interface.</para>
+              <para>The user is now able to interact with the Scheduler using
+              the returned interface.</para>
             </listitem>
           </orderedlist></para>
       </sect3>
@@ -400,11 +412,11 @@ AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");</p
       <sect3 id="Job_submission">
         <title>Job Submission</title>
 
-        <para>User is now able to submit jobs. <emphasis
-        role="bold">Authentication interface is no longer used</emphasis> for
-        this connected user. <xref linkend="jobSubmission">
+        <para>After the connection, a user is ready to submit Jobs. The
+        <emphasis role="bold">Authentication interface is no longer
+        used</emphasis> for this connected user. <xref linkend="jobSubmission">
             The job submission
-          </xref> shows how it works when the scheduler received a new job to
+          </xref> shows what happens when the Scheduler received a new Job to
         schedule. <figure id="jobSubmission">
             <title>A job submission</title>
 
@@ -417,7 +429,7 @@ AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");</p
             </mediaobject>
           </figure> <orderedlist>
             <listitem>
-              <para>First, user submits a job using his <emphasis
+              <para>First, the user submits a Job using his <emphasis
               role="bold">UserSchedulerInterface</emphasis> retrieved by the
               <emphasis role="bold">logAsUser</emphasis> method.
               <programlisting lang="java">// connecting to the scheduler
@@ -429,15 +441,15 @@ scheduler.submit(job);</programlisting></para>
             </listitem>
 
             <listitem>
-              <para>The Scheduler Front-end verify the integrity of the job,
-              and build it in order to be ready to be managed by the Scheduler
-              Core. If there is a problem, an exception is thrown explaining
-              what is the cause.</para>
+              <para>The Scheduler Front-end verifies the integrity of the Job,
+              and builds it in order to be ready to be managed by the
+              Scheduler Core. If there is a problem, an exception is thrown
+              explaining what is the cause.</para>
             </listitem>
 
             <listitem>
-              <para>Finally, the job is transmit to the Core that can schedule
-              it.</para>
+              <para>Finally, the Job is transmitted to the Core for
+              scheduling.</para>
             </listitem>
           </orderedlist></para>
       </sect3>
@@ -465,28 +477,27 @@ scheduler.submit(job);</programlisting></para>
       <para>Create and add a new scheduling policy remains a very simple work.
       You just have to implements the
       <emphasis>org.objectweb.proactive.extra.scheduler.policy.PolicyInterface</emphasis>
-      and start a new scheduler with this new policy or change it if the
-      scheduler is already running.</para>
+      and start a new Scheduler with this new policy, or dynamically change it
+      if the scheduler is already running.</para>
 
-      <para>Here's the interface to implement and the default implementation
-      <emphasis>PriorityPolicy</emphasis> in the same package.</para>
+      <para>Here's the interface which must be implemented. The default
+      implementation <emphasis>PriorityPolicy</emphasis> in the same
+      package:</para>
 
       <programlisting lang="java">public interface PolicyInterface extends Serializable {
-//method to implement
-    Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks(List&lt;JobDescriptor&gt; jobs);
-    
+    //method to implement
+    Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks(List&lt;JobDescriptor&gt; jobs);  
 }</programlisting>
 
-      <para>This method returns all the tasks that have to be scheduled. The
-      tasks must be in the desired scheduling order. The first task to be
-      schedule will be the first in the returned Vector.</para>
+      <para>This method returns all the Tasks that have to be scheduled. The
+      Tasks must be in the desired scheduling order. The first task to be
+      scheduled will be the first in the returned Vector.</para>
 
-      <para>The parameters is a list of jobs, which contains the tasks to be
-      scheduled, came from running and pending queues. The only thing to do is
-      <emphasis>extract the task</emphasis>, <emphasis>re-order
-      them</emphasis> and <emphasis>put them in a vector</emphasis>. Let's see
-      the default implementation of the ProActive Scheduler policy to
-      illustrate it :</para>
+      <para>The parameters is a list of running and pendingJobs, which contain
+      Tasks to be scheduled. The only thing to do is <emphasis>extract the
+      task</emphasis>, <emphasis>re-order them</emphasis> and <emphasis>put
+      them in a vector</emphasis>. Let's see the default implementation of the
+      ProActive Scheduler policy to illustrate it:</para>
 
       <programlisting lang="java">public class PriorityPolicy implements PolicyInterface {
 
@@ -510,9 +521,9 @@ scheduler.submit(job);</programlisting></para>
     }
 }</programlisting>
 
-      <para>By default, the jobs know how to be sorted regarding their
-      priority. But it's as simple to create a Comparator and sort the jobs
-      with it.</para>
+      <para>By default, the Jobs knows how to be sorted regarding their
+      priority. But it is simple to create a Comparator and sort the Jobs with
+      it.</para>
     </sect2>
   </sect1>
 </chapter>
