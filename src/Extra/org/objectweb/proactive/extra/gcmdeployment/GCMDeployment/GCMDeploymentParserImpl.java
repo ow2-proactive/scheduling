@@ -151,12 +151,13 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerUserBridgeParsers();
         try {
             // process variables first
-            GCMEnvironmentParser environmentParser = new GCMEnvironmentParser(descriptor);
 
-            Map<String, String> variableMap = environmentParser.getVariableMap();
-
-            GCMDescriptorProcessor descriptorProcessor = new GCMDescriptorProcessor(variableMap,
-                    document);
+            //            GCMEnvironmentParser environmentParser = new GCMEnvironmentParser(descriptor);
+            //
+            //            Map<String, String> variableMap = environmentParser.getVariableMap();
+            //
+            //            GCMDescriptorProcessor descriptorProcessor = new GCMDescriptorProcessor(variableMap,
+            //                    document);
 
             //            PipedOutputStream pipedOutputStream = new PipedOutputStream();
             //
@@ -165,14 +166,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             //
             //            descriptorProcessor.transform(pipedOutputStream);
             //            
-            File tempFile = File.createTempFile(descriptor.getName(), "tmp");
 
-            FileOutputStream outputStream = new FileOutputStream(tempFile);
-            descriptorProcessor.transform(outputStream);
-            outputStream.close();
+            //            File tempFile = File.createTempFile(descriptor.getName(), "tmp");
+            //
+            //            FileOutputStream outputStream = new FileOutputStream(tempFile);
+            //            descriptorProcessor.transform(outputStream);
+            //            outputStream.close();
 
+            //            InputSource inputSource = new InputSource(new FileInputStream(
+            //                        tempFile));
             InputSource inputSource = new InputSource(new FileInputStream(
-                        tempFile));
+                        descriptor));
 
             document = documentBuilder.parse(inputSource);
         } catch (SAXException e) {
@@ -183,11 +187,10 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             throw new SAXException(msg, e);
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-        } catch (TransformerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
+        } /*catch (TransformerException e) {
+          GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
+          ;
+        } */}
 
     protected void registerDefaultGroupParsers() {
         registerGroupParser(new GroupARCParser());
@@ -235,18 +238,18 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         String deploymentSchema = GCMDeploymentParserImpl.class.getClass()
                                                                .getResource(DEPLOYMENT_DESC_LOCATION)
-                                                               .toString();
+                                                               .getFile();
 
         String commonTypesSchema = GCMDeploymentParserImpl.class.getClass()
                                                                 .getResource(COMMON_TYPES_LOCATION)
-                                                                .toString();
+                                                                .getFile();
 
         String extensionSchemas = GCMDeploymentParserImpl.class.getClass()
                                                                .getResource(EXTENSION_SCHEMAS_LOCATION)
-                                                               .toString();
+                                                               .getFile();
 
-        schemas.add(0, extensionSchemas);
-        schemas.add(0, deploymentSchema);
+        //        schemas.add(extensionSchemas);
+        //        schemas.add(deploymentSchema);
         //        schemas.add(0, commonTypesSchema); // not needed - it is included by the deployment schema
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
