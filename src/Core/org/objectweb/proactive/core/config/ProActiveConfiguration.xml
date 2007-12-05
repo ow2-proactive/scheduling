@@ -15,9 +15,6 @@
 		<prop key="proactive.dgc" value="false"/>
 		<prop key="proactive.exit_on_empty" value="false"/> <!-- destroy the JVM when there is no more active object -->
 		<prop key="schema.validation" value="true"/>
-		<prop key="name_server" value="localhost"/>
-		<prop key="name_server_pool" value="rutget"/>
-		<prop key="pool_host_number" value="1"/>
 		<prop key="proactive.communication.protocol" value="rmi"/> 
 		<prop key="byteCodeManipulator" value="javassist"/>
 		<prop key="proactive.rmi.port" value="1099"/>
@@ -25,7 +22,6 @@
 		<!--<prop key="proactive.java.policy" value="../../../../../../scripts/unix/proactive.java.policy"/>-->
 		<prop key="fractal.provider" value="org.objectweb.proactive.core.component.Fractive"/>
 		<prop key="proactive.http.servlet" value="false" />
-		<prop key="java.protocol.handler.pkgs" value="org.objectweb.proactive.core.ssh"/>
 
 		<!-- <prop key="proactive.tunneling.connect_timeout" value="2000"/> -->
 		<prop key="proactive.tunneling.try_normal_first" value="true"/>
@@ -88,4 +84,8 @@
 		<prop key="proactive.filetransfer.buffer_size_kb" value="256"/>
 		
 	</properties>
+	
+	<javaProperties>
+		<prop key="java.protocol.handler.pkgs" value="org.objectweb.proactive.core.ssh"/>
+	</javaProperties>
 </ProActiveUserProperties>

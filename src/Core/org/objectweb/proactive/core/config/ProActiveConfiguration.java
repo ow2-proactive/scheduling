@@ -34,6 +34,7 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.ConsoleAppender;
@@ -41,7 +42,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PatternLayout;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.xml.PropertyHandler;
+import org.objectweb.proactive.core.config.xml.ProActiveConfigurationParser;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -83,13 +84,15 @@ public class ProActiveConfiguration {
      */
     public synchronized static void load() {
         if (!isLoaded) {
+            checkSystemProperties();
+
             // loading default values
             String filename = ProActiveConfiguration.class.getResource(PROACTIVE_CONFIG_FILENAME)
                                                           .toString();
 
             logger.debug("default configuration file " + filename);
 
-            properties = PropertyHandler.createMasterFileHandler(filename,
+            properties = ProActiveConfigurationParser.parse(filename,
                     new Properties());
 
             filename = null;
@@ -110,7 +113,7 @@ public class ProActiveConfiguration {
             if (filename != null) {
                 // override default properties by the ones defined by the user
                 logger.debug("using user configuration file : " + filename);
-                properties = PropertyHandler.createMasterFileHandler(filename,
+                properties = ProActiveConfigurationParser.parse(filename,
                         properties);
             } else {
                 logger.debug("no user configuration file");
@@ -132,6 +135,29 @@ public class ProActiveConfiguration {
         }
     }
 
+    static private void checkSystemProperties() {
+        Iterator<Object> it = System.getProperties().keySet().iterator();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            PAProperties prop = PAProperties.getProperty(key);
+            if (prop != null) {
+                String value = System.getProperty(key);
+                if (!prop.isValid(value)) {
+                    logger.warn("Invalid value, " + value + " for key " + key +
+                        ". Must be a " + prop.getType().toString());
+                }
+            } else {
+                if (key.startsWith("proactive.")) {
+                    logger.warn("Property " + key + " is not declared inside " +
+                        PAProperties.class.getSimpleName() + " , ignoring");
+                } else {
+                    logger.debug("System property " + key +
+                        " is not a ProAtive property");
+                }
+            }
+        }
+    }
+
     /**
      * Add the loaded properties to the system
      */
@@ -147,19 +173,8 @@ public class ProActiveConfiguration {
             String value = properties.getProperty(key);
 
             if (System.getProperty(key) == null) {
-                PAProperties prop = PAProperties.getProperty(key);
-                if (prop != null) {
-                    if (prop.isValid(value)) {
-                        logger.debug("key:" + key + " --> value:" + value);
-                        System.setProperty(key, value);
-                    } else {
-                        logger.warn("Invalid value, " + value + " for key " +
-                            key + ". Must be a " + prop.getType().toString());
-                    }
-                } else {
-                    logger.warn("Property " + key + " is not declared inside " +
-                        PAProperties.class.getSimpleName() + " , ignoring");
-                }
+                logger.debug("key:" + key + " --> value:" + value);
+                System.setProperty(key, value);
             } else {
                 logger.debug("do not override " + key + ":" +
                     System.getProperty(key) + " with value:" + value);

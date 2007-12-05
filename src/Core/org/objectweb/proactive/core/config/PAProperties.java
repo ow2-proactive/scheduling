@@ -359,6 +359,9 @@ public enum PAProperties {
 
     /** TODO vlegrand Describe this property */
     CATALINA_BASE("catalina.base", PAPropertiesType.STRING),
+
+    /** ProActive installation directory */
+    PA_DIR("proactive.dir", PAPropertiesType.STRING),
     PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient",
         PAPropertiesType.BOOLEAN);static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
