@@ -35,31 +35,49 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.N
 
 
 /**
- * Interface for IMNodeSourceManager
- * methods called by NodeSource objects
+ * This Interface defines for {@link NodeSource} objects, accessible methods to {@link IMCore}.<BR><BR>
+ *
+ * Methods defined here provide a way to a {@link NodeSource} object to :<BR>
+ * -register itself to the IMCore when its active Object creation is ended.<BR>
+ * -add nodes to IMCore, nodes added become ready to perform tasks.<BR>
+ * -remove nodes to the IMCore, nodes are no longer available to perform jobs.<BR>
+ * -inform IMCore that a node has been detected down. <BR><BR>
+ *
+ * @see org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource
+ *
+ * @author ProActive team
  */
 public interface IMCoreSourceInt {
 
-    /** add a new node to the node Manager
-     *  the new node will be available for job
-     */
+    /** Add a new node to the node Manager.
+    *  The new node is available for tasks execution.
+    * @param node {@link Node} object to add.
+    * @param VNodeName Virtual node name of the node.
+    * @param PADName ProActive descriptor name of the node.
+    * @param nodeSource Stub of the {@link NodeSource} object that handle the node.
+    */
     public void internalAddNode(Node node, String VNodeName, String PADName,
         NodeSource nodeSource);
 
     /**
-     * adding a NodeSource to the core with its Id
-     */
+    * Add a NodeSource to the core with its Id.
+    * @param source Stub of the {@link NodeSource} object to add.
+    * @param sourceId name of the {@link NodeSource} object to add.
+    */
     public void addSource(NodeSource source, String sourceId);
 
     /**
-    * release a node as soon as possible.
-    * if the node is busy, waiting the job end
-    * a call back is awaited to confirm this node unregistering
+    * Removes a node from the Core.
+    * IMCore confirm after to the NodeSource the removing.
+    * @param nodeUrl URL of the node to remove.
+    * @param preempt true the node must removed immediately, without waiting job ending if the node is busy,
+    * false the node is removed just after the job ending if the node is busy.
     */
     public void internalRemoveNode(String nodeUrl, boolean preempt);
 
     /**
-     * informing the nodeManager that the node is down
-     */
+    * Informs the nodeManager that a node is down.
+    * @param nodeUrl URL of the down node.
+    */
     public void setDownNode(String nodeUrl);
 }

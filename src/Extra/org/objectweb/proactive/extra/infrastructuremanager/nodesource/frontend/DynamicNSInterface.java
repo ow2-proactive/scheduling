@@ -45,7 +45,9 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.Dy
  * <li><b>Nice Time</b> : The time before trying to get back a node after having released one.
  * </li>
  * </ul>
- * @author proactive team
+ * @author ProActive team
+ *
+ * /TODO gsigety, cdelbe: interface totally useless for the moment
  *
  */
 public interface DynamicNSInterface {

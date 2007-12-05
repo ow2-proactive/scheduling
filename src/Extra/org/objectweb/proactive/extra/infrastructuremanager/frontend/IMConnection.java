@@ -38,7 +38,26 @@ import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
 
 
+/**
+ * Class that implements static methods to execute lookups on
+ * Infrastructure manager (IM) active objects.
+ * This class provide a way to connect to an existing IM and get
+ * stubs of front-end objects :<BR>
+ * - user interface of the IM : {@link IMUser}.<BR>
+ * - administrator interface of the IM : {@link IMAdmin}.<BR>
+ * - Monitoring interface of the IM : {@link IMMonitoring}.<BR>
+ *
+ * @author ProActive team.
+ *
+ */
 public class IMConnection implements IMConstants {
+
+    /**
+     * Gives the IM's Administrator interface.
+     * @param url host name URL of the IM.
+     * @return IMAdmin Stub of IMAdmin active object.
+     * @throws IMException if the lookup fails.
+     */
     public static IMAdmin connectAsAdmin(String url) throws IMException {
         if (url == null) {
             url = "//localhost/" + NAME_ACTIVE_OBJECT_IMADMIN;
@@ -55,6 +74,12 @@ public class IMConnection implements IMConstants {
         }
     }
 
+    /**
+     * Gives the IM's user interface.
+     * @param url host name URL of the IM.
+     * @return User Stub of User active object.
+     * @throws IMException if the lookup fails.
+     */
     public static IMUser connectAsUser(String url) throws IMException {
         if (url == null) {
             url = "//localhost/" + NAME_ACTIVE_OBJECT_IMUSER;
@@ -72,6 +97,12 @@ public class IMConnection implements IMConstants {
         }
     }
 
+    /**
+     * Gives the IM's  monitoring interface.
+     * @param url host name URL of the IM.
+     * @return IMMonitoring Stub of monitoring active object.
+     * @throws IMException if the lookup fails.
+     */
     public static IMMonitoring connectAsMonitor(String url)
         throws IMException {
         if (url == null) {

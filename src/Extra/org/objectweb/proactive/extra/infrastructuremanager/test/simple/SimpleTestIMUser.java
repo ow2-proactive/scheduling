@@ -36,10 +36,8 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeInformation;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 

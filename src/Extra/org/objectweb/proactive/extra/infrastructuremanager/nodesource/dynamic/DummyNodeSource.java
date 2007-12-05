@@ -82,9 +82,8 @@ public class DummyNodeSource extends DynamicNodeSource
         try {
             ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
                     "/user/gsigety/home/pa_descriptors/nodes.xml");
-            String PADName = "Dummy_workers";
             IMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) ProActiveObject.getStubOnThis(),
-                PADName, pad);
+                pad);
         } catch (ProActiveException e) {
             e.printStackTrace();
         }

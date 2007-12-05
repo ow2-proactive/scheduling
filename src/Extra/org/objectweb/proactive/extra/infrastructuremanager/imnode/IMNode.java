@@ -42,14 +42,26 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
- * The <I>IMNode</I> is a object containing a node and its description.<BR/>
+ * An IMNode is a ProActive node able to execute schedulers tasks.
+ * So an IMNode is a representation of a ProActive node object with its associated {@link NodeSource},
+ * and its state in the Infrastructure Manager :<BR>
+ * -free : node is ready to perform a task.<BR>
+ * -busy : node is executing a task.<BR>
+ * -to be released : node is busy and have to be removed at the end of the its current task.<BR>
+ * -down : node is broken, and not anymore able to perform tasks.<BR><BR>
+ *
+ * InfrastructureManager can select nodes that verify criteria. this selection is implemented with
+ * {@link SelectionScript} objects. Each node memorize results of executed scripts, in order to
+ * answer faster to a selection already asked.
+ *
+ *
+ * @see NodeSource
+ * @see SelectionScript
+ *
+ * @author ProActive team.
+ *
  */
 public interface IMNode extends Comparable<IMNode> {
-    // nodes states
-    public static final int FREE = 0;
-    public static final int BUSY = 1;
-    public static final int DOWN = 2;
-    public static final int TO_BE_RELEASED = 3;
 
     /**
      * The script has been executed on this node, and the result was negative.
@@ -87,7 +99,7 @@ public interface IMNode extends Comparable<IMNode> {
     public ScriptResult<Boolean> executeScript(SelectionScript script);
 
     /**
-     * Get a map of all selection script already tested on this node,
+     * Get a map of all selection scripts already tested on this node,
      * and the responses given.
      * @return the map of Script and status
      */
@@ -136,36 +148,58 @@ public interface IMNode extends Comparable<IMNode> {
      */
     public String getDescriptorVMName();
 
+    /**
+     * @return the {@link NodeSource} name of the source that handle the node
+     */
     public String getNodeSourceId();
 
+    /**
+     * @return the URL of the node.
+     */
     public String getNodeURL();
 
-    // ----------------------------------------------------------------------//
-    // STATE
+    /**
+     * @return true if the node is free, false otherwise.
+     */
     public boolean isFree();
 
+    /**
+     * @return true if the node is down, false otherwise.
+     */
     public boolean isDown();
 
+    /**
+     * @return true if the node has to be released, false otherwise.
+     */
     public boolean isToRelease();
 
+    /**
+     * @return true if the node is busy, false otherwise.
+     */
     public boolean isBusy();
 
-    // ----------------------------------------------------------------------//
-    // SET
+    /**
+     * change the node's status to free
+     * @throws NodeException
+     */
     public void setFree() throws NodeException;
 
+    /**
+     * change the node's status to busy.
+     * @throws NodeException
+     */
     public void setBusy() throws NodeException;
 
+    /**
+     * change the node's status to 'to release'.
+     * @throws NodeException.
+     */
     public void setToRelease() throws NodeException;
 
+    /**
+     * change the node's status to down.
+     */
     public void setDown();
-
-    // OTHER SET in the case of the node can migrate.
-    // For example if the node migrate from other jvm, you must change
-    // the attribute JVM, VNode, ...
-
-    // ----------------------------------------------------------------------//
-    // TOSTRING
 
     /**
      * @return a string describing the IMNode (status, vnode, host, pad, ...)
@@ -177,23 +211,34 @@ public interface IMNode extends Comparable<IMNode> {
      */
     public void clean();
 
-    // NODE SOURCES
     /**
-     * The {@link IMNodeSource} from where the IMNode is issued.
+     * The {@link NodeSource} from where the IMNode is issued.
      */
     public NodeSource getNodeSource();
 
     /**
-     * Change the {@link IMNodeSource} from where the node is.
+     * Change the {@link NodeSource} from where the node is.
      * @param nodeSource
      */
     public void setNodeSource(NodeSource nodeSource);
 
+    /**
+     * Memorize a result of a selection script,
+     * node verify conditions of the selection.
+     * @param script script tested.
+     */
     public void setVerifyingScript(SelectionScript script);
 
+    /**
+     * Memorize a result of a selection script,
+     * node does not verify conditions of the selection.
+     * @param script script tested.
+     */
     public void setNotVerifyingScript(SelectionScript script);
 
     /**
-     *  build NodeEvent object for the IMNode */
+     *  Builds the IMNodeEvent object for the IMNode
+     *  @return the IMNodeEvent object related to the node.
+    */
     public IMNodeEvent getNodeEvent();
 }

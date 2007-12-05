@@ -34,6 +34,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeInformation;
@@ -48,27 +50,74 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptResult;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
+/**
+ * Implementation of the IMNode Interface.
+ * An IMNode is a ProActive node able to execute schedulers tasks.
+ * So an IMNode is a representation of a ProActive node object with its associated {@link NodeSource},
+ * and its state in the Infrastructure Manager :<BR>
+ * -free : node is ready to perform a task.<BR>
+ * -busy : node is executing a task.<BR>
+ * -to be released : node is busy and have to be removed at the end of the its current task.<BR>
+ * -down : node is broken, and not anymore able to perform tasks.<BR><BR>
+ *
+ * InfrastructureManager can select nodes that verify criteria. this selection is implemented with
+ * {@link SelectionScript} objects. Each node memorize results of executed scripts, in order to
+ * answer faster to a selection already asked.
+ *
+ * @see NodeSource
+ * @see SelectionScript
+ *
+ * @author ProActive team.
+ *
+ */
 public class IMNodeImpl implements IMNode, Serializable {
 
-    /**  */
+    /** serial version UID */
     private static final long serialVersionUID = -7612176229370058091L;
+
+    /** associated logger */
     private static Logger logger = ProActiveLogger.getLogger(Loggers.IM_DATARESOURCE);
+
+    /** HashMap associates a selection Script to its result on the node */
     private HashMap<SelectionScript, Integer> scriptStatus;
 
-    // Attributes
+    /** ProActive Node Object of the IMNode */
     private Node node;
+
+    /** URL of the node, considered as its unique ID */
     private String nodeURL;
+
+    /** Name of the node */
     private String nodeName;
+
+    /** {@link VirtualNode} name of the node */
     private String vnodeName;
+
+    /** {@link ProActiveDescriptor} name of the node */
     private String padName;
+
+    /** Host name of the node */
     private String hostName;
+
+    /** Java virtual machine name of the node */
     private String vmName;
+
+    /** Script handled, manage scripts launching and results recovering */
     private ScriptHandler handler = null;
+
+    /** {@link NodeSource} Stub of NodeSource that handle the IMNode */
     private NodeSource nodeSource;
+
+    /** State of the node */
     private NodeState status;
 
-    // ----------------------------------------------------------------------//
-    // CONSTRUCTOR
+    /** Create an IMNode Object.
+     * A Created node begins to be free.
+     * @param node ProActive node deployed
+     * @param vnodeName {@link VirtualNode} name of the node
+     * @param padName {@link ProActiveDescriptor} name of the node
+     * @param nodeSource {@link NodeSource} Stub of NodeSource that handle the IMNode
+     */
     public IMNodeImpl(Node node, String vnodeName, String padName,
         NodeSource nodeSource) {
         this.node = node;
@@ -79,18 +128,23 @@ public class IMNodeImpl implements IMNode, Serializable {
         this.nodeURL = node.getNodeInformation().getURL();
         this.hostName = node.getNodeInformation().getVMInformation()
                             .getHostName();
-        this.vmName = node.getNodeInformation().getVMInformation()
-                          .getDescriptorVMName();
+        this.vmName = node.getNodeInformation().getVMInformation().getName();
         this.scriptStatus = new HashMap<SelectionScript, Integer>();
         this.status = NodeState.FREE;
     }
 
-    // ----------------------------------------------------------------------//
-    // GET
+    /**
+     * Returns the name of the node.
+     * @return the name of the node.
+     */
     public String getNodeName() {
         return this.nodeName;
     }
 
+    /**
+     * Returns the ProActive Node object of the IMNode.
+     * @return the ProActive Node object of the IMNode.
+     */
     public Node getNode() throws NodeException {
         if (this.status != NodeState.DOWN) {
             return this.node;
@@ -99,36 +153,66 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
+    /**
+     * Returns the NodeInformation object of the IMNode.
+     * @return the NodeInformation object of the IMNode.
+     */
     public NodeInformation getNodeInformation() {
         return this.node.getNodeInformation();
     }
 
+    /**
+     * Returns the Virtual node name of the IMNode.
+     * @return the Virtual node name  of the IMNode.
+     */
     public String getVNodeName() {
         return this.vnodeName;
     }
 
+    /**
+     * Returns the {@link VirtualNode} name of the IMNode.
+     * @return the Virtual node name  of the IMNode.
+     */
     public String getPADName() {
         return this.padName;
     }
 
+    /**
+     * Returns the host name of the IMNode.
+     * @return the host name of the IMNode.
+     */
     public String getHostName() {
         return this.hostName;
     }
 
+    /**
+     * Returns the java virtual machine name of the IMNode.
+     * @return the java virtual machine name of the IMNode.
+     */
     public String getDescriptorVMName() {
         return this.vmName;
     }
 
+    /**
+     * Returns the NodeSource name of the IMNode.
+     * @return {@link NodeSource} name of the IMNode.
+     */
     public String getNodeSourceId() {
         return this.nodeSource.getSourceId();
     }
 
+    /**
+     * Returns the unique id of the IMNode.
+     * @return the unique id of the IMNode represented by its URL.
+     */
     public String getNodeURL() {
         return this.node.getNodeInformation().getURL();
     }
 
-    // ----------------------------------------------------------------------//
-    // SET
+    /**
+     * change the node's status to busy.
+     * @throws NodeException if the node is down.
+     */
     public void setBusy() throws NodeException {
         if (this.status != NodeState.DOWN) {
             this.status = NodeState.BUSY;
@@ -137,6 +221,10 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
+    /**
+     * change the node's status to free.
+     * @throws NodeException if the node is down.
+     */
     public void setFree() throws NodeException {
         if (this.status != NodeState.DOWN) {
             this.status = NodeState.FREE;
@@ -145,10 +233,17 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
+    /**
+     * change the node's status to down.
+     */
     public void setDown() {
         this.status = NodeState.DOWN;
     }
 
+    /**
+     * change the node's status to 'to be released'.
+     * @throws NodeException if the node is down.
+     */
     public void setToRelease() throws NodeException {
         if (this.status != NodeState.DOWN) {
             this.status = NodeState.TO_BE_RELEASED;
@@ -157,8 +252,9 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
-    // ----------------------------------------------------------------------//
-    // IS
+    /**
+     * @return true if the node is free, false otherwise.
+     */
     public boolean isFree() {
         if (this.status == NodeState.FREE) {
             return true;
@@ -167,22 +263,9 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
-    public boolean isDown() {
-        if (this.status == NodeState.DOWN) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isToRelease() {
-        if (this.status == NodeState.TO_BE_RELEASED) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
+    /**
+     * @return true if the node is busy, false otherwise.
+     */
     public boolean isBusy() {
         if (this.status == NodeState.BUSY) {
             return true;
@@ -191,12 +274,31 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
-    // OTHER SET in the case of the node can migrate.
-    // For exemple if the node migrate from other jvm, you must change
-    // the attribute Jvm, VNode, ...
+    /**
+     * @return true if the node is down, false otherwise.
+     */
+    public boolean isDown() {
+        if (this.status == NodeState.DOWN) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    // ----------------------------------------------------------------------//
-    // TOSTRING
+    /**
+     * @return true if the node is 'to be released', false otherwise.
+     */
+    public boolean isToRelease() {
+        if (this.status == NodeState.TO_BE_RELEASED) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * @return a String shwowing informations about the node.
+     */
     public String toString() {
         String mes = "\n";
 
@@ -213,7 +315,11 @@ public class IMNodeImpl implements IMNode, Serializable {
     }
 
     /**
-     * If no script handler is define, create one, and execute the script.
+     * Execute a selection Script in order to test the Node.
+     * If no script handler is defined, create one, and execute the script.
+     * @param script Selection script to execute
+     * @return Result of the test.
+     *
      */
     @SuppressWarnings("unchecked")
     public ScriptResult<Boolean> executeScript(SelectionScript script) {
@@ -230,6 +336,7 @@ public class IMNodeImpl implements IMNode, Serializable {
     }
 
     /**
+     * Clean the node.
      * kill all active objects on the node.
      */
     public synchronized void clean() {
@@ -242,6 +349,10 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
+    /**
+     * Compare two IMNode objects
+     * @return true if the two IMNode objects represent the same Node.
+     */
     public boolean equals(Object imnode) {
         if (imnode instanceof IMNode) {
             return this.nodeURL.equals(((IMNode) imnode).getNodeURL());
@@ -250,15 +361,27 @@ public class IMNodeImpl implements IMNode, Serializable {
         return false;
     }
 
+    /**
+     * @return HashCode of node's ID,
+     * i.e. the hashCode of the node's URL.
+     */
     public int hashCode() {
         return nodeURL.hashCode();
     }
 
+    /**
+     * Gives the HashMap of all scripts tested with corresponding results.
+     * @return the HashMap of all scripts tested with corresponding results.
+     */
     @SuppressWarnings("unchecked")
     public HashMap<SelectionScript, Integer> getScriptStatus() {
         return scriptStatus;
     }
 
+    /**
+     * Compare two IMNode objects.
+     * @return 0 if two Nodes object are the representation of the same node.
+     */
     public int compareTo(IMNode imnode) {
         if (this.getPADName().equals(imnode.getPADName())) {
             if (this.getVNodeName().equals(imnode.getVNodeName())) {
@@ -281,14 +404,26 @@ public class IMNodeImpl implements IMNode, Serializable {
         return this.getPADName().compareTo(imnode.getPADName());
     }
 
+    /**
+     * @return the stub of the {@link NodeSource} that handle the IMNode.
+     */
     public NodeSource getNodeSource() {
         return this.nodeSource;
     }
 
+    /**
+     * Set the NodeSource stub to the IMNode.
+     * @param ns Stub of the NodeSource that handle the IMNode.
+     */
     public void setNodeSource(NodeSource ns) {
         this.nodeSource = ns;
     }
 
+    /**
+     * memorize a result of a selection script,
+     * node verify conditions of the selection.
+     * @param script script tested.
+     */
     public void setVerifyingScript(SelectionScript script) {
         if (scriptStatus.containsKey(script)) {
             scriptStatus.remove(script);
@@ -296,6 +431,11 @@ public class IMNodeImpl implements IMNode, Serializable {
         scriptStatus.put(script, IMNode.VERIFIED_SCRIPT);
     }
 
+    /**
+     * memorize a result of a selection script,
+     * node does not verify conditions of the selection.
+     * @param script script tested.
+     */
     public void setNotVerifyingScript(SelectionScript script) {
         if (scriptStatus.containsKey(script)) {
             int status = scriptStatus.remove(script);
@@ -309,10 +449,10 @@ public class IMNodeImpl implements IMNode, Serializable {
         }
     }
 
-    //	
-    //	public NodeEvent(String url, String nodeSource, 
-    //			String PADName, String VnName, String hostname,
-    //			String vm, NodeState state) {
+    /**
+     *  build the IMNodeEvent object for the IMNode
+     *  @return the IMNodeEvent object related to the IMNode.
+    */
     public IMNodeEvent getNodeEvent() {
         return new IMNodeEvent(this.nodeURL, this.getNodeSourceId(),
             this.padName, this.vnodeName, this.hostName, this.vmName,

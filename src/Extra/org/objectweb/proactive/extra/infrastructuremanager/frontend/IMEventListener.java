@@ -30,37 +30,85 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
+import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 
 
 /**
- * Interface for IM events monitoring
- * @author gsigety
+ * Interface for IM events monitoring.
+ * Interface and methods to implements for a object that want
+ * to receive (monitor) Infrastructure manager's (IM) events.
+ *
+ * IM Events are defined in {@link IMEvent}.
+ *
+ * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring
+ *
+ * @author ProActive team.
  *
  */
 public interface IMEventListener {
+
+    /** IM is shutting down */
     public void imShutDownEvent();
 
+    /** IM has been stopped */
     public void imShuttingDownEvent();
 
+    /** IM has started */
     public void imStartedEvent();
 
+    /** IM has been killed */
     public void imKilledEvent();
 
+    /** new node source available in IM.
+     * @param ns node source event containing new {@link NodeSource} properties.
+     */
     public void nodeSourceAddedEvent(IMNodeSourceEvent ns);
 
+    /** node removed from IM.
+     * @param ns node source event containing removed {@link NodeSource} properties.
+     */
     public void nodeSourceRemovedEvent(IMNodeSourceEvent ns);
 
+    /** new node available in IM.
+     * @param n node event containing new {@link IMNode} properties.
+     */
     public void nodeAddedEvent(IMNodeEvent n);
 
+    /**
+     * Node has ended a task.
+     * becomes from busy to free state.
+     * @param n node event containing {@link IMNode} properties.
+     */
     public void nodeFreeEvent(IMNodeEvent n);
 
+    /**
+     * Node begins to perform a task.
+     * becomes from free to busy state.
+     * @param n node event containing {@link IMNode} properties.
+     */
     public void nodeBusyEvent(IMNodeEvent n);
 
+    /**
+     * Node is busy and must be released at the end of the task.
+     * becomes from busy to 'to be released' state.
+     * @param n node event containing {@link IMNode} properties.
+     */
     public void nodeToReleaseEvent(IMNodeEvent n);
 
+    /**
+     * Node does not answer anymore to its monitor, the node is said 'down'.
+     * becomes from free, busy, 'to be released' to down state.
+     * @param n node event containing {@link IMNode} properties.
+     */
     public void nodeDownEvent(IMNodeEvent n);
 
+    /**
+     * A Node is removed from the IM.
+     * @param n node event containing the removed {@link IMNode} properties.
+     */
     public void nodeRemovedEvent(IMNodeEvent n);
 }

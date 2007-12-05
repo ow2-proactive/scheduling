@@ -30,17 +30,43 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.common;
 
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DummyNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
+
+
+/**
+ * constant types in the Infrastructure Manager.<BR>
+ * These interface define names for Infrastructure manager active objects
+ * and defines type names for the different node sources types.
+ *
+ * @author ProActive team
+ *
+ */
 public interface IMConstants {
 
-    /** constants for active objects registered in RMI register */
+    /** Name of the ProActive node which contains
+     * infrastructure Manager active objects (AO)*/
     public static final String NAME_NODE_IM = "IMNODE";
+
+    /** name of IMCore AO registered in RMI register */
     public static final String NAME_ACTIVE_OBJECT_IMCORE = "IMCORE";
+
+    /** name of IMAdmin AO registered in RMI register */
     public static final String NAME_ACTIVE_OBJECT_IMADMIN = "IMADMIN";
+
+    /** name of IMUser AO registered in RMI register */
     public static final String NAME_ACTIVE_OBJECT_IMUSER = "IMUSER";
+
+    /** name of IMMonitoring AO registered in RMI register */
     public static final String NAME_ACTIVE_OBJECT_IMMONITORING = "IMMONITORING";
 
-    /** constants for NodeSource objects types */
+    /** constants for {@link PADNodeSource} source type name*/
     public static final String PAD_NODE_SOURCE_TYPE = "PAD_NODE_SOURCE";
+
+    /** constants for {@link P2PNodeSource} source type name*/
     public static final String P2P_NODE_SOURCE_TYPE = "P2P_NODE_SOURCE";
+
+    /** constants for {@link DummyNodeSource} source type name*/
     public static final String DUMMY_NODE_SOURCE_TYPE = "DUMMY_NODE_SOURCE";
 }

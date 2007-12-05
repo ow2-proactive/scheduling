@@ -40,33 +40,42 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PadDeployInterface;
 
 
+/**
+ * Manages for the Infrastructure Manager
+ * a thread pool for {@link IMDeploy} objects that perform deployment.
+ *
+ * @author PrActive team.
+ *
+ */
 public class IMDeploymentFactory {
+
+    /** associated Log4j logger */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_DEPLOYMENT_FACTORY);
 
-    // Attributes
+    /** Thread pool for IMDeploy objects */
     private static ExecutorService executor = Executors.newCachedThreadPool();
 
     /**
-     * Deploy all virtual node of the proactive descriptor <I>pad</I>
-     * @param imCore
-     * @param padName : the name of the proactive descriptor
-     * @param pad     : the procative descriptor
+     * Deploy all virtual node of the ProActive descriptor <I>pad</I>
+     * @param nodeSource Stub of NodeSource object that initiated the deployment.
+     * @param padName : the name of the ProActive descriptor.
+     * @param pad     : the ProcAtive descriptor.
      */
-    public static void deployAllVirtualNodes(PadDeployInterface source,
-        String padName, ProActiveDescriptor pad) {
+    public static void deployAllVirtualNodes(PadDeployInterface nodeSource,
+        ProActiveDescriptor pad) {
         if (logger.isInfoEnabled()) {
             logger.info("deployAllVirtualNodes");
         }
-        IMDeploy d = new IMDeploy(source, padName, pad);
+        IMDeploy d = new IMDeploy(nodeSource, pad);
         executor.execute(d);
     }
 
     /**
      * Deploy only the virtual node <I>vnName</I>
-     * @param imCore
-     * @param padName : the name of the proactive descriptor
-     * @param pad     : the procative descriptor
-     * @param vnName  : the name of the virtual node to deploy
+     * @param nodeSource Stub of NodeSource object that initiated the deployment.
+     * @param padName : the name of the ProActive descriptor.
+     * @param pad     : the ProActive descriptor.
+     * @param vnName  : the name of the virtual node to deploy.
      */
     public static void deployVirtualNode(PadDeployInterface nodeSource,
         String padName, ProActiveDescriptor pad, String vnName) {
@@ -78,9 +87,9 @@ public class IMDeploymentFactory {
 
     /**
      * Deploy only the virtual nodes <I>vnNames</I>
-     * @param imCore
-     * @param padName : the name of the proactive descriptor
-     * @param pad     : the procative descriptor
+     * @param nodeSource Stub of NodeSource object that initiated the deployment.
+     * @param padName : the name of the ProActive descriptor
+     * @param pad     : the ProActive descriptor
      * @param vnNames : the name of the virtual nodes to deploy
      */
     public static void deployVirtualNodes(PadDeployInterface nodeSource,

@@ -45,35 +45,47 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PadDeployInterface;
 
 
+/**
+ * Provides a ProActive descriptor (PAD)
+ * deployment mechanism for Infrastructure Manager.
+ *
+ *
+ * @author ProActive team.
+ *
+ */
 public class IMDeploy implements NodeCreationEventListener, Runnable {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_DEPLOY);
 
-    // Attributes
+    /** name of the Pad to deploy */
     private String padName = null;
+
+    /** pad object to deploy */
     private ProActiveDescriptor pad = null;
+
+    /** Array of virtual nodes names to deploy */
     private String[] vnNames = null;
+
+    /** stub of {@link PADNodeSource} active object that initiated the deployment */
     private PadDeployInterface nodeSource = null;
 
-    //----------------------------------------------------------------------//
-    // Construtors
-
     /**
-     * @param imCore
-     * @param padName : the name of the proactive descriptor
-     * @param pad     : the proactive descriptor
+     * Creates an IMDeploy object.
+     * @param nodeSource Stub of NodeSource object that initiated the deployment.
+     * @param padName descriptor name to deploy.
+     * @param pad ProActive descriptor to deploy.
      */
-    public IMDeploy(PadDeployInterface nodeSource, String padName,
-        ProActiveDescriptor pad) {
+    public IMDeploy(PadDeployInterface nodeSource, ProActiveDescriptor pad) {
         this.nodeSource = nodeSource;
-        this.padName = padName;
+        this.padName = pad.getUrl();
         this.pad = pad;
     }
 
     /**
-     * @param imCore
-     * @param padName : the name of the proactive descriptor
-     * @param pad     : the proactive descriptor
-     * @param vnNames : the name of the virtual nodes of this pad to deploy
+     * Creates an IMDeploy object.
+     * @param nodeSource Stub of NodeSource object that initiated the deployment.
+     * @param padName descriptor name to deploy.
+     * @param pad ProActive descriptor to deploy.
+     * @param vnNames virtual nodes to deploy
      */
     public IMDeploy(PadDeployInterface nodeSource, String padName,
         ProActiveDescriptor pad, String[] vnNames) {
@@ -83,10 +95,9 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
         this.vnNames = vnNames;
     }
 
-    //----------------------------------------------------------------------//
-
     /**
      * Implementation of the method run to interface Runnable
+     * Performs the deployment of the PAD.
      */
     public void run() {
         VirtualNode[] vns;
@@ -113,7 +124,8 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
     }
 
     /**
-     * When a node is activated this method is call for saving
+     * Called when new node is deployed and available.
+     * When a node is activated this method is called for adding
      * the new activated nodes in the NodeSource.
      * @param event
      */

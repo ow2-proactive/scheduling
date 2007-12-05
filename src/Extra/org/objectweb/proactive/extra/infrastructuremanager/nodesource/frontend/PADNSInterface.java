@@ -37,16 +37,18 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
 /**
- * communication Interface for IMCore and IMDeploy objects
+ * Interface for {@link PADNodeSource} objects.
  *
+ * /TODO gsigety, cdelbe: interface totally useless for the moment
  */
 public interface PADNSInterface {
 
     /**
      * add nodes by deploying a ProActive Descriptor, recover nodes created,
-     * adding them to the node Source and register nodes to the IMNodeManager
+     * adding them to the node Source and register nodes to the IMCore.
+     * @param pas ProActive deployment descriptor to deploy.
      */
-    public void addNodes(ProActiveDescriptor pad, String padName);
+    public void addNodes(ProActiveDescriptor pad);
 
     /**
      * @return the number of PADs handled by this {@link PADNodeSource}

@@ -163,32 +163,38 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
 
     public void nodeAddedEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeAddedEvent() " +
-            n.getNodeUrl());
+            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeBusyEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeBusyEvent() " +
-            n.getNodeUrl());
+            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeDownEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeDownEvent() " +
-            n.getNodeUrl());
+            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeFreeEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeFreeEvent() " +
-            n.getNodeUrl());
+            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeToReleaseEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeToReleaseEvent() " +
-            n.getNodeUrl());
+            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeRemovedEvent(IMNodeEvent n) {
         System.out.println("SimpleTestIMMonitoring.nodeRemovedEvent() " +
-            n.getNodeUrl());
+            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeSourceAddedEvent(IMNodeSourceEvent ns) {

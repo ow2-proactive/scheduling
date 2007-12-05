@@ -30,17 +30,38 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.common;
 
+import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
+
+/**
+ * Enumeration of all states of an IMNode :<BR>
+ * -free : node is ready to perform a task.<BR>
+ * -busy : node is executing a task.<BR>
+ * -to be released : node is busy and have to be removed at the end of its current task.<BR>
+ * -down : node is broken, and not anymore able to perform tasks.
+ *
+ * @see IMNode
+ *
+ * @author ProActive team.
+ *
+ */
 public enum NodeState {FREE(0),
     BUSY(1),
     DOWN(2),
     TO_BE_RELEASED(3);
     private int state;
 
+    /**
+     * Constructor
+     * @param nb state to specify.
+     */
     NodeState(int nb) {
         state = nb;
     }
 
-    @Override
+    /**
+     * Gives a string representation of the state.
+     * @return String representation of the state.
+     */
     public String toString() {
         return String.valueOf(state);
     }

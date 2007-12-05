@@ -36,8 +36,11 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
- * Comparator for imnodes :
+ * Comparator for {@link IMNode} objects :<BR>
  * compare two nodes by their chances to verify a script.
+ * This comparator is used to sort a nodes collection according to results
+ * of a {@link SelectionScript}.
+ *
  * @author ProActive Team
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
@@ -45,10 +48,19 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 public class IMNodeComparator implements Comparator<IMNode> {
     private SelectionScript script;
 
+    /**
+     * Create a the comparator object
+     * @param script comparison criteria.
+     */
     public IMNodeComparator(SelectionScript script) {
         this.script = script;
     }
 
+    /**
+     * Comparison function
+     * @return an integer >=0 if o2 is more suitable than o1,
+     *
+     */
     public int compare(IMNode o1, IMNode o2) {
         int status1 = IMNode.NEVER_TESTED;
 

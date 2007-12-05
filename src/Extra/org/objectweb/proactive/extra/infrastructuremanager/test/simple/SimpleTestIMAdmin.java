@@ -53,8 +53,6 @@ public class SimpleTestIMAdmin {
             }
 
             IMAdmin admin = IMConnection.connectAsAdmin(url);
-            System.out.println("#[SimpleTestIMAdmin] Echo admin : " +
-                admin.echo());
 
             System.out.println("#[SimpleTestIMAdmin] deployAllVirtualNodes : " +
                 URL_PAD_LOCAL);

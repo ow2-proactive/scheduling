@@ -48,24 +48,32 @@ import org.objectweb.proactive.core.node.Node;
  */
 public class NodeSet extends ArrayList<Node> {
 
-    /**  */
+    /** serial version UID */
     private static final long serialVersionUID = 4372709972508178428L;
 
+    /**
+     * constructor.
+     */
     public NodeSet() {
         super();
-
         // TODO Auto-generated constructor stub
     }
 
+    /**
+     * Create a node containing a nodes collection.
+     * @param c collection to put ion the NodeSet
+     */
     public NodeSet(Collection<?extends Node> c) {
         super(c);
-
         // TODO Auto-generated constructor stub
     }
 
+    /**
+     * Constructs an empty list with the specified initial capacity.
+     * @param   initialCapacity   the initial capacity of the list
+     */
     public NodeSet(int initialCapacity) {
         super(initialCapacity);
-
         // TODO Auto-generated constructor stub
     }
 }

@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extra.infrastructuremanager;
 
 import java.io.IOException;
-import java.net.URI;
 import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;
@@ -45,17 +44,32 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
+import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 
 
+/**
+ * Object which performs the Infrastructure Manager (IM)creation,
+ * and provides IM's front-end active objects. :<BR>
+ * -{@link IMAdmin}.<BR>
+ * -{@link IMMonitoring}.<BR>
+ * -{@Link IMUSer}.<BR>
+ *
+ * @author ProActive team
+ *
+ */
 public class IMFactory implements IMConstants {
+
+    /** Logger of the IMFactory */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.IM_FACTORY);
+
+    /** IMCore interface of the created Infrastructure manager */
     private static IMCoreInterface imcore = null;
 
     /**
-     * Start the infrastructure manager in the local host
+     * Creates Infrastructure manager on local host.
      * @throws NodeException
      * @throws ActiveObjectCreationException
      * @throws AlreadyBoundException
@@ -81,179 +95,53 @@ public class IMFactory implements IMConstants {
         }
     }
 
-    //----------------------------------------------------------------------//
-    // GET IMCORE
-
     /**
-     * Get the actif object IMCORE in the local host
-     * @return IMCore
-     * @throws IOException
-     * @throws AlreadyBoundException
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
+     * Gives the active object IMADMIN on local host.
+     * @return IMAdmin active object.
+     * @throws IMException if the Infrastructure Manager hasn't been created before.
      */
-    private static IMCoreInterface getIMCore()
-        throws NodeException, ActiveObjectCreationException,
-            AlreadyBoundException, IOException {
-        if (imcore != null) {
-            return imcore;
-        } else {
-            return getIMCore("//localhost/" + NAME_ACTIVE_OBJECT_IMCORE);
-        }
-    }
-
-    /**
-     * @param urlIM : the location of the actif object IMCORE (For example : "//localhost/IMCORE")
-     * @see the name of the IM node in the classe IMConstantes (NAME_ACTIVE_OBJECT_IMCORE)
-     * @return IMCore
-     * @throws IOException
-     * @throws ActiveObjectCreationException
-     */
-    private static IMCoreInterface getIMCore(String urlIM)
-        throws ActiveObjectCreationException, IOException {
-        if (logger.isInfoEnabled()) {
-            logger.info("lookup of IMCore at the IM url node : " + urlIM);
-        }
-
-        IMCoreInterface imcoreLookUp;
-
-        //TODO GERMS lookup sur interface IMNodeManager ou sur IMNodeManagerImpl ?  
-        imcoreLookUp = (IMCoreInterface) ProActiveObject.lookupActive(IMCoreInterface.class.getName(),
-                urlIM);
-
-        return imcoreLookUp;
-    }
-
-    /**
-     * Call the method getIMCore(String);<BR/>
-     * URL -> String
-     * @param urlIM
-     * @return IMCore
-     * @throws ActiveObjectCreationException
-     * @throws IOException
-     */
-    private static IMCoreInterface getIMCore(URI urlIM)
-        throws ActiveObjectCreationException, IOException {
-        String locationIM = urlIM.toString();
-
-        if (!(locationIM.charAt(locationIM.length() - 1) == '/')) {
-            locationIM += "/";
-        }
-
-        locationIM += IMConstants.NAME_ACTIVE_OBJECT_IMCORE;
-
-        return getIMCore(locationIM);
-    }
-
-    /**
-     * @return IMAdmin
-     * @throws IOException
-     * @throws AlreadyBoundException
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     */
-    public static IMAdmin getAdmin()
-        throws NodeException, ActiveObjectCreationException,
-            AlreadyBoundException, IOException {
+    public static IMAdmin getAdmin() throws IMException {
         if (imcore != null) {
             if (logger.isInfoEnabled()) {
                 logger.info("We have started the imcore");
             }
-
             return imcore.getAdmin();
         } else {
-            if (logger.isInfoEnabled()) {
-                logger.info("We try to look at localhost for IM");
-            }
-
-            return getIMCore().getAdmin();
+            throw new IMException(
+                "Infrastructure Manager has not been created before");
         }
     }
 
     /**
-     * @param urlIM : the location of the actif object IMCORE
-     *                 (For example : "rmi://localhost:1099/")
-     * @return IMAdmin
-     * @throws IOException
-     * @throws ActiveObjectCreationException
+     * @return IMMonitoring active object on local host.
+     * @throws IMException if the Infrastructure Manager hasn't been created before
      */
-    public static IMAdmin getAdmin(URI uriIM)
-        throws ActiveObjectCreationException, IOException {
-        IMCoreInterface imcoreLookUp = getIMCore(uriIM);
-
-        return imcoreLookUp.getAdmin();
-    }
-
-    //----------------------------------------------------------------------//
-    // GET MONITORING
-
-    /**
-     * @return IMMonitoring
-     * @throws IOException
-     * @throws AlreadyBoundException
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     */
-    public static IMMonitoring getMonitoring()
-        throws NodeException, ActiveObjectCreationException,
-            AlreadyBoundException, IOException {
+    public static IMMonitoring getMonitoring() throws IMException {
         if (imcore != null) {
             return imcore.getMonitoring();
         } else {
-            return getIMCore().getMonitoring();
+            throw new IMException(
+                "Infrastructure Manager has not been created before");
         }
     }
 
     /**
-     * @param urlIM : the location of the actif object IMCORE
-     *                 (For example : "rmi://localhost:1099/")
-     * @return IMMonitoring
-     * @throws IOException
-     * @throws ActiveObjectCreationException
+     * @return IMUser active object on local host.
+     * @throws IMException if the Infrastructure Manager hasn't been created before
      */
-    public static IMMonitoring getMonitoring(URI uriIM)
-        throws ActiveObjectCreationException, IOException {
-        IMCoreInterface imcoreLookUp = getIMCore(uriIM);
-
-        return imcoreLookUp.getMonitoring();
-    }
-
-    //----------------------------------------------------------------------//
-    // GET USER
-
-    /**
-     * @return IMUser
-     * @throws IOException
-     * @throws AlreadyBoundException
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     */
-    public static IMUser getUser()
-        throws NodeException, ActiveObjectCreationException,
-            AlreadyBoundException, IOException {
+    public static IMUser getUser() throws IMException {
         if (imcore != null) {
             return imcore.getUser();
         } else {
-            return getIMCore().getUser();
+            throw new IMException(
+                "Infrastructure Manager has not been created before");
         }
     }
 
     /**
-     * @param urlIM : the location of the actif object IMCORE
-     *                 (For example : "rmi://localhost:1099/")
-     * @return IMUser
-     * @throws IOException
-     * @throws ActiveObjectCreationException
+     * Main function, create the Infrastructure Manager.
+     * @param args command line arguments
      */
-    public static IMUser getUser(URI uriIM)
-        throws ActiveObjectCreationException, IOException {
-        IMCoreInterface imcoreLookUp = getIMCore(uriIM);
-
-        return imcoreLookUp.getUser();
-    }
-
-    //----------------------------------------------------------------------//
-    // MAIN : start the IM 
     public static void main(String[] args) {
         try {
             startLocal();

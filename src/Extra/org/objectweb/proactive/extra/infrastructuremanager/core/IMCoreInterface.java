@@ -34,121 +34,253 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
-import org.objectweb.proactive.extra.infrastructuremanager.dataresource.IMDataResource;
+import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
+import org.objectweb.proactive.extra.infrastructuremanager.exception.AddingNodesException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DynamicNodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
+import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
- * The {@link IMDataResource} class will handle the resource queries :
- * return nodes that verify the given script, get back the nodes.
- * It's a kind of resource managment policy : you can write your own policy provided the nodes.
+ * Interface of the IMCore Active object for {@link IMAdmin},
+ * {@link IMUser}, {@link IMMonitoring} active objects.
+ *
+ * @see IMCore
+ *
  * @author proactive team
  *
  */
 public interface IMCoreInterface {
+
+    /**
+     * Gives a String representation of the IMCore's ID.
+     * @return String representation of the IMCore's ID.
+     */
     public String getId();
 
-    //Germs old methods to garbage
-    public void createP2PNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr, Vector<String> peerUrls);
-
-    public void createDummyNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr);
-
-    public BooleanWrapper shutdown();
-
+    /**
+     * Creates a static node source Active Object.
+     * Creates a new static node source which is a {@link PADNodeSource} active object.
+     * @param pad a ProActiveDescriptor object to deploy at the node source creation.
+     * @param sourceName name given to the static node source.
+     */
     public void createStaticNodesource(ProActiveDescriptor pad,
         String sourceName);
 
+    /**
+     * Creates a Dynamic Node source Active Object.
+     * Creates a new dynamic node source which is a {@link P2PNodeSource} active object.
+     * Other dynamic node source (PBS, OAR) are not yet implemented
+     * @param id name of the dynamic node source to create
+     * @param nbMaxNodes max number of nodes the NodeSource has to provide.
+     * @param nice nice time in ms, time to wait between a node remove and a new node acquisition
+     * @param ttr Time to release in ms, time during the node will be kept by the nodes source and the Core.
+     * @param peerUrls vector of ProActive P2P living peer and able to provide nodes.
+     */
+    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice,
+        int ttr, Vector<String> peerUrls);
+
+    /**
+     * Creates a dummy node source to test a {@link DynamicNodeSource} active object
+     * @param id name of the dynamic node source to create
+     * @param nbMaxNodes max number of number the NodeSource has to provide.
+     * @param nice nice time in ms, time to wait between a node remove and a new node acquisition
+     * @param ttr Time to release in ms, time during the node will be keeped by the Nodesource and the Core.
+     */
+    public void createDummyNodeSource(String id, int nbMaxNodes, int nice,
+        int ttr);
+
+    /**
+     * Add nodes to a static Node Source.
+     * Ask to a static Node source to deploy a ProActiveDescriptor.
+     * nodes deployed will be added after to IMCore, by the NodeSource itself.
+     * @param pad ProActiveDescriptor to deploy
+     * @param sourceName name of an existing PADNodesource
+     * @throws AddingNodesException if the NodeSource
+     */
     public void addNodes(ProActiveDescriptor pad, String sourceName);
 
+    /**
+     * Add nodes to the default static Node Source.
+     * Ask to the default static Node source to deploy a ProActiveDescriptor.
+     * nodes deployed will be added after to IMCore, by the NodeSource itself.
+     * @param pad ProActiveDescriptor to deploy
+     */
     public void addNodes(ProActiveDescriptor pad);
 
-    public void removeNode(String nodeUrl, boolean killNode);
-
-    public void removeSource(String ns, boolean killNodes);
-
-    public ArrayList<NodeSource> getNodeSources();
-
-    public IntWrapper getSizeListFreeIMNode();
-
-    public IntWrapper getSizeListBusyIMNode();
-
-    public IntWrapper getSizeListDownIMNode();
-
-    public IntWrapper getSizeListToReleaseIMNode();
-
-    public IntWrapper getNbAllIMNode();
-
-    public ArrayList<IMNode> getListFreeIMNode();
-
-    public ArrayList<IMNode> getListBusyIMNode();
-
-    public ArrayList<IMNode> getListAllNodes();
-
-    public ArrayList<IMNode> getListToReleasedIMNodes();
-
-    public IMInitialState getIMInitialState();
-
-    // ----------------------------------------------------------------------//
-    // ACCESSORS
-    public Node getNodeIM();
-
-    public IMAdmin getAdmin();
-
-    public IMMonitoring getMonitoring();
-
-    public IMUser getUser();
-
-    //----------------------------------------------------------------------//
-    //User
-    //----------------------------------------------------------------------//
-
-    // GET NODE 
     /**
-     * Return a maximum of nb Nodes in a {@link NodeSet},
-     * that verify the {@link VerifyingScript} if given.
-     * If no node is available, an empty NodeSet is returned.
+     * Remove a node from the Core and from its node source.
+     * perform the removing request of a node
+     * asked by {@link IMAdmin} active object.<BR><BR>
+     *
+     * If the node is down, node is just removed from the Core, and nothing is asked to its related NodeSource,
+     * because the node source has already detected the node down (it is its function), informed the IMCore,
+     * and removed the node from its list.<BR>
+     * Else the removing request is just forwarded to the corresponding NodeSource of the node.<BR><BR>
+     * @param nodeUrl URL of the node to remove.
+     * @param preempt true the node must be removed immediately, without waiting job ending if the node is busy,
+     * false the node is removed just after the job ending if the node is busy.
+     *
      */
+    public void removeNode(String nodeUrl, boolean preempt);
+
+    /**
+     * Stops the Infrastructure Manager.
+     * Stops all {@link NodeSource} active objects
+     * Stops {@link IMAdmin}, {@link IMUser}, {@link IMMonitoring} active objects.
+     */
+    public BooleanWrapper shutdown();
+
+    /**
+     * Stops and removes a NodeSource active object with their nodes from the Infrastructure Manager
+     * @param sourceName name of the NodeSource object to remove
+     * @param preempt true all the nodes must be removed immediately, without waiting job ending if nodes are busy,
+     * false nodes are removed just after the job ending if busy.
+     */
+    public void removeSource(String sourceName, boolean preempt);
+
+    /**
+    * Get a set of nodes that verify a selection script.
+    * This method has three way to handle the request :<BR>
+    *  - if there is no script, it returns at most the
+    * first nb free nodes asked.<BR>
+    * - If the script is a dynamic script, the method will
+    * test the resources, until nb nodes verify the script or if there is no
+    * node left.<BR>
+    * - If the script is a static script, it will return in priority the
+    * nodes on which the given script has already been verified.<BR>
+    *
+    * @param nb number of node to provide
+    * @param selectionScript that nodes must verify
+    */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript);
 
     /**
-     * Return nb Nodes in a {@link NodeSet},
-     * that verify the {@link VerifyingScript} if given.
-     * If no node is available, or if there is not enough nodes,
-     * an empty NodeSet is returned.
+     * Returns an exactly number of nodes
+     * not yet implemented.
+     * @param nb exactly number of nodes to provide.
+     * @param selectionScript  that nodes must verify.
      */
     public NodeSet getExactlyNodes(IntWrapper nb,
         SelectionScript selectionScript);
 
-    // FREE NODE
     /**
-     * The scheduler or other application that use the Infrastructure Manager
-     * ask to free a node.
+     * Free a node after a work.
+     * IMUser active object wants to free a node that has ended a task.
+     * If the node is 'to be released', perform the removing mechanism with
+     * the {@link NodeSource} object corresponding to the node,
+     * otherwise just set the node to free.
+     * @param node node that has terminated a task and must be freed.
      */
     public void freeNode(Node node);
 
     /**
-     * This method provide a way to free a set of nodes in one call.
-     * @param nodes
+     * Free a set of nodes.
+     * @param nodes a set of nodes to set free.
      */
     public void freeNodes(NodeSet nodes);
 
     /**
-     * You can free nodes giving their {@link VirtualNode}.
-     * @param vnode
+     * Gives an array list of NodeSource object
+     * @return list of NodeSource objects of the IM.
      */
-    @Deprecated
-    public void freeNodes(VirtualNode vnode);
+    public ArrayList<NodeSource> getNodeSources();
+
+    /**
+     * Gives number of free nodes handled by the Core.
+     * @return IntWrapper number of free nodes in the IMCore.
+     */
+    public IntWrapper getSizeListFreeIMNode();
+
+    /**
+     * Gives number of busy nodes handled by the Core.
+     * @return IntWrapper number of busy nodes in the IMCore.
+     */
+    public IntWrapper getSizeListBusyIMNode();
+
+    /**
+     * Gives number of down nodes handled by the Core.
+     * @return IntWrapper number of down nodes in the IMCore.
+     */
+    public IntWrapper getSizeListDownIMNode();
+
+    /**
+     * Gives number of 'to be released' nodes handled by the Core.
+     * @return IntWrapper number of 'to be released' nodes in the IMCore.
+     */
+    public IntWrapper getSizeListToReleaseIMNode();
+
+    /**
+     * Gives number of all nodes handled by the Core.
+     * @return IntWrapper number of nodes in the IMCore.
+     */
+    public IntWrapper getNbAllIMNode();
+
+    /**
+     * Gives the free nodes list
+     * @return free nodes of the IMCore.
+     */
+    public ArrayList<IMNode> getListFreeIMNode();
+
+    /**
+     * Gives the busy nodes list
+     * @return busy nodes of the IMCore.
+     */
+    public ArrayList<IMNode> getListBusyIMNode();
+
+    /**
+     * Gives the 'to be released' nodes list
+     * @return 'to be released' nodes of the IMCore.
+     */
+    public ArrayList<IMNode> getListToReleasedIMNodes();
+
+    /**
+     * Gives the list of all nodes handled by th IMCore
+     * @return 'to be released' nodes of the IMCore.
+     */
+    public ArrayList<IMNode> getListAllNodes();
+
+    /**
+     * Builds and returns a snapshot of IMCore's current state.
+     * Initial state must be understood as a new Monitor point of view.
+     * A new monitor start to receive IMCore events, so must be informed of the current
+     * state of the Core at the beginning of monitoring.
+            * @return IMInitialState containing nodes and nodeSources of the IMCore.
+     */
+    public IMInitialState getIMInitialState();
+
+    /**
+     * Returns the ProActive Node containing the IMCore active object.
+     * @return the ProActive Node containing the IMCore active object.
+     */
+    public Node getNodeIM();
+
+    /**
+     * Returns the stub of IMAdmin ProActive object.
+     * @return the IMAdmin ProActive object.
+     */
+    public IMAdmin getAdmin();
+
+    /**
+     * Returns the stub of IMMonitoring ProActive object.
+     * @return the IMMonitoring ProActive object.
+     */
+    public IMMonitoring getMonitoring();
+
+    /**
+     * Returns the stub of IMUser ProActive object.
+     * @return the IMUser ProActive object.
+     */
+    public IMUser getUser();
 }
