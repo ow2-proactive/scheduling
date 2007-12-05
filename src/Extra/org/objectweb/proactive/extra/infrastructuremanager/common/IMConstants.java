@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.common;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.DummyNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNodeSource;
@@ -43,6 +44,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNod
  * @author ProActive team
  *
  */
+@PublicAPI
 public interface IMConstants {
 
     /** Name of the ProActive node which contains

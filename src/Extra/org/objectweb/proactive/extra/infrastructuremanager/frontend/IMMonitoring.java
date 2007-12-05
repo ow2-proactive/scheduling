@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -55,6 +56,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
  *
  * * @author ProActive team.
  */
+@PublicAPI
 public interface IMMonitoring {
 
     /** Echo function */

@@ -35,6 +35,7 @@ import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -60,6 +61,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
  * @author ProActive team
  *
  */
+@PublicAPI
 public class IMFactory implements IMConstants {
 
     /** Logger of the IMFactory */

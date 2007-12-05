@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
@@ -49,6 +50,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.N
  * @author ProActive team.
  *
  */
+@PublicAPI
 public interface IMEventListener {
 
     /** IM is shutting down */

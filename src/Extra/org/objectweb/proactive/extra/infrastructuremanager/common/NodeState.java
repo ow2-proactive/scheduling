@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.common;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 /**
@@ -44,6 +45,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
  * @author ProActive team.
  *
  */
+@PublicAPI
 public enum NodeState {FREE(0),
     BUSY(1),
     DOWN(2),

@@ -33,8 +33,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.common;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMEventListener;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
@@ -55,6 +54,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.N
  * @author ProActive team
  *
  */
+@PublicAPI
 public class IMInitialState implements Serializable {
 
     /** serial version UID */

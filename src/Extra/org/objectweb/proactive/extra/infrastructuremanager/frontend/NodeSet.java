@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -46,6 +47,7 @@ import org.objectweb.proactive.core.node.Node;
  * @version 1.0, Jun 11, 2007
  * @since ProActive 3.2
  */
+@PublicAPI
 public class NodeSet extends ArrayList<Node> {
 
     /** serial version UID */

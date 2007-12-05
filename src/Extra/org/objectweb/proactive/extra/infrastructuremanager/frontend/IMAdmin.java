@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 import java.io.Serializable;
 import java.util.Vector;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.dynamic.P2PNodeSource;
@@ -53,6 +54,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.PADNod
  * @author ProActive team
  *
  */
+@PublicAPI
 public interface IMAdmin extends Serializable {
 
     /**

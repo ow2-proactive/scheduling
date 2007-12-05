@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 import java.io.IOException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
@@ -50,6 +51,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException
  * @author ProActive team.
  *
  */
+@PublicAPI
 public class IMConnection implements IMConstants {
 
     /**

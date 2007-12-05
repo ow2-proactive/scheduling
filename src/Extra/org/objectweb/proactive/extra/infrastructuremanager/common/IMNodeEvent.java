@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.common;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
@@ -58,6 +59,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.N
  * @author ProActive team.
  *
  */
+@PublicAPI
 public class IMNodeEvent implements Serializable {
 
     /** serial version UID */
