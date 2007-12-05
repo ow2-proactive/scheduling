@@ -33,9 +33,9 @@ package org.objectweb.proactive.examples.hello;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProLifeCycle;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -93,6 +93,6 @@ public class Hello implements java.io.Serializable {
         logger.info("On " + getHostName() + ", a message was received: " +
             received); // potential wait-by-necessity 
         descriptorPad.killall(true);
-        ProActive.exitSuccess();
+        ProLifeCycle.exitSuccess();
     }
 }

@@ -36,9 +36,9 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.ProLifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -115,7 +115,7 @@ public class Jacobi implements Serializable {
             descriptor.killall(true);
         } catch (ProActiveException e) {
         }
-        ProActive.exitSuccess();
+        ProLifeCycle.exitSuccess();
     }
 
     public static void main(String[] args) {

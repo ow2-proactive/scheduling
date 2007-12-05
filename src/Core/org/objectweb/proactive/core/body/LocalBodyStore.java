@@ -34,8 +34,8 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
+import org.objectweb.proactive.api.ProLifeCycle;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
@@ -312,7 +312,7 @@ public class LocalBodyStore {
         // END ProActiveEvent
         if ((this.localBodyMap.size() == 0) &&
                 PAProperties.PA_EXIT_ON_EMPTY.isTrue()) {
-            ProActive.exitSuccess();
+            ProLifeCycle.exitSuccess();
         }
     }
 

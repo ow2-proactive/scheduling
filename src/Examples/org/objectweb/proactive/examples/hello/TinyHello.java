@@ -33,8 +33,8 @@ package org.objectweb.proactive.examples.hello;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.ProLifeCycle;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -84,6 +84,6 @@ public class TinyHello implements java.io.Serializable {
             received); // potential wait-by-necessity
                        // quitting
 
-        ProActive.exitSuccess();
+        ProLifeCycle.exitSuccess();
     }
 }

@@ -34,9 +34,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.ProLifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -151,10 +151,10 @@ public class Launcher {
     private static void finish() {
         try {
             pad.killall(true);
-            ProActive.exitSuccess();
+            ProLifeCycle.exitSuccess();
         } catch (ProActiveException ex) {
             ex.printStackTrace();
-            ProActive.exitFailure();
+            ProLifeCycle.exitFailure();
         }
     }
 }
