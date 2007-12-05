@@ -33,9 +33,11 @@ package org.objectweb.proactive.mpi;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 
 
+@PublicAPI
 public interface MPISpmd {
 
     /**

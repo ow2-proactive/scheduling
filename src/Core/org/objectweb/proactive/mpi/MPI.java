@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.mpi;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
 
@@ -37,6 +38,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
  * This class provides a standard entry point for API MPI tools.
  * @author The ProActive Team
  */
+@PublicAPI
 public class MPI {
 
     /**

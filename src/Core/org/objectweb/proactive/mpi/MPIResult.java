@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.mpi;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
+@PublicAPI
 public class MPIResult implements java.io.Serializable {
     private int returnValue;
 
