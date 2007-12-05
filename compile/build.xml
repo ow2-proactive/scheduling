@@ -379,8 +379,13 @@
 			<fileset dir="${base.dir}/scripts">
 				<include name="unix/cluster/**"/>
 				<include name="windows/cluster/**"/>
+				<include name="gcmdeployment/**"/>
 			</fileset>
 		</copy>
+		<chmod perm="755">
+			<fileset dir="${deploy.scripts.dir}"/>
+		</chmod>
+		
 	</target>
 
 
@@ -685,7 +690,6 @@
 			<format_m srcdir="${src.test.dir}" />
 			<format_m srcdir="${ic2d-plugin.dir}" />
 			<format_m srcdir="${scheduler-plugin.dir}" />
-			<format_m srcdir="${im-plugin.dir}" />
 		</parallel>
 	</target>
 

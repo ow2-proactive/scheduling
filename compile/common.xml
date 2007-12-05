@@ -74,12 +74,11 @@
 	
 	<!-- Scheduler/Infrastructure Manager properties -->
 	<property name="scheduler-plugin.dir" value="${base.dir}/scheduler-plugins-src" />
-	<property name="im-plugin.dir" value="${base.dir}/infrastructure-manager-src" />
 	
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
 	
 	<!-- junit properties -->
-	<property name="junit.showoutput" value="false"/>
+	<property name="junit.showoutput" value="true"/>
 
 	<!-- Performance test properties -->
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest" />
