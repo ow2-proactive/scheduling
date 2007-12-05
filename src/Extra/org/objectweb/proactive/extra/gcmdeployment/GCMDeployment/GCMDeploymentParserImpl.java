@@ -186,7 +186,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 e.getMessage());
             throw new SAXException(msg, e);
         } /* catch (XPathExpressionException e) {
-          GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
+        GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
         } catch (TransformerException e) {
         GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
         ;
