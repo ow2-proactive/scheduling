@@ -18,7 +18,7 @@
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    sodipodi:docbase="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/doc-src/images"
    sodipodi:docname="automaticContinuation5.svg"
-   inkscape:export-filename="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/doc-src/images/automaticContinuation6.png"
+   inkscape:export-filename="/auto/sea/u/sea/0/user/vjuresch/workspace/ProActive/doc-src/images/automaticContinuation5.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <metadata
@@ -997,11 +997,11 @@
              width="82.024384"
              id="rect2834" /></flowRegion><flowPara
            id="flowPara2838"
-           style="font-family:Aharoni CLM">Object B<flowSpan
+           style="font-family:Aharoni CLM">Object <flowSpan
    style="font-weight:bold"
-   id="flowSpan2840" /></flowPara><flowPara
+   id="flowSpan3269">B</flowSpan></flowPara><flowPara
            id="flowPara2842"
-           style="font-family:Aharoni CLM" /></flowRoot>      <path
+           style="font-family:Aharoni CLM;font-weight:bold" /></flowRoot>      <path
          transform="matrix(0.7446579,0,0,0.4377257,-24.88923,56.765)"
          d="M 112.42998 109.19259 A 6.3639607 9.8994951 0 1 1  99.702056,109.19259 A 6.3639607 9.8994951 0 1 1  112.42998 109.19259 z"
          sodipodi:ry="9.8994951"

@@ -984,9 +984,9 @@
            y="-90.918625"
            style="font-size:12px" /></flowRegion><flowPara
          style="font-family:Aharoni CLM"
-         id="flowPara2838">Object B<flowSpan
-   id="flowSpan2840"
-   style="font-weight:bold" /></flowPara><flowPara
+         id="flowPara2838">Object <flowSpan
+   style="font-weight:bold"
+   id="flowSpan3007">B</flowSpan></flowPara><flowPara
          style="font-family:Aharoni CLM"
          id="flowPara2842" /></flowRoot>    <path
        sodipodi:type="arc"

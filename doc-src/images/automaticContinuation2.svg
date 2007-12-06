@@ -984,9 +984,9 @@
            y="-90.918625"
            style="font-size:12px" /></flowRegion><flowPara
          style="font-family:Aharoni CLM"
-         id="flowPara2838">Object B<flowSpan
-   id="flowSpan2840"
-   style="font-weight:bold" /></flowPara><flowPara
+         id="flowPara2838">Object <flowSpan
+   style="font-weight:bold"
+   id="flowSpan2544">B</flowSpan></flowPara><flowPara
          style="font-family:Aharoni CLM"
          id="flowPara2842" /></flowRoot>    <path
        sodipodi:type="arc"
@@ -1081,7 +1081,7 @@
              width="75.855507"
              id="rect2782" /></flowRegion><flowPara
            style="font-size:13.7500267px;text-align:center;text-anchor:middle;font-family:Aharoni CLM"
-           id="flowPara2784">Future_v</flowPara><flowPara
+           id="flowPara2784">Future_v1</flowPara><flowPara
            style="font-size:13.7500267px;text-align:center;text-anchor:middle;font-family:Aharoni CLM"
            id="flowPara2786">Stub</flowPara></flowRoot>      <flowRoot
          style="font-size:14.80264091px;text-align:center;text-anchor:middle"
@@ -1096,7 +1096,7 @@
              width="77.900856"
              id="rect2792" /></flowRegion><flowPara
            style="font-size:14.80264091px;text-align:center;text-anchor:middle;font-family:Aharoni CLM"
-           id="flowPara2794">Future_v</flowPara><flowPara
+           id="flowPara2794">Future_v1</flowPara><flowPara
            id="flowPara2796"
            style="font-size:14.80264091px;text-align:center;text-anchor:middle;font-family:Aharoni CLM">Proxy</flowPara></flowRoot>      <path
          sodipodi:nodetypes="cc"
