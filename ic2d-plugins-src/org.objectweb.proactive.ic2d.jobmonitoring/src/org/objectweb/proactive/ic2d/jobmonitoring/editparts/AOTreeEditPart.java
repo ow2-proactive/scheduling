@@ -63,7 +63,6 @@ public class AOTreeEditPart extends JobMonitoringTreeEditPart<ActiveObject> {
     /**
      * @see java.util.Observer#update(Observable, Object)
      */
-    @Override
     public final void update(final Observable o, final Object arg) {
         if (arg.getClass() != MVCNotification.class) {
             return;

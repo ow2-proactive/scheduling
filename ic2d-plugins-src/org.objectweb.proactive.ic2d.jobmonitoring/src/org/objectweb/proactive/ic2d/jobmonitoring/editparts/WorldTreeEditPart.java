@@ -58,7 +58,6 @@ public class WorldTreeEditPart extends JobMonitoringTreeEditPart<WorldObject> {
     /**
      * @see java.util.Observer#update(Observable, Object)
      */
-    @Override
     public final void update(final Observable o, final Object arg) {
         getViewer().getControl().getDisplay().syncExec(this);
     }

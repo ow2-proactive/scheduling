@@ -67,7 +67,6 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart<RuntimeObject> {
     /**
      * @see java.util.Observer#update(Observable, Object)
      */
-    @Override
     public final void update(final Observable o, final Object arg) {
         if (arg.getClass() != MVCNotification.class) {
             return;

@@ -62,7 +62,6 @@ public class NodeTreeEditPart extends JobMonitoringTreeEditPart<NodeObject> {
     /**
      * @see java.util.Observer#update(Observable, Object)
      */
-    @Override
     public final void update(final Observable o, final Object arg) {
         if (arg.getClass() != MVCNotification.class) {
             return;

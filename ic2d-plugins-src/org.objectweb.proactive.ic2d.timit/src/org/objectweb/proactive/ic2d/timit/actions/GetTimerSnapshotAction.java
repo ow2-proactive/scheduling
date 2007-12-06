@@ -112,7 +112,6 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
         }
     }
 
-    @Override
     public void setActiveSelect(AbstractData ref) {
         if ((this.container != null) && (ref instanceof ActiveObject)) {
             BasicChartObject basicChartObject = this.container.getChartObjectById(((ActiveObject) ref).getUniqueID());
