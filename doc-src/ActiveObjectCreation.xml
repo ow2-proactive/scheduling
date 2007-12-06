@@ -1935,15 +1935,9 @@
 
 			<para>
 				The ping is started when the future is being awaited, but
-				it is also possible to start if beforehand using the
-				<emphasis>ProFuture.monitorFuture(future)</emphasis> API.
-			</para>
-
-			<para>
-				When using the fault tolerance this mechanism is
-				disabled as it could interfere with the former. This
-				should not be a problem as the features provided by the
-				fault tolerance mechanism is a super set of this one.
+				it is also possible to start it beforehand using the
+				<literal>ProFuture.monitorFuture(java.lang.Object future)</literal>. 
+				To find out more about the fault tolerance mechanism read <xref linkend="faultTolerance"/>
 			</para>
 		</sect2>
 	</sect1>
@@ -2052,8 +2046,13 @@
 			<title>Example</title>
 
 			<para>
-				The following piece of code shows both cases: passing a
-				future as parameter or as a result.
+				To illustrate how automatic continuation takes place we will use three classes:
+				<literal>A</literal>,<literal>B</literal>, and <literal>Worker</literal>. The
+				 <literal>A</literal> and <literal>B</literal> classes are used to instantiate passive
+				 objects and the <literal> Worker </literal> class is used to instantiate an active object.
+				 The <literal>Worker</literal> class has a <literal> foo() </literal> method and the
+				 <literal>B</literal> class has a <literal> bar(Value v) </literal> method. 
+			
 			</para>
 
 			<para>
@@ -2062,7 +2061,7 @@
 
 			<para>where</para>
 
-			<programlisting lang="java"><textobject><textdata fileref="code_snippets/futurePasserClassA.txt"></textdata></textobject></programlisting>
+			<programlisting lang="java"><textobject><textdata fileref="code_snippets/futurePasserClassWorker.txt"></textdata></textobject></programlisting>
 
 			<para>and</para>
 
@@ -2075,12 +2074,14 @@
 			<indexterm>
 				<primary>Automatic Continuation</primary>
 			</indexterm>
-
 			<para>
-				We will illustrate how a future is first created, and
-				then passed as parameter to a method.
+			We will first call <literal>foo()</literal> on the worker. The call goes through the worker stub
+			and the body proxy and it is placed in the queue of the body. We are using
+			a passive object as an example, however the process is similar if the
+			caller was an active object or if the the objects were all on the same machine.In 
+			those cases the call
+			will also go through the stub and proxy as described in the sequence diagrams above. 
 			</para>
-
 			<para>
 				<informalfigure>
 					<mediaobject>
@@ -2091,14 +2092,13 @@
 					</mediaobject>
 				</informalfigure>
 			</para>
-
 			<para>
-				Let us say that some piece of code in main method of an
-				object C calls method
-				<emphasis role="bold">foo()</emphasis>
-				on an instance of class A.
-			</para>
-
+				
+				After sending the request the thread of object <literal>A</literal> continues immediately
+				(asynchronous call)
+				and <literal> v1 </literal> points to a future that has not been updated yet.   
+				</para>
+			
 			<para>
 				<informalfigure>
 					<mediaobject>
@@ -2110,12 +2110,7 @@
 				</informalfigure>
 			</para>
 
-			<para>
-				This call is asynhronous and returns a future object
-				<emphasis role="bold">Future_r1</emphasis>
-				of class Result.
-			</para>
-
+			<para>Next, object <literal>A</literal> calls <literal>bar(v1)</literal> on B.</para> 
 			<para>
 				<informalfigure>
 					<mediaobject>
@@ -2126,13 +2121,12 @@
 					</mediaobject>
 				</informalfigure>
 			</para>
-
 			<para>
-				Then method
-				<emphasis role="bold">bar()</emphasis>
-				is called on an instance of class B passing future
-				<emphasis role="bold">Future_r1</emphasis>
-				as a parameter to the method
+
+				The call on <literal>B</literal> leads to the creation of another future 
+				to which <literal>v2</literal> will point to. Also because  <literal>v1</literal> 
+				has not been updated yet there will be a another future created on object <literal>
+				B</literal>. 
 			</para>
 
 			<para>
@@ -2147,14 +2141,9 @@
 			</para>
 
 			<para>
-				This call is asynhronous and returns a future object
-				<emphasis role="bold">Future_r2</emphasis>
-				of class Result. B needs the value of
-				<emphasis role="bold">Future_r1</emphasis>
-				which is not yet available in order to return the result
-				of method
-				<emphasis role="bold">bar()</emphasis>
-				, so it gets the future too.
+			At some point the active object finishes executing <literal>foo</literal>
+			and the value of the future for <literal>v1</literal> will be updated by the
+			<literal>Body</literal>.	 
 			</para>
 
 			<para>
@@ -2167,13 +2156,11 @@
 					</mediaobject>
 				</informalfigure>
 			</para>
-
 			<para>
-				The value of the result for the call to method
-				<emphasis role="bold">foo</emphasis>
-				is now available, so A updates the value of
-				<emphasis role="bold">Future_r1</emphasis>
+			After the value (//TODO synchronous or asych?) on <literal>A</literal> is
+			updated, <literal>A</literal> updates the value in the future on <literal>B</literal>.
 			</para>
+
 
 			<para>
 				<informalfigure>
@@ -2187,9 +2174,9 @@
 			</para>
 
 			<para>
-				C updates the value of
-				<emphasis role="bold">Future_r1</emphasis>
-				for B
+				Once <literal>B</literal> has the value for the future it will execute 
+				<literal>bar()</literal> with the recieved value and update the value
+				<literal>v2</literal> in <literal>A</literal>.
 			</para>
 
 			<para>
@@ -2204,15 +2191,8 @@
 			</para>
 
 			<para>
-				B returns the value for the call to method
-				<emphasis role="bold">bar()</emphasis>
-				and updates the value of
-				<emphasis role="bold">Future_r2</emphasis>
-				for C
+				The final state is with all the future values updated. 
 			</para>
-			
-			
-			
 			<para>
 				<informalfigure>
 					<mediaobject>
@@ -2223,459 +2203,18 @@
 					</mediaobject>
 				</informalfigure>
 			</para>
-			
-			
+			<para>As seen above, as long there is a future needed for a computation, it
+			will be passed to the object doing the computation as long as it is not 
+			need it immediately. If the value is needed right away, the caller thread will
+			block until the future is updated, just like in single threaded call.
+			</para>
+			<para>
+			//TODO object responsabilities when  updating futures</para>
+				
 		</sect2>
+		
 	</sect1>
-
-	<sect1 id="HelloWorld">
-		<title>The Hello world example</title>
-
-		<para>
-			This example implements a very simple client-server
-			application. A client object display a
-			<literal>String</literal>
-			received from a remote server. We will see how to write
-			classes from which active and remote objects can be created,
-			how to find a remote object and how to invoke methods on
-			remote objects.
-		</para>
-
-		<sect2>
-			<title>The two classes</title>
-
-			<para>
-				Only two classes are needed: one for the server object
-				<literal>Hello</literal>
-				and one for the client that accesses it
-				<literal>HelloClient</literal>
-				.
-			</para>
-
-			<sect3>
-				<title>The Hello class</title>
-
-				<para>
-					This class implements server-side functionalities.
-					Its creation involves the following steps:
-				</para>
-
-				<itemizedlist>
-					<listitem>
-						<para>
-							Provide an implementation for the required
-							server-side functionalities
-						</para>
-					</listitem>
-
-					<listitem>
-						<para>
-							Provide an empty, no-arg constructor
-						</para>
-					</listitem>
-
-					<listitem>
-						<para>
-							Write a
-							<literal>main</literal>
-							method in order to instantiate one server
-							object and register it with an URL.
-						</para>
-					</listitem>
-				</itemizedlist>
-
-				<example>
-					<title>
-						A possible implementation for the
-						<literal>Hello</literal>
-						class:
-					</title>
-
-					<para>
-						<programlisting lang="java">
-							public class Hello { private String name;
-							private String hi = "Hello world"; private
-							java.text.DateFormat dateFormat = new
-							java.text.SimpleDateFormat("dd/MM/yyyy
-							HH:mm:ss"); public Hello() { } public
-							Hello(String name) { this.name = name; }
-							public String sayHello() { return hi + " at
-							" + dateFormat.format(new java.util.Date())+
-							" from node: " +
-							org.objectweb.proactive.ProActive.getBodyOnThis().getNodeURL();
-							} public static void main(String[] args) {
-							// Registers it with an URL try { // Creates
-							an active instance of class HelloServer on
-							the local node Hello hello =
-							(Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(),
-							new Object[]{"remote"});
-							java.net.InetAddress localhost =
-							java.net.InetAddress.getLocalHost();
-							org.objectweb.proactive.ProActive.register(hello,
-							"//" + localhost.getHostName() + "/Hello");
-							} catch (Exception e) {
-							System.err.println("Error: " +
-							e.getMessage()); e.printStackTrace(); } } }
-						</programlisting>
-					</para>
-				</example>
-
-				<sect4>
-					<title>
-						Implement the required functionalities
-					</title>
-
-					<para>
-						Implementing any remotely-accessible
-						functionality is simply done through normal Java
-						methods in a normal Java class, in exactly the
-						same manner it would have been done in a
-						non-distributed version of the same class. This
-						has to be contrasted with the RMI approach,
-						where several more steps are needed:
-					</para>
-
-					<itemizedlist>
-						<listitem>
-							<para>
-								Define a remote interface for declaring
-								the remotely-accessible methods.
-							</para>
-						</listitem>
-
-						<listitem>
-							<para>
-								Rewrite the class so that it inherits
-								from
-								<literal>
-									java.rmi.server.UnicastRemoteObject
-								</literal>
-								, which is the root class of all remote
-								objects.
-							</para>
-						</listitem>
-
-						<listitem>
-							<para>
-								Add remote exceptions handling to the
-								code.
-							</para>
-						</listitem>
-					</itemizedlist>
-				</sect4>
-
-				<sect4>
-					<title>Why an empty no-arg constructor?</title>
-
-					<para>
-						You may have noticed that class
-						<literal>Hello</literal>
-						has a constructor with no parameters and an
-						empty implementation. The presence of this empty
-						no-arg constructor is imposed by ProActive and
-						is actually a side-effect of ProActive's
-						transparent implementation of active remote
-						objects (as a matter of fact, this side-effect
-						is caused by ProActive being implemented on top
-						of a 100% Java metaobject protocol). If no such
-						constructor is provided, active objects cannot
-						be created.
-					</para>
-
-					<para>
-						If no constructor at all is provided, active
-						objects can still be created because, in this
-						specific case, all Java compilers provide a
-						default no-arg empty constructor. If a no-arg
-						constructor is provided but its implementation
-						is not empty, unwanted behavior may appear
-						because the no-arg constructor is always called
-						when an active object is created, whatever code
-						the user can write.
-					</para>
-				</sect4>
-
-				<sect4>
-					<title>
-						Creating the remote
-						<literal>Hello</literal>
-						object
-					</title>
-
-					<para>
-						Now that we know how to write the class that
-						implements the required server-side
-						functionalities, let us see how to create the
-						server object. In ProActive, there is actually
-						no difference between a server and a client
-						object as both are remote objects.Creating the
-						active object is done through
-						<emphasis>
-							instantiation-based creation
-						</emphasis>
-						. We want this active object to be created on
-						the current node, which is why we use
-						<literal>newActive</literal>
-						with only two parameters. In order for the
-						client to obtain an initial reference onto this
-						remote object, we need to register it in the
-						registry (which is actually the well-known
-						<literal>rmiregistry</literal>
-						) with a valid RMI URL.
-					</para>
-				</sect4>
-			</sect3>
-
-			<sect3>
-				<title>
-					The
-					<literal>HelloClient</literal>
-					Class
-				</title>
-
-				<para>
-					The responsibility of this class is first to locate
-					the remote server object, then to invoke a method on
-					it in order to retrieve a message, and finally
-					display that message.
-				</para>
-
-				<example>
-					<title>HelloClient.java</title>
-
-					<programlisting lang="java">
-						public class HelloClient { public static void
-						main(String[] args) { Hello myServer; String
-						message; try { // checks for the server's URL if
-						(args.length == 0) { // There is no url to the
-						server, so create an active server within this
-						VM myServer =
-						(Hello)org.objectweb.proactive.ProActive.newActive(Hello.class.getName(),
-						new Object[]{"local"}); } else { // Lookups the
-						server object System.out.println("Using server
-						located on " + args[0]); myServer =
-						(Hello)org.objectweb.proactive.ProActive.lookupActive(Hello.class.getName(),
-						args[0]); } // Invokes a remote method on this
-						object to get the message message =
-						myServer.sayHello(); // Prints out the message
-						System.out.println("The message is: " +
-						message); } catch (Exception e) {
-						System.err.println("Could not reach/create
-						server object"); e.printStackTrace();
-						System.exit(1); } } }
-					</programlisting>
-				</example>
-
-				<sect4>
-					<title>Looking up a remote object</title>
-
-					<para>
-						The operation of
-						<emphasis>lookup</emphasis>
-						simply means obtaining a reference onto an
-						object from the URL it is bound to. The return
-						type of method
-						<literal>Proactive.lookupActive()</literal>
-						is
-						<literal>Object</literal>
-						, then we need to cast it down into the type of
-						the variable that holds the reference (
-						<literal>Hello</literal>
-						here). If no object is found at this URL, the
-						call to
-						<literal>Proactive.lookupActive()</literal>
-						returns
-						<literal>null</literal>
-						.
-					</para>
-				</sect4>
-
-				<sect4>
-					<title>Invoking a method on a remote object</title>
-
-					<para>
-						This is exactly like invoking a method on a
-						local object of the same type. The user does not
-						have to deal with catching distribution related
-						exceptions like, for example, when using RMI or
-						CORBA. Future versions of ProActive will provide
-						an exception handler mechanism in order to
-						process these exceptions in a separate place
-						than the functional code. As class
-						<literal>String</literal>
-						is
-						<literal>final</literal>
-						, there cannot be any asynchronism here since
-						the object returned from the call cannot be
-						replaced by a future object (this restriction on
-						<literal>final</literal>
-						classes is imposed by ProActive's
-						implementation).
-					</para>
-				</sect4>
-
-				<sect4>
-					<title>Printing out the message</title>
-
-					<para>
-						As already stated, the only modification brought
-						to the code by ProActive is located at the place
-						where active objects are created. All the rest
-						of the code remains the same, which fosters
-						software reuse.
-					</para>
-				</sect4>
-			</sect3>
-		</sect2>
-
-		<sect2>
-			<title>Hello World within the same VM</title>
-
-			<para>
-				In order to run both the client and server in the same
-				VM, the client creates an active object in the same VM
-				if it doesn't find the server's URL. The code snippet
-				which instantiates the Server in the same VM is the
-				following:
-			</para>
-
-			<programlisting lang="java">
-				if (args.length == 0) { // There is no url to the
-				server, so create an active server within this VM
-				myServer =
-				(Hello)org.objectweb.proactive.ProActive.newActive(
-				Hello.class.getName(), new Object[]{"local"}); }
-			</programlisting>
-
-			<para>To launch the Client and the Server, just type:</para>
-
-			<screen>
-				linux&gt; java
-				-Djava.security.policy=scripts/proactive.java.policy
-				-Dlog4j.configuration=file:scripts/proactive-log4j
-				org.objectweb.proactive.examples.hello.HelloClient
-			</screen>
-
-			<screen>
-				windows&gt; java
-				-Djava.security.policy=scripts\unix\proactive.java.policy
-				-Dlog4j.configuration=file:scripts\unix\proactive-log4j
-				org.objectweb.proactive.examples.hello.HelloClient &amp;
-			</screen>
-		</sect2>
-
-		<sect2>
-			<title>Hello World from another VM on the same host</title>
-
-			<sect3>
-				<title>Starting the server</title>
-
-				<para>
-					Just start the
-					<literal>main</literal>
-					method in the
-					<literal>Hello</literal>
-					class.
-				</para>
-
-				<screen>
-					linux&gt; java
-					-Djava.security.policy=scripts/proactive.java.policy
-					-Dlog4j.configuration=file:scripts/proactive-log4j
-					org.objectweb.proactive.examples.hello.Hello &amp;
-				</screen>
-
-				<screen>
-					windows&gt; java
-					-Djava.security.policy=scripts\proactive.java.policy
-					-Dlog4j.configuration=file:scripts\proactive-log4j
-					org.objectweb.proactive.examples.hello.Hello
-				</screen>
-			</sect3>
-
-			<sect3>
-				<title>Launching the client</title>
-
-				<screen>
-					linux&gt; java
-					-Djava.security.policy=scripts/proactive.java.policy
-					-Dlog4j.configuration=file:scripts/proactive-log4j
-					org.objectweb.proactive.examples.hello.HelloClient
-					//localhost/Hello &amp;
-				</screen>
-
-				<screen>
-					windows&gt; java
-					-Djava.security.policy=scripts\proactive.java.policy
-					-Dlog4j.configuration=file:scripts\proactive-log4j
-					org.objectweb.proactive.examples.hello.HelloClient
-					//localhost/Hello
-				</screen>
-			</sect3>
-		</sect2>
-
-		<sect2>
-			<title>
-				Hello World from abroad: another VM on a different host
-			</title>
-
-			<sect3>
-				<title>Starting the server</title>
-
-				<para>
-					Log on to the server's host, and launch the
-					<literal>Hello</literal>
-					class.
-				</para>
-
-				<screen>
-					linux remoteHost&gt; java
-					-Djava.security.policy=scripts/proactive.java.policy
-					-Dlog4j.configuration=file:scripts/proactive-log4j
-					org.objectweb.proactive.examples.hello.Hello &amp;
-				</screen>
-
-				<screen>
-					windows remoteHost&gt; java
-					-Djava.security.policy=scripts\proactive.java.policy
-					-Dlog4j.configuration=file:scripts\proactive-log4j
-					org.objectweb.proactive.examples.hello.Hello
-				</screen>
-			</sect3>
-
-			<sect3>
-				<title>Launching the client</title>
-
-				<para>
-					Log on to the client Host, and launch the client
-				</para>
-
-				<screen>
-					linux clientHost&gt; java -cp $CLASSPATH
-					-Djava.security.policy=scripts/proactive.java.policy
-					-Dlog4j.configuration=file:scripts/proactive-log4j
-					org.objectweb.proactive.examples.hello.HelloClient
-					//remoteHost/Hello &amp;
-				</screen>
-
-				<screen>
-					windows clientHost&gt; java -cp $CLASSPATH
-					-Djava.security.policy=scripts\proactive.java.policy
-					-Dlog4j.configuration=file:scripts\proactive-log4j
-					org.objectweb.proactive.examples.hello.HelloClient
-					//remoteHost/Hello
-				</screen>
-
-				<note>
-					<para>
-						There is also a Guided Tour section on the Hello
-						world example:
-						<xref linkend="hands_on_programming" />
-					</para>
-				</note>
-			</sect3>
-		</sect2>
-	</sect1><sect1 id="ActiveObjectCreation_html_events">
+	<sect1 id="ActiveObjectCreation_html_events">
 		<title>Event based programming</title>
 
 		<para>//TODO add immediateService maybe ?</para>
