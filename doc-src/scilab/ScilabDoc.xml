@@ -9,7 +9,8 @@
         <title>Presentation</title>
 
         <para>
-            <emphasis>Scilab</emphasis> is a scientific software for numerical computations.
+            <emphasis>Scilab</emphasis>
+            is a scientific software for numerical computations.
             Developed since 1990 by researchers from INRIA and ENPC, it
             is now maintained and developed by Scilab Consortium since
             its creation in May 2003. Scilab includes hundreds of
@@ -23,7 +24,8 @@
         </para>
 
         <para>
-            <emphasis>Matlab</emphasis> is a numerical computing environment and programming
+            <emphasis>Matlab</emphasis>
+            is a numerical computing environment and programming
             language. Created by The MathWorks, Matlab allows easy
             matrix manipulation, plotting of functions and data,
             implementation of algorithms, creation of user interfaces,
@@ -212,7 +214,8 @@
             <title>Display of results</title>
 
             <para>
-                The last step is the display of results. A double click
+                The last step is the display of results. A
+                <emphasis>double click</emphasis>
                 on a task in the table of terminated tasks sets visible
                 a dialog. This dialog displays the tasks properties and
                 the result (with the possibility to save it in a file)
