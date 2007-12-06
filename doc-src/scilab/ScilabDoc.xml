@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="ScilabDoc">
+<chapter id="ScilabDoc"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://www.docbook.org/xsd/4.2/docbook.xsd">
     <title>Interface with Matlab/Scilab</title>
 
     <sect1 id="Scilab_Overwiew">
         <title>Presentation</title>
 
         <para>
-            Scilab is a scientific software for numerical computations.
+            <emphasis>Scilab</emphasis> is a scientific software for numerical computations.
             Developed since 1990 by researchers from INRIA and ENPC, it
             is now maintained and developed by Scilab Consortium since
             its creation in May 2003. Scilab includes hundreds of
@@ -21,8 +23,8 @@
         </para>
 
         <para>
-            MATLAB is a numerical computing environment and programming
-            language. Created by The MathWorks, MATLAB allows easy
+            <emphasis>Matlab</emphasis> is a numerical computing environment and programming
+            language. Created by The MathWorks, Matlab allows easy
             matrix manipulation, plotting of functions and data,
             implementation of algorithms, creation of user interfaces,
             and interfacing with programs in other languages. Although
@@ -31,7 +33,7 @@
             part of a full computer algebra system.
 
             As of 2004, MATLAB was used by more than one million people
-            in industry and academia.[2].
+            in industry and academia.
         </para>
 
         <para>
@@ -53,8 +55,13 @@
         <para>
             Before starting to use the interface with Scilab, you need
             to follow the steps described in
-            PROACTIVE/scripts/unix/scilab/README
+            PROACTIVE/scripts/unix/scilab/README :
         </para>
+        <programlisting lang="txt">
+            <textobject>
+                <textdata fileref="../scripts/unix/scilab/README" />
+            </textobject>
+        </programlisting>
         <para>
             To install Scilab and find some documentation about it
             <ulink
@@ -159,7 +166,8 @@
             <para>
                 The first step is to deploy the topology of the
                 application. A dialog enables to choice the descriptor
-                and to select the virtual node. The button "deploy"
+                and to select the virtual node. The button
+                <emphasis>deploy</emphasis>
                 launches the deployment of Matlab/Scilab engines over
                 the nodes.
             </para>
@@ -183,7 +191,9 @@
                 The next step is the task launching. A dialog enables to
                 select the script and possibly to define the script
                 initialization, the return values, and the task
-                priority. The button start creates and sends the task.
+                priority. The button
+                <emphasis>start</emphasis>
+                creates and sends the task.
             </para>
 
             <figure>
@@ -500,166 +510,23 @@
         <example id="sciex1">
             <title>Example: Interface Matlab/Scilab</title>
 
-            <programlisting lang="java"><![CDATA[public class SciTest {
-
-	SciTask task;
-	MSService scilab;
-	
-	public void  displayResult(GenTaskInfo scitaskInfo){
-		// scilab result
-		GeneralResult sciResult = scitaskInfo.getResult();
-		// list of return values
-		ArrayList listResult = sciResult.getList();
-		
-		for (int i = 0; i &lt; listResult.size(); i++) {
-			SciData result = (SciData) listResult.get(i);
-				System.out.println(result.toString());
-		}
-		scilab.exit();
-	}
-	
-	public SciTest(String idVN, String pathVN) throws Exception{
-		// a new scilab task 
-		SciTask task = new SciTask("id"); 
-		task.setJobInit("n = 10;");
-		task.addDataOut(new SciData("n"));
-		task.setJob("n = n+1;");
-		
-		//a new scilab service
-		MSService scilab = new MSService();
-		
-		//add task event listener
-		scilab.addEventListenerTask( new MSEventListener(){
-			public void actionPerformed(MSEvent evt){
-				MSTaskInfo sciTaskInfo = (MSTaskInfo) evt.getSource();
-				
-				if(sciTaskInfo.getState() == MSTaskInfo.SUCCESS){
-					 displayResult(sciTaskInfo);
-					return;
-				}
-			}
-		});
-		
-		// deploy engine
-		scilab.deployEngine( idVN, pathVN, new String[]{"Scilab"});
-		// send task
-		scilab.sendTask(task);
-		
-	}
-	
-	public static void main(String[] args) throws Exception {
-		new SciTest(args[0], args[1]);
-	}
-}]]></programlisting>
+            <programlisting lang="java">
+                <textobject>
+                    <textdata
+                        fileref="../src/Extensions/org/objectweb/proactive/extensions/scilab/test/SciTest2.java" />
+                </textobject>
+            </programlisting>
         </example>
 
         <example id="sciex2">
             <title>Descriptor deployment</title>
 
-            <programlisting lang="xml"><![CDATA[
-<ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-xsi:noNamespaceSchemaLocation=
-"http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
-	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="****"/> 
-		<descriptorVariable name="REMOTE_HOME" value="****"/>
-		<descriptorVariable name="SCILAB_HOME" value="****"/>
-	</variables>
-	<componentDefinition>
-		<virtualNodesDefinition>
-			<virtualNode name="ScilabVN" property="multiple"/>
-		</virtualNodesDefinition>
-	</componentDefinition>
-	<deployment>
-		<mapping>
-			<map virtualNode="ScilabVN">
-				<jvmSet>
-					<vmName value="Jvm0"/> 
-					<vmName value="Jvm1"/>
-					<vmName value="Jvm2"/>
-					<vmName value="Jvm3"/>   
-				</jvmSet>
-			</map>
-		</mapping>
-		<jvms>
-			</jvm>
-			<jvm name="Jvm1">
-				<creation>
-					<processReference refid="rsh_predadab"/> 
-				</creation>
-			</jvm>
-			<jvm name="Jvm2">
-				<creation>
-					<processReference refid="rsh_trinidad"/>
-				</creation>
-			</jvm>
-			<jvm name="Jvm3">
-				<creation>
-					 <processReference refid="rsh_apple"/>                                         
-				</creation>
-			</jvm>
-		</jvms>
-	</deployment>
-	<infrastructure>
-		<processes>
-			<processDefinition id="localJVM">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<classpath>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ProActive.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/asm.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/log4j.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/components/fractal.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/xercesImpl.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/bouncycastle.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/ganymed-ssh2-build210.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/lib/javassist.jar" />
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/classes" />
-						<absolutePath value="${REMOTE_HOME}/${SCILAB_HOME}/bin/javasci.jar" />
-					</classpath>
-					<javaPath>
-						<absolutePath value="****" />
-					</javaPath>
-					<policyFile>
-						<absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive.java.policy" />
-					</policyFile>
-					<log4jpropertiesFile>
-						 <absolutePath value="${REMOTE_HOME}/${PROACTIVE_HOME}/scripts/proactive-log4j" />
-				    </log4jpropertiesFile>
-                 </jvmProcess>                       
-			</processDefinition>
-			<processDefinition id="rsh_predadab">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="predadab">
-					<environment>
-						<variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
-						<variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
-						<variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
-					</environment>
-					<processReference refid="localJVM"/>
-				</rshProcess>
-			</processDefinition>
-			<processDefinition id="rsh_trinidad">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="trinidad">
-					<environment>
-						<variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
-						<variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
-						<variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
-					</environment>
-					<processReference refid="localJVM"/>
-				</rshProcess>
-			</processDefinition>
-			<processDefinition id="rsh_apple">
-				<rshProcess class="org.objectweb.proactive.core.process.rsh.RSHProcess" hostname="apple">
-					<environment>
-						<variable name="SCIDIR" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
-						<variable name="SCI" value="${REMOTE_HOME}/${SCILAB_HOME}"/>
-						<variable name="LD_LIBRARY_PATH" value="${REMOTE_HOME}/${SCILAB_HOME}/bin"/>
-					</environment>
-					<processReference refid="localJVM"/>
-				</rshProcess>
-			</processDefinition>                        
-		</processes>
-	</infrastructure>
-</ProActiveDescriptor>]]></programlisting>
+            <programlisting lang="xml">
+                <textobject>
+                    <textdata
+                        fileref="../scripts/unix/scilab/ProActiveScilab.xml" />
+                </textobject>
+            </programlisting>
         </example>
     </sect1>
 </chapter>

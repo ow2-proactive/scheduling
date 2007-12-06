@@ -5,12 +5,19 @@ Before being able to use the extension and launch the GUI (scilab.sh or scilab.b
 ---------------------------------------------  SCILAB --------------------------------------------------
 For every machines that you will be using:
 
-STEP 1: Download Scilab 4.1.2 or above BINARY Version
+STEP 1:
+If you're machine is a 32 bit Linux or Windows:
 
-If you can't download version 4.1.2 please follow step 2.
+	Download Scilab 4.1.2 or above BINARY Version
 
+Otherwise, Download Scilab 4.1.2 SOURCE Version.
 
-STEP 2 (source version only): Download Scilab SOURCE version 4.1 or 4.1.1
+	make binaries of Scilab (procedure is explained  in SCILAB/Readme_Linux or SCILAB/Readme_Windows)
+
+If you successfully did STEP 1, skip STEP 2.  
+
+STEP 2: 
+If you can't have access to Scilab 4.1.2, download Scilab SOURCE version 4.1 or 4.1.1
 
 copy javasci_Scilab2.h and javasci_Scilab2.c from folder c_sources to SCILAB/routines/Javasci/
 
@@ -33,14 +40,18 @@ show_startupinfo();
 
 To comment out just insert "//" in the beginning of the line like in Java.  
 
+STEP 4:
+If you use a source version of ProActive, compile ProActive by the following (PROACTIVE refers to the directory where you installed ProActive):
+> cd PROACTIVE/scripts/[unix|windows]/scilab
+> build.[sh|bat] compile
 
-STEP 4: 
+STEP 5: 
 Read documentation on http://proactive.inria.fr/scilab.htm on how to use the GUI
 
 Edit paths inside the ProActiveScilab.xml descriptor if you want to use it to deploy on remote machines, if you want to deploy locally use the ProActiveScilabLocal.xml descriptor
 
 
-STEP 5:
+STEP 6:
 Run scilab.sh or scilab.bat. 
 
 
@@ -52,3 +63,4 @@ If you want to use the extension without the script, remember two things :
 Under Linux, the environment variables must be set according to the scilab_env.sh script AND the java property java_library_path must contain the directory where the libjavasci.so can be found
 
 Under Windows, the Class PATH environment variable must contain the path to where the javasci.dll can be found
+               
