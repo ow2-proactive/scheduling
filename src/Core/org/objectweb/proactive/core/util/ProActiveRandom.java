@@ -84,11 +84,6 @@ public class ProActiveRandom {
     }
 
     synchronized static public long nextPosLong() {
-        long l = nextLong();
-        while (l <= 0) {
-            l = nextLong();
-        }
-
-        return l;
+        return Math.abs(nextLong());
     }
 }
