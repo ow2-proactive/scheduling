@@ -82,4 +82,13 @@ public class ProActiveRandom {
     synchronized static public long nextLong() {
         return prng.nextLong();
     }
+
+    synchronized static public long nextPosLong() {
+        long l = nextLong();
+        while (l <= 0) {
+            l = nextLong();
+        }
+
+        return l;
+    }
 }
