@@ -2248,7 +2248,6 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     // private static final String PROACTIVE_ORIGIN = "proactive.home";
     private static final String DEFAULT_ORIGIN = USER_HOME_ORIGIN;
     private static final String VALUE_ATTRIBUTE = "value";
-    private static final String proActiveDir = PAProperties.PA_HOME.getValue();
     private static final String userDir = System.getProperty("user.dir");
     private static final String userHome = System.getProperty("user.home");
     private static final String javaHome = System.getProperty("java.home");

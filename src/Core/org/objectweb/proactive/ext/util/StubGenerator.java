@@ -42,7 +42,6 @@ import javassist.ClassClassPath;
 import javassist.ClassPool;
 
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
-import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
 
 
@@ -217,19 +216,9 @@ public class StubGenerator {
             // data = bsb.create();
             // stubClassName = Utils.convertClassNameToStubClassName(className);
             // } else
-            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                data = JavassistByteCodeStubBuilder.create(className, null);
-                stubClassName = Utils.convertClassNameToStubClassName(className,
-                        null);
-            } else {
-                // that shouldn't happen, unless someone manually sets the
-                // BYTE_CODE_MANIPULATOR static variable
-                System.err.println(
-                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
-                System.err.println(
-                    "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
-                return;
-            }
+            data = JavassistByteCodeStubBuilder.create(className, null);
+            stubClassName = Utils.convertClassNameToStubClassName(className,
+                    null);
 
             char sep = File.separatorChar;
             fileName = directoryName + stubClassName.replace('.', sep) +

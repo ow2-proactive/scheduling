@@ -307,18 +307,14 @@ public class URIBuilder {
 
     /**
      * this method returns the hostname or the IP address associated to the InetAddress address parameter.
-     * It is possible to set {@code "proactive.runtime.ipaddress"}  or
-     *  {@code "proactive.hostname"} or the  {@code "proactive.useIPaddress"} property (evaluated in that order) to override the default java behaviour
+     * It is possible to set
+     *  {@code "proactive.hostname"}  property (evaluated in that order) to override the default java behaviour
      * of resolving InetAddress
      * @param address any InetAddress
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
         //        address = UrlBuilder.getNetworkInterfaces();
-        if (PAProperties.PA_RUNTIME_IPADDRESS.getValue() != null) {
-            return PAProperties.PA_RUNTIME_IPADDRESS.getValue();
-        }
-
         if (PAProperties.PA_HOSTNAME.getValue() != null) {
             return PAProperties.PA_HOSTNAME.getValue();
         }

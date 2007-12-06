@@ -91,7 +91,6 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
-import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.process.UniversalProcess;
@@ -1206,16 +1205,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             // ASMBytecodeStubBuilder(classname);
             // classData = bsb.create();
             // } else
-            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                classData = JavassistByteCodeStubBuilder.create(classname, null);
-            } else {
-                // that shouldn't happen, unless someone manually sets the
-                // BYTE_CODE_MANIPULATOR static variable
-                System.err.println(
-                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
-                System.err.println(
-                    "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
-            }
+            classData = JavassistByteCodeStubBuilder.create(classname, null);
 
             // } catch (ClassNotFoundException ignored) {
             // }

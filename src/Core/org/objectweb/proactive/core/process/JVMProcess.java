@@ -172,11 +172,6 @@ public interface JVMProcess extends ExternalProcess {
      */
     public void setExtendedJVM(JVMProcessImpl jvmProcess);
 
-    /**
-     * Each time a makeDeepCopy is performed on a JVMProcess this method must be called.
-     */
-    public int getNewGroupId();
-
     public void setPriority(PriorityLevel priority);
 
     public void setOperatingSystem(OperatingSystem os);

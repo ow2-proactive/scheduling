@@ -30,110 +30,202 @@
  */
 package org.objectweb.proactive.core.config;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.filetransfer.FileTransferService;
+import org.objectweb.proactive.core.runtime.StartRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-import trywithcatch.Catch;
-
 /**
- * A Java Properties factory for ProActive
+ * All ProActive Properties
  *
- * All Java properties supported by ProActive must be declared and documented in
- * this enumeration. Provided methods must be used in place
- * of System.(get|set)property() or the ProActiveConfiguration class.
+ * All Java properties supported by ProActive are declared here. Each property
+ * has a short Javadoc
  *
- * TODO Add integer properties
+ * Provided methods must be used in place of System.(get|set)property()
+ * or the ProActiveConfiguration class.
+ *
  */
+@PublicAPI
 public enum PAProperties {
 
-    // ----------
+    /* ------------------------------------
+     * Java Properties
+     */
 
-    /** this property identifies proactive's configuration file */
+    /**
+     * Java security policy file location
+     */
+    SECURITY_POLICY("java.security.policy", PAPropertiesType.STRING),
+
+    /* ------------------------------------
+     *  PROACTIVE
+     */
+
+    /**
+     * ProActive Configuration file location
+     *
+     * If set ProActive will load the configuration file at the given location.
+     */
     PA_CONFIGURATION_FILE("proactive.configuration", PAPropertiesType.STRING),
 
-    /** this property indicates to create for each ProActive object a MBeans */
-    PA_JMX_MBEAN("proactive.jmx.mbean", PAPropertiesType.BOOLEAN),
-
-    /** this property indicates to send JMX notifications */
-    PA_JMX_NOTIFICATION("proactive.jmx.notification", PAPropertiesType.BOOLEAN),
-
-    /** this property identifies the communication protocol */
-    PA_COMMUNICATION_PROTOCOL("proactive.communication.protocol",
-        PAPropertiesType.STRING),
-
-    /** this property allows to override the default java behavior when retrieving the runtime url */
-    PA_RUNTIME_IPADDRESS("proactive.runtime.ipaddress", PAPropertiesType.STRING),
-
-    /** this property allows to set the hostname of a runtime */
-    PA_HOSTNAME("proactive.hostname", PAPropertiesType.STRING),
-
-    /** this property indicates to use the IP address instead of DNS entry for a runtime url */
-    PA_USE_IP_ADDRESS("proactive.useIPaddress", PAPropertiesType.BOOLEAN),
-    PA_NOLOOPBACK("proactive.nolocal", PAPropertiesType.BOOLEAN),
-    PA_NOPRIVATE("proactive.noprivate", PAPropertiesType.BOOLEAN),
-
-    /** TODO cdelbe Describe this property */
-    PA_FUTURE_AC("proactive.future.ac", PAPropertiesType.BOOLEAN),
-
-    /** TODO cdelbe Describe this property */
-    SCHEMA_VALIDATION("schema.validation", PAPropertiesType.BOOLEAN),
-
-    /** this property indicates if the ProActive class loader must be used */
-    PA_CLASSLOADER("proactive.classloader", PAPropertiesType.BOOLEAN),
-
-    /** TODO cmathieu Describe this property */
-    PA_PAD("proactive.pad", PAPropertiesType.STRING),
-
-    /** TODO cdelbe Describe this property */
-    PA_EXIT_ON_EMPTY("proactive.exit_on_empty", PAPropertiesType.BOOLEAN),
-
-    /** TODO gchazara Describe this property */
-    PA_FUTUREMONITORING_TTM("proactive.futuremonitoring.ttm",
-        PAPropertiesType.INTEGER),
-
-    /** TODO cdelbe Describe this property */
-    PA_STACKTRACE("proactive.stack_trace", PAPropertiesType.BOOLEAN),
+    /**
+     * Indicates where ProActive is installed
+     *
+     * Can be useful to write generic deployment descriptor by using a JavaPropertyVariable
+     * to avoid hard coded path.
+     *
+     * Used in unit and functional tests
+     */
     PA_HOME("proactive.home", PAPropertiesType.STRING),
 
-    /** this property indicates the location of the log4j configuration file */
+    /**
+     * Log4j configuration file location
+     *
+     * If set the specified log4j configuration file is used. Otherwise the default one,
+     * Embedded in the ProActive jar is used.
+     */
     LOG4J("log4j.configuration", PAPropertiesType.STRING),
 
-    /** TODO cmathieu Describe this property */
+    /**
+     * Skip the default initialization procedure
+     *
+     * <strong>Internal Property</strong>
+     *
+     * Used to skip the default log4j initialization procedure when the ProActive classloader is
+     * activated. See log4j documentation
+     * @see StartRuntime
+     */
     LOG4J_DEFAULT_INIT_OVERRIDE("log4j.defaultInitOverride",
         PAPropertiesType.BOOLEAN),
 
-    /** this property indicates the location of the java Security policy file */
-    SECURITY_POLICY("java.security.policy", PAPropertiesType.STRING),
+    /**
+     * Activates ProActive classloader
+     */
+    PA_CLASSLOADER("proactive.classloader", PAPropertiesType.BOOLEAN),
 
-    /**  TODO cmathieu Describe this property */
+    /**
+     * Specifies the name of the ProActive Runtime
+     *
+     * By default a random name is assigned to a ProActive Runtime. This property allows
+     * to choose the name of the Runtime to be able to perform lookups.
+     *
+     * <strong>The name must start with PA_JVM</strong>
+     */
     PA_RUNTIME_NAME("proactive.runtime.name", PAPropertiesType.STRING),
+
+    /**
+     * this property should be used when one wants to start only a runtime without an additional main class
+     */
+    PA_RUNTIME_STAYALIVE("proactive.runtime.stayalive", PAPropertiesType.BOOLEAN),
+
+    /**
+     * Terminates the Runtime when the Runtime becomes empty
+     *
+     * If true, when all bodies have been terminated the ProActive Runtime will exit
+     */
+    PA_EXIT_ON_EMPTY("proactive.exit_on_empty", PAPropertiesType.BOOLEAN),
+
+    /**
+     * TODO cdelbe Describe this property
+     */
+    PA_FUTURE_AC("proactive.future.ac", PAPropertiesType.BOOLEAN),
+
+    /**
+     * TODO gchazara Describe this property
+     */
+    PA_FUTUREMONITORING_TTM("proactive.futuremonitoring.ttm",
+        PAPropertiesType.INTEGER),
+
+    /**
+     * TODO gchazara Describe this property
+     */
+    PA_STACKTRACE("proactive.stack_trace", PAPropertiesType.BOOLEAN),
+
+    /* ------------------------------------
+     *  NETWORK
+     */
+
+    /**
+     * ProActive Communication protocol
+     *
+     * Suppported values are: rmi, rmissh, ibis, http
+     */
+    PA_COMMUNICATION_PROTOCOL("proactive.communication.protocol",
+        PAPropertiesType.STRING),
+
+    /**
+     * ProActive Runtime Hostname (or IP Address)
+     *
+     * This option can be used to set manually the Runtime IP Address. Can be
+     * useful when the Java networking stack return a bad IP address (example: multihomed machines)
+     */
+    PA_HOSTNAME("proactive.hostname", PAPropertiesType.STRING),
+
+    /**
+     * Toggle DNS resolution
+     *
+     * When true IP addresses are used instead of FQDNs. Can be useful with misconfigured DNS servers
+     * or strange /etc/resolv.conf files. FQDNs passed by user or 3rd party tools are resolved and converted
+     * into IP addresses
+     *
+     */
+    PA_USE_IP_ADDRESS("proactive.useIPaddress", PAPropertiesType.BOOLEAN),
+
+    /**
+     * Toggle loopback IP address usage
+     *
+     * When true loopback IP address usage is avoided. Since Remote adapters contain only one
+     * endpoint the right IP address must be used. This property must be set to true if a loopback
+     * address is returned by the Java INET stack.
+     *
+     * If only a loopback address exists, it is used.
+     */
+    PA_NOLOOPBACK("proactive.nolocal", PAPropertiesType.BOOLEAN),
+
+    /**
+     * Toggle Private IP address usage
+     *
+     * When true private IP address usage is avoided. Since Remote adapters contain only one
+     * endpoint the right IP address must be used. This property must be set to true if a private
+     * address is returned by the Java INET stack and this private IP is not reachable by other hosts.
+     */
+    PA_NOPRIVATE("proactive.noprivate", PAPropertiesType.BOOLEAN),
 
     /** TODO cmathieu Describe this property */
     PA_SECONDARYNAMES("proactive.secondaryNames", PAPropertiesType.STRING),
+    SCHEMA_VALIDATION("schema.validation", PAPropertiesType.BOOLEAN),
 
-    /** this property should be used when one wants to start only a runtime without an additionnal main class */
-    PA_RUNTIME_STAYALIVE("proactive.runtime.stayalive", PAPropertiesType.BOOLEAN),
+    /* ------------------------------------
+     *  RMI
+     */
 
-    // ---------- RMI
-
-    /** this property identifies the default port used by the RMI transport layer */
+    /**
+     * Assigns a TCP port to RMI
+     *
+     * this property identifies the default port used by the RMI communication protocol
+     */
     PA_RMI_PORT("proactive.rmi.port", PAPropertiesType.INTEGER),
     JAVA_RMI_SERVER_CODEBASE("java.rmi.server.codebase", PAPropertiesType.STRING),
 
-    // ---------- HTTP
+    /* ------------------------------------
+     *  HTTP
+     */
 
-    /** this property identifies the default port for the xml-http protocol  */
+    /**
+     * Assigns a TCP port to XML-HTTP
+     *
+     * this property identifies the default port for the xml-http protocol
+     */
     PA_XMLHTTP_PORT("proactive.http.port", PAPropertiesType.INTEGER),
 
     /** TODO vlegrand Describe this property */
     PA_HTTP_SERVLET("proactive.http.servlet", PAPropertiesType.BOOLEAN),
-    PA_HTTP_PORT("proactive.http.port", PAPropertiesType.INTEGER),
 
-    // ---------- COMPONENTS
+    /* ------------------------------------
+     *  COMPONENTS
+     */
 
     /** TODO  cdalmass Describe this property */
     PA_FRACTAL_PROVIDER("fractal.provider", PAPropertiesType.STRING),
@@ -146,7 +238,9 @@ public enum PAProperties {
     PA_COMPONENT_USE_SHORTCUTS("proactive.components.use_shortcuts",
         PAPropertiesType.BOOLEAN),
 
-    // ---------- Migration
+    /* ------------------------------------
+     *  MIGRATION
+     */
 
     /** TODO Describe this property */
     PA_LOCATION_SERVER("proactive.locationserver", PAPropertiesType.STRING),
@@ -170,9 +264,17 @@ public enum PAProperties {
     PA_MIXEDLOCATION_MAXTIMEONSITE("proactive.mixedlocation.maxTimeOnSite",
         PAPropertiesType.INTEGER),
 
-    // ---------- SSH
+    /* ------------------------------------
+     *  SSH
+     */
 
-    /** this property identifies the default port used by the RMISSH transport layer */
+    /**
+     * Indicates SSH remote TCP port
+     *
+     * This TCP port will be used to contact a remote SSH server. If not specified the
+     * default IANA assigned port is used (22)
+     *
+     */
     PA_SSH_PORT("proactive.ssh.port", PAPropertiesType.INTEGER),
 
     /** this property identifies the location of the known host file for the RMISSH transport layer */
@@ -206,7 +308,9 @@ public enum PAProperties {
     /** TODO cmathieu Describe this property */
     PA_SSH_USERNAME("proactive.ssh.username", PAPropertiesType.STRING),
 
-    // ------------ Fault Tolerance
+    /* ------------------------------------
+     *  FAULT TOLERANCE
+     */
 
     /** TODO cdelbe Describe this property */
     PA_FT("proactive.ft", PAPropertiesType.BOOLEAN),
@@ -236,7 +340,9 @@ public enum PAProperties {
     /** TODO cdelbe Describe this property */
     PA_FT_PROTOCOL("proactive.ft.protocol", PAPropertiesType.STRING),
 
-    // ---------- Security
+    /* ------------------------------------
+     *  SECURITY
+     */
 
     /** this property indicates if a RMISecurityManager has to be instanciated*/
     PA_SECURITYMANAGER("proactive.securitymanager", PAPropertiesType.BOOLEAN),
@@ -248,18 +354,29 @@ public enum PAProperties {
     PA_RUNTIME_DOMAIN_URL("proactive.runtime.domain.url",
         PAPropertiesType.STRING),
 
-    // ------------ Timit
+    /* ------------------------------------
+     *  TIMIT
+     */
 
     /** TODO vbodnart Describe this property */
     PA_TIMIT_ACTIVATION("proactive.timit.activation", PAPropertiesType.STRING),
 
-    // -------------- Master/Worker
+    /* ------------------------------------
+     *  MASTER/WORKER
+     */
 
-    /** The ping period is the default interval at which workers receive a ping message (to check if they're alive).*/
+    /**
+     * Master/Worker ping period in milliseconds
+     *
+     * The ping period is the default interval at which workers receive a ping message
+     * (to check if they're alive).
+     */
     PA_MASTERWORKER_PINGPERIOD("proactive.masterworker.pingperiod",
         PAPropertiesType.INTEGER),
 
-    // -------------- P2P
+    /* ------------------------------------
+     *  PEER TO PEER
+     */
 
     /** Acquisition method. */
     PA_P2P_ACQUISITION("proactive.p2p.acq", PAPropertiesType.STRING),
@@ -299,7 +416,9 @@ public enum PAProperties {
     /** Boolean value for disable node sharing. */
     PA_P2P_NO_SHARING("proactive.p2p.nosharing", PAPropertiesType.BOOLEAN),
 
-    // -------------- DGC
+    /* ------------------------------------
+     *  DISTRIBUTED GARBAGE COLLECTOR
+     */
 
     /** TODO gchazara Describe this property */
     PA_DGC("proactive.dgc", PAPropertiesType.BOOLEAN),
@@ -318,7 +437,9 @@ public enum PAProperties {
      */
     PA_DGC_TTB("proactive.dgc.ttb", PAPropertiesType.INTEGER),
 
-    // -------------- FileTransfer
+    /* ------------------------------------
+     *  FILE TRANSFER
+     */
 
     /**
      * The maximum number of {@link FileTransferService} objects that can be spawned
@@ -349,19 +470,22 @@ public enum PAProperties {
     // -------------- Misc
 
     /**
-     * PRIVATE
-     * This flag indicate the VM is running unit or functional tests
+     * Indicates if a Runtime is running a functional test
+     *
+     * <strong>Internal use</strong>
+     * This property is set to true by the functional test framework. JVM to be killed
+     * after a functional test are found by using this property
      */
     PA_TEST("proactive.test", PAPropertiesType.BOOLEAN),
 
-    /** TODO Describe this property */
-    PA_BYTECODEMANIPULATOR("byteCodeManipulator", PAPropertiesType.STRING),
-
-    /** TODO vlegrand Describe this property */
+    /**
+     * TODO vlegrand Describe this property
+     */
     CATALINA_BASE("catalina.base", PAPropertiesType.STRING),
 
-    /** ProActive installation directory */
-    PA_DIR("proactive.dir", PAPropertiesType.STRING),
+    /**
+     * TODO
+     */
     PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient",
         PAPropertiesType.BOOLEAN);static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";

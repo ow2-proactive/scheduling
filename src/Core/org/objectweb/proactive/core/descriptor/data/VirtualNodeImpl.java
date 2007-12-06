@@ -1444,10 +1444,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
         //When the virtualNode will be activated, it has to launch the process
         //with such parameter.See StartRuntime
         jvmProcess = (JVMProcess) process.getFinalProcess();
-        jvmProcess.setJvmOptions("-Dproactive.groupInformation=" +
-            ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation()
-                                .getVMID().toString() + "~" +
-            jvmProcess.getNewGroupId());
 
         //if the target class is StartRuntime, then give parameters otherwise keep parameters
         if (jvmProcess.getClassname()
@@ -1476,7 +1472,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 jvmProcess.setJvmOptions(" -Dproactive.pad=" + this.padURL);
             }
 
-            jvmProcess.setJvmOptions("-Dproactive.jobid=" + this.jobID);
             jvmProcess.setParameters(vnName + " " + localruntimeURL + " " +
                 vm.getName());
 

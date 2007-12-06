@@ -85,7 +85,6 @@ public class RegistrationForwarder implements NotificationListener {
 
     public void addMessage(GCMRuntimeRegistrationNotificationData message) {
         if (doNotForward.contains(message.getDeploymentId())) {
-            System.out.println("DO NOT FORWARD");
             return;
         }
 

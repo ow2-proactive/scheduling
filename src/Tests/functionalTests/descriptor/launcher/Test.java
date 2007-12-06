@@ -118,15 +118,4 @@ public class Test extends FunctionalTest {
         vnMain.killAll(true);
         pad.killall(false);
     }
-
-    public static void main(String[] args) {
-        Test test = new Test();
-
-        try {
-            test.action();
-            test.endTest();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

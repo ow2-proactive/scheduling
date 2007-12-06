@@ -140,17 +140,17 @@ public class ProActiveClassLoader extends URLClassLoader {
      */
     @Override
     protected Class<?> findClass(String name) throws ClassNotFoundException {
-        //         System.out.println("Trying to find " + name);
+        //                 System.out.println("Trying to find " + name);
         Class<?> c = null;
         try {
             /* 1- URLClassLoader: find classes inside the classpath */
             c = super.findClass(name);
-            // System.out.println("Loaded " + name + " using the URLClassLoader");
+            //             System.out.println("Loaded " + name + " using the URLClassLoader");
         } catch (ClassNotFoundException e) {
             try {
                 /* 2- SystemClassLoader: find classes inside the JDK */
                 c = getParent().loadClass(name);
-                // System.out.println("Loaded " + name + " using the SystemClassLoader");
+                //                 System.out.println("Loaded " + name + " using the SystemClassLoader");
             } catch (ClassNotFoundException ex) {
 
                 /* 3- ProActiveClassLoaderHelper: find classes from Parent Runtime */
@@ -163,7 +163,7 @@ public class ProActiveClassLoader extends URLClassLoader {
                                 getClass().getProtectionDomain());
                     }
 
-                    // System.out.println("Loaded " + name + " using the PAClassLoader");
+                    //                     System.out.println("Loaded " + name + " using the PAClassLoader");
                 } catch (Exception e1) {
                     throw new ClassNotFoundException(name, e1);
                 }

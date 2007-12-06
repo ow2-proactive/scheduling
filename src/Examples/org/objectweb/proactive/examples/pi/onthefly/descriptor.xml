@@ -4,7 +4,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
-		<javaPropertyVariable name="proactive.dir" />
+		<javaPropertyVariable name="proactive.home" />
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/tmp/ProActive" />
 		<descriptorVariable name="JAVA_HOME"
@@ -42,23 +42,23 @@
 	<fileTransferDefinitions>
 		<fileTransfer id="ProActiveLite">
 			<!-- dir src="${PROACTIVE_LITE}" dest="${PROACTIVE_HOME}" /-->
-			<file src="${proactive.dir}/dist/lib/ProActive.jar"
+			<file src="${proactive.home}/dist/lib/ProActive.jar"
 				dest="${PROACTIVE_HOME}/ProActive.jar" />
-			<file src="${proactive.dir}/dist/lib/log4j.jar"
+			<file src="${proactive.home}/dist/lib/log4j.jar"
 				dest="${PROACTIVE_HOME}/log4j.jar" />
-			<file src="${proactive.dir}/dist/lib/components/fractal.jar"
+			<file src="${proactive.home}/dist/lib/components/fractal.jar"
 				dest="${PROACTIVE_HOME}/fractal.jar" />
-			<file src="${proactive.dir}/dist/lib/xercesImpl.jar"
+			<file src="${proactive.home}/dist/lib/xercesImpl.jar"
 				dest="${PROACTIVE_HOME}/xercesImpl.jar" />
-			<file src="${proactive.dir}/dist/lib/bouncycastle.jar"
+			<file src="${proactive.home}/dist/lib/bouncycastle.jar"
 				dest="${PROACTIVE_HOME}/bouncycastle.jar" />
-			<file src="${proactive.dir}/dist/lib/ganymed-ssh2-build210.jar"
+			<file src="${proactive.home}/dist/lib/ganymed-ssh2-build210.jar"
 				dest="${PROACTIVE_HOME}/ganymed-ssh2-build210.jar" />
-			<file src="${proactive.dir}/dist/lib/javassist.jar"
+			<file src="${proactive.home}/dist/lib/javassist.jar"
 				dest="${PROACTIVE_HOME}/javassist.jar" />
-			<file src="${proactive.dir}/scripts/proactive.java.policy"
+			<file src="${proactive.home}/scripts/proactive.java.policy"
 				dest="${PROACTIVE_HOME}/proactive.java.policy" />
-			<file src="${proactive.dir}/scripts/proactive-log4j"
+			<file src="${proactive.home}/scripts/proactive-log4j"
 				dest="${PROACTIVE_HOME}/proactive-log4j" />
 		</fileTransfer>
 	</fileTransferDefinitions>

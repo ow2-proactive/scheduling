@@ -16,7 +16,6 @@
 		<prop key="proactive.exit_on_empty" value="false"/> <!-- destroy the JVM when there is no more active object -->
 		<prop key="schema.validation" value="true"/>
 		<prop key="proactive.communication.protocol" value="rmi"/> 
-		<prop key="byteCodeManipulator" value="javassist"/>
 		<prop key="proactive.rmi.port" value="1099"/>
 		<prop key="proactive.http.port" value="2026"/> 
 		<!--<prop key="proactive.java.policy" value="../../../../../../scripts/unix/proactive.java.policy"/>-->
@@ -37,10 +36,6 @@
 		
 		<prop key="proactive.ft" value="false"/>
 		<prop key="proactive.ft.ttc" value="30"/>
-				
-		<!-- JMX PROPERTIES VALUE -->
-		<prop key="proactive.jmx.mbean" value="false" />
-		<prop key="proactive.jmx.notification" value="false" />
 
 		<!-- ***************************************************** -->
 		<!-- P2P PROPERTIES VALUE -->

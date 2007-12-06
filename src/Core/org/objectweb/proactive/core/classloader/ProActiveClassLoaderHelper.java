@@ -103,21 +103,8 @@ public class ProActiveClassLoaderHelper {
             logger.info("Generating class : " + className);
             //    e.printStackTrace();
             String classname = Utils.convertStubClassNameToClassName(className);
+            class_data = JavassistByteCodeStubBuilder.create(classname, null);
 
-            //ASM is now the default bytecode manipulator
-            //            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-            //                ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-            //                class_data = bsb.create();
-            //            } else 
-            if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                class_data = JavassistByteCodeStubBuilder.create(classname, null);
-            } else {
-                // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
-                System.err.println(
-                    "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
-                System.err.println(
-                    "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
-            }
             if (class_data != null) {
                 classCache.addClassData(className, class_data);
                 return class_data;

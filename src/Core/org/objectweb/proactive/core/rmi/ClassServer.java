@@ -84,7 +84,7 @@ public class ClassServer implements Runnable {
             server = new java.net.ServerSocket(port);
         }
 
-        PAProperties.PA_HTTP_PORT.setValue(port + "");
+        PAProperties.PA_XMLHTTP_PORT.setValue(port + "");
 
         hostname = URIBuilder.getLocalAddress().getHostAddress();
         //        hostname = URIBuilder.ipv6withoutscope(UrlBuilder.getNetworkInterfaces());

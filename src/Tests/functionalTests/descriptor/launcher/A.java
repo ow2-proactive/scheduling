@@ -30,13 +30,6 @@
  */
 package functionalTests.descriptor.launcher;
 
-import java.io.IOException;
-
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-
-
 public class A implements java.io.Serializable {
 
     /**
@@ -58,19 +51,6 @@ public class A implements java.io.Serializable {
         } catch (Exception e) {
             e.printStackTrace();
             return "getName failed";
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor();
-
-            //System.out.println(pad) ;
-            pad.activateMappings();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ProActiveException e) {
-            e.printStackTrace();
         }
     }
 }

@@ -60,26 +60,6 @@ public class ProDeployment {
 
     /**
      * Returns a <code>ProActiveDescriptor</code> that gives an object representation
-     * of the XML document located at the url given by proactive.pad system's property.
-     * @return the pad located at the url given by proactive.pad system's property
-     * @throws ProActiveException
-     * @throws RemoteException
-     */
-    public static ProActiveDescriptor getProactiveDescriptor()
-        throws ProActiveException, IOException {
-        String padURL = PAProperties.PA_PAD.getValue();
-
-        //System.out.println("pad propertie : " + padURL) ;
-        if (padURL == null) {
-            //System.out.println("pad null");
-            return null;
-        } else {
-            return getProActiveDescriptor(padURL, new VariableContract(), true);
-        }
-    }
-
-    /**
-     * Returns a <code>ProActiveDescriptor</code> that gives an object representation
      * of the XML document located at the given url.
      * @param xmlDescriptorUrl The url of the XML document
      * @return ProActiveDescriptor. The object representation of the XML document

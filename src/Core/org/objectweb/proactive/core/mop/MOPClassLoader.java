@@ -47,8 +47,6 @@ public class MOPClassLoader extends URLClassLoader {
 
     // retreives the optionnal byteCodeManipulator JVM arg
     // javassist is used by default
-    public static String BYTE_CODE_MANIPULATOR = PAProperties.PA_BYTECODEMANIPULATOR.isSet()
-        ? PAProperties.PA_BYTECODEMANIPULATOR.getValue() : "javassist";
     protected static Hashtable<String, byte[]> classDataCache = new Hashtable<String, byte[]>();
     protected static MOPClassLoader mopCl = null;
 
@@ -204,22 +202,9 @@ public class MOPClassLoader extends URLClassLoader {
 
                 byte[] data = null;
 
-                //                if (BYTE_CODE_MANIPULATOR.equals("ASM")) {
-                //                    ASMBytecodeStubBuilder bsb = new ASMBytecodeStubBuilder(classname);
-                //                    data = bsb.create();
-                //                    MOPClassLoader.classDataCache.put(name, data);
-                //                } else 
-                if (BYTE_CODE_MANIPULATOR.equals("javassist")) {
-                    data = JavassistByteCodeStubBuilder.create(classname,
-                            genericParameters);
-                    MOPClassLoader.classDataCache.put(name, data);
-                } else {
-                    // that shouldn't happen, unless someone manually sets the BYTE_CODE_MANIPULATOR static variable
-                    logger.error(
-                        "byteCodeManipulator argument is optionnal. If specified, it can only be set to javassist (ASM is no longer supported).");
-                    logger.error(
-                        "Any other setting will result in the use of javassist, the default bytecode manipulator framework");
-                }
+                data = JavassistByteCodeStubBuilder.create(classname,
+                        genericParameters);
+                MOPClassLoader.classDataCache.put(name, data);
 
                 // We use introspection to invoke the defineClass method to avoid the normal 
                 // class Access checking. This method is supposed to be protected which means 
