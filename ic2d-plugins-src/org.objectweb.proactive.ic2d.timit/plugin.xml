@@ -10,19 +10,19 @@
             class="org.objectweb.proactive.ic2d.timit.views.TimerTreeView"
             icon="icons/sample.gif"
             id="org.objectweb.proactive.ic2d.timit.views.TimerTreeView"
-            name="Timer Tree View"/>
+            name="TimIt Tree View"/>
       <view
             category="org.objectweb.proactive.ic2d.timit.TimItCategory"
             class="org.objectweb.proactive.ic2d.timit.views.TimItView"
             icon="icons/sample.gif"
             id="org.objectweb.proactive.ic2d.timit.views.TimItView"
-            name="TimIt View"/>
+            name="TimIt Main View"/>
       <view
             category="org.objectweb.proactive.ic2d.timit.TimItCategory"
             class="org.objectweb.proactive.ic2d.timit.views.TimeLineView"
             icon="icons/sample.gif"
             id="org.objectweb.proactive.ic2d.timit.views.TimeLineView"
-            name="Time Line View"/>
+            name="TimIt Timeline View"/>
       <category
             id="org.objectweb.proactive.ic2d.timit.TimItCategory"
             name="TimIt"/>
