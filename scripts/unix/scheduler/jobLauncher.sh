@@ -4,6 +4,7 @@ echo
 echo --- LAUNCHER ----------------------------------------------
 
 
+
 workingDir=..
 PROACTIVE=$workingDir/../..
 CLASSPATH=.

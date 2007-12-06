@@ -63,7 +63,7 @@ public class JobLauncher {
             boolean logIt = false;
             int pos = 0;
 
-            if ("-log".equals(args[0])) {
+            if ("-log".equals(args[pos])) {
                 logIt = true;
                 pos++;
             }

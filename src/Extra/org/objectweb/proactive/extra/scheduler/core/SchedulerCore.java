@@ -1164,7 +1164,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
-     * kill the job represented by jobId.
+     * Kill the job represented by jobId.
      * This method will kill every running tasks of this job, and remove it from the scheduler.
      * The job won't be terminated, it won't have result.
      *

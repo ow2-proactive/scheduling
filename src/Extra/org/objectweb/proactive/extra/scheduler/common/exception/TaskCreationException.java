@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extra.scheduler.common.exception;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Exceptions Generated if a problem occurred while creating a task.
@@ -38,6 +40,7 @@ package org.objectweb.proactive.extra.scheduler.common.exception;
  * @version 3.9, Jun 29, 2007
  * @since ProActive 3.9
  */
+@PublicAPI
 public class TaskCreationException extends SchedulerException {
 
     /** Serial version UID */

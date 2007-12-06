@@ -158,7 +158,7 @@ public class NativeTaskLauncher extends TaskLauncher {
      * Execute the generationScript on the default node
      * @throws ActiveObjectCreationException if the script handler cannot be created
      * @throws NodeException if the script handler cannot be created
-     * @throws UserException if an error occured during the execution of the script
+     * @throws UserException if an error occurred during the execution of the script
      * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
      */
     protected String executeGenerationScript(GenerationScript script)
@@ -183,7 +183,9 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     @Override
     public void terminate() {
-        process.destroy();
+    	if (process != null){
+    		process.destroy();
+    	}
         super.terminate();
     }
 }

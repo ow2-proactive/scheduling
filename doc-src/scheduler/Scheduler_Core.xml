@@ -337,13 +337,13 @@ public Object execute(TaskResult... results) throws Throwable {
 
     <sect2 id="job_creation">
       <title>Job Creation</title>
-
+      
       <para></para>
     </sect2>
 
     <sect2 id="user_interface">
       <title>User Interface</title>
-
+		
       <sect3 id="User_Connection">
         <title>User Connection</title>
 
