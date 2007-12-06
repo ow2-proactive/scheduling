@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NamesFactory;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.IC2DThreadPool;
 
 
@@ -212,7 +213,11 @@ public class ActiveObjectListener implements NotificationListener {
 
             // We need to re-explore the host, because some new runtimes have been created.
             if (sourceHost.equals(destinationHost)) {
-                ao.getParent().getParent().getParent().explore();
+                WorldObject wo = ao.getParent().getParent().getParent()
+                                   .getParent();
+                wo.getMonitorThread()
+                  .addObjectToSelectiveRefresh(ao.getParent().getParent()
+                                                 .getParent());
             } else { // We have to monitore a new host.
                 String protocol = URIBuilder.getProtocol(nodeUrlToDiscovered);
                 int port = URIBuilder.getPortNumber(nodeUrlToDiscovered);

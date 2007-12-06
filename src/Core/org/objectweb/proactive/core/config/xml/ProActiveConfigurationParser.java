@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core.config.xml;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Properties;
 
@@ -91,12 +92,18 @@ public class ProActiveConfigurationParser {
             XPath xpath;
             domFactory = DocumentBuilderFactory.newInstance();
             domFactory.setNamespaceAware(false);
-            domFactory.setValidating(true);
+            domFactory.setValidating(false);
             domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-            String schema = ProActiveConfigurationParser.class.getClass()
-                                                              .getResource("/org/objectweb/proactive/core/config/xml/ProActiveConfiguration.xsd")
-                                                              .toString();
-            domFactory.setAttribute(JAXP_SCHEMA_SOURCE, new Object[] { schema });
+
+            URL url = ProActiveConfigurationParser.class.getClass()
+                                                        .getResource("/org/objectweb/proactive/core/config/xml/ProActiveConfiguration.xsd");
+
+            if ((url != null) && (!url.toString().startsWith("bundle"))) {
+                String schema = url.toString();
+                domFactory.setValidating(true);
+                domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
+                    new Object[] { schema });
+            }
 
             XPathFactory factory = XPathFactory.newInstance();
 

@@ -30,8 +30,10 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
+import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
@@ -39,18 +41,23 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 public class MonitorThread implements Observer {
     private final static int DEFAULT_TTR = 30;
+    private final static int DEFAULT_TIME_SELECTIVE_REFRESH = 5;
 
     //	/** Hosts will be recursively searched up to this depth */
     //	private int depth;
 
     /** Thread which refresh the objects */
     private Thread refresher;
+    private Thread selectiveRefresher;
 
     /** true if we want to refresh, false otherwise */
     private boolean refresh;
+    private boolean selectiveRefresh;
 
     /** Time To Refresh (in seconds) */
     private int ttr;
+    private int timeForSelectiveRefresh = DEFAULT_TIME_SELECTIVE_REFRESH;
+    private ConcurrentHashMap<String, AbstractData> objectsToRefreshSelectively = new ConcurrentHashMap<String, AbstractData>();
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
@@ -66,6 +73,10 @@ public class MonitorThread implements Observer {
         this.refresh = false;
         this.refresher = new Thread(new MonitorThreadRefresher(world),
                 "Ic2d refresh thread");
+        selectiveRefresh = true;
+        this.selectiveRefresher = new Thread(new MonitorThreadSelectiveRefresher(),
+                "Ic2d selective refresh thread");
+        selectiveRefresher.start();
     }
 
     //
@@ -103,6 +114,10 @@ public class MonitorThread implements Observer {
      */
     public void setTTR(int ttr) {
         this.ttr = ttr;
+    }
+
+    public void addObjectToSelectiveRefresh(AbstractData data) {
+        this.objectsToRefreshSelectively.put(data.getKey(), data);
     }
 
     public void update(Observable o, Object arg) {
@@ -162,6 +177,25 @@ public class MonitorThread implements Observer {
                 } catch (InterruptedException e) { /* Do nothing */
                     System.out.println(
                         "Ic2d exploring thread has been interupted.");
+                }
+            }
+        }
+    }
+
+    private class MonitorThreadSelectiveRefresher implements Runnable {
+        public void run() {
+            while (selectiveRefresh) {
+                for (AbstractData ad : objectsToRefreshSelectively.values()) {
+                    ad.explore();
+                    //System.out.println("Selective monitoring thread explores "+ad);								
+                }
+                objectsToRefreshSelectively.clear();
+
+                try {
+                    Thread.sleep(timeForSelectiveRefresh * 1000);
+                } catch (InterruptedException e) {
+                    System.out.println(
+                        "Ic2d selective exploring thread has been interupted.");
                 }
             }
         }
