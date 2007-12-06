@@ -88,7 +88,7 @@ public class GCMApplicationDescriptorImpl
     private CommandBuilder commandBuilder;
 
     /** The node allocator in charge of Node dispatching */
-    private NodeAllocator nodeAllocator;
+    private NodeMapper nodeAllocator;
     private ArrayList<String> currentDeploymentPath;
     private Set<Node> nodes;
     private Object deploymentMutex = new Object();
@@ -113,7 +113,7 @@ public class GCMApplicationDescriptorImpl
             nodeProviders = parser.getNodeProviders();
             virtualNodes = parser.getVirtualNodes();
             commandBuilder = parser.getCommandBuilder();
-            nodeAllocator = new NodeAllocator(this, virtualNodes.values());
+            nodeAllocator = new NodeMapper(this, virtualNodes.values());
         } catch (Exception e) {
             GCMA_LOGGER.warn("GCM Application Descriptor cannot be created", e);
             throw new ProActiveException(e);
