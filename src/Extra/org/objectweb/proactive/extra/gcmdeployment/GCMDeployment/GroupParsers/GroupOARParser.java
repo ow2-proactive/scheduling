@@ -103,23 +103,23 @@ public class GroupOARParser extends AbstractGroupParser {
             String nodeValue = GCMParserHelper.getElementValue(childNode);
 
             if (nodeName.equals(NODE_NAME_RESOURCES)) {
-                if (nodeValue != null) {
+                if ((nodeValue != null) && !nodeValue.trim().isEmpty()) {
                     oarGroup.setResources(nodeValue);
                 } else {
                     String nodes = GCMParserHelper.getAttributeValue(childNode,
                             ATTR_RESOURCES_NODES);
                     if (nodes != null) {
-                        oarGroup.setNodes(nodes);
+                        oarGroup.setNodes(Integer.parseInt(nodes));
                     }
                     String cpu = GCMParserHelper.getAttributeValue(childNode,
                             ATTR_RESOURCES_CPU);
                     if (cpu != null) {
-                        oarGroup.setCpu(cpu);
+                        oarGroup.setCpu(Integer.parseInt(cpu));
                     }
                     String core = GCMParserHelper.getAttributeValue(childNode,
                             ATTR_RESOURCES_CORE);
                     if (core != null) {
-                        oarGroup.setCore(core);
+                        oarGroup.setCore(Integer.parseInt(core));
                     }
                 }
             } else if (nodeName.equals(NODE_NAME_DIRECTORY)) {

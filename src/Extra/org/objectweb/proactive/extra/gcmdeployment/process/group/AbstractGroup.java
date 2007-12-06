@@ -46,7 +46,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
 public abstract class AbstractGroup implements Group {
-    private HostInfo hostInfo;
+    protected HostInfo hostInfo;
     private String commandPath;
     private Map<String, String> env;
     private String id;
@@ -78,6 +78,10 @@ public abstract class AbstractGroup implements Group {
 
     public void setCommandPath(String commandPath) {
         this.commandPath = commandPath;
+    }
+
+    public String getBookedNodesAccess() {
+        return bookedNodesAccess;
     }
 
     public void setEnvironment(Map<String, String> envVars) {

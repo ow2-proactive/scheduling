@@ -33,83 +33,125 @@ package org.objectweb.proactive.extra.gcmdeployment.process.group;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
+import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
+
+import sun.security.action.GetBooleanAction;
 
 
 public class GroupOAR extends AbstractGroup {
-    protected String resources;
+    final static public int BEST = -1;
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected String hostNumber = DEFAULT_HOSTS_NUMBER;
     protected String OARSUB = "oarsub";
-    protected String interactive = "false";
+    protected boolean interactive = false;
     protected String queueName;
-    private PathElement scriptLocation;
+    private PathElement scriptLocation = new PathElement("scripts/gcmdeployment/oar2.sh",
+            PathElement.PathBase.PROACTIVE);
     private String directory;
     private String stdout;
     private String stderr;
-    private String type = "deploy";
-    private String nodes = null;
-    private String cpu = null;
-    private String core = null;
+    private String type = null;
+    private String resources = null;
+    private int nodes = 0;
+    private int cpu = 0;
+    private int core = 0;
+
+    @Override
+    public List<String> buildCommands(CommandBuilder commandBuilder,
+        GCMApplicationDescriptor gcma) {
+        StringBuilder command = new StringBuilder();
+
+        // OARSUB parameters
+        command.append(buildOARSub());
+
+        // Script
+        command.append('"');
+        command.append(scriptLocation.getFullPath(hostInfo, commandBuilder));
+        command.append(" ");
+
+        String paCommand = commandBuilder.buildCommand(hostInfo, gcma);
+        paCommand = paCommand.replaceAll(" ", "\\\\ ");
+        //        paCommand = paCommand.replaceAll("'", "'\\\\''");
+        command.append(paCommand);
+        command.append(" ");
+
+        command.append(getBookedNodesAccess());
+        command.append(" ");
+
+        command.append('"');
+
+        List<String> ret = new ArrayList<String>();
+        ret.add(command.toString());
+        return ret;
+    }
 
     @Override
     public List<String> internalBuildCommands() {
-        StringBuffer commandBuf = new StringBuffer(OARSUB);
+        return null;
+    }
 
-        commandBuf.append(" --type=");
-        commandBuf.append(type);
+    public String buildOARSub() {
+        StringBuffer commandBuf = new StringBuffer();
+        if (getCommandPath() != null) {
+            commandBuf.append(getCommandPath());
+        } else {
+            commandBuf.append(OARSUB);
+        }
+        commandBuf.append(" ");
 
-        if (interactive.equalsIgnoreCase("true")) {
+        commandBuf.append(" ");
+        if (type != null) {
+            commandBuf.append(" --type ");
+            commandBuf.append(type);
+            commandBuf.append(" ");
+        }
+
+        if (interactive) {
             commandBuf.append(" --interactive");
+            commandBuf.append(" ");
         }
 
         if (queueName != null) {
             commandBuf.append(" --queue=");
             commandBuf.append(queueName);
+            commandBuf.append(" ");
         }
 
-        String resources = computeResourcesString();
-
-        if (resources != null) {
-            commandBuf.append(" --resource=");
-            commandBuf.append(resources);
-        }
+        commandBuf.append(" -l ");
+        commandBuf.append(resources);
+        commandBuf.append(" ");
 
         if (directory != null) {
             commandBuf.append(" --directory=");
             commandBuf.append(directory);
+            commandBuf.append(" ");
         }
 
         if (stdout != null) {
             commandBuf.append(" --stdout=");
             commandBuf.append(stdout);
+            commandBuf.append(" ");
         }
 
         if (stderr != null) {
             commandBuf.append(" --stderr=");
             commandBuf.append(stderr);
+            commandBuf.append(" ");
         }
 
         // argument - must be last append
         commandBuf.append(" ");
-        commandBuf.append(scriptLocation.toString());
-
-        List<String> res = new ArrayList<String>();
-        res.add(commandBuf.toString());
-
-        return res;
+        return commandBuf.toString();
     }
 
     public void setInteractive(String interactive) {
-        this.interactive = interactive;
+        this.interactive = Boolean.parseBoolean(interactive);
     }
 
     public void setQueueName(String queueName) {
         this.queueName = queueName;
-    }
-
-    public void setResources(String res) {
-        this.resources = res;
     }
 
     public void setScriptLocation(PathElement location) {
@@ -120,16 +162,26 @@ public class GroupOAR extends AbstractGroup {
         this.type = type;
     }
 
-    public void setNodes(String nodes) {
+    public void setNodes(int nodes) {
         this.nodes = nodes;
+        setResourcesString();
+        System.out.println("GroupOAR.setNodes()");
     }
 
-    public void setCpu(String cpu) {
+    public void setCpu(int cpu) {
         this.cpu = cpu;
+        setResourcesString();
+        System.out.println("GroupOAR.setCpu()");
     }
 
-    public void setCore(String core) {
+    public void setCore(int core) {
         this.core = core;
+        setResourcesString();
+        System.out.println("GroupOAR.setCore()");
+    }
+
+    public void setResources(String resources) {
+        this.resources = resources;
     }
 
     public void setDirectory(String directory) {
@@ -144,23 +196,27 @@ public class GroupOAR extends AbstractGroup {
         this.stderr = stderr;
     }
 
-    protected String computeResourcesString() {
-        if (resources != null) {
-            return resources;
-        }
-
+    protected void setResourcesString() {
         StringBuffer resourcesBuf = new StringBuffer();
 
-        if (nodes != null) {
-            resourcesBuf.append("/nodes=" + nodes);
+        if (nodes != 0) {
+            resourcesBuf.append("/nodes=" + resourceAsString(nodes));
         }
-        if (cpu != null) {
-            resourcesBuf.append("/cpu=" + cpu);
+        if (cpu != 0) {
+            resourcesBuf.append("/cpu=" + resourceAsString(cpu));
         }
-        if (core != null) {
-            resourcesBuf.append("/core=" + core);
+        if (core != 0) {
+            resourcesBuf.append("/core=" + resourceAsString(core));
         }
 
-        return resourcesBuf.toString();
+        resources = resourcesBuf.toString();
+    }
+
+    private String resourceAsString(int i) {
+        if (i == BEST) {
+            return "best";
+        }
+
+        return Integer.toString(i);
     }
 }

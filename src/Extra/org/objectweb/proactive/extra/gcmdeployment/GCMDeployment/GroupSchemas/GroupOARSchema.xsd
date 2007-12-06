@@ -12,7 +12,7 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="resource" type="paext:oarResourceType" minOccurs="0" />
+					<element name="resources" type="paext:oarResourcesType" minOccurs="0" />
 					<element name="directory" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
 					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
@@ -34,7 +34,7 @@
 		</complexContent>
 	</complexType>
 
-	<complexType name="oarResourceType">
+	<complexType name="oarResourcesType">
 		<simpleContent>
 			<extension base="pa:TextOrVariableType">
 				<attribute name="nodes" type="pa:PosintOrVariableType" use="optional"></attribute>
