@@ -207,15 +207,8 @@ public class StubGenerator {
 
         try {
             // Generates the bytecode for the class
-            // ASM is now the default bytecode manipulator
             byte[] data;
 
-            // if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-            // ASMBytecodeStubBuilder bsb = new
-            // ASMBytecodeStubBuilder(className);
-            // data = bsb.create();
-            // stubClassName = Utils.convertClassNameToStubClassName(className);
-            // } else
             data = JavassistByteCodeStubBuilder.create(className, null);
             stubClassName = Utils.convertClassNameToStubClassName(className,
                     null);

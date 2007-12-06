@@ -1199,12 +1199,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             // e.printStackTrace();
             String classname = Utils.convertStubClassNameToClassName(className);
 
-            // ASM is now the default bytecode manipulator
-            // if (MOPClassLoader.BYTE_CODE_MANIPULATOR.equals("ASM")) {
-            // ASMBytecodeStubBuilder bsb = new
-            // ASMBytecodeStubBuilder(classname);
-            // classData = bsb.create();
-            // } else
             classData = JavassistByteCodeStubBuilder.create(classname, null);
 
             // } catch (ClassNotFoundException ignored) {
