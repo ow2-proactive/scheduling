@@ -78,7 +78,7 @@
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
 	
 	<!-- junit properties -->
-	<property name="junit.showoutput" value="true"/>
+	<property name="junit.showoutput" value="false"/>
 
 	<!-- Performance test properties -->
 	<property name="performanceTestClass" value="performanceTests.simple.PerformanceTest" />
