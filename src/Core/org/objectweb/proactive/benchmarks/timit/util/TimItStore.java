@@ -37,7 +37,7 @@ import java.util.HashMap;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 
 
 /**
@@ -57,7 +57,7 @@ public class TimItStore {
      * Used by getInstance to create an unique instance per Body
      */
     private TimItStore(Timed timed) {
-        String prop = PAProperties.PA_TIMIT_ACTIVATION.getValue();
+        String prop = ProProperties.PA_TIMIT_ACTIVATION.getValue();
         if (prop == null) {
             this.activation = new String[0];
         } else {

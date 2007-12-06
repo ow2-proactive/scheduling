@@ -55,8 +55,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
@@ -398,7 +398,7 @@ public class ProActiveObject {
 
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
+            threadPool.awaitTermination(ProProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -450,7 +450,7 @@ public class ProActiveObject {
         }
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
+            threadPool.awaitTermination(ProProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block

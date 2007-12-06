@@ -46,8 +46,8 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -97,19 +97,19 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         ProActiveConfiguration.load();
     }
 
-    private static final int MSG_MEMORY = (PAProperties.PA_P2P_MSG_MEMORY.getValue() == null)
-        ? 0 : Integer.parseInt(PAProperties.PA_P2P_MSG_MEMORY.getValue());
+    private static final int MSG_MEMORY = (ProProperties.PA_P2P_MSG_MEMORY.getValue() == null)
+        ? 0 : Integer.parseInt(ProProperties.PA_P2P_MSG_MEMORY.getValue());
 
     //    private static final int NOA = Integer.parseInt(System.getProperty(
     //                P2PConstants.PROPERTY_NOA));
-    private static final int EXPL_MSG = Integer.parseInt(PAProperties.PA_P2P_EXPLORING_MSG.getValue()) -
+    private static final int EXPL_MSG = Integer.parseInt(ProProperties.PA_P2P_EXPLORING_MSG.getValue()) -
         1;
-    static public final long ACQ_TO = Long.parseLong(PAProperties.PA_P2P_NODES_ACQUISITION_T0.getValue());
-    static final long TTU = Long.parseLong(PAProperties.PA_P2P_TTU.getValue());
+    static public final long ACQ_TO = Long.parseLong(ProProperties.PA_P2P_NODES_ACQUISITION_T0.getValue());
+    static final long TTU = Long.parseLong(ProProperties.PA_P2P_TTU.getValue());
 
     //static public final int NOA = Integer.parseInt(System.getProperty(
     //            P2PConstants.PROPERTY_NOA));
-    static final int TTL = Integer.parseInt(PAProperties.PA_P2P_TTL.getValue());
+    static final int TTL = Integer.parseInt(ProProperties.PA_P2P_TTL.getValue());
 
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.

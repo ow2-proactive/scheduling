@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueue;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.event.MessageEventListener;
 import org.objectweb.proactive.core.gc.HalfBodies;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -110,10 +110,10 @@ public class HalfBody extends AbstractBody {
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
-        if (PAProperties.PA_FT.isTrue()) {
+        if (ProProperties.PA_FT.isTrue()) {
             try {
                 // create the fault-tolerance manager
-                int protocolSelector = FTManager.getProtoSelector(PAProperties.PA_FT_PROTOCOL.getValue());
+                int protocolSelector = FTManager.getProtoSelector(ProProperties.PA_FT_PROTOCOL.getValue());
                 this.ftmanager = factory.newFTManagerFactory()
                                         .newHalfFTManager(protocolSelector);
                 this.ftmanager.init(this);

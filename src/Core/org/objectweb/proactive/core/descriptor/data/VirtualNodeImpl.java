@@ -49,7 +49,7 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProDeployment;
 import org.objectweb.proactive.api.ProFileTransfer;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.ServiceThread;
@@ -946,7 +946,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public void createNodeOnCurrentJvm(String protocol) {
         if (protocol == null) {
-            protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            protocol = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
 
         this.localVirtualMachines.add(protocol);

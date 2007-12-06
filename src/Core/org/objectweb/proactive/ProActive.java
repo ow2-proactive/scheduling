@@ -73,8 +73,8 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -1080,7 +1080,7 @@ public class ProActive {
         threadPool.shutdown();
         try {
             threadPool.awaitTermination(new Integer(
-                    PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
+                    ProProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -1143,7 +1143,7 @@ public class ProActive {
         threadPool.shutdown();
         try {
             threadPool.awaitTermination(new Integer(
-                    PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
+                    ProProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -2339,7 +2339,7 @@ public class ProActive {
                 "Cannot register such virtualNode since it results from a lookup!");
         }
         if (registrationProtocol == null) {
-            registrationProtocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            registrationProtocol = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
         String virtualnodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);

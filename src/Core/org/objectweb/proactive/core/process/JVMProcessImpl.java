@@ -35,7 +35,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -78,8 +78,8 @@ public class JVMProcessImpl extends AbstractExternalProcess
                 "java.class.path"));
     public final static String DEFAULT_JAVAPATH = System.getProperty(
             "java.home") + File.separator + "bin" + File.separator + "java";
-    public static String DEFAULT_POLICY_FILE = PAProperties.SECURITY_POLICY.getValue();
-    public static String DEFAULT_LOG4J_FILE = PAProperties.LOG4J.getValue();
+    public static String DEFAULT_POLICY_FILE = ProProperties.SECURITY_POLICY.getValue();
+    public static String DEFAULT_LOG4J_FILE = ProProperties.LOG4J.getValue();
 
     static {
         if (DEFAULT_POLICY_FILE != null) {
@@ -341,7 +341,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
         // dynamic classloading through runtimes
         // check system classloader when ProActive.jar is used (where by default : "proactive.classloader" == "disable")
-        if (PAProperties.PA_CLASSLOADER.isTrue() ||
+        if (ProProperties.PA_CLASSLOADER.isTrue() ||
                 "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(
                     System.getProperty("java.system.class.loader"))) {
             javaCommand.append(

@@ -38,7 +38,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 
 
 /**
@@ -52,7 +52,7 @@ public class ProActiveLogger extends Logger {
     static {
         if (System.getProperty("log4j.configuration") == null) {
             try {
-                InputStream in = PAProperties.class.getResourceAsStream(
+                InputStream in = ProProperties.class.getResourceAsStream(
                         "proactive-log4j");
 
                 // testing the availability of the file
@@ -60,7 +60,7 @@ public class ProActiveLogger extends Logger {
                 p.load(in);
                 PropertyConfigurator.configure(p);
             } catch (Exception e) {
-                URL u = PAProperties.class.getResource("proactive-log4j");
+                URL u = ProProperties.class.getResource("proactive-log4j");
                 System.err.println("the default log4j configuration file (" +
                     u + ") is not accessible, logging is disabled");
             }

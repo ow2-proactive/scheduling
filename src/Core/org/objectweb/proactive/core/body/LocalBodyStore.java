@@ -37,7 +37,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.ProLifeCycle;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.BodyNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -311,7 +311,7 @@ public class LocalBodyStore {
 
         // END ProActiveEvent
         if ((this.localBodyMap.size() == 0) &&
-                PAProperties.PA_EXIT_ON_EMPTY.isTrue()) {
+                ProProperties.PA_EXIT_ON_EMPTY.isTrue()) {
             ProLifeCycle.exitSuccess();
         }
     }

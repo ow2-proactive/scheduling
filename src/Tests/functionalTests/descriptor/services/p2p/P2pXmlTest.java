@@ -39,7 +39,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -63,7 +63,7 @@ public class P2pXmlTest extends FunctionalTest {
             "/functionalTests/descriptor/services/p2p/TestP2P.xml").getPath();
 
     static {
-        if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
+        if ("ibis".equals(ProProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
             P2P_XML_LOCATION_UNIX = P2pXmlTest.class.getResource(
                     "/functionalTests/descriptor/services/p2p/TestP2PIbis.xml")
                                                     .getPath();

@@ -42,7 +42,7 @@ import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -185,13 +185,13 @@ public class URIBuilder {
      */
     public static URI buildURIFromProperties(String host, String name) {
         String port = null;
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+        String protocol = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
                 protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            port = PAProperties.PA_RMI_PORT.getValue();
+            port = ProProperties.PA_RMI_PORT.getValue();
         }
         if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            port = PAProperties.PA_XMLHTTP_PORT.getValue();
+            port = ProProperties.PA_XMLHTTP_PORT.getValue();
         }
         if (port == null) {
             return buildURI(host, name, protocol);
@@ -315,13 +315,13 @@ public class URIBuilder {
      */
     public static String getHostNameorIP(InetAddress address) {
         //        address = UrlBuilder.getNetworkInterfaces();
-        if (PAProperties.PA_HOSTNAME.getValue() != null) {
-            return PAProperties.PA_HOSTNAME.getValue();
+        if (ProProperties.PA_HOSTNAME.getValue() != null) {
+            return ProProperties.PA_HOSTNAME.getValue();
         }
 
         String temp = "";
 
-        if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
+        if (ProProperties.PA_USE_IP_ADDRESS.isTrue()) {
             temp = (address).getHostAddress();
         } else {
             temp = address.getCanonicalHostName();
@@ -457,13 +457,13 @@ public class URIBuilder {
                 while (ias.hasMoreElements()) {
                     InetAddress ia = ias.nextElement();
 
-                    if (PAProperties.PA_NOLOOPBACK.isTrue()) {
+                    if (ProProperties.PA_NOLOOPBACK.isTrue()) {
                         if (ia.isLoopbackAddress()) {
                             continue;
                         }
                     }
 
-                    if (PAProperties.PA_NOPRIVATE.isTrue()) {
+                    if (ProProperties.PA_NOPRIVATE.isTrue()) {
                         if (ia.isSiteLocalAddress()) {
                             continue;
                         }

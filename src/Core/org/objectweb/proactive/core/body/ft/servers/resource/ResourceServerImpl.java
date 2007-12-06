@@ -38,7 +38,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -80,7 +80,7 @@ public class ResourceServerImpl implements ResourceServer {
             Vector<String> v = new Vector<String>(1);
             v.add(p2pServerURL);
             StartP2PService startServiceP2P = new StartP2PService(v);
-            PAProperties.PA_P2P_PORT.setValue("2603");
+            ProProperties.PA_P2P_PORT.setValue("2603");
             startServiceP2P.start();
             this.serviceP2P = startServiceP2P.getP2PService();
             logger.info("[RESOURCE] Running on p2p network");

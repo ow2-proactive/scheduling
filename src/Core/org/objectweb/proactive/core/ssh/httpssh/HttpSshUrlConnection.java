@@ -45,7 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.ssh.SshParameters;
 import org.objectweb.proactive.core.ssh.SshTunnel;
 import org.objectweb.proactive.core.ssh.SshTunnelFactory;
@@ -285,7 +285,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         String host = u.getHost();
         int port = u.getPort();
         String path = u.getPath();
-        if (PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() &&
+        if (ProProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() &&
                 getTryCache().needToTry(host, port)) {
             if (!getTryCache().everTried(host, port)) {
                 try {

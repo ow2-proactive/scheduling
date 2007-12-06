@@ -42,8 +42,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -332,25 +332,25 @@ public class StartP2PService implements P2PConstants {
      * @param parsed Arguments from command line.
      */
     private static void initP2PProperties(Args parsed) {
-        PAProperties.PA_P2P_ACQUISITION.setValue(parsed.acquisitionMethod);
-        PAProperties.PA_P2P_PORT.setValue(parsed.portNumber);
-        PAProperties.PA_P2P_NOA.setValue(parsed.noa);
-        PAProperties.PA_P2P_TTU.setValue(parsed.ttu);
-        PAProperties.PA_P2P_TTL.setValue(parsed.ttl);
-        PAProperties.PA_P2P_MSG_MEMORY.setValue(parsed.msg_capacity);
-        PAProperties.PA_P2P_EXPLORING_MSG.setValue(parsed.expl_msg);
-        PAProperties.PA_P2P_NODES_ACQUISITION_T0.setValue(parsed.nodes_acq_to);
-        PAProperties.PA_P2P_LOOKUP_FREQ.setValue(parsed.lookup_freq);
-        PAProperties.PA_P2P_MULTI_PROC_NODES.setValue(parsed.multi_proc_nodes);
+        ProProperties.PA_P2P_ACQUISITION.setValue(parsed.acquisitionMethod);
+        ProProperties.PA_P2P_PORT.setValue(parsed.portNumber);
+        ProProperties.PA_P2P_NOA.setValue(parsed.noa);
+        ProProperties.PA_P2P_TTU.setValue(parsed.ttu);
+        ProProperties.PA_P2P_TTL.setValue(parsed.ttl);
+        ProProperties.PA_P2P_MSG_MEMORY.setValue(parsed.msg_capacity);
+        ProProperties.PA_P2P_EXPLORING_MSG.setValue(parsed.expl_msg);
+        ProProperties.PA_P2P_NODES_ACQUISITION_T0.setValue(parsed.nodes_acq_to);
+        ProProperties.PA_P2P_LOOKUP_FREQ.setValue(parsed.lookup_freq);
+        ProProperties.PA_P2P_MULTI_PROC_NODES.setValue(parsed.multi_proc_nodes);
 
         if (parsed.xml_path != null) {
-            PAProperties.PA_P2P_XML_PATH.setValue(parsed.xml_path);
+            ProProperties.PA_P2P_XML_PATH.setValue(parsed.xml_path);
         }
 
         if (parsed.no_sharing == null) {
-            PAProperties.PA_P2P_NO_SHARING.setValue(PAProperties.FALSE);
+            ProProperties.PA_P2P_NO_SHARING.setValue(ProProperties.FALSE);
         } else {
-            PAProperties.PA_P2P_NO_SHARING.setValue(parsed.no_sharing);
+            ProProperties.PA_P2P_NO_SHARING.setValue(parsed.no_sharing);
         }
     }
 
@@ -440,11 +440,12 @@ public class StartP2PService implements P2PConstants {
             String url = (String) peerList.get(i);
 
             if (url.indexOf("//") < 0) {
-                url = PAProperties.PA_P2P_ACQUISITION.getValue() + "://" + url;
+                url = ProProperties.PA_P2P_ACQUISITION.getValue() + "://" +
+                    url;
             }
 
             if (!url.matches(".*:[0-9]+.*")) {
-                url += (":" + PAProperties.PA_P2P_PORT.getValue());
+                url += (":" + ProProperties.PA_P2P_PORT.getValue());
             }
 
             newPeerList.add(url);
@@ -463,8 +464,8 @@ public class StartP2PService implements P2PConstants {
         this.peers = StartP2PService.checkingPeersUrl(this.peers);
 
         // Starting new Active P2P Service
-        String acquisitionMethod = PAProperties.PA_P2P_ACQUISITION.getValue();
-        String portNumber = PAProperties.PA_P2P_PORT.getValue();
+        String acquisitionMethod = ProProperties.PA_P2P_ACQUISITION.getValue();
+        String portNumber = ProProperties.PA_P2P_PORT.getValue();
 
         // Keep previous port value
         String bckPortValue = null;
@@ -533,19 +534,19 @@ public class StartP2PService implements P2PConstants {
     }
 
     private static class Args {
-        private String acquisitionMethod = PAProperties.PA_P2P_ACQUISITION.getValue();
-        private String portNumber = PAProperties.PA_P2P_PORT.getValue();
-        private String noa = PAProperties.PA_P2P_NOA.getValue();
-        private String ttu = PAProperties.PA_P2P_TTU.getValue();
-        private String ttl = PAProperties.PA_P2P_TTL.getValue();
-        private String msg_capacity = PAProperties.PA_P2P_MSG_MEMORY.getValue();
-        private String expl_msg = PAProperties.PA_P2P_EXPLORING_MSG.getValue();
-        private String nodes_acq_to = PAProperties.PA_P2P_NODES_ACQUISITION_T0.getValue();
-        private String lookup_freq = PAProperties.PA_P2P_LOOKUP_FREQ.getValue();
-        private String multi_proc_nodes = PAProperties.PA_P2P_MULTI_PROC_NODES.getValue();
-        private String xml_path = PAProperties.PA_P2P_XML_PATH.getValue();
+        private String acquisitionMethod = ProProperties.PA_P2P_ACQUISITION.getValue();
+        private String portNumber = ProProperties.PA_P2P_PORT.getValue();
+        private String noa = ProProperties.PA_P2P_NOA.getValue();
+        private String ttu = ProProperties.PA_P2P_TTU.getValue();
+        private String ttl = ProProperties.PA_P2P_TTL.getValue();
+        private String msg_capacity = ProProperties.PA_P2P_MSG_MEMORY.getValue();
+        private String expl_msg = ProProperties.PA_P2P_EXPLORING_MSG.getValue();
+        private String nodes_acq_to = ProProperties.PA_P2P_NODES_ACQUISITION_T0.getValue();
+        private String lookup_freq = ProProperties.PA_P2P_LOOKUP_FREQ.getValue();
+        private String multi_proc_nodes = ProProperties.PA_P2P_MULTI_PROC_NODES.getValue();
+        private String xml_path = ProProperties.PA_P2P_XML_PATH.getValue();
         private String peerListFile = null;
         private final Vector peers = new Vector();
-        private String no_sharing = PAProperties.PA_P2P_NO_SHARING.getValue();
+        private String no_sharing = ProProperties.PA_P2P_NO_SHARING.getValue();
     }
 }

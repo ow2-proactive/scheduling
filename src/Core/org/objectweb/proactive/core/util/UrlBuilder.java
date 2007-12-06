@@ -43,7 +43,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.ClassServerServlet;
@@ -184,10 +184,10 @@ public class UrlBuilder {
      */
     public static String buildUrlFromProperties(String host, String name) {
         String port = null;
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+        String protocol = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
                 protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            port = PAProperties.PA_RMI_PORT.getValue();
+            port = ProProperties.PA_RMI_PORT.getValue();
         }
         if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
             try {
@@ -196,7 +196,7 @@ public class UrlBuilder {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            port = PAProperties.PA_XMLHTTP_PORT.getValue();
+            port = ProProperties.PA_XMLHTTP_PORT.getValue();
         }
 
         if (port == null) {
@@ -261,7 +261,7 @@ public class UrlBuilder {
     public static String getProtocol(String nodeURL) {
         String protocol = URI.create(nodeURL).getScheme();
         if (protocol == null) {
-            return PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            return ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
         return protocol;
     }
@@ -322,13 +322,13 @@ public class UrlBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
-        if (PAProperties.PA_HOSTNAME.getValue() != null) {
-            return PAProperties.PA_HOSTNAME.getValue();
+        if (ProProperties.PA_HOSTNAME.getValue() != null) {
+            return ProProperties.PA_HOSTNAME.getValue();
         }
 
         String temp = "";
 
-        if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
+        if (ProProperties.PA_USE_IP_ADDRESS.isTrue()) {
             temp = (address).getHostAddress();
         } else {
             temp = address.getCanonicalHostName();

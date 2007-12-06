@@ -37,7 +37,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -180,7 +180,7 @@ public class RemoteObjectExposer implements Serializable {
     }
 
     public String getURL() {
-        return getURL(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+        return getURL(ProProperties.PA_COMMUNICATION_PROTOCOL.getValue());
     }
 
     /**

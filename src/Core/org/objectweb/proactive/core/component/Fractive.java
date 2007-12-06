@@ -78,7 +78,7 @@ import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.mop.MOP;
@@ -1004,7 +1004,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                     threadPool.shutdown();
                     try {
                         threadPool.awaitTermination(new Integer(
-                                PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
+                                ProProperties.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
                             TimeUnit.SECONDS);
                     } catch (InterruptedException e) {
                         logger.info("Interruption when waiting for thread pool termination.",

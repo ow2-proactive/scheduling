@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -93,11 +93,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * Reference to the current Node.
      */
     private Node p2pServiceNode = null;
-    private static final int MSG_MEMORY = Integer.parseInt(PAProperties.PA_P2P_MSG_MEMORY.getValue());
-    private static final int NOA = Integer.parseInt(PAProperties.PA_P2P_NOA.getValue());
-    private static final int EXPL_MSG = Integer.parseInt(PAProperties.PA_P2P_EXPLORING_MSG.getValue()) -
+    private static final int MSG_MEMORY = Integer.parseInt(ProProperties.PA_P2P_MSG_MEMORY.getValue());
+    private static final int NOA = Integer.parseInt(ProProperties.PA_P2P_NOA.getValue());
+    private static final int EXPL_MSG = Integer.parseInt(ProProperties.PA_P2P_EXPLORING_MSG.getValue()) -
         1;
-    private static final long ACQ_TO = Long.parseLong(PAProperties.PA_P2P_NODES_ACQUISITION_T0.getValue());
+    private static final long ACQ_TO = Long.parseLong(ProProperties.PA_P2P_NODES_ACQUISITION_T0.getValue());
 
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
@@ -512,7 +512,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
             // Unregister the remote runtime
             paRuntime.unregister(remoteRuntime, remoteRuntime.getURL(), "p2p",
-                PAProperties.PA_P2P_ACQUISITION.getValue() + ":",
+                ProProperties.PA_P2P_ACQUISITION.getValue() + ":",
                 remoteRuntime.getVMInformation().getName());
         } catch (Exception e) {
             logger.info("Node @" + node + " already down", e);

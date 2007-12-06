@@ -35,7 +35,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
@@ -88,7 +88,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
                         "org.objectweb.proactive.p2p.service.StartP2PService");
 
                     if (this.acquistion == null) {
-                        this.acquistion = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+                        this.acquistion = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
                     }
 
                     process.setParameters("-port " + this.port + " -acq " +
@@ -118,8 +118,9 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      */
     private P2PService getPrecedentService() {
         String url = URIBuilder.buildURI("localhost", P2P_NODE_NAME,
-                PAProperties.PA_P2P_ACQUISITION.getValue(),
-                Integer.parseInt(PAProperties.PA_P2P_PORT.getValue())).toString();
+                ProProperties.PA_P2P_ACQUISITION.getValue(),
+                Integer.parseInt(ProProperties.PA_P2P_PORT.getValue()))
+                               .toString();
 
         try {
             Node serviceNode = NodeFactory.getNode(url);
@@ -181,7 +182,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      */
     public void setAcq(String acq) {
         this.acquistion = acq;
-        PAProperties.PA_P2P_ACQUISITION.setValue(acq);
+        ProProperties.PA_P2P_ACQUISITION.setValue(acq);
     }
 
     /**
@@ -190,7 +191,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      */
     public void setPort(String port) {
         this.port = Integer.parseInt(port);
-        PAProperties.PA_P2P_PORT.setValue(port);
+        ProProperties.PA_P2P_PORT.setValue(port);
     }
 
     /**
@@ -198,7 +199,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @param noa Number Of Acquaintances.
      */
     public void setNoa(String noa) {
-        PAProperties.PA_P2P_NOA.setValue(noa);
+        ProProperties.PA_P2P_NOA.setValue(noa);
     }
 
     /**
@@ -206,7 +207,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @param ttu Time To Update.
      */
     public void setTtu(String ttu) {
-        PAProperties.PA_P2P_TTU.setValue(ttu);
+        ProProperties.PA_P2P_TTU.setValue(ttu);
     }
 
     /**
@@ -214,7 +215,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @param ttl Time To Live.
      */
     public void setTtl(String ttl) {
-        PAProperties.PA_P2P_TTL.setValue(ttl);
+        ProProperties.PA_P2P_TTL.setValue(ttl);
     }
 
     /**
@@ -222,7 +223,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @param multi_proc_nodes true or false.
      */
     public void setMultiProcNodes(String multi_proc_nodes) {
-        PAProperties.PA_P2P_MULTI_PROC_NODES.setValue(multi_proc_nodes);
+        ProProperties.PA_P2P_MULTI_PROC_NODES.setValue(multi_proc_nodes);
     }
 
     /**
@@ -230,7 +231,7 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
      * @param xml_path the file path.
      */
     public void setXmlPath(String xml_path) {
-        PAProperties.PA_P2P_XML_PATH.setValue(xml_path);
+        ProProperties.PA_P2P_XML_PATH.setValue(xml_path);
     }
 
     /**

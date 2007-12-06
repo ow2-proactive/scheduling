@@ -32,7 +32,7 @@ package org.objectweb.proactive;
 
 import java.net.UnknownHostException;
 
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
@@ -62,7 +62,7 @@ public class Main {
         }
         System.out.println("Local IP Address: " + localAddress);
         System.out.println("Available properties:");
-        for (PAProperties p : PAProperties.values()) {
+        for (ProProperties p : ProProperties.values()) {
             String type = p.isBoolean() ? "Boolean" : "String";
             System.out.println("\t" + type + "\t" + p.getKey() + " [" +
                 p.getValue() + "]");

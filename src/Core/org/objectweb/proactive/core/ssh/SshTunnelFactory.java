@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.ssh;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.ssh.SshTunnel;
 import org.objectweb.proactive.core.ssh.UnusedTunnel;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -73,7 +73,7 @@ public class SshTunnelFactory {
 
     private SshTunnelFactory() {
         _unused = new java.util.Hashtable<String, UnusedTunnel>();
-        if (PAProperties.PA_SSH_TUNNELING_USE_GC.isTrue()) {
+        if (ProProperties.PA_SSH_TUNNELING_USE_GC.isTrue()) {
             Thread gcThread = new Thread() {
                     @Override
                     public void run() {
@@ -96,7 +96,7 @@ public class SshTunnelFactory {
 
     private synchronized SshTunnel create(String host, int port)
         throws java.io.IOException {
-        if (PAProperties.PA_SSH_TUNNELING_USE_GC.isTrue()) {
+        if (ProProperties.PA_SSH_TUNNELING_USE_GC.isTrue()) {
             UnusedTunnel unused = _unused.get(getKey(host, port));
             SshTunnel tunnel;
             if (unused == null) {
@@ -118,7 +118,7 @@ public class SshTunnelFactory {
         if (tunnel != null) {
             String host = tunnel.getDistantHost();
             int port = tunnel.getDistantPort();
-            if (PAProperties.PA_SSH_TUNNELING_USE_GC.isTrue()) {
+            if (ProProperties.PA_SSH_TUNNELING_USE_GC.isTrue()) {
                 UnusedTunnel prev = _unused.get(getKey(host, port));
                 if (prev != null) {
                     prev.getTunnel().realClose();

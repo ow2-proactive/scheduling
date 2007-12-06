@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.ssh;
 
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.util.HostsInfos;
 
 
@@ -45,7 +45,7 @@ public class SshParameters {
 
     static public int getConnectTimeout() {
         if (_connectTimeout == -1) {
-            String timeout = PAProperties.PA_SSH_TUNNELING_CONNECT_TIMEOUT.getValue();
+            String timeout = ProProperties.PA_SSH_TUNNELING_CONNECT_TIMEOUT.getValue();
             if (timeout != null) {
                 _connectTimeout = Integer.parseInt(timeout);
             } else {
@@ -56,7 +56,7 @@ public class SshParameters {
     }
 
     static public int getTunnelGCPeriod() {
-        String gcPeriod = PAProperties.PA_SSH_TUNNELING_GC_PERIOD.getValue();
+        String gcPeriod = ProProperties.PA_SSH_TUNNELING_GC_PERIOD.getValue();
         if (gcPeriod != null) {
             return Integer.parseInt(gcPeriod);
         } else {
@@ -66,7 +66,7 @@ public class SshParameters {
     }
 
     static public boolean getSshTunneling() {
-        String tunneling = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+        String tunneling = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         if ((tunneling != null) &&
                 tunneling.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             return true;
@@ -80,7 +80,7 @@ public class SshParameters {
     }
 
     static public String getSshPort() {
-        String sshPort = PAProperties.PA_SSH_PORT.getValue();
+        String sshPort = ProProperties.PA_SSH_PORT.getValue();
         if (sshPort == null) {
             sshPort = "22";
         }
@@ -88,15 +88,15 @@ public class SshParameters {
     }
 
     static public String getSshKnownHostsFile() {
-        if (PAProperties.PA_SSH_KNOWN_HOST.getValue() != null) {
-            return PAProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
+        if (ProProperties.PA_SSH_KNOWN_HOST.getValue() != null) {
+            return ProProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
         }
         return System.getProperty("user.home") +
-        PAProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
+        ProProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
     }
 
     static public String getSshKeyDirectory() {
-        String keydir = PAProperties.PA_SSH_KEY_DIR.getValue();
+        String keydir = ProProperties.PA_SSH_KEY_DIR.getValue();
         if (keydir == null) {
             keydir = SSHKeys.SSH_DIR;
         }

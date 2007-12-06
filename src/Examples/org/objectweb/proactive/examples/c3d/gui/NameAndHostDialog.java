@@ -49,8 +49,8 @@ import javax.swing.JTextField;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.c3d.C3DDispatcher;
 import org.objectweb.proactive.examples.c3d.Dispatcher;
@@ -245,7 +245,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
         try {
             int port = -1;
-            String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            String protocol = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
             if (!protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
                 port = Integer.parseInt(ProActiveConfiguration.getInstance()

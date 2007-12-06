@@ -38,7 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
@@ -295,7 +295,7 @@ public class CommandBuilderProActive implements CommandBuilder {
 
         // Log4j
         if (log4jProperties != null) {
-            command.append(PAProperties.LOG4J.getCmdLine());
+            command.append(ProProperties.LOG4J.getCmdLine());
             command.append("file:");
             command.append(log4jProperties.getFullPath(hostInfo, this));
             command.append(" ");
@@ -303,12 +303,12 @@ public class CommandBuilderProActive implements CommandBuilder {
 
         // Security Policy
         if (securityPolicy != null) {
-            command.append(PAProperties.SECURITY_POLICY.getCmdLine());
+            command.append(ProProperties.SECURITY_POLICY.getCmdLine());
             command.append(securityPolicy.getFullPath(hostInfo, this));
             command.append(" ");
         } else {
-            command.append(PAProperties.SECURITY_POLICY.getCmdLine());
-            command.append(PAProperties.SECURITY_POLICY.getValue());
+            command.append(ProProperties.SECURITY_POLICY.getCmdLine());
+            command.append(ProProperties.SECURITY_POLICY.getValue());
             command.append(" ");
         }
 

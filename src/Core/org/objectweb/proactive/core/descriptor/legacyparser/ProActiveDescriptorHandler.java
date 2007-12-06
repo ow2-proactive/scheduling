@@ -35,7 +35,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Vector;
 
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -191,7 +191,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 
         inputSource.setSystemId(uri.toString());
 
-        if (PAProperties.SCHEMA_VALIDATION.isTrue()) {
+        if (ProProperties.SCHEMA_VALIDATION.isTrue()) {
             String[] selectedSchemasArray = selectedSchemas.toArray(new String[0]);
             if (selectedSchemasArray.length == 0) {
                 selectedSchemasArray = null;

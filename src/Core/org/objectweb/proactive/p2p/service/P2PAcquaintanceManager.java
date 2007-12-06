@@ -44,7 +44,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
@@ -68,9 +68,9 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     private P2PService acquaintances = null;
     private P2PService acquaintancesActived = null;
     private Group<P2PService> groupOfAcquaintances = null;
-    private static final long TTU = Long.parseLong(PAProperties.PA_P2P_TTU.getValue());
-    private static final int NOA = Integer.parseInt(PAProperties.PA_P2P_NOA.getValue());
-    private static final int TTL = Integer.parseInt(PAProperties.PA_P2P_TTL.getValue());
+    private static final long TTU = Long.parseLong(ProProperties.PA_P2P_TTU.getValue());
+    private static final int NOA = Integer.parseInt(ProProperties.PA_P2P_NOA.getValue());
+    private static final int TTL = Integer.parseInt(ProProperties.PA_P2P_TTL.getValue());
 
     /**
      * The empty constructor for activating.

@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.body.reply.ReplyReceiver;
 import org.objectweb.proactive.core.body.reply.ReplyReceiverForwarder;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverForwarder;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.event.AbstractEventProducer;
 import org.objectweb.proactive.core.event.MigrationEvent;
 import org.objectweb.proactive.core.event.MigrationEventListener;
@@ -82,23 +82,23 @@ public class MigrationManagerImpl extends AbstractEventProducer
     public MigrationManagerImpl() {
         super(true);
 
-        if (PAProperties.PA_MIXEDLOCATION_TTL.isSet()) {
-            this.ttl = Integer.valueOf(PAProperties.PA_MIXEDLOCATION_TTL.getValue())
+        if (ProProperties.PA_MIXEDLOCATION_TTL.isSet()) {
+            this.ttl = Integer.valueOf(ProProperties.PA_MIXEDLOCATION_TTL.getValue())
                               .intValue();
         } else {
             this.ttl = INFINITE_TTL;
         }
 
-        this.updatingForwarder = PAProperties.PA_MIXEDLOCATION_UPDATINGFORWARDER.isTrue();
-        if (PAProperties.PA_MIXEDLOCATION_MAXMIGRATIONNB.isSet()) {
-            this.maxMigrationNb = Integer.valueOf(PAProperties.PA_MIXEDLOCATION_MAXMIGRATIONNB.getValue())
+        this.updatingForwarder = ProProperties.PA_MIXEDLOCATION_UPDATINGFORWARDER.isTrue();
+        if (ProProperties.PA_MIXEDLOCATION_MAXMIGRATIONNB.isSet()) {
+            this.maxMigrationNb = Integer.valueOf(ProProperties.PA_MIXEDLOCATION_MAXMIGRATIONNB.getValue())
                                          .intValue();
         } else {
             this.maxMigrationNb = INFINITE_MAX_MIGRATION_NB;
         }
 
-        if (PAProperties.PA_MIXEDLOCATION_MAXTIMEONSITE.isSet()) {
-            this.maxTimeOnSite = Integer.valueOf(PAProperties.PA_MIXEDLOCATION_MAXTIMEONSITE.getValue())
+        if (ProProperties.PA_MIXEDLOCATION_MAXTIMEONSITE.isSet()) {
+            this.maxTimeOnSite = Integer.valueOf(ProProperties.PA_MIXEDLOCATION_MAXTIMEONSITE.getValue())
                                         .intValue();
         } else {
             this.maxTimeOnSite = INFINITE_MAX_TIME_ON_SITE;
