@@ -1,11 +1,8 @@
-class B {
+public class B {
 	...
-	public Result bar (Result r) {
+	public Result bar (Value v) {
 		...
 	}
-	public Result bar2 () {
-		A a = newActive(A);
-		return	a.foo(); //future is sent as a result 
-	} 
+	...
 } //end of class B
 			
