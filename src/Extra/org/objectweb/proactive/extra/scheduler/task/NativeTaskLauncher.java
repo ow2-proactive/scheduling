@@ -183,9 +183,9 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     @Override
     public void terminate() {
-    	if (process != null){
-    		process.destroy();
-    	}
+        if (process != null) {
+            process.destroy();
+        }
         super.terminate();
     }
 }
