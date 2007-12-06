@@ -4,7 +4,7 @@
 ######### Scilab use ##########
 
 # export SCIDIR=<your current scilab path>
-export SCIDIR=/usr/lib/scilab-4.1.2/
+export SCIDIR=/usr/lib/scilab-4.1.2
 export SCI=$SCIDIR
 
 #### Scilab libraries
