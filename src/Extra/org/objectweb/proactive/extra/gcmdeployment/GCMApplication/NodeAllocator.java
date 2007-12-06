@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,19 +55,27 @@ import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
 public class NodeAllocator implements NotificationListener {
 
     /** The GCM Application Descriptor associated to this Node Allocator*/
-    private GCMApplicationDescriptorInternal gcma;
+    final private GCMApplicationDescriptorInternal gcma;
 
     /** All Virtual Nodes*/
-    private List<VirtualNodeInternal> virtualNodes;
+    final private List<VirtualNodeInternal> virtualNodes;
 
     /** Nodes waiting in Stage 2 */
-    private Map<Node, NodeProvider> stage2Pool;
+    final private Map<Node, NodeProvider> stage2Pool;
 
     /** Nodes waiting in Stage 3 */
-    private Map<Node, NodeProvider> stage3Pool;
+    final private Map<Node, NodeProvider> stage3Pool;
 
     /** A Semaphore to activate stage 2/3 node dispatching on node arrival */
-    private Object semaphore;
+    final private Object semaphore;
+
+    /* Node allocation backend (inside VirtualNode) is not thread safe. This mutex
+     * must be take each time a dispatchSx function is called
+     *
+     * Anyway, notifications are currently synchronized by JMX. No concurrency should be
+     * encountered :-/
+     */
+    final private Object dispatchMutex;
 
     public NodeAllocator(GCMApplicationDescriptorImpl gcma,
         Collection<VirtualNodeInternal> virtualNodes) {
@@ -76,7 +85,11 @@ public class NodeAllocator implements NotificationListener {
         this.virtualNodes.addAll(virtualNodes);
 
         this.semaphore = new Object();
+        this.dispatchMutex = new Object();
 
+        /* Stage2Pool and Stage3Pool need weakly consistent iterators.
+         * All this class must be rewritten if fail fast iterators are used
+         */
         this.stage2Pool = new ConcurrentHashMap<Node, NodeProvider>();
         this.stage3Pool = new ConcurrentHashMap<Node, NodeProvider>();
         subscribeJMXRuntimeEvent();
@@ -87,14 +100,10 @@ public class NodeAllocator implements NotificationListener {
         ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
         part.addDeployment(gcma.getDeploymentId());
         JMXNotificationManager.getInstance()
-                              .subscribe(ProActiveRuntimeImpl.getProActiveRuntime()
-                                                             .getMBean()
-                                                             .getObjectName(),
-            this);
+                              .subscribe(part.getMBean().getObjectName(), this);
     }
 
-    synchronized public void handleNotification(Notification notification,
-        Object handback) {
+    public void handleNotification(Notification notification, Object handback) {
         try {
             String type = notification.getType();
 
@@ -107,8 +116,10 @@ public class NodeAllocator implements NotificationListener {
                 NodeProvider nodeProvider = gcma.getNodeProviderFromTopologyId(data.getTopologyId());
                 for (Node node : data.getNodes()) {
                     gcma.addNode(node);
-                    if (!dispatchS1(node, nodeProvider)) {
-                        stage2Pool.put(node, nodeProvider);
+                    synchronized (dispatchMutex) {
+                        if (!dispatchS1(node, nodeProvider)) {
+                            stage2Pool.put(node, nodeProvider);
+                        }
                     }
                 }
 
@@ -216,16 +227,22 @@ public class NodeAllocator implements NotificationListener {
                     GCM_NODEALLOC_LOGGER.info(e);
                 }
 
-                for (Node node : stage2Pool.keySet())
-                    dispatchS2(node, stage2Pool.get(node));
+                synchronized (dispatchMutex) {
+                    for (Node node : stage2Pool.keySet())
+                        dispatchS2(node, stage2Pool.get(node));
 
-                for (Node node : stage3Pool.keySet())
-                    dispatchS3(node, stage3Pool.get(node));
+                    for (Node node : stage3Pool.keySet())
+                        dispatchS3(node, stage3Pool.get(node));
+                }
             }
         }
     }
 
     public Set<Node> getUnusedNode() {
-        return new HashSet<Node>(stage3Pool.keySet());
+        synchronized (dispatchMutex) {
+            // dispatchMutex is a bit coarse grained but getUnusedNode should not be
+            // called so often. Adding a new synchronization on stage3Pool is a bit overkill
+            return new HashSet<Node>(stage3Pool.keySet());
+        }
     }
 }

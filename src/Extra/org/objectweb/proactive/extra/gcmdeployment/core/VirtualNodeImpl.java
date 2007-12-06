@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extra.gcmdeployment.core;
 
 import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,21 +44,23 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
 
     /** capacity (declared by GCMA) */
     private long capacity;
+
     /** All Node Provider Contracts (declared by GCMA) */
-    Set<NodeProviderContract> nodeProvidersContracts;
+    final private Set<NodeProviderContract> nodeProvidersContracts;
+
     /** All the Nodes attached to this VN */
-    Set<Node> nodes;
-    Set<Node> previousNodes;
-    Set<Subscriber> nodeAttachmentSubscribers;
-    Set<Subscriber> isReadySubscribers;
-    TopologyRootImpl deploymentTree;
+    final private Set<Node> nodes;
+    private Set<Node> previousNodes;
+    final private Set<Subscriber> nodeAttachmentSubscribers;
+    final private Set<Subscriber> isReadySubscribers;
+    private TopologyRootImpl deploymentTree;
 
     public VirtualNodeImpl() {
         nodeProvidersContracts = new HashSet<NodeProviderContract>();
-        nodes = Collections.synchronizedSet(new HashSet<Node>());
+        nodes = new HashSet<Node>();
 
-        nodeAttachmentSubscribers = Collections.synchronizedSet(new HashSet<Subscriber>());
-        isReadySubscribers = Collections.synchronizedSet(new HashSet<Subscriber>());
+        nodeAttachmentSubscribers = new HashSet<Subscriber>();
+        isReadySubscribers = new HashSet<Subscriber>();
     }
 
     /*
@@ -74,7 +75,9 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     public boolean isReady() {
-        return (!hasUnsatisfiedContract()) && (!needNode());
+        synchronized (nodes) {
+            return (!hasUnsatisfiedContract()) && (!needNode());
+        }
     }
 
     public long getNbRequiredNodes() {
@@ -89,22 +92,29 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     public long getNbCurrentNodes() {
-        return nodes.size();
+        synchronized (nodes) {
+            return nodes.size();
+        }
     }
 
     public Set<Node> getCurrentNodes() {
-        return new HashSet<Node>(nodes);
+        synchronized (nodes) {
+            return new HashSet<Node>(nodes);
+        }
     }
 
     public Set<Node> getNewNodes() {
-        Set<Node> ret = new HashSet<Node>(nodes);
+        Set<Node> nodesCopied;
+        synchronized (nodes) {
+            nodesCopied = new HashSet<Node>(nodes);
+        }
         if (previousNodes == null) {
-            previousNodes = new HashSet<Node>(nodes);
+            previousNodes = new HashSet<Node>(nodesCopied);
         } else {
-            ret.removeAll(previousNodes);
+            nodesCopied.removeAll(previousNodes);
         }
 
-        return ret;
+        return nodesCopied;
     }
 
     public boolean subscribeNodeAttachment(Object client, String methodeName) {
@@ -115,7 +125,9 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         Class<?> cl = client.getClass();
         try {
             cl.getMethod(methodeName, Node.class, VirtualNode.class);
-            nodeAttachmentSubscribers.add(new Subscriber(client, methodeName));
+            synchronized (nodeAttachmentSubscribers) {
+                nodeAttachmentSubscribers.add(new Subscriber(client, methodeName));
+            }
         } catch (NoSuchMethodException e) {
             GCM_NODEALLOC_LOGGER.warn("Method " + methodeName +
                 "(Node, VirtualNode) cannot be found on " + cl.getSimpleName());
@@ -126,7 +138,9 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     public void unsubscribeNodeAttachment(Object client, String methodeName) {
-        nodeAttachmentSubscribers.remove(new Subscriber(client, methodeName));
+        synchronized (nodeAttachmentSubscribers) {
+            nodeAttachmentSubscribers.remove(new Subscriber(client, methodeName));
+        }
     }
 
     public boolean subscribeIsReady(Object client, String methodeName) {
@@ -137,7 +151,9 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         Class<?> cl = client.getClass();
         try {
             cl.getMethod(methodeName, VirtualNode.class);
-            isReadySubscribers.add(new Subscriber(client, methodeName));
+            synchronized (isReadySubscribers) {
+                isReadySubscribers.add(new Subscriber(client, methodeName));
+            }
         } catch (NoSuchMethodException e) {
             GCM_NODEALLOC_LOGGER.warn("Method " + methodeName +
                 "(VirtualNode) cannot be found on " + cl.getSimpleName());
@@ -148,15 +164,25 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     public void unsubscribeIsReady(Object client, String methodeName) {
-        isReadySubscribers.remove(new Subscriber(client, methodeName));
+        synchronized (isReadySubscribers) {
+            isReadySubscribers.remove(new Subscriber(client, methodeName));
+        }
     }
 
     public Topology getCurrentTopology() {
-        return TopologyImpl.createTopology(deploymentTree, nodes);
+        Set<Node> nodesCopied;
+        synchronized (nodes) {
+            nodesCopied = new HashSet<Node>(nodes);
+        }
+        return TopologyImpl.createTopology(deploymentTree, nodesCopied);
     }
 
     public void updateTopology(Topology topology) {
-        TopologyImpl.updateTopology(topology, nodes);
+        Set<Node> nodesCopied;
+        synchronized (nodes) {
+            nodesCopied = new HashSet<Node>(nodes);
+        }
+        TopologyImpl.updateTopology(topology, nodesCopied);
     }
 
     /* -------------------
@@ -244,29 +270,35 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     private void addNode(Node node) {
         GCM_NODEALLOC_LOGGER.debug("Node " +
             node.getNodeInformation().getURL() + " attached to " + getName());
-        nodes.add(node);
+        synchronized (nodes) {
+            nodes.add(node);
+        }
 
-        for (Subscriber subscriber : nodeAttachmentSubscribers) {
-            Class<?> cl = subscriber.getClient().getClass();
-            try {
-                Method m = cl.getMethod(subscriber.getMethod(), Node.class,
-                        VirtualNode.class);
-                m.invoke(subscriber.getClient(), node, this);
-            } catch (Exception e) {
-                GCM_NODEALLOC_LOGGER.warn(e);
+        synchronized (nodeAttachmentSubscribers) {
+            for (Subscriber subscriber : nodeAttachmentSubscribers) {
+                Class<?> cl = subscriber.getClient().getClass();
+                try {
+                    Method m = cl.getMethod(subscriber.getMethod(), Node.class,
+                            VirtualNode.class);
+                    m.invoke(subscriber.getClient(), node, this);
+                } catch (Exception e) {
+                    GCM_NODEALLOC_LOGGER.warn(e);
+                }
             }
         }
 
         if (isReady()) {
-            for (Subscriber subscriber : isReadySubscribers) {
-                Class<?> cl = subscriber.getClient().getClass();
-                try {
-                    Method m = cl.getMethod(subscriber.getMethod(),
-                            VirtualNode.class);
-                    m.invoke(subscriber.getClient(), this);
-                    isReadySubscribers.remove(subscriber);
-                } catch (Exception e) {
-                    GCM_NODEALLOC_LOGGER.warn(e);
+            synchronized (isReadySubscribers) {
+                for (Subscriber subscriber : isReadySubscribers) {
+                    Class<?> cl = subscriber.getClient().getClass();
+                    try {
+                        Method m = cl.getMethod(subscriber.getMethod(),
+                                VirtualNode.class);
+                        m.invoke(subscriber.getClient(), this);
+                        isReadySubscribers.remove(subscriber);
+                    } catch (Exception e) {
+                        GCM_NODEALLOC_LOGGER.warn(e);
+                    }
                 }
             }
         }
@@ -284,7 +316,9 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     }
 
     private boolean needNode() {
-        return !isGreedy() && (nodes.size() < capacity);
+        synchronized (nodes) {
+            return !isGreedy() && (nodes.size() < capacity);
+        }
     }
 
     private boolean wantNode() {

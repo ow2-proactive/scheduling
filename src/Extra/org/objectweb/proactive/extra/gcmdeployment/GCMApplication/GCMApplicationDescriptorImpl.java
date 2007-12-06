@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -92,6 +91,7 @@ public class GCMApplicationDescriptorImpl
     private NodeAllocator nodeAllocator;
     private ArrayList<String> currentDeploymentPath;
     private Set<Node> nodes;
+    private Object deploymentMutex = new Object();
     private boolean isStarted;
 
     public GCMApplicationDescriptorImpl(String filename)
@@ -101,11 +101,11 @@ public class GCMApplicationDescriptorImpl
 
     public GCMApplicationDescriptorImpl(File file) throws ProActiveException {
         try {
-            deploymentId = Math.abs(ProActiveRandom.nextLong());
+            deploymentId = ProActiveRandom.nextPosLong();
 
             currentDeploymentPath = new ArrayList<String>();
             topologyIdToNodeProviderMapping = new HashMap<Long, NodeProvider>();
-            nodes = Collections.synchronizedSet(new HashSet<Node>());
+            nodes = new HashSet<Node>();
             isStarted = false;
 
             descriptor = Helpers.checkDescriptorFileExist(file);
@@ -124,24 +124,28 @@ public class GCMApplicationDescriptorImpl
      *  GCMApplicationDescriptor interface
      */
     public void startDeployment() {
-        if (isStarted) {
-            GCMA_LOGGER.warn("A GCM Application descriptor cannot be started twice",
-                new Exception());
-        }
+        synchronized (deploymentMutex) {
+            if (isStarted) {
+                GCMA_LOGGER.warn("A GCM Application descriptor cannot be started twice",
+                    new Exception());
+            }
 
-        isStarted = true;
-        deploymentTree = buildDeploymentTree();
-        for (VirtualNodeInternal virtualNode : virtualNodes.values()) {
-            virtualNode.setDeploymentTree(deploymentTree);
-        }
+            isStarted = true;
+            deploymentTree = buildDeploymentTree();
+            for (VirtualNodeInternal virtualNode : virtualNodes.values()) {
+                virtualNode.setDeploymentTree(deploymentTree);
+            }
 
-        for (NodeProvider nodeProvider : nodeProviders.values()) {
-            nodeProvider.start(commandBuilder, this);
+            for (NodeProvider nodeProvider : nodeProviders.values()) {
+                nodeProvider.start(commandBuilder, this);
+            }
         }
     }
 
     public boolean isStarted() {
-        return isStarted;
+        synchronized (deploymentMutex) {
+            return isStarted;
+        }
     }
 
     public VirtualNode getVirtualNode(String vnName) {
@@ -153,27 +157,36 @@ public class GCMApplicationDescriptorImpl
     }
 
     public void kill() {
-        Set<ProActiveRuntime> cache = new HashSet<ProActiveRuntime>();
+        synchronized (deploymentMutex) {
+            Set<ProActiveRuntime> cache = new HashSet<ProActiveRuntime>();
 
-        for (Node node : nodes) {
-            try {
-                ProActiveRuntime part = node.getProActiveRuntime();
-                if (!cache.contains(part)) {
-                    cache.add(part);
-                    part.killRT(false);
+            for (Node node : nodes) {
+                try {
+                    ProActiveRuntime part = node.getProActiveRuntime();
+                    if (!cache.contains(part)) {
+                        cache.add(part);
+                        part.killRT(false);
+                    }
+                } catch (Exception e) {
+                    // Miam Miam Miam
                 }
-            } catch (Exception e) {
-                // Miam Miam Miam
             }
         }
     }
 
     public Set<Node> getCurrentNodes() {
-        return new HashSet<Node>(nodes);
+        synchronized (nodes) {
+            return new HashSet<Node>(nodes);
+        }
     }
 
     public Topology getCurrentTopology() {
-        return TopologyImpl.createTopology(deploymentTree, nodes);
+        // To not block other threads too long we make a snapshot of the node set
+        Set<Node> nodesCopied;
+        synchronized (nodes) {
+            nodesCopied = new HashSet<Node>(nodes);
+        }
+        return TopologyImpl.createTopology(deploymentTree, nodesCopied);
     }
 
     public Set<Node> getCurrentUnusedNodes() {
@@ -181,7 +194,12 @@ public class GCMApplicationDescriptorImpl
     }
 
     public void updateTopology(Topology topology) {
-        TopologyImpl.updateTopology(topology, nodes);
+        // To not block other threads too long we make a snapshot of the node set
+        Set<Node> nodesCopied;
+        synchronized (nodes) {
+            nodesCopied = new HashSet<Node>(nodes);
+        }
+        TopologyImpl.updateTopology(topology, nodesCopied);
     }
 
     /* -----------------------------
@@ -196,7 +214,9 @@ public class GCMApplicationDescriptorImpl
     }
 
     public void addNode(Node node) {
-        nodes.add(node);
+        synchronized (nodes) {
+            nodes.add(node);
+        }
     }
 
     /* -----------------------------
