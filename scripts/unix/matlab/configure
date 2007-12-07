@@ -273,7 +273,7 @@ PACKAGE_BUGREPORT=
 
 ac_unique_file="ptII.mk.in"
 ac_default_prefix=$PTII
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CMD_PATH FIND JAVAC JAVA PTCC MATLAB PTMATLAB_CC PROACTIVE CLASSPATHSEPARATOR JVERSION MAJOR_OS_NAME MATLAB_DIR MATLAB_LIBDIR MATLAB_VERSION PTJAVA_DIR PTJAVA_DIR_NO_CYGDRIVE PTJAVA_HOME PTJNI_DIR PTJNI_ARCHITECTURE PTJNI_DL_LIBRARY PTJNI_LIB_ARCHITECTURE PTJNI_NO_CYGWIN PTJNI_SHAREDLIBRARY_CFLAG PTJNI_SHAREDLIBRARY_LDFLAG PTJNI_SHAREDLIBRARY_PREFIX PTJNI_SHAREDLIBRARY_SUFFIX PTJNI_LIBRARIES PTMATLAB_DIR PTMATLAB_LD_ARGS TOOLS_JAR LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS CMD_PATH FIND JAVAC JAVA PTCC MATLAB PTMATLAB_CC ARCH_INT CLASSPATHSEPARATOR JVERSION MAJOR_OS_NAME MATLAB_DIR MATLAB_LIBDIR MATLAB_VERSION PROACTIVE PTJAVA_DIR PTJAVA_DIR_NO_CYGDRIVE PTJAVA_HOME PTJNI_DIR PTJNI_ARCHITECTURE PTJNI_DL_LIBRARY PTJNI_LIB_ARCHITECTURE PTJNI_NO_CYGWIN PTJNI_SHAREDLIBRARY_CFLAG PTJNI_SHAREDLIBRARY_LDFLAG PTJNI_SHAREDLIBRARY_PREFIX PTJNI_SHAREDLIBRARY_SUFFIX PTJNI_LIBRARIES PTMATLAB_DIR PTMATLAB_LD_ARGS TOOLS_JAR LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -1240,9 +1240,37 @@ echo "${ECHO_T}$MATLAB" >&6
 		exit 3
 	fi
 else
-	echo "You must set the MATLAB environment variable before running configure"
+	echo "You must set the MATLAB environment variable before running configure, MATLAB points to the full Matlab command path"
 	exit 3
 fi
+
+echo "$as_me:$LINENO: checking Testing architecture and generating arch.h file" >&5
+echo $ECHO_N "checking Testing architecture and generating arch.h file... $ECHO_C" >&6
+case "`uname -s`" in
+				Linux)
+					case "`uname -i`" in
+						i386*)
+							ARCH_INT=int
+							;;
+						x86_64*)
+							ARCH_INT=long
+							;;
+						*)
+							ARCH_INT=int
+							;;
+					esac
+					;;
+				CYGWIN*)
+					ARCH_INT=int
+					;;
+				SunOS*)
+					ARCH_INT=int
+					;;
+				*)
+					ARCH_INT=int
+					;;
+			esac
+
 
 
 echo "$as_me:$LINENO: checking Finding ProActive" >&5
@@ -2290,8 +2318,6 @@ echo "$as_me: WARNING: Failed to find '${MATLAB_DIR}'
 					esac
 					;;
 				CYGWIN*)
-
-					MATLAB_USE_MSVC="yes"
 					MATLAB_LIBDIR=bin/win32
 					;;
 				SunOS*)
@@ -2508,8 +2534,19 @@ echo "$as_me: WARNING: Failed to find gcc or cc, so we will
 
             echo "$as_me:$LINENO: checking finding Matlab version" >&5
 echo $ECHO_N "checking finding Matlab version... $ECHO_C" >&6
-            MATLAB_VERSION=$(${MATLAB} -nodisplay -nosplash -nojvm -r 'disp(version()); quit;'|tail -n 2|cut -s -d '.' -f 1-2)
-            echo "$as_me:$LINENO: result: ${MATLAB_VERSION}" >&5
+            case "`uname -s`" in
+				Linux)
+					${MATLAB} -nodisplay -nosplash -nojvm -logfile 'version.txt' -r 'disp(version()); quit;'
+            		MATLAB_VERSION=$(${MATLAB} -nodisplay -nosplash -nojvm -r 'disp(version()); quit;'|tail -n 2|cut -s -d '.' -f 1-2)
+            		;;
+            	CYGWIN*)
+            		${MATLAB} -nosplash -minimize -logfile "version.txt" -r "disp(version()); quit;"
+            		MATLAB_VERSION=$(cat version.txt|cut -s -d '.' -f 1-2)
+            		;;
+            	*)
+            		;;
+           	esac
+           	echo "$as_me:$LINENO: result: ${MATLAB_VERSION}" >&5
 echo "${ECHO_T}${MATLAB_VERSION}" >&6
 	    fi
 	fi
@@ -2518,7 +2555,8 @@ fi
 
 
 # Keep these substitutions alphabetical, with a description
-# Location of ProActive
+
+# Flag in 32 bits this should be int, in 64 bits this should be long
 
 
 # Separator in CLASSPATH,  For Unix, this should be :, for Cygwin use ;
@@ -2540,6 +2578,9 @@ fi
 
 
 # Set the Matlab version
+
+
+# Location of ProActive
 
 
 # Set to gcc if gcc was found and used in $PTII/ptolemy/matlab/makefile.
@@ -3247,13 +3288,14 @@ s,@JAVA@,$JAVA,;t t
 s,@PTCC@,$PTCC,;t t
 s,@MATLAB@,$MATLAB,;t t
 s,@PTMATLAB_CC@,$PTMATLAB_CC,;t t
-s,@PROACTIVE@,$PROACTIVE,;t t
+s,@ARCH_INT@,$ARCH_INT,;t t
 s,@CLASSPATHSEPARATOR@,$CLASSPATHSEPARATOR,;t t
 s,@JVERSION@,$JVERSION,;t t
 s,@MAJOR_OS_NAME@,$MAJOR_OS_NAME,;t t
 s,@MATLAB_DIR@,$MATLAB_DIR,;t t
 s,@MATLAB_LIBDIR@,$MATLAB_LIBDIR,;t t
 s,@MATLAB_VERSION@,$MATLAB_VERSION,;t t
+s,@PROACTIVE@,$PROACTIVE,;t t
 s,@PTJAVA_DIR@,$PTJAVA_DIR,;t t
 s,@PTJAVA_DIR_NO_CYGDRIVE@,$PTJAVA_DIR_NO_CYGDRIVE,;t t
 s,@PTJAVA_HOME@,$PTJAVA_HOME,;t t

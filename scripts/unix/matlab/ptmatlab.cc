@@ -66,11 +66,11 @@ typedef long long __int64;
 #endif
 
 // Declare an integer type that correctly casts a pointer
-typedef int ptrint;
+typedef ARCH_INT ptrint;
 
 #ifndef tmwtypes_h
-typedef int mwSize;
-typedef int mwIndex;
+typedef ARCH_INT mwSize;
+typedef ARCH_INT mwIndex;
 #endif
 
 #include <stdio.h>

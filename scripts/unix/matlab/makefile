@@ -103,7 +103,7 @@ all: $(PROACTIVE)/lib/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)/$(PTLIB)
 # "Invalid access to memory location" errors
 $(PTLIB): ptmatlab.cc $(PTOLEMY_LIB)
 	CLASSPATH="$(CLASSPATH)" "$(PTJAVA_DIR)/bin/javah" -jni -o ptmatlab.h ptolemy.matlab.Engine
-	$(PTCC) -v -shared \
+	$(PTCC) -v -shared $(CFLAGS) \
 		"-I$(MATLAB_DIR)/extern/include" \
 		"-I$(PTJAVA_DIR)/include" \
 		"-I$(PTJAVA_DIR)/include/$(PTJNI_ARCHITECTURE)" \

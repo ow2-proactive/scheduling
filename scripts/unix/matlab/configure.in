@@ -63,9 +63,36 @@ if test -n "$MATLAB"; then
 		exit 3
 	fi
 else
-	echo "You must set the MATLAB environment variable before running configure"
+	echo "You must set the MATLAB environment variable before running configure, MATLAB points to the full Matlab command path"
 	exit 3
 fi
+
+AC_MSG_CHECKING([Testing architecture and generating arch.h file])
+case "`uname -s`" in
+				Linux)
+					case "`uname -i`" in
+						i386*)
+							ARCH_INT=int
+							;;
+						x86_64*)
+							ARCH_INT=long
+							;;
+						*)
+							ARCH_INT=int
+							;;
+					esac
+					;;	
+				CYGWIN*)
+					ARCH_INT=int
+					;;
+				SunOS*)
+					ARCH_INT=int
+					;;
+				*)
+					ARCH_INT=int
+					;;
+			esac
+
 
 
 AC_MSG_CHECKING([Finding ProActive])
@@ -629,8 +656,6 @@ changequote([, ])dnl
 					esac
 					;;	
 				CYGWIN*)
-		
-					MATLAB_USE_MSVC="yes"
 					MATLAB_LIBDIR=bin/win32
 					;;
 				SunOS*)
@@ -683,8 +708,19 @@ changequote([, ])dnl
             fi
             
             AC_MSG_CHECKING([finding Matlab version])
-            MATLAB_VERSION=$(${MATLAB} -nodisplay -nosplash -nojvm -r 'disp(version()); quit;'|tail -n 2|cut -s -d '.' -f 1-2)
-            AC_MSG_RESULT([${MATLAB_VERSION}]) 
+            case "`uname -s`" in
+				Linux)
+					${MATLAB} -nodisplay -nosplash -nojvm -logfile 'version.txt' -r 'disp(version()); quit;'
+            		MATLAB_VERSION=$(${MATLAB} -nodisplay -nosplash -nojvm -r 'disp(version()); quit;'|tail -n 2|cut -s -d '.' -f 1-2)
+            		;;
+            	CYGWIN*)
+            		${MATLAB} -nosplash -minimize -logfile "version.txt" -r "disp(version()); quit;"
+            		MATLAB_VERSION=$(cat version.txt|cut -s -d '.' -f 1-2)
+            		;;
+            	*)
+            		;;
+           	esac
+           	AC_MSG_RESULT([${MATLAB_VERSION}]) 
 	    fi
 	fi    
 fi
@@ -692,8 +728,9 @@ fi
 
 
 # Keep these substitutions alphabetical, with a description
-# Location of ProActive
-AC_SUBST(PROACTIVE)
+
+# Flag in 32 bits this should be int, in 64 bits this should be long
+AC_SUBST(ARCH_INT)
 
 # Separator in CLASSPATH,  For Unix, this should be :, for Cygwin use ;
 AC_SUBST(CLASSPATHSEPARATOR)
@@ -715,6 +752,9 @@ AC_SUBST(MATLAB_LIBDIR)
 
 # Set the Matlab version
 AC_SUBST(MATLAB_VERSION)
+
+# Location of ProActive
+AC_SUBST(PROACTIVE)
 
 # Set to gcc if gcc was found and used in $PTII/ptolemy/matlab/makefile.
 AC_SUBST(PTCC)
