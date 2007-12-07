@@ -114,7 +114,7 @@
 	<target name="p2p_daemon" depends="compile.p2p_daemon"/>
 	<target name="stubGenerator" depends="compile.stubGenerator" description="Deprecated, see compile.stubGenerator"/>
 	<target name="tests" depends="compile.tests"/>
-	<target name="proActiveJar" depends="deploy" description="Deprecated, see proActiveJar"/>
+	<target name="proActiveJar" depends="deploy" description="Deprecated, see deploy"/>
 	<target name="all" depends="compile,docs" description="build the class files and the documentation" />
 	<target name="ic2dLibClean" depends="ic2d.libClean" description="Deprecated, see ic2d.libClean"/>
 	<target name="ic2dLib" depends="ic2d.libCopy" description="Deprecated, see ic2d.libCopy" />
