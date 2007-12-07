@@ -70,6 +70,7 @@
 <!ENTITY reference SYSTEM "definitions.xml">
 <!ENTITY Scheduler_EclipsePlugin SYSTEM "scheduler/Scheduler_EclipsePlugin.xml">
 <!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
+<!ENTITY Scheduler_Matlab SYSTEM "scheduler/Scheduler_Matlab_Ext.xml">
 
 ]>
 <book>
@@ -155,6 +156,7 @@
     &TimIt;
     &ProActive_Scheduler;
     &Scheduler_EclipsePlugin;
+    &Scheduler_Matlab;
    </part>
  
    <part id="ExtendingProActive">

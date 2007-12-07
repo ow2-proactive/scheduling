@@ -1,0 +1,493 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
+<chapter id="ProActive_Scheduler_Matlab"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://www.docbook.org/xsd/4.2/docbook.xsd">
+    <!--<chapter id="ProActive_Scheduler_Matlab">-->
+    <title>ProActive Scheduler's Matlab Extension</title>
+    <sect1 id="Scheduler_Matlab_Overwiew">
+        <title>Presentation</title>
+        <para>
+            MATLAB is a numerical computing environment and programming
+            language. Created by The MathWorks, MATLAB allows easy
+            matrix manipulation, plotting of functions and data,
+            implementation of algorithms, creation of user interfaces,
+            and interfacing with programs in other languages.
+        </para>
+        <para>
+            The Goal of ProActive Scheduler's Matlab Extension is to:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    allow users to easily launch Matlab scripts over an
+                    heterogeneous grid
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    describe complex task flows in Matlab using
+                    human-readable XML descriptors
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    Ability to communicate the result of one task as
+                    input of another task.
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    users won't have to write any other code than Matlab
+                    script code
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    support the following Matlab types : Double,
+                    Complex, Int or String Arrays. Cells. Records.
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect1>
+    <sect1 id="Scheduler_Matlab_Quick_Start">
+        <title>Quick Start with the Matlab Extension</title>
+        <para>
+            To get quickly our hands in, we'll write a very simple
+            Matlab job example. This simple example will compute the
+            roots of several polynomials.
+        </para>
+        <sect2 id="Scheduler_Matlab_Installation_Prerequisite">
+            <title>Installation</title>
+            <para>
+                Before starting to use the Matlab interface, you need to
+                install the Matlab interface to Java. You'll find all
+                the instructions on PROACTIVE/scripts/unix/matlab/README
+            </para>
+        </sect2>
+        <sect2 id="Scheduler_Matlab_Simple_Script">
+            <title>Writing a simple example : the Matlab Script</title>
+            <para>
+                We write a very simple script which computes the roots
+                of a single given polynomial.
+            </para>
+            <programlisting lang="matlab"><![CDATA[out=roots(in);]]></programlisting>
+            <para>
+                The
+                <emphasis>in</emphasis>
+                and
+                <emphasis>out</emphasis>
+                variables are specific variables which describe the
+                inputs and outputs of a Matlab script for the Scheduler.
+                in and out can contain anything supported by the
+                extension (Double, Complex, or String arrays, Cells,
+                Records).
+            </para>
+        </sect2>
+        <sect2 id="Scheduler_Matlab_Simple_Descriptor">
+            <title>
+                Writing a simple example : the Scheduler job descriptor
+            </title>
+            <para>
+                This is a step by step guide to write this job
+                descriptor.
+            </para>
+            <sect3 id="Scheduler_Matlab_Job_Definition">
+                <title>The job definition</title>
+                <para>
+                    The
+                    <emphasis>job</emphasis>
+                    tag is the root tag of our descriptor, it must have
+                    a
+                    <emphasis>name</emphasis>
+                    attribute which holds an id of the job. It is
+                    generally followed by a
+                    <emphasis>description</emphasis>
+                    tag which gives textual description of the job.
+                    Finally, the next tag will be the type of job to
+                    schedule. In our case it will be a
+                    <emphasis>taskFlow</emphasis>
+                    job (a job containing several tasks).
+                </para>
+                <programlisting lang="xml"><![CDATA[<job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+    xmlns="urn:proactive:jobdescriptor:0.9" name="Matlab_job_simplest">
+    <description>A simple Matlab job, which computes the roots of several polynomials</description>
+    <taskFlow>
+      ...
+    </taskFlow>
+</job>]]></programlisting>
+            </sect3>
+            <sect3 id="Scheduler_Matlab_Task_Definition">
+                <title>The task definition</title>
+                <para>
+                    The
+                    <emphasis>task</emphasis>
+                    tag contains all the information for a single task
+                    executed on a single machine. In our example, this
+                    task will be the matlab script calculating the root
+                    of a polynomial.
+                </para>
+                <para>
+                    The task tag must contain a
+                    <emphasis>name</emphasis>
+                    attribute like the job tag. Here it contains as well
+                    the attribute
+                    <emphasis>preciousResult</emphasis>
+                    which tells the scheduler that we need the result of
+                    this task as final output for our job. The task tag
+                    is immediately followed by a
+                    <emphasis>description</emphasis>
+                    tag containing a textual description of this task.
+                </para>
+                <para>
+                    The description tag is followed by a
+                    <emphasis>selection</emphasis>
+                    tag. This tag describes a script which will select,
+                    among all the machine resources that the Scheduler
+                    controls, the specific resources (machine) that can
+                    effectively run this task. This script can for
+                    example test that Matlab is installed and has the
+                    right version, that specific Toolboxes are
+                    installed... We provide a generic script which
+                    simply tests if Matlab is installed. The script is
+                    retrieved from the URL
+                    <ulink
+                        url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js" />
+                </para>
+                <programlisting lang="xml"><![CDATA[<task name="root1" preciousResult="true">
+    <description>Calculates the root of a polynomial</description>
+    <selection>
+        <script>
+            <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+        </script>
+    </selection>
+    ...
+</task>]]></programlisting>
+            </sect3>
+            <sect3 id="Scheduler_Matlab_Script_Definition">
+                <title>The Matlab script definition</title>
+                <para>
+                    Now we finally write the script that will be
+                    executed on the remote machine. The
+                    <emphasis>javaExecutable</emphasis>
+                    tag is a container for our Matlab script, it's a
+                    java program that will connect to the Matlab engine
+                    and launch the given script inside it.
+                </para>
+                <programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
+    <parameters>
+        <parameter name="input" value="in=[1 0 3 -2 5 1];"/>
+        <parameter name="script" value="out=roots(in);"/>
+    </parameters>
+</javaExecutable>]]></programlisting>
+                <para>
+                    The javaExecutable tag contains an attribute
+                    <emphasis>class</emphasis>
+                    which tells which type of Matlab task will be used,
+                    here we'll describe only the task called
+                    <emphasis>SimpleMatlab</emphasis>
+                    . In
+                    <xref linkend="Scheduler_Matlab_AdvancedTasks" />
+                    , we describe more advanced tasks. The
+                    javaExecutable tag contains a child tag called
+                    <emphasis>parameters</emphasis>
+                    . This tag contains a list of
+                    <emphasis>parameter</emphasis>
+                    tags which define the task parameters. Each
+                    parameter tag, has
+                    <emphasis>name/value</emphasis>
+                    couple attributes.
+                </para>
+                <para>
+                    The SimpleMatlab task accepts the following
+                    parameters:
+                </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis>script</emphasis>
+                            : defines which matlab script will be
+                            launched. The value attributes will contain
+                            the matlab script code (useful for one line
+                            scripts only).
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>scriptFile</emphasis>
+                            : defines which matlab script will be
+                            launched. The file at the given path will be
+                            loaded.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>scriptUrl</emphasis>
+                            : defines which matlab script will be
+                            launched. The file at the given remote url
+                            will be loaded.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            <emphasis>input</emphasis>
+                            : defines an input script which will be
+                            launched before the actual matlab script.
+                            The value attribute needs to contain the
+                            script code (which must be single-line
+                            only).
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </sect3>
+            <sect3 id="Scheduler_Matlab_Complete_Descriptor">
+                <title>Complete Job Descriptor</title>
+                <programlisting lang="xml">
+                    <textobject><textdata
+                            fileref="../descriptors/scheduler/jobs/Job_matlab_simplest.xml" /></textobject></programlisting>
+            </sect3>
+        </sect2>
+    </sect1>
+    <sect1 id="Scheduler_Matlab_More_Complex">
+        <title>A More Complex Example : a Matlab task flow</title>
+        <para>
+            Now we will get through a more complex example. This example
+            will use an interesting feature of the Matlab extension :
+            the ability to pass results of one task as inputs of another
+            task. This exemple, on the contrary of the previous one, is
+            not a simple parallel batch processing, it's a flow of
+            tasks, which depends from each others.
+        </para>
+        <para>
+            This example will compute the sum of a big,
+            randomly-generated array, values taken from -50 to +50. The
+            example contains 3 steps:
+        </para>
+        <para>
+            <orderedlist>
+                <listitem>
+                    <para>
+                        It splits the big array into several smaller
+                        arrays.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        It computes the sum of each array in parallel.
+                    </para>
+                </listitem>
+                <listitem>
+                    <para>
+                        It merges the results from each parallel
+                        sub-total to compute the final sum.
+                    </para>
+                </listitem>
+            </orderedlist>
+        </para>
+        <para>
+            This is not, of course, a real-case example as computing the
+            sum of a big array will be much faster on a single machine
+            (due to the overhead of launching Java and a Matlab engine
+            and the network latency), but it is meant to illustrate a
+            simple task flow in Matlab.
+        </para>
+        <para>
+            We'll go through the new concepts introduced in this example
+            compared to the previous one. Have a look at the new job
+            descriptor first:
+        </para>
+        <programlisting lang="xml">
+            <textobject><textdata
+                    fileref="../descriptors/scheduler/jobs/Job_matlab.xml" /></textobject></programlisting>
+        <sect2 id="Scheduler_Matlab_Descriptor_Variables">
+            <title>Descriptor variables</title>
+            <para>
+                The
+                <emphasis>variables</emphasis>
+                declaration allows a user to define a variable which can
+                be used as a pattern in other parts of the descriptor.
+                This helps writing more generic descriptors and
+                replacing only the variables values to adapt the
+                descriptor to many contexts. Here is the variables
+                declaration in the preceding descriptor:
+            </para>
+            <programlisting lang="xml"><![CDATA[<variables>
+    <variable name="HOME" value="/user/fviale/home"/>
+    <variable name="MATLAB_SCRIPTS" value="${HOME}/matlab"/>
+</variables>]]></programlisting>
+            <para>
+                the
+                <emphasis>variables</emphasis>
+                tag contains a list of
+                <emphasis>variable</emphasis>
+                tags which each defines a variable through a
+                <emphasis>name</emphasis>
+                and a
+                <emphasis>value</emphasis>
+                attribute. The variable can then be used by writing the
+                pattern
+                <emphasis>${name_of_the_variable}</emphasis>
+                . Variable can be reused inside the variable declaration
+                itself, but the variables are processed sequentially
+                from top to bottom. Therefore, in this example, In this
+                example the MATLAB_SCRIPTS variable could not be used
+                before the HOME variable.
+            </para>
+        </sect2>
+        <sect2 id="Scheduler_Matlab_AdvancedTasks">
+            <title>
+                New Tasks : MatlabSplitter and MatlabCollector
+            </title>
+            <programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.MatlabSplitter">
+                <parameters>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/splitter.m"/>
+                    <parameter name="input" value="in=round(rand(1,1000000)*100-50)"/>
+                    <parameter name="number_of_children" value="6"/>
+                </parameters>
+            </javaExecutable>]]></programlisting>
+            <programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.MatlabCollector">
+                <parameters>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/collector.m"/>
+                </parameters>
+            </javaExecutable>]]></programlisting>
+            <para>
+                Two new tasks appear in this descriptor : the
+                <emphasis>MatlabSplitter</emphasis>
+                and the
+                <emphasis>MatlabCollector</emphasis>
+                . The Splitter task is used to split an input into a
+                list of several chunks. The Collector task is used to
+                collect and merge the results from several parallel
+                tasks. Each of these tasks come with the same parameter
+                as the SimpleMatlab tasks with an addition: The Splitter
+                expects an additional parameter called
+                <emphasis>number_of_children</emphasis>
+                . This parameter tells the Matlab script responsible for
+                splitting in how many parts the input should be divided.
+            </para>
+        </sect2>
+        <sect2 id="Scheduler_Matlab_Dependencies">
+            <title>Task dependencies</title>
+            <para>
+                In order to do complex task flows, it is necessary to
+                add the concept of dependencies between tasks.
+            </para>
+            <programlisting lang="xml"><![CDATA[<task name="sum1">
+    <description>Calculates the sum of the elements in the array</description>
+    <depends>
+        <task ref="splitter"/>
+    </depends>
+    ...</task>]]></programlisting>
+            <para>
+                The
+                <emphasis>depends</emphasis>
+                tag in this task definition defines a dependency of the
+                task named "sum1" to the task named "splitter". This
+                means that the task sum1 will be launched afer the task
+                splitter is complete, and that the outputs of splitter
+                will be fed as inputs to sum1.
+            </para>
+            <para>
+                You'll notice that in this example, all the sumX
+                SimpleMatlab tasks depend from the Splitter. This means
+                that the output from the Splitter will be fed to each
+                sum task. On the other hand, the Collector depends on
+                every sumX task. It will be launched only after all
+                these tasks have completed, and the results of all these
+                tasks will be the inputs of the Collector, you'll see on
+            </para>
+        </sect2>
+        <sect2 id="Scheduler_Matlab_SimpleTaskIndex">
+            <title>New parameter in SimpleMatlab tasks: index</title>
+            <programlisting lang="xml"><![CDATA[<task name="sum1">
+            <description>Calculates the sum of the elements in the array</description>
+            <depends>
+                <task ref="splitter"/>
+            </depends>
+            <selection>
+                <script>
+                    <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
+                </script>
+            </selection>
+            <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
+                <parameters>
+                    <parameter name="index" value="0"/>
+                    <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
+                </parameters>
+            </javaExecutable>
+        </task>]]></programlisting>
+            <para>
+                A new parameter appears in this descriptor for the
+                SimpleMatlab task : the
+                <emphasis>index</emphasis>
+                . The parameter is related to the splitting mechanism.
+                It can be defined only inside a SimpleMatlab task and
+                has sense only if the Simple task has a Splitter task as
+                parent. The Splitter sends an output in the form of a
+                list of results to each child task. The same list will
+                be sent to every children. Therefore, each one needs to
+                specify at which index of the list it will look at. For
+                example, a splitter task splits the array [1,2,3,4] into
+                two arrays [1,2] and [3,4], the first child needs to
+                specify index 0 and second index 1 (note that the
+                indexes range from 0 to number_of_children-1). By
+                specifying these indexes, the first child will get as
+                input the array [1,2] and the second child will get
+                [3,4].
+            </para>
+        </sect2>
+        <sect2 id="Scheduler_Matlab_ComplexExamples_Scripts">
+            <title>Matlab Scripts for this example</title>
+            <sect3 id="ComplexExamples_Splitter_Script">
+                <title>Script of the Splitter Task</title>
+                <programlisting lang="matlab">
+                    <textobject><textdata
+                            fileref="../scripts/unix/matlab/examples/splitter.m" /></textobject></programlisting>
+                <para>
+                    The Splitter script contains two important aspects:
+                </para>
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            It contains two inputs, the variable
+                            <emphasis>in</emphasis>
+                            which is fed by the "input" script of the
+                            splitter task, and the variable
+                            <emphasis>nout</emphasis>
+                            which contains the value of the
+                            <emphasis>number_of_children</emphasis>
+                            parameter.
+                        </para>
+                    </listitem>
+                    <listitem>
+                        <para>
+                            The
+                            <emphasis>out</emphasis>
+                            variable, which is the output of the script
+                            must be a cell array of size nout.
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </sect3>
+            <sect3 id="ComplexExamples_Summing_Script">
+                <title>Script of the Summing Task</title>
+                <programlisting lang="matlab">
+                    <textobject><textdata
+                            fileref="../scripts/unix/matlab/examples/summer.m" /></textobject></programlisting>
+            </sect3>
+            <sect3 id="ComplexExamples_Collector_Script">
+                <title>Script of the Collector Task</title>
+                <programlisting lang="matlab">
+                    <textobject><textdata
+                            fileref="../scripts/unix/matlab/examples/collector.m" /></textobject></programlisting>
+                <para>
+                    The important aspect of the The Collector script is
+                    that the input parameter
+                    <emphasis>in</emphasis>
+                    is a cell array.
+                </para>
+            </sect3>
+        </sect2>
+    </sect1>
+</chapter>
