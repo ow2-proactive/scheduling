@@ -136,13 +136,13 @@ public enum ProProperties {
     PA_FUTURE_AC("proactive.future.ac", PAPropertiesType.BOOLEAN),
 
     /**
-     * TODO gchazara Describe this property
+     * Period of the future monitoring ping, in milliseconds
      */
     PA_FUTUREMONITORING_TTM("proactive.futuremonitoring.ttm",
         PAPropertiesType.INTEGER),
 
     /**
-     * TODO gchazara Describe this property
+     * Include client side calls in stack traces
      */
     PA_STACKTRACE("proactive.stack_trace", PAPropertiesType.BOOLEAN),
 
@@ -427,7 +427,7 @@ public enum ProProperties {
      *  DISTRIBUTED GARBAGE COLLECTOR
      */
 
-    /** TODO gchazara Describe this property */
+    /** Enable the distributed garbage collector */
     PA_DGC("proactive.dgc", PAPropertiesType.BOOLEAN),
 
     /**
