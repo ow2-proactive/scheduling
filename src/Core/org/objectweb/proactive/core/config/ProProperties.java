@@ -59,7 +59,10 @@ public enum ProProperties {
      */
     SECURITY_POLICY("java.security.policy", PAPropertiesType.STRING),
 
-    /** TODO  cdalmass Describe this property */
+    /**
+     * Indicate the Fractal provider class, to the ProActive implementation of
+     * Fractal/GCM set it to org.objectweb.proactive.core.component.Fractive
+     */
     FRACTAL_PROVIDER("fractal.provider", PAPropertiesType.STRING),
 
     /* ------------------------------------
@@ -237,11 +240,11 @@ public enum ProProperties {
      *  COMPONENTS
      */
 
-    /** TODO  cdalmass Describe this property */
+    /** Timeout in seconds for parallel creation of components */
     PA_COMPONENT_CREATION_TIMEOUT("components.creation.timeout",
         PAPropertiesType.INTEGER),
 
-    /** TODO  cdalmass Describe this property */
+    /** If 'true', the component framework should optimize communication between component using shortcut mechanism */
     PA_COMPONENT_USE_SHORTCUTS("proactive.components.use_shortcuts",
         PAPropertiesType.BOOLEAN),
 
