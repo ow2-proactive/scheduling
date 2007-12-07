@@ -58,7 +58,7 @@ public class IMDeploymentFactory {
     /**
      * Deploy all virtual node of the ProActive descriptor <I>pad</I>
      * @param nodeSource Stub of NodeSource object that initiated the deployment.
-     * @param padName : the name of the ProActive descriptor.
+     * @param padName : name of the ProActive descriptor.
      * @param pad     : the ProcAtive descriptor.
      */
     public static void deployAllVirtualNodes(PadDeployInterface nodeSource,
@@ -73,27 +73,25 @@ public class IMDeploymentFactory {
     /**
      * Deploy only the virtual node <I>vnName</I>
      * @param nodeSource Stub of NodeSource object that initiated the deployment.
-     * @param padName : the name of the ProActive descriptor.
-     * @param pad     : the ProActive descriptor.
-     * @param vnName  : the name of the virtual node to deploy.
+     * @param pad     : ProActive descriptor to deploy.
+     * @param vnName  : name of the virtual node to deploy.
      */
     public static void deployVirtualNode(PadDeployInterface nodeSource,
-        String padName, ProActiveDescriptor pad, String vnName) {
+        ProActiveDescriptor pad, String vnName) {
         if (logger.isInfoEnabled()) {
             logger.info("deployVirtualNode : " + vnName);
         }
-        deployVirtualNodes(nodeSource, padName, pad, new String[] { vnName });
+        deployVirtualNodes(nodeSource, pad, new String[] { vnName });
     }
 
     /**
      * Deploy only the virtual nodes <I>vnNames</I>
      * @param nodeSource Stub of NodeSource object that initiated the deployment.
-     * @param padName : the name of the ProActive descriptor
      * @param pad     : the ProActive descriptor
      * @param vnNames : the name of the virtual nodes to deploy
      */
     public static void deployVirtualNodes(PadDeployInterface nodeSource,
-        String padName, ProActiveDescriptor pad, String[] vnNames) {
+        ProActiveDescriptor pad, String[] vnNames) {
         if (logger.isInfoEnabled()) {
             String concatVnNames = "";
             for (String vnName : vnNames) {
@@ -101,7 +99,7 @@ public class IMDeploymentFactory {
             }
             logger.info("deployVirtualNodes : " + concatVnNames);
         }
-        IMDeploy d = new IMDeploy(nodeSource, padName, pad, vnNames);
+        IMDeploy d = new IMDeploy(nodeSource, pad, vnNames);
         executor.execute(d);
     }
 }

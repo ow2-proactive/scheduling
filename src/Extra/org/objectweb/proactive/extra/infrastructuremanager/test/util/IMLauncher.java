@@ -92,7 +92,7 @@ public class IMLauncher {
         while ((typed = (char) System.in.read()) != 'e') {
         }
         try {
-            IMFactory.getAdmin().shutdown();
+            IMFactory.getAdmin().shutdown(false);
         } catch (Exception e) {
             e.printStackTrace();
             ProActive.exitFailure();

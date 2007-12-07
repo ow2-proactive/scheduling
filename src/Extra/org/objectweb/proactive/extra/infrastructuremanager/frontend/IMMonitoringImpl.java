@@ -43,15 +43,17 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
+import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMEventType;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMInitialState;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
@@ -80,6 +82,7 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
     // Attributes
     private IMCoreInterface imcore;
     private HashMap<UniqueID, IMEventListener> IMListeners;
+    private String MonitoringUrl = null;
 
     // ----------------------------------------------------------------------//
     // CONSTRUTORS
@@ -104,9 +107,14 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
     /** Initialization part of the IMMonitoring active object */
     public void initActivity(Body body) {
         try {
+            MonitoringUrl = "//" +
+                ProActiveObject.getNode().getVMInformation().getHostName() +
+                "/" + IMConstants.NAME_ACTIVE_OBJECT_IMMONITORING;
             ProActiveObject.register((IMMonitoring) ProActiveObject.getStubOnThis(),
-                "//localhost/" + IMConstants.NAME_ACTIVE_OBJECT_IMMONITORING);
+                this.MonitoringUrl);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (NodeException e) {
             e.printStackTrace();
         }
     }
@@ -120,7 +128,7 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      * @return IMInitialState snapshot of IM's current state : nodes and node sources.
      *  */
     public IMInitialState addIMEventListener(IMEventListener listener,
-        IMEvent... events) {
+        IMEventType... events) {
         UniqueID id = ProActiveObject.getContext().getCurrentRequest()
                                      .getSourceBodyID();
 
@@ -134,7 +142,8 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      * @param types Object types associated with the method call.
      * @param params Object associated with the method call.
      */
-    private void dispatch(IMEvent methodName, Class<?>[] types, Object... params) {
+    private void dispatch(IMEventType methodName, Class<?>[] types,
+        Object... params) {
         try {
             Method method = IMEventListener.class.getMethod(methodName.toString(),
                     types);
@@ -233,31 +242,37 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
     /** inherited from IMEventListener methods
      */
 
-    /** IM is shutting down */
-    public void imShutDownEvent() {
-        dispatch(IMEvent.SHUTDOWN, null);
+    /** IM has been stopped */
+    public void imShutDownEvent(IMEvent evt) {
+        evt.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.SHUTDOWN, new Class<?>[] { IMEvent.class }, evt);
     }
 
-    /** IM has been stopped */
-    public void imShuttingDownEvent() {
-        dispatch(IMEvent.SHUTTING_DOWN, null);
+    /** IM is shutting down */
+    public void imShuttingDownEvent(IMEvent evt) {
+        evt.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.SHUTTING_DOWN, new Class<?>[] { IMEvent.class },
+            evt);
     }
 
     /** IM has started */
-    public void imStartedEvent() {
-        dispatch(IMEvent.STARTED, null);
+    public void imStartedEvent(IMEvent evt) {
+        evt.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.STARTED, new Class<?>[] { IMEvent.class }, evt);
     }
 
     /** IM is shutting down */
-    public void imKilledEvent() {
-        dispatch(IMEvent.KILLED, null);
+    public void imKilledEvent(IMEvent evt) {
+        evt.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.KILLED, new Class<?>[] { IMEvent.class }, evt);
     }
 
     /** New node source available in IM.
      * @param ns node source event containing new {@link NodeSource} properties.
      */
     public void nodeSourceAddedEvent(IMNodeSourceEvent ns) {
-        dispatch(IMEvent.NODESOURCE_CREATED,
+        ns.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.NODESOURCE_CREATED,
             new Class<?>[] { IMNodeSourceEvent.class }, ns);
     }
 
@@ -265,7 +280,8 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      * @param ns node source event containing removed {@link NodeSource} properties.
      */
     public void nodeSourceRemovedEvent(IMNodeSourceEvent ns) {
-        dispatch(IMEvent.NODESOURCE_REMOVED,
+        ns.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.NODESOURCE_REMOVED,
             new Class<?>[] { IMNodeSourceEvent.class }, ns);
     }
 
@@ -273,7 +289,8 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      * @param n node event containing new {@link IMNode} properties.
      */
     public void nodeAddedEvent(IMNodeEvent n) {
-        dispatch(IMEvent.NODE_ADDED, new Class<?>[] { IMNodeEvent.class }, n);
+        n.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.NODE_ADDED, new Class<?>[] { IMNodeEvent.class }, n);
     }
 
     /**
@@ -282,7 +299,8 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      * @param n node event containing {@link IMNode} properties.
      */
     public void nodeFreeEvent(IMNodeEvent n) {
-        dispatch(IMEvent.NODE_FREE, new Class<?>[] { IMNodeEvent.class }, n);
+        n.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.NODE_FREE, new Class<?>[] { IMNodeEvent.class }, n);
     }
 
     /**
@@ -291,7 +309,8 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      * @param n node event containing {@link IMNode} properties.
      */
     public void nodeBusyEvent(IMNodeEvent n) {
-        dispatch(IMEvent.NODE_BUSY, new Class<?>[] { IMNodeEvent.class }, n);
+        n.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.NODE_BUSY, new Class<?>[] { IMNodeEvent.class }, n);
     }
 
     /**
@@ -300,8 +319,9 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      * @param n node event containing {@link IMNode} properties.
      */
     public void nodeToReleaseEvent(IMNodeEvent n) {
-        dispatch(IMEvent.NODE_TO_RELEASE, new Class<?>[] { IMNodeEvent.class },
-            n);
+        n.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.NODE_TO_RELEASE,
+            new Class<?>[] { IMNodeEvent.class }, n);
     }
 
     /**
@@ -310,7 +330,8 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      * @param n node event containing {@link IMNode} properties.
      */
     public void nodeDownEvent(IMNodeEvent n) {
-        dispatch(IMEvent.NODE_DOWN, new Class<?>[] { IMNodeEvent.class }, n);
+        n.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.NODE_DOWN, new Class<?>[] { IMNodeEvent.class }, n);
     }
 
     /**
@@ -318,6 +339,15 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      * @param n node event containing the removed {@link IMNode} properties.
      */
     public void nodeRemovedEvent(IMNodeEvent n) {
-        dispatch(IMEvent.NODE_REMOVED, new Class<?>[] { IMNodeEvent.class }, n);
+        n.setIMUrl(this.MonitoringUrl);
+        dispatch(IMEventType.NODE_REMOVED,
+            new Class<?>[] { IMNodeEvent.class }, n);
+    }
+
+    /** Stop and remove monitoring active object */
+    public void shutdown() {
+        //throwing shutdown event
+        imShutDownEvent(new IMEvent());
+        ProActiveObject.terminateActiveObject(false);
     }
 }

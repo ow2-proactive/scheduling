@@ -31,9 +31,10 @@
 package org.objectweb.proactive.extra.infrastructuremanager.frontend;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMEventType;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 
@@ -43,7 +44,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.N
  * Interface and methods to implements for a object that want
  * to receive (monitor) Infrastructure manager's (IM) events.
  *
- * IM Events are defined in {@link IMEvent}.
+ * IM Events are defined in {@link IMEventType}.
  *
  * @see org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring
  *
@@ -54,16 +55,16 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.N
 public interface IMEventListener {
 
     /** IM is shutting down */
-    public void imShutDownEvent();
+    public void imShutDownEvent(IMEvent evt);
 
     /** IM has been stopped */
-    public void imShuttingDownEvent();
+    public void imShuttingDownEvent(IMEvent evt);
 
     /** IM has started */
-    public void imStartedEvent();
+    public void imStartedEvent(IMEvent evt);
 
     /** IM has been killed */
-    public void imKilledEvent();
+    public void imKilledEvent(IMEvent evt);
 
     /** new node source available in IM.
      * @param ns node source event containing new {@link NodeSource} properties.

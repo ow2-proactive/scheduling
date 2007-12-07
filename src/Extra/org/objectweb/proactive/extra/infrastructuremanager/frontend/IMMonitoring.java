@@ -38,8 +38,8 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMEventType;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMInitialState;
 import org.objectweb.proactive.extra.infrastructuremanager.imnode.IMNode;
 
 
@@ -149,5 +149,8 @@ public interface IMMonitoring {
      * @return IMInitialState snapshot of IM's current state : nodes and node sources.
      *  */
     public IMInitialState addIMEventListener(IMEventListener listener,
-        IMEvent... events);
+        IMEventType... events);
+
+    /** Stop and remove monitoring active object */
+    public void shutdown();
 }

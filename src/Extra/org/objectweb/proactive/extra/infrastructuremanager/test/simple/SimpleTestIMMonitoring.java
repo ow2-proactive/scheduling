@@ -39,10 +39,11 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMEventType;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMInitialState;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMEventListener;
@@ -71,11 +72,12 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
     public void initActivity(Body body) {
         System.out.println("SimpleTestIMMonitoring.initActivity()");
         IMInitialState initState = this.imMonitoring.addIMEventListener((IMEventListener) ProActiveObject.getStubOnThis(),
-                IMEvent.KILLED, IMEvent.NODE_ADDED, IMEvent.NODE_BUSY,
-                IMEvent.NODE_DOWN, IMEvent.NODE_FREE, IMEvent.NODE_REMOVED,
-                IMEvent.NODE_TO_RELEASE, IMEvent.NODESOURCE_CREATED,
-                IMEvent.NODESOURCE_REMOVED, IMEvent.SHUTDOWN,
-                IMEvent.SHUTTING_DOWN, IMEvent.STARTED);
+                IMEventType.KILLED, IMEventType.NODE_ADDED,
+                IMEventType.NODE_BUSY, IMEventType.NODE_DOWN,
+                IMEventType.NODE_FREE, IMEventType.NODE_REMOVED,
+                IMEventType.NODE_TO_RELEASE, IMEventType.NODESOURCE_CREATED,
+                IMEventType.NODESOURCE_REMOVED, IMEventType.SHUTDOWN,
+                IMEventType.SHUTTING_DOWN, IMEventType.STARTED);
 
         printInitialState(initState);
     }
@@ -145,65 +147,59 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
     }
 
     //----------------Events handling ---------------//    
-    public void imKilledEvent() {
-        System.out.println("SimpleTestIMMonitoring.imKilledEvent()");
+    public void imKilledEvent(IMEvent evt) {
+        System.out.println("imKilledEvent, IM : " + evt.getIMUrl());
     }
 
-    public void imShutDownEvent() {
-        System.out.println("SimpleTestIMMonitoring.imShutDownEvent()");
+    public void imShutDownEvent(IMEvent evt) {
+        System.out.println("imShutDownEvent, IM : " + evt.getIMUrl());
     }
 
-    public void imShuttingDownEvent() {
-        System.out.println("SimpleTestIMMonitoring.imShuttingDownEvent()");
+    public void imShuttingDownEvent(IMEvent evt) {
+        System.out.println("imShuttingDownEvent, IM : " + evt.getIMUrl());
     }
 
-    public void imStartedEvent() {
-        System.out.println("SimpleTestIMMonitoring.imStartedEvent()");
+    public void imStartedEvent(IMEvent evt) {
+        System.out.println("imStartedEvent IM : " + evt.getIMUrl());
     }
 
     public void nodeAddedEvent(IMNodeEvent n) {
-        System.out.println("SimpleTestIMMonitoring.nodeAddedEvent() " +
-            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
-            n.getVMName());
+        System.out.println("nodeAddedEvent " + n.getNodeUrl() + " status : " +
+            n.getState() + " VMname : " + n.getVMName());
     }
 
     public void nodeBusyEvent(IMNodeEvent n) {
-        System.out.println("SimpleTestIMMonitoring.nodeBusyEvent() " +
-            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
-            n.getVMName());
+        System.out.println("nodeBusyEvent " + n.getNodeUrl() + " status : " +
+            n.getState() + " VMname : " + n.getVMName());
     }
 
     public void nodeDownEvent(IMNodeEvent n) {
-        System.out.println("SimpleTestIMMonitoring.nodeDownEvent() " +
-            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
-            n.getVMName());
+        System.out.println("nodeDownEvent " + n.getNodeUrl() + " status : " +
+            n.getState() + " VMname : " + n.getVMName());
     }
 
     public void nodeFreeEvent(IMNodeEvent n) {
-        System.out.println("SimpleTestIMMonitoring.nodeFreeEvent() " +
-            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
-            n.getVMName());
+        System.out.println("nodeFreeEvent " + n.getNodeUrl() + " status : " +
+            n.getState() + " VMname : " + n.getVMName());
     }
 
     public void nodeToReleaseEvent(IMNodeEvent n) {
-        System.out.println("SimpleTestIMMonitoring.nodeToReleaseEvent() " +
-            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
-            n.getVMName());
+        System.out.println("nodeToReleaseEvent " + n.getNodeUrl() +
+            " status : " + n.getState() + " VMname : " + n.getVMName());
     }
 
     public void nodeRemovedEvent(IMNodeEvent n) {
-        System.out.println("SimpleTestIMMonitoring.nodeRemovedEvent() " +
-            n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
-            n.getVMName());
+        System.out.println("nodeRemovedEvent " + n.getNodeUrl() + " status : " +
+            n.getState() + " VMname : " + n.getVMName());
     }
 
     public void nodeSourceAddedEvent(IMNodeSourceEvent ns) {
-        System.out.println("SimpleTestIMMonitoring.nodeSourceAddedEvent() " +
-            ns.getSourceName());
+        System.out.println("nodeSourceAddedEvent " + ns.getSourceName() +
+            "IM : " + ns.getIMUrl());
     }
 
     public void nodeSourceRemovedEvent(IMNodeSourceEvent ns) {
-        System.out.println("SimpleTestIMMonitoring.nodeSourceRemovedEvent() " +
-            ns.getSourceName());
+        System.out.println("nodeSourceRemovedEvent " + ns.getSourceName() +
+            "IM : " + ns.getIMUrl());
     }
 }

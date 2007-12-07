@@ -39,12 +39,13 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.AddingNodesException;
@@ -115,15 +116,14 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     /** unique id of the source */
     protected String SourceId = null;
 
-    /** boolean indicating status of nodes pinger */
-    private boolean Pinger_alive = true;
-
     /** Ping frequency of the Node Pinger thread */
-    static final int DEFAULT_NODE_SOURCE_PING_FREQUENCY = 5000;
+    protected static final int DEFAULT_NODE_SOURCE_PING_FREQUENCY = 5000;
+    protected Pinger pinger;
 
     /** HashMap of nodes available and managed by this NodeSource
      * All nodes in this HashMap are registered in {@link IMCore} too */
     public HashMap<String, Node> nodes;
+    protected boolean toShutdown = false;
 
     /**
      * ProActive empty constructor.
@@ -148,26 +148,26 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * register itself to the {@link IMCore}.
      */
     public void initActivity(Body body) {
-        this.imCore.addSource((NodeSource) ProActiveObject.getStubOnThis(),
+        this.imCore.internalAddSource((NodeSource) ProActiveObject.getStubOnThis(),
             this.SourceId);
-        // TODO gsigety, cdelbe : giving a stub on the source can 
+        // TODO gsigety, cdelbe : giving a stub on the source to Pinger can 
         // lead to a lock if source is blocked
-        new Pinger((NodeSource) ProActiveObject.getStubOnThis());
+        pinger = new Pinger((NodeSource) ProActiveObject.getStubOnThis());
     }
 
     /**
-     * Terminates activity of NodeSource Active Object.
+     * Shutdown the node source.
+     * Method in this abstract class just stop the Pinger thread,
+     * so for NodeSource's inherited classes, they must override this method,
+     * each node source type has to specify what to perform for the shutting down
+     * (certainly remove nodes handled by the source).
+     * All nodes are removed from node source and from IMCore
+     * @param preempt true Node source doesn't wait tasks end on its handled nodes,
+     * false node source wait end of tasks on its nodes before shutting down
      */
-    public void endActivity(Body body) {
-        Pinger_alive = false;
-    }
-
-    /**
-     * Returns the unique identifier of the NodeSource object.
-     * @return {@link String} representing Id of the NodeSource.
-     */
-    public String getId() {
-        return this.SourceId;
+    public void shutdown(boolean preempt) {
+        this.toShutdown = true;
+        this.pinger.shutdown();
     }
 
     /**
@@ -242,8 +242,6 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     public String getSourceId() {
         return this.SourceId;
     }
-
-    //TODO Germs add shutdown
 
     // ----------------------------------------------------------------------//
     // protected methods
@@ -320,6 +318,10 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
         /** stub of the NodeSource Active Object*/
         private NodeSource nodeSource;
 
+        /** state of the thread, true Pinger "ping", false
+         * pinger is stopped */
+        private boolean active;
+
         /**
          * Pinger constructor.
          * Launch the nodes monitoring thread
@@ -327,7 +329,25 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
          */
         public Pinger(NodeSource source) {
             nodeSource = source;
+            this.active = true;
             start();
+        }
+
+        /**
+         * shutdown the Pinger thread .
+         */
+        public synchronized void shutdown() {
+            this.active = false;
+        }
+
+        /**
+         * Gives the state the Thread's state.
+         * @return boolean indicating thread's state :
+         * true, Pinger continues Pinging or
+         * false Pinger thread stops.
+         */
+        public synchronized boolean isActive() {
+            return this.active;
         }
 
         /**
@@ -340,20 +360,33 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
          * {@link NodeSource#detectedPingedDownNode(String)} is called when a down node is detected.
          */
         public void run() {
-            while (!isInterrupted() && Pinger_alive) {
+            while (!isInterrupted() && this.isActive()) {
                 try {
-                    sleep(DEFAULT_NODE_SOURCE_PING_FREQUENCY);
-                } catch (InterruptedException ex) {
-                }
-                for (Node node : this.nodeSource.getNodes()) {
-                    String nodeURL = node.getNodeInformation().getURL();
                     try {
-                        node.getNumberOfActiveObjects();
-                    } catch (Exception e) {
-                        this.nodeSource.detectedPingedDownNode(nodeURL);
-                    } //catch
-                } //for
-            } //while interrupted
+                        sleep(DEFAULT_NODE_SOURCE_PING_FREQUENCY);
+                    } catch (InterruptedException ex) {
+                    }
+                    if (!this.isActive()) {
+                        break;
+                    }
+                    for (Node node : nodeSource.getNodes()) {
+                        // check active between each ping
+                        if (!this.isActive()) {
+                            break;
+                        }
+                        String nodeURL = node.getNodeInformation().getURL();
+                        try {
+                            node.getNumberOfActiveObjects();
+                        } catch (Exception e) {
+                            this.nodeSource.detectedPingedDownNode(nodeURL);
+                        } //catch
+                    } //for
+                } catch (BodyTerminatedException e) {
+                    // node source is terminated 
+                    // terminate...
+                    break;
+                }
+            } //while !interrupted
         } //run
     }
 }

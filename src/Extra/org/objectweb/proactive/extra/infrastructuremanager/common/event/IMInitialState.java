@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.infrastructuremanager.common;
+package org.objectweb.proactive.extra.infrastructuremanager.common.event;
 
 import java.io.Serializable;
 import java.util.ArrayList;

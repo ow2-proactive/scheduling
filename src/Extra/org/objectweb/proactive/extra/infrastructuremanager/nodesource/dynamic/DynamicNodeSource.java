@@ -38,8 +38,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.EndActive;
-import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -75,8 +73,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.utils.Heap;
  *
  */
 public abstract class DynamicNodeSource extends NodeSource
-    implements DynamicNSInterface, Serializable, InitActive, RunActive,
-        EndActive {
+    implements DynamicNSInterface, Serializable, RunActive {
 
     /** nodes URL and when they must be released */
     private HashMap<String, Long> nodes_ttr;
@@ -97,7 +94,7 @@ public abstract class DynamicNodeSource extends NodeSource
     private int ttr;
 
     /** Indicate the DynamicNodeSource running state */
-    private boolean running;
+    private boolean running = true;
 
     /** At the DynamicNodeSource startup, used to calculate
      * the delay between two nodes acquisitions
@@ -138,7 +135,6 @@ public abstract class DynamicNodeSource extends NodeSource
         super.initActivity(body);
         niceTimes = new Heap<Long>(nbMax);
         nodes_ttr = new HashMap<String, Long>();
-        running = true;
         long currentTime = System.currentTimeMillis();
 
         // delaying the node adding.
@@ -157,19 +153,42 @@ public abstract class DynamicNodeSource extends NodeSource
         Service service = new Service(body);
         while (running) {
             service.blockingServeOldest(3000);
-            cleanAndGet();
+            if (!this.toShutdown) {
+                cleanAndGet();
+            }
         }
     }
 
-    //TODO gsigety refactor the shutdown mechanism 
     /**
-     * Terminate activity of DynamicNodeSource Active Object.
-     * Stop the Pinger thread of the upper class
+     * Terminates activity of DynamicNodeSource Active Object.
      */
     public void endActivity(Body body) {
-        super.endActivity(body);
-        if (!running) {
-            shutdown();
+        System.out.println("DynamicNodeSource.endActivity()");
+    }
+
+    /**
+     * Shutdown the dynamic node source.
+     * call to shutdown function of the super class.
+     * clearing the heap of nice times, no nodes are got anymore
+     * ask to the Core to remove all the nodes
+     * DynamicNodesource will Shutdown after the core confirms all nodes removal.
+     * @param preempt true Node source doesn't wait tasks end on its handled nodes,
+     * false node source wait end of tasks on its nodes before shutting down
+     */
+    public void shutdown(boolean preempt) {
+        super.shutdown(preempt);
+        this.niceTimes.clear();
+        //ask to IMCore to remove all nodes
+        if (this.nodes.size() > 0) {
+            for (Entry<String, Node> entry : this.nodes.entrySet()) {
+                explicitRemoveNode(entry.getKey(), preempt);
+            }
+        } else {
+            //no nodes to remove, shutdown directly the NodeSource
+            this.imCore.internalRemoveSource(this.SourceId,
+                this.getSourceEvent());
+            //terminates runActivty's infinite loop.
+            running = false;
         }
     }
 
@@ -218,20 +237,6 @@ public abstract class DynamicNodeSource extends NodeSource
     }
 
     /**
-     * initiate the shutdown of the DynamicNodeSource ActiveObject.
-     */
-    public void shutdown() {
-        logger.info("Shutting down Node Source : " + getSourceId());
-        running = false;
-        try {
-            for (Node node : this.getNodes())
-                releaseNode(node);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
      * True if the node {@link DynamicNodeSource#nodes_ttr} is reached for this node.
      * @param node the node object to test.
      * @return true if the node must be released, false otherwise.
@@ -271,16 +276,15 @@ public abstract class DynamicNodeSource extends NodeSource
         long time = System.currentTimeMillis();
         while (iter.hasNext()) {
             Entry<String, Long> entry = iter.next();
-
-            // try soft release only free nodes !!
             if (time > entry.getValue()) {
                 iter.remove();
+                this.nodes_ttr.remove(entry.getKey());
                 this.imCore.internalRemoveNode(entry.getKey(), false);
             }
         }
 
         // Getting part
-        while ((nodes.size() <= nbMax) && (niceTimes.peek() != null) &&
+        while ((nodes.size() < nbMax) && (niceTimes.peek() != null) &&
                 (niceTimes.peek() < currentTime)) {
             Node node = getNode();
             if (node == null) {
@@ -294,6 +298,37 @@ public abstract class DynamicNodeSource extends NodeSource
                 this.addNewAvailableNode(node, this.SourceId, this.SourceId);
                 niceTimes.extract();
             }
+        }
+    }
+
+    /**
+     * Performs operation to remove a node by an explicit Admin request,
+     * on the contrary of a normal get-and-release node cycle
+     * made by  dynamic source.
+     * (IMAdmin has asked to remove a node or remove the dynamic source).
+     * node's Removing operation.
+     * Node asked to remove must be handled by source (verify before).
+     * @param nodeUrl
+     * @param preempt
+     */
+    private void explicitRemoveNode(String nodeUrl, boolean preempt) {
+        //node in nodes List and node not in node_ttr list == node already in releasing state,
+        //softly remove has been ask before by cleanAndGet
+        //just override if needed the soft remove by a preemptive remove 
+        if (!this.nodes_ttr.containsKey(nodeUrl)) {
+            if (preempt) {
+                this.imCore.internalRemoveNode(nodeUrl, preempt);
+            }
+
+            //else nothing, softly remove request has already been send  
+        } else {
+            //node in TTR list, don't wait to reach the TTR,
+            //ask the node's remove now
+            this.nodes_ttr.remove(nodeUrl);
+            this.imCore.internalRemoveNode(nodeUrl, preempt);
+        }
+        if (preempt && !nodesToKillOnConfirm.contains(nodeUrl)) {
+            this.nodesToKillOnConfirm.add(nodeUrl);
         }
     }
 
@@ -323,10 +358,24 @@ public abstract class DynamicNodeSource extends NodeSource
         if (this.nodes.containsKey(nodeUrl)) {
             if (this.nodesToKillOnConfirm.contains(nodeUrl)) {
                 this.nodesToKillOnConfirm.remove(nodeUrl);
-                //killing a dynamic node, what to do ?
+                //what to do to kill the node ?
                 releaseNode(this.getNodebyUrl(nodeUrl));
             } else {
                 releaseNode(this.getNodebyUrl(nodeUrl));
+            }
+            //remove node from the main list
+            removeFromList(this.getNodebyUrl(nodeUrl));
+            if (this.toShutdown) {
+                if (this.nodes.size() == 0) {
+                    //Node source is to shutdown and all nodes have been removed :
+                    //finish the shutdown
+                    this.imCore.internalRemoveSource(this.SourceId,
+                        this.getSourceEvent());
+                    //terminates runActivty's infinite loop.
+                    running = false;
+                }
+            } else {
+                newNiceTime();
             }
         }
     }
@@ -345,7 +394,7 @@ public abstract class DynamicNodeSource extends NodeSource
     }
 
     /**
-     * Removes a specific Node asked by Admin.
+     * Removes a specific Node asked by IMAdmin.
      * DynamicNodeSource object has received a node removing request asked by the {@link IMAdmin}.
      * <BR>If the removing request is in a softly way and a softly removing request has been already made,
      * the DynamicNodeSource object has nothing to do, otherwise perform the release.
@@ -356,23 +405,9 @@ public abstract class DynamicNodeSource extends NodeSource
      */
     public void forwardRemoveNode(String nodeUrl, boolean preempt) {
         //verifying that node is already in the list,
-        //node could have been already released or
+        //node could have been already released or detected down
         if (this.nodes.containsKey(nodeUrl)) {
-            //node in nodes List and node not in node_ttr list == node already in releasing state
-            if (!this.nodes_ttr.containsKey(nodeUrl)) {
-                if (preempt) {
-                    this.imCore.internalRemoveNode(nodeUrl, preempt);
-                }
-
-                //else nothing, softly remove request has already been send 
-            } else {
-                //node not in TTR list
-                this.nodes_ttr.remove(nodeUrl);
-                this.imCore.internalRemoveNode(nodeUrl, preempt);
-            }
-            if (preempt && !nodesToKillOnConfirm.contains(nodeUrl)) {
-                this.nodesToKillOnConfirm.add(nodeUrl);
-            }
+            explicitRemoveNode(nodeUrl, preempt);
         }
     }
 

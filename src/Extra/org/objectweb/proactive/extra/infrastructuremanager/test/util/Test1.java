@@ -134,7 +134,7 @@ public class Test1 extends TestCase {
     protected void tearDown() throws Exception {
         super.tearDown();
         System.err.println("Stopping test");
-        admin.shutdown();
+        admin.shutdown(false);
         ProLifeCycle.exitSuccess();
     }
 

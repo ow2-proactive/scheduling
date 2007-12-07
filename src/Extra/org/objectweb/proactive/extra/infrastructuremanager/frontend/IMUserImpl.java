@@ -174,4 +174,8 @@ public class IMUserImpl implements IMUser, InitActive {
 
         imcore.freeNodes(nodes);
     }
+
+    public void shutdown() {
+        ProActiveObject.terminateActiveObject(false);
+    }
 }

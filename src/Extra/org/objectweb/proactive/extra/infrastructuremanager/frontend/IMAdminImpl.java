@@ -175,7 +175,8 @@ public class IMAdminImpl implements IMAdmin, Serializable, InitActive {
      * Kills IMAdin object.
      * @exception ProActiveException
      */
-    public void shutdown() throws ProActiveException {
-        this.imcore.shutdown();
+    public void shutdown(boolean preempt) throws ProActiveException {
+        this.imcore.shutdown(preempt);
+        ProActiveObject.terminateActiveObject(false);
     }
 }

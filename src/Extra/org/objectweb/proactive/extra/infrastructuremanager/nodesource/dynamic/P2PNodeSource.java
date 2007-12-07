@@ -39,7 +39,7 @@ import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
 import org.objectweb.proactive.p2p.service.P2PService;
@@ -125,6 +125,14 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
         }
     }
 
+    /**
+     * Terminates activity of P2PNodeSource Active Object.
+     */
+    public void endActivity(Body body) {
+        super.endActivity(body);
+        //TODO gsigety cdelbe : how to stop P2PService ?
+    }
+
     // ----------------------------------------------------------------------//
     // definition of abstract methods inherited from dynamicNodeSource 
     // ----------------------------------------------------------------------//	    
@@ -145,13 +153,10 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
             nodeUrl + ")");
         P2PNodeLookup p2pNodeLookup = this.lookups.get(nodeUrl);
         p2pNodeLookup.killNode(nodeUrl);
-        //remove node from the list
-        removeFromList(node);
         //terminate AOs, remove node and its lookup form lookup HM
         ProActiveObject.terminateActiveObject(this.lookups.remove(nodeUrl),
             false);
         //indicate that a new node has to be got in a [niceTime] future
-        newNiceTime();
     }
 
     /**
@@ -206,5 +211,15 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
             //indicate that a new node has to be got in a [niceTime] future
             newNiceTime();
         }
+    }
+
+    /**
+     * Shutdown the node source
+     * All nodes are removed from node source and from IMCore
+     * @param preempt true Node source doesn't wait tasks end on its handled nodes,
+     * false node source wait end of tasks on its nodes before shutting down
+     */
+    public void shutdown(boolean preempt) {
+        super.shutdown(preempt);
     }
 }

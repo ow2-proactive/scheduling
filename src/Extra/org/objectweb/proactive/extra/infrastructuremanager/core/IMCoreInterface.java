@@ -35,9 +35,8 @@ import java.util.Vector;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMInitialState;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.AddingNodesException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
@@ -136,11 +135,11 @@ public interface IMCoreInterface {
     public void removeNode(String nodeUrl, boolean preempt);
 
     /**
-     * Stops the Infrastructure Manager.
+     * Stops the IMCore.
      * Stops all {@link NodeSource} active objects
      * Stops {@link IMAdmin}, {@link IMUser}, {@link IMMonitoring} active objects.
      */
-    public BooleanWrapper shutdown();
+    public void shutdown(boolean preempt);
 
     /**
      * Stops and removes a NodeSource active object with their nodes from the Infrastructure Manager

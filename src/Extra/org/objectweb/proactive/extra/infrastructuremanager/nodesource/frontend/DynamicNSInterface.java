@@ -64,6 +64,4 @@ public interface DynamicNSInterface {
     public void setTimeToRelease(int ttr);
 
     public void setNiceTime(int nice);
-
-    public void shutdown();
 }

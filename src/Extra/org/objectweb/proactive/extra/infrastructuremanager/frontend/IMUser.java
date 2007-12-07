@@ -98,4 +98,6 @@ public interface IMUser {
      * @param nodes : a table of nodes to release.
      */
     public void freeNodes(NodeSet nodes);
+
+    public void shutdown();
 }

@@ -35,7 +35,7 @@ import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
 
 
-public class SimpleTestRemove {
+public class SimpleTestRemoveNode {
     public static void main(String[] args) {
         System.out.println("# --oOo-- Simple Test remove --oOo-- ");
 

@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.infrastructuremanager.core;
 
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
 
 
@@ -64,7 +65,17 @@ public interface IMCoreSourceInt {
     * @param source Stub of the {@link NodeSource} object to add.
     * @param sourceId name of the {@link NodeSource} object to add.
     */
-    public void addSource(NodeSource source, String sourceId);
+    public void internalAddSource(NodeSource source, String sourceId);
+
+    /**
+     * Removes a NodeSource to the core.
+     * Nodes source confirms by this call its removal.
+     * Node source has previously removed its nodes.
+     * IMcore delete the nodeSource from its source list.
+     * @param sourceId name of the {@link NodeSource} to remove.
+     * @param evt Remove source event to throw at IMMonitoring
+     */
+    public void internalRemoveSource(String sourceId, IMNodeSourceEvent evt);
 
     /**
     * Removes a node from the Core.

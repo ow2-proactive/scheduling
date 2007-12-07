@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.PadDeployInterface;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad.IMDeploymentFactory;
@@ -76,7 +76,6 @@ public class DummyNodeSource extends DynamicNodeSource
     /** deploy a PAD
      *
      */
-    @Override
     public void initActivity(Body body) {
         super.initActivity(body);
         try {
@@ -89,6 +88,23 @@ public class DummyNodeSource extends DynamicNodeSource
         }
     }
 
+    /**
+     * Terminates activity of P2PNodeSource Active Object.
+     */
+    public void endActivity(Body body) {
+        super.endActivity(body);
+        for (Entry<Node, Boolean> entry : this.StaticNodes.entrySet()) {
+            try {
+                entry.getKey().killAllActiveObjects();
+                //TODO gisgety killing the node ?
+                entry.getKey().getProActiveRuntime()
+                     .killNode(entry.getKey().getNodeInformation().getName());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     // ----------------------------------------------------------------------//
     // definitions of abstract methods inherited from dynamicNodeSource 
     // ----------------------------------------------------------------------//	
@@ -98,7 +114,6 @@ public class DummyNodeSource extends DynamicNodeSource
      * in this this example, just pick a free node
      * from the static deployed nodes list
      */
-    @Override
     protected Node getNode() {
         for (Entry<Node, Boolean> entry : this.StaticNodes.entrySet()) {
             if (entry.getValue().booleanValue()) {
@@ -121,10 +136,6 @@ public class DummyNodeSource extends DynamicNodeSource
         if (logger.isInfoEnabled()) {
             logger.info("[" + this.SourceId + "] releaseNode " + nodeUrl);
         }
-        //remove node from the list
-        removeFromList(node);
-        //indicate that a new node has to be got in a this.niceTime future
-        newNiceTime();
         boolean found = false;
         for (Entry<Node, Boolean> entry : this.StaticNodes.entrySet()) {
             if (entry.getKey().getNodeInformation().getURL() == node.getNodeInformation()
@@ -184,5 +195,18 @@ public class DummyNodeSource extends DynamicNodeSource
      */
     public void receiveDeployedNode(Node node, String VnName, String PADName) {
         this.StaticNodes.put(node, new Boolean(true));
+    }
+
+    /**
+     * Shutdown the node source
+     * All nodes are removed from node source and from IMCore
+     * @param preempt true Node source doesn't wait tasks end on its handled nodes,
+     * false node source wait end of tasks on its nodes before shutting down
+     */
+    public void shutdown(boolean preempt) {
+        //TODO gsigety : work !
+        //		for (Entry<String, Node> entry : this.nodes.entrySet()) {
+        //			this.imCore.internalRemoveNode(entry.getKey(), preempt);
+        //		}
     }
 }

@@ -112,8 +112,11 @@ public interface IMAdmin extends Serializable {
     public void removeSource(String sourceName, boolean preempt);
 
     /**
-     * Kills IMAdin object.
+     * Kills Infrastructure Manager
+     * @param preempt true IM killed without waiting current tasks ending,
+     * false waiting end of tasks already launched.
      * @exception ProActiveException
+     *
      */
-    public void shutdown() throws ProActiveException;
+    public void shutdown(boolean preempt) throws ProActiveException;
 }

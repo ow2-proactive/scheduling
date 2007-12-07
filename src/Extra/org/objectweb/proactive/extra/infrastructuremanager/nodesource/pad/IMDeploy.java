@@ -49,7 +49,6 @@ import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.P
  * Provides a ProActive descriptor (PAD)
  * deployment mechanism for Infrastructure Manager.
  *
- *
  * @author ProActive team.
  *
  */
@@ -87,10 +86,10 @@ public class IMDeploy implements NodeCreationEventListener, Runnable {
      * @param pad ProActive descriptor to deploy.
      * @param vnNames virtual nodes to deploy
      */
-    public IMDeploy(PadDeployInterface nodeSource, String padName,
-        ProActiveDescriptor pad, String[] vnNames) {
+    public IMDeploy(PadDeployInterface nodeSource, ProActiveDescriptor pad,
+        String[] vnNames) {
         this.nodeSource = nodeSource;
-        this.padName = padName;
+        this.padName = pad.getUrl();
         this.pad = pad;
         this.vnNames = vnNames;
     }

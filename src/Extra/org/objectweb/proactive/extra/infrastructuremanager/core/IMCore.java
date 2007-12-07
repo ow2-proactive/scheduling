@@ -50,11 +50,11 @@ import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMInitialState;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeEvent;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMInitialState;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.AddingNodesException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdminImpl;
@@ -137,7 +137,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     /** stub of IMuser active object of the IM */
     private IMUser user;
 
-    /** Hashmap of NodeSource active objects*/
+    /** HashMap of NodeSource active objects*/
     private HashMap<String, NodeSource> nodeSources;
 
     /** HashMaps of nodes known by the IMCore*/
@@ -160,6 +160,9 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
 
     /** Name of the default source node, created at the IMCore initialization */
     private static final String DEFAULT_STATIC_SOURCE_NAME = "default";
+
+    /** indicates that IMCore must shutdown*/
+    private boolean toShutDown = false;
 
     /**
      * ProActive Empty constructor
@@ -230,7 +233,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
             this.createStaticNodesource(null, DEFAULT_STATIC_SOURCE_NAME);
 
             //Creating IM started event 
-            this.monitoring.imStartedEvent();
+            this.monitoring.imStartedEvent(new IMEvent());
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -395,7 +398,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         //removing the node from the HM list		
         this.removeFromAllLists(imnode);
         this.allNodes.remove(imnode.getNodeURL());
-        //create the event
+        //create the event      
         this.monitoring.nodeRemovedEvent(imnode.getNodeEvent());
     }
 
@@ -788,10 +791,13 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
      * Stops all {@link NodeSource} active objects
      * Stops {@link IMAdmin}, {@link IMUser}, {@link IMMonitoring} active objects.
      */
-    public BooleanWrapper shutdown() {
-        //Germs TODO remove all NodeSources
-        //kill all nodes, softly or not 
-        return null;
+    public void shutdown(boolean preempt) {
+        this.toShutDown = true;
+        this.monitoring.imShuttingDownEvent(new IMEvent());
+        for (Entry<String, NodeSource> entry : this.nodeSources.entrySet()) {
+            System.out.println("IMCore.shutdown() source : " + entry.getKey());
+            entry.getValue().shutdown(preempt);
+        }
     }
 
     /**
@@ -801,7 +807,12 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
      * false nodes are removed just after the job ending, if busy.
      */
     public void removeSource(String sourceName, boolean preempt) {
-        //TODO Germs
+        if (nodeSources.containsKey(sourceName)) {
+            this.nodeSources.get(sourceName).shutdown(preempt);
+        }
+
+        //TODO gsigety cdelbe : throwing an exception if node source not found ?
+        // possible to delete default node source ?
     }
 
     /**
@@ -982,7 +993,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
             return;
         }
 
-        //verify wether the not has not been removed to the IM
+        //verify wether the node has not been removed from the IM
         if (this.allNodes.containsKey(nodeURL)) {
             IMNode imnode = this.getNodebyUrl(nodeURL);
             assert (imnode.isBusy() || imnode.isToRelease() || imnode.isDown());
@@ -1022,33 +1033,38 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     * @param selectionScript selection script that nodes must verify.
     */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript) {
-        ArrayList<IMNode> nodes = getNodesSortedByScript(selectionScript);
-        NodeSet result;
-        int found = 0;
-
-        // no verifying script
-        if (selectionScript == null) {
-            logger.info("[IMCORE] Searching for " + nb + " nodes on " +
-                this.getSizeListFreeIMNode() + " free nodes.");
-            result = new NodeSet();
-            while (!nodes.isEmpty() && (found < nb.intValue())) {
-                IMNode node = nodes.remove(0);
-                try {
-                    result.add(node.getNode());
-                    setBusy(node);
-                    found++;
-                } catch (NodeException e) {
-                    setDown(node);
-                }
-            }
-        } else if (selectionScript.isDynamic()) {
-            result = this.selectNodeWithDynamicVerifScript(nb.intValue(),
-                    selectionScript, nodes);
+        //if IM is in shutdown state, don't provide nodes
+        if (this.toShutDown) {
+            return new NodeSet();
         } else {
-            result = this.selectNodeWithStaticVerifScript(nb.intValue(),
-                    selectionScript, nodes);
+            ArrayList<IMNode> nodes = getNodesSortedByScript(selectionScript);
+            int found = 0;
+            NodeSet result;
+
+            //no verifying script
+            if (selectionScript == null) {
+                logger.info("[IMCORE] Searching for " + nb + " nodes on " +
+                    this.getSizeListFreeIMNode() + " free nodes.");
+                result = new NodeSet();
+                while (!nodes.isEmpty() && (found < nb.intValue())) {
+                    IMNode node = nodes.remove(0);
+                    try {
+                        result.add(node.getNode());
+                        setBusy(node);
+                        found++;
+                    } catch (NodeException e) {
+                        setDown(node);
+                    }
+                }
+            } else if (selectionScript.isDynamic()) {
+                result = this.selectNodeWithDynamicVerifScript(nb.intValue(),
+                        selectionScript, nodes);
+            } else {
+                result = this.selectNodeWithStaticVerifScript(nb.intValue(),
+                        selectionScript, nodes);
+            }
+            return result;
         }
-        return result;
     }
 
     /**
@@ -1059,7 +1075,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
      */
     public NodeSet getExactlyNodes(IntWrapper nb,
         SelectionScript selectionScript) {
-        // TODO Auto-generated method stub
+        // TODO gsigety to implement
         return null;
     }
 
@@ -1074,10 +1090,37 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
     * @param source Stub of the {@link NodeSource} object to add.
     * @param sourceId name of the {@link NodeSource} object to add.
     */
-    public void addSource(NodeSource source, String sourceId) {
+    public void internalAddSource(NodeSource source, String sourceId) {
         this.nodeSources.put(sourceId, source);
         //create the event
         this.monitoring.nodeSourceAddedEvent(source.getSourceEvent());
+    }
+
+    /**
+     * Removes a NodeSource to the core.
+     * Nodes source confirms to IMCore by this call its removal.
+     * IMCore has previously asked to the source to shutdown,
+     * and NodeDource has removed its nodes.
+     * IMcore deletes the nodeSource from its source list.
+     * @param sourceId name of the {@link NodeSource} to remove.
+     * @param evt Remove source event to throw at IMMonitoring
+     */
+    public void internalRemoveSource(String sourceId, IMNodeSourceEvent evt) {
+        //IMNodeSourceEvent evt = nodeSources.get(sourceId).getSourceEvent();
+        this.nodeSources.remove(sourceId);
+        if (logger.isInfoEnabled()) {
+            logger.info("[IMCORE] Node Source removed : " + sourceId);
+        }
+        //create the event
+        this.monitoring.nodeSourceRemovedEvent(evt);
+
+        if ((this.nodeSources.size() == 0) && this.toShutDown) {
+            //all nodes sources has been removed and IMCore in shutdown state, 
+            //finish the shutdown 
+            this.user.shutdown();
+            this.monitoring.shutdown();
+            ProActiveObject.terminateActiveObject(false);
+        }
     }
 
     /** add a new node to the node Manager.

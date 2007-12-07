@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extra.infrastructuremanager.nodesource.pad;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.ProActiveObject;
@@ -38,7 +39,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMNodeSourceEvent;
+import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMNodeSourceEvent;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCore;
 import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreSourceInt;
 import org.objectweb.proactive.extra.infrastructuremanager.nodesource.frontend.NodeSource;
@@ -97,6 +98,12 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
         super.initActivity(body);
     }
 
+    /**
+     * Terminates PADNodeSource Active Object.
+     */
+    public void endActivity(Body body) {
+    }
+
     // ----------------------------------------------------------------------//
     // definitions of abstract methods inherited from NodeSource, 
     // called by IMNodeManager
@@ -104,7 +111,8 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
 
     /**
      * Confirms a removing node request asked previously.
-     * PAD nodeSource has received from the Admin and by the Core
+     * PAD nodeSource has received the removing request
+     * from the IMAdmin and forwarded by the Core
      * an explicit removing node Request (@link forwardRemoveNode}.
      * If the node is already handled by the source, PADNode
      * ask to the Core to remove the node {@link IMCoreSourceInt#internalRemoveNode(String, boolean)}
@@ -128,10 +136,22 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
             Node node = nodes.get(nodeUrl);
             try {
                 node.killAllActiveObjects();
+                node.getProActiveRuntime()
+                    .killNode(node.getNodeInformation().getName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
             this.removeFromList(this.getNodebyUrl(nodeUrl));
+        }
+
+        //all nodes has been removed and NodeSource has been asked to shutdown:
+        //shutdown the Node source
+        if (this.toShutdown && (this.nodes.size() == 0)) {
+            this.imCore.internalRemoveSource(this.SourceId,
+                this.getSourceEvent());
+            // object should be terminated NON preemptively 
+            // pinger thread can wait for last results (getNodes)
+            ProActiveObject.terminateActiveObject(false);
         }
     }
 
@@ -160,6 +180,28 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
         this.listPad.put(pad.getUrl(), pad);
         IMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) ProActiveObject.getStubOnThis(),
             pad);
+    }
+
+    /**
+     * Shutdown the node source
+     * All nodes are removed from node source and from IMCore
+     * @param preempt true Node source doesn't wait tasks end on its handled nodes,
+     * false node source wait end of tasks on its nodes before shutting down
+     */
+    public void shutdown(boolean preempt) {
+        super.shutdown(preempt);
+        if (this.nodes.size() > 0) {
+            for (Entry<String, Node> entry : this.nodes.entrySet()) {
+                this.imCore.internalRemoveNode(entry.getKey(), preempt);
+            }
+        } else {
+            //no nodes to remove, shutdown directly the NodeSource
+            this.imCore.internalRemoveSource(this.SourceId,
+                this.getSourceEvent());
+            // object should be terminated NON preemptively 
+            // pinger thread can wait for last results (getNodes)
+            ProActiveObject.terminateActiveObject(false);
+        }
     }
 
     // ----------------------------------------------------------------------//
