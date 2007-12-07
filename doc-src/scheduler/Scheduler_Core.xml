@@ -131,7 +131,7 @@
         <mediaobject>
           <imageobject>
             <imagedata align="center"
-                       fileref="scheduler/images/core/schedulerJob.jpg"
+                       fileref="scheduler/pics/core/schedulerJob.jpg"
                        format="JPG" />
           </imageobject>
         </mediaobject>
@@ -200,7 +200,7 @@ public Object execute(TaskResult... results) throws Throwable {
         <mediaobject>
           <imageobject>
             <imagedata align="center"
-                       fileref="scheduler/images/core/scheduler2entities.jpg"
+                       fileref="scheduler/pics/core/scheduler2entities.jpg"
                        format="JPG" />
           </imageobject>
         </mediaobject>
@@ -251,7 +251,7 @@ public Object execute(TaskResult... results) throws Throwable {
         <mediaobject>
           <imageobject>
             <imagedata align="center"
-                       fileref="scheduler/images/core/schedulerEntity.jpg"
+                       fileref="scheduler/pics/core/schedulerEntity.jpg"
                        format="JPG" />
           </imageobject>
         </mediaobject>
@@ -332,13 +332,67 @@ public Object execute(TaskResult... results) throws Throwable {
     <sect2 id="task_creation">
       <title>Task Creation</title>
 
-      <para></para>
+      <para>
+      	First of all, you must know that you can create your own task by implementing scheduler executable interfaces.
+      	It is possible to implement two types of executables :
+      	<itemizedlist>
+      		<listitem>
+      			<emphasis role="bold">JavaExecutable</emphasis> : to make your own java executable process.
+      			Here's an example of implementation for this type :
+      			<programlisting lang="java">
+	public class WaitAndPrint extends JavaExecutable {
+	
+	    @Override
+	    public Object execute(TaskResult... results) throws Throwable {
+	        String message;
+	
+	        try {
+	            System.err.println("Démarrage de la tache WaitAndPrint");
+	            System.out.println("Parameters are : ");
+	
+	            for (TaskResult tRes : results) {
+	                if (tRes.hadException()) {
+	                    System.out.println("\t " + tRes.getTaskId() + " : " +
+	                        tRes.getException().getMessage());
+	                } else {
+	                    System.out.println("\t " + tRes.getTaskId() + " : " +
+	                        tRes.value());
+	                }
+	            }
+	
+	            message = URIBuilder.getLocalAddress().toString();
+	            Thread.sleep(10000);
+	
+	        } catch (Exception e) {
+	            message = "crashed";
+	            e.printStackTrace();
+	        }
+	
+	        System.out.println("Terminaison de la tache");
+	
+	        return (message + "\t slept for 10 sec");
+	    }
+    }
+      			</programlisting>
+      			<para>
+      				This task print an initial message, then check if there are result from previous tasks and if so,
+      				print the value of this "parameters".
+      				It will then return a message containing what the task did. The return value will be store in the job result.
+      			</para>
+      		</listitem>
+      		<listitem>
+      			<emphasis role="bold">ProActiveExecutable</emphasis> : to make your own ProActive application process.
+      		</listitem>
+      	</itemizedlist>
+      </para>
     </sect2>
 
     <sect2 id="job_creation">
       <title>Job Creation</title>
       
-      <para></para>
+      <para>
+      	
+      </para>
     </sect2>
 
     <sect2 id="user_interface">
@@ -358,7 +412,7 @@ public Object execute(TaskResult... results) throws Throwable {
             <mediaobject>
               <imageobject>
                 <imagedata align="center"
-                           fileref="scheduler/images/core/userConnection.jpg"
+                           fileref="scheduler/pics/core/userConnection.jpg"
                            format="JPG" />
               </imageobject>
             </mediaobject>
@@ -423,7 +477,7 @@ AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");</p
             <mediaobject>
               <imageobject>
                 <imagedata align="center"
-                           fileref="scheduler/images/core/jobSubmission.jpg"
+                           fileref="scheduler/pics/core/jobSubmission.jpg"
                            format="JPG" />
               </imageobject>
             </mediaobject>

@@ -122,6 +122,7 @@
     &Descriptor;
     &VariableContract;
     &FileTransfer;
+    &ProActive_Scheduler;
     &SSHTunneling;
     &technicalService;
    </part>
@@ -154,7 +155,6 @@
     &IC2D_EclipsePlugin;
     &scilab;
     &TimIt;
-    &ProActive_Scheduler;
     &Scheduler_EclipsePlugin;
     &Scheduler_Matlab;
    </part>
