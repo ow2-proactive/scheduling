@@ -2156,7 +2156,7 @@ public class ProActive {
         String xmlDescriptorUrl, VariableContract variableContract,
         boolean hierarchicalSearch) throws ProActiveException {
         ProActiveDescriptorInternal descriptor;
-        if (System.getProperty("proactive.old.parser") != null) {
+        if (ProProperties.PA_LEGACY_PARSER.isTrue()) {
             descriptor = internalGetProActiveDescriptor_old(xmlDescriptorUrl,
                     variableContract, hierarchicalSearch);
         } else {

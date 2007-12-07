@@ -224,7 +224,7 @@ public class FutureMonitoring implements Runnable {
             if (nodes.size() != lastNumberOfNodes) {
                 lastNumberOfNodes = nodes.size();
                 for (LocalNode node : nodes) {
-                    if ("enable".equals(node.getProperty("proactive.ft"))) {
+                    if (ProProperties.PA_FT.isTrue()) {
                         FTEnabled = true;
                         break;
                     }

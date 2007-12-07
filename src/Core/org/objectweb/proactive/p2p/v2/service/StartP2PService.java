@@ -476,8 +476,8 @@ public class StartP2PService implements P2PConstants {
             System.setProperty("proactive." + acquisitionMethod + ".port",
                 portNumber);
         } else {
-            bckPortValue = System.getProperty("proactive.rmi.port");
-            System.setProperty("proactive.rmi.port", portNumber);
+            bckPortValue = ProProperties.PA_RMI_PORT.getValue();
+            ProProperties.PA_RMI_PORT.setValue(portNumber);
         }
 
         // ProActiveRuntime creation

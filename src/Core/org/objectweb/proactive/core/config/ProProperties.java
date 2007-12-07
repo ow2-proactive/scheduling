@@ -143,6 +143,13 @@ public enum ProProperties {
      */
     PA_STACKTRACE("proactive.stack_trace", PAPropertiesType.BOOLEAN),
 
+    /**
+     * Activates the legacy SAX ProActive Descriptor parser
+     *
+     * To check if the new JAXP parser introduced regressions.
+     */
+    PA_LEGACY_PARSER("proactive.legacy.parser", PAPropertiesType.BOOLEAN),
+
     /* ------------------------------------
      *  NETWORK
      */
