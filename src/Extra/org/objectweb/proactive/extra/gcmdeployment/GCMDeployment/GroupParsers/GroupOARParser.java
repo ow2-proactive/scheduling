@@ -103,7 +103,7 @@ public class GroupOARParser extends AbstractGroupParser {
             String nodeValue = GCMParserHelper.getElementValue(childNode);
 
             if (nodeName.equals(NODE_NAME_RESOURCES)) {
-                if ((nodeValue != null) && !nodeValue.trim().isEmpty()) {
+                if ((nodeValue != null) && (nodeValue.trim().length() != 0)) {
                     oarGroup.setResources(nodeValue);
                 } else {
                     String nodes = GCMParserHelper.getAttributeValue(childNode,
