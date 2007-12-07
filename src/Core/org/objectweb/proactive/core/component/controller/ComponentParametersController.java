@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.objectweb.fractal.api.control.AttributeController;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.ComponentParameters;
 
@@ -42,13 +41,7 @@ import org.objectweb.proactive.core.component.ComponentParameters;
  * @author Matthieu Morel
  */
 @PublicAPI
-public interface ComponentParametersController extends AttributeController {
-    // TODO : refactor in a private interface
-    // return int for synchronous call
-    public int setImmediateServices();
-
-    public int removeImmediateServices();
-
+public interface ComponentParametersController {
     public ComponentParameters getComponentParameters();
 
     public void setComponentParameters(ComponentParameters componentParameters);

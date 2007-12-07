@@ -103,13 +103,24 @@ public class ComponentParametersControllerImpl
         return componentParameters.getName();
     }
 
+    /*
+     * used in the ProActiveComponentRepresentativeFactory.create[NF]ComponentRepresentative 
+     * to set the getComponentParameters method as an immediate service
+     * 
+     * return int for synchronous call
+     */
     public int setImmediateServices() {
         ProActiveObject.setImmediateService("getComponentParameters");
-        return 0; // synchrnous call
+        return 0; // Synchronous call
     }
 
+    /*
+     * used in the ProActiveComponentRepresentativeFactory.create[NF]ComponentRepresentative 
+     * to remove the getComponentParameters method as an immediate service
+     * return int for synchronous call
+     */
     public int removeImmediateServices() {
         ProActiveObject.removeImmediateService("getComponentParameters");
-        return 0; // synchrnous call
+        return 0; // Synchronous call
     }
 }

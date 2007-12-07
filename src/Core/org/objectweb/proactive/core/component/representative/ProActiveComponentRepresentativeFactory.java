@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.component.representative;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.controller.ComponentParametersController;
+import org.objectweb.proactive.core.component.controller.ComponentParametersControllerImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
@@ -112,14 +112,14 @@ public class ProActiveComponentRepresentativeFactory {
         Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
         proxy.reify(MethodCall.getComponentMethodCall(
-                ComponentParametersController.class.getDeclaredMethod(
+                ComponentParametersControllerImpl.class.getDeclaredMethod(
                     "setImmediateServices", new Class[] {  }),
                 new Object[] {  }, null,
                 Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
                 ComponentRequest.STRICT_FIFO_PRIORITY));
 
         ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall.getComponentMethodCall(
-                    ComponentParametersController.class.getDeclaredMethod(
+                    ComponentParametersControllerImpl.class.getDeclaredMethod(
                         "getComponentParameters", new Class[] {  }),
                     new Object[] {  }, null,
                     Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
@@ -127,7 +127,7 @@ public class ProActiveComponentRepresentativeFactory {
 
         //remove immediate service for getComponentParameters
         proxy.reify(MethodCall.getComponentMethodCall(
-                ComponentParametersController.class.getDeclaredMethod(
+                ComponentParametersControllerImpl.class.getDeclaredMethod(
                     "removeImmediateServices", new Class[] {  }),
                 new Object[] {  }, null,
                 Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
@@ -151,13 +151,13 @@ public class ProActiveComponentRepresentativeFactory {
         Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
         proxy.reify(MethodCall.getComponentMethodCall(
-                ComponentParametersController.class.getDeclaredMethod(
+                ComponentParametersControllerImpl.class.getDeclaredMethod(
                     "setImmediateServices", new Class[] {  }),
                 new Object[] {  }, null,
                 Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
                 ComponentRequest.STRICT_FIFO_PRIORITY));
         ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall.getComponentMethodCall(
-                    ComponentParametersController.class.getDeclaredMethod(
+                    ComponentParametersControllerImpl.class.getDeclaredMethod(
                         "getComponentParameters", new Class[] {  }),
                     new Object[] {  }, null,
                     Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
@@ -165,7 +165,7 @@ public class ProActiveComponentRepresentativeFactory {
 
         //remove immediate service for getComponentParameters
         proxy.reify(MethodCall.getComponentMethodCall(
-                ComponentParametersController.class.getDeclaredMethod(
+                ComponentParametersControllerImpl.class.getDeclaredMethod(
                     "removeImmediateServices", new Class[] {  }),
                 new Object[] {  }, null,
                 Constants.COMPONENT_PARAMETERS_CONTROLLER, null,

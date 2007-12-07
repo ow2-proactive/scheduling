@@ -177,7 +177,7 @@ public class ProActiveComponentRepresentativeImpl
                 controllerItf = Class.forName(controllerItfName);
                 controllerClass = Class.forName((String) controllersConfiguration.get(
                             controllerItf.getName()));
-                Constructor controllerClassConstructor = controllerClass.getConstructor(new Class<?>[] {
+                Constructor<?> controllerClassConstructor = controllerClass.getConstructor(new Class<?>[] {
                             Component.class
                         });
                 currentController = (AbstractProActiveController) controllerClassConstructor.newInstance(new Object[] {
@@ -238,7 +238,7 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     /*
-     *implements  org.objectweb.fractal.api.Component#getFcInterface(String)}
+     * @see org.objectweb.fractal.api.Component#getFcInterface(String)
      */
     public Object getFcInterface(String interfaceName)
         throws NoSuchInterfaceException {
@@ -271,7 +271,7 @@ public class ProActiveComponentRepresentativeImpl
             InterfaceType itfType = Utils.getItfType(interfaceName, this);
             if ((itfType != null) && itfType.isFcCollectionItf()) {
                 try {
-                    //        				// generate the corresponding interface locally
+                    // generate the corresponding interface locally
                     Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
                                                                                          .generateFunctionalInterface(interfaceName,
                             this, (ProActiveInterfaceType) itfType);
@@ -280,11 +280,9 @@ public class ProActiveComponentRepresentativeImpl
                     // keep it in the list of functional interfaces
                     fcInterfaceReferences.put(interfaceName, interface_reference);
                     return interface_reference;
-                } catch (SecurityException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    logger.info("Could not generate " + interfaceName +
+                        " collection interface", e);
                 }
             }
         }
@@ -293,7 +291,7 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     /*
-     *implements  org.objectweb.fractal.api.Component#getFcInterfaces()}
+     *implements  org.objectweb.fractal.api.Component#getFcInterfaces()
      */
     public Object[] getFcInterfaces() {
         Interface[] nfInterfaces = nfInterfaceReferences.values()
@@ -310,14 +308,14 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     /*
-     *implements  org.objectweb.fractal.api.Component#getFcType()}
+     *implements  org.objectweb.fractal.api.Component#getFcType()
      */
     public Type getFcType() {
         return componentType;
     }
 
     /*
-     *implements  org.objectweb.proactive.core.mop.StubObject#getProxy()}
+     *implements  org.objectweb.proactive.core.mop.StubObject#getProxy()
      */
     public Proxy getProxy() {
         return proxy;
@@ -356,7 +354,7 @@ public class ProActiveComponentRepresentativeImpl
 
     /**
      *  The comparison of component references is actually a comparison of unique
-     * identifiers accross jvms.
+     * identifiers across jvms.
      */
     @Override
     public boolean equals(Object component) {
@@ -399,7 +397,7 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     /*
-     * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getReferenceOnBaseObject()}
+     * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getReferenceOnBaseObject()
      */
     public Object getReferenceOnBaseObject() {
         logger.error(
@@ -408,7 +406,7 @@ public class ProActiveComponentRepresentativeImpl
     }
 
     /*
-     * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()}
+     * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()
      */
     public ProActiveComponent getRepresentativeOnThis() {
         return this;

@@ -54,7 +54,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * where hierarchies can be quite complex and composite components distributed
  * over many different and remote sites.
  * <p>
- * The implementation of the shorcuts is based on tensioning : the first
+ * The implementation of the shortcuts is based on tensioning : the first
  * functional request on an interface goes all the way through possible
  * intermediate composite components, and when it reaches its final destination,
  * which is the primitive component that holds the business code for handling
