@@ -59,6 +59,9 @@ public enum ProProperties {
      */
     SECURITY_POLICY("java.security.policy", PAPropertiesType.STRING),
 
+    /** TODO  cdalmass Describe this property */
+    FRACTAL_PROVIDER("fractal.provider", PAPropertiesType.STRING),
+
     /* ------------------------------------
      *  PROACTIVE
      */
@@ -233,9 +236,6 @@ public enum ProProperties {
     /* ------------------------------------
      *  COMPONENTS
      */
-
-    /** TODO  cdalmass Describe this property */
-    PA_FRACTAL_PROVIDER("fractal.provider", PAPropertiesType.STRING),
 
     /** TODO  cdalmass Describe this property */
     PA_COMPONENT_CREATION_TIMEOUT("components.creation.timeout",

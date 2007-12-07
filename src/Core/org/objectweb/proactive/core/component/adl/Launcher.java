@@ -99,7 +99,7 @@ public class Launcher {
         } else {
             Factory f;
             if ("org.objectweb.proactive.core.component.Fractive".equals(
-                        ProProperties.PA_FRACTAL_PROVIDER.getValue())) {
+                        ProProperties.FRACTAL_PROVIDER.getValue())) {
                 // return the ProActive factory as defined in
                 // org.objectweb.proactive.core.component.adl.FactoryFactory
                 f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
