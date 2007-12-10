@@ -34,9 +34,9 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.List;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAVersion;
 import org.objectweb.proactive.benchmarks.timit.result.BasicResultWriter;
 import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalService;
 
@@ -149,7 +149,7 @@ public class TimItBasicReductor implements ProActiveInternalObject {
             filename = buildFilename();
             TimItBasicManager.getInstance().setReductorNull();
 
-            // If no shutdown hooks have been added fire stats 
+            // If no shutdown hooks have been added fire stats
             if (TimItBasicConfigurator.FIRE_STATISTICS_AFTER_REDUCTION) {
                 this.generateAllStatistics();
             }
@@ -280,7 +280,7 @@ public class TimItBasicReductor implements ProActiveInternalObject {
      */
     public static final String getShortProActiveVersion() {
         String result = "";
-        String paVersion = ProActive.getProActiveVersion();
+        String paVersion = PAVersion.getProActiveVersion();
         if ((paVersion != null) && !"".equals(paVersion)) {
             String[] temp = paVersion.split(" ");
             result += temp[2];

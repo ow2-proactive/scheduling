@@ -35,9 +35,9 @@ import java.io.Serializable;
 import javax.management.MBeanServer;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAVersion;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.node.NodeException;
@@ -58,7 +58,7 @@ public class ProActiveServerImpl implements Serializable,
      * @return
      */
     public String getVersion() {
-        return ProActive.getProActiveVersion();
+        return PAVersion.getProActiveVersion();
     }
 
     /**

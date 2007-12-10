@@ -32,6 +32,7 @@ package org.objectweb.proactive;
 
 import java.net.UnknownHostException;
 
+import org.objectweb.proactive.api.PAVersion;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.URIBuilder;
 
@@ -49,7 +50,7 @@ public class Main {
 
     public static void main(String[] args) {
         System.out.println("\t\t--------------------");
-        System.out.println("\t\tProActive " + ProActive.getProActiveVersion());
+        System.out.println("\t\tProActive " + PAVersion.getProActiveVersion());
         System.out.println("\t\t--------------------");
         System.out.println();
         System.out.println();

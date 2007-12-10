@@ -39,7 +39,7 @@ import java.util.List;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.objectweb.proactive.ProActive;
+import org.objectweb.proactive.api.PAVersion;
 import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
@@ -134,7 +134,7 @@ public class BasicResultWriter {
                 otherInformation));
         // Set the proActiveVersion values as an attribute value
         rootElement.setAttribute(new Attribute("proActiveVersion",
-                ProActive.getProActiveVersion()));
+                PAVersion.getProActiveVersion()));
         // Create the timers element
         Element timersElement = new Element("timers");
         rootElement.addContent(timersElement);
@@ -242,7 +242,7 @@ public class BasicResultWriter {
         // Set the number of startStopCoupleCount value
         newTimerElement.setAttribute(new Attribute("startStopCoupleCount",
                 "" + currentTimer.getStartStopCoupleCount()));
-        // Set the temporary parent name 
+        // Set the temporary parent name
         newTimerElement.setAttribute(new Attribute("parentId",
                 ((currentTimer.getParent() == null) ? ""
                                                     : ("" +
