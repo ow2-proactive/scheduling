@@ -326,7 +326,7 @@ public class RuleTab extends UpdatableTab {
     }
 
     private Button createCheckAoCreation(Composite parent) {
-        this.aoCreationCheck = this.toolkit.createButton(parent, "AOCreation",
+        this.aoCreationCheck = this.toolkit.createButton(parent, "Can create Active Object ?",
                 SWT.CHECK);
         this.aoCreationCheck.addSelectionListener(new SelectionAdapter() {
                 @Override
@@ -342,7 +342,7 @@ public class RuleTab extends UpdatableTab {
     }
 
     private Button createCheckMigration(Composite parent) {
-        this.migrationCheck = this.toolkit.createButton(parent, "Migration",
+        this.migrationCheck = this.toolkit.createButton(parent, "Is Migration authorized ?",
                 SWT.CHECK);
         this.migrationCheck.addSelectionListener(new SelectionAdapter() {
                 @Override
