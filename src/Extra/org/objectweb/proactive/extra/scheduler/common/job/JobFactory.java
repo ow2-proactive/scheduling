@@ -78,7 +78,7 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SimpleScript;
 import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
 import org.objectweb.proactive.extra.scheduler.common.task.NativeTask;
 import org.objectweb.proactive.extra.scheduler.common.task.ProActiveTask;
-import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
+import org.objectweb.proactive.extra.scheduler.common.task.ResultPreview;
 import org.objectweb.proactive.extra.scheduler.common.task.Task;
 import org.objectweb.proactive.extra.scheduler.common.task.executable.JavaExecutable;
 import org.objectweb.proactive.extra.scheduler.common.task.executable.ProActiveExecutable;
@@ -383,7 +383,7 @@ public class JobFactory {
                 taskNode, XPathConstants.STRING);
         if (!descriptorClassName.equals("")) {
             System.out.println("Descriptor class = " + descriptorClassName);
-            Class<?extends ResultDescriptor> descriptorClass = (Class<?extends ResultDescriptor>) Class.forName(descriptorClassName);
+            Class<?extends ResultPreview> descriptorClass = (Class<?extends ResultPreview>) Class.forName(descriptorClassName);
             task.setResultDescriptor(descriptorClass);
         }
 

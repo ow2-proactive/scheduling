@@ -86,11 +86,11 @@ public interface TaskResult extends Serializable {
     public TaskLogs getOuput();
 
     /**
-     * Set the class that is able to describe this result. See ResultDescriptor.
+     * Set the class that is able to describe this result. See ResultPreview.
      *
      * @param descClass the class that is able to describe this result.
      */
-    public void setDescriptorClass(Class<?extends ResultDescriptor> descClass);
+    public void setDescriptorClass(Class<?extends ResultPreview> descClass);
 
     /**
      * Return a swing panel describing this result.

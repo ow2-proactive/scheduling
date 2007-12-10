@@ -69,7 +69,7 @@ public abstract class Task implements Serializable {
     protected String description;
 
     /** Description of the result of the task */
-    protected Class<?extends ResultDescriptor> resultDescriptor;
+    protected Class<?extends ResultPreview> resultDescriptor;
 
     /**
      * selection script : can be launched before getting a node in order to
@@ -157,7 +157,7 @@ public abstract class Task implements Serializable {
      *
      * @return the result descriptor of this task.
      */
-    public Class<?extends ResultDescriptor> getResultDescriptor() {
+    public Class<?extends ResultPreview> getResultDescriptor() {
         return resultDescriptor;
     }
 
@@ -168,7 +168,7 @@ public abstract class Task implements Serializable {
      *            the result descriptor  to set.
      */
     public void setResultDescriptor(
-        Class<?extends ResultDescriptor> resultDescriptor) {
+        Class<?extends ResultPreview> resultDescriptor) {
         this.resultDescriptor = resultDescriptor;
     }
 

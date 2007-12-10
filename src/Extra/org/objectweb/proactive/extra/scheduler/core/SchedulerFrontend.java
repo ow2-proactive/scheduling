@@ -66,7 +66,7 @@ import org.objectweb.proactive.extra.scheduler.job.InternalJobFactory;
 import org.objectweb.proactive.extra.scheduler.job.JobDescriptor;
 import org.objectweb.proactive.extra.scheduler.job.UserIdentification;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
-import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
+import org.objectweb.proactive.extra.scheduler.resourcemanager.ResourceManagerProxy;
 import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 
 
@@ -97,7 +97,7 @@ public class SchedulerFrontend implements InitActive,
     private HashMap<UniqueID, UserIdentification> identifications = new HashMap<UniqueID, UserIdentification>();
 
     /** Implementation of Resource Manager */
-    private transient InfrastructureManagerProxy resourceManager;
+    private transient ResourceManagerProxy resourceManager;
 
     /** Authentication Interface */
     private SchedulerAuthentication authenticationInterface;
@@ -139,7 +139,7 @@ public class SchedulerFrontend implements InitActive,
      * @throws NodeException
      * @throws ActiveObjectCreationException
      */
-    public SchedulerFrontend(InfrastructureManagerProxy imp,
+    public SchedulerFrontend(ResourceManagerProxy imp,
         String policyFullClassName)
         throws ActiveObjectCreationException, NodeException {
         logger.info("Creating scheduler core...");

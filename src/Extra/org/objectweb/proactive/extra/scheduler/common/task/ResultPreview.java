@@ -44,7 +44,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @since 3.9
  */
 @PublicAPI
-public abstract class ResultDescriptor implements Serializable {
+public abstract class ResultPreview implements Serializable {
 
     /**
      * Create a textual representation of the result.

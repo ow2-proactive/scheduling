@@ -60,9 +60,9 @@ import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.logforwarder.BufferedAppender;
 import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
+import org.objectweb.proactive.extra.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extra.scheduler.common.job.Job;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
@@ -87,7 +87,7 @@ import org.objectweb.proactive.extra.scheduler.job.JobDescriptor;
 import org.objectweb.proactive.extra.scheduler.job.JobResultImpl;
 import org.objectweb.proactive.extra.scheduler.job.TaskDescriptor;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
-import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
+import org.objectweb.proactive.extra.scheduler.resourcemanager.ResourceManagerProxy;
 import org.objectweb.proactive.extra.scheduler.task.ProActiveTaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extra.scheduler.task.TaskResultImpl;
@@ -125,8 +125,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     /** Selected port for connection logger system */
     private int port;
 
-    /** Implementation of Infrastructure Manager */
-    private InfrastructureManagerProxy resourceManager;
+    /** Implementation of Resource Manager */
+    private ResourceManagerProxy resourceManager;
 
     /** Scheduler front-end. */
     private SchedulerFrontend frontend;
@@ -166,8 +166,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
      *
      * @param imp the resource manager on which the scheduler will interact.
      */
-    public SchedulerCore(InfrastructureManagerProxy imp,
-        SchedulerFrontend frontend, String policyFullName) {
+    public SchedulerCore(ResourceManagerProxy imp, SchedulerFrontend frontend,
+        String policyFullName) {
         try {
             this.resourceManager = imp;
             this.frontend = frontend;

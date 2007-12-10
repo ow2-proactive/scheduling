@@ -48,12 +48,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Static util methods for result descriptor definition
+ * Static util methods for result preview definition
  * @author cdelbe
  * @since ProActive 3.9
  */
 @PublicAPI
-public class ResultDescriptorTool {
+public class ResultPreviewTool {
 
     /**
      * Name of the environment variable for windows home directory
@@ -77,12 +77,12 @@ public class ResultDescriptorTool {
         String winHome = System.getenv(WINDOWS_HOME_ENV_VAR);
         String unixHome = System.getenv(UNIX_HOME_ENV_VAR);
 
-        System.out.println("[RESULT_DESCRIPTOR] WINHOME: [" + winHome + "]");
-        System.out.println("[RESULT_DESCRIPTOR] UNIXHOME: [" + unixHome + "]");
+        System.out.println("[RESULT_PREVIEW] WINHOME: [" + winHome + "]");
+        System.out.println("[RESULT_PREVIEW] UNIXHOME: [" + unixHome + "]");
 
         if ((winHome == null) || (unixHome == null)) {
             System.err.println(
-                "[RESULT_DESCRIPTOR] Warning : home directories variables are not set !");
+                "[RESULT_PREVIEW] Warning : home directories variables are not set !");
             return path;
         }
 

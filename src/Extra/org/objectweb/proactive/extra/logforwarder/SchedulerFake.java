@@ -42,9 +42,9 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.core.IMCoreInterface;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.resourcemanager.core.RMCoreInterface;
+import org.objectweb.proactive.extra.resourcemanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.resourcemanager.frontend.RMUser;
 
 
 public class SchedulerFake {
@@ -82,11 +82,11 @@ public class SchedulerFake {
         //            // TODO Auto-generated catch block
         //            e1.printStackTrace();
         //        }
-        IMUser imu = null;
+        RMUser imu = null;
         NodeSet nodes = null;
 
         try {
-            IMCoreInterface imc = (IMCoreInterface) (PAActiveObject.lookupActive(IMCoreInterface.class.getName(),
+            RMCoreInterface imc = (RMCoreInterface) (PAActiveObject.lookupActive(RMCoreInterface.class.getName(),
                     "//localhost/IMCORE"));
             imu = imc.getUser();
 

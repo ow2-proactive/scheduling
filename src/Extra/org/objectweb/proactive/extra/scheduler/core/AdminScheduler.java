@@ -45,7 +45,7 @@ import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthent
 import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extra.scheduler.exception.AdminSchedulerException;
 import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
-import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
+import org.objectweb.proactive.extra.scheduler.resourcemanager.ResourceManagerProxy;
 
 
 /**
@@ -82,7 +82,7 @@ public class AdminScheduler extends UserScheduler
      * @param policyFullClassName the full policy class name for the scheduler.
      */
     public static void createScheduler(String loginFile, String groupFile,
-        InfrastructureManagerProxy rm, String policyFullClassName)
+        ResourceManagerProxy rm, String policyFullClassName)
         throws AdminSchedulerException {
         logger.info(
             "********************* STARTING NEW SCHEDULER *******************");
@@ -168,7 +168,7 @@ public class AdminScheduler extends UserScheduler
      */
     public static AdminSchedulerInterface createScheduler(String loginFile,
         String groupFile, String login, String password,
-        InfrastructureManagerProxy rm, String policyFullClassName)
+        ResourceManagerProxy rm, String policyFullClassName)
         throws AdminSchedulerException, SchedulerException, LoginException {
         createScheduler(loginFile, groupFile, rm, policyFullClassName);
 

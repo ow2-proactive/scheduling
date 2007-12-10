@@ -38,10 +38,10 @@ import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
+import org.objectweb.proactive.extra.resourcemanager.RMFactory;
+import org.objectweb.proactive.extra.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extra.scheduler.core.AdminScheduler;
-import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
+import org.objectweb.proactive.extra.scheduler.resourcemanager.ResourceManagerProxy;
 
 
 /**
@@ -55,16 +55,16 @@ import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureMan
 public class LocalSchedulerExample {
     //shows how to run the scheduler
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
-    private static IMAdmin admin;
+    private static RMAdmin admin;
 
     public static void main(String[] args) {
         //get the path of the file
-        InfrastructureManagerProxy imp = null;
+        ResourceManagerProxy imp = null;
 
         try {
             if (args.length > 0) {
                 try {
-                    imp = InfrastructureManagerProxy.getProxy(new URI(args[0]));
+                    imp = ResourceManagerProxy.getProxy(new URI(args[0]));
 
                     logger.info("[SCHEDULER] Connect to ResourceManager on " +
                         args[0]);
@@ -73,8 +73,8 @@ public class LocalSchedulerExample {
                         args[0]);
                 }
             } else {
-                IMFactory.startLocal();
-                admin = IMFactory.getAdmin();
+                RMFactory.startLocal();
+                admin = RMFactory.getAdmin();
                 logger.info(
                     "[SCHEDULER] Start local Resource Manager with 4 local nodes.");
                 try {
@@ -97,8 +97,7 @@ public class LocalSchedulerExample {
                 //                            }
                 //                        }
                 //                    });
-                imp = InfrastructureManagerProxy.getProxy(new URI(
-                            "rmi://localhost:" +
+                imp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
                             System.getProperty("proactive.rmi.port") + "/"));
 
                 logger.info("ResourceManager created on " +

@@ -34,7 +34,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;

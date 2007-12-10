@@ -32,11 +32,11 @@ package org.objectweb.proactive.extra.scheduler.task;
 
 import javax.swing.JPanel;
 
-import org.objectweb.proactive.extra.scheduler.common.task.ResultDescriptor;
+import org.objectweb.proactive.extra.scheduler.common.task.ResultPreview;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
+import org.objectweb.proactive.extra.scheduler.common.task.util.ResultPreviewTool.SimpleTextPanel;
 
 
 /**
@@ -67,8 +67,8 @@ public class TaskResultImpl implements TaskResult {
     private TaskLogs output = null;
 
     /** Description definition of this result */
-    private Class<?extends ResultDescriptor> descriptorClass = null;
-    private transient ResultDescriptor descriptor = null;
+    private Class<?extends ResultPreview> descriptorClass = null;
+    private transient ResultPreview descriptor = null;
 
     /** ProActive empty constructor. */
     public TaskResultImpl() {
@@ -140,7 +140,7 @@ public class TaskResultImpl implements TaskResult {
     /**
      *  @see org.objectweb.proactive.extra.scheduler.common.task.TaskResult#setDescriptorClass(Class)
      */
-    public void setDescriptorClass(Class<?extends ResultDescriptor> descClass) {
+    public void setDescriptorClass(Class<?extends ResultPreview> descClass) {
         if (this.descriptorClass != null) {
             throw new RuntimeException("Descriptor class cannot be changed");
         } else {

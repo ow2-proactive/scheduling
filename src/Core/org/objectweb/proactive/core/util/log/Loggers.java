@@ -149,17 +149,17 @@ public interface Loggers {
     static final public String RESOURCE_MANAGER = CORE + ".resourceManager";
 
     // Infrastructure Manager loggers
-    static final public String IM = CORE + ".im";
-    static final public String IM_FACTORY = IM + ".factory";
-    static final public String IM_CORE = IM + ".core";
-    static final public String IM_ADMIN = IM + ".admin";
-    static final public String IM_MONITORING = IM + ".monitoring";
-    static final public String IM_USER = IM + ".user";
-    static final public String IM_DEPLOYMENT_FACTORY = IM + ".deployfactory";
-    static final public String IM_DEPLOY = IM_DEPLOYMENT_FACTORY + ".deploy";
-    static final public String IM_DATARESOURCE = IM + ".dataresource";
-    static final public String IM_TEST = IM + ".test";
-    static final public String IM_ACTIVITY_NODES = IM + ".activitynodes";
+    static final public String RM = CORE + ".rm";
+    static final public String RM_FACTORY = RM + ".factory";
+    static final public String RM_CORE = RM + ".core";
+    static final public String RM_ADMIN = RM + ".admin";
+    static final public String RM_MONITORING = RM + ".monitoring";
+    static final public String RM_USER = RM + ".user";
+    static final public String RM_DEPLOYMENT_FACTORY = RM + ".deployfactory";
+    static final public String RM_DEPLOY = RM_DEPLOYMENT_FACTORY + ".deploy";
+    static final public String RM_DATARESOURCE = RM + ".dataresource";
+    static final public String RM_TEST = RM + ".test";
+    static final public String RM_ACTIVITY_NODES = RM + ".activitynodes";
 
     //  Master Worker loggers
     static final public String MASTERWORKER = CORE + ".masterworker";

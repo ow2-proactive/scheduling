@@ -51,12 +51,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
-import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
-import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMConnection;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMMonitoring;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMUser;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.resourcemanager.common.RMConstants;
+import org.objectweb.proactive.extra.resourcemanager.exception.RMException;
+import org.objectweb.proactive.extra.resourcemanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.resourcemanager.frontend.RMConnection;
+import org.objectweb.proactive.extra.resourcemanager.frontend.RMMonitoring;
+import org.objectweb.proactive.extra.resourcemanager.frontend.RMUser;
 import org.objectweb.proactive.extra.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptHandler;
 import org.objectweb.proactive.extra.scheduler.common.scripting.ScriptLoader;
@@ -65,8 +65,8 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
 
 
 /**
- * The Infrastructure Manager Proxy provides an interface with the
- * Infrastructure Manager. It combines the IMMonitoring and IMUser interface,
+ * The Resource Manager Proxy provides an interface with the
+ * Resource Manager. It combines the RMMonitoring and RMUser interface,
  * and adds the Post Scripting management.
  *
  *
@@ -74,17 +74,16 @@ import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
  * @version 1.0, Jun 15, 2007
  * @since ProActive 3.2
  */
-public class InfrastructureManagerProxy implements InitActive, RunActive,
-    IMConstants {
+public class ResourceManagerProxy implements InitActive, RunActive, RMConstants {
     private static final long VERIF_TIMEOUT = 10000;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
-    private IMMonitoring monitoring;
-    private IMUser user;
+    private RMMonitoring monitoring;
+    private RMUser user;
     private HashMap<Node, ScriptResult<?>> nodes;
     private boolean running = true;
 
     /** ProActive no Args constructor **/
-    public InfrastructureManagerProxy() {
+    public ResourceManagerProxy() {
     } //proactive no arg constructor
 
     /** IMProxy constructor.
@@ -92,7 +91,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
      * @param monitoring the Monitoring interface
      * @param user the User interface
      */
-    public InfrastructureManagerProxy(IMMonitoring monitoring, IMUser user) {
+    public ResourceManagerProxy(RMMonitoring monitoring, RMUser user) {
         this.monitoring = monitoring;
         this.user = user;
     }
@@ -107,20 +106,20 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
      * @throws IOException
      * @throws NodeException
      */
-    public static InfrastructureManagerProxy getProxy(URI uriIM)
+    public static ResourceManagerProxy getProxy(URI uriIM)
         throws ActiveObjectCreationException, IOException, NodeException {
         try {
             String url = uriIM.toString();
             if (!url.endsWith("/")) {
                 url += "/";
             }
-            IMUser user = IMConnection.connectAsUser(url +
-                    NAME_ACTIVE_OBJECT_IMUSER);
-            IMMonitoring monitor = IMConnection.connectAsMonitor(url +
-                    NAME_ACTIVE_OBJECT_IMMONITORING);
-            return (InfrastructureManagerProxy) PAActiveObject.newActive(InfrastructureManagerProxy.class.getCanonicalName(),
+            RMUser user = RMConnection.connectAsUser(url +
+                    NAME_ACTIVE_OBJECT_RMUSER);
+            RMMonitoring monitor = RMConnection.connectAsMonitor(url +
+                    NAME_ACTIVE_OBJECT_RMMONITORING);
+            return (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class.getCanonicalName(),
                 new Object[] { monitor, user });
-        } catch (IMException e) {
+        } catch (RMException e) {
             throw new ActiveObjectCreationException(e);
         }
     }
@@ -133,7 +132,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
     // FREE NODES *********************************************
     /**
      * Simply free a Node
-     * @see IMUser#freeNode(Node)
+     * @see RMUser#freeNode(Node)
      *
      * @param node
      */
@@ -147,7 +146,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
 
     /**
      * Execute the postScript on the node before freeing it.
-     * @see IMUser#freeNode(Node)
+     * @see RMUser#freeNode(Node)
      *
      * @param node
      * @param postScript
@@ -182,7 +181,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
 
     /**
      * Simply free a NodeSet
-     * @see IMUser#freeNodes(NodeSet)
+     * @see RMUser#freeNodes(NodeSet)
      *
      * @param nodes
      */
@@ -196,7 +195,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
 
     /**
      * Execute the postScript on the nodes before freeing them.
-     * @see IMUser#freeNodes(NodeSet)
+     * @see RMUser#freeNodes(NodeSet)
      *
      * @param nodes
      * @param postScript
@@ -261,7 +260,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
             running = false;
 
             if (logger.isInfoEnabled()) {
-                logger.info("IM Proxy Stopped");
+                logger.info("RM Proxy Stopped");
             }
         }
     }

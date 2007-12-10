@@ -35,17 +35,16 @@ import java.net.URI;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
-import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.resourcemanager.frontend.NodeSet;
+import org.objectweb.proactive.extra.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extra.scheduler.common.scripting.SelectionScript;
-import org.objectweb.proactive.extra.scheduler.resourcemanager.InfrastructureManagerProxy;
+import org.objectweb.proactive.extra.scheduler.resourcemanager.ResourceManagerProxy;
 
 
 public class TestIMProxy {
-    private IMAdmin admin = null;
-    private InfrastructureManagerProxy proxy = null;
+    private RMAdmin admin = null;
+    private ResourceManagerProxy proxy = null;
 
     protected void setUp() throws Exception {
         // Creating Infrastructure Manager
@@ -61,8 +60,7 @@ public class TestIMProxy {
         // Launching IMProxy
         System.err.println("Launching Infrastructure Manager Proxy");
 
-        proxy = InfrastructureManagerProxy.getProxy(new URI(
-                    "rmi://localhost:1099/"));
+        proxy = ResourceManagerProxy.getProxy(new URI("rmi://localhost:1099/"));
 
         System.err.println("Starting tests");
     }
@@ -141,9 +139,9 @@ public class TestIMProxy {
         System.err.println("Stopping test :");
         System.err.println("-> Stopping Proxy:");
         proxy.shutdownProxy();
-        //		System.err.println("-> Stopping IM :");
+        //		System.err.println("-> Stopping RM :");
         //		admin.shutdown();
-        PALifeCycle.exitSuccess();
+        ProActive.exitSuccess();
     }
 
     public static void main(String[] args) throws Exception {
