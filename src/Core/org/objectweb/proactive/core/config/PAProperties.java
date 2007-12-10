@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.config;
 
+import java.net.Socket;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.filetransfer.FileTransferService;
@@ -206,7 +208,12 @@ public enum PAProperties {
      */
     PA_NOPRIVATE("proactive.noprivate", PAPropertiesType.BOOLEAN),
 
-    /** TODO cmathieu Describe this property */
+    /**
+     * RMI/SSH black voodoo
+     *
+     * Can be used to fix broken networks (multihomed, broken DNS etc.). You probably want
+     * to post on the public ProActive mailing list before using this property.
+     */
     PA_SECONDARYNAMES("proactive.secondaryNames", PAPropertiesType.STRING),
     SCHEMA_VALIDATION("schema.validation", PAPropertiesType.BOOLEAN),
 
@@ -311,11 +318,22 @@ public enum PAProperties {
     PA_SSH_TUNNELING_KNOW_HOSTS("proactive.ssh.known_hosts",
         PAPropertiesType.STRING),
 
-    /** TODO cmathieu Describe this property */
+    /**
+     * SSH Tunnel connect timeout, in ms
+     *
+     * The timeout to be used when a SSH Tunnel is opened. 0 is interpreted
+     * as an infinite timeout.
+     *
+     * @see Socket
+     */
     PA_SSH_TUNNELING_CONNECT_TIMEOUT("proactive.tunneling.connect_timeout",
         PAPropertiesType.INTEGER),
 
-    /** TODO cmathieu Describe this property */
+    /**
+     * username on remote machines
+     *
+     * If not specified the local username is used.
+     */
     PA_SSH_USERNAME("proactive.ssh.username", PAPropertiesType.STRING),
 
     /* ------------------------------------
