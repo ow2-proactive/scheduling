@@ -42,9 +42,9 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
-import org.objectweb.proactive.extra.resourcemanager.core.RMCoreInterface;
-import org.objectweb.proactive.extra.resourcemanager.frontend.NodeSet;
-import org.objectweb.proactive.extra.resourcemanager.frontend.RMUser;
+import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface;
+import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
+import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 
 
 public class SchedulerFake {

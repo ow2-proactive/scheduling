@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composite;
+package org.objectweb.proactive.extensions.scheduler.gui.composite;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -37,9 +37,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.objectweb.proactive.extra.scheduler.gui.Colors;
-import org.objectweb.proactive.extra.scheduler.gui.data.EventSchedulerListener;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.Colors;
+import org.objectweb.proactive.extensions.scheduler.gui.data.EventSchedulerListener;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
 
 
 /**

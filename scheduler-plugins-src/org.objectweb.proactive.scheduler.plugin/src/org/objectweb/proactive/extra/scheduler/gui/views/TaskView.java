@@ -28,19 +28,19 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.views;
+package org.objectweb.proactive.extensions.scheduler.gui.views;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.gui.composite.TaskComposite;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.TaskComposite;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
 
 /**
@@ -53,7 +53,7 @@ import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
 public class TaskView extends ViewPart {
 
     /** the view part id */
-    public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.views.TaskView";
+    public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.views.TaskView";
 
     // the shared instance
     private static TaskView instance = null;

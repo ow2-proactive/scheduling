@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.dialog;
+package org.objectweb.proactive.extensions.scheduler.gui.dialog;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -59,7 +59,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 
 
 /**

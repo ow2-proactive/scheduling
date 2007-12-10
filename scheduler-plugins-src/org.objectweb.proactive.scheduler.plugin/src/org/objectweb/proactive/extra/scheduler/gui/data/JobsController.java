@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.data;
 
 import java.util.Collections;
 import java.util.Vector;
@@ -37,41 +37,41 @@ import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobState;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerState;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillRemoveJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PauseSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.ResumeSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.ShutdownSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.StartStopSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.composite.AbstractJobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.TaskComposite;
-import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
-import org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview;
-import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
-import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.job.InternalTaskFlowJob;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerInitialState;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerState;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.FreezeSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.KillSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighestJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ResumeSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ShutdownSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.StartStopSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.SubmitJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.AbstractJobComposite;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.TaskComposite;
+import org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
+import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
+import org.objectweb.proactive.extensions.scheduler.gui.views.TaskView;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.job.InternalTaskFlowJob;
+import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
 
 /**
@@ -246,7 +246,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     // ---------------- implements SchedulerEventListener ----------------- //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
+     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
      */
     @Override
     public void jobSubmittedEvent(InternalJob job) {
@@ -264,7 +264,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
     public void jobPendingToRunningEvent(JobEvent event) {
@@ -306,7 +306,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
     public void jobRunningToFinishedEvent(JobEvent event) {
@@ -348,7 +348,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
     public void jobRemoveFinishedEvent(JobEvent event) {
@@ -379,7 +379,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
     @Override
     public void taskPendingToRunningEvent(TaskEvent event) {
@@ -415,7 +415,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
     @Override
     public void taskRunningToFinishedEvent(TaskEvent event) {
@@ -586,7 +586,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
     @Override
     public void schedulerImmediatePausedEvent() {
@@ -600,7 +600,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
     @Override
     public void schedulerPausedEvent() {
@@ -614,7 +614,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
     @Override
     public void schedulerResumedEvent() {
@@ -628,7 +628,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerShutDownEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerShutDownEvent()
      */
     @Override
     public void schedulerShutDownEvent() {
@@ -644,7 +644,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerShuttingDownEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerShuttingDownEvent()
      */
     @Override
     public void schedulerShuttingDownEvent() {
@@ -658,7 +658,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent()
      */
     @Override
     public void schedulerStartedEvent() {
@@ -674,7 +674,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent()
      */
     @Override
     public void schedulerStoppedEvent() {
@@ -690,7 +690,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent()
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent()
      */
     @Override
     public void schedulerKilledEvent() {
@@ -727,7 +727,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#jobKilledEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobKilledEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     @Override
     public void jobKilledEvent(JobId jobId) {
@@ -768,7 +768,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#jobPausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobPausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
     public void jobPausedEvent(JobEvent event) {
@@ -794,7 +794,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#jobResumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobResumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
     public void jobResumedEvent(JobEvent event) {
@@ -820,7 +820,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
     @Override
     public void jobChangePriorityEvent(JobEvent event) {

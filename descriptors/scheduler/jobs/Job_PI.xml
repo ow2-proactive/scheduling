@@ -8,7 +8,7 @@
 	<taskFlow>
 		<task name="Computation1">
 			<description>Compute Pi and return it</description>
-			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.MonteCarlo">
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>
@@ -17,7 +17,7 @@
 		</task>
 		<task name="Computation2">
 			<description>Compute Pi and return it</description>
-			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.MonteCarlo">
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>
@@ -26,7 +26,7 @@
 		</task>
 		<task name="Computation3">
 			<description>Compute Pi and return it</description>
-			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.MonteCarlo">
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>
@@ -35,7 +35,7 @@
 		</task>
 		<task name="Computation4">
 			<description>Compute Pi and return it</description>
-			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.MonteCarlo">
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>
@@ -44,7 +44,7 @@
 		</task>
 		<task name="Computation5">
 			<description>Compute Pi and return it</description>
-			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.MonteCarlo">
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>
@@ -53,7 +53,7 @@
 		</task>
 		<task name="Computation6">
 			<description>Compute Pi and return it</description>
-			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.MonteCarlo">
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarlo">
 				<parameters>
 					<parameter name="steps" value="20"/>
 					<parameter name="iterations" value="100000000"/>
@@ -68,7 +68,7 @@
 				<task ref="Computation3"/>
 			</depends>
 			<javaExecutable
-				class="org.objectweb.proactive.extra.scheduler.examples.MonteCarloAverage"/>
+				class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarloAverage"/>
 		</task>
 		<task name="Average2">
 			<description>Do the average of 4 5 6 and return it.</description>
@@ -78,7 +78,7 @@
 				<task ref="Computation6"/>
 			</depends>
 			<javaExecutable
-				class="org.objectweb.proactive.extra.scheduler.examples.MonteCarloAverage"/>
+				class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarloAverage"/>
 
 		</task>
 		<task name="LastAverage" preciousResult="true">
@@ -89,7 +89,7 @@
 				<task ref="Average2"/>
 			</depends>
 			<javaExecutable
-				class="org.objectweb.proactive.extra.scheduler.examples.MonteCarloAverage"/>
+				class="org.objectweb.proactive.extensions.scheduler.examples.MonteCarloAverage"/>
 
 		</task>
 	</taskFlow>

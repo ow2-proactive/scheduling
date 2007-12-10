@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.views;
+package org.objectweb.proactive.extensions.scheduler.gui.views;
 
 import java.awt.Frame;
 
@@ -39,7 +39,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
+import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 
 
 /**
@@ -48,7 +48,7 @@ import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptor
 public class ResultPreview extends ViewPart {
 
     /** an id */
-    public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview";
+    public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview";
 
     // The shared instance
     private static Composite parent = null;

@@ -6,7 +6,7 @@
 	<variables>
 		<variable name="HOME" value="/user/fviale/home"/>
 		<variable name="PROACTIVE" value="${HOME}/eclipse_workspace/ProActive_Latest/"/>
-		<variable name="EXAMPLES" value="${PROACTIVE}/src/Extra/org/objectweb/proactive/extra/scheduler/examples"/>
+		<variable name="EXAMPLES" value="${PROACTIVE}/src/Extra/org.objectweb.proactive.extensions.scheduler/examples"/>
 	</variables>
 	<taskFlow>
 		<task name="task1">
@@ -43,7 +43,7 @@
 			<depends>
 				<task ref="task1"/>
 			</depends>
-			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.WaitAndPrint">
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="15"/>
 					<parameter name="number" value="3"/>

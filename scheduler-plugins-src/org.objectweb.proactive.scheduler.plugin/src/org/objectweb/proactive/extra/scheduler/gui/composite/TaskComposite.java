@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composite;
+package org.objectweb.proactive.extensions.scheduler.gui.composite;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -55,18 +55,18 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskId;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskState;
-import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
-import org.objectweb.proactive.extra.scheduler.gui.Colors;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
-import org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.task.internal.InternalTask;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.Tools;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskId;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskState;
+import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
+import org.objectweb.proactive.extensions.scheduler.gui.Colors;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
 
 
 /**

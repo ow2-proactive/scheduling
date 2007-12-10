@@ -47,18 +47,18 @@ import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.exceptions.TaskException;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
-import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.common.job.Job;
-import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEvent;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskEvent;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extensions.scheduler.common.job.Job;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 public class AOJobListener implements SchedulerEventListener, InitActive {

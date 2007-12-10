@@ -11,7 +11,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="input" value="in=[1 0 3 -2 5 1];"/>
                     <parameter name="script" value="out=roots(in);"/>
@@ -25,7 +25,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="input" value="in=[1 0 3 -2 5 2];"/>
                     <parameter name="script" value="out=roots(in);"/>
@@ -39,7 +39,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="input" value="in=[1 0 3 -2 5 3];"/>
                     <parameter name="script" value="out=roots(in);"/>
@@ -53,7 +53,7 @@
                     <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
                 </script>
             </selection>
-            <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
+            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
                 <parameters>
                     <parameter name="input" value="in=[1 0 3 -2 5 4];"/>
                     <parameter name="script" value="out=roots(in);"/>

@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.data;
 
 import java.util.Vector;
 
@@ -38,10 +38,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
-import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extensions.scheduler.gui.views.TaskView;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 /**

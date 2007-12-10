@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composite;
+package org.objectweb.proactive.extensions.scheduler.gui.composite;
 
 import java.util.Vector;
 
@@ -52,27 +52,27 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobState;
-import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
-import org.objectweb.proactive.extra.scheduler.gui.Colors;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillRemoveJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
-import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
-import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
-import org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview;
-import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
+import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
+import org.objectweb.proactive.extensions.scheduler.gui.Colors;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighestJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsOutputController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
+import org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
+import org.objectweb.proactive.extensions.scheduler.gui.views.TaskView;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 /**

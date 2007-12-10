@@ -16,7 +16,7 @@ echo $JAVACMD
 
 yjp=-agentlib:yjpagent
 
-$JAVACMD -Xmx512m -Xms512m org.objectweb.proactive.extra.scheduler.examples.LocalSchedulerExample $RM
+$JAVACMD -Xmx512m -Xms512m org.objectweb.proactive.extensions.scheduler.examples.LocalSchedulerExample $RM
 
 echo
 

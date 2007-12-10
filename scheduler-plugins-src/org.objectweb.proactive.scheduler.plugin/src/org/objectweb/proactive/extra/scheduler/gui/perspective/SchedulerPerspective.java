@@ -28,16 +28,16 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.perspective;
+package org.objectweb.proactive.extensions.scheduler.gui.perspective;
 
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
-import org.objectweb.proactive.extra.scheduler.gui.views.JobInfo;
-import org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview;
-import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
-import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
+import org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo;
+import org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview;
+import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
+import org.objectweb.proactive.extensions.scheduler.gui.views.TaskView;
 
 
 /**
@@ -50,7 +50,7 @@ import org.objectweb.proactive.extra.scheduler.gui.views.TaskView;
 public class SchedulerPerspective implements IPerspectiveFactory {
 
     /** the id */
-    public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.perspective.SchedulerPerspective";
+    public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.perspective.SchedulerPerspective";
 
     /** Top folder's id. */
     public static final String ID_TOP_FOLDER = ID + ".topFolder";

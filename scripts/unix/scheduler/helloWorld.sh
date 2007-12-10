@@ -11,7 +11,7 @@ CLASSPATH=.
 
 echo $JAVACMD
 
-$JAVACMD org.objectweb.proactive.extra.scheduler.examples.SimpleHelloWorld
+$JAVACMD org.objectweb.proactive.extensions.scheduler.examples.SimpleHelloWorld
 
 echo
 

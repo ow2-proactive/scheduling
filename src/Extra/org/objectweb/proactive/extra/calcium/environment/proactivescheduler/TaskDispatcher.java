@@ -40,14 +40,14 @@ import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.AOTaskPool;
 import org.objectweb.proactive.extensions.calcium.exceptions.PanicException;
 import org.objectweb.proactive.extensions.calcium.task.Task;
-import org.objectweb.proactive.extra.scheduler.common.exception.UserException;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
-import org.objectweb.proactive.extra.scheduler.common.job.TaskFlowJob;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.common.task.JavaTask;
-import org.objectweb.proactive.extra.scheduler.common.task.executable.JavaExecutable;
+import org.objectweb.proactive.extensions.scheduler.common.exception.UserException;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extensions.scheduler.common.job.TaskFlowJob;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extensions.scheduler.common.task.JavaTask;
+import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 
 
 public class TaskDispatcher extends Thread {

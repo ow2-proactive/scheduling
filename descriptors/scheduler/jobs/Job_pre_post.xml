@@ -14,7 +14,7 @@
 					<file path="${HOME}/scripts/set.js"/>
 				</script>
 			</pre>
-			<javaExecutable class="org.objectweb.proactive.extra.scheduler.examples.PropertyTask"/>
+			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.PropertyTask"/>
 			<post>
 				<script>
 					<file path="${HOME}/scripts/unset.js"/>

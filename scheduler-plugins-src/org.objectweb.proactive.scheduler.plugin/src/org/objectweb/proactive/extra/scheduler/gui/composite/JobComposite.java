@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.composite;
+package org.objectweb.proactive.extensions.scheduler.gui.composite;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;

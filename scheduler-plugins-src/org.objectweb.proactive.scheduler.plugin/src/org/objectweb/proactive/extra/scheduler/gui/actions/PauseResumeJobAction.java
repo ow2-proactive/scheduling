@@ -28,16 +28,16 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.actions;
+package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.TableItem;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobState;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
-import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobState;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 
 
 /**

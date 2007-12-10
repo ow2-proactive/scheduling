@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.views;
+package org.objectweb.proactive.extensions.scheduler.gui.views;
 
 import java.util.Vector;
 
@@ -39,11 +39,11 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.Tools;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.Tools;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
 
 
 /**
@@ -56,7 +56,7 @@ import org.objectweb.proactive.extra.scheduler.job.InternalJob;
 public class JobInfo extends ViewPart {
 
     /** an id */
-    public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.views.JobInfo";
+    public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo";
 
     // The shared instance
     private static JobInfo instance = null;

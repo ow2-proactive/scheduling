@@ -35,7 +35,7 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 
-%JAVA_CMD% -Dproactive.rmi.port=1234 org.objectweb.proactive.extra.scheduler.AdminCommunicator %SCHEDULER_URL%
+%JAVA_CMD% -Dproactive.rmi.port=1234 org.objectweb.proactive.extensions.scheduler.AdminCommunicator %SCHEDULER_URL%
 
 :end
 echo. 

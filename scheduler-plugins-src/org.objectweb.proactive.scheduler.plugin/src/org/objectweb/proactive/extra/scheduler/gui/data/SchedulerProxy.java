@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.data;
 
 import javax.security.auth.login.LoginException;
 
@@ -36,23 +36,23 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.common.job.Job;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.job.JobPriority;
-import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.AdminSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEvent;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerEventListener;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerInitialState;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.Stats;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface;
-import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
-import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
-import org.objectweb.proactive.extra.scheduler.job.InternalJob;
-import org.objectweb.proactive.extra.scheduler.policy.PolicyInterface;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extensions.scheduler.common.job.Job;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobPriority;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEvent;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerInitialState;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.Stats;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
+import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
+import org.objectweb.proactive.extensions.scheduler.gui.dialog.SelectSchedulerDialogResult;
+import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
+import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
 
 
 /**
@@ -83,7 +83,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     // ---------------- implements AdminSchedulerInterface ---------------- //
     // -------------------------------------------------------------------- //
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
      */
     @Override
     public SchedulerInitialState<InternalJob> addSchedulerEventListener(
@@ -98,7 +98,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#disconnect()
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#disconnect()
      */
     @Override
     public void disconnect() {
@@ -113,7 +113,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#getResult(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     @Override
     public JobResult getJobResult(JobId jobId) {
@@ -126,7 +126,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extra.scheduler.common.job.JobId,
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extra.scheduler.common.job.JobId,
      *      java.lang.String)
      */
     @Override
@@ -140,7 +140,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#getStats()
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#getStats()
      */
     @Override
     public Stats getStats() {
@@ -153,7 +153,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#kill(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     @Override
     public BooleanWrapper kill(JobId jobId) {
@@ -166,7 +166,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId,
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#listenLog(org.objectweb.proactive.extra.scheduler.job.JobId,
      *      java.lang.String, int)
      */
     @Override
@@ -179,7 +179,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#pause(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     @Override
     public BooleanWrapper pause(JobId jobId) {
@@ -192,7 +192,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#resume(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
     @Override
     public BooleanWrapper resume(JobId jobId) {
@@ -205,7 +205,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.Job)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#submit(org.objectweb.proactive.extra.scheduler.job.Job)
      */
     @Override
     public JobId submit(Job job) {
@@ -218,7 +218,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#kill()
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#kill()
      */
     @Override
     public BooleanWrapper kill() {
@@ -231,7 +231,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pause()
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#pause()
      */
     @Override
     public BooleanWrapper pause() {
@@ -244,7 +244,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#pauseImmediate()
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#pauseImmediate()
      */
     @Override
     public BooleanWrapper pauseImmediate() {
@@ -257,7 +257,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#resume()
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#resume()
      */
     @Override
     public BooleanWrapper resume() {
@@ -270,7 +270,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#shutdown()
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#shutdown()
      */
     @Override
     public BooleanWrapper shutdown() {
@@ -283,7 +283,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#start()
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#start()
      */
     @Override
     public BooleanWrapper start() {
@@ -296,7 +296,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.core.AdminSchedulerInterface#stop()
+     * @see org.objectweb.proactive.extensions.scheduler.core.AdminSchedulerInterface#stop()
      */
     @Override
     public BooleanWrapper stop() {
@@ -309,8 +309,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     }
 
     /**
-     * @see org.objectweb.proactive.extra.scheduler.userAPI.UserSchedulerInterface#changePriority(org.objectweb.proactive.extra.scheduler.job.JobId,
-     *      org.objectweb.proactive.extra.scheduler.job.JobPriority)
+     * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#changePriority(org.objectweb.proactive.extra.scheduler.job.JobId,
+     *      org.objectweb.proactive.extensions.scheduler.job.JobPriority)
      */
     @Override
     public void changePriority(JobId jobId, JobPriority priority) {

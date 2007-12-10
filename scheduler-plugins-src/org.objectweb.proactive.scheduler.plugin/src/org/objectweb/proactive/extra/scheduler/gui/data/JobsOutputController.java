@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.data;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,11 +37,11 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
-import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
-import org.objectweb.proactive.extra.scheduler.common.task.Log4JTaskLogs;
-import org.objectweb.proactive.extra.scheduler.gui.Activator;
-import org.objectweb.proactive.extra.scheduler.gui.views.JobOutput;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.task.Log4JTaskLogs;
+import org.objectweb.proactive.extensions.scheduler.gui.Activator;
+import org.objectweb.proactive.extensions.scheduler.gui.views.JobOutput;
 
 
 /**

@@ -45,9 +45,9 @@ import org.objectweb.proactive.extensions.calcium.environment.proactive.AOTaskPo
 import org.objectweb.proactive.extensions.calcium.environment.proactive.FileServerClientImpl;
 import org.objectweb.proactive.extensions.calcium.environment.proactive.Util;
 import org.objectweb.proactive.extensions.calcium.task.TaskPool;
-import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerAuthenticationInterface;
-import org.objectweb.proactive.extra.scheduler.common.scheduler.SchedulerConnection;
+import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
+import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 
 
 /**

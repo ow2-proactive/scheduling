@@ -8,7 +8,7 @@
 		<task name="Controller">
 			<description>Will control the workers in order to find the prime number</description>
 			<proActiveExecutable
-				class="org.objectweb.proactive.extra.scheduler.examples.ProActiveExample">
+				class="org.objectweb.proactive.extensions.scheduler.examples.ProActiveExample">
 				<parameters>
 					<parameter name="numberToFind" value="200"/>
 				</parameters>

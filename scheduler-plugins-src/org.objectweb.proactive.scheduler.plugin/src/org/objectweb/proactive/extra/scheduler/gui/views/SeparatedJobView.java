@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.views;
+package org.objectweb.proactive.extensions.scheduler.gui.views;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -44,36 +44,36 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
-import org.objectweb.proactive.extra.scheduler.gui.actions.ChangeViewModeAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.FreezeSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillRemoveJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.KillSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.ObtainJobOutputAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PauseResumeJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PauseSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityHighestJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityIdleJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityLowestJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.PriorityNormalJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.ResumeSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.ShutdownSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.StartStopSchedulerAction;
-import org.objectweb.proactive.extra.scheduler.gui.actions.SubmitJobAction;
-import org.objectweb.proactive.extra.scheduler.gui.composite.AbstractJobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.FinishedJobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.JobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.PendingJobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.RunningJobComposite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.StatusLabel;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsOutputController;
-import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
-import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
+import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ChangeViewModeAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.FreezeSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.KillRemoveJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.KillSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ObtainJobOutputAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseResumeJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PauseSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityHighestJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityIdleJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityLowestJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.PriorityNormalJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ResumeSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.ShutdownSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.StartStopSchedulerAction;
+import org.objectweb.proactive.extensions.scheduler.gui.actions.SubmitJobAction;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.AbstractJobComposite;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.FinishedJobComposite;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.JobComposite;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.PendingJobComposite;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.RunningJobComposite;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.StatusLabel;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsOutputController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extensions.scheduler.gui.data.TableManager;
 
 
 /**
@@ -86,7 +86,7 @@ import org.objectweb.proactive.extra.scheduler.gui.data.TableManager;
 public class SeparatedJobView extends ViewPart {
 
     /** the view part id */
-    public static final String ID = "org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView";
+    public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView";
     private static final long serialVersionUID = -6958852991395601640L;
     private static JobComposite jobComposite = null;
     private static AbstractJobComposite pendingJobComposite = null;

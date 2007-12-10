@@ -8,7 +8,7 @@ PROACTIVE=$workingDir/../..
 CLASSPATH=.
 . $workingDir/env.sh
 
-$JAVACMD org.objectweb.proactive.extra.resourcemanager.test.util.RMLauncher $@
+$JAVACMD org.objectweb.proactive.extensions.resourcemanager.test.util.RMLauncher $@
 
 echo
 

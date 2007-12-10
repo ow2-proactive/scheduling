@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.views;
+package org.objectweb.proactive.extensions.scheduler.gui.views;
 
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
@@ -36,7 +36,7 @@ import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
-import org.objectweb.proactive.extra.scheduler.gui.Colors;
+import org.objectweb.proactive.extensions.scheduler.gui.Colors;
 
 
 /**

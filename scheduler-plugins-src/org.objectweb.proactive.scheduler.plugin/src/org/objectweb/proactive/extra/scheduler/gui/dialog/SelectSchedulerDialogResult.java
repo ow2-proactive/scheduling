@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.dialog;
+package org.objectweb.proactive.extensions.scheduler.gui.dialog;
 
 import java.io.Serializable;
 

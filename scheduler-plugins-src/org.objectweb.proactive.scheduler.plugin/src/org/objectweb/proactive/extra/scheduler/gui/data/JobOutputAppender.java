@@ -28,12 +28,12 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.data;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;
 import org.apache.log4j.spi.LoggingEvent;
-import org.objectweb.proactive.extra.scheduler.gui.views.JobOutput;
+import org.objectweb.proactive.extensions.scheduler.gui.views.JobOutput;
 
 
 /**

@@ -28,18 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.actions;
+package org.objectweb.proactive.extensions.scheduler.gui.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
-import org.objectweb.proactive.extra.scheduler.gui.composite.StatusLabel;
-import org.objectweb.proactive.extra.scheduler.gui.data.JobsController;
-import org.objectweb.proactive.extra.scheduler.gui.data.SchedulerProxy;
-import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialog;
-import org.objectweb.proactive.extra.scheduler.gui.dialog.SelectSchedulerDialogResult;
-import org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView;
+import org.objectweb.proactive.extensions.scheduler.gui.composite.StatusLabel;
+import org.objectweb.proactive.extensions.scheduler.gui.data.JobsController;
+import org.objectweb.proactive.extensions.scheduler.gui.data.SchedulerProxy;
+import org.objectweb.proactive.extensions.scheduler.gui.dialog.SelectSchedulerDialog;
+import org.objectweb.proactive.extensions.scheduler.gui.dialog.SelectSchedulerDialogResult;
+import org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView;
 
 
 /**

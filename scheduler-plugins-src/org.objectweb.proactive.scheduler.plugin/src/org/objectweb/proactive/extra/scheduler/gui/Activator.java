@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui;
+package org.objectweb.proactive.extensions.scheduler.gui;
 
 import java.net.UnknownHostException;
 

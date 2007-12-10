@@ -28,9 +28,9 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.scheduler.gui.data;
+package org.objectweb.proactive.extensions.scheduler.gui.data;
 
-import org.objectweb.proactive.extra.scheduler.common.job.JobId;
+import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 
 
 /**
