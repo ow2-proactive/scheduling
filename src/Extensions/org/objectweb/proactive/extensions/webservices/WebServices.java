@@ -39,7 +39,7 @@ import org.objectweb.proactive.extensions.webservices.soap.ProActiveDeployer;
 public final class WebServices {
 
     /**
-     *  Expose an active object as a web service
+     * Expose an active object as a web service
      * @param o The object to expose as a web service
      * @param url The url of the host where the object will be seployed  (typically http://localhost:8080)
      * @param urn The name of the object
@@ -60,9 +60,12 @@ public final class WebServices {
     }
 
     /**
-     *  Deploy a component as a webservice. Each interface of the component will be accessible by
-     * the urn [componentName]_[interfaceName]in order to identify the component an interface belongs to.
-     * All the interfaces public  methods will be exposed.
+     * Expose a component as webservice. Each server and controller
+     * interface of the component will be accessible by  the urn
+     * [componentName]_[interfaceName]in order to identify the component an
+     * interface belongs to.
+     * All the interfaces public methods will be exposed.
+     *
      * @param componentName The name of the component
      * @param url  The web server url  where to deploy the service - typically "http://localhost:8080"
      * @param component The component owning the interfaces that will be deployed as web services.

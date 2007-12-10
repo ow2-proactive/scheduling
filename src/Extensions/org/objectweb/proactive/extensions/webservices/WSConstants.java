@@ -65,6 +65,12 @@ public class WSConstants {
         disallowedMethods.addElement("runActivity");
         disallowedMethods.addElement("setProxy");
         disallowedMethods.addElement("getProxy");
+        disallowedMethods.addElement("wait");
+        disallowedMethods.addElement("notify");
+        disallowedMethods.addElement("notifyAll");
+        disallowedMethods.addElement("getClass");
+        disallowedMethods.addElement("hashCode");
+        // component methods
         disallowedMethods.addElement("setFcItfName");
         disallowedMethods.addElement("isFcInternalItf");
         disallowedMethods.addElement("setFcOwner");
@@ -81,11 +87,6 @@ public class WSConstants {
         disallowedMethods.addElement("setFcType");
         disallowedMethods.addElement("getFcItfImpl");
         disallowedMethods.addElement("getFcItfImpl");
-        disallowedMethods.addElement("wait");
-        disallowedMethods.addElement("notify");
-        disallowedMethods.addElement("notifyAll");
-        disallowedMethods.addElement("getClass");
-        disallowedMethods.addElement("hashCode");
     }
 
     /* A vector containing all supported types by Apache Soap */

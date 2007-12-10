@@ -46,7 +46,7 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
 
 
 /**
- * This servlet return a WSDL document whn called with the urn of the service
+ * This servlet return a WSDL document when called with the urn of the service
  * @author vlegrand
  */
 public class WsdlServlet extends HttpServlet {
