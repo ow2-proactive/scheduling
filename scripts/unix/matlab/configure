@@ -2101,6 +2101,7 @@ echo "${ECHO_T}$PTJAVA_HOME/../include/$PTJNI_ARCHITECTURE" >&6
 echo $ECHO_N "checking for the proper JNI architecture... $ECHO_C" >&6
     case "`uname -p`" in
     	*86) PTJNI_LIB_ARCHITECTURE=i386;;
+    	x86_64) PTJNI_LIB_ARCHITECTURE=amd64;;
     	sparc) PTJNI_LIB_ARCHITECTURE=sparc;;
     	unknown) if test $PTJNI_ARCHITECTURE = "win32"; then
 	         PTJNI_LIB_ARCHITECTURE=i386
@@ -2144,7 +2145,7 @@ echo $ECHO_N "checking for the proper shared library cc flag... $ECHO_C" >&6
     	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
     	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
     	SunOS)	 PTJNI_SHAREDLIBRARY_CFLAG=-fPIC;;
-    	*) PTJNI_SHAREDLIBRARY_CFLAG=;;
+    	*) PTJNI_SHAREDLIBRARY_CFLAG=-fPIC;;
     esac
     echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_CFLAG'" >&5
 echo "${ECHO_T}'$PTJNI_SHAREDLIBRARY_CFLAG'" >&6
@@ -2156,7 +2157,7 @@ echo $ECHO_N "checking for the proper shared library link flag... $ECHO_C" >&6
     	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
     	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
     	SunOS)	 PTJNI_SHAREDLIBRARY_LDFLAG=-fPIC;;
-    	*) PTJNI_SHAREDLIBRARY_LDFLAG=;;
+    	*) PTJNI_SHAREDLIBRARY_LDFLAG=-fPIC;;
     esac
     echo "$as_me:$LINENO: result: '$PTJNI_SHAREDLIBRARY_LDFLAG'" >&5
 echo "${ECHO_T}'$PTJNI_SHAREDLIBRARY_LDFLAG'" >&6

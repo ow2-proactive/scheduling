@@ -502,6 +502,7 @@ if test ! -z $PTJNI_DIR; then
     AC_MSG_CHECKING([for the proper JNI architecture])
     case "`uname -p`" in
     	*86) PTJNI_LIB_ARCHITECTURE=i386;;
+    	x86_64) PTJNI_LIB_ARCHITECTURE=amd64;;
     	sparc) PTJNI_LIB_ARCHITECTURE=sparc;;
     	unknown) if test $PTJNI_ARCHITECTURE = "win32"; then
 	         PTJNI_LIB_ARCHITECTURE=i386
@@ -537,7 +538,7 @@ if test ! -z $PTJNI_DIR; then
     	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
     	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_CFLAG=;;
     	SunOS)	 PTJNI_SHAREDLIBRARY_CFLAG=-fPIC;;
-    	*) PTJNI_SHAREDLIBRARY_CFLAG=;;
+    	*) PTJNI_SHAREDLIBRARY_CFLAG=-fPIC;;
     esac
     AC_MSG_RESULT(['$PTJNI_SHAREDLIBRARY_CFLAG'])
 
@@ -547,7 +548,7 @@ if test ! -z $PTJNI_DIR; then
     	CYGWIN_NT-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
     	CYGWIN_98-*) PTJNI_SHAREDLIBRARY_LDFLAG=-Wl,--add-stdcall-alias;;
     	SunOS)	 PTJNI_SHAREDLIBRARY_LDFLAG=-fPIC;;
-    	*) PTJNI_SHAREDLIBRARY_LDFLAG=;;
+    	*) PTJNI_SHAREDLIBRARY_LDFLAG=-fPIC;;
     esac
     AC_MSG_RESULT(['$PTJNI_SHAREDLIBRARY_LDFLAG'])
 

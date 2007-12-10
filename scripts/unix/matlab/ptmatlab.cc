@@ -49,6 +49,7 @@ typedef long long __int64;
 #include <jni.h>
 #include "ptmatlab.h"
 #include "engine.h"
+#include "matrix.h"
 
 // The following test is a kludge for a missing #define in the matlab
 // include files that would allow engine interface C code to test which
@@ -66,12 +67,12 @@ typedef long long __int64;
 #endif
 
 // Declare an integer type that correctly casts a pointer
-typedef ARCH_INT ptrint;
+typedef void * ptrint;
 
-#ifndef tmwtypes_h
-typedef ARCH_INT mwSize;
-typedef ARCH_INT mwIndex;
-#endif
+//#ifndef tmwtypes_h
+//typedef ARCH_INT mwSize;
+//typedef ARCH_INT mwIndex;
+//#endif
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -100,7 +101,7 @@ extern "C"
     if (cmdString != NULL) cmd = jni->GetStringUTFChars(cmdString, 0);
     Engine *ep = engOpen(cmd); 
     if (ep != NULL) {
-      retval = (ptrint)ep;
+      retval = (jlong) (ptrint)ep;
     }
     else {
       printf("ptmatlabEngOpen: %s failed!\n", cmd==NULL?"":cmd);
@@ -148,8 +149,8 @@ extern "C"
         const int *dimArray = (const int *)mxGetDimensions(ma);
         printf("ptmatlabEngGetArray(%s) %d x %d\n", str, dimArray[0], dimArray[1]);
     }
-    jni->ReleaseStringUTFChars(name, str);
-    return (ptrint) ma;
+    jni->ReleaseStringUTFChars(name, str); 
+    return (jlong)(ptrint) ma;
   }
 
   JNIEXPORT jint JNICALL Java_ptolemy_matlab_Engine_ptmatlabEngPutArray
@@ -186,7 +187,7 @@ extern "C"
     }
     if (debug > 1) printf("ptmatlabEngOutputBuffer: set, n=%d\n", n);
     engOutputBuffer(ep, p, n);
-    return (ptrint)p;
+    return (jlong)(ptrint)p;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateCellMatrix
@@ -204,7 +205,7 @@ extern "C"
       printf("ptmatlabCreateCellMatrix(%s) %d x %d\n", nstr, n, m);
       jni->ReleaseStringUTFChars(name, nstr);
     }
-    return (ptrint) ma;
+    return (jlong)(ptrint) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateString
@@ -234,7 +235,7 @@ extern "C"
       }
     }
     jni->ReleaseStringUTFChars(s, str);
-    return (ptrint) ma;
+    return (jlong)(ptrint) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateDoubleMatrixOneDim
@@ -256,7 +257,7 @@ extern "C"
     }
 
     jni->GetDoubleArrayRegion(a, 0, length, pr);
-    return (ptrint) ma;
+    return (jlong)(ptrint) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateDoubleMatrix
@@ -288,7 +289,7 @@ extern "C"
       jni->ReleasePrimitiveArrayCritical(row, rowelements, 0);
       jni->DeleteLocalRef(row);         // free references
     }
-    return (ptrint) ma;
+    return (jlong)(ptrint) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateComplexMatrixOneDim
@@ -321,7 +322,7 @@ extern "C"
       *(pi+j) = jni->GetDoubleField(element, complexImagFieldID);
       jni->DeleteLocalRef(element);
     }
-    return (ptrint) ma;
+    return (jlong)(ptrint) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateComplexMatrix
@@ -359,7 +360,7 @@ extern "C"
       }
       jni->DeleteLocalRef(jcolumn);
     }
-    return (ptrint) ma;
+    return (jlong)(ptrint) ma;
   }
 
   JNIEXPORT jlong JNICALL Java_ptolemy_matlab_Engine_ptmatlabCreateStructMatrix
@@ -392,7 +393,7 @@ extern "C"
       jni->ReleaseStringUTFChars((jstring)jni->GetObjectArrayElement(fieldNames,i),names[i]);
     }
     free(names);
-    return (ptrint) ma;
+    return (jlong)(ptrint) ma;
   }
 
   JNIEXPORT void JNICALL Java_ptolemy_matlab_Engine_ptmatlabDestroy
@@ -427,7 +428,7 @@ extern "C"
         const int *dimArray = (const int *)mxGetDimensions(fma);
         printf("ptmatlabGetCell(%s,%d,%d) %d x %d\n", mxGetName(ma), n, m, dimArray[0], dimArray[1]);
     }
-    return (ptrint) fma;
+    return (jlong)(ptrint) fma;
   }
 
   JNIEXPORT jstring JNICALL Java_ptolemy_matlab_Engine_ptmatlabGetClassName
@@ -452,7 +453,7 @@ extern "C"
 
     mxArray *ma = (mxArray*)(ptrint) pma;
     jint ndims = mxGetNumberOfDimensions(ma);
-    const int *dims = (const int *)mxGetDimensions(ma);
+    const mwSize *dims = mxGetDimensions(ma);
     // MSVC can't deal with variable length arrays 
     //jint jdims[ndims];
     jint *jdims= (jint *)malloc(ndims * sizeof(jint));
@@ -495,7 +496,7 @@ extern "C"
         const int *dimArray = (const int *)mxGetDimensions(fma);
         printf("ptmatlabGetFieldByNumber(%s,%d,%d,%d) %d x %d\n", mxGetName(ma), k, n, m, dimArray[0], dimArray[1]);
     }
-    return (ptrint) fma;
+    return (jlong)(ptrint) fma;
   }
 
   JNIEXPORT jint JNICALL Java_ptolemy_matlab_Engine_ptmatlabGetNumberOfFields
@@ -517,7 +518,7 @@ extern "C"
   {
     char debug = ptmatlabGetDebug(jni,obj);
     mxArray *ma = (mxArray*)(ptrint) pma;
-    const int *dims = (const int *)mxGetDimensions(ma);
+    const mwSize *dims = mxGetDimensions(ma);
     int strlen = dims[1];
     int nrows = dims[0];
     char *str = (char*)mxCalloc(strlen+1,sizeof(mxChar));
