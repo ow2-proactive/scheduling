@@ -35,7 +35,7 @@ import java.util.Vector;
 
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
@@ -972,7 +972,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     public boolean init() {
         SchedulerInitialState<InternalJob> state = null;
         state = SchedulerProxy.getInstance()
-                              .addSchedulerEventListener(((SchedulerEventListener) ProActiveObject.getStubOnThis()));
+                              .addSchedulerEventListener(((SchedulerEventListener) PAActiveObject.getStubOnThis()));
 
         if (state == null) { // addSchedulerEventListener failed
             return false;
@@ -1043,7 +1043,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
     public static JobsController turnActive() {
         try {
-            activeView = (JobsController) ProActiveObject.turnActive(getLocalView());
+            activeView = (JobsController) PAActiveObject.turnActive(getLocalView());
             return activeView;
         } catch (NodeException e) {
             e.printStackTrace();

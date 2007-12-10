@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extra.scheduler.common.task.util.ResultDescriptorTool.SimpleTextPanel;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ChangeViewModeAction;
 import org.objectweb.proactive.extra.scheduler.gui.actions.ConnectDeconnectSchedulerAction;
@@ -316,8 +316,7 @@ public class SeparatedJobView extends ViewPart {
         if (sendDisconnectMessage) {
             SchedulerProxy.getInstance().disconnect();
         }
-        ProActiveObject.terminateActiveObject(SchedulerProxy.getInstance(),
-            false);
+        PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
         SchedulerProxy.clearInstance();
 
         ChangeViewModeAction.getInstance().setEnabled(false);
@@ -414,11 +413,10 @@ public class SeparatedJobView extends ViewPart {
         }
 
         JobsOutputController.clearInstance();
-        ProActiveObject.terminateActiveObject(JobsController.getActiveView(),
+        PAActiveObject.terminateActiveObject(JobsController.getActiveView(),
             false);
         SchedulerProxy.getInstance().disconnect();
-        ProActiveObject.terminateActiveObject(SchedulerProxy.getInstance(),
-            false);
+        PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
         JobsController.clearInstances();
         SchedulerProxy.clearInstance();
         super.dispose();

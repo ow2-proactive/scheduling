@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.scheduler.gui.data;
 import javax.security.auth.login.LoginException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
@@ -379,7 +379,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     public static SchedulerProxy getInstance() {
         if (instance == null) {
             try {
-                instance = (SchedulerProxy) ProActiveObject.newActive(SchedulerProxy.class.getName(),
+                instance = (SchedulerProxy) PAActiveObject.newActive(SchedulerProxy.class.getName(),
                         null);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
