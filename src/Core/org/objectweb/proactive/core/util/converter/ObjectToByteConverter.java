@@ -40,9 +40,8 @@ import java.lang.reflect.Method;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.PAObjectOutputStream;
+import org.objectweb.proactive.core.mop.SunMarshalOutputStream;
 import org.objectweb.proactive.core.util.converter.MakeDeepCopy.ConversionMode;
-
-import sun.rmi.server.MarshalOutputStream;
 
 
 /**
@@ -131,7 +130,7 @@ public class ObjectToByteConverter {
         try {
             // we use enum and static calls to avoid object instanciation
             if (conversionMode == ConversionMode.MARSHALL) {
-                objectOutputStream = new MarshalOutputStream(byteArrayOutputStream);
+                objectOutputStream = new SunMarshalOutputStream(byteArrayOutputStream);
             } else if (conversionMode == ConversionMode.OBJECT) {
                 objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
             } else if (conversionMode == ConversionMode.PAOBJECT) {

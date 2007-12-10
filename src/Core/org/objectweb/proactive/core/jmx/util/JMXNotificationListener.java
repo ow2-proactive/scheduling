@@ -70,7 +70,7 @@ public class JMXNotificationListener implements NotificationListener,
      * @param oname The ObjectName of the MBean
      * @param filter A notification filter
      * @param handback A hanback
-     * This method is deprecated. Use subscribeObjectFromRemoteMBean(ProActiveConnection connection, ObjectName oname,
+     * @deprecated Use subscribeObjectFromRemoteMBean(ProActiveConnection connection, ObjectName oname,
             NotificationFilter filter, Object handback) instead
      */
     @Deprecated
@@ -101,7 +101,7 @@ public class JMXNotificationListener implements NotificationListener,
      * @param oname The ObjectName of the MBean
      * @param filter A notification filter
      * @param handback A hanback
-     * this method is deprecated. Use JMXNotificationManager.unsubscribeObjectFromRemoteMBean(..) instead
+     * @deprecated Use JMXNotificationManager.unsubscribeObjectFromRemoteMBean(..) instead
      */
     @Deprecated
     public void unsubscribe(ProActiveConnection connection, ObjectName oname,

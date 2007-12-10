@@ -34,10 +34,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectStreamClass;
 
-import sun.rmi.server.MarshalInputStream;
 
-
-public class PAObjectInputStream extends MarshalInputStream {
+public class PAObjectInputStream extends SunMarshalInputStream {
     public PAObjectInputStream(InputStream in) throws IOException {
         super(in);
     }

@@ -356,7 +356,7 @@ public class JMXNotificationManager implements NotificationListener {
                 establishedConnection.addObjectName(ob);
 
                 // Subscribes to the JMX notifications
-                notificationlistener.subscribe(establishedConnection.getConnection(),
+                subscribeObjectToRemoteMBean(establishedConnection.getConnection(),
                     ob, null, null);
 
                 //Unsubscribes to the JMXNotifications within the old connection 
@@ -367,7 +367,7 @@ public class JMXNotificationManager implements NotificationListener {
                         ob + " from the old host after migration");
                 } else {
                     oldConnection.removeObjectName(ob);
-                    notificationlistener.unsubscribe(oldConnection.getConnection(),
+                    unsubscribeObjectFromRemoteMBean(oldConnection.getConnection(),
                         ob, null, null);
                 }
                 // Updates our map

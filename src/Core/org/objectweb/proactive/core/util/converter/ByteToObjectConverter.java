@@ -41,8 +41,7 @@ import java.lang.reflect.Method;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.PAObjectInputStream;
-
-import sun.rmi.server.MarshalInputStream;
+import org.objectweb.proactive.core.mop.SunMarshalInputStream;
 
 
 /**
@@ -133,7 +132,7 @@ public class ByteToObjectConverter {
         try {
             // we use enum and static calls to avoid object instanciation
             if (conversionMode == MakeDeepCopy.ConversionMode.MARSHALL) {
-                objectInputStream = new MarshalInputStream(byteArrayInputStream);
+                objectInputStream = new SunMarshalInputStream(byteArrayInputStream);
             } else if (conversionMode == MakeDeepCopy.ConversionMode.PAOBJECT) {
                 objectInputStream = new PAObjectInputStream(byteArrayInputStream);
             } else /*(conversionMode == ObjectToByteConverter.ConversionMode.OBJECT)*/

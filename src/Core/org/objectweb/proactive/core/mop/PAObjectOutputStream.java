@@ -33,10 +33,8 @@ package org.objectweb.proactive.core.mop;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import sun.rmi.server.MarshalOutputStream;
 
-
-public class PAObjectOutputStream extends MarshalOutputStream {
+public class PAObjectOutputStream extends SunMarshalOutputStream {
     public PAObjectOutputStream(OutputStream out) throws IOException {
         super(out);
     }
