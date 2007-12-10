@@ -1008,26 +1008,26 @@
 		</taskdef>
 		<!-- Convert Relax NG schema from compact syntax to xml syntax -->
 		<trang failonerror="true"
-			input="${src.extra.dir}/${extra.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc"
-			output="${src.extra.dir}/${extra.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rng"/>
+			input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc"
+			output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rng"/>
 
 		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
 		<trang failonerror="true"
-			input="${src.extra.dir}/${extra.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc"
-			output="${src.extra.dir}/${extra.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd"/>
+			input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc"
+			output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd"/>
 		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl"
-			in="${src.extra.dir}/${extra.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd"
-			out="${src.extra.dir}/${extra.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd"/>
+			in="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+			out="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd"/>
 		<delete>
 			<fileset
-				dir="${src.extra.dir}/${extra.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/">
+				dir="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/">
 				<include name="xsi.xsd"/>
 				<include name="schedulerjob.xsd"/>
 			</fileset>
 		</delete>
 		<move
-			file="${src.extra.dir}/${extra.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd"
-			tofile="${src.extra.dir}/${extra.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+			file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd"
+			tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd"
 		/>
 	</target>
 

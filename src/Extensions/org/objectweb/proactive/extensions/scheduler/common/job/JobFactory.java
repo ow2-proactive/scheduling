@@ -91,8 +91,8 @@ import org.xml.sax.SAXParseException;
 
 
 public class JobFactory {
-    public static final String SCHEMA_LOCATION = "/org.objectweb.proactive.extensions.scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rng";
-    public static final String STYLESHEET_LOCATION = "/org.objectweb.proactive.extensions.scheduler/common/xml/stylesheets/variables.xsl";
+    public static final String SCHEMA_LOCATION = "/org/objectweb/proactive/extensions/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rng";
+    public static final String STYLESHEET_LOCATION = "/org/objectweb/proactive/extensions/scheduler/common/xml/stylesheets/variables.xsl";
     public static final String JOB_NAMESPACE = "urn:proactive:jobdescriptor:0.9";
     public static final String JOB_PREFIX = "js";
     private static XPath xpath;
