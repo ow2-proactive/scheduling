@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.util.profiling;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 
 
@@ -102,8 +102,8 @@ public class TimerWarehouse {
      * @return An instance of timer provider object.
      */
     public static final TimerProvidable getTimerProvidable() {
-        return TimerWarehouse.timerProvidableStore.get(ProActiveObject.getBodyOnThis()
-                                                                      .getID());
+        return TimerWarehouse.timerProvidableStore.get(PAActiveObject.getBodyOnThis()
+                                                                     .getID());
     }
 
     /**

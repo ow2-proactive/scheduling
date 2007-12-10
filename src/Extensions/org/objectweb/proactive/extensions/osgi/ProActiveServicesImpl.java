@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
@@ -90,21 +90,21 @@ public class ProActiveServicesImpl implements ProActiveService {
      */
     public Object newActive(String className, Object[] params)
         throws ActiveObjectCreationException, NodeException {
-        return ProActiveObject.newActive(className, params, this.node);
+        return PAActiveObject.newActive(className, params, this.node);
     }
 
     /**
      * @see org.objectweb.proactive.osgi.ProActiveService#register(java.lang.Object, java.lang.String)
      */
     public void register(Object obj, String url) throws IOException {
-        ProActiveObject.register(obj, url);
+        PAActiveObject.register(obj, url);
     }
 
     /**
      * @see org.objectweb.proactive.osgi.ProActiveService#unregister(URI)
      */
     public void unregister(String url) throws IOException {
-        ProActiveObject.unregister(url);
+        PAActiveObject.unregister(url);
     }
 
     /**
@@ -211,7 +211,7 @@ public class ProActiveServicesImpl implements ProActiveService {
 
     public Object lookupActive(String className, String url) {
         try {
-            return ProActiveObject.lookupActive(className, url);
+            return PAActiveObject.lookupActive(className, url);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (IOException e) {

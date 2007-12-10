@@ -39,9 +39,9 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 
@@ -99,7 +99,7 @@ public class Launcher {
         } else {
             Factory f;
             if ("org.objectweb.proactive.core.component.Fractive".equals(
-                        ProProperties.FRACTAL_PROVIDER.getValue())) {
+                        PAProperties.FRACTAL_PROVIDER.getValue())) {
                 // return the ProActive factory as defined in
                 // org.objectweb.proactive.core.component.adl.FactoryFactory
                 f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
@@ -109,7 +109,7 @@ public class Launcher {
 
             // PROACTIVE
             if (pargs[3] != null) {
-                deploymentDescriptor = ProDeployment.getProactiveDescriptor(pargs[3]);
+                deploymentDescriptor = PADeployment.getProactiveDescriptor(pargs[3]);
                 HashMap context = new HashMap(1);
                 context.put("deployment-descriptor", deploymentDescriptor);
                 return f.newComponent(pargs[1], context);

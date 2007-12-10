@@ -32,9 +32,9 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 
 import java.io.File;
 
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.api.ProLifeCycle;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -63,7 +63,7 @@ public class Test1 extends TestCase {
         monitor = IMFactory.getMonitoring();
         System.err.println("Deploying nodes...");
 
-        ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
+        ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(
                 "descriptors/scheduler/deployment/Descriptor_SSH_List.xml");
         admin.createStaticNodesource("static source", pad);
 
@@ -108,12 +108,12 @@ public class Test1 extends TestCase {
 
             //			Get At Most 3 nodes not on fiacre (but there is only 2 nodes corresponding"
             nodes = user.getAtMostNodes(new IntWrapper(3), verif);
-            ProFuture.waitFor(nodes);
+            PAFuture.waitFor(nodes);
             if (!nodes.isEmpty()) {
                 System.err.println("nodes obtained = " + nodes.size());
                 for (Node n : nodes)
                     System.err.println(n.getNodeInformation().getURL());
-                ProFuture.waitFor(nodes);
+                PAFuture.waitFor(nodes);
                 assertEquals("getAtMostNodes(3, verif)", nodes.size(),
                     monitor.getNumberOfAllResources().intValue() -
                     monitor.getNumberOfFreeResource().intValue());
@@ -135,7 +135,7 @@ public class Test1 extends TestCase {
         super.tearDown();
         System.err.println("Stopping test");
         admin.shutdown(false);
-        ProLifeCycle.exitSuccess();
+        PALifeCycle.exitSuccess();
     }
 
     public static void main(String[] args) throws Exception {

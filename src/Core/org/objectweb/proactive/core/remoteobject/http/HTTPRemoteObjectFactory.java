@@ -37,7 +37,7 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
@@ -69,7 +69,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
                 classServerHelper = new ClassServerHelper();
                 String codebase = classServerHelper.initializeClassServer();
 
-                ProProperties.PA_XMLHTTP_PORT.setValue(URIBuilder.getPortNumber(
+                PAProperties.PA_XMLHTTP_PORT.setValue(URIBuilder.getPortNumber(
                         codebase) + "");
 
                 addCodebase(codebase);
@@ -149,7 +149,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
         int port = url.getPort();
 
         if (port == -1) {
-            port = Integer.parseInt(ProProperties.PA_XMLHTTP_PORT.getValue());
+            port = Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue());
         }
 
         String urn = url.getPath();
@@ -227,7 +227,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#getPort()
      */
     public int getPort() {
-        return Integer.parseInt(ProProperties.PA_XMLHTTP_PORT.getValue());
+        return Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue());
     }
 
     public String getProtocolId() {

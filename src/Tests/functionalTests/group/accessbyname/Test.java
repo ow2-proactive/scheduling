@@ -30,7 +30,7 @@
  */
 package functionalTests.group.accessbyname;
 
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 
 import functionalTests.FunctionalTest;
@@ -47,9 +47,9 @@ public class Test extends FunctionalTest {
     A typedGroup;
 
     private A createGroup() throws Exception {
-        typedGroup = (A) ProGroup.newGroup(A.class.getName());
+        typedGroup = (A) PAGroup.newGroup(A.class.getName());
 
-        Group group = ProGroup.getGroup(typedGroup);
+        Group group = PAGroup.getGroup(typedGroup);
         group.addNamedElement("number0", new A("Agent0"));
         group.add(new A("Agent1"));
         group.addNamedElement("number2", new A("Agent2"));
@@ -63,7 +63,7 @@ public class Test extends FunctionalTest {
 
         // was the group created ?
         assertTrue(typedGroup != null);
-        Group group = ProGroup.getGroup(this.typedGroup);
+        Group group = PAGroup.getGroup(this.typedGroup);
 
         // has the group the right size ?
         assertTrue(group.size() == 3);

@@ -35,7 +35,7 @@ import java.io.Serializable;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
@@ -110,7 +110,7 @@ public class ComponentParametersControllerImpl
      * return int for synchronous call
      */
     public int setImmediateServices() {
-        ProActiveObject.setImmediateService("getComponentParameters");
+        PAActiveObject.setImmediateService("getComponentParameters");
         return 0; // Synchronous call
     }
 
@@ -120,7 +120,7 @@ public class ComponentParametersControllerImpl
      * return int for synchronous call
      */
     public int removeImmediateServices() {
-        ProActiveObject.removeImmediateService("getComponentParameters");
+        PAActiveObject.removeImmediateService("getComponentParameters");
         return 0; // Synchronous call
     }
 }

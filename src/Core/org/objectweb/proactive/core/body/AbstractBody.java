@@ -49,7 +49,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
@@ -234,7 +234,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         // JMX registration
         isProActiveInternalObject = reifiedObject instanceof ProActiveInternalObject;
 
-        //        if (ProProperties.PA_JMX_MBEAN.isTrue()) {
+        //        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
         if (!isProActiveInternalObject) {
             // If the node is not a HalfBody
             if (!nodeURL.equals("LOCAL")) {
@@ -1042,7 +1042,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @return the size of of the SPMD group
      */
     public int getSPMDGroupSize() {
-        return ProGroup.size(this.getSPMDGroup());
+        return PAGroup.size(this.getSPMDGroup());
     }
 
     /**

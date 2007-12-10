@@ -32,8 +32,8 @@ package functionalTests.activeobject.context;
 
 import org.junit.Before;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.Context;
@@ -52,7 +52,7 @@ public class Test extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(XML_LOCATION);
+        ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(XML_LOCATION);
         pad.activateMappings();
         VirtualNode vn = pad.getVirtualNode("VN");
         assertTrue(vn.getMinNumberOfNodes() <= vn.getNumberOfCreatedNodesAfterDeployment());
@@ -64,7 +64,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         // test halfBody creation
         UniqueID myId = null;
-        Context c = ProActiveObject.getContext();
+        Context c = PAActiveObject.getContext();
         Body myHalfBody = c.getBody();
 
         // a half body should have been created
@@ -82,8 +82,8 @@ public class Test extends FunctionalTest {
         assertTrue(exceptionOccured);
 
         // test getContext
-        A a1 = (A) ProActiveObject.newActive(A.class.getName(), null, this.node1);
-        A a2 = (A) ProActiveObject.newActive(A.class.getName(), null, this.node2);
+        A a1 = (A) PAActiveObject.newActive(A.class.getName(), null, this.node1);
+        A a2 = (A) PAActiveObject.newActive(A.class.getName(), null, this.node2);
 
         a1.init("A1");
         a2.init("A2");

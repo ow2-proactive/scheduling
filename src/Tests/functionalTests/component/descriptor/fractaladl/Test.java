@@ -40,9 +40,9 @@ import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.group.Group;
@@ -100,9 +100,9 @@ public class Test extends ComponentTest {
         //        Component c = Registry.instance().getComponent("parallel");
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
-        deploymentDescriptor = ProDeployment.getProactiveDescriptor(Test.class.getResource(
+        deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class.getResource(
                     "/functionalTests/component/descriptor/deploymentDescriptor.xml")
-                                                                              .getPath());
+                                                                             .getPath());
         context.put("deployment-descriptor", deploymentDescriptor);
         Component root = (Component) f.newComponent("functionalTests.component.descriptor.fractaladl.MessagePassingExample",
                 context);
@@ -126,7 +126,7 @@ public class Test extends ComponentTest {
             }
         }
         StringBuffer resulting_msg = new StringBuffer();
-        Object futureValue = ProFuture.getFutureValue(messages);
+        Object futureValue = PAFuture.getFutureValue(messages);
         Message m = (Message) ((Group) futureValue).getGroupByType();
 
         //        Message m = (Message)(ProActiveGroup.getGroup(ProActive.getFutureValue(messages)).getGroupByType());
@@ -157,9 +157,9 @@ public class Test extends ComponentTest {
 
     private int append(StringBuffer buffer, Message message) {
         int nb_messages = 0;
-        if (ProGroup.isGroup(message)) {
-            for (int i = 0; i < ProGroup.size(message); i++) {
-                nb_messages += append(buffer, (Message) ProGroup.get(message, i));
+        if (PAGroup.isGroup(message)) {
+            for (int i = 0; i < PAGroup.size(message); i++) {
+                nb_messages += append(buffer, (Message) PAGroup.get(message, i));
             }
         } else {
             buffer.append(message.getMessage());

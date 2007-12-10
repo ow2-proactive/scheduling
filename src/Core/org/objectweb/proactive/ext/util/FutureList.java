@@ -48,7 +48,7 @@ package org.objectweb.proactive.ext.util;
  *
  */
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 
 
 @PublicAPI
@@ -97,7 +97,7 @@ public class FutureList {
     public boolean allAwaited() {
         boolean value = true;
         for (int i = 0; i < futureList.size(); i++) {
-            value = value && ProFuture.isAwaited(futureList.elementAt(i));
+            value = value && PAFuture.isAwaited(futureList.elementAt(i));
         }
         return value;
     }
@@ -107,7 +107,7 @@ public class FutureList {
      */
     public boolean noneAwaited() {
         for (int i = 0; i < futureList.size(); i++) {
-            if (ProFuture.isAwaited(futureList.elementAt(i))) {
+            if (PAFuture.isAwaited(futureList.elementAt(i))) {
                 return false;
             }
         }
@@ -120,7 +120,7 @@ public class FutureList {
     public int countAwaited() {
         int count = 0;
         for (int i = 0; i < futureList.size(); i++) {
-            if (ProFuture.isAwaited(futureList.elementAt(i))) {
+            if (PAFuture.isAwaited(futureList.elementAt(i))) {
                 count++;
             }
         }
@@ -140,7 +140,7 @@ public class FutureList {
             Object temp;
             for (int i = 0; i < futureList.size(); i++) {
                 temp = futureList.elementAt(i);
-                if (!ProFuture.isAwaited(temp)) {
+                if (!PAFuture.isAwaited(temp)) {
                     return temp;
                 }
             }
@@ -174,27 +174,27 @@ public class FutureList {
     }
 
     public void waitAll() {
-        ProFuture.waitForAll(futureList);
+        PAFuture.waitForAll(futureList);
     }
 
     public void waitOne() {
-        ProFuture.waitForAny(futureList);
+        PAFuture.waitForAny(futureList);
     }
 
     public void waitN(int n) {
         java.util.Vector<Object> temp = new java.util.Vector<Object>(futureList);
         for (int i = 0; i < n; i++) {
-            int index = ProFuture.waitForAny(temp);
+            int index = PAFuture.waitForAny(temp);
             temp.remove(index);
         }
     }
 
     public void waitTheNth(int n) {
-        ProFuture.waitForTheNth(futureList, n);
+        PAFuture.waitForTheNth(futureList, n);
     }
 
     public Object waitAndGetTheNth(int n) {
-        ProFuture.waitForTheNth(futureList, n);
+        PAFuture.waitForTheNth(futureList, n);
         return this.futureList.elementAt(n);
     }
 }

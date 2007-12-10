@@ -41,8 +41,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.mop.MOP;
@@ -210,21 +210,21 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
                 logger.debug("active object IMAdmin");
             }
 
-            admin = (IMAdminImpl) ProActiveObject.newActive(IMAdminImpl.class.getName(),
-                    new Object[] { ProActiveObject.getStubOnThis() }, nodeIM);
+            admin = (IMAdminImpl) PAActiveObject.newActive(IMAdminImpl.class.getName(),
+                    new Object[] { PAActiveObject.getStubOnThis() }, nodeIM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("active object IMMonitoring");
             }
-            monitoring = (IMMonitoringImpl) ProActiveObject.newActive(IMMonitoringImpl.class.getName(),
-                    new Object[] { ProActiveObject.getStubOnThis() }, nodeIM);
+            monitoring = (IMMonitoringImpl) PAActiveObject.newActive(IMMonitoringImpl.class.getName(),
+                    new Object[] { PAActiveObject.getStubOnThis() }, nodeIM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("active object IMUser");
             }
 
-            user = (IMUserImpl) ProActiveObject.newActive(IMUserImpl.class.getName(),
-                    new Object[] { ProActiveObject.getStubOnThis() }, nodeIM);
+            user = (IMUserImpl) PAActiveObject.newActive(IMUserImpl.class.getName(),
+                    new Object[] { PAActiveObject.getStubOnThis() }, nodeIM);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("instanciation IMNodeManager");
@@ -500,7 +500,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         // Recupere les resultats
         do {
             try {
-                int idx = ProFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
+                int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
                 IMNode imnode = nodeResults.remove(idx);
                 ScriptResult<Boolean> res = scriptResults.remove(idx);
                 if (res.errorOccured()) {
@@ -592,7 +592,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         // testing script results
         do {
             try {
-                int idx = ProFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
+                int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
 
                 // idx could be -1 if an error occured in wfa (or timeout
                 // expires)
@@ -657,10 +657,10 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         String sourceName) {
         logger.info("[IMCORE] Creating a Static source : " + sourceName);
         try {
-            NodeSource padSource = (NodeSource) ProActiveObject.newActive(PADNodeSource.class.getName(),
+            NodeSource padSource = (NodeSource) PAActiveObject.newActive(PADNodeSource.class.getName(),
                     new Object[] {
                         sourceName,
-                        (IMCoreSourceInt) ProActiveObject.getStubOnThis()
+                        (IMCoreSourceInt) PAActiveObject.getStubOnThis()
                     }, nodeIM);
 
             if (pad != null) {
@@ -689,9 +689,9 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         int ttr, Vector<String> peerUrls) {
         logger.info("[IMCORE] Creating a P2P source " + id);
         try {
-            ProActiveObject.newActive(P2PNodeSource.class.getName(),
+            PAActiveObject.newActive(P2PNodeSource.class.getName(),
                 new Object[] {
-                    id, (IMCoreSourceInt) ProActiveObject.getStubOnThis(),
+                    id, (IMCoreSourceInt) PAActiveObject.getStubOnThis(),
                     nbMaxNodes, nice, ttr, peerUrls
                 }, nodeIM);
         } catch (ActiveObjectCreationException e) {
@@ -712,9 +712,9 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
         int ttr) {
         logger.info("[IMCORE] Creating a Dummy node source " + id);
         try {
-            ProActiveObject.newActive(DummyNodeSource.class.getName(),
+            PAActiveObject.newActive(DummyNodeSource.class.getName(),
                 new Object[] {
-                    id, (IMCoreSourceInt) ProActiveObject.getStubOnThis(),
+                    id, (IMCoreSourceInt) PAActiveObject.getStubOnThis(),
                     nbMaxNodes, nice, ttr
                 }, nodeIM);
         } catch (ActiveObjectCreationException e) {
@@ -1119,7 +1119,7 @@ public class IMCore implements IMCoreInterface, InitActive, IMCoreSourceInt,
             //finish the shutdown 
             this.user.shutdown();
             this.monitoring.shutdown();
-            ProActiveObject.terminateActiveObject(false);
+            PAActiveObject.terminateActiveObject(false);
         }
     }
 

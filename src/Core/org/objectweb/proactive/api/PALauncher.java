@@ -37,7 +37,7 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
 @PublicAPI
-public class ProLauncher {
+public class PALauncher {
 
     /**
      * Launches the main method of the main class through the node node

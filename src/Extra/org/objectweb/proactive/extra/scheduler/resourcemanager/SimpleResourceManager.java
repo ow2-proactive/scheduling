@@ -35,8 +35,8 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -82,7 +82,7 @@ public class SimpleResourceManager implements GenericResourceManager,
                     "finished deactivating nodes, will terminate Resource Manager");
             }
 
-            ProActiveObject.terminateActiveObject(true);
+            PAActiveObject.terminateActiveObject(true);
 
             //sucess
             return new BooleanWrapper(true);
@@ -97,7 +97,7 @@ public class SimpleResourceManager implements GenericResourceManager,
     //adds the virtual nodes and create listeners for the virtual nodes to add nodes whenever created
     public void addNodes(String xmlURL) {
         try {
-            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(xmlURL);
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(xmlURL);
             VirtualNode[] virtualNodes = pad.getVirtualNodes();
 
             for (int i = 0; i < virtualNodes.length; i++) {

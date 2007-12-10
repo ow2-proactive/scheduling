@@ -35,9 +35,9 @@ import java.util.Stack;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.api.ProLifeCycle;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.notification.BodyNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -311,8 +311,8 @@ public class LocalBodyStore {
 
         // END ProActiveEvent
         if ((this.localBodyMap.size() == 0) &&
-                ProProperties.PA_EXIT_ON_EMPTY.isTrue()) {
-            ProLifeCycle.exitSuccess();
+                PAProperties.PA_EXIT_ON_EMPTY.isTrue()) {
+            PALifeCycle.exitSuccess();
         }
     }
 

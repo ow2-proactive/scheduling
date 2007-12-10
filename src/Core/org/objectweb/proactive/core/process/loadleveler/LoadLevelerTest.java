@@ -32,8 +32,8 @@ package org.objectweb.proactive.core.process.loadleveler;
 
 import java.net.UnknownHostException;
 
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -63,21 +63,21 @@ public class LoadLevelerTest {
                                        //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_AdvancedTasksPerNodeExample.xml");
                                        //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_AdvancedTotalTasksExample.xml");
                                        //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_AdvancedTaskGeometryExample.xml");
-                ProDeployment.getProactiveDescriptor(args[0]);
+                PADeployment.getProactiveDescriptor(args[0]);
 
             //			ProActive.getProactiveDescriptor(path+"/SSH_LSF_Example.xml");
             pad.activateMappings();
             VirtualNode vn = pad.getVirtualNode("levelerVn");
 
-            LoadLevelerTest group = (LoadLevelerTest) ProGroup.newActiveAsGroup(LoadLevelerTest.class.getName(),
+            LoadLevelerTest group = (LoadLevelerTest) PAGroup.newActiveAsGroup(LoadLevelerTest.class.getName(),
                     null, vn);
 
             StringWrapper p = group.ping();
 
-            ProGroup.waitAll(p);
+            PAGroup.waitAll(p);
 
-            StringWrapper sw1 = (StringWrapper) ProGroup.get(p, 0);
-            StringWrapper sw2 = (StringWrapper) ProGroup.get(p, 1);
+            StringWrapper sw1 = (StringWrapper) PAGroup.get(p, 0);
+            StringWrapper sw2 = (StringWrapper) PAGroup.get(p, 1);
 
             System.out.println(sw1);
             System.out.println(sw2);

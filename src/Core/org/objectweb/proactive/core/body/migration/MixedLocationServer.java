@@ -36,12 +36,12 @@ import java.util.Hashtable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -202,7 +202,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
     protected void register() {
         try {
             logger.info("Attempt at binding : " + url);
-            ProActiveObject.register(ProActiveObject.getStubOnThis(), url);
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), url);
             logger.info("Location Server bound in registry : " + url);
         } catch (Exception e) {
             logger.fatal("Cannot bind in registry - aborting " + url);
@@ -213,7 +213,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
 
     public static void main(String[] args) {
         ProActiveConfiguration.load();
-        String name = ProProperties.PA_LOCATION_SERVER_RMI.getValue();
+        String name = PAProperties.PA_LOCATION_SERVER_RMI.getValue();
 
         Object[] arg = new Object[1];
         arg[0] = name;
@@ -222,10 +222,10 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
 
         try {
             if (args.length == 1) {
-                server = (MixedLocationServer) ProActiveObject.newActive(MixedLocationServer.class.getName(),
+                server = (MixedLocationServer) PAActiveObject.newActive(MixedLocationServer.class.getName(),
                         arg, NodeFactory.getNode(args[0]));
             } else {
-                server = (MixedLocationServer) ProActiveObject.newActive(MixedLocationServer.class.getName(),
+                server = (MixedLocationServer) PAActiveObject.newActive(MixedLocationServer.class.getName(),
                         arg);
             }
         } catch (Exception e) {

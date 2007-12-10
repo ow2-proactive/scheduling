@@ -80,7 +80,7 @@ public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame 
         receiveMessage("on node " +
             ((node == null) ? "local" : node.getNodeInformation().getURL()));
         try {
-            activeHello = (Hello) org.objectweb.proactive.api.ProActiveObject.newActive(Hello.class.getName(),
+            activeHello = (Hello) org.objectweb.proactive.api.PAActiveObject.newActive(Hello.class.getName(),
                     null, node);
         } catch (Exception e) {
             // There has been a problem...

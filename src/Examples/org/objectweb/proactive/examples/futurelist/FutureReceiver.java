@@ -82,7 +82,7 @@ public class FutureReceiver implements java.io.Serializable {
      * Request its body futurePool and create an empty future list
      */
     public void createFutureList() {
-        org.objectweb.proactive.core.body.ActiveBody b = (org.objectweb.proactive.core.body.ActiveBody) org.objectweb.proactive.api.ProActiveObject.getBodyOnThis();
+        org.objectweb.proactive.core.body.ActiveBody b = (org.objectweb.proactive.core.body.ActiveBody) org.objectweb.proactive.api.PAActiveObject.getBodyOnThis();
         this.futureList = new FutureList();
     }
 

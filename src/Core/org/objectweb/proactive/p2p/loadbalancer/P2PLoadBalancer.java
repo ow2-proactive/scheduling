@@ -42,7 +42,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -81,7 +81,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 itAddress = oService.getAddress().stringValue();
                 itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                     "/" + this.balancerName;
-                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
+                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
                         itAddress);
 
                 if (forBalancing.indexOf(oLB) < 0) {
@@ -113,7 +113,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 String itAddress = oService.getAddress().stringValue();
                 itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                     "/" + this.balancerName;
-                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
+                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
                         itAddress);
 
                 if (!forBalancing.contains(oLB)) {
@@ -142,7 +142,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 itAddress = oService.getAddress().stringValue();
                 itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                     "/robinhood";
-                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
+                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
                         itAddress);
 
                 if (!forStealing.contains(oLB)) {
@@ -175,7 +175,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
                 itAddress = oService.getAddress().stringValue();
                 itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                     "/" + this.balancerName;
-                P2PLoadBalancer oLB = (P2PLoadBalancer) ProActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
+                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
                         itAddress);
 
                 if (!forStealing.contains(oLB)) {
@@ -311,7 +311,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
     }
 
     public void runActivity(Body body) {
-        this.myThis = (P2PLoadBalancer) ProActiveObject.getStubOnThis();
+        this.myThis = (P2PLoadBalancer) PAActiveObject.getStubOnThis();
         this.balancerName = "robinhood";
 
         /* Updating the node reference */
@@ -329,7 +329,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             String itAddress = body.getNodeURL();
             itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
                 "/" + this.balancerName;
-            ProActiveObject.register(myThis, itAddress);
+            PAActiveObject.register(myThis, itAddress);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -343,7 +343,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
 
     public void killMePlease() {
         lm.killMePlease();
-        ProActiveObject.terminateActiveObject(myThis, true);
+        PAActiveObject.terminateActiveObject(myThis, true);
     }
 
     public void init() {

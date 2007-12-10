@@ -34,7 +34,7 @@ import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -95,7 +95,7 @@ public class AdminScheduler extends UserScheduler
 
         //check that the scheduler is an active object
         try {
-            ProActiveObject.getActiveObjectNodeUrl(rm);
+            PAActiveObject.getActiveObjectNodeUrl(rm);
         } catch (ProActiveRuntimeException e) {
             logger.warn(
                 "The infrastructure manager is not an active object, this will decrease the scheduler performance.");
@@ -115,12 +115,12 @@ public class AdminScheduler extends UserScheduler
             // creating the scheduler proxy.
             // if this fails then it will not continue.
             logger.info("Creating scheduler frontend...");
-            schedulerFrontend = (SchedulerFrontend) ProActiveObject.newActive(SchedulerFrontend.class.getName(),
+            schedulerFrontend = (SchedulerFrontend) PAActiveObject.newActive(SchedulerFrontend.class.getName(),
                     new Object[] { rm, policyFullClassName });
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger.info("Creating scheduler authentication interface...");
-            schedulerAuth = (SchedulerAuthentication) ProActiveObject.newActive(SchedulerAuthentication.class.getName(),
+            schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class.getName(),
                     new Object[] { loginFile, groupFile, schedulerFrontend });
             // adding NFE listener to managed non functional exceptions
             // that occurs in Proactive Core
@@ -133,7 +133,7 @@ public class AdminScheduler extends UserScheduler
 
             String schedulerUrl = "//localhost/" +
                 SchedulerConnection.SCHEDULER_DEFAULT_NAME;
-            ProActiveObject.register(schedulerAuth, schedulerUrl);
+            PAActiveObject.register(schedulerAuth, schedulerUrl);
             // setting the proxy to the admin scheduler API
             adminScheduler.schedulerFrontend = schedulerFrontend;
             // run forest run !!

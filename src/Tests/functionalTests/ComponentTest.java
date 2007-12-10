@@ -31,7 +31,7 @@
 package functionalTests;
 
 import org.junit.BeforeClass;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.FunctionalTest;
 
@@ -59,13 +59,13 @@ public abstract class ComponentTest extends FunctionalTest {
 
     @BeforeClass
     public static void componentPreConditions() throws Exception {
-        if (!ProProperties.PA_FUTURE_AC.isTrue()) {
+        if (!PAProperties.PA_FUTURE_AC.isTrue()) {
             throw new Exception(
                 "The components framework needs the automatic continuations (system property 'proactive.future.ac' set to 'enable') to be operative");
         }
 
         //-Dfractal.provider=org.objectweb.proactive.core.component.Fractive
-        ProProperties.FRACTAL_PROVIDER.setValue(
+        PAProperties.FRACTAL_PROVIDER.setValue(
             "org.objectweb.proactive.core.component.Fractive");
     }
 }

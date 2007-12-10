@@ -30,7 +30,7 @@
  */
 package functionalTests.activeobject.creation.local.turnactive;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
@@ -49,7 +49,7 @@ public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         a = new A("toto");
-        a = (A) ProActiveObject.turnActive(a);
+        a = (A) PAActiveObject.turnActive(a);
         name = a.getName();
         nodeUrl = a.getNodeUrl();
 

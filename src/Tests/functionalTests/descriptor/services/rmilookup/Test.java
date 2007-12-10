@@ -31,7 +31,7 @@
 package functionalTests.descriptor.services.rmilookup;
 
 import org.junit.After;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -63,10 +63,10 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        pad = ProDeployment.getProactiveDescriptor(ONEVM_XML_LOCATION_UNIX);
+        pad = PADeployment.getProactiveDescriptor(ONEVM_XML_LOCATION_UNIX);
         pad.activateMappings();
         Thread.sleep(5000);
-        pad1 = ProDeployment.getProactiveDescriptor(LOOK_XML_LOCATION_UNIX);
+        pad1 = PADeployment.getProactiveDescriptor(LOOK_XML_LOCATION_UNIX);
         pad1.activateMappings();
         VirtualNode vn = pad1.getVirtualNode("VnTest");
         node = vn.getNode();

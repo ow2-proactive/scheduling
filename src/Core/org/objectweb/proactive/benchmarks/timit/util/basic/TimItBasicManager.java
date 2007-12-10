@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.basic;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 
@@ -74,7 +74,7 @@ public class TimItBasicManager {
             return this.timItBasicReductor;
         }
         try {
-            this.timItBasicReductor = (TimItBasicReductor) ProActiveObject.newActive(TimItBasicReductor.class.getName(),
+            this.timItBasicReductor = (TimItBasicReductor) PAActiveObject.newActive(TimItBasicReductor.class.getName(),
                     new Object[] {  });
             this.timItBasicReductor.registerShutdownHook();
             this.timItBasicReductor.incrementAwaitedResult();

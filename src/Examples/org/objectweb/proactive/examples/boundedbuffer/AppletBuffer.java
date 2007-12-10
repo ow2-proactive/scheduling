@@ -72,7 +72,7 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
         cells[0].setIn(true);
         cells[0].setOut(true);
         try {
-            display = (ActiveDisplay) org.objectweb.proactive.api.ProActiveObject.turnActive(new ActiveDisplay(
+            display = (ActiveDisplay) org.objectweb.proactive.api.PAActiveObject.turnActive(new ActiveDisplay(
                         max, this));
             receiveMessage("ActiveDisplay created : " +
                 display.getClass().getName());

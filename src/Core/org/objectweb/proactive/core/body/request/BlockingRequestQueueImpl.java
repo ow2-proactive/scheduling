@@ -34,7 +34,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -249,7 +249,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         boolean oldest, long timeout) {
         if (oldest && (requestFilter == null) && (timeout == 0)) {
             if (this.spmdManager == null) {
-                this.spmdManager = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSPMDGroupManager();
+                this.spmdManager = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSPMDGroupManager();
             }
             if (!spmdManager.isCurrentBarriersEmpty()) {
                 return this.barrierBlockingRemove(); // the oospmd way ...

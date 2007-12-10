@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.examples.mydiary;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 
@@ -45,18 +45,18 @@ public class StartServer {
     public static void main(String[] args) {
         Diary diary = null;
         try {
-            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(args[0]);
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(args[0]);
 
             pad.activateMappings();
 
             if (args.length == 2) {
-                diary = (Diary) ProActiveObject.newActive("org.objectweb.proactive.examples.mydiary.DiaryImpl",
+                diary = (Diary) PAActiveObject.newActive("org.objectweb.proactive.examples.mydiary.DiaryImpl",
                         new Object[] {  });
             } else {
-                diary = (Diary) ProActiveObject.newActive("org.objectweb.proactive.examples.mydiary.DiaryImpl",
+                diary = (Diary) PAActiveObject.newActive("org.objectweb.proactive.examples.mydiary.DiaryImpl",
                         new Object[] { args[1] });
             }
-            ProActiveObject.register(diary, "//localhost/MyDiary");
+            PAActiveObject.register(diary, "//localhost/MyDiary");
         } catch (Exception e) {
             e.printStackTrace();
         }

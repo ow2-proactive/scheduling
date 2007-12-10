@@ -37,8 +37,8 @@ import java.util.Vector;
 import javasci.SciData;
 import javasci.SciDoubleMatrix;
 
-import org.objectweb.proactive.api.ProFileTransfer;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFileTransfer;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
@@ -65,7 +65,7 @@ public class SciTestLibrary {
             listStateEngine.add((mapEngine.get(arrayEngine[i])).activate());
         }
 
-        ProFuture.waitForAll(listStateEngine);
+        PAFuture.waitForAll(listStateEngine);
         //Transfer
         Object[] arrayKey = mapEngine.keySet().toArray();
         try {
@@ -73,7 +73,7 @@ public class SciTestLibrary {
                 Node node = MSDeployEngine.getEngineNode((String) arrayKey[i]);
                 System.out.println("Sending file to:" +
                     node.getNodeInformation().getURL());
-                RemoteFile rfile = ProFileTransfer.push(new File(localSource),
+                RemoteFile rfile = PAFileTransfer.push(new File(localSource),
                         node, new File(remoteDest));
                 rfile.waitFor();
             }

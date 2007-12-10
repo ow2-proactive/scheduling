@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.gc.HalfBodies;
 
 
 @PublicAPI
-public class ProLifeCycle {
+public class PALifeCycle {
 
     /**
      * Inform the ProActive DGC that all non active threads will not use

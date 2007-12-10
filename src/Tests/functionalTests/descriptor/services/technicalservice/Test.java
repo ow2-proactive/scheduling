@@ -32,7 +32,7 @@ package functionalTests.descriptor.services.technicalservice;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
@@ -69,7 +69,7 @@ public class Test extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        this.pad = ProDeployment.getProactiveDescriptor(XML_LOCATION);
+        this.pad = PADeployment.getProactiveDescriptor(XML_LOCATION);
         this.pad.activateMappings();
     }
 

@@ -34,8 +34,8 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
@@ -93,7 +93,7 @@ public class A implements InitActive, RunActive, EndActive,
     public String getNodeName() {
         try {
             //return the name of the Node
-            return ProActiveObject.getBodyOnThis().getNodeURL().toUpperCase();
+            return PAActiveObject.getBodyOnThis().getNodeURL().toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();
             return "getNodeName failed";
@@ -102,12 +102,12 @@ public class A implements InitActive, RunActive, EndActive,
 
     public void moveTo(String nodeURL) throws Exception {
         // System.out.println(" I am going to migate");
-        ProMobileAgent.migrateTo(nodeURL);
+        PAMobileAgent.migrateTo(nodeURL);
         // System.out.println("migration done");
     }
 
     public void endBodyActivity() throws Exception {
-        ProActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(true);
     }
 
     public void initActivity(Body body) {

@@ -30,9 +30,9 @@
  */
 package functionalTests.descriptor.lookupregister;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -50,7 +50,7 @@ public class Test extends FunctionalTest {
     private static String AGENT_XML_LOCATION_UNIX;
 
     static {
-        if ("ibis".equals(ProProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
+        if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
             AGENT_XML_LOCATION_UNIX = Test.class.getResource(
                     "/functionalTests/descriptor/lookupregister/AgentIbis.xml")
                                                 .getPath();
@@ -66,13 +66,13 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        proActiveDescriptorAgent = ProDeployment.getProactiveDescriptor("file:" +
+        proActiveDescriptorAgent = PADeployment.getProactiveDescriptor("file:" +
                 AGENT_XML_LOCATION_UNIX);
         proActiveDescriptorAgent.activateMappings();
         VirtualNode vnAgent = proActiveDescriptorAgent.getVirtualNode("Agent");
-        ProActiveObject.newActive(A.class.getName(), new Object[] { "local" },
+        PAActiveObject.newActive(A.class.getName(), new Object[] { "local" },
             vnAgent.getNode());
-        VirtualNode vnLookup = ProDeployment.lookupVirtualNode(URIBuilder.buildURIFromProperties(
+        VirtualNode vnLookup = PADeployment.lookupVirtualNode(URIBuilder.buildURIFromProperties(
                     "localhost", "Agent").toString());
         a = (A) vnLookup.getUniqueAO();
 

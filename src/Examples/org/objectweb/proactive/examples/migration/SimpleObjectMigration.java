@@ -36,8 +36,8 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -109,7 +109,7 @@ public class SimpleObjectMigration implements Serializable {
         try {
             logger.info("SimpleObjectMigration> moveTo(" + t + ") " +
                 "% start migration");
-            ProMobileAgent.migrateTo(t);
+            PAMobileAgent.migrateTo(t);
             logger.info("SimpleObjectMigration> moveTo(" + t + ") " +
                 "% stop migration");
         } catch (Exception e) {
@@ -204,7 +204,7 @@ public class SimpleObjectMigration implements Serializable {
                     "Created by " + URIBuilder.getLocalAddress().toString()
                 };
 
-            activeHello = (SimpleObjectMigration) ProActiveObject.newActive(className,
+            activeHello = (SimpleObjectMigration) PAActiveObject.newActive(className,
                     params, sourceNode);
             logger.info("SimpleObjectMigration> main() > " +
                 "We created an simple active object");

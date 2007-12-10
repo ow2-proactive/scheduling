@@ -37,7 +37,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -59,7 +59,7 @@ public class PrimitiveComponentD implements I1, BindingController {
             I2.class.getName());
 
     // ref on the Group
-    Group i2Group = ProGroup.getGroup(i2);
+    Group i2Group = PAGroup.getGroup(i2);
 
     /**
      *

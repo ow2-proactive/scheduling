@@ -39,10 +39,10 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -60,7 +60,7 @@ public class FileTransferEngine implements ProActiveInternalObject, InitActive,
     RunActive {
     //Not Serializable on purpose: This is a service AO that cannot migrate!!
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
-    static public final int DEFAULT_MAX_FILE_TRANSFER_SERVICES = ProProperties.PA_FILETRANSFER_MAX_SERVICES.getValueAsInt();
+    static public final int DEFAULT_MAX_FILE_TRANSFER_SERVICES = PAProperties.PA_FILETRANSFER_MAX_SERVICES.getValueAsInt();
     static FileTransferEngine singletonFTE = getFileTransferEngine();
     Vector<FileTransferService> ftsPool;
     int maxFTS;
@@ -104,7 +104,7 @@ public class FileTransferEngine implements ProActiveInternalObject, InitActive,
             return ftsPool.remove(0);
         }
 
-        FileTransferService localFTS = (FileTransferService) ProActiveObject.newActive(FileTransferService.class.getName(),
+        FileTransferService localFTS = (FileTransferService) PAActiveObject.newActive(FileTransferService.class.getName(),
                 null);
         --maxFTS;
 
@@ -118,7 +118,7 @@ public class FileTransferEngine implements ProActiveInternalObject, InitActive,
     static synchronized public FileTransferEngine getFileTransferEngine() {
         if (singletonFTE == null) {
             try {
-                singletonFTE = (FileTransferEngine) ProActiveObject.newActive(FileTransferEngine.class.getName(),
+                singletonFTE = (FileTransferEngine) PAActiveObject.newActive(FileTransferEngine.class.getName(),
                         new Object[] { DEFAULT_MAX_FILE_TRANSFER_SERVICES });
             } catch (Exception e) {
                 e.printStackTrace();

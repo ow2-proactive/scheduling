@@ -48,27 +48,27 @@ public class ReaderDisplay implements org.objectweb.proactive.InitActive {
         writers = new Writer[3];
 
         Object[] param = new Object[] {
-                org.objectweb.proactive.api.ProActiveObject.getStubOnThis(),
+                org.objectweb.proactive.api.PAActiveObject.getStubOnThis(),
                 new Integer(ReaderWriter.DEFAULT_POLICY)
             };
         try {
-            rw = (ReaderWriter) org.objectweb.proactive.api.ProActiveObject.newActive(ReaderWriter.class.getName(),
+            rw = (ReaderWriter) org.objectweb.proactive.api.PAActiveObject.newActive(ReaderWriter.class.getName(),
                     param);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         param = new Object[3];
-        param[0] = org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
+        param[0] = org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
         param[1] = rw;
         for (int i = 0; i < 3; i++) {
             param[2] = new Integer(i);
             try {
                 // Readers
-                readers[i] = (Reader) org.objectweb.proactive.api.ProActiveObject.newActive(Reader.class.getName(),
+                readers[i] = (Reader) org.objectweb.proactive.api.PAActiveObject.newActive(Reader.class.getName(),
                         param);
                 // Writers
-                writers[i] = (Writer) org.objectweb.proactive.api.ProActiveObject.newActive(Writer.class.getName(),
+                writers[i] = (Writer) org.objectweb.proactive.api.PAActiveObject.newActive(Writer.class.getName(),
                         param);
             } catch (Exception e) {
                 e.printStackTrace();

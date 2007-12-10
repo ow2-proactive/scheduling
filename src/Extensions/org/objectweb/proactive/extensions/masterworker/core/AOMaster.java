@@ -47,9 +47,9 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -307,7 +307,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
                         workersActivity.put(workerName, wact);
                     }
                     TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId);
-                    TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) ProFuture.getFutureValue(taskfuture);
+                    TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) PAFuture.getFutureValue(taskfuture);
                     repository.saveTask(taskId);
                     tasksToDo.offer(realTask);
                 }
@@ -331,7 +331,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      */
     @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
-        stubOnThis = ProActiveObject.getStubOnThis();
+        stubOnThis = PAActiveObject.getStubOnThis();
         // General initializations
         terminated = false;
         // Queues
@@ -342,11 +342,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         // Workers
         try {
             // Worker Group
-            workerGroupStub = (Worker) ProGroup.newGroup(AOWorker.class.getName());
-            workerGroup = ProGroup.getGroup(workerGroupStub);
+            workerGroupStub = (Worker) PAGroup.newGroup(AOWorker.class.getName());
+            workerGroup = PAGroup.getGroup(workerGroupStub);
             // Group of sleeping workers
-            sleepingGroupStub = (Worker) ProGroup.newGroup(AOWorker.class.getName());
-            sleepingGroup = ProGroup.getGroup(sleepingGroupStub);
+            sleepingGroupStub = (Worker) PAGroup.newGroup(AOWorker.class.getName());
+            sleepingGroup = PAGroup.getGroup(sleepingGroupStub);
             workersActivity = new HashMap<String, List<Long>>();
             workersByName = new HashMap<String, Worker>();
             workersByNameRev = new HashMap<Worker, String>();
@@ -358,11 +358,11 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
 
         try {
             // The resource manager
-            smanager = (AOWorkerManager) ProActiveObject.newActive(AOWorkerManager.class.getName(),
+            smanager = (AOWorkerManager) PAActiveObject.newActive(AOWorkerManager.class.getName(),
                     new Object[] { stubOnThis, initialMemory });
 
             // The worker pinger
-            pinger = (WorkerWatcher) ProActiveObject.newActive(AOPinger.class.getName(),
+            pinger = (WorkerWatcher) PAActiveObject.newActive(AOPinger.class.getName(),
                     new Object[] { stubOnThis });
         } catch (ActiveObjectCreationException e1) {
             e1.printStackTrace();
@@ -532,7 +532,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * Serve the pending waitXXX method
      */
     protected void servePending() {
-        Body body = ProActiveObject.getBodyOnThis();
+        Body body = PAActiveObject.getBodyOnThis();
         Request req = pendingRequest;
         pendingRequest = null;
         body.serve(req);
@@ -572,7 +572,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     public void solveIds(final List<Long> taskIds) {
         logger.debug("Adding " + taskIds.size() + " tasks by " +
             Thread.currentThread() + " and body is " +
-            ProActiveObject.getContext().getBody());
+            PAActiveObject.getContext().getBody());
 
         for (Long taskId : taskIds) {
             solve(taskId);
@@ -623,9 +623,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         }
 
         // We terminate the pinger
-        ProFuture.waitFor(pinger.terminate());
+        PAFuture.waitFor(pinger.terminate());
         // We terminate the worker manager
-        ProFuture.waitFor(smanager.terminate(freeResources));
+        PAFuture.waitFor(smanager.terminate(freeResources));
         if (logger.isDebugEnabled()) {
             logger.debug("Master terminated...");
         }

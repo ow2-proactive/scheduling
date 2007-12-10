@@ -31,8 +31,8 @@
 package functionalTests.loadbalancing;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -56,14 +56,14 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        a = (A) ProActiveObject.newActive(A.class.getName(), null, nodeOne);
+        a = (A) PAActiveObject.newActive(A.class.getName(), null, nodeOne);
         Thread.sleep(1000);
         assertTrue(a.getNodeUrl().equals(nodeTwo.getNodeInformation().getURL()));
     }
 
     @Before
     public void initTest() throws Exception {
-        this.pad = ProDeployment.getProactiveDescriptor(XML_LOCATION);
+        this.pad = PADeployment.getProactiveDescriptor(XML_LOCATION);
         this.pad.activateMappings();
         this.vn1 = this.pad.getVirtualNode("VN");
         assertTrue(this.vn1.getMinNumberOfNodes() <= this.vn1.getNumberOfCreatedNodesAfterDeployment());

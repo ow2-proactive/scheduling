@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extensions.scilab.monitor;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.scilab.MSEngine;
 
@@ -60,7 +60,7 @@ public class MSEngineInfo {
     }
 
     public String getSciEngineUrl() {
-        return ProActiveObject.getActiveObjectNodeUrl(this.mSEngine);
+        return PAActiveObject.getActiveObjectNodeUrl(this.mSEngine);
     }
 
     public BooleanWrapper getIsActivate() {

@@ -30,7 +30,7 @@
  */
 package functionalTests.component.conform.components;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
@@ -40,7 +40,7 @@ public class SlaveImpl implements Slave {
     }
 
     public void computeOneWay(String arg, String other) {
-        System.err.println(ProActiveObject.getBodyOnThis().getNodeURL() +
+        System.err.println(PAActiveObject.getBodyOnThis().getNodeURL() +
             "Slave: " + this + " arg: " + arg + " other: " + other);
     }
 

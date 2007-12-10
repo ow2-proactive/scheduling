@@ -47,10 +47,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.c3d.C3DDispatcher;
 import org.objectweb.proactive.examples.c3d.Dispatcher;
@@ -172,7 +172,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         this.c3dDispatcher = null;
         // First try with the provided url, if the user entered the exact url for the dispatcher
         try {
-            this.c3dDispatcher = (Dispatcher) ProActiveObject.lookupActive(C3DDispatcher.class.getName(),
+            this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class.getName(),
                     url);
             setVisible(false);
             return;
@@ -184,7 +184,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         // Second, check the url given does map to a machine, and get list of registered objects on it
         try {
             hostName = URIBuilder.getHostNameFromUrl(url);
-            registeredObjects = ProActiveObject.listActive(url);
+            registeredObjects = PAActiveObject.listActive(url);
         } catch (IOException e) {
             treatException(e,
                 "Sorry, could not find a registered C3DDispatcher on host \"" +
@@ -198,7 +198,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
             if (name.equals("Dispatcher") && (name.indexOf("_VN") == -1)) { // replace by (java 1.5 String.contains)
                 try {
-                    this.c3dDispatcher = (Dispatcher) ProActiveObject.lookupActive(C3DDispatcher.class.getName(),
+                    this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class.getName(),
                             registeredObjects[i]);
                     setVisible(false);
                     return;
@@ -245,7 +245,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
         try {
             int port = -1;
-            String protocol = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
             if (!protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
                 port = Integer.parseInt(ProActiveConfiguration.getInstance()

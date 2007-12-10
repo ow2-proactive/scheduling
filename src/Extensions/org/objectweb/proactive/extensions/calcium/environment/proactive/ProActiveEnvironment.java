@@ -32,7 +32,7 @@ package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
@@ -91,7 +91,7 @@ public class ProActiveEnvironment implements EnvironmentFactory {
         vc.setVariableFromProgram("MAX_CINTERPRETERS", "3",
             VariableContractType.ProgramDefaultVariable);
 
-        pad = ProDeployment.getProactiveDescriptor(descriptor, vc);
+        pad = PADeployment.getProactiveDescriptor(descriptor, vc);
         vc = pad.getVariableContract();
 
         int maxCInterp = Integer.parseInt(vc.getValue("MAX_CINTERPRETERS"));

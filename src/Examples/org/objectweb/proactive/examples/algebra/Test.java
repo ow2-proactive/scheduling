@@ -62,11 +62,11 @@ public class Test extends Object {
             Object[] parameters1 = { m0.getBlock(0, 0, m, n - 1) };
 
             //System.out.println("Le parametre est " + parameters1[0]);
-            m1 = (Matrix) org.objectweb.proactive.api.ProActiveObject.newActive(Matrix.class.getName(),
+            m1 = (Matrix) org.objectweb.proactive.api.PAActiveObject.newActive(Matrix.class.getName(),
                     parameters1);
             //m1 = (Matrix) org.objectweb.proactive.ProActive.newActive(Matrix.class.getName(), null,null);
             Object[] parameters2 = { m0.getBlock(m + 1, 0, n - 1, n - 1) };
-            m2 = (Matrix) org.objectweb.proactive.api.ProActiveObject.newActive(Matrix.class.getName(),
+            m2 = (Matrix) org.objectweb.proactive.api.PAActiveObject.newActive(Matrix.class.getName(),
                     parameters2);
 
             // Computes both products

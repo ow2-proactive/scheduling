@@ -30,7 +30,7 @@
  */
 package performanceTests.simple;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 
 /**
@@ -66,7 +66,7 @@ public class Caller implements java.io.Serializable {
      * should be called to terminate its activity.
      */
     public boolean kill() {
-        ProActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(true);
         return true;
     }
 }

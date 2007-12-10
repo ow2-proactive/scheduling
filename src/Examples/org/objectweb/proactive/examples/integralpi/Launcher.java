@@ -34,9 +34,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProGroup;
-import org.objectweb.proactive.api.ProLifeCycle;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -109,7 +109,7 @@ public class Launcher {
                 }
 
                 // Send the number of iterations to the first worker
-                Worker firstWorker = (Worker) ProGroup.getGroup(workers).get(0);
+                Worker firstWorker = (Worker) PAGroup.getGroup(workers).get(0);
                 wrappedResult = firstWorker.start(numOfIterations);
                 result = wrappedResult.doubleValue();
                 error = result - Math.PI;
@@ -130,7 +130,7 @@ public class Launcher {
     private static Node[] provideNodes(String descriptorUrl) {
         try {
             // Common stuff about ProActive deployement
-            pad = ProDeployment.getProactiveDescriptor(descriptorUrl);
+            pad = PADeployment.getProactiveDescriptor(descriptorUrl);
 
             pad.activateMappings();
             VirtualNode vnode = pad.getVirtualNodes()[0];
@@ -151,10 +151,10 @@ public class Launcher {
     private static void finish() {
         try {
             pad.killall(true);
-            ProLifeCycle.exitSuccess();
+            PALifeCycle.exitSuccess();
         } catch (ProActiveException ex) {
             ex.printStackTrace();
-            ProLifeCycle.exitFailure();
+            PALifeCycle.exitFailure();
         }
     }
 }

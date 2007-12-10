@@ -34,7 +34,7 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.exception.ProtocolErrorException;
@@ -131,7 +131,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
                 this.wait(3000);
 
                 if (!isArrived) {
-                    UniqueID waiter = ProActiveObject.getBodyOnThis().getID();
+                    UniqueID waiter = PAActiveObject.getBodyOnThis().getID();
                     logger.info("[WAIT] " + waiter +
                         " is waiting for a request from " + this.awaitedSender);
                 }

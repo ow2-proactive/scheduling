@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extra.infrastructuremanager.test.simple;
 
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
@@ -57,7 +57,7 @@ public class SimpleTestIMAdmin {
             System.out.println("#[SimpleTestIMAdmin] deployAllVirtualNodes : " +
                 URL_PAD_LOCAL);
 
-            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(URL_PAD_LOCAL);
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(URL_PAD_LOCAL);
             admin.createStaticNodesource("static source", pad);
             System.out.println("Sleep 12s");
             Thread.sleep(12000);

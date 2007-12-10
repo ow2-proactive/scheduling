@@ -49,9 +49,9 @@ import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProException;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAException;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -262,7 +262,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         recover();
 
         //listen log as immediate Service.
-        //ProActiveObject.setImmediateService("listenLog");
+        //PAActiveObject.setImmediateService("listenLog");
         Service service = new Service(body);
 
         //set the filter for serveAll method
@@ -271,7 +271,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         createPingThread();
 
         // default scheduler state is started
-        ((SchedulerCore) ProActiveObject.getStubOnThis()).coreStart();
+        ((SchedulerCore) PAActiveObject.getStubOnThis()).coreStart();
 
         do {
             service.blockingServeOldest();
@@ -340,7 +340,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         logger.info("[SCHEDULER] Closing Scheduler data base !");
         AbstractSchedulerDB.clearInstance();
         //terminate this active object
-        ProActiveObject.terminateActiveObject(false);
+        PAActiveObject.terminateActiveObject(false);
         logger.info("[SCHEDULER] Scheduler is now shutdown !");
         //exit
         System.exit(0);
@@ -411,7 +411,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                         currentJob.getJobResult()
                                   .addTaskResult(internalTask.getName(),
                             ((ProActiveTaskLauncher) launcher).doTask(
-                                (SchedulerCore) ProActiveObject.getStubOnThis(),
+                                (SchedulerCore) PAActiveObject.getStubOnThis(),
                                 (ProActiveExecutable) internalTask.getTask(),
                                 nodes), internalTask.isPreciousResult());
                     } else if (currentJob.getType() != JobType.PROACTIVE) {
@@ -440,14 +440,14 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                             currentJob.getJobResult()
                                       .addTaskResult(internalTask.getName(),
                                 launcher.doTask(
-                                    (SchedulerCore) ProActiveObject.getStubOnThis(),
+                                    (SchedulerCore) PAActiveObject.getStubOnThis(),
                                     internalTask.getTask(), params),
                                 internalTask.isPreciousResult());
                         } else {
                             currentJob.getJobResult()
                                       .addTaskResult(internalTask.getName(),
                                 launcher.doTask(
-                                    (SchedulerCore) ProActiveObject.getStubOnThis(),
+                                    (SchedulerCore) PAActiveObject.getStubOnThis(),
                                     internalTask.getTask()),
                                 internalTask.isPreciousResult());
                         }
@@ -515,7 +515,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
             for (InternalTask td : job.getTasks()) {
                 if ((td.getStatus() == TaskState.RUNNNING) &&
-                        !ProActiveObject.pingActiveObject(
+                        !PAActiveObject.pingActiveObject(
                             td.getExecuterInformations().getLauncher())) {
                     logger.info("[SCHEDULER] Node failed on job " +
                         job.getId() + ", task [ " + td.getId() + " ]");
@@ -642,7 +642,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             }
         }
 
-        taskResult = (TaskResult) ProFuture.getFutureValue(taskResult);
+        taskResult = (TaskResult) PAFuture.getFutureValue(taskResult);
         //failed the job
         job.failed(task.getId(), jobState);
 
@@ -700,7 +700,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             TaskResult res = null;
             res = job.getJobResult().getAllResults().get(descriptor.getName());
             // unwrap future
-            res = (TaskResult) ProFuture.getFutureValue(res);
+            res = (TaskResult) PAFuture.getFutureValue(res);
 
             // HANDLE DESCIPTORS
             if (res != null) {
@@ -708,7 +708,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             }
 
             if (res != null) {
-                if (ProException.isException(res)) {
+                if (PAException.isException(res)) {
                     //in this case, it is a node error.
                     //this is not user exception or usage,
                     //so we restart independently of re-runnable properties
@@ -847,7 +847,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
                 for (TaskResult tr : allRes) {
                     // if taskResult is not awaited, task is terminated
-                    if (!ProFuture.isAwaited(tr)) {
+                    if (!PAFuture.isAwaited(tr)) {
                         MDC.getContext()
                            .put(Log4JTaskLogs.MDC_TASK_ID, tr.getTaskId());
                         l.info(tr.getOuput().getStdoutLogs(false));
@@ -917,7 +917,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         if (job != null) {
             result = job.getJobResult().getAllResults().get(taskName);
 
-            if ((result != null) && !ProFuture.isAwaited(result)) {
+            if ((result != null) && !PAFuture.isAwaited(result)) {
                 logger.info("[SCHEDULER] Get '" + taskName +
                     "' task result for job " + jobId);
             }

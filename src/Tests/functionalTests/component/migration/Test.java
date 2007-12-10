@@ -30,7 +30,7 @@
  */
 package functionalTests.component.migration;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.ComponentTest;
 
@@ -59,7 +59,7 @@ public class Test extends ComponentTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        DummyAO testAO = (DummyAO) ProActiveObject.newActive(DummyAO.class.getName(),
+        DummyAO testAO = (DummyAO) PAActiveObject.newActive(DummyAO.class.getName(),
                 new Object[] {  });
         testAO.go();
     }

@@ -43,7 +43,7 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
@@ -84,7 +84,7 @@ public class JMXNotificationListener implements NotificationListener,
                 return;
             }
             connection.addNotificationListener(oname,
-                (NotificationListener) ProActiveObject.getStubOnThis(), filter,
+                (NotificationListener) PAActiveObject.getStubOnThis(), filter,
                 handback);
         } catch (InstanceNotFoundException e) {
             logger.error("Doesn't find the object name " + oname +
@@ -106,7 +106,7 @@ public class JMXNotificationListener implements NotificationListener,
     @Deprecated
     public void unsubscribe(ProActiveConnection connection, ObjectName oname,
         NotificationFilter filter, Object handback) {
-        if (!ProActiveObject.pingActiveObject(connection)) {
+        if (!PAActiveObject.pingActiveObject(connection)) {
             if (logger.isDebugEnabled()) {
                 logger.debug(
                     "Trying to unregister listener on a connection with terminated body. Ping faild on the connection object: " +
@@ -117,7 +117,7 @@ public class JMXNotificationListener implements NotificationListener,
         try {
             if (connection.isRegistered(oname)) {
                 connection.removeNotificationListener(oname,
-                    (NotificationListener) ProActiveObject.getStubOnThis(),
+                    (NotificationListener) PAActiveObject.getStubOnThis(),
                     filter, handback);
             }
         } catch (InstanceNotFoundException e) {
@@ -146,11 +146,11 @@ public class JMXNotificationListener implements NotificationListener,
 
     public boolean unsubscribeFromRegistry() {
         try {
-            Body myBody = ProActiveObject.getBodyOnThis();
+            Body myBody = PAActiveObject.getBodyOnThis();
             if (myBody instanceof AbstractBody) {
                 System.out.println("Unregistring JMXNotificationManager .... ");
                 RemoteObjectExposer roe = ((AbstractBody) myBody).getRemoteObjectExposer();
-                //  ProActiveObject.terminateActiveObject(ProActiveObject.getStubOnThis(), false);
+                //  PAActiveObject.terminateActiveObject(PAActiveObject.getStubOnThis(), false);
                 roe.unregisterAll();
                 System.out.println(
                     "Unregistered JMXNotificationListener from the registry (body:" +

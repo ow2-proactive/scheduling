@@ -30,7 +30,7 @@
  */
 package functionalTests.group.scatter;
 
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
 
@@ -64,7 +64,7 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        this.typedGroup = (A) ProGroup.newGroup(A.class.getName(), params, nodes);
+        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
         Object[][] paramsParameter = {
                 { "AgentA" },
                 { "AgentB" },
@@ -74,23 +74,23 @@ public class Test extends FunctionalTest {
                 TestNodes.getRemoteVMNode(), TestNodes.getSameVMNode(),
                 TestNodes.getLocalVMNode()
             };
-        this.parameterGroup = (A) ProGroup.newGroup(A.class.getName(),
+        this.parameterGroup = (A) PAGroup.newGroup(A.class.getName(),
                 paramsParameter, nodesParameter);
 
-        ProGroup.setScatterGroup(this.parameterGroup);
+        PAGroup.setScatterGroup(this.parameterGroup);
         this.resultTypedGroup = this.typedGroup.asynchronousCall(this.parameterGroup);
-        ProGroup.unsetScatterGroup(this.parameterGroup);
+        PAGroup.unsetScatterGroup(this.parameterGroup);
 
         // was the result group created ?
         assertTrue(this.resultTypedGroup != null);
 
-        Group group = ProGroup.getGroup(this.typedGroup);
-        Group groupResult = ProGroup.getGroup(this.resultTypedGroup);
+        Group group = PAGroup.getGroup(this.typedGroup);
+        Group groupResult = PAGroup.getGroup(this.resultTypedGroup);
 
         // has the result group the same size as the caller group ?
         assertTrue(groupResult.size() == group.size());
 
-        Group groupParameter = ProGroup.getGroup(this.parameterGroup);
+        Group groupParameter = PAGroup.getGroup(this.parameterGroup);
         boolean rightRankingAndCorrectnessOfResults = true;
         for (int i = 0; i < group.size(); i++) {
             // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?

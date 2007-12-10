@@ -36,8 +36,8 @@ import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -71,7 +71,7 @@ public class startLBoverP2P implements ProActiveInternalObject,
     public static void main(String[] args)
         throws AlreadyBoundException, ProActiveException {
         //Node n = NodeFactory.createNode("rmi://psychoquack:2805/StartTest");
-        startLBoverP2P start = (startLBoverP2P) ProActiveObject.newActive(startLBoverP2P.class.getName(),
+        startLBoverP2P start = (startLBoverP2P) PAActiveObject.newActive(startLBoverP2P.class.getName(),
                 null /*,n*/);
 
         start.doit("IntegrationTest");
@@ -88,7 +88,7 @@ public class startLBoverP2P implements ProActiveInternalObject,
         VirtualNode vn = null;
         arrivedNodes = new Vector();
         try {
-            pad = ProDeployment.getProactiveDescriptor(
+            pad = PADeployment.getProactiveDescriptor(
                     "/user/sboukhal/home/TestLB.xml");
             vn = pad.getVirtualNode("IntegrationTest");
             ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
@@ -125,13 +125,13 @@ public class startLBoverP2P implements ProActiveInternalObject,
         while (it.hasNext()) {
             Node remoteNode = (Node) it.next();
 
-            sp2ps = (StartP2PService) ProActiveObject.newActive(StartP2PService.class.getName(),
+            sp2ps = (StartP2PService) PAActiveObject.newActive(StartP2PService.class.getName(),
                     new Object[] { peersFile }, remoteNode);
             sp2ps.start();
-            ProActiveObject.terminateActiveObject(sp2ps, false);
+            PAActiveObject.terminateActiveObject(sp2ps, false);
         }
 
-        arrivedNodes.add(ProActiveObject.getNode());
+        arrivedNodes.add(PAActiveObject.getNode());
 
         try {
             Thread.sleep(2 * 1000);
@@ -152,7 +152,7 @@ public class startLBoverP2P implements ProActiveInternalObject,
 
             p2plb = null;
             try {
-                p2plb = (P2PLoadBalancer) ProActiveObject.newActive(P2PLoadBalancer.class.getName(),
+                p2plb = (P2PLoadBalancer) PAActiveObject.newActive(P2PLoadBalancer.class.getName(),
                         null, itAddress);
                 loadBalancers.add(p2plb);
             } catch (ActiveObjectCreationException e) {
@@ -193,6 +193,6 @@ public class startLBoverP2P implements ProActiveInternalObject,
     }
 
     public void killMe() {
-        ProActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(true);
     }
 }

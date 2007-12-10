@@ -30,8 +30,8 @@
  */
 package functionalTests.descriptor.coallocation;
 
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -49,7 +49,7 @@ public class Test extends FunctionalTest {
     private static String AGENT_XML_LOCATION_UNIX = null;
 
     static {
-        if ("ibis".equals(ProProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
+        if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
             AGENT_XML_LOCATION_UNIX = Test.class.getResource(
                     "/functionalTests/descriptor/coallocation/coallocationIbis.xml")
                                                 .getPath();
@@ -65,7 +65,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
+        proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
                 AGENT_XML_LOCATION_UNIX);
         // We activate the mapping in reverse order
         // when two vns refer to the same vm, the first vn which creates the vm becomes the creator of the vm

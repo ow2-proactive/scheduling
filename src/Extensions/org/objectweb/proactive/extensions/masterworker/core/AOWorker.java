@@ -42,8 +42,8 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -177,12 +177,12 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
      * {@inheritDoc}
      */
     public void initActivity(final Body body) {
-        stubOnThis = ProActiveObject.getStubOnThis();
+        stubOnThis = PAActiveObject.getStubOnThis();
         isSleeping = false;
         terminated = false;
-        ProActiveObject.setImmediateService("getName");
-        ProActiveObject.setImmediateService("heartBeat");
-        ProActiveObject.setImmediateService("terminate");
+        PAActiveObject.setImmediateService("getName");
+        PAActiveObject.setImmediateService("heartBeat");
+        PAActiveObject.setImmediateService("terminate");
     }
 
     /**
@@ -203,7 +203,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
         }
 
         // InitialTask
-        pendingTasks = (Queue<TaskIntern<Serializable>>) ProFuture.getFutureValue(provider.getTasks(
+        pendingTasks = (Queue<TaskIntern<Serializable>>) PAFuture.getFutureValue(provider.getTasks(
                     (Worker) stubOnThis, name));
     }
 
@@ -307,7 +307,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
         }
 
         this.terminated = true;
-        ProActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(true);
         if (logger.isDebugEnabled()) {
             logger.debug(name + " terminated...");
         }

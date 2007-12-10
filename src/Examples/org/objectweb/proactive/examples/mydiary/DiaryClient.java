@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.examples.mydiary;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 
@@ -44,12 +44,12 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 public class DiaryClient {
     public static void main(String[] args) {
         try {
-            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(args[0]);
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(args[0]);
 
             pad.activateMappings();
 
             System.out.println("looking for server");
-            Diary remoteDiary = (Diary) ProActiveObject.lookupActive("org.objectweb.proactive.examples.mydiary.Diary",
+            Diary remoteDiary = (Diary) PAActiveObject.lookupActive("org.objectweb.proactive.examples.mydiary.Diary",
                     "localhost/MyDiray");
             System.out.println("server found");
         } catch (Exception e) {

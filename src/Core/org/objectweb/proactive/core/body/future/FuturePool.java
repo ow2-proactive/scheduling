@@ -37,7 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 
@@ -84,7 +84,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         futures = new FutureMap();
         valuesForFutures = new java.util.HashMap<String, MethodCallResult>();
         this.newState = false;
-        if (ProProperties.PA_FUTURE_AC.isTrue()) {
+        if (PAProperties.PA_FUTURE_AC.isTrue()) {
             this.registerACs = true;
             this.sendACs = true;
             this.queueAC = new ActiveACQueue();
@@ -289,7 +289,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                         creatorID).clone());
                 if ((bodiesToContinue != null) &&
                         (bodiesToContinue.size() != 0)) {
-                    ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
+                    ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager();
 
                     // lazy starting of the AC thread
                     if (!this.queueAC.isAlive()) {
@@ -638,7 +638,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                 int remainingSends = dests.size();
                 Reply toSend = null;
                 ProActiveSecurityManager psm = (remainingSends > 1)
-                    ? (((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager())
+                    ? (((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager())
                     : null;
 
                 for (int i = 0; i < dests.size(); i++) {

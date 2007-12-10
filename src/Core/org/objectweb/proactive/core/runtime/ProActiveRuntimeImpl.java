@@ -59,7 +59,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -70,7 +70,7 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
@@ -208,7 +208,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.nodeMap = new java.util.Hashtable<String, LocalNode>();
 
             try {
-                String file = ProProperties.PA_RUNTIME_SECURITY.getValue();
+                String file = PAProperties.PA_RUNTIME_SECURITY.getValue();
                 ProActiveSecurity.loadProvider();
 
                 if ((file != null) && new File(file).exists()) {
@@ -223,10 +223,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                             this.getVMInformation().getName());
 
                     // Is the runtime included within a Domain ?
-                    String domainURL = ProProperties.PA_RUNTIME_DOMAIN_URL.getValue();
+                    String domainURL = PAProperties.PA_RUNTIME_DOMAIN_URL.getValue();
 
                     if (domainURL != null) {
-                        SecurityEntity domain = (SecurityDomain) ProActiveObject.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
+                        SecurityEntity domain = (SecurityDomain) PAActiveObject.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
                                 domainURL);
                         ProActiveRuntimeImpl.runtimeSecurityManager.setParent(domain);
                     }
@@ -469,7 +469,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         URI realnodeURL = URI.create(nodeURL);
         if (!realnodeURL.isAbsolute()) {
             try {
-                realnodeURL = RemoteObjectHelper.generateUrl(ProProperties.PA_COMMUNICATION_PROTOCOL.getValue(),
+                realnodeURL = RemoteObjectHelper.generateUrl(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue(),
                         nodeName);
             } catch (UnknownProtocolException e) {
                 throw new NodeException(e);
@@ -1384,8 +1384,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             this.hostName = URIBuilder.getHostNameorIP(this.hostInetAddress);
             String random = Integer.toString(ProActiveRandom.nextPosInt());
 
-            if (ProProperties.PA_RUNTIME_NAME.isSet()) {
-                this.name = ProProperties.PA_RUNTIME_NAME.getValue();
+            if (PAProperties.PA_RUNTIME_NAME.isSet()) {
+                this.name = PAProperties.PA_RUNTIME_NAME.getValue();
 
                 if (this.name.indexOf("PA_JVM") < 0) {
                     runtimeLogger.warn(
@@ -1594,7 +1594,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         Set<String> nodeUrls = new HashSet<String>();
 
-        String protocol = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         String hostname = vmInformation.getHostName();
         for (long i = 0; i < capacity; i++) {
             String nodeName = this.vmInformation.getName() + "_" +

@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.loadbalancing.util;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 
 
@@ -367,7 +367,7 @@ public class JacobiWorker implements java.io.Serializable {
             this.vbRight = boundary;
             break;
         }
-        UniqueID idpa = ProActiveObject.getBodyOnThis().getID();
+        UniqueID idpa = PAActiveObject.getBodyOnThis().getID();
 
         //System.out.println(idpa + " Worker " + id + " has received " + this.nbGetBoundRcvd);
         if (this.nbGetBoundRcvd == this.nbNeighbours) {
@@ -375,7 +375,7 @@ public class JacobiWorker implements java.io.Serializable {
                 this.alreadyRcvBound = true;
             } else {
                 if (iter != this.iteration) {
-                    System.err.println(ProActiveObject.getBodyOnThis().getID() +
+                    System.err.println(PAActiveObject.getBodyOnThis().getID() +
                         " ITER ERROR : local = " + this.iteration +
                         " ; remote = " + iter + "\n\n\n\n\n\n");
                     try {
@@ -405,7 +405,7 @@ public class JacobiWorker implements java.io.Serializable {
     }
 
     private void sendEndIter() {
-        UniqueID idpa = ProActiveObject.getBodyOnThis().getID();
+        UniqueID idpa = PAActiveObject.getBodyOnThis().getID();
 
         //System.out.println(idpa + " Worker " + id + " send enIter " + this.iteration);
         //send ack to neighbors

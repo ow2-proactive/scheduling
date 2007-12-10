@@ -49,8 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
@@ -240,7 +240,7 @@ public class SimpleScilab extends JavaExecutable {
         for (int i = 0; i < 30; i++) {
             try {
                 try {
-                    worker = (AOSimpleScilab) ProActiveObject.newActive(workerClassName,
+                    worker = (AOSimpleScilab) PAActiveObject.newActive(workerClassName,
                             params, uri);
                 } catch (ProActiveException e) {
                     ex = e;
@@ -280,7 +280,7 @@ public class SimpleScilab extends JavaExecutable {
         // We execute the task on the worker
         Object res = scilabWorker.execute(results);
         // We wait for the result
-        res = ProFuture.getFutureValue(res);
+        res = PAFuture.getFutureValue(res);
         // We make a synchronous call to terminate
         scilabWorker.terminate();
 

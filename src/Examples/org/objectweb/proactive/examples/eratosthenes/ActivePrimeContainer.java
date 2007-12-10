@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.eratosthenes;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 
 /**
@@ -129,7 +129,7 @@ public class ActivePrimeContainer implements PrimeNumber, java.io.Serializable,
             return new PrimeNumberImpl(this, n);
         } else {
             return activePrimeContainerCreator.newActivePrimeContainer(n,
-                (ActivePrimeContainer) ProActiveObject.getStubOnThis());
+                (ActivePrimeContainer) PAActiveObject.getStubOnThis());
         }
     }
 }

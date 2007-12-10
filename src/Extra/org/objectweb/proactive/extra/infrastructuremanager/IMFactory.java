@@ -36,7 +36,7 @@ import java.rmi.AlreadyBoundException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -82,9 +82,9 @@ public class IMFactory implements IMConstants {
             AlreadyBoundException, IOException {
         if (imcore == null) {
             Node nodeIM = NodeFactory.createNode(NAME_NODE_IM);
-            imcore = (IMCoreInterface) ProActiveObject.newActive(IMCore.class.getName(), // the class to deploy
+            imcore = (IMCoreInterface) PAActiveObject.newActive(IMCore.class.getName(), // the class to deploy
                     new Object[] { "IMCORE", nodeIM }, nodeIM);
-            ProActiveObject.register(imcore,
+            PAActiveObject.register(imcore,
                 "//localhost/" + NAME_ACTIVE_OBJECT_IMCORE);
 
             if (logger.isInfoEnabled()) {

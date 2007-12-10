@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 import java.io.File;
 import java.util.Map;
 
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -45,7 +45,7 @@ public class TestDeployment {
     //public static String URL_PAD2  = "infrastructuremanager/descriptor/3VNodes-4Jvms-10Nodes.xml";
     public static void DeployPAD(String urlPAD) {
         try {
-            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(urlPAD);
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(urlPAD);
             //pad.activateMappings();
             pad.activateMapping("Asterix");
 

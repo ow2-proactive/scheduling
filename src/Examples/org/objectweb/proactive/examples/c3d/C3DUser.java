@@ -37,8 +37,8 @@ import java.util.Hashtable;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -121,7 +121,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
     // shouldn't be called from outside the class. 
     public void rebuild() {
-        this.me = (User) org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
+        this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
         this.c3ddispatcher.registerMigratedUser(i_user);
         createGUI();
     }
@@ -151,7 +151,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         WaitFrame wait = new WaitFrame("C3D : please wait!", "Please wait...",
                 "Waiting for information from Dispatcher");
         // get the stub, which is a long operation, while the wait window is displayed 
-        this.me = (User) org.objectweb.proactive.api.ProActiveObject.getStubOnThis();
+        this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
 
         int user_id = this.c3ddispatcher.registerUser(this.me, this.userName);
         this.i_user = user_id;
@@ -218,7 +218,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
     public void terminate() {
         this.c3ddispatcher.unregisterConsumer(i_user);
         this.gui.trash();
-        ProActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(true);
     }
 
     /**
@@ -230,7 +230,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
                     argv[0]);
         } catch (Exception e) {
             logger.error("Trouble loading descriptor file");
@@ -244,7 +244,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
         try {
             //C3DUser c3duser = (C3DUser) 
-            org.objectweb.proactive.api.ProActiveObject.newActive(C3DUser.class.getName(),
+            org.objectweb.proactive.api.PAActiveObject.newActive(C3DUser.class.getName(),
                 params, user.getNode());
         } catch (Exception e) {
             logger.error("Problemn with C3DUser Active Object creation:");

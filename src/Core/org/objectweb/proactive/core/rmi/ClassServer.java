@@ -34,7 +34,7 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -52,11 +52,11 @@ public class ClassServer implements Runnable {
     static {
         String newport;
 
-        if (ProProperties.PA_XMLHTTP_PORT.getValue() != null) {
-            newport = ProProperties.PA_XMLHTTP_PORT.getValue();
+        if (PAProperties.PA_XMLHTTP_PORT.getValue() != null) {
+            newport = PAProperties.PA_XMLHTTP_PORT.getValue();
         } else {
             newport = new Integer(DEFAULT_SERVER_BASE_PORT).toString();
-            ProProperties.PA_XMLHTTP_PORT.setValue(newport);
+            PAProperties.PA_XMLHTTP_PORT.setValue(newport);
         }
     }
 
@@ -77,14 +77,14 @@ public class ClassServer implements Runnable {
     protected ClassServer(int port_) throws java.io.IOException {
         if (port_ == 0) {
             port = boundServerSocket(Integer.parseInt(
-                        ProProperties.PA_XMLHTTP_PORT.getValue()), MAX_RETRY);
+                        PAProperties.PA_XMLHTTP_PORT.getValue()), MAX_RETRY);
             //            Thread.dumpStack();
         } else {
             port = port_;
             server = new java.net.ServerSocket(port);
         }
 
-        ProProperties.PA_XMLHTTP_PORT.setValue(port + "");
+        PAProperties.PA_XMLHTTP_PORT.setValue(port + "");
 
         hostname = URIBuilder.getLocalAddress().getHostAddress();
         //        hostname = URIBuilder.ipv6withoutscope(UrlBuilder.getNetworkInterfaces());
@@ -162,7 +162,7 @@ public class ClassServer implements Runnable {
     }
 
     public static int getServerSocketPort() {
-        if (ProProperties.PA_HTTP_SERVLET.isTrue()) {
+        if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
             return ClassServerServlet.getPort();
         }
         return port;
@@ -174,7 +174,7 @@ public class ClassServer implements Runnable {
 
     public static String getUrl() {
         try {
-            if (ProProperties.PA_HTTP_SERVLET.isTrue()) {
+            if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
                 return ClassServerServlet.getUrl();
             } else {
                 return URIBuilder.buildURI(URIBuilder.getHostNameorIP(

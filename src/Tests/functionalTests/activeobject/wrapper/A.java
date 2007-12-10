@@ -35,7 +35,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.DoubleMutableWrapper;
@@ -111,7 +111,7 @@ public class A implements RunActive, Serializable {
     }
 
     public void terminate() {
-        ProActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(true);
     }
 
     public void runActivity(Body body) {

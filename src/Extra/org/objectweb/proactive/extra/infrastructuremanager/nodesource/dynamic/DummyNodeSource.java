@@ -34,8 +34,8 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
@@ -79,9 +79,9 @@ public class DummyNodeSource extends DynamicNodeSource
     public void initActivity(Body body) {
         super.initActivity(body);
         try {
-            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(
                     "/user/gsigety/home/pa_descriptors/nodes.xml");
-            IMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) ProActiveObject.getStubOnThis(),
+            IMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) PAActiveObject.getStubOnThis(),
                 pad);
         } catch (ProActiveException e) {
             e.printStackTrace();

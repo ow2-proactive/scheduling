@@ -42,8 +42,8 @@ import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProFileTransfer;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAFileTransfer;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
@@ -80,7 +80,7 @@ public class TestAPI extends FunctionalTest {
             logger.debug("Loading descriptor from: " + XML_LOCATION);
         }
 
-        pad = ProDeployment.getProactiveDescriptor(XML_LOCATION);
+        pad = PADeployment.getProactiveDescriptor(XML_LOCATION);
 
         VirtualNode testVNode = pad.getVirtualNode("test");
         VirtualNode testVNodePush = pad.getVirtualNode("testPush");
@@ -129,12 +129,12 @@ public class TestAPI extends FunctionalTest {
         Assert.assertTrue(dirTest.exists());
         createRandomContentFile(fileTest, FILE_SIZE);
 
-        RemoteFile rfilePushed = ProFileTransfer.push(fileTest, testnode,
+        RemoteFile rfilePushed = PAFileTransfer.push(fileTest, testnode,
                 filePushed);
         rfilePushed.waitFor();
         Assert.assertTrue(rfilePushed.getRemoteFilePath().equals(filePushed)); //wait-by-necessity
 
-        RemoteFile rfilePulled = ProFileTransfer.pull(testnode, filePushed,
+        RemoteFile rfilePulled = PAFileTransfer.pull(testnode, filePushed,
                 filePulled);
 
         RemoteFile pushedWhilePulling = rfilePulled.push(testnodePush,
@@ -200,9 +200,9 @@ public class TestAPI extends FunctionalTest {
 
         createRandomContentFile(dirTestSrcFile, FILE_SIZE);
 
-        RemoteFile rdirPushed = ProFileTransfer.push(dirTestSrc, testnode,
+        RemoteFile rdirPushed = PAFileTransfer.push(dirTestSrc, testnode,
                 dirTestPushed);
-        RemoteFile rdirPulled = ProFileTransfer.push(dirTestSrc, testnode,
+        RemoteFile rdirPulled = PAFileTransfer.push(dirTestSrc, testnode,
                 dirTestPulled);
 
         rdirPushed.waitFor();

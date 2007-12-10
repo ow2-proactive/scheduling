@@ -30,7 +30,7 @@
  */
 package functionalTests.exception;
 
-import org.objectweb.proactive.api.ProException;
+import org.objectweb.proactive.api.PAException;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -58,39 +58,39 @@ public class Test extends FunctionalTest {
     }
 
     public void testMechanism(Exc r) throws Exception {
-        ProException.tryWithCatch(Exception.class);
+        PAException.tryWithCatch(Exception.class);
         try {
             /* voidRT() */
             r.voidRT();
-            ProException.endTryWithCatch();
+            PAException.endTryWithCatch();
             bad();
         } catch (Exception e) {
             good();
         } finally {
-            ProException.removeTryWithCatch();
+            PAException.removeTryWithCatch();
         }
         /* futureRT() */
-        ProException.tryWithCatch(RuntimeException.class);
+        PAException.tryWithCatch(RuntimeException.class);
         try {
             Exc res = r.futureRT();
             good();
             res.nothing();
             bad();
-            ProException.endTryWithCatch();
+            PAException.endTryWithCatch();
         } catch (RuntimeException re) {
             good();
         } finally {
-            ProException.removeTryWithCatch();
+            PAException.removeTryWithCatch();
         }
 
         /* voidExc() */
-        ProException.tryWithCatch(Exception.class);
+        PAException.tryWithCatch(Exception.class);
         try {
             r.voidExc();
             good();
-            ProException.waitForPotentialException();
+            PAException.waitForPotentialException();
             bad();
-            ProException.endTryWithCatch();
+            PAException.endTryWithCatch();
         } catch (Exception e) {
             if (e.getMessage().startsWith("Test")) {
                 good();
@@ -98,15 +98,15 @@ public class Test extends FunctionalTest {
                 bad();
             }
         } finally {
-            ProException.removeTryWithCatch();
+            PAException.removeTryWithCatch();
         }
 
         /* futureExc() */
-        ProException.tryWithCatch(Exception.class);
+        PAException.tryWithCatch(Exception.class);
         try {
             r.futureExc();
             good();
-            ProException.endTryWithCatch();
+            PAException.endTryWithCatch();
             bad();
         } catch (Exception e) {
             if (e.getMessage().startsWith("Test")) {
@@ -115,7 +115,7 @@ public class Test extends FunctionalTest {
                 bad();
             }
         } finally {
-            ProException.removeTryWithCatch();
+            PAException.removeTryWithCatch();
         }
 
         /* futureExc() synchronous */
@@ -129,10 +129,10 @@ public class Test extends FunctionalTest {
             }
         }
 
-        ProException.tryWithCatch(Exception.class);
+        PAException.tryWithCatch(Exception.class);
         r.futureExc();
         try {
-            ProException.tryWithCatch(Exception.class);
+            PAException.tryWithCatch(Exception.class);
         } catch (Exception e) {
             if (e.getMessage().startsWith("Test")) {
                 good();
@@ -140,16 +140,16 @@ public class Test extends FunctionalTest {
                 bad();
             }
         } finally {
-            ProException.removeTryWithCatch();
+            PAException.removeTryWithCatch();
         }
 
-        ProException.tryWithCatch(Exception.class);
+        PAException.tryWithCatch(Exception.class);
         try {
             r.voidExc();
             r.futureExc();
-            ProException.endTryWithCatch();
+            PAException.endTryWithCatch();
         } catch (Exception e) {
-            int size = ProException.getAllExceptions().size();
+            int size = PAException.getAllExceptions().size();
             if (size == 2) {
                 good();
             } else {
@@ -157,7 +157,7 @@ public class Test extends FunctionalTest {
                 bad();
             }
         } finally {
-            ProException.removeTryWithCatch();
+            PAException.removeTryWithCatch();
         }
 
         assertTrue(counter == 13);
@@ -167,7 +167,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
 
         /* Server */
-        Exc r = (Exc) org.objectweb.proactive.api.ProActiveObject.newActive(Exc.class.getName(),
+        Exc r = (Exc) org.objectweb.proactive.api.PAActiveObject.newActive(Exc.class.getName(),
                 null);
 
         /* Client */

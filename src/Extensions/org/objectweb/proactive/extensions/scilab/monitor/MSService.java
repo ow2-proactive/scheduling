@@ -37,7 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -357,7 +357,7 @@ public class MSService implements Serializable {
             for (int i = 0; i < keys.length; i++) {
                 sciTaskInfo = this.mapTaskRun.get(keys[i]);
                 sciResult = sciTaskInfo.getResult();
-                if (!ProFuture.isAwaited(sciResult)) {
+                if (!PAFuture.isAwaited(sciResult)) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("->MSService loop:retrieveResult:" +
                             keys[i]);
@@ -434,7 +434,7 @@ public class MSService implements Serializable {
                 logger.debug("->MSService test0:getNextEngine:" + idEngine);
             }
 
-            if (ProFuture.isAwaited(isActivate)) {
+            if (PAFuture.isAwaited(isActivate)) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("->MSService test1:getNextEngine:" + idEngine);
                 }

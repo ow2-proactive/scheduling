@@ -33,8 +33,8 @@ package org.objectweb.proactive.extra.scheduler.examples;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -83,7 +83,7 @@ public class LocalSchedulerExample {
                     e.printStackTrace();
                 }
 
-                ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
+                ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(
                         "../../../descriptors/scheduler/deployment/Local4JVM.xml");
                 admin.addNodes(pad);
 
@@ -102,7 +102,7 @@ public class LocalSchedulerExample {
                             System.getProperty("proactive.rmi.port") + "/"));
 
                 logger.info("ResourceManager created on " +
-                    ProActiveObject.getActiveObjectNodeUrl(imp));
+                    PAActiveObject.getActiveObjectNodeUrl(imp));
             }
 
             AdminScheduler.createScheduler(LocalSchedulerExample.class.getResource(

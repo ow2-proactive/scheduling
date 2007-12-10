@@ -39,7 +39,7 @@ import java.rmi.registry.Registry;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
@@ -65,7 +65,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
 
     static {
         if ((System.getSecurityManager() == null) &&
-                ProProperties.PA_SECURITYMANAGER.isTrue()) {
+                PAProperties.PA_SECURITYMANAGER.isTrue()) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 
@@ -233,7 +233,7 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#getPort()
      */
     public int getPort() {
-        return Integer.parseInt(ProProperties.PA_RMI_PORT.getValue());
+        return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
     }
 
     public String getProtocolId() {

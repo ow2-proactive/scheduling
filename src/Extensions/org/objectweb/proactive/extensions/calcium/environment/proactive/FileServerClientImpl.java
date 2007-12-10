@@ -34,7 +34,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
-import org.objectweb.proactive.api.ProFileTransfer;
+import org.objectweb.proactive.api.PAFileTransfer;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.calcium.environment.FileServer;
@@ -66,7 +66,7 @@ public class FileServerClientImpl implements FileServerClient,
                 logger.debug("Pulling file:" + rfile.location + " -> " +
                     localDst);
             }
-            RemoteFile fetchedFile = ProFileTransfer.pull(node, rfile.location,
+            RemoteFile fetchedFile = PAFileTransfer.pull(node, rfile.location,
                     localDst);
             fetchedFile.waitFor();
         } catch (Exception e) {
@@ -84,7 +84,7 @@ public class FileServerClientImpl implements FileServerClient,
 
         try {
             //SkeletonSystemImpl.copyFile(localFile, dst);
-            RemoteFile sentFile = ProFileTransfer.push(current, node,
+            RemoteFile sentFile = PAFileTransfer.push(current, node,
                     rfile.location);
             sentFile.waitFor();
         } catch (Exception e) {

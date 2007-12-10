@@ -38,9 +38,9 @@ import java.io.FileWriter;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
@@ -62,12 +62,12 @@ public class Test extends FunctionalTest {
         VirtualNode vn1 = descriptor.getVirtualNode("evn1");
         VirtualNode vn2 = descriptor.getVirtualNode("evn2");
         VirtualNode vn3 = descriptor.getVirtualNode("evn3");
-        a1 = (A) ProActiveObject.newActive(A.class.getName(),
-                new Object[] {  }, vn1.getNode());
-        a2 = (A) ProActiveObject.newActive(A.class.getName(),
-                new Object[] {  }, vn2.getNode());
-        a3 = (A) ProActiveObject.newActive(A.class.getName(),
-                new Object[] {  }, vn3.getNode());
+        a1 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {  },
+                vn1.getNode());
+        a2 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {  },
+                vn2.getNode());
+        a3 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {  },
+                vn3.getNode());
 
         assertTrue(a2.getTiti() == null);
         assertTrue(a2.getTata() != null);
@@ -82,7 +82,7 @@ public class Test extends FunctionalTest {
     public void initTest() throws Exception {
         String fileName = null;
 
-        if ("ibis".equals(ProProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
+        if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
             fileName = "JVMExtensionIbis";
         } else {
             fileName = "JVMExtension";
@@ -103,8 +103,8 @@ public class Test extends FunctionalTest {
         }
         searchAndReplace(oldFilePath, newFilePath, "proactive.home",
             proactiveDir);
-        descriptor = ProDeployment.getProactiveDescriptor(getClass()
-                                                              .getResource("/functionalTests/descriptor/extendedjvm/" +
+        descriptor = PADeployment.getProactiveDescriptor(getClass()
+                                                             .getResource("/functionalTests/descriptor/extendedjvm/" +
                     fileName + "-tmp.xml").getPath());
         descriptor.activateMappings();
     }

@@ -31,7 +31,7 @@
 package functionalTests.activeobject.request.immediateservice.terminateActiveObject;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
 
@@ -45,10 +45,10 @@ public class Test extends FunctionalTest {
 
     @Before
     public void before() throws Exception {
-        b = (B) ProActiveObject.newActive(B.class.getName(),
+        b = (B) PAActiveObject.newActive(B.class.getName(),
                 new Object[] { "blue" });
         b.changeColor("red");
-        ProActiveObject.terminateActiveObject(b, true);
+        PAActiveObject.terminateActiveObject(b, true);
     }
 
     @org.junit.Test(expected = Exception.class)

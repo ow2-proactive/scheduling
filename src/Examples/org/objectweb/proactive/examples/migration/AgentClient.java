@@ -31,7 +31,7 @@
 package org.objectweb.proactive.examples.migration;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -52,7 +52,7 @@ public class AgentClient {
         ProActiveDescriptor proActiveDescriptor;
         ProActiveConfiguration.load();
         try {
-            proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
                     args[0]);
             proActiveDescriptor.activateMappings();
 
@@ -60,7 +60,7 @@ public class AgentClient {
             String[] nodeList = agent.getNodesURL();
 
             // Create an active server within this VM
-            myServer = (Agent) org.objectweb.proactive.api.ProActiveObject.newActive(Agent.class.getName(),
+            myServer = (Agent) org.objectweb.proactive.api.PAActiveObject.newActive(Agent.class.getName(),
                     new Object[] { "local" });
             // Invokes a remote method on this object to get the message
             hostName = myServer.getName();

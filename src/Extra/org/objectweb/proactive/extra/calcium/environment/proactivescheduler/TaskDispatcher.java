@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.calcium.environment.proactivescheduler;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
@@ -100,7 +100,7 @@ public class TaskDispatcher extends Thread {
 
         while (!shutdown) {
             Vector<Task> taskV = taskpool.getReadyTasks(0);
-            taskV = (Vector<Task>) ProFuture.getFutureValue(taskV);
+            taskV = (Vector<Task>) PAFuture.getFutureValue(taskV);
 
             if (taskV.size() > 0) {
                 try {

@@ -43,7 +43,7 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Active;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -1052,7 +1052,7 @@ public abstract class MOP {
         throws MOPException {
         return createStubObject(className, genericParameters,
             constructorParameters,
-            new Object[] { node, activity, factory, ProActiveObject.getJobId() });
+            new Object[] { node, activity, factory, PAActiveObject.getJobId() });
     }
 
     private static Object createStubObject(String className,
@@ -1072,7 +1072,7 @@ public abstract class MOP {
         String nameOfTargetType, Class<?>[] genericParameters, Node node,
         Active activity, MetaObjectFactory factory) throws MOPException {
         return createStubObject(target,
-            new Object[] { node, activity, factory, ProActiveObject.getJobId() },
+            new Object[] { node, activity, factory, PAActiveObject.getJobId() },
             nameOfTargetType, genericParameters);
     }
 

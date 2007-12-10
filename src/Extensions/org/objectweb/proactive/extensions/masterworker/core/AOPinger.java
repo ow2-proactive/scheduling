@@ -38,9 +38,9 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProGroup;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.group.ExceptionInGroup;
 import org.objectweb.proactive.core.group.ExceptionListException;
 import org.objectweb.proactive.core.group.Group;
@@ -121,7 +121,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     public AOPinger(final WorkerDeadListener listener) {
         this.listener = listener;
         terminated = false;
-        pingPeriod = Long.parseLong(ProProperties.PA_MASTERWORKER_PINGPERIOD.getValue());
+        pingPeriod = Long.parseLong(PAProperties.PA_MASTERWORKER_PINGPERIOD.getValue());
     }
 
     /**
@@ -137,9 +137,9 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     @SuppressWarnings("unchecked")
     public void initActivity(final Body body) {
         try {
-            workerGroupStub = (Worker) ProGroup.newGroup(AOWorker.class.getName());
-            workerGroup = ProGroup.getGroup(workerGroupStub);
-            stubOnThis = (AOPinger) ProActiveObject.getStubOnThis();
+            workerGroupStub = (Worker) PAGroup.newGroup(AOWorker.class.getName());
+            workerGroup = PAGroup.getGroup(workerGroupStub);
+            stubOnThis = (AOPinger) PAActiveObject.getStubOnThis();
             body.setImmediateService("terminate");
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();

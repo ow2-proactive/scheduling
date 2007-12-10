@@ -53,9 +53,9 @@ public class TestFutureList {
             "This is designed to test the use of the future list");
 
         try {
-            blockedO = (BlockedObject) org.objectweb.proactive.api.ProActiveObject.newActive(BlockedObject.class.getName(),
+            blockedO = (BlockedObject) org.objectweb.proactive.api.PAActiveObject.newActive(BlockedObject.class.getName(),
                     null, args[0]);
-            tf = (FutureReceiver) org.objectweb.proactive.api.ProActiveObject.newActive(FutureReceiver.class.getName(),
+            tf = (FutureReceiver) org.objectweb.proactive.api.PAActiveObject.newActive(FutureReceiver.class.getName(),
                     null, args[1]);
         } catch (Exception e) {
             e.printStackTrace();

@@ -40,7 +40,7 @@ import org.objectweb.proactive.core.mop.StubObject;
 
 
 @PublicAPI
-public class ProException {
+public class PAException {
 
     /*** <Exceptions> See ExceptionHandler.java for the documentation ***/
     /**

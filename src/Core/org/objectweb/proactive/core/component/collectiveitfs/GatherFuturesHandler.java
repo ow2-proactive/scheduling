@@ -36,9 +36,9 @@ import java.util.List;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.representative.ItfID;
@@ -106,7 +106,7 @@ public class GatherFuturesHandler implements RunActive, Serializable {
         } else {
             // no cast for futures ==> need to get the result before casting
             resultOfGatheredInvocation = (List<?>) future.getResult();
-            ProFuture.waitFor(resultOfGatheredInvocation);
+            PAFuture.waitFor(resultOfGatheredInvocation);
         }
     }
 
@@ -121,7 +121,7 @@ public class GatherFuturesHandler implements RunActive, Serializable {
     }
 
     public void migrateTo(Node node) throws MigrationException {
-        ProMobileAgent.migrateTo(node);
+        PAMobileAgent.migrateTo(node);
     }
 
     public void setConnectedClientItfs(List<ItfID> connectedClientItfs) {
@@ -139,7 +139,7 @@ public class GatherFuturesHandler implements RunActive, Serializable {
 
     public void runActivity(Body body) {
         Service service = new Service(body);
-        while (ProActiveObject.getBodyOnThis().isActive()) {
+        while (PAActiveObject.getBodyOnThis().isActive()) {
             service.blockingServeOldest("setConnectedClientItfs");
 
             service.blockingServeOldest("setFutureOfGatheredInvocation");

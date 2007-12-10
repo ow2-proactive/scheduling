@@ -45,9 +45,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.component.ProActiveInterface;
@@ -165,7 +165,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
     private boolean isDispatchingCall(MethodCall mc) {
         for (int i = 0; i < mc.getNumberOfParameter(); i++)
-            if (ProGroup.isScatterGroupOn(mc.getParameter(i))) {
+            if (PAGroup.isScatterGroupOn(mc.getParameter(i))) {
                 return true;
             }
         return false;
@@ -208,8 +208,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         throws InvocationTargetException {
         //System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.startXAndDisable(ProActiveObject.getBodyOnThis()
-                                                           .getID(),
+            TimerWarehouse.startXAndDisable(PAActiveObject.getBodyOnThis()
+                                                          .getID(),
                 ((mc.isOneWayCall() ||
                 (mc.getReifiedMethod().getReturnType() == Void.TYPE))
                 ? TimerWarehouse.GROUP_ONE_WAY_CALL
@@ -262,7 +262,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         this.threadpool.complete();
 
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.enableAndStopX(ProActiveObject.getBodyOnThis().getID(),
+            TimerWarehouse.enableAndStopX(PAActiveObject.getBodyOnThis().getID(),
                 ((mc.isOneWayCall() ||
                 (mc.getReifiedMethod().getReturnType() == Void.TYPE))
                 ? TimerWarehouse.GROUP_ONE_WAY_CALL
@@ -307,7 +307,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     protected Object asynchronousCallOnGroup(MethodCall mc)
         throws InvocationTargetException {
         Object result;
-        Body body = ProActiveObject.getBodyOnThis();
+        Body body = PAActiveObject.getBodyOnThis();
 
         // Creates a stub + ProxyForGroup for representing the result
         String returnTypeClassName = null;
@@ -359,10 +359,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
             for (int index = 0; index < memberList.size(); index++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
                 for (int i = 0; i < mc.getNumberOfParameter(); i++)
-                    if (ProGroup.isScatterGroupOn(mc.getParameter(i))) {
-                        individualEffectiveArguments[i] = ProGroup.get(mc.getParameter(
-                                    i),
-                                index % ProGroup.size(mc.getParameter(i)));
+                    if (PAGroup.isScatterGroupOn(mc.getParameter(i))) {
+                        individualEffectiveArguments[i] = PAGroup.get(mc.getParameter(
+                                    i), index % PAGroup.size(mc.getParameter(i)));
                     } else {
                         individualEffectiveArguments[i] = mc.getParameter(i);
                     }
@@ -420,7 +419,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     protected void oneWayCallOnGroup(MethodCall mc,
         ExceptionListException exceptionList) throws InvocationTargetException {
-        Body body = ProActiveObject.getBodyOnThis();
+        Body body = PAActiveObject.getBodyOnThis();
 
         // Creating Threads
         if (isDispatchingCall(mc) == false) {
@@ -436,10 +435,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
             for (int index = 0; index < memberList.size(); index++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
                 for (int i = 0; i < mc.getNumberOfParameter(); i++)
-                    if (ProGroup.isScatterGroupOn(mc.getParameter(i))) {
-                        individualEffectiveArguments[i] = ProGroup.get(mc.getParameter(
-                                    i),
-                                index % ProGroup.size(mc.getParameter(i)));
+                    if (PAGroup.isScatterGroupOn(mc.getParameter(i))) {
+                        individualEffectiveArguments[i] = PAGroup.get(mc.getParameter(
+                                    i), index % PAGroup.size(mc.getParameter(i)));
                     } else {
                         individualEffectiveArguments[i] = mc.getParameter(i);
                     }
@@ -558,7 +556,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     @Override
     public boolean equals(Object o) {
-        ProxyForGroup p = ProGroup.findProxyForGroup(o);
+        ProxyForGroup p = PAGroup.findProxyForGroup(o);
         if (p != null) {
             // comparing with another group
             return this.memberList.equals((p).memberList);
@@ -982,14 +980,14 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * Waits for all members are arrived.
      */
     public void waitAll() {
-        ProFuture.waitForAll(this.memberList);
+        PAFuture.waitForAll(this.memberList);
     }
 
     /**
      * Waits for at least one member is arrived.
      */
     public void waitOne() {
-        ProFuture.waitForAny(this.memberList);
+        PAFuture.waitForAny(this.memberList);
     }
 
     /**
@@ -997,7 +995,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param n - the rank of the awaited member.
      */
     public void waitTheNth(int n) {
-        ProFuture.waitFor(this.memberList.get(n));
+        PAFuture.waitFor(this.memberList.get(n));
     }
 
     /**
@@ -1015,7 +1013,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @return a non-awaited member of the Group.
      */
     public Object waitAndGetOne() {
-        return this.memberList.get(ProFuture.waitForAny(this.memberList));
+        return this.memberList.get(PAFuture.waitForAny(this.memberList));
     }
 
     /**
@@ -1023,7 +1021,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @return a member of <code>o</code>. (<code>o</code> is removed from the group)
      */
     public Object waitAndGetOneThenRemoveIt() {
-        return this.memberList.remove(ProFuture.waitForAny(this.memberList));
+        return this.memberList.remove(PAFuture.waitForAny(this.memberList));
     }
 
     /**
@@ -1032,7 +1030,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @return the member (non-awaited) at the rank <code>n</code> in the Group.
      */
     public Object waitAndGetTheNth(int n) {
-        ProFuture.waitForTheNth(this.memberList, n);
+        PAFuture.waitForTheNth(this.memberList, n);
         return this.memberList.get(n);
     }
 
@@ -1042,8 +1040,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public int waitOneAndGetIndex() {
         int index = 0;
-        this.memberList.get(ProFuture.waitForAny(this.memberList));
-        while (ProFuture.isAwaited(this.memberList.get(index))) {
+        this.memberList.get(PAFuture.waitForAny(this.memberList));
+        while (PAFuture.isAwaited(this.memberList.get(index))) {
             index++;
         }
         return index;
@@ -1055,7 +1053,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public boolean allAwaited() {
         for (int i = 0; i < this.memberList.size(); i++)
-            if (!(ProFuture.isAwaited(this.memberList.get(i)))) {
+            if (!(PAFuture.isAwaited(this.memberList.get(i)))) {
                 return false;
             }
         return true;
@@ -1067,7 +1065,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public boolean allArrived() {
         for (int i = 0; i < this.memberList.size(); i++)
-            if (ProFuture.isAwaited(this.memberList.get(i))) {
+            if (PAFuture.isAwaited(this.memberList.get(i))) {
                 return false;
             }
         return true;

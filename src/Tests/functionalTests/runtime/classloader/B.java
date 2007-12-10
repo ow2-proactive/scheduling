@@ -30,8 +30,8 @@
  */
 package functionalTests.runtime.classloader;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
@@ -54,11 +54,11 @@ public class B {
     }
 
     public void createActiveObjectC() throws Exception {
-        ProActiveDescriptor descriptor = ProDeployment.getProactiveDescriptor(getClass()
-                                                                                  .getResource("/deployment-tmp.xml")
-                                                                                  .getPath());
+        ProActiveDescriptor descriptor = PADeployment.getProactiveDescriptor(getClass()
+                                                                                 .getResource("/deployment-tmp.xml")
+                                                                                 .getPath());
         descriptor.activateMappings();
-        Object ao = ProActiveObject.newActive("functionalTests.runtime.classloader.C",
+        Object ao = PAActiveObject.newActive("functionalTests.runtime.classloader.C",
                 new Object[] { "sdfasdf" },
                 descriptor.getVirtualNode("VN1").getNode());
         descriptor.killall(false);

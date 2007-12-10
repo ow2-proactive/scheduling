@@ -35,7 +35,7 @@ import java.io.StreamCorruptedException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -99,7 +99,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = ProProperties.PA_STACKTRACE.isTrue();
+            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
         }
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
@@ -117,7 +117,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = ProProperties.PA_STACKTRACE.isTrue();
+            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
         }
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
@@ -136,7 +136,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = ProProperties.PA_STACKTRACE.isTrue();
+            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
         }
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
@@ -150,7 +150,7 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if (enableStackTrace == null) {
             /* First time */
-            enableStackTrace = ProProperties.PA_STACKTRACE.isTrue();
+            enableStackTrace = PAProperties.PA_STACKTRACE.isTrue();
         }
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
@@ -251,7 +251,7 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     protected Reply createReply(Body targetBody, MethodCallResult result) {
-        ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
+        ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager();
 
         return new ReplyImpl(targetBody.getID(), this.sequenceNumber,
             this.methodName, result, psm);
@@ -306,7 +306,7 @@ public class RequestImpl extends MessageImpl implements Request,
     protected int sendRequest(UniversalBody destinationBody)
         throws IOException, RenegotiateSessionException,
             CommunicationForbiddenException {
-        ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
+        ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager();
         if (psm != null) {
             try {
                 if (!psm.getSessionTo(destinationBody.getCertificate())

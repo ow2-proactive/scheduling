@@ -40,7 +40,7 @@ import java.net.Socket;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpUtils;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -173,7 +173,7 @@ public class HTTPRequestHandler extends Thread {
                 bytes = new byte[0];
             }
 
-            if (!ProProperties.PA_HTTP_SERVLET.isTrue()) {
+            if (!PAProperties.PA_HTTP_SERVLET.isTrue()) {
                 dOut.writeBytes(statusLine + "\r\n");
                 dOut.writeBytes("Content-Length: " + bytes.length + "\r\n");
                 dOut.writeBytes("Content-Type: " + contentType + "\r\n");

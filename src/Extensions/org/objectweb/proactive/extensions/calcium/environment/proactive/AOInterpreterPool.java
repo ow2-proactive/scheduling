@@ -39,7 +39,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
@@ -76,7 +76,7 @@ public class AOInterpreterPool implements RunActive, InitActive {
     }
 
     public void initActivity(Body body) {
-        AOInterpreterPool thisStub = (AOInterpreterPool) ProActiveObject.getStubOnThis();
+        AOInterpreterPool thisStub = (AOInterpreterPool) PAActiveObject.getStubOnThis();
 
         ArrayList<AOStageIn> list = new ArrayList<AOStageIn>(interpreterList.size());
         for (AOInterpreter interp : interpreterList) {

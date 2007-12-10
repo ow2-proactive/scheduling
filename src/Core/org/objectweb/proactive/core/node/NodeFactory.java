@@ -35,11 +35,11 @@ import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
@@ -96,7 +96,7 @@ public class NodeFactory {
         String nodeURL = null;
 
         ProActiveRuntime defaultRuntime = null;
-        String jobID = ProActiveObject.getJobId();
+        String jobID = PAActiveObject.getJobId();
         ProActiveSecurityManager securityManager = null;
 
         if (defaultNode == null) {
@@ -112,7 +112,7 @@ public class NodeFactory {
             }
 
             defaultNode = new NodeImpl(defaultRuntime, nodeURL,
-                    ProProperties.PA_COMMUNICATION_PROTOCOL.getValue(), jobID);
+                    PAProperties.PA_COMMUNICATION_PROTOCOL.getValue(), jobID);
         }
 
         return defaultNode;
@@ -208,7 +208,7 @@ public class NodeFactory {
         //do we have any association for this node?
         String protocol = URIBuilder.getProtocol(nodeURL);
         if (protocol == null) {
-            protocol = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
 
         //String noProtocolUrl = UrlBuilder.removeProtocol(nodeURL, protocol);

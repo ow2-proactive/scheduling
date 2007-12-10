@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.scheduler.ext.matlab;
 
 import java.util.Map;
 
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
@@ -74,7 +74,7 @@ public class MatlabSplitter extends SimpleMatlab {
             " MATLAB TASK] Executing (MatlabSplitter)");
 
         Object res = splitterWorker.execute(results);
-        res = ProFuture.getFutureValue(res);
+        res = PAFuture.getFutureValue(res);
         splitterWorker.terminate();
 
         return res;

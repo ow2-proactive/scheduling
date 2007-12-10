@@ -38,7 +38,7 @@ import javax.management.Notification;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.jmx.remote.management.client.entities.ManageableEntity;
 import org.objectweb.proactive.examples.jmx.remote.management.client.entities.RemoteBundle;
@@ -94,7 +94,7 @@ public class EntitiesEventManager implements Serializable {
      */
     private EntitiesEventManager() {
         try {
-            this.notificationListener = (ActiveNotificationListener) ProActiveObject.newActive(ActiveNotificationListener.class.getName(),
+            this.notificationListener = (ActiveNotificationListener) PAActiveObject.newActive(ActiveNotificationListener.class.getName(),
                     new Object[] {  });
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();

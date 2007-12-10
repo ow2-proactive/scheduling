@@ -41,7 +41,7 @@ import javax.management.NotificationFilter;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 
 /**
@@ -77,7 +77,7 @@ public class ConnectionListener implements NotificationListener, Serializable {
         Object handback) throws IOException {
         try {
             this.connection.addNotificationListener(name,
-                (ConnectionListener) ProActiveObject.getStubOnThis(), filter,
+                (ConnectionListener) PAActiveObject.getStubOnThis(), filter,
                 handback);
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -99,7 +99,7 @@ public class ConnectionListener implements NotificationListener, Serializable {
     public void stopListening(ObjectName name) throws IOException {
         try {
             this.connection.removeNotificationListener(name,
-                (ConnectionListener) ProActiveObject.getStubOnThis());
+                (ConnectionListener) PAActiveObject.getStubOnThis());
         } catch (InstanceNotFoundException e) {
             throw new IOException(e.getMessage());
         } catch (ListenerNotFoundException e) {

@@ -31,7 +31,7 @@
 package org.objectweb.proactive.examples.webservices.helloWorld;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 
@@ -61,7 +61,7 @@ public class HelloWorld {
         }
         System.out.println("Deploy an hello world service on : " + url);
         try {
-            HelloWorld hw = (HelloWorld) ProActiveObject.newActive("org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld",
+            HelloWorld hw = (HelloWorld) PAActiveObject.newActive("org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld",
                     new Object[] {  });
             WebServices.exposeAsWebService(hw, url, "helloWorld",
                 new String[] { "helloWorld" });

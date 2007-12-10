@@ -38,7 +38,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
@@ -148,11 +148,11 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * register itself to the {@link IMCore}.
      */
     public void initActivity(Body body) {
-        this.imCore.internalAddSource((NodeSource) ProActiveObject.getStubOnThis(),
+        this.imCore.internalAddSource((NodeSource) PAActiveObject.getStubOnThis(),
             this.SourceId);
         // TODO gsigety, cdelbe : giving a stub on the source to Pinger can 
         // lead to a lock if source is blocked
-        pinger = new Pinger((NodeSource) ProActiveObject.getStubOnThis());
+        pinger = new Pinger((NodeSource) PAActiveObject.getStubOnThis());
     }
 
     /**
@@ -273,7 +273,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
                 node.getNodeInformation().getURL());
         }
         this.nodes.put(node.getNodeInformation().getURL(), node);
-        NodeSource s = (NodeSource) ProActiveObject.getStubOnThis();
+        NodeSource s = (NodeSource) PAActiveObject.getStubOnThis();
         this.imCore.internalAddNode(node, VnName, PADName, s);
     }
 

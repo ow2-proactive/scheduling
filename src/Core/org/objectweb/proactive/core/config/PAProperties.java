@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 @PublicAPI
-public enum ProProperties {
+public enum PAProperties {
 
     /* ------------------------------------
      * Java Properties
@@ -503,7 +503,7 @@ public enum ProProperties {
     private String key;
     private PAPropertiesType type;
 
-    ProProperties(String str, PAPropertiesType type) {
+    PAProperties(String str, PAPropertiesType type) {
         this.key = str;
         this.type = type;
     }
@@ -641,8 +641,8 @@ public enum ProProperties {
         }
     }
 
-    static public ProProperties getProperty(String key) {
-        for (ProProperties prop : ProProperties.values()) {
+    static public PAProperties getProperty(String key) {
+        for (PAProperties prop : PAProperties.values()) {
             if (prop.getKey().equals(key)) {
                 return prop;
             }

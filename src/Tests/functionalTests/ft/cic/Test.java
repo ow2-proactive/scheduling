@@ -30,8 +30,8 @@
  */
 package functionalTests.ft.cic;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -73,18 +73,18 @@ public class Test extends FunctionalTest {
         VirtualNode vnode;
 
         //	create nodes
-        pad = ProDeployment.getProactiveDescriptor(Test.FT_XML_LOCATION_UNIX);
+        pad = PADeployment.getProactiveDescriptor(Test.FT_XML_LOCATION_UNIX);
         pad.activateMappings();
         vnode = pad.getVirtualNode("Workers");
         Node[] nodes = vnode.getNodes();
 
-        Agent a = (Agent) ProActiveObject.newActive(Agent.class.getName(),
+        Agent a = (Agent) PAActiveObject.newActive(Agent.class.getName(),
                 new Object[0], nodes[0]);
-        Agent b = (Agent) ProActiveObject.newActive(Agent.class.getName(),
+        Agent b = (Agent) PAActiveObject.newActive(Agent.class.getName(),
                 new Object[0], nodes[1]);
 
         // not ft !
-        Collector c = (Collector) ProActiveObject.newActive(Collector.class.getName(),
+        Collector c = (Collector) PAActiveObject.newActive(Collector.class.getName(),
                 new Object[0]);
 
         a.initCounter(1);

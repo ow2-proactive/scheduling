@@ -48,8 +48,8 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Binding;
 import org.objectweb.proactive.core.component.Bindings;
@@ -147,7 +147,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
                 BindingController userBindingController = (BindingController) (owner).getReferenceOnBaseObject();
 
                 if ((userBindingController.lookupFc(clientItfName) == null) ||
-                        !(ProGroup.isGroup(userBindingController.lookupFc(
+                        !(PAGroup.isGroup(userBindingController.lookupFc(
                                 clientItfName)))) {
                     userBindingController.bindFc(clientItfName,
                         owner.getFcInterface(clientItfName));
@@ -280,13 +280,13 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
         throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         // get value of (eventual) future before casting
-        serverItf = ProFuture.getFutureValue(serverItf);
+        serverItf = PAFuture.getFutureValue(serverItf);
 
         ProActiveInterface sItf = (ProActiveInterface) serverItf;
         if (controllerLogger.isDebugEnabled()) {
             String serverComponentName;
 
-            if (ProGroup.isGroup(serverItf)) {
+            if (PAGroup.isGroup(serverItf)) {
                 serverComponentName = "a group of components ";
             } else {
                 serverComponentName = Fractal.getNameController((sItf).getFcItfOwner())
@@ -425,7 +425,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController
 
         // serverItf cannot be a Future (because it has to be casted) => make
         // sure if binding to a composite's internal interface
-        serverItf = (ProActiveInterface) ProFuture.getFutureValue(serverItf);
+        serverItf = (ProActiveInterface) PAFuture.getFutureValue(serverItf);
         user_binding_controller.bindFc(clientItfName, serverItf);
         //        addBinding(new Binding(clientItf, clientItfName, serverItf));
     }

@@ -52,9 +52,9 @@ public class ActiveBinaryTree extends BinaryTree {
     protected void createChildren() {
         try {
             String s = this.getClass().getName();
-            this.leftTree = (BinaryTree) org.objectweb.proactive.api.ProActiveObject.newActive(s,
+            this.leftTree = (BinaryTree) org.objectweb.proactive.api.PAActiveObject.newActive(s,
                     null);
-            this.rightTree = (BinaryTree) org.objectweb.proactive.api.ProActiveObject.newActive(s,
+            this.rightTree = (BinaryTree) org.objectweb.proactive.api.PAActiveObject.newActive(s,
                     null);
         } catch (Exception e) {
             logger.error(e);

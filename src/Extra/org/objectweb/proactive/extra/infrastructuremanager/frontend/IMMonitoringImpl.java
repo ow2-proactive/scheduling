@@ -39,7 +39,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -108,9 +108,9 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
     public void initActivity(Body body) {
         try {
             MonitoringUrl = "//" +
-                ProActiveObject.getNode().getVMInformation().getHostName() +
+                PAActiveObject.getNode().getVMInformation().getHostName() +
                 "/" + IMConstants.NAME_ACTIVE_OBJECT_IMMONITORING;
-            ProActiveObject.register((IMMonitoring) ProActiveObject.getStubOnThis(),
+            PAActiveObject.register((IMMonitoring) PAActiveObject.getStubOnThis(),
                 this.MonitoringUrl);
         } catch (IOException e) {
             e.printStackTrace();
@@ -129,8 +129,8 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
      *  */
     public IMInitialState addIMEventListener(IMEventListener listener,
         IMEventType... events) {
-        UniqueID id = ProActiveObject.getContext().getCurrentRequest()
-                                     .getSourceBodyID();
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
+                                    .getSourceBodyID();
 
         this.IMListeners.put(id, listener);
         return imcore.getIMInitialState();
@@ -348,6 +348,6 @@ public class IMMonitoringImpl implements IMMonitoring, IMEventListener,
     public void shutdown() {
         //throwing shutdown event
         imShutDownEvent(new IMEvent());
-        ProActiveObject.terminateActiveObject(false);
+        PAActiveObject.terminateActiveObject(false);
     }
 }

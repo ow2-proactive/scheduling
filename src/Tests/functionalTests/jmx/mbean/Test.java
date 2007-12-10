@@ -34,8 +34,8 @@ import java.net.URL;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -58,13 +58,13 @@ public class Test extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        this.pad = ProDeployment.getProactiveDescriptor(descriptor.getPath());
+        this.pad = PADeployment.getProactiveDescriptor(descriptor.getPath());
         this.vn = this.pad.getVirtualNode("MBeanTEST");
         this.vn.activate();
 
         Node node = vn.getNode();
-        ao = (A) ProActiveObject.newActive(A.class.getName(),
-                new Object[] {  }, node);
+        ao = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {  },
+                node);
     }
 
     @org.junit.Test

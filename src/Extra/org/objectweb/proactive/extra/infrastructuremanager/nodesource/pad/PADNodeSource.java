@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -151,7 +151,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
                 this.getSourceEvent());
             // object should be terminated NON preemptively 
             // pinger thread can wait for last results (getNodes)
-            ProActiveObject.terminateActiveObject(false);
+            PAActiveObject.terminateActiveObject(false);
         }
     }
 
@@ -178,7 +178,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      */
     public void addNodes(ProActiveDescriptor pad) {
         this.listPad.put(pad.getUrl(), pad);
-        IMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) ProActiveObject.getStubOnThis(),
+        IMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) PAActiveObject.getStubOnThis(),
             pad);
     }
 
@@ -200,7 +200,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
                 this.getSourceEvent());
             // object should be terminated NON preemptively 
             // pinger thread can wait for last results (getNodes)
-            ProActiveObject.terminateActiveObject(false);
+            PAActiveObject.terminateActiveObject(false);
         }
     }
 

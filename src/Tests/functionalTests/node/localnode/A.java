@@ -32,7 +32,7 @@ package functionalTests.node.localnode;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
@@ -53,6 +53,6 @@ public class A implements Serializable {
     }
 
     public Node getMyNode() throws NodeException {
-        return ProActiveObject.getNode();
+        return PAActiveObject.getNode();
     }
 }

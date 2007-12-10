@@ -37,7 +37,7 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.node.NodeException;
 public class ScriptLoader {
     public static ScriptHandler createHandler(Node node)
         throws ActiveObjectCreationException, NodeException {
-        return (ScriptHandler) ProActiveObject.newActive(ScriptHandler.class.getCanonicalName(),
+        return (ScriptHandler) PAActiveObject.newActive(ScriptHandler.class.getCanonicalName(),
             null, node);
     }
 

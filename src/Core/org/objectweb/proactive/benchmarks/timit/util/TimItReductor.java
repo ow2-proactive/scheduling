@@ -35,7 +35,7 @@ import java.util.ArrayList;
 
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventData;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventDataBag;
 
@@ -136,7 +136,7 @@ public class TimItReductor implements ProActiveInternalObject, Serializable {
         if (this.bstats != null) {
             return this.bstats;
         }
-        this.service = new Service(ProActiveObject.getBodyOnThis());
+        this.service = new Service(PAActiveObject.getBodyOnThis());
 
         // Wait for the groupSize
         while (this.groupSize == 0) {
@@ -271,6 +271,6 @@ public class TimItReductor implements ProActiveInternalObject, Serializable {
     }
 
     public void terminate() {
-        ProActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(true);
     }
 }

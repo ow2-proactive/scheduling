@@ -31,7 +31,7 @@
 package functionalTests.activeobject.request.terminate;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.FunctionalTest;
@@ -49,12 +49,12 @@ public class Test extends FunctionalTest {
 
     @Before
     public void action() throws Exception {
-        a1 = (A) ProActiveObject.newActive(A.class.getName(), new Object[0]);
+        a1 = (A) PAActiveObject.newActive(A.class.getName(), new Object[0]);
         a1.method1();
         a1.exit();
 
         // test with remaining ACs
-        a2 = (A) ProActiveObject.newActive(A.class.getName(), new Object[0]);
+        a2 = (A) PAActiveObject.newActive(A.class.getName(), new Object[0]);
         a2.initDeleguate();
         returnedValue = a2.getDelegateValue();
         a2.exit();

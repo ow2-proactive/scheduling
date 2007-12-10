@@ -42,7 +42,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.OperatingSystem;
 
 
@@ -150,7 +150,7 @@ public class FunctionalTest {
      * Kill all ProActive runtimes
      */
     public static void killProActive() {
-        File dir = new File(ProProperties.PA_HOME.getValue());
+        File dir = new File(PAProperties.PA_HOME.getValue());
         File cmd = new File(dir + "/dev/scripts/killTests");
         if (cmd.exists()) {
             try {

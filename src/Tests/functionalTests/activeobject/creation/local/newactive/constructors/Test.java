@@ -33,7 +33,7 @@ package functionalTests.activeobject.creation.local.newactive.constructors;
 import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -55,26 +55,25 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        b1 = (B) ProActiveObject.newActive(B.class.getName(),
+        b1 = (B) PAActiveObject.newActive(B.class.getName(),
                 new Object[] { "toto" });
 
         // We want B(String) to be taken rather than B(Object)
         assertTrue(b1.getChoosed().equals("C2"));
 
-        b2 = (B) ProActiveObject.newActive(B.class.getName(), new Object[] { 1 });
+        b2 = (B) PAActiveObject.newActive(B.class.getName(), new Object[] { 1 });
 
         // We want B(int) to be taken (autoboxing)
         assertTrue(b2.getChoosed().equals("C3"));
 
-        b3 = (B) ProActiveObject.newActive(B.class.getName(),
-                new Object[] { 1L });
+        b3 = (B) PAActiveObject.newActive(B.class.getName(), new Object[] { 1L });
 
         // We want B(Long) to be taken rather than B(long) : remember that we pass an array of Object so we actually pass a Long !
         assertTrue(b3.getChoosed().equals("C5"));
 
         boolean exception_thrown = false;
         try {
-            b4 = (B) ProActiveObject.newActive(B.class.getName(),
+            b4 = (B) PAActiveObject.newActive(B.class.getName(),
                     new Object[] { "s1", "s2" });
         } catch (ActiveObjectCreationException ex) {
             exception_thrown = true;
@@ -83,13 +82,13 @@ public class Test extends FunctionalTest {
         // We want that an exception is thrown because the choice (C6 or C7) is ambiguous
         assertTrue(exception_thrown);
 
-        b5 = (B) ProActiveObject.newActive(B.class.getName(),
+        b5 = (B) PAActiveObject.newActive(B.class.getName(),
                 new Object[] { "s1", null });
 
         // Here C6 is a non-ambiguous choice
         assertTrue(b5.getChoosed().equals("C6"));
 
-        b6 = (B) ProActiveObject.newActive(B.class.getName(),
+        b6 = (B) PAActiveObject.newActive(B.class.getName(),
                 new Object[] { null, "s2" });
 
         // Here C7 is a not ambiguous choice
@@ -97,7 +96,7 @@ public class Test extends FunctionalTest {
 
         exception_thrown = false;
         try {
-            b7 = (B) ProActiveObject.newActive(B.class.getName(),
+            b7 = (B) PAActiveObject.newActive(B.class.getName(),
                     new Object[] { null, null });
         } catch (ActiveObjectCreationException ex) {
             exception_thrown = true;
@@ -106,7 +105,7 @@ public class Test extends FunctionalTest {
         assertTrue(exception_thrown);
 
         // Here C9 should be taken rather than C8 and C10
-        b7 = (B) ProActiveObject.newActive(B.class.getName(),
+        b7 = (B) PAActiveObject.newActive(B.class.getName(),
                 new Object[] { new Vector() });
         assertTrue(b7.getChoosed().equals("C9"));
     }

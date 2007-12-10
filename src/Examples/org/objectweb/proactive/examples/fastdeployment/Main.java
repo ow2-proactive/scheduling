@@ -42,7 +42,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -112,13 +112,13 @@ public class Main {
 
         try {
             // Create the manager on this ProActive Runtime
-            Manager manager = (Manager) ProActiveObject.newActive(Manager.class.getName(),
+            Manager manager = (Manager) PAActiveObject.newActive(Manager.class.getName(),
                     new Object[] {  });
 
             // Create the Virtual Node Activator on this ProActive Runtime
             // For optimal performances, the manager & VNActivator should be in 
             // the same ProActive Runtime.
-            ProActiveObject.newActive(VNActivator.class.getName(),
+            PAActiveObject.newActive(VNActivator.class.getName(),
                 new Object[] {
                     manager, descriptors, virtualNodes, concurrency, pause
                 });

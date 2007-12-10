@@ -32,8 +32,8 @@ package org.objectweb.proactive.examples.minidescriptor;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -60,7 +60,7 @@ public class MiniDescrClient {
         logger.info("-+-+-+-+-+-+-+- MiniDescrClient launched -+-+-+-+-+-+-+-");
 
         try {
-            pad = ProDeployment.getProactiveDescriptor(location);
+            pad = PADeployment.getProactiveDescriptor(location);
             virtualnode = pad.getVirtualNode("MiniVNServer");
         } catch (ProActiveException e) {
             e.printStackTrace();
@@ -124,7 +124,7 @@ public class MiniDescrClient {
         public void run() {
             try {
                 // Create remote object on the node
-                MiniDescrActive desc = (MiniDescrActive) ProActiveObject.newActive(MiniDescrActive.class.getName(),
+                MiniDescrActive desc = (MiniDescrActive) PAActiveObject.newActive(MiniDescrActive.class.getName(),
                         null, node);
 
                 // Thread number trace

@@ -32,8 +32,8 @@ package functionalTests.activeobject.locationserver;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 
@@ -58,10 +58,10 @@ public class MigratableA implements Serializable {
     }
 
     public String getNodeUrl() {
-        return ProActiveObject.getBodyOnThis().getNodeURL();
+        return PAActiveObject.getBodyOnThis().getNodeURL();
     }
 
     public void moveTo(Node node) throws MigrationException {
-        ProMobileAgent.migrateTo(node);
+        PAMobileAgent.migrateTo(node);
     }
 }

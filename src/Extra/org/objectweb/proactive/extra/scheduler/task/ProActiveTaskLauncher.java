@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.task;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
@@ -97,7 +97,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
     @Override
     public void initActivity(Body body) {
         super.initActivity(body);
-        ProActiveObject.setImmediateService("getNodes");
+        PAActiveObject.setImmediateService("getNodes");
     }
 
     /**

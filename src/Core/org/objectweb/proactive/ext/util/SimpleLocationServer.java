@@ -33,7 +33,7 @@ package org.objectweb.proactive.ext.util;
 import java.net.URISyntaxException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -104,7 +104,7 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
     protected void register() {
         try {
             logger.info("Attempt at binding : " + this.url);
-            ProActiveObject.register(ProActiveObject.getStubOnThis(), this.url);
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), this.url);
             logger.info("Location Server bound in registry : " + this.url);
         } catch (Exception e) {
             logger.fatal("Cannot bind in registry - aborting " + this.url);
@@ -124,10 +124,10 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
         SimpleLocationServer server = null;
         try {
             if (args.length == 2) {
-                server = (SimpleLocationServer) ProActiveObject.newActive("org.objectweb.proactive.ext.util.SimpleLocationServer",
+                server = (SimpleLocationServer) PAActiveObject.newActive("org.objectweb.proactive.ext.util.SimpleLocationServer",
                         arg, NodeFactory.getNode(args[1]));
             } else {
-                server = (SimpleLocationServer) ProActiveObject.newActive("org.objectweb.proactive.ext.util.SimpleLocationServer",
+                server = (SimpleLocationServer) PAActiveObject.newActive("org.objectweb.proactive.ext.util.SimpleLocationServer",
                         arg);
             }
         } catch (Exception e) {

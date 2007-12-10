@@ -39,7 +39,7 @@ import java.util.Vector;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
@@ -177,7 +177,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
         if (((ProActiveInterfaceTypeImpl) interfaceType).isFcCollective()) {
             if (delegatee != null) {
                 Object result;
-                Body body = ProActiveObject.getBodyOnThis();
+                Body body = PAActiveObject.getBodyOnThis();
 
                 // Creates a stub + ProxyForGroup for representing the result
                 try {
@@ -251,7 +251,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                 (delegatee != null)) {
             // 2. generate adapted method calls depending on nb members and parameters distribution
             // each method call is assigned a given member index
-            Body body = ProActiveObject.getBodyOnThis();
+            Body body = PAActiveObject.getBodyOnThis();
 
             Map<MethodCall, Integer> generatedMethodCalls;
 

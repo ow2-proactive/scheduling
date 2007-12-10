@@ -30,7 +30,7 @@
  */
 package functionalTests.activeobject.futurecallbacks;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
 
@@ -38,8 +38,8 @@ import functionalTests.FunctionalTest;
 public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
-        A a1 = (A) ProActiveObject.newActive(A.class.getName(), null);
-        A a2 = (A) ProActiveObject.newActive(A.class.getName(), null);
+        A a1 = (A) PAActiveObject.newActive(A.class.getName(), null);
+        A a2 = (A) PAActiveObject.newActive(A.class.getName(), null);
         a1.giveBrother(a2);
         a1.start();
         synchronized (A.class) {

@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -54,13 +54,13 @@ public class AOInterpreter {
         throws NodeException, ActiveObjectCreationException {
         Node localnode = NodeFactory.getDefaultNode();
 
-        this.stageOut = (AOStageOut) ProActiveObject.newActive(AOStageOut.class.getName(),
+        this.stageOut = (AOStageOut) PAActiveObject.newActive(AOStageOut.class.getName(),
                 new Object[] { taskpool, fserver }, localnode);
 
-        this.stageCompute = (AOStageCompute) ProActiveObject.newActive(AOStageCompute.class.getName(),
+        this.stageCompute = (AOStageCompute) PAActiveObject.newActive(AOStageCompute.class.getName(),
                 new Object[] { taskpool, stageOut }, localnode);
 
-        this.stageIn = (AOStageIn) ProActiveObject.newActive(AOStageIn.class.getName(),
+        this.stageIn = (AOStageIn) PAActiveObject.newActive(AOStageIn.class.getName(),
                 new Object[] { taskpool, fserver, stageCompute }, localnode);
     }
 

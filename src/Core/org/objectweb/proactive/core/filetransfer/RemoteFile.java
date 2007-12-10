@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.node.Node;
  * This class represent the result of a file transfer operation.
  *
  * When a file transfer operation is invoked, for example by using the
- * {@link org.objectweb.proactive.api.ProFileTransfer  ProFileTransfer} API, a RemoteFile instance
+ * {@link org.objectweb.proactive.api.PAFileTransfer  PAFileTransfer} API, a RemoteFile instance
  * is returned. A RemoteFile can be used, among others, to determine
  * if the file transfer operation has been completed, wait for the
  * file transfer operation to finish, obtain a reference on the node

@@ -37,7 +37,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
@@ -94,7 +94,7 @@ public class LocalFutureUpdateCallbacks {
 
     LocalFutureUpdateCallbacks(FutureProxy future) {
         try {
-            this.body = (BodyImpl) ProActiveObject.getBodyOnThis();
+            this.body = (BodyImpl) PAActiveObject.getBodyOnThis();
         } catch (ClassCastException e) {
             throw new IllegalStateException("Can only be called in a body");
         }
@@ -103,7 +103,7 @@ public class LocalFutureUpdateCallbacks {
     }
 
     void add(String methodName) {
-        if (ProActiveObject.getBodyOnThis() != this.body) {
+        if (PAActiveObject.getBodyOnThis() != this.body) {
             throw new IllegalStateException("Callbacks added by different " +
                 "bodies on the same future, this cannot be possible" +
                 "without breaking the no-sharing property");

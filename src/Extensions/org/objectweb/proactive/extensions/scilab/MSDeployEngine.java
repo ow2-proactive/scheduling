@@ -34,8 +34,8 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -69,7 +69,7 @@ public class MSDeployEngine {
         VirtualNode[] arrayVn;
         String[] arrayNameVn = null;
         try {
-            desc = ProDeployment.getProactiveDescriptor("file:" +
+            desc = PADeployment.getProactiveDescriptor("file:" +
                     pathDescriptor);
             arrayVn = desc.getVirtualNodes();
             arrayNameVn = new String[arrayVn.length];
@@ -89,7 +89,7 @@ public class MSDeployEngine {
         ProActiveDescriptor desc;
         VirtualNode vn;
         try {
-            desc = ProDeployment.getProactiveDescriptor("file:" +
+            desc = PADeployment.getProactiveDescriptor("file:" +
                     pathDescriptor);
             vn = desc.getVirtualNode(nameVirtualNode);
             return vn.getNbMappedNodes();
@@ -119,7 +119,7 @@ public class MSDeployEngine {
         HashMap<String, MSEngine> mapEngine = new HashMap<String, MSEngine>();
 
         try {
-            desc = ProDeployment.getProactiveDescriptor("file:" +
+            desc = PADeployment.getProactiveDescriptor("file:" +
                     pathDescriptor);
             vn = desc.getVirtualNode(nameVirtualNode);
             vn.activate();
@@ -150,7 +150,7 @@ public class MSDeployEngine {
     private synchronized static MSEngine deploy(String idEngine,
         Node currentNode) throws ActiveObjectCreationException, NodeException {
         Object[] param = new Object[] { idEngine };
-        MSEngine mSEngine = (MSEngine) ProActiveObject.newActive(MSEngine.class.getName(),
+        MSEngine mSEngine = (MSEngine) PAActiveObject.newActive(MSEngine.class.getName(),
                 param, currentNode);
         mapNode.put(idEngine, currentNode);
         mSEngine.setImmediateServices();
@@ -171,7 +171,7 @@ public class MSDeployEngine {
         }
 
         Object[] param = new Object[] { idEngine };
-        MSEngine mSEngine = (MSEngine) ProActiveObject.newActive(MSEngine.class.getName(),
+        MSEngine mSEngine = (MSEngine) PAActiveObject.newActive(MSEngine.class.getName(),
                 param);
         mSEngine.setImmediateServices();
         return mSEngine;

@@ -43,13 +43,13 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -95,11 +95,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * Reference to the current Node.
      */
     private Node p2pServiceNode = null;
-    private static final int MSG_MEMORY = Integer.parseInt(ProProperties.PA_P2P_MSG_MEMORY.getValue());
-    private static final int NOA = Integer.parseInt(ProProperties.PA_P2P_NOA.getValue());
-    private static final int EXPL_MSG = Integer.parseInt(ProProperties.PA_P2P_EXPLORING_MSG.getValue()) -
+    private static final int MSG_MEMORY = Integer.parseInt(PAProperties.PA_P2P_MSG_MEMORY.getValue());
+    private static final int NOA = Integer.parseInt(PAProperties.PA_P2P_NOA.getValue());
+    private static final int EXPL_MSG = Integer.parseInt(PAProperties.PA_P2P_EXPLORING_MSG.getValue()) -
         1;
-    private static final long ACQ_TO = Long.parseLong(ProProperties.PA_P2P_NODES_ACQUISITION_T0.getValue());
+    private static final long ACQ_TO = Long.parseLong(PAProperties.PA_P2P_NODES_ACQUISITION_T0.getValue());
 
     /**
      * Randomizer uses in <code>shouldBeAcquaintance</code> method.
@@ -139,7 +139,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     /**
      * The empty constructor.
      *
-     * @see org.objectweb.proactive.api.ProActiveObject
+     * @see org.objectweb.proactive.api.PAActiveObject
      */
     public P2PService() {
         // empty
@@ -163,7 +163,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             System.out.println("<<<<<<<<<<<<< p2pServiceMode " +
                 this.p2pServiceNode.getNodeInformation().getURL());
 
-            ProActiveObject.newActive(P2PFirstContact.class.getName(), params,
+            PAActiveObject.newActive(P2PFirstContact.class.getName(), params,
                 this.p2pServiceNode);
         } catch (ActiveObjectCreationException e) {
             logger.warn("Couldn't active P2PFirstContact", e);
@@ -183,7 +183,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 this.acquaintanceManager.add(service);
                 if (logger.isDebugEnabled()) {
                     logger.debug("Remote peer localy registered: " +
-                        ProActiveObject.getActiveObjectNodeUrl(service));
+                        PAActiveObject.getActiveObjectNodeUrl(service));
                 }
 
                 // Wake up all node accessor, because new peers are know
@@ -312,7 +312,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                         // Waitng the ACK
                         long endTime = System.currentTimeMillis() + ACQ_TO;
                         while ((System.currentTimeMillis() < endTime) &&
-                                ProFuture.isAwaited(nodeAck)) {
+                                PAFuture.isAwaited(nodeAck)) {
                             if (this.service.hasRequestToServe()) {
                                 service.serveAll(this.filter);
                             } else {
@@ -325,7 +325,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                         }
 
                         // Testing future is here or timeout is expired??
-                        if (ProFuture.isAwaited(nodeAck)) {
+                        if (PAFuture.isAwaited(nodeAck)) {
                             // Do not forward the message
                             // Prevent from deadlock
                             logger.debug("Ack timeout expired");
@@ -402,9 +402,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
         P2PNodeLookup lookup = null;
         try {
-            lookup = (P2PNodeLookup) ProActiveObject.newActive(P2PNodeLookup.class.getName(),
+            lookup = (P2PNodeLookup) PAActiveObject.newActive(P2PNodeLookup.class.getName(),
                     params, this.p2pServiceNode);
-            ProActiveObject.enableAC(lookup);
+            PAActiveObject.enableAC(lookup);
             if (numberOfNodes == MAX_NODE) {
                 this.waitingMaximunNodesLookup.add(lookup);
             } else {
@@ -500,7 +500,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             Node remoteNode = NodeFactory.getNode(node);
             ProActiveRuntime remoteRuntime = remoteNode.getProActiveRuntime();
             String remoteRuntimeUrl = remoteRuntime.getURL();
-            P2PNodeManager remoteNodeManager = (P2PNodeManager) ProActiveObject.lookupActive(P2PNodeManager.class.getName(),
+            P2PNodeManager remoteNodeManager = (P2PNodeManager) PAActiveObject.lookupActive(P2PNodeManager.class.getName(),
                     URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(
                             remoteRuntimeUrl), "P2PNodeManager",
                         URIBuilder.getProtocol(remoteRuntimeUrl),
@@ -514,7 +514,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
             // Unregister the remote runtime
             paRuntime.unregister(remoteRuntime, remoteRuntime.getURL(), "p2p",
-                ProProperties.PA_P2P_ACQUISITION.getValue() + ":",
+                PAProperties.PA_P2P_ACQUISITION.getValue() + ":",
                 remoteRuntime.getVMInformation().getName());
         } catch (Exception e) {
             logger.info("Node @" + node + " already down", e);
@@ -577,7 +577,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
         String remoteNodeUrl = null;
         try {
-            remoteNodeUrl = ProActiveObject.getActiveObjectNodeUrl(remoteService);
+            remoteNodeUrl = PAActiveObject.getActiveObjectNodeUrl(remoteService);
         } catch (Exception e) {
             isAnOldMessage = true;
         }
@@ -680,13 +680,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         logger.debug("P2P Service running in p2pServiceNode: " +
             this.p2pServiceNode.getNodeInformation().getURL());
 
-        this.stubOnThis = (P2PService) ProActiveObject.getStubOnThis();
+        this.stubOnThis = (P2PService) PAActiveObject.getStubOnThis();
 
         Object[] params = new Object[1];
         params[0] = this.stubOnThis;
         try {
             // Active acquaintances
-            this.acquaintanceManager = (P2PAcquaintanceManager) ProActiveObject.newActive(P2PAcquaintanceManager.class.getName(),
+            this.acquaintanceManager = (P2PAcquaintanceManager) PAActiveObject.newActive(P2PAcquaintanceManager.class.getName(),
                     params, this.p2pServiceNode);
             logger.debug("P2P acquaintance manager activated");
 
@@ -695,7 +695,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             logger.debug("Got active group reference");
 
             // Active Node Manager
-            this.nodeManager = (P2PNodeManager) ProActiveObject.newActive(P2PNodeManager.class.getName(),
+            this.nodeManager = (P2PNodeManager) PAActiveObject.newActive(P2PNodeManager.class.getName(),
                     null, this.p2pServiceNode);
             logger.debug("P2P node manager activated");
         } catch (ActiveObjectCreationException e) {

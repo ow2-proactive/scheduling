@@ -35,7 +35,7 @@ import java.rmi.AlreadyBoundException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.Job;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -48,7 +48,7 @@ public class TestJobId extends FunctionalTest {
     public void testHalfBodyJobID() {
 
         /* Half Body must have Job.DEFAULT_JOBID as jobId */
-        String halfBodyJobId = ProActiveObject.getBodyOnThis().getJobID();
+        String halfBodyJobId = PAActiveObject.getBodyOnThis().getJobID();
         Assert.assertEquals(Job.DEFAULT_JOBID, halfBodyJobId);
     }
 

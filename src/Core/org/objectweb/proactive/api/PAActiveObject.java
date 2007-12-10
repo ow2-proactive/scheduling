@@ -55,8 +55,8 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
 import org.objectweb.proactive.core.event.NodeCreationEventProducerImpl;
@@ -82,7 +82,7 @@ import org.objectweb.proactive.core.util.profiling.Profiling;
 
 
 @PublicAPI
-public class ProActiveObject {
+public class PAActiveObject {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
     private final static Heartbeat hb = new Heartbeat();
 
@@ -96,7 +96,7 @@ public class ProActiveObject {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    private ProActiveObject() {
+    private PAActiveObject() {
     }
 
     /**
@@ -245,7 +245,7 @@ public class ProActiveObject {
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
             if (factory.getProActiveSecurityManager() == null) {
-                factory.setProActiveSecurityManager(((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager());
+                factory.setProActiveSecurityManager(((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager());
             }
         }
 
@@ -398,7 +398,7 @@ public class ProActiveObject {
 
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(ProProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
+            threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -450,7 +450,7 @@ public class ProActiveObject {
         }
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(ProProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
+            threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
                 TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -611,7 +611,7 @@ public class ProActiveObject {
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
             if (factory.getProActiveSecurityManager() == null) {
-                factory.setProActiveSecurityManager(((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager());
+                factory.setProActiveSecurityManager(((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager());
             }
         }
 
@@ -844,8 +844,8 @@ public class ProActiveObject {
         try {
             body.register(url);
             body.setRegistered(true);
-            if (ProActiveObject.logger.isInfoEnabled()) {
-                ProActiveObject.logger.info("Success at binding url " + url);
+            if (PAActiveObject.logger.isInfoEnabled()) {
+                PAActiveObject.logger.info("Success at binding url " + url);
             }
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
@@ -889,7 +889,7 @@ public class ProActiveObject {
     public static void terminateActiveObject(Object ao, boolean immediate) {
         if (MOP.isReifiedObject(ao)) {
             //if ao is a future we need to obtain the real stub
-            ao = ProFuture.getFutureValue(ao);
+            ao = PAFuture.getFutureValue(ao);
 
             Proxy proxy = ((StubObject) ao).getProxy();
             try {
@@ -900,8 +900,8 @@ public class ProActiveObject {
                 }
             } catch (BodyTerminatedException e) {
                 // the terminated body is already terminated
-                if (ProActiveObject.logger.isDebugEnabled()) {
-                    ProActiveObject.logger.debug(
+                if (PAActiveObject.logger.isDebugEnabled()) {
+                    PAActiveObject.logger.debug(
                         "Terminating already terminated body : " + e);
                 }
             } catch (Throwable e) {
@@ -921,7 +921,7 @@ public class ProActiveObject {
      * is put on the request queue. The termination is asynchronous.
      */
     public static void terminateActiveObject(boolean immediate) {
-        terminateActiveObject(ProActiveObject.getStubOnThis(), immediate);
+        terminateActiveObject(PAActiveObject.getStubOnThis(), immediate);
     }
 
     /**
@@ -933,18 +933,18 @@ public class ProActiveObject {
      */
     public static boolean pingActiveObject(Object target) {
         //if target is a future we need to obtain the real stub
-        target = ProFuture.getFutureValue(target);
+        target = PAFuture.getFutureValue(target);
 
         UniversalBody targetedBody = null;
         try {
             // reified object is checked in getRemoteBody
             targetedBody = AbstractBody.getRemoteBody(target);
-            targetedBody.receiveFTMessage(ProActiveObject.hb);
+            targetedBody.receiveFTMessage(PAActiveObject.hb);
             return true;
         } catch (IOException e) {
-            if (ProActiveObject.logger.isDebugEnabled()) {
+            if (PAActiveObject.logger.isDebugEnabled()) {
                 // id should be cached locally
-                ProActiveObject.logger.debug("Active object " +
+                PAActiveObject.logger.debug("Active object " +
                     targetedBody.getID() + " is unreachable.", e);
             }
             return false;
@@ -961,7 +961,7 @@ public class ProActiveObject {
      * @param methodName the name of the method
      */
     public static void setImmediateService(String methodName) {
-        ProActiveObject.getBodyOnThis().setImmediateService(methodName);
+        PAActiveObject.getBodyOnThis().setImmediateService(methodName);
     }
 
     /**
@@ -976,8 +976,8 @@ public class ProActiveObject {
      */
     public static void setImmediateService(String methodName,
         Class<?>[] parametersTypes) {
-        ProActiveObject.getBodyOnThis()
-                       .setImmediateService(methodName, parametersTypes);
+        PAActiveObject.getBodyOnThis()
+                      .setImmediateService(methodName, parametersTypes);
     }
 
     /**
@@ -986,7 +986,7 @@ public class ProActiveObject {
      * @param methodName the name of the method
      */
     public static void removeImmediateService(String methodName) {
-        ProActiveObject.getBodyOnThis().removeImmediateService(methodName);
+        PAActiveObject.getBodyOnThis().removeImmediateService(methodName);
     }
 
     /**
@@ -997,8 +997,8 @@ public class ProActiveObject {
      */
     public static void removeImmediateService(String methodName,
         Class<?>[] parametersTypes) {
-        ProActiveObject.getBodyOnThis()
-                       .removeImmediateService(methodName, parametersTypes);
+        PAActiveObject.getBodyOnThis()
+                      .removeImmediateService(methodName, parametersTypes);
     }
 
     /**
@@ -1035,8 +1035,8 @@ public class ProActiveObject {
                 ub.setRegistered(false);
             }
 
-            if (ProActiveObject.logger.isDebugEnabled()) {
-                ProActiveObject.logger.debug("Success at unbinding url " + url);
+            if (PAActiveObject.logger.isDebugEnabled()) {
+                PAActiveObject.logger.debug("Success at unbinding url " + url);
             }
         } catch (ProActiveException e) {
             throw new IOException(e.getMessage());
@@ -1058,26 +1058,26 @@ public class ProActiveObject {
      * Returns a Stub-Proxy couple pointing to the local body associated to the active
      * object whose active thread is calling this method.
      * @return a Stub-Proxy couple pointing to the local body.
-     * @see ProActiveObject#getBodyOnThis
+     * @see PAActiveObject#getBodyOnThis
      */
     public static StubObject getStubOnThis() {
-        Body body = ProActiveObject.getBodyOnThis();
+        Body body = PAActiveObject.getBodyOnThis();
 
-        if (ProActiveObject.logger.isDebugEnabled()) {
+        if (PAActiveObject.logger.isDebugEnabled()) {
             //logger.debug("ProActive: getStubOnThis() returns " + body);
         }
         if (body == null) {
             return null;
         }
 
-        return ProActiveObject.getStubForBody(body);
+        return PAActiveObject.getStubForBody(body);
     }
 
     /**
      * @return the jobId associated with the object calling this method
      */
     public static String getJobId() {
-        return ProActiveObject.getBodyOnThis().getJobID();
+        return PAActiveObject.getBodyOnThis().getJobID();
     }
 
     /**

@@ -31,7 +31,7 @@
 package org.objectweb.proactive.examples.mpi;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -63,7 +63,7 @@ public class Jacobi {
         ProActiveDescriptor pad = null;
 
         try {
-            pad = ProDeployment.getProactiveDescriptor("file:" + args[0]);
+            pad = PADeployment.getProactiveDescriptor("file:" + args[0]);
 
             // gets virtual node 
             vnJacobi = pad.getVirtualNode("JacobiMPI");

@@ -35,7 +35,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -96,7 +96,7 @@ public class Start {
                 // creation of its sons and computation of the values of mass and mass center of
                 // all the tree's nodes
                 // useless boolean, just for pick up a different constructor
-                listOctTree.add((OctTree) ProActiveObject.newActive(
+                listOctTree.add((OctTree) PAActiveObject.newActive(
                         OctTree.class.getName(),
                         new Object[] { lplanets, universe, new Boolean(true) },
                         nodes[((10 * i) + 8) % nodes.length]));
@@ -123,7 +123,7 @@ public class Start {
                     fornod += 2;
                 }
 
-                domainArray[i] = (Domain) ProActiveObject.newActive(Domain.class.getName(),
+                domainArray[i] = (Domain) PAActiveObject.newActive(Domain.class.getName(),
                         new Object[] {
                             new Integer(i), lplanets.get(i),
                             listOctTree.get(cmp)
@@ -142,7 +142,7 @@ public class Start {
 
         try {
             for (int i = 0; i < nbOctTree; i++) {
-                maestroArray[i] = (Maestro) ProActiveObject.newActive(Maestro.class.getName(),
+                maestroArray[i] = (Maestro) PAActiveObject.newActive(Maestro.class.getName(),
                         new Object[] { new Integer(i), domainArray, killsupport },
                         nodes[((10 * i) + 9) % nodes.length]);
             }
@@ -157,7 +157,7 @@ public class Start {
         BigMaestro bigMaestro = null;
 
         try {
-            bigMaestro = (BigMaestro) ProActiveObject.newActive(BigMaestro.class.getName(),
+            bigMaestro = (BigMaestro) PAActiveObject.newActive(BigMaestro.class.getName(),
                     new Object[] { maestroArray, new Integer(maxIter), killsupport },
                     nodes[nodes.length - 1]);
         } catch (ActiveObjectCreationException e) {

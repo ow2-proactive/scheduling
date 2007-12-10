@@ -32,7 +32,7 @@ package functionalTests.component.immediateservice;
 
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.component.body.ComponentInitActive;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
@@ -44,11 +44,11 @@ public class A implements Itf, ComponentInitActive {
      * Initialize the immediate service method in the initComponentActivity
      */
     public void initComponentActivity(Body body) {
-        ProActiveObject.setImmediateService("immediateMethod",
+        PAActiveObject.setImmediateService("immediateMethod",
             new Class[] { String.class });
         //        ProActive.setImmediateService("startFc",
         //                new Class[] { });
-        ProActiveObject.setImmediateService("immediateStopLoopMethod");
+        PAActiveObject.setImmediateService("immediateStopLoopMethod");
         //ProActive.setImmediateService("startFc");
     }
 

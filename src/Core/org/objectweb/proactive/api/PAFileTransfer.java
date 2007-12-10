@@ -66,7 +66,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Note that an active objec's node can be obtained with:
  *
  * <pre>
- *                 String nodeURL = ProActiveObject.getActiveObjectNodeUrl(Object activeobject);
+ *                 String nodeURL = PAActiveObject.getActiveObjectNodeUrl(Object activeobject);
  *                 Node node = NodeFactory.getNode(nodeURL);
  * </pre>
  *
@@ -74,7 +74,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since ProActive 3.9 (November 2007)
  */
 @PublicAPI
-public class ProFileTransfer {
+public class PAFileTransfer {
     static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
 
     protected static Node getLocalNode() throws IOException {

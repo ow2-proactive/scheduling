@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extensions.calcium.environment.proactive;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.calcium.exceptions.TaskException;
@@ -59,7 +59,7 @@ public class TaskDispatcher extends Thread {
         while (!shutdown) {
             //TODO fix this blocking call
             Task task = taskpool.getReadyTask(0);
-            task = (Task) ProFuture.getFutureValue(task);
+            task = (Task) PAFuture.getFutureValue(task);
 
             try {
                 //block until there is an available interpreter

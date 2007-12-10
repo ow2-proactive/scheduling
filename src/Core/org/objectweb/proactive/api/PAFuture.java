@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.util.TimeoutAccounter;
 
 
 @PublicAPI
-public class ProFuture {
+public class PAFuture {
 
     /**
      * This negative value is returned by waitForAny(java.util.Vector futures) if
@@ -157,7 +157,7 @@ public class ProFuture {
     */
     public static void waitForAll(java.util.Vector futures) {
         try {
-            ProFuture.waitForAll(futures, 0);
+            PAFuture.waitForAll(futures, 0);
         } catch (ProActiveException e) {
             //Exception above should never be thrown since timeout=0 means no timeout
             e.printStackTrace();
@@ -179,7 +179,7 @@ public class ProFuture {
                 throw new ProActiveException(
                     "Timeout expired while waiting for future update");
             }
-            ProFuture.waitFor(future, time.getRemainingTimeout());
+            PAFuture.waitFor(future, time.getRemainingTimeout());
         }
     }
 
@@ -191,7 +191,7 @@ public class ProFuture {
     */
     public static int waitForAny(java.util.Vector futures) {
         try {
-            return ProFuture.waitForAny(futures, 0);
+            return PAFuture.waitForAny(futures, 0);
         } catch (ProActiveException e) {
             //Exception above should never be thrown since timeout=0 means no timeout
             e.printStackTrace();
@@ -216,13 +216,13 @@ public class ProFuture {
              * Yes, this return value is meaningless but at least we are
              * not permanently blocked
              */
-            return ProFuture.INVALID_EMPTY_COLLECTION;
+            return PAFuture.INVALID_EMPTY_COLLECTION;
         }
-        FuturePool fp = ProActiveObject.getBodyOnThis().getFuturePool();
+        FuturePool fp = PAActiveObject.getBodyOnThis().getFuturePool();
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
 
         for (Object future : futures) {
-            if (ProFuture.isAwaited(future)) {
+            if (PAFuture.isAwaited(future)) {
                 monitorFuture(future);
             }
         }
@@ -235,7 +235,7 @@ public class ProFuture {
                 while (it.hasNext()) {
                     Object current = it.next();
 
-                    if (!ProFuture.isAwaited(current)) {
+                    if (!PAFuture.isAwaited(current)) {
                         return index;
                     }
 
@@ -256,7 +256,7 @@ public class ProFuture {
     * @param n index of future to wait
     */
     public static void waitForTheNth(java.util.Vector futures, int n) {
-        ProFuture.waitFor(futures.get(n));
+        PAFuture.waitFor(futures.get(n));
     }
 
     /**
@@ -268,7 +268,7 @@ public class ProFuture {
          */
     public static void waitForTheNth(java.util.Vector futures, int n,
         long timeout) throws ProActiveException {
-        ProFuture.waitFor(futures.get(n), timeout);
+        PAFuture.waitFor(futures.get(n), timeout);
     }
 
     /**
@@ -279,7 +279,7 @@ public class ProFuture {
      * </code>.
      */
     public static boolean allAwaited(java.util.Vector futures) {
-        FuturePool fp = ProActiveObject.getBodyOnThis().getFuturePool();
+        FuturePool fp = PAActiveObject.getBodyOnThis().getFuturePool();
 
         synchronized (fp) {
             java.util.Iterator it = futures.iterator();
@@ -287,7 +287,7 @@ public class ProFuture {
             while (it.hasNext()) {
                 Object current = it.next();
 
-                if (!ProFuture.isAwaited(current)) {
+                if (!PAFuture.isAwaited(current)) {
                     return false;
                 }
             }

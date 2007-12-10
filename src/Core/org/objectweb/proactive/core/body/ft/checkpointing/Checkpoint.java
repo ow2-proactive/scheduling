@@ -39,7 +39,7 @@ import java.rmi.server.RemoteStub;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 
 
@@ -80,7 +80,7 @@ public class Checkpoint implements java.io.Serializable {
             // put futures in copy mode
             bodyToCheckpoint.getFuturePool().setCopyMode(true);
             this.bodyID = bodyToCheckpoint.getID();
-            String codebase = ProProperties.JAVA_RMI_SERVER_CODEBASE.getValue();
+            String codebase = PAProperties.JAVA_RMI_SERVER_CODEBASE.getValue();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             CheckpointingOutputStream objectOutputStream = new CheckpointingOutputStream(byteArrayOutputStream,
                     codebase + " " + additionalCodebase);

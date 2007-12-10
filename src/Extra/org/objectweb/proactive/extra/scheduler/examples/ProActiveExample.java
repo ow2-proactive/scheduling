@@ -35,8 +35,8 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -77,7 +77,7 @@ public class ProActiveExample extends ProActiveExecutable {
 
         for (Node node : nodes) {
             try {
-                Worker w = (Worker) ProActiveObject.newActive(Worker.class.getName(),
+                Worker w = (Worker) PAActiveObject.newActive(Worker.class.getName(),
                         new Object[] {  }, node);
                 workers.add(w);
             } catch (ActiveObjectCreationException e) {
@@ -120,7 +120,7 @@ public class ProActiveExample extends ProActiveExecutable {
                     answers.add(resp);
                 }
 
-                ProFuture.waitForAll(answers);
+                PAFuture.waitForAll(answers);
 
                 if (!answers.contains(flase)) {
                     workers.get(found % workers.size()).addPrimeNumber(n);

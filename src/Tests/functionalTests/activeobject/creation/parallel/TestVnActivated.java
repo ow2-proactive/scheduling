@@ -33,8 +33,8 @@ package functionalTests.activeobject.creation.parallel;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 
@@ -61,7 +61,7 @@ public class TestVnActivated extends FunctionalTest {
     public void action() throws Exception {
         assertTrue(vn.isActivated());
 
-        this.aos = (A[]) ProActiveObject.newActiveInParallel(A.class.getName(),
+        this.aos = (A[]) PAActiveObject.newActiveInParallel(A.class.getName(),
                 new Object[] { "toto" }, vn);
 
         assertTrue(aos != null);
@@ -75,7 +75,7 @@ public class TestVnActivated extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        padForActiving = ProDeployment.getProactiveDescriptor(XML_PATH);
+        padForActiving = PADeployment.getProactiveDescriptor(XML_PATH);
         this.vn = padForActiving.getVirtualNode("Workers01");
         this.vn.activate();
     }

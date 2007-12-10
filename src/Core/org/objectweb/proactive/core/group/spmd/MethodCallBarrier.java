@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.group.spmd;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
@@ -80,7 +80,7 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
     @Override
     public Object execute(Object target)
         throws InvocationTargetException, MethodCallExecutionFailedException {
-        ProActiveSPMDGroupManager spmdManager = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSPMDGroupManager();
+        ProActiveSPMDGroupManager spmdManager = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSPMDGroupManager();
         BarrierState bs = spmdManager.getBarrierStateFor(this.getIDName());
 
         // bs == null  =>  state not found  =>  first barrier encountered for ID name

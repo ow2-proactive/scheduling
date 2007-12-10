@@ -46,9 +46,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -165,7 +165,7 @@ public class AOWorkerManager implements WorkerManager,
     public void addResources(final URL descriptorURL) {
         if (!isTerminated) {
             try {
-                ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
+                ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
                 for (VirtualNode vn : pad.getVirtualNodes()) {
                     addResources(vn);
                 }
@@ -183,7 +183,7 @@ public class AOWorkerManager implements WorkerManager,
         final String virtualNodeName) {
         if (!isTerminated) {
             try {
-                ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
+                ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
                 addResources(pad.getVirtualNode(virtualNodeName));
             } catch (ProActiveException e) {
                 logger.error("Couldn't add the specified resources.");
@@ -236,7 +236,7 @@ public class AOWorkerManager implements WorkerManager,
 
                 // Creates the worker which will automatically connect to the master
                 workers.put(workername,
-                    (Worker) ProActiveObject.newActive(
+                    (Worker) PAActiveObject.newActive(
                         AOWorker.class.getName(),
                         new Object[] { workername, provider, initialMemory },
                         node));
@@ -256,7 +256,7 @@ public class AOWorkerManager implements WorkerManager,
      * {@inheritDoc}
      */
     public void initActivity(final Body body) {
-        stubOnThis = ProActiveObject.getStubOnThis();
+        stubOnThis = PAActiveObject.getStubOnThis();
         workerNameCounter = 0;
         workers = new HashMap<String, Worker>();
         vnlist = new Vector<VirtualNode>();
@@ -316,7 +316,7 @@ public class AOWorkerManager implements WorkerManager,
                 try {
                     BooleanWrapper term = worker.getValue().terminate();
                     // as it is a termination algorithm we wait a bit, but not forever
-                    ProFuture.waitFor(term, 3 * 1000);
+                    PAFuture.waitFor(term, 3 * 1000);
                     if (logger.isDebugEnabled()) {
                         logger.debug(worker.getKey() + " freed.");
                     }
@@ -342,7 +342,7 @@ public class AOWorkerManager implements WorkerManager,
             }
 
             // finally we terminate this active object
-            ProActiveObject.terminateActiveObject(true);
+            PAActiveObject.terminateActiveObject(true);
             // success
             if (logger.isDebugEnabled()) {
                 logger.debug("WorkerManager terminated...");

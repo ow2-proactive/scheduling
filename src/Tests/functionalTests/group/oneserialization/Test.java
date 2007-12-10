@@ -33,7 +33,7 @@ package functionalTests.group.oneserialization;
 import java.util.Iterator;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
 
@@ -53,12 +53,12 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        ProGroup.setUniqueSerialization(this.typedGroup);
+        PAGroup.setUniqueSerialization(this.typedGroup);
         this.typedGroup.onewayCall();
-        ProGroup.unsetUniqueSerialization(this.typedGroup);
+        PAGroup.unsetUniqueSerialization(this.typedGroup);
 
         boolean allOnewayCallDone = true;
-        Group group = ProGroup.getGroup(this.typedGroup);
+        Group group = PAGroup.getGroup(this.typedGroup);
         Iterator it = group.iterator();
         while (it.hasNext()) {
             allOnewayCallDone &= ((A) it.next()).isOnewayCallReceived();
@@ -79,11 +79,11 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        this.typedGroup = (A) ProGroup.newGroup(A.class.getName(), params, nodes);
-        ProGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
+        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
+        PAGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
 
         boolean NoOnewayCallDone = true;
-        Group group = ProGroup.getGroup(this.typedGroup);
+        Group group = PAGroup.getGroup(this.typedGroup);
         Iterator it = group.iterator();
         while (it.hasNext()) {
             NoOnewayCallDone &= !((A) it.next()).isOnewayCallReceived();

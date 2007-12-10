@@ -32,8 +32,8 @@ package org.objectweb.proactive.examples.robustarith;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProException;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAException;
 
 
 class DangerousException extends Exception {
@@ -61,26 +61,26 @@ public class ExceptionTest implements Serializable {
     public static void main(String[] args) {
         ExceptionTest test = null;
         try {
-            test = (ExceptionTest) ProActiveObject.newActive(ExceptionTest.class.getName(),
+            test = (ExceptionTest) PAActiveObject.newActive(ExceptionTest.class.getName(),
                     null);
         } catch (Exception e) {
             e.printStackTrace();
             return;
         }
 
-        ProException.tryWithCatch(DangerousException.class);
+        PAException.tryWithCatch(DangerousException.class);
         try {
             System.out.println("Appel");
             ExceptionTest et = test.dangerousMethod();
 
             //            et.toString();
             System.out.println("Fin de l'appel");
-            ProException.endTryWithCatch();
+            PAException.endTryWithCatch();
         } catch (DangerousException de) {
             System.out.println("Backtrace de l'exception :");
             de.printStackTrace(System.out);
         } finally {
-            ProException.removeTryWithCatch();
+            PAException.removeTryWithCatch();
         }
         System.out.println("fini");
     }

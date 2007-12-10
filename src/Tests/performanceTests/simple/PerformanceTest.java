@@ -38,8 +38,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.jdom.Document;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.result.BasicResultWriter;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
@@ -57,9 +57,9 @@ public class PerformanceTest {
 
     private final void initTest() throws Exception {
         // Access the nodes of the descriptor file
-        this.descriptorPad = ProDeployment.getProactiveDescriptor(this.getClass()
-                                                                      .getResource("/performanceTests/simple/descriptor.xml")
-                                                                      .getPath());
+        this.descriptorPad = PADeployment.getProactiveDescriptor(this.getClass()
+                                                                     .getResource("/performanceTests/simple/descriptor.xml")
+                                                                     .getPath());
         descriptorPad.activateMappings();
         VirtualNode vnode = descriptorPad.getVirtualNodes()[0];
         this.nodes = vnode.getNodes();
@@ -67,11 +67,11 @@ public class PerformanceTest {
 
     private final void performLocal() throws Exception {
         // First create the callee that will be local to the caller
-        Callee callee = (Callee) ProActiveObject.newActive(Callee.class.getName(),
+        Callee callee = (Callee) PAActiveObject.newActive(Callee.class.getName(),
                 null, nodes[0]);
 
         // Then create the caller and provide it a stub on the callee
-        Caller caller = (Caller) ProActiveObject.newActive(Caller.class.getName(),
+        Caller caller = (Caller) PAActiveObject.newActive(Caller.class.getName(),
                 new Object[] { callee }, nodes[0]);
         caller.performTest();
         // Kill these active objects
@@ -81,11 +81,11 @@ public class PerformanceTest {
 
     private final void performRemote() throws Exception {
         // First create the callee that will be remote to the caller
-        Callee callee = (Callee) ProActiveObject.newActive(Callee.class.getName(),
+        Callee callee = (Callee) PAActiveObject.newActive(Callee.class.getName(),
                 null, nodes[0]);
 
         // Then create the caller and provide it a stub on the callee
-        Caller caller = (Caller) ProActiveObject.newActive(Caller.class.getName(),
+        Caller caller = (Caller) PAActiveObject.newActive(Caller.class.getName(),
                 new Object[] { callee }, nodes[1]);
         caller.performTest();
         // Kill these active objects

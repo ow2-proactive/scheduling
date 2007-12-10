@@ -31,7 +31,7 @@
 package functionalTests.activeobject.request;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -48,7 +48,7 @@ public class Test extends FunctionalTest {
 
     @Before
     public void action() throws Exception {
-        activeA = (A) ProActiveObject.newActive(A.class.getName(), new Object[0]);
+        activeA = (A) PAActiveObject.newActive(A.class.getName(), new Object[0]);
         activeA.method1();
         javaA = activeA.method2();
         counterA = javaA.method3();

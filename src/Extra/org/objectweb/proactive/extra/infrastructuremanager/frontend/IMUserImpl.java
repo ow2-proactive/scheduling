@@ -35,7 +35,7 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -103,7 +103,7 @@ public class IMUserImpl implements IMUser, InitActive {
      */
     public void initActivity(Body body) {
         try {
-            ProActiveObject.register((IMUser) ProActiveObject.getStubOnThis(),
+            PAActiveObject.register((IMUser) PAActiveObject.getStubOnThis(),
                 "//localhost/" + IMConstants.NAME_ACTIVE_OBJECT_IMUSER);
         } catch (IOException e) {
             e.printStackTrace();
@@ -176,6 +176,6 @@ public class IMUserImpl implements IMUser, InitActive {
     }
 
     public void shutdown() {
-        ProActiveObject.terminateActiveObject(false);
+        PAActiveObject.terminateActiveObject(false);
     }
 }

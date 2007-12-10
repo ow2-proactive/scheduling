@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.group.spmd;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.group.MethodCallControlForGroup;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
@@ -79,7 +79,7 @@ public class MethodCallSetSPMDGroup extends MethodCallControlForGroup {
     @Override
     public Object execute(Object targetObject)
         throws InvocationTargetException, MethodCallExecutionFailedException {
-        AbstractBody body = (AbstractBody) ProActiveObject.getBodyOnThis();
+        AbstractBody body = (AbstractBody) PAActiveObject.getBodyOnThis();
         body.setSPMDGroup(this.getParameter(0));
         return null;
     }

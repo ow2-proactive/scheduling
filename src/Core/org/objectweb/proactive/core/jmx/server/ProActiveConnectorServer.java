@@ -41,7 +41,7 @@ import javax.management.remote.JMXConnectorServer;
 import javax.management.remote.JMXServiceURL;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.node.NodeException;
@@ -147,7 +147,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
         try {
             paServer = new ProActiveServerImpl();
             paServer.setMBeanServer(mbs);
-            paServer = (ProActiveServerImpl) ProActiveObject.turnActive(paServer);
+            paServer = (ProActiveServerImpl) PAActiveObject.turnActive(paServer);
             id = paServer.getUniqueID();
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
@@ -163,7 +163,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
         String path = this.address.getURLPath();
         int index = path.indexOf(ProActiveJMXConstants.SERVER_REGISTERED_NAME);
         String url = path.substring(index);
-        ProActiveObject.register(this.paServer, url);
+        PAActiveObject.register(this.paServer, url);
         state = STARTED;
     }
 
@@ -183,7 +183,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
             String path = this.address.getURLPath();
             int index = path.indexOf(ProActiveJMXConstants.SERVER_REGISTERED_NAME);
             String url = path.substring(index);
-            ProActiveObject.unregister(url);
+            PAActiveObject.unregister(url);
         } catch (IOException e) {
             System.out.println(
                 "Could not unregister ProActiveServerImpl from the registry. " +

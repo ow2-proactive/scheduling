@@ -66,8 +66,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Date;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 
 import com.sun.media.jai.codec.BMPEncodeParam;
@@ -292,8 +292,8 @@ public class fractParallel extends Frame {
         fractComputation fractGroup = null;
         Group fg = null;
         try {
-            fractGroup = (fractComputation) ProGroup.newGroup(fractComputation.class.getName());
-            fg = ProGroup.getGroup(fractGroup);
+            fractGroup = (fractComputation) PAGroup.newGroup(fractComputation.class.getName());
+            fg = PAGroup.getGroup(fractGroup);
         } catch (Exception e) {
             textLog.append("[" + (new Date()) + "] " +
                 "Error: cannot create ProActive Group!\n");
@@ -319,7 +319,7 @@ public class fractParallel extends Frame {
                 }
                 try {
                     // If destination==null, the computation will be done locally
-                    fg.add(ProActiveObject.turnActive(
+                    fg.add(PAActiveObject.turnActive(
                             new fractComputation(
                                 new Complex(r1 + (((j * column) / n) * zoom), i1),
                                 new Complex(r1 +
@@ -354,7 +354,7 @@ public class fractParallel extends Frame {
         }
         int received = 0;
         while (received < nodes) {
-            ProGroup.waitN(resultsGroup, received + 1);
+            PAGroup.waitN(resultsGroup, received + 1);
             received++;
             textLog.append("[" + (new Date()) + "] " + received + "/" + nodes +
                 " results received...\n");
@@ -375,7 +375,7 @@ public class fractParallel extends Frame {
         for (int i = 0; i < nodes; i++) {
             // Debug information
             //System.out.println(".");
-            tmp = ((fractResult) ProGroup.get(resultsGroup, i)).getResults();
+            tmp = ((fractResult) PAGroup.get(resultsGroup, i)).getResults();
             if (i == appn) {
                 ColCounter = 0;
                 RowCounter++;

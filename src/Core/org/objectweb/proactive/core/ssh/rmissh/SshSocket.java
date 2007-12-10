@@ -41,7 +41,7 @@ import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.nio.channels.SocketChannel;
 
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import static org.objectweb.proactive.core.ssh.SSH.logger;
 import org.objectweb.proactive.core.ssh.SshParameters;
 import org.objectweb.proactive.core.ssh.SshTunnel;
@@ -78,7 +78,7 @@ public class SshSocket extends Socket {
     }
 
     public SshSocket(String host, int port) throws IOException {
-        if (ProProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() &&
+        if (PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() &&
                 getTryCache().needToTry(host, port)) {
             try {
                 if (logger.isDebugEnabled()) {

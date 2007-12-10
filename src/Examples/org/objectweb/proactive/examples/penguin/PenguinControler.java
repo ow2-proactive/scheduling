@@ -31,8 +31,8 @@
 package org.objectweb.proactive.examples.penguin;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -56,14 +56,14 @@ public class PenguinControler implements org.objectweb.proactive.RunActive,
         this.penguinList = new CircularArrayList(20);
         this.args = args;
         try {
-            ProActiveObject.turnActive(this);
+            PAActiveObject.turnActive(this);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     public void rebuild() {
-        this.display = new PenguinApplet((PenguinControler) ProActiveObject.getStubOnThis(),
+        this.display = new PenguinApplet((PenguinControler) PAActiveObject.getStubOnThis(),
                 penguinList);
     }
 
@@ -84,10 +84,10 @@ public class PenguinControler implements org.objectweb.proactive.RunActive,
 
     public Penguin createPenguin(int n) {
         try {
-            Penguin newPenguin = (Penguin) org.objectweb.proactive.api.ProActiveObject.newActive(Penguin.class.getName(),
+            Penguin newPenguin = (Penguin) org.objectweb.proactive.api.PAActiveObject.newActive(Penguin.class.getName(),
                     new Object[] { new Integer(n) });
             newPenguin.initialize(args);
-            newPenguin.setControler((PenguinControler) ProActiveObject.getStubOnThis());
+            newPenguin.setControler((PenguinControler) PAActiveObject.getStubOnThis());
             return newPenguin;
         } catch (Exception e) {
             e.printStackTrace();
@@ -117,7 +117,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive,
         // Version with descriptor
         ProActiveDescriptor proActiveDescriptor = null;
         try {
-            proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
                     args[0]);
             proActiveDescriptor.activateMappings();
             VirtualNode vn1 = proActiveDescriptor.getVirtualNode("penguinNode");

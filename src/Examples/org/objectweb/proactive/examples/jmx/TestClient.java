@@ -51,7 +51,7 @@ import javax.management.ObjectName;
 import javax.management.remote.JMXConnector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
 import org.objectweb.proactive.core.node.NodeException;
@@ -111,7 +111,7 @@ public class TestClient implements NotificationListener, Serializable {
         /* adds a connector listener */
         this.connector.addConnectionNotificationListener(this, null, null);
         try {
-            this.listener = (ConnectionListener) ProActiveObject.newActive(ConnectionListener.class.getName(),
+            this.listener = (ConnectionListener) PAActiveObject.newActive(ConnectionListener.class.getName(),
                     new Object[] { this.connection });
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();

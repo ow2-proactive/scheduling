@@ -31,8 +31,8 @@
 package org.objectweb.proactive.examples.hello;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -54,7 +54,7 @@ public class SimpleAgent implements java.io.Serializable {
     /** Migrate the Active Object to a new host */
     public void moveTo(String t) {
         try {
-            ProMobileAgent.migrateTo(t);
+            PAMobileAgent.migrateTo(t);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -81,7 +81,7 @@ public class SimpleAgent implements java.io.Serializable {
         SimpleAgent t = null;
         try {
             // create the SimpleAgent in this JVM
-            t = (SimpleAgent) ProActiveObject.newActive("org.objectweb.proactive.examples.hello.SimpleAgent",
+            t = (SimpleAgent) PAActiveObject.newActive("org.objectweb.proactive.examples.hello.SimpleAgent",
                     null);
         } catch (Exception e) {
             e.printStackTrace();

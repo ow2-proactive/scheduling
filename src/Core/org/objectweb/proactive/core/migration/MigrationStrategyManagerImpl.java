@@ -33,7 +33,7 @@ package org.objectweb.proactive.core.migration;
 import java.lang.reflect.Method;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.event.MigrationEvent;
@@ -187,7 +187,7 @@ public class MigrationStrategyManagerImpl implements MigrationStrategyManager,
             return;
         }
         methodOnArrival = r.getMethodName();
-        ProMobileAgent.migrateTo(body, r.getDestination(), fifoFirst);
+        PAMobileAgent.migrateTo(body, r.getDestination(), fifoFirst);
     }
 
     //

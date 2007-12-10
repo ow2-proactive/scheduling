@@ -34,7 +34,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -71,9 +71,9 @@ public class Test extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
         ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
 
-        ProActiveDescriptor deploymentDescriptor = ProDeployment.getProactiveDescriptor(Test.class.getResource(
+        ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class.getResource(
                     "/functionalTests/component/nonfunctional/creation/descriptor.xml")
-                                                                                                  .getPath());
+                                                                                                 .getPath());
         deploymentDescriptor.activateMappings();
         VirtualNode vn = deploymentDescriptor.getVirtualNode("computers-vn");
         dummyNFComponent = cf.newNFcInstance(type_factory.createFcType(

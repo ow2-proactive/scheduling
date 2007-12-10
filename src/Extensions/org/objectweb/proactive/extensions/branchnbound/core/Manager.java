@@ -43,9 +43,9 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
@@ -108,7 +108,7 @@ public class Manager implements Serializable, InitActive {
     private Manager(Task root, Node myNode, String queueType) {
         // Activate the root task
         try {
-            this.rootTask = (Task) ProActiveObject.turnActive(root, myNode);
+            this.rootTask = (Task) PAActiveObject.turnActive(root, myNode);
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Problem with the turn active of the root task", e);
             throw new RuntimeException(e);
@@ -122,7 +122,7 @@ public class Manager implements Serializable, InitActive {
             if (logger.isInfoEnabled()) {
                 logger.info("Activing the task queue: " + queueType);
             }
-            this.taskProviderQueue = (TaskQueue) ProActiveObject.newActive(queueType,
+            this.taskProviderQueue = (TaskQueue) PAActiveObject.newActive(queueType,
                     null, myNode);
         } catch (ActiveObjectCreationException e1) {
             logger.fatal("Couldn't create the Task Provider", e1);
@@ -198,10 +198,10 @@ public class Manager implements Serializable, InitActive {
                 logger.info("Manager is deploying a group of workers");
                 // Node[]
                 long singleStartTime = System.currentTimeMillis();
-                this.workerGroup = (Worker) ProGroup.newGroupInParallel(Worker.class.getName(),
+                this.workerGroup = (Worker) PAGroup.newGroupInParallel(Worker.class.getName(),
                         args, this.nodes);
-                ProGroup.getGroup(this.workerGroup).setAutomaticPurge(true);
-                this.freeWorkerList.addAll(ProGroup.getGroup(this.workerGroup));
+                PAGroup.getGroup(this.workerGroup).setAutomaticPurge(true);
+                this.freeWorkerList.addAll(PAGroup.getGroup(this.workerGroup));
                 long singleEndTime = System.currentTimeMillis();
                 if (logger.isInfoEnabled()) {
                     logger.info("The  Group was created in " +
@@ -212,8 +212,8 @@ public class Manager implements Serializable, InitActive {
                 logger.info("Manager is deploying " + this.arrayOfNodes.length +
                     " groups of workers");
                 // Node[][]
-                this.workerGroup = (Worker) ProGroup.newGroup(Worker.class.getName());
-                Group<Worker> mainGroup = ProGroup.getGroup(this.workerGroup);
+                this.workerGroup = (Worker) PAGroup.newGroup(Worker.class.getName());
+                Group<Worker> mainGroup = PAGroup.getGroup(this.workerGroup);
                 for (int i = 0; i < this.arrayOfNodes.length; i++) {
                     GroupThread gt = new GroupThread(this.arrayOfNodes[i],
                             args, mainGroup);
@@ -224,8 +224,8 @@ public class Manager implements Serializable, InitActive {
                 logger.info("Manager is deploying " + this.arrayOfVns.length +
                     " groups of workers");
                 // VN []
-                this.workerGroup = (Worker) ProGroup.newGroup(Worker.class.getName());
-                Group<Worker> vnGroup = ProGroup.getGroup(this.workerGroup);
+                this.workerGroup = (Worker) PAGroup.newGroup(Worker.class.getName());
+                Group<Worker> vnGroup = PAGroup.getGroup(this.workerGroup);
                 for (int i = 0; i < this.arrayOfVns.length; i++) {
                     VnThread vt = new VnThread(this.arrayOfVns[i], args, vnGroup);
                     new Thread(vt).start();
@@ -248,7 +248,7 @@ public class Manager implements Serializable, InitActive {
             throw new ProActiveRuntimeException(e);
         }
 
-        Group<Worker> groupOfWorkers = ProGroup.getGroup(this.workerGroup);
+        Group<Worker> groupOfWorkers = PAGroup.getGroup(this.workerGroup);
         this.workerGroup.setWorkerGroup(this.workerGroup);
 
         if (logger.isInfoEnabled()) {
@@ -267,7 +267,7 @@ public class Manager implements Serializable, InitActive {
     public Result start() {
         logger.info("Starting computation");
         // Nothing to do if the manager is not actived
-        if (!ProActiveObject.getBodyOnThis().isActive()) {
+        if (!PAActiveObject.getBodyOnThis().isActive()) {
             logger.fatal("The manager is not active");
             throw new ProActiveRuntimeException("The manager is not active");
         }
@@ -325,7 +325,7 @@ public class Manager implements Serializable, InitActive {
                 }
 
                 try {
-                    int index = ProFuture.waitForAny(this.futureTaskList, 1000);
+                    int index = PAFuture.waitForAny(this.futureTaskList, 1000);
                     backupCounter++;
                     Result currentResult = this.futureTaskList.remove(index);
                     this.taskProviderQueue.addResult(currentResult);
@@ -390,7 +390,7 @@ public class Manager implements Serializable, InitActive {
 
         // Set the final result
         Collection<Result> resultsFuture = this.taskProviderQueue.getAllResults();
-        ProFuture.waitFor(resultsFuture);
+        PAFuture.waitFor(resultsFuture);
         Result[] results = resultsFuture.toArray(new Result[this.taskProviderQueue.howManyResults()
                                                                                   .intValue()]);
         return this.rootTask.gather(results);
@@ -407,8 +407,8 @@ public class Manager implements Serializable, InitActive {
         this.workerGroup.reset();
 
         try {
-            this.rootTask = (Task) ProActiveObject.turnActive(rootTask,
-                    ProActiveObject.getBodyOnThis().getNodeURL());
+            this.rootTask = (Task) PAActiveObject.turnActive(rootTask,
+                    PAActiveObject.getBodyOnThis().getNodeURL());
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Problem with the turn active of the root task", e);
             throw new RuntimeException(e);
@@ -427,7 +427,7 @@ public class Manager implements Serializable, InitActive {
         logger.info("The ROOT task sends " + subTaskList.size());
         this.taskProviderQueue.addAll(subTaskList);
 
-        return ((Manager) ProActiveObject.getStubOnThis()).start();
+        return ((Manager) PAActiveObject.getStubOnThis()).start();
     }
 
     /**
@@ -439,7 +439,7 @@ public class Manager implements Serializable, InitActive {
     public Result start(InputStream task, InputStream result) {
         this.loadTasks(task);
         this.loadResults(result);
-        return ((Manager) ProActiveObject.getStubOnThis()).start();
+        return ((Manager) PAActiveObject.getStubOnThis()).start();
     }
 
     /**
@@ -493,15 +493,15 @@ public class Manager implements Serializable, InitActive {
      * @param taskFile the stream for restoring.
      */
     private void loadTasks(InputStream taskFile) {
-        if (!ProActiveObject.getBodyOnThis().isActive()) {
+        if (!PAActiveObject.getBodyOnThis().isActive()) {
             logger.fatal("The manager is not active");
             throw new ProActiveRuntimeException("The manager is not active");
         }
         this.taskProviderQueue.loadTasks(taskFile);
         this.taskProviderQueue.getRootTaskFromBackup();
         try {
-            this.rootTask = (Task) ProActiveObject.turnActive(this.taskProviderQueue.getRootTaskFromBackup(),
-                    ProActiveObject.getBodyOnThis().getNodeURL());
+            this.rootTask = (Task) PAActiveObject.turnActive(this.taskProviderQueue.getRootTaskFromBackup(),
+                    PAActiveObject.getBodyOnThis().getNodeURL());
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Problem with the turn active of the root task", e);
             throw new RuntimeException(e);
@@ -546,10 +546,10 @@ public class Manager implements Serializable, InitActive {
             if (this.nodes.length > 0) {
                 long startTime = System.currentTimeMillis();
                 try {
-                    tmpWorkers = (Worker) ProGroup.newGroupInParallel(Worker.class.getName(),
+                    tmpWorkers = (Worker) PAGroup.newGroupInParallel(Worker.class.getName(),
                             args, this.nodes);
-                    freeWorkerList.addAll(ProGroup.getGroup(tmpWorkers));
-                    Worker activedTmpWorkers = (Worker) ProGroup.turnActiveGroup(tmpWorkers,
+                    freeWorkerList.addAll(PAGroup.getGroup(tmpWorkers));
+                    Worker activedTmpWorkers = (Worker) PAGroup.turnActiveGroup(tmpWorkers,
                             this.nodes[0]);
                     this.group.add(activedTmpWorkers);
                 } catch (Exception e) {
@@ -561,7 +561,7 @@ public class Manager implements Serializable, InitActive {
                     logger.info("The remote Group " +
                         this.nodes[0].getVMInformation().getHostName() +
                         " was created in " + (endTime - startTime) +
-                        " ms with " + ProGroup.getGroup(tmpWorkers).size() +
+                        " ms with " + PAGroup.getGroup(tmpWorkers).size() +
                         " members");
                 }
             } else {
@@ -615,10 +615,10 @@ public class Manager implements Serializable, InitActive {
             if (nodes.length > 0) {
                 startTime = System.currentTimeMillis();
                 try {
-                    tmpWorkers = (Worker) ProGroup.newGroupInParallel(Worker.class.getName(),
+                    tmpWorkers = (Worker) PAGroup.newGroupInParallel(Worker.class.getName(),
                             args, nodes);
-                    freeWorkerList.addAll(ProGroup.getGroup(tmpWorkers));
-                    Worker activedTmpWorkers = (Worker) ProGroup.turnActiveGroup(tmpWorkers,
+                    freeWorkerList.addAll(PAGroup.getGroup(tmpWorkers));
+                    Worker activedTmpWorkers = (Worker) PAGroup.turnActiveGroup(tmpWorkers,
                             nodes[0]);
                     this.group.add(activedTmpWorkers);
                 } catch (Exception e) {
@@ -630,7 +630,7 @@ public class Manager implements Serializable, InitActive {
                 if (logger.isInfoEnabled()) {
                     logger.info("The remote Group " + this.vn.getName() +
                         " was created in " + (endTime - startTime) +
-                        " ms with " + ProGroup.getGroup(tmpWorkers).size() +
+                        " ms with " + PAGroup.getGroup(tmpWorkers).size() +
                         " members");
                 }
             } else {

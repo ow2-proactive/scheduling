@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 
 public class A implements Serializable, RunActive {
@@ -53,7 +53,7 @@ public class A implements Serializable, RunActive {
     }
 
     public void runActivity(Body body) {
-        ProActiveObject.setImmediateService("getObject");
+        PAActiveObject.setImmediateService("getObject");
         while (body.isActive()) {
             //do nothing
         }

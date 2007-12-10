@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.node.NodeException;
 
 
 @PublicAPI
-public class ProComponent {
+public class PAComponent {
 
     /**
      * Creates a new ProActive component over the specified base class, according to the

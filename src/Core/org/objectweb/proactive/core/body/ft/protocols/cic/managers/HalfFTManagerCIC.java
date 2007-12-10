@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.body.ft.protocols.cic.infos.MessageInfoCIC;
 import org.objectweb.proactive.core.body.ft.servers.location.LocationServer;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -81,11 +81,11 @@ public class HalfFTManagerCIC extends FTManager {
         //super.init(owner);
         // a half body need only a location server...
         try {
-            String urlGlobal = ProProperties.PA_FT_SERVER_GLOBAL.getValue();
+            String urlGlobal = PAProperties.PA_FT_SERVER_GLOBAL.getValue();
             if (urlGlobal != null) {
                 this.location = (LocationServer) (Naming.lookup(urlGlobal));
             } else {
-                String urlLocation = ProProperties.PA_LOCATION_SERVER.getValue();
+                String urlLocation = PAProperties.PA_LOCATION_SERVER.getValue();
                 if (urlLocation != null) {
                     this.location = (LocationServer) (Naming.lookup(urlLocation));
                 } else {

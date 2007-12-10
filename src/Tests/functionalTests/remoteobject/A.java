@@ -32,8 +32,8 @@ package functionalTests.remoteobject;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.node.Node;
 
@@ -50,7 +50,7 @@ public class A implements Serializable {
 
     public void migrateTo(Node n) {
         try {
-            ProMobileAgent.migrateTo(n);
+            PAMobileAgent.migrateTo(n);
         } catch (MigrationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -58,6 +58,6 @@ public class A implements Serializable {
     }
 
     public String sayHello() {
-        return "hello from " + ProActiveObject.getBodyOnThis().getNodeURL();
+        return "hello from " + PAActiveObject.getBodyOnThis().getNodeURL();
     }
 }

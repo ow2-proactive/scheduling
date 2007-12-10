@@ -47,9 +47,9 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -75,7 +75,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      */
     private static long MAX_WAIT_TIME = 10000;
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
-    static public int NOA = Integer.parseInt(ProProperties.PA_P2P_NOA.getValue());
+    static public int NOA = Integer.parseInt(PAProperties.PA_P2P_NOA.getValue());
 
     //	static public int NOA = new NOAPowerLawGenerator(1, 9, -3).nextInt();
 
@@ -316,7 +316,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return add succesfull
      */
     public Vector<String> add(P2PService peer) {
-        return this.add(buildCorrectUrl(ProActiveObject.getActiveObjectNodeUrl(
+        return this.add(buildCorrectUrl(PAActiveObject.getActiveObjectNodeUrl(
                     peer)), peer);
     }
 
@@ -388,7 +388,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      */
     public void remove(P2PService peer, Vector<String> acquaintancesURLs) {
         boolean result = this.acquaintances.remove(peer,
-                buildCorrectUrl(ProActiveObject.getActiveObjectNodeUrl(peer)));
+                buildCorrectUrl(PAActiveObject.getActiveObjectNodeUrl(peer)));
         if (acquaintancesURLs != null) {
             this.addToPreferedAcq(acquaintancesURLs);
         }

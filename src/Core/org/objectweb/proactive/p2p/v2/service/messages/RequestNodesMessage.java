@@ -32,7 +32,7 @@ package org.objectweb.proactive.p2p.v2.service.messages;
 
 import java.util.Vector;
 
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.p2p.v2.service.P2PService;
 import org.objectweb.proactive.p2p.v2.service.node.P2PNode;
@@ -134,7 +134,7 @@ public class RequestNodesMessage extends BreadthFirstMessage {
                         long endTime = System.currentTimeMillis() +
                             P2PService.ACQ_TO;
                         while ((System.currentTimeMillis() < endTime) &&
-                                ProFuture.isAwaited(nodeAck)) {
+                                PAFuture.isAwaited(nodeAck)) {
                             if (target.service.hasRequestToServe()) {
                                 target.service.serveAll(target.filter);
                             } else {
@@ -147,7 +147,7 @@ public class RequestNodesMessage extends BreadthFirstMessage {
                         }
 
                         // Testing future is here or timeout is expired??
-                        if (ProFuture.isAwaited(nodeAck)) {
+                        if (PAFuture.isAwaited(nodeAck)) {
                             // Do not forward the message
                             // Prevent  deadlock
                             target.nodeManager.noMoreNodeNeeded(nodeAvailable);

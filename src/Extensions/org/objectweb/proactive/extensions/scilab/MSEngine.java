@@ -35,7 +35,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.AbstractExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
@@ -78,8 +78,8 @@ public class MSEngine implements Serializable {
      * Set the immediate services for this active object
      */
     public int setImmediateServices() {
-        ProActiveObject.setImmediateService("killWorker");
-        ProActiveObject.setImmediateService("exit");
+        PAActiveObject.setImmediateService("killWorker");
+        PAActiveObject.setImmediateService("exit");
         return 0; // synchronous call
     }
 
@@ -126,7 +126,7 @@ public class MSEngine implements Serializable {
         for (int i = 0; i < 30; i++) {
             try {
                 try {
-                    mSEngineWorker = (MSEngineWorker) ProActiveObject.newActive(MSEngineWorker.class.getName(),
+                    mSEngineWorker = (MSEngineWorker) PAActiveObject.newActive(MSEngineWorker.class.getName(),
                             null, uri);
                     return new BooleanWrapper(true);
                 } catch (ProActiveException e) {

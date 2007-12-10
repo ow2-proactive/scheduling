@@ -47,7 +47,7 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.migration.Migratable;
@@ -187,7 +187,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         } catch (NodeException e) {
             throw new MigrationException("Cannot find node " + nodeUrl, e);
         }
-        ProMobileAgent.migrateTo(body, node, true,
+        PAMobileAgent.migrateTo(body, node, true,
             Request.NFREQUEST_IMMEDIATE_PRIORITY);
     }
 

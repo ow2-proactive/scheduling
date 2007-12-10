@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extra.scheduler.task.internal;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
@@ -103,10 +103,10 @@ public class InternalNativeTask extends InternalTask {
         throws ActiveObjectCreationException, NodeException {
         NativeTaskLauncher launcher;
         if (getPreScript() == null) {
-            launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
+            launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
                     new Object[] { getId(), host, port }, node);
         } else {
-            launcher = (NativeTaskLauncher) ProActiveObject.newActive(NativeTaskLauncher.class.getName(),
+            launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
                     new Object[] { getId(), host, port, getPreScript() }, node);
         }
 

@@ -35,8 +35,8 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -184,7 +184,7 @@ public class Start implements Serializable {
         descriptorPad = null;
         VirtualNode vnode;
         try {
-            descriptorPad = ProDeployment.getProactiveDescriptor(xmlFileName);
+            descriptorPad = PADeployment.getProactiveDescriptor(xmlFileName);
         } catch (ProActiveException e) {
             abort(e);
         }
@@ -201,7 +201,7 @@ public class Start implements Serializable {
         Displayer displayer = null;
         if (display) {
             try {
-                displayer = (Displayer) (ProActiveObject.newActive(Displayer.class.getName(),
+                displayer = (Displayer) (PAActiveObject.newActive(Displayer.class.getName(),
                         new Object[] {
                             new Integer(totalNbBodies), new Boolean(displayft),
                             this, new BooleanWrapper(ddd)

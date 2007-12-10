@@ -31,7 +31,7 @@
 package functionalTests.activeobject.migration.multiplemigration;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
@@ -51,7 +51,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        a = (A) ProActiveObject.newActive(A.class.getName(),
+        a = (A) PAActiveObject.newActive(A.class.getName(),
                 new Object[] { "toto" });
         a.moveTo(TestNodes.getRemoteVMNode());
         a.getNodeUrl();

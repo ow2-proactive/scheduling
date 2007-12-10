@@ -43,9 +43,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -62,8 +62,8 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public class FileTransferService implements ProActiveInternalObject, InitActive,
     FileTransferServiceSend, FileTransferServiceReceive {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
-    public final static int DEFAULT_MAX_SIMULTANEOUS_BLOCKS = ProProperties.PA_FILETRANSFER_MAX_SIMULTANEOUS_BLOCKS.getValueAsInt();
-    public static final int DEFAULT_BUFFER_SIZE = ProProperties.PA_FILETRANSFER_MAX_BUFFER_SIZE.getValueAsInt() * 1024; //Bytes
+    public final static int DEFAULT_MAX_SIMULTANEOUS_BLOCKS = PAProperties.PA_FILETRANSFER_MAX_SIMULTANEOUS_BLOCKS.getValueAsInt();
+    public static final int DEFAULT_BUFFER_SIZE = PAProperties.PA_FILETRANSFER_MAX_BUFFER_SIZE.getValueAsInt() * 1024; //Bytes
     protected HashMap<File, BufferedOutputStream> writeBufferMap; //Map for storing the opened output sockets
 
     /**
@@ -77,7 +77,7 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
     public void initActivity(Body body) {
         writeBufferMap = new HashMap<File, BufferedOutputStream>();
 
-        //ProActiveObject.setImmediateService("requestFileTransfer", new Class[] { FileTransferRequest.class });
+        //PAActiveObject.setImmediateService("requestFileTransfer", new Class[] { FileTransferRequest.class });
     }
 
     /* ***************** BEGIN FILETRANSFER SERVICE RECIEVE  ***************************/
@@ -300,9 +300,9 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
                     numBlocks++;
                 } catch (IOException e) {
                     //TODO change when moving to Java 1.6
-                    //throw new IOException("Cannot send file block to:" + ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e);
+                    //throw new IOException("Cannot send file block to:" + PAActiveObject.getActiveObjectNodeUrl(ftsRemote), e);
                     throw new IOException("Cannot send file block to:" +
-                        ProActiveObject.getActiveObjectNodeUrl(ftsRemote) + e);
+                        PAActiveObject.getActiveObjectNodeUrl(ftsRemote) + e);
                 }
             }
         }
@@ -314,13 +314,13 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
             numBlocks++;
         } catch (IOException e) {
             //TODO change when moving to Java 1.6
-            //throw new IOException("Cannot send File to:" + ProActiveObject.getActiveObjectNodeUrl(ftsRemote), e);
+            //throw new IOException("Cannot send File to:" + PAActiveObject.getActiveObjectNodeUrl(ftsRemote), e);
             throw new IOException("Cannot send File to:" +
-                ProActiveObject.getActiveObjectNodeUrl(ftsRemote) + e);
+                PAActiveObject.getActiveObjectNodeUrl(ftsRemote) + e);
         }
 
         //Close the remote/local buffers
-        ProFuture.waitFor(ftsRemote.closeWrite(dstFile));
+        PAFuture.waitFor(ftsRemote.closeWrite(dstFile));
         close(bis);
 
         if (logger.isDebugEnabled()) {
@@ -346,7 +346,7 @@ public class FileTransferService implements ProActiveInternalObject, InitActive,
      */
     public void putBackInLocalPool() {
         FileTransferEngine.getFileTransferEngine()
-                          .putFTS((FileTransferService) ProActiveObject.getStubOnThis());
+                          .putFTS((FileTransferService) PAActiveObject.getStubOnThis());
     }
 
     /**

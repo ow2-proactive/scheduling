@@ -38,7 +38,7 @@ import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -73,8 +73,8 @@ public class Registry {
      * see @link org.objectweb.fractal.adl.RegistryManager#addComponent(org.objectweb.fractal.api.Component)
      */
     public void addComponent(Component component) throws ADLException {
-        if (ProGroup.isGroup(component)) {
-            Group group = ProGroup.getGroup(component);
+        if (PAGroup.isGroup(component)) {
+            Group group = PAGroup.getGroup(component);
             Iterator it = group.iterator();
             while (it.hasNext()) {
                 addComponent((Component) it.next());

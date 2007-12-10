@@ -37,9 +37,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 import functionalTests.FunctionalTest;
@@ -64,7 +64,7 @@ public class Test extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        ProProperties.PA_CLASSLOADER.setValue(ProProperties.TRUE);
+        PAProperties.PA_CLASSLOADER.setValue(PAProperties.TRUE);
         String oldFilePath = getClass()
                                  .getResource("/functionalTests/runtime/classloader/deployment.xml")
                                  .getPath();
@@ -81,15 +81,15 @@ public class Test extends FunctionalTest {
         }
         searchAndReplace(oldFilePath, newFilePath, "proactive.home",
             proactiveDir);
-        descriptor = ProDeployment.getProactiveDescriptor(getClass()
-                                                              .getResource("/functionalTests/runtime/classloader/deployment-tmp.xml")
-                                                              .getPath());
+        descriptor = PADeployment.getProactiveDescriptor(getClass()
+                                                             .getResource("/functionalTests/runtime/classloader/deployment-tmp.xml")
+                                                             .getPath());
         descriptor.activateMappings();
     }
 
     @org.junit.Test
     public void action() throws Exception {
-        A a = (A) ProActiveObject.newActive("functionalTests.runtime.classloader.A",
+        A a = (A) PAActiveObject.newActive("functionalTests.runtime.classloader.A",
                 new Object[] {  }, descriptor.getVirtualNode("VN1").getNode());
         a.createActiveObjectB();
 

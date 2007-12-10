@@ -37,8 +37,8 @@ import java.net.URL;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
-import org.objectweb.proactive.core.config.ProProperties;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -82,17 +82,17 @@ public class StartRuntime {
     }
 
     public static void main(String[] args) {
-        if (ProProperties.LOG4J_DEFAULT_INIT_OVERRIDE.isTrue() &&
-                ProProperties.LOG4J.isSet()) {
+        if (PAProperties.LOG4J_DEFAULT_INIT_OVERRIDE.isTrue() &&
+                PAProperties.LOG4J.isSet()) {
             // configure log4j here to avoid classloading problems with log4j classes
             try {
-                String log4jConfiguration = ProProperties.LOG4J.getValue();
+                String log4jConfiguration = PAProperties.LOG4J.getValue();
                 File f = new File(log4jConfiguration);
                 PropertyConfigurator.configure(new URL(f.getPath()));
             } catch (IOException e) {
                 System.out.println(
                     "Error : incorrect path for log4j configuration : " +
-                    ProProperties.LOG4J.getValue());
+                    PAProperties.LOG4J.getValue());
             }
         }
 
@@ -113,7 +113,7 @@ public class StartRuntime {
         }
 
         new StartRuntime(args).run();
-        if (ProProperties.PA_RUNTIME_STAYALIVE.isTrue()) {
+        if (PAProperties.PA_RUNTIME_STAYALIVE.isTrue()) {
             Object o = new Object();
             synchronized (o) {
                 try {
@@ -166,11 +166,11 @@ public class StartRuntime {
      */
     private void register(ProActiveRuntime PART) {
         try {
-            ProActiveRuntime proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(ProProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+            ProActiveRuntime proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
 
             PART.register(proActiveRuntime, proActiveRuntime.getURL(),
                 this.creatorID,
-                ProProperties.PA_COMMUNICATION_PROTOCOL.getValue(), this.vmName);
+                PAProperties.PA_COMMUNICATION_PROTOCOL.getValue(), this.vmName);
         } catch (ProActiveException e) {
             e.printStackTrace();
 

@@ -30,7 +30,7 @@
  */
 package org.objectweb.proactive.extra.scheduler.ext.matlab;
 
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
 
 
@@ -56,7 +56,7 @@ public class MatlabCollector extends SimpleMatlab {
         System.out.println("[" + host + " MATLAB TASK] Executing (Collector)");
 
         Object res = collectorWorker.execute(results);
-        res = ProFuture.getFutureValue(res);
+        res = PAFuture.getFutureValue(res);
         collectorWorker.terminate();
 
         return res;

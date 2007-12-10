@@ -34,8 +34,8 @@ import java.io.IOException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -61,7 +61,7 @@ public class MiniDescr {
         logger.info("-+-+-+-+-+-+-+- MiniDescr launched -+-+-+-+-+-+-+-");
 
         try {
-            pad = ProDeployment.getProactiveDescriptor(location);
+            pad = PADeployment.getProactiveDescriptor(location);
             virtualnode = pad.getVirtualNode("MiniVN");
         } catch (ProActiveException e) {
             e.printStackTrace();
@@ -73,7 +73,7 @@ public class MiniDescr {
             Object[] param = null;
 
             for (int i = 0; i < nodes.length; i++) {
-                MiniDescrActive desc = (MiniDescrActive) ProActiveObject.newActive(MiniDescrActive.class.getName(),
+                MiniDescrActive desc = (MiniDescrActive) PAActiveObject.newActive(MiniDescrActive.class.getName(),
                         param, nodes[i]);
                 Message msg = desc.getComputerInfo();
                 logger.info("-+-+-+-+-+-+-+- " + msg + " -+-+-+-+-+-+-+-");

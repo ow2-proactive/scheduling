@@ -32,8 +32,8 @@ package functionalTests.activeobject.generics;
 
 import java.util.Arrays;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -59,7 +59,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         //      new active with '_' in classname of a parametized type.
         //pa.stub.parameterized.nonregressiontest.activeobject.generics.Stub_Pair_Generics_[nonregressiontest_activeobject_generics_My_Type5org_objectweb_proactive_core_util_wrapper_IntWrapper]
-        Pair<My_DType, IntWrapper> p_ = (Pair<My_DType, IntWrapper>) ProActiveObject.newActive(Pair.class.getName(),
+        Pair<My_DType, IntWrapper> p_ = (Pair<My_DType, IntWrapper>) PAActiveObject.newActive(Pair.class.getName(),
                 new Class[] { My_DType.class, IntWrapper.class },
                 new Object[] { new My_DType("toto"), new IntWrapper(12) });
         assertTrue(My_DType.class.isAssignableFrom(p_.getFirst().getClass()));
@@ -70,7 +70,7 @@ public class Test extends FunctionalTest {
         // new active with reifiable parameter types
         // test before non reifiable return types to verify caching of synchronous/asynchrous method calls 
         // works fine with parameterized types
-        Pair<StringWrapper, IntWrapper> b = (Pair<StringWrapper, IntWrapper>) ProActiveObject.newActive(Pair.class.getName(),
+        Pair<StringWrapper, IntWrapper> b = (Pair<StringWrapper, IntWrapper>) PAActiveObject.newActive(Pair.class.getName(),
                 new Class[] { StringWrapper.class, IntWrapper.class },
                 new Object[] { new StringWrapper("toto"), new IntWrapper(12) });
         assertTrue(StringWrapper.class.isAssignableFrom(b.getFirst().getClass()));
@@ -79,7 +79,7 @@ public class Test extends FunctionalTest {
         assertEquals(12, b.getSecond().intValue());
 
         // new active with non reifiable parameter types
-        Pair<String, Integer> a = (Pair<String, Integer>) ProActiveObject.newActive(Pair.class.getName(),
+        Pair<String, Integer> a = (Pair<String, Integer>) PAActiveObject.newActive(Pair.class.getName(),
                 new Class[] { String.class, Integer.class },
                 new Object[] { "A", 42 });
         assertTrue(String.class.isAssignableFrom(a.getFirst().getClass()));
@@ -92,7 +92,7 @@ public class Test extends FunctionalTest {
         assertTrue(42 == pair.getFirst());
         assertEquals("X", pair.getSecond());
 
-        Pair<Integer, String> activePair = (Pair<Integer, String>) ProActiveObject.turnActive(pair,
+        Pair<Integer, String> activePair = (Pair<Integer, String>) PAActiveObject.turnActive(pair,
                 new Class[] { Integer.class, String.class });
         assertTrue(Integer.class.isAssignableFrom(activePair.getFirst()
                                                             .getClass()));
@@ -102,7 +102,7 @@ public class Test extends FunctionalTest {
         assertEquals("X", activePair.getSecond());
 
         // new active group with reifiable parameter types
-        Pair<StringWrapper, IntWrapper> gb = (Pair<StringWrapper, IntWrapper>) ProGroup.newGroup(Pair.class.getName(),
+        Pair<StringWrapper, IntWrapper> gb = (Pair<StringWrapper, IntWrapper>) PAGroup.newGroup(Pair.class.getName(),
                 new Class[] { StringWrapper.class, IntWrapper.class },
                 new Object[][] {
                     { new StringWrapper("A"), new IntWrapper(1) },
@@ -113,9 +113,9 @@ public class Test extends FunctionalTest {
         assertTrue(IntWrapper.class.isAssignableFrom(gb.getSecond().getClass()));
 
         StringWrapper stringWrapperResult = gb.getFirst();
-        Group stringWrapperResultGroup = ProGroup.getGroup(stringWrapperResult);
+        Group stringWrapperResultGroup = PAGroup.getGroup(stringWrapperResult);
         IntWrapper intWrapperResult = gb.getSecond();
-        Group intWrapperResultGroup = ProGroup.getGroup(intWrapperResult);
+        Group intWrapperResultGroup = PAGroup.getGroup(intWrapperResult);
 
         assertEquals(new StringWrapper("A"), stringWrapperResultGroup.get(0));
         assertEquals(new StringWrapper("B"), stringWrapperResultGroup.get(1));
@@ -124,7 +124,7 @@ public class Test extends FunctionalTest {
 
         // new active group with non reifiable parameter types (which is not allowed with groups)
         boolean invocationTargetException = false;
-        Pair<String, Integer> ga = (Pair<String, Integer>) ProGroup.newGroup(Pair.class.getName(),
+        Pair<String, Integer> ga = (Pair<String, Integer>) PAGroup.newGroup(Pair.class.getName(),
                 new Class[] { String.class, Integer.class },
                 new Object[][] {
                     { "A", 1 },

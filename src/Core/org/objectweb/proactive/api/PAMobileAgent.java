@@ -45,7 +45,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 @PublicAPI
-public class ProMobileAgent {
+public class PAMobileAgent {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
 
     private static Node getNodeFromURL(String url) throws MigrationException {
@@ -78,13 +78,13 @@ public class ProMobileAgent {
      * current thread will be used to find which active object is calling the method.
      * @param node an existing node where to migrate to.
      * @exception MigrationException if the migration fails
-     * @see ProActiveObject#getBodyOnThis
+     * @see PAActiveObject#getBodyOnThis
      */
     public static void migrateTo(Node node) throws MigrationException {
-        if (ProMobileAgent.logger.isDebugEnabled()) {
-            ProMobileAgent.logger.debug("migrateTo " + node);
+        if (PAMobileAgent.logger.isDebugEnabled()) {
+            PAMobileAgent.logger.debug("migrateTo " + node);
         }
-        Body bodyToMigrate = ProActiveObject.getBodyOnThis();
+        Body bodyToMigrate = PAActiveObject.getBodyOnThis();
         if (!(bodyToMigrate instanceof Migratable)) {
             throw new MigrationException(
                 "This body cannot migrate. It doesn't implement Migratable interface");
@@ -101,11 +101,11 @@ public class ProMobileAgent {
      * The object given as destination must be an active object.
      * @param activeObject the active object indicating the destination of the migration.
      * @exception MigrationException if the migration fails
-     * @see ProActiveObject#getBodyOnThis
+     * @see PAActiveObject#getBodyOnThis
      */
     public static void migrateTo(Object activeObject) throws MigrationException {
-        migrateTo(ProMobileAgent.getNodeFromURL(
-                ProMobileAgent.getNodeURLFromActiveObject(activeObject)));
+        migrateTo(PAMobileAgent.getNodeFromURL(
+                PAMobileAgent.getNodeURLFromActiveObject(activeObject)));
     }
 
     /**
@@ -116,13 +116,13 @@ public class ProMobileAgent {
      * The url must be the url of an existing node.
      * @param nodeURL the url of an existing where to migrate to.
      * @exception MigrationException if the migration fails
-     * @see ProActiveObject#getBodyOnThis
+     * @see PAActiveObject#getBodyOnThis
      */
     public static void migrateTo(String nodeURL) throws MigrationException {
-        if (ProMobileAgent.logger.isDebugEnabled()) {
-            ProMobileAgent.logger.debug("migrateTo " + nodeURL);
+        if (PAMobileAgent.logger.isDebugEnabled()) {
+            PAMobileAgent.logger.debug("migrateTo " + nodeURL);
         }
-        ProMobileAgent.migrateTo(ProMobileAgent.getNodeFromURL(nodeURL));
+        PAMobileAgent.migrateTo(PAMobileAgent.getNodeFromURL(nodeURL));
     }
 
     /**
@@ -139,7 +139,7 @@ public class ProMobileAgent {
         boolean isNFRequest) throws MigrationException {
         //In the context of ProActive, migration of an active object is considered as a non functional request.
         //That's why "true" is set by default for the "isNFRequest" parameter.
-        ProMobileAgent.migrateTo(bodyToMigrate, node, true,
+        PAMobileAgent.migrateTo(bodyToMigrate, node, true,
             org.objectweb.proactive.core.body.request.Request.NFREQUEST_IMMEDIATE_PRIORITY);
     }
 
@@ -187,9 +187,9 @@ public class ProMobileAgent {
      */
     public static void migrateTo(Body bodyToMigrate, Object activeObject,
         boolean isNFRequest) throws MigrationException {
-        ProMobileAgent.migrateTo(bodyToMigrate,
-            ProMobileAgent.getNodeFromURL(
-                ProMobileAgent.getNodeURLFromActiveObject(activeObject)),
+        PAMobileAgent.migrateTo(bodyToMigrate,
+            PAMobileAgent.getNodeFromURL(
+                PAMobileAgent.getNodeURLFromActiveObject(activeObject)),
             isNFRequest);
     }
 
@@ -205,7 +205,7 @@ public class ProMobileAgent {
      */
     public static void migrateTo(Body bodyToMigrate, String nodeURL,
         boolean isNFRequest) throws MigrationException {
-        ProMobileAgent.migrateTo(bodyToMigrate,
-            ProMobileAgent.getNodeFromURL(nodeURL), isNFRequest);
+        PAMobileAgent.migrateTo(bodyToMigrate,
+            PAMobileAgent.getNodeFromURL(nodeURL), isNFRequest);
     }
 }

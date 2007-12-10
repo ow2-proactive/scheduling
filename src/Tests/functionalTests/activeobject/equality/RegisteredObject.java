@@ -32,7 +32,7 @@ package functionalTests.activeobject.equality;
 
 import java.io.IOException;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
@@ -52,7 +52,7 @@ public class RegisteredObject {
 
     public int register() {
         try {
-            ProActiveObject.register(ProActiveObject.getStubOnThis(),
+            PAActiveObject.register(PAActiveObject.getStubOnThis(),
                 URIBuilder.buildURIFromProperties("localhost", "A").toString());
         } catch (IOException e) {
             e.printStackTrace();

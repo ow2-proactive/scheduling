@@ -33,8 +33,8 @@ package org.objectweb.proactive.core.filetransfer;
 import java.io.File;
 import java.io.IOException;
 
-import org.objectweb.proactive.api.ProFileTransfer;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFileTransfer;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -65,7 +65,7 @@ public class RemoteFileImpl implements RemoteFile {
             throw new IOException("Can't get local node " + e.getMessage());
         }
 
-        return ProFileTransfer.transfer(node, file, localNode, localDst);
+        return PAFileTransfer.transfer(node, file, localNode, localDst);
     }
 
     //@Override
@@ -73,7 +73,7 @@ public class RemoteFileImpl implements RemoteFile {
         throws IOException {
         waitFor();
 
-        return ProFileTransfer.transfer(getRemoteNode(), getRemoteFilePath(),
+        return PAFileTransfer.transfer(getRemoteNode(), getRemoteFilePath(),
             dstNode, dstFile);
     }
 
@@ -89,12 +89,12 @@ public class RemoteFileImpl implements RemoteFile {
 
     //@Override
     public boolean isFinished() {
-        return !ProFuture.isAwaited(status);
+        return !PAFuture.isAwaited(status);
     }
 
     //@Override
     public void waitFor() throws IOException {
-        ProFuture.waitFor(status);
+        PAFuture.waitFor(status);
 
         if (status.hasException()) {
             throw status.getException();

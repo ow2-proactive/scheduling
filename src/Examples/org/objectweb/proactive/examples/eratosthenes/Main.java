@@ -40,8 +40,8 @@ import javax.swing.JToggleButton;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -88,7 +88,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
     public Main(String xmlDescriptor, Boolean gui) throws ProActiveException {
         // read XML Descriptor
         if (xmlDescriptor.length() > 0) {
-            pad = ProDeployment.getProactiveDescriptor(xmlDescriptor);
+            pad = PADeployment.getProactiveDescriptor(xmlDescriptor);
         }
         this.gui = gui.booleanValue();
     }
@@ -128,9 +128,9 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
 
             logger.info("    Creating container with size " + containerSize +
                 " starting with number " + n);
-            ActivePrimeContainer result = (ActivePrimeContainer) ProActiveObject.newActive(ActivePrimeContainer.class.getName(),
+            ActivePrimeContainer result = (ActivePrimeContainer) PAActiveObject.newActive(ActivePrimeContainer.class.getName(),
                     new Object[] {
-                        ProActiveObject.getStubOnThis(), outputListener,
+                        PAActiveObject.getStubOnThis(), outputListener,
                         new Integer(containerSize), new Long(n), previous
                     }, node);
 
@@ -159,13 +159,13 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             }
 
             // create output listener
-            outputListener = (PrimeOutputListener) ProActiveObject.newActive(ConsolePrimeOutputListener.class.getName(),
+            outputListener = (PrimeOutputListener) PAActiveObject.newActive(ConsolePrimeOutputListener.class.getName(),
                     new Object[] {  }, listenerNode);
 
             outputListener.newPrimeNumberFound(2);
 
             // create number source  
-            source = (NumberSource) ProActiveObject.newActive(NumberSource.class.getName(),
+            source = (NumberSource) PAActiveObject.newActive(NumberSource.class.getName(),
                     new Object[] {  }, sourceNode);
 
             // create first container  			
@@ -213,7 +213,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             }
         }
         ProActiveConfiguration.load();
-        Main main = (Main) ProActiveObject.newActive(Main.class.getName(),
+        Main main = (Main) PAActiveObject.newActive(Main.class.getName(),
                 new Object[] { xmlDescriptor, new Boolean(gui) });
     }
 

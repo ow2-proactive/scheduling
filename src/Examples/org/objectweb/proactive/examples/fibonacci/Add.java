@@ -38,7 +38,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 
 
@@ -92,10 +92,10 @@ public class Add implements Serializable, InitActive, RunActive {
 
     public static void main(String[] args) {
         try {
-            Add add = (Add) ProActiveObject.newActive(Add.class.getName(), null);
-            Cons1 cons1 = (Cons1) ProActiveObject.newActive(Cons1.class.getName(),
+            Add add = (Add) PAActiveObject.newActive(Add.class.getName(), null);
+            Cons1 cons1 = (Cons1) PAActiveObject.newActive(Cons1.class.getName(),
                     null);
-            Cons2 cons2 = (Cons2) ProActiveObject.newActive(Cons2.class.getName(),
+            Cons2 cons2 = (Cons2) PAActiveObject.newActive(Cons2.class.getName(),
                     null);
             add.setCons1(cons1);
             cons1.setAdd(add);

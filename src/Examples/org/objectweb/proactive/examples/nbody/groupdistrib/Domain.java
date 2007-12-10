@@ -36,8 +36,8 @@ import java.net.UnknownHostException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -109,8 +109,8 @@ public class Domain implements Serializable {
         this.display = dp;
         this.maxIter = maxIter;
         this.neighbours = domainGroup;
-        Group g = ProGroup.getGroup(neighbours);
-        g.remove(ProActiveObject.getStubOnThis()); // no need to send information to self
+        Group g = PAGroup.getGroup(neighbours);
+        g.remove(PAActiveObject.getStubOnThis()); // no need to send information to self
         this.nbvalues = g.size(); // number of expected values to receive.
         reset();
     }

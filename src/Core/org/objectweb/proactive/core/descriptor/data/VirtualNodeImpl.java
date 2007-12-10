@@ -45,11 +45,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.management.Notification;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProFileTransfer;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAFileTransfer;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.services.FaultToleranceService;
 import org.objectweb.proactive.core.descriptor.services.P2PDescriptorService;
 import org.objectweb.proactive.core.descriptor.services.ServiceThread;
@@ -195,7 +195,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     // Security
     private ProActiveSecurityManager proactiveSecurityManager;
-    protected String jobID = ProActiveObject.getJobId();
+    protected String jobID = PAActiveObject.getJobId();
 
     // FAULT TOLERANCE
     private FaultToleranceService ftService;
@@ -928,7 +928,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             try {
                 //if registered in any regigistry, unregister everything
                 if (this.registration) {
-                    ProDeployment.unregisterVirtualNode(this);
+                    PADeployment.unregisterVirtualNode(this);
                 }
                 //else unregister just in the local runtime
                 else {
@@ -946,7 +946,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
     public void createNodeOnCurrentJvm(String protocol) {
         if (protocol == null) {
-            protocol = ProProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         }
 
         this.localVirtualMachines.add(protocol);
@@ -1238,7 +1238,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
                 try {
                     url = defaultRuntime.createLocalNode(nodeName, false,
                             siblingPSM, this.getName(),
-                            ProActiveObject.getJobId());
+                            PAActiveObject.getJobId());
                     registrationAttempts = 0;
                 } catch (AlreadyBoundException e) {
                     registrationAttempts--;
@@ -1547,7 +1547,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             //  	ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);
             //  	part.registerVirtualnode(this.name,false);
-            ProDeployment.registerVirtualNode(this, this.registrationProtocol,
+            PADeployment.registerVirtualNode(this, this.registrationProtocol,
                 false);
         } catch (NodeException e) {
             logger.error(e.getMessage());
@@ -1763,7 +1763,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
 
             long init = System.currentTimeMillis();
 
-            list.addAll(ProFileTransfer.pull(nodes[i], srcFile, dstFile));
+            list.addAll(PAFileTransfer.pull(nodes[i], srcFile, dstFile));
 
             if (FILETRANSFER_LOGGER.isDebugEnabled()) {
                 FILETRANSFER_LOGGER.debug("Returned pullFiles in:" +
@@ -1847,7 +1847,7 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
             filesDst[j] = dstFile;
         }
 
-        list.addAll(ProFileTransfer.push(filesSrc, node, filesDst));
+        list.addAll(PAFileTransfer.push(filesSrc, node, filesDst));
 
         return list;
     }

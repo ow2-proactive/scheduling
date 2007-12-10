@@ -58,7 +58,7 @@ import javax.management.ReflectionException;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.jmx.listeners.ListenerAdapter;
@@ -558,11 +558,11 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     }
 
     public UniqueID getUniqueID() {
-        return ProActiveObject.getBodyOnThis().getID();
+        return PAActiveObject.getBodyOnThis().getID();
     }
 
     public void unsubscribeFromRegistry() {
-        Body myBody = ProActiveObject.getBodyOnThis();
+        Body myBody = PAActiveObject.getBodyOnThis();
         if (myBody instanceof AbstractBody) {
             RemoteObjectExposer roe = ((AbstractBody) myBody).getRemoteObjectExposer();
             roe.unregisterAll();

@@ -31,7 +31,7 @@
 package functionalTests.group.dynamicthreadpool;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.node.Node;
 
@@ -51,7 +51,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        Group g = ProGroup.getGroup(this.typedGroup);
+        Group g = PAGroup.getGroup(this.typedGroup);
 
         this.typedGroup.onewayCall();
 
@@ -81,7 +81,7 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        this.typedGroup = (A) ProGroup.newGroup(A.class.getName(), params, nodes);
+        this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
 
         assertTrue(this.typedGroup != null);
     }

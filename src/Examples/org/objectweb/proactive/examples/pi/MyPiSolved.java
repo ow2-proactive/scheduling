@@ -30,8 +30,8 @@
  */
 package org.objectweb.proactive.examples.pi;
 
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -42,19 +42,19 @@ public class MyPiSolved {
         Integer numberOfDecimals = new Integer(args[0]);
         String descriptorPath = args[1];
 
-        ProActiveDescriptor descriptor = ProDeployment.getProactiveDescriptor(descriptorPath);
+        ProActiveDescriptor descriptor = PADeployment.getProactiveDescriptor(descriptorPath);
         descriptor.activateMappings();
         VirtualNode virtualNode = descriptor.getVirtualNode("computers-vn");
         Node[] nodes = virtualNode.getNodes();
 
-        PiComputer piComputer = (PiComputer) ProGroup.newGroupInParallel(PiComputer.class.getName(),
+        PiComputer piComputer = (PiComputer) PAGroup.newGroupInParallel(PiComputer.class.getName(),
                 new Object[] { numberOfDecimals }, nodes);
 
-        int numberOfWorkers = ProGroup.getGroup(piComputer).size();
+        int numberOfWorkers = PAGroup.getGroup(piComputer).size();
 
         Interval intervals = PiUtil.dividePI(numberOfWorkers,
                 numberOfDecimals.intValue());
-        ProGroup.setScatterGroup(intervals);
+        PAGroup.setScatterGroup(intervals);
 
         Result results = piComputer.compute(intervals);
         Result result = PiUtil.conquerPI(results);

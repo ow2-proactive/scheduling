@@ -31,7 +31,7 @@
 package functionalTests.activeobject.migration.strategy;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
@@ -57,7 +57,7 @@ public class Test extends FunctionalTest {
         nodesUrl[0] = TestNodes.getLocalVMNode().getNodeInformation().getURL();
         nodesUrl[1] = TestNodes.getSameVMNode().getNodeInformation().getURL();
         nodesUrl[2] = TestNodes.getRemoteVMNode().getNodeInformation().getURL();
-        a = (A) ProActiveObject.newActive(A.class.getName(),
+        a = (A) PAActiveObject.newActive(A.class.getName(),
                 new Object[] { nodesUrl });
 
         assertTrue(a.getCounter() == 7);

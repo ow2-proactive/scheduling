@@ -43,9 +43,9 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
@@ -134,7 +134,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
      * (ie after migration), warn them of new machine settings.
      */
     public void go() {
-        this.me = (Dispatcher) ProActiveObject.getStubOnThis();
+        this.me = (Dispatcher) PAActiveObject.getStubOnThis();
 
         this.gui = new DispatcherGUI("C3D Dispatcher", (DispatcherLogic) this.me);
 
@@ -149,7 +149,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                 RenderingEngine tmpEngine;
 
                 try {
-                    tmpEngine = (RenderingEngine) ProActiveObject.newActive(C3DRenderingEngine.class.getName(),
+                    tmpEngine = (RenderingEngine) PAActiveObject.newActive(C3DRenderingEngine.class.getName(),
                             param, this.rendererNodes[i]);
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -321,7 +321,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
      * @return an image which is no longer a future
      */
     private Image2D getReturned(Vector<Image2D> images, boolean[] received) {
-        int index = ProFuture.waitForAny(images);
+        int index = PAFuture.waitForAny(images);
         Image2D returnedImage = images.remove(index);
         setPixels(returnedImage);
         received[returnedImage.getInterval().number] = true;
@@ -408,7 +408,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         myStrategyManager.onDeparture("leaveHost");
 
         try {
-            ProActiveObject.register(ProActiveObject.getStubOnThis(),
+            PAActiveObject.register(PAActiveObject.getStubOnThis(),
                 "//" + URIBuilder.getLocalAddress().getHostName() + "/" +
                 "Dispatcher");
         } catch (IOException ioe) {
@@ -521,7 +521,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         if ((nbUsers >= 2) && (this.election == null)) {
             try {
-                this.election = (Election) ProActiveObject.newActive(Election.class.getName(),
+                this.election = (Election) PAActiveObject.newActive(Election.class.getName(),
                         new Object[] { (C3DDispatcher) me });
             } catch (Exception e) {
                 e.printStackTrace();
@@ -866,7 +866,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
                     argv[0]);
 
             proActiveDescriptor.activateMappings();
@@ -883,7 +883,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                                                  .getNode();
 
         try {
-            ProActiveObject.newActive(C3DDispatcher.class.getName(), param,
+            PAActiveObject.newActive(C3DDispatcher.class.getName(), param,
                 dispatcherNode);
         } catch (Exception e) {
             logger.error("Problemn with C3DDispatcher Active Object creation:");

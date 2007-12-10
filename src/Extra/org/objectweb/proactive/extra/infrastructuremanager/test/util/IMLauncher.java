@@ -31,7 +31,7 @@
 package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
@@ -57,11 +57,11 @@ public class IMLauncher {
 
         if (args.length > 0) {
             for (String desc : args) {
-                ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(desc);
+                ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(desc);
                 admin.addNodes(pad);
             }
         } else {
-            ProActiveDescriptor pad = ProDeployment.getProactiveDescriptor(
+            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(
                     "../../../descriptors/scheduler/deployment/Local4JVM.xml");
             admin.addNodes(pad);
         }
@@ -70,7 +70,7 @@ public class IMLauncher {
         //        v.add("//macyavel:6444");
         //        admin.createP2PNodeSource("P2P", 2, 10000, 50000, v);
 
-        //DynamicNodeSource d = (DynamicNodeSource) ProActiveObject.newActive(P2PNodeSource.class.getCanonicalName(),
+        //DynamicNodeSource d = (DynamicNodeSource) PAActiveObject.newActive(P2PNodeSource.class.getCanonicalName(),
         //new Object[] { "Nodes on P2P", 4, 6, 60000000 });
         //admin.addDynamicNodeSources(d);
         //IMUser user = IMFactory.getUser();

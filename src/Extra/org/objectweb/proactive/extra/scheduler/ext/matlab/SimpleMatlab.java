@@ -51,8 +51,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
@@ -236,7 +236,7 @@ public class SimpleMatlab extends JavaExecutable {
         for (int i = 0; i < 30; i++) {
             try {
                 try {
-                    worker = (AOSimpleMatlab) ProActiveObject.newActive(workerClassName,
+                    worker = (AOSimpleMatlab) PAActiveObject.newActive(workerClassName,
                             params, uri);
                 } catch (ProActiveException e) {
                     ex = e;
@@ -276,7 +276,7 @@ public class SimpleMatlab extends JavaExecutable {
         // We execute the task on the worker
         Object res = matlabWorker.execute(index, results);
         // We wait for the result
-        res = ProFuture.getFutureValue(res);
+        res = PAFuture.getFutureValue(res);
         // We make a synchronous call to terminate
         matlabWorker.terminate();
 

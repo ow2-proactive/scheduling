@@ -34,7 +34,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 
@@ -76,7 +76,7 @@ public class Sum implements Serializable {
         throws ActiveObjectCreationException, NodeException {
         sums = new SubSum[nodes.length];
         for (int i = 0; i < sums.length; i++) {
-            sums[i] = (SubSum) ProActiveObject.newActive(SubSum.class.getName(),
+            sums[i] = (SubSum) PAActiveObject.newActive(SubSum.class.getName(),
                     new Object[] { "SubSum" + i }, nodes[i]);
         }
     }

@@ -36,7 +36,7 @@ import java.io.Serializable;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
@@ -92,7 +92,7 @@ public class SchedulerConnection implements Serializable {
             "'");
 
         try {
-            schedulerAuth = (SchedulerAuthenticationInterface) (ProActiveObject.lookupActive(SchedulerAuthenticationInterface.class.getName(),
+            schedulerAuth = (SchedulerAuthenticationInterface) (PAActiveObject.lookupActive(SchedulerAuthenticationInterface.class.getName(),
                     schedulerURL));
 
             return schedulerAuth;

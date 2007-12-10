@@ -33,7 +33,7 @@ package org.objectweb.proactive.extra.scheduler.task.internal;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.scheduler.common.exception.TaskCreationException;
@@ -108,10 +108,10 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
         throws ActiveObjectCreationException, NodeException {
         TaskLauncher launcher;
         if (getPreScript() == null) {
-            launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
+            launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
                     new Object[] { getId(), host, port }, node);
         } else {
-            launcher = (TaskLauncher) ProActiveObject.newActive(TaskLauncher.class.getName(),
+            launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
                     new Object[] { getId(), host, port, getPreScript() }, node);
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));

@@ -33,7 +33,7 @@ package org.objectweb.proactive.loadbalancing.util;
 import java.util.Vector;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.node.Node;
@@ -200,7 +200,7 @@ public class JacobiDispatcher {
                 " nodes");
             for (int i = 0; i < nbWorker; i++) {
                 int fix = (int) (Math.random() * n);
-                workers[i] = (JacobiWorker) (ProActiveObject.newActive(JacobiWorker.class.getName(),
+                workers[i] = (JacobiWorker) (PAActiveObject.newActive(JacobiWorker.class.getName(),
                         new Object[] {
                             new Integer(i),
                             new Double(JacobiDispatcher.boudaryValue),

@@ -33,7 +33,7 @@ package functionalTests.group.barrier;
 import java.util.Iterator;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.node.Node;
 
@@ -67,7 +67,7 @@ public class Test extends FunctionalTest {
                 nodes);
 
         assertTrue(spmdgroup != null);
-        assertTrue(ProGroup.size(spmdgroup) == 3);
+        assertTrue(PAGroup.size(spmdgroup) == 3);
     }
 
     @org.junit.Test
@@ -75,7 +75,7 @@ public class Test extends FunctionalTest {
         this.spmdgroup.start();
 
         String errors = "";
-        Iterator it = ProGroup.getGroup(this.spmdgroup).iterator();
+        Iterator it = PAGroup.getGroup(this.spmdgroup).iterator();
         while (it.hasNext()) {
             errors += ((A) it.next()).getErrors();
         }

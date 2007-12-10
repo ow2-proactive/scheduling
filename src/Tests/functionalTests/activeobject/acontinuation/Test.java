@@ -32,9 +32,9 @@ package functionalTests.activeobject.acontinuation;
 
 import java.util.Vector;
 
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -55,14 +55,14 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        String initial_ca_setting = ProProperties.PA_FUTURE_AC.getValue();
-        if (!ProProperties.PA_FUTURE_AC.isTrue()) {
-            ProProperties.PA_FUTURE_AC.setValue(ProProperties.TRUE);
+        String initial_ca_setting = PAProperties.PA_FUTURE_AC.getValue();
+        if (!PAProperties.PA_FUTURE_AC.isTrue()) {
+            PAProperties.PA_FUTURE_AC.setValue(PAProperties.TRUE);
         }
         ACThread acthread = new ACThread();
         acthread.start();
         acthread.join();
-        ProProperties.PA_FUTURE_AC.setValue(initial_ca_setting);
+        PAProperties.PA_FUTURE_AC.setValue(initial_ca_setting);
 
         assertTrue(futureByResult && a.isSuccessful());
         assertTrue(a.getFinalResult().equals("dummy"));
@@ -75,7 +75,7 @@ public class Test extends FunctionalTest {
         @Override
         public void run() {
             try {
-                a = (A) ProActiveObject.newActive(A.class.getName(),
+                a = (A) PAActiveObject.newActive(A.class.getName(),
                         new Object[] { "principal" });
                 //test future by result
                 a.initFirstDeleguate();
@@ -84,23 +84,23 @@ public class Test extends FunctionalTest {
                 Vector<Id> v = new Vector<Id>(2);
                 v.add(idDeleguate);
                 v.add(idPrincipal);
-                if (ProFuture.waitForAny(v) == 0) {
+                if (PAFuture.waitForAny(v) == 0) {
                     futureByResult = false;
                 } else {
                     futureByResult = true;
                 }
 
                 //test future passed as parameter
-                b = (A) ProActiveObject.newActive(A.class.getName(),
+                b = (A) PAActiveObject.newActive(A.class.getName(),
                         new Object[] { "dummy" });
                 idPrincipal = b.getIdforFuture();
                 a.forwardID(idPrincipal);
                 //Test non-blocking when future passed as parameter
-                A c = (A) ProActiveObject.newActive(A.class.getName(),
+                A c = (A) PAActiveObject.newActive(A.class.getName(),
                         new Object[] { "c" });
-                A d = (A) ProActiveObject.newActive(A.class.getName(),
+                A d = (A) PAActiveObject.newActive(A.class.getName(),
                         new Object[] { "d" });
-                A e = (A) ProActiveObject.newActive(A.class.getName(),
+                A e = (A) PAActiveObject.newActive(A.class.getName(),
                         new Object[] { "e" });
 
                 A de = d.getA(e);
@@ -108,7 +108,7 @@ public class Test extends FunctionalTest {
                 lastA = e.getA(cde);
 
                 //test multiple wrapped futures with multiples AC destinations
-                A f = (A) ProActiveObject.newActive(A.class.getName(),
+                A f = (A) PAActiveObject.newActive(A.class.getName(),
                         new Object[] { "f" });
                 c.initSecondDeleguate();
                 A t = c.delegatedGetA(d);

@@ -34,8 +34,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -147,7 +147,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * <code>false</code> if <code>obj</code> is not a future object.
      */
     public static boolean isAwaited(Object obj) {
-        return ProFuture.isAwaited(obj);
+        return PAFuture.isAwaited(obj);
     }
 
     public synchronized static FutureProxy getFutureProxy() {
@@ -271,7 +271,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
 
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.startTimer(ProActiveObject.getBodyOnThis().getID(),
+            TimerWarehouse.startTimer(PAActiveObject.getBodyOnThis().getID(),
                 TimerWarehouse.WAIT_BY_NECESSITY);
         }
 
@@ -279,7 +279,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         // JMX Notification
         BodyWrapperMBean mbean = null;
-        UniqueID bodyId = ProActiveObject.getBodyOnThis().getID();
+        UniqueID bodyId = PAActiveObject.getBodyOnThis().getID();
         Body body = LocalBodyStore.getInstance().getLocalBody(bodyId);
 
         // Send notification only if ActiveObject, not for HalfBodies
@@ -313,7 +313,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         // END JMX Notification
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.stopTimer(ProActiveObject.getBodyOnThis().getID(),
+            TimerWarehouse.stopTimer(PAActiveObject.getBodyOnThis().getID(),
                 TimerWarehouse.WAIT_BY_NECESSITY);
         }
     }
@@ -435,7 +435,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 if (sender != null) { // else we are in a migration forwarder
                     if (continuation) {
                         /* The written future will be updated by the writing body */
-                        writtenUpdater = ProActiveObject.getBodyOnThis();
+                        writtenUpdater = PAActiveObject.getBodyOnThis();
                         for (UniversalBody dest : FuturePool.getBodiesDestination()) {
                             sender.getFuturePool()
                                   .addAutomaticContinuation(id, dest);

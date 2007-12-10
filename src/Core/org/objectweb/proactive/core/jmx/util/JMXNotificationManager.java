@@ -48,7 +48,7 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
@@ -109,7 +109,7 @@ public class JMXNotificationManager implements NotificationListener {
 
         try {
             // Initalise the JMXNotificationListener which is an active object listening all needed MBeans
-            this.notificationlistener = (JMXNotificationListener) ProActiveObject.newActive(JMXNotificationListener.class.getName(),
+            this.notificationlistener = (JMXNotificationListener) PAActiveObject.newActive(JMXNotificationListener.class.getName(),
                     new Object[] {  });
         } catch (ActiveObjectCreationException e) {
             logger.error("Can't create the JMX notifications listener active object",
@@ -257,7 +257,7 @@ public class JMXNotificationManager implements NotificationListener {
                     //Next line throws:  org.objectweb.proactive.core.ProActiveRuntimeException: FutureProxy: Illegal arguments in call _terminateAO
                     System.out.println("Terminating connection with runtime :" +
                         connection.getRuntimeUrl());
-                    ProActiveObject.terminateActiveObject(connection.getConnection(),
+                    PAActiveObject.terminateActiveObject(connection.getConnection(),
                         false);
                 }
                 // Updates our map
@@ -297,7 +297,7 @@ public class JMXNotificationManager implements NotificationListener {
     public void unsubscribeObjectFromRemoteMBean(
         ProActiveConnection connection, ObjectName oname,
         NotificationFilter filter, Object handback) {
-        if (!ProActiveObject.pingActiveObject(connection)) {
+        if (!PAActiveObject.pingActiveObject(connection)) {
             if (logger.isDebugEnabled()) {
                 logger.debug(
                     "Trying to unregister listener on a connection with terminated body. Ping faild on the connection object: " +
@@ -570,7 +570,7 @@ public class JMXNotificationManager implements NotificationListener {
 
         //The localBody for this thread will be removed by the unregisterAllHalfBodiesFromRegistry()
         //So we don't need to run this code (even if we could)
-        //        Body myBody=ProActiveObject.getBodyOnThis();
+        //        Body myBody=PAActiveObject.getBodyOnThis();
         //        if (myBody instanceof AbstractBody)
         //        {
         //           

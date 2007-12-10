@@ -34,7 +34,7 @@ import java.io.IOException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.exception.IMException;
 
@@ -66,7 +66,7 @@ public class IMConnection implements IMConstants {
         }
 
         try {
-            IMAdmin admin = (IMAdmin) ProActiveObject.lookupActive(IMAdmin.class.getName(),
+            IMAdmin admin = (IMAdmin) PAActiveObject.lookupActive(IMAdmin.class.getName(),
                     url);
             return admin;
         } catch (ActiveObjectCreationException e) {
@@ -89,7 +89,7 @@ public class IMConnection implements IMConstants {
         System.out.println("IMConnection.connectAsUser() " + url);
 
         try {
-            IMUser user = (IMUser) ProActiveObject.lookupActive(IMUser.class.getName(),
+            IMUser user = (IMUser) PAActiveObject.lookupActive(IMUser.class.getName(),
                     url);
             return user;
         } catch (ActiveObjectCreationException e) {
@@ -111,7 +111,7 @@ public class IMConnection implements IMConstants {
             url = "//localhost/" + NAME_ACTIVE_OBJECT_IMMONITORING;
         }
         try {
-            IMMonitoring mon = (IMMonitoring) ProActiveObject.lookupActive(IMMonitoring.class.getName(),
+            IMMonitoring mon = (IMMonitoring) PAActiveObject.lookupActive(IMMonitoring.class.getName(),
                     url);
             return mon;
         } catch (ActiveObjectCreationException e) {

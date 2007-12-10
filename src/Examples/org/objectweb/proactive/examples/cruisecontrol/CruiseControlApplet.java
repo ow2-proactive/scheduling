@@ -81,7 +81,7 @@ public class CruiseControlApplet extends org.objectweb.proactive.examples.Standa
      */
     public void createActiveObject() {
         try {
-            activeObject = (Interface) org.objectweb.proactive.api.ProActiveObject.turnActive(new Interface(
+            activeObject = (Interface) org.objectweb.proactive.api.PAActiveObject.turnActive(new Interface(
                         this));
         } catch (Exception e) {
             e.printStackTrace();

@@ -33,10 +33,10 @@ package org.objectweb.proactive.examples.timit.example2;
 import java.util.Iterator;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProException;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PAException;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 import org.objectweb.proactive.benchmarks.timit.util.Startable;
 import org.objectweb.proactive.benchmarks.timit.util.TimItManager;
@@ -80,7 +80,7 @@ public class Launcher implements Startable {
     public void start(String[] args) {
         try {
             // Common stuff about ProActive deployement
-            this.pad = ProDeployment.getProactiveDescriptor(args[0]);
+            this.pad = PADeployment.getProactiveDescriptor(args[0]);
             int np = Integer.valueOf(args[1]).intValue();
 
             this.pad.activateMappings();
@@ -126,13 +126,13 @@ public class Launcher implements Startable {
     // You have to implement a kill() method called by TimIt between each run.
     // Here you can terminate all your workers as here
     public void kill() {
-        Group<Worker> gWorkers = ProGroup.getGroup(workers);
+        Group<Worker> gWorkers = PAGroup.getGroup(workers);
         Iterator<Worker> it = gWorkers.iterator();
 
         while (it.hasNext()) {
-            ProActiveObject.terminateActiveObject(it.next(), true);
+            PAActiveObject.terminateActiveObject(it.next(), true);
         }
-        ProException.waitForPotentialException();
+        PAException.waitForPotentialException();
 
         try {
             this.pad.killall(false);

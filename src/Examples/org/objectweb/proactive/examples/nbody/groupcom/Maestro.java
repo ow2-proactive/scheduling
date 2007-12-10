@@ -32,7 +32,7 @@ package org.objectweb.proactive.examples.nbody.groupcom;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 
 
 /**
@@ -62,7 +62,7 @@ public class Maestro implements Serializable {
         this.killsupport = killsupport;
         this.maxIter = max.intValue();
         this.domainGroup = domainG;
-        this.size = ProGroup.getGroup(domainGroup).size();
+        this.size = PAGroup.getGroup(domainGroup).size();
     }
 
     /**

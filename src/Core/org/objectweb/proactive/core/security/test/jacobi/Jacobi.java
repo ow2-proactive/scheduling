@@ -31,7 +31,7 @@
 package org.objectweb.proactive.core.security.test.jacobi;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -74,7 +74,7 @@ public class Jacobi {
         ProActiveDescriptor proActiveDescriptor = null;
         String[] nodes = null;
         try {
-            proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
                     args[0]);
         } catch (ProActiveException e) {
             System.err.println("** ProActiveException **");

@@ -41,11 +41,11 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -77,8 +77,8 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private final Vector<Node> usingNodes = new Vector<Node>();
     private int nodeCounter = 0;
 
-    //    private final String descriptorPath = ProProperties.PA_P2P_XML_PATH.getValue();
-    private final String descriptorPath = System.getProperty(ProProperties.PA_P2P_XML_PATH.getKey());
+    //    private final String descriptorPath = PAProperties.PA_P2P_XML_PATH.getValue();
+    private final String descriptorPath = System.getProperty(PAProperties.PA_P2P_XML_PATH.getKey());
     private ProActiveDescriptor pad = null;
 
     //--------------------------------------------------------------------------
@@ -116,7 +116,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                 this.bookedNodes.add(new Booking(node));
                 logger.debug("Yes the manager has a node");
                 return new P2PNode(node,
-                    (P2PNodeManager) ProActiveObject.getStubOnThis());
+                    (P2PNodeManager) PAActiveObject.getStubOnThis());
             }
         }
 
@@ -164,12 +164,12 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
             this.bookedNodes.add(new Booking(node));
             logger.debug("Yes, the manager has an empty node");
             return new P2PNode(node,
-                (P2PNodeManager) ProActiveObject.getStubOnThis());
+                (P2PNodeManager) PAActiveObject.getStubOnThis());
         } else if (this.bookedNodes.size() > 0) {
             Node node = ((Booking) this.bookedNodes.get(0)).getNode();
             logger.debug("Yes, the manager has a shared node");
             return new P2PNode(node,
-                (P2PNodeManager) ProActiveObject.getStubOnThis());
+                (P2PNodeManager) PAActiveObject.getStubOnThis());
         } else {
             // All nodes is already assigned
             logger.debug("Sorry no availbale node for the moment");
@@ -246,7 +246,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
                 this.proactiveRuntime.getURL());
         }
         try {
-            ProActiveObject.register(ProActiveObject.getStubOnThis(),
+            PAActiveObject.register(PAActiveObject.getStubOnThis(),
                 URIBuilder.buildURIFromProperties("localhost", "P2PNodeManager")
                           .toString());
         } catch (IOException e) {
@@ -289,7 +289,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     private Node createNewNode()
         throws NodeException, ProActiveException, AlreadyBoundException {
         // security
-        ProActiveSecurityManager psm = ((AbstractBody) ProActiveObject.getBodyOnThis()).getProActiveSecurityManager();
+        ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager();
         ProActiveSecurityManager newNodeSecurityManager = null;
         if (psm != null) {
             newNodeSecurityManager = psm.generateSiblingCertificate(EntityType.NODE,
@@ -321,12 +321,12 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         assert PROC > 0 : "Processor count = 0";
         logger.debug("Number of available processors for this JVM: " + PROC);
         int nodes = PROC;
-        if (!ProProperties.PA_P2P_MULTI_PROC_NODES.isTrue()) {
+        if (!PAProperties.PA_P2P_MULTI_PROC_NODES.isTrue()) {
             nodes = 1;
         }
 
         // No sharing enable
-        if (ProProperties.PA_P2P_NO_SHARING.isTrue()) {
+        if (PAProperties.PA_P2P_NO_SHARING.isTrue()) {
             nodes = 0;
         }
 
@@ -348,7 +348,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      */
     private void deployingXmlSharedNodes() {
         try {
-            this.pad = ProDeployment.getProactiveDescriptor(this.descriptorPath);
+            this.pad = PADeployment.getProactiveDescriptor(this.descriptorPath);
         } catch (ProActiveException e) {
             logger.fatal("Could't get ProActive Descripor at " +
                 this.descriptorPath, e);

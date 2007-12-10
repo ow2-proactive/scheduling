@@ -31,7 +31,7 @@
 package functionalTests.activeobject.garbagecollection;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
@@ -56,11 +56,11 @@ public class Test extends FunctionalTest {
      *    4       5
      */
     private static void buildGraph() throws Exception {
-        A a1 = (A) ProActiveObject.newActive(A.class.getName(), null);
-        A a2 = (A) ProActiveObject.newActive(A.class.getName(), null);
-        A a3 = (A) ProActiveObject.newActive(A.class.getName(), null);
-        A a4 = (A) ProActiveObject.newActive(A.class.getName(), null);
-        A a5 = (A) ProActiveObject.newActive(A.class.getName(), null);
+        A a1 = (A) PAActiveObject.newActive(A.class.getName(), null);
+        A a2 = (A) PAActiveObject.newActive(A.class.getName(), null);
+        A a3 = (A) PAActiveObject.newActive(A.class.getName(), null);
+        A a4 = (A) PAActiveObject.newActive(A.class.getName(), null);
+        A a5 = (A) PAActiveObject.newActive(A.class.getName(), null);
 
         a1.addRef(a2);
         a2.addRef(a3);

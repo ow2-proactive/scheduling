@@ -38,9 +38,9 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProGroup;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.body.migration.Migratable;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -114,13 +114,13 @@ public class Chat implements java.io.Serializable, RunActive {
      */
     public void startAlone() {
         try {
-            this.diffusionGroup = (Chat) ProGroup.newGroup(Chat.class.getName());
+            this.diffusionGroup = (Chat) PAGroup.newGroup(Chat.class.getName());
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        this.addIntoDiffusionGroup((Chat) ProActiveObject.getStubOnThis(),
+        this.addIntoDiffusionGroup((Chat) PAActiveObject.getStubOnThis(),
             this.name);
         this.writeMessage(new Message(" *** " + this.name +
                 " has joined the place"));
@@ -141,14 +141,14 @@ public class Chat implements java.io.Serializable, RunActive {
     public void connect(String hostName, String userName) {
         Chat neighbour = null;
         try {
-            neighbour = (Chat) ProActiveObject.lookupActive(Chat.class.getName(),
+            neighbour = (Chat) PAActiveObject.lookupActive(Chat.class.getName(),
                     "//" + hostName + "/" + userName); // 1
             this.diffusionGroup = neighbour.getDiffusionGroup(); // 2
             this.writeUsersInTheList();
-            this.diffusionGroup.addIntoDiffusionGroup((Chat) ProActiveObject.getStubOnThis(),
+            this.diffusionGroup.addIntoDiffusionGroup((Chat) PAActiveObject.getStubOnThis(),
                 this.name); // 3
-            ProGroup.getGroup(this.diffusionGroup)
-                    .add((Chat) ProActiveObject.getStubOnThis()); //4
+            PAGroup.getGroup(this.diffusionGroup)
+                   .add((Chat) PAActiveObject.getStubOnThis()); //4
             this.frame.list.append(this.name + "\n");
             this.writeMessage(new Message(" *** " + this.name +
                     " has joined the place"));
@@ -170,7 +170,7 @@ public class Chat implements java.io.Serializable, RunActive {
      * @param name - the name of the user to add
      */
     public void addIntoDiffusionGroup(Chat c, String name) {
-        ProGroup.getGroup(this.diffusionGroup).add(c);
+        PAGroup.getGroup(this.diffusionGroup).add(c);
         this.frame.list.append(name + "\n");
     }
 
@@ -180,9 +180,9 @@ public class Chat implements java.io.Serializable, RunActive {
     public void disconnect() {
         this.writeMessage(new Message(" *** " + this.name + " has left"));
         this.diffusionGroup.removeUserFromTheList(this.name);
-        this.diffusionGroup.removeFromDiffusionGroup((Chat) ProActiveObject.getStubOnThis());
-        ProGroup.getGroup(this.diffusionGroup)
-                .remove((Chat) ProActiveObject.getStubOnThis());
+        this.diffusionGroup.removeFromDiffusionGroup((Chat) PAActiveObject.getStubOnThis());
+        PAGroup.getGroup(this.diffusionGroup)
+               .remove((Chat) PAActiveObject.getStubOnThis());
     }
 
     /**
@@ -190,7 +190,7 @@ public class Chat implements java.io.Serializable, RunActive {
      * @param c - the user to remove
      */
     public void removeFromDiffusionGroup(Chat c) {
-        ProGroup.getGroup(this.diffusionGroup).remove(c);
+        PAGroup.getGroup(this.diffusionGroup).remove(c);
     }
 
     /**
@@ -212,7 +212,7 @@ public class Chat implements java.io.Serializable, RunActive {
      */
     public void initializeMigrationStrategy() {
         if (this.migrationStrategy == null) {
-            this.migrationStrategy = new MigrationStrategyManagerImpl((Migratable) ProActiveObject.getBodyOnThis());
+            this.migrationStrategy = new MigrationStrategyManagerImpl((Migratable) PAActiveObject.getBodyOnThis());
             this.migrationStrategy.onDeparture("onDeparture");
         }
     }
@@ -230,7 +230,7 @@ public class Chat implements java.io.Serializable, RunActive {
      */
     public void register() {
         try {
-            ProActiveObject.register(ProActiveObject.getStubOnThis(),
+            PAActiveObject.register(PAActiveObject.getStubOnThis(),
                 "//localhost/" + this.name);
         } catch (IOException e) {
             e.printStackTrace();
@@ -242,7 +242,7 @@ public class Chat implements java.io.Serializable, RunActive {
      */
     public void unregister() {
         try {
-            ProActiveObject.unregister("//localhost/" + this.name);
+            PAActiveObject.unregister("//localhost/" + this.name);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -263,7 +263,7 @@ public class Chat implements java.io.Serializable, RunActive {
      * Rebuild the graphic interface
      */
     public void rebuildFrame() {
-        this.frame = new ChatGUI((Chat) ProActiveObject.getStubOnThis(), name);
+        this.frame = new ChatGUI((Chat) PAActiveObject.getStubOnThis(), name);
         this.frame.list.setText(this.listOfName);
     }
 
@@ -283,7 +283,7 @@ public class Chat implements java.io.Serializable, RunActive {
     public void migrateTo(String nodeURL) {
         this.writePrivateMessage(new Message(" *** I move to " + nodeURL));
         try {
-            ProMobileAgent.migrateTo(nodeURL);
+            PAMobileAgent.migrateTo(nodeURL);
         } catch (MigrationException e) {
             this.writePrivateMessage(new Message(
                     " *** WARNING : Unable to move to " + nodeURL + " !"));
@@ -311,7 +311,7 @@ public class Chat implements java.io.Serializable, RunActive {
      * Writes the name of all connected users in the list
      */
     public void writeUsersInTheList() {
-        java.util.Iterator it = ProGroup.getGroup(this.diffusionGroup).iterator();
+        java.util.Iterator it = PAGroup.getGroup(this.diffusionGroup).iterator();
         while (it.hasNext())
             this.frame.list.append(((Chat) it.next()).getName() + "\n");
     }
@@ -347,8 +347,8 @@ public class Chat implements java.io.Serializable, RunActive {
         try {
             Object[] param = new Object[1];
             param[0] = new String(userName);
-            chat = (Chat) ProActiveObject.newActive(Chat.class.getName(),
-                    param, (Node) null);
+            chat = (Chat) PAActiveObject.newActive(Chat.class.getName(), param,
+                    (Node) null);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {

@@ -94,7 +94,7 @@ public class Office {
     public synchronized void createPeople() {
         int i;
         try {
-            rand = (RandomTime) org.objectweb.proactive.api.ProActiveObject.newActive(RandomTime.class.getName(),
+            rand = (RandomTime) org.objectweb.proactive.api.PAActiveObject.newActive(RandomTime.class.getName(),
                     null);
 
             for (i = 1; i <= NB_DOC; i++)
@@ -114,7 +114,7 @@ public class Office {
                     rand
                 };
 
-            Doctor newDoc = (Doctor) org.objectweb.proactive.api.ProActiveObject.newActive(Doctor.class.getName(),
+            Doctor newDoc = (Doctor) org.objectweb.proactive.api.PAActiveObject.newActive(Doctor.class.getName(),
                     params);
             doctors.insertElementAt(newDoc, id - 1);
             recept.addDoctor(id);
@@ -131,7 +131,7 @@ public class Office {
                     rand
                 };
 
-            Patient newPat = (Patient) org.objectweb.proactive.api.ProActiveObject.newActive(Patient.class.getName(),
+            Patient newPat = (Patient) org.objectweb.proactive.api.PAActiveObject.newActive(Patient.class.getName(),
                     params);
             patients.insertElementAt(newPat, id - 1);
             display.addPatient(id);
@@ -169,9 +169,9 @@ public class Office {
     public static void main(String[] argv) {
         logger.info("The Salishan problems : Problem 3 - The Doctor's Office");
         try {
-            Office off = (Office) org.objectweb.proactive.api.ProActiveObject.newActive(Office.class.getName(),
+            Office off = (Office) org.objectweb.proactive.api.PAActiveObject.newActive(Office.class.getName(),
                     new Object[] { new Integer(0) });
-            Receptionnist recept = (Receptionnist) org.objectweb.proactive.api.ProActiveObject.newActive(Receptionnist.class.getName(),
+            Receptionnist recept = (Receptionnist) org.objectweb.proactive.api.PAActiveObject.newActive(Receptionnist.class.getName(),
                     new Object[] { off });
             off.init(off, recept);
         } catch (Exception e) {

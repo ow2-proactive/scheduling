@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 @PublicAPI
-public class ProGroup {
+public class PAGroup {
 
     /** The logger for the Class */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
@@ -81,7 +81,7 @@ public class ProGroup {
         ProxyForGroup pfg;
 
         try {
-            pfg = (ProxyForGroup) ProGroup.getGroup(group);
+            pfg = (ProxyForGroup) PAGroup.getGroup(group);
         } catch (ClassCastException cce) {
             pfg = null;
         }
@@ -158,7 +158,7 @@ public class ProGroup {
      * @return the member of the typed group at the rank <code>n</code>
      */
     public static Object get(Object o, int n) {
-        org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+        org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
         if (theProxy == null) {
             return null;
         } else {
@@ -174,7 +174,7 @@ public class ProGroup {
      * @throws IllegalArgumentException if the parameter doesn't represent a group
      */
     public static int size(Object o) {
-        ProxyForGroup theProxy = ProGroup.findProxyForGroup(o);
+        ProxyForGroup theProxy = PAGroup.findProxyForGroup(o);
         if (theProxy == null) {
             throw new java.lang.IllegalArgumentException(
                 "Parameter doesn't represent a group");
@@ -194,7 +194,7 @@ public class ProGroup {
      */
     public static Object newGroup(String className)
         throws ClassNotFoundException, ClassNotReifiableException {
-        return ProGroup.newGroup(className, (Class<?>[]) null);
+        return PAGroup.newGroup(className, (Class<?>[]) null);
     }
 
     /**
@@ -213,20 +213,20 @@ public class ProGroup {
 
         try {
             result = MOP.newInstance(className, genericParameters, null,
-                    ProGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
+                    PAGroup.DEFAULT_PROXYFORGROUP_CLASS_NAME, null);
 
             ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) ((StubObject) result).getProxy();
             proxy.setClassName(className);
             proxy.setStub((StubObject) result);
         } catch (ClassNotReifiableException e) {
-            ProGroup.logger.error("**** ClassNotReifiableException ****");
+            PAGroup.logger.error("**** ClassNotReifiableException ****");
         } catch (InvalidProxyClassException e) {
-            ProGroup.logger.error("**** InvalidProxyClassException ****");
+            PAGroup.logger.error("**** InvalidProxyClassException ****");
         } catch (ConstructionOfProxyObjectFailedException e) {
-            ProGroup.logger.error(
+            PAGroup.logger.error(
                 "**** ConstructionOfProxyObjectFailedException ****");
         } catch (ConstructionOfReifiedObjectFailedException e) {
-            ProGroup.logger.error(
+            PAGroup.logger.error(
                 "**** ConstructionOfReifiedObjectFailedException ****");
         }
 
@@ -251,7 +251,7 @@ public class ProGroup {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
-        return ProGroup.newGroup(className, genericParameters, params, nodeList);
+        return PAGroup.newGroup(className, genericParameters, params, nodeList);
     }
 
     /**
@@ -270,12 +270,12 @@ public class ProGroup {
         Class<?>[] genericParameters, Object[] params, Node[] nodeList)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        Object result = ProGroup.newGroup(className, genericParameters);
+        Object result = PAGroup.newGroup(className, genericParameters);
         Group g = getGroup(result);
 
         if (params != null) {
             for (int i = 0; i < nodeList.length; i++) {
-                g.add(ProActiveObject.newActive(className, genericParameters,
+                g.add(PAActiveObject.newActive(className, genericParameters,
                         params, nodeList[i % nodeList.length]));
             }
         }
@@ -301,7 +301,7 @@ public class ProGroup {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
-        return ProGroup.newGroup(className, genericParameters, params, nodeList);
+        return PAGroup.newGroup(className, genericParameters, params, nodeList);
     }
 
     /**
@@ -323,7 +323,7 @@ public class ProGroup {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
-        return ProGroup.newGroup(className, genericParameters, params, nodeList);
+        return PAGroup.newGroup(className, genericParameters, params, nodeList);
     }
 
     /**
@@ -343,7 +343,7 @@ public class ProGroup {
         VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProGroup.newGroup(className, genericParameters, params,
+        return PAGroup.newGroup(className, genericParameters, params,
             virtualNode.getNodes());
     }
 
@@ -366,7 +366,7 @@ public class ProGroup {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getDefaultNode();
 
-        return ProGroup.newGroup(className, genericParameters, params, nodeList);
+        return PAGroup.newGroup(className, genericParameters, params, nodeList);
     }
 
     /**
@@ -387,7 +387,7 @@ public class ProGroup {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
-        return ProGroup.newGroup(className, genericParameters, params, nodeList);
+        return PAGroup.newGroup(className, genericParameters, params, nodeList);
     }
 
     /**
@@ -412,7 +412,7 @@ public class ProGroup {
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                g.add(ProActiveObject.newActive(className, params[i],
+                g.add(PAActiveObject.newActive(className, params[i],
                         nodeList[i % nodeList.length]));
             }
         }
@@ -438,7 +438,7 @@ public class ProGroup {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
-        return ProGroup.newGroup(className, genericParameters, params, nodeList);
+        return PAGroup.newGroup(className, genericParameters, params, nodeList);
     }
 
     /**
@@ -460,7 +460,7 @@ public class ProGroup {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
-        return ProGroup.newGroup(className, genericParameters, params, nodeList);
+        return PAGroup.newGroup(className, genericParameters, params, nodeList);
     }
 
     /**
@@ -501,7 +501,7 @@ public class ProGroup {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
-        return ProGroup.newGroup(className, params, nodeList);
+        return PAGroup.newGroup(className, params, nodeList);
     }
 
     /**
@@ -524,7 +524,7 @@ public class ProGroup {
 
         if (params != null) {
             for (int i = 0; i < nodeList.length; i++) {
-                g.add(ProActiveObject.newActive(className, params,
+                g.add(PAActiveObject.newActive(className, params,
                         nodeList[i % nodeList.length]));
             }
         }
@@ -549,7 +549,7 @@ public class ProGroup {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
-        return ProGroup.newGroup(className, params, nodeList);
+        return PAGroup.newGroup(className, params, nodeList);
     }
 
     /**
@@ -570,7 +570,7 @@ public class ProGroup {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
-        return ProGroup.newGroup(className, params, nodeList);
+        return PAGroup.newGroup(className, params, nodeList);
     }
 
     /**
@@ -608,7 +608,7 @@ public class ProGroup {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getDefaultNode();
 
-        return ProGroup.newGroup(className, params, nodeList);
+        return PAGroup.newGroup(className, params, nodeList);
     }
 
     /**
@@ -627,7 +627,7 @@ public class ProGroup {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
-        return ProGroup.newGroup(className, params, nodeList);
+        return PAGroup.newGroup(className, params, nodeList);
     }
 
     public static Object newGroup(String className, Object[][] params,
@@ -654,7 +654,7 @@ public class ProGroup {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
-        return ProGroup.newGroup(className, params, nodeList);
+        return PAGroup.newGroup(className, params, nodeList);
     }
 
     /**
@@ -675,7 +675,7 @@ public class ProGroup {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
-        return ProGroup.newGroup(className, params, nodeList);
+        return PAGroup.newGroup(className, params, nodeList);
     }
 
     /**
@@ -694,7 +694,7 @@ public class ProGroup {
         VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProGroup.newGroup(className, params, virtualNode.getNodes());
+        return PAGroup.newGroup(className, params, virtualNode.getNodes());
     }
 
     /**
@@ -745,7 +745,7 @@ public class ProGroup {
         Node[] nodeListString = new Node[nodeList.length];
         for (int i = 0; i < nodeList.length; i++)
             nodeListString[i] = NodeFactory.getNode(nodeList[i]);
-        return ProGroup.newGroupBuiltWithMultithreading(className, params,
+        return PAGroup.newGroupBuiltWithMultithreading(className, params,
             nodeListString);
     }
 
@@ -768,7 +768,7 @@ public class ProGroup {
         Object[] params, VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProGroup.newGroupBuiltWithMultithreading(className, params,
+        return PAGroup.newGroupBuiltWithMultithreading(className, params,
             virtualNode.getNodes());
     }
 
@@ -792,7 +792,7 @@ public class ProGroup {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getDefaultNode();
 
-        return ProGroup.newGroupBuiltWithMultithreading(className, params,
+        return PAGroup.newGroupBuiltWithMultithreading(className, params,
             nodeList);
     }
 
@@ -844,7 +844,7 @@ public class ProGroup {
         Node[] nodeListString = new Node[nodeList.length];
         for (int i = 0; i < nodeList.length; i++)
             nodeListString[i] = NodeFactory.getNode(nodeList[i]);
-        return ProGroup.newGroupBuiltWithMultithreading(className, params,
+        return PAGroup.newGroupBuiltWithMultithreading(className, params,
             nodeListString);
     }
 
@@ -867,7 +867,7 @@ public class ProGroup {
         Object[][] params, VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProGroup.newGroupBuiltWithMultithreading(className, params,
+        return PAGroup.newGroupBuiltWithMultithreading(className, params,
             virtualNode.getNodes());
     }
 
@@ -916,8 +916,8 @@ public class ProGroup {
         Node[] nodeListString = new Node[nodeList.length];
         for (int i = 0; i < nodeList.length; i++)
             nodeListString[i] = NodeFactory.getNode(nodeList[i]);
-        return ProGroup.newGroupInParallel(className, genericParameters,
-            params, nodeListString);
+        return PAGroup.newGroupInParallel(className, genericParameters, params,
+            nodeListString);
     }
 
     /**
@@ -938,8 +938,8 @@ public class ProGroup {
         VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProGroup.newGroupInParallel(className, genericParameters,
-            params, virtualNode.getNodes());
+        return PAGroup.newGroupInParallel(className, genericParameters, params,
+            virtualNode.getNodes());
     }
 
     //// generic methods
@@ -961,8 +961,8 @@ public class ProGroup {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getDefaultNode();
 
-        return ProGroup.newGroupInParallel(className, genericParameters,
-            params, nodeList);
+        return PAGroup.newGroupInParallel(className, genericParameters, params,
+            nodeList);
     }
 
     /**
@@ -1010,8 +1010,8 @@ public class ProGroup {
         Node[] nodeListString = new Node[nodeList.length];
         for (int i = 0; i < nodeList.length; i++)
             nodeListString[i] = NodeFactory.getNode(nodeList[i]);
-        return ProGroup.newGroupInParallel(className, genericParameters,
-            params, nodeListString);
+        return PAGroup.newGroupInParallel(className, genericParameters, params,
+            nodeListString);
     }
 
     /**
@@ -1032,8 +1032,8 @@ public class ProGroup {
         VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProGroup.newGroupInParallel(className, genericParameters,
-            params, virtualNode.getNodes());
+        return PAGroup.newGroupInParallel(className, genericParameters, params,
+            virtualNode.getNodes());
     }
 
     /**
@@ -1189,7 +1189,7 @@ public class ProGroup {
         Class<?>[] genericParameters, Object[] constructorParameters,
         VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
-        return ProGroup.newActiveAsGroup(classname, genericParameters,
+        return PAGroup.newActiveAsGroup(classname, genericParameters,
             constructorParameters, virtualnode, null, null);
     }
 
@@ -1223,7 +1223,7 @@ public class ProGroup {
             Node[] nodeTab = virtualnode.getNodes();
             Group aoGroup = null;
             try {
-                aoGroup = ProGroup.getGroup(ProGroup.newGroup(classname,
+                aoGroup = PAGroup.getGroup(PAGroup.newGroup(classname,
                             genericParameters));
             } catch (ClassNotFoundException e) {
                 throw new ActiveObjectCreationException(
@@ -1233,7 +1233,7 @@ public class ProGroup {
                     "Cannot create group of active objects" + e);
             }
             for (int i = 0; i < nodeTab.length; i++) {
-                Object tmp = ProActiveObject.newActive(classname, null,
+                Object tmp = PAActiveObject.newActive(classname, null,
                         constructorParameters, nodeTab[i], activity, factory);
                 aoGroup.add(tmp);
             }
@@ -1261,8 +1261,8 @@ public class ProGroup {
     public static Object newActiveAsGroup(String classname,
         Object[] constructorParameters, VirtualNode virtualnode)
         throws ActiveObjectCreationException, NodeException {
-        return ProGroup.newActiveAsGroup(classname, null,
-            constructorParameters, virtualnode, null, null);
+        return PAGroup.newActiveAsGroup(classname, null, constructorParameters,
+            virtualnode, null, null);
     }
 
     /**
@@ -1313,7 +1313,7 @@ public class ProGroup {
             Node[] nodeTab = virtualnode.getNodes();
             Group aoGroup = null;
             try {
-                aoGroup = ProGroup.getGroup(ProGroup.newGroup(
+                aoGroup = PAGroup.getGroup(PAGroup.newGroup(
                             target.getClass().getName(), genericParameters));
             } catch (ClassNotFoundException e) {
                 throw new ActiveObjectCreationException(
@@ -1324,7 +1324,7 @@ public class ProGroup {
             }
 
             for (int i = 0; i < nodeTab.length; i++) {
-                Object tmp = ProActiveObject.turnActive(target,
+                Object tmp = PAActiveObject.turnActive(target,
                         genericParameters, nameOfTargetType, nodeTab[i], null,
                         null);
                 aoGroup.add(tmp);
@@ -1369,7 +1369,7 @@ public class ProGroup {
     public static Object turnActiveGroup(Object ogroup)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActiveObject.turnActive(ogroup, null, getType(ogroup),
+        return PAActiveObject.turnActive(ogroup, null, getType(ogroup),
             (Node) null, null, null);
     }
 
@@ -1387,7 +1387,7 @@ public class ProGroup {
         Class<?>[] genericParameters)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActiveObject.turnActive(ogroup, genericParameters,
+        return PAActiveObject.turnActive(ogroup, genericParameters,
             getType(ogroup), (Node) null, null, null);
     }
 
@@ -1406,7 +1406,7 @@ public class ProGroup {
         Class<?>[] genericParameters, Node node)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActiveObject.turnActive(ogroup, genericParameters,
+        return PAActiveObject.turnActive(ogroup, genericParameters,
             getType(ogroup), node, null, null);
     }
 
@@ -1424,7 +1424,7 @@ public class ProGroup {
         Class<?>[] genericParameters, String nodeName)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActiveObject.turnActive(ogroup, genericParameters,
+        return PAActiveObject.turnActive(ogroup, genericParameters,
             getType(ogroup), NodeFactory.getNode(nodeName), null, null);
     }
 
@@ -1442,7 +1442,7 @@ public class ProGroup {
     public static Object turnActiveGroup(Object ogroup, Node node)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActiveObject.turnActive(ogroup, null, getType(ogroup), node,
+        return PAActiveObject.turnActive(ogroup, null, getType(ogroup), node,
             null, null);
     }
 
@@ -1459,7 +1459,7 @@ public class ProGroup {
     public static Object turnActiveGroup(Object ogroup, String nodeName)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProActiveObject.turnActive(ogroup, null, getType(ogroup),
+        return PAActiveObject.turnActive(ogroup, null, getType(ogroup),
             NodeFactory.getNode(nodeName), null, null);
     }
 
@@ -1474,10 +1474,10 @@ public class ProGroup {
         try {
             result = newGroup(getType(ogroup), (Class<?>[]) null);
         } catch (ClassNotReifiableException e) {
-            ProGroup.logger.error("**** ClassNotReifiableException ****");
+            PAGroup.logger.error("**** ClassNotReifiableException ****");
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            ProGroup.logger.error("**** ClassNotFoundException ****");
+            PAGroup.logger.error("**** ClassNotFoundException ****");
             e.printStackTrace();
         }
 
@@ -1497,7 +1497,7 @@ public class ProGroup {
      * @param ogroup the typed group who will change his semantic of communication.
      */
     public static void setScatterGroup(Object ogroup) {
-        Proxy proxytmp = ProGroup.findProxyForGroup(ogroup);
+        Proxy proxytmp = PAGroup.findProxyForGroup(ogroup);
         if (proxytmp != null) {
             ((ProxyForGroup) proxytmp).setDispatchingOn();
         }
@@ -1508,7 +1508,7 @@ public class ProGroup {
      * @param ogroup the typed group who will change his semantic of communication.
      */
     public static void unsetScatterGroup(Object ogroup) {
-        Proxy proxytmp = ProGroup.findProxyForGroup(ogroup);
+        Proxy proxytmp = PAGroup.findProxyForGroup(ogroup);
         if (proxytmp != null) {
             ((ProxyForGroup) proxytmp).setDispatchingOff();
         }
@@ -1520,7 +1520,7 @@ public class ProGroup {
      * @return <code>true</code> if the "scatter option" is enabled for the typed group <code>ogroup</code>.
      */
     public static boolean isScatterGroupOn(Object ogroup) {
-        Proxy proxytmp = ProGroup.findProxyForGroup(ogroup);
+        Proxy proxytmp = PAGroup.findProxyForGroup(ogroup);
         if (proxytmp != null) {
             return ((ProxyForGroup) proxytmp).isDispatchingOn();
         } else {
@@ -1533,7 +1533,7 @@ public class ProGroup {
      * @param ogroup the typed group who will change his semantic of communication.
      */
     public static void setUniqueSerialization(Object ogroup) {
-        Proxy proxytmp = ProGroup.findProxyForGroup(ogroup);
+        Proxy proxytmp = PAGroup.findProxyForGroup(ogroup);
         if (proxytmp != null) {
             ((ProxyForGroup) proxytmp).setUniqueSerializationOn();
         }
@@ -1544,7 +1544,7 @@ public class ProGroup {
      * @param ogroup the typed group who will change his semantic of communication.
      */
     public static void unsetUniqueSerialization(Object ogroup) {
-        Proxy proxytmp = ProGroup.findProxyForGroup(ogroup);
+        Proxy proxytmp = PAGroup.findProxyForGroup(ogroup);
         if (proxytmp != null) {
             ((ProxyForGroup) proxytmp).setUniqueSerializationOff();
         }
@@ -1556,7 +1556,7 @@ public class ProGroup {
      * @return <code>true</code> if <code>o</code> is a typed group.
      */
     public static boolean isGroup(Object o) {
-        return (ProGroup.findProxyForGroup(o) != null);
+        return (PAGroup.findProxyForGroup(o) != null);
     }
 
     /**
@@ -1565,7 +1565,7 @@ public class ProGroup {
      */
     public static void waitAll(Object o) {
         if (MOP.isReifiedObject(o)) {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {
@@ -1583,7 +1583,7 @@ public class ProGroup {
      */
     public static Object waitAndGetOne(Object o) {
         if (MOP.isReifiedObject(o)) {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {
@@ -1607,7 +1607,7 @@ public class ProGroup {
      */
     public static Object waitAndGetOneThenRemoveIt(Object o) {
         if (MOP.isReifiedObject(o)) {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {
@@ -1632,7 +1632,7 @@ public class ProGroup {
      */
     public static Object waitAndGetTheNth(Object o, int n) {
         if (MOP.isReifiedObject(o)) {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {
@@ -1656,7 +1656,7 @@ public class ProGroup {
      */
     public static void waitN(Object o, int n) {
         if (MOP.isReifiedObject(o)) {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {
@@ -1673,7 +1673,7 @@ public class ProGroup {
      */
     public static void waitOne(Object o) {
         if (MOP.isReifiedObject(o)) {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {
@@ -1691,7 +1691,7 @@ public class ProGroup {
      */
     public static int waitOneAndGetIndex(Object o) {
         if (MOP.isReifiedObject(o)) {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {
@@ -1714,7 +1714,7 @@ public class ProGroup {
      */
     public static void waitTheNth(Object o, int n) {
         if (MOP.isReifiedObject(o)) {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {
@@ -1736,7 +1736,7 @@ public class ProGroup {
         if (!(MOP.isReifiedObject(o))) {
             return true;
         } else {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {
@@ -1760,7 +1760,7 @@ public class ProGroup {
         if (!(MOP.isReifiedObject(o))) {
             return false;
         } else {
-            org.objectweb.proactive.core.mop.Proxy theProxy = ProGroup.findProxyForGroup(o);
+            org.objectweb.proactive.core.mop.Proxy theProxy = PAGroup.findProxyForGroup(o);
 
             // If the object represents a group, we use the proxyForGroup's method
             if (theProxy != null) {

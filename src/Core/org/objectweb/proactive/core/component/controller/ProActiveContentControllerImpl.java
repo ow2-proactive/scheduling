@@ -48,7 +48,7 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.exceptions.ContentControllerExceptionListException;
@@ -124,8 +124,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
     }
 
     public boolean isSubComponent(Component component) {
-        if (ProGroup.isGroup(component)) {
-            Group<Component> group = ProGroup.getGroup(component);
+        if (PAGroup.isGroup(component)) {
+            Group<Component> group = PAGroup.getGroup(component);
             for (Iterator<Component> it = group.iterator(); it.hasNext();) {
                 if (!fcSubComponents.contains(it.next())) {
                     return false;
@@ -152,9 +152,9 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
         // pb is that the subComponent might not be stopped
         try {
             // could not do this invocation on a group (non reifiable return type)
-            if (ProGroup.isGroup(subComponent)) {
+            if (PAGroup.isGroup(subComponent)) {
                 try {
-                    addFcSubComponent(ProGroup.getGroup(subComponent));
+                    addFcSubComponent(PAGroup.getGroup(subComponent));
                 } catch (ContentControllerExceptionListException e) {
                     e.printStackTrace();
                     throw new IllegalContentException(

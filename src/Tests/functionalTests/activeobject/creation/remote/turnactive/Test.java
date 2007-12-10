@@ -31,7 +31,7 @@
 package functionalTests.activeobject.creation.remote.turnactive;
 
 import org.junit.Before;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
@@ -58,7 +58,7 @@ public class Test extends FunctionalTest {
         assertTrue(TestNodes.getRemoteHostname() != null);
 
         a = new A("toto");
-        a = (A) ProActiveObject.turnActive(a, TestNodes.getRemoteVMNode());
+        a = (A) PAActiveObject.turnActive(a, TestNodes.getRemoteVMNode());
         name = a.getName();
         nodeUrl = a.getNodeUrl();
         assertTrue(name.equals("toto") /*&& (nodeUrl.indexOf(remoteHost) != -1)*/);

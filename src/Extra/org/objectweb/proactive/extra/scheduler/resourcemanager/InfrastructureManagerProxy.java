@@ -42,8 +42,8 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -118,7 +118,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
                     NAME_ACTIVE_OBJECT_IMUSER);
             IMMonitoring monitor = IMConnection.connectAsMonitor(url +
                     NAME_ACTIVE_OBJECT_IMMONITORING);
-            return (InfrastructureManagerProxy) ProActiveObject.newActive(InfrastructureManagerProxy.class.getCanonicalName(),
+            return (InfrastructureManagerProxy) PAActiveObject.newActive(InfrastructureManagerProxy.class.getCanonicalName(),
                 new Object[] { monitor, user });
         } catch (IMException e) {
             throw new ActiveObjectCreationException(e);
@@ -293,7 +293,7 @@ public class InfrastructureManagerProxy implements InitActive, RunActive,
         while (iterator.hasNext()) {
             Entry<Node, ScriptResult<?>> entry = iterator.next();
 
-            if (!ProFuture.isAwaited(entry.getValue())) { // !awaited = arrived
+            if (!PAFuture.isAwaited(entry.getValue())) { // !awaited = arrived
                 if (logger.isInfoEnabled()) {
                     logger.info("Post script successfull, node freed : " +
                         entry.getKey().getNodeInformation().getURL());

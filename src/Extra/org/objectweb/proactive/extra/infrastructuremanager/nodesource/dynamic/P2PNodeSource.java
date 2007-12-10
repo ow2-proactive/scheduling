@@ -35,7 +35,7 @@ import java.util.Vector;
 
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
@@ -107,7 +107,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
         //set this method in Immediate service in order to avoid avoid 
         //waiting time for a monitor, if the P2PNode is blocked by 
         //the acquisition delay of a peer to peer node.
-        ProActiveObject.setImmediateService("getSourceEvent");
+        PAActiveObject.setImmediateService("getSourceEvent");
 
         try {
             StartP2PService startServiceP2P = new StartP2PService(this.peerUrls);
@@ -154,8 +154,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
         P2PNodeLookup p2pNodeLookup = this.lookups.get(nodeUrl);
         p2pNodeLookup.killNode(nodeUrl);
         //terminate AOs, remove node and its lookup form lookup HM
-        ProActiveObject.terminateActiveObject(this.lookups.remove(nodeUrl),
-            false);
+        PAActiveObject.terminateActiveObject(this.lookups.remove(nodeUrl), false);
         //indicate that a new node has to be got in a [niceTime] future
     }
 

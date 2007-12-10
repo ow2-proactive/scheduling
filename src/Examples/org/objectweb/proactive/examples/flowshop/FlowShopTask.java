@@ -33,7 +33,7 @@ package org.objectweb.proactive.examples.flowshop;
 import java.util.Arrays;
 import java.util.Vector;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.extensions.branchnbound.core.Result;
 import org.objectweb.proactive.extensions.branchnbound.core.Task;
 import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsException;
@@ -320,7 +320,7 @@ public class FlowShopTask extends Task {
         time = System.currentTimeMillis() - time;
 
         if (mustSplit) {
-            this.worker.sendSubTasksToTheManager(((FlowShopTask) ProActiveObject.getStubOnThis()).split());
+            this.worker.sendSubTasksToTheManager(((FlowShopTask) PAActiveObject.getStubOnThis()).split());
         }
 
         Main.logger.info(" -- Explore " + nbPerm + " permutations in " + time +

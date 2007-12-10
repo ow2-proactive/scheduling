@@ -31,7 +31,7 @@
 package org.objectweb.proactive.ext.locationserver;
 
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -173,7 +173,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
         System.out.println(
             "TimedRequestWithLocationServer: backupSolution() server has sent an answer after " +
             (endTimeBackupSolution - startTimeBackupSolution));
-        ProFuture.waitFor(mobile);
+        PAFuture.waitFor(mobile);
         return mobile;
     }
 }

@@ -37,8 +37,8 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.ProActiveInternalObject;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProMobileAgent;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.BodyMap;
 import org.objectweb.proactive.core.body.LocalBodyStore;
@@ -169,7 +169,7 @@ public class LoadBalancer implements ProActiveInternalObject {
                         " to " + destNode.getNodeInformation().getURL());
                 }
 
-                ProMobileAgent.migrateTo(minBody, destNode, false);
+                PAMobileAgent.migrateTo(minBody, destNode, false);
                 informationRecover.register(this.getName(),
                     this.metric.getLoad(),
                     destNode.getNodeInformation().getURL(),
@@ -203,13 +203,13 @@ public class LoadBalancer implements ProActiveInternalObject {
     public void init(ArrayList<LoadBalancer> loadBalancers,
         InformationRecover ir) {
         try {
-            this.myNode = ProActiveObject.getNode();
+            this.myNode = PAActiveObject.getNode();
             this.informationRecover = ir;
         } catch (NodeException e) {
             e.printStackTrace();
         }
         this.loadBalancers = loadBalancers;
-        this.myThis = (LoadBalancer) ProActiveObject.getStubOnThis();
+        this.myThis = (LoadBalancer) PAActiveObject.getStubOnThis();
         this.balancerName = myNode.getNodeInformation().getURL();
 
         // by now we use only Linux
@@ -247,7 +247,7 @@ public class LoadBalancer implements ProActiveInternalObject {
 
     public void notifyLoadBalancers() {
         LoadBalancer lb;
-        LoadBalancer myThis = (LoadBalancer) ProActiveObject.getStubOnThis();
+        LoadBalancer myThis = (LoadBalancer) PAActiveObject.getStubOnThis();
         Iterator<LoadBalancer> it = loadBalancers.iterator();
         while (it.hasNext()) {
             lb = it.next();

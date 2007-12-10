@@ -38,7 +38,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
@@ -67,7 +67,7 @@ public class SchedulerFake {
             e2.printStackTrace();
         }
 
-        ProActiveObject.setImmediateService("listenLog");
+        PAActiveObject.setImmediateService("listenLog");
 
         // resources
         //        SimpleResourceManager srm = null;
@@ -86,7 +86,7 @@ public class SchedulerFake {
         NodeSet nodes = null;
 
         try {
-            IMCoreInterface imc = (IMCoreInterface) (ProActiveObject.lookupActive(IMCoreInterface.class.getName(),
+            IMCoreInterface imc = (IMCoreInterface) (PAActiveObject.lookupActive(IMCoreInterface.class.getName(),
                     "//localhost/IMCORE"));
             imu = imc.getUser();
 
@@ -119,10 +119,10 @@ public class SchedulerFake {
             System.out.println("**********" + nodes.size());
 
             // Creates an active instance of class Hello2 on the local node
-            t1 = (RemoteTask) ProActiveObject.newActive(RemoteTask.class.getName(), // the class to deploy
+            t1 = (RemoteTask) PAActiveObject.newActive(RemoteTask.class.getName(), // the class to deploy
                     null, // the arguments to pass to the constructor, here none
                     nodes.get(0)); // which jvm should be used to hold the Active Object
-            t2 = (RemoteTask) ProActiveObject.newActive(RemoteTask.class.getName(), // the class to deploy
+            t2 = (RemoteTask) PAActiveObject.newActive(RemoteTask.class.getName(), // the class to deploy
                     null, // the arguments to pass to the constructor, here none
                     nodes.get(1)); // which jvm should be used to hold the Active Object
         } catch (NodeException e) {
@@ -145,8 +145,8 @@ public class SchedulerFake {
         t1.terminateTask();
         t2.terminateTask();
 
-        ProActiveObject.terminateActiveObject(t1, false);
-        ProActiveObject.terminateActiveObject(t2, false);
+        PAActiveObject.terminateActiveObject(t1, false);
+        PAActiveObject.terminateActiveObject(t2, false);
 
         // release nodes
         imu.freeNodes(nodes);
@@ -186,9 +186,9 @@ public class SchedulerFake {
 
     public static void main(String[] args) {
         try {
-            SchedulerFake sf = (SchedulerFake) (ProActiveObject.newActive(SchedulerFake.class.getName(),
+            SchedulerFake sf = (SchedulerFake) (PAActiveObject.newActive(SchedulerFake.class.getName(),
                     null));
-            ProActiveObject.register(sf, "rmi://duff/scheduler");
+            PAActiveObject.register(sf, "rmi://duff/scheduler");
             sf.scheduleTasks();
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();

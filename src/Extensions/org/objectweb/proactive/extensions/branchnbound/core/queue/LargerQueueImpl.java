@@ -38,7 +38,7 @@ import java.io.ObjectOutputStream;
 import java.util.Collection;
 import java.util.Vector;
 
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.util.wrapper.BooleanMutableWrapper;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -75,7 +75,7 @@ public class LargerQueueImpl extends TaskQueue {
      */
     @Override
     public void addAll(Collection<Task> tasks) {
-        tasks = (Collection<Task>) ProFuture.getFutureValue(tasks);
+        tasks = (Collection<Task>) PAFuture.getFutureValue(tasks);
         if (tasks.size() > 0) {
             this.queue.add(tasks);
             this.size += tasks.size();

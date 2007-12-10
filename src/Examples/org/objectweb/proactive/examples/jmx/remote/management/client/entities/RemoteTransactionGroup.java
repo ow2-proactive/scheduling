@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 import javax.management.ObjectName;
 
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
@@ -55,8 +55,8 @@ public class RemoteTransactionGroup extends ManageableEntity
     public RemoteTransactionGroup(String name) {
         this.name = name;
         try {
-            this.entities = (ManageableEntity) ProGroup.newGroup(ManageableEntity.class.getName());
-            this.gEntities = ProGroup.getGroup(this.entities);
+            this.entities = (ManageableEntity) PAGroup.newGroup(ManageableEntity.class.getName());
+            this.gEntities = PAGroup.getGroup(this.entities);
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

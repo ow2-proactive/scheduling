@@ -32,7 +32,7 @@ package org.objectweb.proactive.extra.scheduler.job;
 
 import java.util.HashMap;
 
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.extra.scheduler.common.job.JobId;
 import org.objectweb.proactive.extra.scheduler.common.job.JobResult;
 import org.objectweb.proactive.extra.scheduler.common.task.TaskResult;
@@ -117,7 +117,7 @@ public class JobResultImpl implements JobResult {
         }
 
         //exceptionResults
-        if (!ProFuture.isAwaited(taskResult) && taskResult.hadException()) {
+        if (!PAFuture.isAwaited(taskResult) && taskResult.hadException()) {
             if (exceptionResults == null) {
                 exceptionResults = new HashMap<String, TaskResult>();
             }

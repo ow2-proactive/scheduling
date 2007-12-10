@@ -36,9 +36,9 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
-import org.objectweb.proactive.api.ProLifeCycle;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -96,7 +96,7 @@ public class Jacobi implements Serializable {
             Object[] params = new Object[1];
             params[0] = descriptor;
             try {
-                singleton = (Jacobi) ProActiveObject.newActive(Jacobi.class.getName(),
+                singleton = (Jacobi) PAActiveObject.newActive(Jacobi.class.getName(),
                         params);
             } catch (ActiveObjectCreationException e) {
                 // TODO Auto-generated catch block
@@ -115,7 +115,7 @@ public class Jacobi implements Serializable {
             descriptor.killall(true);
         } catch (ProActiveException e) {
         }
-        ProLifeCycle.exitSuccess();
+        PALifeCycle.exitSuccess();
     }
 
     public static void main(String[] args) {
@@ -146,7 +146,7 @@ public class Jacobi implements Serializable {
         ProActiveDescriptor proActiveDescriptor = null;
         String[] nodes = null;
         try {
-            proActiveDescriptor = ProDeployment.getProactiveDescriptor("file:" +
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
                     args[0]);
         } catch (ProActiveException e) {
             System.err.println("** ProActiveException **");

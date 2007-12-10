@@ -36,7 +36,7 @@ import java.util.ArrayList;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.common.IMConstants;
 import org.objectweb.proactive.extra.infrastructuremanager.common.event.IMEvent;
@@ -71,7 +71,7 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
      */
     public void initActivity(Body body) {
         System.out.println("SimpleTestIMMonitoring.initActivity()");
-        IMInitialState initState = this.imMonitoring.addIMEventListener((IMEventListener) ProActiveObject.getStubOnThis(),
+        IMInitialState initState = this.imMonitoring.addIMEventListener((IMEventListener) PAActiveObject.getStubOnThis(),
                 IMEventType.KILLED, IMEventType.NODE_ADDED,
                 IMEventType.NODE_BUSY, IMEventType.NODE_DOWN,
                 IMEventType.NODE_FREE, IMEventType.NODE_REMOVED,
@@ -96,7 +96,7 @@ public class SimpleTestIMMonitoring implements IMEventListener, InitActive,
 
             IMMonitoring imMonitoring = IMConnection.connectAsMonitor(url);
 
-            SimpleTestIMMonitoring test = (SimpleTestIMMonitoring) ProActiveObject.newActive(SimpleTestIMMonitoring.class.getName(),
+            SimpleTestIMMonitoring test = (SimpleTestIMMonitoring) PAActiveObject.newActive(SimpleTestIMMonitoring.class.getName(),
                     new Object[] { imMonitoring });
         } catch (NodeException e) {
             e.printStackTrace();

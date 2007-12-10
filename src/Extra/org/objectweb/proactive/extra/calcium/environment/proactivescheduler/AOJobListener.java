@@ -37,7 +37,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -97,7 +97,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
             logger.debug("Creating Job Listener");
         }
 
-        AOJobListener monitor = (AOJobListener) ProActiveObject.newActive(AOJobListener.class.getName(),
+        AOJobListener monitor = (AOJobListener) PAActiveObject.newActive(AOJobListener.class.getName(),
                 new Object[] { taskpool, auth, user, password }, frameworkNode);
 
         return monitor;
@@ -107,7 +107,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
         try {
             this.scheduler = auth.logAsUser(user, password);
 
-            AOJobListener stubOnThis = (AOJobListener) ProActiveObject.getStubOnThis();
+            AOJobListener stubOnThis = (AOJobListener) PAActiveObject.getStubOnThis();
 
             this.scheduler.addSchedulerEventListener(stubOnThis,
                 SchedulerEvent.JOB_KILLED,

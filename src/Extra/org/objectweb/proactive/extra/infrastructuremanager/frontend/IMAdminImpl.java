@@ -37,7 +37,7 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -98,7 +98,7 @@ public class IMAdminImpl implements IMAdmin, Serializable, InitActive {
      */
     public void initActivity(Body body) {
         try {
-            ProActiveObject.register((IMAdmin) ProActiveObject.getStubOnThis(),
+            PAActiveObject.register((IMAdmin) PAActiveObject.getStubOnThis(),
                 "//localhost/" + IMConstants.NAME_ACTIVE_OBJECT_IMADMIN);
         } catch (IOException e) {
             e.printStackTrace();
@@ -177,6 +177,6 @@ public class IMAdminImpl implements IMAdmin, Serializable, InitActive {
      */
     public void shutdown(boolean preempt) throws ProActiveException {
         this.imcore.shutdown(preempt);
-        ProActiveObject.terminateActiveObject(false);
+        PAActiveObject.terminateActiveObject(false);
     }
 }

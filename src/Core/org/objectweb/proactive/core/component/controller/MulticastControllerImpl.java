@@ -50,7 +50,7 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
@@ -247,8 +247,8 @@ public class MulticastControllerImpl extends AbstractProActiveController
     public void unbindFcMulticast(String clientItfName,
         ProActiveInterface serverItf) {
         if (multicastItfs.containsKey(clientItfName)) {
-            if (ProGroup.getGroup(multicastItfs.get(clientItfName))
-                            .remove(serverItf)) {
+            if (PAGroup.getGroup(multicastItfs.get(clientItfName))
+                           .remove(serverItf)) {
                 logger.debug(
                     "removed connected interface from multicast interface : " +
                     clientItfName);
@@ -405,7 +405,7 @@ public class MulticastControllerImpl extends AbstractProActiveController
         init();
         if (logger.isDebugEnabled()) {
             try {
-                if (!ProGroup.isGroup(serverItf.getFcItfOwner())) {
+                if (!PAGroup.isGroup(serverItf.getFcItfOwner())) {
                     logger.debug("multicast binding : " + clientItfName +
                         " to : " +
                         Fractal.getNameController(serverItf.getFcItfOwner())

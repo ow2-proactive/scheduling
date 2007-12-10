@@ -32,7 +32,7 @@ package functionalTests.security.dynamicsecuritypropagation;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityDescriptorHandler;
@@ -59,7 +59,7 @@ public class SecurityTestContextPropagation extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        A a = (A) ProActiveObject.newActive("functionalTests.security.A",
+        A a = (A) PAActiveObject.newActive("functionalTests.security.A",
                 new Object[] {  });
 
         assertTrue("hello".equals(a.hello("hello")));

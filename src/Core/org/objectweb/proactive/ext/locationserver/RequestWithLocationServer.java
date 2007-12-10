@@ -32,7 +32,7 @@ package org.objectweb.proactive.ext.locationserver;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -129,7 +129,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
         logger.debug(
             "RequestWithLocationServer: backupSolution() server has sent an answer");
 
-        ProFuture.waitFor(mobile);
+        PAFuture.waitFor(mobile);
         return mobile;
     }
 }

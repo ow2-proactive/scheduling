@@ -98,9 +98,9 @@ public class ProActiveConfiguration {
             filename = null;
 
             /* First we look for the user defined properties */
-            if (System.getProperty(ProProperties.PA_CONFIGURATION_FILE.getKey()) != null) {
+            if (System.getProperty(PAProperties.PA_CONFIGURATION_FILE.getKey()) != null) {
                 // if specified as a system property
-                filename = System.getProperty(ProProperties.PA_CONFIGURATION_FILE.getKey());
+                filename = System.getProperty(PAProperties.PA_CONFIGURATION_FILE.getKey());
             } else {
                 // or if the file exists in the user home dir
                 File f = new File(System.getProperty("user.home") +
@@ -122,7 +122,7 @@ public class ProActiveConfiguration {
             // set the properties
             setProperties(properties);
 
-            if (System.getProperty(ProProperties.LOG4J.getKey()) == null) {
+            if (System.getProperty(PAProperties.LOG4J.getKey()) == null) {
                 // if logger is not defined create default logger with level info that logs
                 // on the console
                 Logger logger = ProActiveLogger.getLogger(Loggers.CORE);
@@ -139,7 +139,7 @@ public class ProActiveConfiguration {
         Iterator<Object> it = System.getProperties().keySet().iterator();
         while (it.hasNext()) {
             String key = (String) it.next();
-            ProProperties prop = ProProperties.getProperty(key);
+            PAProperties prop = PAProperties.getProperty(key);
             if (prop != null) {
                 String value = System.getProperty(key);
                 if (!prop.isValid(value)) {
@@ -149,7 +149,7 @@ public class ProActiveConfiguration {
             } else {
                 if (key.startsWith("proactive.")) {
                     logger.warn("Property " + key + " is not declared inside " +
-                        ProProperties.class.getSimpleName() + " , ignoring");
+                        PAProperties.class.getSimpleName() + " , ignoring");
                 } else {
                     logger.debug("System property " + key +
                         " is not a ProAtive property");

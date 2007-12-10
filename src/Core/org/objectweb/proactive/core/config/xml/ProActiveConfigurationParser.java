@@ -46,7 +46,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.w3c.dom.Document;
@@ -124,7 +124,7 @@ public class ProActiveConfigurationParser {
                 String key = getAttributeValue(node, ATTR_KEY);
                 String value = getAttributeValue(node, ATTR_VALUE);
 
-                ProProperties prop = ProProperties.getProperty(key);
+                PAProperties prop = PAProperties.getProperty(key);
                 if (prop != null) {
                     if (prop.isValid(value)) {
                         properties.setProperty(key, value);
@@ -134,7 +134,7 @@ public class ProActiveConfigurationParser {
                     }
                 } else {
                     logger.warn("Property " + key + " is not declared inside " +
-                        ProProperties.class.getSimpleName() + " , ignoring");
+                        PAProperties.class.getSimpleName() + " , ignoring");
                 }
             }
 

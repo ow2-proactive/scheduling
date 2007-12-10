@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.body.HalfBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 
 /**
  * Remember if we terminated and why.
@@ -84,13 +84,13 @@ public class GarbageCollector {
     static int TTA = 5 * TTB;
 
     static {
-        String ttb = ProProperties.PA_DGC_TTB.getValue();
+        String ttb = PAProperties.PA_DGC_TTB.getValue();
         if (ttb != null) {
             TTB = Integer.parseInt(ttb);
             TTA = 5 * TTB;
         }
 
-        String tta = ProProperties.PA_DGC_TTA.getValue();
+        String tta = PAProperties.PA_DGC_TTA.getValue();
         if (tta != null) {
             TTA = Integer.parseInt(tta);
         }
@@ -678,7 +678,7 @@ public class GarbageCollector {
 
     public static boolean dgcIsEnabled() {
         if (cache == null) {
-            cache = ProProperties.PA_DGC.isTrue();
+            cache = PAProperties.PA_DGC.isTrue();
         }
         return cache.booleanValue();
     }

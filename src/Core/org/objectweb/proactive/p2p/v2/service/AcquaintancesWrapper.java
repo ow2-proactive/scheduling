@@ -34,7 +34,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.ProGroup;
+import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -49,8 +49,8 @@ public class AcquaintancesWrapper implements Serializable {
 
     public AcquaintancesWrapper() {
         try {
-            acquaintances_active = (P2PService) ProGroup.newGroup(P2PService.class.getName());
-            this.groupOfAcquaintances = ProGroup.getGroup(acquaintances_active);
+            acquaintances_active = (P2PService) PAGroup.newGroup(P2PService.class.getName());
+            this.groupOfAcquaintances = PAGroup.getGroup(acquaintances_active);
         } catch (ClassNotReifiableException e) {
             e.printStackTrace();
         } catch (ClassNotFoundException e) {

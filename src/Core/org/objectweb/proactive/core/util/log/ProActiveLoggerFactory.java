@@ -40,7 +40,7 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.PropertyConfigurator;
 import org.apache.log4j.spi.LoggerFactory;
-import org.objectweb.proactive.core.config.ProProperties;
+import org.objectweb.proactive.core.config.PAProperties;
 
 
 /**
@@ -54,7 +54,7 @@ public class ProActiveLoggerFactory implements LoggerFactory {
         if (System.getProperty("log4j.configuration") == null) {
             Properties p = new Properties();
             try {
-                InputStream in = ProProperties.class.getResourceAsStream(
+                InputStream in = PAProperties.class.getResourceAsStream(
                         "proactive-log4j");
                 if (in != null) {
                     p.load(in);

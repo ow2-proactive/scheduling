@@ -39,9 +39,9 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFileTransfer;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFileTransfer;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
@@ -108,7 +108,7 @@ public class ProActiveMPIManager implements Serializable {
                         "/libProActiveMPIComm.so");
                 File localSource = new File(u.getFile());
 
-                RemoteFile filePushed = ProFileTransfer.push(localSource,
+                RemoteFile filePushed = PAFileTransfer.push(localSource,
                         allNodes[0], remoteDest);
                 filePushed.waitFor();
 
@@ -121,7 +121,7 @@ public class ProActiveMPIManager implements Serializable {
                 for (int j = 0; j < params.length; j++) {
                     params[j] = new Object[] {
                             "ProActiveMPIComm",
-                            (ProActiveMPIManager) ProActiveObject.getStubOnThis(),
+                            (ProActiveMPIManager) PAActiveObject.getStubOnThis(),
                             new Integer(currentJobNumber)
                         };
                 }
@@ -136,7 +136,7 @@ public class ProActiveMPIManager implements Serializable {
                 MPI_IMPL_LOGGER.info("[MANAGER] Initialize remote environments");
                 // initialize queues & semaphores and start thread
                 Ack ack = spmdCouplingProxy.initEnvironment();
-                ProFuture.waitFor(ack);
+                PAFuture.waitFor(ack);
                 MPI_IMPL_LOGGER.info(
                     "[MANAGER] Activate remote thread for communication");
                 // once environment is ready, start thread to get mpi process rank  
@@ -257,8 +257,8 @@ public class ProActiveMPIManager implements Serializable {
                     for (int i = 0; i < parameters.length; i++) {
                         Object[] params = (Object[]) parameters[i];
                         if (params != null) {
-                            proxyList[i] = ProActiveObject.newActive(cl,
-                                    params, orderedNodes[i]);
+                            proxyList[i] = PAActiveObject.newActive(cl, params,
+                                    orderedNodes[i]);
                         }
                     }
                     userProxyList.put(cl, proxyList);

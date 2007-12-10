@@ -39,7 +39,7 @@ import javax.security.auth.login.LoginException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extra.scheduler.common.exception.SchedulerException;
@@ -148,8 +148,8 @@ public class SchedulerAuthentication implements InitActive,
         UserScheduler us = new UserScheduler();
         us.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
-        scheduler.connect(ProActiveObject.getContext().getCurrentRequest()
-                                         .getSourceBodyID(),
+        scheduler.connect(PAActiveObject.getContext().getCurrentRequest()
+                                        .getSourceBodyID(),
             new UserIdentification(user));
 
         // return the created interface
@@ -180,8 +180,8 @@ public class SchedulerAuthentication implements InitActive,
         AdminScheduler as = new AdminScheduler();
         as.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
-        scheduler.connect(ProActiveObject.getContext().getCurrentRequest()
-                                         .getSourceBodyID(),
+        scheduler.connect(PAActiveObject.getContext().getCurrentRequest()
+                                        .getSourceBodyID(),
             new UserIdentification(user, true));
 
         // return the created interface
@@ -207,7 +207,7 @@ public class SchedulerAuthentication implements InitActive,
      * Terminate the SchedulerAuthentication active object.
      */
     public boolean terminate() {
-        ProActiveObject.terminateActiveObject(false);
+        PAActiveObject.terminateActiveObject(false);
         logger.info("Scheduler authentication is now shutdown !");
 
         return true;

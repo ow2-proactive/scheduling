@@ -34,7 +34,7 @@ import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -56,7 +56,7 @@ public class Util {
             logger.debug("Creating Active Object TaskPool.");
         }
 
-        AOTaskPool aom = (AOTaskPool) ProActiveObject.newActive(AOTaskPool.class.getName(),
+        AOTaskPool aom = (AOTaskPool) PAActiveObject.newActive(AOTaskPool.class.getName(),
                 new Object[] {  }, frameworkNode);
 
         return aom;
@@ -68,7 +68,7 @@ public class Util {
             logger.debug("Creating File Server Proxy.");
         }
 
-        FileServer fserver = (FileServer) ProActiveObject.newActive(FileServer.class.getName(),
+        FileServer fserver = (FileServer) PAActiveObject.newActive(FileServer.class.getName(),
                 new Object[] {  }, frameworkNode);
         fserver.initFileServer();
 
@@ -92,7 +92,7 @@ public class Util {
 
         AOInterpreter[] ai;
         try {
-            ai = (AOInterpreter[]) ProActiveObject.newActiveInParallel(AOInterpreter.class.getName(),
+            ai = (AOInterpreter[]) PAActiveObject.newActiveInParallel(AOInterpreter.class.getName(),
                     new Object[][] {
                         { taskpool, fserver }
                     }, nodes);
@@ -100,7 +100,7 @@ public class Util {
             throw new ProActiveException(e);
         }
 
-        AOInterpreterPool interpool = (AOInterpreterPool) ProActiveObject.newActive(AOInterpreterPool.class.getName(),
+        AOInterpreterPool interpool = (AOInterpreterPool) PAActiveObject.newActive(AOInterpreterPool.class.getName(),
                 new Object[] { Arrays.asList(ai), new Integer(times) },
                 frameworknode);
 

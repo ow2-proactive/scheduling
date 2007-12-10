@@ -30,7 +30,7 @@
  */
 package functionalTests.activeobject.context;
 
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.exceptions.HalfBodyException;
@@ -45,14 +45,14 @@ public class A implements java.io.Serializable {
     private A stubOnCaller;
 
     public boolean init(String name) {
-        this.myID = ProActiveObject.getBodyOnThis().getID();
-        ProActiveObject.setImmediateService("immediateService");
+        this.myID = PAActiveObject.getBodyOnThis().getID();
+        PAActiveObject.setImmediateService("immediateService");
         this.name = new StringWrapper(name);
         return (this.myID != null);
     }
 
     public BooleanWrapper standardService(UniqueID caller) {
-        Context current = ProActiveObject.getContext();
+        Context current = PAActiveObject.getContext();
         Request r = current.getCurrentRequest();
         return new BooleanWrapper((r != null) &&
             (current.getBody().getID().equals(myID)) &&
@@ -61,7 +61,7 @@ public class A implements java.io.Serializable {
     }
 
     public BooleanWrapper immediateService(UniqueID caller) {
-        Context current = ProActiveObject.getContext();
+        Context current = PAActiveObject.getContext();
         Request r = current.getCurrentRequest();
         return new BooleanWrapper((r != null) &&
             (current.getBody().getID().equals(myID)) &&
@@ -81,7 +81,7 @@ public class A implements java.io.Serializable {
     }
 
     public void setStubOnCaller() {
-        this.stubOnCaller = (A) ProActiveObject.getContext().getStubOnCaller();
+        this.stubOnCaller = (A) PAActiveObject.getContext().getStubOnCaller();
     }
 
     public StringWrapper getCallerName() {
@@ -93,7 +93,7 @@ public class A implements java.io.Serializable {
     }
 
     public BooleanWrapper testHalfBodyCaller() {
-        Context c = ProActiveObject.getContext();
+        Context c = PAActiveObject.getContext();
         try {
             // caller is a halfbody
             Object o = c.getStubOnCaller();

@@ -44,7 +44,7 @@ import org.apache.log4j.net.SocketAppender;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
@@ -128,8 +128,8 @@ public class TaskLauncher implements InitActive {
     * @param body the body of the active object being initialized
     */
     public void initActivity(Body body) {
-        ProActiveObject.setImmediateService("getNodes");
-        ProActiveObject.setImmediateService("terminate");
+        PAActiveObject.setImmediateService("getNodes");
+        PAActiveObject.setImmediateService("terminate");
     }
 
     /**
@@ -259,7 +259,7 @@ public class TaskLauncher implements InitActive {
      */
     public NodeSet getNodes() throws NodeException {
         Collection<Node> nodes = new ArrayList<Node>();
-        nodes.add(ProActiveObject.getNode());
+        nodes.add(PAActiveObject.getNode());
 
         return new NodeSet(new ArrayList<Node>(nodes));
     }
@@ -269,6 +269,6 @@ public class TaskLauncher implements InitActive {
      * In fact it will terminate the launcher.
      */
     public void terminate() {
-        ProActiveObject.terminateActiveObject(true);
+        PAActiveObject.terminateActiveObject(true);
     }
 }

@@ -42,8 +42,8 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.jdom.Element;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.benchmarks.timit.config.Benchmark;
 import org.objectweb.proactive.benchmarks.timit.config.ConfigChart;
 import org.objectweb.proactive.benchmarks.timit.config.ConfigReader;
@@ -192,7 +192,7 @@ public class TimIt {
      */
     private static void createTimItReductor() {
         try {
-            TimIt.timitReductor = (TimItReductor) ProActiveObject.newActive(TimItReductor.class.getName(),
+            TimIt.timitReductor = (TimItReductor) PAActiveObject.newActive(TimItReductor.class.getName(),
                     new Object[] {  });
             TimItManager.getInstance().setTimitReductor(TimIt.timitReductor);
         } catch (ActiveObjectCreationException e) {
@@ -307,7 +307,7 @@ public class TimIt {
                         bstats = TimIt.timitReductor.getStatistics();
                         TimIt.timitReductor.clean();
                         TimItReductor.ready();
-                        ProFuture.waitFor(bstats);
+                        PAFuture.waitFor(bstats);
 
                         if (TimIt.timeoutError) {
                             TimIt.totalTimeoutErrors++;

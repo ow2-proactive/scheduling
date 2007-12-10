@@ -41,8 +41,8 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.api.ProActiveObject;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -99,7 +99,7 @@ public class VNActivator implements Serializable, RunActive,
     }
 
     public void initActivity(Body body) {
-        ProActiveObject.setImmediateService("nodeCreated");
+        PAActiveObject.setImmediateService("nodeCreated");
 
         slaveIDLock = new Object();
         AOCreators = Executors.newFixedThreadPool(concurrency);
@@ -117,7 +117,7 @@ public class VNActivator implements Serializable, RunActive,
             ProActiveDescriptor pad;
 
             try {
-                pad = ProDeployment.getProactiveDescriptor(descriptor);
+                pad = PADeployment.getProactiveDescriptor(descriptor);
                 logger.debug("Loaded Descriptor: " +
                     pad.getProActiveDescriptorURL());
 
@@ -144,7 +144,7 @@ public class VNActivator implements Serializable, RunActive,
                 for (VirtualNode vn : virtualNodes) {
                     logger.info("Activating Virtual Node " + vn.getName() +
                         " from " + pad.getProActiveDescriptorURL());
-                    ((VirtualNodeImpl) vn).addNodeCreationEventListener((NodeCreationEventListener) ProActiveObject.getStubOnThis());
+                    ((VirtualNodeImpl) vn).addNodeCreationEventListener((NodeCreationEventListener) PAActiveObject.getStubOnThis());
                     vn.activate();
 
                     try {
@@ -195,7 +195,7 @@ public class VNActivator implements Serializable, RunActive,
                 logger.info("Creating Active Object on " + nodeUrl);
 
                 // CHANGEME: Create your active object here !
-                CPUBurner ao = (CPUBurner) ProActiveObject.newActive(CPUBurner.class.getName(),
+                CPUBurner ao = (CPUBurner) PAActiveObject.newActive(CPUBurner.class.getName(),
                         new Object[] { new IntWrapper(slaveID), manager }, node);
 
                 logger.info("Created Active Object on " + nodeUrl);

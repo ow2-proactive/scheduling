@@ -34,7 +34,7 @@ import java.io.File;
 import java.net.URI;
 
 import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.api.ProFuture;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.NodeSet;
@@ -99,7 +99,7 @@ public class TestIMProxy {
             //			verif = new SelectionScript(url);
             //			Get At Most 3 nodes not on fiacre (but there is only 2 nodes corresponding"
             nodes = proxy.getAtMostNodes(2, verif);
-            ProFuture.waitFor(nodes);
+            PAFuture.waitFor(nodes);
 
             if (!nodes.isEmpty()) {
                 System.err.println("nodes obtained = " + nodes.size());
@@ -107,7 +107,7 @@ public class TestIMProxy {
                 for (Node n : nodes)
                     System.err.println(n.getNodeInformation().getURL());
 
-                ProFuture.waitFor(nodes);
+                PAFuture.waitFor(nodes);
                 System.err.println("Free nodes = " +
                     proxy.getNumberOfFreeResource());
 
