@@ -214,7 +214,7 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
 
     /**
      * Sets the parameters of the class to start with the given value for the target JVMProcess
-     * @param parameters Paramaters to be given in order to start the class
+     * @param parameters Parameters to be given in order to start the class
      */
     public void setParameters(String parameters) {
         checkStarted();
@@ -231,7 +231,7 @@ public class SSHJVMProcess extends SSHProcess implements JVMProcess {
 
     /**
      * Sets the parameters of the jvm to start with the given parameters for the target JVMProcess
-     * @param parameters Paramaters to be given in order to start the jvm
+     * @param parameters Parameters to be given in order to start the jvm
      */
     public void setJvmOptions(String parameters) {
         jvmProcess.setJvmOptions(parameters);
