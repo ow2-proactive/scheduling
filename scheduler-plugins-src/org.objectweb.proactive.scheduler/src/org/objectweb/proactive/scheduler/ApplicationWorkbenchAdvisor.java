@@ -56,6 +56,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     }
 
     public String getInitialWindowPerspectiveId() {
-        return "org.objectweb.proactive.extra.scheduler.gui.perspective.SchedulerPerspective"; //MonitoringPerspective.ID /*DefaultPerspective.ID*/;
+        return "org.objectweb.proactive.extensions.scheduler.gui.SchedulerPerspective"; //MonitoringPerspective.ID /*DefaultPerspective.ID*/;
     }
 }
