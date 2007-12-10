@@ -104,9 +104,9 @@ public class ComponentParametersControllerImpl
     }
 
     /*
-     * used in the ProActiveComponentRepresentativeFactory.create[NF]ComponentRepresentative 
+     * used in the ProActiveComponentRepresentativeFactory.create[NF]ComponentRepresentative
      * to set the getComponentParameters method as an immediate service
-     * 
+     *
      * return int for synchronous call
      */
     public int setImmediateServices() {
@@ -115,7 +115,7 @@ public class ComponentParametersControllerImpl
     }
 
     /*
-     * used in the ProActiveComponentRepresentativeFactory.create[NF]ComponentRepresentative 
+     * used in the ProActiveComponentRepresentativeFactory.create[NF]ComponentRepresentative
      * to remove the getComponentParameters method as an immediate service
      * return int for synchronous call
      */
