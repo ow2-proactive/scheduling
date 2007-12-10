@@ -70,11 +70,11 @@ public class URIBuilder {
      */
     public static URI checkURI(String url) throws URISyntaxException {
         URI u = new URI(url);
+
         String hostname;
         try {
             hostname = fromLocalhostToHostname(u.getHost());
-            URI u2 = new URI(u.getScheme(), null, hostname, u.getPort(),
-                    u.getPath(), u.getQuery(), u.getFragment());
+            URI u2 = buildURI(hostname, u.getPath(), u.getScheme(), u.getPort());
             return u2;
         } catch (UnknownHostException e) {
             throw new URISyntaxException(url, "host unknow");
@@ -184,16 +184,17 @@ public class URIBuilder {
      * @return an Url built from properties
      */
     public static URI buildURIFromProperties(String host, String name) {
-        String port = null;
+        int port = -1;
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
-        if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
-                protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            port = PAProperties.PA_RMI_PORT.getValue();
+        try {
+            // ok, awful hack but ensures that the factory for the given
+            // protocol has effectively been loaded by the classloader
+            // and that the initialization process has been performed
+            port = RemoteObjectHelper.getDefaultPortForProtocol(protocol);
+        } catch (UnknownProtocolException e) {
+            logger.debug(e.getMessage());
         }
-        if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
-            port = PAProperties.PA_XMLHTTP_PORT.getValue();
-        }
-        if (port == null) {
+        if (port == -1) {
             return buildURI(host, name, protocol);
         } else {
             return buildURI(host, name, protocol, new Integer(port).intValue());
