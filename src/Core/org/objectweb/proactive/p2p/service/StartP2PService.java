@@ -40,6 +40,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Job;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
@@ -58,6 +59,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  *
  * Created on Jan 4, 2005
  */
+@PublicAPI
 public class StartP2PService implements P2PConstants {
     // TODO Disable node sharing when starting a p2p sevice
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_STARTSERVICE);

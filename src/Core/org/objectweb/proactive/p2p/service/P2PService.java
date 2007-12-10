@@ -42,6 +42,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.Service;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.core.Constants;
@@ -75,6 +76,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * @author Alexandre di Costanzo
  *
  */
+@PublicAPI
 public class P2PService implements InitActive, P2PConstants, Serializable,
     ProActiveInternalObject {
 
