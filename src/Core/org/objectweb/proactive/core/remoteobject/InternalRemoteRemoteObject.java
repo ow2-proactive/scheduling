@@ -50,13 +50,12 @@ import org.objectweb.proactive.core.security.SecurityEntity;
 public interface InternalRemoteRemoteObject extends RemoteRemoteObject,
     SecurityEntity {
 
-
-	/**
-	 * @return returns the URI where its protocol dependant remote object is bound
-	 * @throws ProActiveException
-	 * @throws IOException
-	 */
-	public URI getURI() throws ProActiveException, IOException;
+    /**
+     * @return returns the URI where its protocol dependant remote object is bound
+     * @throws ProActiveException
+     * @throws IOException
+     */
+    public URI getURI() throws ProActiveException, IOException;
 
     /**
      * @param uri sets the URI where  its protocol dependant remote object is bound
