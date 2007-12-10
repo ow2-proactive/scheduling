@@ -3292,13 +3292,4 @@ public class ProActive {
     public static void exitFailure() {
         System.exit(1);
     }
-
-    /**
-     * Returns the version number
-     *
-     * XXX: PROACTIVE-102
-     */
-    public static String getProActiveVersion() {
-        return Main.getProActiveVersion();
-    }
 }
