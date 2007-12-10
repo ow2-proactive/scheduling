@@ -30,11 +30,6 @@
  */
 package doc;
 
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.helpers.DefaultHandler;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -43,13 +38,17 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.ext.LexicalHandler;
+import org.xml.sax.helpers.DefaultHandler;
 
 
 /** This works this way:
@@ -68,12 +67,11 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
     private String language = ""; // when storing programlisting, the language in which the code is written
 
     /** An association between 'language' ==> 'highlighter for language' */
-    private Map languageHighlighters = new HashMap(); // type is <String => LanguageToDocBook> 
-
+    private Map<String, LanguageToDocBook> languageHighlighters = new HashMap<String, LanguageToDocBook>(); 
     /** fields needed to know where to add the source code at the end of the docbook xml */
-    private Vector listOFids = null; // type is <String> Vector
-    private HashMap srcContentsToAdd = new HashMap(); // type is String ==> StringBuffer
-    private Vector srcFilesAlreadyAdded = new Vector(); // type is <String> Vector 
+    private Vector<String> listOFids = null;
+    private HashMap<String, String> srcContentsToAdd = new HashMap<String, String>();
+    private Vector<String> srcFilesAlreadyAdded = new Vector<String>(); 
 
     /** @param fileName The name of the XML file which should have its <screen> tags decorated
      * @param path The paths on which to find the files to include in the docbook */
@@ -309,7 +307,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
 
         if ("srcCodeAppendix".equals(id)) {
             assert this.listOFids == null : "Hey, listOfIds should have been null, meaning 'not yet found srcCodeAppendix'";
-            this.listOFids = new Vector(); // used to avoid searching in srcContentsToAdd too often.
+            this.listOFids = new Vector<String>(); // used to avoid searching in srcContentsToAdd too often.
         }
 
         if (this.listOFids != null) {

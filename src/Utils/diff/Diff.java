@@ -78,7 +78,7 @@ public class Diff {
         an edit script, if desired.
      */
     public Diff(Object[] a, Object[] b) {
-        Hashtable h = new Hashtable(a.length + b.length);
+        Hashtable<Object, Integer> h = new Hashtable<Object, Integer>(a.length + b.length);
         filevec[0] = new file_data(a, h);
         filevec[1] = new file_data(b, h);
     }
@@ -350,7 +350,7 @@ public class Diff {
             /* Find a point of correspondence in the middle of the files.  */
             int d = diag(xoff, xlim, yoff, ylim);
             int c = cost;
-            int f = fdiag[fdiagoff + d];
+//            int f = fdiag[fdiagoff + d];
             int b = bdiag[bdiagoff + d];
 
             if (c == 1) {
@@ -786,7 +786,7 @@ public class Diff {
             nondiscarded_lines = j;
         }
 
-        file_data(Object[] data, Hashtable h) {
+        file_data(Object[] data, Hashtable<Object, Integer> h) {
             buffered_lines = data.length;
 
             equivs = new int[buffered_lines];
