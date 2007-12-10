@@ -80,6 +80,7 @@ import org.objectweb.proactive.ic2d.security.core.KeystoreFile;
 import org.objectweb.proactive.ic2d.security.core.KeystoreUtils;
 import org.objectweb.proactive.ic2d.security.widgets.CertificateDetailsSection;
 import org.objectweb.proactive.ic2d.security.widgets.CertificateTreeListSection;
+import org.objectweb.proactive.ic2d.security.widgets.PasswordDialog;
 
 
 public class KeystoreTab extends UpdatableTab {
@@ -90,8 +91,8 @@ public class KeystoreTab extends UpdatableTab {
     protected Tree keystoreTree;
     protected CertificateTreeListSection activeKeystoreSection;
     protected CertificateDetailsSection certDetailsSection;
-    protected Text passwordText;
 
+    //  protected Text passwordText;
     public KeystoreTab(CTabFolder folder, CertificateTreeList keystore,
         FormToolkit tk) {
         super(folder, SWT.NULL);
@@ -130,12 +131,11 @@ public class KeystoreTab extends UpdatableTab {
         createButtonSave(client)
             .setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        this.toolkit.createLabel(client, "Keystore Password :");
+        //this.toolkit.createLabel(client, "Keystore Password :");
 
-        this.passwordText = this.toolkit.createText(client, "");
-        this.passwordText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
-                false));
-
+        //this.passwordText = this.toolkit.createText(client, "");
+        //this.passwordText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
+        //        false));
         return client;
     }
 
@@ -146,14 +146,12 @@ public class KeystoreTab extends UpdatableTab {
                 @Override
                 public void mouseUp(MouseEvent e) {
                     FileDialog fd = new FileDialog(new Shell(), SWT.OPEN);
-                    fd.setText("Open keystore");
+                    fd.setText("Open a keystore");
                     fd.setFilterExtensions(new String[] { "*.p12", "*.crt", "*.*" });
                     String name = fd.open();
                     try {
                         KeystoreTab.this.keystoreFileList.add(new KeystoreFile(
-                                name,
-                                KeystoreUtils.loadKeystore(name,
-                                    KeystoreTab.this.passwordText.getText())));
+                                name, KeystoreUtils.loadKeystore(name, "ha")));
                     } catch (NoSuchAlgorithmException e1) {
                         e1.printStackTrace();
                     } catch (CertificateException e1) {
@@ -197,12 +195,11 @@ public class KeystoreTab extends UpdatableTab {
                     Map<CertificateTree, Boolean> keepPrivateKeyMap = getSelected();
 
                     FileDialog fd = new FileDialog(new Shell(), SWT.SAVE);
-                    fd.setText("Save active Keystore");
+                    fd.setText("Save the active keystore as");
                     fd.setFilterExtensions(new String[] { "*.p12", "*.crt", "*.*" });
                     String name = fd.open();
                     try {
-                        KeystoreUtils.saveKeystore(name,
-                            KeystoreTab.this.passwordText.getText(),
+                        KeystoreUtils.saveKeystore(name, "ha",
                             KeystoreTab.this.activeKeystore, keepPrivateKeyMap);
                     } catch (FileNotFoundException fnfe) {
                         fnfe.printStackTrace();
