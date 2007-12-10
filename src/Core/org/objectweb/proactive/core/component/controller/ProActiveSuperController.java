@@ -36,13 +36,24 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Implementation of the {@link org.objectweb.fractal.api.control.SuperController} interface
+ * Implementation of the {@link org.objectweb.fractal.api.control.SuperController} interface.
  *
  * @author Matthieu Morel
  */
 @PublicAPI
 public interface ProActiveSuperController extends SuperController {
+
+    /**
+     * Add a parent component.
+     *
+     * @param parent
+     */
     public abstract void addParent(final Component parent);
 
+    /**
+     * Remove a parent component.
+     *
+     * @param parent
+     */
     public abstract void removeParent(final Component parent);
 }

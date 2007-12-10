@@ -41,8 +41,19 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
 
 /**
  * <p>This enumeration defines the various dispatch modes available for
- * parameters. The CUSTOM mode indicates that the dispatch mode is given as a
- * parameter, as a class signature.</p>
+ * parameters. The available dispatch mode are:
+ * <ul>
+ * <li>BROADCAST is the default dispatch mode. All parameters are send to all
+ * bounded server interfaces.</li>
+ * <li>ONE_TO_ONE dispatch sends the i<sup>th</sup> member of a List arguments
+ * to i<sup>th</sup>connected server interface. The length of the List argument
+ * and the number of bounded server interface must be the same.</li>
+ * <li>ROUND_ROBIN sends the i/n<sup>th</sup> member of a List arguments
+ * to n<sup>th</sup>connected server interface.</li>
+ * <li> The CUSTOM mode indicates that the dispatch mode is given as a
+ * parameter, as a class signature.</li>
+ * </ul>
+ * </p>
  * <p>It also provides an implementation of the "strategy" pattern: it implements the methods of
  * the <code>ParamDispatch</code> interface depending on the selected mode.
  *
@@ -50,14 +61,31 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
  *
  */
 @PublicAPI
-public enum ParamDispatchMode implements ParamDispatch, Serializable {BROADCAST,
+public enum ParamDispatchMode implements ParamDispatch, Serializable {
+    /**
+    * The default dispatch mode. All parameters are send to all
+    * bounded server interfaces.
+    */
+    BROADCAST,
+    /**
+    * Sends the i<sup>th</sup> member of a List arguments
+    * to i<sup>th</sup>connected server interface. The length of the List argument
+    * and the number of bounded server interface must be the same.
+    */
     ONE_TO_ONE,
+    /**
+    * Sends the i/n<sup>th</sup> member of a List arguments
+    * to n<sup>th</sup>connected server interface.
+    */
     ROUND_ROBIN,
+    /**
+    * The dispatch mode is given as a
+    * parameter, as a class signature.
+    */
     CUSTOM;
-
     /*
      *
-     * @see org.objectweb.proactive.core.component.type.annotations.ParametersDispatch#dispatch(java.util.List, int, int)
+     * @see org.objectweb.proactive.core.component.type.annotations.multicast.ParametersDispatch#dispatch(java.lang.Object, int)
      */
     private List<Object> dispatch(List<?> inputParameter, int nbOutputReceivers)
         throws ParameterDispatchException {

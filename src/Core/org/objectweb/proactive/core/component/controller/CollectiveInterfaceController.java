@@ -42,6 +42,14 @@ import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
  */
 @PublicAPI
 public interface CollectiveInterfaceController {
+
+    /**
+     * Ensure the type compatibility between <code>itfType</code> type and interface <code>itf</code>.
+     *
+     * @param itfType an interface type
+     * @param itf a component interface
+     * @throws org.objectweb.fractal.api.control.IllegalBindingException
+     */
     public void ensureCompatibility(ProActiveInterfaceType itfType,
         ProActiveInterface itf)
         throws org.objectweb.fractal.api.control.IllegalBindingException;

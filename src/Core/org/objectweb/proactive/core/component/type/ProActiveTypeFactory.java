@@ -51,7 +51,7 @@ public interface ProActiveTypeFactory extends TypeFactory {
     public static final String GATHER_CARDINALITY = "gathercast";
 
     /**
-     * Creates an interface type.
+     * Creates an interface type with a particular cardinality.
      *
      * @param name the name of interfaces of this type (see {@link
      *       InterfaceType#getFcItfName getFcItfName}).

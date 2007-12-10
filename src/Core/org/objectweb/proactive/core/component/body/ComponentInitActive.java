@@ -45,7 +45,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public interface ComponentInitActive extends ComponentActive {
 
     /**
-     * See @see org.objectweb.proactive.InitActive#initActivity(Body)
+     * @see org.objectweb.proactive.InitActive#initActivity(Body)
      */
     public void initComponentActivity(Body body);
 }

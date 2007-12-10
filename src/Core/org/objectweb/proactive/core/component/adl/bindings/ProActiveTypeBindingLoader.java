@@ -42,7 +42,7 @@ import org.objectweb.fractal.adl.bindings.BindingContainer;
 import org.objectweb.fractal.adl.bindings.TypeBindingLoader;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.types.TypeInterface;
-import org.objectweb.proactive.core.component.adl.types.ProActiveTypeInterface;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 /**
@@ -84,7 +84,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
                 //            	Class<?> serverSideItfClass = Class<?>.forName(sItf.getSignature());
                 if (!clientSideItfClass.isAssignableFrom(serverSideItfClass)) {
                     // check if multicast interface
-                    if (ProActiveTypeInterface.MULTICAST_CARDINALITY.equals(
+                    if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(
                                 cItf.getCardinality())) {
                         Method[] clientSideItfMethods = clientSideItfClass.getMethods();
                         Method[] serverSideItfMethods = serverSideItfClass.getMethods();

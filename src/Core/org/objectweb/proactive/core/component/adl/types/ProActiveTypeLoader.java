@@ -38,6 +38,7 @@ import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.types.TypeInterface;
 import org.objectweb.fractal.adl.types.TypeLoader;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 /**
@@ -91,9 +92,9 @@ public class ProActiveTypeLoader extends TypeLoader {
                     if (!cardinality.equals("singleton") &&
                             !cardinality.equals("collection") &&
                             !cardinality.equals(
-                                ProActiveTypeInterface.MULTICAST_CARDINALITY) &&
+                                ProActiveTypeFactory.MULTICAST_CARDINALITY) &&
                             !cardinality.equals(
-                                ProActiveTypeInterface.GATHER_CARDINALITY)) {
+                                ProActiveTypeFactory.GATHER_CARDINALITY)) {
                         throw new ADLException("Invalid cardinality '" +
                             cardinality + "'", (Node) itf);
                     }

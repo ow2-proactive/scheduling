@@ -41,22 +41,33 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * of primitive components.<br>
  * This implies that method invocations will return groups of results, and this has to be known
  * in advance.
+ * The cardinality of a VirtualNode is used to know if a composition of VirtualNode is possible.
  *
  * @author Matthieu Morel
  */
 @PublicAPI
 public interface VirtualNode extends org.objectweb.fractal.adl.nodes.VirtualNode {
+
+    /**
+     * A virtual node with a single cardinality contains only one real node.
+     */
     public static String SINGLE = "single";
+
+    /**
+     * A virtual node with a single cardinality can contain many real node.
+     */
     public static String MULTIPLE = "multiple";
 
     /**
-     * getter for the cardinality
+     * Getter for the cardinality.
+     *
      * @return the cardinality of the virtual node
      */
     String getCardinality();
 
     /**
-     * setter for the cardinality
+     * Setter for the cardinality.
+     *
      * @param cardinality the cardinality of the virtual node
      */
     void setCardinality(String cardinality);

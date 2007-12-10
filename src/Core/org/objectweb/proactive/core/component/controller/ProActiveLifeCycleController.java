@@ -40,14 +40,27 @@ import org.objectweb.proactive.annotation.PublicAPI;
  *<p>
  * (Under development)
  * </p>
+ *
+ * @see org.objectweb.fractal.api.control.LifeCycleController
+ *
  * @author Matthieu Morel
  *
  */
 @PublicAPI
 public interface ProActiveLifeCycleController extends LifeCycleController {
+
+    /**
+     * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
+     */
     public String getFcState(short priority);
 
+    /**
+     * @see org.objectweb.fractal.api.control.LifeCycleController#startFc()
+     */
     public void startFc(short priority);
 
+    /**
+     * @see org.objectweb.fractal.api.control.LifeCycleController#stopFc()
+     */
     public void stopFc(short priority);
 }

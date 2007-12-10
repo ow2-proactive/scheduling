@@ -49,7 +49,7 @@ import org.objectweb.fractal.adl.components.ComponentPair;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.types.TypeInterface;
-import org.objectweb.proactive.core.component.adl.types.ProActiveTypeInterface;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 public class ProActiveBindingCompiler extends BindingCompiler {
@@ -106,7 +106,7 @@ public class ProActiveBindingCompiler extends BindingCompiler {
                         for (int j = 0; j < itfs.length; j++) {
                             TypeInterface itf = (TypeInterface) itfs[j];
                             if (clientItf.equals(itf.getName())) {
-                                if (ProActiveTypeInterface.MULTICAST_CARDINALITY.equals(
+                                if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(
                                             itf.getCardinality())) {
                                     throw new NoSuchElementException(clientItf);
                                 }
@@ -118,7 +118,7 @@ public class ProActiveBindingCompiler extends BindingCompiler {
                         for (int j = 0; j < itfs.length; j++) {
                             TypeInterface itf = (TypeInterface) itfs[j];
                             if (clientItf.equals(itf.getName())) {
-                                if (ProActiveTypeInterface.MULTICAST_CARDINALITY.equals(
+                                if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(
                                             itf.getCardinality())) {
                                     throw new NoSuchElementException(clientItf);
                                 }
@@ -183,7 +183,7 @@ public class ProActiveBindingCompiler extends BindingCompiler {
         for (int j = 0; j < itfs.length; j++) {
             TypeInterface itf = (TypeInterface) itfs[j];
             if (clientItf.equals(itf.getName())) {
-                if (ProActiveTypeInterface.MULTICAST_CARDINALITY.equals(
+                if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(
                             itf.getCardinality())) {
                     // ok, this is a multicast interface => multiple bindings allowed from this interface
                     // ==> need to create several tasks
