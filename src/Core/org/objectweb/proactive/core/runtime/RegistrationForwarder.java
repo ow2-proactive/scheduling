@@ -108,7 +108,6 @@ public class RegistrationForwarder implements NotificationListener {
     private void cancelFlusher() {
         if (flusher != null) {
             flusher.cancel();
-            System.out.println("Flusher cancelled");
         }
     }
 
