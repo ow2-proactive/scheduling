@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="Security">
-  <title>ProActive Security Mechanism</title>
+  <title>Security Framework</title>
 
   <para>In order to use the Proactive Security features, you have to
   install <emphasis role="bold">the Java(TM) Cryptography Extension (JCE)
@@ -46,12 +46,12 @@
       to security.</para>
 
       <para><figure>
-          <title>A typical object graph with active objects</title>
+          <title>Setting up virtual distributed sandboxs at runtime</title>
 
           <mediaobject>
             <imageobject>
               <imagedata contentwidth="100"
-                         fileref="security_images/activeObjects.png"
+                         fileref="security_images/secureDeployment.png"
                          format="PNG" width="6in" />
             </imageobject>
           </mediaobject>
@@ -507,17 +507,133 @@
     </sect2>
   </sect1>
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   <sect1>
+    <title>How to create policy files and certificates</title>
+
+    <para>A GUI has been created to facilitate certificate generation. It is a
+    RCP plugin shipped with the IC2D tool.</para>
+
+    <para>The first screenshot presents a root certificate. Notice that the
+    certificate chain table is empty.</para>
+
+    <para><figure>
+        <title>The ProActive Certificate Generator (for oasis)</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="security_images/gui-oasis.png" format="PNG"
+                       width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure></para>
+
+    <para>The second screenshot presents a certificate generated from the
+    previous one using menu entry 'Certificate -&gt; generate a
+    sub-certificate'.</para>
+
+    <para>Notice that the certification table contains one entry and
+    Distinguished Name of the Entity ID 1 is the same as the subject DN of the
+    certificate</para>
+
+    <para><figure>
+        <title>The ProActive Certificate Generator (for proactive)</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="security_images/gui-proactive.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure></para>
+
+
+
+     <para><figure>
+        <title>The ProActive Certificate Generator (for proactive)</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="security_images/security_gui_cert_chain_edit.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure></para>
+
+ <para><figure>
+        <title>The ProActive Certificate Generator (for proactive)</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="security_images/security_gui_cert_chain_edit_activeks.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure></para>
+
+ <para><figure>
+        <title>The ProActive Certificate Generator (for proactive)</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="security_images/security_gui_ks_edit.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure></para>
+
+
+ <para><figure>
+        <title>The ProActive Certificate Generator (for proactive)</title>
+
+        <mediaobject>
+          <imageobject>
+            <imagedata contentwidth="100"
+                       fileref="security_images/security_gui_rule_edit.png"
+                       format="PNG" width="6in" />
+          </imageobject>
+        </mediaobject>
+      </figure></para>
+
+
+    <para>Using this GUI, a user is able to generate a certificate and if
+    needed a certificate chain.</para>
+
+    <para>Certificates are saved under a PKCS12 format (extension .p12). This
+    format is natively supported by the ProActive Security mechanism.</para>
+  </sect1>
+
+ <sect1>
     <title>Activating security mechanism</title>
 
     <para>Within the deployment descriptor, the tag &lt;security&gt; is used
     to specify the policy for the deployed application. It will be the policy
-    for all Nodes and Active Objects that will be created. Below is a fragment
+    by all the Nodes and the Active Objects that will be created. Below is a fragment
     of a sample deployment descriptor:</para>
 
     <screen>
  2:&lt;ProActiveDescriptor xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'  xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;
- 3: &lt;security file='../../descriptors/security/applicationPolicy.xml'&gt;&lt;/security&gt;
+ 3: &lt;security&gt;
+          &lt;file uri='../../descriptors/security/applicationPolicy.xml'/&gt;
+    &lt;/security&gt;
  4: &lt;componentDefinition&gt;
  5:   &lt;virtualNodesDefinition&gt;
  6:   &lt;virtualNode name='Locale' property='unique'/&gt;
@@ -541,6 +657,13 @@
  84: &lt;/processDefinition&gt;
  ....</screen>
 
+</sect1>
+
+
+
+ <sect1>
+    <title>The XML Security Descriptor in details</title>
+ 
     <para>Inside the policy file, you can express policy between entities
     (domain, runtime, node, active object).</para>
 
@@ -572,14 +695,17 @@
       <para>&lt;ApplicationName&gt; sets the application name. This allows
       easy identification of which application an entity belongs to.</para>
 
-      <screen> 4: &lt;Certificate&gt;/.../appli.cert&lt;/Certificate&gt;
- 5: &lt;PrivateKey&gt;/.../appli.key&lt;/PrivateKey&gt;</screen>
+      <screen> 4: &lt;PKCS12KeyStore&gt;/.../appli.cert&lt;/PKCS12KeyStore&gt;
+      </screen>
 
-      <para>&lt;Certificate&gt; is the X509 certificate of the application,
-      generated from a user certificate, and</para>
-
-      <para>&lt;PrivateKey&gt; the private key associated to the
-      certificate.</para>
+      <para>&lt;PKCS12KeyStore&gt; describes the path to the keystore created
+      using the graphical interface. The path could be either absolute or
+      relative. An absolute path contains the whole path (starting with / under
+      Unix systems or a letter under Windows systems). A relative path
+      describes the path to follow from the policy file in order to find the
+      keystore file. For instance, setting just the name of the keystore file
+      indicates that the file is located under the same directory the policy
+      file is.</para>
 
       <screen> 6: &lt;CertificationAuthority&gt;
  7: &lt;Certificate&gt;/.../ca.cert&lt;/Certificate&gt;
@@ -774,50 +900,10 @@
     </sect2>
   </sect1>
 
-  <sect1>
-    <title>How to quickly generate certificate?</title>
 
-    <para>A GUI has been created to facilitate certificate generation.</para>
 
-    <para>The first screenshot presents a root certificate. Notice that the
-    certificate chain table is empty.</para>
 
-    <para><figure>
-        <title>The ProActive Certificate Generator (for oasis)</title>
 
-        <mediaobject>
-          <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="security_images/gui-oasis.png" format="PNG"
-                       width="6in" />
-          </imageobject>
-        </mediaobject>
-      </figure></para>
 
-    <para>The second screenshot presents a certificate generated from the
-    previous one using menu entry 'Certificate -&gt; generate a
-    sub-certificate'.</para>
 
-    <para>Notice that the certification table contains one entry and
-    Distinguished Name of the Entity ID 1 is the same as the subject DN of the
-    certificate</para>
-
-    <para><figure>
-        <title>The ProActive Certificate Generator (for proactive)</title>
-
-        <mediaobject>
-          <imageobject>
-            <imagedata contentwidth="100"
-                       fileref="security_images/gui-proactive.png"
-                       format="PNG" width="6in" />
-          </imageobject>
-        </mediaobject>
-      </figure></para>
-
-    <para>Using this GUI, a user is able to generate a certificate and if
-    needed a certificate chain.</para>
-
-    <para>Certificates are saved under a PKCS12 format (extension .p12). This
-    format is natively supported by the ProActive Security mechanism.</para>
-  </sect1>
 </chapter>
