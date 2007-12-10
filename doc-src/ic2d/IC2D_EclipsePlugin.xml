@@ -561,6 +561,493 @@
 
 		</sect2><!-- The Job Monitoring plugin -->
 
+		<!-- ******************************************************************************** -->
+
+		<sect2><!-- The TimIt for IC2D plugin -->
+
+			<title>The TimIt plugin</title>
+
+			<para>
+				The TimIt plugin for IC2D provides the ability to
+				<emphasis role="bold">profile</emphasis>
+				a distributed application in
+				<emphasis role="bold">real time</emphasis>
+				.
+			</para>
+
+			<para>
+				The activation of profiling is done through a
+				<emphasis role="bold">TimItTechnicalService</emphasis>
+				attached to the virtual node that contains active
+				objects the user want to profile.
+				<para>
+					In your deployement descriptor you have to declare
+					the technical service :
+					<programlisting lang="xml">
+						<![CDATA[
+						 <technicalServices>
+						     <technicalServiceDefinition id="profile" class="org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalService">
+							      <arg name="timitActivation" value="all"/>          
+							      <arg name="reduceResults" value="false"/>
+							      <arg name="printOutput" value="false"/>     
+						     </technicalServiceDefinition>
+						 </technicalServices>]]>
+					</programlisting>
+				</para>
+				<para>
+					Then use the defined id in the virtualNode
+					definition :
+					<programlisting lang="xml">
+						<![CDATA[
+						<virtualNodesDefinition>
+							<virtualNode name="Workers" technicalServiceId="profile"/>
+						</virtualNodesDefinition>]]>
+					</programlisting>
+				</para>
+			</para>
+
+			<para>
+				As shown in <xref linkend="timit-context-menu" /> the user can collect some usefull information from
+				active objects during the execution time to analyse the
+				application
+				<emphasis role="bold">performance</emphasis>
+				.
+				<para>
+					<figure id="timit-context-menu">
+						<title>
+							Gathering stats (right-click in Monitoring View).
+						</title>
+						<mediaobject>
+							<imageobject>
+								<imagedata
+									fileref="ic2d/images/timit/timit-context-menu.png" format="PNG" />
+							</imageobject>
+						</mediaobject>
+					</figure>
+				</para>
+			</para>
+
+			<para>
+				For that, 3 views are available.
+				<!-- TimIt Main View -->
+				<sect3>
+					<para>
+						<emphasis role="bold">TimIt Main View</emphasis>
+						<para>
+							The main view shown in
+							<xref linkend="timit-main-view" />
+							is composed of bar charts (one chart per
+							active object). Each chart represents
+							cumulated times of different states that the
+							active object has been in.
+						</para>
+					</para>
+					<para>
+						<figure id="timit-main-view">
+							<title>
+								Time snapshots for 2 active objects
+							</title>
+							<mediaobject>
+								<imageobject>
+									<imagedata
+										fileref="ic2d/images/timit/timit-main-view.png" format="PNG" />
+								</imageobject>
+							</mediaobject>
+						</figure>
+					</para>
+				</sect3>
+				<!-- TimIt Tree View -->
+				<sect3>
+					<para>
+						<emphasis role="bold">TimIt Tree View</emphasis>
+						<para>
+							The tree view shown in
+							<xref linkend="timit-tree-view" />
+							allows a more detailed hierarchical
+							decomposition view of the total time for a
+							particular active object.
+						</para>
+						<!--  HIERARCHICAL DECOMPOSITION DESCRIPTION -->
+
+						<para>
+							<para>
+								Suppose that your active object class is
+								:
+								<programlisting lang="java">
+									<![CDATA[
+	package org.objectweb.user.example;
+
+	public class ActiveObjectClass{
+		public ActiveObjectClass(){}
+
+		public void methodA(Integer i, Double d){}
+
+		private void methodB(){}
+
+		protected void methodC(){}
+	}]]>
+								</programlisting>
+							</para>
+							<para>
+								The hierarchical time decomposition
+								includes times of user active object
+								class methods (that must be public and
+								non-final) served as requests (ie called
+								by other active objects).
+							</para>
+							<itemizedlist>
+								<!-- Total -->
+								<listitem>
+									<emphasis role="bold">
+										Total
+									</emphasis>
+									<para>
+										The total time since the
+										creation of the active object.
+									</para>
+									<itemizedlist>
+										<!-- WaitForRequest -->
+										<listitem>
+											<para>
+												<emphasis role="bold">
+													WaitForRequest
+												</emphasis>
+												<para>
+													The time spent on
+													waiting for
+													requests.
+												</para>
+											</para>
+										</listitem>
+										<!-- Serve -->
+										<listitem>
+											<para>
+												<emphasis role="bold">
+													Serve
+												</emphasis>
+												<para>
+													The time spent on
+													serving incoming
+													requests.
+												</para>
+												<itemizedlist>
+													<!-- org.objectweb.user.example.ActiveObjectClass.methodA(Integer, Double) -->
+													<listitem>
+														<para>
+															<emphasis
+																role="bold">
+																org.objectweb.user.example.ActiveObjectClass.methodA(Integer,
+																Double)
+															</emphasis>
+															<para>
+																The time
+																spent on
+																serving
+																the
+																<emphasis
+																	role="bold">
+																	methodA
+																</emphasis>
+																as a
+																request
+																(local
+																calls to
+																this
+																method
+																are not
+																included).
+															</para>
+															<itemizedlist>
+																<!-- UserComputation -->
+																<listitem>
+																	<para>
+																		<emphasis
+																			role="bold">
+																			UserComputation
+																		</emphasis>
+																		<para>
+																			The
+																			time
+																			spent
+																			on
+																			computation
+																			(ie
+																			everything
+																			except
+																			communications).
+																		</para>
+																	</para>
+																</listitem>
+																<!-- SendRequest -->
+																<listitem>
+																	<para>
+																		<emphasis
+																			role="bold">
+																			SendRequest
+																		</emphasis>
+																		<para>
+																			The
+																			time
+																			spent
+																			on
+																			sending
+																			requests
+																			to
+																			other
+																			active
+																			objects.
+																		</para>
+																		<itemizedlist>
+																			<!-- BeforeSerialization -->
+																			<listitem>
+																				<para>
+																					<emphasis
+																						role="bold">
+																						BeforeSerialization
+																					</emphasis>
+																					<para>
+																						The
+																						time
+																						spent
+																						before
+																						the
+																						serialization
+																						of
+																						requests
+																						to
+																						other
+																						active
+																						objects.
+																					</para>
+																				</para>
+																			</listitem>
+																			<!-- Serialization -->
+																			<listitem>
+																				<para>
+																					<emphasis
+																						role="bold">
+																						Serialization
+																					</emphasis>
+																					<para>
+																						The
+																						time
+																						spent
+																						on
+																						serializing
+																						requests
+																						to
+																						other
+																						active
+																						objects.
+																					</para>
+																				</para>
+																			</listitem>
+																			<!-- AfterSerialization -->
+																			<listitem>
+																				<para>
+																					<emphasis
+																						role="bold">
+																						AfterSerialization
+																					</emphasis>
+																					<para>
+																						The
+																						time
+																						spent
+																						after
+																						the
+																						serialization
+																						af
+																						requests
+																						to
+																						other
+																						active
+																						objects.
+																					</para>
+																				</para>
+																			</listitem>
+																			<!-- LocalCopy -->
+																			<listitem>
+																				<para>
+																					<emphasis
+																						role="bold">
+																						LocalCopy
+																					</emphasis>
+																					<para>
+																						The
+																						time
+																						spent
+																						on
+																						copying
+																						arguments
+																						in
+																						case
+																						of
+																						communications
+																						with
+																						local
+																						active
+																						objects.
+																					</para>
+																				</para>
+																			</listitem>
+																		</itemizedlist>
+																	</para>
+																</listitem>
+																<!-- SendReply -->
+																<listitem>
+																	<para>
+																		<emphasis
+																			role="bold">
+																			SendReply
+																		</emphasis>
+																		<para>
+																			The
+																			time
+																			spent
+																			on
+																			sending
+																			replies
+																			to
+																			other
+																			active
+																			objects.
+																		</para>
+																	</para>
+																</listitem>
+																<!-- GroupOneWayCall -->
+																<listitem>
+																	<para>
+																		<emphasis
+																			role="bold">
+																			GroupOneWayCall
+																		</emphasis>
+																		<para>
+																			The
+																			time
+																			spent
+																			on
+																			performing
+																			asynchronous
+																			one
+																			way
+																			calls
+																			to
+																			groups
+																			of
+																			active
+																			objects
+																			(void
+																			methods).
+																		</para>
+																	</para>
+																</listitem>
+																<!-- GroupAsyncCall -->
+																<listitem>
+																	<para>
+																		<emphasis
+																			role="bold">
+																			GroupAsyncCall
+																		</emphasis>
+																		<para>
+																			The
+																			time
+																			spent
+																			on
+																			performing
+																			asynchronous
+																			calls
+																			to
+																			groups
+																			of
+																			active
+																			objects
+																			(non-void
+																			methods).
+																		</para>
+																	</para>
+																</listitem>
+																<!-- WaitByNecessity -->
+																<listitem>
+																	<para>
+																		<emphasis
+																			role="bold">
+																			WaitByNecessity
+																		</emphasis>
+																		<para>
+																			The
+																			time
+																			spent
+																			on
+																			waiting
+																			by
+																			necessity.
+																		</para>
+																	</para>
+																</listitem>
+															</itemizedlist>
+														</para>
+													</listitem>
+												</itemizedlist>
+											</para>
+										</listitem>
+									</itemizedlist>
+								</listitem>
+							</itemizedlist>
+						</para>
+					</para>
+					<para>
+						<figure id="timit-tree-view">
+							<title>
+								Hierarchical decomposition of the total
+								time of an active object
+							</title>
+							<mediaobject>
+								<imageobject>
+									<imagedata
+										fileref="ic2d/images/timit/timit-tree-view.png" format="PNG" />
+								</imageobject>
+							</mediaobject>
+						</figure>
+					</para>
+				</sect3>
+				<!-- TimIt Timeline View -->
+				<sect3>
+					<para>
+						<emphasis role="bold">
+							TimIt Timeline View
+						</emphasis>
+						<para>
+							The timeline view shown in
+							<xref linkend="timit-timeline-view" />
+							represents all events that were recorded
+							during a certain time-lapse. The color of
+							each event correspond to colors defined in
+							the Legend view. This view shows the
+							intensity of particular states (serving,
+							waiting for request, etc...).
+						</para>
+					</para>
+					<para>
+						<figure id="timit-timeline-view">
+							<title>
+								The timeline for 7 active objects
+							</title>
+							<mediaobject>
+								<imageobject>
+									<imagedata
+										fileref="ic2d/images/timit/timit-timeline-view.png"
+										format="PNG" />
+								</imageobject>
+							</mediaobject>
+						</figure>
+					</para>
+				</sect3>
+			</para>
+
+		</sect2><!-- The TimIt for IC2D plugin -->
+
+		<!-- ******************************************************************************** -->
+
 
 	</sect1><!-- Monitoring and Control -->
 
@@ -638,6 +1125,7 @@
 				with the same name in the virtualNodeDefinitions tag (in
 				componentDefinition).
 			</para>
+
 
 			<screen>
 				&lt;?xml version="1.0" encoding="UTF-8"?&gt;
