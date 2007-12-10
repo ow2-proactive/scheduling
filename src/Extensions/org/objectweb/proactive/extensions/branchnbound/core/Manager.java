@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.api.ProFuture;
 import org.objectweb.proactive.api.ProGroup;
@@ -63,6 +64,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.queue.TaskQueue;
  *
  * Created on May 31, 2005
  */
+@PublicAPI
 public class Manager implements Serializable, InitActive {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
     private static final boolean enableRealloc = false; // TODO turn it

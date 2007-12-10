@@ -35,6 +35,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsException;
 
 
@@ -45,6 +46,7 @@ import org.objectweb.proactive.extensions.branchnbound.core.exception.NoResultsE
  *
  * Created on May 2, 2005
  */
+@PublicAPI
 public class Result implements Serializable {
     private Object theSolution = null;
     private Exception exception = null;

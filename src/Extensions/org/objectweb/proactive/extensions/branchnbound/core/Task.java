@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.ProActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -46,6 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * Created on May 2, 2005
  */
+@PublicAPI
 public abstract class Task implements Serializable, Comparable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_MANAGER);
     protected Result initLowerBound;

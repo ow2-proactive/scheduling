@@ -32,6 +32,8 @@ package org.objectweb.proactive.extensions.branchnbound.core.exception;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * This exception is used for signaling that a <code>Result</code> containts no
@@ -41,6 +43,7 @@ import java.io.Serializable;
  *
  * Created on Nov 2, 2005
  */
+@PublicAPI
 public class NoResultsException extends Exception implements Serializable {
 
     /**
