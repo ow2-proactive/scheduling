@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.component;
 import java.io.Serializable;
 import java.util.Map;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 
@@ -55,6 +56,7 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
  *
  * @author Matthieu Morel
  */
+@PublicAPI
 public class ControllerDescription implements Serializable {
     protected String hierarchicalType;
     protected String name;
