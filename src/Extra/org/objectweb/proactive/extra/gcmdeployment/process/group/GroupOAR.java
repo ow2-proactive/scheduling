@@ -37,8 +37,6 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication
 import org.objectweb.proactive.extra.gcmdeployment.PathElement;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 
-import sun.security.action.GetBooleanAction;
-
 
 public class GroupOAR extends AbstractGroup {
     final static public int BEST = -1;

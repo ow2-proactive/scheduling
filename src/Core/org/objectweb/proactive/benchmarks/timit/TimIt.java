@@ -379,10 +379,7 @@ public class TimIt {
         message(1, "Done.");
     }
 
-    /**
-     * @deprecated
-     */
-    @Deprecated
+    @SuppressWarnings("deprecation")
     public static void threadsCleaning() {
         ThreadGroup tg = Thread.currentThread().getThreadGroup().getParent();
         Thread[] threads = new Thread[200];

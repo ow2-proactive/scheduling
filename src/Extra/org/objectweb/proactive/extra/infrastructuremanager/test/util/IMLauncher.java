@@ -32,6 +32,8 @@ package org.objectweb.proactive.extra.infrastructuremanager.test.util;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PALifeCycle;
+import org.objectweb.proactive.api.PAVersion;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extra.infrastructuremanager.IMFactory;
 import org.objectweb.proactive.extra.infrastructuremanager.frontend.IMAdmin;
@@ -95,7 +97,7 @@ public class IMLauncher {
             IMFactory.getAdmin().shutdown(false);
         } catch (Exception e) {
             e.printStackTrace();
-            ProActive.exitFailure();
+            PALifeCycle.exitFailure();
         }
     }
 }

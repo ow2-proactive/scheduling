@@ -151,7 +151,7 @@ public class SchedulerFake {
         // release nodes
         imu.freeNodes(nodes);
 
-        Category.shutdown();
+        LogManager.shutdown();
         //        System.out.println("CLOOOOOOOOOOOOOOSE");
         LogManager.shutdown();
     }

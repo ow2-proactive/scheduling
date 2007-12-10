@@ -43,6 +43,7 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -124,7 +125,7 @@ public class Main {
                 });
         } catch (ProActiveException e) {
             logger.error("Manager or VNActivator cannot be created", e);
-            ProActive.exitFailure();
+            PALifeCycle.exitFailure();
         }
     }
 

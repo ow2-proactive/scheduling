@@ -282,9 +282,10 @@ public class ProxyFile extends File {
         return getCurrent().getCanonicalFile();
     }
 
+    @Deprecated
     @Override
     public URL toURL() throws MalformedURLException {
-        return getCurrent().toURI().toURL();
+        return getCurrent().toURL();
     }
 
     @Override
