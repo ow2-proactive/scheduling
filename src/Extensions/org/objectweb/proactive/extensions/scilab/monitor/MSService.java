@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -52,12 +53,13 @@ import org.objectweb.proactive.extensions.scilab.SciTask;
 
 /**
  * This class is used to offer a set of services:
- * 1. to deploy, activate, and manage Scilab Engines over the Grid,
+ * 1. to deploy, activate, and manage Scilab or Matlab Engines over the Grid,
  * 2. to execute and kill tasks
  * 3. to retrieve results,
  * 4. to notify the user application of each event.
  * @author ProActive Team (amangin)
  */
+@PublicAPI
 public class MSService implements Serializable {
 
     /**
@@ -142,6 +144,12 @@ public class MSService implements Serializable {
         return mapNewEngine.size();
     }
 
+    /**
+     * Deploy engines over each node defined in the the file descriptor
+     * @param nameVirtualNode
+     * @param pathDescriptor
+     * @return the number of deployed engine
+     */
     public synchronized int deployEngine(String nameVirtualNode,
         String pathDescriptor) {
         long countTmp = this.countIdEngine;
@@ -158,6 +166,13 @@ public class MSService implements Serializable {
         return nbEngine;
     }
 
+    /**
+     * Deploy engines over each node defined in the the file descriptor
+     * @param nameVirtualNode
+     * @param pathDescriptor
+     * @param number of engines to deploy
+     * @return the number of deployed engine
+     */
     public synchronized int deployEngine(String nameVirtualNode,
         String pathDescriptor, int nbEngine) {
         long countTmp = this.countIdEngine;
@@ -173,7 +188,7 @@ public class MSService implements Serializable {
     }
 
     /**
-     * Put the task in a queue of pending tasks. The task will be sent when a Scilab Engine will be free.
+     * Put the task in a queue of pending tasks. The task will be sent when an engine will be free.
      * An event notify the user application of the effective sending .
      * @param sciTask
      */
@@ -189,11 +204,26 @@ public class MSService implements Serializable {
         notifyAll();
     }
 
+    /**
+     * Put the task in a queue of pending tasks. The task will be sent when an engine will be free.
+     * An event notify the user application of the effective sending. Corresponding engine will chosen depending on the file extension (Matlab or Scilab).
+     * @param scriptFile script of the file to launch
+     * @param jobInit initialization script
+     * @param dataOut array of output variables
+     */
     public synchronized void sendTask(File scriptFile, String jobInit,
         String[] dataOut) throws IOException {
         this.sendTask(scriptFile, jobInit, dataOut, GenTaskInfo.NORMAL);
     }
 
+    /**
+     * Put the task in a queue of pending tasks. The task will be sent when an engine will be free.
+     * An event notify the user application of the effective sending. Corresponding engine will chosen depending on the file extension (Matlab or Scilab).
+     * @param scriptFile script of the file to launch
+     * @param jobInit initialization script
+     * @param dataOut array of output variables
+     * @param Priority priority of the job
+     */
     public synchronized void sendTask(File scriptFile, String jobInit,
         String[] dataOut, int Priority) throws IOException {
         if (logger.isDebugEnabled()) {
@@ -218,14 +248,15 @@ public class MSService implements Serializable {
 
         for (int i = 0; i < dataOut.length; i++) {
             if (logger.isDebugEnabled()) {
-                logger.debug("->MSService :sendTask DataOut:" + dataOut[i]);
+                logger.debug("->MSService :sendTask DataOut:" +
+                    dataOut[i].trim());
             }
 
             if (dataOut[i].trim().equals("")) {
                 continue;
             }
 
-            task.addDataOut(dataOut[i]);
+            task.addDataOut(dataOut[i].trim());
         }
 
         task.setJob(scriptFile);

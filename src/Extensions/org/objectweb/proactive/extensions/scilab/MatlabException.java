@@ -30,6 +30,15 @@
  */
 package org.objectweb.proactive.extensions.scilab;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
+/**
+ * An exception arisen from Matlab
+ * @author fviale
+ *
+ */
+@PublicAPI
 public class MatlabException extends TaskException {
 
     /**
@@ -37,14 +46,27 @@ public class MatlabException extends TaskException {
      */
     private static final long serialVersionUID = -677631385223840714L;
 
+    /**
+     * exception with the given message
+     * @param message message of the exception
+     */
     public MatlabException(String message) {
         super(message);
     }
 
+    /**
+     * exception from the given cause
+     * @param cause cause of the exception
+     */
     public MatlabException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * exception from the given cause and with the given message
+     * @param message message of the exception
+     * @param cause cause of the exception
+     */
     public MatlabException(String message, Throwable cause) {
         super(message, cause);
     }

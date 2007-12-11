@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.extensions.scilab;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
+@PublicAPI
 public class TaskException extends Exception {
 
     /**

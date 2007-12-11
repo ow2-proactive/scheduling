@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -46,7 +47,10 @@ import ptolemy.matlab.Engine;
 
 /**
  * This class represents a Matlab task
+ * @author fviale
+ *
  */
+@PublicAPI
 public class MatlabTask extends AbstractGeneralTask {
     private static final long serialVersionUID = 1995967729621014754L;
     private HashMap<String, Token> listDataIn;
@@ -56,19 +60,36 @@ public class MatlabTask extends AbstractGeneralTask {
     ;
     private static long[] engineHandle;
 
+    /**
+     * Create a MAtlab task with the given id
+     * @param id
+     */
     public MatlabTask(String id) {
         super(id);
         this.listDataIn = new HashMap<String, Token>();
     }
 
+    /**
+     * Retrieve the list of input data
+     * @return list of input data
+     */
     public HashMap<String, Token> getListDataIn() {
         return listDataIn;
     }
 
+    /**
+     * set the list of input data
+     * @param listDataIn map of <name,data> pairs
+     */
     public void setListDataIn(HashMap<String, Token> listDataIn) {
         this.listDataIn = listDataIn;
     }
 
+    /**
+     * add an input data
+     * @param name name of the data
+     * @param data ptolemy Token data
+     */
     public void addDataIn(String name, Token data) {
         this.listDataIn.put(name, data);
     }
@@ -122,6 +143,9 @@ public class MatlabTask extends AbstractGeneralTask {
             }
             try {
                 matlabEngine = new Engine();
+                if (logger.isDebugEnabled()) {
+                    matlabEngine.setDebugging((byte) 2);
+                }
                 if (os.equals(OperatingSystem.unix)) {
                     engineHandle = matlabEngine.open(matlab_command +
                             " -nosplash -nodesktop -nojvm", true);

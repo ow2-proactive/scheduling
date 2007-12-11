@@ -41,6 +41,7 @@ import javasci.SciData;
 import javasci.Scilab;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -48,6 +49,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class represents a Scilab task
  */
+@PublicAPI
 public class SciTask extends AbstractGeneralTask {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_TASK);
 
@@ -64,14 +66,27 @@ public class SciTask extends AbstractGeneralTask {
         this.listDataOut = new ArrayList<String>();
     }
 
+    /**
+     * Retrieve the list of input data
+     * @return list of input data
+     */
     public ArrayList<SciData> getListDataIn() {
         return listDataIn;
     }
 
+    /**
+     * set the list of input data
+     * @param listDataIn map of <name,data> pairs
+     */
     public void setListDataIn(ArrayList<SciData> listDataIn) {
         this.listDataIn = listDataIn;
     }
 
+    /**
+     * add an input data
+     * @param name name of the data
+     * @param data ptolemy Token data
+     */
     public void addDataIn(SciData data) {
         this.listDataIn.add(data);
     }

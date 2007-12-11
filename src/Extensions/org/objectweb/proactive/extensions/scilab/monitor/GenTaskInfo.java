@@ -32,13 +32,20 @@ package org.objectweb.proactive.extensions.scilab.monitor;
 
 import java.io.File;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.scilab.GeneralResult;
 import org.objectweb.proactive.extensions.scilab.GeneralTask;
 
 
 /**
- * SciTaskInfo contains all methods to access to informations about a Scilab task
+ * SciTaskInfo contains all methods to access to informations about a Scilab/Matlab task running on the MSService
  */
+
+/**
+ * @author fviale
+ *
+ */
+@PublicAPI
 public class GenTaskInfo {
     public static final int LOW = 0;
     public static final int NORMAL = 1;
@@ -64,70 +71,137 @@ public class GenTaskInfo {
         this.dateStart = System.currentTimeMillis();
     }
 
+    /**
+     * Get the priority of this task
+     * @return
+     */
     public int getPriority() {
         return priority;
     }
 
+    /**
+     * Sets the priority of this task
+     * @param priority new priority
+     */
     public void setPriority(int priority) {
         this.priority = priority;
     }
 
+    /**
+     * retrieve the static task definition
+     * @return GeneralTask
+     */
     public GeneralTask getTask() {
         return genTask;
     }
 
+    /**
+     * Retrieves the result of this task
+     * @return a general result object
+     */
     public GeneralResult getResult() {
         return genResult;
     }
 
+    /**
+     * Sets the result of this task
+     * @param genResult the result of this task
+     */
     public void setResult(GeneralResult genResult) {
         this.genResult = genResult;
     }
 
+    /**
+     * Returns the id of this task, with regards to the MSService
+     * @return
+     */
     public String getIdTask() {
         return genTask.getId();
     }
 
+    /**
+     * Returns the state of this task
+     * @return the task state
+     */
     public int getState() {
         return state;
     }
 
+    /**
+     * Sets the state of this task
+     * @param state the new task state
+     */
     public void setState(int state) {
         this.state = state;
     }
 
+    /**
+     * Retrieves the id associated with the engine this task's being run
+     * @return engine id
+     */
     public String getIdEngine() {
         return idEngine;
     }
 
+    /**
+     * Sets the id associated with the engine this task's being run
+     * @param idEngine engine id
+     */
     public void setIdEngine(String idEngine) {
         this.idEngine = idEngine;
     }
 
+    /**
+     * Sets the date when this task was finished
+     */
     public void setDateEnd() {
         this.dateEnd = System.currentTimeMillis();
     }
 
+    /**
+     * Retrieves the global time necessary for this task to complete
+     * @return time (ms)
+     */
     public long getTimeGlobal() {
         return this.dateEnd - this.dateStart;
     }
 
+    /**
+     * Retrieves the actual computing time
+     * @return computing time (ms)
+     */
     public long getTimeExecution() {
         return this.genResult.getTimeExecution();
     }
 
+    /**
+     * Retrieves the date at which this task started
+     * @return
+     */
     public long getDateStart() {
         return dateStart;
     }
 
+    /**
+     * Retrieves the path to the script associated with this task
+     * @return
+     */
     public String getPathScript() {
         return fileScript.getAbsolutePath();
     }
 
+    /**
+     * Retrieves the file name of the script associated with this task
+     * @return
+     */
     public String getNameScript() {
         return fileScript.getName();
     }
 
+    /**
+     * Sets the script associated with this task
+     * @param fileScript
+     */
     public void setFileScript(File fileScript) {
         this.fileScript = fileScript;
     }

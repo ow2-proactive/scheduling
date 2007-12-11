@@ -157,9 +157,9 @@ public class DialogTask extends javax.swing.JDialog {
                         }
                     };
 
-                chooserScript.addChoosableFileFilter(filter_all);
                 chooserScript.addChoosableFileFilter(filter_sci);
                 chooserScript.addChoosableFileFilter(filter_mat);
+                chooserScript.addChoosableFileFilter(filter_all);
             }
 
             {

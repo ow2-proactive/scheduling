@@ -34,9 +34,17 @@ import java.io.Serializable;
 
 import javasci.SciData;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 import ptolemy.data.Token;
 
 
+/**
+ * This class encapsulate either a ptolemy token (Matlab interface to java) or a Scilab SciData
+ * @author fviale
+ *
+ */
+@PublicAPI
 public class AbstractData implements Serializable {
 
     /**
@@ -52,17 +60,30 @@ public class AbstractData implements Serializable {
     ;
     private data_type type;
 
+    /**
+     * Build an AbstractData with a Scilab data type
+     * @param data scilab data type
+     */
     public AbstractData(SciData data) {
         this.sciData = data;
         this.type = data_type.SCILAB_DATA;
     }
 
+    /**
+     * Build an AbstractData with a ptolemy Matlab data type
+     * @param name name of data
+     * @param data actual data
+     */
     public AbstractData(String name, Token data) {
         this.matName = name;
         this.matData = data;
         this.type = data_type.MATLAB_DATA;
     }
 
+    /**
+     * Retrieve the name of this data
+     * @return name
+     */
     public String getName() {
         switch (type) {
         case SCILAB_DATA:
@@ -74,6 +95,10 @@ public class AbstractData implements Serializable {
         return null;
     }
 
+    /**
+     * Retrieve the data object itself (need to be cast into appropriate type)
+     * @return data object
+     */
     public Object getData() {
         switch (type) {
         case SCILAB_DATA:

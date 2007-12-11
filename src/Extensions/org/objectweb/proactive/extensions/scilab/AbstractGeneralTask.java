@@ -36,7 +36,15 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
+
+/**
+ * Abstract class implementing GeneralTask, handles setting job from a file and variable lists
+ * @author fviale
+ *
+ */
+@PublicAPI
 public abstract class AbstractGeneralTask implements GeneralTask {
     String id;
     String job;

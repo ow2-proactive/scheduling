@@ -33,36 +33,101 @@ package org.objectweb.proactive.extensions.scilab;
 import java.io.Serializable;
 import java.util.List;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 
+
+/**
+ * This is a container for Scilab or Matlab results
+ * @author fviale
+ *
+ */
+@PublicAPI
 public interface GeneralResult extends Serializable {
     public static final int SUCCESS = 0;
     public static final int ABORT = 1;
 
+    /**
+     * Retrieve the final state of the task SUCCESS or ABORT
+     * @return state
+     */
     public abstract int getState();
 
+    /**
+     * Set the final state of the task SUCCESS or ABORT
+     * @param state new state
+     */
     public abstract void setState(int state);
 
+    /**
+     * Retrieve the total execution time of the task
+     * @return execution time
+     */
     public abstract long getTimeExecution();
 
+    /**
+     * Set the total execution time of the task
+     * @param timeExecution
+     */
     public abstract void setTimeExecution(long timeExecution);
 
+    /**
+     * Retrieve the id of the task associated to this result
+     * @return id
+     */
     public abstract String getId();
 
+    /**
+     * Add a result data to this container
+     * @param data scilab or matlab data
+     */
     public void add(AbstractData data);
 
+    /**
+     * Get the list of all data in this container
+     * @return list of data
+     */
     public List<AbstractData> getList();
 
+    /**
+     * Retrieve a data of the given name
+     * @param name name of the data (Matlab or Scilab)
+     * @return the data of the given name
+     */
     public AbstractData get(String name);
 
-    public void setException(Exception exp);
-
+    /**
+     * Set the message associated with this task
+     * @param message
+     */
     public void setMessage(String message);
 
+    /**
+     * Does the result have a message associated with it
+     * @return answer
+     */
     public boolean hasMessage();
 
+    /**
+     * Returns the message associated with this result
+     * @return message
+     */
     public String getMessage();
 
+    /**
+     * Did the task launch an exception?
+     * @return answer
+     */
     public boolean isException();
 
+    /**
+     * Return the exception thrown by the task
+     * @return exception thrown
+     */
     public Exception getException();
+
+    /**
+     * Set the exception thrown by the task
+     * @param exp
+     */
+    public void setException(Exception exp);
 }
