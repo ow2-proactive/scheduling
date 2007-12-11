@@ -93,8 +93,8 @@
     classes required to launch a ProActive runtime.</para>
 
     <para>The <emphasis role="bold">ProActive bundle offers a
-    service</emphasis> , the <emphasis>ProActiveService</emphasis> that have
-    almost the same interface that the ProActive static classe. When
+    service</emphasis> , the <emphasis>ProActiveService</emphasis> that has
+    almost the same interface that the ProActive static class. When
     installed, the ProActive bundle starts a new runtime, and clients that use
     the ProActive Service will be able to create active object on this
     runtime.</para>
@@ -121,10 +121,9 @@
   <sect1  id="OSGi_html_helloWorld">
     <title> Yet another Hello World</title>
 
-    <para>The example above is <emphasis role="bold">a simple hello world that
+    <para>The example below is <emphasis role="bold">a simple hello world that
     uses ProActive Service</emphasis> . It creates an Hello active Object and
-    register it as a service. We use the hello basic service in the ProActive
-    example. We have to write a <emphasis role="bold">bundle
+    registers it as a service. We reuse the basic hello example provided within the ProActive's examples. We have to write a <emphasis role="bold">bundle
     Activator</emphasis> that will create the active object and register it as
     a OSGi service.</para>
 
@@ -136,7 +135,7 @@
         } </programlisting>
 
     <para>The <literal>start ()</literal> method is the one executed when the
-    bundle starts. When the hello bundle start we need to get the reference on
+    bundle starts. When the hello bundle starts we need to get the reference on
     the ProActive service and use it. Once we have the reference, we can
     create our active object thanks to the
     <literal>ProActiveService.newActive()</literal> method. Finally, we
