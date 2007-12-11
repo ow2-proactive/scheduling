@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.process;
 
 import java.io.Serializable;
 
-import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 

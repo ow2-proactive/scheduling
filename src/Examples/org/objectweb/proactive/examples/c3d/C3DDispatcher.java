@@ -33,7 +33,6 @@ package org.objectweb.proactive.examples.c3d;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Vector;
@@ -51,7 +50,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
@@ -409,8 +408,9 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         try {
             PAActiveObject.register(PAActiveObject.getStubOnThis(),
-                "//" + URIBuilder.getLocalAddress().getHostName() + "/" +
-                "Dispatcher");
+                "//" +
+                ProActiveInet.getInstance().getInetAddress().getHostName() +
+                "/" + "Dispatcher");
         } catch (IOException ioe) {
             logger.error("Coudn't register the Dispatcher! " +
                 ioe.getMessage());
@@ -634,15 +634,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
     /** Find the name of the machine this Dispatcher is running on */
     public String getMachineName() {
-        String hostName = "unknown";
-
-        try {
-            hostName = URIBuilder.getLocalAddress().getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-
-        return hostName;
+        return ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /** Find the name of the OS the Dispatcher is running on */

@@ -105,7 +105,8 @@ public class MonitorNewHostDialog extends Dialog {
 
         /* Get the machine's name */
         try {
-            initialHostValue = URIBuilder.getLocalAddress().getHostName();
+            initialHostValue = ProActiveInet.getInstance().getLocal()
+                                            .getHostName();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

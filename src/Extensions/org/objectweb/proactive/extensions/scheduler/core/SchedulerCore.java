@@ -56,6 +56,7 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -172,7 +173,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             this.resourceManager = imp;
             this.frontend = frontend;
             //logger
-            host = URIBuilder.getLocalAddress().getHostName();
+            host = ProActiveInet.getInstance().getInetAddress().getHostName();
 
             try {
                 // redirect event only into JobLogs
@@ -197,9 +198,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             logger.error(
                 "The class definition cannot be found, it might be due to case sentivity : " +
                 e.getMessage());
-            throw new RuntimeException(e);
-        } catch (UnknownHostException e) {
-            logger.error("Unknown host in host creation : " + e.getMessage());
             throw new RuntimeException(e);
         }
     }

@@ -43,7 +43,7 @@ public class HelloWorld {
 	{
 		String hostname="Unkown";
 		try {
-			hostname=URIBuilder.getLocalAddress().toString();
+			hostname=ProActiveInet.getInstance().getLocal().toString();
 		}
 		catch (UnknownHostException excep){
 			//hostname will be "Unknown"

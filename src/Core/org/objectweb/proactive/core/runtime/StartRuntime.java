@@ -39,6 +39,7 @@ import org.apache.log4j.PropertyConfigurator;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -98,18 +99,15 @@ public class StartRuntime {
 
         ProActiveConfiguration.load();
 
-        try {
-            logger.info("**** Starting jvm on " +
-                URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress()));
+        logger.info("**** Starting jvm on " +
+            URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
+                                                    .getInetAddress()));
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("**** Starting jvm with classpath " +
-                    System.getProperty("java.class.path"));
-                logger.debug("****              with bootclasspath " +
-                    System.getProperty("sun.boot.class.path"));
-            }
-        } catch (java.net.UnknownHostException e) {
-            e.printStackTrace();
+        if (logger.isDebugEnabled()) {
+            logger.debug("**** Starting jvm with classpath " +
+                System.getProperty("java.class.path"));
+            logger.debug("****              with bootclasspath " +
+                System.getProperty("sun.boot.class.path"));
         }
 
         new StartRuntime(args).run();

@@ -31,6 +31,7 @@
 package functionalTests.activeobject.creation.local.turnactive;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.FunctionalTest;
@@ -55,6 +56,6 @@ public class Test extends FunctionalTest {
 
         assertTrue(name.equals("toto"));
         assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(
-                    URIBuilder.getLocalAddress())) != -1);
+                    ProActiveInet.getInstance().getInetAddress())) != -1);
     }
 }

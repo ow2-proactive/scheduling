@@ -31,11 +31,13 @@
 package org.objectweb.proactive.core.process.globus;
 
 import org.apache.log4j.Logger;
-import org.globus.gram.*;
+import org.globus.gram.Gram;
+import org.globus.gram.GramJob;
+import org.globus.gram.GramJobListener;
 import org.globus.gram.internal.GRAMConstants;
-import org.globus.io.gass.server.*;
-
-//import org.globus.security.*;
+import org.globus.io.gass.server.GassServer;
+import org.globus.io.gass.server.JobOutputListener;
+import org.globus.io.gass.server.JobOutputStream;
 import org.globus.util.deactivator.Deactivator;
 import org.gridforum.jgss.ExtendedGSSManager;
 import org.ietf.jgss.GSSCredential;

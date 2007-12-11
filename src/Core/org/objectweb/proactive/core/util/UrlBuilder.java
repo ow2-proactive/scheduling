@@ -328,7 +328,7 @@ public class UrlBuilder {
 
         String temp = "";
 
-        if (PAProperties.PA_USE_IP_ADDRESS.isTrue()) {
+        if (PAProperties.PA_NET_USE_IP_ADDRESS.isTrue()) {
             temp = (address).getHostAddress();
         } else {
             temp = address.getCanonicalHostName();
@@ -365,7 +365,8 @@ public class UrlBuilder {
             localName = "localhost";
         }
 
-        java.net.InetAddress hostInetAddress = URIBuilder.getLocalAddress();
+        java.net.InetAddress hostInetAddress = ProActiveInet.getInstance()
+                                                            .getInetAddress();
 
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {

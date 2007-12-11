@@ -26,7 +26,7 @@ public class Hello {
             Hello hello = (Hello) org.objectweb.proactive.ProActive.newActive(
                     Hello.class.getName(),
                     new Object[] { "remote" });
-            java.net.InetAddress localhost = URIBuilder.getLocalAddress();
+            java.net.InetAddress localhost = ProActiveInet.getInstance().getLocal();
             org.objectweb.proactive.api.ProActiveObject.register(hello,
                 "//" + localhost.getHostName() + "/Hello");
         } catch (Exception e) {

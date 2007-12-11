@@ -39,6 +39,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 import functionalTests.ComponentTest;
@@ -94,6 +95,6 @@ public class Test extends ComponentTest {
 
         Assert.assertEquals(name, "toto");
         Assert.assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(
-                    URIBuilder.getLocalAddress())) != -1);
+                    ProActiveInet.getInstance().getInetAddress())) != -1);
     }
 }

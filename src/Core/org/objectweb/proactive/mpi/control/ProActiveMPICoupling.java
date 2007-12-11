@@ -33,7 +33,6 @@ package org.objectweb.proactive.mpi.control;
 import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Hashtable;
 
 import org.objectweb.proactive.ActiveObjectCreationException;

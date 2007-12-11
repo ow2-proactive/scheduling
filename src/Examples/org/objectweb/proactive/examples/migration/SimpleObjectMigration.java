@@ -31,7 +31,6 @@
 package org.objectweb.proactive.examples.migration;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
@@ -41,7 +40,7 @@ import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -90,7 +89,7 @@ public class SimpleObjectMigration implements Serializable {
         logger.info("SimpleObjectMigration> sayHello()");
         String localhost = null;
         try {
-            localhost = URIBuilder.getLocalAddress().toString();
+            localhost = ProActiveInet.getInstance().getInetAddress().toString();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -201,7 +200,8 @@ public class SimpleObjectMigration implements Serializable {
         try {
             String className = SimpleObjectMigration.class.getName();
             Object[] params = new Object[] {
-                    "Created by " + URIBuilder.getLocalAddress().toString()
+                    "Created by " +
+                    ProActiveInet.getInstance().getInetAddress().toString()
                 };
 
             activeHello = (SimpleObjectMigration) PAActiveObject.newActive(className,
@@ -216,11 +216,6 @@ public class SimpleObjectMigration implements Serializable {
 
             logger.info("SimpleObjectMigration> main() > " +
                 "The simple active object said '" + helloAnswer + "'");
-        } catch (UnknownHostException e) {
-            logger.info("SimpleObjectMigration> main() > " +
-                "Exception during the creation of the active object" + " (" +
-                e.getMessage() + ")");
-            e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
             logger.info("SimpleObjectMigration> main() > " +
                 "Exception during the creation of the active object" + " (" +

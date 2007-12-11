@@ -37,6 +37,7 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAMobileAgent;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -63,7 +64,8 @@ public class Agent implements InitActive, RunActive, EndActive,
         try {
             //System.out.println("getName called");
             //return the name of the Host
-            return URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress())
+            return URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
+                                                           .getInetAddress())
                              .toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();

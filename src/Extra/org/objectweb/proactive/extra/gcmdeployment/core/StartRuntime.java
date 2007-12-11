@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -195,13 +196,9 @@ public class StartRuntime {
 
     private void start() {
         // Print some information message
-        try {
-            logger.info("Starting a ProActiveRuntime on " +
-                URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress()));
-        } catch (UnknownHostException e1) {
-            logger.error("Hostname cannot be determined", new Exception());
-            abort();
-        }
+        logger.info("Starting a ProActiveRuntime on " +
+            URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
+                                                    .getInetAddress()));
 
         if (logger.isDebugEnabled()) {
             logger.debug("**** Starting jvm with classpath " +

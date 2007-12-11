@@ -34,7 +34,11 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
-import org.objectweb.proactive.core.event.*;
+import org.objectweb.proactive.core.event.AbstractEventProducer;
+import org.objectweb.proactive.core.event.ProActiveEvent;
+import org.objectweb.proactive.core.event.ProActiveListener;
+import org.objectweb.proactive.core.event.RequestQueueEvent;
+import org.objectweb.proactive.core.event.RequestQueueEventListener;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
 

@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.DirectoryDescription;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
-import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop.StructureInformation;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;

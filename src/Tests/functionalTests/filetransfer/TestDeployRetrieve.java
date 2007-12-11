@@ -36,7 +36,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -44,7 +43,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.node.Node;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
@@ -85,7 +84,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         TestAPI.createRandomContentFile(fileTest, filesize);
 
         try {
-            hostName = URIBuilder.getLocalAddress().getHostName();
+            hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
         } catch (Exception e) {
             hostName = "localhost";
         }

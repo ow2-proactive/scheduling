@@ -62,6 +62,17 @@ public enum PAProperties {
     SECURITY_POLICY("java.security.policy", PAPropertiesType.STRING),
 
     /**
+     * If IPv6 is available on the operating system the default preference is to prefer an IPv4-mapped address over an IPv6 address
+     */
+    PREFER_IPV6_ADDRESSES("java.net.preferIPv6Addresses",
+        PAPropertiesType.BOOLEAN),
+
+    /**
+     * If IPv6 is available on the operating system the underlying native socket will be an IPv6 socket. This allows Java(tm) applications to connect too, and accept connections from, both IPv4 and IPv6 hosts.
+     */
+    PREFER_IPV4_STACK("java.net.preferIPv4Stack", PAPropertiesType.BOOLEAN),
+
+    /**
      * Indicate the Fractal provider class, to the ProActive implementation of
      * Fractal/GCM set it to org.objectweb.proactive.core.component.Fractive
      */
@@ -186,7 +197,7 @@ public enum PAProperties {
      * into IP addresses
      *
      */
-    PA_USE_IP_ADDRESS("proactive.useIPaddress", PAPropertiesType.BOOLEAN),
+    PA_NET_USE_IP_ADDRESS("proactive.useIPaddress", PAPropertiesType.BOOLEAN),
 
     /**
      * Toggle loopback IP address usage
@@ -197,7 +208,7 @@ public enum PAProperties {
      *
      * If only a loopback address exists, it is used.
      */
-    PA_NOLOOPBACK("proactive.nolocal", PAPropertiesType.BOOLEAN),
+    PA_NET_NOLOOPBACK("proactive.net.nolocal", PAPropertiesType.BOOLEAN),
 
     /**
      * Toggle Private IP address usage
@@ -206,7 +217,12 @@ public enum PAProperties {
      * endpoint the right IP address must be used. This property must be set to true if a private
      * address is returned by the Java INET stack and this private IP is not reachable by other hosts.
      */
-    PA_NOPRIVATE("proactive.noprivate", PAPropertiesType.BOOLEAN),
+    PA_NET_NOPRIVATE("proactive.net.noprivate", PAPropertiesType.BOOLEAN),
+
+    /**
+     * Select the network interface
+     */
+    PA_NET_INTERFACE("proactive.net.interface", PAPropertiesType.STRING),
 
     /**
      * RMI/SSH black voodoo
@@ -214,7 +230,8 @@ public enum PAProperties {
      * Can be used to fix broken networks (multihomed, broken DNS etc.). You probably want
      * to post on the public ProActive mailing list before using this property.
      */
-    PA_SECONDARYNAMES("proactive.secondaryNames", PAPropertiesType.STRING),
+    PA_NET_SECONDARYNAMES("proactive.net.secondaryNames",
+        PAPropertiesType.STRING),
     SCHEMA_VALIDATION("schema.validation", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------

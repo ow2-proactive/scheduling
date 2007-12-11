@@ -31,14 +31,13 @@
 package org.objectweb.proactive.examples.nbody.groupcom;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
@@ -78,11 +77,8 @@ public class Domain implements Serializable {
         this.killsupport = killsupport;
         identification = i.intValue();
         info = planet;
-        try {
-            this.hostName = URIBuilder.getLocalAddress().getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        this.hostName = ProActiveInet.getInstance().getInetAddress()
+                                     .getHostName();
     }
 
     /**
@@ -162,11 +158,7 @@ public class Domain implements Serializable {
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        try {
-            this.hostName = URIBuilder.getLocalAddress().getHostName();
-        } catch (UnknownHostException e) {
-            hostName = "unknown";
-            e.printStackTrace();
-        }
+        this.hostName = ProActiveInet.getInstance().getInetAddress()
+                                     .getHostName();
     }
 }

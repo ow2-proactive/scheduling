@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.core.mop;
 
+import java.lang.reflect.InvocationTargetException;
+
 
 /**
  * A reified constructor call.

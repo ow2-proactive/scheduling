@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.process.filetransfer;
 
 import java.util.ArrayList;
 
-import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.*;
+import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition.FileDescription;
 
 
 /**

@@ -74,7 +74,8 @@ public class DumpP2PNetworkDialog extends Dialog {
 
         /* Get the machine's name */
         try {
-            initialHostValue = URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
+            initialHostValue = URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
+                                                                       .getLocal());
         } catch (UnknownHostException e) {
             // TODO catch this exception, and do something
             e.printStackTrace();

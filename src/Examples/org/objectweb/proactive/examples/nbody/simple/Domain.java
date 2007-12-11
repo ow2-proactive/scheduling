@@ -31,11 +31,10 @@
 package org.objectweb.proactive.examples.nbody.simple;
 
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.nbody.common.Displayer;
@@ -69,11 +68,8 @@ public class Domain implements Serializable {
     public Domain(Integer i, Planet planet) {
         this.identification = i.intValue();
         this.info = planet;
-        try {
-            this.hostName = URIBuilder.getLocalAddress().getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        this.hostName = ProActiveInet.getInstance().getInetAddress()
+                                     .getHostName();
     }
 
     /**
@@ -154,11 +150,7 @@ public class Domain implements Serializable {
     private void readObject(java.io.ObjectInputStream in)
         throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        try {
-            this.hostName = URIBuilder.getLocalAddress().getHostName();
-        } catch (UnknownHostException e) {
-            hostName = "unknown";
-            e.printStackTrace();
-        }
+        this.hostName = ProActiveInet.getInstance().getInetAddress()
+                                     .getHostName();
     }
 }

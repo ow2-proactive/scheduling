@@ -34,6 +34,7 @@ import java.net.UnknownHostException;
 
 import org.objectweb.proactive.api.PAVersion;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
@@ -56,11 +57,8 @@ public class Main {
         System.out.println();
 
         String localAddress = null;
-        try {
-            localAddress = URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
-        } catch (UnknownHostException e) {
-            localAddress = null;
-        }
+        localAddress = URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
+                                                               .getInetAddress());
         System.out.println("Local IP Address: " + localAddress);
         System.out.println("Available properties:");
         for (PAProperties p : PAProperties.values()) {

@@ -30,11 +30,18 @@
  */
 package org.objectweb.proactive.core.rmi;
 
+import java.net.URI;
+
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.ssh.SshParameters;
+import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ClassServerHelper {
+    protected static Logger logger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
 
     /**
      * settings of the ClassServer
@@ -110,14 +117,17 @@ public class ClassServerHelper {
     // 
     private String getCodebase() {
         String codebase;
+
         if (SshParameters.getSshTunneling()) {
-            codebase = "httpssh://" + currentClassServer.getHostname() + ":" +
-                ClassServer.getServerSocketPort() + "/";
+            URI uri = URIBuilder.buildURI(currentClassServer.getHostname(),
+                    "/", "httpssh", ClassServer.getServerSocketPort());
+            codebase = uri.toString();
         } else if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
-            codebase = ClassServerServlet.getUrl() + "doc";
+            codebase = ClassServerServlet.getURI().toString() + "doc";
         } else {
-            codebase = "http://" + currentClassServer.getHostname() + ":" +
-                ClassServer.getServerSocketPort() + "/";
+            URI uri = URIBuilder.buildURI(currentClassServer.getHostname(),
+                    "/", "http", ClassServer.getServerSocketPort());
+            codebase = uri.toString();
         }
 
         return codebase;

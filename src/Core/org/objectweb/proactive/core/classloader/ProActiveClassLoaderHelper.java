@@ -32,7 +32,6 @@ package org.objectweb.proactive.core.classloader;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
-import org.objectweb.proactive.core.mop.MOPClassLoader;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.ClassDataCache;

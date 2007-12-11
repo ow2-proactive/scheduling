@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.rmi;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.UnknownHostException;
 
 import javax.servlet.http.HttpServlet;
@@ -40,14 +41,13 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
 public class ClassServerServlet extends HttpServlet {
     //	public static final String WEB_ROOT = "/proactive";
     public static final String SERVLET_NAME = "ProActiveHTTP";
-    private String url;
-    private ClassServer classServer;
     private HttpServletRequest request;
     private HttpServletResponse response;
     private static int port;
@@ -104,25 +104,9 @@ public class ClassServerServlet extends HttpServlet {
         }
     }
 
-    public static String getUrl() {
-        try {
-            //            int port = Integer.parseInt(System.getProperty(
-            //                        "proactive.http.port"));
-            String url = Constants.XMLHTTP_PROTOCOL_IDENTIFIER + "://" +
-                URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress()) + ':' +
-                port + '/' + SERVLET_NAME;
-
-            //                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port); /*+
-            //            "/" + SERVLET_NAME ;*/
-
-            //            if (url.charAt(url.length() - 1) == '/') {
-            //                url = url.substring(0, url.length() - 1);
-            //            }
-            //            url += SERVLET_NAME + '/';
-            return url;
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static URI getURI() {
+        return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
+                ProActiveInet.getInstance().getInetAddress()), SERVLET_NAME,
+            Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port);
     }
 }

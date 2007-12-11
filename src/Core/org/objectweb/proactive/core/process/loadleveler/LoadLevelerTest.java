@@ -37,7 +37,7 @@ import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 
@@ -46,14 +46,8 @@ public class LoadLevelerTest {
     }
 
     public StringWrapper ping() {
-        try {
-            return new StringWrapper("Hi from " +
-                URIBuilder.getLocalAddress().getHostName());
-        } catch (UnknownHostException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return new StringWrapper("RESOLUTION FAILED");
-        }
+        return new StringWrapper("Hi from " +
+            ProActiveInet.getInstance().getInetAddress().getHostName());
     }
 
     public static void main(String[] args) {

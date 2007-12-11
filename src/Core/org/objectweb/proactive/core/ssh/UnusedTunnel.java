@@ -30,9 +30,6 @@
  */
 package org.objectweb.proactive.core.ssh;
 
-import org.objectweb.proactive.core.ssh.SshParameters;
-import org.objectweb.proactive.core.ssh.SshTunnel;
-
 
 /**
  * @author mlacage

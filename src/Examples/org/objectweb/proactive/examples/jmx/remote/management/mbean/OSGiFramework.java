@@ -32,7 +32,6 @@ package org.objectweb.proactive.examples.jmx.remote.management.mbean;
 
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -47,7 +46,7 @@ import javax.management.NotificationBroadcasterSupport;
 import javax.management.ObjectName;
 
 import org.objectweb.proactive.core.rmi.ClassServer;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.examples.jmx.remote.management.command.osgi.InstallCommand;
 import org.objectweb.proactive.examples.jmx.remote.management.command.osgi.OSGiCommand;
 import org.objectweb.proactive.examples.jmx.remote.management.exceptions.InvalidTransactionException;
@@ -101,7 +100,8 @@ public class OSGiFramework extends NotificationBroadcasterSupport
         try {
             this.context = context;
             OSGiStore.getInstance().setContext(this.context);
-            this.url = URIBuilder.getLocalAddress().getCanonicalHostName();
+            this.url = ProActiveInet.getInstance().getInetAddress()
+                                    .getCanonicalHostName();
             this.port = ClassServer.getServerSocketPort();
             OSGiStore.getInstance().setUrl(url);
             UrlMBean urlMbean = new Url(this.url + '(' + this.port + ')');
@@ -113,8 +113,6 @@ public class OSGiFramework extends NotificationBroadcasterSupport
 
             this.context.addBundleListener(this);
             buildBundleList();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {

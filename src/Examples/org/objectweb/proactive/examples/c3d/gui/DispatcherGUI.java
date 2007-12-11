@@ -40,7 +40,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import javax.swing.Box;
@@ -59,6 +58,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.border.TitledBorder;
 
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.examples.c3d.DispatcherLogic;
 
@@ -158,11 +158,8 @@ public class DispatcherGUI implements ActionListener {
         JPanel infoPanel = new JPanel(); // the box should have been enough, but the label overwrites the menu!!!
         Box box = Box.createVerticalBox();
         String localhostName = "";
-        try {
-            localhostName = URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
-        } catch (UnknownHostException e) {
-            localhostName = "unknown host name!";
-        }
+        localhostName = URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
+                                                                .getInetAddress());
         Label machine = new Label("on " + localhostName + " (" +
                 System.getProperty("os.name") + ")", Label.CENTER);
         Label header = new Label("C3D Dispatcher", Label.CENTER);

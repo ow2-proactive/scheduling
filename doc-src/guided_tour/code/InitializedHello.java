@@ -43,7 +43,7 @@ public class InitializedHello extends Hello implements InitActive, EndActive {
             // Creates an active instance of class HelloServer on the local node
             InitializedHello hello = (InitializedHello) org.objectweb.proactive.ProActive.newActive(InitializedHello.class.getName(),
                     new Object[] { "remote" });
-            java.net.InetAddress localhost = URIBuilder.getLocalAddress();
+            java.net.InetAddress localhost = ProActiveInet.getInstance().getLocal();
             org.objectweb.proactive.api.ProActiveObject.register(hello,
                 "//" + localhost.getHostName() + "/Hello");
         } catch (Exception e) {

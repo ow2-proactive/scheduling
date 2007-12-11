@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.process;
 
 import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.HostsInfos;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -290,10 +291,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     // -- PRIVATE METHODS -----------------------------------------------
     //
     private static String getLocalHost() {
-        try {
-            return URIBuilder.getHostNameorIP(URIBuilder.getLocalAddress());
-        } catch (java.net.UnknownHostException e) {
-            return "localhost";
-        }
+        return URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
+                                                       .getInetAddress());
     }
 }

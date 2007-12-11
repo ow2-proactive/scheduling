@@ -34,7 +34,7 @@ import java.net.UnknownHostException;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -84,13 +84,9 @@ public class ProActiveMPIComm {
     }
 
     public ProActiveMPIComm(String libName, int uniqueID) {
-        try {
-            hostname = URIBuilder.getLocalAddress().getHostName();
-            logger.info("[REMOTE PROXY] [" + this.hostname +
-                "] Constructor> : Loading library.");
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        hostname = ProActiveInet.getInstance().getInetAddress().getHostName();
+        logger.info("[REMOTE PROXY] [" + this.hostname +
+            "] Constructor> : Loading library.");
         System.loadLibrary(libName);
         logger.info("[REMOTE PROXY] [" + this.hostname +
             "] Constructor> : Library loaded.");

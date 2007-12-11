@@ -35,6 +35,7 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -86,7 +87,8 @@ public class ClassServer implements Runnable {
 
         PAProperties.PA_XMLHTTP_PORT.setValue(port + "");
 
-        hostname = URIBuilder.getLocalAddress().getHostAddress();
+        hostname = ProActiveInet.getInstance().getInetAddress().getHostName();
+        logger.warn("@#@ Hostname " + hostname);
         //        hostname = URIBuilder.ipv6withoutscope(UrlBuilder.getNetworkInterfaces());
 
         //        System.out.println("URL du classServer : " + hostname + ":" + port);
@@ -124,7 +126,8 @@ public class ClassServer implements Runnable {
         java.net.Socket socket = null;
 
         try {
-            socket = new java.net.Socket(URIBuilder.getLocalAddress(), port);
+            socket = new java.net.Socket(ProActiveInet.getInstance()
+                                                      .getInetAddress(), port);
 
             // if we can connect to the port it means the server already exists
             return true;
@@ -173,19 +176,13 @@ public class ClassServer implements Runnable {
     }
 
     public static String getUrl() {
-        try {
-            if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
-                return ClassServerServlet.getUrl();
-            } else {
-                return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
-                        URIBuilder.getLocalAddress()), "",
-                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port).toString();
-            }
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
+        if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
+            return ClassServerServlet.getURI().toString();
+        } else {
+            return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
+                    ProActiveInet.getInstance().getInetAddress()), "",
+                Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port).toString();
         }
-        return URIBuilder.buildURI("localhost", "",
-            Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port).toString();
     }
 
     /**

@@ -35,6 +35,7 @@ import java.util.Map;
 
 import javax.management.MBeanServer;
 import javax.management.remote.JMXConnectorServer;
+import javax.management.remote.JMXConnectorServerFactory;
 import javax.management.remote.JMXConnectorServerProvider;
 import javax.management.remote.JMXServiceURL;
 

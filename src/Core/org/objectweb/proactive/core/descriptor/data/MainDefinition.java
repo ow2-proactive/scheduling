@@ -34,8 +34,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
-
 
 /**
  * <p>

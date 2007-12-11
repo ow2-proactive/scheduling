@@ -104,7 +104,7 @@ public class HostsInfos {
         if (host_infos.get("username") == null) {
             host_infos.put("username", username);
             //        	try {
-            //        		System.out.println(hostname+" --> "+username+ " on host "+URIBuilder.getLocalAddress().getHostName());
+            //        		System.out.println(hostname+" --> "+username+ " on host "+ProActiveInet.getInstance().getLocal().getHostName());
             //        	} catch (UnknownHostException e) {
             //        		// TODO Auto-generated catch block
             //        		e.printStackTrace();
@@ -149,7 +149,7 @@ public class HostsInfos {
         }
         parseUserNames(userNames);
 
-        String secondaryNames = PAProperties.PA_SECONDARYNAMES.getValue();
+        String secondaryNames = PAProperties.PA_NET_SECONDARYNAMES.getValue();
         if (secondaryNames != null) {
             if (secondaryNames.matches(REGEXP_KEYVAL + "(," + REGEXP_KEYVAL +
                         ")?")) {

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.api;
 
-import java.io.IOException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
 

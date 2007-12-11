@@ -149,6 +149,9 @@ public class RmiRemoteObjectFactory extends AbstractRemoteObjectFactory
             }
         }
 
+        LOGGER_RO.warn("#@# " + url);
+        LOGGER_RO.warn("#@# Without protocol" +
+            URIBuilder.removeProtocol(url).toString());
         try {
             if (replacePreviousBinding) {
                 java.rmi.Naming.rebind(URIBuilder.removeProtocol(url).toString(),

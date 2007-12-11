@@ -32,10 +32,9 @@ package org.objectweb.proactive.examples.pi;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 
 
 /**
@@ -69,11 +68,8 @@ public class PiComputer implements PiComp {
      * @param scaleObject The scale parameter for the setScale method
      */
     public PiComputer(Integer scaleObject) {
-        try {
-            System.out.println("created PiComputer on host " +
-                URIBuilder.getLocalAddress().getHostName());
-        } catch (UnknownHostException ignored) {
-        }
+        System.out.println("created PiComputer on host " +
+            ProActiveInet.getInstance().getInetAddress().getHostName());
         setScale(scaleObject);
     }
 
@@ -91,13 +87,10 @@ public class PiComputer implements PiComp {
     }
 
     public Result compute(Interval interval) {
-        try {
-            System.out.println("Starting computation for interval [" +
-                interval.getBeginning() + " , " + interval.getEnd() +
-                "] on host : " + URIBuilder.getLocalAddress().getHostName());
-        } catch (UnknownHostException ignored) {
-            ignored.printStackTrace();
-        }
+        System.out.println("Starting computation for interval [" +
+            interval.getBeginning() + " , " + interval.getEnd() +
+            "] on host : " +
+            ProActiveInet.getInstance().getInetAddress().getHostName());
         long startChrono = System.currentTimeMillis();
 
         BigDecimal bd = ZERO;

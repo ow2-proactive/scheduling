@@ -35,7 +35,7 @@ import java.net.UnknownHostException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PALifeCycle;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
@@ -63,11 +63,7 @@ public class TinyHello implements java.io.Serializable {
 
     /** finds the name of the local machine */
     static String getHostName() {
-        try {
-            return URIBuilder.getLocalAddress().getHostName();
-        } catch (UnknownHostException e) {
-            return "unknown";
-        }
+        return ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /** The call that starts the Acive Objects, and displays results.

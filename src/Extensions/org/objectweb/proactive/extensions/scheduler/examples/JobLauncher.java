@@ -38,6 +38,7 @@ import java.util.Date;
 
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -110,7 +111,8 @@ public class JobLauncher {
                 if (logIt) {
                     // next, this method will forward task output on the previous loggerServer
                     scheduler.listenLog(id,
-                        URIBuilder.getLocalAddress().getHostName(),
+                        ProActiveInet.getInstance().getInetAddress()
+                                     .getHostName(),
                         simpleLoggerServer.getPort());
 
                     Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +

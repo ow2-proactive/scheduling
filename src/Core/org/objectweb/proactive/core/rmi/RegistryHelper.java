@@ -111,6 +111,7 @@ public class RegistryHelper {
     private static java.rmi.registry.Registry createRegistry(int port)
         throws java.rmi.RemoteException {
         registry = java.rmi.registry.LocateRegistry.createRegistry(port);
+        logger.warn("@#@ Registry");
         registryCreator = true;
         return registry;
     }

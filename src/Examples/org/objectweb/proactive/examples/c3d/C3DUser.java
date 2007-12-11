@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Hashtable;
 
@@ -43,7 +42,7 @@ import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
@@ -329,11 +328,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
     private String getMachineRelatedValues() {
         String hostName = "unknown";
 
-        try {
-            hostName = URIBuilder.getLocalAddress().getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
 
         return "User\n   " + this.userName + " (" + hostName + ")" +
         "\nDispatcher\n" + this.dispMachineAndOS;

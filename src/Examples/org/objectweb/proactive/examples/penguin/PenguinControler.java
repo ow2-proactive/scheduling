@@ -133,7 +133,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive,
     //  public static void main(String args[]) {
     //      //args modification to replace relative name of nodes to them absolute name
     //      try {
-    //	  java.net.InetAddress localhost = URIBuilder.getLocalAddress();
+    //	  java.net.InetAddress localhost = ProActiveInet.getInstance().getLocal();
     //	  for (int i=0; i<args.length; i++) {
     //	      if (args[i].startsWith("//localhost")) {
     //		  String nodeName;

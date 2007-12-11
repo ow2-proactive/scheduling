@@ -34,8 +34,8 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetAddress;
 import static org.objectweb.proactive.core.ssh.SSH.logger;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.core.util.URIBuilder;
 
 import ch.ethz.ssh2.LocalPortForwarder;
 
@@ -118,8 +118,8 @@ public class SshTunnel {
     public void realClose() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Closing tunnel from " +
-                URIBuilder.getLocalAddress().getHostAddress() + ":" +
-                localPort + "to " + distantHost + ":" + distantPort);
+                ProActiveInet.getInstance().getInetAddress().getHostAddress() +
+                ":" + localPort + "to " + distantHost + ":" + distantPort);
         }
         lpf.close();
         lpf = null;

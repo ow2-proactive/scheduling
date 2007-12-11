@@ -33,7 +33,6 @@ package org.objectweb.proactive.core.descriptor.services;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.node.Node;
 
 

@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer;
 import org.objectweb.proactive.core.body.ft.servers.resource.ResourceServerImpl;
 import org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer;
 import org.objectweb.proactive.core.rmi.RegistryHelper;
-import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.ProActiveInet;
 
 
 /**
@@ -136,7 +136,8 @@ public class StartFTServer {
             server.init(fd, ls, rp, rs, cs);
             server.startFailureDetector();
 
-            String host = URIBuilder.getLocalAddress().getHostName();
+            String host = ProActiveInet.getInstance().getInetAddress()
+                                       .getHostName();
             Naming.rebind("rmi://" + host + ":" + port + "/" + name, server);
             System.out.println("Fault-tolerance server is bound on rmi://" +
                 host + ":" + port + "/" + name);
@@ -144,9 +145,6 @@ public class StartFTServer {
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();
         } catch (MalformedURLException e) {
-            System.err.println("** ERROR ** Unable to launch FT server : ");
-            e.printStackTrace();
-        } catch (UnknownHostException e) {
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();
         }

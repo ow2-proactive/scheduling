@@ -35,6 +35,7 @@ import java.net.URI;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
@@ -141,7 +142,7 @@ public class TestIMProxy {
         proxy.shutdownProxy();
         //		System.err.println("-> Stopping RM :");
         //		admin.shutdown();
-        ProActive.exitSuccess();
+        PALifeCycle.exitSuccess();
     }
 
     public static void main(String[] args) throws Exception {

@@ -34,7 +34,6 @@ import java.io.File;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Properties;
-import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.ConsoleAppender;

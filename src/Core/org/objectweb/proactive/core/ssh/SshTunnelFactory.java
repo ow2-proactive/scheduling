@@ -32,8 +32,6 @@ package org.objectweb.proactive.core.ssh;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.ssh.SshTunnel;
-import org.objectweb.proactive.core.ssh.UnusedTunnel;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
