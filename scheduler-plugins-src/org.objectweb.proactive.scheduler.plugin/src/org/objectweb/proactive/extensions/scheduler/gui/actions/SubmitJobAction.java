@@ -57,7 +57,6 @@ public class SubmitJobAction extends Action {
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
-    
     @Override
     public void run() {
         FileDialog fileDialog = new FileDialog(parent.getShell(), SWT.OPEN);

@@ -55,7 +55,6 @@ public class KillSchedulerAction extends Action {
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
-    
     @Override
     public void run() {
         if (MessageDialog.openConfirm(shell, "Confirm please",

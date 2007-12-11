@@ -81,7 +81,6 @@ public class FinishedJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#getJobs()
      */
-    
     @Override
     public Vector<JobId> getJobs() {
         return JobsController.getLocalView().getFinishedJobs();
@@ -90,7 +89,6 @@ public class FinishedJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#sortJobs()
      */
-    
     @Override
     public void sortJobs() {
         JobsController.getLocalView().sortFinishedJobs();
@@ -99,7 +97,6 @@ public class FinishedJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
      */
-    
     @Override
     public void jobSelected(InternalJob job) {
         boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
@@ -127,7 +124,6 @@ public class FinishedJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composite.AbstractJobComposite#clear()
      */
-    
     @Override
     public void clear() {
         // Nothing to do
@@ -139,7 +135,6 @@ public class FinishedJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.FinishedJobsListener#addFinishedJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    
     public void addFinishedJob(JobId jobId) {
         addJob(jobId);
     }
@@ -147,7 +142,6 @@ public class FinishedJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.FinishedJobsListener#removeFinishedJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    
     public void removeFinishedJob(JobId jobId) {
         removeJob(jobId);
     }

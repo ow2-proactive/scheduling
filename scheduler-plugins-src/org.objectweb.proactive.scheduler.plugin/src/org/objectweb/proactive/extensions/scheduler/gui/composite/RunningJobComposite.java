@@ -113,7 +113,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#getJobs()
      */
-    
     @Override
     public Vector<JobId> getJobs() {
         return JobsController.getLocalView().getRunningsJobs();
@@ -122,7 +121,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#sortJobs()
      */
-    
     @Override
     public void sortJobs() {
         JobsController.getLocalView().sortRunningsJobs();
@@ -131,7 +129,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
      */
-    
     @Override
     public void jobSelected(InternalJob job) {
         // enabling/disabling button permitted with this job
@@ -184,7 +181,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composite.AbstractJobComposite#clear()
      */
-    
     @Override
     public void clear() {
         for (TableEditor te : tableEditors)
@@ -199,7 +195,6 @@ public class RunningJobComposite extends AbstractJobComposite
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#createTable(org.eclipse.swt.widgets.Composite,
      *      int)
      */
-    
     @Override
     protected Table createTable(Composite parent, int tableId) {
         Table table = super.createTable(parent, tableId);
@@ -220,7 +215,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#createItem(org.objectweb.proactive.extra.scheduler.job.Job)
      */
-    
     @Override
     protected TableItem createItem(InternalJob job, int itemIndex) {
         Table table = getTable();
@@ -257,7 +251,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.RunningJobsListener#addRunningJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    
     public void addRunningJob(JobId jobId) {
         addJob(jobId);
     }
@@ -265,7 +258,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.RunningJobsListener#removeRunningJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    
     public void removeRunningJob(JobId jobId) {
         if (!isDisposed()) {
             Vector<JobId> jobsId = getJobs();
@@ -283,7 +275,6 @@ public class RunningJobComposite extends AbstractJobComposite
             }
             final int i = tmp;
             getDisplay().asyncExec(new Runnable() {
-                    
                     public void run() {
                         int j = getTable().getSelectionIndex();
                         if (i == j) {
@@ -344,7 +335,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventTasksListener#runningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
-    
     public void runningTaskEvent(TaskEvent event) {
         super.stateUpdate(event.getJobId());
     }
@@ -352,14 +342,12 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventTasksListener#finishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
-    
     public void finishedTaskEvent(TaskEvent event) {
         super.stateUpdate(event.getJobId());
         if (!this.isDisposed()) {
             final TaskEvent taskEvent = event;
 
             getDisplay().asyncExec(new Runnable() {
-                    
                     public void run() {
                         Table table = getTable();
                         TableItem[] items = table.getItems();
@@ -405,7 +393,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#killedEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    
     public void killedEvent(JobId jobId) {
         // Do nothing
     }
@@ -413,7 +400,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void pausedEvent(JobEvent event) {
         stateUpdate(event);
     }
@@ -421,7 +407,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void resumedEvent(JobEvent event) {
         stateUpdate(event);
     }
@@ -429,7 +414,6 @@ public class RunningJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void priorityChangedEvent(JobEvent event) {
         JobId jobId = event.getJobId();
         if (getJobs().contains(jobId)) {

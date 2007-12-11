@@ -165,49 +165,42 @@ public class TaskComposite extends Composite {
         TableColumn tc9 = new TableColumn(table, SWT.LEFT);
         // addSelectionListener
         tc1.addSelectionListener(new SelectionAdapter() {
-                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalTask.SORT_BY_ID);
                 }
             });
         tc2.addSelectionListener(new SelectionAdapter() {
-                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalTask.SORT_BY_STATUS);
                 }
             });
         tc3.addSelectionListener(new SelectionAdapter() {
-                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalTask.SORT_BY_NAME);
                 }
             });
         tc4.addSelectionListener(new SelectionAdapter() {
-                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalTask.SORT_BY_HOST_NAME);
                 }
             });
         tc5.addSelectionListener(new SelectionAdapter() {
-                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalTask.SORT_BY_STARTED_TIME);
                 }
             });
         tc6.addSelectionListener(new SelectionAdapter() {
-                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalTask.SORT_BY_FINISHED_TIME);
                 }
             });
         tc7.addSelectionListener(new SelectionAdapter() {
-                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalTask.SORT_BY_RERUNNABLE);
@@ -220,7 +213,6 @@ public class TaskComposite extends Composite {
         //                }
         //            });
         tc9.addSelectionListener(new SelectionAdapter() {
-                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalTask.SORT_BY_DESCRIPTION);
@@ -523,7 +515,6 @@ public class TaskComposite extends Composite {
     /**
      * @see org.eclipse.swt.widgets.Widget#isDisposed()
      */
-    
     @Override
     public boolean isDisposed() {
         return super.isDisposed() || ((table != null) && (table.isDisposed())) ||
@@ -533,7 +524,6 @@ public class TaskComposite extends Composite {
     /**
      * @see org.eclipse.swt.widgets.Control#setMenu(org.eclipse.swt.widgets.Menu)
      */
-    
     @Override
     public void setMenu(Menu menu) {
         super.setMenu(menu);
@@ -544,7 +534,6 @@ public class TaskComposite extends Composite {
     /**
      * @see org.eclipse.swt.widgets.Control#setVisible(boolean)
      */
-    
     @Override
     public void setVisible(boolean visible) {
         super.setVisible(visible);

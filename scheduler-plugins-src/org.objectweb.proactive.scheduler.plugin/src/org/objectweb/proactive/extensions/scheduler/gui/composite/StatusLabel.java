@@ -90,42 +90,34 @@ public class StatusLabel implements EventSchedulerListener {
         return instance;
     }
 
-    
     public void freezeEvent() {
         setText(FREEZED_TEXT, FREEZED_COLOR);
     }
 
-    
     public void killedEvent() {
         setText(KILLED_TEXT, KILLED_COLOR);
     }
 
-    
     public void pausedEvent() {
         setText(PAUSED_TEXT, PAUSED_COLOR);
     }
 
-    
     public void resumedEvent() {
         setText(RESUMED_TEXT, RESUMED_COLOR);
     }
 
-    
     public void shutDownEvent() {
         setText(SHUTTED_DOWN_TEXT, SHUTTED_DOWN_COLOR);
     }
 
-    
     public void shuttingDownEvent() {
         setText(SHUTTING_DOWN_TEXT, SHUTTING_DOWN_COLOR);
     }
 
-    
     public void startedEvent() {
         setText(STARTED_TEXT, STARTED_COLOR);
     }
 
-    
     public void stoppedEvent() {
         setText(STOPPED_TEXT, STOPPED_COLOR);
     }
@@ -139,7 +131,6 @@ public class StatusLabel implements EventSchedulerListener {
         final Color color = aColor;
         if (!label.isDisposed()) {
             Display.getDefault().asyncExec(new Runnable() {
-                    
                     public void run() {
                         label.setForeground(color);
                         label.setText(text);

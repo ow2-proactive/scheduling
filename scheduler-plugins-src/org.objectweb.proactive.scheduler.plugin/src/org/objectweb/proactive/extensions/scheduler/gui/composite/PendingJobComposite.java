@@ -85,7 +85,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#getJobs()
      */
-    
     @Override
     public Vector<JobId> getJobs() {
         return JobsController.getLocalView().getPendingsJobs();
@@ -94,7 +93,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#sortJobs()
      */
-    
     @Override
     public void sortJobs() {
         JobsController.getLocalView().sortPendingsJobs();
@@ -103,7 +101,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composites.AbstractJobComposite#jobSelected(org.objectweb.proactive.extra.scheduler.job.Job)
      */
-    
     @Override
     public void jobSelected(InternalJob job) {
         // enabling/disabling button permitted with this job
@@ -155,7 +152,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.composite.AbstractJobComposite#clear()
      */
-    
     @Override
     public void clear() {
         // Nothing to do
@@ -167,7 +163,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.PendingJobsListener#addPendingJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    
     public void addPendingJob(JobId jobId) {
         addJob(jobId);
     }
@@ -175,7 +170,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.PendingJobsListener#removePendingJob(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    
     public void removePendingJob(JobId jobId) {
         removeJob(jobId);
     }
@@ -186,7 +180,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#killedEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    
     public void killedEvent(JobId jobId) {
         // Do nothing
     }
@@ -194,7 +187,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#pausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void pausedEvent(JobEvent event) {
         stateUpdate(event);
     }
@@ -202,7 +194,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#resumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void resumedEvent(JobEvent event) {
         stateUpdate(event);
     }
@@ -210,7 +201,6 @@ public class PendingJobComposite extends AbstractJobComposite
     /**
      * @see org.objectweb.proactive.extensions.scheduler.gui.data.EventJobsListener#priorityChangedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void priorityChangedEvent(JobEvent event) {
         JobId jobId = event.getJobId();
         if (getJobs().contains(jobId)) {

@@ -52,7 +52,6 @@ public class PauseResumeJobAction extends Action {
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
-    
     @Override
     public void run() {
         TableItem item = TableManager.getInstance().getLastSelectedItem();

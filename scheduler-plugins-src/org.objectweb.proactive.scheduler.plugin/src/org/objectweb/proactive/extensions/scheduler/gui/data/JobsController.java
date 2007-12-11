@@ -248,7 +248,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#newPendingJobEvent(org.objectweb.proactive.extra.scheduler.job.Job)
      */
-    
     public void jobSubmittedEvent(InternalJob job) {
         // add job to the global jobs list
         jobs.add(job);
@@ -266,7 +265,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void jobPendingToRunningEvent(JobEvent event) {
         JobId jobId = event.getJobId();
         InternalJob job = getJobById(jobId);
@@ -308,7 +306,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void jobRunningToFinishedEvent(JobEvent event) {
         JobId jobId = event.getJobId();
         InternalJob job = getJobById(jobId);
@@ -350,7 +347,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void jobRemoveFinishedEvent(JobEvent event) {
         JobId jobId = event.getJobId();
         getJobById(jobId).update(event);
@@ -381,7 +377,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
-    
     public void taskPendingToRunningEvent(TaskEvent event) {
         JobId jobId = event.getJobId();
         getJobById(jobId).update(event);
@@ -417,7 +412,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.core.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extra.scheduler.task.TaskEvent)
      */
-    
     public void taskRunningToFinishedEvent(TaskEvent event) {
         JobId jobId = event.getJobId();
         getJobById(jobId).update(event);
@@ -588,7 +582,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerImmediatePausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
-    
     public void schedulerImmediatePausedEvent() {
         schedulerState = SchedulerState.PAUSED_IMMEDIATE;
         jeSaisPasLeNom();
@@ -602,7 +595,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerPausedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
-    
     public void schedulerPausedEvent() {
         schedulerState = SchedulerState.PAUSED;
         jeSaisPasLeNom();
@@ -616,7 +608,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerResumedEvent(org.objectweb.proactive.extra.scheduler.core.SchedulerEvent)
      */
-    
     public void schedulerResumedEvent() {
         schedulerState = SchedulerState.STARTED;
         jeSaisPasLeNom();
@@ -630,7 +621,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerShutDownEvent()
      */
-    
     public void schedulerShutDownEvent() {
         schedulerState = SchedulerState.KILLED;
         Display.getDefault().asyncExec(new Runnable() {
@@ -646,7 +636,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerShuttingDownEvent()
      */
-    
     public void schedulerShuttingDownEvent() {
         schedulerState = SchedulerState.SHUTTING_DOWN;
         jeNeSaisToujoursPas();
@@ -660,7 +649,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStartedEvent()
      */
-    
     public void schedulerStartedEvent() {
         schedulerState = SchedulerState.STARTED;
         jeSaisPasLeNom();
@@ -676,7 +664,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerStoppedEvent()
      */
-    
     public void schedulerStoppedEvent() {
         schedulerState = SchedulerState.STOPPED;
         jeNeSaisToujoursPas();
@@ -692,7 +679,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#SchedulerkilledEvent()
      */
-    
     public void schedulerKilledEvent() {
         schedulerState = SchedulerState.KILLED;
         Display.getDefault().asyncExec(new Runnable() {
@@ -729,7 +715,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobKilledEvent(org.objectweb.proactive.extra.scheduler.job.JobId)
      */
-    
     public void jobKilledEvent(JobId jobId) {
         Vector<JobId> list = null;
 
@@ -770,7 +755,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobPausedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void jobPausedEvent(JobEvent event) {
         final InternalJob job = getJobById(event.getJobId());
         job.update(event);
@@ -796,7 +780,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#jobResumedEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void jobResumedEvent(JobEvent event) {
         final InternalJob job = getJobById(event.getJobId());
         job.update(event);
@@ -822,7 +805,6 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extra.scheduler.job.JobEvent)
      */
-    
     public void jobChangePriorityEvent(JobEvent event) {
         getJobById(event.getJobId()).update(event);
         jobPriorityChangedEventInternal(event);

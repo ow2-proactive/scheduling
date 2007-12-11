@@ -347,7 +347,6 @@ public class SeparatedJobView extends ViewPart {
     /**
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
-    
     @Override
     public void createPartControl(Composite theParent) {
         parent = theParent;
@@ -392,12 +391,10 @@ public class SeparatedJobView extends ViewPart {
     /**
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
-    
     @Override
     public void setFocus() {
     }
 
-    
     @Override
     public void dispose() {
         TableManager.clearInstance();
