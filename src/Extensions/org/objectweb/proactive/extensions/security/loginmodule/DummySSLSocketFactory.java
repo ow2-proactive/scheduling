@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.security;
+package org.objectweb.proactive.extensions.security.loginmodule;
 
 import java.io.IOException;
 import java.net.InetAddress;

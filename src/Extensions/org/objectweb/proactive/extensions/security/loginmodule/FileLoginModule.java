@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.security;
+package org.objectweb.proactive.extensions.security.loginmodule;
 
 import java.io.File;
 import java.io.FileInputStream;

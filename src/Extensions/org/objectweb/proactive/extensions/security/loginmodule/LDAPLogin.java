@@ -28,11 +28,10 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.security;
+package org.objectweb.proactive.extensions.security.loginmodule;
 
 import java.util.Map;
 
-import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 
 
@@ -41,33 +40,28 @@ import javax.security.auth.login.LoginException;
  * @author nhouillo
  *
  */
-public class Login {
+public abstract class LDAPLogin {
 
     /**
-     * Standard interface to check credentials. The system property
-     * "java.security.auth.login.config" must be set to designate a
-     * configuration file, see
-     * http://java.sun.com/javase/6/docs/technotes/guides/security/jaas/JAASRefGuide.html#AppendixB
-     * for more information.
+     * LDAP implementation of the Login standard interface. Uses the
+     * <code>LDAPLoginMethod</code> from the configuration file designated by
+     * the "java.security.auth.login.config" system property, which must be set
+     * to use the <code>LDAPLoginModule</code> in this package. It will only
+     * work if the structure of the LDAP directory is the same as the one
+     * described here
+     * http://dsi.inria.fr/services_offerts/authentification/info_en_plus#2
      *
      * @param params
-     *            The parameters to be given to the login modules found in the
-     *            entry <code>loginMethod</code> of the configuratino file.
-     * @param loginMethod
-     *            The entry of the configuration file containig the list of
-     *            login modules to use to authenticate a user.
-     * @return always true.
+     *            It must contain 3 <code>String</code>s : "username"
+     *            corresponding to the "inriaLocalLogin" in the directory, "pw"
+     *            being the password, and "url" the url of the LDAP directory.
+     * @return always true
      * @throws LoginException
      *             If the authentication fails (incorrect credentials) or if
      *             there is an error during the attempt to verify them.
      */
-    public static Boolean login(Map<String, Object> params, String loginMethod)
+    public static Boolean login(Map<String, Object> params)
         throws LoginException {
-        LoginContext lc = new LoginContext(loginMethod,
-                new NoCallbackHandler(params));
-
-        lc.login();
-
-        return true;
+        return Login.login(params, "LDAPLoginMethod");
     }
 }

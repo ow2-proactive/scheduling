@@ -47,8 +47,8 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedu
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.job.UserIdentification;
-import org.objectweb.proactive.extensions.security.FileLogin;
-import org.objectweb.proactive.extensions.security.Login;
+import org.objectweb.proactive.extensions.security.loginmodule.FileLogin;
+import org.objectweb.proactive.extensions.security.loginmodule.Login;
 
 
 /**
@@ -106,7 +106,7 @@ public class SchedulerAuthentication implements InitActive,
         if (jaasConfig == null) {
             throw new RuntimeException(
                 "The file 'jaas.config' has not been found and have to be at the following directory :\n" +
-                "\tclasses/Extensions/org.objectweb.proactive.extensions.security/");
+                "\tclasses/Extensions/org.objectweb.proactive.extensions.security.loginmodule/");
         }
 
         System.setProperty("java.security.auth.login.config",
