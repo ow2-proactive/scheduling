@@ -7,11 +7,20 @@
 	<target name="-compile">
 		<if>
 			<bool>
-				<contains string="${java.version}" substring="1.5"/>
+				<or>
+					<contains string="${java.version}" substring="1.6"/>
+					<contains string="${java.version}" substring="1.7"/>
+					<and>
+						<available file="${lib.dir}/script-api.jar" />
+						<available file="${lib.dir}/script-js.jar" />
+						<available file="${lib.dir}/js.jar" />
+					</and>
+				</or>
 			</bool>
-			<echo>Infrastructure Manager requires Java 6 or newer ; Skipping Resource Manager compilation...</echo>
+			<compile_extension module="resourcemanager" />
 			<else>
-				<compile_extension module="resourcemanager" />
+				<echo>Scheduler build requires jsr233, DISABLED</echo>
+				<echo>Use JDK 6 or add jsr233 jars file into ${lib.dir}</echo>
 			</else>
 		</if>
 	</target>
