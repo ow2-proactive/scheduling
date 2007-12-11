@@ -35,7 +35,7 @@ import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
-import org.objectweb.proactive.extra.security.Login;
+import org.objectweb.proactive.extensions.security.Login;
 
 
 /**

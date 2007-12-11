@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.security;
+package org.objectweb.proactive.extensions.security;
 
 import java.io.Serializable;
 import java.util.Map;

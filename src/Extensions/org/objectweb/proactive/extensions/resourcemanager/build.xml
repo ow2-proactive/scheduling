@@ -11,7 +11,7 @@
 			</bool>
 			<echo>Infrastructure Manager requires Java 6 or newer ; Skipping Resource Manager compilation...</echo>
 			<else>
-				<compile_extra module="resourcemanager" />
+				<compile_extension module="resourcemanager" />
 			</else>
 		</if>
 	</target>

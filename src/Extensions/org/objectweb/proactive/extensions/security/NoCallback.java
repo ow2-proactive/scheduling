@@ -28,36 +28,34 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.logforwarder;
+package org.objectweb.proactive.extensions.security;
 
-import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Level;
-import org.apache.log4j.spi.LoggingEvent;
+import java.io.Serializable;
+import java.util.Map;
+
+import javax.security.auth.callback.Callback;
 
 
-public class AppenderTest extends AppenderSkeleton {
-    @Override
-    protected void append(LoggingEvent arg0) {
-        if (arg0.getLevel().equals(Level.INFO)) {
-            System.out.println("======INFO======> " + arg0.getLoggerName() +
-                " : " + arg0.getRenderedMessage());
-        } else if (arg0.getLevel().equals(Level.ERROR)) {
-            System.out.println("======ERROR=====> " + arg0.getLoggerName() +
-                " : " + arg0.getRenderedMessage());
-        } else {
-            System.out.println("======OTHER=====> " + arg0.getLoggerName() +
-                " : " + arg0.getRenderedMessage());
-        }
+/**
+ * Actually does no callback. It is given its information by a
+ * <code>NoCallbackHandler</code>.
+ *
+ * @author nhouillo
+ *
+ */
+public class NoCallback implements Callback, Serializable {
+    private static final long serialVersionUID = -6514625872087330694L;
+    private Map<String, Object> values;
+
+    protected void set(Map<String, Object> values) {
+        this.values = values;
     }
 
-    @Override
-    public void close() {
-        // TODO Auto-generated method stub
+    protected Map<String, Object> get() {
+        return values;
     }
 
-    @Override
-    public boolean requiresLayout() {
-        // TODO Auto-generated method stub
-        return false;
+    protected void clear() {
+        values = null;
     }
 }

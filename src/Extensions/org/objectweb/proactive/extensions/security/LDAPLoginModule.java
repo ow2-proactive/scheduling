@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.security;
+package org.objectweb.proactive.extensions.security;
 
 import java.util.Hashtable;
 import java.util.Map;

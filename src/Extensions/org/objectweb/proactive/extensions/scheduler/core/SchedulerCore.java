@@ -60,6 +60,8 @@ import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.logforwarder.BufferedAppender;
+import org.objectweb.proactive.extensions.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
@@ -91,8 +93,6 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 import org.objectweb.proactive.extensions.scheduler.task.TaskResultImpl;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalNativeTask;
 import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
-import org.objectweb.proactive.extra.logforwarder.BufferedAppender;
-import org.objectweb.proactive.extra.logforwarder.SimpleLoggerServer;
 
 
 /**

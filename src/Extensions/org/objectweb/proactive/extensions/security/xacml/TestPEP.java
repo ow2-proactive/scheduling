@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.security.xacml;
+package org.objectweb.proactive.extensions.security.xacml;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -150,7 +150,7 @@ public class TestPEP {
             Logger logger = Logger.getLogger(PDP.class.getName());
             logger.addHandler(handler);
             TestPEP pep = new TestPEP(
-                    "/user/nhouillo/home/ws/ProActive/src/Extra/org/objectweb/proactive/extra/security/xacml/generated.xml");
+                    "/user/nhouillo/home/ws/ProActive/src/Extra/org.objectweb.proactive.extensions.security/xacml/generated.xml");
             List<String> from = new ArrayList<String>();
             from.add("TATA");
             List<String> to = new ArrayList<String>();

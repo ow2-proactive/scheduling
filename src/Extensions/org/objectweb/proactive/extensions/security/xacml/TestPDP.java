@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.security.xacml;
+package org.objectweb.proactive.extensions.security.xacml;
 
 import java.io.IOException;
 import java.util.ArrayList;

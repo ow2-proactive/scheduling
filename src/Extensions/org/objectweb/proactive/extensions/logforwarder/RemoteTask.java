@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extra.logforwarder;
+package org.objectweb.proactive.extensions.logforwarder;
 
 import java.io.PrintStream;
 
