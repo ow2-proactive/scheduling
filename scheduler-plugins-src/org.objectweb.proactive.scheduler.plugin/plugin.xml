@@ -4,47 +4,47 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="org.objectweb.proactive.extra.scheduler.gui.SchedulerPerspective"
-            id="org.objectweb.proactive.extra.scheduler.gui.SchedulerPerspective"
+            class="org.objectweb.proactive.extensions.scheduler.gui.SchedulerPerspective"
+            id="org.objectweb.proactive.extensions.scheduler.gui.SchedulerPerspective"
             name="Scheduler">
       </perspective>
    </extension>
    <extension
          point="org.eclipse.ui.views">
       <category
-            id="org.objectweb.proactive.extra.scheduler.gui"
+            id="org.objectweb.proactive.extensions.scheduler.gui"
             name="Scheduler">
       </category>
       <view
             allowMultiple="true"
-            category="org.objectweb.proactive.extra.scheduler.gui"
-            class="org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView"
+            category="org.objectweb.proactive.extensions.scheduler.gui"
+            class="org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView"
             icon="icons/monitoring.gif"
-            id="org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView"
+            id="org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView"
             name="Jobs">
       </view>
       <view
             allowMultiple="false"
-            category="org.objectweb.proactive.extra.scheduler.gui"
-            class="org.objectweb.proactive.extra.scheduler.gui.views.JobInfo"
+            category="org.objectweb.proactive.extensions.scheduler.gui"
+            class="org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo"
             icon="icons/info.png"
-            id="org.objectweb.proactive.extra.scheduler.gui.views.JobInfo"
+            id="org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo"
             name="Job Info">
       </view>
       <view
             allowMultiple="false"
-            category="org.objectweb.proactive.extra.scheduler.gui"
-            class="org.objectweb.proactive.extra.scheduler.gui.views.TaskView"
+            category="org.objectweb.proactive.extensions.scheduler.gui"
+            class="org.objectweb.proactive.extensions.scheduler.gui.views.TaskView"
             icon="icons/monitoring.gif"
-            id="org.objectweb.proactive.extra.scheduler.gui.views.TaskView"
+            id="org.objectweb.proactive.extensions.scheduler.gui.views.TaskView"
             name="Tasks">
       </view>
       <view
             allowMultiple="false"
-            category="org.objectweb.proactive.extra.scheduler.gui"
-            class="org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview"
+            category="org.objectweb.proactive.extensions.scheduler.gui"
+            class="org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview"
             icon="icons/info.png"
-            id="org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview"
+            id="org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview"
             name="Result Preview">
       </view>
    </extension>
@@ -62,24 +62,24 @@
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
       <perspectiveExtension
-            targetID="org.objectweb.proactive.extra.scheduler.gui.perspective.SchedulerPerspective">
+            targetID="org.objectweb.proactive.extensions.scheduler.gui.perspective.SchedulerPerspective">
          <perspectiveShortcut
-               id="org.objectweb.proactive.extra.scheduler.gui.perspective.SchedulerPerspective">
+               id="org.objectweb.proactive.extensions.scheduler.gui.perspective.SchedulerPerspective">
          </perspectiveShortcut>
          <viewShortcut
-               id="org.objectweb.proactive.extra.scheduler.gui.views.SeparatedJobView">
+               id="org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView">
          </viewShortcut>
          <viewShortcut
                id="org.eclipse.ui.console.ConsoleView">
          </viewShortcut>
          <viewShortcut
-               id="org.objectweb.proactive.extra.scheduler.gui.views.JobInfo">
+               id="org.objectweb.proactive.extensions.scheduler.gui.views.JobInfo">
          </viewShortcut>
          <viewShortcut
-               id="org.objectweb.proactive.extra.scheduler.gui.views.TaskView">
+               id="org.objectweb.proactive.extensions.scheduler.gui.views.TaskView">
          </viewShortcut>
          <viewShortcut
-               id="org.objectweb.proactive.extra.scheduler.gui.views.ResultPreview">
+               id="org.objectweb.proactive.extensions.scheduler.gui.views.ResultPreview">
          </viewShortcut>
       </perspectiveExtension>
    </extension>
