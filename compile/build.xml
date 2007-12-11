@@ -586,17 +586,17 @@
 		<mkdir dir="${release.dir}" />
 	</target>
 
-	<target name="release.bin" depends="deploy.all, docs, -release.mkdir" description="Binary Release: dist + docs">
+	<target name="release.bin" depends="deploy.all, manualPdf, -release.mkdir" description="Binary Release: dist + docs">
 		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
 		<zip destfile="${release.dir}/ProActive-bin_${version}.zip">
 			<fileset dir="${base.dir}">
 				<include name="dist/**" />
-				<include name="docs/html/**" />
 				<include name="docs/pdf/**" />
-				<include name="docs/api/**" />
 				<include name="descriptors/**" />
 				<include name="scripts/**" />
-				<include name="*" />
+
+				<include name="LICENSE.txt" />
+				<include name="README.txt" />
 			</fileset>
 		</zip>
 	</target>
@@ -617,7 +617,9 @@
 				<include name="ic2d-plugins-src/**"/>
 				<include name="infrastructure-manager-src/**"/>
 				<include name="scheduler-plugins-src/**"/>
-				<include name="*"/>
+
+				<include name="LICENSE.txt" />
+				<include name="README.txt" />
 			</fileset>
 		</zip>
 	</target>
