@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.util.profiling;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.UniqueID;
 
@@ -41,6 +42,7 @@ import org.objectweb.proactive.core.UniqueID;
  * Timers indexes are typed with int.
  * This class handles all operations relative to the internal ProActive timing system.
  */
+@PublicAPI
 public class TimerWarehouse {
 
     /** The root Total timer */

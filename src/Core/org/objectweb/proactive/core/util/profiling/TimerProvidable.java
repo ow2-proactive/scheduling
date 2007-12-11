@@ -32,6 +32,7 @@ package org.objectweb.proactive.core.util.profiling;
 
 import java.lang.reflect.Method;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.core.UniqueID;
 
@@ -42,6 +43,7 @@ import org.objectweb.proactive.core.UniqueID;
  * @see TimerWarehouse
  * @author vbodnart
  */
+@PublicAPI
 public interface TimerProvidable {
 
     /**

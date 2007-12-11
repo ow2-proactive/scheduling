@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.benchmarks.timit.util.basic.TimItBasicReductor;
 import org.objectweb.proactive.benchmarks.timit.util.service.TimItTechnicalService;
@@ -95,6 +96,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
  *
  * @author vbodnart
  */
+@PublicAPI
 public class CoreTimersContainer implements TimerProvidable {
     public static final String TOTAL_TIMER_NAME = "Total";
     public static final String SERVE_TIMER_NAME = "Serve";
