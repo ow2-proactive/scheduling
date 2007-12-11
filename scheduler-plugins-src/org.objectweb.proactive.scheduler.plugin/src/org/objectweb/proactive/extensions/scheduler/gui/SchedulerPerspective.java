@@ -67,7 +67,6 @@ public class SchedulerPerspective implements IPerspectiveFactory {
     /**
      * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
      */
-    @Override
     public void createInitialLayout(IPageLayout layout) {
         String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(false);
