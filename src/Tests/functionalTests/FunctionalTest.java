@@ -32,8 +32,10 @@ package functionalTests;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Timer;
@@ -146,40 +148,104 @@ public class FunctionalTest {
         killProActive();
     }
 
+    static private void killProActiveWithJPS() throws IOException {
+        String javaHome = System.getProperty("java.home");
+        File jpsBin = null;
+        switch (OperatingSystem.getOperatingSystem()) {
+        case unix:
+            jpsBin = new File(javaHome + File.separator + ".." +
+                    File.separator + "bin" + File.separator + "jps");
+            break;
+        case windows:
+            jpsBin = new File(javaHome + File.separator + ".." +
+                    File.separator + "bin" + File.separator + "jps.exe");
+            break;
+        }
+        if (!jpsBin.exists()) {
+            throw new FileNotFoundException("JPS not found: " +
+                jpsBin.toString());
+        }
+
+        Process jps;
+        jps = Runtime.getRuntime()
+                     .exec(new String[] { jpsBin.toString(), "-mlv" }, null,
+                null);
+        Reader reader = new InputStreamReader(jps.getInputStream());
+        BufferedReader bReader = new BufferedReader(reader);
+
+        String line = bReader.readLine();
+        while (line != null) {
+            if (line.matches(".*proactive.test=true.*")) {
+                logger.warn("MATCH " + line);
+
+                String pid = line.substring(0, line.indexOf(" "));
+                Process kill = null;
+                switch (OperatingSystem.getOperatingSystem()) {
+                case unix:
+                    kill = Runtime.getRuntime()
+                                  .exec(new String[] { "kill", "-9", pid });
+                    break;
+                case windows:
+                    kill = Runtime.getRuntime()
+                                  .exec(new String[] { "taskkill", "/PID", pid });
+                    break;
+                default:
+                    System.err.println("Unsupported operating system");
+                    break;
+                }
+
+                try {
+                    kill.waitFor();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                logger.warn("NO MATCH " + line);
+            }
+            line = bReader.readLine();
+        }
+    }
+
+    static private void killProActiveWithScript() {
+        File dir = new File(PAProperties.PA_HOME.getValue());
+        File command = null;
+        switch (OperatingSystem.getOperatingSystem()) {
+        case unix:
+            command = new File(dir + "dev" + File.separator + "scripts" +
+                    File.separator + "killTests");
+            break;
+        default:
+            break;
+        }
+
+        if (command != null) {
+            if (command.exists()) {
+                try {
+                    Runtime.getRuntime()
+                           .exec(new String[] {
+                            command.getAbsolutePath(), null, dir.toString()
+                        });
+                } catch (Exception e) {
+                    logger.warn(e);
+                }
+            } else {
+                logger.warn(command + " does not exist");
+            }
+        } else {
+            logger.warn(command + " not defined for " +
+                OperatingSystem.getOperatingSystem().toString());
+        }
+    }
+
     /**
      * Kill all ProActive runtimes
      */
     public static void killProActive() {
-        File dir = new File(PAProperties.PA_HOME.getValue());
-        File cmd = new File(dir + "/dev/scripts/killTests");
-        if (cmd.exists()) {
-            try {
-                Process p = null;
-
-                switch (OperatingSystem.getOperatingSystem()) {
-                case unix:
-                    p = Runtime.getRuntime()
-                               .exec(new String[] { cmd.getAbsolutePath() },
-                            null, dir);
-                    try {
-                        p.waitFor();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                default:
-                    System.err.println("TODO: Kill JVMs on Windows also !");
-                    break;
-                }
-
-                p.waitFor();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        } else {
-            System.err.println(cmd + "does not exist");
+        try {
+            killProActiveWithJPS();
+        } catch (Exception jpsException) {
+            jpsException.printStackTrace();
+            killProActiveWithScript();
         }
     }
 
