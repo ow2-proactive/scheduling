@@ -63,6 +63,7 @@ import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableExce
 import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
+
 /**
  * @author acontes
  * this class provides some additional behaviours expected when talking with a
@@ -73,18 +74,17 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     implements ProActiveRuntime {
 
     /**
-	 * generated serial uid
-	 */
-	private static final long serialVersionUID = -8238213803072932083L;
+         * generated serial uid
+         */
+    private static final long serialVersionUID = -8238213803072932083L;
 
-
-	/**
-     * Cache the vmInformation field
-     */
+    /**
+    * Cache the vmInformation field
+    */
     protected VMInformation vmInformation;
 
     public ProActiveRuntimeRemoteObjectAdapter() {
-    	// empty non arg constructor
+        // empty non arg constructor
     }
 
     public ProActiveRuntimeRemoteObjectAdapter(ProActiveRuntime u) {
@@ -98,7 +98,6 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     protected void construct() {
         this.vmInformation = target.getVMInformation();
     }
-
 
     // =========   Implements ProActiveRuntime ==================
     @Override
