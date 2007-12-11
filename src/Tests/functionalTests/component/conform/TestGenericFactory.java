@@ -95,7 +95,9 @@ public class TestGenericFactory extends Conformtest {
                 C.class.getName());
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, AC, NC, CP, MCC, GC, MC, PC, sI, cI })));
+                    new Object[] {
+                        COMP, BC, LC, AC, NC, CP, MCC, GC, MC, PC, sI, cI
+                    })));
     }
 
     @Test
@@ -103,7 +105,9 @@ public class TestGenericFactory extends Conformtest {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, SC, NC, CP, MCC, GC, MC, PC, sI, cI })));
+                    new Object[] {
+                        COMP, BC, LC, SC, NC, CP, MCC, GC, MC, PC, sI, cI
+                    })));
     }
 
     @Test
@@ -133,7 +137,8 @@ public class TestGenericFactory extends Conformtest {
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
                     new Object[] {
-                        COMP, BC, CC, LC, SC, AC, NC, CP, MCC, GC, MC, PC, sI, cI
+                        COMP, BC, CC, LC, SC, AC, NC, CP, MCC, GC, MC, PC, sI,
+                        cI
                     })));
     }
 

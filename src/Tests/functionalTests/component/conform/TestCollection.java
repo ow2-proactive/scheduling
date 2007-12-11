@@ -98,7 +98,8 @@ public class TestCollection extends Conformtest {
         checkComponent(c,
             new HashSet(Arrays.asList(
                     new Object[] {
-                        COMP, BC, LC, SC, NC, CP, MCC, GC, MC, PC, serverI, clientI
+                        COMP, BC, LC, SC, NC, CP, MCC, GC, MC, PC, serverI,
+                        clientI
                     })));
         //       new Object[] { COMP, BC, LC, SC, NC, serverI, clientI })));
     }
@@ -122,13 +123,15 @@ public class TestCollection extends Conformtest {
         checkComponent(c,
             new HashSet(Arrays.asList(
                     new Object[] {
-                        COMP, BC, F, SC, NC, MC, MCC, GC, CP, PC, serverI, clientI
+                        COMP, BC, F, SC, NC, MC, MCC, GC, CP, PC, serverI,
+                        clientI
                     })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c,
             new HashSet(Arrays.asList(
                     new Object[] {
-                        COMP, BC, LC, SC, NC, MC, MCC, GC, CP, PC, serverI, clientI
+                        COMP, BC, LC, SC, NC, MC, MCC, GC, CP, PC, serverI,
+                        clientI
                     })));
     }
 
@@ -215,7 +218,8 @@ public class TestCollection extends Conformtest {
         checkComponent(c,
             new HashSet(Arrays.asList(
                     new Object[] {
-                        COMP, BC, LC, SC, NC, MC, MCC, GC, CP, PC, serverI, clientI
+                        COMP, BC, LC, SC, NC, MC, MCC, GC, CP, PC, serverI,
+                        clientI
                     })));
     }
 

@@ -56,7 +56,9 @@ public abstract class Conformtest extends ComponentTest {
     protected final static String MCC = "multicast-controller/org.objectweb.proactive.core.component.controller.MulticastController/false,false,false";
     protected final static String GC = "gathercast-controller/org.objectweb.proactive.core.component.controller.GathercastController/false,false,false";
     protected final static String CP = "component-parameters-controller/org.objectweb.proactive.core.component.controller.ComponentParametersController/false,false,false";
-    protected final static String PC = Constants.REQUEST_PRIORITY_CONTROLLER + "/" + PriorityController.class.getCanonicalName() + "/false,false,false";
+    protected final static String PC = Constants.REQUEST_PRIORITY_CONTROLLER +
+        "/" + PriorityController.class.getCanonicalName() +
+        "/false,false,false";
 
     //  protected final static String COMP = "component/"+ComponentItf.TYPE.getFcItfSignature()+"/false,false,false";
     //  protected final static String BC = "binding-controller/"+BindingControllerDef.TYPE.getFcItfSignature()+"/false,false,false";
