@@ -63,6 +63,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
+import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.ic2d.console.Console;
 import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
@@ -104,12 +105,7 @@ public class MonitorNewHostDialog extends Dialog {
         String port = "";
 
         /* Get the machine's name */
-        try {
-            initialHostValue = ProActiveInet.getInstance().getLocal()
-                                            .getHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        }
+        initialHostValue = ProActiveInet.getInstance().getHostname();
 
         /* Load the proactive default configuration */
         ProActiveConfiguration.load();
