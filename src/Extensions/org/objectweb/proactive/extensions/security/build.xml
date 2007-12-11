@@ -5,6 +5,6 @@
 	<target name="compile" depends="core,-compile"/>
 	
 	<target name="-compile">
-		<compile_extra module="security" />
+		<compile_extension module="security" />
 	</target>
 </project>
