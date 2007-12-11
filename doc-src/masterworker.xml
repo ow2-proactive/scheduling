@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
-<chapter id="MasterSlave">
+<chapter id="MasterWorker">
     <title>Master/Worker API</title>
 
     <para>The outline of this short handbook:</para>
