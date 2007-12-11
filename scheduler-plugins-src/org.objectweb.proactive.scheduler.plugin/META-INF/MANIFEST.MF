@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scheduler Plug-in
 Bundle-SymbolicName: org.objectweb.proactive.extra.scheduler.gui;singleton:=true
 Bundle-Version: 1.0.0
-Bundle-Activator: org.objectweb.proactive.extra.scheduler.gui.Activator
+Bundle-Activator: org.objectweb.proactive.extensions.scheduler.gui.Activator
 Bundle-Vendor: ProActive
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -11,15 +11,15 @@ Require-Bundle: org.eclipse.ui,
  org.objectweb.proactive.ic2d.lib
 Eclipse-LazyStart: true
 Export-Package: .,
- org.objectweb.proactive.extra.scheduler.gui;uses:="org.eclipse.ui.plugin,org.eclipse.swt.graphics,org.osgi.framework",
- org.objectweb.proactive.extra.scheduler.gui.actions;uses:="org.objectweb.proactive.extra.scheduler.gui.views,org.eclipse.jface.action,org.eclipse.swt.widgets",
- org.objectweb.proactive.extra.scheduler.gui.actions.icons,
- org.objectweb.proactive.extra.scheduler.gui.composite;
+ org.objectweb.proactive.extensions.scheduler.gui;uses:="org.eclipse.ui",
+ org.objectweb.proactive.extensions.scheduler.gui.actions;uses:="org.objectweb.proactive.extra.scheduler.gui.views,org.eclipse.jface.action,org.eclipse.swt.widgets",
+ org.objectweb.proactive.extensions.scheduler.gui.actions.icons,
+ org.objectweb.proactive.extensions.scheduler.gui.composite;
   uses:="org.objectweb.proactive.extra.scheduler.gui.data,
    org.objectweb.proactive.extra.scheduler.job,
    org.objectweb.proactive.extra.scheduler.task,
    org.eclipse.swt.widgets",
- org.objectweb.proactive.extra.scheduler.gui.data;
+ org.objectweb.proactive.extensions.scheduler.gui.data;
   uses:="org.objectweb.proactive.extra.scheduler.gui.views,
    org.objectweb.proactive.extra.scheduler.core,
    org.apache.log4j,
@@ -29,9 +29,8 @@ Export-Package: .,
    org.objectweb.proactive.extra.scheduler.task,
    org.eclipse.swt.widgets,
    org.objectweb.proactive.extra.scheduler.userAPI",
- org.objectweb.proactive.extra.scheduler.gui.dialog;uses:="org.eclipse.swt.widgets",
- org.objectweb.proactive.extra.scheduler.gui;uses:="org.eclipse.ui",
- org.objectweb.proactive.extra.scheduler.gui.views;
+ org.objectweb.proactive.extensions.scheduler.gui.dialog;uses:="org.eclipse.swt.widgets",
+ org.objectweb.proactive.extensions.scheduler.gui.views;
   uses:="org.eclipse.ui.console,
    org.objectweb.proactive.extra.scheduler.gui.composites,
    org.objectweb.proactive.extra.scheduler.job,
