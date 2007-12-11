@@ -58,7 +58,7 @@ public class RequestReceiverImpl implements RequestReceiver,
     private AtomicInteger inImmediateService;
 
     public RequestReceiverImpl() {
-        immediateServices = new Hashtable<String, Object>(2);
+        immediateServices = new Hashtable<String, Object>(4);
         immediateServices.put("toString", ANY_PARAMETERS);
         immediateServices.put("hashCode", ANY_PARAMETERS);
         immediateServices.put("_terminateAOImmediately", ANY_PARAMETERS);
