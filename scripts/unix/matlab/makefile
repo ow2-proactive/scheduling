@@ -42,8 +42,10 @@ CONFIG =	ptII.mk
 include $(CONFIG)
 
 
+PTOLEMY_LIB_NO_CYGDRIVE = $(PROACTIVE_NO_CYGDRIVE)/lib/ptolemy.jar
 PTOLEMY_LIB = $(PROACTIVE)/lib/ptolemy.jar
-CLASSPATH =	$(PTOLEMY_LIB)
+
+CLASSPATH =	$(PTOLEMY_LIB_NO_CYGDRIVE)
 
 PTLIB=$(PTJNI_SHAREDLIBRARY_PREFIX)ptmatlab.$(PTJNI_SHAREDLIBRARY_SUFFIX)
 
@@ -101,16 +103,18 @@ all: $(PROACTIVE)/lib/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)/$(PTLIB)
 # -fno-exceptions  - see note at bottom
 # $(PTJNI_NO_CYGWIN) is sometimes set to -mno-cygwin and causes
 # "Invalid access to memory location" errors
+
+
 $(PTLIB): ptmatlab.cc $(PTOLEMY_LIB)
 	CLASSPATH="$(CLASSPATH)" "$(PTJAVA_DIR)/bin/javah" -jni -o ptmatlab.h ptolemy.matlab.Engine
 	$(PTCC) -v -shared $(CFLAGS) \
-		"-I$(MATLAB_DIR)/extern/include" \
-		"-I$(PTJAVA_DIR)/include" \
-		"-I$(PTJAVA_DIR)/include/$(PTJNI_ARCHITECTURE)" \
+		"-I$(MATLAB_DIR_NO_CYGDRIVE)/extern/include" \
+		"-I$(PTJAVA_DIR_NO_CYGDRIVE)/include" \
+		"-I$(PTJAVA_DIR_NO_CYGDRIVE)/include/$(PTJNI_ARCHITECTURE)" \
 		$< \
 		-fno-exceptions \
 		-o $@ \
-		-L$(MATLAB_DIR)/$(MATLAB_LIBDIR) $(PTJNI_SHAREDLIBRARY_LDFLAG) -lc -leng -lmx
+		"-L$(MATLAB_DIR_NO_CYGDRIVE)/$(MATLAB_LIBDIR)" $(PTJNI_SHAREDLIBRARY_LDFLAG) -lc -leng -lmx
 		
 $(PROACTIVE)/lib/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)/$(PTLIB) : $(PTLIB)
 	mkdir -p $(PROACTIVE)/lib/$(MATLAB_VERSION)/$(MATLAB_LIBDIR)

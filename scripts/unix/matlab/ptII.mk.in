@@ -52,6 +52,7 @@ BIN_INSTALL_DIR =	$(exec_prefix)/bin
 
 # The home of ProActive
 PROACTIVE = @PROACTIVE@
+PROACTIVE_NO_CYGDRIVE = @PROACTIVE_NO_CYGDRIVE@
 
 # The home of the Java Developer's Kit (JDK)
 # Generating Java documentation uses this makefile variable
@@ -62,11 +63,13 @@ PROACTIVE = @PROACTIVE@
 # you are looking for Java jar files.  Note that PTJAVA_HOME is set to
 # the jre/ directory, wheras PTJAVA_DIR is set to the directory 
 # above the jre/ directory.
-PTJAVA_DIR = 	@PTJAVA_DIR@
+PTJAVA_DIR =	@PTJAVA_DIR@
+PTJAVA_DIR_NO_CYGDRIVE =	@PTJAVA_DIR_NO_CYGDRIVE@
 
 # Value of the java.home Java property, which usually refers to the jre.
 # Under Cygwin, PTJAVA_HOME will not contain /cygdrive/c
 PTJAVA_HOME =	@PTJAVA_HOME@
+PTJAVA_HOME_NO_CYGDRIVE =	@PTJAVA_HOME_NO_CYGDRIVE@
 
 # Location of rt.jar, usually $(PTJAVA_HOME)/lib/rt.jar
 # However, we have to be careful of backslashes and /cygwin
@@ -111,6 +114,7 @@ MAJOR_OS_NAME =	@MAJOR_OS_NAME@
 # Location of the Matlab directory.  The matlab binary will be
 # found at $(MATLAB_DIR)/bin/matlab
 MATLAB_DIR = 	@MATLAB_DIR@
+MATLAB_DIR_NO_CYGDRIVE = @MATLAB_DIR_NO_CYGDRIVE@
 
 # Location of Matlab's engine libraries (libeng.so, libmx.so)
 MATLAB_LIBDIR =	@MATLAB_LIBDIR@

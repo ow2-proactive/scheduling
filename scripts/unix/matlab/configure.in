@@ -52,8 +52,20 @@ dnl else we won't be able to rebuild after make extraclean.
 AC_INIT(ptII.mk.in)
 PTII=`pwd`
 
+
+AC_MSG_CHECKING([Finding ProActive])
+PROACTIVE=$(readlink -f $PTII/../../../)
+AC_MSG_RESULT([$PROACTIVE])
+
 # We must have MATLAB set before running configure.
 AC_MSG_CHECKING([Testing Matlab environment variable])
+
+case "`uname -s`" in
+CYGWIN*)
+	# horrible hack for converted windows path : they can't be used directly !
+	MATLAB=$(echo $(cygpath -u $MATLAB))
+	;;
+esac
 
 if test -n "$MATLAB"; then
 	if (test -f "$MATLAB" -a -x "$MATLAB"); then
@@ -95,10 +107,6 @@ case "`uname -s`" in
 
 
 
-AC_MSG_CHECKING([Finding ProActive])
-PROACTIVE=$(readlink -f $PTII/../../../)
-AC_MSG_RESULT([$PROACTIVE])
-
 # We must have PTII set before running configure.
 #if test -z "$PTII"; then
 #    if test -n "$PTOLEMY"; then
@@ -137,64 +145,6 @@ else
     which contains backslashes.  Even under Windows, please set
     PTII to use forward slashes.])
 fi
-
-AC_MSG_CHECKING([if \$PTII ('$PTII') contains "cygdrive"])
-echo "$PTII" | egrep 'cygdrive|cygwin' > /dev/null
-status=$?
-if test "$status" -eq 1 ; then
-    AC_MSG_RESULT([ok
-    '$PTII' does not contain cygdrive or cygwin, which is right.])
-else
-    AC_MSG_WARN(['\$PTII == $PTII,
-which contains 'cygdrive' or 'cygwin'.
-It could be that you have incorrectly set PTII.
-If you have installed Cygwin in c:/cygwin, and your Ptolemy II installation
-is in a directory outside of the c:/cygwin tree, then Cygwin may
-change your PTII variable to include "/cygdrive/c".  This
-will cause problems with non-Cygwin tools like javac that do
-not understand /cygdrive/c
-
-PTII can end up with cygdrive or cygwin in it if
-you mistakenly do something like PTII=`pwd`.
-
-Under Cygwin, try permanently setting PTII in the control panel 
-(Start->Control Panels->Advanced->Environment Variables)
-or temporary set it within bash:
-  PTII=c:/users/yourname/ptII
-  export PTII
-and then rerun
-  ./configure
-See $PTII/doc/install.htm for details.'])
-fi
-
-
-case "`uname -s`" in
-    CYGWIN_NT-*)
-        AC_MSG_CHECKING([if \$PTII ('$PTII') contains "cygwin"])
-        cygpath -w "$PTII" | grep cygwin > /dev/null
-        status=$?
-        if test "$status" -eq 1 ; then
-	     AC_MSG_RESULT([ok
-  \$PTII is '$PTII', which does not contain cygwin, which is right.])
-        else
-    AC_MSG_WARN([
-'cygpath -w \$PTII' == '`cygpath -w $PTII`'
-which contains 'cygwin'.
-This could happen if your home directory is in the default location
-for cygwin which cygwin thinks is /home/yourname,
-but windows thinks is c:\\cygwin\\home\\yourname.
-This will cause problems with non-Cygwin tools like javac that do
-not understand Cygwin directory structure and mounts will not
-be able to find files in $PTII.
-The solution is to move the Ptolemy II tree outside of
-c:\\cygwin and to set the PTII variable to point to that location
-and then rerun
-  cd \$PTII  
-  ./configure
-See $PTII/doc/install.htm for details.'])
-     fi
-     ;;
-esac 
 
 
 # If we are under Cygwin, check that we can find CMD
@@ -247,6 +197,7 @@ CYGWIN*)
 	PTII_DIR=$PTII
 	;;
 esac
+
 
 #--------------------------------------------------------------------
 #       Look for the "find" command
@@ -351,11 +302,7 @@ but adding the directory to your path is likely to work best.])
     fi
 fi
 
-# PTJAVA_DIR without /cygdrive
-# Use changequote here to preserve square brackets
-changequote(<<, >>)dnl
-PTJAVA_DIR_NO_CYGDRIVE="`echo "$PTJAVA_DIR" | sed 's@/cygdrive/\([a-z]\)/@\1:/@'`"
-changequote([, ])dnl
+
 
 #
 # Check that we have the java that corresponds with PTJAVA_DIR in our path
@@ -623,13 +570,17 @@ else
 	else 
 	   	startdir="`pwd`"
 		AC_MSG_CHECKING([the value of the Matlab root directory ])
-	    MATLAB_DIR_TMP=$(readlink -f $(dirname $(readlink -f $MATLAB))/..)
+		case "`uname -s`" in
+		CYGWIN*)
+			MATLAB_DIR_TMP=$(readlink -f "$(dirname "$(readlink -f "$MATLAB")")/..")
+			;;
+		*)
+			MATLAB_DIR_TMP=$(readlink -f $(dirname $(readlink -f $MATLAB))/..)
+			;;
+		esac
+		
+		MATLAB_DIR=$MATLAB_DIR_TMP
 	    
-	    # Use changequote to protect the square brackets in sed
-changequote(<<, >>)dnl
-	    # Remove /cygdrive so we can compile with MSVC
-	    MATLAB_DIR=`echo "$MATLAB_DIR_TMP" | sed 's@/cygdrive/\([a-zA-Z]\)/@\1:/@'`
-changequote([, ])dnl
 
 	    AC_MSG_RESULT('$MATLAB_DIR')
 		
@@ -715,7 +666,7 @@ changequote([, ])dnl
             		MATLAB_VERSION=$(${MATLAB} -nodisplay -nosplash -nojvm -r 'disp(version()); quit;'|tail -n 2|cut -s -d '.' -f 1-2)
             		;;
             	CYGWIN*)
-            		${MATLAB} -nosplash -minimize -logfile "version.txt" -r "disp(version()); quit;"
+            		"${MATLAB}" -nosplash -minimize -logfile "version.txt" -r "disp(version()); quit;"
             		MATLAB_VERSION=$(cat version.txt|cut -s -d '.' -f 1-2)
             		;;
             	*)
@@ -726,6 +677,48 @@ changequote([, ])dnl
 	fi    
 fi
 
+# Cygdrive versions, removing all cygdrive paths
+case "`uname -s`" in
+CYGWIN*)
+AC_MSG_CHECKING([Stripping cygdrive in paths])
+# Use changequote here to preserve square brackets
+	changequote(<<, >>)dnl
+	
+	# PTJAVA_DIR without /cygdrive
+	PTJAVA_DIR_NO_CYGDRIVE=`cygpath -w "$PTJAVA_DIR"`
+	
+	
+	# PTJAVA_HOME without /cygdrive
+	PTJAVA_HOME_NO_CYGDRIVE=`cygpath -w "$PTJAVA_HOME"`
+	
+	
+	# PTII without /cygdrive
+	PTII_NO_CYGDRIVE=`cygpath -w "$PTII"`
+	 
+	
+	# PROACTIVE without /cygdrive
+	PROACTIVE_NO_CYGDRIVE=`cygpath -w "$PROACTIVE"`
+	
+	
+	# MATLAB_DIR without /cygdrive
+	MATLAB_DIR_NO_CYGDRIVE=`cygpath -w "$MATLAB_DIR"`
+	
+	
+	changequote([, ])dnl
+	AC_MSG_RESULT([PTJAVA_DIR_NO_CYGDRIVE='${PTJAVA_DIR_NO_CYGDRIVE}']) 
+	AC_MSG_RESULT([PTJAVA_HOME_NO_CYGDRIVE='${PTJAVA_HOME_NO_CYGDRIVE}']) 
+	AC_MSG_RESULT([PTII_NO_CYGDRIVE='${PTII_NO_CYGDRIVE}'])
+	AC_MSG_RESULT([PROACTIVE_NO_CYGDRIVE='${PROACTIVE_NO_CYGDRIVE}'])
+	AC_MSG_RESULT([MATLAB_DIR_NO_CYGDRIVE='${MATLAB_DIR_NO_CYGDRIVE}'])
+	;;
+*)
+	PTJAVA_DIR_NO_CYGDRIVE=$PTJAVA_DIR
+	PTJAVA_HOME_NO_CYGDRIVE=$PTJAVA_HOME
+	PTII_NO_CYGDRIVE=$PTII
+	PROACTIVE_NO_CYGDRIVE=$PROACTIVE
+	MATLAB_DIR_NO_CYGDRIVE=$MATLAB_DIR
+	;;
+esac
 
 
 # Keep these substitutions alphabetical, with a description
@@ -747,6 +740,7 @@ AC_SUBST(MAJOR_OS_NAME)
 # Set to the location of the matlab installation, e.g. /matlabr11
 # This directory usually contains bin,...
 AC_SUBST(MATLAB_DIR)
+AC_SUBST(MATLAB_DIR_NO_CYGDRIVE)
 
 # Set the location of Matlab's engine libraries
 AC_SUBST(MATLAB_LIBDIR)
@@ -756,18 +750,18 @@ AC_SUBST(MATLAB_VERSION)
 
 # Location of ProActive
 AC_SUBST(PROACTIVE)
+AC_SUBST(PROACTIVE_NO_CYGDRIVE)
 
 # Set to gcc if gcc was found and used in $PTII/ptolemy/matlab/makefile.
 AC_SUBST(PTCC)
 
 # Location of the JDK
 AC_SUBST(PTJAVA_DIR)
-
-# Location of the JDK
 AC_SUBST(PTJAVA_DIR_NO_CYGDRIVE)
 
 # Value of java.home property, location of the JDK with /cygdrive/c/ converted to c:/
 AC_SUBST(PTJAVA_HOME)
+AC_SUBST(PTJAVA_HOME_NO_CYGDRIVE)
 
 # Set to jni and used in 
 # $PTII/makefile if gcc or cc was found
@@ -775,10 +769,6 @@ AC_SUBST(PTJNI_DIR)
 
 # JNI architecture, used to compile C files
 AC_SUBST(PTJNI_ARCHITECTURE)
-
-# Set to jni and used in 
-# $PTII/makefile if gcc or cc was found
-AC_SUBST(PTJNI_DIR)
 
 # Set to -ldl for use by jni/launcher/makefile under Linux
 AC_SUBST(PTJNI_DL_LIBRARY)
