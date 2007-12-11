@@ -100,12 +100,12 @@ public abstract class PolicyTools {
         List<SimplePolicyRule> rules, List<String> authorizedUsers)
         throws SAXException {
         AttributesImpl atts = new AttributesImpl();
-        atts.addAttribute("", "", "xmlns", "CDATA", "urn:proactive:security:1.0");
+        atts.addAttribute("", "", "xmlns", "CDATA", "urn:proactive:security:1.1");
         atts.addAttribute("", "", "schemaVersion", "CDATA", "1.0");
         atts.addAttribute("", "", "xmlns:xsi", "CDATA",
             "http://www.w3.org/2001/XMLSchema-instance");
         atts.addAttribute("", "", "xsi:schemaLocation", "CDATA",
-            "urn:proactive:security:1.0 http://www-sop.inria.fr/oasis/ProActive/schemas/security/1.0/security.xsd");
+            "urn:proactive:security:1.1 http://www-sop.inria.fr/oasis/ProActive/schemas/security/1.1/security.xsd");
 
         th.startElement("", "", "Policy", atts);
 
