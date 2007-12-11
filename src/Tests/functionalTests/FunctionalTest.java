@@ -175,7 +175,8 @@ public class FunctionalTest {
 
         String line = bReader.readLine();
         while (line != null) {
-            if (line.matches(".*proactive.test=true.*")) {
+            if (line.matches(".*proactive.test=true.*") ||
+                    line.matches(".*StartP2PService.*")) {
                 logger.warn("MATCH " + line);
 
                 String pid = line.substring(0, line.indexOf(" "));

@@ -30,14 +30,8 @@
  */
 package functionalTests.descriptor.services.p2p;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.HashMap;
-
 import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -45,10 +39,10 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
-import org.objectweb.proactive.core.util.OperatingSystem;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
+
 
 /**
  * Test service: P2P JVM acquisition in deployment descriptor
@@ -78,58 +72,6 @@ public class P2pXmlTest extends FunctionalTest {
     JVMProcessImpl process;
     Node[] nodeTab;
     ProActiveDescriptor pad;
-
-    @BeforeClass
-    public static void globalInit() {
-        /**
-             * StartP2PService is started without the FunctionalTest.JVM_PARAMETERS
-             * parameters. This shutdownhook is added to kill every StartP2PService.
-             */
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    HashMap<String, String> pids = new HashMap<String, String>();
-
-                    try {
-                        // Run JPS to list all JVMs on this machine
-                        Process p = Runtime.getRuntime()
-                                           .exec(getJPSCommand() + " -ml");
-                        BufferedReader br = new BufferedReader(new InputStreamReader(
-                                    p.getInputStream()));
-
-                        for (String line = br.readLine(); line != null;
-                                line = br.readLine()) {
-                            if (line.contains("StartP2PService")) {
-                                String[] fields = line.split(" ", 2);
-
-                                switch (OperatingSystem.getOperatingSystem()) {
-                                case unix:
-                                    p = Runtime.getRuntime()
-                                               .exec(new String[] {
-                                                "kill", fields[0]
-                                            }, null, null);
-                                    try {
-                                        p.waitFor();
-                                    } catch (InterruptedException e) {
-                                        e.printStackTrace();
-                                    }
-                                    break;
-                                default:
-                                    System.err.println(
-                                        "TODO: Kill P2PService on Windows also !");
-                                    break;
-                                }
-
-                                pids.put(fields[0], fields[1]);
-                            }
-                        }
-                    } catch (IOException e) {
-                        // Should not happen
-                        e.printStackTrace();
-                    }
-                }
-            });
-    }
 
     @Before
     public void initTest() throws Exception {
