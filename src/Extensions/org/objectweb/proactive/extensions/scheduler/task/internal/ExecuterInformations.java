@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extensions.scheduler.task.internal;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
 
@@ -43,7 +45,7 @@ import org.objectweb.proactive.extensions.scheduler.task.TaskLauncher;
  * @version 3.9, Sept 10, 2007
  * @since ProActive 3.9
  */
-public class ExecuterInformations {
+public class ExecuterInformations implements Serializable {
 
     /** Serial Version UID */
     private static final long serialVersionUID = 7710839621630737064L;
