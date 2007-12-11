@@ -192,10 +192,6 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         return target.getCertificate();
     }
 
-    //    public byte[] getCertificateEncoded()
-    //        throws SecurityNotAvailableException, IOException {
-    //        return target.getCertificateEncoded();
-    //    }
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return target.getEntities();
