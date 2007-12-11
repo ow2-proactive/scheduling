@@ -86,7 +86,7 @@ public class TestGenericFactory extends Conformtest {
         Component c = gf.newFcInstance(t, flatPrimitive, C.class.getName());
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, NC, CP, MCC, GC, MC, sI, cI })));
+                    new Object[] { COMP, BC, LC, NC, CP, MCC, GC, MC, PC, sI, cI })));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class TestGenericFactory extends Conformtest {
                 C.class.getName());
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, AC, NC, CP, MCC, GC, MC, sI, cI })));
+                    new Object[] { COMP, BC, LC, AC, NC, CP, MCC, GC, MC, PC, sI, cI })));
     }
 
     @Test
@@ -103,7 +103,7 @@ public class TestGenericFactory extends Conformtest {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, SC, NC, CP, MCC, GC, MC, sI, cI })));
+                    new Object[] { COMP, BC, LC, SC, NC, CP, MCC, GC, MC, PC, sI, cI })));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class TestGenericFactory extends Conformtest {
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
                     new Object[] {
-                        COMP, BC, MC, LC, MCC, GC, SC, NC, CP, AC, sI, cI
+                        COMP, BC, MC, LC, MCC, GC, SC, NC, CP, AC, PC, sI, cI
                     })));
         //          new Object[] { COMP, BC, LC, SC, AC, NC, sI, cI })));
     }
@@ -123,7 +123,7 @@ public class TestGenericFactory extends Conformtest {
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
                     new Object[] {
-                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, sI, cI
+                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, PC, sI, cI
                     })));
     }
 
@@ -133,7 +133,7 @@ public class TestGenericFactory extends Conformtest {
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
                     new Object[] {
-                        COMP, BC, CC, LC, SC, AC, NC, CP, MCC, GC, MC, sI, cI
+                        COMP, BC, CC, LC, SC, AC, NC, CP, MCC, GC, MC, PC, sI, cI
                     })));
     }
 
@@ -147,11 +147,11 @@ public class TestGenericFactory extends Conformtest {
                 new Object[] { "flatPrimitive", C.class.getName() });
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, F, NC, sI, cI })));
+                    new Object[] { COMP, BC, F, NC, PC, sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, NC, sI, cI })));
+                    new Object[] { COMP, BC, LC, NC, PC, sI, cI })));
     }
 
     @Test
@@ -161,11 +161,11 @@ public class TestGenericFactory extends Conformtest {
                 new Object[] { "flatParametricPrimitive", C.class.getName() });
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, F, AC, NC, sI, cI })));
+                    new Object[] { COMP, BC, F, AC, NC, PC, sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, AC, NC, sI, cI })));
+                    new Object[] { COMP, BC, LC, AC, NC, PC, sI, cI })));
     }
 
     @Test
@@ -175,11 +175,11 @@ public class TestGenericFactory extends Conformtest {
                 new Object[] { "primitive", C.class.getName() });
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, F, SC, NC, sI, cI })));
+                    new Object[] { COMP, BC, F, SC, NC, PC, sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, SC, NC, sI, cI })));
+                    new Object[] { COMP, BC, LC, SC, NC, PC, sI, cI })));
     }
 
     @Test
@@ -189,11 +189,11 @@ public class TestGenericFactory extends Conformtest {
                 new Object[] { "parametricPrimitive", C.class.getName() });
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, F, SC, AC, NC, sI, cI })));
+                    new Object[] { COMP, BC, F, SC, AC, NC, PC, sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, LC, SC, AC, NC, sI, cI })));
+                    new Object[] { COMP, BC, LC, SC, AC, NC, PC, sI, cI })));
     }
 
     @Test
@@ -203,11 +203,11 @@ public class TestGenericFactory extends Conformtest {
                 new Object[] { "composite", null });
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, CC, F, SC, NC, sI, cI })));
+                    new Object[] { COMP, BC, CC, F, SC, NC, PC, sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, CC, LC, SC, NC, sI, cI })));
+                    new Object[] { COMP, BC, CC, LC, SC, NC, PC, sI, cI })));
     }
 
     @Test
@@ -217,11 +217,11 @@ public class TestGenericFactory extends Conformtest {
                 new Object[] { "parametricComposite", C.class.getName() });
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, CC, F, SC, AC, NC, sI, cI })));
+                    new Object[] { COMP, BC, CC, F, SC, AC, NC, PC, sI, cI })));
         c = Fractal.getFactory(c).newFcInstance();
         checkComponent(c,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, BC, CC, LC, SC, AC, NC, sI, cI })));
+                    new Object[] { COMP, BC, CC, LC, SC, AC, NC, PC, sI, cI })));
     }
 
     // -------------------------------------------------------------------------

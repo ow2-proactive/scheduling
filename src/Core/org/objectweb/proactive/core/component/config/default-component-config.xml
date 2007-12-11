@@ -40,6 +40,10 @@
             <interface>org.objectweb.proactive.core.component.controller.MigrationController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.MigrationControllerImpl</implementation>
         </controller>
+        <controller>
+            <interface>org.objectweb.proactive.core.component.controller.PriorityController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.PriorityControllerImpl</implementation>
+        </controller>
     </controllers>
     
 </componentConfiguration>

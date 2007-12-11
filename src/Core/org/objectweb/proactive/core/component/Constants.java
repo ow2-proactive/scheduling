@@ -50,6 +50,7 @@ public interface Constants {
     public final static String COMPONENT = "component";
     public final static String CYCLIC_NODE_SUFFIX = "-cyclicInstanceNumber-";
     public final static String MEMBRANE_CONTROLLER = "membrane-controller";
+    public final static String REQUEST_PRIORITY_CONTROLLER = "request-priority-controller";
 
     // hierarchical types of component
     public final static String COMPOSITE = "composite";

@@ -107,14 +107,14 @@ public class TestMulticast extends Conformtest {
         checkComponent(master,
             new HashSet<Object>(Arrays.asList(
                     new Object[] {
-                        COMP, BC, LC, SC, NC, CP, MCC, GC, MC, serverMaster,
+                        COMP, BC, LC, SC, NC, CP, MCC, GC, MC, PC, serverMaster,
                         clientSlaveMulticast
                     })));
         Component slave = gf.newFcInstance(tSlave, "primitive",
                 SlaveImpl.class.getName());
         checkComponent(slave,
             new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, LC, SC, NC, CP, MCC, GC, MC, serverSlave })));
+                    new Object[] { COMP, LC, SC, NC, CP, MCC, GC, MC, PC, serverSlave })));
     }
 
     @Test
@@ -123,14 +123,14 @@ public class TestMulticast extends Conformtest {
         checkComponent(master,
             new HashSet<Object>(Arrays.asList(
                     new Object[] {
-                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, serverMaster,
+                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, PC, serverMaster,
                         clientSlaveMulticast
                     })));
         Component slave = gf.newFcInstance(tSlave, "composite", null);
         checkComponent(slave,
             new HashSet<Object>(Arrays.asList(
                     new Object[] {
-                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, serverSlave
+                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, PC, serverSlave
                     })));
     }
 
