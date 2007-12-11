@@ -42,9 +42,9 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  * The key of the map is the name of the task on which to get the result.<br>
  * To identify the job attached to this result, a JobId and its name are provide by this class.<br>
  * You can get the task results within 3 different ways :<ul>
- * <li></li> Every results of every tasks executed in the job.
- * <li></li> Every results that have generated an exception.
- * <li></li> Every results that you pointed out as precious result.
+ * <li> Every results of every tasks executed in the job.</li>
+ * <li> Every results that have generated an exception.</li>
+ * <li> Every results that you pointed out as precious result.</li>
  * <ul>
  *
  * @author jlscheef - ProActiveTeam
@@ -69,6 +69,7 @@ public interface JobResult extends Serializable {
     public String getName();
 
     /**
+     * <font color="red">-- For internal use only --</font>
      * Add a new task result to this job result.<br>
      * Used by the scheduler to fill your job result.
      *
