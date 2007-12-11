@@ -41,7 +41,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.logforwarder.SimpleLoggerServer;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobFactory;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
@@ -49,6 +48,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAu
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerConnection;
 import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface;
 import org.objectweb.proactive.extensions.scheduler.common.task.Log4JTaskLogs;
+import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLoggerServer;
 
 
 public class JobLauncher {

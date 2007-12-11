@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.logforwarder;
+package org.objectweb.proactive.extensions.scheduler.util.logforwarder;
 
 import java.io.BufferedInputStream;
 import java.io.EOFException;

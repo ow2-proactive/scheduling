@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.logforwarder;
+package org.objectweb.proactive.extensions.scheduler.util.logforwarder;
 
 import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Level;

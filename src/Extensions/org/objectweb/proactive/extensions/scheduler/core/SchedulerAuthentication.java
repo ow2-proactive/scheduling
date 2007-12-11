@@ -106,7 +106,7 @@ public class SchedulerAuthentication implements InitActive,
         if (jaasConfig == null) {
             throw new RuntimeException(
                 "The file 'jaas.config' has not been found and have to be at the following directory :\n" +
-                "\tclasses/Extra/org.objectweb.proactive.extensions.security/");
+                "\tclasses/Extensions/org.objectweb.proactive.extensions.security/");
         }
 
         System.setProperty("java.security.auth.login.config",

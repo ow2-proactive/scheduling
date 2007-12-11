@@ -28,7 +28,7 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.logforwarder;
+package org.objectweb.proactive.extensions.scheduler.util.logforwarder;
 
 public class RemoteLogListener {
     public static final int LISTEN_PORT = 1988;

@@ -47,9 +47,6 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.extensions.logforwarder.BufferedAppender;
-import org.objectweb.proactive.extensions.logforwarder.EmptyAppender;
-import org.objectweb.proactive.extensions.logforwarder.LoggingOutputStream;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.scheduler.common.exception.UserException;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.Script;
@@ -62,6 +59,9 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskLogs;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
+import org.objectweb.proactive.extensions.scheduler.util.logforwarder.BufferedAppender;
+import org.objectweb.proactive.extensions.scheduler.util.logforwarder.EmptyAppender;
+import org.objectweb.proactive.extensions.scheduler.util.logforwarder.LoggingOutputStream;
 
 
 /**
