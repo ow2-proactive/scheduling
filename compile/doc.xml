@@ -61,7 +61,23 @@
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
 				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
 				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
-
+	
+				<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
+				<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
+				<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
+				<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
+				<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*" />
+				<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
+				<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
+				<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
+				<group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />
+				<group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />
+				<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
+				<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
+				<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
+				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
+				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
+					
 				
 			</javadoc>			
 		</target>
@@ -97,22 +113,6 @@
 				</doclet>
 				<packageset dir="${src.extra.dir}"/>
 				
-				<group title="ProActive packages for end user" packages="org.objectweb.proactive" />
-				<group title="ProActive Core" packages="org.objectweb.proactive.core*" />
-				<group title="ProActive Core : Body" packages="org.objectweb.proactive.core.body*" />
-				<group title="ProActive Core : Components (implementation of the Fractal model)" packages="org.objectweb.proactive.core.component*" />
-				<group title="ProActive P2P : P2P infrastructure" packages="org.objectweb.proactive.p2p*" />
-				<group title="ProActive Extensions : Security" packages="org.objectweb.proactive.ext.security*" />
-				<group title="ProActive Extensions" packages="org.objectweb.proactive.ext*" />
-				<group title="ProActive Branch and Bound API" packages="org.objectweb.proactive.branchnbound*" />
-				<group title="ProActive Calcium API" packages="org.objectweb.proactive.calcium*" />
-				<group title="ProActive Load Balancing API" packages="org.objectweb.proactive.loadbalancing*" />
-				<group title="ProActive MPI API" packages="org.objectweb.proactive.mpi*" />
-				<group title="ProActive OSGI API" packages="org.objectweb.proactive.osgi*" />
-				<group title="ProActive JMX API" packages="org.objectweb.proactive.jmx*" />
-				<group title="ProActive Scheduler API" packages="org.objectweb.proactive.scheduler*" />
-				<group title="ProActive Benchmarks API" packages="org.objectweb.proactive.benchmarks*" />
-						
 			</javadoc>
 						
 			<javadoc  
@@ -145,8 +145,9 @@
 					<package name="org.objectweb.proactive.api" />
 					<package name="org.objectweb.proactive.filetransfer*" />
 					<package name="org.objectweb.proactive.ext.*" />
+					<package name="org.objectweb.proactive.mpi.*" />
 					<package name="org.objectweb.proactive" />
-						<package name="org.objectweb.proactive.annotation" />
+					<package name="org.objectweb.proactive.annotation" />
 				</group>
 								
 				<group title="ProActive Extensions">
@@ -362,7 +363,7 @@
 	<!-- ==================================================================== -->
 	<!-- Construct the manual from the XML files in {docs.src}                -->
 	<!-- ==================================================================== -->
-	<target name="manual" description="Build all the different manual version: html, pdf... " depends="java2html,manualSingleHtml,manualHtml,manualPdf">
+	<target name="manual" description="Build all the different manual version: html, pdf... " depends="manualSingleHtml,manualHtml,manualPdf">
 		<!-- The generation of the files is done by the depends clause -->
 		<!-- Once the doc files have been generated, do some cleaning up -->
 		<delete dir="${docs.tmp.dir}" />
