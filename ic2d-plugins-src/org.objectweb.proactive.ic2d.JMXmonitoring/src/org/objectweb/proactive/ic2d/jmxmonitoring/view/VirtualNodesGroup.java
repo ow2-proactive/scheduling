@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.figure.VNColors;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
@@ -57,8 +57,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 public class VirtualNodesGroup implements Observer {
     private Group group;
-    private Map<Button, VNObject> buttons = new HashMap<Button, VNObject>();
-    private Map<VNObject, Button> virtualNodes = new HashMap<VNObject, Button>();
+    private Map<Button, VirtualNodeObject> buttons = new HashMap<Button, VirtualNodeObject>();
+    private Map<VirtualNodeObject, Button> virtualNodes = new HashMap<VirtualNodeObject, Button>();
     private VNColors vnColors;
 
     //
@@ -96,7 +96,7 @@ public class VirtualNodesGroup implements Observer {
         if ((notif.getMVCNotification() == MVCNotificationTag.WORLD_OBJECT_ADD_VIRTUAL_NODE) &&
                 (data instanceof Hashtable)) { //<"Add a virtual node",VNObject>
             Hashtable table = (Hashtable) data;
-            final VNObject vnAdded = (VNObject) table.get(WorldObject.ADD_VN_MESSAGE);
+            final VirtualNodeObject vnAdded = (VirtualNodeObject) table.get(WorldObject.ADD_VN_MESSAGE);
             if (vnAdded != null) {
                 Display.getDefault().asyncExec(new Runnable() {
                         public void run() {
@@ -113,7 +113,7 @@ public class VirtualNodesGroup implements Observer {
         } else if ((notif.getMVCNotification() == MVCNotificationTag.WORLD_OBJECT_REMOVE_VIRTUAL_NODE) &&
                 (data instanceof Hashtable)) { //<"Remove a virtual node",VNObject>
             Hashtable table = (Hashtable) data;
-            final VNObject vnRemoved = (VNObject) table.get(WorldObject.REMOVE_VN_MESSAGE);
+            final VirtualNodeObject vnRemoved = (VirtualNodeObject) table.get(WorldObject.REMOVE_VN_MESSAGE);
             if (vnRemoved != null) {
                 Display.getDefault().asyncExec(new Runnable() {
                         public void run() {
@@ -136,7 +136,7 @@ public class VirtualNodesGroup implements Observer {
         return group;
     }
 
-    public Color getColor(VNObject vn) {
+    public Color getColor(VirtualNodeObject vn) {
         Button b = virtualNodes.get(vn);
         if (b == null) {
             return null;
@@ -152,7 +152,7 @@ public class VirtualNodesGroup implements Observer {
     //
     private class VirtualNodeButtonListener extends SelectionAdapter {
         public void widgetSelected(SelectionEvent e) {
-            VNObject vn = buttons.get(e.widget);
+            VirtualNodeObject vn = buttons.get(e.widget);
             List<AbstractData> nodes = vn.getMonitoredChildrenAsList();
             for (int i = 0, size = nodes.size(); i < size; i++) {
                 NodeObject node = (NodeObject) nodes.get(i);

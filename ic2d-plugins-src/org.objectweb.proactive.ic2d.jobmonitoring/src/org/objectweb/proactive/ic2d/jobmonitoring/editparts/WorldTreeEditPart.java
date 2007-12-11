@@ -33,7 +33,7 @@ package org.objectweb.proactive.ic2d.jobmonitoring.editparts;
 import java.util.List;
 import java.util.Observable;
 
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 
@@ -70,7 +70,7 @@ public class WorldTreeEditPart extends JobMonitoringTreeEditPart<WorldObject> {
      * @see org.eclipse.gef.editparts.AbstractEditPart#getModelChildren()
      */
     @Override
-    protected final List<VNObject> getModelChildren() {
+    protected final List<VirtualNodeObject> getModelChildren() {
         return super.getCastedModel().getVNChildren();
     }
 }

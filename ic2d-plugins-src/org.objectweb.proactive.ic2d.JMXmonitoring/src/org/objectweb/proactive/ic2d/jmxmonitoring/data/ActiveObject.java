@@ -52,14 +52,6 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
  * Class for the active object representation in the IC2D model.
  */
 public class ActiveObject extends AbstractData {
-    //TODO
-    /** All the method names used to notify the observers */
-    public enum methodName {SET_STATE,
-        ADD_COMMUNICATION,
-        RESET_COMMUNICATION,
-        SET_REQUEST_QUEUE_LENGTH;
-    }
-    ;
 
     /** The parent object. */
     private final NodeObject parent;
@@ -73,10 +65,12 @@ public class ActiveObject extends AbstractData {
     /** Name of the class used to created the active object. */
     private final String className;
 
-    /** JMX Notification listener */
+    /** JMX Notification listener
+     *  This listener will be subscribed to the JMXNotificationManager
+     * */
     private final NotificationListener listener;
 
-    /** State of the object (ex: WAITING_BY_NECESSITY) */
+    /** State of the object defined as a constant of the enum <code> org.objectweb.proactive.ic2d.jmxmonitoring.util.State </code> */
     private State currentState = State.UNKNOWN;
 
     /** request queue length */
@@ -102,7 +96,7 @@ public class ActiveObject extends AbstractData {
     }
 
     /**
-     * Creates a new AOObject.
+     * Creates a new ActiveObject.
      * @param parent The NodeObject containing the active object
      * @param id The active object's id
      * @param className The active object's name
@@ -272,6 +266,10 @@ public class ActiveObject extends AbstractData {
     public void addCommunication(ActiveObject aoSource) {
         // Set<ActiveObject> comm = new HashSet<ActiveObject>();
         // comm.add(aoSource);
+        if (aoSource == null) {
+            //TODO Treat this error
+            return;
+        }
         setChanged();
         notifyObservers(new MVCNotification(
                 MVCNotificationTag.ACTIVE_OBJECT_ADD_COMMUNICATION, aoSource));
@@ -310,6 +308,10 @@ public class ActiveObject extends AbstractData {
         destination.addCommunication(this);
     }
 
+    /**
+     * Sends a notification to this ActiveObject's EditPart(s) who will remove
+     * the graphical connections to and from this object.
+     */
     @Override
     public void resetCommunications() {
         setChanged();

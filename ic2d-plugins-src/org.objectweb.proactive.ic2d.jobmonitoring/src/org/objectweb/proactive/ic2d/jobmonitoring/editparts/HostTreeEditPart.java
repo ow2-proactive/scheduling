@@ -37,7 +37,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
@@ -112,6 +112,6 @@ public class HostTreeEditPart extends JobMonitoringTreeEditPart<HostObject> {
     @Override
     protected final List<RuntimeObject> getModelChildren() {
         return JobMonitoringTreeUtil.getHostChildren(getCastedModel(),
-            (VNObject) getParent().getModel());
+            (VirtualNodeObject) getParent().getModel());
     }
 }

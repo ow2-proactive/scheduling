@@ -37,7 +37,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 
 
 /**
@@ -63,7 +63,7 @@ public class JobMonitoringTreeUtil {
      * @param vn the virtual node which one wants the children
      * @return Children of the virtual node.
      */
-    public static List<HostObject> getVNChildren(VNObject vn) {
+    public static List<HostObject> getVNChildren(VirtualNodeObject vn) {
         List<HostObject> result = new ArrayList<HostObject>();
         List<AbstractData> worldChildren = vn.getWorldObject()
                                              .getMonitoredChildrenAsList();
@@ -93,7 +93,7 @@ public class JobMonitoringTreeUtil {
      * @return Children of the host.
      */
     public static List<RuntimeObject> getHostChildren(HostObject host,
-        VNObject vn) {
+        VirtualNodeObject vn) {
         List<RuntimeObject> result = new ArrayList<RuntimeObject>();
         List<AbstractData> hostChildren = host.getMonitoredChildrenAsList();
         for (AbstractData obj : hostChildren) {
@@ -121,7 +121,8 @@ public class JobMonitoringTreeUtil {
      * @param vn the virtual node parent of the JVM
      * @return Children of the JVM
      */
-    public static List<NodeObject> getJVMChildren(RuntimeObject jvm, VNObject vn) {
+    public static List<NodeObject> getJVMChildren(RuntimeObject jvm,
+        VirtualNodeObject vn) {
         List<NodeObject> result = new ArrayList<NodeObject>();
         List<AbstractData> jvmChildren = jvm.getMonitoredChildrenAsList();
         for (AbstractData obj : jvmChildren) {

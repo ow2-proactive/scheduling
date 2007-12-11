@@ -43,6 +43,19 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
 
+/**
+ *
+ * Listener for a RuntimeObject. Listens for notifications concerning a ProActive Runtime and updates the
+ * IC2D model object representation of it.
+ * For each IC2D representation a ProActive Runtime, a RuntimeObjectListener will be created and subscribed to
+ * the </code>org.objectweb.proactive.core.jmx.util.JMXNotificationManager</code> (singleton).
+ * Each time an event occur related to the ProActive Runtime, a notification
+ * will be sent to this listener.  This listener will update the model representation of the Runtime
+ * which will send notification for its own listener(s) (the edit part(s))
+ *
+ * @author ProActive Team
+ *
+ */
 public class RuntimeObjectListener implements NotificationListener {
     private RuntimeObject runtimeObject;
 

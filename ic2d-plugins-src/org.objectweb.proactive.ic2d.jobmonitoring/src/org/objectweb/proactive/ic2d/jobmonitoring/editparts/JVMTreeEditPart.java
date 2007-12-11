@@ -37,7 +37,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
@@ -104,7 +104,7 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart<RuntimeObject> {
         if ((getParent() != null) && (getParent().getParent() != null) &&
                 (getParent().getParent().getModel() != null)) {
             res = JobMonitoringTreeUtil.getJVMChildren(getCastedModel(),
-                    (VNObject) getParent().getParent().getModel());
+                    (VirtualNodeObject) getParent().getParent().getModel());
         } else {
             // Return an empty list to avoid NullPointerException
             res = new java.util.ArrayList<NodeObject>(0);

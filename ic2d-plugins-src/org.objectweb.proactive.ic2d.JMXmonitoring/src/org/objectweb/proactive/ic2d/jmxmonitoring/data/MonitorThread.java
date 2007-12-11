@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
-import java.util.HashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,9 +38,21 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
 
+/**
+ * This class is used to perform a refresh over the model data (the IC2D representations of the monitored objects).
+ * It defines a thread (<code>MonitorThreadRefresher</code>) that explores all the data in order to guaranty the
+ * sync between the monitored objects and their representations.
+ *
+ * It also defines a thread (<code> MonitorThreadSelectiveRefresher </code>) that will performed an explore on objects
+ * for which an explore have been specifically asked. This thread is used to explore new found objects in the system.
+ * The time between two executions of the MonitorThreadSelectiveRefresher (timeForSelectiveRefresh * 1000) should allways be less that
+ *
+ * @author ProActive Team
+ *
+ */
 public class MonitorThread implements Observer {
     private final static int DEFAULT_TTR = 30;
-    private final static int DEFAULT_TIME_SELECTIVE_REFRESH = 5;
+    private final static int DEFAULT_TIME_SELECTIVE_REFRESH = 10;
 
     //	/** Hosts will be recursively searched up to this depth */
     //	private int depth;
@@ -116,7 +127,14 @@ public class MonitorThread implements Observer {
         this.ttr = ttr;
     }
 
-    public void addObjectToSelectiveRefresh(AbstractData data) {
+    /**
+     * Adds an object to be explored
+     * When a new Object is discovered (i.e. a new Runtime) this method is to be called in order to explore the new object.
+     * Calling this method instead of directly calling explore on the new object is recommended as it would avoid exploring the object several times.
+     *
+     * @param data the object to explore
+     */
+    public void addObjectToExplore(AbstractData data) {
         this.objectsToRefreshSelectively.put(data.getKey(), data);
     }
 

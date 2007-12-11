@@ -33,10 +33,10 @@ package org.objectweb.proactive.ic2d.jmxmonitoring.util;
 
 /**
  * This Enum describes the types of notification messages
- * sent in the ic2d mvc mechanism.
+ * sent in the ic2d MVC Pattern.
  * Each time an event occurs in an AbstractData object,
- * a notification of type <code> Notification </code> is sent.
- * A Notification includes a notification message (a constant defined in this enum)
+ * a notification of type <code> MVCNotification </code> is sent.
+ * A MVCNotification includes a notification message (a constant defined in this enum)
  * and an object Data which depends on the notification message.
  *
  * @author ProActiveTeam
@@ -47,26 +47,26 @@ public enum MVCNotificationTag {
     /**
      * Notification message sent when a child has been added to an
      * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData </code> object.
-     * Use the key corresponding to the child as data in the Notification object.
+     * Use the key corresponding to the child as data in the MVCNotification object.
      */
     ADD_CHILD,
     /**
      * Notification message sent when a set of children (ActieObject(s)) has been added to an
      * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject </code> object.
-     * Use a list with the keys corresponding to the child as data in the Notification object.
+     * Use a list with the keys corresponding to the child as data in the MVCNotification object.
      */
     ADD_CHILDREN,
     /**
      * Notification message sent when a child has been removed from an
      * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData </code> object.
-     * Use the key corresponding to the child as data in the Notification object.
+     * Use the key corresponding to the child as data in the MVCNotification object.
      */
     REMOVE_CHILD,
     /**
      * Notification message sent when a child of a
      * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData </code> object
      * is no longer monitored.
-     * Use the key corresponding to the child as data in the Notification object.
+     * Use the key corresponding to the child as data in the MVCNotification object.
      */
     REMOVE_CHILD_FROM_MONITORED_CHILDREN,
     /**
@@ -89,19 +89,55 @@ public enum MVCNotificationTag {
     /**
      * Notification message sent when a <code> VirtualNode </code> is added to a
      * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject </code> object
-     * Use the key corresponding to the virtual node as data in the Notification object.
+     * Use the key corresponding to the virtual node as data in the MVCNotification object.
      */
     WORLD_OBJECT_ADD_VIRTUAL_NODE,
     /**
      * Notification message sent when a <code> VirtualNode </code> is removed from a
      * <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject </code> object
-     * Use the key corresponding to the virtual node as data in the Notification object.
+     * Use the key corresponding to the virtual node as data in the MVCNotification object.
      */
-    WORLD_OBJECT_REMOVE_VIRTUAL_NODE,HOST_OBJECT_UPDATED_OSNAME_AND_VERSON,
+    WORLD_OBJECT_REMOVE_VIRTUAL_NODE,
+    /**
+     * Notification message sent when a <code> HostObject </code> has updated the Operating System name
+     * and the version.  Use a String describing the host (<code> host.toString()</code>) as
+     * data in the MVCNotification object.
+     */
+    HOST_OBJECT_UPDATED_OSNAME_AND_VERSON,
+    /**
+     * Notification message sent when a <code> RuntimeObject </code> has been killed.
+     * No data has to be sent in the MVCNotification object.
+     */
     RUNTIME_OBJECT_RUNTIME_KILLED,
+    /**
+    * Notification message sent when a <code> RuntimeObject </code> is not responding.
+    * No data has to be sent in the MVCNotification object.
+    * TODO: notification not used. Send this type of notification
+    */
     RUNTIME_OBJECT_RUNTIME_NOT_RESPONDING,
+    /**
+     * Notification message sent when a <code> RuntimeObject </code> is not monitored anymore.
+     * No data has to be sent in the MVCNotification object.
+     * TODO: notification not used. Send this type of notification
+     */
     RUNTIME_OBJECT_RUNTIME_NOT_MONITORED,
+    /**
+     * Notification message sent when an <code> ActiveObject </code> has received a communication.
+     * Us an <code> org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject </code> representing
+     * the source of the communication  as data in the MVCNotification object.
+     */
     ACTIVE_OBJECT_ADD_COMMUNICATION,
+    /**
+     * Notification message sent when the communications to and from an <code> ActiveObject </code> have
+     * been reseted.
+     * No data has to be sent in the MVCNotification object.
+     */
     ACTIVE_OBJECT_RESET_COMMUNICATIONS,
+
+    /**
+     * Notification message sent when the request queue length
+     * has been changed for an <code> ActiveObject </code>.
+     * Use an Integer representing the new length of the queue as data in the MVCNotification object.
+     */
     ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED;
 }

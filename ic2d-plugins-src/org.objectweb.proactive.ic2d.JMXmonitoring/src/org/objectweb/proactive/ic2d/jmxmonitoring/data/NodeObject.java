@@ -53,7 +53,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
 
 public class NodeObject extends AbstractData {
     private RuntimeObject parent;
-    private VNObject vnParent;
+    private VirtualNodeObject vnParent;
     private String url;
 
     //Warning: Don't use this variavle directly, use getProxyNodeMBean().
@@ -79,7 +79,7 @@ public class NodeObject extends AbstractData {
      * Sets the virtual node.
      * @param vn the virtual node.
      */
-    public void setVirtualNode(VNObject vn) {
+    public void setVirtualNode(VirtualNodeObject vn) {
         this.vnParent = vn;
     }
 
@@ -87,10 +87,15 @@ public class NodeObject extends AbstractData {
      * Returns the virtual node.
      * @return the virtual node.
      */
-    public VNObject getVirtualNode() {
+    public VirtualNodeObject getVirtualNode() {
         return this.vnParent;
     }
 
+    /**
+     * Gets a proxy for the MBean representing this Node.
+     * If the proxy does not exist it creates it
+     * @return
+     */
     private NodeWrapperMBean getProxyNodeMBean() {
         if (proxyNodeMBean == null) {
             proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),

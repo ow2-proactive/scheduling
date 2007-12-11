@@ -82,7 +82,7 @@ public class WorldObject extends AbstractData {
     //private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
 
     /** Contains all virtual nodes. */
-    private Map<String, VNObject> vnChildren;
+    private Map<String, VirtualNodeObject> vnChildren;
 
     /**
      * A map of all known active objects.
@@ -111,7 +111,7 @@ public class WorldObject extends AbstractData {
         super(null);
         this.activeObjects = new ConcurrentHashMap<UniqueID, ActiveObject>();
         this.migrations = new ConcurrentHashMap<UniqueID, ActiveObject>();
-        this.vnChildren = new ConcurrentHashMap<String, VNObject>();
+        this.vnChildren = new ConcurrentHashMap<String, VirtualNodeObject>();
 
         // Record the model
         this.name = ModelRecorder.getInstance().addModel(this);
@@ -335,10 +335,10 @@ public class WorldObject extends AbstractData {
      * Add a virtual node to this object
      * @param vn
      */
-    protected void addVirtualNode(VNObject vn) {
+    protected void addVirtualNode(VirtualNodeObject vn) {
         vnChildren.put(vn.getKey(), vn);
         setChanged();
-        Hashtable<String, VNObject> data = new Hashtable<String, VNObject>();
+        Hashtable<String, VirtualNodeObject> data = new Hashtable<String, VirtualNodeObject>();
         data.put(ADD_VN_MESSAGE, vn);
         //VirtualNodesGroup object will use the information within data
         notifyObservers(new MVCNotification(
@@ -349,21 +349,21 @@ public class WorldObject extends AbstractData {
      * Remove a virtual node to this object
      * @param vn
      */
-    protected void removeVirtualNode(VNObject vn) {
+    protected void removeVirtualNode(VirtualNodeObject vn) {
         vnChildren.remove(vn.getKey());
         setChanged();
-        Hashtable<String, VNObject> data = new Hashtable<String, VNObject>();
+        Hashtable<String, VirtualNodeObject> data = new Hashtable<String, VirtualNodeObject>();
         data.put(REMOVE_VN_MESSAGE, vn);
         notifyObservers(new MVCNotification(
                 MVCNotificationTag.WORLD_OBJECT_REMOVE_VIRTUAL_NODE, data));
     }
 
-    public VNObject getVirtualNode(String virtualNodeName) {
+    public VirtualNodeObject getVirtualNode(String virtualNodeName) {
         return vnChildren.get(virtualNodeName);
     }
 
-    public List<VNObject> getVNChildren() {
-        return new ArrayList<VNObject>(this.vnChildren.values());
+    public List<VirtualNodeObject> getVNChildren() {
+        return new ArrayList<VirtualNodeObject>(this.vnChildren.values());
     }
 
     /**

@@ -36,7 +36,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 
@@ -56,8 +56,8 @@ public class JobMonitoringTreePartFactory implements EditPartFactory {
         if (model instanceof WorldObject) {
             return new WorldTreeEditPart((WorldObject) model);
         }
-        if (model instanceof VNObject) {
-            return new VNTreeEditPart((VNObject) model);
+        if (model instanceof VirtualNodeObject) {
+            return new VNTreeEditPart((VirtualNodeObject) model);
         }
         if (model instanceof HostObject) {
             return new HostTreeEditPart((HostObject) model);

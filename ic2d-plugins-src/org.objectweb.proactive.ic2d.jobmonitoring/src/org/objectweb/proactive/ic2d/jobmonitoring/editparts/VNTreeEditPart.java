@@ -36,7 +36,7 @@ import java.util.Observable;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
-import org.objectweb.proactive.ic2d.jmxmonitoring.data.VNObject;
+import org.objectweb.proactive.ic2d.jmxmonitoring.data.VirtualNodeObject;
 import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
 
 
@@ -45,7 +45,7 @@ import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
  * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
  *
  */
-public class VNTreeEditPart extends JobMonitoringTreeEditPart<VNObject> {
+public class VNTreeEditPart extends JobMonitoringTreeEditPart<VirtualNodeObject> {
     public static final Image VN_IMAGE = new Image(Display.getCurrent(),
             VNTreeEditPart.class.getResourceAsStream("vn_icon.png"));
 
@@ -57,7 +57,7 @@ public class VNTreeEditPart extends JobMonitoringTreeEditPart<VNObject> {
      * The contructor of this controller part.
      * @param model The instance VNObject model associated to this controller
      */
-    public VNTreeEditPart(final VNObject model) {
+    public VNTreeEditPart(final VirtualNodeObject model) {
         super(model);
     }
 

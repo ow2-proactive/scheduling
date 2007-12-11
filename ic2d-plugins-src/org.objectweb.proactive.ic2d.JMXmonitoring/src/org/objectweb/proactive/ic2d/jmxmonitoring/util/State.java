@@ -30,12 +30,16 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.util;
 
-public enum State {UNKNOWN,
 
-    /**SOME DOC HERE
-     *
-     */
-    MIGRATING,NOT_RESPONDING,
+/**
+ * This Enum describes the states a
+ * </code> org.objectweb.proactive.ic2d.jmxmonitoring.data.Abstractdata </code> object can have.
+ * @author ProActiveTeam
+ *
+ */
+public enum State {UNKNOWN,
+    MIGRATING,
+    NOT_RESPONDING,
     HIGHLIGHTED,
     NOT_HIGHLIGHTED,
     NOT_MONITORED,

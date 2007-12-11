@@ -263,7 +263,9 @@ public abstract class AbstractData extends Observable {
     public abstract <T extends AbstractData> T getParent();
 
     /**
-     * Explore the current object
+     * Updates the set of the children of this object so that they are in sync with the
+     * children of the monitored object corresponding to this object.
+     *
      */
     public abstract void explore();
 

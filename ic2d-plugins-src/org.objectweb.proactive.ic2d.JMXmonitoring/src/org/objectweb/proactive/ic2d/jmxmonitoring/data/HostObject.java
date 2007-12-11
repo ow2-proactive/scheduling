@@ -158,7 +158,7 @@ public class HostObject extends AbstractData {
     @Override
     public void explore() {
         System.out.println(this);
-        findRuntimes();
+        refreshRuntimes();
     }
 
     @Override
@@ -185,10 +185,13 @@ public class HostObject extends AbstractData {
     }
 
     /**
-     * Find all the ProActive Runtimes of this host.
+     * Updates the set of IC2D's RuntimeObjects so that it is in sync with the ProActive Runtimes on the monitored Host.
+     * The update is performed by comparing the existing RuntimeObjects with the set of ProActive Runtimes
+     * returned from <code> RemoteObjectHostRTFinder.getRuntimeObjects(HostObject host) </code>
+     *
      */
     @SuppressWarnings("unchecked")
-    private void findRuntimes() {
+    private void refreshRuntimes() {
         RuntimeFinder rfinder = new RemoteObjectHostRTFinder();
         Collection<RuntimeObject> runtimeObjects = rfinder.getRuntimeObjects(this);
 

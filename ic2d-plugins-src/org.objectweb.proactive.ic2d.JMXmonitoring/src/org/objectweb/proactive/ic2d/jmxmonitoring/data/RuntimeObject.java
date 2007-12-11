@@ -184,7 +184,10 @@ public class RuntimeObject extends AbstractData {
     }
 
     /**
-     * Finds all nodes of this Runtime.
+     * Updates the set of IC2D's NodeObjects so that it is in sync with the ProActive Nodes on the monitored Host.
+     * The update is performed by comparing the existing NodeObjects with the set of ProActive Node Objects
+     * returned from <code>ProActiveRuntimeWrapperMBean.getNodes() </code>
+     *
      */
     @SuppressWarnings("unchecked")
     private void findNodes() {
@@ -249,11 +252,13 @@ public class RuntimeObject extends AbstractData {
                 final String virtualNodeName = res[1];
 
                 // Find the virtualNode if already monitored
-                VNObject vn = getWorldObject().getVirtualNode(virtualNodeName);
+                VirtualNodeObject vn = getWorldObject()
+                                           .getVirtualNode(virtualNodeName);
 
                 // This virtual node is not monitored
                 if (vn == null) {
-                    vn = new VNObject(virtualNodeName, jobId, getWorldObject());
+                    vn = new VirtualNodeObject(virtualNodeName, jobId,
+                            getWorldObject());
                     getWorldObject().addVirtualNode(vn);
                 }
 
@@ -286,6 +291,9 @@ public class RuntimeObject extends AbstractData {
         return URIBuilder.getNameFromURI(getUrl());
     }
 
+    /**
+     * Returns the ProActiveConnection for this Runtime
+     */
     @Override
     public ProActiveConnection getConnection() {
         return JMXNotificationManager.getInstance().getConnection(getUrl());

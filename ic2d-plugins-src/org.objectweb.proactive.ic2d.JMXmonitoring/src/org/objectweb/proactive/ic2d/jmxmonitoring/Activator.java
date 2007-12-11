@@ -89,18 +89,29 @@ public class Activator extends AbstractUIPlugin {
         //        PropertyConfigurator.configure(p);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     *  Performs several clean operations before stopping this plugin:
+     *    unsubscribes the  MXNotificationListener from all remote MBeans
+     *    kill all nodes of this Runtime
+     *    unregister this runtime
+     *    unregister all HalfBodies of this Runtime
+     *  Stop this plugin after the operations above are performed
      * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
      */
     public void stop(BundleContext context) throws Exception {
         JMXNotificationManager nm = JMXNotificationManager.getInstance();
+
+        // Unsubscribe the JMXNotificationListener from all remote MBeans
         nm.kill();
 
+        //Kill all nodes deployed by IC2D runtime. 
         ProActiveRuntimeImpl.getProActiveRuntime().killAllNodes();
+
+        //Unregister the IC2d runtime from all registries
         ProActiveRuntimeImpl.getProActiveRuntime().getRemoteObjectExposer()
                             .unregisterAll();
 
+        //
         unregisterAllHalfBodiesFromRegistry();
         plugin = null;
         super.stop(context);
@@ -115,6 +126,9 @@ public class Activator extends AbstractUIPlugin {
         return plugin;
     }
 
+    /**
+     * Unregisters from all registries the HalfBodies of this JVM
+     */
     private void unregisterAllHalfBodiesFromRegistry() {
         BodyMap bm = LocalBodyStore.getInstance().getLocalHalfBodies();
 

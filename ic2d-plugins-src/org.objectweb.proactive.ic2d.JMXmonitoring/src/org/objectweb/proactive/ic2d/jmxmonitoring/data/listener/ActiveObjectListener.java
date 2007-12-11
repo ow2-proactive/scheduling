@@ -49,6 +49,18 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.IC2DThreadPool;
 
 
+/**
+ *
+ * Listener for an Active Object. Listens for notifications concerning an ActiveObject and updates the
+ * IC2D model object representation of it.
+ * For each IC2D representation of an ActiveObject, an ActiveObjectListener will be created and subscribed to
+ * the </code>org.objectweb.proactive.core.jmx.util.JMXNotificationManager</code> (singleton).
+ * Each time an event occur related to the ActiveObject this listener listens for, a notification
+ * will be sent to this listener.  This listener will update the ActiveObject model representation
+ * which will send notification for its own listener(s) (the edit part(s))
+ * @author ProActive Team
+ *
+ */
 public class ActiveObjectListener implements NotificationListener {
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
     private enum Type {SENDER,
@@ -165,7 +177,8 @@ public class ActiveObjectListener implements NotificationListener {
     }
 
     /**
-     *
+     *  Manages the fact that the active object this listener is registered for has communicated.
+     *  it updates the ActiveObject (the model object) and manages automatic discovery
      * @param request
      * @param ao
      * @param type
@@ -216,8 +229,7 @@ public class ActiveObjectListener implements NotificationListener {
                 WorldObject wo = ao.getParent().getParent().getParent()
                                    .getParent();
                 wo.getMonitorThread()
-                  .addObjectToSelectiveRefresh(ao.getParent().getParent()
-                                                 .getParent());
+                  .addObjectToExplore(ao.getParent().getParent().getParent());
             } else { // We have to monitore a new host.
                 String protocol = URIBuilder.getProtocol(nodeUrlToDiscovered);
                 int port = URIBuilder.getPortNumber(nodeUrlToDiscovered);

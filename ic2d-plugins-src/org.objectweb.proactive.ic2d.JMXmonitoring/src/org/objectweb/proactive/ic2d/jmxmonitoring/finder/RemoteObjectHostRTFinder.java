@@ -53,6 +53,12 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.HostObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.RuntimeObject;
 
 
+/**
+ * Utility class for looking for the ProActiveRuntimes on a given host.
+ *
+ * @author ProActiveTeam
+ *
+ */
 public class RemoteObjectHostRTFinder implements RuntimeFinder {
     private String localRuntimeUrl;
     private String localDefaultNodeUrl;
@@ -75,6 +81,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
     //
 
     /**
+     *
      * @see org.objectweb.proactive.ic2d.jmxmonitoring.finder.RuntimeFinder#getRuntimeObjects(HostObject)
      */
     public Collection<RuntimeObject> getRuntimeObjects(HostObject host) {
