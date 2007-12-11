@@ -100,13 +100,11 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     }
 
     // =========   Implements ProActiveRuntime ==================
-    @Override
     public void addAcquaintance(String proActiveRuntimeName)
         throws ProActiveException {
         target.addAcquaintance(proActiveRuntimeName);
     }
 
-    @Override
     public UniversalBody createBody(String nodeName,
         ConstructorCall bodyConstructorCall, boolean isNodeLocal)
         throws ProActiveException, ConstructorCallExecutionFailedException,
@@ -114,7 +112,6 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         return target.createBody(nodeName, bodyConstructorCall, isNodeLocal);
     }
 
-    @Override
     public String createLocalNode(String nodeName,
         boolean replacePreviousBinding,
         ProActiveSecurityManager nodeSecurityManager, String vnName,
@@ -123,155 +120,127 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
             nodeSecurityManager, vnName, jobId);
     }
 
-    @Override
     public void createVM(UniversalProcess remoteProcess)
         throws IOException, ProActiveException {
         target.createVM(remoteProcess);
     }
 
-    @Override
     public String[] getAcquaintances() throws ProActiveException {
         return target.getAcquaintances();
     }
 
-    @Override
     public List<UniversalBody> getActiveObjects(String nodeName)
         throws ProActiveException {
         return target.getActiveObjects(nodeName);
     }
 
-    @Override
     public List<UniversalBody> getActiveObjects(String nodeName,
         String className) throws ProActiveException {
         return target.getActiveObjects(nodeName, className);
     }
 
-    @Override
     public byte[] getClassDataFromParentRuntime(String className)
         throws ProActiveException {
         return target.getClassDataFromParentRuntime(className);
     }
 
-    @Override
     public byte[] getClassDataFromThisRuntime(String className)
         throws ProActiveException {
         return target.getClassDataFromThisRuntime(className);
     }
 
-    @Override
     public ProActiveDescriptorInternal getDescriptor(String url,
         boolean isHierarchicalSearch) throws IOException, ProActiveException {
         return target.getDescriptor(url, isHierarchicalSearch);
     }
 
-    @Override
     public FileTransferEngine getFileTransferEngine() {
         return target.getFileTransferEngine();
     }
 
-    @Override
     public ServerConnector getJMXServerConnector() {
         return target.getJMXServerConnector();
     }
 
-    @Override
     public String getJobID(String nodeUrl) throws ProActiveException {
         return target.getJobID(nodeUrl);
     }
 
-    @Override
     public String[] getLocalNodeNames() throws ProActiveException {
         return target.getLocalNodeNames();
     }
 
-    @Override
     public String getLocalNodeProperty(String nodeName, String key)
         throws ProActiveException {
         return target.getLocalNodeProperty(nodeName, key);
     }
 
-    @Override
     public ProActiveRuntimeWrapperMBean getMBean() {
         return target.getMBean();
     }
 
-    @Override
     public String getMBeanServerName() {
         return target.getMBeanServerName();
     }
 
-    @Override
     public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
         throws ProActiveException {
         return target.getProActiveRuntime(proActiveRuntimeName);
     }
 
-    @Override
     public ProActiveRuntime[] getProActiveRuntimes() throws ProActiveException {
         return target.getProActiveRuntimes();
     }
 
-    @Override
     public String getURL() {
         return target.getURL();
     }
 
-    @Override
     public VMInformation getVMInformation() {
         return this.vmInformation;
     }
 
-    @Override
     public String getVNName(String Nodename) throws ProActiveException {
         return target.getVNName(Nodename);
     }
 
-    @Override
     public VirtualNodeInternal getVirtualNode(String virtualNodeName)
         throws ProActiveException {
         return target.getVirtualNode(virtualNodeName);
     }
 
-    @Override
     public void killAllNodes() throws ProActiveException {
         target.killAllNodes();
     }
 
-    @Override
     public void killNode(String nodeName) throws ProActiveException {
         target.killNode(nodeName);
     }
 
-    @Override
     public void killRT(boolean softly) throws Exception {
         target.killRT(softly);
     }
 
-    @Override
     public void launchMain(String className, String[] parameters)
         throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
         target.launchMain(className, parameters);
     }
 
-    @Override
     public void newRemote(String className)
         throws ClassNotFoundException, ProActiveException {
         target.newRemote(className);
     }
 
-    @Override
     public UniversalBody receiveBody(String nodeName, Body body)
         throws ProActiveException {
         return target.receiveBody(nodeName, body);
     }
 
-    @Override
     public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
         int inc) throws ProActiveException {
         return target.receiveCheckpoint(nodeName, ckpt, inc);
     }
 
-    @Override
     public void register(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
         String vmName) throws ProActiveException {
@@ -279,36 +248,30 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
             creationProtocol, vmName);
     }
 
-    @Override
     public void register(GCMRuntimeRegistrationNotificationData event) {
         target.register(event);
     }
 
-    @Override
     public void registerVirtualNode(String virtualNodeName,
         boolean replacePreviousBinding)
         throws ProActiveException, AlreadyBoundException {
         target.registerVirtualNode(virtualNodeName, replacePreviousBinding);
     }
 
-    @Override
     public void rmAcquaintance(String proActiveRuntimeName)
         throws ProActiveException {
         target.rmAcquaintance(proActiveRuntimeName);
     }
 
-    @Override
     public Object setLocalNodeProperty(String nodeName, String key, String value)
         throws ProActiveException {
         return target.setLocalNodeProperty(nodeName, key, value);
     }
 
-    @Override
     public void startJMXServerConnector() {
         target.startJMXServerConnector();
     }
 
-    @Override
     public void unregister(ProActiveRuntime proActiveRuntimeDist,
         String proActiveRuntimeUrl, String creatorID, String creationProtocol,
         String vmName) throws ProActiveException {
@@ -316,63 +279,53 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
             creationProtocol, vmName);
     }
 
-    @Override
     public void unregisterAllVirtualNodes() throws ProActiveException {
         target.unregisterAllVirtualNodes();
     }
 
-    @Override
     public void unregisterVirtualNode(String virtualNodeName)
         throws ProActiveException {
         target.unregisterVirtualNode(virtualNodeName);
     }
 
-    @Override
     public TypedCertificate getCertificate()
         throws SecurityNotAvailableException, IOException {
         return target.getCertificate();
     }
 
-    @Override
     public Entities getEntities()
         throws SecurityNotAvailableException, IOException {
         return target.getEntities();
     }
 
-    @Override
     public SecurityContext getPolicy(Entities local, Entities distant)
         throws SecurityNotAvailableException, IOException {
         return target.getPolicy(local, distant);
     }
 
-    @Override
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
         throws SecurityNotAvailableException, AccessControlException,
             IOException {
         return target.getProActiveSecurityManager(user);
     }
 
-    @Override
     public PublicKey getPublicKey()
         throws SecurityNotAvailableException, IOException {
         return target.getPublicKey();
     }
 
-    @Override
     public byte[] publicKeyExchange(long sessionID, byte[] signature)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             KeyExchangeException, IOException {
         return target.publicKeyExchange(sessionID, signature);
     }
 
-    @Override
     public byte[] randomValue(long sessionID, byte[] clientRandomValue)
         throws SecurityNotAvailableException, RenegotiateSessionException,
             IOException {
         return target.randomValue(sessionID, clientRandomValue);
     }
 
-    @Override
     public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
         byte[] encodedIVParameters, byte[] encodedClientMacKey,
         byte[] encodedLockData, byte[] parametersSignature)
@@ -383,7 +336,6 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
             parametersSignature);
     }
 
-    @Override
     public void setProActiveSecurityManager(Entity user,
         PolicyServer policyServer)
         throws SecurityNotAvailableException, AccessControlException,
@@ -391,7 +343,6 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         target.setProActiveSecurityManager(user, policyServer);
     }
 
-    @Override
     public long startNewSession(long distantSessionID, SecurityContext policy,
         TypedCertificate distantCertificate)
         throws SessionException, SecurityNotAvailableException, IOException {
@@ -399,7 +350,6 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
             distantCertificate);
     }
 
-    @Override
     public void terminateSession(long sessionID)
         throws SecurityNotAvailableException, IOException {
         target.terminateSession(sessionID);
