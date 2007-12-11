@@ -31,7 +31,6 @@
 package org.objectweb.proactive.examples.nbody.groupdistrib;
 
 import java.io.Serializable;
-import java.net.UnknownHostException;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;

@@ -103,7 +103,7 @@ public class RMUserImpl implements RMUser, InitActive {
      */
     public void initActivity(Body body) {
         try {
-            PAActiveObject.register((RMUser) PAActiveObject.getStubOnThis(),
+            PAActiveObject.register(PAActiveObject.getStubOnThis(),
                 "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMUSER);
         } catch (IOException e) {
             e.printStackTrace();

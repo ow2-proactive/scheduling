@@ -94,6 +94,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * Initialization part of NodeSource Active Object.
      * call the init part of super class {@link NodeSource}.
      */
+    @Override
     public void initActivity(Body body) {
         super.initActivity(body);
     }
@@ -125,6 +126,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      *
      * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource
      */
+    @Override
     public void confirmRemoveNode(String nodeUrl) {
         if (logger.isInfoEnabled()) {
             logger.info("[" + this.SourceId + "] removing Node : " + nodeUrl);
@@ -164,6 +166,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * @param preempt true the node must removed immediately, without waiting job ending if the node is busy,
      * false the node is removed just after the job ending if the node is busy.
      */
+    @Override
     public void forwardRemoveNode(String nodeUrl, boolean preempt) {
         assert this.nodes.containsKey(nodeUrl);
         this.imCore.internalRemoveNode(nodeUrl, preempt);
@@ -176,6 +179,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * @param nodeUrl pad ProActive descriptor to deploy.
      * @param PADName name of the ProActive descriptor.
      */
+    @Override
     public void addNodes(ProActiveDescriptor pad) {
         this.listPad.put(pad.getUrl(), pad);
         RMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) PAActiveObject.getStubOnThis(),
@@ -188,6 +192,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * @param preempt true Node source doesn't wait tasks end on its handled nodes,
      * false node source wait end of tasks on its nodes before shutting down
      */
+    @Override
     public void shutdown(boolean preempt) {
         super.shutdown(preempt);
         if (this.nodes.size() > 0) {
@@ -213,6 +218,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * Inform the IMCore about the broken node,
      * remove the broken node from the nodes list.
      */
+    @Override
     public void detectedPingedDownNode(String nodeUrl) {
         Node node = getNodebyUrl(nodeUrl);
         if (node != null) {
@@ -242,6 +248,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * <BR>Called by {@link RMCore}.<BR>
      * @return {@link RMNodeSourceEvent} object contains properties of the NodeSource.
      */
+    @Override
     public RMNodeSourceEvent getSourceEvent() {
         return new RMNodeSourceEvent(this.getSourceId(),
             RMConstants.PAD_NODE_SOURCE_TYPE);

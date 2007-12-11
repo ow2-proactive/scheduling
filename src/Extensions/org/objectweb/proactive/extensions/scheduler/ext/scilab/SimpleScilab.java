@@ -123,6 +123,7 @@ public class SimpleScilab extends JavaExecutable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extensions.scheduler.common.task.Executable#execute(org.objectweb.proactive.extensions.scheduler.common.task.TaskResult[])
      */
+    @Override
     public Object execute(TaskResult... results) throws Throwable {
         for (TaskResult res : results) {
             if (res.hadException()) {
@@ -177,6 +178,7 @@ public class SimpleScilab extends JavaExecutable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extensions.scheduler.common.task.JavaExecutable#init(java.util.Map)
      */
+    @Override
     public void init(Map<String, Object> args) throws Exception {
         Object s = args.get("script");
 

@@ -259,7 +259,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
                     listing += ("</example>");
 
                     if (this.srcContentsToAdd.containsKey(role)) {
-                        String old = (String) this.srcContentsToAdd.remove(role);
+                        String old = this.srcContentsToAdd.remove(role);
                         this.srcContentsToAdd.put(role, old + listing);
                     } else {
                         this.srcContentsToAdd.put(role, listing);
@@ -328,7 +328,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
         String realName) throws SAXException {
         // Code to add remembered elements in the src appendix 
         if (this.listOFids != null) {
-            String id = (String) this.listOFids.remove(this.listOFids.size() -
+            String id = this.listOFids.remove(this.listOFids.size() -
                     1);
 
             if (this.listOFids.size() == 0) { // we have stepped out of the appendix
@@ -336,7 +336,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
             }
 
             if (this.srcContentsToAdd.containsKey(id)) { // end of a tag labelled to have extra info? ==> paste this extra info
-                print(((String) this.srcContentsToAdd.get(id)).toString());
+                print((this.srcContentsToAdd.get(id)).toString());
             }
         }
 
@@ -483,7 +483,7 @@ public class DocBookize extends DefaultHandler implements LexicalHandler {
         String result = "";
 
         if (s.length() > 0) {
-            LanguageToDocBook converter = (LanguageToDocBook) this.languageHighlighters.get(this.language);
+            LanguageToDocBook converter = this.languageHighlighters.get(this.language);
 
             if (converter == null) {
                 System.err.println("Language '" + this.language +

@@ -91,6 +91,7 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
         }
     }
 
+    @Override
     public void connect() throws IOException {
         ((RemoteEntity) this.entities).connect();
     }
@@ -145,19 +146,21 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
                             .newEvent(this, EntitiesEventManager.GROUP_REMOVED);
     }
 
+    @Override
     public void removeEntity(ManageableEntity entity) {
         if (entity instanceof RemoteGroup) {
-            this.groups.removeElement((RemoteGroup) entity);
+            this.groups.removeElement(entity);
             this.totalGateways -= ((RemoteGroup) entity).getTotalGateways();
             this.nbConnected -= ((RemoteGroup) entity).getNbConnected();
         } else if (entity instanceof RemoteGateway) {
-            this.gateways.removeElement((RemoteGateway) entity);
+            this.gateways.removeElement(entity);
             this.totalGateways--;
             this.nbConnected--;
         }
         this.gEntities.remove(entity);
     }
 
+    @Override
     public Status executeCommand(String command) {
         return this.entities.executeCommand(command);
     }
@@ -166,15 +169,18 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
         return this.entities.executeCommand("install " + location);
     }
 
+    @Override
     public void refresh() {
         this.entities.refresh();
     }
 
+    @Override
     public String toString() {
         return this.name + "[  " + this.nbConnected + " / " +
         this.totalGateways + " ] ";
     }
 
+    @Override
     public String getName() {
         return name;
     }
@@ -214,14 +220,17 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
         this.description = description;
     }
 
+    @Override
     public Status cancelTransaction() {
         return ((Transactionnable) this.entities).cancelTransaction();
     }
 
+    @Override
     public Status commitTransaction() {
         return ((Transactionnable) this.entities).commitTransaction();
     }
 
+    @Override
     public Status openTransaction() {
         try {
             return this.entities.openTransaction();

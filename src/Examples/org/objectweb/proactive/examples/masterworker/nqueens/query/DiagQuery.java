@@ -43,6 +43,7 @@ public class DiagQuery extends Query {
         this.scale = s;
     }
 
+    @Override
     public long run() {
         return Diag.run(this) * scale;
     }
@@ -54,6 +55,7 @@ public class DiagQuery extends Query {
         return (new DiagQuery(n, done + 1, sym, scale, l, d, r));
     }
 
+    @Override
     public Vector split(Vector v) {
         int y = n - done - 1;
         int todo = ~(left | down | right | ((y >= sym) ? 2 : 0));

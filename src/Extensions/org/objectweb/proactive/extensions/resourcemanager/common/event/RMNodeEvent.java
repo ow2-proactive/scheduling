@@ -117,6 +117,7 @@ public class RMNodeEvent extends RMEvent {
      * @param obj IMNodeEvent object to compare.
      * @return true if the two events represent the same Node.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof RMNodeEvent) {
             return ((RMNodeEvent) obj).nodeUrl.equals(this.nodeUrl);

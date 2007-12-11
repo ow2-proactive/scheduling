@@ -358,11 +358,11 @@ public class C3DRenderingEngine implements java.io.Serializable {
         // All loops are reversed for 'speedup' (cf. thinking in java p331)
         // For each line
         for (y = interval.yfrom; y < interval.yto; y++) {
-            ylen = ((double) (2.0 * y) / (double) interval.width) - 1.0;
+            ylen = ((2.0 * y) / interval.width) - 1.0;
 
             // For each pixel of the line
             for (x = 0; x < interval.width; x++) {
-                xlen = ((double) (2.0 * x) / (double) interval.width) - 1.0;
+                xlen = ((2.0 * x) / interval.width) - 1.0;
                 r.D = Vec.comb(xlen, leftVec, ylen, upVec);
                 r.D.add(viewVec);
                 r.D.normalize();

@@ -119,6 +119,7 @@ public class RemoteTransaction extends ManageableEntity implements Serializable 
         this.commandList.remove(entity);
     }
 
+    @Override
     public String toString() {
         return this.getName();
     }

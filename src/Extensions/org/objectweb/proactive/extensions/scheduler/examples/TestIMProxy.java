@@ -33,7 +33,6 @@ package org.objectweb.proactive.extensions.scheduler.examples;
 import java.io.File;
 import java.net.URI;
 
-import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.node.Node;

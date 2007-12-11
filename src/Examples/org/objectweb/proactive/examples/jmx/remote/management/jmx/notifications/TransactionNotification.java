@@ -61,6 +61,7 @@ public class TransactionNotification extends Notification {
         return this.date;
     }
 
+    @Override
     public String getMessage() {
         return this.message;
     }

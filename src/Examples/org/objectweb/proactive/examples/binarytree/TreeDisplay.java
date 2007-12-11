@@ -166,7 +166,7 @@ public class TreeDisplay {
             add(t[0], randomWord(4), AC);
             add(t[1], randomWord(4), AC);
         } else {
-            add(t[(int) t.length / 2], randomWord(4), AC);
+            add(t[t.length / 2], randomWord(4), AC);
             addRandom(firstHalf(t), AC);
             addRandom(secondHalf(t), AC);
         }
@@ -184,7 +184,7 @@ public class TreeDisplay {
     }
 
     private String[] firstHalf(String[] t) {
-        String[] firstHalf = new String[(int) (t.length / 2)];
+        String[] firstHalf = new String[(t.length / 2)];
         for (int i = 0; i < (t.length / 2); i++) {
             firstHalf[i] = t[i];
         }
@@ -192,10 +192,10 @@ public class TreeDisplay {
     }
 
     private String[] secondHalf(String[] t) {
-        int size = t.length - ((int) (t.length / 2) + 1);
+        int size = t.length - ((t.length / 2) + 1);
         String[] secondHalf = new String[size];
         int j = 0;
-        for (int i = ((int) (t.length / 2) + 1); i < t.length; i++) {
+        for (int i = ((t.length / 2) + 1); i < t.length; i++) {
             secondHalf[j++] = t[i];
         }
         return secondHalf;

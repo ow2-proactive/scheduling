@@ -88,7 +88,7 @@ public class Reader implements org.objectweb.proactive.RunActive {
                 startRead();
             }
             try {
-                Thread.sleep((long) 700 + (long) (Math.random() * 1500));
+                Thread.sleep(700 + (long) (Math.random() * 1500));
             } catch (InterruptedException e) {
             }
         }

@@ -231,7 +231,7 @@ public class PiBBP implements Serializable {
             //Starting all the workers
             PiComp picomp;
             for (int j = 0; j < workers.size(); j++) {
-                w = (Component) workers.get(j);
+                w = workers.get(j);
                 Fractal.getLifeCycleController(w).startFc();
                 picomp = (PiComp) w.getFcInterface("computation");
                 picomp.setScale(nbDecimals_); /*Normally, this is made when instanciating PiComputers, but with ADL instanciation, we have to make an explicit call to setScale */
@@ -247,7 +247,7 @@ public class PiBBP implements Serializable {
 
             /*Stopping workers components*/
             for (int j = 0; j < workers.size(); j++) {
-                w = (Component) workers.get(j);
+                w = workers.get(j);
                 Fractal.getLifeCycleController(w).stopFc();
             }
 

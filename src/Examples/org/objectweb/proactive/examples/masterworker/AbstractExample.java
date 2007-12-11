@@ -31,7 +31,6 @@
 package org.objectweb.proactive.examples.masterworker;
 
 import java.io.File;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -40,8 +39,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
-import org.objectweb.proactive.extensions.masterworker.ProActiveMaster;
-import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
 
 
 public abstract class AbstractExample {

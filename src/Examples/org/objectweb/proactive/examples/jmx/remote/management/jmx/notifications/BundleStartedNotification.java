@@ -61,6 +61,7 @@ public class BundleStartedNotification extends BundleNotification {
         return this.bundleInfo;
     }
 
+    @Override
     public String getUrl() {
         return this.url;
     }

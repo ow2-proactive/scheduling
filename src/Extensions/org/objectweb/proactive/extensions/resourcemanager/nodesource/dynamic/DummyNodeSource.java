@@ -76,6 +76,7 @@ public class DummyNodeSource extends DynamicNodeSource
     /** deploy a PAD
      *
      */
+    @Override
     public void initActivity(Body body) {
         super.initActivity(body);
         try {
@@ -91,6 +92,7 @@ public class DummyNodeSource extends DynamicNodeSource
     /**
      * Terminates activity of P2PNodeSource Active Object.
      */
+    @Override
     public void endActivity(Body body) {
         super.endActivity(body);
         for (Entry<Node, Boolean> entry : this.StaticNodes.entrySet()) {
@@ -114,6 +116,7 @@ public class DummyNodeSource extends DynamicNodeSource
      * in this this example, just pick a free node
      * from the static deployed nodes list
      */
+    @Override
     protected Node getNode() {
         for (Entry<Node, Boolean> entry : this.StaticNodes.entrySet()) {
             if (entry.getValue().booleanValue()) {
@@ -151,6 +154,7 @@ public class DummyNodeSource extends DynamicNodeSource
         }
     }
 
+    @Override
     public RMNodeSourceEvent getSourceEvent() {
         return new RMNodeSourceEvent(this.getSourceId(),
             RMConstants.DUMMY_NODE_SOURCE_TYPE);
@@ -203,6 +207,7 @@ public class DummyNodeSource extends DynamicNodeSource
      * @param preempt true Node source doesn't wait tasks end on its handled nodes,
      * false node source wait end of tasks on its nodes before shutting down
      */
+    @Override
     public void shutdown(boolean preempt) {
         //TODO gsigety : work !
         //		for (Entry<String, Node> entry : this.nodes.entrySet()) {

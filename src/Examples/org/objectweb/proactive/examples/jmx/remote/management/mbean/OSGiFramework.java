@@ -32,7 +32,6 @@ package org.objectweb.proactive.examples.jmx.remote.management.mbean;
 
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Iterator;
 

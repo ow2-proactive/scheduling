@@ -349,7 +349,7 @@ public class FlowShopTask extends Task {
 
         Vector tasks = new Vector(nbTasks);
 
-        int[] perm = (int[]) currentPerm.clone();
+        int[] perm = currentPerm.clone();
         int[] beginPerm = new int[perm.length];
 
         do {
@@ -422,7 +422,7 @@ public class FlowShopTask extends Task {
 
     @Override
     public void initUpperBound() {
-        int[] randomPerm = (int[]) currentPerm.clone();
+        int[] randomPerm = currentPerm.clone();
         for (int i = depth + 1; i < randomPerm.length; i++) {
             int randomI = (int) (i +
                 (Math.random() * (randomPerm.length - (i + 1))));

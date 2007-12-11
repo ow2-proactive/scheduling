@@ -267,10 +267,10 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
                     _call.setEncodingStyle(null);
 
                     for (int i = 0; i < cachedSerFactories.size(); ++i) {
-                        java.lang.Class<?> cls = (java.lang.Class<?>) cachedSerClasses.get(i);
-                        javax.xml.namespace.QName qName = (javax.xml.namespace.QName) cachedSerQNames.get(i);
-                        java.lang.Class<?> sf = (java.lang.Class<?>) cachedSerFactories.get(i);
-                        java.lang.Class<?> df = (java.lang.Class<?>) cachedDeserFactories.get(i);
+                        java.lang.Class<?> cls = cachedSerClasses.get(i);
+                        javax.xml.namespace.QName qName = cachedSerQNames.get(i);
+                        java.lang.Class<?> sf = cachedSerFactories.get(i);
+                        java.lang.Class<?> df = cachedDeserFactories.get(i);
                         _call.registerTypeMapping(cls, qName, sf, df, false);
                     }
                 }

@@ -56,6 +56,7 @@ public class BundleAddedNotification extends BundleNotification {
     /**
      * @return the bundleInfo
      */
+    @Override
     public BundleInfo getBundleInfo() {
         return bundleInfo;
     }
@@ -63,6 +64,7 @@ public class BundleAddedNotification extends BundleNotification {
     /**
      * @return the url
      */
+    @Override
     public String getUrl() {
         return url;
     }

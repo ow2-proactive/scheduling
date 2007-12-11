@@ -33,7 +33,6 @@ package org.objectweb.proactive.examples.c3d;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Vector;
 

@@ -96,7 +96,7 @@ public class TryCatch extends Anything {
 
     private String getTryWithCatchCall() {
         String call = getPackageName() + TRY_WITH_CATCH + "(";
-        Catch firstCatch = (Catch) catchBlocks.get(0);
+        Catch firstCatch = catchBlocks.get(0);
         if (catchBlocks.size() == 1) {
             call += ("" + firstCatch.getClassName());
         } else {
@@ -104,7 +104,7 @@ public class TryCatch extends Anything {
             Iterator<Catch> iter = catchBlocks.iterator();
             iter.next(); // The first one is already done
             while (iter.hasNext()) {
-                Catch ca = (Catch) iter.next();
+                Catch ca = iter.next();
                 call += (", " + ca.getClassName());
             }
             call += "}";
@@ -129,7 +129,7 @@ public class TryCatch extends Anything {
         Iterator<Catch> iter = catchBlocks.iterator();
         Catch ca = null;
         while (iter.hasNext()) {
-            ca = (Catch) iter.next();
+            ca = iter.next();
             ca.work(c);
         }
 

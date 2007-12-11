@@ -31,9 +31,6 @@
 package org.objectweb.proactive.extensions.scheduler.examples;
 
 import java.util.Map;
-import java.util.Map.Entry;
-
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
 

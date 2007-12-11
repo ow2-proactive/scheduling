@@ -53,6 +53,7 @@ public class OutQuery extends Query {
         board = b;
     }
 
+    @Override
     public long run() {
         long n = Out.run(this);
 
@@ -76,6 +77,7 @@ public class OutQuery extends Query {
         return (r);
     }
 
+    @Override
     public Vector split(Vector v) {
         int n = this.n;
         int sidemask = (1 << (n - 1)) | 1;

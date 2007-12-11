@@ -881,7 +881,7 @@ public final class JMath {
                 if (k == 0) {
                     return zero;
                 } else {
-                    dk = (double) k;
+                    dk = k;
                 }
                 return (dk * ln2_hi) + (dk * ln2_lo);
             }
@@ -889,12 +889,12 @@ public final class JMath {
             if (k == 0) {
                 return f - R;
             } else {
-                dk = (double) k;
+                dk = k;
                 return (dk * ln2_hi) - ((R - (dk * ln2_lo)) - f);
             }
         }
         s = f / (2.0 + f);
-        dk = (double) k;
+        dk = k;
         z = s * s;
         i = hx - 0x6147a;
         w = z * z;
@@ -1252,8 +1252,8 @@ public final class JMath {
         r += (T[0] * s);
         w = x + r;
         if (ix >= 0x3FE59428) {
-            v = (double) iy;
-            return (double) (1 - ((hx >> 30) & 2)) * (v -
+            v = iy;
+            return (1 - ((hx >> 30) & 2)) * (v -
             (2.0 * (x - (((w * w) / (w + v)) - r))));
         }
         if (iy == 1) {
@@ -1861,7 +1861,7 @@ public final class JMath {
         if (ix <= 0x413921fb) { /* |x| ~<= 2^19*(pi/2), medium size */
             t = abs(x);
             n = (int) ((t * invpio2) + half);
-            fn = (double) n;
+            fn = n;
             r = t - (fn * pio2_1);
             w = fn * pio2_1t; /* 1st round good to 85 bit */
             if ((n < 32) && (ix != npio2_hw[n - 1])) {
@@ -1913,7 +1913,7 @@ public final class JMath {
         lx &= 0x7fffffffffffffffL;
         z = Double.longBitsToDouble(lx);
         for (i = 0; i < 2; i++) {
-            tx[i] = (double) ((int) (z));
+            tx[i] = ((int) (z));
             z = (z - tx[i]) * two24;
         }
         tx[2] = z;
@@ -2111,7 +2111,7 @@ public final class JMath {
 
             /* distill q[] into iq[] reversingly */
             for (i = 0, j = jz, z = q[jz]; j > 0; i++, j--) {
-                fw = (double) ((int) (twon24 * z));
+                fw = ((int) (twon24 * z));
                 iq[i] = (int) (z - (two24 * fw));
                 z = q[j - 1] + fw;
             }
@@ -2120,7 +2120,7 @@ public final class JMath {
             z = scalbn(z, q0); /* actual value of z */
             z -= (8.0 * floor(z * 0.125)); /* trim off integer >= 8 */
             n = (int) z;
-            z -= (double) n;
+            z -= n;
             ih = 0;
             if (q0 > 0) { /* need iq[jz-1] to determine n */
                 i = (iq[jz - 1] >> (24 - q0));
@@ -2173,7 +2173,7 @@ public final class JMath {
                     for (k = 1; iq[jk - k] == 0; k++)
                         ; /* k = no. of terms needed */for (i = jz + 1;
                             i <= (jz + k); i++) { /* add q[jz+1] to q[jz+k] */
-                        f[jx + i] = (double) two_over_pi[jv + i];
+                        f[jx + i] = two_over_pi[jv + i];
                         for (j = 0, fw = 0.0; j <= jx; j++)
                             fw += (x[j] * f[(jx + i) - j]);
                         q[i] = fw;
@@ -2196,7 +2196,7 @@ public final class JMath {
         } else { /* break z into 24-bit if necessary */
             z = scalbn(z, -q0);
             if (z >= two24) {
-                fw = (double) ((int) (twon24 * z));
+                fw = ((int) (twon24 * z));
                 iq[jz] = (int) (z - (two24 * fw));
                 jz++;
                 q0 += 24;
@@ -2209,7 +2209,7 @@ public final class JMath {
         /* convert integer "bit" chunk to floating-point value */
         fw = scalbn(one, q0);
         for (i = jz; i >= 0; i--) {
-            q[i] = fw * (double) iq[i];
+            q[i] = fw * iq[i];
             fw *= twon24;
         }
 
@@ -2523,7 +2523,7 @@ public final class JMath {
             z_l = (cp_l * p_h) + (p_l * cp) + dp_l[k];
 
             /* log2(ax) = (s+..)*2/(3*log2) = n + dp_h + z_h + z_l */
-            t = (double) n;
+            t = n;
             t1 = (((z_h + z_l) + dp_h[k]) + t);
             t1 = setLO(t1, 0);
             t2 = z_l - (((t1 - t) - dp_h[k]) - z_h);

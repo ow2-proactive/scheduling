@@ -147,6 +147,7 @@ public class RemoteBundle extends ManageableEntity implements Serializable {
         // TODO Auto-generated method stub
     }
 
+    @Override
     public String toString() {
         return this.info.getName();
     }

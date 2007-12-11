@@ -107,12 +107,13 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
         return this.bundles.size() > 0;
     }
 
+    @Override
     public Status executeCommand(String command) {
         return null;
     }
 
     public Status installBundle(String location) throws IOException {
-        GenericTypeWrapper<Status> ow = ((ProActiveConnection) this.connection).invokeAsynchronous(this.on,
+        GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(this.on,
                 "installBundle", new Object[] { this.idTransaction, location },
                 new String[] { Long.TYPE.getName(), "java.lang.String" });
         if (ow.getObject().containsErrors()) {
@@ -132,6 +133,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
                             .newEvent(this, EntitiesEventManager.ENTITY_ADDED);
     }
 
+    @Override
     public void connect() throws IOException {
         if (!this.connected) {
             this.fwConnection.connect();
@@ -144,6 +146,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
         }
     }
 
+    @Override
     public void refresh() {
         try {
             GatewayRefresher refresher = new GatewayRefresher(this,
@@ -154,6 +157,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
         }
     }
 
+    @Override
     public void remove() {
         try {
             if (fwConnection.isConnected()) {
@@ -198,15 +202,17 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
         // TODO Auto-generated method stu
     }
 
+    @Override
     public String toString() {
         return this.url;
     }
 
+    @Override
     public Status cancelTransaction() {
         try {
             ObjectName tmName = new ObjectName("Transactions:id=" +
                     this.idTransaction);
-            GenericTypeWrapper<Status> ow = ((ProActiveConnection) this.connection).invokeAsynchronous(tmName,
+            GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName,
                     "rollback", new Object[] {  }, new String[] {  });
             return ow.getObject();
         } catch (MalformedObjectNameException e) {
@@ -220,11 +226,12 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
         return null;
     }
 
+    @Override
     public Status commitTransaction() {
         try {
             ObjectName tmName = new ObjectName("Transactions:id=" +
                     this.idTransaction);
-            GenericTypeWrapper<Status> ow = ((ProActiveConnection) this.connection).invokeAsynchronous(tmName,
+            GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName,
                     "commit", new Object[] {  }, new String[] {  });
             return ow.getObject();
         } catch (MalformedObjectNameException e) {
@@ -238,11 +245,12 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
         return null;
     }
 
+    @Override
     public Status openTransaction() {
         ObjectName tmName;
         try {
             tmName = new ObjectName(Constants.ON_TRANSACTION_MANAGER);
-            GenericTypeWrapper<Long> ow = ((ProActiveConnection) this.connection).invokeAsynchronous(tmName,
+            GenericTypeWrapper<Long> ow = (this.connection).invokeAsynchronous(tmName,
                     "openTransaction", new Object[] {  }, new String[] {  });
 
             this.idTransaction = ow.getObject().longValue();

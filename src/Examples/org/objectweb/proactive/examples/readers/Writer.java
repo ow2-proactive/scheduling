@@ -88,7 +88,7 @@ public class Writer implements org.objectweb.proactive.RunActive {
                 startWrite();
             }
             try {
-                Thread.sleep((long) 700 + (long) (Math.random() * 1500));
+                Thread.sleep(700 + (long) (Math.random() * 1500));
             } catch (InterruptedException e) {
             }
         }

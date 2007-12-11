@@ -3279,6 +3279,7 @@ public class ProActive {
      *
      * @deprecated Use {@link org.objectweb.proactive.api.ProActiveLifeCycle#exitSuccess()} instead
      */
+    @Deprecated
     public static void exitSuccess() {
         System.exit(0);
     }
@@ -3289,6 +3290,7 @@ public class ProActive {
      *
      * @deprecated Use {@link org.objectweb.proactive.api.ProActiveLifeCycle#exitFailure()} instead
      */
+    @Deprecated
     public static void exitFailure() {
         System.exit(1);
     }

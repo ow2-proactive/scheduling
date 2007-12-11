@@ -120,8 +120,8 @@ public class PiUtil {
         Result total = new Result(new BigDecimal(0), 0);
 
         for (int i = 0; i < results.size(); i++) {
-            total.addNumericalResult(((Result) results.get(i)).getNumericalResult());
-            total.addComputationTime(((Result) results.get(i)).getComputationTime());
+            total.addNumericalResult((results.get(i)).getNumericalResult());
+            total.addComputationTime((results.get(i)).getComputationTime());
         }
 
         return total;

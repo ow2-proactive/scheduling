@@ -106,10 +106,10 @@ public class Worker implements Serializable {
         long i;
         double err = 0.0d;
         double sum = 0.0d;
-        double w = 1.0 / (double) N;
+        double w = 1.0 / N;
 
         for (i = rank + 1; i <= N; i += groupSize)
-            sum += f(((double) i - 0.5) * w);
+            sum += f((i - 0.5) * w);
         sum *= w;
 
         // The leader collects partial results.
@@ -141,7 +141,7 @@ public class Worker implements Serializable {
      * @return The computed result
      */
     public static final double f(final double x) {
-        return ((double) (4.0 / (1.0 + (x * x))));
+        return ((4.0 / (1.0 + (x * x))));
     }
 
     /**

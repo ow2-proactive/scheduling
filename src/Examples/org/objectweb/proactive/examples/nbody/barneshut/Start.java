@@ -96,7 +96,7 @@ public class Start {
                 // creation of its sons and computation of the values of mass and mass center of
                 // all the tree's nodes
                 // useless boolean, just for pick up a different constructor
-                listOctTree.add((OctTree) PAActiveObject.newActive(
+                listOctTree.add(PAActiveObject.newActive(
                         OctTree.class.getName(),
                         new Object[] { lplanets, universe, new Boolean(true) },
                         nodes[((10 * i) + 8) % nodes.length]));

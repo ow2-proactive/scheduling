@@ -276,7 +276,7 @@ public class JMXNotificationManager implements NotificationListener {
                 return;
             }
             connection.addNotificationListener(oname,
-                (NotificationListener) notificationlistener, filter, handback);
+                notificationlistener, filter, handback);
         } catch (InstanceNotFoundException e) {
             logger.error("Doesn't find the object name " + oname +
                 " during the registration", e);

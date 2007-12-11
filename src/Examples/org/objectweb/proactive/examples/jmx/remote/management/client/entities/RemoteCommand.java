@@ -104,6 +104,7 @@ public class RemoteCommand extends ManageableEntity implements Serializable {
         return null;
     }
 
+    @Override
     public String toString() {
         return this.name;
     }

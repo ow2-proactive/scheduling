@@ -32,11 +32,8 @@ package org.objectweb.proactive.extensions.masterworker.core;
 
 import java.io.Serializable;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.Stack;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;

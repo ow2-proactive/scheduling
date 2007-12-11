@@ -40,8 +40,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.net.UnknownHostException;
-
 import javax.swing.Box;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;

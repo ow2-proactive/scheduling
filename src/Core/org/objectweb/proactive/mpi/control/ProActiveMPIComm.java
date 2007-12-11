@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.mpi.control;
 
-import java.net.UnknownHostException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.ProActiveInet;

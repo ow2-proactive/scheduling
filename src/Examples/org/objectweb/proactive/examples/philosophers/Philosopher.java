@@ -117,7 +117,7 @@ public class Philosopher implements org.objectweb.proactive.RunActive {
                 }
                 service.serveOldest("toggle"); // Serve any toggle
                 try {
-                    Thread.sleep((int) (Math.random() * (double) 2000) + 1000);
+                    Thread.sleep((int) (Math.random() * 2000) + 1000);
                 } catch (InterruptedException e) {
                 }
             } else {

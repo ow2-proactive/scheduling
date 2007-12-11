@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extensions.scheduler.task;
 
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 

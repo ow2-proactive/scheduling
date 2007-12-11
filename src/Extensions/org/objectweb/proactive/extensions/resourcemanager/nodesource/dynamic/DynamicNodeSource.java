@@ -131,6 +131,7 @@ public abstract class DynamicNodeSource extends NodeSource
      * Initialization part of NodeSource Active Object.
      * Creates objects member of the object.
      */
+    @Override
     public void initActivity(Body body) {
         super.initActivity(body);
         niceTimes = new Heap<Long>(nbMax);
@@ -139,7 +140,7 @@ public abstract class DynamicNodeSource extends NodeSource
 
         // delaying the node adding.
         for (int i = 0; i < nbMax; i++) {
-            niceTimes.add((long) currentTime + ((i * delay) / nbMax));
+            niceTimes.add(currentTime + ((i * delay) / nbMax));
         }
     }
 
@@ -175,6 +176,7 @@ public abstract class DynamicNodeSource extends NodeSource
      * @param preempt true Node source doesn't wait tasks end on its handled nodes,
      * false node source wait end of tasks on its nodes before shutting down
      */
+    @Override
     public void shutdown(boolean preempt) {
         super.shutdown(preempt);
         this.niceTimes.clear();
@@ -352,6 +354,7 @@ public abstract class DynamicNodeSource extends NodeSource
      * @param nodeUrl url of the node.
      * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#confirmRemoveNode(String)
      */
+    @Override
     public void confirmRemoveNode(String nodeUrl) {
         //verifying if node is already in the list,
         //node could have fallen between remove request and the confirm
@@ -388,6 +391,7 @@ public abstract class DynamicNodeSource extends NodeSource
      * @param pad ProActive Deployment descriptor representing nodes to deploy.
      * @throws AddingNodesException always.
      */
+    @Override
     public void addNodes(ProActiveDescriptor pad) throws AddingNodesException {
         throw new AddingNodesException("Node source : " + this.SourceId +
             " Node cannot be added to a dynamic source");
@@ -403,6 +407,7 @@ public abstract class DynamicNodeSource extends NodeSource
      * false the node is removed just after the job ending if the node is busy.<BR><BR>
      * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#forwardRemoveNode(String, boolean)
      */
+    @Override
     public void forwardRemoveNode(String nodeUrl, boolean preempt) {
         //verifying that node is already in the list,
         //node could have been already released or detected down

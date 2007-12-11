@@ -64,6 +64,7 @@ public enum NodeState {FREE(0),
      * Gives a string representation of the state.
      * @return String representation of the state.
      */
+    @Override
     public String toString() {
         return String.valueOf(state);
     }

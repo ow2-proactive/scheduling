@@ -30,8 +30,6 @@
  */
 package functionalTests.security.ruleCheck;
 
-import java.security.Policy;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;

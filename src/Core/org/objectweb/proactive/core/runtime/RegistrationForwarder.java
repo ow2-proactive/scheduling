@@ -125,6 +125,7 @@ public class RegistrationForwarder implements NotificationListener {
     }
 
     class Flusher extends TimerTask {
+        @Override
         public void run() {
             flush();
         }

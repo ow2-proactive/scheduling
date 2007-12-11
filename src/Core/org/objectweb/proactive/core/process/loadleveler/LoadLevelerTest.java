@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive.core.process.loadleveler;
 
-import java.net.UnknownHostException;
-
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveException;

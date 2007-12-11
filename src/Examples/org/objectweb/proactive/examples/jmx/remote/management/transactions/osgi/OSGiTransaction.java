@@ -127,6 +127,7 @@ public class OSGiTransaction extends Transaction implements OSGiTransactionMBean
         return this.idTransaction;
     }
 
+    @Override
     public void compensate() {
         for (CommandMBean c : this.compensation) {
             c.do_();

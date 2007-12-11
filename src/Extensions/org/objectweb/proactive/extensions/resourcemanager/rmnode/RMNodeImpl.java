@@ -299,6 +299,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      * @return a String shwowing informations about the node.
      */
+    @Override
     public String toString() {
         String mes = "\n";
 
@@ -353,6 +354,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * Compare two IMNode objects
      * @return true if the two IMNode objects represent the same Node.
      */
+    @Override
     public boolean equals(Object imnode) {
         if (imnode instanceof RMNode) {
             return this.nodeURL.equals(((RMNode) imnode).getNodeURL());
@@ -365,6 +367,7 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @return HashCode of node's ID,
      * i.e. the hashCode of the node's URL.
      */
+    @Override
     public int hashCode() {
         return nodeURL.hashCode();
     }

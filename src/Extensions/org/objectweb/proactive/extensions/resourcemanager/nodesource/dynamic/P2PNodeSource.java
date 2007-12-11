@@ -101,6 +101,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
      * Launching {@link StartP2PService P2P Service}, which connect to
      * an existing P2P infrastructure.
      */
+    @Override
     public void initActivity(Body body) {
         super.initActivity(body);
 
@@ -128,6 +129,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     /**
      * Terminates activity of P2PNodeSource Active Object.
      */
+    @Override
     public void endActivity(Body body) {
         super.endActivity(body);
         //TODO gsigety cdelbe : how to stop P2PService ?
@@ -147,6 +149,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
      * @param node Node object to release
      * @Override releaseNode from DynamicNodeSource
      */
+    @Override
     protected void releaseNode(Node node) {
         String nodeUrl = node.getNodeInformation().getURL();
         System.out.println("[DYNAMIC P2P SOURCE] P2PNodeSource.releaseNode(" +
@@ -165,6 +168,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
      * Get the node from the lookup
      * @Override getNode from DynamicNodeSource
      */
+    @Override
     protected Node getNode() {
         // TODO Auto-generated method stub
         P2PNodeLookup p2pNodeLookup = this.p2pService.getNodes(1,
@@ -179,6 +183,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
      * Create the {@link RMNodeSourceEvent} object related to the P2PNodeSource
      * @return event representing the source.
      */
+    @Override
     public RMNodeSourceEvent getSourceEvent() {
         return new RMNodeSourceEvent(this.getSourceId(),
             RMConstants.P2P_NODE_SOURCE_TYPE);
@@ -196,6 +201,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
      * Inform the IMNode Manager about the broken node,
      * Create a new nice time.
      */
+    @Override
     public void detectedPingedDownNode(String nodeUrl) {
         Node node = getNodebyUrl(nodeUrl);
         if (node != null) {
@@ -218,6 +224,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
      * @param preempt true Node source doesn't wait tasks end on its handled nodes,
      * false node source wait end of tasks on its nodes before shutting down
      */
+    @Override
     public void shutdown(boolean preempt) {
         super.shutdown(preempt);
     }

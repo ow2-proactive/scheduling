@@ -53,7 +53,7 @@ public class WSUser implements User, Serializable {
         this.locator = new Service1Locator(this.urlCallback);
 
         try {
-            this.service = (Service1Soap) locator.getService1Soap();
+            this.service = locator.getService1Soap();
         } catch (ServiceException e) {
             e.printStackTrace();
         }

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-import java.net.UnknownHostException;
 import java.util.Hashtable;
 
 import org.apache.log4j.Logger;

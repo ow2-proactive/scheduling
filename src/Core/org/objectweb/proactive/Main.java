@@ -30,8 +30,6 @@
  */
 package org.objectweb.proactive;
 
-import java.net.UnknownHostException;
-
 import org.objectweb.proactive.api.PAVersion;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.ProActiveInet;

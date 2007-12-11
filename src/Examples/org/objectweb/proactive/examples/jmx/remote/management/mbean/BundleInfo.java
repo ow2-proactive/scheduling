@@ -154,7 +154,7 @@ public class BundleInfo extends NotificationBroadcasterSupport
         Dictionary hTmp = bundle.getHeaders();
         Enumeration<String> e = hTmp.keys();
         while (e.hasMoreElements()) {
-            String key = (String) e.nextElement();
+            String key = e.nextElement();
             Object value = hTmp.get(key);
             this.headers.put(key, value);
         }
@@ -411,6 +411,7 @@ public class BundleInfo extends NotificationBroadcasterSupport
         return this.location.equals(b.getLocation());
     }
 
+    @Override
     public String toString() {
         return this.name;
     }

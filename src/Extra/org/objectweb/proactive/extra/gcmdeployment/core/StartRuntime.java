@@ -33,7 +33,6 @@ package org.objectweb.proactive.extra.gcmdeployment.core;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.HashSet;
 import java.util.Set;
 

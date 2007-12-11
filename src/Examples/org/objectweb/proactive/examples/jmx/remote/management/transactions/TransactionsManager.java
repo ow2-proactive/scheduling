@@ -103,7 +103,7 @@ public class TransactionsManager implements TransactionsManagerMBean, IJmx {
 
     public Transaction getTransaction(long id)
         throws InvalidTransactionException {
-        Transaction t = (Transaction) this.transactionsMap.get(id);
+        Transaction t = this.transactionsMap.get(id);
 
         if ((t != null) && (t.getState() != Transaction.COMMITED) &&
                 (t.getState() != Transaction.DEAD)) {

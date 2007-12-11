@@ -56,6 +56,7 @@ public abstract class Query implements Serializable {
         this.queryId = Query.taskId++;
     }
 
+    @Override
     public String toString() {
         //return(mask((left | down | right), n));
         return ("<" + n + "," + done + type() + "{" + mask(left, n) + "," +

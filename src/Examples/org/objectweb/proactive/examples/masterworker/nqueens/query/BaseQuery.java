@@ -76,10 +76,12 @@ public class BaseQuery extends Query {
         super(n, done, left, down, right);
     }
 
+    @Override
     public long run() {
         return Base.run(this);
     }
 
+    @Override
     public Vector split(Vector v) {
         int n = this.n;
         int QUEENS = (1 << n) - 1;

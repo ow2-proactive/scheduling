@@ -89,6 +89,7 @@ public class RMNodeSourceEvent extends RMEvent {
      * @param obj IMNodeSourceEvent object to compare.
      * @return true if the two events represent the same NodeSource.
      */
+    @Override
     public boolean equals(Object obj) {
         if (obj instanceof RMNodeSourceEvent) {
             return ((RMNodeSourceEvent) obj).nodeSourceName.equals(this.nodeSourceName) &&

@@ -38,6 +38,7 @@ public class FirstOutQuery extends Query {
         super(n, 0, 0, ~((1 << n) - 1), 0);
     }
 
+    @Override
     public long run() {
         Vector v = split(new Vector());
         int n = v.size();
@@ -48,6 +49,7 @@ public class FirstOutQuery extends Query {
         return (r);
     }
 
+    @Override
     public Vector split(Vector v) {
         int nq1 = n - 1;
         int j = n - 2;

@@ -101,6 +101,7 @@ public class RemoteTransactionGroup extends ManageableEntity
         this.gEntities.remove(entity);
     }
 
+    @Override
     public String toString() {
         return this.getName();
     }

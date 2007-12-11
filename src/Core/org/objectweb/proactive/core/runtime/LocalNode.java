@@ -288,7 +288,7 @@ public class LocalNode implements SecurityEntity {
         List<UniqueID> activeObjects = this.getActiveObjectsId();
 
         for (int i = 0; i < activeObjects.size(); i++) {
-            UniqueID bodyID = (UniqueID) activeObjects.get(i);
+            UniqueID bodyID = activeObjects.get(i);
 
             //check if the body is still on this vm
             Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);

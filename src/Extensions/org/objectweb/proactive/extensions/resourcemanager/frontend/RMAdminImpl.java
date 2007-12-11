@@ -94,7 +94,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      */
     public void initActivity(Body body) {
         try {
-            PAActiveObject.register((RMAdmin) PAActiveObject.getStubOnThis(),
+            PAActiveObject.register(PAActiveObject.getStubOnThis(),
                 "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
         } catch (IOException e) {
             e.printStackTrace();

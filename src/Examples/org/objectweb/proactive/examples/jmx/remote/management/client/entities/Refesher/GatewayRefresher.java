@@ -83,7 +83,7 @@ public class GatewayRefresher {
                             "Url")).getObject();
                     gateway.setUrl(url);
 
-                    GenericTypeWrapper<Object> gtw = (GenericTypeWrapper<Object>) paConn.getAttributeAsynchronous(gateway.getOn(),
+                    GenericTypeWrapper<Object> gtw = paConn.getAttributeAsynchronous(gateway.getOn(),
                             "Bundles");
 
                     PAFuture.waitFor(gtw);

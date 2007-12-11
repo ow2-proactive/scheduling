@@ -359,6 +359,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
          * and must be removed from the NodeSource.
          * {@link NodeSource#detectedPingedDownNode(String)} is called when a down node is detected.
          */
+        @Override
         public void run() {
             while (!isInterrupted() && this.isActive()) {
                 try {

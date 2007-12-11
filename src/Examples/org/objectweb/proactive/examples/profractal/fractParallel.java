@@ -257,7 +257,7 @@ public class fractParallel extends Frame {
                 "Distributed parallel computation...\n");
             distributed = true;
         }
-        Double checkPower = new Double((double) ((double) Math.sqrt(nodes)));
+        Double checkPower = new Double((Math.sqrt(nodes)));
         checkPower = new Double(checkPower.doubleValue() -
                 checkPower.intValue());
         if (!checkPower.equals(new Double(0.0))) {
@@ -273,14 +273,14 @@ public class fractParallel extends Frame {
         int n = nodeSquare.intValue();
         row = Math.abs(row);
         column = Math.abs(column);
-        Double app = new Double((double) ((double) column) / n);
+        Double app = new Double((column) / n);
         app = new Double(app.intValue() - app.doubleValue());
         if (!app.equals(new Double(0.0))) {
             textLog.append("[" + (new Date()) + "] " +
                 "Error: the differences are not divisible for the square root of nodes!\n");
             return;
         }
-        app = new Double((double) ((double) row) / n);
+        app = new Double((row) / n);
         app = new Double(app.intValue() - app.doubleValue());
         if (!app.equals(new Double(0.0))) {
             textLog.append("[" + (new Date()) + "] " +

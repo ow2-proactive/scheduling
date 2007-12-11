@@ -148,7 +148,7 @@ public class Chat implements java.io.Serializable, RunActive {
             this.diffusionGroup.addIntoDiffusionGroup((Chat) PAActiveObject.getStubOnThis(),
                 this.name); // 3
             PAGroup.getGroup(this.diffusionGroup)
-                   .add((Chat) PAActiveObject.getStubOnThis()); //4
+                   .add(PAActiveObject.getStubOnThis()); //4
             this.frame.list.append(this.name + "\n");
             this.writeMessage(new Message(" *** " + this.name +
                     " has joined the place"));
@@ -182,7 +182,7 @@ public class Chat implements java.io.Serializable, RunActive {
         this.diffusionGroup.removeUserFromTheList(this.name);
         this.diffusionGroup.removeFromDiffusionGroup((Chat) PAActiveObject.getStubOnThis());
         PAGroup.getGroup(this.diffusionGroup)
-               .remove((Chat) PAActiveObject.getStubOnThis());
+               .remove(PAActiveObject.getStubOnThis());
     }
 
     /**

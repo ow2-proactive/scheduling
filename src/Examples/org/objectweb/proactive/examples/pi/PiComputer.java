@@ -32,8 +32,6 @@ package org.objectweb.proactive.examples.pi;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.net.UnknownHostException;
-
 import org.objectweb.proactive.core.util.ProActiveInet;
 
 

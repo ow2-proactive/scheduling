@@ -42,6 +42,7 @@ public class FirstDiagQuery extends Query {
         scale = s;
     }
 
+    @Override
     public long run() {
         Vector v = split(new Vector());
         int n = v.size();
@@ -59,6 +60,7 @@ public class FirstDiagQuery extends Query {
         return (new DiagQuery(n, 2, sym, scale, l, d, r));
     }
 
+    @Override
     public Vector split(Vector v) {
         int nq1 = n - 1;
         for (int i = 2; i < nq1; i++)

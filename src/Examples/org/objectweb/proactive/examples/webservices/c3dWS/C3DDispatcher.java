@@ -53,7 +53,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Serializable;
-import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -1448,7 +1447,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
 
             return;
         } else {
-            scene.addObject((Primitive) s);
+            scene.addObject(s);
             showMessageAll("A Sphere has been added\nX:" +
                 Math.floor(s.getCenter().x) + " Y:" +
                 Math.floor(s.getCenter().y) + " Z:" +
