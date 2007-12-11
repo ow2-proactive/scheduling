@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.nbody.barneshut;
 
 import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;

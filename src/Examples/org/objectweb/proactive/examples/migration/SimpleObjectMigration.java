@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.migration;
 
 import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;

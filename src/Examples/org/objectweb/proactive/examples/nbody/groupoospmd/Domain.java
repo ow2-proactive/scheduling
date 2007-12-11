@@ -31,6 +31,7 @@
 package org.objectweb.proactive.examples.nbody.groupoospmd;
 
 import java.io.Serializable;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.group.spmd.ProSPMD;
