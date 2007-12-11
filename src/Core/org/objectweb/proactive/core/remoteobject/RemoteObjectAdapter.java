@@ -60,14 +60,42 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * @author acontes
- * RemoteObjectAdapter are used to hide the protocol specific part of a remote object ie the RemoteRemoteObject
+ * The RemoteObjectAdapter is used to hide the fact that the remote object
+ * called is distant.
  */
 public class RemoteObjectAdapter implements RemoteObject {
+
+    /**
+     * the location of the remote object this remote object adapter represents
+     */
     protected RemoteRemoteObject remoteObject;
+
+    /**
+     * a stub on the object reified by the remote object
+     */
     protected Object stub;
+
+    /**
+     * the URI where the remote remote is bound
+     */
     protected URI uri;
+
+    /**
+     * Array of methods belonging to the RemoteObject class.
+     * These methods are reified using the RemoteObjectRequest class
+     */
     protected static Method[] methods;
+
+    /**
+     * Array of methods belonging to the SecurityEntity class
+     * These methods are reified using the InternalRemoteRemoteObjectRequest class
+     */
     protected static Method[] securityMethods;
+
+    /**
+     * Array of methods belonging to the InternalRemoteRemoteObject class.
+     * These methods are reified using the InternalRemoteRemoteObjectRequest class
+     */
     protected static Method[] internalRROMethods;
 
     static {
@@ -105,8 +133,6 @@ public class RemoteObjectAdapter implements RemoteObject {
                     });
             securityMethods[5] = SecurityEntity.class.getDeclaredMethod("getPolicy",
                     new Class<?>[] { Entities.class, Entities.class });
-            //            securityMethods[6] = SecurityEntity.class.getDeclaredMethod("getCertificateEncoded",
-            //                    new Class<?>[0]);
             securityMethods[7] = SecurityEntity.class.getDeclaredMethod("getEntities",
                     new Class<?>[0]);
             securityMethods[8] = SecurityEntity.class.getDeclaredMethod("terminateSession",
@@ -122,8 +148,6 @@ public class RemoteObjectAdapter implements RemoteObject {
             internalRROMethods = new Method[20];
             internalRROMethods[0] = InternalRemoteRemoteObject.class.getDeclaredMethod("getObjectProxy",
                     new Class<?>[] {  });
-            //            internalRROMethods[1] = InternalRemoteRemoteObject.class.getDeclaredMethod("getObjectProxy",
-            //                    new Class<?>[] { RemoteRemoteObject.class });
             internalRROMethods[2] = InternalRemoteRemoteObject.class.getDeclaredMethod("getURI",
                     new Class<?>[0]);
         } catch (NoSuchMethodException e) {
@@ -620,7 +644,7 @@ public class RemoteObjectAdapter implements RemoteObject {
         return;
     }
 
-    //TODO: write a public method which does't throw exception. 
+    //TODO: write a public method which does't throw exception.
     protected URI getURI() throws ProActiveException {
         try {
             MethodCall mc = MethodCall.getMethodCall(internalRROMethods[2],
