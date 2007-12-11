@@ -524,6 +524,13 @@ public enum PAProperties {
     PA_TEST("proactive.test", PAPropertiesType.BOOLEAN),
 
     /**
+     * Functional test timeout in ms
+     *
+     * If 0 no timeout.
+     */
+    PA_TEST_TIMEOUT("proactive.test.timeout", PAPropertiesType.INTEGER),
+
+    /**
      * TODO vlegrand Describe this property
      */
     CATALINA_BASE("catalina.base", PAPropertiesType.STRING),
