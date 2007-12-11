@@ -255,7 +255,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
         // Remote Object exporter
         this.roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
-                this);
+                this, new ProActiveRuntimeRemoteObjectAdapter());
 
         String url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(
                     getInternalURL()),

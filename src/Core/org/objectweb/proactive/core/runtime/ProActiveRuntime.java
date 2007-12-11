@@ -134,7 +134,6 @@ public interface ProActiveRuntime extends SecurityEntity {
      * retrieve all JVM information in one call to optimize performance.
      * @return the JVM information as one object
      */
-    @Cache
     public VMInformation getVMInformation();
 
     /**
