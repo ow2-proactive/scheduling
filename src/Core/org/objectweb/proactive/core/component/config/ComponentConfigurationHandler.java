@@ -216,10 +216,10 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
         protected void notifyEndActiveHandler(String name,
             UnmarshallerHandler activeHandler) throws SAXException {
             if (name.equals(INTERFACE_ELEMENT)) {
-                interfaceSignature = (String) activeHandler.getResultObject();
+                interfaceSignature = ((String) activeHandler.getResultObject()).trim();
             }
             if (name.equals(IMPLEMENTATION_ELEMENT)) {
-                implementationSignature = (String) activeHandler.getResultObject();
+                implementationSignature = ((String) activeHandler.getResultObject()).trim();
             }
         }
 
