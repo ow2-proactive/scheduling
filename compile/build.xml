@@ -606,8 +606,6 @@
 			<fileset dir="${base.dir}">
 				<include name="compile/**"/>
 				<include name="descriptors/**"/>
-				<include name="docs/api/**"/>
-				<include name="docs/html/**"/>
 				<include name="docs/pdf/**"/>
 				<include name="lib/**"/>
 				<include name="daemon/**"/>
