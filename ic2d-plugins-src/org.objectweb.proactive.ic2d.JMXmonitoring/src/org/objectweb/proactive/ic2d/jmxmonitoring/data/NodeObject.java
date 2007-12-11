@@ -93,7 +93,7 @@ public class NodeObject extends AbstractData {
 
     private NodeWrapperMBean getProxyNodeMBean() {
         if (proxyNodeMBean == null) {
-            proxyNodeMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
+            proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),
                     getObjectName(), NodeWrapperMBean.class, false);
         }
         return proxyNodeMBean;
@@ -146,7 +146,7 @@ public class NodeObject extends AbstractData {
         // System.out.println("Node "  +this.getName()+" has: " + activeObjectNames.size()+" ao's");
         // int count=0;
         for (final ObjectName oname : activeObjectNames) {
-            final BodyWrapperMBean proxyBodyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
+            final BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),
                     oname, BodyWrapperMBean.class, false);
 
             // Since the id is already contained as a String in the ObjectName 

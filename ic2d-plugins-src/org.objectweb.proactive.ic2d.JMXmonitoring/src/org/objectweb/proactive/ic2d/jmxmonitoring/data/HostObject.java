@@ -239,7 +239,7 @@ public class HostObject extends AbstractData {
                 e.printStackTrace();
             }
 
-            OperatingSystemMXBean proxyMXBean = MBeanServerInvocationHandler.newProxyInstance(connection,
+            OperatingSystemMXBean proxyMXBean = (OperatingSystemMXBean) MBeanServerInvocationHandler.newProxyInstance(connection,
                     OSoname, OperatingSystemMXBean.class, false);
             this.osName = proxyMXBean.getName();
             this.osVersion = proxyMXBean.getVersion();

@@ -189,7 +189,7 @@ public class RuntimeObject extends AbstractData {
     @SuppressWarnings("unchecked")
     private void findNodes() {
         if (this.proxyMBean == null) {
-            this.proxyMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
+            this.proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),
                     getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
         }
 
@@ -240,7 +240,7 @@ public class RuntimeObject extends AbstractData {
             // If this child is not monitored.
             if (child == null) {
                 // Get the mbean proxy for the current node
-                final NodeWrapperMBean proxyNodeMBean = MBeanServerInvocationHandler.newProxyInstance(getConnection(),
+                final NodeWrapperMBean proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),
                         name, NodeWrapperMBean.class, false);
 
                 // Get the jobId and the virtualNodeName in one call
