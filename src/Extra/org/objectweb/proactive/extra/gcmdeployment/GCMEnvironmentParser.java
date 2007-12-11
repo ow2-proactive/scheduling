@@ -103,15 +103,15 @@ public class GCMEnvironmentParser implements GCMParserConstants {
 
         String deploymentSchema = GCMDeploymentParserImpl.class.getClass()
                                                                .getResource(DEPLOYMENT_DESC_LOCATION)
-                                                               .toString();
+                                                               .getFile();
 
         String commonTypesSchema = GCMDeploymentParserImpl.class.getClass()
                                                                 .getResource(COMMON_TYPES_LOCATION)
-                                                                .toString();
+                                                                .getFile();
 
         String extensionSchemas = GCMDeploymentParserImpl.class.getClass()
                                                                .getResource(EXTENSION_SCHEMAS_LOCATION)
-                                                               .toString();
+                                                               .getFile();
 
         schemas.add(0, extensionSchemas);
         schemas.add(0, deploymentSchema);

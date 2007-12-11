@@ -49,6 +49,12 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 
+/**
+ * Add -Djaxp.debug=1 for, well, JAXP debugging
+ *
+ * @author glaurent
+ *
+ */
 public class TestDeploymentDescriptorParser {
     @Test
     public void test()
@@ -160,7 +166,7 @@ public class TestDeploymentDescriptorParser {
 
         String userSchema = getClass()
                                 .getResource("testfiles/deployment/SampleDeploymentExtension.xsd")
-                                .toString();
+                                .getFile();
 
         ArrayList<String> schemas = new ArrayList<String>();
         schemas.add(userSchema);

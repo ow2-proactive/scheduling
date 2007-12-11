@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Map;
 

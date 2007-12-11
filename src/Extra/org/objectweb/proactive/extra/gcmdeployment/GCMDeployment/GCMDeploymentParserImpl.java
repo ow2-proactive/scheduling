@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,6 +71,8 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.Gr
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupSSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDescriptorProcessor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMEnvironmentParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
@@ -128,7 +131,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     public GCMDeploymentParserImpl(File descriptor, List<String> userSchemas)
-        throws IOException, SAXException {
+        throws RuntimeException, SAXException, IOException {
         this.descriptor = descriptor;
         infrastructure = new GCMDeploymentInfrastructure();
         resources = new GCMDeploymentResources();
@@ -145,14 +148,20 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerUserBridgeParsers();
         try {
             // process variables first
+            GCMEnvironmentParser environmentParser = new GCMEnvironmentParser(descriptor);
 
-            //            GCMEnvironmentParser environmentParser = new GCMEnvironmentParser(descriptor);
-            //
-            //            Map<String, String> variableMap = environmentParser.getVariableMap();
-            //
-            //            GCMDescriptorProcessor descriptorProcessor = new GCMDescriptorProcessor(variableMap,
-            //                    document);
+            Map<String, String> variableMap = environmentParser.getVariableMap();
 
+            InputSource inputSource = new InputSource(new FileInputStream(
+                        descriptor));
+
+            Document baseDocument = documentBuilder.parse(inputSource);
+
+            GCMDescriptorProcessor descriptorProcessor = new GCMDescriptorProcessor(variableMap,
+                    baseDocument);
+
+            // this blocks - use temp file until I figure it out
+            //
             //            PipedOutputStream pipedOutputStream = new PipedOutputStream();
             //
             //            InputSource inputSource = new InputSource(new PipedInputStream(
@@ -160,31 +169,27 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             //
             //            descriptorProcessor.transform(pipedOutputStream);
             //            
+            File tempFile = File.createTempFile(descriptor.getName(), "tmp");
 
-            //            File tempFile = File.createTempFile(descriptor.getName(), "tmp");
-            //
-            //            FileOutputStream outputStream = new FileOutputStream(tempFile);
-            //            descriptorProcessor.transform(outputStream);
-            //            outputStream.close();
+            FileOutputStream outputStream = new FileOutputStream(tempFile);
+            descriptorProcessor.transform(outputStream);
+            outputStream.close();
 
-            //            InputSource inputSource = new InputSource(new FileInputStream(
-            //                        tempFile));
-            InputSource inputSource = new InputSource(new FileInputStream(
-                        descriptor));
+            InputSource processedInputSource = new InputSource(new FileInputStream(
+                        tempFile));
 
-            document = documentBuilder.parse(inputSource);
-        } catch (SAXException e) {
+            documentBuilder = domFactory.newDocumentBuilder();
+            documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
+
+            document = documentBuilder.parse(processedInputSource);
+        } catch (Exception e) {
             String msg = "parsing problem with document " +
                 descriptor.getCanonicalPath();
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " +
                 e.getMessage());
             throw new SAXException(msg, e);
-        } /* catch (XPathExpressionException e) {
-        GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-        } catch (TransformerException e) {
-        GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-        ;
-        } */}
+        }
+    }
 
     protected void registerDefaultGroupParsers() {
         registerGroupParser(new GroupARCParser());
@@ -225,6 +230,10 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     public void setup() throws IOException {
+        //    	System.setProperty("jaxp.debug", "1");
+        System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
+            "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
+
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
@@ -242,9 +251,11 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                                                                .getResource(EXTENSION_SCHEMAS_LOCATION)
                                                                .getFile();
 
-        //        schemas.add(extensionSchemas);
-        //        schemas.add(deploymentSchema);
-        //        schemas.add(0, commonTypesSchema); // not needed - it is included by the deployment schema
+        // DO NOT change the order here, it would break validation
+        //
+        schemas.add(deploymentSchema);
+        schemas.add(extensionSchemas);
+        //        schemas.add(commonTypesSchema); // not needed - it is included by the deployment schema
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {

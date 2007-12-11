@@ -4,9 +4,17 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:pauext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaUserExtension"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaUserExtension SampleDeploymentExtension.xsd">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+>
 
+<!-- 
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                 ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
+	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd
+	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaUserExtension SampleDeploymentExtension.xsd
+	
+	"
+ -->
+ 
 	<environment>
 		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
@@ -26,7 +34,10 @@
 		</hosts>
 
 		<groups>
-			<pauext:myGroup id="gINRIAEXT" someattr="foobar" />
+			<paext:sshGroup id="LAN_INRIA" hostList="cheypa schubby petawawa naruto" username="${USERNAME}"
+				commandPath="/usr/local/bin/ssh">
+			</paext:sshGroup>			
+ 			<pauext:myGroup id="gINRIAEXT" someattr="foobar" />
 		</groups>
 
 		<bridges>

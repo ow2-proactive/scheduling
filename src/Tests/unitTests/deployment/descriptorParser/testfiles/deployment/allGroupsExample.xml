@@ -94,7 +94,7 @@
 
 			<paext:oarGroup bookedNodesAccess="ssh" id="oargroup" interactive="true">
 				<pa:scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh" />
-				<paext:resource nodes="2" cpu="4" />
+				<paext:resources nodes="2" cpu="4" />
 				<paext:stderr>trace/err.log</paext:stderr>
 			</paext:oarGroup>
 
