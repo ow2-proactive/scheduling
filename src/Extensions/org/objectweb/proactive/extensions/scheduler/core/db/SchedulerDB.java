@@ -48,6 +48,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialException;
+
+import org.objectweb.proactive.core.util.converter.ObjectToByteConverter;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobEvent;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobResult;
@@ -82,18 +86,17 @@ public class SchedulerDB extends AbstractSchedulerDB {
     // -------------------------------------------------------------------- //
     // ---------------------------- private ------------------------------- //
     // -------------------------------------------------------------------- //
-    private InputStream serialize(Object o) {
+    private Blob serialize(Object o) {
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(o);
-            oos.flush();
-            oos.close();
-
-            return new ByteArrayInputStream(baos.toByteArray());
+            return new SerialBlob(ObjectToByteConverter.ObjectStream.convert(o));
+        } catch (SerialException e) {
+            e.printStackTrace();
+            return null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         } catch (IOException e) {
             e.printStackTrace();
-
             return null;
         }
     }
@@ -384,13 +387,15 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 }
             }
 
-            if (blob != null) {
-                try {
-                    blob.free();
-                } catch (SQLException e) {
-                    // Nothing to do
-                }
-            }
+            /* Blob.free() is not available in Java 5 */
+
+            //            if (blob != null) {
+            //                try {
+            //                    blob.free();
+            //                } catch (SQLException e) {
+            //                    // Nothing to do
+            //                }
+            //            }
         }
 
         return null;
