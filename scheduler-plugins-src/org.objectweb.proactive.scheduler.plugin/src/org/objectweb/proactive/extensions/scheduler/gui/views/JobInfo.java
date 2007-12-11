@@ -203,6 +203,7 @@ public class JobInfo extends ViewPart {
     /**
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
+    
     @Override
     public void createPartControl(Composite parent) {
         isDisposed = false;
@@ -232,6 +233,7 @@ public class JobInfo extends ViewPart {
     /**
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
+    
     @Override
     public void setFocus() {
         // TODO petit problème, Eclipse envoi 3 fois d'afiler le mm event
@@ -249,6 +251,7 @@ public class JobInfo extends ViewPart {
     /**
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
      */
+    
     @Override
     public void dispose() {
         isDisposed = true;

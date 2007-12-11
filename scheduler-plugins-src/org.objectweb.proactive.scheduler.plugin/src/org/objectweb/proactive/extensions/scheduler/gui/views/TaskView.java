@@ -83,7 +83,7 @@ public class TaskView extends ViewPart {
         if (!taskComposite.isDisposed()) {
             final InternalJob aJob = job;
             Display.getDefault().asyncExec(new Runnable() {
-                    @Override
+                    
                     public void run() {
                         taskComposite.setTasks(aJob.getId(), aJob.getTasks());
                     }
@@ -102,7 +102,7 @@ public class TaskView extends ViewPart {
         final TaskEvent aTaskEvent = taskEvent;
         final InternalTask aTaskDescriptor = taskDescriptor;
         Display.getDefault().asyncExec(new Runnable() {
-                @Override
+                
                 public void run() {
                     taskComposite.changeLine(aTaskEvent.getTaskId(),
                         aTaskDescriptor);
@@ -154,6 +154,7 @@ public class TaskView extends ViewPart {
     /**
      * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
      */
+    
     @Override
     public void createPartControl(Composite parent) {
         isDisposed = false;
@@ -173,6 +174,7 @@ public class TaskView extends ViewPart {
     /**
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
+    
     @Override
     public void setFocus() {
         // TableManager tableManager = TableManager.getInstance();
@@ -187,6 +189,7 @@ public class TaskView extends ViewPart {
     /**
      * @see org.eclipse.ui.part.WorkbenchPart#dispose()
      */
+    
     @Override
     public void dispose() {
         isDisposed = true;

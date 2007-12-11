@@ -59,6 +59,7 @@ public class KillRemoveJobAction extends Action {
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
+    
     @Override
     public void run() {
         if (killMode) {

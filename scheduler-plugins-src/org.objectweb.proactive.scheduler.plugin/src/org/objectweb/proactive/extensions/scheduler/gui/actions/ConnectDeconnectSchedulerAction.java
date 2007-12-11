@@ -57,6 +57,7 @@ public class ConnectDeconnectSchedulerAction extends Action {
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
+    
     @Override
     public void run() {
         if (isConnected) {

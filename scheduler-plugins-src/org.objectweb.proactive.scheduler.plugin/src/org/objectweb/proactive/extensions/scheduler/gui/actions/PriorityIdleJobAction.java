@@ -50,6 +50,7 @@ public class PriorityIdleJobAction extends Action {
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
+    
     @Override
     public void run() {
         JobId jobId = TableManager.getInstance().getLastJobIdOfLastSelectedItem();

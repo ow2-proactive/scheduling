@@ -54,6 +54,7 @@ public class ChangeViewModeAction extends Action {
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
+    
     @Override
     public void run() {
         FillLayout layout = (FillLayout) (jobComposite.getLayout());

@@ -76,6 +76,7 @@ public class JobOutputAppender extends AppenderSkeleton {
     /**
      * @see org.apache.log4j.AppenderSkeleton#append(org.apache.log4j.spi.LoggingEvent)
      */
+    
     @Override
     protected void append(LoggingEvent event) {
         String msg = null;
@@ -106,6 +107,7 @@ public class JobOutputAppender extends AppenderSkeleton {
     /**
      * @see org.apache.log4j.AppenderSkeleton#close()
      */
+    
     @Override
     public void close() {
     }
@@ -113,6 +115,7 @@ public class JobOutputAppender extends AppenderSkeleton {
     /**
      * @see org.apache.log4j.AppenderSkeleton#requiresLayout()
      */
+    
     @Override
     public boolean requiresLayout() {
         return false;

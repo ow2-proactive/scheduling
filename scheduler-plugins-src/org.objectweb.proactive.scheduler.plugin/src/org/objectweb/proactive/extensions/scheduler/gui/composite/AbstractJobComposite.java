@@ -147,7 +147,7 @@ public abstract class AbstractJobComposite extends Composite {
         if (!this.isDisposed()) {
             final int c = count;
             getDisplay().asyncExec(new Runnable() {
-                    @Override
+                    
                     public void run() {
                         label.setText(title + " (" + c + ")");
                     }
@@ -179,7 +179,7 @@ public abstract class AbstractJobComposite extends Composite {
                                                   .getJobById(jobId);
             final int itemIndex = anItemIndex;
             getDisplay().asyncExec(new Runnable() {
-                    @Override
+                    
                     public void run() {
                         createItem(job, itemIndex);
                     }
@@ -270,30 +270,35 @@ public abstract class AbstractJobComposite extends Composite {
         TableColumn tc3 = new TableColumn(table, SWT.CENTER);
         // addSelectionListener
         tc1.addSelectionListener(new SelectionAdapter() {
+                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalJob.SORT_BY_ID);
                 }
             });
         tc2.addSelectionListener(new SelectionAdapter() {
+                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalJob.SORT_BY_PRIORITY);
                 }
             });
         tc3.addSelectionListener(new SelectionAdapter() {
+                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalJob.SORT_BY_NAME);
                 }
             });
         tc4.addSelectionListener(new SelectionAdapter() {
+                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalJob.SORT_BY_STATE);
                 }
             });
         tc5.addSelectionListener(new SelectionAdapter() {
+                
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     sort(event, InternalJob.SORT_BY_OWNER);
@@ -416,7 +421,7 @@ public abstract class AbstractJobComposite extends Composite {
             final JobId jobId = aJobId;
 
             getDisplay().asyncExec(new Runnable() {
-                    @Override
+                    
                     public void run() {
                         Table table = getTable();
                         TableItem[] items = table.getItems();
@@ -467,7 +472,7 @@ public abstract class AbstractJobComposite extends Composite {
             final JobId jobId = aJobId;
 
             getDisplay().asyncExec(new Runnable() {
-                    @Override
+                    
                     public void run() {
                         Table table = getTable();
                         TableItem[] items = table.getItems();
@@ -567,7 +572,7 @@ public abstract class AbstractJobComposite extends Composite {
             }
             final int i = tmp;
             getDisplay().asyncExec(new Runnable() {
-                    @Override
+                    
                     public void run() {
                         int j = table.getSelectionIndex();
                         if (i == j) {
@@ -658,6 +663,7 @@ public abstract class AbstractJobComposite extends Composite {
     /**
      * @see org.eclipse.swt.widgets.Control#setMenu(org.eclipse.swt.widgets.Menu)
      */
+    
     @Override
     public void setMenu(Menu menu) {
         super.setMenu(menu);
@@ -668,6 +674,7 @@ public abstract class AbstractJobComposite extends Composite {
     /**
      * @see org.eclipse.swt.widgets.Control#setVisible(boolean)
      */
+    
     @Override
     public void setVisible(boolean visible) {
         if (label != null) {

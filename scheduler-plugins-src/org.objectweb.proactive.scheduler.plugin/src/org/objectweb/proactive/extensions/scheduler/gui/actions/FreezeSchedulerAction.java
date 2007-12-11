@@ -51,6 +51,7 @@ public class FreezeSchedulerAction extends Action {
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
+    
     @Override
     public void run() {
         SchedulerProxy.getInstance().pauseImmediate();
