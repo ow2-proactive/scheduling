@@ -39,9 +39,6 @@
 	<classpathentry kind="lib" path="lib/ibis-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/ibis-connect-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ibis-util-1.0.jar"/>
-	<classpathentry kind="lib" path="lib/jai_codec.jar"/>
-	<classpathentry kind="lib" path="lib/jai_core.jar"/>
-	<classpathentry kind="lib" path="lib/jai_imageio.jar"/>
 	<classpathentry kind="lib" path="lib/javasci.jar"/>
 	<classpathentry kind="lib" path="lib/javassist.jar"/>
 	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
