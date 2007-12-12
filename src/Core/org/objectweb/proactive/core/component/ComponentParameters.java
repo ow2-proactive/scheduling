@@ -147,14 +147,14 @@ public class ComponentParameters implements Serializable {
      * @return the types of server interfaces
      */
     public InterfaceType[] getServerInterfaceTypes() {
-        ArrayList server_interfaces = new ArrayList();
+        ArrayList<InterfaceType> server_interfaces = new ArrayList<InterfaceType>();
         InterfaceType[] interfaceTypes = componentType.getFcInterfaceTypes();
         for (int i = 0; i < interfaceTypes.length; i++) {
             if (!interfaceTypes[i].isFcClientItf()) {
                 server_interfaces.add(interfaceTypes[i]);
             }
         }
-        return (InterfaceType[]) server_interfaces.toArray(new InterfaceType[server_interfaces.size()]);
+        return server_interfaces.toArray(new InterfaceType[server_interfaces.size()]);
     }
 
     /**

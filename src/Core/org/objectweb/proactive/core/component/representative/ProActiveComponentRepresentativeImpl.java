@@ -146,13 +146,13 @@ public class ProActiveComponentRepresentativeImpl
             return;
         }
         ComponentConfigurationHandler componentConfiguration = ProActiveComponentImpl.loadControllerConfiguration(controllersConfigFileLocation);
-        Map controllersConfiguration = componentConfiguration.getControllers();
+        Map<String, String> controllersConfiguration = componentConfiguration.getControllers();
 
         addControllers(componentType, controllersConfiguration);
     }
 
     private void addControllers(ComponentType componentType,
-        Map controllersConfiguration) {
+        Map<String, String> controllersConfiguration) {
         // create the interface references tables
         // the size is the addition of :  
         // - 1 for the current ItfRef (that is at the same time a binding controller, lifecycle controller,
@@ -165,17 +165,17 @@ public class ProActiveComponentRepresentativeImpl
 
         // add controllers
         //Enumeration controllersInterfaces = controllersConfiguration.propertyNames();
-        Iterator iteratorOnControllers = controllersConfiguration.keySet()
+        Iterator<String> iteratorOnControllers = controllersConfiguration.keySet()
                                                                  .iterator();
         Class<?> controllerClass = null;
         AbstractProActiveController currentController;
         ProActiveInterface currentInterface = null;
         Class<?> controllerItf;
         while (iteratorOnControllers.hasNext()) {
-            String controllerItfName = (String) iteratorOnControllers.next();
+            String controllerItfName = iteratorOnControllers.next();
             try {
                 controllerItf = Class.forName(controllerItfName);
-                controllerClass = Class.forName((String) controllersConfiguration.get(
+                controllerClass = Class.forName(controllersConfiguration.get(
                             controllerItf.getName()));
                 Constructor<?> controllerClassConstructor = controllerClass.getConstructor(new Class<?>[] {
                             Component.class

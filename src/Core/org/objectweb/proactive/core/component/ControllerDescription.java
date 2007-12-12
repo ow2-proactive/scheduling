@@ -62,7 +62,7 @@ public class ControllerDescription implements Serializable {
     protected boolean synchronous = false;
     public static final String DEFAULT_COMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/config/default-component-config.xml";
     protected String controllersConfigFileLocation;
-    protected Map controllersSignatures;
+    protected Map<String, String> controllersSignatures;
 
     /**
      * a no-arg constructor (used in the ProActive parser)
@@ -198,7 +198,7 @@ public class ControllerDescription implements Serializable {
         return controllersConfigFileLocation;
     }
 
-    public Map getControllersSignatures() {
+    public Map<String, String> getControllersSignatures() {
         return controllersSignatures;
     }
 }

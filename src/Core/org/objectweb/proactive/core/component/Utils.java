@@ -87,9 +87,9 @@ public class Utils {
     }
 
     public static boolean hasSingleCardinality(String itfName, Component owner) {
-        Iterator it = Arrays.asList(owner.getFcInterfaces()).iterator();
+        Iterator<Interface> it = Arrays.<Interface>asList((Interface[])owner.getFcInterfaces()).iterator();
         while (it.hasNext()) {
-            ProActiveInterfaceType itfType = ((ProActiveInterfaceType) ((Interface) it.next()).getFcItfType());
+            ProActiveInterfaceType itfType = (ProActiveInterfaceType) it.next().getFcItfType();
             if (itfType.getFcItfName().equals(itfName) &&
                     itfType.isFcSingletonItf()) {
                 return true;

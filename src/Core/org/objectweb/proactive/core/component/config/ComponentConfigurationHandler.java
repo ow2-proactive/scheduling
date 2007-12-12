@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
  */
 public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
     implements ComponentConfigurationConstants {
-    Map controllers = new HashMap();
+    Map<String, String> controllers = new HashMap<String, String>();
     List inputInterceptors = new ArrayList();
     List outputInterceptors = new ArrayList();
     public static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
@@ -79,7 +79,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
         return outputInterceptors;
     }
 
-    public Map getControllers() {
+    public Map<String, String> getControllers() {
         return controllers;
     }
 
