@@ -165,15 +165,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             GCMDescriptorProcessor descriptorProcessor = new GCMDescriptorProcessor(variableMap,
                     baseDocument);
 
-            // this blocks - use temp file until I figure it out
-            //
-            // PipedOutputStream pipedOutputStream = new PipedOutputStream();
-            //
-            // InputSource inputSource = new InputSource(new PipedInputStream(
-            // pipedOutputStream));
-            //
-            // descriptorProcessor.transform(pipedOutputStream);
-            //            
             File tempFile = File.createTempFile(descriptor.getName(), "tmp");
 
             FileOutputStream outputStream = new FileOutputStream(tempFile);
