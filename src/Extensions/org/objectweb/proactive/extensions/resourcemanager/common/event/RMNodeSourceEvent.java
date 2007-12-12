@@ -75,7 +75,7 @@ public class RMNodeSourceEvent extends RMEvent {
     }
 
     /**
-     * Creates an IMNodesourceEvent object.
+     * Creates an RMNodesourceEvent object.
      * @param name of the Node Source
      * @param type type of the NodeSource
      */
@@ -85,8 +85,8 @@ public class RMNodeSourceEvent extends RMEvent {
     }
 
     /**
-     * Compare two IMNodeSourceEvent objects.
-     * @param obj IMNodeSourceEvent object to compare.
+     * Compare two RMNodeSourceEvent objects.
+     * @param obj RMNodeSourceEvent object to compare.
      * @return true if the two events represent the same NodeSource.
      */
     @Override

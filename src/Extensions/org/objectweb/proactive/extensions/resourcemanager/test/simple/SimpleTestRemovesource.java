@@ -53,6 +53,6 @@ public class SimpleTestRemovesource {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("##[TestIMAdmin] END TEST");
+        System.out.println("##[TestRMAdmin] END TEST");
     }
 }

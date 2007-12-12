@@ -31,6 +31,7 @@
 package org.objectweb.proactive.extensions.resourcemanager.test.util;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAFuture;
@@ -45,6 +46,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 
+import junit.framework.TestCase;
 import junit.framework.TestCase;
 
 
@@ -65,8 +67,9 @@ public class Test1 extends TestCase {
 
         ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(
                 "descriptors/scheduler/deployment/Descriptor_SSH_List.xml");
-        admin.createStaticNodesource("static source", pad);
-
+        ArrayList<ProActiveDescriptor> padList = new ArrayList<ProActiveDescriptor>();
+        padList.add(pad);
+        admin.createStaticNodesource("static source", padList);
         Thread.sleep(10000);
         System.err.println("Starting tests");
     }

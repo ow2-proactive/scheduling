@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Vector;
 
@@ -51,11 +52,13 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
+import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMEvent;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMInitialState;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
+import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdminImpl;
@@ -158,10 +161,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
     /** Timeout for selection script result */
     private static final int MAX_VERIF_TIMEOUT = 120000;
 
-    /** Name of the default source node, created at the IMCore initialization */
-    private static final String DEFAULT_STATIC_SOURCE_NAME = "default";
-
-    /** indicates that IMCore must shutdown*/
+    /** indicates that RMCore must shutdown*/
     private boolean toShutDown = false;
 
     /**
@@ -230,13 +230,16 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                 logger.debug("instanciation RMNodeManager");
             }
 
-            this.createStaticNodesource(null, DEFAULT_STATIC_SOURCE_NAME);
+            this.createStaticNodesource(null,
+                RMConstants.DEFAULT_STATIC_SOURCE_NAME);
 
             //Creating RM started event 
             this.monitoring.imStartedEvent(new RMEvent());
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
+            e.printStackTrace();
+        } catch (RMException e) {
             e.printStackTrace();
         }
         if (logger.isDebugEnabled()) {
@@ -381,9 +384,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
         (rmnode.isToRelease() && this.toBeReleased.contains(rmnode)));
 
         if (logger.isInfoEnabled()) {
-            logger.info("[RMCORE] doing release of node " +
-                rmnode.getNodeURL());
+            logger.info("[RMCORE] releasing node " + rmnode.getNodeURL());
         }
+        rmnode.clean();
         removeNodeFromCore(rmnode);
         rmnode.getNodeSource().confirmRemoveNode(rmnode.getNodeURL());
     }
@@ -653,25 +656,26 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param pad a ProActiveDescriptor object to deploy at the node source creation.
      * @param sourceName name given to the static node source.
      */
-    public void createStaticNodesource(ProActiveDescriptor pad,
-        String sourceName) {
+    public void createStaticNodesource(List<ProActiveDescriptor> padList,
+        String sourceName) throws RMException {
         logger.info("[RMCORE] Creating a Static source : " + sourceName);
-        try {
-            NodeSource padSource = (NodeSource) PAActiveObject.newActive(PADNodeSource.class.getName(),
-                    new Object[] {
-                        sourceName,
-                        (RMCoreSourceInt) PAActiveObject.getStubOnThis()
-                    }, nodeRM);
-
-            if (pad != null) {
-                padSource.addNodes(pad);
+        if (this.nodeSources.containsKey(sourceName)) {
+            throw new RMException("Node Source name already existing");
+        } else {
+            try {
+                NodeSource padSource = (NodeSource) PAActiveObject.newActive(PADNodeSource.class.getName(),
+                        new Object[] {
+                            sourceName,
+                            (RMCoreSourceInt) PAActiveObject.getStubOnThis()
+                        }, nodeRM);
+                if (padList != null) {
+                    for (ProActiveDescriptor pad : padList) {
+                        padSource.addNodes(pad);
+                    }
+                }
+            } catch (Exception e) {
+                throw new RMException(e);
             }
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        } catch (AddingNodesException e) {
-            e.printStackTrace();
         }
     }
 
@@ -686,41 +690,22 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param peerUrls vector of ProActive P2P living peers and able to provide nodes.
      */
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr, Vector<String> peerUrls) {
+        int ttr, Vector<String> peerUrls) throws RMException {
         logger.info("[RMCORE] Creating a P2P source " + id);
-        try {
-            PAActiveObject.newActive(P2PNodeSource.class.getName(),
-                new Object[] {
-                    id, (RMCoreSourceInt) PAActiveObject.getStubOnThis(),
-                    nbMaxNodes, nice, ttr, peerUrls
-                }, nodeRM);
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Creates a dummy node source to test a {@link DynamicNodeSource} active object
-     * @param id name of the dynamic node source to create.
-     * @param nbMaxNodes max number of number the NodeSource has to provide.
-     * @param nice nice time in ms, time to wait between a node remove and a new node acquisition.
-     * @param ttr Time to release in ms, time during the node will be kept by the Nodesource and the Core.
-     */
-    public void createDummyNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr) {
-        logger.info("[RMCORE] Creating a Dummy node source " + id);
-        try {
-            PAActiveObject.newActive(DummyNodeSource.class.getName(),
-                new Object[] {
-                    id, (RMCoreSourceInt) PAActiveObject.getStubOnThis(),
-                    nbMaxNodes, nice, ttr
-                }, nodeRM);
-        } catch (ActiveObjectCreationException e) {
-            e.printStackTrace();
-        } catch (NodeException e) {
-            e.printStackTrace();
+        if (this.nodeSources.containsKey(id)) {
+            throw new RMException("Node Source name already existing");
+        } else {
+            try {
+                PAActiveObject.newActive(P2PNodeSource.class.getName(),
+                    new Object[] {
+                        id, (RMCoreSourceInt) PAActiveObject.getStubOnThis(),
+                        nbMaxNodes, nice, ttr, peerUrls
+                    }, nodeRM);
+            } catch (ActiveObjectCreationException e) {
+                e.printStackTrace();
+            } catch (NodeException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -731,15 +716,16 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param pad ProActiveDescriptor to deploy
      * @param sourceName name of an existing PADNodesource
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName) {
+    public void addNodes(ProActiveDescriptor pad, String sourceName)
+        throws RMException {
         if (this.nodeSources.containsKey(sourceName)) {
             try {
                 this.nodeSources.get(sourceName).addNodes(pad);
             } catch (AddingNodesException e) {
-                e.printStackTrace();
+                throw new RMException(e);
             }
         } else {
-            addNodes(pad);
+            throw new RMException("unknown node source");
         }
     }
 
@@ -751,9 +737,42 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      */
     public void addNodes(ProActiveDescriptor pad) {
         try {
-            this.nodeSources.get(DEFAULT_STATIC_SOURCE_NAME).addNodes(pad);
+            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME)
+                            .addNodes(pad);
         } catch (AddingNodesException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Add a deployed node to the default static nodes source of the RM
+     * @param nodeUrl Url of the node.
+     */
+    public void addNode(String nodeUrl) throws RMException {
+        try {
+            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME)
+                            .addNode(nodeUrl);
+        } catch (AddingNodesException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Add nodes to a StaticNodeSource represented by sourceName.
+     * SourceName must exist and must be a static source
+     * @param pad ProActive deployment descriptor to deploy.
+     * @param sourceName name of the static node source that perform the deployment.
+     */
+    public void addNode(String nodeUrl, String sourceName)
+        throws RMException {
+        if (this.nodeSources.containsKey(sourceName)) {
+            try {
+                this.nodeSources.get(sourceName).addNode(nodeUrl);
+            } catch (AddingNodesException e) {
+                throw new RMException(e);
+            }
+        } else {
+            throw new RMException("unknown node source");
         }
     }
 
@@ -763,7 +782,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * asked by {@link RMAdmin} active object.<BR><BR>
      *
      * If the node is down, node is just removed from the Core, and nothing is asked to its related NodeSource,
-     * because the node source has already detected the node down (it is its function), informed the IMCore,
+     * because the node source has already detected the node down (it is its function), informed the RMCore,
      * and removed the node from its list.<BR>
      * Else the removing request is just forwarded to the corresponding NodeSource of the node.<BR><BR>
      * @param nodeUrl URL of the node to remove.
@@ -805,13 +824,16 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param preempt true all the nodes must be removed immediately, without waiting job ending if nodes are busy,
      * false nodes are removed just after the job ending, if busy.
      */
-    public void removeSource(String sourceName, boolean preempt) {
-        if (nodeSources.containsKey(sourceName)) {
+    public void removeSource(String sourceName, boolean preempt)
+        throws RMException {
+        if (sourceName.equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME)) {
+            throw new RMException(
+                "Default static node source cannot be removed");
+        } else if (nodeSources.containsKey(sourceName)) {
             this.nodeSources.get(sourceName).shutdown(preempt);
+        } else {
+            throw new RMException("unknown node source");
         }
-
-        //TODO gsigety cdelbe : throwing an exception if node source not found ?
-        // possible to delete default node source ?
     }
 
     /**
@@ -1074,12 +1096,12 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      */
     public NodeSet getExactlyNodes(IntWrapper nb,
         SelectionScript selectionScript) {
-        // TODO gsigety to implement
+        // TODO
         return null;
     }
 
     //----------------------------------------------------------------------
-    //  Methods called by NodeSource objects, override IMNodeManagerSourceInt  
+    //  Methods called by NodeSource objects, override RMNodeManagerSourceInt  
     //----------------------------------------------------------------------
     //
 
@@ -1105,7 +1127,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param evt Remove source event to throw at RMMonitoring
      */
     public void internalRemoveSource(String sourceId, RMNodeSourceEvent evt) {
-        //IMNodeSourceEvent evt = nodeSources.get(sourceId).getSourceEvent();
         this.nodeSources.remove(sourceId);
         if (logger.isInfoEnabled()) {
             logger.info("[RMCORE] Node Source removed : " + sourceId);
@@ -1114,7 +1135,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
         this.monitoring.nodeSourceRemovedEvent(evt);
 
         if ((this.nodeSources.size() == 0) && this.toShutDown) {
-            //all nodes sources has been removed and IMCore in shutdown state, 
+            //all nodes sources has been removed and RMCore in shutdown state, 
             //finish the shutdown 
             this.user.shutdown();
             this.monitoring.shutdown();

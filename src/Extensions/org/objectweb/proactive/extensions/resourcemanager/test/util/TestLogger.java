@@ -38,9 +38,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class TestLogger {
     // voir la classe org.objectweb.proactive.core.util.log.Loggers 
     /*-----------------------------------------------------------------------
-    //InfrastructureManager loggers
+    //Resource Manager loggers
     static final public String RM                      = "RM";
-    static final public String IMTEST                = RM+".IMTest";
+    static final public String RMTEST                = RM+".IMTest";
      *-----------------------------------------------------------------------
      */
 

@@ -37,11 +37,14 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt;
+import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PADNSInterface;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.PadDeployInterface;
@@ -56,7 +59,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.Pa
  * and are only removed thanks to an administrator request.<BR><R>
  *
  * This source can deploy a PAD at its startup, or during its activity.
- * So it can handle many PAD.
+ * So it can handle many PADs.
  *
  * @author ProActive team
  *
@@ -82,7 +85,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      * call the upper class constructor.
      * Initialize the PADs list.
      * @param id unique id of the source.
-     * @param imCore the {@link RMCoreSourceInt core} already created of the Infrastructure Manager.
+     * @param imCore the {@link RMCoreSourceInt core} already created of the Resource Manager.
 
      */
     public PADNodeSource(String id, RMCoreSourceInt imCore) {
@@ -107,13 +110,13 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
 
     // ----------------------------------------------------------------------//
     // definitions of abstract methods inherited from NodeSource, 
-    // called by IMNodeManager
+    // called by RMCore
     // ----------------------------------------------------------------------//
 
     /**
      * Confirms a removing node request asked previously.
      * PAD nodeSource has received the removing request
-     * from the IMAdmin and forwarded by the Core
+     * from the RMAdmin and forwarded by the Core
      * an explicit removing node Request (@link forwardRemoveNode}.
      * If the node is already handled by the source, PADNode
      * ask to the Core to remove the node {@link RMCoreSourceInt#internalRemoveNode(String, boolean)}
@@ -137,9 +140,8 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
         if (this.nodes.containsKey(nodeUrl)) {
             Node node = nodes.get(nodeUrl);
             try {
-                node.killAllActiveObjects();
-                node.getProActiveRuntime()
-                    .killNode(node.getNodeInformation().getName());
+                // Kill virtual machine
+                node.getProActiveRuntime().killRT(false);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -159,7 +161,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
 
     /**
      * Receives a removing node request.
-     * IMCore has been asked to Remove a node, and forward it.
+     * RMCore has been asked to Remove a node, and forward it.
      * remove mechanism must be initiated by the NodeSource.
      * check if the node is not down. and ask to the Core to make its internal remove.
      * @param nodeUrl URL of the node to remove
@@ -175,7 +177,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
     /**
      * Add nodes to the Source.
      * add nodes by deploying a ProActive Descriptor,get nodes created,
-     *  add them to the node Source and register nodes to the IMCore
+     *  add them to the node Source and register nodes to the RMCore
      * @param nodeUrl pad ProActive descriptor to deploy.
      * @param PADName name of the ProActive descriptor.
      */
@@ -187,8 +189,24 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
     }
 
     /**
+     * Adds an already deployed node to the NodeSource.
+     * lookup the node an add the node to the Source
+     * Operation unavailable on a dynamic node source
+     * @param nodeUrl
+     * @throws AddingNodesException if lookup has failed
+     */
+    public void addNode(String nodeUrl) throws AddingNodesException {
+        try {
+            Node newNode = NodeFactory.getNode(nodeUrl);
+            this.addNewAvailableNode(newNode, "noVN", "no_pad");
+        } catch (NodeException e) {
+            throw new AddingNodesException(e);
+        }
+    }
+
+    /**
      * Shutdown the node source
-     * All nodes are removed from node source and from IMCore
+     * All nodes are removed from node source and from RMCore
      * @param preempt true Node source doesn't wait tasks end on its handled nodes,
      * false node source wait end of tasks on its nodes before shutting down
      */
@@ -215,7 +233,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
 
     /**
      * A down node has been detected.
-     * Inform the IMCore about the broken node,
+     * Inform the RMCore about the broken node,
      * remove the broken node from the nodes list.
      */
     @Override

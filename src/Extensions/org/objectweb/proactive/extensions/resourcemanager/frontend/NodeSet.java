@@ -39,7 +39,7 @@ import org.objectweb.proactive.core.node.Node;
 
 /**
  * Representation of a node set.
- * In this first version, the node set contains only the nodes given by the Infrastructure Manager.
+ * In this first version, the node set contains only the nodes given by the Resource Manager.
  * In a future version, it will give also further informations like why nodes haven't been given,
  * or more specifications on the nodes, like distance between them, etc...
  *

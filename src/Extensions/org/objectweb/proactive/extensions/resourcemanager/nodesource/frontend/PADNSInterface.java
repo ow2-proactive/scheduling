@@ -46,7 +46,7 @@ public interface PADNSInterface {
 
     /**
      * add nodes by deploying a ProActive Descriptor, recover nodes created,
-     * adding them to the node Source and register nodes to the IMCore.
+     * adding them to the node Source and register nodes to the RMCore.
      * @param pas ProActive deployment descriptor to deploy.
      */
     public void addNodes(ProActiveDescriptor pad);

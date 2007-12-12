@@ -117,7 +117,7 @@ public class RMUserImpl implements RMUser, InitActive {
 
     /**
      * Provides nbNodes nodes verifying a selection script.
-     * If the infrastructure manager (RM) don't have nb free nodes
+     * If the Resource manager (RM) don't have nb free nodes
      * it returns the max of valid free nodes
      * @param nbNodes the number of nodes.
      * @param selectionScript : script to be verified by the returned nodes.
@@ -130,7 +130,7 @@ public class RMUserImpl implements RMUser, InitActive {
 
     /**
      * provides exactly nbNodes nodes verifying the selection script.
-     * If the infrastructure manager (RM) don't have nb free nodes
+     * If the Resource manager (RM) don't have nb free nodes
      * it returns an empty node set.
      * @param nbNodes the number of nodes.
      * @param selectionScript : script to be verified by the returned nodes.

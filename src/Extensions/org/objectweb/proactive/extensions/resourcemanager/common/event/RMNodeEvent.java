@@ -49,7 +49,7 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
  * -a node becoming busy.<BR>
  * -a node becoming to release.<BR>
  * -a node becoming to down.<BR>
- * -a node removed from the infrastructure Manager.<BR><BR>
+ * -a node removed from the Resource Manager.<BR><BR>
  *
  * An RMNodesourceEvent contains all information about its related {@link RMNode}.
  *
@@ -113,8 +113,8 @@ public class RMNodeEvent extends RMEvent {
     }
 
     /**
-     * Compare two IMNodeEvent objects.
-     * @param obj IMNodeEvent object to compare.
+     * Compare two RMNodeEvent objects.
+     * @param obj RMNodeEvent object to compare.
      * @return true if the two events represent the same Node.
      */
     @Override

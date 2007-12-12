@@ -30,6 +30,8 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.test.simple;
 
+import java.util.ArrayList;
+
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
@@ -53,12 +55,13 @@ public class SimpleTestRMAdmin {
             }
 
             RMAdmin admin = RMConnection.connectAsAdmin(url);
-
-            System.out.println("#[SimpleTestIMAdmin] deployAllVirtualNodes : " +
+            System.out.println("#[SimpleTestRMAdmin] deployAllVirtualNodes : " +
                 URL_PAD_LOCAL);
 
             ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(URL_PAD_LOCAL);
-            admin.createStaticNodesource("static source", pad);
+            ArrayList<ProActiveDescriptor> padList = new ArrayList<ProActiveDescriptor>();
+            padList.add(pad);
+            admin.createStaticNodesource("static source", padList);
             System.out.println("Sleep 12s");
             Thread.sleep(12000);
             admin.removeSource("static source", true);
@@ -66,6 +69,6 @@ public class SimpleTestRMAdmin {
             e.printStackTrace();
         }
 
-        System.out.println("##[TestIMAdmin] END TEST");
+        System.out.println("##[TestRMAdmin] END TEST");
     }
 }

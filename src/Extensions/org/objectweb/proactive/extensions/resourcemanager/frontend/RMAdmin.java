@@ -31,11 +31,13 @@
 package org.objectweb.proactive.extensions.resourcemanager.frontend;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
+import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
@@ -63,7 +65,7 @@ public interface RMAdmin extends Serializable {
      * @param pad ProActive deployment descriptor to deploy.
      */
     public void createStaticNodesource(String sourceName,
-        ProActiveDescriptor pad);
+        List<ProActiveDescriptor> padList) throws RMException;
 
     /**
      * Creates a Dynamic Node source Active Object.
@@ -76,10 +78,10 @@ public interface RMAdmin extends Serializable {
      * @param peerUrls vector of ProActive P2P living peer and able to provide nodes.
      */
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr, Vector<String> peerUrls);
+        int ttr, Vector<String> peerUrls) throws RMException;
 
     /**
-     * Add nodes to the default static nodes source of the scheduler
+     * Add nodes to the default static nodes source of the RM
      * @param pad ProActive deployment descriptor to deploy.
      */
     public void addNodes(ProActiveDescriptor pad);
@@ -90,7 +92,24 @@ public interface RMAdmin extends Serializable {
      * @param pad ProActive deployment descriptor to deploy.
      * @param sourceName name of the static node source that perform the deployment.
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName);
+    public void addNodes(ProActiveDescriptor pad, String sourceName)
+        throws RMException;
+
+    /**
+     * Add a deployed node to the default static nodes source of the RM
+     * @param nodeUrl Url of the node.
+     */
+    public void addNode(String nodeUrl) throws RMException;
+    ;
+
+    /**
+     * Add nodes to a StaticNodeSource represented by sourceName.
+     * SourceName must exist and must be a static source
+     * @param pad ProActive deployment descriptor to deploy.
+     * @param sourceName name of the static node source that perform the deployment.
+     */
+    public void addNode(String nodeUrl, String sourceName)
+        throws RMException;
 
     /**
      * Removes a node from the RM.
@@ -109,7 +128,8 @@ public interface RMAdmin extends Serializable {
      * @param preempt true the node must be removed immediately, without waiting job ending if the node is busy,
      * false the node is removed just after the job ending if the node is busy.
      */
-    public void removeSource(String sourceName, boolean preempt);
+    public void removeSource(String sourceName, boolean preempt)
+        throws RMException;
 
     /**
      * Kills Resource Manager

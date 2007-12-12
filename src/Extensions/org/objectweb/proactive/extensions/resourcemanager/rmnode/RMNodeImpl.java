@@ -51,16 +51,16 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
 
 
 /**
- * Implementation of the IMNode Interface.
- * An IMNode is a ProActive node able to execute schedulers tasks.
- * So an IMNode is a representation of a ProActive node object with its associated {@link NodeSource},
- * and its state in the Infrastructure Manager :<BR>
+ * Implementation of the RMNode Interface.
+ * An RMNode is a ProActive node able to execute schedulers tasks.
+ * So an RMNode is a representation of a ProActive node object with its associated {@link NodeSource},
+ * and its state in the Resource Manager :<BR>
  * -free : node is ready to perform a task.<BR>
  * -busy : node is executing a task.<BR>
  * -to be released : node is busy and have to be removed at the end of the its current task.<BR>
  * -down : node is broken, and not anymore able to perform tasks.<BR><BR>
  *
- * InfrastructureManager can select nodes that verify criteria. this selection is implemented with
+ * Resource Manager can select nodes that verify criteria. this selection is implemented with
  * {@link SelectionScript} objects. Each node memorize results of executed scripts, in order to
  * answer faster to a selection already asked.
  *
@@ -81,7 +81,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** HashMap associates a selection Script to its result on the node */
     private HashMap<SelectionScript, Integer> scriptStatus;
 
-    /** ProActive Node Object of the IMNode */
+    /** ProActive Node Object of the RMNode */
     private Node node;
 
     /** URL of the node, considered as its unique ID */
@@ -105,18 +105,18 @@ public class RMNodeImpl implements RMNode, Serializable {
     /** Script handled, manage scripts launching and results recovering */
     private ScriptHandler handler = null;
 
-    /** {@link NodeSource} Stub of NodeSource that handle the IMNode */
+    /** {@link NodeSource} Stub of NodeSource that handle the RMNode */
     private NodeSource nodeSource;
 
     /** State of the node */
     private NodeState status;
 
-    /** Create an IMNode Object.
+    /** Create an RMNode Object.
      * A Created node begins to be free.
-     * @param node ProActive node deployed
-     * @param vnodeName {@link VirtualNode} name of the node
-     * @param padName {@link ProActiveDescriptor} name of the node
-     * @param nodeSource {@link NodeSource} Stub of NodeSource that handle the IMNode
+     * @param node ProActive node deployed.
+     * @param vnodeName {@link VirtualNode} name of the node.
+     * @param padName {@link ProActiveDescriptor} name of the node.
+     * @param nodeSource {@link NodeSource} Stub of NodeSource that handle the RMNode.
      */
     public RMNodeImpl(Node node, String vnodeName, String padName,
         NodeSource nodeSource) {
@@ -142,8 +142,8 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * Returns the ProActive Node object of the IMNode.
-     * @return the ProActive Node object of the IMNode.
+     * Returns the ProActive Node object of the RMNode.
+     * @return the ProActive Node object of the RMNode.
      */
     public Node getNode() throws NodeException {
         if (this.status != NodeState.DOWN) {
@@ -154,56 +154,56 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * Returns the NodeInformation object of the IMNode.
-     * @return the NodeInformation object of the IMNode.
+     * Returns the NodeInformation object of the RMNode.
+     * @return the NodeInformation object of the RMNode.
      */
     public NodeInformation getNodeInformation() {
         return this.node.getNodeInformation();
     }
 
     /**
-     * Returns the Virtual node name of the IMNode.
-     * @return the Virtual node name  of the IMNode.
+     * Returns the Virtual node name of the RMNode.
+     * @return the Virtual node name  of the RMNode.
      */
     public String getVNodeName() {
         return this.vnodeName;
     }
 
     /**
-     * Returns the {@link VirtualNode} name of the IMNode.
-     * @return the Virtual node name  of the IMNode.
+     * Returns the {@link VirtualNode} name of the RMNode.
+     * @return the Virtual node name  of the RMNode.
      */
     public String getPADName() {
         return this.padName;
     }
 
     /**
-     * Returns the host name of the IMNode.
-     * @return the host name of the IMNode.
+     * Returns the host name of the RMNode.
+     * @return the host name of the RMNode.
      */
     public String getHostName() {
         return this.hostName;
     }
 
     /**
-     * Returns the java virtual machine name of the IMNode.
-     * @return the java virtual machine name of the IMNode.
+     * Returns the java virtual machine name of the RMNode.
+     * @return the java virtual machine name of the RMNode.
      */
     public String getDescriptorVMName() {
         return this.vmName;
     }
 
     /**
-     * Returns the NodeSource name of the IMNode.
-     * @return {@link NodeSource} name of the IMNode.
+     * Returns the NodeSource name of the RMNode.
+     * @return {@link NodeSource} name of the RMNode.
      */
     public String getNodeSourceId() {
         return this.nodeSource.getSourceId();
     }
 
     /**
-     * Returns the unique id of the IMNode.
-     * @return the unique id of the IMNode represented by its URL.
+     * Returns the unique id of the RMNode.
+     * @return the unique id of the RMNode represented by its URL.
      */
     public String getNodeURL() {
         return this.node.getNodeInformation().getURL();
@@ -351,8 +351,8 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * Compare two IMNode objects
-     * @return true if the two IMNode objects represent the same Node.
+     * Compare two RMNode objects
+     * @return true if the two RMNode objects represent the same Node.
      */
     @Override
     public boolean equals(Object imnode) {
@@ -382,7 +382,7 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * Compare two IMNode objects.
+     * Compare two RMNode objects.
      * @return 0 if two Nodes object are the representation of the same node.
      */
     public int compareTo(RMNode imnode) {
@@ -408,14 +408,14 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     * @return the stub of the {@link NodeSource} that handle the IMNode.
+     * @return the stub of the {@link NodeSource} that handle the RMNode.
      */
     public NodeSource getNodeSource() {
         return this.nodeSource;
     }
 
     /**
-     * Set the NodeSource stub to the IMNode.
+     * Set the NodeSource stub to the RMNode.
      * @param ns Stub of the NodeSource that handle the IMNode.
      */
     public void setNodeSource(NodeSource ns) {
@@ -453,8 +453,8 @@ public class RMNodeImpl implements RMNode, Serializable {
     }
 
     /**
-     *  build the IMNodeEvent object for the IMNode
-     *  @return the IMNodeEvent object related to the IMNode.
+     *  build the RMNodeEvent object for the RMNode
+     *  @return the RMNodeEvent object related to the RMNode.
     */
     public RMNodeEvent getNodeEvent() {
         return new RMNodeEvent(this.nodeURL, this.getNodeSourceId(),

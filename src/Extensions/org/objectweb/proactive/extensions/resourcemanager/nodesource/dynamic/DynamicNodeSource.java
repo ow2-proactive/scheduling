@@ -180,7 +180,7 @@ public abstract class DynamicNodeSource extends NodeSource
     public void shutdown(boolean preempt) {
         super.shutdown(preempt);
         this.niceTimes.clear();
-        //ask to IMCore to remove all nodes
+        //ask to RMCore to remove all nodes
         if (this.nodes.size() > 0) {
             for (Entry<String, Node> entry : this.nodes.entrySet()) {
                 explicitRemoveNode(entry.getKey(), preempt);
@@ -307,7 +307,7 @@ public abstract class DynamicNodeSource extends NodeSource
      * Performs operation to remove a node by an explicit Admin request,
      * on the contrary of a normal get-and-release node cycle
      * made by  dynamic source.
-     * (IMAdmin has asked to remove a node or remove the dynamic source).
+     * (RMAdmin has asked to remove a node or remove the dynamic source).
      * node's Removing operation.
      * Node asked to remove must be handled by source (verify before).
      * @param nodeUrl
@@ -329,7 +329,9 @@ public abstract class DynamicNodeSource extends NodeSource
             this.nodes_ttr.remove(nodeUrl);
             this.imCore.internalRemoveNode(nodeUrl, preempt);
         }
-        if (preempt && !nodesToKillOnConfirm.contains(nodeUrl)) {
+
+        //memorize that node must be killed at IMCore's confirm
+        if (!nodesToKillOnConfirm.contains(nodeUrl)) {
             this.nodesToKillOnConfirm.add(nodeUrl);
         }
     }
@@ -344,7 +346,7 @@ public abstract class DynamicNodeSource extends NodeSource
 
     // ----------------------------------------------------------------------//
     // definitions of abstract methods inherited from NodeSource, 
-    // called by IMNCore
+    // called by RMCore
     // ----------------------------------------------------------------------//
 
     /**
@@ -361,13 +363,14 @@ public abstract class DynamicNodeSource extends NodeSource
         if (this.nodes.containsKey(nodeUrl)) {
             if (this.nodesToKillOnConfirm.contains(nodeUrl)) {
                 this.nodesToKillOnConfirm.remove(nodeUrl);
-                //what to do to kill the node ?
-                releaseNode(this.getNodebyUrl(nodeUrl));
+                this.killNodeRT(this.getNodebyUrl(nodeUrl));
             } else {
                 releaseNode(this.getNodebyUrl(nodeUrl));
             }
             //remove node from the main list
             removeFromList(this.getNodebyUrl(nodeUrl));
+
+            //shutdown nodesource part
             if (this.toShutdown) {
                 if (this.nodes.size() == 0) {
                     //Node source is to shutdown and all nodes have been removed :
@@ -384,7 +387,7 @@ public abstract class DynamicNodeSource extends NodeSource
     }
 
     /**
-     * Manages an explicit adding nodes request asked by IMAdmin object.
+     * Manages an explicit adding nodes request asked by RMAdmin object.
      * <BR>Called by {@link RMCore}.<BR>
      * Ask to a DynamicNodesource object to add static nodes is prohibited.
      * So this method just return an addingNodesException.
@@ -398,7 +401,20 @@ public abstract class DynamicNodeSource extends NodeSource
     }
 
     /**
-     * Removes a specific Node asked by IMAdmin.
+     * Adds an already deployed node to the Node source.
+     * Operation impossible on a dynamic node source
+     * AddingnodesException always launched.
+     * @param nodeUrl
+     * @throws AddingNodesException if lookup has failed
+     * or asked to a dynamicnodeSource object.
+     */
+    public void addNode(String nodeUrl) throws AddingNodesException {
+        throw new AddingNodesException("Node source : " + this.SourceId +
+            " Node cannot be added to a dynamic source");
+    }
+
+    /**
+     * Removes a specific Node asked by RMAdmin.
      * DynamicNodeSource object has received a node removing request asked by the {@link RMAdmin}.
      * <BR>If the removing request is in a softly way and a softly removing request has been already made,
      * the DynamicNodeSource object has nothing to do, otherwise perform the release.
@@ -434,4 +450,12 @@ public abstract class DynamicNodeSource extends NodeSource
      * @param node node to release.
      */
     protected abstract void releaseNode(Node node);
+
+    /**
+     * Way to give Kill a node's RT.
+     * RMAdmin has asked to kill the node, runtime is killed on after Core's confirm.
+     * <BR>Abstract method to implement according to the specific dynamicNodeSource.
+     * @param node node to kill.
+     */
+    protected abstract void killNodeRT(Node node);
 }

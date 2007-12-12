@@ -71,4 +71,7 @@ public interface RMConstants {
 
     /** constants for {@link DummyNodeSource} source type name*/
     public static final String DUMMY_NODE_SOURCE_TYPE = "DUMMY_NODE_SOURCE";
+
+    /** Name of the default source node, created at the RMCore initialization */
+    public static final String DEFAULT_STATIC_SOURCE_NAME = "Default";
 }

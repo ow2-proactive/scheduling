@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.resourcemanager.frontend;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -45,6 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.core.RMCoreInterface;
+import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic.P2PNodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource;
 import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNodeSource;
@@ -71,7 +73,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
     /** Log4J logger name for RMAdmin */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.RM_ADMIN);
 
-    /** IMCore active object of the RM */
+    /** RMCore active object of the RM */
     private RMCoreInterface rmcore;
 
     /**
@@ -107,8 +109,8 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @param pad ProActive deployment descriptor to deploy.
      */
     public void createStaticNodesource(String sourceName,
-        ProActiveDescriptor pad) {
-        this.rmcore.createStaticNodesource(pad, sourceName);
+        List<ProActiveDescriptor> padList) throws RMException {
+        this.rmcore.createStaticNodesource(padList, sourceName);
     }
 
     /**
@@ -122,7 +124,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @param peerUrls vector of ProActive P2P living peer and able to provide nodes.
      */
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr, Vector<String> peerUrls) {
+        int ttr, Vector<String> peerUrls) throws RMException {
         this.rmcore.createDynamicNodeSource(id, nbMaxNodes, nice, ttr, peerUrls);
     }
 
@@ -140,8 +142,28 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @param pad ProActive deployment descriptor to deploy.
      * @param sourceName name of the static node source that perform the deployment.
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName) {
+    public void addNodes(ProActiveDescriptor pad, String sourceName)
+        throws RMException {
         this.rmcore.addNodes(pad, sourceName);
+    }
+
+    /**
+     * Add a deployed node to the default static nodes source of the RM
+     * @param nodeUrl Url of the node.
+     */
+    public void addNode(String nodeUrl) throws RMException {
+        this.rmcore.addNode(nodeUrl);
+    }
+
+    /**
+     * Add nodes to a StaticNodeSource represented by sourceName.
+     * SourceName must exist and must be a static source
+     * @param pad ProActive deployment descriptor to deploy.
+     * @param sourceName name of the static node source that perform the deployment.
+     */
+    public void addNode(String nodeUrl, String sourceName)
+        throws RMException {
+        this.rmcore.addNode(nodeUrl, sourceName);
     }
 
     /**
@@ -163,7 +185,8 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @param preempt true the node must be removed immediately, without waiting job ending if the node is busy,
      * false the node is removed just after the job ending if the node is busy.
      */
-    public void removeSource(String sourceName, boolean preempt) {
+    public void removeSource(String sourceName, boolean preempt)
+        throws RMException {
         this.rmcore.removeSource(sourceName, preempt);
     }
 

@@ -66,13 +66,17 @@ public class RMLauncher {
         }
 
         //        Vector<String> v = new Vector<String>();
-        //        v.add("//macyavel:6444");
-        //        admin.createP2PNodeSource("P2P", 2, 10000, 50000, v);
+        //        v.add("//localhost:6444");
+        //        try {
+        //        	admin.createDynamicNodeSource("P2P", 3, 10000, 50000, v);
+        //        } catch (RMException e) {
+        //        	e.printStackTrace();
+        //        }
 
         //DynamicNodeSource d = (DynamicNodeSource) PAActiveObject.newActive(P2PNodeSource.class.getCanonicalName(),
         //new Object[] { "Nodes on P2P", 4, 6, 60000000 });
         //admin.addDynamicNodeSources(d);
-        //IMUser user = IMFactory.getUser();
+        //RMUser user = IMFactory.getUser();
         //IMMonitoring monitor = IMFactory.getMonitoring();
 
         // Thread.sleep(Integer.MAX_VALUE);

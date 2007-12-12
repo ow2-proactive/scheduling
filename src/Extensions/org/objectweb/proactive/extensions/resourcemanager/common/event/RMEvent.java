@@ -38,7 +38,7 @@ public class RMEvent implements Serializable {
     /** serial version UID */
     private static final long serialVersionUID = -7781655355601704944L;
 
-    /**Infrastructure manager URL */
+    /** Resource manager URL */
     private String RMUrl = null;
 
     /**
@@ -59,15 +59,15 @@ public class RMEvent implements Serializable {
      * Returns the RM's URL of the event.
      * @return node source type of the event.
      */
-    public String getIMUrl() {
+    public String getRMUrl() {
         return this.RMUrl;
     }
 
     /**
      * Set the RM's URL of the event.
-     * @param IMURL URL of the RM to set
+     * @param RMURL URL of the RM to set
      */
-    public void setIMUrl(String IMURL) {
-        this.RMUrl = IMURL;
+    public void setRMUrl(String RMURL) {
+        this.RMUrl = RMURL;
     }
 }

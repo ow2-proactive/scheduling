@@ -42,15 +42,15 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
 
 
 /**
- * An IMNode is a ProActive node able to execute schedulers tasks.
- * So an IMNode is a representation of a ProActive node object with its associated {@link NodeSource},
- * and its state in the Infrastructure Manager :<BR>
+ * An RMNode is a ProActive node able to execute schedulers tasks.
+ * So an RMNode is a representation of a ProActive node object with its associated {@link NodeSource},
+ * and its state in the Resource Manager :<BR>
  * -free : node is ready to perform a task.<BR>
  * -busy : node is executing a task.<BR>
  * -to be released : node is busy and have to be removed at the end of the its current task.<BR>
  * -down : node is broken, and not anymore able to perform tasks.<BR><BR>
  *
- * InfrastructureManager can select nodes that verify criteria. this selection is implemented with
+ * Resource Manager can select nodes that verify criteria. this selection is implemented with
  * {@link SelectionScript} objects. Each node memorize results of executed scripts, in order to
  * answer faster to a selection already asked.
  *
@@ -202,7 +202,7 @@ public interface RMNode extends Comparable<RMNode> {
     public void setDown();
 
     /**
-     * @return a string describing the IMNode (status, vnode, host, pad, ...)
+     * @return a string describing the RMNode (status, vnode, host, pad, ...)
      */
     public String toString();
 
@@ -212,7 +212,7 @@ public interface RMNode extends Comparable<RMNode> {
     public void clean();
 
     /**
-     * The {@link NodeSource} from where the IMNode is issued.
+     * The {@link NodeSource} from where the MNode is issued.
      */
     public NodeSource getNodeSource();
 
@@ -237,8 +237,8 @@ public interface RMNode extends Comparable<RMNode> {
     public void setNotVerifyingScript(SelectionScript script);
 
     /**
-     *  Builds the IMNodeEvent object for the IMNode
-     *  @return the IMNodeEvent object related to the node.
+     *  Builds the RMNodeEvent object for the RMNode
+     *  @return the RMNodeEvent object related to the node.
     */
     public RMNodeEvent getNodeEvent();
 }

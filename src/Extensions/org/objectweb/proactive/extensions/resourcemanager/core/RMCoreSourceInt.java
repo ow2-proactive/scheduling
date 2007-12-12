@@ -73,7 +73,7 @@ public interface RMCoreSourceInt {
      * Node source has previously removed its nodes.
      * RMcore delete the nodeSource from its source list.
      * @param sourceId name of the {@link NodeSource} to remove.
-     * @param evt Remove source event to throw at IMMonitoring
+     * @param evt Remove source event to throw to RMMonitoring
      */
     public void internalRemoveSource(String sourceId, RMNodeSourceEvent evt);
 

@@ -31,14 +31,15 @@
 package org.objectweb.proactive.extensions.resourcemanager.core;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMInitialState;
-import org.objectweb.proactive.extensions.resourcemanager.core.RMCore;
 import org.objectweb.proactive.extensions.resourcemanager.exception.AddingNodesException;
+import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.NodeSet;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
@@ -57,7 +58,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  *
  * @see RMCore
  *
- * @author proactive team
+ * @author ProActive team
  *
  */
 public interface RMCoreInterface {
@@ -74,8 +75,8 @@ public interface RMCoreInterface {
      * @param pad a ProActiveDescriptor object to deploy at the node source creation.
      * @param sourceName name given to the static node source.
      */
-    public void createStaticNodesource(ProActiveDescriptor pad,
-        String sourceName);
+    public void createStaticNodesource(List<ProActiveDescriptor> padList,
+        String sourceName) throws RMException;
 
     /**
      * Creates a Dynamic Node source Active Object.
@@ -88,17 +89,7 @@ public interface RMCoreInterface {
      * @param peerUrls vector of ProActive P2P living peer and able to provide nodes.
      */
     public void createDynamicNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr, Vector<String> peerUrls);
-
-    /**
-     * Creates a dummy node source to test a {@link DynamicNodeSource} active object
-     * @param id name of the dynamic node source to create
-     * @param nbMaxNodes max number of number the NodeSource has to provide.
-     * @param nice nice time in ms, time to wait between a node remove and a new node acquisition
-     * @param ttr Time to release in ms, time during the node will be keeped by the Nodesource and the Core.
-     */
-    public void createDummyNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr);
+        int ttr, Vector<String> peerUrls) throws RMException;
 
     /**
      * Add nodes to a static Node Source.
@@ -108,7 +99,8 @@ public interface RMCoreInterface {
      * @param sourceName name of an existing PADNodesource
      * @throws AddingNodesException if the NodeSource
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName);
+    public void addNodes(ProActiveDescriptor pad, String sourceName)
+        throws RMException;
 
     /**
      * Add nodes to the default static Node Source.
@@ -117,6 +109,22 @@ public interface RMCoreInterface {
      * @param pad ProActiveDescriptor to deploy
      */
     public void addNodes(ProActiveDescriptor pad);
+
+    /**
+     * Add a deployed node to the default static nodes source of the RM
+     * @param nodeUrl URL of the node.
+     */
+    public void addNode(String nodeUrl) throws RMException;
+    ;
+
+    /**
+     * Add nodes to a StaticNodeSource represented by sourceName.
+     * SourceName must exist and must be a static source
+     * @param pad ProActive deployment descriptor to deploy.
+     * @param sourceName name of the static node source that perform the deployment.
+     */
+    public void addNode(String nodeUrl, String sourceName)
+        throws RMException;
 
     /**
      * Remove a node from the Core and from its node source.
@@ -147,7 +155,8 @@ public interface RMCoreInterface {
      * @param preempt true all the nodes must be removed immediately, without waiting job ending if nodes are busy,
      * false nodes are removed just after the job ending if busy.
      */
-    public void removeSource(String sourceName, boolean preempt);
+    public void removeSource(String sourceName, boolean preempt)
+        throws RMException;
 
     /**
     * Get a set of nodes that verify a selection script.
@@ -210,7 +219,7 @@ public interface RMCoreInterface {
 
     /**
      * Gives number of down nodes handled by the Core.
-     * @return IntWrapper number of down nodes in the IMCore.
+     * @return IntWrapper number of down nodes in the RMCore.
      */
     public IntWrapper getSizeListDownRMNode();
 
@@ -245,8 +254,8 @@ public interface RMCoreInterface {
     public ArrayList<RMNode> getListToReleasedRMNodes();
 
     /**
-     * Gives the list of all nodes handled by th IMCore
-     * @return 'to be released' nodes of the IMCore.
+     * Gives the list of all nodes handled by the RMCore
+     * @return 'to be released' nodes of the RMCore.
      */
     public ArrayList<RMNode> getListAllNodes();
 
@@ -255,7 +264,7 @@ public interface RMCoreInterface {
      * Initial state must be understood as a new Monitor point of view.
      * A new monitor start to receive RMCore events, so must be informed of the current
      * state of the Core at the beginning of monitoring.
-            * @return RMInitialState containing nodes and nodeSources of the IMCore.
+            * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState();
 

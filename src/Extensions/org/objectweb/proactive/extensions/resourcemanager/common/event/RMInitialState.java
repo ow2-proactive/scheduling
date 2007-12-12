@@ -43,7 +43,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
  * Defines a state of the Resource Manager for a Monitor.
  * In order to receive Resource Manager events,
  * a monitor register itself to {@link RMMonitoring} by
- * the method {@link RMMonitoring#addRMEventListener(RMEventListener, IMEvent...)},
+ * the method {@link RMMonitoring#addRMEventListener(RMEventListener, RMEvent...)},
  * and get an InitialState which is the snapshot of InfrastrcutureManager state, with its
  * nodes and NodeSources.
  *

@@ -34,7 +34,7 @@ import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * Interface between IMDeploy objects and a NodeSource that performs
+ * Interface between RMDeploy objects and a NodeSource that performs
  * deployment by ProActive descriptors.
  *
  * @see PADNodesource
@@ -46,7 +46,7 @@ public interface PadDeployInterface {
     /**
      * Things to do when a new node has been deployed by a ProActivedescriptor
      * and is now available.
-     * Called by IMDeploy.
+     * Called by RMDeploy.
      */
     public void receiveDeployedNode(Node node, String VnName, String PADName);
 }

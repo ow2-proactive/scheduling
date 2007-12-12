@@ -172,14 +172,25 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     protected Node getNode() {
         // TODO Auto-generated method stub
         P2PNodeLookup p2pNodeLookup = this.p2pService.getNodes(1,
-                this.SourceId, "Infrastructure Manager");
+                this.SourceId, "Resource Manager");
         Node n = (Node) ((p2pNodeLookup.getNodes()).firstElement());
         this.lookups.put(n.getNodeInformation().getURL(), p2pNodeLookup);
         return n;
     }
 
+    protected void killNodeRT(Node node) {
+        String nodeUrl = node.getNodeInformation().getURL();
+        try {
+            node.getProActiveRuntime().killRT(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("P2PNodeSource.killNodeRT() kill done");
+        this.lookups.remove(nodeUrl);
+    }
+
     /**
-     * Get the IMNodeSourceEvent object of the source.
+     * Get the RMNodeSourceEvent object of the source.
      * Create the {@link RMNodeSourceEvent} object related to the P2PNodeSource
      * @return event representing the source.
      */
@@ -198,7 +209,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
      * A down node has been detected
      * remove the broken node from the list this.nodes
      * remove node from the TTR list
-     * Inform the IMNode Manager about the broken node,
+     * Inform the RMNode Manager about the broken node,
      * Create a new nice time.
      */
     @Override
@@ -211,7 +222,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
             this.lookups.remove(nodeUrl);
             //remove the node from the node_ttr HashMap
             this.getNodesTtr_List().remove(nodeUrl);
-            //informing IMNode Manager about the broken node
+            //informing RMNode Manager about the broken node
             this.imCore.setDownNode(nodeUrl);
             //indicate that a new node has to be got in a [niceTime] future
             newNiceTime();
@@ -220,7 +231,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
 
     /**
      * Shutdown the node source
-     * All nodes are removed from node source and from IMCore
+     * All nodes are removed from node source and from RMCore
      * @param preempt true Node source doesn't wait tasks end on its handled nodes,
      * false node source wait end of tasks on its nodes before shutting down
      */

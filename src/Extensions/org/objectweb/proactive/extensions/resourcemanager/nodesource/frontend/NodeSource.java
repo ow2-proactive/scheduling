@@ -57,19 +57,19 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
 /**
  * Abstract class designed to manage a NodeSource.
  * A NodeSource active object is designed to manage acquisition, monitoring
- * and removing of a set of {@link Node} objects in the Infrastructure Manager.
+ * and removing of a set of {@link Node} objects in the Resource Manager.
  * This set of nodes could be nodes deployed by a ProActive Descriptor,
  * or nodes acquired dynamically from a dynamic source,
  * such as a peer to peer infrastructure, or a cluster.<BR>
  * As the {@link RMCore} manage nodes providing to Scheduler (with nodes selection, and nodes states handling),
  * a NodeSource has just to : acquire nodes, add them to {@link RMCore}, monitor these acquired nodes,
- * and finally remove them from IMCore.
- * NodeSource communications to IMCore are defined in {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt}.<BR><BR><BR>
+ * and finally remove them from RMCore.
+ * NodeSource communications to RMCore are defined in {@link org.objectweb.proactive.extensions.resourcemanager.core.RMCoreSourceInt}.<BR><BR><BR>
  *
  *
  * There is a mechanism of giving-removing nodes between NodeSource and {@link RMCore} :<BR><BR>
  *
- * 1- Giving to IMCore a new available node :<BR>
+ * 1- Giving to RMCore a new available node :<BR>
  * {@link org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource#addNewAvailableNode(Node,String,String)}
  * (method to call when a new node is available).<BR>
  * The NodeSource add node to the {@link RMCoreSourceInt} with the method<BR>
@@ -134,7 +134,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
     /**
      * Creates a new NodeSource.
      * @param id unique id of the source.
-     * @param imCore the {@link RMCoreSourceInt} already created of the Infrastructure Manager.
+     * @param imCore the {@link RMCoreSourceInt} already created of the Resource Manager.
      */
     public NodeSource(String id, RMCoreSourceInt imCore) {
         this.SourceId = id;
@@ -161,7 +161,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * so for NodeSource's inherited classes, they must override this method,
      * each node source type has to specify what to perform for the shutting down
      * (certainly remove nodes handled by the source).
-     * All nodes are removed from node source and from IMCore
+     * All nodes are removed from node source and from RMCore
      * @param preempt true Node source doesn't wait tasks end on its handled nodes,
      * false node source wait end of tasks on its nodes before shutting down
      */
@@ -205,6 +205,16 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
         throws AddingNodesException;
 
     /**
+     * Adds an  already deployed node to the NodeSource.
+     * lookup the node an add the node to the Source
+     * Operation unavailable on a dynamic node source
+     * @param nodeUrl
+     * @throws AddingNodesException if lookup has failed
+     * or asked to a dynamicnodeSource object.
+     */
+    public abstract void addNode(String nodeUrl) throws AddingNodesException;
+
+    /**
      * Confirms a removing node request.
      * <BR>Called by {@link RMCore}.<BR>
      * Confirm to a NodeSource a node release :<BR>
@@ -212,7 +222,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * the {@link RMCore#internalRemoveNode(String, boolean)} method.<BR>
      * So the {@link RMCore} has removed the Node and confirm the action to the NodeSource.
      * This abstract method must be defined to perform last actions for node removing mechanism.
-     * @param nodeUrl Url of the node on which IMCore confirm the remove.
+     * @param nodeUrl Url of the node on which RMCore confirm the remove.
      */
     public abstract void confirmRemoveNode(String nodeUrl);
 
@@ -295,7 +305,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * Perform operations to do when a node is down.
      * <BR>Called when the Pinger has detected a down node, each NodeSource
      * has to specify what to do when a down node is detected
-     * (certainly inform the IMCore about the broken node,
+     * (certainly inform the RMCore about the broken node,
      * remove the broken node from the list this.nodes
      * and for a dynamic node source, adding a new nice time for example)
      * the method is public because called by the NodeSource stub

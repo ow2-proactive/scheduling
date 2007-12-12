@@ -88,7 +88,7 @@ public interface RMMonitoring {
      *
      *         TODO gsigety remove this method when new RM GUI will be available
      */
-    public ArrayList<RMNode> getListAllIMNodes();
+    public ArrayList<RMNode> getListAllRMNodes();
 
     /**
      * @return the ArrayList of free Node
@@ -97,7 +97,7 @@ public interface RMMonitoring {
      *
      * @see RMNode
      */
-    public ArrayList<RMNode> getListFreeIMNode();
+    public ArrayList<RMNode> getListFreeRMNode();
 
     /**
      *
@@ -106,7 +106,7 @@ public interface RMMonitoring {
      * @return the ArrayList of used Node
      * @see RMNode
      */
-    public ArrayList<RMNode> getListBusyIMNode();
+    public ArrayList<RMNode> getListBusyRMNode();
 
     /**
      *

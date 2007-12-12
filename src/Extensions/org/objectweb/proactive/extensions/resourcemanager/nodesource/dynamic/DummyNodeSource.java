@@ -154,7 +154,16 @@ public class DummyNodeSource extends DynamicNodeSource
         }
     }
 
-    @Override
+    protected void killNodeRT(Node node) {
+        String nodeUrl = node.getNodeInformation().getURL();
+        StaticNodes.remove(nodeUrl);
+        try {
+            node.getProActiveRuntime().killRT(false);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public RMNodeSourceEvent getSourceEvent() {
         return new RMNodeSourceEvent(this.getSourceId(),
             RMConstants.DUMMY_NODE_SOURCE_TYPE);
@@ -167,7 +176,7 @@ public class DummyNodeSource extends DynamicNodeSource
      * A down node has been detected
      * remove the broken node from the list this.nodes
      * remove node from the TTR list
-     * Inform the IMNode Manager about the broken node,
+     * Inform the RMcore about the broken node,
      * create a new nice time
      * remove node from the static node list
      */
@@ -179,7 +188,7 @@ public class DummyNodeSource extends DynamicNodeSource
             removeFromList(node);
             //remove the node from the node_ttr HashMap
             this.getNodesTtr_List().remove(nodeUrl);
-            //informing IMNode Manager about the broken node
+            //informing RMCore about the broken node
             this.imCore.setDownNode(nodeUrl);
             //indicate that a new node has to be got in a this.niceTime future
             newNiceTime();
@@ -194,7 +203,7 @@ public class DummyNodeSource extends DynamicNodeSource
     // ----------------------------------------------------------------------//	
     /**
      * a new node is available in the NodeSource, register it to the internal list
-     * but not register it to the "true" node list neither to the IMNodeManager
+     * but not register it to the "true" node list neither to the RMNodeManager
      * (where are in a dynamic node source)
      */
     public void receiveDeployedNode(Node node, String VnName, String PADName) {
@@ -203,7 +212,7 @@ public class DummyNodeSource extends DynamicNodeSource
 
     /**
      * Shutdown the node source
-     * All nodes are removed from node source and from IMCore
+     * All nodes are removed from node source and from RMCore
      * @param preempt true Node source doesn't wait tasks end on its handled nodes,
      * false node source wait end of tasks on its nodes before shutting down
      */

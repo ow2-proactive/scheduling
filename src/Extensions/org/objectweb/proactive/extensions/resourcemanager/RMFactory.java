@@ -52,11 +52,11 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 
 
 /**
- * Object which performs the Infrastructure Manager (RM)creation,
+ * Object which performs the Resource Manager (RM)creation,
  * and provides RM's front-end active objects. :<BR>
  * -{@link RMAdmin}.<BR>
  * -{@link RMMonitoring}.<BR>
- * -{@Link IMUSer}.<BR>
+ * -{@Link RMUSer}.<BR>
  *
  * @author ProActive team
  *
@@ -64,14 +64,14 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
 @PublicAPI
 public class RMFactory implements RMConstants {
 
-    /** Logger of the IMFactory */
+    /** Logger of the RMFactory */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.RM_FACTORY);
 
-    /** IMCore interface of the created Infrastructure manager */
-    private static RMCoreInterface imcore = null;
+    /** RMCore interface of the created Resource manager */
+    private static RMCoreInterface rmcore = null;
 
     /**
-     * Creates Infrastructure manager on local host.
+     * Creates Resource manager on local host.
      * @throws NodeException
      * @throws ActiveObjectCreationException
      * @throws AlreadyBoundException
@@ -80,11 +80,11 @@ public class RMFactory implements RMConstants {
     public static void startLocal()
         throws NodeException, ActiveObjectCreationException,
             AlreadyBoundException, IOException {
-        if (imcore == null) {
+        if (rmcore == null) {
             Node nodeIM = NodeFactory.createNode(NAME_NODE_RM);
-            imcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
+            rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                     new Object[] { "IMCORE", nodeIM }, nodeIM);
-            PAActiveObject.register(imcore,
+            PAActiveObject.register(rmcore,
                 "//localhost/" + NAME_ACTIVE_OBJECT_RMCORE);
 
             if (logger.isInfoEnabled()) {
@@ -100,48 +100,48 @@ public class RMFactory implements RMConstants {
     /**
      * Gives the active object IMADMIN on local host.
      * @return IMAdmin active object.
-     * @throws RMException if the Infrastructure Manager hasn't been created before.
+     * @throws RMException if the resource Manager hasn't been created before.
      */
     public static RMAdmin getAdmin() throws RMException {
-        if (imcore != null) {
+        if (rmcore != null) {
             if (logger.isInfoEnabled()) {
                 logger.info("We have started the imcore");
             }
-            return imcore.getAdmin();
+            return rmcore.getAdmin();
         } else {
             throw new RMException(
-                "Infrastructure Manager has not been created before");
+                "resource Manager has not been created before");
         }
     }
 
     /**
      * @return IMMonitoring active object on local host.
-     * @throws RMException if the Infrastructure Manager hasn't been created before
+     * @throws RMException if the resource Manager hasn't been created before
      */
     public static RMMonitoring getMonitoring() throws RMException {
-        if (imcore != null) {
-            return imcore.getMonitoring();
+        if (rmcore != null) {
+            return rmcore.getMonitoring();
         } else {
             throw new RMException(
-                "Infrastructure Manager has not been created before");
+                "resource Manager has not been created before");
         }
     }
 
     /**
      * @return IMUser active object on local host.
-     * @throws RMException if the Infrastructure Manager hasn't been created before
+     * @throws RMException if the resource Manager hasn't been created before
      */
     public static RMUser getUser() throws RMException {
-        if (imcore != null) {
-            return imcore.getUser();
+        if (rmcore != null) {
+            return rmcore.getUser();
         } else {
             throw new RMException(
-                "Infrastructure Manager has not been created before");
+                "resource Manager has not been created before");
         }
     }
 
     /**
-     * Main function, create the Infrastructure Manager.
+     * Main function, create the resource Manager.
      * @param args command line arguments
      */
     public static void main(String[] args) {

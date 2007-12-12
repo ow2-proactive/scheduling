@@ -108,7 +108,7 @@ public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
     }
 
     private void printInitialState(RMInitialState state) {
-        System.out.println("\n\n\t Infrastructure Manager - Initial state : ");
+        System.out.println("\n\n\t Resource Manager - Initial state : ");
         ArrayList<RMNodeSourceEvent> nsList = state.getNodeSource();
 
         System.out.println("\n" + nsList.size() + " node sources :");
@@ -148,19 +148,19 @@ public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
 
     //----------------Events handling ---------------//    
     public void imKilledEvent(RMEvent evt) {
-        System.out.println("imKilledEvent, RM : " + evt.getIMUrl());
+        System.out.println("imKilledEvent, RM : " + evt.getRMUrl());
     }
 
     public void imShutDownEvent(RMEvent evt) {
-        System.out.println("imShutDownEvent, RM : " + evt.getIMUrl());
+        System.out.println("imShutDownEvent, RM : " + evt.getRMUrl());
     }
 
     public void imShuttingDownEvent(RMEvent evt) {
-        System.out.println("imShuttingDownEvent, RM : " + evt.getIMUrl());
+        System.out.println("imShuttingDownEvent, RM : " + evt.getRMUrl());
     }
 
     public void imStartedEvent(RMEvent evt) {
-        System.out.println("imStartedEvent RM : " + evt.getIMUrl());
+        System.out.println("imStartedEvent RM : " + evt.getRMUrl());
     }
 
     public void nodeAddedEvent(RMNodeEvent n) {
@@ -195,11 +195,11 @@ public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
 
     public void nodeSourceAddedEvent(RMNodeSourceEvent ns) {
         System.out.println("nodeSourceAddedEvent " + ns.getSourceName() +
-            "RM : " + ns.getIMUrl());
+            "RM : " + ns.getRMUrl());
     }
 
     public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
         System.out.println("nodeSourceRemovedEvent " + ns.getSourceName() +
-            "RM : " + ns.getIMUrl());
+            "RM : " + ns.getRMUrl());
     }
 }

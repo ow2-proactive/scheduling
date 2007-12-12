@@ -187,7 +187,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
         //TODO Germ todo
     }
 
-    public ArrayList<RMNode> getListAllIMNodes() {
+    public ArrayList<RMNode> getListAllRMNodes() {
         if (logger.isDebugEnabled()) {
             logger.debug("getListAllIMNodes");
         }
@@ -195,7 +195,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
         return rmcore.getListAllNodes();
     }
 
-    public ArrayList<RMNode> getListFreeIMNode() {
+    public ArrayList<RMNode> getListFreeRMNode() {
         if (logger.isDebugEnabled()) {
             logger.debug("getListFreeIMNode");
         }
@@ -203,7 +203,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
         return rmcore.getListFreeRMNode();
     }
 
-    public ArrayList<RMNode> getListBusyIMNode() {
+    public ArrayList<RMNode> getListBusyRMNode() {
         if (logger.isDebugEnabled()) {
             logger.debug("getListBusyIMNode");
         }
@@ -240,26 +240,26 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
 
     /** RM has been stopped */
     public void imShutDownEvent(RMEvent evt) {
-        evt.setIMUrl(this.MonitoringUrl);
+        evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.SHUTDOWN, new Class<?>[] { RMEvent.class }, evt);
     }
 
     /** RM is shutting down */
     public void imShuttingDownEvent(RMEvent evt) {
-        evt.setIMUrl(this.MonitoringUrl);
+        evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.SHUTTING_DOWN, new Class<?>[] { RMEvent.class },
             evt);
     }
 
     /** RM has started */
     public void imStartedEvent(RMEvent evt) {
-        evt.setIMUrl(this.MonitoringUrl);
+        evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.STARTED, new Class<?>[] { RMEvent.class }, evt);
     }
 
     /** RM is shutting down */
     public void imKilledEvent(RMEvent evt) {
-        evt.setIMUrl(this.MonitoringUrl);
+        evt.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.KILLED, new Class<?>[] { RMEvent.class }, evt);
     }
 
@@ -267,7 +267,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param ns node source event containing new {@link NodeSource} properties.
      */
     public void nodeSourceAddedEvent(RMNodeSourceEvent ns) {
-        ns.setIMUrl(this.MonitoringUrl);
+        ns.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODESOURCE_CREATED,
             new Class<?>[] { RMNodeSourceEvent.class }, ns);
     }
@@ -276,7 +276,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param ns node source event containing removed {@link NodeSource} properties.
      */
     public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
-        ns.setIMUrl(this.MonitoringUrl);
+        ns.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODESOURCE_REMOVED,
             new Class<?>[] { RMNodeSourceEvent.class }, ns);
     }
@@ -285,7 +285,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param n node event containing new {@link RMNode} properties.
      */
     public void nodeAddedEvent(RMNodeEvent n) {
-        n.setIMUrl(this.MonitoringUrl);
+        n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_ADDED, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
@@ -295,7 +295,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param n node event containing {@link RMNode} properties.
      */
     public void nodeFreeEvent(RMNodeEvent n) {
-        n.setIMUrl(this.MonitoringUrl);
+        n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_FREE, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
@@ -305,7 +305,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param n node event containing {@link RMNode} properties.
      */
     public void nodeBusyEvent(RMNodeEvent n) {
-        n.setIMUrl(this.MonitoringUrl);
+        n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_BUSY, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
@@ -315,7 +315,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param n node event containing {@link RMNode} properties.
      */
     public void nodeToReleaseEvent(RMNodeEvent n) {
-        n.setIMUrl(this.MonitoringUrl);
+        n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_TO_RELEASE,
             new Class<?>[] { RMNodeEvent.class }, n);
     }
@@ -326,7 +326,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param n node event containing {@link RMNode} properties.
      */
     public void nodeDownEvent(RMNodeEvent n) {
-        n.setIMUrl(this.MonitoringUrl);
+        n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_DOWN, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
@@ -335,7 +335,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param n node event containing the removed {@link RMNode} properties.
      */
     public void nodeRemovedEvent(RMNodeEvent n) {
-        n.setIMUrl(this.MonitoringUrl);
+        n.setRMUrl(this.MonitoringUrl);
         dispatch(RMEventType.NODE_REMOVED,
             new Class<?>[] { RMNodeEvent.class }, n);
     }

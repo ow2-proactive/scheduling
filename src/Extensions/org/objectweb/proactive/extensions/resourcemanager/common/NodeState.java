@@ -34,7 +34,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 
 /**
- * Enumeration of all states of an IMNode :<BR>
+ * Enumeration of all states of an RMNode :<BR>
  * -free : node is ready to perform a task.<BR>
  * -busy : node is executing a task.<BR>
  * -to be released : node is busy and have to be removed at the end of its current task.<BR>
