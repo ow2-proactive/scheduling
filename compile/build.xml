@@ -96,6 +96,7 @@
 			</fileset>
 		</else>
 	</if>
+		
 
 
 
@@ -447,6 +448,7 @@
 
 				<formatter type="xml" />
 
+
 				<batchtest fork="yes" todir="${junit.dir}">
 					<fileset refid="testsuite" />
 				</batchtest>
@@ -457,6 +459,10 @@
 
 	<target name="junit.distributed" depends="compile.tests, deploy.all" description="Run all non regression tests">
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" />
+	</target>
+	
+	<target name="junit.solo" description="Run all non regression tests on the current host only, don't compile">
+			<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" />
 	</target>
 
 	<target name="junit" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
@@ -1000,7 +1006,7 @@
 	<!--  Scheduler Specific - Convert Schemas from Relax NG to XMLSchema -->
 	<!-- ================================================================ -->
 
-	<target name="convertSchemas">
+	<target name="convertSchemas" description="convert Schemas from Relax NG Compact Syntax to Relax NG XML Syntax and to XMLSchema inside the scheduler">
 		<taskdef name="trang" classname="net.amadan.trang.ant.TrangTask">
 			<classpath>
 				<fileset dir="${base.dir}/dev/lib/trang">
