@@ -149,6 +149,7 @@
 					<package name="org.objectweb.proactive.filetransfer*" />
 					<package name="org.objectweb.proactive.ext.*" />
 					<package name="org.objectweb.proactive.mpi" />
+					<package name="org.objectweb.proactive.benchmarks.*" />
 					<package name="org.objectweb.proactive.p2p.*" />
 					<package name="org.objectweb.proactive" />
 					<package name="org.objectweb.proactive.annotation" />
