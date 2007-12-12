@@ -42,8 +42,14 @@ import org.objectweb.proactive.core.mop.Proxy;
 
 
 /**
- *
- *
+ * A synchrounous proxy send reified method calls in a synchronous fashion.
+ * Two methods are available for that :
+ *  1 - the reify method that expects a MethodCall as parameter and that is capable
+ *  of creating the corresponding request
+ *  2 - the receiveMessage method only pass an already created request to the remote target.
+ *  This last method is used to avoid a double reification when an active object sends a request
+ *  (a request containing an other request). It could also be used by the forwarder mechanism.
+ *  @author acontes
  */
 public class SynchronousProxy implements Proxy, Serializable {
     protected RemoteObject remoteObject;
@@ -51,7 +57,6 @@ public class SynchronousProxy implements Proxy, Serializable {
     public SynchronousProxy(ConstructorCall contructorCall, Object[] params)
         throws ProActiveException {
         Object p0 = params[0];
-
         if (p0 instanceof RemoteObject) {
             this.remoteObject = (RemoteObject) p0;
         } else if (p0 instanceof RemoteRemoteObject) {
@@ -59,6 +64,9 @@ public class SynchronousProxy implements Proxy, Serializable {
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.mop.Proxy#reify(org.objectweb.proactive.core.mop.MethodCall)
+     */
     public Object reify(MethodCall c) throws Throwable {
         Request r = new RequestImpl(c,
                 c.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE));
@@ -77,8 +85,16 @@ public class SynchronousProxy implements Proxy, Serializable {
         return null;
     }
 
-    public Object receiveMessage(Request m) throws Throwable {
-        SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(m);
+    /**
+     * this method forward the request passed as parameter to the target without
+     * encapsulating it within a new request.
+     * @param request the request to send
+     * @return the result of the method call
+     * @throws Throwable if the result was an exception or if the method call raised
+     * an exception then this exception is thrown
+     */
+    public Object receiveMessage(Request request) throws Throwable {
+        SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(request);
 
         if (reply != null) {
             MethodCallResult rr = reply.getResult();
@@ -92,11 +108,20 @@ public class SynchronousProxy implements Proxy, Serializable {
         return null;
     }
 
+    /**
+     * Sets the remote remote object identified as target by this proxy
+     * @param rro the remote remote object identified as target by this proxy
+     * @throws ProActiveException if the remote remote object does not exist
+     */
     public void setRemoteObject(RemoteRemoteObject rro)
         throws ProActiveException {
         this.remoteObject = new RemoteObjectAdapter(rro);
     }
 
+    /**
+     * set the remote object identified as target of this proxy
+     * @param ro the remote object identified as target by this proxy
+     */
     public void setRemoteObject(RemoteObject ro) {
         this.remoteObject = ro;
     }
