@@ -243,8 +243,7 @@
             </sect3>
             <sect3 id="Scheduler_Matlab_Complete_Descriptor">
                 <title>Complete Job Descriptor</title>
-                <programlisting lang="xml">
-                    <textobject><textdata
+                <programlisting lang="xml"><textobject><textdata
                             fileref="../descriptors/scheduler/jobs/Job_matlab_simplest.xml" /></textobject></programlisting>
             </sect3>
         </sect2>
@@ -297,8 +296,7 @@
             compared to the previous one. Have a look at the new job
             descriptor first:
         </para>
-        <programlisting lang="xml">
-            <textobject><textdata
+        <programlisting lang="xml"><textobject><textdata
                     fileref="../descriptors/scheduler/jobs/Job_matlab.xml" /></textobject></programlisting>
         <sect2 id="Scheduler_Matlab_Descriptor_Variables">
             <title>Descriptor variables</title>
@@ -441,8 +439,7 @@
             <title>Matlab Scripts for this example</title>
             <sect3 id="ComplexExamples_Splitter_Script">
                 <title>Script of the Splitter Task</title>
-                <programlisting lang="matlab">
-                    <textobject><textdata
+                <programlisting lang="matlab"><textobject><textdata
                             fileref="../scripts/unix/matlab/examples/splitter.m" /></textobject></programlisting>
                 <para>
                     The Splitter script contains two important aspects:
@@ -472,14 +469,12 @@
             </sect3>
             <sect3 id="ComplexExamples_Summing_Script">
                 <title>Script of the Summing Task</title>
-                <programlisting lang="matlab">
-                    <textobject><textdata
+                <programlisting lang="matlab"><textobject><textdata
                             fileref="../scripts/unix/matlab/examples/summer.m" /></textobject></programlisting>
             </sect3>
             <sect3 id="ComplexExamples_Collector_Script">
                 <title>Script of the Collector Task</title>
-                <programlisting lang="matlab">
-                    <textobject><textdata
+                <programlisting lang="matlab"><textobject><textdata
                             fileref="../scripts/unix/matlab/examples/collector.m" /></textobject></programlisting>
                 <para>
                     The important aspect of the The Collector script is
