@@ -276,25 +276,26 @@ public enum PAProperties {
      *  MIGRATION
      */
 
-    /** TODO Describe this property */
+    /** The class or interface of the location server to be looked up */
     PA_LOCATION_SERVER("proactive.locationserver", PAPropertiesType.STRING),
 
-    /** TODO fhuet Describe this property */
+    /** The bind name of a location server, used during lookup */
     PA_LOCATION_SERVER_RMI("proactive.locationserver.rmi",
         PAPropertiesType.STRING),
 
-    /** TODO fhuet Describe this property */
+    /** The lifetime (in seconds) of a forwarder left after a migration when using the mixed location scheme */
     PA_MIXEDLOCATION_TTL("proactive.mixedlocation.ttl", PAPropertiesType.INTEGER),
 
-    /** TODO fhuet Describe this property */
+    /** If set to true, a forwarder will send an update to a location server when reaching
+     * the end of its lifetime */
     PA_MIXEDLOCATION_UPDATINGFORWARDER("proactive.mixedlocation.updatingForwarder",
         PAPropertiesType.BOOLEAN),
 
-    /** TODO fhuet Describe this property */
+    /** The maximum number of migration allowed before an object must send its new location to a location server */
     PA_MIXEDLOCATION_MAXMIGRATIONNB("proactive.mixedlocation.maxMigrationNb",
         PAPropertiesType.INTEGER),
 
-    /** TODO fhuet Describe this property */
+    /** The maximum time (in seconds) an object can spend on a site before updating its location to a location server */
     PA_MIXEDLOCATION_MAXTIMEONSITE("proactive.mixedlocation.maxTimeOnSite",
         PAPropertiesType.INTEGER),
 
