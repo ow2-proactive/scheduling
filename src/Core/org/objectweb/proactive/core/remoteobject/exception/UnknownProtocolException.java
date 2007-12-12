@@ -35,8 +35,9 @@ import org.objectweb.proactive.core.ProActiveException;
 
 
 /**
+ * This exception is thrown when the protocol is unknown by the remote 
+ * object framework.
  * @author acontes
- * thrown when the protocol is unknown by the remote object framework
  */
 @PublicAPI
 public class UnknownProtocolException extends ProActiveException {
