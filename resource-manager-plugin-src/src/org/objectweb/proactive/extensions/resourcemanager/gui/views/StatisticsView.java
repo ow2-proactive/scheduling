@@ -7,26 +7,29 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.part.ViewPart;
 
+
 /**
  * @author FRADJ Johann
  */
 public class StatisticsView extends ViewPart {
-	/** the view part id */
-	public static final String ID = "org.objectweb.proactive.extensions.resourcemanager.gui.views.StatisticsView";
 
-	/**
-	 * The constructor.
-	 */
-	public StatisticsView() {}
+    /** the view part id */
+    public static final String ID = "org.objectweb.proactive.extensions.resourcemanager.gui.views.StatisticsView";
 
-	/**
-	 * This is a callback that will allow us to create the viewer and initialize
-	 * it.
-	 */
-	@Override
-	public void createPartControl(Composite parent) {
-		//parent.setLayout(new FillLayout(SWT.VERTICAL));
-		Table table = new Table(parent, SWT.BORDER | SWT.SINGLE);
+    /**
+     * The constructor.
+     */
+    public StatisticsView() {
+    }
+
+    /**
+     * This is a callback that will allow us to create the viewer and initialize
+     * it.
+     */
+    @Override
+    public void createPartControl(Composite parent) {
+        //parent.setLayout(new FillLayout(SWT.VERTICAL));
+        Table table = new Table(parent, SWT.BORDER | SWT.SINGLE);
         table.setLayoutData(new GridData(GridData.FILL_BOTH));
         table.setHeaderVisible(true);
         table.setLinesVisible(true);
@@ -39,15 +42,15 @@ public class StatisticsView extends ViewPart {
         tc2.setWidth(100);
         tc1.setMoveable(true);
         tc2.setMoveable(true);
-	}
+    }
 
-	/**
-	 * Passing the focus request to the viewer's control.
-	 * 
-	 * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
-	 */
-	@Override
-	public void setFocus() {
-		//viewer.getControl().setFocus();
-	}
+    /**
+     * Passing the focus request to the viewer's control.
+     *
+     * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+     */
+    @Override
+    public void setFocus() {
+        //viewer.getControl().setFocus();
+    }
 }

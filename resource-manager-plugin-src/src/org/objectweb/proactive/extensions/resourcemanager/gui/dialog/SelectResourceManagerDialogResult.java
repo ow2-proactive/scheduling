@@ -39,31 +39,31 @@ import java.io.Serializable;
  */
 public class SelectResourceManagerDialogResult implements Serializable {
     private String url = null;
-//    private String login = null;
-//    private String password = null;
-//    private Boolean logAsAdmin = false;
 
-    public SelectResourceManagerDialogResult(String url) {//, String login,
-//        String password, Boolean logAsAdmin) {
+    //    private String login = null;
+    //    private String password = null;
+    //    private Boolean logAsAdmin = false;
+    public SelectResourceManagerDialogResult(String url) { //, String login,
+                                                           //        String password, Boolean logAsAdmin) {
         this.url = url;
-//        this.login = login;
-//        this.password = password;
-//        this.logAsAdmin = logAsAdmin;
+        //        this.login = login;
+        //        this.password = password;
+        //        this.logAsAdmin = logAsAdmin;
     }
 
     public String getUrl() {
         return url;
     }
 
-//    public String getLogin() {
-//        return login;
-//    }
-//
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//    public Boolean isLogAsAdmin() {
-//        return logAsAdmin;
-//    }
+    //    public String getLogin() {
+    //        return login;
+    //    }
+    //
+    //    public String getPassword() {
+    //        return password;
+    //    }
+    //
+    //    public Boolean isLogAsAdmin() {
+    //        return logAsAdmin;
+    //    }
 }

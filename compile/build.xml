@@ -690,6 +690,7 @@
 			<format_m srcdir="${src.test.dir}" />
 			<format_m srcdir="${ic2d-plugin.dir}" />
 			<format_m srcdir="${scheduler-plugin.dir}" />
+			<format_m srcdir="${resourcemanager-plugin.dir}" />
 		</parallel>
 	</target>
 

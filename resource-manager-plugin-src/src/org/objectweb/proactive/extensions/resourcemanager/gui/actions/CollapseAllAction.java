@@ -45,7 +45,7 @@ public class CollapseAllAction extends Action {
     private TreeViewer viewer = null;
 
     private CollapseAllAction(TreeViewer viewer) {
-    	this.viewer = viewer;
+        this.viewer = viewer;
         this.setText("Collapse All");
         this.setToolTipText("To collapse all items");
         this.setImageDescriptor(ImageDescriptor.createFromFile(

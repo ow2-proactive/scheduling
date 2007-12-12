@@ -10,133 +10,138 @@ import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEve
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
 import org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener;
 
+
 /**
  * @author FRADJ Johann
  */
-public class ResourceExplorerTree extends TreeViewer implements RMNodeEventListener {
+public class ResourceExplorerTree extends TreeViewer
+    implements RMNodeEventListener {
+    public ResourceExplorerTree(ViewPart view, Composite parent) {
+        super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
+        TreeManager.newInstance(view);
+        this.setContentProvider(TreeManager.getInstance());
+        this.setLabelProvider(TreeManager.getInstance());
+        this.setInput(view.getViewSite());
+        // this.setSorter(new NameSorter());
+    }
 
-	public ResourceExplorerTree(ViewPart view, Composite parent) {
-		super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-		TreeManager.newInstance(view);
-		this.setContentProvider(TreeManager.getInstance());
-		this.setLabelProvider(TreeManager.getInstance());
-		this.setInput(view.getViewSite());
-		// this.setSorter(new NameSorter());
-	}
+    public void initTree(RMInitialState initialState) {
+        if (initialState != null) {
+            TreeManager treeManager = TreeManager.getInstance();
+            for (RMNodeSourceEvent nodeSourceEvent : initialState.getNodeSource()) {
+                treeManager.addNodeSource(nodeSourceEvent);
+            }
 
-	public void initTree(RMInitialState initialState) {
-		if (initialState != null) {
-			TreeManager treeManager = TreeManager.getInstance();
-			for (RMNodeSourceEvent nodeSourceEvent : initialState.getNodeSource()) {
-				treeManager.addNodeSource(nodeSourceEvent);
-			}
-			
-			for (RMNodeEvent nodeEvent : initialState.getBusyNodes()) {
-				treeManager.addNode(nodeEvent);
-			}
+            for (RMNodeEvent nodeEvent : initialState.getBusyNodes()) {
+                treeManager.addNode(nodeEvent);
+            }
 
-			for (RMNodeEvent nodeEvent : initialState.getDownNodes()) {
-				treeManager.addNode(nodeEvent);
-			}
+            for (RMNodeEvent nodeEvent : initialState.getDownNodes()) {
+                treeManager.addNode(nodeEvent);
+            }
 
-			for (RMNodeEvent nodeEvent : initialState.getFreeNodes()) {
-				treeManager.addNode(nodeEvent);
-			}
+            for (RMNodeEvent nodeEvent : initialState.getFreeNodes()) {
+                treeManager.addNode(nodeEvent);
+            }
 
-			for (RMNodeEvent nodeEvent : initialState.getToReleaseNodes()) {
-				treeManager.addNode(nodeEvent);
-			}
+            for (RMNodeEvent nodeEvent : initialState.getToReleaseNodes()) {
+                treeManager.addNode(nodeEvent);
+            }
 
-			Display.getDefault().asyncExec(new Runnable() {
-				public void run() {
-					refresh();
-				}
-			});
-		}
-	}
+            Display.getDefault().asyncExec(new Runnable() {
+                    public void run() {
+                        refresh();
+                    }
+                });
+        }
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeAddedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
-	 */
-	public void nodeAddedEvent(RMNodeEvent nodeEvent) {
-		actualize(TreeManager.getInstance().addNode(nodeEvent));
-	}
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeAddedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     */
+    public void nodeAddedEvent(RMNodeEvent nodeEvent) {
+        actualize(TreeManager.getInstance().addNode(nodeEvent));
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeRemovedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
-	 */
-	public void nodeRemovedEvent(RMNodeEvent nodeEvent) {
-		actualize(TreeManager.getInstance().removeNode(nodeEvent));
-	}
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeRemovedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     */
+    public void nodeRemovedEvent(RMNodeEvent nodeEvent) {
+        actualize(TreeManager.getInstance().removeNode(nodeEvent));
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeBusyEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
-	 */
-	public void nodeBusyEvent(RMNodeEvent nodeEvent) {
-		System.out.println("ResourceExplorerTree.nodeBusyEvent("+ nodeEvent.getState() + ")");
-		nodeStateChanged(nodeEvent);
-	}
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeBusyEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     */
+    public void nodeBusyEvent(RMNodeEvent nodeEvent) {
+        System.out.println("ResourceExplorerTree.nodeBusyEvent(" +
+            nodeEvent.getState() + ")");
+        nodeStateChanged(nodeEvent);
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeDownEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
-	 */
-	public void nodeDownEvent(RMNodeEvent nodeEvent) {
-		System.out.println("ResourceExplorerTree.nodeDownEvent("+ nodeEvent.getState() + ")");
-		nodeStateChanged(nodeEvent);
-	}
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeDownEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     */
+    public void nodeDownEvent(RMNodeEvent nodeEvent) {
+        System.out.println("ResourceExplorerTree.nodeDownEvent(" +
+            nodeEvent.getState() + ")");
+        nodeStateChanged(nodeEvent);
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeFreeEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
-	 */
-	public void nodeFreeEvent(RMNodeEvent nodeEvent) {
-		System.out.println("ResourceExplorerTree.nodeFreeEvent("+ nodeEvent.getState() + ")");
-		nodeStateChanged(nodeEvent);
-	}
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeFreeEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     */
+    public void nodeFreeEvent(RMNodeEvent nodeEvent) {
+        System.out.println("ResourceExplorerTree.nodeFreeEvent(" +
+            nodeEvent.getState() + ")");
+        nodeStateChanged(nodeEvent);
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeToReleaseEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
-	 */
-	public void nodeToReleaseEvent(RMNodeEvent nodeEvent) {
-		System.out.println("ResourceExplorerTree.nodeToReleaseEvent("+ nodeEvent.getState() + ")");
-		nodeStateChanged(nodeEvent);
-	}
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeToReleaseEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
+     */
+    public void nodeToReleaseEvent(RMNodeEvent nodeEvent) {
+        System.out.println("ResourceExplorerTree.nodeToReleaseEvent(" +
+            nodeEvent.getState() + ")");
+        nodeStateChanged(nodeEvent);
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeSourceAddedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeSourceEvent)
-	 */
-	public void nodeSourceAddedEvent(RMNodeSourceEvent nodeSourceEvent) {
-		TreeManager.getInstance().addNodeSource(nodeSourceEvent);
-		actualize();
-	}
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeSourceAddedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeSourceEvent)
+     */
+    public void nodeSourceAddedEvent(RMNodeSourceEvent nodeSourceEvent) {
+        TreeManager.getInstance().addNodeSource(nodeSourceEvent);
+        actualize();
+    }
 
-	/**
-	 * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeSourceRemovedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeSourceEvent)
-	 */
-	public void nodeSourceRemovedEvent(RMNodeSourceEvent nodeSourceEvent) {
-		TreeManager.getInstance().removeNodeSource(nodeSourceEvent);
-		actualize();
-	}
-	
-	private void nodeStateChanged(RMNodeEvent nodeEvent) {
-		actualize(TreeManager.getInstance().changeNodeState(nodeEvent));
-	}
-	
-	private void actualize() {
-		actualize(null);
-	}
-	
-	private void actualize(TreeLeafElement element) {
-		final TreeLeafElement elem = element;
-		Display.getDefault().asyncExec(new Runnable() {
-			public void run() {
-				if(elem == null)
-					refresh(true);
-				else {
-					refresh(elem, true);
-				}
-			}
-		});
-	}
+    /**
+     * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeSourceRemovedEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeSourceEvent)
+     */
+    public void nodeSourceRemovedEvent(RMNodeSourceEvent nodeSourceEvent) {
+        TreeManager.getInstance().removeNodeSource(nodeSourceEvent);
+        actualize();
+    }
 
-	// private class NameSorter extends ViewerSorter {}
+    private void nodeStateChanged(RMNodeEvent nodeEvent) {
+        actualize(TreeManager.getInstance().changeNodeState(nodeEvent));
+    }
+
+    private void actualize() {
+        actualize(null);
+    }
+
+    private void actualize(TreeLeafElement element) {
+        final TreeLeafElement elem = element;
+        Display.getDefault().asyncExec(new Runnable() {
+                public void run() {
+                    if (elem == null) {
+                        refresh(true);
+                    } else {
+                        refresh(elem, true);
+                    }
+                }
+            });
+    }
+
+    // private class NameSorter extends ViewerSorter {}
 }

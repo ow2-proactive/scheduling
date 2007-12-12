@@ -68,18 +68,17 @@ public class ResourceManagerPerspective implements IPerspectiveFactory {
     public void createInitialLayout(IPageLayout layout) {
         String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(false);
-        
+
         IFolderLayout topFolder = layout.createFolder(ID_TOP_FOLDER,
-        		IPageLayout.TOP, 0.7f, editorArea);
+                IPageLayout.TOP, 0.7f, editorArea);
         topFolder.addView(ResourceExplorerView.ID);
 
         IFolderLayout subleftFolder = layout.createFolder(ID_LEFT_FOLDER,
-        		IPageLayout.BOTTOM, 0.3f, editorArea);
+                IPageLayout.BOTTOM, 0.3f, editorArea);
         subleftFolder.addView(StatisticsView.ID);
-        
-        IFolderLayout subsubleftFolder = layout.createFolder(ID_BOTTOM_FOLDER,
-        		IPageLayout.RIGHT, 0.5f, ID_LEFT_FOLDER);
-        subsubleftFolder.addView(NodeInfoView.ID);
 
+        IFolderLayout subsubleftFolder = layout.createFolder(ID_BOTTOM_FOLDER,
+                IPageLayout.RIGHT, 0.5f, ID_LEFT_FOLDER);
+        subsubleftFolder.addView(NodeInfoView.ID);
     }
 }

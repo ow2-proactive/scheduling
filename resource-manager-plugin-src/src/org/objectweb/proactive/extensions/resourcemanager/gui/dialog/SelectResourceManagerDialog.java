@@ -71,17 +71,20 @@ public class SelectResourceManagerDialog extends Dialog {
     public static final String URL_FILE = ".ProActive_ResourceManager_urls";
 
     /** Name of the file which store the good login */
-//    public static final String LOGIN_FILE = ".ProActive_Scheduler_logins";
+    //    public static final String LOGIN_FILE = ".ProActive_Scheduler_logins";
     private static List<String> urls = null;
-//    private static List<String> logins = null;
+
+    //    private static List<String> logins = null;
     private static boolean validate = false;
     private static String url = null;
-//    private static String login = null;
-//    private static String pwd = null;
-//    private static Boolean logAsAdmin = null;
+
+    //    private static String login = null;
+    //    private static String pwd = null;
+    //    private static Boolean logAsAdmin = null;
     private static Combo urlCombo = null;
-//    private static Combo loginCombo = null;
-//    private Button adminCheck = null;
+
+    //    private static Combo loginCombo = null;
+    //    private Button adminCheck = null;
     private Shell shell = null;
     private Button okButton = null;
     private Button cancelButton = null;
@@ -112,12 +115,12 @@ public class SelectResourceManagerDialog extends Dialog {
         // creation
         Label urlLabel = new Label(shell, SWT.NONE);
         urlCombo = new Combo(shell, SWT.BORDER);
-//        Label loginLabel = new Label(shell, SWT.NONE);
-//        loginCombo = new Combo(shell, SWT.BORDER);
-//        Label pwdLabel = new Label(shell, SWT.NONE);
-//        final Text pwdText = new Text(shell,
-//                SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
-//        adminCheck = new Button(shell, SWT.CHECK);
+        //        Label loginLabel = new Label(shell, SWT.NONE);
+        //        loginCombo = new Combo(shell, SWT.BORDER);
+        //        Label pwdLabel = new Label(shell, SWT.NONE);
+        //        final Text pwdText = new Text(shell,
+        //                SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+        //        adminCheck = new Button(shell, SWT.CHECK);
         okButton = new Button(shell, SWT.NONE);
         cancelButton = new Button(shell, SWT.NONE);
 
@@ -137,39 +140,39 @@ public class SelectResourceManagerDialog extends Dialog {
         loadUrls();
 
         // label login
-//        loginLabel.setText("login :");
-//        FormData loginLabelFormData = new FormData();
-//        loginLabelFormData.top = new FormAttachment(loginCombo, 0, SWT.CENTER);
-//        loginLabel.setLayoutData(loginLabelFormData);
+        //        loginLabel.setText("login :");
+        //        FormData loginLabelFormData = new FormData();
+        //        loginLabelFormData.top = new FormAttachment(loginCombo, 0, SWT.CENTER);
+        //        loginLabel.setLayoutData(loginLabelFormData);
 
         // text login
-//        FormData loginFormData = new FormData();
-//        loginFormData.top = new FormAttachment(urlCombo, 5);
-//        loginFormData.left = new FormAttachment(loginLabel, 5);
-//        loginFormData.right = new FormAttachment(40, 5);
-//        loginCombo.setLayoutData(loginFormData);
-//        loadLogins();
+        //        FormData loginFormData = new FormData();
+        //        loginFormData.top = new FormAttachment(urlCombo, 5);
+        //        loginFormData.left = new FormAttachment(loginLabel, 5);
+        //        loginFormData.right = new FormAttachment(40, 5);
+        //        loginCombo.setLayoutData(loginFormData);
+        //        loadLogins();
 
         // label password
-//        pwdLabel.setText("password :");
-//        FormData pwdLabelFormData = new FormData();
-//        pwdLabelFormData.top = new FormAttachment(pwdText, 0, SWT.CENTER);
-//        pwdLabelFormData.left = new FormAttachment(loginCombo, 5);
-//        pwdLabel.setLayoutData(pwdLabelFormData);
+        //        pwdLabel.setText("password :");
+        //        FormData pwdLabelFormData = new FormData();
+        //        pwdLabelFormData.top = new FormAttachment(pwdText, 0, SWT.CENTER);
+        //        pwdLabelFormData.left = new FormAttachment(loginCombo, 5);
+        //        pwdLabel.setLayoutData(pwdLabelFormData);
 
         // text password
-//        FormData pwdFormData = new FormData();
-//        pwdFormData.top = new FormAttachment(urlCombo, 5);
-//        pwdFormData.left = new FormAttachment(pwdLabel, 5);
-//        pwdFormData.right = new FormAttachment(100, -5);
-//        pwdText.setLayoutData(pwdFormData);
+        //        FormData pwdFormData = new FormData();
+        //        pwdFormData.top = new FormAttachment(urlCombo, 5);
+        //        pwdFormData.left = new FormAttachment(pwdLabel, 5);
+        //        pwdFormData.right = new FormAttachment(100, -5);
+        //        pwdText.setLayoutData(pwdFormData);
 
         // admin check
-//        adminCheck.setText("log as admin");
-//        FormData checkFormData = new FormData();
-//        checkFormData.top = new FormAttachment(loginCombo, 5);
-//        checkFormData.left = new FormAttachment(50, -45);
-//        adminCheck.setLayoutData(checkFormData);
+        //        adminCheck.setText("log as admin");
+        //        FormData checkFormData = new FormData();
+        //        checkFormData.top = new FormAttachment(loginCombo, 5);
+        //        checkFormData.left = new FormAttachment(50, -45);
+        //        adminCheck.setLayoutData(checkFormData);
 
         // button "OK"
         okButton.setText("OK");
@@ -178,9 +181,9 @@ public class SelectResourceManagerDialog extends Dialog {
                 public void handleEvent(Event event) {
                     validate = true;
                     url = urlCombo.getText();
-//                    login = loginCombo.getText();
-//                    pwd = pwdText.getText();
-//                    logAsAdmin = adminCheck.getSelection();
+                    //                    login = loginCombo.getText();
+                    //                    pwd = pwdText.getText();
+                    //                    logAsAdmin = adminCheck.getSelection();
                     shell.close();
                 }
             });
@@ -211,8 +214,7 @@ public class SelectResourceManagerDialog extends Dialog {
         shell.pack();
         shell.open();
 
-//        pwdText.setFocus();
-
+        //        pwdText.setFocus();
         while (!shell.isDisposed()) {
             if (!display.readAndDispatch()) {
                 display.sleep();
@@ -239,13 +241,13 @@ public class SelectResourceManagerDialog extends Dialog {
         urlCombo.setText("rmi://" + initialHostValue + ":" + port + "/");
     }
 
-//    private static void setInitialLogin() {
-//
-//        /* Get the user name */
-//        String initialLogin = System.getProperty("user.name");
-//        loginCombo.add(initialLogin);
-//        loginCombo.setText(initialLogin);
-//    }
+    //    private static void setInitialLogin() {
+    //
+    //        /* Get the user name */
+    //        String initialLogin = System.getProperty("user.name");
+    //        loginCombo.add(initialLogin);
+    //        loginCombo.setText(initialLogin);
+    //    }
 
     /**
      * Load Urls
@@ -326,85 +328,85 @@ public class SelectResourceManagerDialog extends Dialog {
         }
     }
 
-//    /**
-//     * Load Logins
-//     */
-//    private static void loadLogins() {
-//        try {
-//            BufferedReader reader = new BufferedReader(new FileReader(
-//                        LOGIN_FILE));
-//            try {
-//                logins = new ArrayList<String>();
-//                String login = null;
-//                String lastUrl = null;
-//                while ((login = reader.readLine()) != null) {
-//                    logins.add(login);
-//                    lastUrl = login;
-//                }
-//                int size = logins.size();
-//                if (size > 0) {
-//                    String[] hosts = new String[size];
-//                    logins.toArray(hosts);
-//                    Arrays.sort(hosts);
-//                    loginCombo.setItems(hosts);
-//                    loginCombo.setText(lastUrl);
-//                } else {
-//                    setInitialLogin();
-//                }
-//            } catch (IOException e) {
-//
-//                /* Do-nothing */
-//            } finally {
-//                try {
-//                    reader.close();
-//                } catch (IOException e) {
-//
-//                    /* Do-Nothing */
-//                }
-//            }
-//        } catch (FileNotFoundException e) {
-//            setInitialLogin();
-//        }
-//    }
-//
-//    /**
-//     * Record an login
-//     */
-//    private static void recordLogins() {
-//        BufferedWriter bw = null;
-//        PrintWriter pw = null;
-//        try {
-//            bw = new BufferedWriter(new FileWriter(LOGIN_FILE, false));
-//            pw = new PrintWriter(bw, true);
-//
-//            // Record logins
-//            if (logins != null) {
-//                for (String s : logins) {
-//                    if (!s.equals(login)) {
-//                        pw.println(s);
-//                    }
-//                }
-//            }
-//            // Record the last Login used at the end of the file
-//            // in order to find it easily for the next time
-//            pw.println(login);
-//        } catch (IOException e) {
-//
-//            /* Do-Nothing */
-//        } finally {
-//            try {
-//                if (bw != null) {
-//                    bw.close();
-//                }
-//                if (pw != null) {
-//                    pw.close();
-//                }
-//            } catch (IOException e) {
-//
-//                /* Do-Nothing */
-//            }
-//        }
-//    }
+    //    /**
+    //     * Load Logins
+    //     */
+    //    private static void loadLogins() {
+    //        try {
+    //            BufferedReader reader = new BufferedReader(new FileReader(
+    //                        LOGIN_FILE));
+    //            try {
+    //                logins = new ArrayList<String>();
+    //                String login = null;
+    //                String lastUrl = null;
+    //                while ((login = reader.readLine()) != null) {
+    //                    logins.add(login);
+    //                    lastUrl = login;
+    //                }
+    //                int size = logins.size();
+    //                if (size > 0) {
+    //                    String[] hosts = new String[size];
+    //                    logins.toArray(hosts);
+    //                    Arrays.sort(hosts);
+    //                    loginCombo.setItems(hosts);
+    //                    loginCombo.setText(lastUrl);
+    //                } else {
+    //                    setInitialLogin();
+    //                }
+    //            } catch (IOException e) {
+    //
+    //                /* Do-nothing */
+    //            } finally {
+    //                try {
+    //                    reader.close();
+    //                } catch (IOException e) {
+    //
+    //                    /* Do-Nothing */
+    //                }
+    //            }
+    //        } catch (FileNotFoundException e) {
+    //            setInitialLogin();
+    //        }
+    //    }
+    //
+    //    /**
+    //     * Record an login
+    //     */
+    //    private static void recordLogins() {
+    //        BufferedWriter bw = null;
+    //        PrintWriter pw = null;
+    //        try {
+    //            bw = new BufferedWriter(new FileWriter(LOGIN_FILE, false));
+    //            pw = new PrintWriter(bw, true);
+    //
+    //            // Record logins
+    //            if (logins != null) {
+    //                for (String s : logins) {
+    //                    if (!s.equals(login)) {
+    //                        pw.println(s);
+    //                    }
+    //                }
+    //            }
+    //            // Record the last Login used at the end of the file
+    //            // in order to find it easily for the next time
+    //            pw.println(login);
+    //        } catch (IOException e) {
+    //
+    //            /* Do-Nothing */
+    //        } finally {
+    //            try {
+    //                if (bw != null) {
+    //                    bw.close();
+    //                }
+    //                if (pw != null) {
+    //                    pw.close();
+    //                }
+    //            } catch (IOException e) {
+    //
+    //                /* Do-Nothing */
+    //            }
+    //        }
+    //    }
 
     // -------------------------------------------------------------------- //
     // ------------------------------ public ------------------------------ //
@@ -423,16 +425,17 @@ public class SelectResourceManagerDialog extends Dialog {
                 MessageDialog.openError(parent, "Error", "The url is empty !");
                 return null;
             }
-//            if ((login == null) || login.trim().equals("")) {
-//                MessageDialog.openError(parent, "Error", "The login is empty !");
-//                return null;
-//            }
-//            if ((pwd == null) || pwd.trim().equals("")) {
-//                MessageDialog.openError(parent, "Error",
-//                    "The password is empty !");
-//                return null;
-//            }
-            return new SelectResourceManagerDialogResult(url);//, login, pwd, logAsAdmin);
+
+            //            if ((login == null) || login.trim().equals("")) {
+            //                MessageDialog.openError(parent, "Error", "The login is empty !");
+            //                return null;
+            //            }
+            //            if ((pwd == null) || pwd.trim().equals("")) {
+            //                MessageDialog.openError(parent, "Error",
+            //                    "The password is empty !");
+            //                return null;
+            //            }
+            return new SelectResourceManagerDialogResult(url); //, login, pwd, logAsAdmin);
         }
         return null;
     }
@@ -441,7 +444,7 @@ public class SelectResourceManagerDialog extends Dialog {
      * For saving login and url in files.
      */
     public static void saveInformations() {
-//        recordLogins();
+        //        recordLogins();
         recordUrls();
     }
 }

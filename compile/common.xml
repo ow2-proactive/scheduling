@@ -74,6 +74,7 @@
 	
 	<!-- Scheduler/Infrastructure Manager properties -->
 	<property name="scheduler-plugin.dir" value="${base.dir}/scheduler-plugins-src" />
+	<property name="resourcemanager-plugin.dir" value="${base.dir}/resource-manager-plugin-src" />
 	
 	<property name="stubgenerator.class" value="org.objectweb.proactive.ext.util.StubGenerator" />
 	

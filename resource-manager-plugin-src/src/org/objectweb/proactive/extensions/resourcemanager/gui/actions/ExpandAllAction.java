@@ -45,7 +45,7 @@ public class ExpandAllAction extends Action {
     private TreeViewer viewer = null;
 
     private ExpandAllAction(TreeViewer viewer) {
-    	this.viewer = viewer;
+        this.viewer = viewer;
         this.setText("Expand All");
         this.setToolTipText("To expand all items");
         this.setImageDescriptor(ImageDescriptor.createFromFile(
