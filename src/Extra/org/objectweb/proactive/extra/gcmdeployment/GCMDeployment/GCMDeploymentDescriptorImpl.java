@@ -36,6 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.junit.Test;
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
@@ -58,7 +62,9 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private GCMDeploymentResources resources;
 
     public GCMDeploymentDescriptorImpl(File descriptor,
-        Set<FileTransferBlock> ftBlocks) throws SAXException, IOException {
+        Set<FileTransferBlock> ftBlocks)
+        throws SAXException, IOException, XPathExpressionException,
+            TransformerException, ParserConfigurationException {
         parser = new GCMDeploymentParserImpl(descriptor);
         environment = parser.getEnvironment();
         resources = parser.getResources();

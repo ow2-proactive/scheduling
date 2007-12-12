@@ -41,6 +41,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -229,7 +230,11 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
         } catch (IOException e) {
-            // TODO: handle exception
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
+        } catch (TransformerException e) {
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
+        } catch (ParserConfigurationException e) {
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage(), e);
         }
 
         return nodeProvidersMap;

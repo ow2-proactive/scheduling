@@ -60,13 +60,20 @@ public class GCMEnvironmentParser implements GCMParserConstants {
     protected DocumentBuilderFactory domFactory;
     protected XPath xpath;
     protected DocumentBuilder documentBuilder;
-    protected List<String> schemas = new ArrayList<String>();
+    protected List<String> schemas = null;
     protected VariableContract variableContract;
     private static final String XPATH_ENVIRONMENT = "/*/pa:environment";
 
     public GCMEnvironmentParser(File descriptor)
         throws IOException, SAXException {
+        this(descriptor, null);
+    }
+
+    public GCMEnvironmentParser(File descriptor, List<String> userSchemas)
+        throws IOException, SAXException {
         variableContract = null;
+        schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas)
+                                        : new ArrayList<String>();
 
         setup();
 

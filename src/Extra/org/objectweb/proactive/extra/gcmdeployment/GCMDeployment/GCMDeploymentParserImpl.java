@@ -42,6 +42,8 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.validation.Schema;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -118,7 +120,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     protected Map<String, BridgeParser> bridgeParserMap;
     protected GCMDeploymentInfrastructure infrastructure;
 
-    //    protected GCMDeploymentEnvironment environment;
+    // protected GCMDeploymentEnvironment environment;
     protected GCMDeploymentResources resources;
     private VariableContract variableContract;
     private boolean parsedResource = false;
@@ -126,12 +128,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private File descriptor;
 
     public GCMDeploymentParserImpl(File descriptor)
-        throws IOException, SAXException {
+        throws IOException, SAXException, XPathExpressionException,
+            TransformerException, ParserConfigurationException {
         this(descriptor, null);
     }
 
     public GCMDeploymentParserImpl(File descriptor, List<String> userSchemas)
-        throws RuntimeException, SAXException, IOException {
+        throws RuntimeException, SAXException, IOException, TransformerException,
+            XPathExpressionException, ParserConfigurationException {
         this.descriptor = descriptor;
         infrastructure = new GCMDeploymentInfrastructure();
         resources = new GCMDeploymentResources();
@@ -148,7 +152,8 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerUserBridgeParsers();
         try {
             // process variables first
-            GCMEnvironmentParser environmentParser = new GCMEnvironmentParser(descriptor);
+            GCMEnvironmentParser environmentParser = new GCMEnvironmentParser(descriptor,
+                    userSchemas);
 
             Map<String, String> variableMap = environmentParser.getVariableMap();
 
@@ -162,12 +167,12 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
             // this blocks - use temp file until I figure it out
             //
-            //            PipedOutputStream pipedOutputStream = new PipedOutputStream();
+            // PipedOutputStream pipedOutputStream = new PipedOutputStream();
             //
-            //            InputSource inputSource = new InputSource(new PipedInputStream(
-            //            		pipedOutputStream));
+            // InputSource inputSource = new InputSource(new PipedInputStream(
+            // pipedOutputStream));
             //
-            //            descriptorProcessor.transform(pipedOutputStream);
+            // descriptorProcessor.transform(pipedOutputStream);
             //            
             File tempFile = File.createTempFile(descriptor.getName(), "tmp");
 
@@ -182,12 +187,24 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
 
             document = documentBuilder.parse(processedInputSource);
-        } catch (Exception e) {
+        } catch (SAXException e) {
             String msg = "parsing problem with document " +
                 descriptor.getCanonicalPath();
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " +
                 e.getMessage());
             throw new SAXException(msg, e);
+        } catch (XPathExpressionException e) {
+            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e);
+            throw e;
+        } catch (TransformerException e) {
+            String msg = "problem when evaluating variables with document " +
+                descriptor.getCanonicalPath();
+            GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " +
+                e.getMessage());
+            throw new TransformerException(msg, e);
+        } catch (ParserConfigurationException e) {
+            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e);
+            throw e;
         }
     }
 
@@ -230,7 +247,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     }
 
     public void setup() throws IOException {
-        //    	System.setProperty("jaxp.debug", "1");
+        // System.setProperty("jaxp.debug", "1");
         System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
             "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
 
@@ -253,9 +270,10 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         // DO NOT change the order here, it would break validation
         //
-        schemas.add(deploymentSchema);
-        schemas.add(extensionSchemas);
-        //        schemas.add(commonTypesSchema); // not needed - it is included by the deployment schema
+        schemas.add(0, extensionSchemas);
+        schemas.add(0, deploymentSchema);
+        // schemas.add(commonTypesSchema); // not needed - it is included by the
+        // deployment schema
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {
@@ -393,7 +411,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         String refid = GCMParserHelper.getAttributeValue(hostNode, "refid");
 
-        // FIXME glaurent XSD does not enforce keyref integrity so a check is needed to see if refid exist or not
         HostInfo hostInfo = getHostInfo(refid);
         group.setHostInfo(hostInfo);
     }
