@@ -54,9 +54,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.Task;
 @PublicAPI
 public class TaskFlowJob extends Job {
 
-    /** Serial Version UID */
-    private static final long serialVersionUID = 1623955669459590983L;
-
     /** List of task for the task flow job */
     private HashMap<String, Task> tasks = new HashMap<String, Task>();
 

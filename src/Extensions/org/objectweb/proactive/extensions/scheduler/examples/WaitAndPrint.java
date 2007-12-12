@@ -39,7 +39,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaE
 public class WaitAndPrint extends JavaExecutable {
 
     /**  */
-    private static final long serialVersionUID = 2518295052900092724L;
     public int sleepTime;
     public int number;
 

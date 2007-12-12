@@ -63,8 +63,6 @@ public class Test extends ComponentTest {
     /**
          *
          */
-    private static final long serialVersionUID = 4191582789150566643L;
-
     @Before
     public void createComponent() throws Exception {
         Component boot = Fractal.getBootstrapComponent();

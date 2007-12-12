@@ -49,7 +49,6 @@ import static junit.framework.Assert.assertTrue;
  * Test migration with location server and forwarder
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -8550542790438719546L;
     A a;
     MigratableA migratableA;
     SimpleLocationServer server;

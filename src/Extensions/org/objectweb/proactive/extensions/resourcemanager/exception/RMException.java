@@ -46,9 +46,6 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMConnection;
  */
 public class RMException extends Exception {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = 2432509637813486418L;
-
     /**
     * Attaches a message to the Exception
     * @param message message attached

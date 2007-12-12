@@ -69,7 +69,6 @@ public class SimpleMatlab extends JavaExecutable {
     /**
          *
          */
-    private static final long serialVersionUID = 1928510537227891918L;
 
     // This hostname, for debugging purpose
     protected String host;
@@ -548,8 +547,6 @@ public class SimpleMatlab extends JavaExecutable {
         /**
                  *
                  */
-        private static final long serialVersionUID = -434626212534426067L;
-
         public List<String> getJavaCommand() {
             String javaCommand = buildJavaCommand();
             List<String> javaCommandList = new ArrayList<String>();

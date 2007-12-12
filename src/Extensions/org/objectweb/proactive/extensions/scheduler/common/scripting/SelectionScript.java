@@ -48,7 +48,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class SelectionScript extends Script<Boolean> {
 
     /**  */
-    private static final long serialVersionUID = 120693403230482727L;
 
     /**
      * The variable name which must be set after the evaluation

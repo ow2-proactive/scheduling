@@ -72,9 +72,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  */
 public class RMNodeImpl implements RMNode, Serializable {
 
-    /** serial version UID */
-    private static final long serialVersionUID = -7612176229370058091L;
-
     /** associated logger */
     private static Logger logger = ProActiveLogger.getLogger(Loggers.RM_DATARESOURCE);
 

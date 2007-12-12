@@ -48,7 +48,6 @@ public class DummyControllerImpl extends AbstractProActiveController
     /**
          *
          */
-    private static final long serialVersionUID = 3802641387106106202L;
     private String dummyValue = null;
 
     /**

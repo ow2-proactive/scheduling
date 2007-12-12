@@ -44,8 +44,6 @@ public class Killer implements FTMessage {
     /**
          *
          */
-    private static final long serialVersionUID = 6735541194818684940L;
-
     public Killer() {
     }
 

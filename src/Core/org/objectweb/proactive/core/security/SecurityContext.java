@@ -45,7 +45,6 @@ public class SecurityContext implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -3210156951283073478L;
     private final Entities entitiesLocal;
     private final Entities entitiesDistant;
     private final Communication sendRequest;

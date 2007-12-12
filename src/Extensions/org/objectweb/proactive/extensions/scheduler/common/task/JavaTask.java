@@ -51,9 +51,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.TaskConstru
 @PublicAPI
 public class JavaTask extends Task {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = -2327189450547547292L;
-
     /** Task as an instance */
     private JavaExecutable taskInstance = null;
 

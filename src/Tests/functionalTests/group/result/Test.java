@@ -48,7 +48,6 @@ import static junit.framework.Assert.assertTrue;
  * @author Laurent Baduel
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -3291469024207693377L;
     private A resultTypedGroup = null;
     private A resultResultTypedGroup = null;
 

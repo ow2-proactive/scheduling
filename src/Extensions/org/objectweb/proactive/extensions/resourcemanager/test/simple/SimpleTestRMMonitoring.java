@@ -52,7 +52,6 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 
 public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
     Serializable {
-    private static final long serialVersionUID = 2L;
     private RMMonitoring imMonitoring;
 
     /**

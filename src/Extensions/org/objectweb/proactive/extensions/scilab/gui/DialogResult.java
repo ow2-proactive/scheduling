@@ -66,7 +66,6 @@ public class DialogResult extends javax.swing.JDialog {
     /**
          *
          */
-    private static final long serialVersionUID = -803945554182445086L;
     private JPanel pnlMain;
     private JLabel lblPath;
     private JPanel pnlPath;

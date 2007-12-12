@@ -41,7 +41,6 @@ import static junit.framework.Assert.assertFalse;
  * Test AO loop migration
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 38511988116531130L;
     String node1;
     String node2;
     A a;

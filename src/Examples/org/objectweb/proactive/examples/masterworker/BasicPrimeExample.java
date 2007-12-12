@@ -186,7 +186,6 @@ public class BasicPrimeExample extends AbstractExample {
         /**
                  *
                  */
-        private static final long serialVersionUID = -3118018812460915695L;
         private long begin;
         private long end;
         private long candidate;

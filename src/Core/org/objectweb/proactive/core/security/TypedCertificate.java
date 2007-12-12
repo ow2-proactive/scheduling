@@ -46,7 +46,6 @@ public class TypedCertificate implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -3389269734930919276L;
     private transient X509Certificate cert;
     private final EntityType type;
     private final PrivateKey privateKey;

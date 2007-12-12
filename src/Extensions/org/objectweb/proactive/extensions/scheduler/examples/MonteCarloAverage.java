@@ -35,10 +35,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaE
 
 
 public class MonteCarloAverage extends JavaExecutable {
-
-    /** Serial version UID */
-    private static final long serialVersionUID = -2762210298670871929L;
-
     @Override
     public Object execute(TaskResult... results) throws Throwable {
         double avrg = 0;

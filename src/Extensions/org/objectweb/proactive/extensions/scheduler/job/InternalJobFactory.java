@@ -59,9 +59,6 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  */
 public class InternalJobFactory implements Serializable {
 
-    /** Serial Version UID */
-    private static final long serialVersionUID = -7017115222916960404L;
-
     /**
      * Create a new internal job with the given job (user).
      *

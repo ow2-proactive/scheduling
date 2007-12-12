@@ -44,7 +44,6 @@ public class A implements Serializable, RunActive {
     /**
          *
          */
-    private static final long serialVersionUID = 5115640483342344013L;
     public static final int MAX_MIG = 20;
     String node1;
     String node2;

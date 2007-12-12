@@ -59,7 +59,6 @@ public class HierarchicalBarChart implements Chart {
     /**
      *
      */
-    private static final long serialVersionUID = 321266061715197229L;
     private static double CATEGORY_MARGIN = 0.0;
     private Element[] timers;
     private Comparable[] categories;

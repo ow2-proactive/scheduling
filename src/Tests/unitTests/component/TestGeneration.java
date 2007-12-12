@@ -39,8 +39,6 @@ import org.objectweb.proactive.core.component.gen.Utils;
  *
  */
 public class TestGeneration {
-    private static final long serialVersionUID = 3599379824812275514L;
-
     @org.junit.Test
     public void testEscapementInGeneratedClassName() throws Exception {
         Assert.assertEquals("CgeneratednonregressiontestCPcomponentCPgenerationCPItfCCOTypeCOitfCIunCrepresentative",

@@ -64,7 +64,6 @@ public class HalfFTManagerPMLRB extends FTManager {
     /**
          *
          */
-    private static final long serialVersionUID = 1882876243682793836L;
 
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_PML);

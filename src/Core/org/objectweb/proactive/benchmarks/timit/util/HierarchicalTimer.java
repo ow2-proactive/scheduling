@@ -56,7 +56,6 @@ public class HierarchicalTimer implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -6579163067813117881L;
     public static final int MAX_ENABLED_COUNTERS = 20;
     private static final int MAX_DEPTH = 3;
 

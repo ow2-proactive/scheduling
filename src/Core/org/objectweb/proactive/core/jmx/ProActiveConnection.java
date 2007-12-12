@@ -75,9 +75,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     ProActiveInternalObject {
 
     /**
-     * the serial version UID
+
      */
-    protected static final long serialVersionUID = 1245L;
     private transient MBeanServer mbs;
 
     //private HashMap<NotificationListener, ListenerAdapter> listenerMap = new HashMap<NotificationListener, ListenerAdapter>();

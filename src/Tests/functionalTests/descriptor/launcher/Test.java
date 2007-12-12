@@ -50,7 +50,6 @@ import static junit.framework.Assert.assertTrue;
  * @since ProActive 2.0.1
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -2153432590156382257L;
     private static String XML_LOCATION;
 
     static {

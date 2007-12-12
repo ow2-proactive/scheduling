@@ -39,7 +39,6 @@ public class GeneralResultImpl implements GeneralResult {
     /**
          *
          */
-    private static final long serialVersionUID = 5006133711230740830L;
     private String id;
     private int state;
     private long timeExecution;

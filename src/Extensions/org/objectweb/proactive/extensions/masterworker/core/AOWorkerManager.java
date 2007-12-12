@@ -84,7 +84,6 @@ public class AOWorkerManager implements WorkerManager,
     /**
          *
          */
-    private static final long serialVersionUID = -1488970573456417472L;
 
     /**
     * log4j logger for the worker manager

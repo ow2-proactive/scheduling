@@ -51,7 +51,6 @@ public class Test extends FunctionalTest {
     /**
          *
          */
-    private static final long serialVersionUID = 6700674087317492737L;
     private static String ONEVM_XML_LOCATION_UNIX = Test.class.getResource(
             "/functionalTests/descriptor/services/rmilookup/OneVM.xml").getPath();
     private static String LOOK_XML_LOCATION_UNIX = Test.class.getResource(

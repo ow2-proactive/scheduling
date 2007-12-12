@@ -51,7 +51,6 @@ import static junit.framework.Assert.assertTrue;
  * @since ProActive 2.0.1
  */
 public class P2pXmlTest extends FunctionalTest {
-    private static final long serialVersionUID = -3787507831019771599L;
     private static String P2P_XML_LOCATION_UNIX = P2pXmlTest.class.getResource(
             "/functionalTests/descriptor/services/p2p/TestP2P.xml").getPath();
 

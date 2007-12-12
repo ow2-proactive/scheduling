@@ -50,7 +50,6 @@ import org.objectweb.proactive.api.PAActiveObject;
  * @author ProActive Team
  */
 public class ConnectionListener implements NotificationListener, Serializable {
-    private static final long serialVersionUID = 651518694903154592L;
     private MBeanServerConnection connection;
 
     /**

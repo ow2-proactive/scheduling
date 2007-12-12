@@ -47,9 +47,6 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
  */
 public class AddingNodesException extends Exception {
 
-    /** Serial version UID*/
-    private static final long serialVersionUID = 0L;
-
     /**
     * Attaches a message to the Exception
     * @param msg message attached

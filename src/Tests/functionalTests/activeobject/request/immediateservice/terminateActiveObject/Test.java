@@ -40,7 +40,6 @@ import functionalTests.FunctionalTest;
  * Test immediate termination of an active object
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -5501538868583034371L;
     B b;
 
     @Before

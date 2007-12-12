@@ -46,7 +46,6 @@ public class OutputCommit implements FTMessage {
     /**
          *
          */
-    private static final long serialVersionUID = 8277241393322154618L;
     private long lastIndexToRetreive;
     private long firstIndexToRetreive;
 

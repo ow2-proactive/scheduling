@@ -62,7 +62,6 @@ public class Line2dChart implements Chart {
     /**
      *
      */
-    private static final long serialVersionUID = -3848003891108767655L;
     private Element[] series;
     private Comparable[] categories;
     private String wantedTag;

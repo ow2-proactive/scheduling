@@ -45,8 +45,6 @@ public class AOMatlabCollector extends AOSimpleMatlab {
     /**
          *
          */
-    private static final long serialVersionUID = -5140257280630144580L;
-
     public AOMatlabCollector() {
     }
 

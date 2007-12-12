@@ -36,7 +36,6 @@ import java.io.Serializable;
 public class ScriptHandler implements Serializable {
 
     /**  */
-    private static final long serialVersionUID = 6321493405892656541L;
 
     /**
      * ProActive Constructor

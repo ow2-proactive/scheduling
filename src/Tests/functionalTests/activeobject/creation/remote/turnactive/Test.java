@@ -42,7 +42,6 @@ import static junit.framework.Assert.assertTrue;
  * Test turnActive method on a remote node
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -1029555907940725925L;
     A a;
     String name;
     String nodeUrl;

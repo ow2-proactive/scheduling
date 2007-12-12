@@ -44,7 +44,6 @@ public class MSEngineWorker implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -815964410313302240L;
     private GeneralTask genTask;
     private GeneralResult genResult;
     private long dateStart;

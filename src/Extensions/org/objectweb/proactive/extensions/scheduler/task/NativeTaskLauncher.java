@@ -54,9 +54,6 @@ import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
  * @since ProActive 3.9
  */
 public class NativeTaskLauncher extends TaskLauncher {
-
-    /** Serial version UID */
-    private static final long serialVersionUID = 8574369410634220047L;
     private Process process;
 
     /**

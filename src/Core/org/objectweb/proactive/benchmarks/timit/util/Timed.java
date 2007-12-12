@@ -50,7 +50,6 @@ public class Timed implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -5295024562082646228L;
     private HierarchicalTimer timer;
     private EventObservable delegatedObservable;
     private TimItReductor timitReductor;

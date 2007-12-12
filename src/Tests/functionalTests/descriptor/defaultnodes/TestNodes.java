@@ -46,7 +46,6 @@ import functionalTests.FunctionalTest;
  *
  */
 public class TestNodes extends FunctionalTest {
-    private static final long serialVersionUID = 7106378819266760591L;
     private static String XML_LOCATION;
 
     static {

@@ -66,7 +66,6 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     /**
          *
          */
-    private static final long serialVersionUID = -7489033564540496244L;
 
     /**
     * pinger log4j logger

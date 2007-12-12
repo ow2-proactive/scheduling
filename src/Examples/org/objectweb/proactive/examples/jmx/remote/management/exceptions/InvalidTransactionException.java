@@ -35,7 +35,6 @@ public class InvalidTransactionException extends Exception {
     /**
      *
      */
-    private static final long serialVersionUID = -1727603023084034338L;
     private long id;
 
     public InvalidTransactionException(long id) {

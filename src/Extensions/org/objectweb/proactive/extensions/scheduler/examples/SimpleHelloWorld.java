@@ -93,8 +93,6 @@ public class SimpleHelloWorld {
             //******************** CREATE A NEW TASK ***********************
             //creating a new task
             JavaExecutable task = new JavaExecutable() {
-                    private static final long serialVersionUID = 1938122426482626365L;
-
                     @Override
                     public Object execute(TaskResult... results) {
                         System.out.println("Hello World !");

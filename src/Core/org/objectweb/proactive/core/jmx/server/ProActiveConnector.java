@@ -62,7 +62,6 @@ import org.objectweb.proactive.core.util.URIBuilder;
  */
 public class ProActiveConnector implements JMXConnector, Serializable,
     NotificationListener {
-    private static final long serialVersionUID = -4295401093312884914L;
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
     private ProActiveConnection connection;

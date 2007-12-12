@@ -42,7 +42,6 @@ public class NamedRuleEntity extends RuleEntity {
     /**
      *
      */
-    private static final long serialVersionUID = -2724922813544854253L;
     private final String name;
 
     public NamedRuleEntity(EntityType type, KeyStore keystore, String name)

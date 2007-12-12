@@ -49,7 +49,6 @@ import static junit.framework.Assert.assertTrue;
  * Created on Nov 8, 2005
  */
 public class TestVnActivated extends FunctionalTest {
-    private static final long serialVersionUID = 4947991801620598508L;
     private static final String XML_PATH = TestVnActivated.class.getResource(
             "/functionalTests/activeobject/creation/parallel/4_local.xml")
                                                                 .getPath();

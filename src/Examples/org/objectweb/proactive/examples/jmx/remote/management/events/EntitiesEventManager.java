@@ -64,7 +64,6 @@ public class EntitiesEventManager implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 6371894154663904329L;
     private static transient EntitiesEventManager instance;
     public static final String GATEWAY_ADDED = "Gateway added";
     public static final String GATEWAY_CONNECTED = "Gateway connected";

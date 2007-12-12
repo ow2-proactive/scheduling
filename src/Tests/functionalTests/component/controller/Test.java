@@ -55,7 +55,6 @@ public class Test extends ComponentTest {
     /**
          *
          */
-    private static final long serialVersionUID = 6072679061847402007L;
     Component componentA;
     String name;
     String nodeUrl;

@@ -107,9 +107,6 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLogg
  */
 public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
-    /** serial version UID */
-    private static final long serialVersionUID = 1581139478784832488L;
-
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 

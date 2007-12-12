@@ -56,7 +56,6 @@ public class Session implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 3314095815395811127L;
 
     // the session identifiant
     private long distantSessionID = 0;

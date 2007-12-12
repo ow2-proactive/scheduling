@@ -40,7 +40,6 @@ public class BundleAddedNotification extends BundleNotification {
     /**
      *
      */
-    private static final long serialVersionUID = 1L;
     private BundleInfo bundleInfo;
     private String url;
     private ObjectName on;

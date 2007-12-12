@@ -46,7 +46,6 @@ public class A implements InitActive, RunActive, EndActive,
     /**
          *
          */
-    private static final long serialVersionUID = -8916491354681028888L;
     private String name = "anonymous";
     private boolean onewayCallReceived = false;
 

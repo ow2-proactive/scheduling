@@ -44,7 +44,6 @@ public class IconRenderer extends DefaultTableCellRenderer {
     /**
          *
          */
-    private static final long serialVersionUID = -2879522014785077529L;
     JLabel res = new JLabel();
 
     @Override

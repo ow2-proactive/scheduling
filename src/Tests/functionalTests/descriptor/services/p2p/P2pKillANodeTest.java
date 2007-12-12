@@ -43,7 +43,6 @@ import org.objectweb.proactive.p2p.service.StartP2PService;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 public class P2pKillANodeTest extends FunctionalTest {
-    private static final long serialVersionUID = -3787507831019771599L;
     JVMProcessImpl process1;
     JVMProcessImpl process;
 

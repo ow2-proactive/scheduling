@@ -37,8 +37,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaE
 public class PropertyTask extends JavaExecutable {
 
     /**  */
-    private static final long serialVersionUID = -2536751215944833218L;
-
     @Override
     public Object execute(TaskResult... results) {
         try {

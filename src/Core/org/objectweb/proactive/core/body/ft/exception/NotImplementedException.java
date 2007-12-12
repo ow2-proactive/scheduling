@@ -40,7 +40,6 @@ public class NotImplementedException extends RuntimeException {
     /**
          *
          */
-    private static final long serialVersionUID = 4001870397538018429L;
 
     /**
     *

@@ -39,7 +39,6 @@ import static junit.framework.Assert.assertTrue;
  * Test stub generation for interface
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 7137686002811784615L;
     String result1;
     String result2;
 

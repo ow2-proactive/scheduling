@@ -60,7 +60,6 @@ public class Worker extends Timed {
     /**
      *
      */
-    private static final long serialVersionUID = 1190090440152932457L;
     private int rank;
 
     // Here, you have to declare all timer counters you want to use in this class :

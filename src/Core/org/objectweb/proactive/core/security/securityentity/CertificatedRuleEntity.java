@@ -45,7 +45,6 @@ public class CertificatedRuleEntity extends RuleEntity {
     /**
      *
      */
-    private static final long serialVersionUID = 6616484696945476576L;
     protected final TypedCertificate certificate;
 
     public CertificatedRuleEntity(EntityType type, KeyStore keystore,

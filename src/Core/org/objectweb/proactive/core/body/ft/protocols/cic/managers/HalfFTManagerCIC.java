@@ -65,7 +65,6 @@ public class HalfFTManagerCIC extends FTManager {
     /**
          *
          */
-    private static final long serialVersionUID = -8139927208797911404L;
 
     // message infos
     private MessageInfoCIC forSentMessage;

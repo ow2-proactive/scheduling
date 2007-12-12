@@ -38,7 +38,6 @@ public class MethodRepresentation implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -1309787919106266246L;
     private String name;
     private String[] sig;
     private String description;

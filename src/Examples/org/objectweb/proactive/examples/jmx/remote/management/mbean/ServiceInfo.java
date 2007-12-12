@@ -67,7 +67,6 @@ public class ServiceInfo implements Serializable, IJmx, DynamicMBean,
     /**
      *
      */
-    private static final long serialVersionUID = -1011117496984920813L;
     private Object actualService;
     private transient ServiceReference serviceReference;
     private BundleInfo bundleParent;

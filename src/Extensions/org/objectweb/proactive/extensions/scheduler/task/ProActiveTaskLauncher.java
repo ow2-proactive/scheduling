@@ -53,9 +53,6 @@ import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
  */
 public class ProActiveTaskLauncher extends TaskLauncher {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = 4655938634771399458L;
-
     /** execution nodes list */
     private NodeSet nodesList;
 

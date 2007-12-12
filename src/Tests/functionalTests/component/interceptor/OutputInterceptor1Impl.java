@@ -49,8 +49,6 @@ public class OutputInterceptor1Impl extends AbstractProActiveController
     /**
          *
          */
-    private static final long serialVersionUID = -1124383838566848964L;
-
     public OutputInterceptor1Impl(Component owner) {
         super(owner);
     }

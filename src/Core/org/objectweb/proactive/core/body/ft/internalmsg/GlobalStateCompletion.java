@@ -44,7 +44,6 @@ public class GlobalStateCompletion implements FTMessage {
     /**
          *
          */
-    private static final long serialVersionUID = -3950343920191825755L;
     private int index;
 
     /**

@@ -49,7 +49,6 @@ public class BenchmarkStatistics implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -2107445173337154096L;
     private HierarchicalTimerStatistics time;
     private EventStatistics events;
 

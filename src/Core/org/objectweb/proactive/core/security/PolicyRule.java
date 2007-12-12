@@ -41,7 +41,6 @@ public class PolicyRule implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -8290604572288562113L;
     private final RuleEntities from;
     private final RuleEntities to;
     private final Communication communicationReply;

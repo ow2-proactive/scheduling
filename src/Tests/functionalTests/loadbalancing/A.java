@@ -40,8 +40,6 @@ public class A implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 7562698745274296370L;
-
     public A() {
     }
 

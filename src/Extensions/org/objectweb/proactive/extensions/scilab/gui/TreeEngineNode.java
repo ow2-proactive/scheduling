@@ -38,7 +38,6 @@ public class TreeEngineNode extends DefaultMutableTreeNode {
     /**
          *
          */
-    private static final long serialVersionUID = 1475857816943927858L;
     public static final int VALID = 0;
     public static final int SUSPECT = 1;
     private int state = VALID;

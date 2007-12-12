@@ -74,7 +74,6 @@ public class OSGiFramework extends NotificationBroadcasterSupport
     /**
      *
      */
-    private static final long serialVersionUID = 6871230015619578483L;
     private String path;
     private transient BundleContext context;
     private transient ObjectName on;

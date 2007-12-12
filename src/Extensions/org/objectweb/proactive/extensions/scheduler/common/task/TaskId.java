@@ -56,9 +56,6 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
      */
     public static final int JOB_FACTOR = 1000;
 
-    /** Serial version UID */
-    private static final long serialVersionUID = -7367447876595953374L;
-
     /** the global id count */
     private static int currentId = 0;
 

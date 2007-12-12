@@ -44,8 +44,6 @@ import static junit.framework.Assert.assertTrue;
  * Test lookup and register in deployment descriptors
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -6581981842836211604L;
-
     // private static String FS = File.separator;
     private static String AGENT_XML_LOCATION_UNIX;
 

@@ -40,8 +40,6 @@ public class RuleEntities extends ArrayList<RuleEntity> {
     /**
      *
      */
-    private static final long serialVersionUID = -5629440174390543367L;
-
     public RuleEntities() {
         super();
     }

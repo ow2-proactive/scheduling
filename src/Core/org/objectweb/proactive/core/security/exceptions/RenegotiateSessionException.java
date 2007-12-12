@@ -47,7 +47,6 @@ public class RenegotiateSessionException extends Exception
     /**
      *
      */
-    private static final long serialVersionUID = 2159674076069020805L;
     protected UniversalBody body;
 
     /**

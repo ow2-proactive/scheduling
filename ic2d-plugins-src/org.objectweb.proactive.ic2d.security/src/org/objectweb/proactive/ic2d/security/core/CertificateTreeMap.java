@@ -41,5 +41,4 @@ public class CertificateTreeMap extends HashMap<CertificateTree, List<TypedCerti
     /**
      *
      */
-    private static final long serialVersionUID = 3833428238200053254L;
 }

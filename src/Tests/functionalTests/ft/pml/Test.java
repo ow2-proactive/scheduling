@@ -48,7 +48,6 @@ import static junit.framework.Assert.assertTrue;
  * Communications between passive object, non-ft active object and ft active object.
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -4220420197998713085L;
     private int result = 0;
     private JVMProcessImpl server;
     private static String FT_XML_LOCATION_UNIX = Test.class.getResource(

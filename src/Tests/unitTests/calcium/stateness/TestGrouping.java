@@ -118,6 +118,5 @@ public class TestGrouping {
     }
 
     static class Leaf implements Serializable {
-        private static final long serialVersionUID = 1L;
     }
 }

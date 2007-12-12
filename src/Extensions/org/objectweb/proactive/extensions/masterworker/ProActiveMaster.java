@@ -95,7 +95,6 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     /**
          *
          */
-    private static final long serialVersionUID = -8400896859797547714L;
     protected AOMaster aomaster = null;
     protected AOTaskRepository aorepository = null;
 

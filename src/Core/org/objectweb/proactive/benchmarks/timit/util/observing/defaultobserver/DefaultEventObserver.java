@@ -45,7 +45,6 @@ public class DefaultEventObserver implements EventObserver {
     /**
      *
      */
-    private static final long serialVersionUID = 1090600979208050233L;
     private DefaultEventData eventData;
     private String name;
 

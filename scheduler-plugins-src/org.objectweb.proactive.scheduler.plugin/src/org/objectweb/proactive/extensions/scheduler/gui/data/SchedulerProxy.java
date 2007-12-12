@@ -67,7 +67,6 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     public static final int LOGIN_OR_PASSWORD_WRONG = 1;
     public static final int COULD_NOT_CONNECT_SCHEDULER = 2;
     public static final int CONNECTION_REFUSED = 3;
-    private static final long serialVersionUID = 3783194235036041589L;
     private static SchedulerProxy instance = null;
     private UserSchedulerInterface scheduler = null;
     private String userName = null;

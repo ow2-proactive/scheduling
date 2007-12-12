@@ -60,9 +60,6 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
  */
 public class P2PNodeSource extends DynamicNodeSource implements InitActive {
 
-    /** serial version UID */
-    private static final long serialVersionUID = -9077907016230441233L;
-
     /** Peer to peer Service object which is interface to peer to peer network */
     private P2PService p2pService;
 

@@ -104,9 +104,6 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  */
 public abstract class NodeSource implements Serializable, InitActive, EndActive {
 
-    /** serial version UID */
-    private static final long serialVersionUID = 1L;
-
     /** RM logger */
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_CORE);
 

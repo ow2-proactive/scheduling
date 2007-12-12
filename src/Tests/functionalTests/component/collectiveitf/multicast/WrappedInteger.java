@@ -38,7 +38,6 @@ public class WrappedInteger implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 5411596900135491758L;
     private Integer intValue;
 
     public WrappedInteger() {

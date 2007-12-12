@@ -42,7 +42,6 @@ import static junit.framework.Assert.assertTrue;
  * Test newActive method on a remote node
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 6283316656144464814L;
     A a;
     String name;
     String nodeUrl;

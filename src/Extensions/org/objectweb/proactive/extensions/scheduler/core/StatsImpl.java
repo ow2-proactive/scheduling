@@ -46,9 +46,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.Tools;
  */
 public class StatsImpl implements Stats {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = 1986632393105294431L;
-
     /** Map of properties of the scheduler */
     private HashMap<String, Object> properties = new HashMap<String, Object>();
 

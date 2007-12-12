@@ -51,9 +51,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPrevi
  */
 public class TaskResultImpl implements TaskResult {
 
-    /** Serial Version UID */
-    private static final long serialVersionUID = 2976276079143998102L;
-
     /** The task identification of the result */
     private TaskId id = null;
 

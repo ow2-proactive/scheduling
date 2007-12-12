@@ -70,9 +70,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  */
 public class RMUserImpl implements RMUser, InitActive {
 
-    /** serial version UID */
-    private static final long serialVersionUID = 1L;
-
     /** Log4J logger name for RMUser */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.RM_USER);
 

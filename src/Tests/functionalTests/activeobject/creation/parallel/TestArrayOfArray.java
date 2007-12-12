@@ -50,7 +50,6 @@ import static junit.framework.Assert.assertTrue;
  * Created on Nov 8, 2005
  */
 public class TestArrayOfArray extends FunctionalTest {
-    private static final long serialVersionUID = -1371427361062549957L;
     private static final String XML_PATH = TestVnNotActivated.class.getResource(
             "/functionalTests/activeobject/creation/parallel/4_local.xml")
                                                                    .getPath();

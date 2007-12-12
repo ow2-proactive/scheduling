@@ -45,7 +45,6 @@ public class SampleObject implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -6487329851736398592L;
     private String name;
 
     public SampleObject() {

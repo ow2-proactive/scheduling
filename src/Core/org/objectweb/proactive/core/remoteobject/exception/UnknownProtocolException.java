@@ -35,7 +35,7 @@ import org.objectweb.proactive.core.ProActiveException;
 
 
 /**
- * This exception is thrown when the protocol is unknown by the remote 
+ * This exception is thrown when the protocol is unknown by the remote
  * object framework.
  * @author acontes
  */
@@ -45,8 +45,6 @@ public class UnknownProtocolException extends ProActiveException {
     /**
     *
     */
-    private static final long serialVersionUID = 2157668587034907154L;
-
     public UnknownProtocolException() {
         super();
     }

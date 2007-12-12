@@ -42,7 +42,6 @@ public class A implements Serializable, RunActive {
     /**
          *
          */
-    private static final long serialVersionUID = -2006727574867723226L;
     DummyObject dum;
 
     public A() {

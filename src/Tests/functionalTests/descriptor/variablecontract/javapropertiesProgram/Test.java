@@ -47,7 +47,6 @@ import static junit.framework.Assert.assertTrue;
  * Tests conditions for variables of type JavaPropertiesProgram
  */
 public class Test extends FunctionalTest {
-    static final long serialVersionUID = 1;
     private static String XML_LOCATION = Test.class.getResource(
             "/functionalTests/descriptor/variablecontract/javapropertiesProgram/Test.xml")
                                                    .getPath();

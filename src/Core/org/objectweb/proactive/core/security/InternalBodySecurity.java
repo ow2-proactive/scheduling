@@ -53,7 +53,6 @@ public class InternalBodySecurity implements SecurityEntity {
     /**
          *
          */
-    private static final long serialVersionUID = -2486146998877256304L;
     protected SecurityEntity distantBody;
 
     public InternalBodySecurity(UniversalBody distantBody) {

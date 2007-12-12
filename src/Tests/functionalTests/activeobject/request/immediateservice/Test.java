@@ -41,7 +41,6 @@ import static junit.framework.Assert.assertTrue;
  * Test immediateService method on an AO
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -3419716072002687705L;
     A a;
     DummyObject dum;
     String name;

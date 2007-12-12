@@ -74,7 +74,6 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     /**
          *
          */
-    private static final long serialVersionUID = 524923697097028320L;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     // note that we do not want to serialize this member but rather handle

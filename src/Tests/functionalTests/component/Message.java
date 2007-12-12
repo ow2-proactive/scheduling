@@ -42,7 +42,6 @@ public class Message implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 7172398116571652345L;
     String message;
     boolean valid = true;
 

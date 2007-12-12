@@ -44,7 +44,6 @@ public class ComponentA implements Serializable, ComponentInfo {
     /**
          *
          */
-    private static final long serialVersionUID = -167227859096739545L;
     String name;
 
     public ComponentA() {

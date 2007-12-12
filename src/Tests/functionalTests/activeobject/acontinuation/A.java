@@ -39,7 +39,6 @@ public class A implements java.io.Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 5362621066324170354L;
     boolean isFuture = true;
     private A deleguate;
     Id id;

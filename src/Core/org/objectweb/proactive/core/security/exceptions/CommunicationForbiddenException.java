@@ -40,8 +40,6 @@ public class CommunicationForbiddenException extends Exception {
     /**
      *
      */
-    private static final long serialVersionUID = 6854171458569221401L;
-
     public CommunicationForbiddenException() {
         super();
     }

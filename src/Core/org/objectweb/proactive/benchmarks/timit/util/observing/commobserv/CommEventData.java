@@ -44,7 +44,6 @@ public class CommEventData implements EventData {
     /**
      *
      */
-    private static final long serialVersionUID = -5062574158941020818L;
     private String name;
     private int subjectRank;
     private int[] markedCommunication;

@@ -45,7 +45,6 @@ public class AOSimpleMatlab implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -933248120525832351L;
     static String nl = System.getProperty("line.separator");
     private String inputScript = null;
     private ArrayList<String> scriptLines = new ArrayList<String>();

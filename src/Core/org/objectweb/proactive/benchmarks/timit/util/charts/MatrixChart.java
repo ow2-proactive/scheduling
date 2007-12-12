@@ -81,7 +81,6 @@ public class MatrixChart implements Chart {
     /**
      *
      */
-    private static final long serialVersionUID = -9045078395503131290L;
     public static final URL logoFile = MatrixChart.class.getResource(
             "/org/objectweb/proactive/benchmarks/timit/pics/TimItProActive.png");
     private Chart.LegendFormat legendFormatMode;
@@ -332,7 +331,6 @@ public class MatrixChart implements Chart {
         /**
          *
          */
-        private static final long serialVersionUID = -7987810288979911261L;
 
         /** The current viewed row */
         private int currentRow = 0;
@@ -474,8 +472,6 @@ public class MatrixChart implements Chart {
         /**
          *
          */
-        private static final long serialVersionUID = -1624475755178533032L;
-
         public CustomAxis(String labelName) {
             super(labelName);
         }
@@ -527,8 +523,6 @@ public class MatrixChart implements Chart {
         /**
          *
          */
-        private static final long serialVersionUID = -6476772736783076413L;
-
         public CustomTickUnit(double size) {
             super(size);
         }

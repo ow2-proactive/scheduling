@@ -49,9 +49,6 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  */
 public class TaskDescriptor implements Serializable {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = -3597161883966090934L;
-
     /** Task id */
     private TaskId id;
 

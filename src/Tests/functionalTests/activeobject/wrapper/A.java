@@ -55,8 +55,6 @@ public class A implements RunActive, Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -681586215164175864L;
-
     public A() {
     }
 

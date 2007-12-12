@@ -43,7 +43,6 @@ import javax.script.ScriptEngineManager;
 public class SimpleScript extends Script {
 
     /**  */
-    private static final long serialVersionUID = -263217514047549052L;
 
     /**  */
     private String id = null;

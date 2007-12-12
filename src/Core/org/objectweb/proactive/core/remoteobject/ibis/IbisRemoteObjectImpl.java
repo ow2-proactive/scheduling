@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  */
 public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
     implements IbisRemoteObject {
-    private static final long serialVersionUID = -1989838338769716953L;
     private transient InternalRemoteRemoteObject remoteObject;
 
     public IbisRemoteObjectImpl() throws ibis.rmi.RemoteException {

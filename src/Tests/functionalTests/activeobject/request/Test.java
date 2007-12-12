@@ -40,7 +40,6 @@ import static junit.framework.Assert.assertTrue;
  * Test blocking request, and calling void, int returned type and object returned type method
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 5390683714407366750L;
     A activeA;
     A javaA;
     int counterActiveA;

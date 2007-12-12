@@ -54,7 +54,6 @@ public class Test extends ComponentTest {
     /**
          *
          */
-    private static final long serialVersionUID = 4444015607362310548L;
     Component compA;
     Component compB1;
     Component compB2;

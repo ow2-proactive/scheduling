@@ -44,7 +44,6 @@ public class Heartbeat implements FTMessage {
     /**
          *
          */
-    private static final long serialVersionUID = 1990752542736468465L;
 
     /**
     * Create a new heartbeat message.

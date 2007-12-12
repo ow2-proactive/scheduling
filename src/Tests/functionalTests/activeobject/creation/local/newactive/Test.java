@@ -42,7 +42,6 @@ import static junit.framework.Assert.assertTrue;
  * Test newActive method on the local default node
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 8174997414009997078L;
     A a;
     String name;
     String nodeUrl;

@@ -44,7 +44,6 @@ public class Communication implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -4624752375050653382L;
     private final Authorization authentication;
     private final Authorization confidentiality;
     private final Authorization integrity;

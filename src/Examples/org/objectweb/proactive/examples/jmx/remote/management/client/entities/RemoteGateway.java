@@ -56,7 +56,6 @@ import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
  */
 public class RemoteGateway extends ManageableEntity implements Serializable,
     RemoteEntity, Transactionnable {
-    private static final long serialVersionUID = 7328040934879913911L;
     private ObjectName on;
     private long currentTransactionId;
     private String url;

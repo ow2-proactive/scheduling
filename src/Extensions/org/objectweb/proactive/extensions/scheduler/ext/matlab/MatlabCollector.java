@@ -40,8 +40,6 @@ public class MatlabCollector extends SimpleMatlab {
     /**
      *
      */
-    private static final long serialVersionUID = 8172262790006689713L;
-
     public MatlabCollector() {
     }
 

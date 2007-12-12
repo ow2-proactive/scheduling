@@ -55,7 +55,6 @@ import static junit.framework.Assert.assertTrue;
  * Tests that both schemes work using the ProActive FileTransfer API
  */
 public class TestDeployRetrieve extends FunctionalTest {
-    static final long serialVersionUID = 1;
     private static Logger logger = ProActiveLogger.getLogger("functionalTests");
     private static String XML_LOCATION = TestAPI.class.getResource(
             "/functionalTests/filetransfer/TestDeployRetrieve.xml").getPath();

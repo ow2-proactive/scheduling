@@ -44,8 +44,6 @@ public class CertificateTreeList extends ArrayList<CertificateTree> {
     /**
      *
      */
-    private static final long serialVersionUID = 8097072392302851020L;
-
     public CertificateTreeList() {
         super();
     }

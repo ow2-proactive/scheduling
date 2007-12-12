@@ -46,9 +46,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.Execu
  */
 public abstract class InternalAbstractJavaTask extends InternalTask {
 
-    /** Serial Version UID  */
-    private static final long serialVersionUID = 1340022492862249182L;
-
     /** Class instance of the class to instantiate. */
     protected Class<?extends Executable> taskClass;
 

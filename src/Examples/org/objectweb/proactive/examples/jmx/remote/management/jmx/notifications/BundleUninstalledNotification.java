@@ -40,7 +40,6 @@ public class BundleUninstalledNotification extends BundleNotification {
     /**
              *
              */
-    private static final long serialVersionUID = 6144032772861355442L;
     private ObjectName on;
     private String message;
     private String url;

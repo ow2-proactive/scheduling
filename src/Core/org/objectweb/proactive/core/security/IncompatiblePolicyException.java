@@ -35,8 +35,6 @@ public class IncompatiblePolicyException extends RuntimeException {
     /**
          *
          */
-    private static final long serialVersionUID = -265837841620216559L;
-
     public IncompatiblePolicyException() {
         super();
     }

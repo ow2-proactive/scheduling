@@ -70,9 +70,6 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
     private static int currentSort = SORT_BY_ID;
     private static int currentOrder = ASC_ORDER;
 
-    /** Serial version UID */
-    private static final long serialVersionUID = 1565033147327965656L;
-
     /** Owner of the job */
     private String owner = "";
 

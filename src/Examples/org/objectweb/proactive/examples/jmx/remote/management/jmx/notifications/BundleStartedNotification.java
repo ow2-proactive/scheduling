@@ -54,8 +54,6 @@ public class BundleStartedNotification extends BundleNotification {
     /**
      *
      */
-    private static final long serialVersionUID = 1L;
-
     @Override
     public BundleInfo getBundleInfo() {
         return this.bundleInfo;

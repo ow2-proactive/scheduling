@@ -80,7 +80,6 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     /**
          *
          */
-    private static final long serialVersionUID = 3052592435278639241L;
 
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------

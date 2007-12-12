@@ -63,7 +63,6 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
     /**
          *
          */
-    private static final long serialVersionUID = 9091467877589392360L;
 
     /**
     * Cache the ID of the Body locally for speed

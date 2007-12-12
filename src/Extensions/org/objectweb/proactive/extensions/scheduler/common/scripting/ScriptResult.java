@@ -36,7 +36,6 @@ import java.io.Serializable;
 public class ScriptResult<E> implements Serializable {
 
     /**  */
-    private static final long serialVersionUID = 2665277848502662458L;
     private E result = null;
     private Throwable exception = null;
 

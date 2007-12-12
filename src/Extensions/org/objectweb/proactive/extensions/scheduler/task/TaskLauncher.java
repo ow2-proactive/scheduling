@@ -74,7 +74,6 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.LoggingOut
  * @since ProActive 3.9
  */
 public class TaskLauncher implements InitActive {
-    private static final long serialVersionUID = -9159607482957244049L;
     protected TaskId taskId;
     protected Script<?> pre;
 

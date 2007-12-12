@@ -39,7 +39,6 @@ public class A implements Task<Integer> {
     /**
          *
          */
-    private static final long serialVersionUID = -7987484979718521364L;
     private int taskcounter;
     private long delay;
     private boolean exception;

@@ -44,7 +44,6 @@ import static junit.framework.Assert.assertTrue;
  * Test coallocation in deployment descriptors
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 1869140219007735164L;
     ProActiveDescriptor proActiveDescriptor;
     private static String AGENT_XML_LOCATION_UNIX = null;
 

@@ -92,7 +92,6 @@ public class ProActiveSecurityManager implements Serializable /*, SecurityEntity
     /**
          *
          */
-    private static final long serialVersionUID = -7334116392720150964L;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER);
 
     /* contains all active sessions for the current active object */

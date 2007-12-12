@@ -17,7 +17,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class DependenceFailedException extends RuntimeException {
 
     /**  */
-    private static final long serialVersionUID = -2407982905465733418L;
 
     /**
     * Create a new instance of JobCreationException with the given messag

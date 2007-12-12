@@ -44,9 +44,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class UserException extends Exception {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = 3408315072563808188L;
-
     /**
     * Attaches a message to the Exception.
     *

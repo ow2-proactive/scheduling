@@ -57,7 +57,6 @@ public class DialogLegend extends javax.swing.JDialog {
     /**
          *
          */
-    private static final long serialVersionUID = 6549328184403592998L;
     private JPanel pnlTaskWait;
     private JPanel pnlTaskRun;
     private JPanel pnlTaskEnd;
@@ -108,8 +107,6 @@ public class DialogLegend extends javax.swing.JDialog {
                             /**
                                          *
                                          */
-                            private static final long serialVersionUID = 6126219757994056557L;
-
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -133,8 +130,6 @@ public class DialogLegend extends javax.swing.JDialog {
                             /**
                                          *
                                          */
-                            private static final long serialVersionUID = 825828661786789883L;
-
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -176,8 +171,6 @@ public class DialogLegend extends javax.swing.JDialog {
                             /**
                                          *
                                          */
-                            private static final long serialVersionUID = -4360589620462031715L;
-
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -201,8 +194,6 @@ public class DialogLegend extends javax.swing.JDialog {
                             /**
                                          *
                                          */
-                            private static final long serialVersionUID = -8143023097232932524L;
-
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -242,8 +233,6 @@ public class DialogLegend extends javax.swing.JDialog {
                             /**
                                          *
                                          */
-                            private static final long serialVersionUID = -5919733083275533178L;
-
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);
@@ -267,8 +256,6 @@ public class DialogLegend extends javax.swing.JDialog {
                             /**
                                          *
                                          */
-                            private static final long serialVersionUID = 1891961450729453972L;
-
                             @Override
                             public void paintComponent(Graphics g) {
                                 super.paintComponent(g);

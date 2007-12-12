@@ -42,7 +42,6 @@ import static junit.framework.Assert.assertTrue;
  * Test AO simple migration
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -7610928539081956490L;
     A a;
     Node sameVmNode;
     Node localVmNode;

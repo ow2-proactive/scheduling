@@ -61,7 +61,6 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     /**
          *
          */
-    private static final long serialVersionUID = 7024758149949993234L;
     protected UniversalBody wrappedBody;
     protected long time;
     protected UniqueID id;

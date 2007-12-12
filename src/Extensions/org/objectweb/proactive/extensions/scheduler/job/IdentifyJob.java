@@ -45,9 +45,6 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobId;
  */
 public class IdentifyJob implements Serializable {
 
-    /** serial version UID */
-    private static final long serialVersionUID = 9100796464303741891L;
-
     /** Job Identification */
     private JobId jobId;
 

@@ -119,9 +119,6 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
 public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
     Serializable {
 
-    /** serial version UID */
-    private static final long serialVersionUID = -6005871512766524208L;
-
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_CORE);
 

@@ -41,7 +41,6 @@ public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
     /**
          *
          */
-    private static final long serialVersionUID = -6885646803779608858L;
 
     //	private transient Logger logger;
     public DefaultProActiveSecurityManager(EntityType type)

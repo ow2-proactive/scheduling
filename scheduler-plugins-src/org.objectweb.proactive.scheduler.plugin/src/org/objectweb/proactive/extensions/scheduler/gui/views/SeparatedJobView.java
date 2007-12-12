@@ -87,7 +87,6 @@ public class SeparatedJobView extends ViewPart {
 
     /** the view part id */
     public static final String ID = "org.objectweb.proactive.extensions.scheduler.gui.views.SeparatedJobView";
-    private static final long serialVersionUID = -6958852991395601640L;
     private static JobComposite jobComposite = null;
     private static AbstractJobComposite pendingJobComposite = null;
     private static AbstractJobComposite runningJobComposite = null;

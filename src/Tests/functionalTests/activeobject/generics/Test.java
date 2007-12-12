@@ -53,8 +53,6 @@ import static junit.framework.Assert.assertTrue;
  * @author Matthieu Morel
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -3311965940327392139L;
-
     @org.junit.Test
     public void action() throws Exception {
         //      new active with '_' in classname of a parametized type.

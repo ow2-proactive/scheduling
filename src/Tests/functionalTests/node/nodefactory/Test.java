@@ -45,7 +45,6 @@ import static junit.framework.Assert.assertTrue;
  * Test the creation of rmi, ibis node whith the factory
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -303170046021003591L;
     Node rmiNode;
     private String rmiURL;
 

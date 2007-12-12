@@ -48,9 +48,6 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  */
 public class InternalProActiveJob extends InternalJob {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = 5793055959400444968L;
-
     /**
      * ProActive empty constructor.
      */

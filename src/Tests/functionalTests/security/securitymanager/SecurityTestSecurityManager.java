@@ -48,7 +48,6 @@ import static junit.framework.Assert.assertNotNull;
  *
  */
 public class SecurityTestSecurityManager extends FunctionalTest {
-    private static final long serialVersionUID = -3414159361865609323L;
     private ProActiveSecurityManager psm = null;
     private ProActiveSecurityManager psm2 = null;
 

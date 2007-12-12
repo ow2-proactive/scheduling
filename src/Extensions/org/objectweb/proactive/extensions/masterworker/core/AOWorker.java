@@ -64,7 +64,6 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
     /**
          *
          */
-    private static final long serialVersionUID = 2385554161935080046L;
 
     /**
     * log4j logger of the worker

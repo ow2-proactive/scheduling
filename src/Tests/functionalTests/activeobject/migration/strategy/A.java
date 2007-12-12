@@ -46,7 +46,6 @@ public class A implements Serializable, RunActive {
     /**
          *
          */
-    private static final long serialVersionUID = -1563516776788920760L;
     int counter = 0;
     private MigrationStrategyManager migrationStrategyManager;
     private MigrationStrategy migrationStrategy;

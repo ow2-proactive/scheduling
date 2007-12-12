@@ -47,7 +47,6 @@ public class MessageInfoCIC implements MessageInfo {
     /**
          *
          */
-    private static final long serialVersionUID = 4847104774963985302L;
 
     // checkpointing protocol
     public char checkpointIndex;

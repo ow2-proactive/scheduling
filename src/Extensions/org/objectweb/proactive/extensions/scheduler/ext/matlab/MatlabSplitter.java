@@ -41,7 +41,6 @@ public class MatlabSplitter extends SimpleMatlab {
     /**
      *
      */
-    private static final long serialVersionUID = -5667273368988117301L;
     private static AOMatlabSplitter splitterWorker = null;
     private int numberOfChildren;
 

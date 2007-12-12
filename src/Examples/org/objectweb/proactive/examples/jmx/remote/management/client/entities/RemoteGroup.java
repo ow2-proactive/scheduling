@@ -59,7 +59,6 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
     /**
      *
      */
-    private static final long serialVersionUID = 1L;
     private ManageableEntity entities;
     private Group<ManageableEntity> gEntities;
     private String name;

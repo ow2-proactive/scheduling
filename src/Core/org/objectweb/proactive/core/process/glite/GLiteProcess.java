@@ -65,7 +65,6 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
     /**
      * Firsts parameters
      */
-    private static final long serialVersionUID = 1L;
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected static final String DEFAULT_COMMAND_PATH = "glite-job-submit";
     protected static final String DEFAULT_FILE_LOCATION = System.getProperty(

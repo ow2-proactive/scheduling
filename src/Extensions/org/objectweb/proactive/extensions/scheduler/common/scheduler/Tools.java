@@ -46,9 +46,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class Tools implements Serializable {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = 2410081686855631412L;
-
     /**
      * Format the given integer 'toFormat' to a String containing 'nbChar'
      * characters

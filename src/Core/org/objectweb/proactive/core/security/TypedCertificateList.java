@@ -39,8 +39,6 @@ public class TypedCertificateList extends ArrayList<TypedCertificate> {
     /**
      *
      */
-    private static final long serialVersionUID = 4754182179785159674L;
-
     public Certificate[] certsToArray() {
         Certificate[] array = new Certificate[this.size()];
         for (int i = 0; i < this.size(); i++) {

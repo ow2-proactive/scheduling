@@ -41,7 +41,6 @@ import functionalTests.FunctionalTest;
  * Stub generation on abstract classes
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 69064608102818965L;
     String stubClassName;
     byte[] data;
 

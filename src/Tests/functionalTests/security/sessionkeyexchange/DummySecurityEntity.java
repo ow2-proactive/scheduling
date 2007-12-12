@@ -53,7 +53,6 @@ public class DummySecurityEntity implements SecurityEntity {
     /**
          *
          */
-    private static final long serialVersionUID = -5293341556904690052L;
     private ProActiveSecurityManager securityManager;
 
     public DummySecurityEntity(ProActiveSecurityManager securityManager) {

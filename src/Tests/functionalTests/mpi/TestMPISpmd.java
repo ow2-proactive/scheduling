@@ -48,7 +48,6 @@ import static junit.framework.Assert.assertTrue;
  * Tests if dependency is well ensured between processes. That is MPISpmd object is created from a Virtual Node.
  */
 public class TestMPISpmd extends FunctionalTest {
-    static final long serialVersionUID = 1;
     private static Logger logger = ProActiveLogger.getLogger("functionalTests");
     private static String XML_FILE = TestMPISpmd.class.getResource(
             "/functionalTests/mpi/MPILocal-descriptor.xml").getPath();

@@ -41,7 +41,6 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
  * Test multiple migration with method call
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -1990961843638689934L;
     A a;
 
     @Before

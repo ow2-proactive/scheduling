@@ -44,7 +44,6 @@ public class SecurityMigrationException extends MigrationException {
     /**
      *
      */
-    private static final long serialVersionUID = 300940928165011339L;
 
     /**
      *

@@ -58,7 +58,6 @@ public class SciTestCalcium implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -4818541143376680296L;
 
     /*
             private Skeleton<SciTask> root;

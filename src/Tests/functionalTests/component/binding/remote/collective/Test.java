@@ -60,7 +60,6 @@ public class Test extends ComponentTest {
     /**
          *
          */
-    private static final long serialVersionUID = -2951919520858323164L;
     public static String MESSAGE = "-->Main";
     Component pD1;
     Component pB1;

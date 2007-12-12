@@ -49,8 +49,6 @@ public class ActiveNotificationListener implements Serializable,
     /**
      *
      */
-    private static final long serialVersionUID = 8099866747677304010L;
-
     public ActiveNotificationListener() {
     }
 

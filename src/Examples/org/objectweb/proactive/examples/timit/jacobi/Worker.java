@@ -49,7 +49,6 @@ public class Worker extends Timed implements java.io.Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 3829306560222826269L;
     public static final boolean COMMUNICATION_PATTERN_OBSERVING_MODE = true;
 
     /** ORIENTATION */

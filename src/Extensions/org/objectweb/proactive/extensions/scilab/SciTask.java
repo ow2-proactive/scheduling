@@ -56,7 +56,6 @@ public class SciTask extends AbstractGeneralTask {
     /**
          *
          */
-    private static final long serialVersionUID = 1995967729621014754L;
     private static boolean initialized = false;
     private ArrayList<SciData> listDataIn;
 

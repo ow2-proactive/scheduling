@@ -43,8 +43,6 @@ import functionalTests.FunctionalTest;
  *
  */
 public class SecurityTestKeyGen extends FunctionalTest {
-    private static final long serialVersionUID = 6453945881218909030L;
-
     @Test
     public void action() throws Exception {
         ProActiveSecurity.loadProvider();

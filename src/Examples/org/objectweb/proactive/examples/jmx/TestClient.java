@@ -64,7 +64,6 @@ import org.objectweb.proactive.core.util.URIBuilder;
  *
  */
 public class TestClient implements NotificationListener, Serializable {
-    private static final long serialVersionUID = -4075612313448881287L;
     private transient ClientConnector cc;
     private transient ProActiveConnection connection;
     private transient JMXConnector connector;

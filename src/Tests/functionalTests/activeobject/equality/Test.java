@@ -52,7 +52,7 @@ public class Test extends FunctionalTest {
 
     /*
      * XXX: FIXME Disabled
-            private static final long serialVersionUID = 1450115095761511338L;
+
             private A group1 = null;
         private A group2 = null;
         private A group3 = null;

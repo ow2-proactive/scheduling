@@ -109,7 +109,6 @@ public class VirtualNodeImpl extends NodeCreationEventProducerImpl
     /**
          *
          */
-    private static final long serialVersionUID = -4112836381808692922L;
 
     /** Logger */
     private final static Logger P2P_LOGGER = ProActiveLogger.getLogger(Loggers.P2P_VN);

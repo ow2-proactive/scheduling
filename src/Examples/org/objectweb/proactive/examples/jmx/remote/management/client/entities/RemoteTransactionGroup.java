@@ -47,7 +47,6 @@ public class RemoteTransactionGroup extends ManageableEntity
     /**
      *
      */
-    private static final long serialVersionUID = -7754791636990302445L;
     private String name;
     private ManageableEntity entities;
     private Group<ManageableEntity> gEntities;

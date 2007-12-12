@@ -44,7 +44,6 @@ public class GenericTypeWrapper<T extends Object> implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 6165789939643190366L;
     private T o;
 
     /**

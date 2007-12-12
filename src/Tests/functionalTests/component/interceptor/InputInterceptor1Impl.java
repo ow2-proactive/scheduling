@@ -52,7 +52,6 @@ public class InputInterceptor1Impl extends AbstractProActiveController
     /**
          *
          */
-    private static final long serialVersionUID = -855162283473328497L;
     private int beforeInvocationCounter = 0;
     private int afterInvocationCounter = 0;
 

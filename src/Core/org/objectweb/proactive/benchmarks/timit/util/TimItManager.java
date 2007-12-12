@@ -48,7 +48,6 @@ public class TimItManager implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -2687394905241420341L;
     private static TimItManager instance = new TimItManager();
     private BenchmarkStatistics benchStats;
     private TimItReductor timitReductor;

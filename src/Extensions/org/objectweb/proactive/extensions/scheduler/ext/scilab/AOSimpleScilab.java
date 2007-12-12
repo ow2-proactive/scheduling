@@ -53,7 +53,6 @@ public class AOSimpleScilab implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -267156251320729618L;
     static String nl = System.getProperty("line.separator");
     private String inputScript = null;
     private String[] outputVars = null;

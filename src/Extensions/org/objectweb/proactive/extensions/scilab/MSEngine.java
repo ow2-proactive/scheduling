@@ -55,7 +55,6 @@ public class MSEngine implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -5906306770453347764L;
     private MSEngineWorker mSEngineWorker;
     private String idEngine;
     private JVMProcessImpl process;

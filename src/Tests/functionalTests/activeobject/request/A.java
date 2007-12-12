@@ -48,7 +48,6 @@ public class A implements Serializable, RunActive {
     /**
          *
          */
-    private static final long serialVersionUID = 7313731330586627985L;
     int counter = 0;
 
     // for ACs after termination test

@@ -42,5 +42,4 @@ public class TransactionCommitedNotification extends TransactionNotification {
     /**
      *
      */
-    private static final long serialVersionUID = 1L;
 }

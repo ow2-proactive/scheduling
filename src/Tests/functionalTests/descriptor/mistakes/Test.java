@@ -41,7 +41,6 @@ import static junit.framework.Assert.assertTrue;
  * Test service: variable support and mistakes in deployment descriptor
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 8303982699999215955L;
     private static String TESTMISTAKES_XML_LOCATION_UNIX = Test.class.getResource(
             "/functionalTests/descriptor/mistakes/testMistakes.xml").getPath();
     private static String TESTVARIABLES_XML_LOCATION_UNIX = Test.class.getResource(

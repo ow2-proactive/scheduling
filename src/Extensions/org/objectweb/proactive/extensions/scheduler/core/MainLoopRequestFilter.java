@@ -47,9 +47,6 @@ import org.objectweb.proactive.core.body.request.RequestFilter;
  * @since ProActive 3.9
  */
 public class MainLoopRequestFilter implements RequestFilter, Serializable {
-
-    /** Serial version UID */
-    private static final long serialVersionUID = 1218635121519401713L;
     private ArrayList<String> methodNames = new ArrayList<String>();
 
     /**

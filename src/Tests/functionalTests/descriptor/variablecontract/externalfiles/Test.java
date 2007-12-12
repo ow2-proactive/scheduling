@@ -44,7 +44,6 @@ import static junit.framework.Assert.assertTrue;
  * Tests conditions for external files
  */
 public class Test extends FunctionalTest {
-    static final long serialVersionUID = 1;
     private static String XML_LOCATION = Test.class.getResource(
             "/functionalTests/descriptor/variablecontract/externalfiles/Test.xml")
                                                    .getPath();

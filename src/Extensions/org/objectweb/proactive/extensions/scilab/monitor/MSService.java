@@ -65,7 +65,6 @@ public class MSService implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -2572074681533287826L;
     private HashMap<String, MSEngineInfo> mapEngine;
     private ArrayList<String> listIdEngineFree;
     private ArrayList<GenTaskInfo> listTaskWait;

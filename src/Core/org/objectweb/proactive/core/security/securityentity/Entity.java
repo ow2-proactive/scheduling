@@ -49,7 +49,6 @@ public class Entity implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -5134177585663270596L;
 
     //	private static final Logger logger = ProActiveLogger.getLogger(Loggers.SECURITY);
     private final TypedCertificateList certChain;

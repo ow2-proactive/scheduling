@@ -55,7 +55,6 @@ public class NativeTask implements Task<String[]> {
     /**
          *
          */
-    private static final long serialVersionUID = 1876671441054524480L;
     private String[] commandArray = null;
     private String[] envp = null;
     private URL urlDir = null;

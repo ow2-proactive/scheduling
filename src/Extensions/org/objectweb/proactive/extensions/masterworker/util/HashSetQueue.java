@@ -48,7 +48,6 @@ public class HashSetQueue<T> extends LinkedHashSet<T> implements Queue<T> {
     /**
          *
          */
-    private static final long serialVersionUID = 5257040493571680215L;
 
     /* (non-Javadoc)
     * @see java.util.Queue#element()

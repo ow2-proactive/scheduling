@@ -42,8 +42,6 @@ import static junit.framework.Assert.assertTrue;
  * Test register and lookup AOs
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -6695388796855172951L;
-
     @org.junit.Test
     public void action() throws Exception {
         A a = (A) PAActiveObject.newActive(A.class.getName(),

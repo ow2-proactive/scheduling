@@ -58,8 +58,6 @@ public class TestOptional extends ComponentTest {
     /**
          *
          */
-    private static final long serialVersionUID = 4191582789150566643L;
-
     @Test
     public void testPriorityController() throws Exception {
         Component boot = Fractal.getBootstrapComponent();

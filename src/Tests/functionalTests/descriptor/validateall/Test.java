@@ -50,7 +50,6 @@ import static junit.framework.Assert.assertTrue;
  * sayHello() The object does nothing but reflect the host its on.
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 6795575088681405778L;
     ProActiveDescriptor pad;
     transient SAXParser parser = null;
     transient Validator handler = null;

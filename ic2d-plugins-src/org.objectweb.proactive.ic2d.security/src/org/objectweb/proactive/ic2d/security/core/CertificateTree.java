@@ -57,7 +57,6 @@ public class CertificateTree implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = -7966227118791659019L;
     private static KeyPairGenerator keygen;
     private final List<CertificateTree> children;
     private CertificateTree parent;

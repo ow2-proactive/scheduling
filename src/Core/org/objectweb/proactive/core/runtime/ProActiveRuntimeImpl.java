@@ -138,7 +138,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
          *
          */
-    private static final long serialVersionUID = 1L;
 
     //
     // -- STATIC MEMBERS

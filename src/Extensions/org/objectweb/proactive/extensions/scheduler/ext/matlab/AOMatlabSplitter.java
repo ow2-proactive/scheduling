@@ -47,7 +47,6 @@ public class AOMatlabSplitter extends AOSimpleMatlab {
     /**
          *
          */
-    private static final long serialVersionUID = -1673684977325219341L;
     private int numberOfChildren;
 
     public AOMatlabSplitter() {

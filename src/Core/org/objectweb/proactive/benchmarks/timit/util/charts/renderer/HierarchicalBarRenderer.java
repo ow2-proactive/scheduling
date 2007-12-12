@@ -66,7 +66,6 @@ public class HierarchicalBarRenderer extends BarRenderer {
     /**
      *
      */
-    private static final long serialVersionUID = -9139779432077336720L;
     public static final int INCLUSION_MARGIN = 3;
     public static final int CORNER = 2;
     private int alpha;

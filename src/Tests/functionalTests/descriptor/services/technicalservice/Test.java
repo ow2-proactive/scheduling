@@ -43,7 +43,6 @@ import static junit.framework.Assert.assertTrue;
  * Deployment descriptor technical services.
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 6092398365628948219L;
     private static String XML_LOCATION = Test.class.getResource(
             "/functionalTests/descriptor/services/technicalservice/TechnicalService.xml")
                                                    .getPath();

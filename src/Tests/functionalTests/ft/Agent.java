@@ -41,7 +41,6 @@ public class Agent implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 5663916362893375558L;
     private Agent neighbour;
     private int counter;
     private int iter;

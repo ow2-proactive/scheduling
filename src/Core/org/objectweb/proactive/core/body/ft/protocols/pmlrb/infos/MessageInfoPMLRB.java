@@ -45,7 +45,6 @@ public class MessageInfoPMLRB implements MessageInfo {
     /**
          *
          */
-    private static final long serialVersionUID = -921030093832103114L;
     public long sentSequenceNumber;
 
     /**

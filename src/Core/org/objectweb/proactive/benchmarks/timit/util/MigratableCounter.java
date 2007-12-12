@@ -46,7 +46,6 @@ public class MigratableCounter extends TimerCounter {
     /**
      *
      */
-    private static final long serialVersionUID = 2195039327751012564L;
     private TimItReductor netclock;
     private long elapsed;
     private long latency;

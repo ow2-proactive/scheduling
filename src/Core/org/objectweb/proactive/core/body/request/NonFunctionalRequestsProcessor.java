@@ -58,7 +58,6 @@ import java.util.Vector;
  */
 public class NonFunctionalRequestsProcessor implements RequestProcessor,
     Serializable {
-    private static final long serialVersionUID = 1L;
     private AbstractList<Request> nfRequestsQueue;
     private RequestFilter immediateNFResquestFilter;
     private RequestFilter priorityNFRequestFilter;
@@ -186,8 +185,6 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
         /**
                  *
                  */
-        private static final long serialVersionUID = 1L;
-
         public boolean acceptRequest(Request request) {
             return (request.isFunctionalRequest() &&
             (request.getNFRequestPriority() == Request.NFREQUEST_IMMEDIATE_PRIORITY));
@@ -209,8 +206,6 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
         /**
                  *
                  */
-        private static final long serialVersionUID = 1L;
-
         public boolean acceptRequest(Request request) {
             return (request.isFunctionalRequest() &&
             (request.getNFRequestPriority() == Request.NFREQUEST_PRIORITY));
@@ -232,8 +227,6 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
         /**
                  *
                  */
-        private static final long serialVersionUID = 1L;
-
         public boolean acceptRequest(Request request) {
             return (request.isFunctionalRequest() &&
             (request.getNFRequestPriority() == Request.NFREQUEST_NO_PRIORITY));

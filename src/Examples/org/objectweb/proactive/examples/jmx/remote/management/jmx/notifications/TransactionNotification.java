@@ -40,7 +40,6 @@ public class TransactionNotification extends Notification {
     /**
      *
      */
-    private static final long serialVersionUID = -3725278897594704337L;
     private long id;
     private String message;
     private Date date;

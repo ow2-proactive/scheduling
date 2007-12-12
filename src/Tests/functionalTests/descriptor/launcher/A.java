@@ -35,7 +35,6 @@ public class A implements java.io.Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 4766054198458124936L;
     private String name;
 
     public A() {

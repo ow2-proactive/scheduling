@@ -43,7 +43,6 @@ import static junit.framework.Assert.assertTrue;
  * Test automatic continuations by results and parameters
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -8272627897015121569L;
     A a;
     A b;
     A t1;

@@ -40,7 +40,6 @@ public class BundleStoppedNotification extends BundleNotification {
     /**
      *
      */
-    private static final long serialVersionUID = -1206514214334399000L;
     private String url;
     private ObjectName on;
     private String message;

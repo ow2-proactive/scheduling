@@ -52,7 +52,6 @@ public class SerializableKeyStore implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 2632782516480112932L;
     protected transient KeyStore keyStore;
     protected byte[] encodedKeyStore;
 

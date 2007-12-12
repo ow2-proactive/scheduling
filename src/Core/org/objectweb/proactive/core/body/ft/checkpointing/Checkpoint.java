@@ -56,7 +56,6 @@ public class Checkpoint implements java.io.Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -3527697223299111892L;
 
     //id of the checkpointed body
     private UniqueID bodyID;

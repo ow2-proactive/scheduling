@@ -84,9 +84,6 @@ public class SchedulerFrontend implements InitActive,
     SchedulerEventListener<InternalJob>, UserSchedulerInterface,
     SchedulerCoreInterface {
 
-    /** Serial Version UID */
-    private static final long serialVersionUID = -7843011649407086298L;
-
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 

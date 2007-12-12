@@ -50,9 +50,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.ProActiveTask;
  */
 @PublicAPI
 public class ProActiveJob extends Job {
-
-    /** Serial Version UID */
-    private static final long serialVersionUID = 1623955669459590983L;
     private ProActiveTask task = null;
 
     /** ProActive Empty Constructor */

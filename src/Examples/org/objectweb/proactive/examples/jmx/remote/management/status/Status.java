@@ -43,7 +43,6 @@ public class Status implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -3582190320483420821L;
     public static final int OK = 0;
     public static final int ERR = 1;
     public static final int MULTIPLE = 2;

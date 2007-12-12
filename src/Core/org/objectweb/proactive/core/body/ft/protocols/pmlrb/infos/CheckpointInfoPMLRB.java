@@ -49,7 +49,6 @@ public class CheckpointInfoPMLRB implements CheckpointInfo {
     /**
          *
          */
-    private static final long serialVersionUID = 5617275963859365110L;
 
     // message logs
     private List<Request> requestLog;

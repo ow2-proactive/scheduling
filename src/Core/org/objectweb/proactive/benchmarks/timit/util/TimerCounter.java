@@ -44,7 +44,6 @@ public class TimerCounter implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 6077443063543623646L;
     private int id;
     private String name;
     private HierarchicalTimer timer;

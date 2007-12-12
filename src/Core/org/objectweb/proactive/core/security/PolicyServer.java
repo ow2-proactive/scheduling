@@ -67,7 +67,6 @@ public class PolicyServer implements Serializable, Cloneable {
     /**
      *
      */
-    private static final long serialVersionUID = 6881821067929081660L;
     private static final Logger log = ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER);
     private final List<PolicyRule> policyRules;
     private final RuleEntities accessAuthorizations;

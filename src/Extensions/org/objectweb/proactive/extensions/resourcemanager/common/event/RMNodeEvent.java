@@ -61,9 +61,6 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 @PublicAPI
 public class RMNodeEvent extends RMEvent {
 
-    /** serial version UID */
-    private static final long serialVersionUID = -7781655355601704944L;
-
     /** URL of the related node */
     private String nodeUrl = null;
 

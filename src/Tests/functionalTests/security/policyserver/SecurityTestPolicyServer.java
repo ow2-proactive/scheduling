@@ -46,7 +46,6 @@ import static junit.framework.Assert.assertNotNull;
  *
  */
 public class SecurityTestPolicyServer extends FunctionalTest {
-    private static final long serialVersionUID = -8689457521948634564L;
     private PolicyServer policyServer = null;
     private PolicyServer ps = null;
 

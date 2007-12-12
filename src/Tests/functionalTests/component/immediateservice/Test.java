@@ -51,7 +51,6 @@ public class Test extends ComponentTest {
     /**
          *
          */
-    private static final long serialVersionUID = 4191411789650566643L;
 
     /**
      * Use immediate service while the loopQueueMethod is serving.

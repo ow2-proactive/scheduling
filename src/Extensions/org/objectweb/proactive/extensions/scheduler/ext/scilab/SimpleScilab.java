@@ -67,7 +67,6 @@ public class SimpleScilab extends JavaExecutable {
     /**
          *
          */
-    private static final long serialVersionUID = 6876359361914422628L;
     final private static String[] DEFAULT_OUT_VARIABLE_SET = { "out" };
 
     /**
@@ -484,8 +483,6 @@ public class SimpleScilab extends JavaExecutable {
         /**
                  *
                  */
-        private static final long serialVersionUID = -434626212534426067L;
-
         public List<String> getJavaCommand() {
             String javaCommand = buildJavaCommand();
             List<String> javaCommandList = new ArrayList<String>();

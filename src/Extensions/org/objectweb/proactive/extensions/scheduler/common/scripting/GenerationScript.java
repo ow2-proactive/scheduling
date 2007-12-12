@@ -54,7 +54,6 @@ public class GenerationScript extends Script<String> {
     /**
          *
          */
-    private static final long serialVersionUID = 3897723948093818929L;
 
     /**
     * The variable name which must be set after the evaluation

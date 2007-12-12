@@ -50,8 +50,6 @@ import static junit.framework.Assert.assertTrue;
  * Test for the remote objects, registration of a remote object with several protocols and lookup
  */
 public class RemoteObjectTest extends FunctionalTest {
-    private static final long serialVersionUID = -6695388796855172951L;
-
     @org.junit.Test
     public void register() throws Exception {
         // get an object

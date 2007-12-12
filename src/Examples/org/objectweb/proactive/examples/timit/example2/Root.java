@@ -55,7 +55,6 @@ public class Root extends Timed {
     /**
      *
      */
-    private static final long serialVersionUID = -1845112923760019294L;
     public static final String TNAME_FOO = "foo";
     public static final String TNAME_BAR = "bar";
     private TimerCounter T_FOO;

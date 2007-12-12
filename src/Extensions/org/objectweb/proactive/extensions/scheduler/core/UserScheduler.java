@@ -57,9 +57,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  */
 public class UserScheduler implements UserSchedulerInterface {
 
-    /** serial version UID */
-    private static final long serialVersionUID = 3319322779771815630L;
-
     /** Scheduler logger */
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 

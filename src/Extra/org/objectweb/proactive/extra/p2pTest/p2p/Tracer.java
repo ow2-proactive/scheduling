@@ -52,7 +52,6 @@ import org.objectweb.proactive.p2p.v2.service.util.UniversalUniqueID;
  *            -fait une requete pour obtenir un noeud ProActive
  */
 public class Tracer implements java.io.Serializable {
-    private static final long serialVersionUID = 1L;
     public static final boolean DEBUG = true;
     private static final String USAGE = Tracer.class.getName() +
         " address[ex://fiacre.inria.fr/] opt[dump/trace/reqnode]";

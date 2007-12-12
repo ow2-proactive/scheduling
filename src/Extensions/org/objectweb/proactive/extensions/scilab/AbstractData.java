@@ -50,7 +50,6 @@ public class AbstractData implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 3613670513261702795L;
     private SciData sciData;
     private String matName;
     private Token matData;

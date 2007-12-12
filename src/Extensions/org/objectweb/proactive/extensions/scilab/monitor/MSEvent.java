@@ -43,8 +43,6 @@ public class MSEvent extends EventObject {
     /**
          *
          */
-    private static final long serialVersionUID = 3662815599418919180L;
-
     public MSEvent(Object source) {
         super(source);
     }

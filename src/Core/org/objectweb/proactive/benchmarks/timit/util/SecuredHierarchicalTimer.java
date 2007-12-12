@@ -44,7 +44,6 @@ public class SecuredHierarchicalTimer extends HierarchicalTimer {
     /**
      *
      */
-    private static final long serialVersionUID = 4851461458559620436L;
     private int headCounterID = -1;
 
     private void checkRange(int n) {

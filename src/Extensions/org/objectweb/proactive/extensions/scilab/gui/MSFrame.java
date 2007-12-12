@@ -96,7 +96,6 @@ public class MSFrame extends javax.swing.JFrame {
     /**
          *
          */
-    private static final long serialVersionUID = 1925232783263309759L;
     private JMenuBar menuBar;
     private JSplitPane splitMain2;
     private JScrollPane scrollTreeEngine;
@@ -322,8 +321,6 @@ public class MSFrame extends javax.swing.JFrame {
                             /**
                                          *
                                          */
-                            private static final long serialVersionUID = -5375355976633702829L;
-
                             @Override
                             public boolean isCellEditable(int rowIndex,
                                 int vColIndex) {
@@ -395,8 +392,6 @@ public class MSFrame extends javax.swing.JFrame {
                             /**
                                          *
                                          */
-                            private static final long serialVersionUID = -7868936623193687294L;
-
                             @Override
                             public boolean isCellEditable(int rowIndex,
                                 int vColIndex) {
@@ -480,8 +475,6 @@ public class MSFrame extends javax.swing.JFrame {
                             /**
                                          *
                                          */
-                            private static final long serialVersionUID = -5498963708742304900L;
-
                             @Override
                             public boolean isCellEditable(int rowIndex,
                                 int vColIndex) {
@@ -570,8 +563,6 @@ public class MSFrame extends javax.swing.JFrame {
                                     /**
                                                          *
                                                          */
-                                    private static final long serialVersionUID = 2706641770975042036L;
-
                                     @Override
                                     public void paintComponent(Graphics g) {
                                         super.paintComponent(g);
@@ -592,8 +583,6 @@ public class MSFrame extends javax.swing.JFrame {
                                     /**
                                                          *
                                                          */
-                                    private static final long serialVersionUID = 590057625154204438L;
-
                                     @Override
                                     public void paintComponent(Graphics g) {
                                         super.paintComponent(g);

@@ -48,7 +48,6 @@ public class ReceptionHistory implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 490062375216717743L;
 
     // the elements of the history
     private List<UniqueID> elements;

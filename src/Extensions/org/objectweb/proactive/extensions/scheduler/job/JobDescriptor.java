@@ -55,9 +55,6 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  */
 public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = -2183608268194326422L;
-
     /** Job id */
     private JobId id;
 

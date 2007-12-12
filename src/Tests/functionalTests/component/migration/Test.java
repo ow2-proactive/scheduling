@@ -46,7 +46,6 @@ public class Test extends ComponentTest {
     /**
          *
          */
-    private static final long serialVersionUID = 597685496464004752L;
     public static String MESSAGE = "-->m";
 
     //ComponentsCache componentsCache;

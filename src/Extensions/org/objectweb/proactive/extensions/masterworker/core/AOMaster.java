@@ -87,7 +87,6 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
          *
          */
-    private static final long serialVersionUID = -5623997488806806210L;
 
     /**
     * log4j logger for the master
@@ -709,7 +708,6 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         /**
                  *
                  */
-        private static final long serialVersionUID = -9077989348627519335L;
 
         /**
         * Creates a filter
@@ -742,7 +740,6 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         /**
                  *
                  */
-        private static final long serialVersionUID = -1650163314641695052L;
 
         /**
         * Creates the filter

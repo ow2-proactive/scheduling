@@ -90,8 +90,6 @@ public class PIExample {
         /**
                  *
                  */
-        private static final long serialVersionUID = 4371513541977004163L;
-
         public ComputePIMonteCarlo() {
         }
 

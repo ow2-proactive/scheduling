@@ -42,7 +42,6 @@ import static junit.framework.Assert.assertTrue;
  * Test sending termination method
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = 9207669520580816164L;
     A a1;
     A a2;
     StringWrapper returnedValue;

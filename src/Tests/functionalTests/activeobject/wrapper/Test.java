@@ -58,7 +58,6 @@ import static junit.framework.Assert.assertTrue;
  * Created on Jul 28, 2005
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -659037699635472597L;
     private A ao;
     private BooleanMutableWrapper boolMutable;
     private DoubleMutableWrapper dbleMutable;

@@ -47,7 +47,6 @@ public class EventStatistics implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 3762604865283613499L;
     private String[] counterName;
     private Object[] value;
     private EventDataBag statDataBag;

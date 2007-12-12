@@ -82,8 +82,6 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * @since ProActive 3.2
  */
 public class JobsController implements SchedulerEventListener<InternalJob> {
-    private static final long serialVersionUID = -160416757449171779L;
-
     // The shared instance view as a direct reference
     private static JobsController localView = null;
 

@@ -63,8 +63,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FTServer extends UnicastRemoteObject implements FaultDetector,
     LocationServer, RecoveryProcess, ResourceServer, CheckpointServer {
-    private static final long serialVersionUID = 7757071442311462095L;
-
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 

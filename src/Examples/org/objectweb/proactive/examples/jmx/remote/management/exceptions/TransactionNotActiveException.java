@@ -35,8 +35,6 @@ public class TransactionNotActiveException extends Exception {
     /**
      *
      */
-    private static final long serialVersionUID = -5681520146148495310L;
-
     public TransactionNotActiveException(String message) {
         super(message);
     }

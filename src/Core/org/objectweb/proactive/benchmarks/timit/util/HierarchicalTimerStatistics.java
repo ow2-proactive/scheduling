@@ -45,7 +45,6 @@ public class HierarchicalTimerStatistics implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 2887387260859694305L;
     private String[] timerName;
     private double[][][] deviation;
     private double[][][] average;

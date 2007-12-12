@@ -65,9 +65,6 @@ import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceMana
 public class AdminScheduler extends UserScheduler
     implements AdminSchedulerInterface {
 
-    /** serial version UID */
-    private static final long serialVersionUID = -8799427055681878266L;
-
     /** Logger to be used for all messages related to the scheduler */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 

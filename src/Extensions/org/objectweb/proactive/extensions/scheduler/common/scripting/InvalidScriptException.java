@@ -33,8 +33,6 @@ package org.objectweb.proactive.extensions.scheduler.common.scripting;
 public class InvalidScriptException extends Exception {
 
     /**  */
-    private static final long serialVersionUID = 9017447962578395084L;
-
     public InvalidScriptException() {
         super();
     }

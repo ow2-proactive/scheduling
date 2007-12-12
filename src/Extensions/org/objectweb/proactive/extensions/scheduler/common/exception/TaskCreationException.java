@@ -43,9 +43,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public class TaskCreationException extends SchedulerException {
 
-    /** Serial version UID */
-    private static final long serialVersionUID = 7699281034780102890L;
-
     /**
      * Attaches a message to the Exception.
      *

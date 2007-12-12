@@ -47,7 +47,6 @@ public class Test extends ComponentTest {
     /**
          *
          */
-    private static final long serialVersionUID = -8895361792922703822L;
     public static final String MESSAGE = "-Main-";
     public static final int NB_CONNECTED_ITFS = 2;
     public static final String VALUE_1 = "10";

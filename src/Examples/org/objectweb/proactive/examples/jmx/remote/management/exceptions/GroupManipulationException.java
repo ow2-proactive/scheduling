@@ -41,7 +41,6 @@ public class GroupManipulationException extends Exception {
     /**
          *
          */
-    private static final long serialVersionUID = -2781981813737351161L;
 
     /**
     *

@@ -62,7 +62,6 @@ public class HalfBody extends AbstractBody {
     /**
          *
          */
-    private static final long serialVersionUID = 545137923222704906L;
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -223,7 +222,6 @@ public class HalfBody extends AbstractBody {
         /**
                  *
                  */
-        private static final long serialVersionUID = 3183517822839330706L;
 
         /** A pool future that contains the pending future objects */
         protected FuturePool futures;

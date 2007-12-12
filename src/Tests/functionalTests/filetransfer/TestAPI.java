@@ -60,7 +60,6 @@ import junit.framework.Assert;
  * Tests the two main methods of the File Transfer API
  */
 public class TestAPI extends FunctionalTest {
-    static final long serialVersionUID = 1;
     private static Logger logger = ProActiveLogger.getLogger("functionalTests");
     private static String XML_LOCATION = TestAPI.class.getResource(
             "/functionalTests/filetransfer/TestAPI.xml").getPath();

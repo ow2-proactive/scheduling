@@ -65,7 +65,6 @@ public class OSGiTransaction extends Transaction implements OSGiTransactionMBean
     /**
      *
      */
-    private static final long serialVersionUID = 7072159196238269037L;
     private Stack<CommandMBean> commands = new Stack<CommandMBean>();
     private ArrayList<CommandMBean> compensation = new ArrayList<CommandMBean>();
 

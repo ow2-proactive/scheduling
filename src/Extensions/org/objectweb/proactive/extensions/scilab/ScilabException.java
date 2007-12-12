@@ -44,7 +44,6 @@ public class ScilabException extends TaskException {
     /**
      *
      */
-    private static final long serialVersionUID = -677631385223840714L;
 
     /**
      * exception with the given message

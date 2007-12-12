@@ -42,8 +42,6 @@ public class RemoteService extends ManageableEntity implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 6776043593851011896L;
-
     public RemoteService() {
     }
 

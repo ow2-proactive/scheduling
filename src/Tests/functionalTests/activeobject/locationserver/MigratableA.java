@@ -43,7 +43,6 @@ public class MigratableA implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -4068318564591662315L;
     String name;
 
     public MigratableA() {

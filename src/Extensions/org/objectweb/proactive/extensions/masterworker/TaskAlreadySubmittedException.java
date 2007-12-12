@@ -44,5 +44,4 @@ public class TaskAlreadySubmittedException extends Exception {
     /**
      *
      */
-    private static final long serialVersionUID = 7940573023893118257L;
 }

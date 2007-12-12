@@ -58,7 +58,6 @@ public class DialogTask extends javax.swing.JDialog {
     /**
          *
          */
-    private static final long serialVersionUID = 1087324934691115701L;
     private JPanel pnlPath;
     private JLabel lblPath;
     private JTextField txtOutParam;

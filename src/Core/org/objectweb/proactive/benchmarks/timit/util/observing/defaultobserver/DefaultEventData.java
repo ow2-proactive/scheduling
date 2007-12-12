@@ -44,7 +44,6 @@ public class DefaultEventData implements EventData {
     /**
      *
      */
-    private static final long serialVersionUID = -8362004552051089021L;
     public static final int MIN = 0;
     public static final int MAX = 1;
     public static final int AVERAGE = 2;

@@ -39,7 +39,6 @@ public class A implements Active, java.io.Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = 6959297031183046321L;
     private String name;
     private int fooCounter = 0;
     private int barCounter = 0;

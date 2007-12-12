@@ -53,8 +53,6 @@ public class DummyAO implements Serializable {
     /**
          *
          */
-    private static final long serialVersionUID = -382934140742469216L;
-
     public boolean go() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();

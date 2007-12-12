@@ -67,9 +67,6 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  */
 public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
 
-    /** serial version UID */
-    private static final long serialVersionUID = 320085562179242055L;
-
     /** Log4J logger name for RMAdmin */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.RM_ADMIN);
 

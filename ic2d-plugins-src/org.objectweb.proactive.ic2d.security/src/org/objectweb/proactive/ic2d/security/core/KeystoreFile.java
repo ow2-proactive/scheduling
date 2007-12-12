@@ -35,7 +35,6 @@ public class KeystoreFile extends CertificateTreeList {
     /**
      *
      */
-    private static final long serialVersionUID = 4612887605387014845L;
     private String name;
 
     public KeystoreFile(String name, CertificateTreeList trees) {

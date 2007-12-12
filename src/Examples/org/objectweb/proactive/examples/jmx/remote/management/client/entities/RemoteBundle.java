@@ -54,7 +54,6 @@ public class RemoteBundle extends ManageableEntity implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 4669748561152375346L;
     private ArrayList<RemoteService> services = new ArrayList<RemoteService>();
     private ObjectName on;
     private BundleInfo info;

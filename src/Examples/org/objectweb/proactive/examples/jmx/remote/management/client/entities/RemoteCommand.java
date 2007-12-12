@@ -42,7 +42,6 @@ public class RemoteCommand extends ManageableEntity implements Serializable {
     /**
      *
      */
-    private static final long serialVersionUID = 3515023813621620519L;
     private RemoteTransaction parent;
     private String name;
 

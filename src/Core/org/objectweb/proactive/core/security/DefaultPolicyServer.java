@@ -42,8 +42,6 @@ public class DefaultPolicyServer extends PolicyServer {
     /**
          *
          */
-    private static final long serialVersionUID = -4393963783885047655L;
-
     public DefaultPolicyServer() {
         super();
     }

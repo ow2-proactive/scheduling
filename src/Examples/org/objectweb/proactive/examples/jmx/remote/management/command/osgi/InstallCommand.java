@@ -45,7 +45,6 @@ public class InstallCommand extends OSGiCommand implements InstallCommandMBean,
     /**
      *
      */
-    private static final long serialVersionUID = 330953827163165545L;
     private String location;
 
     public InstallCommand(Transaction t, String location, String type) {

@@ -51,7 +51,6 @@ import static junit.framework.Assert.assertTrue;
  * Jvm extension in deployment descriptor
  */
 public class Test extends FunctionalTest {
-    private static final long serialVersionUID = -6030295227851414810L;
     ProActiveDescriptor descriptor;
     A a1;
     A a2;
