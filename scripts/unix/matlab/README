@@ -13,6 +13,10 @@ The scripts in this directory can be run on Linux or Cygwin(Windows)
 
 In order to build the libraries, first set the MATLAB environment variable to the full path of your Matlab command.
 
+Make sure that the javac command from a Java JDK (and not JRE) is accessible in the Path. 
+
+Under Cygwin you need to set the right Path and the MATLAB environment variable by System Properties > Advanced > Environment Variables (don't define them directly under Cygwin). 
+
 On the prompt run:
 
 > configure
