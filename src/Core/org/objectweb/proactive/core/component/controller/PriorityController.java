@@ -61,7 +61,7 @@ public interface PriorityController {
      * @param priority The priority
      * @return true if success, else false
      */
-    public boolean setPriority(String interfaceName, String methodName,
+    public void setPriority(String interfaceName, String methodName,
         RequestPriority priority);
 
     /**
@@ -76,67 +76,7 @@ public interface PriorityController {
      * @param priority The priority
      * @return true if success, else false
      */
-    public boolean setPriority(String interfaceName, String methodName,
-        Class<?>[] parametersTypes, RequestPriority priority);
-
-    /**
-     * Set priority of all methods named 'methodName' in the interface
-     * 'interfaceName' to 'priority'.
-     * This request is processed with a NF2 priority.
-     *
-     * @param interfaceName Name of the component interface providing the
-     * method
-     * @param methodName Name of the method on which set the priority
-     * @param priority The priority
-     * @return true if success, else false
-     */
-    public boolean setPriorityNF2(String interfaceName, String methodName,
-        RequestPriority priority);
-
-    /**
-     * Set priority of the method named 'methodName' with the signature
-     * defined by 'parametersTypes' in the interface 'interfaceName' to
-     * 'priority'.
-     * This request is processed with a NF2 priority.
-     *
-     * @param interfaceName Name of the component interface providing the
-     * method
-     * @param methodName Name of the method on which set the priority
-     * @param parametersTypes The type of the method's parameters signature
-     * @param priority The priority
-     * @return true if success, else false
-     */
-    public boolean setPriorityNF2(String interfaceName, String methodName,
-        Class<?>[] parametersTypes, RequestPriority priority);
-
-    /**
-     * Set priority of all methods named 'methodName' in the interface
-     * 'interfaceName' to 'priority'.
-     * This request is processed with a NF3 priority.
-     *
-     * @param interfaceName Name of the component interface providing the
-     * method
-     * @param methodName Name of the method on which set the priority
-     * @param priority The priority
-     * @return true if success, else false
-     */
-    public boolean setPriorityNF3(String interfaceName, String methodName,
-        RequestPriority priority);
-
-    /**
-     * Set priority of the method named 'methodName' with the signature
-     * defined by 'parametersTypes' in the interface 'interfaceName' to
-     * 'priority'.
-     * This request is processed with a NF3 priority.
-     *
-     * @param interfaceName Name of the component interface providing the
-     * method
-     * @param methodName Name of the method on which set the priority
-     * @param parametersTypes The type of the method's parameters signature
-     * @param priority The priority
-     * @return true if success, else false
-     */
-    public boolean setPriorityNF3(String interfaceName, String methodName,
+    public void setPriority(String interfaceName, String methodName,
         Class<?>[] parametersTypes, RequestPriority priority);
 
     /**

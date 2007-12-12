@@ -45,6 +45,7 @@ package org.objectweb.proactive.core.body;
  *
  */
 import org.apache.log4j.Logger;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
@@ -54,7 +55,9 @@ import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
+import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.body.ComponentActivity;
+import org.objectweb.proactive.core.component.body.ComponentActivityPriority;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
@@ -105,7 +108,13 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         // when building a component, encapsulate the functional activity
         // TODO_M read some flag before doing this?
         if (getProActiveComponentImpl() != null) {
-            activity = new ComponentActivity(activity, reifiedObject);
+            try {
+                getProActiveComponentImpl()
+                    .getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
+                activity = new ComponentActivityPriority(activity, reifiedObject);
+            } catch (NoSuchInterfaceException e) {
+                activity = new ComponentActivity(activity, reifiedObject);
+            }
         }
 
         // InitActive

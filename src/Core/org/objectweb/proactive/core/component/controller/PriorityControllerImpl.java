@@ -77,7 +77,7 @@ public class PriorityControllerImpl extends AbstractProActiveController
     // PriorityController IMPLEMENTATION //
     ///////////////////////////////////////
     // TODO_C for a NF? priority check that the method is in a controller
-    public boolean setPriority(String interfaceName, String methodName,
+    public void setPriority(String interfaceName, String methodName,
         RequestPriority priority) {
         switch (priority) {
         case NF1:
@@ -95,11 +95,10 @@ public class PriorityControllerImpl extends AbstractProActiveController
         default:
             break;
         }
-        return true;
     }
 
     // TODO_C for a NF? priority check that the method is in a controller
-    public boolean setPriority(String interfaceName, String methodName,
+    public void setPriority(String interfaceName, String methodName,
         Class<?>[] parametersTypes, RequestPriority priority) {
         switch (priority) {
         case NF1:
@@ -117,27 +116,6 @@ public class PriorityControllerImpl extends AbstractProActiveController
         default:
             break;
         }
-        return true;
-    }
-
-    public boolean setPriorityNF2(String interfaceName, String methodName,
-        RequestPriority priority) {
-        return setPriority(interfaceName, methodName, priority);
-    }
-
-    public boolean setPriorityNF2(String interfaceName, String methodName,
-        Class<?>[] parametersTypes, RequestPriority priority) {
-        return setPriority(interfaceName, methodName, parametersTypes, priority);
-    }
-
-    public boolean setPriorityNF3(String interfaceName, String methodName,
-        RequestPriority priority) {
-        return setPriority(interfaceName, methodName, priority);
-    }
-
-    public boolean setPriorityNF3(String interfaceName, String methodName,
-        Class<?>[] parametersTypes, RequestPriority priority) {
-        return setPriority(interfaceName, methodName, parametersTypes, priority);
     }
 
     public RequestPriority getPriority(String interfaceName, String methodName,

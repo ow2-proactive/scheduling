@@ -44,7 +44,7 @@ import org.objectweb.proactive.core.component.body.ComponentBody;
 /**
  * <P>
  * Service is a utility class that provides many useful methods to serve requests.
- * It is usually instantiated once at the begining of the runActivity() method of
+ * It is usually instantiated once at the beginning of the runActivity() method of
  * an active object in order to be used for serving requests. For instance :
  * </P><P>
  * <pre>
@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.component.body.ComponentBody;
  * ...
  * }
  * </pre>
- * For intance the live method of the bounded buffer example :
+ * For instance the live method of the bounded buffer example :
  * <pre>
  *  public void runActivity(org.objectweb.proactive.Body body) {
  *    org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
@@ -94,7 +94,7 @@ public class Service {
     //
 
     /**
-     * Creates a new intance of Service based on the given body.
+     * Creates a new instance of Service based on the given body.
      * @param body the body that helper service is for.
      */
     public Service(Body body) {

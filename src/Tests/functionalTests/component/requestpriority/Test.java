@@ -127,11 +127,11 @@ public class Test extends ComponentTest {
         assertEquals(RequestPriority.NF1,
             pc.getPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
 
-        pc.setPriorityNF2(NF2Itf.CONTROLLER_NAME, "NF2Call", RequestPriority.NF2);
+        pc.setPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", RequestPriority.NF2);
         assertEquals(RequestPriority.NF2,
             pc.getPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", null));
 
-        pc.setPriorityNF2(NF3Itf.CONTROLLER_NAME, "NF3Call", RequestPriority.NF3);
+        pc.setPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", RequestPriority.NF3);
         assertEquals(RequestPriority.NF3,
             pc.getPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
     }
