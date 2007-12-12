@@ -460,10 +460,6 @@
 	<target name="junit.distributed" depends="compile.tests, deploy.all" description="Run all non regression tests">
 		<junitMacro nodeDescriptor="/functionalTests/descriptor/defaultnodes/Nodes.xml" />
 	</target>
-	
-	<target name="junit.solo" description="Run all non regression tests on the current host only, don't compile">
-			<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" />
-	</target>
 
 	<target name="junit" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
 		<junitMacro nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" />
