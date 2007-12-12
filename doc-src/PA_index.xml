@@ -97,7 +97,7 @@
   </part>
   
   <part id="ProActiveProgramming">
-    <title>Programming</title>
+    <title>Programming With Active Objects</title>
      &ProActiveBasis; 
     &AOCreation; 
     &TypedGroupCommunication;
@@ -106,7 +106,7 @@
   </part>
   
     <part id="HighLevelAPI">
-   <title>High Level APIs</title>
+   <title>Programming With High Level APIs</title>
     &MasterWorker;
     &MonteCarlo;
     &bnb;
@@ -128,7 +128,7 @@
    </part>
    
    <part id="ProActiveComponents">
-    <title>Composing</title>
+    <title>Programming With Components</title>
     &intro;
     &implementation;
     &Compconfiguration;

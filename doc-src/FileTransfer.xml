@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="FileTransfer">
-  <title>ProActive File Transfer Model</title>
+  <title>ProActive File Transfer</title>
 
   <sect1 id="FileTransfer_html_intro">
     <title>Introduction and Concepts</title>

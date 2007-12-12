@@ -28,6 +28,7 @@
 		computing system with common interfaces, new programming models have to be defined to abstract away these complexities 
 		from programmers.
 	</para>
+	<!--
 	<sect1>
 		<title>ProActive Parallel Suite</title>
 		<sect2>
@@ -53,12 +54,12 @@
 		
 	</sect1>
 	
-		
+		-->
    <sect1>
   	<title>ProActive Programming Frameworks</title>
 		<sect2>
 			<title>Introduction</title>
-			<para>//TODO</para>
+			<!--//TODO -->
 		</sect2>
   	<para>
   	
@@ -144,7 +145,7 @@
 		</para>
 	</sect2>
 	
-	<sect2> <title> Communication through messages</title>
+	<sect2> <title> Communication through typed asychronous messages</title>
 		<para>
 			In ProActive, the distribution is transparent: invoking methods on remote objects
 			does not require the developer to design remote objects with an explicit remoting mechanism.
@@ -220,9 +221,9 @@
 	
 	<sect2>
 	 <title>Programming With Components: GCM</title>
-	 <para>
+	 <!-- 
 	  //******************* TODO ********************
-	 </para>
+	  -->
 	 
 	 
 	</sect2>

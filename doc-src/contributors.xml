@@ -75,36 +75,7 @@
             <entry align="center" valign="top">
               <itemizedlist mark="none" role="sorted">
               
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Francoise</firstname>
-
-                      <surname>Baude</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Javier</firstname>
-
-                      <surname>Bustos</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Antonio</firstname>
-
-                      <surname>Cansado</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
+          
                 <listitem>
                   <para>
                     <personname>
@@ -218,57 +189,37 @@
  			</entry>
  			<entry align="center" valign="top">
               <itemizedlist mark="none" role="sorted">
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Francoise</firstname>
+
+                      <surname>Baude</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Javier</firstname>
+
+                      <surname>Bustos</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Antonio</firstname>
+
+                      <surname>Cansado</surname>
+                    </personname>
+                  </para>
+                </listitem>
               
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Stephane</firstname>
-
-                      <surname>Mariani</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Matthieu</firstname>
-
-                      <surname>Morel</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Marc</firstname>
-
-                      <surname>Ozonne</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Igor</firstname>
-
-                      <surname>Rosenberg</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
-                      <firstname>Bernard</firstname>
-
-                      <surname>Serpette</surname>
-                    </personname>
-                  </para>
-                </listitem>
-	
+    	
 			  <listitem>
                   <para>
                     <personname>
@@ -338,6 +289,15 @@
                     </personname>
                   </para>
                 </listitem>
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Matthieu</firstname>
+
+                      <surname>Morel</surname>
+                    </personname>
+                  </para>
+                </listitem>
 
 			  <listitem>
                   <para>
@@ -354,13 +314,24 @@
 
             <entry align="center" valign="top">
               <itemizedlist mark="none" role="sorted">
-              
+          
+            <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Stephane</firstname>
+
+                      <surname>Mariani</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+
                 <listitem>
                   <para>
                     <personname>
-                      <firstname>Laurent</firstname>
+                      <firstname>Marc</firstname>
 
-                      <surname>Baduel</surname>
+                      <surname>Ozonne</surname>
                     </personname>
                   </para>
                 </listitem>
@@ -368,12 +339,23 @@
                 <listitem>
                   <para>
                     <personname>
-                      <firstname>Hejer</firstname>
+                      <firstname>Igor</firstname>
 
-                      <surname>Rejeb</surname>
+                      <surname>Rosenberg</surname>
                     </personname>
                   </para>
                 </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Bernard</firstname>
+
+                      <surname>Serpette</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
 
                 <listitem>
                   <para>
@@ -491,6 +473,27 @@
 		</entry>
  			<entry align="center" valign="top">
               <itemizedlist mark="none" role="sorted">
+              
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Laurent</firstname>
+
+                      <surname>Baduel</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Hejer</firstname>
+
+                      <surname>Rejeb</surname>
+                    </personname>
+                  </para>
+                </listitem>
+          
                  <listitem>
                   <para>
                     <personname>

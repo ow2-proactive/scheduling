@@ -8,7 +8,12 @@
   
   	<sect1>
   		<title>Overview</title>
-  		<para>//TODO</para>
+  		<!-- //TODO  expand -->
+  		<para>In this part we will present the process of creating an active object
+  		from a class or from another already existing object. We will also look 
+  		at the internal structure of an active object and at its thread. 
+  		In the last chapters we will examine group communication, mobile agents  and
+  		exception handling for active objects. </para>
   	</sect1>
     <sect1 id="ProActiveBasis_html_def">
     <title>Active Object Structure</title>

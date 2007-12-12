@@ -3,7 +3,7 @@
   <title>ProActive And IC2D Installation</title>
 
   <para>ProActive is available for <ulink
-  url="http://proactive.inria.fr/download_proactive_latest.htm">download </ulink>under 
+  url="http://proactive.inria.fr/download_proactive_latest.htm"> download </ulink>under 
   the <ulink url="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html"> GPL 2</ulink>
    license. ProActive requires <ulink
   url="http://java.sun.com/j2se/1.5/">JDK 1.5</ulink> or later to be installed 
@@ -283,6 +283,10 @@
         <para><literal>classad.jar, glite-wms-jdlj.jar</literal>  - used when deploying on gLite sites.</para>
       </listitem>
     </itemizedlist>
+    <para>
+    	The jar files can be found under <literal> Proactive/lib </literal> and under
+    	<literal> ProaActive/dist/lib</literal>.  
+    </para>
     </sect2>
     <sect2><title id="Create_Java_Policy">Create a <literal>java.policy</literal> File To Set
     Permissions</title><para>See <ulink url="http://java.sun.com/j2se/1.5/docs/guide/security/permissions.html">Permissions

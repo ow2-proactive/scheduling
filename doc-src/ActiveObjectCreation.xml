@@ -24,6 +24,7 @@
 		</para>
 
 		<para>
+		
 			In
 			<emphasis role="bold">ProActive</emphasis>
 			there are two ways to create active objects: instantiation
@@ -33,8 +34,8 @@
 			and
 			<literal>ProActiveObject.newActiveInParallel(...)</literal>
 			and object based creation is done through
-			<literal>ProActiveObject.turnActive(...)</literal>
-			. The methods are part of the
+			<literal>ProActiveObject.turnActive(...)</literal>.
+			The methods are part of the
 			<literal>org.objectweb.proactive.api</literal>
 			package. Each method takes several parameters that control
 			how the active object is created and most of the parameters
@@ -53,7 +54,8 @@
 			<mediaobject>
 				<imageobject>
 					<imagedata
-						fileref="images/creationMethodsTable.png" />
+						fileref="images/creationMethodsTable.png" scalefit="1"
+						contentwidth="100" format="PNG"	width="6in" />
 
 				</imageobject>
 			</mediaobject>
@@ -379,11 +381,12 @@
 			</para>
 		</sect2>
 
-
+	<!--
 		<sect2>
 			<title>Using Parameterized Classes</title>
-			<para>//TODO explain generics</para>
+			//TODO explain generics
 		</sect2>
+		-->
 		<sect2>
 			<title>Using A Node</title>
 			<para>
@@ -403,8 +406,8 @@
 				. The node argument and the URL string are used with
 				<literal>ProActiveObject.newActive(...)</literal>
 				and
-				<literal>ProActiveObject.turnActive(...)</literal>
-				. The array of
+				<literal>ProActiveObject.turnActive(...)</literal>.
+				The array of
 				<literal>Node</literal>
 				and the virtual node argument is used with
 				<literal>
@@ -556,7 +559,7 @@
 					The algorithms for each running phase 
 					are the following (
 					<literal>activity</literal>
-					is the eventual object passed as a parameter to
+					is the object passed as a parameter to
 					<literal>newActive</literal>
 					or
 					<literal>turnActive</literal>
@@ -564,42 +567,20 @@
 				</para>
 
 
-				<para>
-					<emphasis role="bold">InitActive</emphasis>
-				</para><programlisting><textobject><textdata
-							fileref="code_snippets/InitActiveAlgorithm.txt" /></textobject></programlisting>
-				<para>
-					<emphasis role="bold">RunActive</emphasis>
-				</para>
-
-				<programlisting><textobject><textdata
-							fileref="code_snippets/RunActiveAlgorithm.txt" /></textobject></programlisting>
-
-				<indexterm significance="preferred">
-					<primary>EndActive</primary>
-
-					<secondary>interface</secondary>
-				</indexterm>
-
-				<para>
-					<emphasis role="bold">EndActive</emphasis>
-				</para>
-				<programlisting><textobject><textdata
-							fileref="code_snippets/EndActiveAlgorithm.txt" /></textobject></programlisting>
-
-
-
-		<para>
+		<!-- 
 			//TODO add explanation
 			
-		</para>
+		 -->
 		<figure>
 			<title>Activity algorithm</title>
 			<mediaobject>
 				<imageobject>
-					<imagedata
+			<!--  		<imagedata  width="6in" depth="5.5in" scalefit="0" format="PNG" 
 						fileref="images/init_run_end_Activity.png" />
-
+				-->
+					<imagedata  contentwidth="100" width="500px"  format="PNG" 
+						fileref="images/init_run_end_Activity.png" />
+				
 				</imageobject>
 			</mediaobject>
 		</figure>
@@ -702,7 +683,7 @@
 			<title>Using the factory pattern with Active Objects</title>
 			<para>
 				<emphasis role="bold">
-					//TODO - very complex, it might need its own section
+					<!-- //TODO - very complex, it might need its own section  -->
 				</emphasis>
 			</para>
 			<para>
@@ -851,9 +832,9 @@
 				<literal>ProActiveObject.turnActive(...)</literal>
 			</title>
 		</sect2>
-		<para>
+		<!-- 
 			//TODO - why doesn't newActive have the same parameter ?
-		</para>
+		 -->
 	</sect1>
 
 
@@ -895,9 +876,8 @@
 
 				<mediaobject>
 					<imageobject>
-						<imagedata contentwidth="100"
-							fileref="images/workerActiveObject.png" format="PNG"
-							width="6in" />
+						<imagedata fileref="images/workerActiveObject.png"
+							contentwidth="100" format="PNG"	width="6in" />
 					</imageobject>
 				</mediaobject>
 			</figure>
@@ -1155,7 +1135,7 @@
 			<title>Creation of a Future Object</title>
 
 			<para>
-				//TODO Explain asynchronous request
+				<!--  //TODO Explain asynchronous request -->
 				Whenever possible a method call on an active object is
 				reified as an asynchronous request. If not possible the
 				call is synchronous and blocks until the reply is
@@ -2157,7 +2137,8 @@
 				</informalfigure>
 			</para>
 			<para>
-			After the value (//TODO synchronous or asych?) on <literal>A</literal> is
+			After the value 
+			<!-- //TODO synchronous or asych? --> on <literal>A</literal> is
 			updated, <literal>A</literal> updates the value in the future on <literal>B</literal>.
 			</para>
 
@@ -2209,7 +2190,7 @@
 			block until the future is updated, just like in single threaded call.
 			</para>
 			<para>
-			//TODO object responsabilities when  updating futures</para>
+			<!--  //TODO object responsabilities when  updating futures --></para>
 				
 		</sect2>
 		
@@ -2217,7 +2198,7 @@
 	<sect1 id="ActiveObjectCreation_html_events">
 		<title>Event based programming</title>
 
-		<para>//TODO add immediateService maybe ?</para>
+		<!-- //TODO add immediateService maybe ?  -->
 		<para>
 			ProActive supports an event based programming model. That
 			is, an active object can schedule one of its method to be
