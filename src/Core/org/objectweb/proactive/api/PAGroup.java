@@ -56,6 +56,12 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/**
+ * This class is the entry point to groups in ProActive.
+ *
+ * @author The ProActive Team
+ * @since ProActive 3.9 (November 2007)
+ */
 @PublicAPI
 public class PAGroup {
 

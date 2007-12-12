@@ -39,6 +39,12 @@ import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 
 
+/**
+ * This class provides a mechanism to handle exceptions in asynchronous calls.
+ *
+ * @author The ProActive Team
+ * @since ProActive 3.9 (November 2007)
+ */
 @PublicAPI
 public class PAException {
 

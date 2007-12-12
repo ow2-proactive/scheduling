@@ -34,6 +34,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.gc.HalfBodies;
 
 
+/**
+ * This class provides helpers for both explicit and implicit application termination.
+ *
+ * @author The ProActive Team
+ * @since ProActive 3.9 (November 2007)
+ */
 @PublicAPI
 public class PALifeCycle {
 

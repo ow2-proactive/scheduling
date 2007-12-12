@@ -44,6 +44,12 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
+/**
+ * This class provides methods to migrate active objects.
+ *
+ * @author The ProActive Team
+ * @since ProActive 3.9 (November 2007)
+ */
 @PublicAPI
 public class PAMobileAgent {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);

@@ -41,6 +41,12 @@ import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.TimeoutAccounter;
 
 
+/**
+ * This class provides wait primitives on futures, as well as the event programming interface.
+ *
+ * @author The ProActive Team
+ * @since ProActive 3.9 (November 2007)
+ */
 @PublicAPI
 public class PAFuture {
 

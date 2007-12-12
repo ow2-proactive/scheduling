@@ -81,6 +81,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 
 
+/**
+ * This class provides the main operations on active objects.
+ *
+ * @author The ProActive Team
+ * @since ProActive 3.9 (November 2007)
+ */
 @PublicAPI
 public class PAActiveObject {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);

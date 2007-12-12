@@ -53,6 +53,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.xml.VariableContract;
 
 
+/**
+ * This class provides entry points to deployment descriptors and the registration of virtual nodes.
+ *
+ * @author The ProActive Team
+ * @since ProActive 3.9 (November 2007)
+ */
 @PublicAPI
 public class PADeployment {
     protected final static Logger logger = ProActiveLogger.getLogger(Loggers.CORE);

@@ -34,6 +34,12 @@ import org.objectweb.proactive.Main;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
+/**
+ * This class provides the version number of ProActive.
+ *
+ * @author The ProActive Team
+ * @since ProActive 3.9 (November 2007)
+ */
 @PublicAPI
 public class PAVersion {
 
