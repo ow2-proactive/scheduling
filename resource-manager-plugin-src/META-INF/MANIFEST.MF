@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Resource Manager Plug-in
+Bundle-SymbolicName: org.objectweb.proactive.extensions.resourcemanager.gui;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.objectweb.proactive.extensions.resourcemanager.gui.Activator
+Bundle-Vendor: ProActive
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.objectweb.proactive.ic2d.lib
+Eclipse-LazyStart: true
+Eclipse-RegisterBuddy: org.objectweb.proactive.ic2d.lib
