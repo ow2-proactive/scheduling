@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.scheduler.common.exception.DependenceFailedException;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.Script;
 import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript;
 
@@ -115,7 +116,10 @@ public abstract class Task implements Serializable {
         if (dependences == null) {
             dependences = new ArrayList<Task>();
         }
-
+        if (task instanceof ProActiveTask) {
+            throw new DependenceFailedException(
+                "Cannot add a ProActive task in a dependence context !");
+        }
         dependences.add(task);
     }
 
@@ -129,8 +133,9 @@ public abstract class Task implements Serializable {
         if (dependences == null) {
             dependences = new ArrayList<Task>();
         }
-
-        dependences.addAll(tasks);
+        for (Task t : tasks) {
+            addDependence(t);
+        }
     }
 
     /**

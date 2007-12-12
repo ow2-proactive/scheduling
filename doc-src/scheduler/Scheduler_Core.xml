@@ -57,7 +57,7 @@
           </listitem>
 
           <listitem>
-            <para><emphasis role="bold">PARAMETER SWEEPING</emphasis>, is a
+            <para><emphasis role="bold">PARAMETER SWEEPING (not yet implemented)</emphasis>, is a
             Job that represents multiple executions of one type of Task with
             different given parameters. It is typically executed in parallel.
             The Tasks inside this job can also be Java or Native. </para>
@@ -190,9 +190,7 @@ public Object execute(TaskResult... results) throws Throwable {
       <para>In order to launch Jobs, the Scheduler must obtain nodes
       (resources) from the Resources Manager. As describe below (<xref
       linkend="scheduler2entities" />), the user interacts only with the
-      Scheduler entity and the managed resources can be simple or complex
-      (TODO dont understand "and the managed resources can be simpel or
-      complex").</para>
+      Scheduler entity and the managed resources can be simple host or peer to peer resource.</para>
 
       <figure id="scheduler2entities">
         <title>The Scheduler Entities</title>
@@ -259,267 +257,538 @@ public Object execute(TaskResult... results) throws Throwable {
     </sect2>
   </sect1>
 
-  <sect1 id="scheduler_API">
-    <title>Scheduler API and Usecase</title>
+  <sect1 id="scheduler_use">
+    <title>Using the ProActive Scheduler</title>
 
-    <sect2 id="start_scheduler">
-      <title>Starting the scheduler</title>
-
-      <para>To start a local scheduler, run the
-      <emphasis>scheduler.sh</emphasis> script in scripts/scheduler directory.
-      Without arguments, the scheduler will start on the local host and create
-      its own Resources Manager.</para>
-
-      <para><emphasis>scheduler.sh</emphasis> can be started with 1 optional
-      argument : <itemizedlist>
-          <listitem>
-            <para>The URL of a resources manager already started. (ie:
-            <emphasis role="bold">//hostname/</emphasis>) </para>
-          </listitem>
-        </itemizedlist></para>
-
-      <para>You can also start the scheduler using the java API. Supposing
-      that a Resources Manager is already started (see Resource Manager
-      documentation <xref linkend="resources_manager" />), this can be done in
-      the following way:</para>
-
-      <programlisting lang="java">AdminScheduler.createScheduler(
-    LocalSchedulerExample.class.getResource("login.cfg").getFile(),
-                LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
-                rm,
-                "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");</programlisting>
-
-      <para>Arguments are respectively : <orderedlist>
-          <listitem>
-            <para><emphasis>loginFile</emphasis> : A file describing the users
-            and passwords authorized to connect to the scheduler.</para>
-          </listitem>
-
-          <listitem>
-            <para><emphasis>groupFile</emphasis> : A file describing the group
-            on which each user belongs. These groups will be used to identify
-            admin or user rights. </para>
-          </listitem>
-
-          <listitem>
-            <para><emphasis>rm</emphasis> : A reference on an already started
-            Resources Manager instance. </para>
-          </listitem>
-
-          <listitem>
-            <para><emphasis>policyFullClassName</emphasis> : The scheduling
-            policy to use, as a string representing the complete name of the
-            class. </para>
-          </listitem>
-        </orderedlist></para>
-
-      <para>Another way is to start the scheduler AND connect an administrator
-      at the same time :</para>
-
-      <programlisting lang="java">AdminScheduler.createScheduler(
-   LocalSchedulerExample.class.getResource("login.cfg").getFile(),
-                LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
-                "login",
-                "password",
-                rm,
-                "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");</programlisting>
-
-      <para>Where arguments are the same plus a <emphasis>login</emphasis> and
-      a <emphasis>password</emphasis> as a string. The user must be in the
-      login file and his group must be admin in the group file.</para>
-    </sect2>
-
-    <sect2 id="task_creation">
-      <title>Task Creation</title>
-
-      <para>
-      	First of all, you must know that you can create your own task by implementing scheduler executable interfaces.
-      	It is possible to implement two types of executables :
-      	<itemizedlist>
-      		<listitem>
-      			<emphasis role="bold">JavaExecutable</emphasis> : to make your own java executable process.
-      			Here's an example of implementation for this type :
-      			<programlisting lang="java">
-	public class WaitAndPrint extends JavaExecutable {
-	
-	    @Override
-	    public Object execute(TaskResult... results) throws Throwable {
-	        String message;
-	
-	        try {
-	            System.err.println("Démarrage de la tache WaitAndPrint");
-	            System.out.println("Parameters are : ");
-	
-	            for (TaskResult tRes : results) {
-	                if (tRes.hadException()) {
-	                    System.out.println("\t " + tRes.getTaskId() + " : " +
-	                        tRes.getException().getMessage());
-	                } else {
-	                    System.out.println("\t " + tRes.getTaskId() + " : " +
-	                        tRes.value());
-	                }
-	            }
-	
-	            message = URIBuilder.getLocalAddress().toString();
-	            Thread.sleep(10000);
-	
-	        } catch (Exception e) {
-	            message = "crashed";
-	            e.printStackTrace();
-	        }
-	
-	        System.out.println("Terminaison de la tache");
-	
-	        return (message + "\t slept for 10 sec");
-	    }
-    }
-      			</programlisting>
-      			<para>
-      				This task print an initial message, then check if there are result from previous tasks and if so,
-      				print the value of this "parameters".
-      				It will then return a message containing what the task did. The return value will be store in the job result.
-      			</para>
-      		</listitem>
-      		<listitem>
-      			<emphasis role="bold">ProActiveExecutable</emphasis> : to make your own ProActive application process.
-      		</listitem>
-      	</itemizedlist>
-      </para>
-    </sect2>
-
-    <sect2 id="job_creation">
-      <title>Job Creation</title>
-      
-      <para>
-      	
-      </para>
-    </sect2>
-
-    <sect2 id="user_interface">
-      <title>User Interface</title>
+	<sect2 id="define_executable">
+		<title>Define your own executable</title>
+		<para>
+	      	First of all, you must know that you can create your own task by implementing scheduler executable interfaces.
+	      	It is possible to implement two types of executables :
+	      	<itemizedlist>
+	      		<listitem>
+	      			<emphasis role="bold">JavaExecutable</emphasis> : to make your own java executable process.
+	      			Here's an example of implementation for this type :
+	      			<programlisting lang="java">
+		public class WaitAndPrint extends JavaExecutable {
 		
-      <sect3 id="User_Connection">
-        <title>User Connection</title>
+		    @Override
+		    public Object execute(TaskResult... results) throws Throwable {
+		        String message;
+		
+		        try {
+		            System.err.println("Démarrage de la tache WaitAndPrint");
+		            System.out.println("Parameters are : ");
+		
+		            for (TaskResult tRes : results) {
+		                if (tRes.hadException()) {
+		                    System.out.println("\t " + tRes.getTaskId() + " : " +
+		                        tRes.getException().getMessage());
+		                } else {
+		                    System.out.println("\t " + tRes.getTaskId() + " : " +
+		                        tRes.value());
+		                }
+		            }
+		
+		            message = URIBuilder.getLocalAddress().toString();
+		            Thread.sleep(10000);
+		
+		        } catch (Exception e) {
+		            message = "crashed";
+		            e.printStackTrace();
+		        }
+		
+		        System.out.println("Terminaison de la tache");
+		
+		        return (message + "\t slept for 10 sec");
+		    }
+	    }
+	      			</programlisting>
+	      			<para>
+	      				This task will print an initial message, then check if there are results from previous tasks and if so,
+	      				print the value of these "parameters".
+	      				It will then return a message containing what the task did. The return value will be store in the job result.
+	      			</para>
+	      			<para>
+	      				It is also possible to get a list of arguments that you can give to the task at its start
+	      				by overriding the init method on a java task.
+	      				How to give arguments will be explain further in task creation section
+	      				(<xref linkend="task_creation" />). We get back the foo, bar and test arguments to
+	      				illustrate the task creation example below.
+	      				<programlisting lang="java">
+	private boolean foo;
+	private int bar;
+	private String arg;
+	
+	@Override
+    public void init(Map&lt;String, Object&gt; args) {
+        foo = (Boolean)args.get("foo");
+        bar = (Integer)args.get("bar");
+        arg = (String)args.get("arg");
+    }
+	      				</programlisting>
+	      			</para>
+	      		</listitem>
+	      		<listitem>
+	      			<emphasis role="bold">ProActiveExecutable</emphasis> : to make your own ProActive application process.
+	      			Here's an example overview of implementation for this type :
+	      			<programlisting lang="java">
+	@Override
+    public Object execute(ArrayList&lt;Node&gt; nodes) {
+        System.out.println("ProActive job started !!");
 
-        <para>A user can connect to the Scheduler only if he/she is known.
-        That's the goal of the authentication interface which is able to
-        authenticate users. <xref linkend="userConnection">
-            The user connection
-          </xref> shows how the Scheduler connects a user. <figure
-            id="userConnection">
-            <title>A user connection</title>
+        // create workers (on local node)
+        Vector&lt;Worker&gt; workers = new Vector&lt;Worker&gt;();
 
-            <mediaobject>
-              <imageobject>
-                <imagedata align="center"
-                           fileref="scheduler/pics/core/userConnection.jpg"
-                           format="JPG" />
-              </imageobject>
-            </mediaobject>
-          </figure> <orderedlist>
-            <listitem>
-              <para>First of all, a user tries to join the authentication
-              interface using the <emphasis
-              role="bold">SchedulerConnection.join(...)</emphasis> static
-              method. </para>
+        for (Node node : nodes) {
+            try {
+                Worker w = (Worker) PAActiveObject.newActive(Worker.class.getName(),
+                        new Object[] {  }, node);
+                workers.add(w);
+            } catch (ActiveObjectCreationException e) {
+                e.printStackTrace();
+            } catch (NodeException e) {
+                e.printStackTrace();
+            }
+        }
 
-              <programlisting>SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");</programlisting>
+        // create controller
+        Controller controller = new Controller(workers);
+        int result = controller.findNthPrimeNumber(numberToFind);
 
-              <para> Then, with the <emphasis
-              role="bold">SchedulerAuthenticationInterface</emphasis>, users
-              can be connected as user or administrator roles using the
-              <emphasis role="bold">logAsUser</emphasis> or <emphasis
-              role="bold">logAsAdmin</emphasis> methods. </para>
+        System.out.println("last prime : " + result);
 
-              <programlisting>UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
-// OR
-AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");</programlisting>
-            </listitem>
+        return result;
+    }
+	      			</programlisting>
+	      			<para>
+	      				As shown in a ProActive tutorial, this example uses the given nodes with 
+	      				the ProActive API in order to launch 'workers' on them. The <emphasis>execute(nodes)</emphasis> method
+	      				shows what can be done inside this kind of task.
+	      				For more details about how to use the ProActive API, see the appropriate documentation.
+	      			</para>
+	      		</listitem>
+	      		<listitem>
+	      			<emphasis role="bold">NativeExecutable</emphasis> : just use this class when you'd like
+	      			to run a native process on the scheduler. You don't have to extend this class,
+	      			just use it as shown in the next section.
+	      		</listitem>
+	      	</itemizedlist>
+	      </para>
+	</sect2>
 
-            <listitem>
-              <para>Next, the authentication object checks the users rights
-              and wether the user is authorized to connect the scheduler. If
-              not, an exception will be thrown.</para>
-            </listitem>
-
-            <listitem>
-              <para>Once connected, the authentication object sends the right
-              and username/password to the scheduler front-end which will be
-              able to authenticate user on its own.</para>
-            </listitem>
-
-            <listitem>
-              <para>If nothing goes wrong, the authentication interface will
-              return a <emphasis
-              role="bold">AdminSchedulerInterface</emphasis> which is in fact
-              a direct link to the <emphasis
-              role="bold">Front-end</emphasis>.</para>
-            </listitem>
-
-            <listitem>
-              <para>The user is now able to interact with the Scheduler using
-              the returned interface.</para>
-            </listitem>
-          </orderedlist></para>
-      </sect3>
-
-      <sect3 id="Job_submission">
-        <title>Job Submission</title>
-
-        <para>After the connection, a user is ready to submit Jobs. The
-        <emphasis role="bold">Authentication interface is no longer
-        used</emphasis> for this connected user. <xref linkend="jobSubmission">
-            The job submission
-          </xref> shows what happens when the Scheduler received a new Job to
-        schedule. <figure id="jobSubmission">
-            <title>A job submission</title>
-
-            <mediaobject>
-              <imageobject>
-                <imagedata align="center"
-                           fileref="scheduler/pics/core/jobSubmission.jpg"
-                           format="JPG" />
-              </imageobject>
-            </mediaobject>
-          </figure> <orderedlist>
-            <listitem>
-              <para>First, the user submits a Job using his <emphasis
-              role="bold">UserSchedulerInterface</emphasis> retrieved by the
-              <emphasis role="bold">logAsUser</emphasis> method.
-              <programlisting lang="java">// connecting to the scheduler
-SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
-// checking username and password
-UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
-// submitting a new job
-scheduler.submit(job);</programlisting></para>
-            </listitem>
-
-            <listitem>
-              <para>The Scheduler Front-end verifies the integrity of the Job,
-              and builds it in order to be ready to be managed by the
-              Scheduler Core. If there is a problem, an exception is thrown
-              explaining what is the cause.</para>
-            </listitem>
-
-            <listitem>
-              <para>Finally, the Job is transmitted to the Core for
-              scheduling.</para>
-            </listitem>
-          </orderedlist></para>
-      </sect3>
-    </sect2>
-
-    <sect2 id="admin_interface">
-      <title>Administrator Interface</title>
-
-      <para></para>
-
-      <sect3 id="communicator">
-        <title>Communicator</title>
-
-        <para></para>
-      </sect3>
-    </sect2>
+	<sect2 id="without_java_API">
+		<title>Using XML descriptors</title>
+		
+		<sect2 id="start_scheduler_xml">
+	      <title>Starting the scheduler</title>
+			<para>To start a local scheduler, run the
+		      <emphasis>scheduler.sh</emphasis> script in scripts/scheduler directory.
+		      Without arguments, the scheduler will start on the local host and create
+		      its own Resources Manager.
+		    </para>
+		
+		    <para>
+		    	<emphasis>scheduler.sh</emphasis> can be started with 1 optional
+		      	argument : <itemizedlist>
+		          <listitem>
+		            <para>
+		            	The URL of a resources manager already started. (ie:
+		            	<emphasis role="bold">//hostname/</emphasis>)
+		            </para>
+		          </listitem>
+		        </itemizedlist>
+		   	</para>
+		</sect2>
+	</sect2>
+	
+	
+	<sect2 id="with_java_API">
+		<title>Using the java API</title>
+		
+		<sect2 id="start_scheduler_API">
+	      <title>Starting the scheduler</title>
+	
+	      <para>You can start the scheduler using the java API. Supposing
+	      that a Resources Manager is already started (see Resource Manager
+	      documentation <xref linkend="resources_manager" />), this can be done in
+	      the following way:</para>
+	
+	      <programlisting lang="java">AdminScheduler.createScheduler(
+	    LocalSchedulerExample.class.getResource("login.cfg").getFile(),
+	                LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
+	                rm,
+	                "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");</programlisting>
+	
+	      <para>Arguments are respectively : <orderedlist>
+	          <listitem>
+	            <para><emphasis>loginFile</emphasis> : A file describing the users
+	            and passwords authorized to connect to the scheduler.</para>
+	          </listitem>
+	
+	          <listitem>
+	            <para><emphasis>groupFile</emphasis> : A file describing the group
+	            on which each user belongs. These groups will be used to identify
+	            admin or user rights. </para>
+	          </listitem>
+	
+	          <listitem>
+	            <para><emphasis>rm</emphasis> : A reference on an already started
+	            Resources Manager instance. </para>
+	          </listitem>
+	
+	          <listitem>
+	            <para><emphasis>policyFullClassName</emphasis> : The scheduling
+	            policy to use, as a string representing the complete name of the
+	            class. </para>
+	          </listitem>
+	        </orderedlist></para>
+	
+	      <para>Another way is to start the scheduler AND connect an administrator
+	      at the same time :</para>
+	
+	      <programlisting lang="java">AdminScheduler.createScheduler(
+	   LocalSchedulerExample.class.getResource("login.cfg").getFile(),
+	                LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
+	                "login",
+	                "password",
+	                rm,
+	                "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");</programlisting>
+	
+	      <para>Where arguments are the same plus a <emphasis>login</emphasis> and
+	      a <emphasis>password</emphasis> as a string. The user must be in the
+	      login file and his group must be admin in the group file.</para>
+	    </sect2>
+	    
+		<sect2 id="how_to_make_job">
+			<title>Job Creation</title>
+			<sect3 id="task_creation">
+		      <title>Create task(s)</title>
+		      
+		      <para>
+		      	As it has been said, it is possible to create 3 types of tasks. These 3 types have some
+		      	common features like name, description, scripts, etc... Here's the details of each of these common features :
+		      	<itemizedlist>
+		      		<listitem>
+		      			<emphasis>name</emphasis> is the name assigned to the task. It can be whatever you
+		      			want as a String. This name must be unique for each task.
+		      			<programlisting lang="java">
+	aTask.setName("task 1");
+		      			</programlisting>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>description</emphasis> is a human readable description of the task.
+		      			It is for human use only. This field is optional but it is better to set it.
+		      			<programlisting lang="java">
+	aTask.setDescription("This task will do something...");
+		      			</programlisting>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>precious result</emphasis> is the way to define that a result of a task
+		      			is important or not. For example, in a job result, you could have to retrieve only
+		      			some task results that are important for you. By setting the precious result to true
+		      			you'll be able to retrieve easily these results. (default is false)
+		      			<programlisting lang="java">
+	aTask.setPreciousResult(true);
+		      			</programlisting>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>re-runnable</emphasis> is a way to define how many times a task will be
+		      			reran if a user or network problems occur. Set this value to <emphasis>n</emphasis> if you want the task
+		      			to be restarted <emphasis>n</emphasis> times and so, started a maximum of <emphasis>n+1</emphasis> times.
+		      			(default is 1)
+		      			<programlisting lang="java">
+	aTask.setRerunnable(2);
+		      			</programlisting>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>result descriptor</emphasis> (TODO, chrichri, can you explain this feature ? and give a java example -> ? inner anonymous class ?)
+		      			<programlisting lang="java">
+	aTask.setResultDescriptor(...);
+		      			</programlisting>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>scripts</emphasis>
+		      			<itemizedlist>
+		      				<listitem>
+		      					<emphasis>pre-script</emphasis> (TODO, germ, explain prescript and give java example)
+		      					<programlisting lang="java">
+	//If the script to use is in a file or URL
+	String[] args = new String("foo","bar");
+	File scriptFile = new File("path/to/script_file");
+	// File scriptURL = new URL("url/to/script_file");
+	Script script = new SimpleScript(scriptFile, args);
+	// Script script = new SimpleScript(scriptURL, args);
+	aTask.setPreScript(script);
+	//If the script to use is in a java string for example
+	Script script = new SimpleScript("Script_content", "type_of_language");
+	//where type_of_language can be javascript (rhino)
+	aTask.setPreScript(script);
+		      					</programlisting>
+		      				</listitem>
+		      				<listitem>
+		      					<emphasis>post-script</emphasis> (TODO, germ, explain postscript and give java example)
+		      					<programlisting lang="java">
+	//same use as the pre-script
+	aTask.setPostScript(script);
+		      					</programlisting>
+		      				</listitem>
+		      				<listitem>
+		      					<emphasis>selection script</emphasis> (TODO, germ, explain selectionscript and give java example)
+		      					<programlisting lang="java">
+	//same construction for the script
+	//the last parameter tell if the script is dynamic or not.
+	SelectionScript selScript = new SelectionScript(script, true);
+	aTask.setSelectionScript(selScript);
+		      					</programlisting>
+		      				</listitem>
+		      			</itemizedlist>
+		      		</listitem>
+		      	</itemizedlist>
+		      	
+		      	Now Let's explain the functioning of each separate specific features of each type of task :
+		      	<itemizedlist>
+		      		<listitem>
+		      			<para>
+		      			<emphasis>Create a native task</emphasis> is the simplest thing to do.
+		      			Use the <emphasis>NativeTask</emphasis> class to create such a task.
+		      			You just have then to specify a command line that have to be executed by the scheduler.
+		      			Here's an example that describe how to create a native task with a <emphasis>static command</emphasis> :
+		      			<programlisting lang="java">
+	//create a new native task
+	NativeTask task1 = new NativeTask();
+	//set the command to execute as a string
+	task1.setCommandLine("ls -al");
+		      			</programlisting>
+		      			</para>
+		      			<para>
+		      				Here's an example that describe how to create a native task with a <emphasis>dynamic command</emphasis>
+		      				(ie: generated by a script called a generation Script) : (TODO germ, explain what is a generation script)
+		      				<programlisting lang="java">
+	//create a new native task
+	NativeTask task2 = new NativeTask();
+	//create a generation script with a script as shown above
+    GenerationScript gscript = new GenerationScript(script);
+	//set the command to execute as a string
+	task2.setGenerationScript(gscript);
+		      				</programlisting>
+		      			</para>
+		      		</listitem>
+		      		<listitem>
+		      			<para>
+		      			<emphasis>Create a java task</emphasis> is not much more difficult.
+		      			Use the <emphasis>JavaTask</emphasis> class to create this type of task.
+		      			In this type, you must specify the class you want to start with, by mentioning
+		      			a Class or an instance of your executable. (To make your own executable see
+		      			the proper section <xref linkend="define_executable" />). In addition, you can add
+		      			arguments with which the task will be launched. These launching arguments will
+		      			be given to the java executable as a Map.
+		      			<programlisting lang="java">
+	//create a new java task
+	JavaTask task3 = new JavaTask();
+	//add arguments (optional)
+	task3.addArgument("foo",new Boolean(true));
+	task3.addArgument("bar",new Integer(12));
+	task3.addArgument("test","test1");
+	//add executable class or instance
+	task3.setTaskClass(WaitAndPrint.class);
+	// or
+	//task3.setTaskInstance(new WaitAndPrint());
+		      			</programlisting>
+		      			</para>
+		      		</listitem>
+		      	</itemizedlist>
+		      </para>
+		      <para>
+		      	For both native and java task, you can specify dependences between each other 
+		      	<emphasis role="bold">(but not for ProActive task)</emphasis>.
+		      	To perform such a thing, and following the example shown in the dependencies explanation
+		      	(<xref linkend="how_dependences" />), let's see an example illustrating how to make task 5
+		      	depends of 2 and 3 in this order :
+		      	<programlisting lang="java">
+	//task 2 has been create just before as a native task
+	//task 3 has been create just before as a java task
+	//we have to create task 5.
+	//create a new native or java task
+	JavaTask task5 = new JavaTask();
+	//... (fill task5 as describe above)
+	//then specify dependencies by using the addDependence(Task) method
+	task5.addDependence(task2);
+	task5.addDependence(task3);
+	//or use the addDependences(list&lt;Task&gt;) method as shown
+	//task5.addDependences(new ArrayList&lt;Task&gt;(task2,task3));
+		      	</programlisting>
+		      </para>
+		      
+		      <para>
+		      	<itemizedlist>
+		      		<listitem>
+		      			<para>
+		      				<emphasis>Create a ProActive task</emphasis> is a bit different. Indeed, it is
+		      				not possible to add dependences to this task. This task is design for the
+		      				ProActive job. Like the java task, arguments can be set in order to be used
+		      				at the start of the task. The corresponding executable is attach to the task
+		      				using the same methods as java task. Finally, you must specify the number of needed
+		      				nodes for the ProActive task. This is the list of nodes you will receive in the
+		      				<emphasis>execute(nodeList)</emphasis> method in the ProActive executable.
+		      				See <xref linkend="define_executable" /> to make your own ProActive executable.
+		      				<programlisting lang="java">
+	//create the ProActive task
+	ProActiveTask task = new ProActiveTask();
+	//add dependencies... (see java task)
+	//add task instance or class... (see java task)
+	//set number of needed nodes
+	task.setNumberOfNodesNeeded(8);
+		      				</programlisting>
+		      			</para>
+		      			In this example, 8 needed nodes means that you want to use 7 nodes in your executable.
+		      			Indeed, one node will be used to start your executable, and the other are given to your
+		      			application.
+		      		</listitem>
+		      	</itemizedlist>
+		      </para>
+		      <para>
+		      	Now that you know how to define tasks, let's see how to make your job.
+		      </para>
+		    </sect3>
+		
+		    <sect3 id="job_creation">
+		      <title>Create Job</title>
+		      
+		      <para>
+		      	
+		      </para>
+		    </sect3>
+		</sect2>
+	
+	    <sect2 id="user_interface">
+	      <title>User Interface</title>
+			
+	      <sect3 id="User_Connection">
+	        <title>User Connection</title>
+	
+	        <para>A user can connect to the Scheduler only if he/she is known.
+	        That's the goal of the authentication interface which is able to
+	        authenticate users. <xref linkend="userConnection">
+	            The user connection
+	          </xref> shows how the Scheduler connects a user. <figure
+	            id="userConnection">
+	            <title>A user connection</title>
+	
+	            <mediaobject>
+	              <imageobject>
+	                <imagedata align="center"
+	                           fileref="scheduler/pics/core/userConnection.jpg"
+	                           format="JPG" />
+	              </imageobject>
+	            </mediaobject>
+	          </figure> <orderedlist>
+	            <listitem>
+	              <para>First of all, a user tries to join the authentication
+	              interface using the <emphasis
+	              role="bold">SchedulerConnection.join(...)</emphasis> static
+	              method. </para>
+	
+	              <programlisting lang="java">SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");</programlisting>
+	
+	              <para> Then, with the <emphasis
+	              role="bold">SchedulerAuthenticationInterface</emphasis>, users
+	              can be connected as user or administrator roles using the
+	              <emphasis role="bold">logAsUser</emphasis> or <emphasis
+	              role="bold">logAsAdmin</emphasis> methods. </para>
+	
+	              <programlisting lang="java">UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+	// OR
+	AdminSchedulerInterface scheduler = auth.logAsAdmin("adminname", "password");</programlisting>
+	            </listitem>
+	
+	            <listitem>
+	              <para>Next, the authentication object checks the users rights
+	              and wether the user is authorized to connect the scheduler. If
+	              not, an exception will be thrown.</para>
+	            </listitem>
+	
+	            <listitem>
+	              <para>Once connected, the authentication object sends the right
+	              and username/password to the scheduler front-end which will be
+	              able to authenticate user on its own.</para>
+	            </listitem>
+	
+	            <listitem>
+	              <para>If nothing goes wrong, the authentication interface will
+	              return a <emphasis
+	              role="bold">AdminSchedulerInterface</emphasis> which is in fact
+	              a direct link to the <emphasis
+	              role="bold">Front-end</emphasis>.</para>
+	            </listitem>
+	
+	            <listitem>
+	              <para>The user is now able to interact with the Scheduler using
+	              the returned interface.</para>
+	            </listitem>
+	          </orderedlist></para>
+	      </sect3>
+	
+	      <sect3 id="Job_submission">
+	        <title>Job Submission</title>
+	
+	        <para>After the connection, a user is ready to submit Jobs. The
+	        <emphasis role="bold">Authentication interface is no longer
+	        used</emphasis> for this connected user. <xref linkend="jobSubmission">
+	            The job submission
+	          </xref> shows what happens when the Scheduler received a new Job to
+	        schedule. <figure id="jobSubmission">
+	            <title>A job submission</title>
+	
+	            <mediaobject>
+	              <imageobject>
+	                <imagedata align="center"
+	                           fileref="scheduler/pics/core/jobSubmission.jpg"
+	                           format="JPG" />
+	              </imageobject>
+	            </mediaobject>
+	          </figure> <orderedlist>
+	            <listitem>
+	              <para>First, the user submits a Job using his <emphasis
+	              role="bold">UserSchedulerInterface</emphasis> retrieved by the
+	              <emphasis role="bold">logAsUser</emphasis> method.
+	              <programlisting lang="java">// connecting to the scheduler
+	SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
+	// checking username and password
+	UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+	// submitting a new job
+	scheduler.submit(job);</programlisting></para>
+	            </listitem>
+	
+	            <listitem>
+	              <para>The Scheduler Front-end verifies the integrity of the Job,
+	              and builds it in order to be ready to be managed by the
+	              Scheduler Core. If there is a problem, an exception is thrown
+	              explaining what is the cause.</para>
+	            </listitem>
+	
+	            <listitem>
+	              <para>Finally, the Job is transmitted to the Core for
+	              scheduling.</para>
+	            </listitem>
+	          </orderedlist></para>
+	      </sect3>
+	    </sect2>
+	
+	    <sect2 id="admin_interface">
+	      <title>Administrator Interface</title>
+	
+	      <para></para>
+	
+	      <sect3 id="communicator">
+	        <title>Communicator</title>
+	
+	        <para></para>
+	      </sect3>
+	    </sect2>
+	</sect2>
+	
+    
   </sect1>
 
   <sect1 id="scheduler_extension">

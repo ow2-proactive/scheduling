@@ -88,8 +88,11 @@ public class ProActiveTask extends Task {
     }
 
     /**
-     * Set the number of nodes needed for this task.
-     * (by default : 1)
+     * Set the number of nodes needed for this task.<br />
+     * This number represents the total number of nodes that you need. You may remember that
+     * one node is used to start your task. So if you ask for 11 nodes, 10 would be given to your
+     * ProActive executable task.
+     * (Default number is 1)
      *
      * @param numberOfNodesNeeded the number Of Nodes Needed to set.
      */
