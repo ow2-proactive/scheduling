@@ -140,9 +140,12 @@
 				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
 				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
 				
+				<group title="ProActive entry point">
+					<package name="org.objectweb.proactive.api" />
+				</group>
+					
 				<group title="ProActive Core">
 					<package name="org.objectweb.proactive.core*" />
-					<package name="org.objectweb.proactive.api" />
 					<package name="org.objectweb.proactive.filetransfer*" />
 					<package name="org.objectweb.proactive.ext.*" />
 					<package name="org.objectweb.proactive.mpi.*" />
