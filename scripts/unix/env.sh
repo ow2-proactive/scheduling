@@ -1,13 +1,13 @@
 #!/bin/sh
 # ----------------------------------------------------------------------------
 #
-# This variable should be set to the directory where is installed ProActive
+# This variable should be set to the directory where is installed PROACTIVE
 #
 
-if [ -z "$PROACTIVE" ]
+if [ -z "$PROACTIVE_HOME" ]
 then
 workingDir=`dirname $0`
-PROACTIVE=$(cd $workingDir/../.././ || (echo "Broken ProActive installation" ; exit 1) && echo $PWD)
+PROACTIVE_HOME=$(cd $workingDir/../.././ || (echo "Broken PROACTIVE_HOME installation" ; exit 1) && echo $PWD)
 CLASSPATH=.
 fi
 
@@ -29,37 +29,27 @@ fi
 # Set up the classpath using classes dir or jar files
 #
 
-if [ -d $PROACTIVE/classes ]
+if [ -d $PROACTIVE_HOME/classes ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Core
-    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extensions
-    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extra
-    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Examples
-    for i in $PROACTIVE/lib/*.jar ; do
+    CLASSPATH=$CLASSPATH:$PROACTIVE_HOME/classes/Core
+    CLASSPATH=$CLASSPATH:$PROACTIVE_HOME/classes/Extensions
+    CLASSPATH=$CLASSPATH:$PROACTIVE_HOME/classes/Extra
+    CLASSPATH=$CLASSPATH:$PROACTIVE_HOME/classes/Examples
+    for i in $PROACTIVE_HOME/lib/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
 else 
-    for i in $PROACTIVE/dist/lib/*.jar ; do
+    for i in $PROACTIVE_HOME/dist/lib/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
-fi
-
-if [ -f $PROACTIVE/ProActive_examples.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ProActive_examples.jar
-fi
-if [ -f $PROACTIVE/ic2d.jar ]
-then
-    CLASSPATH=$CLASSPATH:$PROACTIVE/ic2d.jar
 fi
 
 #echo "CLASSPATH"=$CLASSPATH 
 export CLASSPATH
 
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PROACTIVE/scripts/proactive.java.policy -Dlog4j.configuration=file:$PROACTIVE/scripts/proactive-log4j "
-#export LD_LIBRARY_PATH=~/softs/yjp/bin/linux-amd64
-#JAVACMD="$JAVACMD -agentlib:yjpagent -Dcom.sun.management.jmxremote "
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PROACTIVE_HOME/scripts/proactive.java.policy -Dlog4j.configuration=file:$PROACTIVE_HOME/scripts/proactive-log4j "
+
 export JAVACMD
 
 
