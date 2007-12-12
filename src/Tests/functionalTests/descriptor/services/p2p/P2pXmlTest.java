@@ -43,7 +43,6 @@ import org.objectweb.proactive.core.process.JVMProcessImpl;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
-
 /**
  * Test service: P2P JVM acquisition in deployment descriptor
  *
