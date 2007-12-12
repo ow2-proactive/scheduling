@@ -69,8 +69,6 @@
       </listitem>
     </itemizedlist>
 
-    <para>Further research information is available <ulink
-    url="http://www-sop.inria.fr/oasis/personnel/Alexandre.Di_Costanzo/publications.html">here</ulink>.</para>
   </sect1>
 
   <sect1  id="bnb_model">
@@ -179,7 +177,7 @@
 
       <screen> org.objectweb.proactive.branchnbound.core </screen>
 
-      <para>All abstract methods are described bellow:</para>
+      <para>All methods are described bellow:</para>
 
       <sect3 >
         <title>public Result execute()</title>
@@ -213,8 +211,7 @@
       <sect3 >
         <title>public Result gather(Result[] results)</title>
 
-        <para>This one is <emphasis role="bold">not abstract</emphasis> but it
-        is strongly recommended to override it. The default behavior is to
+        <para>The default behavior is to
         return the smallest Result gave by the compareTo method. That's why it
         is also recommended to override the <emphasis
         role="bold">compareTo(Object)</emphasis> method.</para>
