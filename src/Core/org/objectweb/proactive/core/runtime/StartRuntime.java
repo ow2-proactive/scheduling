@@ -32,7 +32,7 @@ package org.objectweb.proactive.core.runtime;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -60,7 +60,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class StartRuntime {
-    static Logger logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
+    static Logger logger = null;
 
     /** The VirtualNode that started this ProActive Runtime */
     protected String creatorID;
@@ -83,19 +83,25 @@ public class StartRuntime {
     }
 
     public static void main(String[] args) {
-        if (PAProperties.LOG4J_DEFAULT_INIT_OVERRIDE.isTrue() &&
-                PAProperties.LOG4J.isSet()) {
+        // PAProperties cannot be used since we do not want to use log4j
+        String defaultInitOverride = System.getProperty(
+                "log4j.defaultInitOverride");
+        String log4jFile = System.getProperty("log4j.configuration");
+
+        if ("true".equals(defaultInitOverride) && (log4jFile != null)) {
             // configure log4j here to avoid classloading problems with log4j classes
             try {
-                String log4jConfiguration = PAProperties.LOG4J.getValue();
-                File f = new File(log4jConfiguration);
-                PropertyConfigurator.configure(new URL(f.getPath()));
+                URI log4jConfigurationURI = URI.create(log4jFile);
+                PropertyConfigurator.configure(log4jConfigurationURI.toURL());
             } catch (IOException e) {
                 System.out.println(
                     "Error : incorrect path for log4j configuration : " +
-                    PAProperties.LOG4J.getValue());
+                    log4jFile);
             }
         }
+        System.out.println("log4j is ready");
+
+        logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
         ProActiveConfiguration.load();
 

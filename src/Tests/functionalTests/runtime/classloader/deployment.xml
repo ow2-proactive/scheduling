@@ -43,8 +43,10 @@
 					<jvmParameters>
 						<parameter value="-Dproactive.test=true"/>
 						<parameter value="-Dlog4j.configuration=file:///proactive.home/compile/proactive-log4j"/>
+<!--			
 						<parameter value="-Djaxp.debug=true"/>
 						<parameter value="-Dsun.misc.URLClassPath.debug=true"/>
+-->						
 					</jvmParameters>
 					
 				</jvmProcess>
