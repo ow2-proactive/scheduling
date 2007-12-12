@@ -467,7 +467,7 @@
   <xsl:template match="bookinfo/subtitle" mode="book.titlepage.recto.mode">
   <fo:inline color="#0010FF" >
    <xsl:attribute name="font-weight">bold</xsl:attribute>
-   <xsl:attribute name="font-size">40pt</xsl:attribute>
+   <xsl:attribute name="font-size">21pt</xsl:attribute>
      <xsl:apply-templates mode="titlepage.mode" /> 
   </fo:inline>
 
@@ -514,8 +514,8 @@
   <fo:block text-align="center">
     <fo:external-graphic>
       <xsl:attribute name="src">images/logo-objectweb250.png</xsl:attribute>
-      <xsl:attribute name="height">50pt</xsl:attribute>
-      <xsl:attribute name="content-height">50pt</xsl:attribute>
+      <xsl:attribute name="height">45pt</xsl:attribute>
+      <xsl:attribute name="content-height">45pt</xsl:attribute>
     </fo:external-graphic>
   </fo:block>
 
@@ -549,7 +549,7 @@
        <fo:block text-align="center">
           <fo:external-graphic >
             <xsl:attribute name="src">images/logo-INRIA.png</xsl:attribute>
-            <xsl:attribute name="height">60pt</xsl:attribute>
+            <xsl:attribute name="height">40pt</xsl:attribute>
             <xsl:attribute name="content-height">60pt</xsl:attribute>
            </fo:external-graphic>
        </fo:block>
@@ -558,8 +558,8 @@
        <fo:block text-align="center">
        <fo:external-graphic>
         <xsl:attribute name="src">images/logo-UNSA.png</xsl:attribute>
-        <xsl:attribute name="height">60pt</xsl:attribute>
-        <xsl:attribute name="content-height">60pt</xsl:attribute>
+        <xsl:attribute name="height">40pt</xsl:attribute>
+        <xsl:attribute name="content-height">40pt</xsl:attribute>
        </fo:external-graphic>
        </fo:block>
       </fo:table-cell>
