@@ -5,16 +5,16 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/user/cdelbe/home/ProActiveStd/ProActiveSVN/"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME" value="/user/bamedro/home/ProActive-Stable"/> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA_HOME" 
-			value="/user/cdelbe/home/bin/jdk1.6.0_01/" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+			value="/user/bamedro/home/apps/java-x86_64" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
 			<virtualNode name="Workers" property="multiple"
 				ftServiceId="appli" />
 			<virtualNode name="Failed" property="multiple"
-				ftServiceId="ressource" />
+				ftServiceId="resources" />
 		</virtualNodesDefinition>
 	</componentDefinition>
 	<deployment>
@@ -97,8 +97,8 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
 						                        <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
+						                        <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive_examples.jar"/>
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
-
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar"/>
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar"/>
@@ -124,70 +124,70 @@
 			<processDefinition id="jvmAppli1">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="pollux">
+					hostname="eon1">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli2">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="naruto">
+					hostname="eon2">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli3">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="schubby">
+					hostname="eon3">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli4">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="cheypa">
+					hostname="eon4">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli5">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="lo">
+					hostname="eon5">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli6">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="sgouirk">
+					hostname="eon6">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli7">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="islamabad">
+					hostname="eon7">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli8">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="orchidee">
+					hostname="eon8">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed1">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="petawawa">
+					hostname="eon9">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed2">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="nyx">
+					hostname="eon10">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
@@ -196,16 +196,16 @@
 			<serviceDefinition id="appli">
 				<faultTolerance>
 					<protocol type="cic"></protocol>
-					<globalServer url="rmi://duff:1100/FTServer"></globalServer>
+					<globalServer url="rmi://eon11:1100/FTServer"></globalServer>
 					<ttc value="15"></ttc>
 				</faultTolerance>
 			</serviceDefinition>
 
-			<serviceDefinition id="ressource">
+			<serviceDefinition id="resources">
 				<faultTolerance>
 					<protocol type="cic"></protocol>
-					<globalServer url="rmi://duff:1100/FTServer"></globalServer>
-					<resourceServer url="rmi://duff:1100/FTServer" />
+					<globalServer url="rmi://eon11:1100/FTServer"></globalServer>
+					<resourceServer url="rmi://eon11:1100/FTServer" />
 					<ttc value="15"></ttc>
 				</faultTolerance>
 			</serviceDefinition>
