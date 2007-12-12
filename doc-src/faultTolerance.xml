@@ -63,10 +63,6 @@
       overhead on failure-free execution, but the recovery time is lower as a
       single failure does not involve all the system.</para>
 
-      <para><emphasis role="bold">Warning:</emphasis> For the version 3.0,
-      those two protocols are not compatible: a fault-tolerance application
-      can use <emphasis role="bold">only</emphasis> one of the two protocols.
-      This compatibility will be provide in the next version.</para>
     </sect2>
   </sect1>
 
@@ -439,7 +435,7 @@ rvice(body);
     </sect2>
 
     <sect2 >
-      <title>Limitations</title>
+      <title>Limitations and known bugs</title>
 
       <para>Fault-tolerance in ProActive is still not compliant with the
       following features:</para>
@@ -455,6 +451,17 @@ rvice(body);
           fault-tolerance servers are implemented using standard RMI.</para>
         </listitem>
       </itemizedlist>
+      
+      <para>CIC and PML protocols are not compatible: a fault-tolerance application
+      can use <emphasis role="bold">only</emphasis> one of the two protocols.</para>
+      
+      <para>Fault-Tolerance in ProActive is not compliant with on-the-fly RMI 
+      stub generation, available since Java 1.5; even with a JRE 1.5 or greater, 
+      ProActive RMI stubs must be created <emphasis role="bold">before</emphasis> 
+      running the application, with <literal>/ProActive/compile/build.[sh/bat] 
+      compile</literal>.</para>
+      
+      
     </sect2>
   </sect1>
 
@@ -465,7 +472,7 @@ rvice(body);
       <title>Description</title>
 
       <para>You can find in
-      <literal>ProActive/scripts/[unix|windows]/ft/nbodyft.[sh|bat]</literal>
+      <literal>ProActive/scripts/[unix|windows]/FT/nbodyft.[sh|bat]</literal>
       a script that starts a fault-tolerant version of the <ulink
       url="http://www-sop.inria.fr/oasis/ProActive/apps/nbody.html">ProActive
       NBody</ulink> example. This script actually call the
@@ -499,7 +506,7 @@ rvice(body);
       had just before the failure.</para>
     </sect2>
 
-    <sect2 >
+    <sect2>
       <title>Running NBody example</title>
 
       <para>Before starting the fault-tolerant body example, you have to edit
@@ -548,6 +555,11 @@ rvice(body);
    &lt;/serviceDefinition&gt;
   &lt;/services&gt;
  ...</screen>
+
+	  <para> Before running the application itself, you should start the Fault-Tolerance
+	  server, using  <literal>ProActive/scripts/[unix|windows]/FT/startGlobalFTServer.[sh|bat]</literal>
+      script (see 'Fault-Tolerance servers' section).</para>
+
 
       <para>Finally, you can start the fault-tolerant ProActive NBody and
       choose the version you want to run:</para>
