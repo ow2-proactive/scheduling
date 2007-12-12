@@ -4,15 +4,24 @@
 # This variable should be set to the directory where is installed PROACTIVE
 #
 
-if [ -z "$PROACTIVE_HOME" ]
-then
-workingDir=`dirname $0`
-PROACTIVE_HOME=$(cd $workingDir/../.././ || (echo "Broken PROACTIVE_HOME installation" ; exit 1) && echo $PWD)
 CLASSPATH=.
+
+# User envrionment variable
+if [ ! -z "$PROACTIVE_HOME" ] ; then
+	PROACTIVE=$PROACTIVE_HOME
+fi 
+
+
+# Internal ProActive scripts can override $PROACTIVE
+if [ -z "$PROACTIVE" ]
+then
+	workingDir=`dirname $0`
+	PROACTIVE=$(cd $workingDir/../.././ || (echo "Broken PROACTIVE installation" ; exit 1) && echo $PWD)
 fi
 
 
 # ----------------------------------------------------------------------------
+
 
 JAVA_HOME=${JAVA_HOME-NULL};
 if [ "$JAVA_HOME" = "NULL" ]
@@ -29,17 +38,17 @@ fi
 # Set up the classpath using classes dir or jar files
 #
 
-if [ -d $PROACTIVE_HOME/classes ]
+if [ -d $PROACTIVE/classes ]
 then
-    CLASSPATH=$CLASSPATH:$PROACTIVE_HOME/classes/Core
-    CLASSPATH=$CLASSPATH:$PROACTIVE_HOME/classes/Extensions
-    CLASSPATH=$CLASSPATH:$PROACTIVE_HOME/classes/Extra
-    CLASSPATH=$CLASSPATH:$PROACTIVE_HOME/classes/Examples
-    for i in $PROACTIVE_HOME/lib/*.jar ; do
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Core
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extensions
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Extra
+    CLASSPATH=$CLASSPATH:$PROACTIVE/classes/Examples
+    for i in $PROACTIVE/lib/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
 else 
-    for i in $PROACTIVE_HOME/dist/lib/*.jar ; do
+    for i in $PROACTIVE/dist/lib/*.jar ; do
       CLASSPATH=$CLASSPATH:$i
     done
 fi
@@ -48,7 +57,7 @@ fi
 export CLASSPATH
 
 
-JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PROACTIVE_HOME/scripts/proactive.java.policy -Dlog4j.configuration=file:$PROACTIVE_HOME/scripts/proactive-log4j "
+JAVACMD=$JAVA_HOME"/bin/java -Djava.security.manager -Djava.security.policy=$PROACTIVE/scripts/proactive.java.policy -Dlog4j.configuration=file:$PROACTIVE/scripts/proactive-log4j "
 
 export JAVACMD
 
