@@ -36,6 +36,7 @@ import java.util.Map;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.scheduler.common.job.TaskFlowJob;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable;
+import org.objectweb.proactive.extensions.scheduler.common.task.util.TaskConstructorTools;
 
 
 /**
@@ -84,6 +85,10 @@ public class JavaTask extends Task {
      * @param taskClass the task Class to set.
      */
     public void setTaskClass(Class<JavaExecutable> taskClass) {
+        if (!TaskConstructorTools.hasEmptyConstructor(taskClass)) {
+            throw new RuntimeException("WARNING : The executable class '" +
+                taskClass + "' must have a public no parameter constructor !");
+        }
         this.taskClass = taskClass;
         this.taskInstance = null;
     }
@@ -104,6 +109,11 @@ public class JavaTask extends Task {
      * @param taskInstance the task Instance to set.
      */
     public void setTaskInstance(JavaExecutable taskInstance) {
+        if (!TaskConstructorTools.hasEmptyConstructor(taskInstance.getClass())) {
+            throw new RuntimeException("WARNING : The executable class '" +
+                taskInstance.getClass() +
+                "' must have a public no parameter constructor !");
+        }
         this.taskInstance = taskInstance;
         this.taskClass = null;
     }
