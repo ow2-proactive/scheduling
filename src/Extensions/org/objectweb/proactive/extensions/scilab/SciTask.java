@@ -123,7 +123,27 @@ public class SciTask extends AbstractGeneralTask {
 
     public void init() {
         if (!initialized) {
+            if (logger.isInfoEnabled()) {
+                logger.info("Initializing Scilab engine using :" +
+                    System.getenv("SCI"));
+            }
             Scilab.init();
+            initialized = true;
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    public void run() {
+                        terminateEngine();
+                    }
+                }));
+        }
+    }
+
+    public static void terminateEngine() {
+        if (initialized) {
+            Scilab.Finish();
+            initialized = false;
+            if (logger.isDebugEnabled()) {
+                logger.debug("->SciTask Scilab Engine Terminated");
+            }
         }
     }
 

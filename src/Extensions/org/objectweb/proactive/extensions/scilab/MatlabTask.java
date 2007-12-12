@@ -156,6 +156,21 @@ public class MatlabTask extends AbstractGeneralTask {
             } catch (Throwable e) {
                 throw new MatlabException(e);
             }
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                    public void run() {
+                        terminateEngine();
+                    }
+                }));
+        }
+    }
+
+    public static void terminateEngine() {
+        if (matlabEngine != null) {
+            matlabEngine.close(engineHandle);
+            matlabEngine = null;
+            if (logger.isDebugEnabled()) {
+                logger.debug("->MatlabTask Matlab Engine Terminated");
+            }
         }
     }
 

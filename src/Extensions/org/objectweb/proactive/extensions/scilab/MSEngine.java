@@ -85,6 +85,7 @@ public class MSEngine implements Serializable {
 
     public void exit() {
         //logger.debug("->MSEngineWorker In:exit");
+        mSEngineWorker.exit();
         this.killWorker();
         System.exit(0);
     }

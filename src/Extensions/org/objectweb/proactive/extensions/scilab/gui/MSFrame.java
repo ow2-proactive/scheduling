@@ -1040,6 +1040,10 @@ public class MSFrame extends javax.swing.JFrame {
         if ((this.dialogTask.getState() == DialogTask.CANCEL)) {
             return;
         }
+        if ((this.dialogTask.getFile() == null)) {
+            txtLog.append("->Error : File not selected\n");
+            return;
+        }
 
         int priority = GenTaskInfo.NORMAL;
 

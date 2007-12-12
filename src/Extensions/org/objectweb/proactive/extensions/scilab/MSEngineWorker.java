@@ -34,6 +34,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -52,6 +53,11 @@ public class MSEngineWorker implements Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_TASK);
 
     public MSEngineWorker() {
+    }
+
+    public int setImmediateServices() {
+        PAActiveObject.setImmediateService("exit");
+        return 0; // synchronous call
     }
 
     /**
@@ -158,7 +164,12 @@ public class MSEngineWorker implements Serializable {
         return genTask.execute();
     }
 
-    public void exit() {
-        System.exit(0);
+    public int exit() {
+        if (logger.isDebugEnabled()) {
+            logger.debug("->MSEngineWorker In: exit");
+        }
+        SciTask.terminateEngine();
+        MatlabTask.terminateEngine();
+        return 0; //synchronous call
     }
 }
