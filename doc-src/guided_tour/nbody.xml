@@ -534,7 +534,7 @@
                if (i != this.identification) // don't notify self!
                this.neighbours[i].setValue(this.info, this.identification);</programlisting>
 
-      <para>Well, that's BAAAAD, or at least inefficient! Replace this by the
+      <para>Well, that's is inefficient so replace this by the
       following code, because it works faster:</para>
 
       <para><literal> this.neighbours.setValue(this.info,
@@ -552,11 +552,11 @@
     </sect2>
 
     <sect2>
-      <title>groupdistrib</title>
+    <!-- TODO title might be wrong -->
+      <title>Group Distribution</title>
 
-      <para>Now, do we like the idea that the synchronization is centralized
-      on one entity, the <literal>Maestro</literal>? I don't and it's the
-      bottleneck of the application anyway: once a <literal>Domain</literal>
+      <para>Because the synchronization is centralized
+      on one entity, the <literal>Maestro</literal>? once a <literal>Domain</literal>
       has finished, it sends the notifyFinshed, and then sits idle. A way of
       making this better is to remove this bottleneck completely! This is done
       by using an odd-even scheme: if a Domain receives information from a

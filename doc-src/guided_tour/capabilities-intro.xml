@@ -23,7 +23,7 @@
 
   <sect1 id="C3D_example">
     <title>Parallel processing and collaborative application with
-    ProActive: C3D : a parallel, distributed and collaborative 3D renderer</title>
+    ProActive: C3D a 3D renderer</title>
 
     <para>Distribution is often used for CPU-intensive applications, where
     parallelism is a key for performance. </para>
@@ -94,7 +94,7 @@
       rendering.</para>
 
       <para><figure>
-          <title>the dispatcher GUI is launched</title>
+          <title>The dispatcher GUI is launched</title>
 
           <mediaobject>
             <imageobject>
