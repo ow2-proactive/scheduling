@@ -502,9 +502,21 @@ public Object execute(TaskResult... results) throws Throwable {
 		      			</programlisting>
 		      		</listitem>
 		      		<listitem>
-		      			<emphasis>result descriptor</emphasis> (TODO, chrichri, can you explain this feature ? and give a java example -> ? inner anonymous class ?)
+		      			<emphasis>result preview</emphasis> allows to specify how the result of a task should be displayed in 
+		      			the Scheduler graphical client. The user should implement a result preview class (that extends <literal>org.objectweb.proactive.extensions.scheduler.common.task.ResultPreview</literal> 
+		      			abstract class) which specifies result rendrering in two different manners :
+		      			<itemizedlist>
+		      				<listitem> a textual manner, by implementing <literal>public abstract String getTextualDescription(TaskResult result);</literal>. 
+		      				This method, similarily to <literal>String Object.toString()</literal> should return a <literal>String</literal> object that describes the result;
+		      				</listitem>
+		      				<listitem> a graphical manner, by implementing <literal>public abstract JPanel getGraphicalDescription(TaskResult result);</literal>.
+		      				This method should return a Swing <literal>JPanel</literal> object that describes the result.
+		      				</listitem>
+		      			</itemizedlist>
+		      			Some usefull methods to create a specific preview class can be found in <literal>org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool</literal>, 
+		      			such as automatic display of an image file, or automatic translation between windows and unix path.
 		      			<programlisting lang="java">
-	aTask.setResultDescriptor(...);
+	aTask.setResultPreview(UserDefinedResultPreview.class);
 		      			</programlisting>
 		      		</listitem>
 		      		<listitem>

@@ -724,7 +724,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
             // HANDLE DESCIPTORS
             if (res != null) {
-                res.setDescriptorClass(descriptor.getResultDescriptor());
+                res.setDescriptorClass(descriptor.getResultPreview());
             }
 
             if (res != null) {

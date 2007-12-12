@@ -70,7 +70,7 @@ public abstract class Task implements Serializable {
     protected String description;
 
     /** Description of the result of the task */
-    protected Class<?extends ResultPreview> resultDescriptor;
+    protected Class<?extends ResultPreview> resultPreview;
 
     /**
      * selection script : can be launched before getting a node in order to
@@ -158,23 +158,22 @@ public abstract class Task implements Serializable {
     }
 
     /**
-     * Return the result descriptor of this task.
+     * Return the result preview of this task.
      *
-     * @return the result descriptor of this task.
+     * @return the result preview of this task.
      */
-    public Class<?extends ResultPreview> getResultDescriptor() {
-        return resultDescriptor;
+    public Class<?extends ResultPreview> getResultPreview() {
+        return resultPreview;
     }
 
     /**
-     * Set the result descriptor of this task.
+     * Set the result preview of this task.
      *
-     * @param resultDescriptor
-     *            the result descriptor  to set.
+     * @param resultPreview
+     *            the result preview  to set.
      */
-    public void setResultDescriptor(
-        Class<?extends ResultPreview> resultDescriptor) {
-        this.resultDescriptor = resultDescriptor;
+    public void setResultPreview(Class<?extends ResultPreview> resultPreview) {
+        this.resultPreview = resultPreview;
     }
 
     /**

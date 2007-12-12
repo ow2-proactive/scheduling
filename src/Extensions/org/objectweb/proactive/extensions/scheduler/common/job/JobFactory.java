@@ -379,12 +379,12 @@ public class JobFactory {
         System.out.println("desc = " + task.getDescription());
 
         // TASK RESULT DESCRIPTION
-        String descriptorClassName = (String) xpath.evaluate("@resultPreviewClass",
+        String previewClassName = (String) xpath.evaluate("@resultPreviewClass",
                 taskNode, XPathConstants.STRING);
-        if (!descriptorClassName.equals("")) {
-            System.out.println("Descriptor class = " + descriptorClassName);
-            Class<?extends ResultPreview> descriptorClass = (Class<?extends ResultPreview>) Class.forName(descriptorClassName);
-            task.setResultDescriptor(descriptorClass);
+        if (!previewClassName.equals("")) {
+            System.out.println("Preview class = " + previewClassName);
+            Class<?extends ResultPreview> descriptorClass = (Class<?extends ResultPreview>) Class.forName(previewClassName);
+            task.setResultPreview(descriptorClass);
         }
 
         // TASK PRECIOUS RESULT
