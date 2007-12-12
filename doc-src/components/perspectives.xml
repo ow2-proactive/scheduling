@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="perspectives">
-  <title>Component perspectives: a support for our research work</title>
+  <title>Component perspectives: a support for advanced research</title>
 
   <para>The ProActive/Fractal framework is a functional and flexible
   implementation of the Fractal API and model. One can configure and deploy a
