@@ -177,7 +177,7 @@ public class FunctionalTest {
         while (line != null) {
             if (line.matches(".*proactive.test=true.*") ||
                     line.matches(".*StartP2PService.*")) {
-                logger.warn("MATCH " + line);
+                logger.debug("MATCH " + line);
 
                 String pid = line.substring(0, line.indexOf(" "));
                 Process kill = null;
@@ -191,7 +191,7 @@ public class FunctionalTest {
                                   .exec(new String[] { "taskkill", "/PID", pid });
                     break;
                 default:
-                    System.err.println("Unsupported operating system");
+                    logger.info("Unsupported operating system");
                     break;
                 }
 
@@ -201,7 +201,7 @@ public class FunctionalTest {
                     e.printStackTrace();
                 }
             } else {
-                logger.warn("NO MATCH " + line);
+                logger.debug("NO MATCH " + line);
             }
             line = bReader.readLine();
         }
