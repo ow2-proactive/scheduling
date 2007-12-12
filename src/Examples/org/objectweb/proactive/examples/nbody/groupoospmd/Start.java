@@ -32,7 +32,7 @@ package org.objectweb.proactive.examples.nbody.groupoospmd;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -74,7 +74,7 @@ public class Start {
         }
         Domain domainGroup = null;
         try {
-            domainGroup = (Domain) ProSPMD.newSPMDGroup(Domain.class.getName(),
+            domainGroup = (Domain) PASPMD.newSPMDGroup(Domain.class.getName(),
                     constructorParams, nodes);
         } catch (NodeException e) {
             killsupport.abort(e);

@@ -28,17 +28,18 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.core.group.spmd;
+package org.objectweb.proactive.api;
 
 import java.lang.reflect.InvocationTargetException;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProxyForGroup;
+import org.objectweb.proactive.core.group.spmd.MethodCallBarrier;
+import org.objectweb.proactive.core.group.spmd.MethodCallBarrierWithMethodName;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -58,14 +59,15 @@ import org.objectweb.proactive.core.node.NodeFactory;
  * Object[] params = {param1,param2,...};
  * Node[] nodes = {node1,node2,...};
  *
- * A group  =  (A) ProSPMD.newSPMDGroup("A", params, nodes);
+ * A group  =  (A) PASPMD.newSPMDGroup("A", params, nodes);
  * </pre>
  *
  * @version 1.0,  2003/10/09
  * @since   ProActive 1.0.3
  * @author Laurent Baduel
  */
-public class ProSPMD {
+@PublicAPI
+public class PASPMD {
 
     /**
      * Creates an object representing a spmd group (a typed group) and creates all members with params on the node.
@@ -84,7 +86,7 @@ public class ProSPMD {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
-        return ProSPMD.newSPMDGroup(className, params, nodeList);
+        return PASPMD.newSPMDGroup(className, params, nodeList);
     }
 
     /**
@@ -105,7 +107,7 @@ public class ProSPMD {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
-        return ProSPMD.newSPMDGroup(className, params, nodeList);
+        return PASPMD.newSPMDGroup(className, params, nodeList);
     }
 
     /**
@@ -125,7 +127,7 @@ public class ProSPMD {
             ActiveObjectCreationException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
-        return ProSPMD.newSPMDGroup(className, params, nodeList);
+        return PASPMD.newSPMDGroup(className, params, nodeList);
     }
 
     /**
@@ -173,7 +175,7 @@ public class ProSPMD {
         VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException,
             ActiveObjectCreationException, NodeException {
-        return ProSPMD.newSPMDGroup(className, params, virtualNode.getNodes());
+        return PASPMD.newSPMDGroup(className, params, virtualNode.getNodes());
     }
 
     // -------------------------------------------------------------------------
@@ -195,7 +197,7 @@ public class ProSPMD {
         throws ClassNotFoundException, ClassNotReifiableException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
-        return ProSPMD.newSPMDGroupInParallel(className, params, nodeList);
+        return PASPMD.newSPMDGroupInParallel(className, params, nodeList);
     }
 
     /**
@@ -214,7 +216,7 @@ public class ProSPMD {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
-        return ProSPMD.newSPMDGroupInParallel(className, params, nodeList);
+        return PASPMD.newSPMDGroupInParallel(className, params, nodeList);
     }
 
     /**
@@ -231,7 +233,7 @@ public class ProSPMD {
         throws ClassNotFoundException, ClassNotReifiableException {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
-        return ProSPMD.newSPMDGroupInParallel(className, params, nodeList);
+        return PASPMD.newSPMDGroupInParallel(className, params, nodeList);
     }
 
     /**
@@ -248,7 +250,7 @@ public class ProSPMD {
     public static Object newSPMDGroupInParallel(String className,
         Object[][] params, VirtualNodeInternal virtualNode)
         throws ClassNotFoundException, ClassNotReifiableException, NodeException {
-        return ProSPMD.newSPMDGroupInParallel(className, params,
+        return PASPMD.newSPMDGroupInParallel(className, params,
             virtualNode.getNodes());
     }
 
@@ -301,7 +303,7 @@ public class ProSPMD {
      * @return a size (int)
      */
     public static int getMySPMDGroupSize() {
-        return PAGroup.getGroup(ProSPMD.getSPMDGroup()).size();
+        return PAGroup.getGroup(PASPMD.getSPMDGroup()).size();
     }
 
     /**
@@ -309,7 +311,7 @@ public class ProSPMD {
      * @return the index of the object
      */
     public static int getMyRank() {
-        return PAGroup.getGroup(ProSPMD.getSPMDGroup())
+        return PAGroup.getGroup(PASPMD.getSPMDGroup())
                       .indexOf(PAActiveObject.getStubOnThis());
     }
 
@@ -318,7 +320,7 @@ public class ProSPMD {
      * @param barrierName the name of the barrier (used as unique identifier)
      */
     public static void barrier(String barrierName) {
-        ProSPMD.barrier(barrierName, ProSPMD.getSPMDGroup());
+        PASPMD.barrier(barrierName, PASPMD.getSPMDGroup());
     }
 
     /**

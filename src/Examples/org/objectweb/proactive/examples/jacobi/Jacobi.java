@@ -39,10 +39,10 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -69,12 +69,12 @@ public class Jacobi implements Serializable {
     /**
      * Min diff to stop
      */
-    public static final double MINDIFF = 0.001;
+    public static final double MINDIFF = 0.000000001;
 
     /**
      * Default external border value
      */
-    public static final double DEFAULT_BORDER_VALUE = 0;
+    public static final double DEFAULT_BORDER_VALUE = 1;
 
     /**
      * the filename which will store the results
@@ -171,7 +171,7 @@ public class Jacobi implements Serializable {
 
         SubMatrix matrix = null;
         try {
-            matrix = (SubMatrix) ProSPMD.newSPMDGroup(SubMatrix.class.getName(),
+            matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(),
                     params, nodes);
         } catch (ClassNotFoundException e) {
             System.err.println("** ClassNotFoundException **");

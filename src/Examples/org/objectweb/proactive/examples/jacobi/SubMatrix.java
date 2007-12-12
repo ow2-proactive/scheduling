@@ -40,8 +40,8 @@ import java.text.DecimalFormat;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.group.topology.Plan;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -144,7 +144,7 @@ public class SubMatrix implements Serializable {
         this.current = new double[x * y];
         this.old = new double[x * y];
         for (int i = 0; i < this.old.length; i++) {
-            this.old[i] = Math.random() * 10000;
+            this.old[i] = 1000000;
         }
     }
 
@@ -310,7 +310,7 @@ public class SubMatrix implements Serializable {
      * Connects this submatrix with its neighbors and send them its borders
      */
     public void buildNeighborhood() {
-        this.matrix = (SubMatrix) ProSPMD.getSPMDGroup();
+        this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
         Group allSubMatrix = PAGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
@@ -503,7 +503,7 @@ public class SubMatrix implements Serializable {
      */
     public void compute() {
         this.buildNeighborhood();
-        ProSPMD.barrier("InitDone");
+        PASPMD.barrier("InitDone");
 
         this.asyncRefToMe.loop();
     }
@@ -518,7 +518,7 @@ public class SubMatrix implements Serializable {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        ProSPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop,
+        PASPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop,
             this.neighbors);
         // compute the border values
         this.asyncRefToMe.borderCompute();
@@ -534,11 +534,14 @@ public class SubMatrix implements Serializable {
             logger.info("[JACOBI] [" + this.name +
                 "] Computation over :\n      " + this.minDiff +
                 " (asked less than " + Jacobi.MINDIFF + ")");
+            this.matrix.stop();
         }
+
+        /*
         if (this.minDiff < Jacobi.MINDIFF) {
             System.out.println("[" + this.name + "] sent the \"end signal\"");
             this.matrix.stop();
-        }
+        }*/
     }
 
     /**
@@ -548,7 +551,7 @@ public class SubMatrix implements Serializable {
         this.iterationsToStop = 0;
         logger.debug("[JACOBI] [" + this.name +
             "] Stop Message Received, waiting for others.");
-        ProSPMD.barrier("stop");
+        PASPMD.barrier("stop");
         if ((north != null) && (east != null) && (west != null) &&
                 (south != null)) {
             PrintWriter pw = null;

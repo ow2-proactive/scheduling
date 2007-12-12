@@ -34,7 +34,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -104,9 +104,9 @@ public class Domain implements Serializable {
         this.killsupport = killsupport;
         this.display = dp;
         this.maxIter = maxIter;
-        this.neighbours = (Domain) ProSPMD.getSPMDGroup();
+        this.neighbours = (Domain) PASPMD.getSPMDGroup();
         this.asyncRefToSelf = (Domain) PAActiveObject.getStubOnThis();
-        ProSPMD.barrier("INIT"); // first barrier, needed to have all objects synchronized before running 
+        PASPMD.barrier("INIT"); // first barrier, needed to have all objects synchronized before running 
         this.asyncRefToSelf.sendValueToNeighbours();
         this.currentForce = new Force(); // initialize the force to 0.
     }
@@ -135,7 +135,7 @@ public class Domain implements Serializable {
      */
     public void sendValueToNeighbours() {
         this.neighbours.setValue(this.info, this.identification);
-        ProSPMD.barrier("barrier" + this.iter);
+        PASPMD.barrier("barrier" + this.iter);
         this.iter++;
         this.asyncRefToSelf.moveBody();
         if (this.iter < this.maxIter) {

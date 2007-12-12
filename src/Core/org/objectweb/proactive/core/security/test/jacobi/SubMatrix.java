@@ -32,8 +32,8 @@ package org.objectweb.proactive.core.security.test.jacobi;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.group.topology.Plan;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -302,7 +302,7 @@ public class SubMatrix {
      * METHODBARRIER
      */
     public void buildNeighborhood_MethodBarrier() {
-        this.matrix = (SubMatrix) ProSPMD.getSPMDGroup();
+        this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
         Group allSubMatrix = PAGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
@@ -361,7 +361,7 @@ public class SubMatrix {
      * NEIGHBORBARRIER
      */
     public void buildNeighborhood_NeighborBarrier() {
-        this.matrix = (SubMatrix) ProSPMD.getSPMDGroup();
+        this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
         Group allSubMatrix = PAGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
@@ -422,7 +422,7 @@ public class SubMatrix {
      * BTOTAL BARRIER
      */
     public void buildNeighborhood_TotalBarrier() {
-        this.matrix = (SubMatrix) ProSPMD.getSPMDGroup();
+        this.matrix = (SubMatrix) PASPMD.getSPMDGroup();
         Group allSubMatrix = PAGroup.getGroup(this.matrix);
         Plan topology = null;
         try {
@@ -597,7 +597,7 @@ public class SubMatrix {
      */
     public void compute() {
         this.buildNeighborhood_TotalBarrier();
-        ProSPMD.barrier("InitDone");
+        PASPMD.barrier("InitDone");
         this.me.loop_TotalBarrier();
     }
 
@@ -613,7 +613,7 @@ public class SubMatrix {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        ProSPMD.barrier(methodsToWaitFor);
+        PASPMD.barrier(methodsToWaitFor);
         // compute the border values
         this.me.borderCompute();
         // send the borders to neighbors for the next loop
@@ -657,7 +657,7 @@ public class SubMatrix {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        ProSPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop,
+        PASPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop,
             this.neighbors);
         // compute the border values
         this.me.borderCompute();
@@ -700,7 +700,7 @@ public class SubMatrix {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        ProSPMD.barrier(
+        PASPMD.barrier(
             "SynchronizationToBeSureThatAllSubmatrixHaveExchangedBorders" +
             this.iterationsToStop);
         // compute the border values

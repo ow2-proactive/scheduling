@@ -42,10 +42,10 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFileTransfer;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -68,10 +68,10 @@ public class ProActiveMPIManager implements Serializable {
     /*  Hashtable<jobID, ProActiveCoupling []> */
     private Hashtable<Integer, ProActiveMPICoupling[]> proxyMap;
 
-    /*  Hashtable<jobID, ProSPMD ProActiveMPICoupling> */
+    /*  Hashtable<jobID, PASPMD ProActiveMPICoupling> */
     private Hashtable<Integer, ProActiveMPICoupling> spmdProxyMap;
 
-    /*  Hashtable<jobID, Hashtable<class, ProSPMD user class || user proxy array>> */
+    /*  Hashtable<jobID, Hashtable<class, PASPMD user class || user proxy array>> */
     private Hashtable<Integer, Hashtable> userProxyMap;
 
     /*  ackToStart[jobID] = number of proxy registered */
@@ -127,10 +127,10 @@ public class ProActiveMPIManager implements Serializable {
                 }
                 MPI_IMPL_LOGGER.info("[MANAGER] Create SPMD Proxy for jobID: " +
                     currentJobNumber);
-                ProActiveMPICoupling spmdCouplingProxy = (ProActiveMPICoupling) ProSPMD.newSPMDGroup(ProActiveMPICoupling.class.getName(),
+                ProActiveMPICoupling spmdCouplingProxy = (ProActiveMPICoupling) PASPMD.newSPMDGroup(ProActiveMPICoupling.class.getName(),
                         params, vn);
 
-                // create ProSPMD proxy
+                // create PASPMD proxy
                 this.spmdProxyMap.put(new Integer(currentJobNumber),
                     spmdCouplingProxy);
                 MPI_IMPL_LOGGER.info("[MANAGER] Initialize remote environments");
@@ -296,17 +296,17 @@ public class ProActiveMPIManager implements Serializable {
                             p[i] = params;
                         }
                         userProxyList.put(cl,
-                            ProSPMD.newSPMDGroup(cl, p, orderedNodes));
+                            PASPMD.newSPMDGroup(cl, p, orderedNodes));
                     } // matrix parameter 
                     else if (parameters.get(1) != null) {
                         Object[][] params = (Object[][]) parameters.get(1);
                         userProxyList.put(cl,
-                            ProSPMD.newSPMDGroup(cl, params, orderedNodes));
+                            PASPMD.newSPMDGroup(cl, params, orderedNodes));
                     } // no parameters 
                     else {
                         Object[][] params = new Object[orderedNodes.length][];
                         userProxyList.put(cl,
-                            ProSPMD.newSPMDGroup(cl, params, orderedNodes));
+                            PASPMD.newSPMDGroup(cl, params, orderedNodes));
                     }
                     this.userProxyMap.put(new Integer(jobID), userProxyList);
                 } catch (ClassNotReifiableException e) {

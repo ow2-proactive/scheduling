@@ -37,6 +37,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAException;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.benchmarks.timit.util.BenchmarkStatistics;
 import org.objectweb.proactive.benchmarks.timit.util.Startable;
 import org.objectweb.proactive.benchmarks.timit.util.TimItManager;
@@ -44,7 +45,6 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
@@ -96,7 +96,7 @@ public class Launcher implements Startable {
                 params[i] = param;
             }
 
-            this.workers = (Worker) ProSPMD.newSPMDGroup(Worker.class.getName(),
+            this.workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(),
                     params, nodes);
 
             // You must create a TimItManager instance and give to it

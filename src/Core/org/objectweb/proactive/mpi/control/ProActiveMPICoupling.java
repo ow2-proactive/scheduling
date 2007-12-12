@@ -54,7 +54,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     /** Comm object it refers */
     private ProActiveMPIComm target;
 
-    /*  Hashtable<jobID, Hashtable<class, ProSPMD user class || user proxy array>> */
+    /*  Hashtable<jobID, Hashtable<class, PASPMD user class || user proxy array>> */
     private Hashtable userProxyMap;
 
     // job # managed by the Job Manager
@@ -63,7 +63,7 @@ public class ProActiveMPICoupling implements Serializable, InitActive {
     /*  Hashtable<jobID, ProActiveCoupling []> */
     private static Hashtable proxyMap;
 
-    /*  Hashtable<jobID, ProSPMD ProActiveMPICoupling> */
+    /*  Hashtable<jobID, PASPMD ProActiveMPICoupling> */
     private Hashtable spmdProxyMap;
 
     ////////////////////////////////

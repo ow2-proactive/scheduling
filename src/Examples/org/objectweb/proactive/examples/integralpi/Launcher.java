@@ -37,10 +37,10 @@ import java.io.InputStreamReader;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.api.PALifeCycle;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
@@ -73,7 +73,7 @@ public class Launcher {
                 params[i] = param;
             }
 
-            Worker workers = (Worker) ProSPMD.newSPMDGroup(Worker.class.getName(),
+            Worker workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(),
                     params, provideNodes(args[0]));
 
             String input = "";

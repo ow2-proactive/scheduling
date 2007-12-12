@@ -34,7 +34,7 @@ import java.util.Iterator;
 
 import org.junit.Before;
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
@@ -63,7 +63,7 @@ public class Test extends FunctionalTest {
                 TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
                 TestNodes.getRemoteVMNode()
             };
-        this.spmdgroup = (A) ProSPMD.newSPMDGroup(A.class.getName(), params,
+        this.spmdgroup = (A) PASPMD.newSPMDGroup(A.class.getName(), params,
                 nodes);
 
         assertTrue(spmdgroup != null);

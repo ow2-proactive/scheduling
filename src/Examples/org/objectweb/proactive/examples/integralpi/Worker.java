@@ -35,7 +35,7 @@ import java.io.Serializable;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.util.wrapper.DoubleWrapper;
 
 
@@ -84,9 +84,9 @@ public class Worker implements Serializable {
         N = numOfIterations;
 
         // ProActive initialization
-        rank = ProSPMD.getMyRank();
-        groupSize = ProSPMD.getMySPMDGroupSize();
-        workersArray = (Worker[]) PAGroup.getGroup(ProSPMD.getSPMDGroup())
+        rank = PASPMD.getMyRank();
+        groupSize = PASPMD.getMySPMDGroupSize();
+        workersArray = (Worker[]) PAGroup.getGroup(PASPMD.getSPMDGroup())
                                          .toArray(new Worker[0]);
         body = PAActiveObject.getBodyOnThis();
 

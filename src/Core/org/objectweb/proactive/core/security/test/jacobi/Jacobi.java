@@ -32,10 +32,10 @@ package org.objectweb.proactive.core.security.test.jacobi;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PADeployment;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.NodeException;
 
@@ -100,7 +100,7 @@ public class Jacobi {
 
         SubMatrix matrix = null;
         try {
-            matrix = (SubMatrix) ProSPMD.newSPMDGroup(SubMatrix.class.getName(),
+            matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(),
                     params, nodes);
         } catch (ClassNotFoundException e) {
             System.err.println("** ClassNotFoundException **");

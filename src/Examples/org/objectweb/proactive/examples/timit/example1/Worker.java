@@ -32,6 +32,7 @@ package org.objectweb.proactive.examples.timit.example1;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.benchmarks.timit.util.Timed;
 import org.objectweb.proactive.benchmarks.timit.util.observing.Event;
 import org.objectweb.proactive.benchmarks.timit.util.observing.EventObserver;
@@ -39,7 +40,6 @@ import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEv
 import org.objectweb.proactive.benchmarks.timit.util.observing.commobserv.CommEventObserver;
 import org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.DefaultEventData;
 import org.objectweb.proactive.benchmarks.timit.util.observing.defaultobserver.DefaultEventObserver;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
 
 
 /**
@@ -98,11 +98,11 @@ public class Worker extends Timed {
      * @see org.objectweb.proactive.benchmarks.timit.examples.example2.Launcher
      */
     public void start() {
-        this.rank = ProSPMD.getMyRank();
-        this.workers = (Worker) ProSPMD.getSPMDGroup();
+        this.rank = PASPMD.getMyRank();
+        this.workers = (Worker) PASPMD.getSPMDGroup();
         this.workersArray = (Worker[]) PAGroup.getGroup(this.workers)
                                               .toArray(new Worker[0]);
-        this.groupSize = ProSPMD.getMySPMDGroupSize();
+        this.groupSize = PASPMD.getMySPMDGroupSize();
 
         // The defaultObserver will perform two
         // operations. The first operation is performed between

@@ -31,7 +31,7 @@
 package functionalTests.group.barrier;
 
 import org.objectweb.proactive.Active;
-import org.objectweb.proactive.core.group.spmd.ProSPMD;
+import org.objectweb.proactive.api.PASPMD;
 
 
 public class A implements Active, java.io.Serializable {
@@ -95,12 +95,12 @@ public class A implements Active, java.io.Serializable {
     }
 
     public void start() {
-        A myspmdgroup = (A) ProSPMD.getSPMDGroup();
+        A myspmdgroup = (A) PASPMD.getSPMDGroup();
         this.waitFewSecondes();
         myspmdgroup.foo();
-        ProSPMD.barrier("'1'");
+        PASPMD.barrier("'1'");
         myspmdgroup.bar();
-        ProSPMD.barrier("'2'");
+        PASPMD.barrier("'2'");
         myspmdgroup.gee();
     }
 }
