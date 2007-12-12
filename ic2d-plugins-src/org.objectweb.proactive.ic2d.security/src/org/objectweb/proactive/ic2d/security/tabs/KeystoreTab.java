@@ -66,7 +66,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -150,6 +149,8 @@ public class KeystoreTab extends UpdatableTab {
                     fd.setFilterExtensions(new String[] { "*.p12", "*.crt", "*.*" });
                     String name = fd.open();
                     try {
+                        new PasswordDialog(null);
+
                         KeystoreTab.this.keystoreFileList.add(new KeystoreFile(
                                 name, KeystoreUtils.loadKeystore(name, "ha")));
                     } catch (NoSuchAlgorithmException e1) {

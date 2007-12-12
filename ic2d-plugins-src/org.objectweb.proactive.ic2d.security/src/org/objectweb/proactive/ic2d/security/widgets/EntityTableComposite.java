@@ -156,4 +156,15 @@ public class EntityTableComposite extends Composite {
             }
         }
     }
+
+    public void add(String re) {
+        if (isFrom) {
+            EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex())
+                                           .addFrom(re);
+        } else {
+            EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex())
+                                           .addTo(re);
+        }
+        this.updateTable();
+    }
 }

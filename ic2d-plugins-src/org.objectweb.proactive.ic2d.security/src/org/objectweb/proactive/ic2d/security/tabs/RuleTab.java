@@ -72,6 +72,7 @@ import org.objectweb.proactive.ic2d.security.core.PolicyTools;
 import org.objectweb.proactive.ic2d.security.core.SimplePolicyRule;
 import org.objectweb.proactive.ic2d.security.widgets.CertificateTreeListSection;
 import org.objectweb.proactive.ic2d.security.widgets.EntityTableComposite;
+import org.objectweb.proactive.ic2d.security.widgets.VirtualEntityDialog;
 
 
 public class RuleTab extends UpdatableTab {
@@ -115,10 +116,10 @@ public class RuleTab extends UpdatableTab {
         createSectionActiveKeystore(body)
             .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createSectionRuleEdition(body)
+        createSectionRules(body)
             .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createSectionRules(body)
+        createSectionRuleEdition(body)
             .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         updateRuleEditor();
@@ -146,10 +147,16 @@ public class RuleTab extends UpdatableTab {
                 this.rules, true);
         this.fromTable.setLayoutData(new GridData(GridData.FILL_BOTH));
 
+        createAddRemoveVirtualEntityFrom(client)
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+
         this.toolkit.createLabel(client, "To");
         this.toTable = new EntityTableComposite(client, this.toolkit,
                 this.rules, false);
         this.toTable.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+        createAddRemoveVirtualEntityTo(client)
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
         createCheckRequest(client);
 
@@ -168,6 +175,38 @@ public class RuleTab extends UpdatableTab {
         section.setClient(client);
 
         return section;
+    }
+
+    private Button createAddRemoveVirtualEntityFrom(Composite parent) {
+        // TODO Auto-generated method stub
+        Button button = this.toolkit.createButton(parent, "New Virtual Entity",
+                SWT.BUTTON1);
+        button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseUp(MouseEvent e) {
+                    new VirtualEntityDialog(new Shell(), fromTable);
+
+                    super.mouseUp(e);
+                }
+            });
+
+        return button;
+    }
+
+    private Button createAddRemoveVirtualEntityTo(Composite parent) {
+        // TODO Auto-generated method stub
+        Button button = this.toolkit.createButton(parent,
+                "add a Virtual Entity", SWT.BUTTON1);
+        button.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseUp(MouseEvent e) {
+                    new VirtualEntityDialog(new Shell(), toTable);
+
+                    super.mouseUp(e);
+                }
+            });
+
+        return button;
     }
 
     private Button createCheckRequest(Composite parent) {
