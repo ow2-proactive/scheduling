@@ -18,7 +18,7 @@
     our group communication scheme let the possibility to one activity to call
     a method on the group.</para>
 
-    <para>The purpose of the our group communication is to free the programmer
+    <para>The purpose of our group communication is to free the programmer
     from having to implement the complex communication code required for
     setting identical group in each SPMD activity, group communication,
     thereby allowing the focus to be on the application itself.</para>
@@ -42,7 +42,7 @@
     <indexterm><primary>OOSPMD</primary><secondary>groups</secondary></indexterm>
     
     <para>An spmd group is a ProActive typed group built with the <emphasis
-    role="bold">ProSPMD.newSPMDGroup()</emphasis> method. This method looks
+    role="bold">PASPMD.newSPMDGroup()</emphasis> method. This method looks
     like the <emphasis role="bold">ProActiveGroup.newGroup()</emphasis>; they
     have similar behavior (and overloads). The difference is that each members
     of an spmd group have a reference to a group containing all the others
@@ -64,7 +64,7 @@
     
       <para><programlisting lang="java">  Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
-  A agroup = (A) ProSPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
+  A agroup = (A) PASPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
     
 
     <para>Object members of an spmd group are aware about the whole group.
@@ -75,7 +75,7 @@
     methods <emphasis role="bold">getMySPMDGroupSize()</emphasis>, <emphasis
     role="bold">getMyRank()</emphasis>, and <emphasis
     role="bold">getSPMDGroup()</emphasis> of the <emphasis
-    role="bold">ProSPMD</emphasis> class.</para>
+    role="bold">PASPMD</emphasis> class.</para>
   </sect1>
 
   <sect1 >
@@ -85,13 +85,14 @@
 
     <para>ProActive provides three kinds of barrier to synchronize activities.
     The feature is specially useful in a SPMD programming style. A barrier
-    stops the activity of the active object that invokes it until a special
+    stops the activity of the active object that invokes it (ie. stop serving
+    the requests which are in its request queue) until a special
     condition is satisfied. Notice that, as the opposite of MPI or such
     libraries, the ProActive barriers do not stop the current activity
     immediately (when the <emphasis role="bold">barrier</emphasis> method is
-    encountered). The current method actually keeps on executing until the
-    end. The barrier will be activated at the end of the service: no other
-    service will be started until all the AOs involved in the barrier are at
+    encountered). The current request actually keeps on executing until the
+    end. The barrier will be activated at the end of the request: no other
+    request will be served until all the AOs involved in the barrier are at
     that same point.</para>
 
     <para>The three barriers are named:</para>
@@ -119,15 +120,15 @@
     <para>Total barrier directly involves the spmd group. A call to <emphasis
     role="bold">barrier(String)</emphasis> will block until all the members in
     the spmd group have themselves reach and called the identical <emphasis
-    role="bold">ProSPMD.barrier()</emphasis> primitive. A call communicates
+    role="bold">PASPMD.barrier()</emphasis> primitive. Such call communicates
     with all the members of the spmd group. The barrier is released when the
     Active Object has received a <emphasis>barrier message</emphasis> from all
     other members of the spmd group (including itself).</para>
 
-    <para>The string parameter is used as unique identity name for the
-    barrier. It is the programmer responsibility to ensure that two (or more)
+    <para>The string parameter is used as a unique identity name for the
+    barrier. <emphasis>It is the programmer responsibility to ensure that two (or more)
     different barriers with the same id name are not invoked
-    simultaneously.</para>
+    simultaneously.</emphasis></para>
 
     <para>Let us take a Java class that contains a method calling a total
     barrier, here the method <emphasis role="bold">foo</emphasis>:</para>
@@ -137,7 +138,7 @@
   public A() {}
   public void foo (...) {
     ...
-    ProSPMD.barrier('MyBarrier');
+    PASPMD.barrier('MyBarrier');
   }
   public void bar (...) {...}
   ...
@@ -152,7 +153,7 @@
     
       <para><programlisting lang="java">  Object[][] params = {{...} , {...} , ... }; 
   Node[] nodes  = { ... , ..., ... }; 
-  A agroup = (A) ProSPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
+  A agroup = (A) PASPMD.newSPMDGroup('A', params[], nodes); </programlisting></para>
     
 
     <para>Here the main method of our application:</para>
@@ -185,12 +186,12 @@
     barrier only with the objects of the specified group. Those objects, that
     contribute to the end of the barrier state, are called
     <emphasis>neighbors</emphasis> as they are usually local to a given
-    topology, An object that invoke the Neighbor barrier HAVE TO BE IN THE
+    topology, an object that invokes the Neighbor barrier HAVE TO BE IN THE
     GROUP given as parameter. The <emphasis>barrier message</emphasis> is only
     sent to the group of neighbors.</para>
 
     <para>The programmer has to explicitly build this group of neighbors. The
-    topology API can help him or her to build such group. Topologies are
+    topology API can be used to build such group. Topologies are
     groups. They just give special access to their members or (sub)groups
     members. For instance, a matrix fits well with the topology <emphasis
     role="bold">Plan</emphasis> that provides methods to get the reference of
@@ -210,12 +211,12 @@
     neighbors built by the programmer. Here is an example:</para>
 
     
-      <para><programlisting lang="java"> ProSPMD.barrier('MyString', neighborGroup); </programlisting></para>
+      <para><programlisting lang="java"> PASPMD.barrier('MyString', neighborGroup); </programlisting></para>
     
 
-    <para>Refer to the <emphasis>Jacobi</emphasis> example to see a use of the
+    <para>Refer to the <emphasis>Jacobi</emphasis> example to see a use-case of the
     Neighbor barrier. Each submatrix needs only to be synchronized with the
-    submatrixes which it is in contact.</para>
+    submatrixes which are in its cardinal neighbors.</para>
 
     <para>This barrier increases the asynchronism and reduce the amount of
     exchanged messages.</para>
@@ -229,13 +230,13 @@
     Communications between objects to release a barrier are achieved by the
     standard method call and request reception of ProActive.</para>
 
-    <para>The method <emphasis role="bold">barrier(String[])</emphasis> stops
-    the active object that calls it, and wait for a request on the specified
+    <para>As a standard barrier, the method <emphasis role="bold">barrier(String[])</emphasis>
+    will finish the current request served by the active object that calls it, but it then wait for a request on the specified
     methods to resume. The array of string contains the name of the awaited
     methods. The order of the methods does not matter. For example:</para>
 
     
-      <para><programlisting lang="java"> ProSPMD.barrier({'foo', 'bar', 'gee'}); </programlisting></para>
+      <para><programlisting lang="java"> PASPMD.barrier({'foo', 'bar', 'gee'}); </programlisting></para>
     
 
     <para>The caller will stop and wait for the three methods. bar or gee can
@@ -243,9 +244,9 @@
     wait for gee, three calls can be successively done:</para>
 
     
-      <para><programlisting lang="java">   ProSPMD.barrier({'foo'});
-   ProSPMD.barrier({'bar'});
-   ProSPMD.barrier({'gee'}); </programlisting></para>
+      <para><programlisting lang="java">   PASPMD.barrier({'foo'});
+   PASPMD.barrier({'bar'});
+   PASPMD.barrier({'gee'}); </programlisting></para>
     
 
     <para>A method barrier is used without any group (spmd or not). To learn
@@ -260,7 +261,7 @@
     Instead, they are run at the end of the method. Look at this code:</para>
     <programlisting lang="java">public void MyMethodWithBarrier () {
     foo();
-    ProSPMD.barrier("barrier");
+    PASPMD.barrier("barrier");
     bar();
     } </programlisting>
   <para>In this case, the call to bar() will be made <emphasis>BEFORE</emphasis> 
@@ -276,7 +277,7 @@
   <para>To enforce the barrier, you should make the barrier the last action 
    of your method, or you can use this trick:</para>
   <programlisting lang="java">    foo();
-    ProSPMD.barrier("barrier");
+    PASPMD.barrier("barrier");
     this.asyncRefToSelf.bar();</programlisting>
     
     <note><para>The behavior of barrier is peculiar in this sense. You should keep 

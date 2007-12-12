@@ -11,7 +11,7 @@
 
       <sect3>
         <title>Source files:
-        ProActive/src/org/objectweb/proactive/examples/jacobi</title>
+        ProActive/src/Examples/org/objectweb/proactive/examples/jacobi</title>
 
         <para>The Jacobi example is made of two Java classes:</para>
 
@@ -309,7 +309,7 @@
 
         <programlisting lang="java">String[] st= new String[1];
 st[0]="keepOnGoing";
-ProSPMD.barrier(st);</programlisting>
+PASPMD.barrier(st);</programlisting>
 
         <para>Do not forget to define the <literal>keepOnGoing()</literal>
         method that indeed can return void, and just be empty. Find the
@@ -376,7 +376,7 @@ private static void printMessageAndWait() {
         synchronization. Below in method "loop()", an efficient barrier is
         achieved only using the direct neighbors:</para>
 
-        <para><literal>ProSPMD.barrier("SynchronizationWithNeighbors"+
+        <para><literal>PASPMD.barrier("SynchronizationWithNeighbors"+
         this.iterationsToStop, this.neighbors);</literal></para>
 
         <para>This barrier takes as a parameter the group to synchronize with:
@@ -387,7 +387,7 @@ private static void printMessageAndWait() {
 
         <para>Try to change the barrier instruction to a total barrier:</para>
 
-        <para><literal>ProSPMD.barrier("SynchronizationWithNeighbors"+
+        <para><literal>PASPMD.barrier("SynchronizationWithNeighbors"+
         this.iterationsToStop);</literal></para>
 
         <para>Then recompile and execute again. Using IC2D observe that many
@@ -881,8 +881,7 @@ private static void printMessageAndWait() {
   <!-- Pi MPI -> Pi ProActive -->
 
   <sect1>
-    <title>OO SPMD on a Integral Pi example MPI to ProActive
-    adaptation</title>
+    <title>An MPI to ProActive example through an Integral Pi application</title>
 
     <sect2>
       <title>Introduction</title>
@@ -918,12 +917,12 @@ private static void printMessageAndWait() {
         </listitem>
 
         <listitem>
-          <para>ProActive/trunk/src/org/objectweb/proactive/examples/integralpi/Launcher.java
+          <para>ProActive/src/Examples/org/objectweb/proactive/examples/integralpi/Launcher.java
           : the main class</para>
         </listitem>
 
         <listitem>
-          <para>ProActive/trunk/src/org/objectweb/proactive/examples/integralpi/Worker.java
+          <para>ProActive/src/Examples/org/objectweb/proactive/examples/integralpi/Worker.java
           : the class implementing the SPMD code</para>
         </listitem>
       </itemizedlist>
@@ -960,24 +959,24 @@ private static void printMessageAndWait() {
         descriptor.</para>
 
         <programlisting lang="java">  // Group creation           
-  Worker workers = (Worker) ProSPMD.newSPMDGroup(
+  Worker workers = (Worker) PASPMD.newSPMDGroup(
          Worker.class.getName(), params, provideNodes(args[0]));
 
   // Once the group is created and the value for N is entered we can start the workers job
   // Workers starts their job and return a group of Futures
   DoubleWrapper results = workers.start( numOfIterations );</programlisting>
 
-        <para>The ProSPMD layer provides similar to MPI initialization
+        <para>As with MPI, the ProActive's SPMD layer provides some initialization
         primitives. In Worker.java you can identify this initialization. Note
         that one-to-one communications will be done thanks to an array view on
         the created group.</para>
 
         <programlisting lang="java">  // Worker initialization
-  rank = ProSPMD.getMyRank();
-  groupSize = ProSPMD.getMySPMDGroupSize();
+  rank = PASPMD.getMyRank();
+  groupSize = PASPMD.getMySPMDGroupSize();
 
   // Get all workers references
-  workersArray = (Worker[]) ProActiveGroup.getGroup(ProSPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
+  workersArray = (Worker[]) ProActiveGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);</programlisting>
       </sect3>
     </sect2>
 
@@ -1115,13 +1114,13 @@ private static void printMessageAndWait() {
               <row>
                 <entry>MPI_Comm_Size</entry>
 
-                <entry>ProSPMD.getMyGroupSize</entry>
+                <entry>PASPMD.getMyGroupSize</entry>
               </row>
 
               <row>
                 <entry>MPI_Comm_Rank</entry>
 
-                <entry>ProSPMD.getMyRank</entry>
+                <entry>PASPMD.getMyRank</entry>
               </row>
 
               <row>
@@ -1133,7 +1132,7 @@ private static void printMessageAndWait() {
               <row>
                 <entry>MPI_Barrier</entry>
 
-                <entry>ProSPMD.barrier</entry>
+                <entry>PASPMD.barrier</entry>
               </row>
 
               <row>
@@ -1167,25 +1166,6 @@ private static void printMessageAndWait() {
 
     <sect2>
       <title>Running ProActive example</title>
-
-      <sect3>
-        <title>Compilation</title>
-
-        <para>ProActive distribution comes with scripts to easily recompile
-        the provided examples:</para>
-
-        <screen>linux&gt;ProActive/compile/build</screen>
-
-        <para>or</para>
-
-        <screen>windows&gt;ProActive/compile/build.bat</screen>
-
-        <para>Use the build script to recompile the example</para>
-
-        <screen>build examples</screen>
-
-        <para>2 source files must appear as being recompiled.</para>
-      </sect3>
 
       <sect3>
         <title>Running ProActive example</title>
