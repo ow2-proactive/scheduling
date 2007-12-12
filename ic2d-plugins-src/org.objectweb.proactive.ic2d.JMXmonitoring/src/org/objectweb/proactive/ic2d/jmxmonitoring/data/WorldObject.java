@@ -196,16 +196,19 @@ public class WorldObject extends AbstractData {
     public void addActiveObject(ActiveObject ao) {
         //Note: until now, this method is only called in the constructor of an (ic2d) ActiveObject
         synchronized (activeObjects) {
-            ActiveObject oldAO = this.activeObjects.get(ao.getUniqueID());
-            if (oldAO != null) {
-                // It's maybe a migration
-                // If the url of the two active objects are different, this is a migration
-                if (!ao.getParent().getUrl().equals(oldAO.getParent().getUrl())) {
-                    migrations.put(ao.getUniqueID(), oldAO);
+            synchronized (migrations) {
+                ActiveObject oldAO = this.activeObjects.get(ao.getUniqueID());
+                if (oldAO != null) {
+                    // It's maybe a migration
+                    // If the url of the two active objects are different, this is a migration
+                    if (!ao.getParent().getUrl()
+                               .equals(oldAO.getParent().getUrl())) {
+                        migrations.put(ao.getUniqueID(), oldAO);
+                    }
                 }
-            }
-            this.activeObjects.put(ao.getUniqueID(), ao);
-        }
+                this.activeObjects.put(ao.getUniqueID(), ao);
+            } //synchronized (migrations)
+        } //  synchronized (activeObjects) 
     }
 
     /**

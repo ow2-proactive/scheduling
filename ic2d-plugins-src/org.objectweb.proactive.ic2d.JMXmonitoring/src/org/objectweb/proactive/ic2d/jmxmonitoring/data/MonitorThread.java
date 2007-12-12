@@ -34,6 +34,10 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
 
@@ -51,6 +55,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
  *
  */
 public class MonitorThread implements Observer {
+    private static org.apache.log4j.Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
     private final static int DEFAULT_TTR = 30;
     private final static int DEFAULT_TIME_SELECTIVE_REFRESH = 10;
 
@@ -189,7 +194,16 @@ public class MonitorThread implements Observer {
 
         public void run() {
             while (refresh) {
-                world.explore();
+                try {
+                    world.explore();
+                } catch (Exception e) {
+                    logger.debug(
+                        "Exception when performing refresh on the WorldObject: " +
+                        e.getStackTrace());
+                    Console.getInstance(Activator.CONSOLE_NAME)
+                           .err("Refresh could not be performed. See logged errors for more details. Make shure the same ProActive version is used for IC2D and all monitored ressources.");
+                }
+
                 try {
                     Thread.sleep(ttr * 1000);
                 } catch (InterruptedException e) { /* Do nothing */
