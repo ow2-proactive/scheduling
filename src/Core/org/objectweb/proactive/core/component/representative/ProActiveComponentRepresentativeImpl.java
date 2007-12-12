@@ -166,7 +166,7 @@ public class ProActiveComponentRepresentativeImpl
         // add controllers
         //Enumeration controllersInterfaces = controllersConfiguration.propertyNames();
         Iterator<String> iteratorOnControllers = controllersConfiguration.keySet()
-                                                                 .iterator();
+                                                                         .iterator();
         Class<?> controllerClass = null;
         AbstractProActiveController currentController;
         ProActiveInterface currentInterface = null;
