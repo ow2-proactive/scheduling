@@ -159,7 +159,7 @@
                 <entry><para>The value has to be set in the descriptor, and
                 cannot be specified in the program.</para></entry>
 
-                <entry><para>If the deployer wants to use a value, without
+                <entry><para>The deployer wants to use a value, without
                 giving the possibility to the programmer to modify it. The
                 programmer can define this variable to empty, to force the
                 descriptor to set a value.</para></entry>
@@ -172,7 +172,7 @@
                 <entry><para>The value must be set in the program, and cannot
                 be specified in the descriptor.</para></entry>
 
-                <entry><para>If the programmer wants to use a value, without
+                <entry><para>The programmer wants to use a value, without
                 giving the possibility to the descriptor to modify it. The
                 descriptor can define this variable to empty, to force the
                 programmer to set a value.</para></entry>
@@ -184,14 +184,14 @@
                 </para></entry>
 
                 <entry><para>A default value must be specified in the
-                descriptor. The programmer has the ability not to change the
-                value in the program. Nevertheless, if the value is changed in
+                descriptor. The programmer has the ability to change the
+                value in the program. If the value is changed in
                 the program, then this new value will have precedence over the
                 one defined in the descriptor.</para></entry>
 
-                <entry><para>If the programmer may override the default value,
-                but the responsability of setting a default belongs to the
-                deployer.</para></entry>
+                <entry><para>The programmer may override the default value, but 
+				the responsability of setting a default belongs to the 
+                deployer. </para></entry>
               </row>
 
               <row>
@@ -199,12 +199,12 @@
                 role="bold">programDefaultVariable</emphasis> </para></entry>
 
                 <entry><para>A default value must be specified in the program.
-                The descriptor has the ability not to change the value.
-                Nevertheless, if the value is changed in the descriptor, then
+                The descriptor has the ability to change the value.
+                If the value is changed in the descriptor, then
                 this new value will have precedence over the one defined in
                 the program.</para></entry>
 
-                <entry><para>If the deployer may override the default value,
+                <entry><para>The deployer may override the default value,
                 but the responsability of setting a default belongs to the
                 programmer.</para></entry>
               </row>

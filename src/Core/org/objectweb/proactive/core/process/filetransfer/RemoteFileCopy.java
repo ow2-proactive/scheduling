@@ -43,41 +43,4 @@ public class RemoteFileCopy extends SecureCopyProtocol {
         super(name);
         super.COMMAND = "rcp";
     }
-
-    public static void main(String[] args) {
-        //Default is RCP_COMMAND
-        FileTransferWorkShop fts = new FileTransferWorkShop("rcp");
-
-        FileTransferDefinition ft1 = new FileTransferDefinition("1");
-        FileTransferDefinition ft2 = new FileTransferDefinition("2");
-
-        ft1.addFile("FileTransferTest.txt", "FileTransferTest-dest.txt");
-        ft1.addFile("FileTransferTest.txt", "FileTransferTest.txt");
-        ft1.addFile("heterofile1A", "heterofile1B");
-        ft1.addDir("FileTransferTestDir", "FileTransferTestDir");
-        ft1.addDir("heterodir1A", "heterodir1B");
-
-        ft2.addFile("homofile2", "homofile2");
-        ft2.addFile("heterofile2A", "heterofile2B");
-        ft2.addDir("homodir2", "homodir2");
-        ft2.addDir("heterodir2A", "heterodir2B");
-
-        fts.addFileTransfer(ft1);
-        fts.addFileTransfer(ft2);
-        fts.setFileTransferCopyProtocol("processDefault");
-        fts.dstInfoParams.setInfoParameter("username", "mleyton");
-        fts.dstInfoParams.setInfoParameter("hostname", "plugrid1.inria.fr");
-        fts.dstInfoParams.setInfoParameter("prefix", "/0/user/mleyton");
-        fts.srcInfoParams.setInfoParameter("prefix", "/home/mleyton");
-
-        CopyProtocol[] cp = fts.getCopyProtocols();
-
-        System.out.println("Copying protocols:");
-        for (int i = 0; i < cp.length; i++) {
-            System.out.println(cp[i].getProtocolName());
-            System.out.println(cp[i].getClass());
-
-            cp[i].startFileTransfer();
-        }
-    }
 }

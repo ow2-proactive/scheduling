@@ -70,7 +70,7 @@ public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
             addHandler(FILE_TRANSFER_FILE_TAG, new FileHandler());
             addHandler(FILE_TRANSFER_DIR_TAG, new DirHandler());
 
-            //This will be initalized once we have the ID in in the startContextElement(...)
+            //This will be initialized once we have the ID in in the startContextElement(...)
             fileTransfer = null;
         }
 

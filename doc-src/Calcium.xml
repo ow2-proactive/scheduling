@@ -134,7 +134,7 @@
       <screen>public class <emphasis role="bold">Primes</emphasis> implements <emphasis
           role="bold">Serializable</emphasis> {
 
-    public Vector&lt;Integer&gt; primes;
+    public Vector&lt;Integer&gt; list;
 
     public <emphasis role="bold">Primes</emphasis>(){
         primes=new Vector&lt;Integer&gt;();
@@ -151,7 +151,7 @@
         <screen>public class <emphasis role="bold">IntervalDivide</emphasis> <emphasis
             role="bold">implements Divide</emphasis>&lt;Interval, Interval&gt;{
     
-    public <emphasis role="bold">Vector&lt;Challenge&gt; divide(SkeletonSystem system, Interval param)</emphasis> {
+    public <emphasis role="bold">Vector&lt;Interval&gt; divide(SkeletonSystem system, Interval param)</emphasis> {
         
         Interval ttUp = new Interval(1+param.min+(param.max-param.min)/2,param.max,param.solvableSize);
 
@@ -175,7 +175,7 @@
         not.</para>
 
         <screen>public class <emphasis role="bold">IntervalDivideCondition</emphasis> <emphasis
-            role="bold">implements Condition&lt;Challenge&gt;</emphasis>{
+            role="bold">implements Condition&lt;Interval&gt;</emphasis>{
     
     public <emphasis role="bold">boolean evalCondition(SkeletonSystem system, Interval params)</emphasis> {
         
@@ -200,7 +200,7 @@
 
         for (int i = param.min; i &lt;= param.max; i++) {
             if (isPrime(i)) {
-                primes.primes.add(new Integer(i));
+                primes.list.add(new Integer(i));
             }
         }
 
@@ -214,7 +214,7 @@
         <title>Conquer</title>
 
         <para>The <emphasis role="bold">JoinPrimes</emphasis> class
-        consolidates the result of the sub challenges into a single
+        consolidates the result of the sub intervals into a single
         result.</para>
 
         <screen>public class <emphasis role="bold">JoinPrimes implements Conquer</emphasis>&lt;Primes, Primes&gt; {
@@ -223,7 +223,7 @@
         Primes conquered = new Primes();
 
         for (Primes param : p) {
-            conquered.primes.addAll(param.primes);
+            conquered.list.addAll(param.primes);
         }
 
         Collections.sort(conquered.primes);
@@ -239,7 +239,7 @@
       <para>The instantiation of the framework is performed in the following
       way</para>
 
-      <screen><emphasis role="bold">Skeleton&lt;Challenge&gt; root = ...; //Step 1
+      <screen><emphasis role="bold">Skeleton&lt;Interval,Primes&gt; root = ...; //Step 1
 
 EnvironmentFactory</emphasis> enviroment = new <emphasis role="bold">MultiThreadedEnvironment</emphasis>(2);<emphasis
           role="bold">
@@ -271,7 +271,7 @@ calcium.<emphasis role="bold">boot</emphasis>(); //begin the evaluation</screen>
 
       <screen>for(CalFuture&lt;Primes&gt; future:futures){
     Primes res=future.get();
-    System.out.print(res);
+    System.out.print(res.list);
 }
 
 calcium.<emphasis role="bold">shutdown</emphasis>(); //release the resources</screen>
@@ -456,8 +456,9 @@ interface <emphasis role="bold">Conquer</emphasis>&lt;Y,R&gt;  extends Muscle&lt
         <listitem>
           <para><emphasis role="bold">MAX_CINTERPRETERS</emphasis> Is an
           optional variable, and represents the number of maximum tasks that
-          can be queued on an interpreter. By default this value is 3, but can
-          be overriden using this variable.</para>
+          can be queued on an interpreter. By default this value is <emphasis
+          role="bold">3</emphasis>, but can be overriden using this
+          variable.</para>
         </listitem>
       </itemizedlist>
     </sect2>

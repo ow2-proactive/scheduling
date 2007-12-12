@@ -47,7 +47,7 @@ public class DummyCopyProtocol extends AbstractCopyProtocol {
      * @see org.objectweb.proactive.core.process.filetransfer.CopyProtocol#startFileTransfer()
      */
     public boolean startFileTransfer() {
-        //DummyCopyProtocol is always unsuccesful
+        //DummyCopyProtocol is always unsuccessful
         return false;
     }
 

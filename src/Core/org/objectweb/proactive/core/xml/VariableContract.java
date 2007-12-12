@@ -49,8 +49,9 @@ import org.xml.sax.SAXException;
 
 /**
  * This class provides a Variable Contract between the deployment descriptor and the application program.
- * Variables can be defined of different types, thus inforcing different requirements to the contract.
- * @author The ProActive Team
+ * Variables can be defined of different types, thus enforcing different requirements to the contract.
+ *
+ * @author The ProActive Team (mleyton)
  */
 @PublicAPI
 public class VariableContract implements Serializable {
@@ -97,7 +98,7 @@ public class VariableContract implements Serializable {
     }
 
     /**
-         * Tells wether this contract is closed or not.
+         * Tells if this contract is closed or not.
          *
          * @return True if it is closed, false otherwise.
          */
@@ -309,7 +310,7 @@ public class VariableContract implements Serializable {
 
     /**
      * Replaces the variables inside a text with their values.
-     * I
+     *
      * @param         text        Text with variables inside.
      * @return        The text with the values
      */
@@ -493,7 +494,7 @@ public class VariableContract implements Serializable {
     }
 
     /**
-     * Class used for exclusive acces to global static variable:
+     * Class used for exclusive access to global static variable:
      * org.objectweb.proactive.core.xml.XMLProperties.xmlproperties
      *
      * @author The ProActive Team

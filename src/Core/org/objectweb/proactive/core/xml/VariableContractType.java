@@ -93,6 +93,9 @@ public class VariableContractType implements Serializable {
         return result;
     }
 
+    /**
+     * Tests if two variable types are the same.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -113,31 +116,30 @@ public class VariableContractType implements Serializable {
 
     @Override
     public String toString() {
-        if (type == 0) {
+        switch (type) {
+        case 0:
             return ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_TAG;
-        }
-        if (type == 1) {
+        case 1:
             return ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG;
-        }
-        if (type == 2) {
+        case 2:
             return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG;
-        }
-        if (type == 3) {
+        case 3:
             return ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG;
-        }
-        if (type == 4) {
+        case 4:
             return ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_DEFAULT_TAG;
-        }
-        if (type == 5) {
+        case 5:
             return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG;
-        }
-        if (type == 6) {
+        case 6:
             return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG;
+        default:
+            return "UnkownVariable";
         }
-
-        return "UnkownVariable";
     }
 
+    /**
+     * @param type The String representing the types name.
+     * @return The VariableType The java object representing this type.
+     */
     public static VariableContractType getType(String type) {
         if (type.equals(ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_TAG)) {
             return DescriptorVariable;
@@ -221,7 +223,7 @@ public class VariableContractType implements Serializable {
         return j <= i;
     }
 
-    public String getEmptyErrorMessage(String name) {
+    String getEmptyErrorMessage(String name) {
         String canSetValue = "nobody";
         for (int i = 0; i < setAbility.length; i++) {
             canSetValue = setAbility[i] + " ";

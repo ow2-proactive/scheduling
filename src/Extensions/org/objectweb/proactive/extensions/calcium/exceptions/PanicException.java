@@ -34,8 +34,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * A panic exception indicates that all the execution must
- * be halted as a result of this error.
+ * A panic exception indicates a general system error.
+ * All the execution must be halted as a result of this error.
  *
  * @author The ProActive Team (mleyton)
  */

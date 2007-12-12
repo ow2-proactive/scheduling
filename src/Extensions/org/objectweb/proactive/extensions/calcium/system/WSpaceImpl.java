@@ -37,9 +37,9 @@ import java.net.URL;
 
 
 /**
- * This class is an implementation of the Wspace interface.
+ * This class is an implementation of the {@link WSpace} interface.
  *
- * This class is not serializable on purpose, since it is environment dependant.
+ * This class is not serializable on purpose, since it is environment dependent.
  *
  * @author The ProActive Team (mleyton)
  */

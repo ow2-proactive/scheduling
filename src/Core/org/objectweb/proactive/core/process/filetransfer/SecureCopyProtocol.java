@@ -199,36 +199,4 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
 
         return retval;
     }
-
-    static public void main(String[] args) {
-        //Default is SCP_COMMAND
-        FileTransferWorkShop fts = new FileTransferWorkShop("scp");
-
-        FileTransferDefinition ft1 = new FileTransferDefinition("1");
-        FileTransferDefinition ft2 = new FileTransferDefinition("2");
-
-        ft1.addFile("homofile1", "homofile1");
-        ft1.addFile("heterofile1A", "heterofile1B");
-        ft1.addDir("homodir1", "homodir1");
-        ft1.addDir("heterodir1A", "heterodir1B");
-
-        ft2.addFile("homofile2", "homofile2");
-        ft2.addFile("heterofile2A", "heterofile2B");
-        ft2.addDir("homodir2", "homodir2");
-        ft2.addDir("heterodir2A", "heterodir2B");
-
-        fts.addFileTransfer(ft1);
-        fts.addFileTransfer(ft2);
-        fts.setFileTransferCopyProtocol("processDefault");
-        fts.dstInfoParams.setInfoParameter("username", "mleyton");
-        fts.dstInfoParams.setInfoParameter("hostname", "plugrid1.inria.fr");
-        fts.dstInfoParams.setInfoParameter("prefix",
-            "/auto/owenii/u/owenii/home/mleyton");
-        fts.srcInfoParams.setInfoParameter("prefix", "/home/USER");
-
-        CopyProtocol[] cp = fts.getCopyProtocols();
-
-        for (int i = 0; i < cp.length; i++)
-            cp[i].startFileTransfer();
-    }
 }
