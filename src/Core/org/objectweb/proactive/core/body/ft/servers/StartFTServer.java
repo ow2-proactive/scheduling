@@ -35,6 +35,7 @@ import java.rmi.Naming;
 import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 
+import org.objectweb.proactive.core.body.ft.protocols.FTManagerFactory;
 import org.objectweb.proactive.core.body.ft.protocols.cic.servers.CheckpointServerCIC;
 import org.objectweb.proactive.core.body.ft.protocols.cic.servers.RecoveryProcessCIC;
 import org.objectweb.proactive.core.body.ft.protocols.pmlrb.servers.CheckpointServerPMLRB;
@@ -63,12 +64,12 @@ public class StartFTServer {
             int port = 0;
             int fdPeriod = 0;
             String name = "";
-            String proto = "cic";
+            String proto = FTManagerFactory.PROTO_CIC;
             String p2pServer = null;
 
             if (args.length == 0) {
                 System.out.println(
-                    "Usage startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)] [-p2p serverUrl]");
+                    "Usage : startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)] [-p2p serverUrl]");
             } else {
                 for (int i = 0; i < args.length; i++) {
                     if (args[i].equals("-port")) {
@@ -111,10 +112,10 @@ public class StartFTServer {
             // protocol specific
             CheckpointServer cs = null;
             RecoveryProcess rp = null;
-            if (proto.equals("cic")) {
+            if (proto.equals(FTManagerFactory.PROTO_CIC)) {
                 cs = new CheckpointServerCIC(server);
                 rp = new RecoveryProcessCIC(server);
-            } else if (proto.equals("pml")) {
+            } else if (proto.equals(FTManagerFactory.PROTO_PML)) {
                 cs = new CheckpointServerPMLRB(server);
                 rp = new RecoveryProcessPMLRB(server);
             } else {

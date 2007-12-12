@@ -432,9 +432,9 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
         Serializable {
         public FTManager newFTManager(int protocolSelector) {
             switch (protocolSelector) {
-            case FTManagerFactory.PROTO_CIC:
+            case FTManagerFactory.PROTO_CIC_ID:
                 return new FTManagerCIC();
-            case FTManagerFactory.PROTO_PML:
+            case FTManagerFactory.PROTO_PML_ID:
                 return new FTManagerPMLRB();
             default:
                 logger.error("Error while creating fault-tolerance manager : " +
@@ -446,9 +446,9 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
 
         public FTManager newHalfFTManager(int protocolSelector) {
             switch (protocolSelector) {
-            case FTManagerFactory.PROTO_CIC:
+            case FTManagerFactory.PROTO_CIC_ID:
                 return new HalfFTManagerCIC();
-            case FTManagerFactory.PROTO_PML:
+            case FTManagerFactory.PROTO_PML_ID:
                 return new HalfFTManagerPMLRB();
             default:
                 logger.error("Error while creating fault-tolerance manager : " +

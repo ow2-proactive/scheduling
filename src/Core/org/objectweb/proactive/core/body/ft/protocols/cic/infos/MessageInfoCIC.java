@@ -65,7 +65,7 @@ public class MessageInfoCIC implements MessageInfo {
      * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#getProtocolType()
      */
     public int getProtocolType() {
-        return FTManagerFactory.PROTO_CIC;
+        return FTManagerFactory.PROTO_CIC_ID;
     }
 
     /**

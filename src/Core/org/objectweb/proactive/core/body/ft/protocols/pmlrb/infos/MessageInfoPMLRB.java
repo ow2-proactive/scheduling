@@ -52,7 +52,7 @@ public class MessageInfoPMLRB implements MessageInfo {
      * @see org.objectweb.proactive.core.body.ft.message.MessageInfo#getProtocolType()
      */
     public int getProtocolType() {
-        return FTManagerFactory.PROTO_PML;
+        return FTManagerFactory.PROTO_PML_ID;
     }
 
     /**

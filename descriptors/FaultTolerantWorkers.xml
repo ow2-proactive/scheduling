@@ -5,9 +5,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/user/fviale/home/eclipse_workspace/ProActive_Latest"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME" value="/user/cdelbe/home/ProActiveStd/ProActiveSVN/"/> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA_HOME" 
-			value="/user/fviale/home/bin/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+			value="/user/cdelbe/home/bin/jdk1.6.0_01/" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -96,7 +96,7 @@
 			<processDefinition id="jvmProcess">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
+						                        <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
 
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>
@@ -124,70 +124,70 @@
 			<processDefinition id="jvmAppli1">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="noadcoco">
+					hostname="pollux">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli2">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="predadab">
+					hostname="naruto">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli3">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="nahuel">
+					hostname="schubby">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli4">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="crusoe">
+					hostname="cheypa">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli5">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="sidonie">
+					hostname="lo">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli6">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="amstel">
+					hostname="sgouirk">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli7">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="psychoquack">
+					hostname="islamabad">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmAppli8">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="macyavel">
+					hostname="orchidee">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed1">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="apple">
+					hostname="petawawa">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
 			<processDefinition id="jvmFailed2">
 				<rshProcess
 					class="org.objectweb.proactive.core.process.rsh.RSHProcess"
-					hostname="amda">
+					hostname="nyx">
 					<processReference refid="jvmProcess" />
 				</rshProcess>
 			</processDefinition>
@@ -196,7 +196,7 @@
 			<serviceDefinition id="appli">
 				<faultTolerance>
 					<protocol type="cic"></protocol>
-					<globalServer url="rmi://trinidad:1334/FTServer"></globalServer>
+					<globalServer url="rmi://duff:1100/FTServer"></globalServer>
 					<ttc value="15"></ttc>
 				</faultTolerance>
 			</serviceDefinition>
@@ -204,8 +204,8 @@
 			<serviceDefinition id="ressource">
 				<faultTolerance>
 					<protocol type="cic"></protocol>
-					<globalServer url="rmi://trinidad:1334/FTServer"></globalServer>
-					<resourceServer url="rmi://trinidad:1334/FTServer" />
+					<globalServer url="rmi://duff:1100/FTServer"></globalServer>
+					<resourceServer url="rmi://duff:1100/FTServer" />
 					<ttc value="15"></ttc>
 				</faultTolerance>
 			</serviceDefinition>

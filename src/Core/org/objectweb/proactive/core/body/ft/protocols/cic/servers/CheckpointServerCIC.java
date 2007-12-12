@@ -71,7 +71,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * This class define a checkpoint server for the CIC protocol.
+ * This class defines a checkpoint server for the CIC protocol.
  * @author cdelbe
  * @since 2.2
  */
@@ -312,7 +312,6 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     }
 
     //return true if the recoveryline has changed
-    // Recovery increase only 1 by 1 ... TO DO
     private boolean checkRecoveryLine() {
         try {
             int systemSize = this.server.getSystemSize();

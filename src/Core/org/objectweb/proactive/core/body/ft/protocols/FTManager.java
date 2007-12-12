@@ -109,10 +109,10 @@ public abstract class FTManager implements java.io.Serializable {
      * @return the selector value for a given protocol.
      */
     public static int getProtoSelector(String protoName) {
-        if ("cic".equals(protoName)) {
-            return FTManagerFactory.PROTO_CIC;
-        } else if ("pml".equals(protoName)) {
-            return FTManagerFactory.PROTO_PML;
+        if (FTManagerFactory.PROTO_CIC.equals(protoName)) {
+            return FTManagerFactory.PROTO_CIC_ID;
+        } else if (FTManagerFactory.PROTO_PML.equals(protoName)) {
+            return FTManagerFactory.PROTO_PML_ID;
         }
         return 0;
     }

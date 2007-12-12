@@ -147,7 +147,7 @@ public enum PAProperties {
     PA_EXIT_ON_EMPTY("proactive.exit_on_empty", PAPropertiesType.BOOLEAN),
 
     /**
-     * TODO cdelbe Describe this property
+     * Boolean to activate automatic continuations for this runtime.
      */
     PA_FUTURE_AC("proactive.future.ac", PAPropertiesType.BOOLEAN),
 
@@ -279,7 +279,7 @@ public enum PAProperties {
     /** TODO Describe this property */
     PA_LOCATION_SERVER("proactive.locationserver", PAPropertiesType.STRING),
 
-    /** TODO cdelbe Describe this property */
+    /** TODO fhuet Describe this property */
     PA_LOCATION_SERVER_RMI("proactive.locationserver.rmi",
         PAPropertiesType.STRING),
 
@@ -357,32 +357,32 @@ public enum PAProperties {
      *  FAULT TOLERANCE
      */
 
-    /** TODO cdelbe Describe this property */
+    /** Boolean for activating fault-Tolerance */
     PA_FT("proactive.ft", PAPropertiesType.BOOLEAN),
 
-    /** TODO cdelbe Describe this property */
+    /** URL of the checkpoint server */
     PA_FT_SERVER_CHECKPOINT("proactive.ft.server.checkpoint",
         PAPropertiesType.STRING),
 
-    /** TODO cdelbe Describe this property */
+    /** URL of the location server */
     PA_FT_SERVER_LOCATION("proactive.ft.server.location",
         PAPropertiesType.STRING),
 
-    /** TODO cdelbe Describe this property */
+    /** URL of the recovery server */
     PA_FT_SERVER_RECOVERY("proactive.ft.server.recovery",
         PAPropertiesType.STRING),
 
-    /** TODO cdelbe Describe this property */
+    /** URL of the global server */
     PA_FT_SERVER_GLOBAL("proactive.ft.server.global", PAPropertiesType.STRING),
 
-    /** TODO cdelbe Describe this property */
+    /** Value of the TTC, in seconds */
     PA_FT_TTC("proactive.ft.ttc", PAPropertiesType.INTEGER),
 
-    /** TODO cdelbe Describe this property */
+    /** URL of the resource server */
     PA_FT_SERVER_RESOURCE("proactive.ft.server.resource",
         PAPropertiesType.STRING),
 
-    /** TODO cdelbe Describe this property */
+    /** Protocol type, could be "cic" or "pml" */
     PA_FT_PROTOCOL("proactive.ft.protocol", PAPropertiesType.STRING),
 
     /* ------------------------------------

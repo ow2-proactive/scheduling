@@ -53,6 +53,10 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
  * @since 2.2
  */
 public class ResourceServerImpl implements ResourceServer {
+
+    /** Connexion port for recovery nodes p2p network */
+    public static final String P2P_PORT = "2603";
+
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
@@ -80,7 +84,7 @@ public class ResourceServerImpl implements ResourceServer {
             Vector<String> v = new Vector<String>(1);
             v.add(p2pServerURL);
             StartP2PService startServiceP2P = new StartP2PService(v);
-            PAProperties.PA_P2P_PORT.setValue("2603");
+            PAProperties.PA_P2P_PORT.setValue(P2P_PORT);
             startServiceP2P.start();
             this.serviceP2P = startServiceP2P.getP2PService();
             logger.info("[RESOURCE] Running on p2p network");

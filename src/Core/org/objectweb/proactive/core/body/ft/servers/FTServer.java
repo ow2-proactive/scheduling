@@ -63,10 +63,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class FTServer extends UnicastRemoteObject implements FaultDetector,
     LocationServer, RecoveryProcess, ResourceServer, CheckpointServer {
-
-    /**
-         *
-         */
     private static final long serialVersionUID = 7757071442311462095L;
 
     //logger
@@ -245,30 +241,8 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-
-    // Commented code is used to benchmark recovery time. A failure is triggered
-    // artifially by sending a kill message to one active object.
-    //public static final int numCkpt = 4; // totalWorker * failureFrequency
-    //public static final int numberOfWorker = 4;
-    //public static final long timeToWait = 45000; // TTC/2
-    //public static final int totalFailure = 1;
-    //private int ckptCounter = 1;
-    //private int failureCounter = 1;
-    //private int firstCkptCounter = numberOfWorker;
-    //private ActiveQueue killingQueue = new ActiveQueue("Killing thread");
     public int storeCheckpoint(Checkpoint c, int incarnation)
         throws RemoteException {
-        //this.firstCkptCounter--;
-        //if (this.firstCkptCounter < 0){
-        //    if ((this.failureCounter <= totalFailure) &&
-        //            ((ckptCounter) == numCkpt)) {
-        //        this.killingQueue.addJob(
-        //                new KillerJob(this,this.getLocation(c.getBodyID()),timeToWait));
-        //        this.ckptCounter=0; // the following ++ set it to 1 ...
-        //        this.failureCounter++;
-        //    }
-        //    this.ckptCounter++;
-        //}
         return this.checkpointServer.storeCheckpoint(c, incarnation);
     }
 

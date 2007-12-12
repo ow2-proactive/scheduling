@@ -37,11 +37,17 @@ package org.objectweb.proactive.core.body.ft.protocols;
  */
 public interface FTManagerFactory {
 
+    /** Communication induced checkpointing protocol name */
+    public static final String PROTO_CIC = "cic";
+
+    /** Pessimistic message logging protocol name. */
+    public static final String PROTO_PML = "pml";
+
     /** Communication induced checkpointing protocol selector value. */
-    public static final int PROTO_CIC = 1;
+    public static final int PROTO_CIC_ID = 1;
 
     /** Pessimistic message logging protocol selector value. */
-    public static final int PROTO_PML = 2;
+    public static final int PROTO_PML_ID = 2;
 
     /**
      * Return a fault-tolerance manager for a body
