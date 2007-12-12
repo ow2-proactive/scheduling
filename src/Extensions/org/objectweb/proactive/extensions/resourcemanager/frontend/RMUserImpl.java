@@ -65,7 +65,9 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  *
  *  @see org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionScript
  *
- *  @author ProActive team.
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 public class RMUserImpl implements RMUser, InitActive {

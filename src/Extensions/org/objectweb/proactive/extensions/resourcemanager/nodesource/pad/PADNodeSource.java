@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.nodesource.pad;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -137,8 +138,8 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
         if (this.nodes.containsKey(nodeUrl)) {
             Node node = nodes.get(nodeUrl);
             try {
-                // Kill virtual machine
                 node.getProActiveRuntime().killRT(false);
+            } catch (IOException e) {
             } catch (Exception e) {
                 e.printStackTrace();
             }

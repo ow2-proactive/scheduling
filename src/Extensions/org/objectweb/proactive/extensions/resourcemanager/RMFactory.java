@@ -58,7 +58,9 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMUser;
  * -{@link RMMonitoring}.<BR>
  * -{@Link RMUSer}.<BR>
  *
- * @author ProActive team
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 @PublicAPI
@@ -148,16 +150,12 @@ public class RMFactory implements RMConstants {
         try {
             startLocal();
         } catch (NodeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (AlreadyBoundException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

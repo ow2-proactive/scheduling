@@ -54,6 +54,8 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  * @see RMMonitoring
  *
  * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 @PublicAPI

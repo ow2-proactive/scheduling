@@ -49,6 +49,8 @@ import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
  * - Monitoring interface of the RM : {@link RMMonitoring}.<BR>
  *
  * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 @PublicAPI

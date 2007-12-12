@@ -68,6 +68,8 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  * @see SelectionScript
  *
  * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 public class RMNodeImpl implements RMNode, Serializable {

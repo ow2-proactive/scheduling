@@ -41,9 +41,10 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  * This comparator is used to sort a nodes collection according to results
  * of a {@link SelectionScript}.
  *
- * @author ProActive Team
- * @version 1.0, Jul 12, 2007
- * @since ProActive 3.2
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
+ *
  */
 public class RMNodeComparator implements Comparator<RMNode> {
     private SelectionScript script;

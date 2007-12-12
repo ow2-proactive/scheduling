@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -157,6 +158,7 @@ public class DummyNodeSource extends DynamicNodeSource
         StaticNodes.remove(nodeUrl);
         try {
             node.getProActiveRuntime().killRT(false);
+        } catch (IOException e) {
         } catch (Exception e) {
             e.printStackTrace();
         }

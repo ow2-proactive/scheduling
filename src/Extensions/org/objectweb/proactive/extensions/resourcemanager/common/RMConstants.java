@@ -41,7 +41,9 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  * These interface define names for Resource manager active objects
  * and defines type names for the different node sources types.
  *
- * @author ProActive team
+ * @author ProActiveTeam
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 @PublicAPI

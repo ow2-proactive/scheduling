@@ -50,6 +50,8 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.Pa
  * deployment mechanism for Resource Manager.
  *
  * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 public class RMDeploy implements NodeCreationEventListener, Runnable {

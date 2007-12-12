@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.nodesource.dynamic;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Vector;
 
@@ -179,10 +180,10 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
         String nodeUrl = node.getNodeInformation().getURL();
         try {
             node.getProActiveRuntime().killRT(false);
+        } catch (IOException e) {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("P2PNodeSource.killNodeRT() kill done");
         this.lookups.remove(nodeUrl);
     }
 

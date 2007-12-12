@@ -46,7 +46,10 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
  *
  * @see org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.NodeSource
  *
- * @author ProActive team
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
+ *
  */
 public interface RMCoreSourceInt {
 

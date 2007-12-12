@@ -72,7 +72,9 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
  *
  * @see org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListener
  *
- * @author ProActive team
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 public class RMMonitoringImpl implements RMMonitoring, RMEventListener,

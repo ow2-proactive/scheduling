@@ -43,9 +43,10 @@ import org.objectweb.proactive.core.node.Node;
  * In a future version, it will give also further informations like why nodes haven't been given,
  * or more specifications on the nodes, like distance between them, etc...
  *
- * @author ProActive Team
- * @version 1.0, Jun 11, 2007
- * @since ProActive 3.2
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
+ *
  */
 @PublicAPI
 public class NodeSet extends ArrayList<Node> {

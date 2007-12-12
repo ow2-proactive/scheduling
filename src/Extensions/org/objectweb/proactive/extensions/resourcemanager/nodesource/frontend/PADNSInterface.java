@@ -41,6 +41,11 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  * Interface for {@link PADNodeSource} objects.
  *
  * /TODO gsigety, cdelbe: interface totally useless for the moment
+ *
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
+ *
  */
 public interface PADNSInterface {
 

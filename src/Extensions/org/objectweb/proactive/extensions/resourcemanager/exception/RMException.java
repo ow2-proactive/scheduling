@@ -40,9 +40,10 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMConnection;
  * @see RMConnection
  * @see RMFactory
  *
- * @author ProActive Team
- * @version 1.1, Jun 29, 2007
- * @since ProActive 3.2
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
+ *
  */
 public class RMException extends Exception {
 

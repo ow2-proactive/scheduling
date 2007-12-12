@@ -71,6 +71,10 @@ import org.objectweb.proactive.extensions.resourcemanager.utils.Heap;
  * @see org.objectweb.proactive.extensions.resourcemanager.core.RMCore
  * @author ProActive team
  *
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
+ *
  */
 public abstract class DynamicNodeSource extends NodeSource
     implements DynamicNSInterface, Serializable, RunActive {
@@ -144,7 +148,6 @@ public abstract class DynamicNodeSource extends NodeSource
         }
     }
 
-    //TODO The Time To Update (here 3000) should be parameterable.
     /**
      * Periodically updates the internal state of the DynamicNodeSource.
      * Verify if there are nodes to release and nodes to acquire, by calling {@link DynamicNodeSource#cleanAndGet()}

@@ -28,50 +28,30 @@
  *
  * ################################################################
  */
-package org.objectweb.proactive.extensions.resourcemanager.common.event;
+package org.objectweb.proactive.extensions.resourcemanager.test.simple;
 
-import java.io.Serializable;
+import org.objectweb.proactive.extensions.resourcemanager.common.RMConstants;
+import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
+import org.objectweb.proactive.extensions.resourcemanager.frontend.RMConnection;
 
 
-/**
- * Upper class for RM's event objects
- *
- * @author ProActive team.
- * @version 3.9
- * @since ProActive 3.9
- */
-public class RMEvent implements Serializable {
+public class SimpleTestAddNode {
+    public static void main(String[] args) {
+        System.out.println("# --oOo-- adding node Test --oOo-- ");
 
-    /** Resource manager URL */
-    private String RMUrl = null;
+        try {
+            String url = "rmi://localhost:1099/" +
+                RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
+            RMAdmin admin = RMConnection.connectAsAdmin(url);
 
-    /**
-     * ProActive empty constructor
-     */
-    public RMEvent() {
-    }
-
-    /**
-     * Creates the node event object.
-     * @param url URL of the node.
-     */
-    public RMEvent(String url) {
-        this.RMUrl = url;
-    }
-
-    /**
-     * Returns the RM's URL of the event.
-     * @return node source type of the event.
-     */
-    public String getRMUrl() {
-        return this.RMUrl;
-    }
-
-    /**
-     * Set the RM's URL of the event.
-     * @param RMURL URL of the RM to set
-     */
-    public void setRMUrl(String RMURL) {
-        this.RMUrl = RMURL;
+            for (String toAddUrl : args) {
+                System.out.println("adding " + toAddUrl);
+                admin.addNode(toAddUrl);
+            }
+            System.exit(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        System.out.println("##[TestRMAdmin] END TEST");
     }
 }

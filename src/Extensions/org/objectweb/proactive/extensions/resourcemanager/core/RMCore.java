@@ -113,7 +113,9 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  * @see RMCoreInterface
  * @see RMCoreSourceInt
  *
- * @author ProActive team
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,

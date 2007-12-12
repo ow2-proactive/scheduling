@@ -44,7 +44,9 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.Pa
  * Manages for the Resource Manager
  * a thread pool for {@link RMDeploy} objects that perform deployment.
  *
- * @author PrActive team.
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 public class RMDeploymentFactory {

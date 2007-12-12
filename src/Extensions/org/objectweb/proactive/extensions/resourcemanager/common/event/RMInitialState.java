@@ -51,7 +51,9 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
  * @see RMNodeSourceEvent
  * @see RMMonitoring
  *
- * @author ProActive team
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 @PublicAPI

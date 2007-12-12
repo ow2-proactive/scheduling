@@ -99,7 +99,9 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.PADNode
  *        @see RMCoreSourceInt
  *        @see RMCore
  *
- * @author ProActive team
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
  *
  */
 public abstract class NodeSource implements Serializable, InitActive, EndActive {

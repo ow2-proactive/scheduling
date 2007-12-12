@@ -30,13 +30,24 @@
  */
 package org.objectweb.proactive.extensions.resourcemanager.test.util;
 
+import java.util.Vector;
+
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.extensions.resourcemanager.RMFactory;
+import org.objectweb.proactive.extensions.resourcemanager.exception.RMException;
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMAdmin;
 
 
+/**
+ * Class with main which instantiates a Resource Manager.
+ *
+ * @author ProActive team.
+ * @version 3.9
+ * @since ProActive 3.9
+ *
+ */
 public class RMLauncher {
 
     /**
@@ -65,31 +76,13 @@ public class RMLauncher {
             admin.addNodes(pad);
         }
 
-        //        Vector<String> v = new Vector<String>();
-        //        v.add("//localhost:6444");
-        //        try {
-        //        	admin.createDynamicNodeSource("P2P", 3, 10000, 50000, v);
-        //        } catch (RMException e) {
-        //        	e.printStackTrace();
-        //        }
-
-        //DynamicNodeSource d = (DynamicNodeSource) PAActiveObject.newActive(P2PNodeSource.class.getCanonicalName(),
-        //new Object[] { "Nodes on P2P", 4, 6, 60000000 });
-        //admin.addDynamicNodeSources(d);
-        //RMUser user = IMFactory.getUser();
-        //IMMonitoring monitor = IMFactory.getMonitoring();
-
-        // Thread.sleep(Integer.MAX_VALUE);
-        // System.out.println("Number of nodes : "+
-        // monitor.getNumberOfAllResources().intValue());
-        //        
-        // System.out.println("Asking for 2 nodes :");
-        // NodeSet ns = user.getAtMostNodes(new IntWrapper(3), null);
-        // System.out.println("Nodes obtained : "+ ns.size());
-        // System.out.println("Free nodes : "+
-        // monitor.getNumberOfFreeResource().intValue());
-        // System.out.println("Free nodes : "+
-        // monitor.getNumberOfFreeResource().intValue());
+        //                Vector<String> v = new Vector<String>();
+        //                v.add("//localhost:6444");
+        //                try {
+        //                	admin.createDynamicNodeSource("P2P", 3, 10000, 50000, v);
+        //                } catch (RMException e) {
+        //                	e.printStackTrace();
+        //                }
         System.out.println("[RESOURCE MANAGER] Press e+enter to exit...");
         char typed = 'x';
         while ((typed = (char) System.in.read()) != 'e') {
