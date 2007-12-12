@@ -37,7 +37,6 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -62,6 +61,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.objectweb.proactive.core.Constants;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -111,7 +111,7 @@ public class MonitorNewHostDialog extends Dialog {
         ProActiveConfiguration.load();
 
         /* Get the machine's port */
-        port = System.getProperty("proactive.rmi.port");
+        port = PAProperties.PA_RMI_PORT.getValue();
 
         /* Init the display */
         Display display = getParent().getDisplay();
