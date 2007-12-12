@@ -164,6 +164,9 @@ public class MatlabTask extends AbstractGeneralTask {
         }
     }
 
+    /**
+     * Static method for terminating the Matlab Engine
+     */
     public static void terminateEngine() {
         if (matlabEngine != null) {
             matlabEngine.close(engineHandle);

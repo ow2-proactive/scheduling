@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.proactive.annotation.PublicAPI;
@@ -128,4 +129,16 @@ public interface GeneralTask extends Serializable {
      * @param data data to add
      */
     public void addDataOut(String data);
+
+    /**
+     * Retrieve the list of output variables
+     * @return a list of variable names
+     */
+    public ArrayList<String> getListDataOut();
+
+    /**
+     * Set the list of output variables
+     * @param listDataOut a list of variable names
+     */
+    public void setListDataOut(ArrayList<String> listDataOut);
 }

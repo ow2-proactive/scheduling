@@ -372,6 +372,9 @@ public class MSService implements Serializable {
         this.taskObservable.fireMSEvent(new MSEvent(sciTaskInfo));
     }
 
+    /**
+     * retrieve all results available
+     */
     private synchronized void retrieveResults() {
         if (logger.isDebugEnabled()) {
             logger.debug("->MSService In:retrieveResult");
@@ -416,6 +419,10 @@ public class MSService implements Serializable {
         }
     }
 
+    /**
+     * Get next task to process
+     * @return task information
+     */
     private GenTaskInfo getNextTask() {
         if (logger.isDebugEnabled()) {
             logger.debug("->MSService loop:getNextTask");
@@ -446,6 +453,10 @@ public class MSService implements Serializable {
         return this.listTaskWait.remove(0);
     }
 
+    /**
+     * Get the next engine available
+     * @return engine information
+     */
     private MSEngineInfo getNextEngine() {
         if (logger.isDebugEnabled()) {
             logger.debug("->MSService loop:getNextEngine");
@@ -493,6 +504,9 @@ public class MSService implements Serializable {
         return null;
     }
 
+    /**
+     * Execute all pending tasks
+     */
     private synchronized void executeTasks() {
         if (logger.isDebugEnabled()) {
             logger.debug("->MSService In:executeTasks");
@@ -547,6 +561,11 @@ public class MSService implements Serializable {
         }
     }
 
+    /**
+     * Execute the given task on the given engine
+     * @param mSEngineInfo engine information
+     * @param sciTaskInfo task information
+     */
     private synchronized void executeTask(MSEngineInfo mSEngineInfo,
         GenTaskInfo sciTaskInfo) {
         if (logger.isDebugEnabled()) {
@@ -569,29 +588,51 @@ public class MSService implements Serializable {
         notifyAll();
     }
 
+    /**
+     * Register a listener to task events
+     * @param evtListener listener
+     */
     public synchronized void addEventListenerTask(MSEventListener evtListener) {
         taskObservable.addMSEventListener(evtListener);
     }
 
+    /**
+     * Register a listener to engine events
+     * @param evtListener listener
+     */
     public synchronized void addEventListenerEngine(MSEventListener evtListener) {
         engineObservable.addMSEventListener(evtListener);
     }
 
+    /**
+     * Unregister a listener to task events
+     * @param evtListener listener
+     */
     public synchronized void removeEventListenerTask(
         MSEventListener evtListener) {
         taskObservable.removeMSEventListener(evtListener);
     }
 
+    /**
+     * Unregister all listeners to task events
+     */
     public synchronized void removeAllEventListenerTask() {
         taskObservable = null;
         taskObservable = new MSEventSource();
     }
 
+    /**
+     * Unregister all listeners to engine events
+     */
     public synchronized void removeAllEventListenerEngine() {
         engineObservable = null;
         engineObservable = new MSEventSource();
     }
 
+    /**
+     * Unregister a listener to engine events
+     * @param evtListener listener
+     */
     public synchronized void removeEventListenerEngine(
         MSEventListener evtListener) {
         engineObservable.removeMSEventListener(evtListener);
@@ -647,7 +688,6 @@ public class MSService implements Serializable {
 
     /**
      * exit the monitor and free each deployed engine
-     *
      */
     public synchronized void exit() {
         if (logger.isDebugEnabled()) {

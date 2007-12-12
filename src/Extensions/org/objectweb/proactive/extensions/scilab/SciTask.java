@@ -137,6 +137,9 @@ public class SciTask extends AbstractGeneralTask {
         }
     }
 
+    /**
+     * Static method for terminating the Scilab Engine
+     */
     public static void terminateEngine() {
         if (initialized) {
             Scilab.Finish();
