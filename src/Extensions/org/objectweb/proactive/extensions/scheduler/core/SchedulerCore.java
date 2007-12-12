@@ -45,6 +45,7 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.apache.log4j.MDC;
 import org.apache.log4j.net.SocketAppender;
+import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
@@ -151,11 +152,15 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     /** Thread that will ping the running nodes */
     private Thread pinger;
 
-    /** Store logs for running jobs : SHOULD BE REMOVED */
-    private Hashtable<JobId, BufferedAppender> jobLogs = new Hashtable<JobId, BufferedAppender>();
+    /** Jobs that must be logged into the corresponding appender */
+    private Hashtable<JobId, BufferedAppender> jobsToBeLogged = new Hashtable<JobId, BufferedAppender>();
+
+    /** Currently running tasks for a given jobId*/
+    private Hashtable<JobId, Hashtable<TaskId, TaskLauncher>> currentlyRunningTasks =
+        new Hashtable<JobId, Hashtable<TaskId, TaskLauncher>>();
 
     /**
-     * Pro Active empty constructor
+     * ProActive empty constructor
      */
     public SchedulerCore() {
     }
@@ -394,8 +399,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     if ((currentJob.getType() == JobType.PROACTIVE) &&
                             (nodeSet.size() >= internalTask.getNumberOfNodesNeeded())) {
                         nodeSet.remove(0);
-                        launcher = internalTask.createLauncher(host, port, node);
-
+                        launcher = internalTask.createLauncher(node);
+                        this.currentlyRunningTasks.get(internalTask.getJobId())
+                                                  .put(internalTask.getId(),
+                            launcher);
                         NodeSet nodes = new NodeSet();
 
                         for (int i = 0;
@@ -404,6 +411,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                             nodes.add(nodeSet.remove(0));
                         }
 
+                        // activate loggers for this task if needed
+                        if (this.jobsToBeLogged.containsKey(currentJob.getId())) {
+                            launcher.activateLogs(host, port);
+                        }
                         currentJob.getJobResult()
                                   .addTaskResult(internalTask.getName(),
                             ((ProActiveTaskLauncher) launcher).doTask(
@@ -412,11 +423,17 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                                 nodes), internalTask.isPreciousResult());
                     } else if (currentJob.getType() != JobType.PROACTIVE) {
                         nodeSet.remove(0);
-                        launcher = internalTask.createLauncher(host, port, node);
+                        launcher = internalTask.createLauncher(node);
+                        this.currentlyRunningTasks.get(internalTask.getJobId())
+                                                  .put(internalTask.getId(),
+                            launcher);
+                        // activate loggers for this task if needed
+                        if (this.jobsToBeLogged.containsKey(currentJob.getId())) {
+                            launcher.activateLogs(host, port);
+                        }
 
                         //if job is TASKSFLOW, preparing the list of parameters for this task.
                         int resultSize = taskDescriptor.getParents().size();
-
                         if ((currentJob.getType() == JobType.TASKSFLOW) &&
                                 (resultSize > 0)) {
                             TaskResult[] params = new TaskResult[resultSize];
@@ -432,7 +449,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                                                       .getAllResults()
                                                       .get(parentTask.getName());
                             }
-
                             currentJob.getJobResult()
                                       .addTaskResult(internalTask.getName(),
                                 launcher.doTask(
@@ -562,19 +578,22 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //store the job result until user get it
         job.setJobResult(jobResult);
 
-        //create appender for this job
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
-                job.getId());
-        l.setAdditivity(false);
+        // create a running task table for this job
+        this.currentlyRunningTasks.put(job.getId(),
+            new Hashtable<TaskId, TaskLauncher>());
 
-        if (l.getAppender(Log4JTaskLogs.JOB_APPENDER_NAME) == null) {
-            BufferedAppender op = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
-                    true);
-            this.jobLogs.put(job.getId(), op);
-            l.addAppender(op);
+        //create appender for this job if required 
+        if (job.getLogFile() != null) {
+            Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                    job.getId());
+            l.setAdditivity(false);
 
-            // log into file if required
-            if (job.getLogFile() != null) {
+            if (l.getAppender(Log4JTaskLogs.JOB_APPENDER_NAME) == null) {
+                BufferedAppender op = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
+                        true);
+                this.jobsToBeLogged.put(job.getId(), op);
+                l.addAppender(op);
+
                 try {
                     FileAppender fa = new FileAppender(Log4JTaskLogs.DEFAULT_LOG_LAYOUT,
                             job.getLogFile(), false);
@@ -583,10 +602,10 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     logger.warn("[SCHEDULER] Cannot open log file " +
                         job.getLogFile() + " : " + e.getMessage());
                 }
+            } else {
+                throw new RuntimeException("[SCHEDULER] Appender for job " +
+                    job.getId() + " is already activated");
             }
-        } else {
-            throw new RuntimeException("[SCHEDULER] Appender for job " +
-                job.getId() + " is already activated");
         }
 
         //sending event to client
@@ -664,6 +683,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
                 job.getId());
         l.removeAllAppenders();
+        this.jobsToBeLogged.remove(job.getId());
+
+        // remove current running tasks
+        this.currentlyRunningTasks.remove(job.getId());
+
         //send event to listeners.
         frontend.jobRunningToFinishedEvent(job.getJobInfo());
         //create tasks events list
@@ -684,7 +708,7 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         InternalJob job = jobs.get(jobId);
 
         InternalTask descriptor = job.getHMTasks().get(taskId);
-
+        this.currentlyRunningTasks.get(jobId).remove(taskId);
         try {
             //The task is terminated but it's possible to have to
             //wait for the future of the task result (TaskResult).
@@ -771,6 +795,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 l.removeAllAppenders(); // appender are closed...
                                         //send event to listeners.
 
+                this.jobsToBeLogged.remove(jobId);
+                // TODO cdelbe : race condition with GUI ? Logger are removed before
+                // job is removed from GUI ...
+                this.currentlyRunningTasks.remove(jobId);
+
                 frontend.jobRunningToFinishedEvent(job.getJobInfo());
                 //and to data base
                 AbstractSchedulerDB.getInstance().setJobEvent(job.getJobInfo());
@@ -814,60 +843,56 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
 
     /**
      * Listen for the tasks user log.
-     * WARNING : This method is served as immediate service
      * @param jobId the id of the job to listen to.
      * @param hostname the host name where to send the log.
      * @param port the port number on which the log will be sent.
      */
     public void listenLog(JobId jobId, String hostname, int port) {
-        BufferedAppender bufferForJobId = this.jobLogs.get(jobId);
+        BufferedAppender bufferForJobId = this.jobsToBeLogged.get(jobId);
+        Logger l = null;
+        if (bufferForJobId == null) {
+            // can be not null if a log file has been defined for this job
+            // or created by previous call to listenLog
+            bufferForJobId = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
+                    true);
+            this.jobsToBeLogged.put(jobId, bufferForJobId);
+            l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
+            l.setAdditivity(false);
+            l.addAppender(bufferForJobId);
 
-        if (bufferForJobId != null) {
-            bufferForJobId.addSink(new SocketAppender(hostname, port));
-        } else {
-            // job has been removed _or_ scheduler has recovered
-            // create appender for this job
             InternalJob target = this.jobs.get(jobId);
+            if ((target != null) && !this.pendingJobs.contains(target)) {
+                // this jobs contains running and finished tasks
+                // for running tasks, activate loggers on taskLauncher side
+                Hashtable<TaskId, TaskLauncher> curRunning = this.currentlyRunningTasks.get(jobId);
 
-            if (target != null) {
-                // this job is finished after recovery
-                this.createAppenderForJob(jobId)
-                    .addSink(new SocketAppender(hostname, port));
+                // for running tasks
+                if (curRunning != null) {
+                    Collection<TaskLauncher> runningTasks = curRunning.values();
+                    for (TaskLauncher tl : runningTasks) {
+                        tl.activateLogs(host, port);
+                    }
+                }
 
-                Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
-                        jobId);
-
-                // Retrieve already stored output of job id in task logs in task results
+                // for finished tasks, add logs events "manually"
                 Collection<TaskResult> allRes = target.getJobResult()
                                                       .getAllResults().values();
-
                 for (TaskResult tr : allRes) {
                     // if taskResult is not awaited, task is terminated
                     if (!PAFuture.isAwaited(tr)) {
-                        MDC.getContext()
-                           .put(Log4JTaskLogs.MDC_TASK_ID, tr.getTaskId());
-                        l.info(tr.getOuput().getStdoutLogs(false));
-                        l.error(tr.getOuput().getStderrLogs(false));
+                        // mmm, well... It's only half-generic for the moment,
+                        // but I don't despair...
+                        Log4JTaskLogs logs = (Log4JTaskLogs) (tr.getOuput());
+                        for (LoggingEvent le : logs.getAllEvents()) {
+                            bufferForJobId.doAppend(le);
+                        }
                     }
                 }
             }
         }
-    }
-
-    /**
-     * Create an appender for the job id and add it to jobLogs
-     * @param id the id of the job
-     */
-    private BufferedAppender createAppenderForJob(JobId id) {
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id);
-        l.setAdditivity(false);
-
-        BufferedAppender op = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
-                true);
-        this.jobLogs.put(id, op);
-        l.addAppender(op);
-
-        return op;
+        // connect to client side logger 
+        // TODO should connect to socket before flusing finished logs
+        bufferForJobId.addSink(new SocketAppender(hostname, port));
     }
 
     /**
@@ -888,13 +913,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             frontend.jobRemoveFinishedEvent(job.getJobInfo());
             //and to data base
             AbstractSchedulerDB.getInstance().setJobEvent(job.getJobInfo());
-
-            BufferedAppender jobLog = this.jobLogs.remove(jobId);
-
+            // close log buffer
+            BufferedAppender jobLog = this.jobsToBeLogged.remove(jobId);
             if (jobLog != null) {
                 jobLog.close();
             }
-
             logger.info("[SCHEDULER] Removed result for job " + jobId);
         }
 
@@ -1083,6 +1106,8 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         pendingJobs.clear();
         runningJobs.clear();
         finishedJobs.clear();
+        jobsToBeLogged.clear();
+        currentlyRunningTasks.clear();
         //finally : shutdown
         state = SchedulerState.KILLED;
         logger.info("[SCHEDULER] Scheduler has just been killed !");
@@ -1203,6 +1228,15 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             ;
         }
 
+        // terminate loggers
+        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
+                job.getId());
+        l.removeAllAppenders();
+        this.jobsToBeLogged.remove(job.getId());
+
+        // remove current running tasks
+        this.currentlyRunningTasks.remove(job.getId());
+
         logger.info("[SCHEDULER] Job " + jobId + " has just been killed !");
         frontend.jobKilledEvent(jobId);
         AbstractSchedulerDB.getInstance().removeJob(jobId);
@@ -1320,13 +1354,14 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
             switch (job.getState()) {
             case PENDING:
                 pendingJobs.add(job);
-                this.createAppenderForJob(job.getId());
-
+                currentlyRunningTasks.put(job.getId(),
+                    new Hashtable<TaskId, TaskLauncher>());
                 break;
             case STALLED:
             case RUNNING:
                 runningJobs.add(job);
-                this.createAppenderForJob(job.getId());
+                currentlyRunningTasks.put(job.getId(),
+                    new Hashtable<TaskId, TaskLauncher>());
 
                 //reset the finished events in the order they they have occurred
                 ArrayList<InternalTask> tasksList = copyAndSort(job.getTasks(),
@@ -1343,7 +1378,6 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 finishedJobs.add(job);
                 break;
             case PAUSED:
-                this.createAppenderForJob(job.getId());
                 if ((job.getNumberOfPendingTask() +
                         job.getNumberOfRunningTask() +
                         job.getNumberOfFinishedTask()) == 0) {

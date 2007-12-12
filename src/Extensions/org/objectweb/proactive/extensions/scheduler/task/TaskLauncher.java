@@ -59,7 +59,6 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.common.task.executable.Executable;
 import org.objectweb.proactive.extensions.scheduler.core.SchedulerCore;
 import org.objectweb.proactive.extensions.scheduler.util.logforwarder.BufferedAppender;
-import org.objectweb.proactive.extensions.scheduler.util.logforwarder.EmptyAppender;
 import org.objectweb.proactive.extensions.scheduler.util.logforwarder.LoggingOutputStream;
 
 
@@ -78,8 +77,6 @@ public class TaskLauncher implements InitActive {
     private static final long serialVersionUID = -9159607482957244049L;
     protected TaskId taskId;
     protected Script<?> pre;
-    protected String host;
-    protected Integer port;
 
     // handle streams
     protected transient PrintStream redirectedStdout;
@@ -97,13 +94,9 @@ public class TaskLauncher implements InitActive {
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
      *
      * @param taskId represents the task the launcher will execute.
-     * @param host the host on which to append the standard output/input.
-     * @param port the port number on which to send the standard output/input.
      */
-    public TaskLauncher(TaskId taskId, String host, Integer port) {
+    public TaskLauncher(TaskId taskId) {
         this.taskId = taskId;
-        this.host = host;
-        this.port = port;
     }
 
     /**
@@ -111,14 +104,10 @@ public class TaskLauncher implements InitActive {
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
      *
      * @param taskId represents the task the launcher will execute.
-     * @param host the host on which to append the standard output/input.
-     * @param port the port number on which to send the standard output/input.
      * @param pre the script executed before the task.
      */
-    public TaskLauncher(TaskId taskId, String host, Integer port, Script<?> pre) {
+    public TaskLauncher(TaskId taskId, Script<?> pre) {
         this.taskId = taskId;
-        this.host = host;
-        this.port = port;
         this.pre = pre;
     }
 
@@ -128,7 +117,10 @@ public class TaskLauncher implements InitActive {
     */
     public void initActivity(Body body) {
         PAActiveObject.setImmediateService("getNodes");
+        PAActiveObject.setImmediateService("activateLogs");
         PAActiveObject.setImmediateService("terminate");
+        // plug stdout/err into a socketAppender
+        this.initLoggers();
     }
 
     /**
@@ -142,9 +134,6 @@ public class TaskLauncher implements InitActive {
     @SuppressWarnings("unchecked")
     public TaskResult doTask(SchedulerCore core, Executable executableTask,
         TaskResult... results) {
-        // plug stdout/err into a socketAppender
-        this.initLoggers();
-
         try {
             //launch pre script
             if (pre != null) {
@@ -184,26 +173,20 @@ public class TaskLauncher implements InitActive {
     }
 
     /**
-     * Redirect stdout/err in the scheduler task logger.
+     * Redirect stdout/err in the buffered appender.
      */
     @SuppressWarnings("unchecked")
     protected void initLoggers() {
         // error about log should not be logged
         LogLog.setQuietMode(true);
-
         // create logger
         Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
                 this.taskId.getJobId());
         l.setAdditivity(false);
-
-        Appender out = new SocketAppender(this.host, this.port);
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
         l.removeAllAppenders();
-        l.addAppender(EmptyAppender.SINK);
         this.logBuffer = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
                 true);
-        // TODO : connection to the scheduler should be triggered by the scheduler
-        this.logBuffer.addSink(out);
         l.addAppender(this.logBuffer);
         // redirect stdout and err
         this.redirectedStdout = new PrintStream(new LoggingOutputStream(l,
@@ -212,6 +195,18 @@ public class TaskLauncher implements InitActive {
                     Level.ERROR), true);
         System.setOut(redirectedStdout);
         System.setErr(redirectedStderr);
+    }
+
+    // Pass host and ports here ...
+    /**
+     *
+     */
+    public void activateLogs(String host, int port) {
+        // should reset taskId because calling thread is not active thread (immediate service)
+        MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
+        Appender out = new SocketAppender(host, port);
+        // already logged events are flushed into out sink
+        this.logBuffer.addSink(out);
     }
 
     /**

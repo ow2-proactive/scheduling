@@ -70,11 +70,9 @@ public class NativeTaskLauncher extends TaskLauncher {
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
      *
      * @param taskId the task identification.
-     * @param jobId the job identification.
-     * @param host the host on which the task is launched.
      */
-    public NativeTaskLauncher(TaskId taskId, String host, Integer port) {
-        super(taskId, host, port);
+    public NativeTaskLauncher(TaskId taskId) {
+        super(taskId);
     }
 
     /**
@@ -82,13 +80,10 @@ public class NativeTaskLauncher extends TaskLauncher {
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
      *
      * @param taskId the task identification.
-     * @param host the host on which the task is launched.
-     * @param port the port on which the task is launched.
      * @param pre the script executed before the task.
      */
-    public NativeTaskLauncher(TaskId taskId, String host, Integer port,
-        Script<?> pre) {
-        super(taskId, host, port, pre);
+    public NativeTaskLauncher(TaskId taskId, Script<?> pre) {
+        super(taskId, pre);
     }
 
     /**

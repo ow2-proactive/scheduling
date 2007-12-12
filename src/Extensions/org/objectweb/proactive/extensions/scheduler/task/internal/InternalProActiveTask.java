@@ -105,19 +105,19 @@ public class InternalProActiveTask extends InternalAbstractJavaTask {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+     * @see org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask#createLauncher(org.objectweb.proactive.core.node.Node)
      */
     @Override
-    public TaskLauncher createLauncher(String host, int port, Node node)
+    public TaskLauncher createLauncher(Node node)
         throws ActiveObjectCreationException, NodeException {
         ProActiveTaskLauncher launcher;
 
         if (getPreScript() == null) {
             launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(ProActiveTaskLauncher.class.getName(),
-                    new Object[] { getId(), host, port }, node);
+                    new Object[] { getId() }, node);
         } else {
             launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(ProActiveTaskLauncher.class.getName(),
-                    new Object[] { getId(), host, port, getPreScript() }, node);
+                    new Object[] { getId(), getPreScript() }, node);
         }
 
         setExecuterInformations(new ExecuterInformations(launcher, node));

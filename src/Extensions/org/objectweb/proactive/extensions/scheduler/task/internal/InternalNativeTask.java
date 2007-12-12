@@ -96,18 +96,18 @@ public class InternalNativeTask extends InternalTask {
     }
 
     /**
-     * @see org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask#createLauncher(java.lang.String, int, org.objectweb.proactive.core.node.Node)
+     * @see org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask#createLauncher(org.objectweb.proactive.core.node.Node)
      */
     @Override
-    public TaskLauncher createLauncher(String host, int port, Node node)
+    public TaskLauncher createLauncher(Node node)
         throws ActiveObjectCreationException, NodeException {
         NativeTaskLauncher launcher;
         if (getPreScript() == null) {
             launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                    new Object[] { getId(), host, port }, node);
+                    new Object[] { getId() }, node);
         } else {
             launcher = (NativeTaskLauncher) PAActiveObject.newActive(NativeTaskLauncher.class.getName(),
-                    new Object[] { getId(), host, port, getPreScript() }, node);
+                    new Object[] { getId(), getPreScript() }, node);
         }
 
         setExecuterInformations(new ExecuterInformations(launcher, node));

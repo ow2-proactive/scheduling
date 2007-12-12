@@ -120,4 +120,12 @@ public class Log4JTaskLogs implements TaskLogs {
 
         return logs.toString();
     }
+
+    /**
+     * Return all the currently logged events
+     * @return a list containing all the currently logged events
+     */
+    public LinkedList<LoggingEvent> getAllEvents() {
+        return (LinkedList<LoggingEvent>) allEvents.clone();
+    }
 }

@@ -99,20 +99,18 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
     /**
      * Create the launcher for this taskDescriptor.
      *
-     * @param host the host name on which to send the log.
-     * @param port the port on which to send the log.
      * @param node the node on which to create the launcher.
      * @return the created launcher as an activeObject.
      */
-    public TaskLauncher createLauncher(String host, int port, Node node)
+    public TaskLauncher createLauncher(Node node)
         throws ActiveObjectCreationException, NodeException {
         TaskLauncher launcher;
         if (getPreScript() == null) {
             launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
-                    new Object[] { getId(), host, port }, node);
+                    new Object[] { getId() }, node);
         } else {
             launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
-                    new Object[] { getId(), host, port, getPreScript() }, node);
+                    new Object[] { getId(), getPreScript() }, node);
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));
 

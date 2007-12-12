@@ -70,11 +70,9 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
      *
      * @param taskId the identification of the task to launch.
-     * @param host the host name on which the task is launched.
-     * @param port the port number on which the task is launched.
      */
-    public ProActiveTaskLauncher(TaskId taskId, String host, Integer port) {
-        super(taskId, host, port);
+    public ProActiveTaskLauncher(TaskId taskId) {
+        super(taskId);
     }
 
     /**
@@ -82,13 +80,10 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * CONSTRUCTOR USED BY THE SCHEDULER CORE : plz do not remove.
      *
      * @param taskId the identification of the task to launch.
-     * @param host the host name on which the task is launched.
-     * @param port the port number on which the task is launched.
      * @param pre the pre-script executed before the task is launched.
      */
-    public ProActiveTaskLauncher(TaskId taskId, String host, Integer port,
-        Script<?> pre) {
-        super(taskId, host, port, pre);
+    public ProActiveTaskLauncher(TaskId taskId, Script<?> pre) {
+        super(taskId, pre);
     }
 
     /**
@@ -128,8 +123,6 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             nodesList.add(super.getNodes().get(0));
         } catch (NodeException e) {
         }
-
-        this.initLoggers();
 
         try {
             //launch pre script
