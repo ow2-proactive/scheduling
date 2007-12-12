@@ -207,13 +207,13 @@ public class FunctionalTest {
         }
     }
 
-    static private void killProActiveWithScript() {
+    static private void killProActiveWithScript() throws Exception {
         File dir = new File(PAProperties.PA_HOME.getValue());
         File command = null;
         switch (OperatingSystem.getOperatingSystem()) {
         case unix:
-            command = new File(dir + "dev" + File.separator + "scripts" +
-                    File.separator + "killTests");
+            command = new File(dir + File.separator + "dev" + File.separator +
+                    "scripts" + File.separator + "killTests");
             break;
         default:
             break;
@@ -230,10 +230,10 @@ public class FunctionalTest {
                     logger.warn(e);
                 }
             } else {
-                logger.warn(command + " does not exist");
+                throw new IOException(command + " does not exist");
             }
         } else {
-            logger.warn(command + " not defined for " +
+            throw new Exception(command + " not defined for" +
                 OperatingSystem.getOperatingSystem().toString());
         }
     }
@@ -245,8 +245,13 @@ public class FunctionalTest {
         try {
             killProActiveWithJPS();
         } catch (Exception jpsException) {
-            jpsException.printStackTrace();
-            killProActiveWithScript();
+            logger.warn("JPS kill failed: " + jpsException.getMessage());
+            try {
+                killProActiveWithScript();
+            } catch (Exception scriptException) {
+                logger.warn("Script kill failed: " +
+                    scriptException.getMessage());
+            }
         }
     }
 
