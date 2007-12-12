@@ -167,7 +167,6 @@ public abstract class DynamicNodeSource extends NodeSource
      * Terminates activity of DynamicNodeSource Active Object.
      */
     public void endActivity(Body body) {
-        System.out.println("DynamicNodeSource.endActivity()");
     }
 
     /**
