@@ -384,13 +384,14 @@
 		</copy>
 		<chmod perm="755">
 			<fileset dir="${deploy.scripts.dir}"/>
+				<include name="**/*.sh"/>
 		</chmod>
 		
 	</target>
 
 
 	<target name="deploy.examples" depends="examples, deploy" description="Add examples.jar to the dist/ directory">
-		<jar destfile="${deploy.lib.dir}/examples.jar">
+		<jar destfile="${deploy.lib.dir}/ProActive_examples.jar">
 			<fileset dir="${cl.examples.dir}"/>
 		</jar>
 	</target>
@@ -403,7 +404,7 @@
 	</target>
 
 
-	<target name="deploy.all" depends="deploy.examples" description="Populate dist/ (with examples.jar)" />
+	<target name="deploy.all" depends="deploy.examples" description="Populate dist/ (with ProActive_examples.jar)" />
 
 
 
