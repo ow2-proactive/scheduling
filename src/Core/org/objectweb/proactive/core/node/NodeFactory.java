@@ -80,6 +80,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class NodeFactory {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
     private static final String DEFAULT_NODE_NAME;
+    public static final String DEFAULT_VIRTUAL_NODE_NAME = "DefaultVN";
     private static Node defaultNode = null;
 
     static {
@@ -104,7 +105,7 @@ public class NodeFactory {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
                 nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
                         Integer.toString(ProActiveRandom.nextPosInt()), false,
-                        securityManager, "DefaultVN", jobID);
+                        securityManager, DEFAULT_VIRTUAL_NODE_NAME, jobID);
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             } catch (AlreadyBoundException e) { //if this exception is risen, we generate an othe random name for the node
@@ -173,6 +174,10 @@ public class NodeFactory {
 
         //first look for the prototcol
         String protocol = URIBuilder.getProtocol(url);
+
+        if (vnname == null) {
+            vnname = DEFAULT_VIRTUAL_NODE_NAME;
+        }
 
         //NodeFactory factory = getFactory(protocol);
         //then create a node
