@@ -119,6 +119,7 @@ public class ProActiveConfigurationParser {
             nodes = (NodeList) xpath.evaluate(XPATH_PAPROPS, document,
                     XPathConstants.NODESET);
 
+            boolean unknownProperty = false;
             for (int i = 0; i < nodes.getLength(); i++) {
                 Node node = nodes.item(i);
                 String key = getAttributeValue(node, ATTR_KEY);
@@ -133,9 +134,17 @@ public class ProActiveConfigurationParser {
                             key + ". Must be a " + prop.getType().toString());
                     }
                 } else {
-                    logger.warn("Property " + key + " is not declared inside " +
-                        PAProperties.class.getSimpleName() + " , ignoring");
+                    logger.warn("Skiped unknown ProActive Java property: " +
+                        key);
+                    unknownProperty = true;
                 }
+            }
+            if (unknownProperty) {
+                logger.warn(
+                    "All supported ProActive Java properties are declared inside " +
+                    PAProperties.class.getName() +
+                    ". Please check your ProActive Configuration file: " +
+                    filename);
             }
 
             nodes = (NodeList) xpath.evaluate(XPATH_JAVAPROPS, document,
