@@ -71,20 +71,28 @@ h1 {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 h2 {
+	color:white;
 	font-size:17px;
 	font-weight:bold;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
+	background-color:#282d60;
+	
 }
 h3 {
-	color:#3A4376;
+	color:white;
 	font-size:14px;
 	font-weight:bold;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
+	background-color:#282d60;
+	
 }
 h4 {
+	color:white;
 	font-size:12px;
 	font-weight:bold;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
+	background-color:#282d60;
+	
 }
 h5 {
 	font-size:11px;
