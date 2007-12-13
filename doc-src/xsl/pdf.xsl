@@ -7,6 +7,21 @@
  <xsl:import href="http://docbook.sourceforge.net/release/xsl/1.69.1/fo/docbook.xsl" />
  <xsl:import href="common.xsl" />
 
+<!-- numbering depth: will remove numbers from sections but still display them in TOC  
+<xsl:param name="section.autolabel.max.depth">2</xsl:param>
+-->
+
+
+<!--  center all images in the tag figure horizontally  -->
+<xsl:attribute-set name="figure.properties">
+  <xsl:attribute name="text-align">center</xsl:attribute>
+</xsl:attribute-set>
+
+
+<!--  align all images in the tag informalfigure horizontally  -->
+<xsl:attribute-set name="informalfigure.properties">
+  <xsl:attribute name="text-align">center</xsl:attribute>
+</xsl:attribute-set>
 
 <xsl:attribute-set name="table.properties">
   <xsl:attribute name="keep-together.within-page">always</xsl:attribute>
