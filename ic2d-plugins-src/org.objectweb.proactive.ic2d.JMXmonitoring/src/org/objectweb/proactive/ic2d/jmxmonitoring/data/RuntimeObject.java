@@ -255,7 +255,7 @@ public class RuntimeObject extends AbstractData {
 
                 // Get the jobId and the virtualNodeName in one call
                 final String[] res = proxyNodeMBean.getJobIdAndVirtualNodeName();
-                Console.getInstance(Activator.CONSOLE_NAME).log("res " + res);
+
                 final String jobId = res[0];
                 final String virtualNodeName = res[1];
 
