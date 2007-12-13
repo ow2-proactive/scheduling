@@ -890,7 +890,6 @@ public Object execute(TaskResult... results) throws Throwable {
       it.</para>
     </sect2>
   </sect1>
-    </sect1>
 <sect1 id="Resource_Manager">
     <title>Resource Manager</title>
     <sect2 id="Role">
