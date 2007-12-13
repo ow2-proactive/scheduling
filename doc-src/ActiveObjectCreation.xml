@@ -54,8 +54,8 @@
 			<mediaobject>
 				<imageobject>
 					<imagedata
-						fileref="images/creationMethodsTable.png" scalefit="1"
-						contentwidth="100" format="PNG"	width="6in" />
+						fileref="images/creationMethodsTable.png" 
+						contentwidth="100" format="PNG"	width="6in" align="center" />
 
 				</imageobject>
 			</mediaobject>
@@ -578,7 +578,7 @@
 			<!--  		<imagedata  width="6in" depth="5.5in" scalefit="0" format="PNG" 
 						fileref="images/init_run_end_Activity.png" />
 				-->
-					<imagedata  contentwidth="100" width="500px"  format="PNG" 
+					<imagedata  contentwidth="100" width="500px"  
 						fileref="images/init_run_end_Activity.png" />
 				
 				</imageobject>
@@ -1509,7 +1509,9 @@
 						<mediaobject>
 							<imageobject>
 								<imagedata
-									fileref="images/sequentialCall.png" format="PNG" />
+									fileref="images/sequentialCall.png" format="PNG" 
+									
+									/>
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1517,9 +1519,12 @@
 			</sect3>
 
 			<sect3>
-				<title>Visualizing the graph of objects</title>
+				<title>Visualizing the graph of active and passive objects</title>
 
 				<para>
+					Now we will show how an active object handles the call for the code above.
+					Instead of blocking on the execution of <literal>foo()</literal> it will create a future
+					and continue execution.
 					Let us first get an idea of what the graph of
 					objects at execution (the objects with their
 					references to each other) looks like at three
