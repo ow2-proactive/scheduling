@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="ScilabDoc"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="http://www.docbook.org/xsd/4.2/docbook.xsd">
+<chapter id="ScilabDoc">
     <title>Interface with Matlab/Scilab</title>
 
     <sect1 id="Scilab_Overwiew">
@@ -513,12 +511,8 @@
         <example id="sciex1">
             <title>Example: Interface Matlab/Scilab</title>
 
-            <programlisting lang="java">
-                <textobject>
-                    <textdata
-                        fileref="../src/Extensions/org/objectweb/proactive/extensions/scilab/test/SciTest2.java" />
-                </textobject>
-            </programlisting>
+            <programlisting lang="java"><textobject><textdata
+                        fileref="../src/Extensions/org/objectweb/proactive/extensions/scilab/test/SciTest2.java" /></textobject></programlisting>
         </example>
 
         <example id="sciex2">
