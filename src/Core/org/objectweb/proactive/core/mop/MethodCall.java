@@ -397,11 +397,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
                 "Arguments for the method " + this.getName() +
                 " are invalids: " + e + "for the object " + targetObject + "(" +
                 targetObject.getClass().getName() + ")");
-        } /*catch (InvocationTargetException e) {
-        throw new MethodCallExecutionFailedException(
-        "Target for invocation of " + this.getName() +
-        " is invalid: " + e);
-        }*/}
+        } 
+}
 
     @Override
     protected void finalize() {

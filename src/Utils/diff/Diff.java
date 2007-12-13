@@ -97,14 +97,16 @@ public class Diff {
     public boolean no_discards = false;
     private int[] xvec; /* Vectors being compared. */
     private int[] yvec; /* Vectors being compared. */
-    private int[] fdiag; /* Vector, indexed by diagonal, containing
+/* Vector, indexed by diagonal, containing
     the X coordinate of the point furthest
     along the given diagonal in the forward
     search of the edit matrix. */
-    private int[] bdiag; /* Vector, indexed by diagonal, containing
+    private int[] fdiag; 
+/* Vector, indexed by diagonal, containing
     the X coordinate of the point furthest
     along the given diagonal in the backward
     search of the edit matrix. */
+    private int[] bdiag;     
     private int fdiagoff;
     private int bdiagoff;
     private final file_data[] filevec = new file_data[2];
