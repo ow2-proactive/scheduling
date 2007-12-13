@@ -381,7 +381,7 @@ private static void printMessageAndWait() {
         <para><literal>PASPMD.barrier("SynchronizationWithNeighbors"+
         this.iterationsToStop);</literal></para>
 
-        <para>Then recompile and execute again. Using IC2D observe that many
+        <para>Then recompile and execute again. Using IC2D observe that much
         more communications are necessary.</para>
 
         <figure>
