@@ -6,7 +6,7 @@
     <para><emphasis role="bold">IMPORTANT NOTE</emphasis> - Some parts of the ProActive Scheduler rely on Java Scripting capabilities (<ulink url="http://jcp.org/en/jsr/detail?id=223">JSR 223</ulink>). As a consequence, it requires either:
     <itemizedlist>
           <listitem> a 1.6 or greater Java Runtime Environment, without any modifications, </listitem>
-          <listitem> or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>. Those files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
+          <listitem> or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>.those files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
           you are using the bin release or ProActive, or in the <literal>/ProActive/lib/</literal> directory if you build ProActive from the source release.</listitem>
     </itemizedlist>
     </para>
@@ -163,7 +163,8 @@
       (TaskResult 2 and 3) in this order. Therefore you can use them to
       perform Task 5 process. <programlisting lang="java">@Override
 public Object execute(TaskResult... results) throws Throwable {
-    //user code for task 5...
+    //TaskResult tResult2 = results[0];
+    //TaskResult tResult3 = results[1];
 }</programlisting></para>
 
       <para>We will see how to define the dependencies and the order when we
@@ -411,6 +412,45 @@ public Object execute(TaskResult... results) throws Throwable {
 		        </itemizedlist>
 		   	</para>
 		</sect2>
+		
+		<sect2 id="communicator">
+	        <title>The Scheduler Shell Communicator</title>
+			<para>
+				The shell communicator is a shell interface that allow a user to administer the scheduler
+				without the java API.
+			To start a communicator, run the
+		      <emphasis>communicator.sh</emphasis> script in scripts/scheduler directory.
+		      Without arguments, the communicator will try to connect a scheduler on the local host.
+		      Note that the communicator uses an administrator to allow the connection to the scheduler.
+		    </para>
+		
+		    <para>
+		    	<emphasis>communicator.sh</emphasis> can be started with 1 optional
+		      	argument : <itemizedlist>
+		          <listitem>
+		            <para>
+		            	The URL of a started scheduler. (ie:
+		            	<emphasis role="bold">//hostname/</emphasis>)
+		            </para>
+		          </listitem>
+		        </itemizedlist>
+		   	</para>
+		   	
+	        <para>
+	        	Here's an overview of the shell communicator :
+	        	<figure id="communicator_shell">
+			        <title>The shell communicator</title>
+			
+			        <mediaobject>
+			          <imageobject>
+			            <imagedata align="center"
+			                       fileref="scheduler/pics/core/communicator.png"
+			                       format="PNG" />
+			          </imageobject>
+			        </mediaobject>
+		      </figure>
+	        </para>
+	    </sect2>
 	</sect2>
 	
 	
@@ -675,11 +715,11 @@ public Object execute(TaskResult... results) throws Throwable {
 		      				See <xref linkend="define_executable" /> to make your own ProActive executable.
 		      				<programlisting lang="java">
 	//create the ProActive task
-	ProActiveTask task = new ProActiveTask();
+	ProActiveTask aPATask = new ProActiveTask();
 	//add dependencies... (see java task)
 	//add task instance or class... (see java task)
 	//set number of needed nodes
-	task.setNumberOfNodesNeeded(8);
+	aPATask.setNumberOfNodesNeeded(8);
 		      				</programlisting>
 		      			</para>
 		      			In this example, 8 needed nodes means that you want to use 7 nodes in your executable.
@@ -697,7 +737,102 @@ public Object execute(TaskResult... results) throws Throwable {
 		      <title>Create Job</title>
 		      
 		      <para>
-		      	
+		      	It is possible to create two types of job. As it was the case for the tasks, jobs have some
+		      	common features :
+		      	<itemizedlist>
+		      		<listitem>
+		      			<emphasis>id</emphasis> is a way to identify your job, you cannot set it but the 
+		      			scheduler will send you back the id associated to your job as soon as it is submit.
+		      			It will permit you to ask for services about your job.
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>description</emphasis> is a human readable description of the job.
+		      			It is for human use only. This field is optional but it is better to set it.
+		      			<programlisting lang="java">
+	aJob.setDescription("This job will do something...");
+		      			</programlisting>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>name</emphasis> is the name of your job as a string.
+		      			<programlisting lang="java">
+	aJob.setName("a name");
+		      			</programlisting>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>Log file</emphasis> is the path of an optional log file. Set if if you want
+		      			to save the job generated log in a file.
+		      			<programlisting lang="java">
+	aJob.setLogFile("path/to/log_file");
+		      			</programlisting>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>priority</emphasis> is the scheduling priority level for your job.
+		      			<programlisting lang="java">
+	aJob.setPriority(JobPriority.NORMAL);
+		      			</programlisting>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>Cancel on Error</emphasis> is a way to define if your job will continue
+		      			if a user exception or error occurs during the whole job process.
+		      			It means that if the value of this property is true, the job will stop immediately
+		      			every running task if one error occurs in one of the task of this job. It will have
+		      			the consequence to failed the job, but free resources for other jobs. It is usefull
+		      			when it has no interest to continue after a task failure.
+		      			<programlisting lang="java">
+	aJob.setCancelOnError(true);
+		      			</programlisting>
+		      		</listitem>
+		      	</itemizedlist>
+		      </para>
+		      <para>
+		      	Let's see in details how to build the different job :
+		      	<itemizedlist>
+		      		<listitem>
+		      			<emphasis>The TaskFlowJob</emphasis> or data flow job is a job that can contain
+		      			one or more task(s) with the dependencies you want. To make this type of job,
+		      			just use the default no arg constructor, and set the properties you want to set.
+						Then add tasks with the given method addTask(Task) in order to fill the job with
+						your own tasks. Here's the step to create your task flow job :
+						<programlisting lang="java">
+	//your tasks has already been created as seen in previous sections
+	//create a task flow job
+	TaskFlowJob job = new TaskFlowJob();
+	//fill the job...
+	job.setName("task flow job 1");
+	job.setPriority(JobPriority.NORMAL);
+	//...
+	//add your tasks (java or native task created in the previous sections)
+	job.addTask(task1);
+	job.addTasks(new ArrayList&lt;Task&gt;(task2,task3,task5));
+	//that's it.
+						</programlisting>
+						<para>
+							You may now be able to create a task flow job that can contains native or java tasks.
+							See <xref linkend="Job_submission" /> to learn how to submit a job to the scheduler.
+						</para>
+		      		</listitem>
+		      		<listitem>
+		      			<emphasis>The ProActiveJob</emphasis> is a job that contains one task that has a list
+		      			of nodes in its argument list. To make this type of job, just use the default no argument
+		      			constructor, and set the properties you want to set.
+		      			In this job, you must set the only ProActive task that will be inside this job.
+						<programlisting lang="java">
+	//your ProActive task has already been created in previous section
+	//create a ProActive job
+	ProActiveJob job = new ProActiveJob();
+	//fill the job...
+	job.setName("ProActive job 1");
+	job.setPriority(JobPriority.LOW);
+	//...
+	//add the task (ProActive task created in the previous section)
+	job.addTask(aPATask);
+						</programlisting>
+						<para>
+							Here's your first ProActive job.
+							See <xref linkend="Job_submission" /> to learn how to submit a job to the scheduler.
+						</para>
+		      		</listitem>
+		      	</itemizedlist>
 		      </para>
 		    </sect3>
 		</sect2>
@@ -797,8 +932,8 @@ public Object execute(TaskResult... results) throws Throwable {
 	SchedulerAuthenticationInterface auth = SchedulerConnection.join("//host/SCHEDULER_OBJECT_NAME");
 	// checking username and password
 	UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
-	// submitting a new job
-	scheduler.submit(job);</programlisting></para>
+	// submitting a new job and get the associated id
+	JobId myJobId = scheduler.submit(job);</programlisting></para>
 	            </listitem>
 	
 	            <listitem>
@@ -814,18 +949,91 @@ public Object execute(TaskResult... results) throws Throwable {
 	            </listitem>
 	          </orderedlist></para>
 	      </sect3>
+	      
+	      <sect3 id="get_job_result">
+	        <title>Getting the result of a job</title>
+	
+	        <para>
+	        	You may have to retrieve the result of a job. It is possible by using the
+	        	<emphasis role="bold">getJobResult(JobId)</emphasis> method in the
+	        	<emphasis role="bold">UserSchedulerInterface</emphasis>.
+	        	A job result is in fact a list of task result ordered in three lists :
+	        	<itemizedlist>
+	        		<listitem>
+	        			A failed list that contains every result or exception returned by a task that failed.
+	        		</listitem>
+	        		<listitem>
+	        			A full list that contains every result or exception of every tasks.
+	        		</listitem>
+	        		<listitem>
+	        			And A precious result list that contains every result or exception returned by the task marked precious.
+	        		</listitem>
+	        	</itemizedlist>
+	        	<para>
+	        		This result will be given to you exactly like you returned it in your executable.
+	        		You can only get the result of your job if you are a user and every job if your are
+	        		an administrator. To know when a job that you have submitted has finished its execution,
+	        		you can subscribe to the scheduler to be notified of some events. This will be explain
+	        		in the next section.
+	        	</para>
+	        	<programlisting lang="java">
+	// get the user interface
+	// UserSchedulerInterface scheduler = auth.logAsUser("username", "password");
+	JobResult myResult = scheduler.getJobResult(myJobId);
+	        	</programlisting>
+	        </para>
+	      </sect3>
+	      
+	      <sect3 id="add_listener">
+	        <title>Get a listener on the scheduler activity</title>
+	
+	        <para>
+	        	In order to be notified about the scheduler activities, you can add a scheduler listener that
+	        	will inform you of some events, like job submitting, job or task finished, scheduling state changing, etc...
+	        	To add a listener, just make your listener by implementing the <emphasis>SchedulerEventListener</emphasis> interface
+	        	and add it to the scheduler.
+	        	You will then receive the scheduler initial state containing some informations about the current
+	        	scheduling. See the javadoc for more details.
+	        	<programlisting lang="java">
+	//make your listener
+	SchedulerEventListener MySchedulerEventListener = new SchedulerEventListener () {
+		public void jobRunningToFinishedEvent(JobEvent event){
+			//if my job is finished
+			if (event.getJobId().equals(myJobId)){
+				//get its result
+				JobResult myResult = scheduler.getJobResult(myJobId);
+			}
+		}
+		//Implement other methods...
+	}
+	//add the listener to the scheduler
+	scheduler.addSchedulerEventListener(MySchedulerEventListener, SchedulerEvent.JOB_RUNNING_TO_FINISHED);
+	        	</programlisting>
+	        	<para>
+	        		This example shows you how to listen to the scheduler events (here the finished job event only).
+	        		But you can listen for every events you want containing in this interface.
+	        	</para>
+	        	<para>
+	        		For more details and features on the user scheduler interface, please refer to the java Documentation.
+	        	</para>
+	        </para>
+	      </sect3>
+	      
 	    </sect2>
 	
 	    <sect2 id="admin_interface">
 	      <title>Administrator Interface</title>
 	
-	      <para></para>
-	
-	      <sect3 id="communicator">
-	        <title>Communicator</title>
-	
-	        <para></para>
-	      </sect3>
+	      <para>
+	      	The administrator can do more with its interface, see the javadoc for more details and features.
+	      	He can also change the policy during the scheduling, that will consequently change the remaining
+	      	scheduling order. Refer to the <xref linkend="add_policy" /> section to make your own policy and change
+	      	it as shown below :
+	      	<programlisting lang="java">
+	//scheduler is the AdminSchedulerInterface returned in the previous sections
+	scheduler.changePolicy(full.name.of.MyPolicy);
+	      	</programlisting>
+	      </para>
 	    </sect2>
 	</sect2>
 	
