@@ -41,14 +41,12 @@ public class DecreaseSizeAction extends Action {
 
     public DecreaseSizeAction() {
         super.setId(DECREASE_SIZE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "decrease_width.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "decrease_width.gif"));
         super.setToolTipText(DECREASE_SIZE_ACTION);
         super.setEnabled(false);
     }
 
-    public final void setTarget(
-        final TimeLineChartEditPart durationChartEditPart) {
+    public final void setTarget(final TimeLineChartEditPart durationChartEditPart) {
         super.setEnabled(true);
         this.durationChartEditPart = durationChartEditPart;
     }

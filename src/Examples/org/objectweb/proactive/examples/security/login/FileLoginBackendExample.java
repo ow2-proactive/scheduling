@@ -55,8 +55,8 @@ public class FileLoginBackendExample {
         // example) with the jvm parameter
         // -Djava.security.auth.login.config==jaas.config or like this
         // :
-        System.setProperty("java.security.auth.login.config",
-            Login.class.getResource("jaas.config").getFile());
+        System.setProperty("java.security.auth.login.config", Login.class.getResource("jaas.config")
+                .getFile());
 
         Map<String, Object> params = new HashMap<String, Object>(3);
 
@@ -64,10 +64,8 @@ public class FileLoginBackendExample {
         params.put("pw", "cesar");
         params.put("path", FileLogin.class.getResource("login.cfg").getFile());
         params.put("group", "user");
-        params.put("groupsFilePath",
-            FileLogin.class.getResource("groups.cfg").getFile());
-        params.put("groupsHierarchy",
-            new String[] { "intern", "goon", "user", "admin" });
+        params.put("groupsFilePath", FileLogin.class.getResource("groups.cfg").getFile());
+        params.put("groupsHierarchy", new String[] { "intern", "goon", "user", "admin" });
 
         try {
             Login.login(params, "FileLoginMethod");

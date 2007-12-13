@@ -44,25 +44,24 @@ public class LoadLevelerTest {
     }
 
     public StringWrapper ping() {
-        return new StringWrapper("Hi from " +
-            ProActiveInet.getInstance().getInetAddress().getHostName());
+        return new StringWrapper("Hi from " + ProActiveInet.getInstance().getInetAddress().getHostName());
     }
 
     public static void main(String[] args) {
         try {
             //		String path = "/users/icmcb/cave/proactive.loadleveler/descriptors/examples";
-            ProActiveDescriptor pad =  //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_SimpleExample.xml");
-                                       //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_AdvancedTasksPerNodeExample.xml");
-                                       //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_AdvancedTotalTasksExample.xml");
-                                       //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_AdvancedTaskGeometryExample.xml");
-                PADeployment.getProactiveDescriptor(args[0]);
+            ProActiveDescriptor pad = //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_SimpleExample.xml");
+            //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_AdvancedTasksPerNodeExample.xml");
+            //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_AdvancedTotalTasksExample.xml");
+            //			ProActive.getProactiveDescriptor(path+"/LoadLeveler_AdvancedTaskGeometryExample.xml");
+            PADeployment.getProactiveDescriptor(args[0]);
 
             //			ProActive.getProactiveDescriptor(path+"/SSH_LSF_Example.xml");
             pad.activateMappings();
             VirtualNode vn = pad.getVirtualNode("levelerVn");
 
-            LoadLevelerTest group = (LoadLevelerTest) PAGroup.newActiveAsGroup(LoadLevelerTest.class.getName(),
-                    null, vn);
+            LoadLevelerTest group = (LoadLevelerTest) PAGroup.newActiveAsGroup(LoadLevelerTest.class
+                    .getName(), null, vn);
 
             StringWrapper p = group.ping();
 

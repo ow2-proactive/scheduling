@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.jmx.remote.management.exceptions;
 
-
 /**
  *
  * @author vlegrand
@@ -39,13 +38,13 @@ package org.objectweb.proactive.examples.jmx.remote.management.exceptions;
 public class GroupCreationException extends Exception {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    *
-    *
-    */
+     *
+     *
+     */
     public GroupCreationException() {
         super();
     }

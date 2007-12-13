@@ -30,7 +30,6 @@
  */
 package functionalTests.component.descriptor.arguments;
 
-
 /**
  * @author Matthieu Morel
  *

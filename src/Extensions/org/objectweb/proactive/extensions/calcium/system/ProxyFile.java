@@ -88,8 +88,7 @@ public class ProxyFile extends File {
         this.wspace = wspace;
     }
 
-    public void store(FileServerClient fserver, int refCount)
-        throws IOException {
+    public void store(FileServerClient fserver, int refCount) throws IOException {
         this.cachedSize = current.length();
         this.uploadedBytes += current.length();
         this.remote = fserver.store(current, refCount);
@@ -126,10 +125,10 @@ public class ProxyFile extends File {
     public boolean hasBeenModified() {
 
         /* TODO improve by:
-             *
-             *  1. Also considering the hashcode.
-             *  2. Keeping track of lastModified access.
-             */
+         *
+         *  1. Also considering the hashcode.
+         *  2. Keeping track of lastModified access.
+         */
         if (current == null) {
             return false;
         }
@@ -137,12 +136,11 @@ public class ProxyFile extends File {
         return lastmodified != current.lastModified();
     }
 
-    public void handleStageOut(FileServerClient fserver)
-        throws IOException {
+    public void handleStageOut(FileServerClient fserver) throws IOException {
         if (isNew()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Storing new file: [" + refCBefore + "," +
-                    refCAfter + "] " + relative + " (" + current + ")");
+                logger.debug("Storing new file: [" + refCBefore + "," + refCAfter + "] " + relative + " (" +
+                    current + ")");
             }
 
             store(fserver, refCAfter);
@@ -152,8 +150,8 @@ public class ProxyFile extends File {
 
         if (isModified()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Storing modified file: [" + refCBefore + "," +
-                    refCAfter + "] " + relative + " (" + current + ")");
+                logger.debug("Storing modified file: [" + refCBefore + "," + refCAfter + "] " + relative +
+                    " (" + current + ")");
             }
 
             fserver.commit(remote.fileId, -refCBefore);
@@ -165,17 +163,16 @@ public class ProxyFile extends File {
 
         if (isNormal()) { //&& (refCAfter - refCBefore !=0)){
             if (logger.isDebugEnabled()) {
-                logger.debug("Updating normal file: [" + refCBefore + "," +
-                    refCAfter + "] " + "name=" + relative + " id=" +
-                    remote.fileId + " (" + current + ")");
+                logger.debug("Updating normal file: [" + refCBefore + "," + refCAfter + "] " + "name=" +
+                    relative + " id=" + remote.fileId + " (" + current + ")");
             }
 
             fserver.commit(remote.fileId, refCAfter - refCBefore);
             return;
         }
 
-        logger.error("Illegal ProxyFile state: " + refCAfter + "a " +
-            refCBefore + "b" + " data modified=" + hasBeenModified());
+        logger.error("Illegal ProxyFile state: " + refCAfter + "a " + refCBefore + "b" + " data modified=" +
+            hasBeenModified());
 
         //Reached here, not good!
         throw new IOException("ProxyFile reached illegal state:" + this);
@@ -198,8 +195,7 @@ public class ProxyFile extends File {
     }
 
     private boolean isModified() {
-        return (this.refCBefore != 0) && (this.refCAfter != 0) &&
-        hasBeenModified();
+        return (this.refCBefore != 0) && (this.refCAfter != 0) && hasBeenModified();
     }
 
     public File getWSpaceFile() {
@@ -211,8 +207,7 @@ public class ProxyFile extends File {
             Timer t = new Timer();
             t.start();
 
-            logger.debug("Blocking waiting for file's data:" + wspace + "/" +
-                relative);
+            logger.debug("Blocking waiting for file's data:" + wspace + "/" + relative);
 
             /*
                 try{
@@ -220,7 +215,7 @@ public class ProxyFile extends File {
                 }catch(Exception e){
                         e.printStackTrace();
                 }
-                */
+             */
             try {
                 saveRemoteDataInWSpace();
             } catch (IOException e) {

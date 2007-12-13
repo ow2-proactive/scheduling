@@ -45,8 +45,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  * @version 1.0,  2005/07/07
  * @since   ProActive
  */
-class MainDefinitionHandler extends PassiveCompositeUnmarshaller
-    implements ProActiveDescriptorConstants {
+class MainDefinitionHandler extends PassiveCompositeUnmarshaller implements ProActiveDescriptorConstants {
     private ProActiveDescriptorInternal proActiveDescriptor;
 
     //
@@ -58,24 +57,20 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
     public MainDefinitionHandler() {
     }
 
-    public MainDefinitionHandler(
-        ProActiveDescriptorInternal proActiveDescriptor) {
+    public MainDefinitionHandler(ProActiveDescriptorInternal proActiveDescriptor) {
         super();
         this.proActiveDescriptor = proActiveDescriptor;
         this.addHandler(ARG_TAG, new ArgHandler(proActiveDescriptor));
-        this.addHandler(MAP_TO_VIRTUAL_NODE_TAG,
-            new MapToVirtualNodeHandler(proActiveDescriptor));
+        this.addHandler(MAP_TO_VIRTUAL_NODE_TAG, new MapToVirtualNodeHandler(proActiveDescriptor));
     }
 
     @Override
-    public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
         String id = attributes.getValue("id");
         String className = attributes.getValue("class");
 
         if (!checkNonEmpty(className)) {
-            throw new org.xml.sax.SAXException(
-                "class Tag without any mainDefinition defined");
+            throw new org.xml.sax.SAXException("class Tag without any mainDefinition defined");
         }
 
         proActiveDescriptor.createMainDefinition(id);
@@ -85,8 +80,8 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
     }
 
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+            throws org.xml.sax.SAXException {
         if (name.equals(ARG_TAG)) {
             //System.out.println("end of a arg tag") ;
         }
@@ -116,14 +111,12 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             String arg = attributes.getValue("value");
 
             //System.out.println("enter in a arg node : " + arg);
             if (!checkNonEmpty(arg)) {
-                throw new org.xml.sax.SAXException(
-                    "value Tag without any arg defined");
+                throw new org.xml.sax.SAXException("value Tag without any arg defined");
             }
 
             proActiveDescriptor.mainDefinitionAddParameter(arg);
@@ -133,23 +126,19 @@ class MainDefinitionHandler extends PassiveCompositeUnmarshaller
     private class MapToVirtualNodeHandler extends BasicUnmarshaller {
         ProActiveDescriptorInternal proActiveDescriptor;
 
-        private MapToVirtualNodeHandler(
-            ProActiveDescriptorInternal proActiveDescriptor) {
+        private MapToVirtualNodeHandler(ProActiveDescriptorInternal proActiveDescriptor) {
             this.proActiveDescriptor = proActiveDescriptor;
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             String virtualNode = attributes.getValue("value");
 
             if (!checkNonEmpty(virtualNode)) {
-                throw new org.xml.sax.SAXException(
-                    "value Tag without any mapToVirtualNode defined");
+                throw new org.xml.sax.SAXException("value Tag without any mapToVirtualNode defined");
             }
 
-            VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(virtualNode,
-                    false, true);
+            VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(virtualNode, false, true);
 
             proActiveDescriptor.mainDefinitionAddVirtualNode(vn);
         }

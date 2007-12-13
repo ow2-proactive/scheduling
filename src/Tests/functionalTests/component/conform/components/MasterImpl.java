@@ -51,9 +51,8 @@ public class MasterImpl implements BindingController, Master {
     /**
      * {@inheritDoc}
      */
-    public void bindFc(String clientItfName, Object serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException,
-            IllegalLifeCycleException {
+    public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
+            IllegalBindingException, IllegalLifeCycleException {
         if (ITF_CLIENTE_MULTICAST.equals(clientItfName)) {
             slaves = (SlaveMulticast) serverItf;
         } else {
@@ -71,8 +70,7 @@ public class MasterImpl implements BindingController, Master {
     /**
      * {@inheritDoc}
      */
-    public Object lookupFc(String clientItfName)
-        throws NoSuchInterfaceException {
+    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
         if (ITF_CLIENTE_MULTICAST.equals(clientItfName)) {
             return slaves;
         } else {
@@ -83,8 +81,7 @@ public class MasterImpl implements BindingController, Master {
     /**
      * {@inheritDoc}
      */
-    public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if (ITF_CLIENTE_MULTICAST.equals(clientItfName)) {
             slaves = null;
@@ -116,8 +113,7 @@ public class MasterImpl implements BindingController, Master {
         System.err.println();
 
         for (List<String> list : multicastArgsList) {
-            System.err.println("Async calls with " + list.size() +
-                " arguments.");
+            System.err.println("Async calls with " + list.size() + " arguments.");
             Object[] sw = (slaves.computeAsync(list, "Async")).toArray();
             for (Object object : sw) {
                 System.err.println("Object result: " + object);
@@ -127,8 +123,7 @@ public class MasterImpl implements BindingController, Master {
         System.err.println();
 
         for (List<String> list : multicastArgsList) {
-            System.err.println("OneWay calls with " + list.size() +
-                " arguments.");
+            System.err.println("OneWay calls with " + list.size() + " arguments.");
             slaves.computeOneWay(list, "OneWay");
         }
         System.err.println();
@@ -142,8 +137,7 @@ public class MasterImpl implements BindingController, Master {
         return slaves.computeAsync(args, other);
     }
 
-    public List<GenericTypeWrapper<String>> computeAsyncGenerics(
-        List<String> args, String other) {
+    public List<GenericTypeWrapper<String>> computeAsyncGenerics(List<String> args, String other) {
         //            System.err.println("Async calls with " + list.size() + " arguments.");
         //            Object[] sw = ((List<StringWrapper>) slaves.computeAsync(list,
         //                    "Async")).toArray();

@@ -126,8 +126,7 @@ public abstract class RegexpHighLighter implements LanguageToDocBook {
         // OK, the string read is too long. 
         visibleLenght -= (start - previousGroupEnd);
 
-        String tosplit = string.substring(previousGroupEnd,
-                (MAX - visibleLenght) + previousGroupEnd);
+        String tosplit = string.substring(previousGroupEnd, (MAX - visibleLenght) + previousGroupEnd);
 
         // the bit (possibly between tags) which really has to be split
         // We need to split so that visibleLength < MAX, which is done by above tosplit length. 
@@ -136,8 +135,7 @@ public abstract class RegexpHighLighter implements LanguageToDocBook {
         if (index < 1) { // did we find a possible breaking spot? 
 
             if (previousGroupEnd == 0) {
-                System.err.println("Warning: had to insert hard line break in " +
-                    tosplit);
+                System.err.println("Warning: had to insert hard line break in " + tosplit);
                 previousGroupEnd = MAX; // define cut at longest allowed line length
             }
 
@@ -146,6 +144,6 @@ public abstract class RegexpHighLighter implements LanguageToDocBook {
 
         //index+ previousGroupStart is the place where the string should be split!  
         return string.substring(0, index + previousGroupEnd) + '\n' +
-        split(string.substring(index + previousGroupEnd));
+            split(string.substring(index + previousGroupEnd));
     }
 }

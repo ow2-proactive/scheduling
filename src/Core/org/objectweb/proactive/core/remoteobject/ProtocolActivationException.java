@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.remoteobject;
 
-
 /**
  * @author acontes
  * Identify that the activation of a remote object has failed

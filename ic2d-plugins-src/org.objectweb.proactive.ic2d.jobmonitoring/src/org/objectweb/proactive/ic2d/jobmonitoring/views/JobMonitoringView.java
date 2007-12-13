@@ -93,8 +93,7 @@ public class JobMonitoringView extends ViewPart {
         formData.right = new FormAttachment(100, 0);
         parent.getChildren()[1].setLayoutData(formData);
 
-        IToolBarManager toolBarManager = getViewSite().getActionBars()
-                                             .getToolBarManager();
+        IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
         toolBarManager.add(new ExpandAllAction(treeViewer));
         toolBarManager.add(new CollapseAllAction(treeViewer));
@@ -129,7 +128,8 @@ public class JobMonitoringView extends ViewPart {
     /**
      * To monitor a new host.
      */
-    public class NewHostJobMonitoringAction extends org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction {
+    public class NewHostJobMonitoringAction extends
+            org.objectweb.proactive.ic2d.jmxmonitoring.action.NewHostAction {
         public NewHostJobMonitoringAction(Composite parent) {
             super(parent.getDisplay(), null);
             setImageDescriptor(null);

@@ -38,38 +38,34 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test register and lookup AOs
  */
 public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
-        A a = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { "toto" });
+        A a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
         a.register();
 
         // check lookup works
-        String url = URIBuilder.buildURIFromProperties("localhost", "A")
-                               .toString();
+        String url = URIBuilder.buildURIFromProperties("localhost", "A").toString();
         a = (A) PAActiveObject.lookupActive(A.class.getName(), url);
 
         assertTrue(a != null);
         assertEquals(a.getName(), "toto");
 
         // check listActive contains the previous lookup
-        String host = URIBuilder.buildURIFromProperties("localhost", "")
-                                .toString();
+        String host = URIBuilder.buildURIFromProperties("localhost", "").toString();
         String[] registered = PAActiveObject.listActive(host);
         assertNotNull(registered);
 
         for (int i = 0; i < registered.length; i++) {
-            if (registered[i].substring(registered[i].lastIndexOf('/'))
-                                 .equals("/A")) {
+            if (registered[i].substring(registered[i].lastIndexOf('/')).equals("/A")) {
                 return;
             }
         }
 
-        throw new Exception(
-            "Could not find registered object in list of objects");
+        throw new Exception("Could not find registered object in list of objects");
     }
 }

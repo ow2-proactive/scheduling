@@ -41,8 +41,8 @@ import java.security.KeyStore;
 public class IdentityServer implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private KeyStore keyStore;
 
     public IdentityServer() {

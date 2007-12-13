@@ -136,8 +136,7 @@ public class LocalBodyStore {
         return this.halfBodyMetaObjectFactory;
     }
 
-    public synchronized void setHalfBodyMetaObjectFactory(
-        MetaObjectFactory factory) {
+    public synchronized void setHalfBodyMetaObjectFactory(MetaObjectFactory factory) {
         this.halfBodyMetaObjectFactory = factory;
     }
 
@@ -253,7 +252,6 @@ public class LocalBodyStore {
     //    public void addBodyEventListener(BodyEventListener listener) {
     //        this.bodyEventProducer.addBodyEventListener(listener);
     //    }
-
     /**
      * Removes a listener of body events.
      * @param listener the listener of body events to remove
@@ -262,7 +260,6 @@ public class LocalBodyStore {
     //    public void removeBodyEventListener(BodyEventListener listener) {
     //        this.bodyEventProducer.removeBodyEventListener(listener);
     //    }
-
     //
     // -- FRIENDLY METHODS -----------------------------------------------
     //
@@ -279,12 +276,10 @@ public class LocalBodyStore {
 
         // JMX Notification
         if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
-            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                     .getMBean();
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime().getMBean();
             if (mbean != null) {
-                mbean.sendNotification(NotificationType.bodyCreated,
-                    new BodyNotificationData(body.getID(), body.getJobID(),
-                        body.getNodeURL(), body.getName()));
+                mbean.sendNotification(NotificationType.bodyCreated, new BodyNotificationData(body.getID(),
+                    body.getJobID(), body.getNodeURL(), body.getName()));
             }
         }
 
@@ -300,18 +295,15 @@ public class LocalBodyStore {
 
         // JMX Notification
         if (!(body.getReifiedObject() instanceof ProActiveInternalObject)) {
-            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                     .getMBean();
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime().getMBean();
             if (mbean != null) {
-                mbean.sendNotification(NotificationType.bodyDestroyed,
-                    new BodyNotificationData(body.getID(), body.getJobID(),
-                        body.getNodeURL(), body.getName()));
+                mbean.sendNotification(NotificationType.bodyDestroyed, new BodyNotificationData(body.getID(),
+                    body.getJobID(), body.getNodeURL(), body.getName()));
             }
         }
 
         // END ProActiveEvent
-        if ((this.localBodyMap.size() == 0) &&
-                PAProperties.PA_EXIT_ON_EMPTY.isTrue()) {
+        if ((this.localBodyMap.size() == 0) && PAProperties.PA_EXIT_ON_EMPTY.isTrue()) {
             PALifeCycle.exitSuccess();
         }
     }

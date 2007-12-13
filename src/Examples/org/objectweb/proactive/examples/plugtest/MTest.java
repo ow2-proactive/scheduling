@@ -69,9 +69,8 @@ public class MTest {
             System.out.println("Calling sayHello " + a.sayHello());
 
             for (int i = 0; i < arrayA.length; i++)
-                System.out.println("\nI'm " + arrayA[i].getInfo() +
-                    " and I say " + arrayA[i].sayHello() + " on " +
-                    arrayA[i].getNode());
+                System.out.println("\nI'm " + arrayA[i].getInfo() + " and I say " + arrayA[i].sayHello() +
+                    " on " + arrayA[i].getNode());
 
             printMessageAndWait(pad);
             pad.killall(false);
@@ -82,8 +81,7 @@ public class MTest {
     }
 
     private static void printMessageAndWait(ProActiveDescriptor pad) {
-        java.io.BufferedReader d = new java.io.BufferedReader(new java.io.InputStreamReader(
-                    System.in));
+        java.io.BufferedReader d = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
         System.out.println("   --> Press <return> to continue");
 
         try {

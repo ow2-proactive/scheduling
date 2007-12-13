@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.basic;
 
-
 /**
  * This class is used to store some configuration values used by
  * different classes.

@@ -37,8 +37,8 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 public class A implements Task<Integer> {
 
     /**
-         *
-         */
+     *
+     */
     private int taskcounter;
     private long delay;
     private boolean exception;

@@ -71,8 +71,7 @@ public class FlowShop implements Serializable {
      * the fs
      */
     public static int computeMakespan(FlowShop fs, int[] permutation) {
-        return computePartialMakespan(fs, permutation, permutation.length)[fs.nbMachine -
-        1];
+        return computePartialMakespan(fs, permutation, permutation.length)[fs.nbMachine - 1];
     }
 
     /**
@@ -84,8 +83,7 @@ public class FlowShop implements Serializable {
      * @param nbJob the length use of the permutation, begin 0
      * @return the makespan for the nbJob first job of permutation
      */
-    public static int[] computePartialMakespan(FlowShop fs, int[] permutation,
-        int nbJob) {
+    public static int[] computePartialMakespan(FlowShop fs, int[] permutation, int nbJob) {
         int[] timeMachine = new int[fs.nbMachine];
         for (int i = 0; i < nbJob; i++) {
             int[] currentJob = fs.jobs[permutation[i]];
@@ -111,8 +109,7 @@ public class FlowShop implements Serializable {
      * @return the makespan if it not exceed bound else the negative index
      * where the makespan exeed the bound
      */
-    public static int computeConditionalMakespan(FlowShop fs,
-        int[] permutation, int nbJob, long bound) {
+    public static int computeConditionalMakespan(FlowShop fs, int[] permutation, int nbJob, long bound) {
         //contains cumulated time by machine
         int[] timeMachine = new int[fs.nbMachine];
         long cumulateTimeOnLastMachine = fs.cumulateTimeOnLastMachine;
@@ -129,8 +126,7 @@ public class FlowShop implements Serializable {
                 }
             }
             cumulateTimeOnLastMachine -= currentJob[timeMachine.length - 1];
-            if ((timeMachine[timeMachine.length - 1] +
-                    cumulateTimeOnLastMachine) >= bound) {
+            if ((timeMachine[timeMachine.length - 1] + cumulateTimeOnLastMachine) >= bound) {
                 return -(i + 1);
             }
         }

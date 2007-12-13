@@ -65,31 +65,31 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
         if (r instanceof ComponentRequest) {
             if (!((ComponentRequest) r).isControllerRequest()) {
                 if (PAProperties.PA_COMPONENT_USE_SHORTCUTS.isTrue()) {
-                    if (!((ComponentBody) bodyReceiver).getProActiveComponentImpl()
-                              .getInputInterceptors().isEmpty() ||
-                            !((ComponentBody) bodyReceiver).getProActiveComponentImpl()
-                                  .getOutputInterceptors().isEmpty()) {
+                    if (!((ComponentBody) bodyReceiver).getProActiveComponentImpl().getInputInterceptors()
+                            .isEmpty() ||
+                        !((ComponentBody) bodyReceiver).getProActiveComponentImpl().getOutputInterceptors()
+                                .isEmpty()) {
                         if (logger.isDebugEnabled()) {
-                            logger.debug(
-                                "shortcut is stopped in this component, because functional invocations are intercepted");
+                            logger
+                                    .debug("shortcut is stopped in this component, because functional invocations are intercepted");
                         }
 
                         // no shortcut if there is an interception
                         return super.receiveRequest(r, bodyReceiver);
                     }
 
-                    ((ComponentRequest) r).shortcutNotification(r.getSender(),
-                        bodyReceiver.getRemoteAdapter());
+                    ((ComponentRequest) r).shortcutNotification(r.getSender(), bodyReceiver
+                            .getRemoteAdapter());
 
                     // TODO_M leave a ref of the shortcut
                     if (logger.isDebugEnabled()) {
-                        logger.debug("directly executing request " +
-                            r.getMethodCall().getName() +
-                            ((r.getMethodCall().getComponentMetadata()
-                               .getComponentInterfaceName() != null)
-                            ? (" on interface " +
-                            r.getMethodCall().getComponentMetadata()
-                             .getComponentInterfaceName()) : ""));
+                        logger
+                                .debug("directly executing request " +
+                                    r.getMethodCall().getName() +
+                                    ((r.getMethodCall().getComponentMetadata().getComponentInterfaceName() != null) ? (" on interface " + r
+                                            .getMethodCall().getComponentMetadata()
+                                            .getComponentInterfaceName())
+                                            : ""));
                     }
                 }
                 bodyReceiver.serve(r);

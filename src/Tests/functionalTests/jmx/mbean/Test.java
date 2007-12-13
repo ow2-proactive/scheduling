@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.node.Node;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test the creation of the JMX MBean.
  * (i.e BodyWrapperMBean and ProActiveRuntimeWrapperMBean)
@@ -50,8 +51,7 @@ import static junit.framework.Assert.assertTrue;
  * @author Jean-Michael Legait
  */
 public class Test extends FunctionalTest {
-    private URL descriptor = Test.class.getResource(
-            "/functionalTests/jmx/mbean/MBeanDescriptor.xml");
+    private URL descriptor = Test.class.getResource("/functionalTests/jmx/mbean/MBeanDescriptor.xml");
     private ProActiveDescriptor pad;
     private VirtualNode vn;
     private A ao;
@@ -63,16 +63,14 @@ public class Test extends FunctionalTest {
         this.vn.activate();
 
         Node node = vn.getNode();
-        ao = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {  },
-                node);
+        ao = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {}, node);
     }
 
     @org.junit.Test
     public void action() throws Exception {
-        assertTrue("The MBean associated to the active object doesn't exist!",
-            ao.existBodyWrapperMBean());
-        assertTrue("The MBean associated to the ProActive Runtime doesn't exist!",
-            ao.existProActiveRuntimeWrapperMBean());
+        assertTrue("The MBean associated to the active object doesn't exist!", ao.existBodyWrapperMBean());
+        assertTrue("The MBean associated to the ProActive Runtime doesn't exist!", ao
+                .existProActiveRuntimeWrapperMBean());
     }
 
     @After

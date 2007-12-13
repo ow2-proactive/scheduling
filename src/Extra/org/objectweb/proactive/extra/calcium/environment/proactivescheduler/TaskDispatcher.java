@@ -71,9 +71,8 @@ public class TaskDispatcher extends Thread {
     public TaskDispatcher() {
     }
 
-    public TaskDispatcher(AOTaskPool taskpool, FileServerClient fserver,
-        AOJobListener monitor, SchedulerAuthenticationInterface auth,
-        String user, String password) {
+    public TaskDispatcher(AOTaskPool taskpool, FileServerClient fserver, AOJobListener monitor,
+            SchedulerAuthenticationInterface auth, String user, String password) {
         super();
         shutdown = false;
 
@@ -143,13 +142,11 @@ public class TaskDispatcher extends Thread {
 
     private TaskFlowJob newJob(Vector<Task> taskV) throws UserException {
         TaskFlowJob job = new TaskFlowJob();
-        job.setName("Skeleton Framework Job (id=" + taskV.get(0).parentId +
-            ")");
+        job.setName("Skeleton Framework Job (id=" + taskV.get(0).parentId + ")");
         job.setPriority(JobPriority.NORMAL);
         job.setCancelOnError(true);
         job.setDescription("Set of tasks data parallel skeleton-tasks id=" +
-            taskV.get(0).taskId.getFamilyId() + "/" +
-            taskV.get(0).taskId.getParentId());
+            taskV.get(0).taskId.getFamilyId() + "/" + taskV.get(0).taskId.getParentId());
 
         for (Task task : taskV) {
             JavaExecutable schedInterp = new SchedulerInterpreter(task, fserver);

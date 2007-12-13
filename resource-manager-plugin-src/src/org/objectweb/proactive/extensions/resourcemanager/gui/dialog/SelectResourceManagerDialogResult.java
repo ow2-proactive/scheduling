@@ -44,7 +44,7 @@ public class SelectResourceManagerDialogResult implements Serializable {
     //    private String password = null;
     //    private Boolean logAsAdmin = false;
     public SelectResourceManagerDialogResult(String url) { //, String login,
-                                                           //        String password, Boolean logAsAdmin) {
+        //        String password, Boolean logAsAdmin) {
         this.url = url;
         //        this.login = login;
         //        this.password = password;

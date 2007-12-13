@@ -58,16 +58,15 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
  * They execute tasks needed by the master
  * @author fviale
  */
-public class AOWorker implements InitActive, RunActive, Serializable, Worker,
-    WorkerMemory {
+public class AOWorker implements InitActive, RunActive, Serializable, Worker, WorkerMemory {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * log4j logger of the worker
-    */
+     * log4j logger of the worker
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
 
     /**
@@ -120,9 +119,8 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
      * @param provider the entity which will provide tasks to the worker
      * @param initialMemory initial memory of the worker
      */
-    public AOWorker(final String name,
-        final TaskProvider<Serializable> provider,
-        final Map<String, Object> initialMemory) {
+    public AOWorker(final String name, final TaskProvider<Serializable> provider,
+            final Map<String, Object> initialMemory) {
         this.name = name;
         this.provider = provider;
         this.memory = initialMemory;
@@ -201,7 +199,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
 
         // InitialTask
         pendingTasks = (Queue<TaskIntern<Serializable>>) PAFuture.getFutureValue(provider.getTasks(
-                    (Worker) stubOnThis, name));
+                (Worker) stubOnThis, name));
     }
 
     /**
@@ -209,8 +207,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
      * @param task task to run
      * @return the same task, but containing the result
      */
-    protected ResultIntern<Serializable> handleTask(
-        final TaskIntern<Serializable> task) {
+    protected ResultIntern<Serializable> handleTask(final TaskIntern<Serializable> task) {
         Serializable resultObj = null;
         ResultInternImpl result = new ResultInternImpl(task);
 
@@ -242,8 +239,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
                 initialGetTask();
 
                 while (!isSleeping) {
-                    while ((pendingTasks.size() == 0) &&
-                            (pendingTasksFutures.size() > 0)) {
+                    while ((pendingTasks.size() == 0) && (pendingTasksFutures.size() > 0)) {
                         pendingTasks.addAll(pendingTasksFutures.remove());
                     }
                     if (pendingTasks.size() == 0) {
@@ -258,21 +254,18 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker,
                         ResultIntern<Serializable> result = handleTask(newTask);
 
                         if (logger.isDebugEnabled()) {
-                            logger.debug(name + " sends the result of task " +
-                                result.getId() + " and asks a new task...");
+                            logger.debug(name + " sends the result of task " + result.getId() +
+                                " and asks a new task...");
                         }
 
                         newTask = null;
 
                         // We send the result back to the master
                         Queue<TaskIntern<Serializable>> newTasks;
-                        if ((pendingTasks.size() == 0) &&
-                                (pendingTasksFutures.size() == 0)) {
-                            newTasks = provider.sendResultAndGetTasks(result,
-                                    name, true);
+                        if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
+                            newTasks = provider.sendResultAndGetTasks(result, name, true);
                         } else {
-                            newTasks = provider.sendResultAndGetTasks(result,
-                                    name, false);
+                            newTasks = provider.sendResultAndGetTasks(result, name, false);
                         }
                         pendingTasksFutures.offer(newTasks);
                     }

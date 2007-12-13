@@ -167,33 +167,30 @@ public class AOFigure extends AbstractFigure {
             length -= (numSeveral * NUMBER_OF_REQUESTS_FOR_SEVERAL);
             int numSingle = length;
             if (numSingle > 0) {
-                int requestQueueX = bounds.x +
-                    ((bounds.width - (6 * numSingle)) / 2) + 2;
+                int requestQueueX = bounds.x + ((bounds.width - (6 * numSingle)) / 2) + 2;
                 int requestQueueY = bounds.y + 4;
                 graphics.setBackgroundColor(COLOR_REQUEST_SINGLE);
                 for (int i = 0; i < numSingle; i++) {
-                    graphics.fillRectangle(requestQueueX + (i * 6),
-                        requestQueueY, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
+                    graphics.fillRectangle(requestQueueX + (i * 6), requestQueueY, REQUEST_FIGURE_SIZE,
+                            REQUEST_FIGURE_SIZE);
                 }
             }
             if (numSeveral > 0) {
-                int requestQueueX = bounds.x +
-                    ((bounds.width - (6 * (numSeveral + numMany))) / 2) + 2;
+                int requestQueueX = bounds.x + ((bounds.width - (6 * (numSeveral + numMany))) / 2) + 2;
                 int requestQueueY = (bounds.y + bounds.height) - 6;
                 graphics.setBackgroundColor(COLOR_REQUEST_SEVERAL);
                 for (int i = 0; i < numSeveral; i++)
-                    graphics.fillRectangle(requestQueueX + (i * 6),
-                        requestQueueY, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
+                    graphics.fillRectangle(requestQueueX + (i * 6), requestQueueY, REQUEST_FIGURE_SIZE,
+                            REQUEST_FIGURE_SIZE);
             }
             if (numMany > 0) {
-                int requestQueueX = bounds.x +
-                    ((bounds.width - (6 * (numSeveral + numMany))) / 2) +
+                int requestQueueX = bounds.x + ((bounds.width - (6 * (numSeveral + numMany))) / 2) +
                     (6 * numSeveral) + 2;
                 int requestQueueY = (bounds.y + bounds.height) - 6;
                 graphics.setBackgroundColor(COLOR_REQUEST_MANY);
                 for (int i = 0; i < numMany; i++)
-                    graphics.fillRectangle(requestQueueX + (i * 6),
-                        requestQueueY, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
+                    graphics.fillRectangle(requestQueueX + (i * 6), requestQueueY, REQUEST_FIGURE_SIZE,
+                            REQUEST_FIGURE_SIZE);
             }
         }
 
@@ -219,42 +216,42 @@ public class AOFigure extends AbstractFigure {
      */
     public void setState(State state) {
         switch (state) {
-        // busy
-        case SERVING_REQUEST:
-            this.backgroundColor = AOFigure.COLOR_WHEN_SERVING_REQUEST;
-            break;
+            // busy
+            case SERVING_REQUEST:
+                this.backgroundColor = AOFigure.COLOR_WHEN_SERVING_REQUEST;
+                break;
 
-        // waiting by necessity
-        case WAITING_BY_NECESSITY:
-        case WAITING_BY_NECESSITY_WHILE_ACTIVE:
-        case WAITING_BY_NECESSITY_WHILE_SERVING:
-            this.backgroundColor = AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY;
-            break;
+            // waiting by necessity
+            case WAITING_BY_NECESSITY:
+            case WAITING_BY_NECESSITY_WHILE_ACTIVE:
+            case WAITING_BY_NECESSITY_WHILE_SERVING:
+                this.backgroundColor = AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY;
+                break;
 
-        // waiting for request
-        case WAITING_FOR_REQUEST:
-            this.backgroundColor = AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST;
-            break;
+            // waiting for request
+            case WAITING_FOR_REQUEST:
+                this.backgroundColor = AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST;
+                break;
 
-        // active
-        case ACTIVE:
-            this.backgroundColor = AOFigure.COLOR_WHEN_ACTIVE;
-            break;
+            // active
+            case ACTIVE:
+                this.backgroundColor = AOFigure.COLOR_WHEN_ACTIVE;
+                break;
 
-        // not responding
-        case NOT_RESPONDING:
-            this.backgroundColor = AOFigure.COLOR_WHEN_NOT_RESPONDING;
-            break;
+            // not responding
+            case NOT_RESPONDING:
+                this.backgroundColor = AOFigure.COLOR_WHEN_NOT_RESPONDING;
+                break;
 
-        // migrate
-        case MIGRATING:
-            this.backgroundColor = AOFigure.COLOR_WHEN_MIGRATING;
-            if (mouseListener != null) {
-                removeMouseListener(mouseListener);
-            }
-            break;
-        default:
-            break;
+            // migrate
+            case MIGRATING:
+                this.backgroundColor = AOFigure.COLOR_WHEN_MIGRATING;
+                if (mouseListener != null) {
+                    removeMouseListener(mouseListener);
+                }
+                break;
+            default:
+                break;
         }
 
         //Display.getDefault().asyncExec(this);
@@ -275,8 +272,7 @@ public class AOFigure extends AbstractFigure {
      * @param target the target of the connection
      * @param panel the connection is added to this panel
      */
-    public final void addConnection(final AOFigure target, final IFigure panel,
-        final Color color) {
+    public final void addConnection(final AOFigure target, final IFigure panel, final Color color) {
         RoundedLineConnection connection = targetConnections.get(target);
         if (connection != null) {
             connection.addOneCommunication();
@@ -392,16 +388,13 @@ public class AOFigure extends AbstractFigure {
     //
     private class AOBorderLayout extends BorderLayout {
         @Override
-        protected Dimension calculatePreferredSize(IFigure container,
-            int wHint, int hHint) {
+        protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
             if (legend) {
                 return new Dimension(50,
-                    super.calculatePreferredSize(container, wHint, hHint)
-                         .expand(0, 8).height);
+                    super.calculatePreferredSize(container, wHint, hHint).expand(0, 8).height);
             }
             return new Dimension(100,
-                super.calculatePreferredSize(container, wHint, hHint)
-                     .expand(0, 15).height);
+                super.calculatePreferredSize(container, wHint, hHint).expand(0, 15).height);
         }
     }
 
@@ -416,15 +409,13 @@ public class AOFigure extends AbstractFigure {
         public void paintFigure(Graphics graphics) {
             super.paintFigure(graphics);
             graphics.setBackgroundColor(color);
-            graphics.fillRectangle(bounds.x, bounds.y, REQUEST_FIGURE_SIZE,
-                REQUEST_FIGURE_SIZE);
+            graphics.fillRectangle(bounds.x, bounds.y, REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
             graphics.restoreState();
         }
 
         class RequestQueueLayout extends BorderLayout {
             @Override
-            protected Dimension calculatePreferredSize(IFigure container,
-                int wHint, int hHint) {
+            protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
                 return new Dimension(REQUEST_FIGURE_SIZE, REQUEST_FIGURE_SIZE);
             }
         }

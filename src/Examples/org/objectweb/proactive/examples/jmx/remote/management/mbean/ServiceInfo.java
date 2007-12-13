@@ -61,8 +61,7 @@ import org.osgi.framework.ServiceListener;
 import org.osgi.framework.ServiceReference;
 
 
-public class ServiceInfo implements Serializable, IJmx, DynamicMBean,
-    ServiceListener {
+public class ServiceInfo implements Serializable, IJmx, DynamicMBean, ServiceListener {
 
     /**
      *
@@ -74,8 +73,7 @@ public class ServiceInfo implements Serializable, IJmx, DynamicMBean,
     private String path;
     private HashMap<String, Object> properties;
 
-    public ServiceInfo(BundleInfo bundleParent,
-        ServiceReference serviceReference) {
+    public ServiceInfo(BundleInfo bundleParent, ServiceReference serviceReference) {
         this.serviceReference = serviceReference;
         this.properties = new HashMap<String, Object>();
         this.bundleParent = bundleParent;
@@ -83,10 +81,9 @@ public class ServiceInfo implements Serializable, IJmx, DynamicMBean,
         this.path = this.bundleParent.getPath() + ",category=services";
 
         try {
-            this.on = new ObjectName(this.bundleParent.getPath() +
-                    ",bundleName=" + this.bundleParent.getName() +
-                    ",category=services,className=" +
-                    this.actualService.getClass().getName());
+            this.on = new ObjectName(this.bundleParent.getPath() + ",bundleName=" +
+                this.bundleParent.getName() + ",category=services,className=" +
+                this.actualService.getClass().getName());
             register();
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
@@ -107,46 +104,40 @@ public class ServiceInfo implements Serializable, IJmx, DynamicMBean,
             Object value = this.serviceReference.getProperty(keys[i]);
             this.properties.put(keys[i], value);
         }
-        this.actualService = OSGiStore.getInstance().getContext()
-                                      .getService(this.serviceReference);
+        this.actualService = OSGiStore.getInstance().getContext().getService(this.serviceReference);
     }
 
-    public void register()
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
+    public void register() throws InstanceAlreadyExistsException, MBeanRegistrationException,
             NotCompliantMBeanException {
         ManagementFactory.getPlatformMBeanServer().registerMBean(this, this.on);
     }
 
-    public void unregister()
-        throws InstanceNotFoundException, MBeanRegistrationException {
+    public void unregister() throws InstanceNotFoundException, MBeanRegistrationException {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(this.on);
     }
 
     /* implementation of Dynamic MBean */
-    public Object getAttribute(String attribute)
-        throws AttributeNotFoundException, MBeanException, ReflectionException {
+    public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException,
+            ReflectionException {
         return this.properties.get(attribute).toString();
     }
 
     public AttributeList getAttributes(String[] attributes) {
         AttributeList al = new AttributeList(attributes.length);
         for (int i = 0; i < attributes.length; i++) {
-            al.add(new Attribute(attributes[i],
-                    this.properties.get(attributes[i]).toString()));
+            al.add(new Attribute(attributes[i], this.properties.get(attributes[i]).toString()));
         }
         return al;
     }
 
     private MBeanAttributeInfo[] getAttributesInfos() {
-        MBeanAttributeInfo[] attInfos = new MBeanAttributeInfo[this.properties.keySet()
-                                                                              .size()];
+        MBeanAttributeInfo[] attInfos = new MBeanAttributeInfo[this.properties.keySet().size()];
         Iterator i = this.properties.keySet().iterator();
         int j = 0;
         while (i.hasNext()) {
             String attribute = (String) i.next();
-            MBeanAttributeInfo info = new MBeanAttributeInfo(attribute,
-                    this.properties.get(attribute).getClass().getName(),
-                    attribute, true, false, false);
+            MBeanAttributeInfo info = new MBeanAttributeInfo(attribute, this.properties.get(attribute)
+                    .getClass().getName(), attribute, true, false, false);
             attInfos[j++] = info;
         }
         return attInfos;
@@ -154,23 +145,21 @@ public class ServiceInfo implements Serializable, IJmx, DynamicMBean,
 
     public MBeanInfo getMBeanInfo() {
         MBeanAttributeInfo[] attributes = getAttributesInfos();
-        MBeanConstructorInfo[] constructors = new MBeanConstructorInfo[] {  };
-        MBeanOperationInfo[] operations = new MBeanOperationInfo[] {  };
-        MBeanNotificationInfo[] notifications = new MBeanNotificationInfo[] {  };
-        MBeanInfo mbi = new MBeanInfo(this.getClass().getName(),
-                "Mbean matching an OSGi service", attributes, constructors,
-                operations, notifications);
+        MBeanConstructorInfo[] constructors = new MBeanConstructorInfo[] {};
+        MBeanOperationInfo[] operations = new MBeanOperationInfo[] {};
+        MBeanNotificationInfo[] notifications = new MBeanNotificationInfo[] {};
+        MBeanInfo mbi = new MBeanInfo(this.getClass().getName(), "Mbean matching an OSGi service",
+            attributes, constructors, operations, notifications);
         return mbi;
     }
 
-    public Object invoke(String actionName, Object[] params, String[] signature)
-        throws MBeanException, ReflectionException {
+    public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException,
+            ReflectionException {
         return null;
     }
 
-    public void setAttribute(Attribute attribute)
-        throws AttributeNotFoundException, InvalidAttributeValueException,
-            MBeanException, ReflectionException {
+    public void setAttribute(Attribute attribute) throws AttributeNotFoundException,
+            InvalidAttributeValueException, MBeanException, ReflectionException {
     }
 
     public AttributeList setAttributes(AttributeList attributes) {

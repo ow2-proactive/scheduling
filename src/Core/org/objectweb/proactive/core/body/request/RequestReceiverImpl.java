@@ -46,8 +46,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class RequestReceiverImpl implements RequestReceiver,
-    java.io.Serializable {
+public class RequestReceiverImpl implements RequestReceiver, java.io.Serializable {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.REQUESTS);
     private static final String ANY_PARAMETERS = "any-parameters";
 
@@ -69,8 +68,7 @@ public class RequestReceiverImpl implements RequestReceiver,
         try {
             if (immediateExecution(request)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("immediately serving " +
-                        request.getMethodName());
+                    logger.debug("immediately serving " + request.getMethodName());
                 }
                 this.inImmediateService.incrementAndGet();
                 try {
@@ -79,8 +77,7 @@ public class RequestReceiverImpl implements RequestReceiver,
                     this.inImmediateService.decrementAndGet();
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug("end of service for " +
-                        request.getMethodName());
+                    logger.debug("end of service for " + request.getMethodName());
                 }
 
                 //Dummy value for immediate services...
@@ -91,8 +88,7 @@ public class RequestReceiverImpl implements RequestReceiver,
                 try {
                     queue = bodyReceiver.getRequestQueue();
                 } catch (InactiveBodyException e) {
-                    throw new InactiveBodyException("Cannot add request \"" +
-                        request.getMethodName() +
+                    throw new InactiveBodyException("Cannot add request \"" + request.getMethodName() +
                         "\" because this body is inactive", e);
                 }
                 return queue.add(request);
@@ -105,7 +101,7 @@ public class RequestReceiverImpl implements RequestReceiver,
 
     private boolean immediateExecution(Request request) {
         if ((request == null) || (request.getMethodCall() == null) ||
-                (request.getMethodCall().getReifiedMethod() == null)) {
+            (request.getMethodCall().getReifiedMethod() == null)) {
             return false;
         } else {
             String methodName = request.getMethodName();
@@ -117,9 +113,8 @@ public class RequestReceiverImpl implements RequestReceiver,
                     Iterator it = ((List) immediateServices.get(methodName)).iterator();
                     while (it.hasNext()) {
                         Class<?>[] next = (Class<?>[]) it.next();
-                        if (Arrays.equals(next,
-                                    request.getMethodCall().getReifiedMethod()
-                                               .getParameterTypes())) {
+                        if (Arrays.equals(next, request.getMethodCall().getReifiedMethod()
+                                .getParameterTypes())) {
                             return true;
                         }
                     }
@@ -141,8 +136,7 @@ public class RequestReceiverImpl implements RequestReceiver,
         this.immediateServices.remove(methodName);
     }
 
-    public void removeImmediateService(String methodName,
-        Class<?>[] parametersTypes) {
+    public void removeImmediateService(String methodName, Class<?>[] parametersTypes) {
         if (immediateServices.containsKey(methodName)) {
             if (!ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
                 List<Class<?>[]> list = (List<Class<?>[]>) immediateServices.get(methodName);
@@ -168,8 +162,7 @@ public class RequestReceiverImpl implements RequestReceiver,
         }
     }
 
-    public void setImmediateService(String methodName,
-        Class<?>[] parametersTypes) {
+    public void setImmediateService(String methodName, Class<?>[] parametersTypes) {
         if (immediateServices.containsKey(methodName)) {
             if (ANY_PARAMETERS.equals(immediateServices.get(methodName))) {
                 // there is already a filter on all methods with that name, whatever the parameters

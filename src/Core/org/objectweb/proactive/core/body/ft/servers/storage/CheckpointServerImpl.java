@@ -125,8 +125,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
      * Return the memory actually used For debugging stuff.
      */
     protected long getUsedMem() {
-        return (CheckpointServerImpl.runtime.totalMemory() -
-        CheckpointServerImpl.runtime.freeMemory()) / 1024;
+        return (CheckpointServerImpl.runtime.totalMemory() - CheckpointServerImpl.runtime.freeMemory()) / 1024;
     }
 
     /**

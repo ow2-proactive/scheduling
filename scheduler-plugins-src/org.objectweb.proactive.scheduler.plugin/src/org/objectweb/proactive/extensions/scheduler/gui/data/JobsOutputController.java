@@ -104,8 +104,7 @@ public class JobsOutputController {
         if (joa == null) {
             return false;
         }
-        ConsolePlugin.getDefault().getConsoleManager()
-                     .showConsoleView(joa.getJobOutput());
+        ConsolePlugin.getDefault().getConsoleManager().showConsoleView(joa.getJobOutput());
         return true;
     }
 
@@ -118,14 +117,11 @@ public class JobsOutputController {
     public void createJobOutput(JobId jobId) {
         try {
             if (!showJobOutput(jobId)) {
-                SchedulerProxy.getInstance()
-                              .listenLog(jobId, Activator.getHostname(),
-                    Activator.getListenPortNumber());
-                JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE +
-                            jobId));
+                SchedulerProxy.getInstance().listenLog(jobId, Activator.getHostname(),
+                        Activator.getListenPortNumber());
+                JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId));
                 joa.setLayout(Log4JTaskLogs.DEFAULT_LOG_LAYOUT);
-                Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
-                        jobId);
+                Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
                 log.setAdditivity(false);
                 log.setLevel(Level.ALL);
                 log.removeAllAppenders();
@@ -147,8 +143,8 @@ public class JobsOutputController {
     public void removeJobOutput(JobId jobId) {
         JobOutputAppender joa = appenders.get(jobId);
         if (joa != null) {
-            ConsolePlugin.getDefault().getConsoleManager()
-                         .removeConsoles(new IConsole[] { joa.getJobOutput() });
+            ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
+                    new IConsole[] { joa.getJobOutput() });
         }
         appenders.remove(jobId);
     }
@@ -158,7 +154,7 @@ public class JobsOutputController {
      */
     public void removeAllJobOutput() {
         for (JobOutputAppender joa : appenders.values())
-            ConsolePlugin.getDefault().getConsoleManager()
-                         .removeConsoles(new IConsole[] { joa.getJobOutput() });
+            ConsolePlugin.getDefault().getConsoleManager().removeConsoles(
+                    new IConsole[] { joa.getJobOutput() });
     }
 }

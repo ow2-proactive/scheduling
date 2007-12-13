@@ -40,8 +40,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  * @author       Lionel Mestre
  * @version      1.0
  */
-public class PathHandler extends BasicUnmarshaller
-    implements ProActiveDescriptorConstants {
+public class PathHandler extends BasicUnmarshaller implements ProActiveDescriptorConstants {
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
     //
@@ -72,8 +71,7 @@ public class PathHandler extends BasicUnmarshaller
     }
 
     @Override
-    public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
         // read from XML
         //    String type = attributes.getValue(TYPE_ATTRIBUTE);
         //    if (! checkNonEmpty(type)) type = DEFAULT_TYPE;
@@ -88,8 +86,7 @@ public class PathHandler extends BasicUnmarshaller
         //                value);
         //        }
         if (!checkNonEmpty(value)) {
-            throw new org.xml.sax.SAXException(
-                "Path element defined without a value");
+            throw new org.xml.sax.SAXException("Path element defined without a value");
         }
 
         // build the associated string
@@ -105,8 +102,7 @@ public class PathHandler extends BasicUnmarshaller
             } else if (origin.equals(FROM_CLASSPATH_ORIGIN)) {
                 setResultObject(resolvePathFromClasspath(value));
             } else {
-                throw new org.xml.sax.SAXException(
-                    "Relative Path element defined with an unknown origin=" +
+                throw new org.xml.sax.SAXException("Relative Path element defined with an unknown origin=" +
                     origin);
             }
         }

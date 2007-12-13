@@ -30,13 +30,11 @@
  */
 package org.objectweb.proactive.examples.eratosthenes;
 
-
 /**
  * @author Jonathan Streit
  *  Interface for a class that can create new ActivePrimeConatiners on demand.
  *
  */
 public interface ActivePrimeContainerCreator {
-    public ActivePrimeContainer newActivePrimeContainer(long n,
-        Slowable previous);
+    public ActivePrimeContainer newActivePrimeContainer(long n, Slowable previous);
 }

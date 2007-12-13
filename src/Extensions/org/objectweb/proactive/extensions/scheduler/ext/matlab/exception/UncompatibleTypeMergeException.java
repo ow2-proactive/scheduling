@@ -39,7 +39,7 @@ public class UncompatibleTypeMergeException extends Exception {
      *
      */
     public UncompatibleTypeMergeException(String key, Type type, Type type2) {
-        super("Impossible to merge types from variable \"" + key +
-            "\", types are " + type.toString() + " and " + type.toString());
+        super("Impossible to merge types from variable \"" + key + "\", types are " + type.toString() +
+            " and " + type.toString());
     }
 }

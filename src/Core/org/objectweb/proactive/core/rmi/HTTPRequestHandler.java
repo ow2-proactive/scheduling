@@ -64,21 +64,19 @@ public class HTTPRequestHandler extends Thread {
     private RequestInfo reqInfo;
     private HttpServletResponse response;
 
-    public HTTPRequestHandler(Socket socket, String paths)
-        throws IOException {
+    public HTTPRequestHandler(Socket socket, String paths) throws IOException {
         this(socket.getInputStream(), socket.getOutputStream());
         this.socket = socket;
         this.paths = paths;
     }
 
-    public HTTPRequestHandler(InputStream in, OutputStream out,
-        RequestInfo reqInfo, HttpServletResponse response) {
+    public HTTPRequestHandler(InputStream in, OutputStream out, RequestInfo reqInfo,
+            HttpServletResponse response) {
         this(in, out, reqInfo);
         this.response = response;
     }
 
-    public HTTPRequestHandler(InputStream in, OutputStream out,
-        RequestInfo reqInfo) {
+    public HTTPRequestHandler(InputStream in, OutputStream out, RequestInfo reqInfo) {
         this(in, out);
         this.reqInfo = reqInfo;
     }
@@ -162,8 +160,7 @@ public class HTTPRequestHandler extends Thread {
                     contentType = "application/java";
                 }
             } catch (ClassNotFoundException e) {
-                logger.info("ClassServer failed to load class " +
-                    this.reqInfo.getClassFileName());
+                logger.info("ClassServer failed to load class " + this.reqInfo.getClassFileName());
                 statusLine = "HTTP/1.1 404 " + e.getMessage();
                 contentType = "text/plain";
                 bytes = new byte[0];
@@ -188,8 +185,7 @@ public class HTTPRequestHandler extends Thread {
 
             if (reqInfo.getClassFileName() != null) {
                 if (logger.isDebugEnabled()) {
-                    logger.info("ClassServer sent class " +
-                        reqInfo.getClassFileName() + " successfully");
+                    logger.info("ClassServer sent class " + reqInfo.getClassFileName() + " successfully");
                 }
             }
         } catch (IOException e) {

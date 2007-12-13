@@ -241,6 +241,6 @@ public interface RMNode extends Comparable<RMNode> {
     /**
      *  Builds the RMNodeEvent object for the RMNode
      *  @return the RMNodeEvent object related to the node.
-    */
+     */
     public RMNodeEvent getNodeEvent();
 }

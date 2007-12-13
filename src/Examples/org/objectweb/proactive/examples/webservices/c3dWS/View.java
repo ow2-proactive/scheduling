@@ -40,5 +40,4 @@ public class View implements java.io.Serializable {
     public double dist;
     public double angle;
     public double aspect;
-}
-;
+};

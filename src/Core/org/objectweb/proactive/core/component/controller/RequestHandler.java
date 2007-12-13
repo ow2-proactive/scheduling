@@ -54,8 +54,8 @@ public interface RequestHandler {
      * @throws MethodCallExecutionFailedException if the execution of a request failed (ProActive level)
      * @throws InvocationTargetException if the execution of a request failed (java reflection level)
      */
-    public Object handleRequest(ComponentRequest request)
-        throws MethodCallExecutionFailedException, InvocationTargetException;
+    public Object handleRequest(ComponentRequest request) throws MethodCallExecutionFailedException,
+            InvocationTargetException;
 
     /**
      *

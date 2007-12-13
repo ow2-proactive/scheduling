@@ -78,14 +78,12 @@ public abstract class Script<E> implements Serializable {
     }
 
     /** Directly create a script with a string. */
-    public Script(String script, String engineName, String[] parameters)
-        throws InvalidScriptException {
+    public Script(String script, String engineName, String[] parameters) throws InvalidScriptException {
         ScriptEngineManager manager = new ScriptEngineManager();
         ScriptEngine engine = manager.getEngineByName(engineName);
 
         if (engine == null) {
-            throw new InvalidScriptException("The engine '" + engineName +
-                "' is not valid");
+            throw new InvalidScriptException("The engine '" + engineName + "' is not valid");
         } else {
             scriptEngine = engine.getFactory().getNames().get(0);
         }
@@ -96,8 +94,7 @@ public abstract class Script<E> implements Serializable {
     }
 
     /** Directly create a script with a string. */
-    public Script(String script, String engineName)
-        throws InvalidScriptException {
+    public Script(String script, String engineName) throws InvalidScriptException {
         this(script, engineName, null);
     }
 
@@ -144,10 +141,10 @@ public abstract class Script<E> implements Serializable {
     }
 
     /**
-    * Execute the script and return the ScriptResult corresponding.
-    *
-    * @return
-    */
+     * Execute the script and return the ScriptResult corresponding.
+     *
+     * @return
+     */
     public ScriptResult<E> execute() {
         ScriptEngine engine = getEngine();
 
@@ -162,8 +159,7 @@ public abstract class Script<E> implements Serializable {
 
             return getResult(bindings);
         } catch (Throwable e) {
-            return new ScriptResult<E>(new Exception(
-                    "An exception occured while executing the script ", e));
+            return new ScriptResult<E>(new Exception("An exception occured while executing the script ", e));
         }
     }
 
@@ -195,8 +191,7 @@ public abstract class Script<E> implements Serializable {
 
     /** Create string script from url */
     protected void storeScript(URL url) throws IOException {
-        BufferedReader buf = new BufferedReader(new InputStreamReader(
-                    url.openStream()));
+        BufferedReader buf = new BufferedReader(new InputStreamReader(url.openStream()));
         StringBuilder builder = new StringBuilder();
         String tmp = null;
 
@@ -209,8 +204,7 @@ public abstract class Script<E> implements Serializable {
 
     /** Create string script from file */
     protected void storeScript(File file) throws IOException {
-        BufferedReader buf = new BufferedReader(new InputStreamReader(
-                    new FileInputStream(file)));
+        BufferedReader buf = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
         StringBuilder builder = new StringBuilder();
         String tmp = null;
 

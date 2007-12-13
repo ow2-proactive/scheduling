@@ -252,8 +252,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         // add job to the pending jobs list
         if (!pendingJobsIds.add(job.getId())) {
-            throw new IllegalStateException("can't add the job (id = " +
-                job.getJobInfo() + ") from the pendingJobsIds list !");
+            throw new IllegalStateException("can't add the job (id = " + job.getJobInfo() +
+                ") from the pendingJobsIds list !");
         }
 
         // call method on listeners
@@ -269,8 +269,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         job.update(event);
 
         // remember if the job, which changing list, was selected
-        boolean remember = TableManager.getInstance()
-                                       .isJobSelectedInThisTable(jobId,
+        boolean remember = TableManager.getInstance().isJobSelectedInThisTable(jobId,
                 AbstractJobComposite.PENDING_TABLE_ID);
 
         // call method on listeners
@@ -278,8 +277,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         // remove job from the pending jobs list
         if (!pendingJobsIds.remove(jobId)) {
-            throw new IllegalStateException("can't remove the job (id = " +
-                jobId + ") from the pendingJobsIds list !");
+            throw new IllegalStateException("can't remove the job (id = " + jobId +
+                ") from the pendingJobsIds list !");
         }
 
         // add job to running jobs list
@@ -293,9 +292,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         // if the job was selected, move its selection to an other table
         if (remember) {
-            TableManager.getInstance()
-                        .moveJobSelection(jobId,
-                AbstractJobComposite.RUNNING_TABLE_ID);
+            TableManager.getInstance().moveJobSelection(jobId, AbstractJobComposite.RUNNING_TABLE_ID);
             // update the available buttons
             SeparatedJobView.getRunningJobComposite().jobSelected(job);
         }
@@ -310,8 +307,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         job.update(event);
 
         // remember if the job, which changing list, was selected
-        boolean remember = TableManager.getInstance()
-                                       .isJobSelectedInThisTable(jobId,
+        boolean remember = TableManager.getInstance().isJobSelectedInThisTable(jobId,
                 AbstractJobComposite.RUNNING_TABLE_ID);
 
         // call method on listeners
@@ -319,8 +315,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         // remove job from the running jobs list
         if (!runningJobsIds.remove(jobId)) {
-            throw new IllegalStateException("can't remove the job (id = " +
-                jobId + ") from the runningJobsIds list !");
+            throw new IllegalStateException("can't remove the job (id = " + jobId +
+                ") from the runningJobsIds list !");
         }
 
         // add job to finished jobs list
@@ -334,9 +330,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         // if the job was selected, move its selection to an other table
         if (remember) {
-            TableManager.getInstance()
-                        .moveJobSelection(jobId,
-                AbstractJobComposite.FINISHED_TABLE_ID);
+            TableManager.getInstance().moveJobSelection(jobId, AbstractJobComposite.FINISHED_TABLE_ID);
             // update the available buttons
             SeparatedJobView.getFinishedJobComposite().jobSelected(job);
         }
@@ -358,14 +352,13 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         InternalJob job = new InternalTaskFlowJob();
         job.setId(jobId);
         if (!jobs.remove(job)) {
-            throw new IllegalStateException("can't remove the job (id = " +
-                jobId + ") from the jobs list !");
+            throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs list !");
         }
 
         // remove job from the finished jobs list
         if (!finishedJobsIds.remove(jobId)) {
-            throw new IllegalStateException("can't remove the job (id = " +
-                jobId + ") from the finishedJobsIds list !");
+            throw new IllegalStateException("can't remove the job (id = " + jobId +
+                ") from the finishedJobsIds list !");
         }
 
         // remove job's output
@@ -385,25 +378,22 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         final TaskEvent taskEvent = event;
 
         // if this job is selected in the Running table
-        if (TableManager.getInstance()
-                            .isJobSelectedInThisTable(jobId,
-                    AbstractJobComposite.RUNNING_TABLE_ID)) {
+        if (TableManager.getInstance().isJobSelectedInThisTable(jobId, AbstractJobComposite.RUNNING_TABLE_ID)) {
             final InternalJob job = getJobById(jobId);
             Display.getDefault().asyncExec(new Runnable() {
-                    public void run() {
-                        // update info
-                        JobInfo jobInfo = JobInfo.getInstance();
-                        if (jobInfo != null) {
-                            jobInfo.updateInfos(job);
-                        }
-
-                        TaskView taskView = TaskView.getInstance();
-                        if (taskView != null) {
-                            taskView.lineUpdate(taskEvent,
-                                getTaskDescriptorById(job, taskEvent.getTaskId()));
-                        }
+                public void run() {
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        jobInfo.updateInfos(job);
                     }
-                });
+
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskEvent.getTaskId()));
+                    }
+                }
+            });
         }
     }
 
@@ -419,41 +409,37 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         runningToFinishedTaskEventInternal(event);
 
         // if this job is selected in the Running table
-        if (TableManager.getInstance()
-                            .isJobSelectedInThisTable(jobId,
-                    AbstractJobComposite.RUNNING_TABLE_ID)) {
+        if (TableManager.getInstance().isJobSelectedInThisTable(jobId, AbstractJobComposite.RUNNING_TABLE_ID)) {
             final InternalJob job = getJobById(jobId);
             Display.getDefault().asyncExec(new Runnable() {
-                    public void run() {
-                        // update info
-                        JobInfo jobInfo = JobInfo.getInstance();
-                        if (jobInfo != null) {
-                            jobInfo.updateInfos(job);
-                        }
+                public void run() {
+                    // update info
+                    JobInfo jobInfo = JobInfo.getInstance();
+                    if (jobInfo != null) {
+                        jobInfo.updateInfos(job);
+                    }
 
-                        TaskView taskView = TaskView.getInstance();
-                        if (taskView != null) {
-                            TaskId taskId = taskEvent.getTaskId();
-                            taskView.lineUpdate(taskEvent,
-                                getTaskDescriptorById(job, taskId));
+                    TaskView taskView = TaskView.getInstance();
+                    if (taskView != null) {
+                        TaskId taskId = taskEvent.getTaskId();
+                        taskView.lineUpdate(taskEvent, getTaskDescriptorById(job, taskId));
 
-                            if (taskId.equals(taskView.getIdOfSelectedTask())) {
-                                TaskResult tr = TaskComposite.getTaskResult(job.getId(),
-                                        taskId);
-                                if (tr != null) {
-                                    ResultPreview resultPreview = ResultPreview.getInstance();
-                                    if (resultPreview != null) {
-                                        resultPreview.update(tr.getGraphicalDescription());
-                                    }
-                                } else {
-                                    // TODO throw new RuntimeException("Task " +
-                                    // taskId
-                                    // + " is finished but result is null");
+                        if (taskId.equals(taskView.getIdOfSelectedTask())) {
+                            TaskResult tr = TaskComposite.getTaskResult(job.getId(), taskId);
+                            if (tr != null) {
+                                ResultPreview resultPreview = ResultPreview.getInstance();
+                                if (resultPreview != null) {
+                                    resultPreview.update(tr.getGraphicalDescription());
                                 }
+                            } else {
+                                // TODO throw new RuntimeException("Task " +
+                                // taskId
+                                // + " is finished but result is null");
                             }
                         }
                     }
-                });
+                }
+            });
         }
     }
 
@@ -477,11 +463,9 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             PriorityHighestJobAction.getInstance().setEnabled(false);
             PauseResumeJobAction.getInstance().setEnabled(false);
             KillRemoveJobAction.getInstance().setEnabled(false);
-        } else if (tableManager.isItTheLastSelectedTable(
-                    AbstractJobComposite.FINISHED_TABLE_ID)) {
-            ObtainJobOutputAction.getInstance()
-                                 .setEnabled(SchedulerProxy.getInstance()
-                                                           .isItHisJob(job.getOwner()));
+        } else if (tableManager.isItTheLastSelectedTable(AbstractJobComposite.FINISHED_TABLE_ID)) {
+            ObtainJobOutputAction.getInstance().setEnabled(
+                    SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
             PriorityJobAction.getInstance().setEnabled(false);
             PriorityIdleJobAction.getInstance().setEnabled(false);
             PriorityLowestJobAction.getInstance().setEnabled(false);
@@ -493,8 +477,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             PauseResumeJobAction.getInstance().setPauseResumeMode();
             KillRemoveJobAction.getInstance().setEnabled(false);
         } else { // The table selected is the pending or the running table
-            boolean enabled = SchedulerProxy.getInstance()
-                                            .isItHisJob(job.getOwner());
+            boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
             // enabling/disabling button permitted with this job
             ObtainJobOutputAction.getInstance().setEnabled(enabled);
 
@@ -511,8 +494,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
             JobState jobState = job.getState();
             if (jobState.equals(JobState.PAUSED)) {
                 PauseResumeJobAction.getInstance().setResumeMode();
-            } else if (jobState.equals(JobState.RUNNING) ||
-                    jobState.equals(JobState.PENDING)) {
+            } else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING)) {
                 PauseResumeJobAction.getInstance().setPauseMode();
             } else {
                 PauseResumeJobAction.getInstance().setPauseResumeMode();
@@ -533,15 +515,12 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         if (job == null) {
             ObtainJobOutputAction.getInstance().setEnabled(false);
             KillRemoveJobAction.getInstance().setEnabled(false);
-        } else if (tableManager.isItTheLastSelectedTable(
-                    AbstractJobComposite.FINISHED_TABLE_ID)) {
-            ObtainJobOutputAction.getInstance()
-                                 .setEnabled(SchedulerProxy.getInstance()
-                                                           .isItHisJob(job.getOwner()));
+        } else if (tableManager.isItTheLastSelectedTable(AbstractJobComposite.FINISHED_TABLE_ID)) {
+            ObtainJobOutputAction.getInstance().setEnabled(
+                    SchedulerProxy.getInstance().isItHisJob(job.getOwner()));
             KillRemoveJobAction.getInstance().setEnabled(false);
         } else { // The table selected is the pending or the running table
-            boolean enabled = SchedulerProxy.getInstance()
-                                            .isItHisJob(job.getOwner());
+            boolean enabled = SchedulerProxy.getInstance().isItHisJob(job.getOwner());
             // enabling/disabling button permitted with this job
             ObtainJobOutputAction.getInstance().setEnabled(enabled);
             KillRemoveJobAction.getInstance().setEnabled(enabled);
@@ -559,9 +538,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         PauseResumeJobAction.getInstance().setPauseResumeMode();
     }
 
-    private void setEnabledAdminButtons(Boolean startStopEnabled,
-        Boolean freezeEnabled, Boolean pauseEnabled, Boolean resumeEnabled,
-        Boolean shutdownEnabled) {
+    private void setEnabledAdminButtons(Boolean startStopEnabled, Boolean freezeEnabled,
+            Boolean pauseEnabled, Boolean resumeEnabled, Boolean shutdownEnabled) {
         if (SchedulerProxy.getInstance().isAnAdmin()) {
             StartStopSchedulerAction.getInstance().setEnabled(startStopEnabled);
             FreezeSchedulerAction.getInstance().setEnabled(freezeEnabled);
@@ -622,10 +600,10 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     public void schedulerShutDownEvent() {
         schedulerState = SchedulerState.KILLED;
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    SeparatedJobView.clearOnDisconnection(false);
-                }
-            });
+            public void run() {
+                SeparatedJobView.clearOnDisconnection(false);
+            }
+        });
 
         // call method on listeners
         schedulerShutDownEventInternal();
@@ -680,10 +658,10 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     public void schedulerKilledEvent() {
         schedulerState = SchedulerState.KILLED;
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    SeparatedJobView.clearOnDisconnection(false);
-                }
-            });
+            public void run() {
+                SeparatedJobView.clearOnDisconnection(false);
+            }
+        });
 
         // disable all buttons
         SubmitJobAction.getInstance().setEnabled(false);
@@ -733,14 +711,12 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         InternalJob job = new InternalTaskFlowJob();
         job.setId(jobId);
         if (!jobs.remove(job)) {
-            throw new IllegalStateException("can't remove the job (id = " +
-                jobId + ") from the jobs list !");
+            throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the jobs list !");
         }
 
         // remove job from the specified jobs list
         if (!list.remove(jobId)) {
-            throw new IllegalStateException("can't remove the job (id = " +
-                jobId + ") from the list !");
+            throw new IllegalStateException("can't remove the job (id = " + jobId + ") from the list !");
         }
 
         // remove job's output
@@ -757,19 +733,19 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         final InternalJob job = getJobById(event.getJobId());
         job.update(event);
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
-                    if (jobInfo != null) {
-                        jobInfo.updateInfos(job);
-                    }
-
-                    TaskView taskView = TaskView.getInstance();
-                    if (taskView != null) {
-                        taskView.fullUpdate(job);
-                    }
+            public void run() {
+                // update info
+                JobInfo jobInfo = JobInfo.getInstance();
+                if (jobInfo != null) {
+                    jobInfo.updateInfos(job);
                 }
-            });
+
+                TaskView taskView = TaskView.getInstance();
+                if (taskView != null) {
+                    taskView.fullUpdate(job);
+                }
+            }
+        });
 
         // call method on listeners
         jobPausedEventInternal(event);
@@ -782,19 +758,19 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
         final InternalJob job = getJobById(event.getJobId());
         job.update(event);
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    // update info
-                    JobInfo jobInfo = JobInfo.getInstance();
-                    if (jobInfo != null) {
-                        jobInfo.updateInfos(job);
-                    }
-
-                    TaskView taskView = TaskView.getInstance();
-                    if (taskView != null) {
-                        taskView.fullUpdate(job);
-                    }
+            public void run() {
+                // update info
+                JobInfo jobInfo = JobInfo.getInstance();
+                if (jobInfo != null) {
+                    jobInfo.updateInfos(job);
                 }
-            });
+
+                TaskView taskView = TaskView.getInstance();
+                if (taskView != null) {
+                    taskView.fullUpdate(job);
+                }
+            }
+        });
 
         // call method on listeners
         jobResumedEventInternal(event);
@@ -937,8 +913,7 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
     public InternalTask getTaskDescriptorById(InternalJob job, TaskId id) {
         InternalTask taskDescriptor = job.getHMTasks().get(id);
         if (taskDescriptor == null) {
-            throw new IllegalArgumentException(
-                "there are no taskDescriptor with the id : " + id +
+            throw new IllegalArgumentException("there are no taskDescriptor with the id : " + id +
                 " in the job : " + job.getId());
         }
         return taskDescriptor;
@@ -951,8 +926,8 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
      */
     public boolean init() {
         SchedulerInitialState<InternalJob> state = null;
-        state = SchedulerProxy.getInstance()
-                              .addSchedulerEventListener(((SchedulerEventListener) PAActiveObject.getStubOnThis()));
+        state = SchedulerProxy.getInstance().addSchedulerEventListener(
+                ((SchedulerEventListener) PAActiveObject.getStubOnThis()));
 
         if (state == null) { // addSchedulerEventListener failed
             return false;
@@ -960,24 +935,24 @@ public class JobsController implements SchedulerEventListener<InternalJob> {
 
         schedulerState = state.getState();
         switch (schedulerState) {
-        case KILLED:
-            schedulerKilledEvent();
-            break;
-        case PAUSED:
-            schedulerPausedEvent();
-            break;
-        case PAUSED_IMMEDIATE:
-            schedulerImmediatePausedEvent();
-            break;
-        case SHUTTING_DOWN:
-            schedulerShuttingDownEvent();
-            break;
-        case STARTED:
-            schedulerStartedEvent();
-            break;
-        case STOPPED:
-            schedulerStoppedEvent();
-            break;
+            case KILLED:
+                schedulerKilledEvent();
+                break;
+            case PAUSED:
+                schedulerPausedEvent();
+                break;
+            case PAUSED_IMMEDIATE:
+                schedulerImmediatePausedEvent();
+                break;
+            case SHUTTING_DOWN:
+                schedulerShuttingDownEvent();
+                break;
+            case STARTED:
+                schedulerStartedEvent();
+                break;
+            case STOPPED:
+                schedulerStoppedEvent();
+                break;
         }
 
         jobs = new Vector<InternalJob>();

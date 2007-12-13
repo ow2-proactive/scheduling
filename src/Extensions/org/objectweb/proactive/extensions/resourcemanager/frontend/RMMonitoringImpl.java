@@ -77,8 +77,7 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
  * @since ProActive 3.9
  *
  */
-public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
-    InitActive {
+public class RMMonitoringImpl implements RMMonitoring, RMEventListener, InitActive {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.RM_MONITORING);
 
     // Attributes
@@ -105,11 +104,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
     /** Initialization part of the RMMonitoring active object */
     public void initActivity(Body body) {
         try {
-            MonitoringUrl = "//" +
-                PAActiveObject.getNode().getVMInformation().getHostName() +
-                "/" + RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING;
-            PAActiveObject.register(PAActiveObject.getStubOnThis(),
-                this.MonitoringUrl);
+            MonitoringUrl = "//" + PAActiveObject.getNode().getVMInformation().getHostName() + "/" +
+                RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING;
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), this.MonitoringUrl);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -125,10 +122,8 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param events list of wanted events that must be received.
      * @return RMInitialState snapshot of RM's current state : nodes and node sources.
      *  */
-    public RMInitialState addRMEventListener(RMEventListener listener,
-        RMEventType... events) {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+    public RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events) {
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         this.RMListeners.put(id, listener);
         return rmcore.getRMInitialState();
@@ -140,11 +135,9 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      * @param types Object types associated with the method call.
      * @param params Object associated with the method call.
      */
-    private void dispatch(RMEventType methodName, Class<?>[] types,
-        Object... params) {
+    private void dispatch(RMEventType methodName, Class<?>[] types, Object... params) {
         try {
-            Method method = RMEventListener.class.getMethod(methodName.toString(),
-                    types);
+            Method method = RMEventListener.class.getMethod(methodName.toString(), types);
 
             Iterator<UniqueID> iter = this.RMListeners.keySet().iterator();
             while (iter.hasNext()) {
@@ -153,8 +146,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
                     method.invoke(RMListeners.get(id), params);
                 } catch (Exception e) {
                     iter.remove();
-                    logger.error(
-                        "RM has detected that a listener is not connected anymore !");
+                    logger.error("RM has detected that a listener is not connected anymore !");
                 }
             }
         } catch (SecurityException e) {
@@ -249,8 +241,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
     /** RM is shutting down */
     public void imShuttingDownEvent(RMEvent evt) {
         evt.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.SHUTTING_DOWN, new Class<?>[] { RMEvent.class },
-            evt);
+        dispatch(RMEventType.SHUTTING_DOWN, new Class<?>[] { RMEvent.class }, evt);
     }
 
     /** RM has started */
@@ -270,8 +261,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      */
     public void nodeSourceAddedEvent(RMNodeSourceEvent ns) {
         ns.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODESOURCE_CREATED,
-            new Class<?>[] { RMNodeSourceEvent.class }, ns);
+        dispatch(RMEventType.NODESOURCE_CREATED, new Class<?>[] { RMNodeSourceEvent.class }, ns);
     }
 
     /** node removed from RM.
@@ -279,8 +269,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      */
     public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
         ns.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODESOURCE_REMOVED,
-            new Class<?>[] { RMNodeSourceEvent.class }, ns);
+        dispatch(RMEventType.NODESOURCE_REMOVED, new Class<?>[] { RMNodeSourceEvent.class }, ns);
     }
 
     /** new node available in RM.
@@ -318,8 +307,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      */
     public void nodeToReleaseEvent(RMNodeEvent n) {
         n.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODE_TO_RELEASE,
-            new Class<?>[] { RMNodeEvent.class }, n);
+        dispatch(RMEventType.NODE_TO_RELEASE, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
     /**
@@ -338,8 +326,7 @@ public class RMMonitoringImpl implements RMMonitoring, RMEventListener,
      */
     public void nodeRemovedEvent(RMNodeEvent n) {
         n.setRMUrl(this.MonitoringUrl);
-        dispatch(RMEventType.NODE_REMOVED,
-            new Class<?>[] { RMNodeEvent.class }, n);
+        dispatch(RMEventType.NODE_REMOVED, new Class<?>[] { RMNodeEvent.class }, n);
     }
 
     /** Stop and remove monitoring active object */

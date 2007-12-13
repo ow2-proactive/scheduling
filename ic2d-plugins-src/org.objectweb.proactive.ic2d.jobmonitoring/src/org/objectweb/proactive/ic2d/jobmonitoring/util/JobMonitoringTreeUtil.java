@@ -65,8 +65,7 @@ public class JobMonitoringTreeUtil {
      */
     public static List<HostObject> getVNChildren(VirtualNodeObject vn) {
         List<HostObject> result = new ArrayList<HostObject>();
-        List<AbstractData> worldChildren = vn.getWorldObject()
-                                             .getMonitoredChildrenAsList();
+        List<AbstractData> worldChildren = vn.getWorldObject().getMonitoredChildrenAsList();
         for (AbstractData obj : worldChildren) {
             HostObject host = (HostObject) obj;
             if (!getHostChildren(host, vn).isEmpty()) {
@@ -92,8 +91,7 @@ public class JobMonitoringTreeUtil {
      * @param vn the virtual node parent of the host
      * @return Children of the host.
      */
-    public static List<RuntimeObject> getHostChildren(HostObject host,
-        VirtualNodeObject vn) {
+    public static List<RuntimeObject> getHostChildren(HostObject host, VirtualNodeObject vn) {
         List<RuntimeObject> result = new ArrayList<RuntimeObject>();
         List<AbstractData> hostChildren = host.getMonitoredChildrenAsList();
         for (AbstractData obj : hostChildren) {
@@ -121,8 +119,7 @@ public class JobMonitoringTreeUtil {
      * @param vn the virtual node parent of the JVM
      * @return Children of the JVM
      */
-    public static List<NodeObject> getJVMChildren(RuntimeObject jvm,
-        VirtualNodeObject vn) {
+    public static List<NodeObject> getJVMChildren(RuntimeObject jvm, VirtualNodeObject vn) {
         List<NodeObject> result = new ArrayList<NodeObject>();
         List<AbstractData> jvmChildren = jvm.getMonitoredChildrenAsList();
         for (AbstractData obj : jvmChildren) {

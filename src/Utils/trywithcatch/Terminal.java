@@ -47,12 +47,12 @@ public class Terminal extends Anything {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         return str + "@" + left + "";
     }
 
     @Override
-	protected void prettyPrint(int indent) {
+    protected void prettyPrint(int indent) {
         super.prettyPrint(indent);
         System.out.println(this);
     }
@@ -70,7 +70,7 @@ public class Terminal extends Anything {
     }
 
     @Override
-	public void work(Catcher c) throws IOException {
+    public void work(Catcher c) throws IOException {
         c.removeCallAtOffset(left - column);
     }
 }

@@ -40,8 +40,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 public class A implements Serializable, RunActive {
 
     /**
-         *
-         */
+     *
+     */
     DummyObject dum;
 
     public A() {

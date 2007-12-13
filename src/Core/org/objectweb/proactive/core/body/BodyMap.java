@@ -53,8 +53,7 @@ import org.objectweb.proactive.core.UniqueID;
  * @version 1.1,  2001/12/23
  * @since   ProActive 0.9
  */
-public class BodyMap /* extends AbstractEventProducer */ implements Cloneable,
-    java.io.Externalizable {
+public class BodyMap /* extends AbstractEventProducer */implements Cloneable, java.io.Externalizable {
     //
     // -- PRIVATE MEMBER -----------------------------------------------
     //
@@ -160,8 +159,7 @@ public class BodyMap /* extends AbstractEventProducer */ implements Cloneable,
 
         while (iterator.hasNext()) {
             java.util.Map.Entry entry = (java.util.Map.Entry) iterator.next();
-            sb.append(entry.getKey()).append("  body = ")
-              .append(entry.getValue()).append("\n");
+            sb.append(entry.getKey()).append("  body = ").append(entry.getValue()).append("\n");
         }
 
         return sb.toString();
@@ -197,8 +195,8 @@ public class BodyMap /* extends AbstractEventProducer */ implements Cloneable,
      * The object implements the readExternal method to restore its contents by calling the methods
      * of DataInput for primitive types and readObject for objects, strings and arrays.
      */
-    public synchronized void readExternal(java.io.ObjectInput in)
-        throws java.io.IOException, ClassNotFoundException {
+    public synchronized void readExternal(java.io.ObjectInput in) throws java.io.IOException,
+            ClassNotFoundException {
         int size = in.readInt();
 
         for (int i = 0; i < size; i++) {
@@ -213,8 +211,7 @@ public class BodyMap /* extends AbstractEventProducer */ implements Cloneable,
      * of DataOutput for its primitive values or calling the writeObject method of ObjectOutput
      * for objects, strings, and arrays.
      */
-    public synchronized void writeExternal(java.io.ObjectOutput out)
-        throws java.io.IOException {
+    public synchronized void writeExternal(java.io.ObjectOutput out) throws java.io.IOException {
         int size = idToBodyMap.size();
         out.writeInt(size);
 

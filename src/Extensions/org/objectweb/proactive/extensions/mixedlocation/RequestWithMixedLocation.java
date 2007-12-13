@@ -53,24 +53,20 @@ public class RequestWithMixedLocation extends RequestImpl implements java.io.Ser
     private int tries;
     transient protected LocationServer server;
 
-    public RequestWithMixedLocation(MethodCall methodCall,
-        UniversalBody sender, boolean isOneWay, long nextSequenceID,
-        LocationServer server) {
+    public RequestWithMixedLocation(MethodCall methodCall, UniversalBody sender, boolean isOneWay,
+            long nextSequenceID, LocationServer server) {
         super(methodCall, sender, isOneWay, nextSequenceID);
         if (logger.isDebugEnabled()) {
-            logger.debug("RequestWithMixedLocation.RequestWithMixedLocation " +
-                ++counter);
+            logger.debug("RequestWithMixedLocation.RequestWithMixedLocation " + ++counter);
         }
         this.server = server;
     }
 
     @Override
-    protected int sendRequest(UniversalBody destinationBody)
-        throws java.io.IOException {
+    protected int sendRequest(UniversalBody destinationBody) throws java.io.IOException {
         int ftres = FTManager.NON_FT;
         if (logger.isDebugEnabled()) {
-            logger.debug("RequestWithMixedLocation: sending to universal " +
-                counter);
+            logger.debug("RequestWithMixedLocation: sending to universal " + counter);
         }
         try {
             ftres = destinationBody.receiveRequest(this);
@@ -83,8 +79,7 @@ public class RequestWithMixedLocation extends RequestImpl implements java.io.Ser
     /**
      * Implements the backup solution
      */
-    protected void backupSolution(UniversalBody destinationBody)
-        throws java.io.IOException {
+    protected void backupSolution(UniversalBody destinationBody) throws java.io.IOException {
         boolean ok = false;
         tries = 0;
         //get the new location from the server
@@ -104,8 +99,8 @@ public class RequestWithMixedLocation extends RequestImpl implements java.io.Ser
                 if (sender != null) {
                     sender.updateLocation(bodyID, remoteBody);
                 } else {
-                    LocalBodyStore.getInstance().getLocalBody(getSourceBodyID())
-                                  .updateLocation(bodyID, remoteBody);
+                    LocalBodyStore.getInstance().getLocalBody(getSourceBodyID()).updateLocation(bodyID,
+                            remoteBody);
                 }
                 ok = true;
             } catch (Exception e) {

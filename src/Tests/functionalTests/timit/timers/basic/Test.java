@@ -39,6 +39,8 @@ import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
+
+
 public class Test extends FunctionalTest {
     private ActiveObjectClass a1;
     private ActiveObjectClass a1bis;
@@ -48,9 +50,8 @@ public class Test extends FunctionalTest {
     //private TimItBasicReductor t;
     public void initTest() throws Exception {
         // Access the nodes of the descriptor file
-        descriptorPad = PADeployment.getProactiveDescriptor(this.getClass()
-                                                                .getResource("/functionalTests/timit/timers/basic/descriptor.xml")
-                                                                .getPath());
+        descriptorPad = PADeployment.getProactiveDescriptor(this.getClass().getResource(
+                "/functionalTests/timit/timers/basic/descriptor.xml").getPath());
         descriptorPad.activateMappings();
         VirtualNode vnode = descriptorPad.getVirtualNodes()[0];
         Node[] nodes = vnode.getNodes();
@@ -71,7 +72,7 @@ public class Test extends FunctionalTest {
 
     public boolean preConditions() throws Exception {
         return ((this.a1 != null) && (this.a1bis != null)) &&
-        ((this.a2 != null) && this.a2.checkRemoteAndLocalReference());
+            ((this.a2 != null) && this.a2.checkRemoteAndLocalReference());
     }
 
     @org.junit.Test
@@ -79,8 +80,7 @@ public class Test extends FunctionalTest {
         // Create active objects
         this.initTest();
         // Check their creation
-        assertTrue("Problem with the creation of active objects for this test !",
-            this.preConditions());
+        assertTrue("Problem with the creation of active objects for this test !", this.preConditions());
         // Check if the Total timer is started
         String reason = this.a2.checkIfTotalIsStarted();
         assertTrue(reason, reason == null);

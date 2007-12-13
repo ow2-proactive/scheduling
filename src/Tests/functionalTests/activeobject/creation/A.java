@@ -38,8 +38,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 public class A implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     String name;
 
     public A() {

@@ -47,8 +47,7 @@ import org.objectweb.proactive.core.security.SecurityEntity;
  * object, hidden to the level on the protocol dependant part of the remote object it represents
  * that only provides a transport layer
  */
-public interface InternalRemoteRemoteObject extends RemoteRemoteObject,
-    SecurityEntity {
+public interface InternalRemoteRemoteObject extends RemoteRemoteObject, SecurityEntity {
 
     /**
      * @return returns the URI where its protocol dependant remote object is bound

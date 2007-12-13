@@ -38,8 +38,8 @@ import java.rmi.server.RMIClientSocketFactory;
 import java.rmi.server.RMIServerSocketFactory;
 
 
-public class BenchSocketFactory extends BenchFactory
-    implements RMIServerSocketFactory, RMIClientSocketFactory, Serializable {
+public class BenchSocketFactory extends BenchFactory implements RMIServerSocketFactory,
+        RMIClientSocketFactory, Serializable {
     //protected ArrayList streamList;
     protected static boolean measure = true;
 

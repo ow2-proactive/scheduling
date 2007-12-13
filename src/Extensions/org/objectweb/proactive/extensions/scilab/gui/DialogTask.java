@@ -56,8 +56,8 @@ import javax.swing.filechooser.FileFilter;
 public class DialogTask extends javax.swing.JDialog {
 
     /**
-         *
-         */
+     *
+     */
     private JPanel pnlPath;
     private JLabel lblPath;
     private JTextField txtOutParam;
@@ -94,67 +94,65 @@ public class DialogTask extends javax.swing.JDialog {
             {
                 chooserScript = new JFileChooser();
                 FileFilter filter_all = new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            if (f == null) {
-                                return false;
-                            }
+                    @Override
+                    public boolean accept(File f) {
+                        if (f == null) {
+                            return false;
+                        }
 
-                            if (f.isDirectory()) {
-                                return true;
-                            }
+                        if (f.isDirectory()) {
+                            return true;
+                        }
 
-                            return f.getName().endsWith(".sci") ||
-                            f.getName().endsWith(".sce") ||
+                        return f.getName().endsWith(".sci") || f.getName().endsWith(".sce") ||
                             f.getName().endsWith(".m");
-                        }
+                    }
 
-                        @Override
-                        public String getDescription() {
-                            return "Scilab & Matlab Files";
-                        }
-                    };
+                    @Override
+                    public String getDescription() {
+                        return "Scilab & Matlab Files";
+                    }
+                };
 
                 FileFilter filter_sci = new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            if (f == null) {
-                                return false;
-                            }
-
-                            if (f.isDirectory()) {
-                                return true;
-                            }
-
-                            return f.getName().endsWith(".sci") ||
-                            f.getName().endsWith(".sce");
+                    @Override
+                    public boolean accept(File f) {
+                        if (f == null) {
+                            return false;
                         }
 
-                        @Override
-                        public String getDescription() {
-                            return "Scilab Files";
+                        if (f.isDirectory()) {
+                            return true;
                         }
-                    };
+
+                        return f.getName().endsWith(".sci") || f.getName().endsWith(".sce");
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "Scilab Files";
+                    }
+                };
 
                 FileFilter filter_mat = new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            if (f == null) {
-                                return false;
-                            }
-
-                            if (f.isDirectory()) {
-                                return true;
-                            }
-
-                            return f.getName().endsWith(".m");
+                    @Override
+                    public boolean accept(File f) {
+                        if (f == null) {
+                            return false;
                         }
 
-                        @Override
-                        public String getDescription() {
-                            return "Matlab Files";
+                        if (f.isDirectory()) {
+                            return true;
                         }
-                    };
+
+                        return f.getName().endsWith(".m");
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "Matlab Files";
+                    }
+                };
 
                 chooserScript.addChoosableFileFilter(filter_sci);
                 chooserScript.addChoosableFileFilter(filter_mat);
@@ -179,12 +177,10 @@ public class DialogTask extends javax.swing.JDialog {
                         pnlInit.setLayout(pnlInitLayout);
                         pnlInit.setPreferredSize(new java.awt.Dimension(396, 228));
                         pnlInit.setSize(393, 23);
-                        pnlInit.setBorder(BorderFactory.createTitledBorder(
-                                "Initialize Script"));
+                        pnlInit.setBorder(BorderFactory.createTitledBorder("Initialize Script"));
                         scrollInit = new JScrollPane();
                         pnlInit.add(scrollInit, BorderLayout.CENTER);
-                        scrollInit.setPreferredSize(new java.awt.Dimension(
-                                502, 203));
+                        scrollInit.setPreferredSize(new java.awt.Dimension(502, 203));
                         txtInit = new JTextArea();
                         scrollInit.setViewportView(txtInit);
                     }
@@ -195,14 +191,11 @@ public class DialogTask extends javax.swing.JDialog {
                         BorderLayout pnlOutParamLayout = new BorderLayout();
                         pnlOutParamLayout.setHgap(5);
                         pnlTaskSouth.setLayout(pnlOutParamLayout);
-                        pnlTaskSouth.setPreferredSize(new java.awt.Dimension(
-                                512, 31));
-                        pnlTaskSouth.setBorder(BorderFactory.createTitledBorder(
-                                ""));
+                        pnlTaskSouth.setPreferredSize(new java.awt.Dimension(512, 31));
+                        pnlTaskSouth.setBorder(BorderFactory.createTitledBorder(""));
                         txtOutParam = new JTextField();
                         pnlTaskSouth.add(txtOutParam, BorderLayout.CENTER);
-                        txtOutParam.setPreferredSize(new java.awt.Dimension(
-                                213, 15));
+                        txtOutParam.setPreferredSize(new java.awt.Dimension(213, 15));
                         {
                             pnlTaskPriority = new JPanel();
                             BorderLayout pnlTaskPriorityLayout = new BorderLayout();
@@ -212,18 +205,14 @@ public class DialogTask extends javax.swing.JDialog {
                             lblPriority = new JLabel();
                             pnlTaskPriority.add(lblPriority, BorderLayout.WEST);
                             lblPriority.setText("Priority Task:");
-                            lblPriority.setPreferredSize(new java.awt.Dimension(
-                                    84, 16));
+                            lblPriority.setPreferredSize(new java.awt.Dimension(84, 16));
                             {
                                 ComboBoxModel cmbPriorityModel = new DefaultComboBoxModel(new String[] {
-                                            "Low", "Normal", "High"
-                                        });
+                                        "Low", "Normal", "High" });
                                 cmbPriority = new JComboBox();
-                                pnlTaskPriority.add(cmbPriority,
-                                    BorderLayout.CENTER);
+                                pnlTaskPriority.add(cmbPriority, BorderLayout.CENTER);
                                 cmbPriority.setModel(cmbPriorityModel);
-                                cmbPriority.setPreferredSize(new java.awt.Dimension(
-                                        79, 19));
+                                cmbPriority.setPreferredSize(new java.awt.Dimension(79, 19));
                                 cmbPriority.setSelectedIndex(1);
                             }
                         }
@@ -231,8 +220,7 @@ public class DialogTask extends javax.swing.JDialog {
                         lblOutParam = new JLabel();
                         pnlTaskSouth.add(lblOutParam, BorderLayout.WEST);
                         lblOutParam.setText("Out Parameters:");
-                        lblOutParam.setPreferredSize(new java.awt.Dimension(
-                                111, 17));
+                        lblOutParam.setPreferredSize(new java.awt.Dimension(111, 17));
                     }
 
                     {
@@ -256,10 +244,10 @@ public class DialogTask extends javax.swing.JDialog {
                         btnPath.setPreferredSize(new java.awt.Dimension(85, 22));
                         btnPath.setSize(72, 22);
                         btnPath.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent evt) {
-                                    btnPathActionPerformed(evt);
-                                }
-                            });
+                            public void actionPerformed(ActionEvent evt) {
+                                btnPathActionPerformed(evt);
+                            }
+                        });
                         pnlPathNorth = new JPanel();
                         pnlPath.add(pnlPathNorth, BorderLayout.NORTH);
                         pnlPathSouth = new JPanel();
@@ -279,30 +267,29 @@ public class DialogTask extends javax.swing.JDialog {
                     btnCancel.setText("Cancel");
                     btnCancel.setPreferredSize(new java.awt.Dimension(75, 22));
                     btnCancel.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnCancelActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnCancelActionPerformed(evt);
+                        }
+                    });
                     btnStart = new JButton();
                     pnlValid.add(btnStart);
                     btnStart.setText("Start");
                     btnStart.setPreferredSize(new java.awt.Dimension(75, 22));
-                    btnStart.setToolTipText(
-                        "Create and launch the defined task");
+                    btnStart.setToolTipText("Create and launch the defined task");
                     btnStart.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnStartActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnStartActionPerformed(evt);
+                        }
+                    });
                 }
             }
 
             this.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        state = DialogTask.CANCEL;
-                    }
-                });
+                @Override
+                public void windowClosing(WindowEvent e) {
+                    state = DialogTask.CANCEL;
+                }
+            });
 
             this.setTitle("Open Scilab/Matlab Task");
             this.setSize(520, 354);

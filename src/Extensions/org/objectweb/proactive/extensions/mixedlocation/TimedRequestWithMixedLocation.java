@@ -39,25 +39,21 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.TimedRequestWithLocationServer;
 
 
-public class TimedRequestWithMixedLocation
-    extends TimedRequestWithLocationServer {
+public class TimedRequestWithMixedLocation extends TimedRequestWithLocationServer {
     private static final int MAX_TRIES = 30;
     private static int counter = 0;
     private int tries;
     transient protected LocationServer server;
     protected long startTime;
 
-    public TimedRequestWithMixedLocation(MethodCall methodCall,
-        UniversalBody sender, boolean isOneWay, long nextSequenceID,
-        LocationServer server) {
+    public TimedRequestWithMixedLocation(MethodCall methodCall, UniversalBody sender, boolean isOneWay,
+            long nextSequenceID, LocationServer server) {
         super(methodCall, sender, isOneWay, nextSequenceID, server);
     }
 
     @Override
-    protected int sendRequest(UniversalBody destinationBody)
-        throws java.io.IOException {
-        System.out.println("RequestWithMixedLocation: sending to universal " +
-            counter);
+    protected int sendRequest(UniversalBody destinationBody) throws java.io.IOException {
+        System.out.println("RequestWithMixedLocation: sending to universal " + counter);
         int ftres = FTManager.NON_FT;
         try {
             ftres = destinationBody.receiveRequest(this);
@@ -72,24 +68,19 @@ public class TimedRequestWithMixedLocation
      * Implements the backup solution
      */
     @Override
-    protected void backupSolution(UniversalBody destinationBody)
-        throws java.io.IOException {
+    protected void backupSolution(UniversalBody destinationBody) throws java.io.IOException {
         boolean ok = false;
         tries = 0;
-        System.out.println(
-            "RequestWithMixedLocationr: backupSolution() contacting server " +
-            server);
-        System.out.println(
-            "RequestWithMixedLocation.backupSolution() : looking for " +
-            destinationBody);
+        System.out.println("RequestWithMixedLocationr: backupSolution() contacting server " + server);
+        System.out.println("RequestWithMixedLocation.backupSolution() : looking for " + destinationBody);
         //get the new location from the server
         while (!ok && (tries < MAX_TRIES)) {
             UniversalBody mobile = server.searchObject(destinationBody.getID());
-            System.out.println(
-                "RequestWithMixedLocation: backupSolution() server has sent an answer");
+            System.out.println("RequestWithMixedLocation: backupSolution() server has sent an answer");
 
             //we want to bypass the stub/proxy
-            UniversalBody newDestinationBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile).getProxy()).getResult();
+            UniversalBody newDestinationBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile)
+                    .getProxy()).getResult();
 
             // !!!!
             // !!!! should put a counter here to stop calling if continuously failing
@@ -99,16 +90,13 @@ public class TimedRequestWithMixedLocation
                 newDestinationBody.receiveRequest(this);
                 //everything went fine, we have to update the current location of the object
                 //so that next requests don't go through the server
-                System.out.println(
-                    "RequestWithMixedLocation: backupSolution() updating location");
+                System.out.println("RequestWithMixedLocation: backupSolution() updating location");
                 if (sender != null) {
-                    sender.updateLocation(newDestinationBody.getID(),
-                        newDestinationBody.getRemoteAdapter());
+                    sender.updateLocation(newDestinationBody.getID(), newDestinationBody.getRemoteAdapter());
                 }
                 ok = true;
             } catch (Exception e) {
-                System.out.println(
-                    "RequestWithMixedLocation: backupSolution() failed");
+                System.out.println("RequestWithMixedLocation: backupSolution() failed");
                 tries++;
                 try {
                     Thread.sleep(500);

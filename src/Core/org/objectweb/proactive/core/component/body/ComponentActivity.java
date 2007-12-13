@@ -56,8 +56,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class ComponentActivity implements RunActive, InitActive, EndActive,
-    Serializable {
+public class ComponentActivity implements RunActive, InitActive, EndActive, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ACTIVITY);
     private transient InitActive componentInitActive; // used only once
     protected RunActive componentRunActive;
@@ -157,10 +156,8 @@ public class ComponentActivity implements RunActive, InitActive, EndActive,
                 NFRequestFilterImpl nfRequestFilter = new NFRequestFilterImpl();
                 while (body.isActive()) {
                     ComponentBody componentBody = (ComponentBody) body;
-                    while (LifeCycleController.STOPPED.equals(
-                                Fractal.getLifeCycleController(
-                                    componentBody.getProActiveComponentImpl())
-                                           .getFcState())) {
+                    while (LifeCycleController.STOPPED.equals(Fractal.getLifeCycleController(
+                            componentBody.getProActiveComponentImpl()).getFcState())) {
                         componentService.blockingServeOldest(nfRequestFilter);
                         if (!body.isActive()) {
                             // in case of a migration 
@@ -189,9 +186,9 @@ public class ComponentActivity implements RunActive, InitActive, EndActive,
                     }
                 }
             } catch (NoSuchInterfaceException e) {
-                logger.error(
-                    "could not retreive an interface, probably the life cycle controller of this component; terminating the component. Error message is : " +
-                    e.getMessage());
+                logger
+                        .error("could not retreive an interface, probably the life cycle controller of this component; terminating the component. Error message is : " +
+                            e.getMessage());
             }
         }
     }
@@ -204,8 +201,8 @@ public class ComponentActivity implements RunActive, InitActive, EndActive,
             componentInitActive.initActivity(body);
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "initializing component activity ... (component will be active but not yet started)");
+                logger
+                        .debug("initializing component activity ... (component will be active but not yet started)");
             }
         }
     }
@@ -218,8 +215,7 @@ public class ComponentActivity implements RunActive, InitActive, EndActive,
             componentEndActive.endActivity(body);
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "ending component activity ... (object is still active)");
+                logger.debug("ending component activity ... (object is still active)");
             }
         }
     }
@@ -233,8 +229,7 @@ public class ComponentActivity implements RunActive, InitActive, EndActive,
     private class DefaultInitActive implements InitActive, Serializable {
         public void initActivity(Body body) {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "initializing default functional activity of the component");
+                logger.debug("initializing default functional activity of the component");
             }
         }
     }
@@ -242,18 +237,15 @@ public class ComponentActivity implements RunActive, InitActive, EndActive,
     private class DefaultEndActive implements EndActive, Serializable {
         public void endActivity(Body body) {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "ending default functional activity of this component");
+                logger.debug("ending default functional activity of this component");
             }
         }
     }
 
-    private class ComponentInitActiveWrapper implements InitActive,
-        Serializable {
+    private class ComponentInitActiveWrapper implements InitActive, Serializable {
         private ComponentInitActive wrappedComponentInitActive;
 
-        public ComponentInitActiveWrapper(
-            ComponentInitActive componentInitActive) {
+        public ComponentInitActiveWrapper(ComponentInitActive componentInitActive) {
             wrappedComponentInitActive = componentInitActive;
         }
 

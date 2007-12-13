@@ -52,8 +52,7 @@ public class FutureMonitoring implements Runnable {
      * For each body, the list of futures to monitor. We ping the updater body,
      * so we should detect a broken automatic continuations chain.
      */
-    private static final ConcurrentHashMap<UniqueID, ConcurrentLinkedQueue<FutureProxy>> futuresToMonitor =
-        new ConcurrentHashMap<UniqueID, ConcurrentLinkedQueue<FutureProxy>>();
+    private static final ConcurrentHashMap<UniqueID, ConcurrentLinkedQueue<FutureProxy>> futuresToMonitor = new ConcurrentHashMap<UniqueID, ConcurrentLinkedQueue<FutureProxy>>();
 
     static {
 
@@ -219,8 +218,7 @@ public class FutureMonitoring implements Runnable {
 
     private static boolean isFTEnabled() {
         if (!FTEnabled) {
-            Collection<LocalNode> nodes = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                              .getLocalNodes();
+            Collection<LocalNode> nodes = ProActiveRuntimeImpl.getProActiveRuntime().getLocalNodes();
             if (nodes.size() != lastNumberOfNodes) {
                 lastNumberOfNodes = nodes.size();
                 for (LocalNode node : nodes) {

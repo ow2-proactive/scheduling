@@ -48,8 +48,7 @@ public class RoundedLine extends Polyline {
     private static final int MAX_STROKE_WIDTH_PROPORTIONAL = 80;
     private float communicationCounter = 1;
     private static float maxCommunicationCounter = 1;
-    private static DrawingStyle drawingStyle = DEFAULT_STYLE;
-    ;
+    private static DrawingStyle drawingStyle = DEFAULT_STYLE;;
     private static boolean displayTopology = DEFAULT_DISPLAY_TOPOLOGY;
 
     //
@@ -108,18 +107,16 @@ public class RoundedLine extends Polyline {
 
     protected int drawingStyleSize() {
         switch (drawingStyle) {
-        case FIXED:
-            return 1;
-        case PROPORTIONAL:
-            if (maxCommunicationCounter > MAX_STROKE_WIDTH_PROPORTIONAL) {
-                return (int) (((MAX_STROKE_WIDTH_PROPORTIONAL / maxCommunicationCounter) * communicationCounter) +
-                1);
-            } else {
-                return (int) (communicationCounter + 1);
-            }
-        case RATIO:
-            return (int) (((MAX_STROKE_WIDTH_RATIO / maxCommunicationCounter) * communicationCounter) +
-            1);
+            case FIXED:
+                return 1;
+            case PROPORTIONAL:
+                if (maxCommunicationCounter > MAX_STROKE_WIDTH_PROPORTIONAL) {
+                    return (int) (((MAX_STROKE_WIDTH_PROPORTIONAL / maxCommunicationCounter) * communicationCounter) + 1);
+                } else {
+                    return (int) (communicationCounter + 1);
+                }
+            case RATIO:
+                return (int) (((MAX_STROKE_WIDTH_RATIO / maxCommunicationCounter) * communicationCounter) + 1);
         }
         return 1;
     }
@@ -157,19 +154,17 @@ public class RoundedLine extends Polyline {
         } else {
             if (xSource == xTarget) {
                 if (ySource > yTarget) {
-                    g.drawArc(xTarget - shapeY, yTarget, shapeY * 2,
-                        Math.abs(ySource - yTarget), 90, -180);
+                    g.drawArc(xTarget - shapeY, yTarget, shapeY * 2, Math.abs(ySource - yTarget), 90, -180);
                 } else {
-                    g.drawArc(xSource - shapeY, ySource, shapeY * 2,
-                        Math.abs(ySource - yTarget), 90, 180);
+                    g.drawArc(xSource - shapeY, ySource, shapeY * 2, Math.abs(ySource - yTarget), 90, 180);
                 }
             } else if (ySource == yTarget) {
                 if (xSource > xTarget) {
-                    g.drawArc(xTarget, yTarget - (shapeX / 4),
-                        Math.abs(xSource - xTarget), shapeX / 2, 0, 180);
+                    g.drawArc(xTarget, yTarget - (shapeX / 4), Math.abs(xSource - xTarget), shapeX / 2, 0,
+                            180);
                 } else {
-                    g.drawArc(xSource, ySource - (shapeX / 4),
-                        Math.abs(xSource - xTarget), shapeX / 2, 0, -180);
+                    g.drawArc(xSource, ySource - (shapeX / 4), Math.abs(xSource - xTarget), shapeX / 2, 0,
+                            -180);
                 }
             } else {
                 g.drawLine(source, target);
@@ -180,8 +175,7 @@ public class RoundedLine extends Polyline {
     /**
      * Represents the different types of drawing
      */
-    public enum DrawingStyle {PROPORTIONAL,
-        RATIO,
-        FIXED;
+    public enum DrawingStyle {
+        PROPORTIONAL, RATIO, FIXED;
     }
 }

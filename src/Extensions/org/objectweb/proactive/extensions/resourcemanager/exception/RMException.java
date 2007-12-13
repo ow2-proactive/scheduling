@@ -48,9 +48,9 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMConnection;
 public class RMException extends Exception {
 
     /**
-    * Attaches a message to the Exception
-    * @param message message attached
-    */
+     * Attaches a message to the Exception
+     * @param message message attached
+     */
     public RMException(String message) {
         super(message);
     }

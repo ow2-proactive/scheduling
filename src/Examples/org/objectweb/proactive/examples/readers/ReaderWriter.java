@@ -30,10 +30,9 @@
  */
 package org.objectweb.proactive.examples.readers;
 
-
 /*
-   ajouter un futur a la place de tout ca.
-   Dans l interface ajouter orange pour attente.
+ ajouter un futur a la place de tout ca.
+ Dans l interface ajouter orange pour attente.
  */
 import org.objectweb.proactive.ObjectForSynchronousCall;
 
@@ -68,8 +67,7 @@ public class ReaderWriter implements org.objectweb.proactive.RunActive {
      * @param policy  the id of the new policy
      */
     public void setPolicy(int policy) {
-        if ((policy == DEFAULT_POLICY) || (policy == WRITER_POLICY) ||
-                (policy == READER_POLICY)) {
+        if ((policy == DEFAULT_POLICY) || (policy == WRITER_POLICY) || (policy == READER_POLICY)) {
             this.policy = policy;
         }
     }
@@ -148,16 +146,16 @@ public class ReaderWriter implements org.objectweb.proactive.RunActive {
             // Allows policy changes
             service.serveOldest("setPolicy");
             switch (policy) {
-            case WRITER_POLICY:
-                writerPolicy(service);
-                break;
-            case READER_POLICY:
-                readerPolicy(service);
-                break;
-            case DEFAULT_POLICY: // Default policy
-            default: // We never know..
-                evenPolicy(service);
-                break;
+                case WRITER_POLICY:
+                    writerPolicy(service);
+                    break;
+                case READER_POLICY:
+                    readerPolicy(service);
+                    break;
+                case DEFAULT_POLICY: // Default policy
+                default: // We never know..
+                    evenPolicy(service);
+                    break;
             }
 
             // Allow endXX requests
@@ -185,8 +183,7 @@ public class ReaderWriter implements org.objectweb.proactive.RunActive {
             this.methodNameB = methodNameB;
         }
 
-        public boolean acceptRequest(
-            org.objectweb.proactive.core.body.request.Request request) {
+        public boolean acceptRequest(org.objectweb.proactive.core.body.request.Request request) {
             if (foundMethodB) {
                 return false;
             }

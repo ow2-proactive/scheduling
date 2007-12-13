@@ -59,8 +59,8 @@ public interface Master<T extends Task<R>, R extends Serializable> {
      */
     public enum OrderingMode {
         /**
-             * Results of tasks are received in the same order as tasks were submitted
-             */
+         * Results of tasks are received in the same order as tasks were submitted
+         */
         SubmitionOrder,
         /**
          * Results of tasks are received in the same order as tasks are completed (unspecified)
@@ -82,11 +82,11 @@ public interface Master<T extends Task<R>, R extends Serializable> {
     void addResources(URL descriptorURL);
 
     /**
-    * Adds the given descriptor to the master<br>
-    * Only the specified virtual node inside the given descriptor will be activated <br/>
-    * @param descriptorURL URL of a deployment descriptor
-    * @param virtualNodeName name of the virtual node to activate
-    */
+     * Adds the given descriptor to the master<br>
+     * Only the specified virtual node inside the given descriptor will be activated <br/>
+     * @param descriptorURL URL of a deployment descriptor
+     * @param virtualNodeName name of the virtual node to activate
+     */
     void addResources(URL descriptorURL, String virtualNodeName);
 
     /**

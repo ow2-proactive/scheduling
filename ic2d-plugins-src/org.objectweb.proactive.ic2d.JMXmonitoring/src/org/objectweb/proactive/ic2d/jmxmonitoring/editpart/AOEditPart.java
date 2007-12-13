@@ -57,8 +57,7 @@ public class AOEditPart extends AbstractMonitoringEditPart {
     /**
      * The default color of an arrow used in getArrowColor() method
      */
-    private static final Color DEFAULT_ARROW_COLOR = new Color(Display.getCurrent(),
-            108, 108, 116);
+    private static final Color DEFAULT_ARROW_COLOR = new Color(Display.getCurrent(), 108, 108, 116);
     private Integer length;
 
     /*private Set<IFigure> figuresToUpdate;
@@ -129,88 +128,88 @@ public class AOEditPart extends AbstractMonitoringEditPart {
 
             // State updated
             switch (mvcNotif) {
-            case STATE_CHANGED: {
-                final State state = (State) notificationdata;
-                if (state == State.NOT_MONITORED) {
-                    // System.out.println("Active Object not monitored : " +
-                    //     AOEditPart.this.castedModel.toString());
-                    // Invoke the removeConnections at the next reasonable opportunity 
-                    getViewer().getControl().getDisplay().syncExec(new Runnable() {
+                case STATE_CHANGED: {
+                    final State state = (State) notificationdata;
+                    if (state == State.NOT_MONITORED) {
+                        // System.out.println("Active Object not monitored : " +
+                        //     AOEditPart.this.castedModel.toString());
+                        // Invoke the removeConnections at the next reasonable opportunity 
+                        getViewer().getControl().getDisplay().syncExec(new Runnable() {
                             public final void run() {
-                                getCastedFigure()
-                                    .removeConnections(getGlobalPanel());
+                                getCastedFigure().removeConnections(getGlobalPanel());
                             }
                         });
-                    // If this clear is too brutal just filter on this (source||tagret) on clear
-                    getWorldEditPart().clearCommunicationsAndRepaintFigure();
-                } else {
-                    // COMMON REFRESH IE THE AO IS MONITORED JUST DO A REPAINT
-                    // Set the new state directly
-                    getCastedFigure().setState(state);
-                    // The state of this controller has changed repaint at the next 
-                    // reasonable opportunity
-                    getViewer().getControl().getDisplay().syncExec(new Runnable() {
+                        // If this clear is too brutal just filter on this (source||tagret) on clear
+                        getWorldEditPart().clearCommunicationsAndRepaintFigure();
+                    } else {
+                        // COMMON REFRESH IE THE AO IS MONITORED JUST DO A REPAINT
+                        // Set the new state directly
+                        getCastedFigure().setState(state);
+                        // The state of this controller has changed repaint at the next 
+                        // reasonable opportunity
+                        getViewer().getControl().getDisplay().syncExec(new Runnable() {
                             public final void run() {
                                 //getCastedFigure().refresh();
                                 getCastedFigure().repaint();
                             }
                         });
-                } //if else NOT_MONITORED
-                break;
-            } //  case CTATE_CHANGED
+                    } //if else NOT_MONITORED
+                    break;
+                } //  case CTATE_CHANGED
 
-            // Add communication
-            //else if (arg instanceof HashSet) {
-            case ACTIVE_OBJECT_RESET_COMMUNICATIONS: {
-                final AOFigure destination = getCastedFigure();
-                final IFigure panel = getGlobalPanel();
-                getViewer().getControl().getDisplay().syncExec(new Runnable() {
+                    // Add communication
+                    //else if (arg instanceof HashSet) {
+                case ACTIVE_OBJECT_RESET_COMMUNICATIONS: {
+                    final AOFigure destination = getCastedFigure();
+                    final IFigure panel = getGlobalPanel();
+                    getViewer().getControl().getDisplay().syncExec(new Runnable() {
                         public final void run() {
                             destination.removeConnections(panel);
                         }
                     });
-                getWorldEditPart().clearCommunications();
-                break;
-            } //case ACTIVE_OBJECT_RESET_COMMUNICATIONS
-            case ACTIVE_OBJECT_ADD_COMMUNICATION: {
-                //                final Set<ActiveObject> communications = (HashSet<ActiveObject>) notificationdata;
-                //                final AOFigure destination = getCastedFigure();
-                //                final IFigure panel = getGlobalPanel();
-                //                for (ActiveObject aoSource : communications) {
-                //                    AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
-                //                    if (editPart != null) {
-                //                        AOFigure source = (AOFigure) editPart.getFigure();
-                //                        if (source != null) {
-                //                            /*communicationsToDraw.add(*/ addGraphicalCommunication(new GraphicalCommunication(
-                //                                    source, destination, panel, getArrowColor()));
-                //                        } else {
-                //                            System.out.println(
-                //                                "[Error] Unable to find the source");
-                //                        }
-                //                    }
-                //                }
-                final ActiveObject aoSource = (ActiveObject) notificationdata;
-                final AOFigure destination = getCastedFigure();
-                final IFigure panel = getGlobalPanel();
-                final AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
-                if (editPart != null) {
-                    AOFigure source = (AOFigure) editPart.getFigure();
-                    if (source != null) {
-                        addGraphicalCommunication(new GraphicalCommunication(
-                                source, destination, panel, getArrowColor()));
-                    } else {
-                        System.out.println("[Error] Unable to find the source");
+                    getWorldEditPart().clearCommunications();
+                    break;
+                } //case ACTIVE_OBJECT_RESET_COMMUNICATIONS
+                case ACTIVE_OBJECT_ADD_COMMUNICATION: {
+                    //                final Set<ActiveObject> communications = (HashSet<ActiveObject>) notificationdata;
+                    //                final AOFigure destination = getCastedFigure();
+                    //                final IFigure panel = getGlobalPanel();
+                    //                for (ActiveObject aoSource : communications) {
+                    //                    AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry.get(aoSource);
+                    //                    if (editPart != null) {
+                    //                        AOFigure source = (AOFigure) editPart.getFigure();
+                    //                        if (source != null) {
+                    //                            /*communicationsToDraw.add(*/ addGraphicalCommunication(new GraphicalCommunication(
+                    //                                    source, destination, panel, getArrowColor()));
+                    //                        } else {
+                    //                            System.out.println(
+                    //                                "[Error] Unable to find the source");
+                    //                        }
+                    //                    }
+                    //                }
+                    final ActiveObject aoSource = (ActiveObject) notificationdata;
+                    final AOFigure destination = getCastedFigure();
+                    final IFigure panel = getGlobalPanel();
+                    final AbstractMonitoringEditPart editPart = AbstractMonitoringEditPart.registry
+                            .get(aoSource);
+                    if (editPart != null) {
+                        AOFigure source = (AOFigure) editPart.getFigure();
+                        if (source != null) {
+                            addGraphicalCommunication(new GraphicalCommunication(source, destination, panel,
+                                getArrowColor()));
+                        } else {
+                            System.out.println("[Error] Unable to find the source");
+                        }
                     }
-                }
-                break;
-            } // case ACTIVE_OBJECT_ADD_COMMUNICATION 
-            case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED: {
-                length = (Integer) notificationdata;
-                getCastedFigure().setRequestQueueLength(length);
-                break;
-            } //case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED:
-            default:
-                super.update(o, arg);
+                    break;
+                } // case ACTIVE_OBJECT_ADD_COMMUNICATION 
+                case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED: {
+                    length = (Integer) notificationdata;
+                    getCastedFigure().setRequestQueueLength(length);
+                    break;
+                } //case ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED:
+                default:
+                    super.update(o, arg);
             } //switch 
         } //if arg is Notification     
 
@@ -295,8 +294,8 @@ public class AOEditPart extends AbstractMonitoringEditPart {
      */
     protected IFigure createFigure() {
         AOFigure figure = new AOFigure(getCastedModel().getName() /*getFullName()*/);
-        AOListener listener = new AOListener(getCastedModel(), figure,
-                getMonitoringView(), getCastedParentFigure());
+        AOListener listener = new AOListener(getCastedModel(), figure, getMonitoringView(),
+            getCastedParentFigure());
         figure.addMouseListener(listener);
         figure.addMouseMotionListener(listener);
         return figure;
@@ -361,8 +360,7 @@ public class AOEditPart extends AbstractMonitoringEditPart {
 
     private NodeFigure getCastedParentFigure() {
         if (castedParentFigure == null) {
-            castedParentFigure = (NodeFigure) getCastedParentEditPart()
-                                                  .getFigure();
+            castedParentFigure = (NodeFigure) getCastedParentEditPart().getFigure();
         }
         return castedParentFigure;
     }

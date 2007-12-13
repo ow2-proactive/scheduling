@@ -164,8 +164,7 @@ public class FaultDetectorImpl implements FaultDetector {
                     //synchronized (FaultDetectorImpl.this.server){
                     List<UniversalBody> al = FaultDetectorImpl.this.server.getAllLocations();
                     Iterator<UniversalBody> it = al.iterator();
-                    logger.info("[FAULT DETECTOR] Scanning " + al.size() +
-                        " objects ...");
+                    logger.info("[FAULT DETECTOR] Scanning " + al.size() + " objects ...");
                     while (it.hasNext()) {
                         if (kill) {
                             break;

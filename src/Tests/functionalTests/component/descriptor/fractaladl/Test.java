@@ -66,8 +66,8 @@ import functionalTests.component.PrimitiveComponentB;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     public static String MESSAGE = "-->m";
     private List<Message> messages;
 
@@ -76,7 +76,7 @@ public class Test extends ComponentTest {
 
     public Test() {
         super("Virtual node exportation / composition in the Fractal ADL",
-            "Virtual node exportation / composition in the Fractal ADL");
+                "Virtual node exportation / composition in the Fractal ADL");
     }
 
     /* (non-Javadoc)
@@ -100,20 +100,16 @@ public class Test extends ComponentTest {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
         deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class.getResource(
-                    "/functionalTests/component/descriptor/deploymentDescriptor.xml")
-                                                                             .getPath());
+                "/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath());
         context.put("deployment-descriptor", deploymentDescriptor);
-        Component root = (Component) f.newComponent("functionalTests.component.descriptor.fractaladl.MessagePassingExample",
-                context);
+        Component root = (Component) f.newComponent(
+                "functionalTests.component.descriptor.fractaladl.MessagePassingExample", context);
         Fractal.getLifeCycleController(root).startFc();
-        Component[] subComponents = Fractal.getContentController(root)
-                                           .getFcSubComponents();
+        Component[] subComponents = Fractal.getContentController(root).getFcSubComponents();
         for (Component component : subComponents) {
-            if ("parallel".equals(Fractal.getNameController(component)
-                                             .getFcName())) {
+            if ("parallel".equals(Fractal.getNameController(component).getFcName())) {
                 // invoke method on composite
-                I1Multicast i1Multicast = (I1Multicast) component.getFcInterface(
-                        "i1");
+                I1Multicast i1Multicast = (I1Multicast) component.getFcInterface("i1");
                 //I1 i1= (I1)p1.getFcInterface("i1");
                 messages = i1Multicast.processInputMessage(new Message(MESSAGE));
 
@@ -135,13 +131,12 @@ public class Test extends ComponentTest {
         //            resulting_msg.toString());
         //        System.out.println("***" + resulting_msg.toString());
         // this --> primitiveC --> primitiveA --> primitiveB--> primitiveA --> primitiveC --> this  (message goes through parallel and composite components)
-        String single_message = Test.MESSAGE + PrimitiveComponentA.MESSAGE +
-            PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE +
-            Test.MESSAGE;
+        String single_message = Test.MESSAGE + PrimitiveComponentA.MESSAGE + PrimitiveComponentB.MESSAGE +
+            PrimitiveComponentA.MESSAGE + Test.MESSAGE;
 
         // there should be 4 messages with the current configuration
-        Assert.assertEquals(resulting_msg.toString(),
-            single_message + single_message + single_message + single_message);
+        Assert.assertEquals(resulting_msg.toString(), single_message + single_message + single_message +
+            single_message);
     }
 
     /* (non-Javadoc)

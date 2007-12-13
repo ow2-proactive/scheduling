@@ -59,8 +59,7 @@ public class BenchmarkStatistics implements Serializable {
     public BenchmarkStatistics() {
     }
 
-    public BenchmarkStatistics(HierarchicalTimerStatistics time,
-        EventStatistics events, String information) {
+    public BenchmarkStatistics(HierarchicalTimerStatistics time, EventStatistics events, String information) {
         this.time = time;
         this.events = events;
         // this.memory=memory;
@@ -87,13 +86,13 @@ public class BenchmarkStatistics implements Serializable {
         // res += information;
         // res += "\nAvailable processors by JVM : "+nbProc;
         // res += "\nTotal Memory by JVM: "+(memory/1024.0/1024.0)+"MB";
-        res += ("\nOS Version : " + System.getProperty("os.arch") + " " +
-        System.getProperty("os.name") + " " + System.getProperty("os.version"));
+        res += ("\nOS Version : " + System.getProperty("os.arch") + " " + System.getProperty("os.name") + " " + System
+                .getProperty("os.version"));
         res += ("\nJava Version : " + System.getProperty("java.version"));
         res += "\nProactive Version : ";
         try {
-            res += (String) ProActive.class.getMethod("getProActiveVersion",
-                new Class[0]).invoke(null, new Object[0]);
+            res += (String) ProActive.class.getMethod("getProActiveVersion", new Class[0]).invoke(null,
+                    new Object[0]);
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         } catch (IllegalArgumentException e) {
@@ -119,11 +118,9 @@ public class BenchmarkStatistics implements Serializable {
     @Override
     public String toString() {
         return "\n" +
-        (((this.time != null) && (this.time.toString().length() != 0))
-        ? ("Timers statistics\n" + "=================\n" +
-        this.time.toString() + "\n\n") : "") +
-        (((this.events != null) && (this.events.toString().length() != 0))
-        ? ("Events statistics\n" + "=================\n" +
-        this.events.toString() + "\n") : "");
+            (((this.time != null) && (this.time.toString().length() != 0)) ? ("Timers statistics\n" +
+                "=================\n" + this.time.toString() + "\n\n") : "") +
+            (((this.events != null) && (this.events.toString().length() != 0)) ? ("Events statistics\n" +
+                "=================\n" + this.events.toString() + "\n") : "");
     }
 }

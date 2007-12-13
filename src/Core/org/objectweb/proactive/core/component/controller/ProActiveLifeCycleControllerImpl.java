@@ -61,9 +61,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class ProActiveLifeCycleControllerImpl
-    extends AbstractProActiveController implements ProActiveLifeCycleController,
-        Serializable {
+public class ProActiveLifeCycleControllerImpl extends AbstractProActiveController implements
+        ProActiveLifeCycleController, Serializable {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     protected String fcState = LifeCycleController.STOPPED;
 
@@ -74,20 +73,17 @@ public class ProActiveLifeCycleControllerImpl
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(Constants.LIFECYCLE_CONTROLLER,
-                    ProActiveLifeCycleController.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY,
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
+                    ProActiveLifeCycleController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 
     /*
-    * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
-    */
+     * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
+     */
     public String getFcState() {
         return fcState;
         //        return getRequestQueue().isStarted() ? LifeCycleController.STARTED
@@ -103,62 +99,49 @@ public class ProActiveLifeCycleControllerImpl
         try {
             //check that all mandatory client interfaces are bound
             //            Object[] itfs = getFcItfOwner().getFcInterfaces();
-            InterfaceType[] itfTypes = ((ComponentType) getFcItfOwner()
-                                                            .getFcType()).getFcInterfaceTypes();
+            InterfaceType[] itfTypes = ((ComponentType) getFcItfOwner().getFcType()).getFcInterfaceTypes();
 
             for (int i = 0; i < itfTypes.length; i++) {
-                if (itfTypes[i].isFcClientItf() &&
-                        !itfTypes[i].isFcOptionalItf()) {
+                if (itfTypes[i].isFcClientItf() && !itfTypes[i].isFcOptionalItf()) {
                     if (itfTypes[i].isFcCollectionItf()) {
                         // look for collection members
                         Object[] itfs = owner.getFcInterfaces();
                         for (int j = 0; j < itfs.length; j++) {
                             Interface itf = (Interface) itfs[j];
-                            if (itf.getFcItfName()
-                                       .startsWith(itfTypes[i].getFcItfName())) {
-                                if (itf.getFcItfName()
-                                           .equals(itfTypes[i].getFcItfName())) {
+                            if (itf.getFcItfName().startsWith(itfTypes[i].getFcItfName())) {
+                                if (itf.getFcItfName().equals(itfTypes[i].getFcItfName())) {
                                     throw new IllegalLifeCycleException(
                                         "invalid collection interface name at runtime (suffix required)");
                                 }
-                                if (Fractal.getBindingController(owner)
-                                               .lookupFc(itf.getFcItfName()) == null) {
+                                if (Fractal.getBindingController(owner).lookupFc(itf.getFcItfName()) == null) {
                                     throw new IllegalLifeCycleException(
                                         "compulsory collection client interface " +
-                                        itfTypes[i].getFcItfName() +
-                                        " in component " +
-                                        Fractal.getNameController(
-                                            getFcItfOwner()).getFcName() +
-                                        " is not bound. ");
+                                            itfTypes[i].getFcItfName() + " in component " +
+                                            Fractal.getNameController(getFcItfOwner()).getFcName() +
+                                            " is not bound. ");
                                 }
                             }
                         }
                     } else if (((ProActiveInterfaceType) itfTypes[i]).isFcMulticastItf() &&
-                            !!itfTypes[i].isFcOptionalItf()) {
-                        ProxyForComponentInterfaceGroup clientSideProxy = Fractive.getMulticastController(getFcItfOwner())
-                                                                                  .lookupFcMulticast(itfTypes[i].getFcItfName());
+                        !!itfTypes[i].isFcOptionalItf()) {
+                        ProxyForComponentInterfaceGroup clientSideProxy = Fractive.getMulticastController(
+                                getFcItfOwner()).lookupFcMulticast(itfTypes[i].getFcItfName());
 
                         //                        if (clientSideProxy == null) {
                         //                        	System.out.println("client side proxy is null from " + ProActiveRuntimeImpl.getProActiveRuntime().getURL());
                         //                        }
                         if (clientSideProxy.getDelegatee().isEmpty()) {
-                            throw new IllegalLifeCycleException(
-                                "compulsory multicast client interface " +
+                            throw new IllegalLifeCycleException("compulsory multicast client interface " +
                                 itfTypes[i].getFcItfName() + " in component " +
-                                Fractal.getNameController(getFcItfOwner())
-                                       .getFcName() + " is not bound. ");
+                                Fractal.getNameController(getFcItfOwner()).getFcName() + " is not bound. ");
                         }
-                    } else if ((((ProActiveInterfaceType) itfTypes[i]).getFcCardinality()
-                                     .equals(ProActiveTypeFactory.SINGLETON_CARDINALITY) ||
-                            ((ProActiveInterfaceType) itfTypes[i]).getFcCardinality()
-                                 .equals(ProActiveTypeFactory.GATHER_CARDINALITY)) &&
-                            (Fractal.getBindingController(getFcItfOwner())
-                                        .lookupFc(itfTypes[i].getFcItfName()) == null)) {
-                        throw new IllegalLifeCycleException(
-                            "compulsory client interface " +
+                    } else if ((((ProActiveInterfaceType) itfTypes[i]).getFcCardinality().equals(
+                            ProActiveTypeFactory.SINGLETON_CARDINALITY) || ((ProActiveInterfaceType) itfTypes[i])
+                            .getFcCardinality().equals(ProActiveTypeFactory.GATHER_CARDINALITY)) &&
+                        (Fractal.getBindingController(getFcItfOwner()).lookupFc(itfTypes[i].getFcItfName()) == null)) {
+                        throw new IllegalLifeCycleException("compulsory client interface " +
                             itfTypes[i].getFcItfName() + " in component " +
-                            Fractal.getNameController(getFcItfOwner())
-                                   .getFcName() + " is not bound. ");
+                            Fractal.getNameController(getFcItfOwner()).getFcName() + " is not bound. ");
                     }
 
                     // TODO check compulsory client gathercast interface in composite
@@ -167,15 +150,15 @@ public class ProActiveLifeCycleControllerImpl
             }
 
             String hierarchical_type = Fractive.getComponentParametersController(getFcItfOwner())
-                                               .getComponentParameters()
-                                               .getHierarchicalType();
+                    .getComponentParameters().getHierarchicalType();
             if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // start all inner components
                 Component[] inner_components = Fractal.getContentController(getFcItfOwner())
-                                                      .getFcSubComponents();
+                        .getFcSubComponents();
                 if (inner_components != null) {
                     for (int i = 0; i < inner_components.length; i++) {
-                        ((LifeCycleController) inner_components[i].getFcInterface(Constants.LIFECYCLE_CONTROLLER)).startFc();
+                        ((LifeCycleController) inner_components[i]
+                                .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).startFc();
                     }
                 }
             }
@@ -184,9 +167,8 @@ public class ProActiveLifeCycleControllerImpl
             fcState = LifeCycleController.STARTED;
             if (logger.isDebugEnabled()) {
                 logger.debug("started " +
-                    ((ComponentParametersController) getFcItfOwner()
-                     .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                     .getName());
+                    ((ComponentParametersController) getFcItfOwner().getFcInterface(
+                            Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters().getName());
             }
         } catch (NoSuchInterfaceException nsie) {
             logger.error("interface not found : " + nsie.getMessage());
@@ -203,16 +185,17 @@ public class ProActiveLifeCycleControllerImpl
      */
     public void stopFc() {
         try {
-            String hierarchical_type = ((ComponentParametersController) getFcItfOwner()
-                                        .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                                        .getHierarchicalType();
+            String hierarchical_type = ((ComponentParametersController) getFcItfOwner().getFcInterface(
+                    Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
+                    .getHierarchicalType();
             if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // stop all inner components
-                Component[] inner_components = ((ContentController) getFcItfOwner()
-                                                                        .getFcInterface(Constants.CONTENT_CONTROLLER)).getFcSubComponents();
+                Component[] inner_components = ((ContentController) getFcItfOwner().getFcInterface(
+                        Constants.CONTENT_CONTROLLER)).getFcSubComponents();
                 if (inner_components != null) {
                     for (int i = 0; i < inner_components.length; i++) {
-                        ((LifeCycleController) inner_components[i].getFcInterface(Constants.LIFECYCLE_CONTROLLER)).stopFc();
+                        ((LifeCycleController) inner_components[i]
+                                .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).stopFc();
                     }
                 }
             }
@@ -221,9 +204,8 @@ public class ProActiveLifeCycleControllerImpl
             fcState = LifeCycleController.STOPPED;
             if (logger.isDebugEnabled()) {
                 logger.debug("stopped" +
-                    ((ComponentParametersController) getFcItfOwner()
-                     .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                     .getName());
+                    ((ComponentParametersController) getFcItfOwner().getFcInterface(
+                            Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters().getName());
             }
         } catch (NoSuchInterfaceException nsie) {
             logger.error("interface not found : " + nsie.getMessage());

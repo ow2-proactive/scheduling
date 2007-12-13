@@ -67,8 +67,7 @@ public class CommandLineChanger {
      */
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.err.println("Usage: java " +
-                CommandLineChanger.class.getName() + " <URL> <noa> ");
+            System.err.println("Usage: java " + CommandLineChanger.class.getName() + " <URL> <noa> ");
             System.exit(-1);
         }
         CommandLineChanger c = new CommandLineChanger();

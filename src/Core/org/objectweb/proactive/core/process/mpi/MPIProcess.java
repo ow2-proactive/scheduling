@@ -44,16 +44,14 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
  * @version 1.0,  2005/11/10
  * @since   ProActive 3.0
  */
-public abstract class MPIProcess extends AbstractExternalProcessDecorator
-    implements FileDependant {
+public abstract class MPIProcess extends AbstractExternalProcessDecorator implements FileDependant {
 
     /**
      * Firsts parameters
      */
     protected static final String DEFAULT_HOSTSFILENAME_PATH = ".machinefile";
     protected static final String DEFAULT_MPICOMMAND_PATH = "/usr/bin/mpirun";
-    protected static final String DEFAULT_FILE_LOCATION = System.getProperty(
-            "user.home");
+    protected static final String DEFAULT_FILE_LOCATION = System.getProperty("user.home");
     public final static String DEFAULT_SSH_COPYPROTOCOL = "scp";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected int jobID;
@@ -123,8 +121,7 @@ public abstract class MPIProcess extends AbstractExternalProcessDecorator
     public FileTransferDefinition getFileTransfertDefinition() {
         FileTransferDefinition ft = new FileTransferDefinition("mpiProcess");
         if (remotePath != null) {
-            ft.addFile(localPath + "/" + hostsFileName,
-                remotePath + "/" + hostsFileName);
+            ft.addFile(localPath + "/" + hostsFileName, remotePath + "/" + hostsFileName);
             //    System.out.println(localPath + "/" + hostsFileName + " --> " +
             //                        remotePath + "/" + hostsFileName);
         }

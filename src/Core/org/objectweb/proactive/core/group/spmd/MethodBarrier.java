@@ -93,8 +93,7 @@ public class MethodBarrier implements Serializable {
         boolean find = false;
         int i;
         for (i = 0; ((i < this.methodNames.length) && (!find)); i++) {
-            find = this.methodNames[i].equals(methodName) &&
-                !this.arrivedMethods[i];
+            find = this.methodNames[i].equals(methodName) && !this.arrivedMethods[i];
         }
         if (find) {
             return i - 1;

@@ -44,8 +44,8 @@ public class TransactionNotification extends Notification {
     private String message;
     private Date date;
 
-    public TransactionNotification(String type, Object source,
-        long sequenceNumber, String message, long id, Date date) {
+    public TransactionNotification(String type, Object source, long sequenceNumber, String message, long id,
+            Date date) {
         super(type, source, sequenceNumber);
         this.message = message;
         this.id = id;

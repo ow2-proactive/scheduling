@@ -89,12 +89,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     }
 
     protected void fillMenuBar(IMenuManager menuBar) {
-        MenuManager fileMenu = new MenuManager("&File",
-                IWorkbenchActionConstants.M_FILE);
-        MenuManager windowMenu = new MenuManager("&Window",
-                IWorkbenchActionConstants.M_WINDOW);
-        MenuManager helpMenu = new MenuManager("&Help",
-                IWorkbenchActionConstants.M_HELP);
+        MenuManager fileMenu = new MenuManager("&File", IWorkbenchActionConstants.M_FILE);
+        MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
+        MenuManager helpMenu = new MenuManager("&Help", IWorkbenchActionConstants.M_HELP);
 
         MenuManager perspectiveMenu = new MenuManager("Open Perspective");
         MenuManager viewMenu = new MenuManager("Show View");
@@ -136,7 +133,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         fileToolBar.add(saveAction);
 
         // Add to the cool bar manager
-        coolBar.add(new ToolBarContributionItem(fileToolBar,
-                IWorkbenchActionConstants.TOOLBAR_FILE));
+        coolBar.add(new ToolBarContributionItem(fileToolBar, IWorkbenchActionConstants.TOOLBAR_FILE));
     }
 }

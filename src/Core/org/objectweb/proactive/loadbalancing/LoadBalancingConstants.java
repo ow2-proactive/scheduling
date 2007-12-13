@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.loadbalancing;
 
-
 /**
  * @author Javier.Bustos@sophia.inria.fr
  *

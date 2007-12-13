@@ -77,8 +77,7 @@ public class OverviewOutlinePage extends Page implements IContentOutlinePage {
         // create thumbnail
         thumbnail = new ScrollableThumbnail((Viewport) rootEditPart.getFigure());
         thumbnail.setBorder(new MarginBorder(3));
-        thumbnail.setSource(rootEditPart.getLayer(
-                LayerConstants.PRINTABLE_LAYERS));
+        thumbnail.setSource(rootEditPart.getLayer(LayerConstants.PRINTABLE_LAYERS));
         lws.setContents(thumbnail);
     }
 
@@ -113,8 +112,7 @@ public class OverviewOutlinePage extends Page implements IContentOutlinePage {
         return StructuredSelection.EMPTY;
     }
 
-    public void removeSelectionChangedListener(
-        ISelectionChangedListener listener) {
+    public void removeSelectionChangedListener(ISelectionChangedListener listener) {
         // TODO Auto-generated method stub
     }
 

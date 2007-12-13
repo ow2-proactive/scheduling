@@ -67,33 +67,25 @@ public class ProActiveSchedulerEnvironment implements EnvironmentFactory {
     AOJobListener joblistener;
     FileServerClientImpl fserver;
 
-    public ProActiveSchedulerEnvironment(String host, String user,
-        String password)
-        throws NodeException, ActiveObjectCreationException, LoginException,
-            SchedulerException {
-        this(URI.create("//" + host + "/" +
-                SchedulerConnection.SCHEDULER_DEFAULT_NAME), user, password);
+    public ProActiveSchedulerEnvironment(String host, String user, String password) throws NodeException,
+            ActiveObjectCreationException, LoginException, SchedulerException {
+        this(URI.create("//" + host + "/" + SchedulerConnection.SCHEDULER_DEFAULT_NAME), user, password);
     }
 
-    public ProActiveSchedulerEnvironment(URI schedUri, String user,
-        String password)
-        throws NodeException, ActiveObjectCreationException, LoginException,
-            SchedulerException {
+    public ProActiveSchedulerEnvironment(URI schedUri, String user, String password) throws NodeException,
+            ActiveObjectCreationException, LoginException, SchedulerException {
         this(SchedulerConnection.join(schedUri.toString()), user, password);
     }
 
-    public ProActiveSchedulerEnvironment(
-        SchedulerAuthenticationInterface auth, String user, String password)
-        throws NodeException, ActiveObjectCreationException {
+    public ProActiveSchedulerEnvironment(SchedulerAuthenticationInterface auth, String user, String password)
+            throws NodeException, ActiveObjectCreationException {
         Node localnode = NodeFactory.getDefaultNode();
 
         this.fserver = Util.createFileServer(localnode);
         this.taskpool = Util.createActiveTaskPool(localnode);
 
-        this.joblistener = AOJobListener.createAOJobListener(localnode,
-                taskpool, auth, user, password);
-        this.dispatcher = new TaskDispatcher(taskpool, fserver, joblistener,
-                auth, user, password);
+        this.joblistener = AOJobListener.createAOJobListener(localnode, taskpool, auth, user, password);
+        this.dispatcher = new TaskDispatcher(taskpool, fserver, joblistener, auth, user, password);
     }
 
     /*
@@ -112,7 +104,7 @@ public class ProActiveSchedulerEnvironment implements EnvironmentFactory {
                     this.scheduler.addSchedulerEventListener(joblistener, SchedulerEvent.SHUTDOWN);                //SHUTDOWN("schedulerShutDownEvent"),
                     this.scheduler.addSchedulerEventListener(joblistener, SchedulerEvent.SHUTTING_DOWN);           //SHUTTING_DOWN("schedulerShuttingDownEvent"),
             }
-            */
+     */
 
     /**
      * File server is not supported on the current version of the ProActiveSchedulerEnvironment.

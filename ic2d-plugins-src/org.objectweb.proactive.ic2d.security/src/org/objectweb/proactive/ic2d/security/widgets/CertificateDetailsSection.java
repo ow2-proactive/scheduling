@@ -50,8 +50,7 @@ public class CertificateDetailsSection {
     private Text privateText;
 
     public CertificateDetailsSection(Composite parent, FormToolkit toolkit) {
-        this.section = toolkit.createSection(parent,
-                ExpandableComposite.TITLE_BAR);
+        this.section = toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
         this.section.setText("Certificate details");
 
         Composite client = toolkit.createComposite(this.section);
@@ -65,26 +64,22 @@ public class CertificateDetailsSection {
         toolkit.createLabel(client, "Subject DN :");
         this.subjectText = toolkit.createText(client, "");
         this.subjectText.setEditable(false);
-        this.subjectText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
-                false));
+        this.subjectText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         toolkit.createLabel(client, "Issuer DN :");
         this.issuerText = toolkit.createText(client, "");
         this.issuerText.setEditable(false);
-        this.issuerText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
-                false));
+        this.issuerText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         toolkit.createLabel(client, "Public Key :");
         this.publicText = toolkit.createText(client, "", SWT.MULTI | SWT.WRAP);
         this.publicText.setEditable(false);
-        this.publicText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-                true));
+        this.publicText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         toolkit.createLabel(client, "Private Key :");
         this.privateText = toolkit.createText(client, "", SWT.MULTI | SWT.WRAP);
         this.privateText.setEditable(false);
-        this.privateText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-                true));
+        this.privateText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         this.section.setClient(client);
     }

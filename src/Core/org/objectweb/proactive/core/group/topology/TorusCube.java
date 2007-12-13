@@ -54,7 +54,7 @@ public class TorusCube extends Torus { // implements Topology3D {
      * @throws ConstructionOfReifiedObjectFailedException
      */
     public TorusCube(Group g, int height, int width, int depth)
-        throws ConstructionOfReifiedObjectFailedException {
+            throws ConstructionOfReifiedObjectFailedException {
         super(g, height * width * depth);
         this.height = height;
         this.width = width;
@@ -219,8 +219,7 @@ public class TorusCube extends Torus { // implements Topology3D {
             e.printStackTrace();
         }
 
-        int begining = (posZ * (this.getHeight() * this.getWidth())) +
-            (posY * this.getWidth());
+        int begining = (posZ * (this.getHeight() * this.getWidth())) + (posY * this.getWidth());
         for (int i = begining; i < (begining + this.getWidth()); i++) {
             tmp.add(this.get(i));
         }
@@ -282,8 +281,7 @@ public class TorusCube extends Torus { // implements Topology3D {
 
         int begining = (posY * this.getWidth()) + posY;
         for (int i = 0; i < this.getDepth(); i++) {
-            tmp.add(this.get(begining +
-                    (i * (this.getWidth() * this.getHeight()))));
+            tmp.add(this.get(begining + (i * (this.getWidth() * this.getHeight()))));
         }
         Ring result = null;
         try {
@@ -311,7 +309,7 @@ public class TorusCube extends Torus { // implements Topology3D {
         for (int i = 0; i < this.getHeight(); i++) {
             for (int j = 0; j < this.getDepth(); j++) {
                 tmp.add(this.get((begining + (i * this.getWidth())) +
-                        (j * (this.getWidth() * this.getHeight()))));
+                    (j * (this.getWidth() * this.getHeight()))));
             }
         }
         Torus result = null;
@@ -340,7 +338,7 @@ public class TorusCube extends Torus { // implements Topology3D {
         for (int i = 0; i < this.getWidth(); i++) {
             for (int j = 0; j < this.getDepth(); j++) {
                 tmp.add(this.get((begining + (i * this.getWidth())) +
-                        (j * (this.getWidth() * this.getHeight()))));
+                    (j * (this.getWidth() * this.getHeight()))));
             }
         }
         Torus result = null;

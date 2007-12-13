@@ -39,8 +39,7 @@ import org.objectweb.fractal.api.Component;
  * @author Paul Naoumenko
  *
  */
-public class ProActiveNFContentControllerImpl
-    extends ProActiveContentControllerImpl {
+public class ProActiveNFContentControllerImpl extends ProActiveContentControllerImpl {
 
     /**
      * Constructor for ProActiveNFContentController.

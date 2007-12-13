@@ -44,8 +44,7 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
  * @author Paul Naoumenko
  *
  */
-@ClassDispatchMetadata(mode = @ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE)
-)
+@ClassDispatchMetadata(mode = @ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE))
 public interface PiCompMultiCast {
 
     /**

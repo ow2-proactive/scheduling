@@ -84,8 +84,8 @@ public class TesterImpl implements Tester, BindingController {
         result = clientItf.testRoundRobin_Method(listForRoundRobin);
         Assert.assertTrue(result.size() == (Test.NB_CONNECTED_ITFS + 1));
 
-        result = clientItf.testAllStdModes_Param(listParameter, listParameter,
-                listParameter, listParameter, new WrappedInteger(42));
+        result = clientItf.testAllStdModes_Param(listParameter, listParameter, listParameter, listParameter,
+                new WrappedInteger(42));
         Assert.assertTrue(result.size() == Test.NB_CONNECTED_ITFS);
 
         result = clientItf.testCustom_Param(listForRoundRobin);
@@ -107,48 +107,48 @@ public class TesterImpl implements Tester, BindingController {
         Assert.assertTrue(result.size() == Test.NB_CONNECTED_ITFS);
         for (int i = 0; i < Test.NB_CONNECTED_ITFS; i++) {
             Assert.assertTrue(result.contains(new WrappedInteger(i))); // do
-                                                                       // not
-                                                                       // know
-                                                                       // the
-                                                                       // ordering
-                                                                       // ...
-                                                                       // ?
+            // not
+            // know
+            // the
+            // ordering
+            // ...
+            // ?
         }
 
         result = multicastClientItf.testBroadcast_Method(listParameter);
         Assert.assertTrue(result.size() == Test.NB_CONNECTED_ITFS);
         for (int i = 0; i < Test.NB_CONNECTED_ITFS; i++) {
             Assert.assertTrue(result.contains(new WrappedInteger(i))); // do
-                                                                       // not
-                                                                       // know
-                                                                       // the
-                                                                       // ordering
-                                                                       // ...
-                                                                       // ?
+            // not
+            // know
+            // the
+            // ordering
+            // ...
+            // ?
         }
 
         result = multicastClientItf.testOneToOne_Param(listParameter);
         Assert.assertTrue(result.size() == Test.NB_CONNECTED_ITFS);
         for (int i = 0; i < Test.NB_CONNECTED_ITFS; i++) {
             Assert.assertTrue(result.contains(new WrappedInteger(i))); // do
-                                                                       // not
-                                                                       // know
-                                                                       // the
-                                                                       // ordering
-                                                                       // ...
-                                                                       // ?
+            // not
+            // know
+            // the
+            // ordering
+            // ...
+            // ?
         }
 
         result = multicastClientItf.testOneToOne_Method(listParameter);
         Assert.assertTrue(result.size() == Test.NB_CONNECTED_ITFS);
         for (int i = 0; i < Test.NB_CONNECTED_ITFS; i++) {
             Assert.assertTrue(result.get(i).equals(new WrappedInteger(i))); // do
-                                                                            // not
-                                                                            // know
-                                                                            // the
-                                                                            // ordering
-                                                                            // ...
-                                                                            // ?
+            // not
+            // know
+            // the
+            // ordering
+            // ...
+            // ?
         }
 
         List<WrappedInteger> listForRoundRobin = new ArrayList<WrappedInteger>();
@@ -161,9 +161,8 @@ public class TesterImpl implements Tester, BindingController {
         result = multicastClientItf.testRoundRobin_Method(listForRoundRobin);
         Assert.assertTrue(result.size() == (Test.NB_CONNECTED_ITFS + 1));
 
-        result = multicastClientItf.testAllStdModes_Param(listParameter,
-                listParameter, listParameter, listParameter,
-                new WrappedInteger(42));
+        result = multicastClientItf.testAllStdModes_Param(listParameter, listParameter, listParameter,
+                listParameter, new WrappedInteger(42));
         Assert.assertTrue(result.size() == Test.NB_CONNECTED_ITFS);
 
         result = multicastClientItf.testCustom_Param(listForRoundRobin);
@@ -179,9 +178,8 @@ public class TesterImpl implements Tester, BindingController {
      * @see org.objectweb.fractal.api.control.BindingController#bindFc(java.lang.String,
      *      java.lang.Object)
      */
-    public void bindFc(String clientItfName, Object serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException,
-            IllegalLifeCycleException {
+    public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
+            IllegalBindingException, IllegalLifeCycleException {
         if (clientItfName.equals("clientItf")) {
             clientItf = (MulticastTestItf) serverItf;
         } else if ("multicastClientItf".equals(clientItfName)) {
@@ -202,8 +200,7 @@ public class TesterImpl implements Tester, BindingController {
     /*
      * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
      */
-    public Object lookupFc(String clientItfName)
-        throws NoSuchInterfaceException {
+    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
         if ("clientItf".equals(clientItfName)) {
             return clientItf;
         }
@@ -216,8 +213,7 @@ public class TesterImpl implements Tester, BindingController {
     /*
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
-    public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         // TODO Auto-generated method stub
     }

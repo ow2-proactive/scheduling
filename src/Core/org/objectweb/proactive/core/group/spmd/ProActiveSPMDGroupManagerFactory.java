@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.group.spmd;
 
-
 /**
  * @author Laurent Baduel
  */

@@ -33,8 +33,7 @@ package org.objectweb.proactive.examples.masterworker.util;
 import java.io.Serializable;
 
 
-public class Pair<P extends Serializable, R extends Serializable>
-    implements Serializable {
+public class Pair<P extends Serializable, R extends Serializable> implements Serializable {
     private P first;
     private R second;
 

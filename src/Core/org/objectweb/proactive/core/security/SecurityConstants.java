@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.security;
 
-
 /**
  * @author ProActive Team
  * Defines usefull constants for security
@@ -42,14 +41,9 @@ public abstract class SecurityConstants {
     //    public static final String XML_TRUSTED_CERTIFICATION_AUTHORITY = "/Policy/TrustedCertificationAuthority/CertificationAuthority";
     //    public static final String XML_CERTIFICATION_AUTHORITY_CERTIFICATE = "Certificate";
     public static final int MAX_SESSION_VALIDATION_WAIT = 30;
-    public enum EntityType {UNKNOWN,
-        ENTITY,
-        OBJECT,
-        NODE,
-        RUNTIME,
-        APPLICATION,
-        USER,
-        DOMAIN;
+
+    public enum EntityType {
+        UNKNOWN, ENTITY, OBJECT, NODE, RUNTIME, APPLICATION, USER, DOMAIN;
         public static EntityType fromString(String string) {
             for (EntityType value : EntityType.values()) {
                 if (value.toString().equalsIgnoreCase(string)) {
@@ -61,18 +55,18 @@ public abstract class SecurityConstants {
 
         public EntityType getParentType() {
             switch (this) {
-            case ENTITY:
-            case OBJECT:
-            case NODE:
-            case RUNTIME:
-                return APPLICATION;
-            case APPLICATION:
-                return USER;
-            case USER:
-            case DOMAIN:
-                return DOMAIN;
-            default:
-                return UNKNOWN;
+                case ENTITY:
+                case OBJECT:
+                case NODE:
+                case RUNTIME:
+                    return APPLICATION;
+                case APPLICATION:
+                    return USER;
+                case USER:
+                case DOMAIN:
+                    return DOMAIN;
+                default:
+                    return UNKNOWN;
             }
         }
 
@@ -85,13 +79,11 @@ public abstract class SecurityConstants {
                 return true;
             }
 
-            if ((this == ENTITY) &&
-                    ((that == RUNTIME) || (that == NODE) || (that == OBJECT))) {
+            if ((this == ENTITY) && ((that == RUNTIME) || (that == NODE) || (that == OBJECT))) {
                 return true;
             }
 
-            if ((that == ENTITY) &&
-                    ((this == RUNTIME) || (this == NODE) || (this == OBJECT))) {
+            if ((that == ENTITY) && ((this == RUNTIME) || (this == NODE) || (this == OBJECT))) {
                 return true;
             }
 

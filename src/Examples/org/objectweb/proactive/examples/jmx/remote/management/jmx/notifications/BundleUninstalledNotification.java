@@ -38,15 +38,15 @@ import org.objectweb.proactive.examples.jmx.remote.management.mbean.BundleInfo;
 public class BundleUninstalledNotification extends BundleNotification {
 
     /**
-             *
-             */
+     *
+     */
     private ObjectName on;
     private String message;
     private String url;
     private BundleInfo bundleInfo;
 
-    public BundleUninstalledNotification(String type, Object source,
-        long sequenceNumber, String message, String url, ObjectName on) {
+    public BundleUninstalledNotification(String type, Object source, long sequenceNumber, String message,
+            String url, ObjectName on) {
         super(type, source, sequenceNumber);
         this.on = on;
         this.url = url;

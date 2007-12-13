@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.process.JVMProcessImpl;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test service: P2P JVM acquisition in deployment descriptor
  *
@@ -57,12 +58,10 @@ public class P2pXmlTest extends FunctionalTest {
     static {
         if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
             P2P_XML_LOCATION_UNIX = P2pXmlTest.class.getResource(
-                    "/functionalTests/descriptor/services/p2p/TestP2PIbis.xml")
-                                                    .getPath();
+                    "/functionalTests/descriptor/services/p2p/TestP2PIbis.xml").getPath();
         } else {
             P2P_XML_LOCATION_UNIX = P2pXmlTest.class.getResource(
-                    "/functionalTests/descriptor/services/p2p/TestP2P.xml")
-                                                    .getPath();
+                    "/functionalTests/descriptor/services/p2p/TestP2P.xml").getPath();
         }
     }
 
@@ -75,14 +74,12 @@ public class P2pXmlTest extends FunctionalTest {
     public void initTest() throws Exception {
         this.process1 = new JVMProcessImpl(new StandardOutputMessageLogger());
         this.process1.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
-        this.process1.setClassname(
-            "org.objectweb.proactive.p2p.service.StartP2PService");
+        this.process1.setClassname("org.objectweb.proactive.p2p.service.StartP2PService");
         this.process1.setParameters("-port 2900");
 
         this.process = new JVMProcessImpl(new StandardOutputMessageLogger());
         this.process.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
-        this.process.setClassname(
-            "org.objectweb.proactive.p2p.service.StartP2PService");
+        this.process.setClassname("org.objectweb.proactive.p2p.service.StartP2PService");
         this.process.setParameters("-port 3000 -s //localhost:2900/");
 
         this.process1.startProcess();

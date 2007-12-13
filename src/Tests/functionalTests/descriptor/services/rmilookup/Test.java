@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.node.Node;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test service:  JVM acquisition with RMI in deployment descriptor
  *
@@ -49,13 +50,12 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
 
     /**
-         *
-         */
+     *
+     */
     private static String ONEVM_XML_LOCATION_UNIX = Test.class.getResource(
             "/functionalTests/descriptor/services/rmilookup/OneVM.xml").getPath();
     private static String LOOK_XML_LOCATION_UNIX = Test.class.getResource(
-            "/functionalTests/descriptor/services/rmilookup/LookupRMI.xml")
-                                                             .getPath();
+            "/functionalTests/descriptor/services/rmilookup/LookupRMI.xml").getPath();
     Node node;
     ProActiveDescriptor pad;
     ProActiveDescriptor pad1;
@@ -70,8 +70,7 @@ public class Test extends FunctionalTest {
         VirtualNode vn = pad1.getVirtualNode("VnTest");
         node = vn.getNode();
 
-        assertTrue(node.getProActiveRuntime().getVMInformation().getName()
-                       .equals("PA_JVM1"));
+        assertTrue(node.getProActiveRuntime().getVMInformation().getName().equals("PA_JVM1"));
     }
 
     @After

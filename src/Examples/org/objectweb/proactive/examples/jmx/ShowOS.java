@@ -102,8 +102,7 @@ public class ShowOS {
 
     private void help(ObjectName name) throws Exception {
         System.out.println("List of attributes :");
-        MBeanAttributeInfo[] atts = this.connection.getMBeanInfo(name)
-                                                   .getAttributes();
+        MBeanAttributeInfo[] atts = this.connection.getMBeanInfo(name).getAttributes();
         for (int i = 0, size = atts.length; i < size; i++)
             System.out.println("> " + atts[i].getName());
         System.out.println("> help");

@@ -85,10 +85,9 @@ public class SchedulerProxy implements AdminSchedulerInterface {
      * @see org.objectweb.proactive.extensions.scheduler.userAPI.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extra.scheduler.userAPI.SchedulerEventListener)
      */
     public SchedulerInitialState<InternalJob> addSchedulerEventListener(
-        SchedulerEventListener<?extends Job> listener, SchedulerEvent... events) {
+            SchedulerEventListener<? extends Job> listener, SchedulerEvent... events) {
         try {
-            return (SchedulerInitialState<InternalJob>) scheduler.addSchedulerEventListener(listener,
-                events);
+            return (SchedulerInitialState<InternalJob>) scheduler.addSchedulerEventListener(listener, events);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
@@ -302,9 +301,8 @@ public class SchedulerProxy implements AdminSchedulerInterface {
         }
     }
 
-    public BooleanWrapper changePolicy(
-        Class<?extends PolicyInterface> newPolicyFile)
-        throws SchedulerException {
+    public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
+            throws SchedulerException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -358,8 +356,7 @@ public class SchedulerProxy implements AdminSchedulerInterface {
     public static SchedulerProxy getInstance() {
         if (instance == null) {
             try {
-                instance = (SchedulerProxy) PAActiveObject.newActive(SchedulerProxy.class.getName(),
-                        null);
+                instance = (SchedulerProxy) PAActiveObject.newActive(SchedulerProxy.class.getName(), null);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {

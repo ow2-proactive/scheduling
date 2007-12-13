@@ -43,8 +43,8 @@ import org.objectweb.proactive.core.body.reply.Reply;
 public class ReplyLog implements MessageLog {
 
     /**
-         *
-         */
+     *
+     */
 
     // Logged message and its destination
     private UniversalBody destination;

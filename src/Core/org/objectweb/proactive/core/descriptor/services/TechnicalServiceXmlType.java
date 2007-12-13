@@ -48,8 +48,8 @@ public class TechnicalServiceXmlType {
     }
 
     /**
-    * @return Returns the args.
-    */
+     * @return Returns the args.
+     */
     public Map getArgs() {
         return args;
     }

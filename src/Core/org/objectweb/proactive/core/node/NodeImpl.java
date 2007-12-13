@@ -79,8 +79,7 @@ public class NodeImpl implements Node, Serializable {
     public NodeImpl() {
     }
 
-    public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL,
-        String protocol, String jobID) {
+    public NodeImpl(ProActiveRuntime proActiveRuntime, String nodeURL, String protocol, String jobID) {
         this.proActiveRuntime = proActiveRuntime;
         this.nodeInformation = new NodeInformationImpl(nodeURL, protocol, jobID);
     }
@@ -105,14 +104,12 @@ public class NodeImpl implements Node, Serializable {
     /**
      * @see org.objectweb.proactive.core.node.Node#getActiveObjects()
      */
-    public Object[] getActiveObjects()
-        throws NodeException, ActiveObjectCreationException {
+    public Object[] getActiveObjects() throws NodeException, ActiveObjectCreationException {
         List<UniversalBody> bodyArray;
         try {
             bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
         } catch (ProActiveException e) {
-            throw new NodeException(
-                "Cannot get Active Objects registered on this node: " +
+            throw new NodeException("Cannot get Active Objects registered on this node: " +
                 this.nodeInformation.getURL(), e);
         }
         if (bodyArray.size() == 0) {
@@ -125,8 +122,8 @@ public class NodeImpl implements Node, Serializable {
                 try {
                     stubOnAO[i] = createStubObject(className, body);
                 } catch (MOPException e) {
-                    throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy",
-                        e);
+                    throw new ActiveObjectCreationException(
+                        "Exception occured when trying to create stub-proxy", e);
                 }
             }
             return stubOnAO;
@@ -141,8 +138,7 @@ public class NodeImpl implements Node, Serializable {
         try {
             bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
         } catch (ProActiveException e) {
-            throw new NodeException(
-                "Cannot get Active Objects registered on this node: " +
+            throw new NodeException("Cannot get Active Objects registered on this node: " +
                 this.nodeInformation.getURL(), e);
         }
         return bodyArray.size();
@@ -151,21 +147,17 @@ public class NodeImpl implements Node, Serializable {
     /**
      * @see org.objectweb.proactive.core.node.Node#getActiveObjects(String)
      */
-    public Object[] getActiveObjects(String className)
-        throws NodeException, ActiveObjectCreationException {
+    public Object[] getActiveObjects(String className) throws NodeException, ActiveObjectCreationException {
         List<UniversalBody> bodyArray;
         try {
-            bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName(),
-                    className);
+            bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName(), className);
         } catch (ProActiveException e) {
-            throw new NodeException("Cannot get Active Objects of type " +
-                className + " registered on this node: " +
-                this.nodeInformation.getURL(), e);
+            throw new NodeException("Cannot get Active Objects of type " + className +
+                " registered on this node: " + this.nodeInformation.getURL(), e);
         }
         if (bodyArray.size() == 0) {
             throw new NodeException("no ActiveObjects of type " + className +
-                " are registered for this node: " +
-                this.nodeInformation.getURL());
+                " are registered for this node: " + this.nodeInformation.getURL());
         } else {
             Object[] stubOnAO = new Object[bodyArray.size()];
             for (int i = 0; i < bodyArray.size(); i++) {
@@ -173,16 +165,16 @@ public class NodeImpl implements Node, Serializable {
                 try {
                     stubOnAO[i] = createStubObject(className, body);
                 } catch (MOPException e) {
-                    throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy",
-                        e);
+                    throw new ActiveObjectCreationException(
+                        "Exception occured when trying to create stub-proxy", e);
                 }
             }
             return stubOnAO;
         }
     }
 
-    private void readObject(ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException, ProActiveException {
+    private void readObject(ObjectInputStream in) throws java.io.IOException, ClassNotFoundException,
+            ProActiveException {
         in.defaultReadObject();
         if (NodeFactory.isNodeLocal(this)) {
             this.proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(nodeInformation.getProtocol());
@@ -194,21 +186,17 @@ public class NodeImpl implements Node, Serializable {
     // STUB CREATION
     //
     // -------------------------------------------------------------------------------------------
-    private static Object createStubObject(String className, UniversalBody body)
-        throws MOPException {
+    private static Object createStubObject(String className, UniversalBody body) throws MOPException {
         return createStubObject(className, null, new Object[] { body });
     }
 
-    private static Object createStubObject(String className,
-        Object[] constructorParameters, Object[] proxyParameters)
-        throws MOPException {
+    private static Object createStubObject(String className, Object[] constructorParameters,
+            Object[] proxyParameters) throws MOPException {
         try {
-            return MOP.newInstance(className, (Class[]) null,
-                constructorParameters, Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
-                proxyParameters);
+            return MOP.newInstance(className, (Class[]) null, constructorParameters,
+                    Constants.DEFAULT_BODY_PROXY_CLASS_NAME, proxyParameters);
         } catch (ClassNotFoundException e) {
-            throw new ConstructionOfProxyObjectFailedException(
-                "Class can't be found e=" + e);
+            throw new ConstructionOfProxyObjectFailedException("Class can't be found e=" + e);
         }
     }
 
@@ -297,8 +285,7 @@ public class NodeImpl implements Node, Serializable {
         try {
             bodyArray = this.proActiveRuntime.getActiveObjects(this.nodeInformation.getName());
         } catch (ProActiveException e) {
-            throw new NodeException(
-                "Cannot get Active Objects registered on this node: " +
+            throw new NodeException("Cannot get Active Objects registered on this node: " +
                 this.nodeInformation.getURL(), e);
         }
         for (int i = 0; i < bodyArray.size(); i++) {
@@ -308,13 +295,11 @@ public class NodeImpl implements Node, Serializable {
             } else {
                 try {
                     // reify for remote terminate
-                    PAActiveObject.terminateActiveObject(MOP.createStubObject(
-                            Object.class.getName(), body), true);
+                    PAActiveObject.terminateActiveObject(MOP.createStubObject(Object.class.getName(), body),
+                            true);
                 } catch (MOPException e) {
-                    throw new IOException(
-                        "Cannot contact Active Objects on this node: " +
-                        this.nodeInformation.getURL() + " caused by " +
-                        e.getMessage());
+                    throw new IOException("Cannot contact Active Objects on this node: " +
+                        this.nodeInformation.getURL() + " caused by " + e.getMessage());
                 }
             }
         }
@@ -323,18 +308,15 @@ public class NodeImpl implements Node, Serializable {
     /**
      * @see org.objectweb.proactive.core.node.Node#setProperty(java.lang.String, java.lang.String)
      */
-    public Object setProperty(String key, String value)
-        throws ProActiveException {
-        return this.proActiveRuntime.setLocalNodeProperty(this.nodeInformation.getName(),
-            key, value);
+    public Object setProperty(String key, String value) throws ProActiveException {
+        return this.proActiveRuntime.setLocalNodeProperty(this.nodeInformation.getName(), key, value);
     }
 
     /**
      * @see org.objectweb.proactive.core.node.Node#getProperty(java.lang.String)
      */
     public String getProperty(String key) throws ProActiveException {
-        return this.proActiveRuntime.getLocalNodeProperty(this.nodeInformation.getName(),
-            key);
+        return this.proActiveRuntime.getLocalNodeProperty(this.nodeInformation.getName(), key);
     }
 
     public VMInformation getVMInformation() {

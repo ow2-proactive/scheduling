@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.components.c3d;
 
-
 /**
  * Change some properties of the user of the rendering session.
  */

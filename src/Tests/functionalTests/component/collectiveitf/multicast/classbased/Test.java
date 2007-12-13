@@ -50,8 +50,8 @@ import functionalTests.component.collectiveitf.multicast.Tester;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     public static final String MESSAGE = "-Main-";
     public static final int NB_CONNECTED_ITFS = 2;
 
@@ -62,8 +62,8 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
-        Component testcase = (Component) f.newComponent("functionalTests.component.collectiveitf.multicast.classbased.testcase",
-                context);
+        Component testcase = (Component) f.newComponent(
+                "functionalTests.component.collectiveitf.multicast.classbased.testcase", context);
 
         Fractal.getLifeCycleController(testcase).startFc();
         ((Tester) testcase.getFcInterface("runTestItf")).testConnectedServerMulticastItf();

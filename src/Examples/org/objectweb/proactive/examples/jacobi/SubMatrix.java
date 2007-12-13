@@ -177,8 +177,7 @@ public class SubMatrix implements Serializable {
                 center = old[index];
                 west = old[index - 1];
                 east = old[index + 1];
-                current = (west + east + this.old[index - this.width] +
-                    this.old[index + this.width]) / 4;
+                current = (west + east + this.old[index - this.width] + this.old[index + this.width]) / 4;
                 this.current[index] = current;
                 diff = Math.abs(current - center);
                 if (diff < this.minDiff) {
@@ -202,8 +201,7 @@ public class SubMatrix implements Serializable {
 
         // north-west corner
         index = 0;
-        current = (this.northNeighborBorder[0] + this.old[index + this.width] +
-            this.westNeighborBorder[0] + this.old[index + 1]) / 4;
+        current = (this.northNeighborBorder[0] + this.old[index + this.width] + this.westNeighborBorder[0] + this.old[index + 1]) / 4;
         this.current[index] = current;
         diff = Math.abs(current - this.old[index]);
         if (diff < this.minDiff) {
@@ -212,9 +210,8 @@ public class SubMatrix implements Serializable {
 
         // north-east corner
         index = this.width - 1;
-        current = (this.northNeighborBorder[this.width - 1] +
-            this.old[index + this.width] + this.old[index - 1] +
-            this.eastNeighborBorder[0]) / 4;
+        current = (this.northNeighborBorder[this.width - 1] + this.old[index + this.width] +
+            this.old[index - 1] + this.eastNeighborBorder[0]) / 4;
         this.current[index] = current;
         diff = Math.abs(current - this.old[index]);
         if (diff < this.minDiff) {
@@ -223,9 +220,7 @@ public class SubMatrix implements Serializable {
 
         // north border
         for (index = 1; index < (this.width - 1); index++) {
-            current = (this.northNeighborBorder[index] +
-                this.old[this.width + index] + this.old[index - 1] +
-                this.old[index + 1]) / 4;
+            current = (this.northNeighborBorder[index] + this.old[this.width + index] + this.old[index - 1] + this.old[index + 1]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -246,9 +241,8 @@ public class SubMatrix implements Serializable {
         // west border
         index = this.width;
         for (int i = 1; i < (this.height - 1); i++) {
-            current = (this.old[index - this.width] +
-                this.old[index + this.width] + this.westNeighborBorder[i] +
-                this.old[index + 1]) / 4;
+            current = (this.old[index - this.width] + this.old[index + this.width] +
+                this.westNeighborBorder[i] + this.old[index + 1]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -259,9 +253,8 @@ public class SubMatrix implements Serializable {
 
         // south-east corner
         index = (this.width * this.height) - 1;
-        current = (this.old[index - this.width] +
-            this.southNeighborBorder[this.width - 1] + this.old[index - 1] +
-            this.eastNeighborBorder[this.height - 1]) / 4;
+        current = (this.old[index - this.width] + this.southNeighborBorder[this.width - 1] +
+            this.old[index - 1] + this.eastNeighborBorder[this.height - 1]) / 4;
         this.current[index] = current;
         diff = Math.abs(current - this.old[index]);
         if (diff < this.minDiff) {
@@ -271,9 +264,7 @@ public class SubMatrix implements Serializable {
         // south border
         index = (this.width * (this.height - 1)) + 1;
         for (int i = 1; i < (this.width - 1); i++) {
-            current = (this.old[index - this.width] +
-                this.southNeighborBorder[i] + this.old[index - 1] +
-                this.old[index + 1]) / 4;
+            current = (this.old[index - this.width] + this.southNeighborBorder[i] + this.old[index - 1] + this.old[index + 1]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -285,9 +276,7 @@ public class SubMatrix implements Serializable {
         // east border
         index = (this.width * 2) - 1;
         for (int i = 1; i < (this.height - 1); i++) {
-            current = (this.old[index - this.width] +
-                this.old[index + this.width] + this.old[index - 1] +
-                this.eastNeighborBorder[i]) / 4;
+            current = (this.old[index - this.width] + this.old[index + this.width] + this.old[index - 1] + this.eastNeighborBorder[i]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -316,8 +305,8 @@ public class SubMatrix implements Serializable {
         try {
             topology = new Plan(allSubMatrix, Jacobi.HEIGHT, Jacobi.WIDTH);
         } catch (ConstructionOfReifiedObjectFailedException e) {
-            logger.error(
-                "[JACOBI] ** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
+            logger
+                    .error("[JACOBI] ** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
             e.printStackTrace();
         }
 
@@ -330,12 +319,10 @@ public class SubMatrix implements Serializable {
         try {
             this.neighbors = (SubMatrix) PAGroup.newGroup(SubMatrix.class.getName());
         } catch (ClassNotReifiableException e) {
-            logger.error(
-                "[JACOBI] ** ClassNotReifiableException ** - Unable to build the neighbors group");
+            logger.error("[JACOBI] ** ClassNotReifiableException ** - Unable to build the neighbors group");
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            logger.error(
-                "[JACOBI] ** ClassNotFoundException ** - Unable to build the neighbors group");
+            logger.error("[JACOBI] ** ClassNotFoundException ** - Unable to build the neighbors group");
             e.printStackTrace();
         }
         Group neighborsGroup = PAGroup.getGroup(this.neighbors);
@@ -512,14 +499,12 @@ public class SubMatrix implements Serializable {
      * Launch the main loop
      */
     public void loop() {
-        logger.debug("[JACOBI] [" + this.name + "] Iteration : " +
-            iterationsToStop);
+        logger.debug("[JACOBI] [" + this.name + "] Iteration : " + iterationsToStop);
 
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        PASPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop,
-            this.neighbors);
+        PASPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop, this.neighbors);
         // compute the border values
         this.asyncRefToMe.borderCompute();
         // send the borders to neighbors
@@ -531,8 +516,7 @@ public class SubMatrix implements Serializable {
             this.asyncRefToMe.exchange();
             this.asyncRefToMe.loop();
         } else {
-            logger.info("[JACOBI] [" + this.name +
-                "] Computation over :\n      " + this.minDiff +
+            logger.info("[JACOBI] [" + this.name + "] Computation over :\n      " + this.minDiff +
                 " (asked less than " + Jacobi.MINDIFF + ")");
             this.matrix.stop();
         }
@@ -549,11 +533,9 @@ public class SubMatrix implements Serializable {
      */
     public void stop() {
         this.iterationsToStop = 0;
-        logger.debug("[JACOBI] [" + this.name +
-            "] Stop Message Received, waiting for others.");
+        logger.debug("[JACOBI] [" + this.name + "] Stop Message Received, waiting for others.");
         PASPMD.barrier("stop");
-        if ((north != null) && (east != null) && (west != null) &&
-                (south != null)) {
+        if ((north != null) && (east != null) && (west != null) && (south != null)) {
             PrintWriter pw = null;
             try {
                 pw = new PrintWriter(new FileOutputStream(resultFile), true);
@@ -563,16 +545,13 @@ public class SubMatrix implements Serializable {
                 for (int i = 0; i < height; i++) {
                     String line = "[";
                     for (int j = 0; j < (width - 1); j++) {
-                        line += (decimalFormat.format(current[(i * width) + j]) +
-                        " ");
+                        line += (decimalFormat.format(current[(i * width) + j]) + " ");
                     }
-                    line += decimalFormat.format(current[((i * width) + width) -
-                        1]);
+                    line += decimalFormat.format(current[((i * width) + width) - 1]);
                     line += "] ";
                     pw.println(line);
                 }
-                logger.info("CALCULATION COMPLETE, plese find results in: " +
-                    resultFile.getAbsolutePath());
+                logger.info("CALCULATION COMPLETE, plese find results in: " + resultFile.getAbsolutePath());
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

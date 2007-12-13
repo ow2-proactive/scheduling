@@ -45,8 +45,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 public class DivideDBCondition implements Condition<BlastParams> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public boolean evalCondition(SkeletonSystem system, BlastParams param)
-        throws IOException {
+    public boolean evalCondition(SkeletonSystem system, BlastParams param) throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("Evaluating DB divition condition");
         }

@@ -87,17 +87,15 @@ public class Launcher implements Startable {
             VirtualNode vnode = this.pad.getVirtualNode("Workers");
 
             Node[] nodes = vnode.getNodes();
-            System.out.println(nodes.length + " nodes found, " + np +
-                " wanted. ");
+            System.out.println(nodes.length + " nodes found, " + np + " wanted. ");
 
-            Object[] param = new Object[] {  };
+            Object[] param = new Object[] {};
             Object[][] params = new Object[np][];
             for (int i = 0; i < np; i++) {
                 params[i] = param;
             }
 
-            this.workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(),
-                    params, nodes);
+            this.workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(), params, nodes);
 
             // You must create a TimItManager instance and give to it
             // typed group of Timed workers

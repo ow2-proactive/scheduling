@@ -55,8 +55,7 @@ public class NF1NF2RequestFilter implements RequestFilter {
 
     public boolean acceptRequest(Request request) {
         if (nfRequestFilter.acceptRequest(request) ||
-                pc.getPriority(null, request.getMethodName(), null)
-                      .equals(RequestPriority.NF2)) {
+            pc.getPriority(null, request.getMethodName(), null).equals(RequestPriority.NF2)) {
             return true;
         }
         return false;

@@ -121,8 +121,7 @@ public interface VirtualNodeInternal extends VirtualNode, NotificationListener {
      * @param value the value of the information
      * @throws ProActiveException if the given information does not exist or has alredy been set
      */
-    public void setRuntimeInformations(String information, String value)
-        throws ProActiveException;
+    public void setRuntimeInformations(String information, String value) throws ProActiveException;
 
     /**
      * checks the cardinality of the virtual node (i.e. whether the node is mapped to several nodes or not)
@@ -138,8 +137,7 @@ public interface VirtualNodeInternal extends VirtualNode, NotificationListener {
      *
      * @return An array of FileWrapper (Futures) with the retrieved files.
      */
-    public List<RemoteFile> fileTransferRetrieve()
-        throws ProActiveException, IOException;
+    public List<RemoteFile> fileTransferRetrieve() throws ProActiveException, IOException;
 
     /**
      *

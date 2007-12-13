@@ -47,13 +47,9 @@ public class CertificatedRuleEntity extends RuleEntity {
      */
     protected final TypedCertificate certificate;
 
-    public CertificatedRuleEntity(EntityType type, KeyStore keystore,
-        String name)
-        throws KeyStoreException, UnrecoverableKeyException,
-            NoSuchAlgorithmException {
-        super(type,
-            KeyStoreTools.getLevel(keystore,
-                KeyStoreTools.getCertificate(keystore, type, name)));
+    public CertificatedRuleEntity(EntityType type, KeyStore keystore, String name) throws KeyStoreException,
+            UnrecoverableKeyException, NoSuchAlgorithmException {
+        super(type, KeyStoreTools.getLevel(keystore, KeyStoreTools.getCertificate(keystore, type, name)));
         this.certificate = KeyStoreTools.getCertificate(keystore, type, name);
     }
 
@@ -69,8 +65,7 @@ public class CertificatedRuleEntity extends RuleEntity {
 
     @Override
     public String toString() {
-        return super.toString() + "\n\tCertificate : " +
-        this.certificate.toString();
+        return super.toString() + "\n\tCertificate : " + this.certificate.toString();
     }
 
     @Override

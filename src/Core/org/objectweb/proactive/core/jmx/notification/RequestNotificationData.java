@@ -50,9 +50,8 @@ public class RequestNotificationData implements Serializable {
      * @param methodName The name of the method called
      * @param requestQueueLength The request queue length of the destination active object
      */
-    public RequestNotificationData(UniqueID source, String sourceNode,
-        UniqueID destination, String destinationNode, String methodName,
-        int requestQueueLength) {
+    public RequestNotificationData(UniqueID source, String sourceNode, UniqueID destination,
+            String destinationNode, String methodName, int requestQueueLength) {
         this.source = source;
         this.sourceNode = sourceNode;
         this.destination = destination;
@@ -111,8 +110,7 @@ public class RequestNotificationData implements Serializable {
 
     @Override
     public String toString() {
-        return "Request source: " + source + ", destination: " + destination +
-        ", methodName: " + methodName + ", destination request queue length: " +
-        requestQueueLength;
+        return "Request source: " + source + ", destination: " + destination + ", methodName: " + methodName +
+            ", destination request queue length: " + requestQueueLength;
     }
 }

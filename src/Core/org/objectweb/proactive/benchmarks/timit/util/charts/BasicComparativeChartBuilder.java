@@ -74,8 +74,7 @@ public class BasicComparativeChartBuilder {
      * @param chartTitle The title of the chart
      * @param subtitle The subtitle of the chart
      */
-    public BasicComparativeChartBuilder(File[] files, String chartTitle,
-        String subtitle) {
+    public BasicComparativeChartBuilder(File[] files, String chartTitle, String subtitle) {
         this.series = files;
         this.chartTitle = chartTitle;
         this.subtitle = subtitle;
@@ -126,16 +125,13 @@ public class BasicComparativeChartBuilder {
 
         // Iterate through  all series to get their values
         for (i = 0; i < this.series.length; i++) {
-            forChartName += (this.series[i].getName() +
-            (((i + 1) >= this.series.length) ? "" : "-"));
+            forChartName += (this.series[i].getName() + (((i + 1) >= this.series.length) ? "" : "-"));
         }
 
         final JFreeChart chart = createChart();
         try {
-            javax.imageio.ImageIO.write(chart.createBufferedImage(800, 600),
-                "png",
-                new java.io.File(outputFolder.getAbsoluteFile() +
-                    "/compareChart_" + forChartName + ".png"));
+            javax.imageio.ImageIO.write(chart.createBufferedImage(800, 600), "png", new java.io.File(
+                outputFolder.getAbsoluteFile() + "/compareChart_" + forChartName + ".png"));
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -162,17 +158,15 @@ public class BasicComparativeChartBuilder {
         Element root = d.getRootElement();
 
         if (root == null) {
-            throw new RuntimeException("No root element for xml file " +
-                file.getAbsolutePath());
+            throw new RuntimeException("No root element for xml file " + file.getAbsolutePath());
         }
 
         // Get values from XML tree (Element)
         List<Element> children = root.getChildren();
 
         if (children.size() == 0) {
-            throw new RuntimeException("Nothing to collect from " +
-                file.getAbsolutePath() + ". There is no children for " +
-                root.getName() + " element.");
+            throw new RuntimeException("Nothing to collect from " + file.getAbsolutePath() +
+                ". There is no children for " + root.getName() + " element.");
         }
 
         // Collect all available classNames
@@ -181,8 +175,8 @@ public class BasicComparativeChartBuilder {
             val = e.getAttributeValue(CLASSNAME_ATTRIBUTE_NAME);
             // If already known className
             if (this.classNamesList.contains(val)) {
-                throw new RuntimeException("Found a className repetition " +
-                    val + " in the file " + file.getAbsolutePath());
+                throw new RuntimeException("Found a className repetition " + val + " in the file " +
+                    file.getAbsolutePath());
             }
             this.classNamesList.add(val);
         }
@@ -201,8 +195,8 @@ public class BasicComparativeChartBuilder {
         Element ao = null;
         for (Element e : aos) {
             String val = "";
-            if ((val = e.getAttributeValue(CLASSNAME_ATTRIBUTE_NAME)).equals(
-                        className) || (val.indexOf(className) >= 0)) {
+            if ((val = e.getAttributeValue(CLASSNAME_ATTRIBUTE_NAME)).equals(className) ||
+                (val.indexOf(className) >= 0)) {
                 ao = e;
                 break;
             }
@@ -210,14 +204,12 @@ public class BasicComparativeChartBuilder {
 
         // If not found return
         if (ao == null) {
-            throw new RuntimeException("The following classname : " +
-                className + " was not found in the file " +
-                file.getAbsolutePath());
+            throw new RuntimeException("The following classname : " + className +
+                " was not found in the file " + file.getAbsolutePath());
         }
 
         String[] splittedClassname = className.split("\\.");
-        String classNameWithoutPackage = splittedClassname[splittedClassname.length -
-            1];
+        String classNameWithoutPackage = splittedClassname[splittedClassname.length - 1];
 
         // Search for asked ao
 
@@ -229,10 +221,8 @@ public class BasicComparativeChartBuilder {
             Object o = it.next();
             if (o instanceof Element) {
                 Element current = (Element) o;
-                String name = current.getAttributeValue("name") + "_" +
-                    classNameWithoutPackage;
-                double timeInMillis = Double.parseDouble(current.getAttributeValue(
-                            TIME_ATTRIBUTE_NAME));
+                String name = current.getAttributeValue("name") + "_" + classNameWithoutPackage;
+                double timeInMillis = Double.parseDouble(current.getAttributeValue(TIME_ATTRIBUTE_NAME));
                 // Add information to the datasets
                 this.dataset.addValue(timeInMillis, file.getName(), name);
             }
@@ -263,17 +253,15 @@ public class BasicComparativeChartBuilder {
                 PlotOrientation.VERTICAL, true, // include legend
                 true, // tooltips
                 false // urls
-            );
+                );
 
         // NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
         chart.setBackgroundPaint(Color.white);
-        chart.addSubtitle(new TextTitle(this.subtitle + "Time used is : " +
-                TIME_ATTRIBUTE_NAME));
+        chart.addSubtitle(new TextTitle(this.subtitle + "Time used is : " + TIME_ATTRIBUTE_NAME));
 
         // get a reference to the plot for further customisation...
         final CategoryPlot plot = chart.getCategoryPlot();
-        plot.getDomainAxis()
-            .setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+        plot.getDomainAxis().setCategoryLabelPositions(CategoryLabelPositions.UP_45);
         plot.setBackgroundPaint(Color.WHITE);
         plot.setDomainGridlinePaint(Color.BLACK);
         plot.setRangeGridlinePaint(Color.black);

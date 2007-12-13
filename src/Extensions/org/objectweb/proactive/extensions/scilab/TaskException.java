@@ -37,8 +37,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class TaskException extends Exception {
 
     /**
-         *
-         */
+     *
+     */
     public TaskException() {
         super();
     }

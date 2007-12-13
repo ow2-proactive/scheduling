@@ -145,8 +145,7 @@ public abstract class Task implements Serializable, Comparable {
     public void setBestKnownSolution(Object newBestKnownResult) {
         if (this.bestKnownSolution != null) {
             synchronized (this.bestKnownSolution) {
-                if (((Comparable) this.bestKnownSolution).compareTo(
-                            newBestKnownResult) > 0) {
+                if (((Comparable) this.bestKnownSolution).compareTo(newBestKnownResult) > 0) {
                     this.bestKnownSolution = newBestKnownResult;
                 }
             }

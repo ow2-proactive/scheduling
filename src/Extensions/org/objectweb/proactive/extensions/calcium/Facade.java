@@ -66,8 +66,7 @@ class Facade {
         this.counter = 0;
     }
 
-    synchronized void putTask(Task<?> task, CalFutureImpl<?> future)
-        throws PanicException {
+    synchronized void putTask(Task<?> task, CalFutureImpl<?> future) throws PanicException {
         task.taskId.setFamilyId(counter * (-1));
         counter++;
         taskpool.addReadyRootTask(task);
@@ -112,8 +111,7 @@ class Facade {
 
         private synchronized void updateFuture(Task<?> task) {
             if (!pending.containsKey(task.taskId)) {
-                logger.error("No future is waiting for task:" +
-                    task.taskId.value());
+                logger.error("No future is waiting for task:" + task.taskId.value());
                 return;
             }
 

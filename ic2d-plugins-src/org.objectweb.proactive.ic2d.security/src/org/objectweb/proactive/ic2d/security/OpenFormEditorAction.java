@@ -42,8 +42,7 @@ import org.eclipse.ui.PartInitException;
 /**
  * @see IWorkbenchWindowActionDelegate
  */
-public abstract class OpenFormEditorAction
-    implements IWorkbenchWindowActionDelegate {
+public abstract class OpenFormEditorAction implements IWorkbenchWindowActionDelegate {
     private IWorkbenchWindow window;
 
     /*

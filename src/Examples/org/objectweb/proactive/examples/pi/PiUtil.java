@@ -54,15 +54,14 @@ public class PiUtil {
      * @throws ClassNotReifiableException
      * @throws ClassNotFoundException
      */
-    static public Interval dividePI(int length, int scale)
-        throws ClassNotReifiableException, ClassNotFoundException {
+    static public Interval dividePI(int length, int scale) throws ClassNotReifiableException,
+            ClassNotFoundException {
         int intervalSize = scale / length;
         Interval intervals = (Interval) PAGroup.newGroup(Interval.class.getName());
         Group intervals_group = PAGroup.getGroup(intervals);
         for (int i = 0; i < length; i++) {
             int beginning = i * intervalSize;
-            int end = ((i == (length - 1)) ? scale
-                                           : ((beginning + intervalSize) - 1));
+            int end = ((i == (length - 1)) ? scale : ((beginning + intervalSize) - 1));
             intervals_group.add(new Interval(beginning, end));
         }
         return intervals;
@@ -96,16 +95,15 @@ public class PiUtil {
      * @throws ClassNotReifiableException
      * @throws ClassNotFoundException
      */
-    static public List<Interval> dividePIList(int length, int scale)
-        throws ClassNotReifiableException, ClassNotFoundException {
+    static public List<Interval> dividePIList(int length, int scale) throws ClassNotReifiableException,
+            ClassNotFoundException {
         int intervalSize = scale / length;
 
         List<Interval> intervals = new ArrayList<Interval>();
 
         for (int i = 0; i < length; i++) {
             int beginning = i * intervalSize;
-            int end = ((i == (length - 1)) ? scale
-                                           : ((beginning + intervalSize) - 1));
+            int end = ((i == (length - 1)) ? scale : ((beginning + intervalSize) - 1));
             intervals.add(new Interval(beginning, end));
         }
         return intervals;

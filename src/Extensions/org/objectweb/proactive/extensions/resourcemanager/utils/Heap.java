@@ -41,17 +41,16 @@ import java.util.Comparator;
  *
  * @param <E> a {@link Comparable} class
  */
-public class Heap<E extends Comparable<?super E>> {
+public class Heap<E extends Comparable<? super E>> {
     private Object[] nodes_; // the tree nodes, packed into an array
     private int count_ = 0; // number of used slots
-    private final Comparator<?super E> cmp_; // for ordering
+    private final Comparator<? super E> cmp_; // for ordering
 
     /**
      * Create a Heap with the given initial capacity and comparator
      * @exception IllegalArgumentException if capacity less or equal to zero
      **/
-    public Heap(int capacity, Comparator<?super E> cmp)
-        throws IllegalArgumentException {
+    public Heap(int capacity, Comparator<? super E> cmp) throws IllegalArgumentException {
         if (capacity <= 0) {
             throw new IllegalArgumentException();
         }
@@ -142,8 +141,7 @@ public class Heap<E extends Comparable<?super E>> {
                 break;
             } else {
                 int r = right(k);
-                int child = ((r >= count_) ||
-                    (compare((E) nodes_[l], (E) nodes_[r]) < 0)) ? l : r;
+                int child = ((r >= count_) || (compare((E) nodes_[l], (E) nodes_[r]) < 0)) ? l : r;
 
                 if (compare((E) x, (E) nodes_[child]) > 0) {
                     nodes_[k] = nodes_[child];
@@ -203,7 +201,7 @@ public class Heap<E extends Comparable<?super E>> {
             }
 
             if (++column == itemsPerRow) // end of row?
-             {
+            {
                 nBlanks /= 2;
                 itemsPerRow *= 2;
                 column = 0;
@@ -243,7 +241,7 @@ public class Heap<E extends Comparable<?super E>> {
         return true;
     }
 
-    public boolean addAll(Collection<?extends E> c) {
+    public boolean addAll(Collection<? extends E> c) {
         for (E e : c)
             insert(e);
 

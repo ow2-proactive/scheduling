@@ -38,6 +38,7 @@ import functionalTests.activeobject.creation.A;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test turnActive method on a remote node
  */

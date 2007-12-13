@@ -261,13 +261,10 @@ public class UniverseDescription implements Serializable {
         int size = this.planets.size();
 
         if (size > numberOfPlanets) {
-            logger.info("Too many planets (" + size + "), removing " +
-                (size - numberOfPlanets));
-            this.planets = new Vector(new ArrayList(this.planets).subList(0,
-                        numberOfPlanets));
+            logger.info("Too many planets (" + size + "), removing " + (size - numberOfPlanets));
+            this.planets = new Vector(new ArrayList(this.planets).subList(0, numberOfPlanets));
         } else if (size < numberOfPlanets) {
-            logger.info("Not enough planets (" + size + "), adding " +
-                (numberOfPlanets - size));
+            logger.info("Not enough planets (" + size + "), adding " + (numberOfPlanets - size));
             for (int i = size; i < numberOfPlanets; i++)
                 this.planets.add(new PlanetDescription(this));
         }
@@ -283,8 +280,7 @@ public class UniverseDescription implements Serializable {
         try {
             setNumberOfPlanets(Integer.parseInt(numberOfPlanets));
         } catch (NumberFormatException e) {
-            logger.warn(numberOfPlanets +
-                "is not a correct number of planets value");
+            logger.warn(numberOfPlanets + "is not a correct number of planets value");
         }
     }
 }

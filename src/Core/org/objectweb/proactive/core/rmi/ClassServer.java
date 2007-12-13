@@ -75,8 +75,7 @@ public class ClassServer implements Runnable {
 
     protected ClassServer(int port_) throws java.io.IOException {
         if (port_ == 0) {
-            port = boundServerSocket(Integer.parseInt(
-                        PAProperties.PA_XMLHTTP_PORT.getValue()), MAX_RETRY);
+            port = boundServerSocket(Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue()), MAX_RETRY);
             //            Thread.dumpStack();
         } else {
             port = port_;
@@ -123,8 +122,7 @@ public class ClassServer implements Runnable {
         java.net.Socket socket = null;
 
         try {
-            socket = new java.net.Socket(ProActiveInet.getInstance()
-                                                      .getInetAddress(), port);
+            socket = new java.net.Socket(ProActiveInet.getInstance().getInetAddress(), port);
 
             // if we can connect to the port it means the server already exists
             return true;
@@ -142,17 +140,14 @@ public class ClassServer implements Runnable {
 
     private void printMessage() {
         if (logger.isDebugEnabled()) {
-            logger.info(
-                "To use this ClassFileServer set the property java.rmi.server.codebase to http://" +
+            logger.info("To use this ClassFileServer set the property java.rmi.server.codebase to http://" +
                 hostname + ":" + port + "/");
         }
 
         if (this.paths == null) {
-            logger.info(" --> This ClassFileServer is listening on port " +
-                port);
+            logger.info(" --> This ClassFileServer is listening on port " + port);
         } else {
-            logger.info(
-                " --> This ClassFileServer is reading resources from the following paths");
+            logger.info(" --> This ClassFileServer is reading resources from the following paths");
 
             //for (int i = 0; i < codebases.length; i++) {
             logger.info(paths);
@@ -176,9 +171,9 @@ public class ClassServer implements Runnable {
         if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
             return ClassServerServlet.getURI().toString();
         } else {
-            return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
-                    ProActiveInet.getInstance().getInetAddress()), "",
-                Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port).toString();
+            return URIBuilder.buildURI(
+                    URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress()), "",
+                    Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port).toString();
         }
     }
 
@@ -196,8 +191,7 @@ public class ClassServer implements Runnable {
             try {
                 socket = server.accept();
 
-                HTTPRequestHandler service = (new HTTPRequestHandler(socket,
-                        paths));
+                HTTPRequestHandler service = (new HTTPRequestHandler(socket, paths));
                 service.start();
             } catch (java.io.IOException e) {
                 System.out.println("Class Server died: " + e.getMessage());
@@ -217,8 +211,7 @@ public class ClassServer implements Runnable {
         t.start();
     }
 
-    private int boundServerSocket(int basePortNumber, int numberOfTry)
-        throws java.io.IOException {
+    private int boundServerSocket(int basePortNumber, int numberOfTry) throws java.io.IOException {
         for (int i = 0; i < numberOfTry; i++) {
             try {
                 server = new java.net.ServerSocket(basePortNumber);
@@ -228,8 +221,7 @@ public class ClassServer implements Runnable {
             }
         }
 
-        throw new java.io.IOException(
-            "ClassServer cannot create a ServerSocket after " + numberOfTry +
+        throw new java.io.IOException("ClassServer cannot create a ServerSocket after " + numberOfTry +
             " attempts !!!");
     }
 }

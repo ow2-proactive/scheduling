@@ -60,7 +60,7 @@ public class GetJobResult {
 
             if (args.length > 0) {
                 auth = SchedulerConnection.join("//" + args[0] + "/" +
-                        SchedulerConnection.SCHEDULER_DEFAULT_NAME);
+                    SchedulerConnection.SCHEDULER_DEFAULT_NAME);
             } else {
                 auth = SchedulerConnection.join(null);
             }
@@ -72,8 +72,7 @@ public class GetJobResult {
             // Wrap the reader with a buffered reader.
             BufferedReader buf = new BufferedReader(reader);
             String jID;
-            System.out.print(
-                "\nPlease enter the job id to get its result or 'exit' to exit :  ");
+            System.out.print("\nPlease enter the job id to get its result or 'exit' to exit :  ");
 
             while (!(jID = buf.readLine()).equals("exit")) {
                 int begin = 0;
@@ -90,38 +89,30 @@ public class GetJobResult {
 
                 for (int i = begin; i <= end; i++) {
                     try {
-                        JobResult result = scheduler.getJobResult(JobId.makeJobId(i +
-                                    ""));
+                        JobResult result = scheduler.getJobResult(JobId.makeJobId(i + ""));
 
                         if (result != null) {
                             System.out.println("Job " + i + " Result => ");
 
-                            for (Entry<String, TaskResult> e : result.getAllResults()
-                                                                     .entrySet()) {
+                            for (Entry<String, TaskResult> e : result.getAllResults().entrySet()) {
                                 TaskResult tRes = e.getValue();
 
                                 try {
-                                    System.out.println("\t " + e.getKey() +
-                                        " : " + tRes.value());
+                                    System.out.println("\t " + e.getKey() + " : " + tRes.value());
                                 } catch (Throwable e1) {
-                                    System.out.println(
-                                        "\t ERROR during execution of " +
-                                        e.getKey() + "... ");
+                                    System.out.println("\t ERROR during execution of " + e.getKey() + "... ");
                                     tRes.getException().printStackTrace();
                                 }
                             }
                         } else {
-                            System.out.println("Job " + i +
-                                " is not finished or unknown !");
+                            System.out.println("Job " + i + " is not finished or unknown !");
                         }
                     } catch (SchedulerException e) {
-                        System.out.println("Error job " + i + " : " +
-                            e.getMessage());
+                        System.out.println("Error job " + i + " : " + e.getMessage());
                     }
                 }
 
-                System.out.print(
-                    "\nPlease enter the job id to get its result or 'exit' to exit :  ");
+                System.out.print("\nPlease enter the job id to get its result or 'exit' to exit :  ");
             }
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());

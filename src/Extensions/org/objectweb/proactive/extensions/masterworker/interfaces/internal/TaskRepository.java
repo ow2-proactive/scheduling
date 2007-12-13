@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Task;
  * @author fviale
  *
  */
-public interface TaskRepository<T extends Task<?extends Serializable>> {
+public interface TaskRepository<T extends Task<? extends Serializable>> {
 
     /**
      * Adds a new task to the repository
@@ -58,7 +58,7 @@ public interface TaskRepository<T extends Task<?extends Serializable>> {
      * @param id id of the task
      * @return the task which has this id
      */
-    TaskIntern<?extends Serializable> getTask(long id);
+    TaskIntern<? extends Serializable> getTask(long id);
 
     /**
      * Removes the task from the database, i.e. the task won't be used anymore by the system <br/>

@@ -94,8 +94,8 @@ public class PAActiveObject {
 
     static {
         ProActiveConfiguration.load();
-        @SuppressWarnings("unused") // Execute RuntimeFactory's static blocks
-
+        @SuppressWarnings("unused")
+        // Execute RuntimeFactory's static blocks
         Class<?> c = org.objectweb.proactive.core.runtime.RuntimeFactory.class;
     }
 
@@ -113,11 +113,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
      */
-    public static Object newActive(String classname,
-        Object[] constructorParameters)
-        throws ActiveObjectCreationException, NodeException {
-        return newActive(classname, null, constructorParameters, (Node) null,
-            null, null);
+    public static Object newActive(String classname, Object[] constructorParameters)
+            throws ActiveObjectCreationException, NodeException {
+        return newActive(classname, null, constructorParameters, (Node) null, null, null);
     }
 
     /**
@@ -130,15 +128,12 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node URL cannot be resolved as an existing Node
      */
-    public static Object newActive(String classname,
-        Object[] constructorParameters, String nodeURL)
-        throws ActiveObjectCreationException, NodeException {
+    public static Object newActive(String classname, Object[] constructorParameters, String nodeURL)
+            throws ActiveObjectCreationException, NodeException {
         if (nodeURL == null) {
-            return newActive(classname, null, constructorParameters,
-                (Node) null, null, null);
+            return newActive(classname, null, constructorParameters, (Node) null, null, null);
         } else {
-            return newActive(classname, null, constructorParameters,
-                NodeFactory.getNode(nodeURL), null, null);
+            return newActive(classname, null, constructorParameters, NodeFactory.getNode(nodeURL), null, null);
         }
     }
 
@@ -152,11 +147,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newActive(String classname,
-        Object[] constructorParameters, Node node)
-        throws ActiveObjectCreationException, NodeException {
-        return newActive(classname, null, constructorParameters, node, null,
-            null);
+    public static Object newActive(String classname, Object[] constructorParameters, Node node)
+            throws ActiveObjectCreationException, NodeException {
+        return newActive(classname, null, constructorParameters, node, null, null);
     }
 
     /**
@@ -168,13 +161,11 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
      */
-    public static Object newActive(String classname,
-        Class<?>[] genericParameters, Object[] constructorParameters)
-        throws ActiveObjectCreationException, NodeException {
+    public static Object newActive(String classname, Class<?>[] genericParameters,
+            Object[] constructorParameters) throws ActiveObjectCreationException, NodeException {
         // avoid ambiguity for method parameters types
         Node nullNode = null;
-        return newActive(classname, genericParameters, constructorParameters,
-            nullNode, null, null);
+        return newActive(classname, genericParameters, constructorParameters, nullNode, null, null);
     }
 
     /**
@@ -188,17 +179,16 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node URL cannot be resolved as an existing Node
      */
-    public static Object newActive(String classname,
-        Class<?>[] genericParameters, Object[] constructorParameters,
-        String nodeURL) throws ActiveObjectCreationException, NodeException {
+    public static Object newActive(String classname, Class<?>[] genericParameters,
+            Object[] constructorParameters, String nodeURL) throws ActiveObjectCreationException,
+            NodeException {
         if (nodeURL == null) {
             // avoid ambiguity for method parameters types
             Node nullNode = null;
-            return newActive(classname, genericParameters,
-                constructorParameters, nullNode, null, null);
+            return newActive(classname, genericParameters, constructorParameters, nullNode, null, null);
         } else {
-            return newActive(classname, genericParameters,
-                constructorParameters, NodeFactory.getNode(nodeURL), null, null);
+            return newActive(classname, genericParameters, constructorParameters, NodeFactory
+                    .getNode(nodeURL), null, null);
         }
     }
 
@@ -213,11 +203,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newActive(String classname,
-        Class<?>[] genericParameters, Object[] constructorParameters, Node node)
-        throws ActiveObjectCreationException, NodeException {
-        return newActive(classname, genericParameters, constructorParameters,
-            node, null, null);
+    public static Object newActive(String classname, Class<?>[] genericParameters,
+            Object[] constructorParameters, Node node) throws ActiveObjectCreationException, NodeException {
+        return newActive(classname, genericParameters, constructorParameters, node, null, null);
     }
 
     /**
@@ -244,14 +232,14 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newActive(String classname,
-        Class<?>[] genericParameters, Object[] constructorParameters,
-        Node node, Active activity, MetaObjectFactory factory)
-        throws ActiveObjectCreationException, NodeException {
+    public static Object newActive(String classname, Class<?>[] genericParameters,
+            Object[] constructorParameters, Node node, Active activity, MetaObjectFactory factory)
+            throws ActiveObjectCreationException, NodeException {
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
             if (factory.getProActiveSecurityManager() == null) {
-                factory.setProActiveSecurityManager(((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager());
+                factory.setProActiveSecurityManager(((AbstractBody) PAActiveObject.getBodyOnThis())
+                        .getProActiveSecurityManager());
             }
         }
 
@@ -271,8 +259,7 @@ public class PAActiveObject {
 
                     //                    // The timit reductor will be passed to the factory
                     //                    // and used when a body is created
-                    clonedFactory.setTimItReductor(TimItBasicManager.getInstance()
-                                                                    .createReductor());
+                    clonedFactory.setTimItReductor(TimItBasicManager.getInstance().createReductor());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -299,8 +286,8 @@ public class PAActiveObject {
 
         try {
             //          create stub object
-            Object stub = MOP.createStubObject(classname, genericParameters,
-                    constructorParameters, node, activity, clonedFactory);
+            Object stub = MOP.createStubObject(classname, genericParameters, constructorParameters, node,
+                    activity, clonedFactory);
 
             return stub;
         } catch (MOPException e) {
@@ -331,9 +318,8 @@ public class PAActiveObject {
      * created active objects.
      * @throws ClassNotFoundException in the case of className is not a class.
      */
-    public static Object[] newActiveInParallel(String className,
-        Object[][] constructorParameters, Node[] nodes)
-        throws ClassNotFoundException {
+    public static Object[] newActiveInParallel(String className, Object[][] constructorParameters,
+            Node[] nodes) throws ClassNotFoundException {
         return newActiveInParallel(className, null, constructorParameters, nodes);
     }
 
@@ -356,11 +342,9 @@ public class PAActiveObject {
      * activated and throws an exception.
      * @throws ClassNotFoundException in the case of className is not a class.
      */
-    public static Object[] newActiveInParallel(String className,
-        Object[] constructorParameters, VirtualNode virtualNode)
-        throws NodeException, ClassNotFoundException {
-        return newActiveInParallel(className, null, constructorParameters,
-            virtualNode);
+    public static Object[] newActiveInParallel(String className, Object[] constructorParameters,
+            VirtualNode virtualNode) throws NodeException, ClassNotFoundException {
+        return newActiveInParallel(className, null, constructorParameters, virtualNode);
     }
 
     /**
@@ -381,13 +365,11 @@ public class PAActiveObject {
      * created active objects.
      * @throws ClassNotFoundException in the case of className is not a class.
      */
-    public static Object[] newActiveInParallel(String className,
-        Class<?>[] genericParameters, Object[][] constructorParameters,
-        Node[] nodes) throws ClassNotFoundException {
+    public static Object[] newActiveInParallel(String className, Class<?>[] genericParameters,
+            Object[][] constructorParameters, Node[] nodes) throws ClassNotFoundException {
         if (constructorParameters.length != nodes.length) {
-            throw new ProActiveRuntimeException(
-                "The total of constructors must" +
-                " be equal to the total of nodes");
+            throw new ProActiveRuntimeException("The total of constructors must"
+                + " be equal to the total of nodes");
         }
 
         ExecutorService threadPool = Executors.newCachedThreadPool();
@@ -397,23 +379,21 @@ public class PAActiveObject {
         // TODO execute tasks
         // The Virtual Node is already activate
         for (int i = 0; i < constructorParameters.length; i++) {
-            threadPool.execute(new ProcessForAoCreation(result, className,
-                    genericParameters, constructorParameters[i],
-                    nodes[i % nodes.length]));
+            threadPool.execute(new ProcessForAoCreation(result, className, genericParameters,
+                constructorParameters[i], nodes[i % nodes.length]));
         }
 
         threadPool.shutdown();
         try {
             threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
-                TimeUnit.SECONDS);
+                    TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 
         Class<?> classForResult = Class.forName(className);
-        return result.toArray((Object[]) Array.newInstance(classForResult,
-                result.size()));
+        return result.toArray((Object[]) Array.newInstance(classForResult, result.size()));
     }
 
     /**
@@ -432,9 +412,9 @@ public class PAActiveObject {
      * activated and throws an exception.
      * @throws ClassNotFoundException in the case of className is not a class.
      */
-    public static Object[] newActiveInParallel(String className,
-        Class<?>[] genericParameters, Object[] constructorParameters,
-        VirtualNode virtualNode) throws NodeException, ClassNotFoundException {
+    public static Object[] newActiveInParallel(String className, Class<?>[] genericParameters,
+            Object[] constructorParameters, VirtualNode virtualNode) throws NodeException,
+            ClassNotFoundException {
         // Creation of the thread pool
         ExecutorService threadPool = Executors.newCachedThreadPool();
 
@@ -443,29 +423,28 @@ public class PAActiveObject {
             // The Virtual Node is already activate
             Node[] nodes = virtualNode.getNodes();
             for (int i = 0; i < nodes.length; i++) {
-                threadPool.execute(new ProcessForAoCreation(result, className,
-                        genericParameters, constructorParameters, nodes[i]));
+                threadPool.execute(new ProcessForAoCreation(result, className, genericParameters,
+                    constructorParameters, nodes[i]));
             }
         } else {
             // Use the node creation event mechanism
-            ((NodeCreationEventProducerImpl) virtualNode).addNodeCreationEventListener(new NodeCreationListenerForAoCreation(
-                    result, className, genericParameters,
-                    constructorParameters, threadPool));
+            ((NodeCreationEventProducerImpl) virtualNode)
+                    .addNodeCreationEventListener(new NodeCreationListenerForAoCreation(result, className,
+                        genericParameters, constructorParameters, threadPool));
             virtualNode.activate();
             ((VirtualNodeImpl) virtualNode).waitForAllNodesCreation();
         }
         threadPool.shutdown();
         try {
             threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
-                TimeUnit.SECONDS);
+                    TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
         }
 
         Class<?> classForResult = Class.forName(className);
-        return result.toArray((Object[]) Array.newInstance(classForResult,
-                result.size()));
+        return result.toArray((Object[]) Array.newInstance(classForResult, result.size()));
     }
 
     /**
@@ -476,8 +455,7 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target)
-        throws ActiveObjectCreationException, NodeException {
+    public static Object turnActive(Object target) throws ActiveObjectCreationException, NodeException {
         return turnActive(target, (Class<?>[]) null, (Node) null);
     }
 
@@ -492,14 +470,13 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, String nodeURL)
-        throws ActiveObjectCreationException, NodeException {
+    public static Object turnActive(Object target, String nodeURL) throws ActiveObjectCreationException,
+            NodeException {
         if (nodeURL == null) {
-            return turnActive(target, null, target.getClass().getName(), null,
-                null, null);
+            return turnActive(target, null, target.getClass().getName(), null, null, null);
         } else {
-            return turnActive(target, null, target.getClass().getName(),
-                NodeFactory.getNode(nodeURL), null, null);
+            return turnActive(target, null, target.getClass().getName(), NodeFactory.getNode(nodeURL), null,
+                    null);
         }
     }
 
@@ -514,10 +491,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Node node)
-        throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, null, target.getClass().getName(), node,
-            null, null);
+    public static Object turnActive(Object target, Node node) throws ActiveObjectCreationException,
+            NodeException {
+        return turnActive(target, null, target.getClass().getName(), node, null, null);
     }
 
     /**
@@ -535,11 +511,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, Node node, Active activity,
-        MetaObjectFactory factory)
-        throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, null, target.getClass().getName(), node,
-            activity, factory);
+    public static Object turnActive(Object target, Node node, Active activity, MetaObjectFactory factory)
+            throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, null, target.getClass().getName(), node, activity, factory);
     }
 
     /**
@@ -555,8 +529,8 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, String nameOfTargetType,
-        Node node) throws ActiveObjectCreationException, NodeException {
+    public static Object turnActive(Object target, String nameOfTargetType, Node node)
+            throws ActiveObjectCreationException, NodeException {
         return turnActive(target, null, nameOfTargetType, node, null, null);
     }
 
@@ -581,11 +555,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, String nameOfTargetType,
-        Node node, Active activity, MetaObjectFactory factory)
-        throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, null, nameOfTargetType, node, activity,
-            factory);
+    public static Object turnActive(Object target, String nameOfTargetType, Node node, Active activity,
+            MetaObjectFactory factory) throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, null, nameOfTargetType, node, activity, factory);
     }
 
     /**
@@ -610,14 +582,14 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target, String nameOfTargetType,
-        Class<?>[] genericParameters, Node node, Active activity,
-        MetaObjectFactory factory)
-        throws ActiveObjectCreationException, NodeException {
+    public static Object turnActive(Object target, String nameOfTargetType, Class<?>[] genericParameters,
+            Node node, Active activity, MetaObjectFactory factory) throws ActiveObjectCreationException,
+            NodeException {
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
             if (factory.getProActiveSecurityManager() == null) {
-                factory.setProActiveSecurityManager(((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager());
+                factory.setProActiveSecurityManager(((AbstractBody) PAActiveObject.getBodyOnThis())
+                        .getProActiveSecurityManager());
             }
         }
 
@@ -633,11 +605,9 @@ public class PAActiveObject {
             }
 
             clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
-                                                             .generateSiblingCertificate(EntityType.OBJECT,
-                    nameOfTargetType));
+                    .generateSiblingCertificate(EntityType.OBJECT, nameOfTargetType));
 
-            ProActiveLogger.getLogger(Loggers.SECURITY)
-                           .debug("new active object with security manager");
+            ProActiveLogger.getLogger(Loggers.SECURITY).debug("new active object with security manager");
         }
 
         if (node == null) {
@@ -646,8 +616,8 @@ public class PAActiveObject {
         }
 
         try {
-            return MOP.createStubObject(target, nameOfTargetType,
-                genericParameters, node, activity, clonedFactory);
+            return MOP.createStubObject(target, nameOfTargetType, genericParameters, node, activity,
+                    clonedFactory);
         } catch (MOPException e) {
             Throwable t = e;
 
@@ -669,9 +639,8 @@ public class PAActiveObject {
      * @exception NodeException if the DefaultNode cannot be created
      */
     public static Object turnActive(Object target, Class<?>[] genericParameters)
-        throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, genericParameters, (Node) null,
-            (Active) null, (MetaObjectFactory) null);
+            throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, genericParameters, (Node) null, (Active) null, (MetaObjectFactory) null);
     }
 
     /**
@@ -686,16 +655,13 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target,
-        Class<?>[] genericParameters, String nodeURL)
-        throws ActiveObjectCreationException, NodeException {
+    public static Object turnActive(Object target, Class<?>[] genericParameters, String nodeURL)
+            throws ActiveObjectCreationException, NodeException {
         if (nodeURL == null) {
-            return turnActive(target, genericParameters,
-                target.getClass().getName(), null, null, null);
+            return turnActive(target, genericParameters, target.getClass().getName(), null, null, null);
         } else {
-            return turnActive(target, genericParameters,
-                target.getClass().getName(), NodeFactory.getNode(nodeURL),
-                null, null);
+            return turnActive(target, genericParameters, target.getClass().getName(), NodeFactory
+                    .getNode(nodeURL), null, null);
         }
     }
 
@@ -711,11 +677,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target,
-        Class<?>[] genericParameters, Node node)
-        throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, genericParameters,
-            target.getClass().getName(), node, null, null);
+    public static Object turnActive(Object target, Class<?>[] genericParameters, Node node)
+            throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, genericParameters, target.getClass().getName(), node, null, null);
     }
 
     /**
@@ -734,12 +698,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target,
-        Class<?>[] genericParameters, Node node, Active activity,
-        MetaObjectFactory factory)
-        throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, genericParameters,
-            target.getClass().getName(), node, activity, factory);
+    public static Object turnActive(Object target, Class<?>[] genericParameters, Node node, Active activity,
+            MetaObjectFactory factory) throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, genericParameters, target.getClass().getName(), node, activity, factory);
     }
 
     /**
@@ -756,11 +717,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target,
-        Class<?>[] genericParameters, String nameOfTargetType, Node node)
-        throws ActiveObjectCreationException, NodeException {
-        return turnActive(target, genericParameters, nameOfTargetType, node,
-            null, null);
+    public static Object turnActive(Object target, Class<?>[] genericParameters, String nameOfTargetType,
+            Node node) throws ActiveObjectCreationException, NodeException {
+        return turnActive(target, genericParameters, nameOfTargetType, node, null, null);
     }
 
     /**
@@ -785,10 +744,9 @@ public class PAActiveObject {
      * @exception ActiveObjectCreationException if a problem occur while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object turnActive(Object target,
-        Class<?>[] genericParameters, String nameOfTargetType, Node node,
-        Active activity, MetaObjectFactory factory)
-        throws ActiveObjectCreationException, NodeException {
+    public static Object turnActive(Object target, Class<?>[] genericParameters, String nameOfTargetType,
+            Node node, Active activity, MetaObjectFactory factory) throws ActiveObjectCreationException,
+            NodeException {
         if (factory == null) {
             factory = ProActiveMetaObjectFactory.newInstance();
         }
@@ -805,10 +763,8 @@ public class PAActiveObject {
             }
 
             clonedFactory.setProActiveSecurityManager(factory.getProActiveSecurityManager()
-                                                             .generateSiblingCertificate(EntityType.OBJECT,
-                    nameOfTargetType));
-            ProActiveLogger.getLogger(Loggers.SECURITY)
-                           .debug("new active object with security manager");
+                    .generateSiblingCertificate(EntityType.OBJECT, nameOfTargetType));
+            ProActiveLogger.getLogger(Loggers.SECURITY).debug("new active object with security manager");
         }
 
         if (node == null) {
@@ -817,8 +773,8 @@ public class PAActiveObject {
         }
 
         try {
-            return MOP.createStubObject(target, nameOfTargetType,
-                genericParameters, node, activity, clonedFactory);
+            return MOP.createStubObject(target, nameOfTargetType, genericParameters, node, activity,
+                    clonedFactory);
         } catch (MOPException e) {
             Throwable t = e;
 
@@ -843,8 +799,7 @@ public class PAActiveObject {
      * using lookupActive method. Protocol and port can be removed if default
      * @exception java.io.IOException if the remote body cannot be registered
      */
-    public static void register(Object obj, String url)
-        throws java.io.IOException {
+    public static void register(Object obj, String url) throws java.io.IOException {
         UniversalBody body = AbstractBody.getRemoteBody(obj);
 
         try {
@@ -907,15 +862,13 @@ public class PAActiveObject {
             } catch (BodyTerminatedException e) {
                 // the terminated body is already terminated
                 if (PAActiveObject.logger.isDebugEnabled()) {
-                    PAActiveObject.logger.debug(
-                        "Terminating already terminated body : " + e);
+                    PAActiveObject.logger.debug("Terminating already terminated body : " + e);
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
             }
         } else {
-            throw new ProActiveRuntimeException("The given object " + ao +
-                " is not a reified object");
+            throw new ProActiveRuntimeException("The given object " + ao + " is not a reified object");
         }
     }
 
@@ -950,8 +903,7 @@ public class PAActiveObject {
         } catch (IOException e) {
             if (PAActiveObject.logger.isDebugEnabled()) {
                 // id should be cached locally
-                PAActiveObject.logger.debug("Active object " +
-                    targetedBody.getID() + " is unreachable.", e);
+                PAActiveObject.logger.debug("Active object " + targetedBody.getID() + " is unreachable.", e);
             }
             return false;
         }
@@ -980,10 +932,8 @@ public class PAActiveObject {
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
      */
-    public static void setImmediateService(String methodName,
-        Class<?>[] parametersTypes) {
-        PAActiveObject.getBodyOnThis()
-                      .setImmediateService(methodName, parametersTypes);
+    public static void setImmediateService(String methodName, Class<?>[] parametersTypes) {
+        PAActiveObject.getBodyOnThis().setImmediateService(methodName, parametersTypes);
     }
 
     /**
@@ -1001,10 +951,8 @@ public class PAActiveObject {
      * @param methodName the name of the method
      * @param parametersTypes the types of the parameters of the method
      */
-    public static void removeImmediateService(String methodName,
-        Class<?>[] parametersTypes) {
-        PAActiveObject.getBodyOnThis()
-                      .removeImmediateService(methodName, parametersTypes);
+    public static void removeImmediateService(String methodName, Class<?>[] parametersTypes) {
+        PAActiveObject.getBodyOnThis().removeImmediateService(methodName, parametersTypes);
     }
 
     /**
@@ -1017,8 +965,7 @@ public class PAActiveObject {
         return body.getNodeURL();
     }
 
-    public static Node getActiveObjectNode(Object activeObject)
-        throws NodeException {
+    public static Node getActiveObjectNode(Object activeObject) throws NodeException {
         Node node = NodeFactory.getNode(getActiveObjectNodeUrl(activeObject));
         return node;
     }
@@ -1111,8 +1058,8 @@ public class PAActiveObject {
      *      or if the object found is not of type RmiRemoteBody
      * @exception ActiveObjectCreationException if the stub-proxy couple cannot be created
      */
-    public static Object lookupActive(String classname, String url)
-        throws ActiveObjectCreationException, java.io.IOException {
+    public static Object lookupActive(String classname, String url) throws ActiveObjectCreationException,
+            java.io.IOException {
         RemoteObject rmo;
         URI uri = RemoteObjectHelper.expandURI(URI.create(url));
 
@@ -1133,8 +1080,7 @@ public class PAActiveObject {
                 t = e.getTargetException();
             }
 
-            throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy",
-                t);
+            throw new ActiveObjectCreationException("Exception occured when trying to create stub-proxy", t);
         }
 
         return null;
@@ -1182,12 +1128,10 @@ public class PAActiveObject {
     // -------------------------------------------------------------------------------------------
     private static StubObject getStubForBody(Body body) {
         try {
-            return MOP.createStubObject(body.getReifiedObject(),
-                new Object[] { body },
-                body.getReifiedObject().getClass().getName(), null);
+            return MOP.createStubObject(body.getReifiedObject(), new Object[] { body }, body
+                    .getReifiedObject().getClass().getName(), null);
         } catch (MOPException e) {
-            throw new ProActiveRuntimeException(
-                "Cannot create Stub for this Body e=" + e);
+            throw new ProActiveRuntimeException("Cannot create Stub for this Body e=" + e);
         }
     }
 }

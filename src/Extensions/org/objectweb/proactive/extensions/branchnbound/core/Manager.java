@@ -70,10 +70,10 @@ public class Manager implements Serializable, InitActive {
     private static final boolean enableRealloc = false; // TODO turn it
     private static final boolean enableBackup = false; // TODO turn it
     private static final int backupTask = 10; // TODO turn it configurable
-    private static final String backupResultFile = System.getProperty(
-            "user.home") + File.separator + "framework.results.backup"; // TODO turn it configurable
-    public static final String backupTaskFile = System.getProperty("user.home") +
-        File.separator + "framework.tasks.backup"; // TODO turn it configurable
+    private static final String backupResultFile = System.getProperty("user.home") + File.separator +
+        "framework.results.backup"; // TODO turn it configurable
+    public static final String backupTaskFile = System.getProperty("user.home") + File.separator +
+        "framework.tasks.backup"; // TODO turn it configurable
     private Task rootTask = null;
     private TaskQueue taskProviderQueue = null;
 
@@ -122,8 +122,7 @@ public class Manager implements Serializable, InitActive {
             if (logger.isInfoEnabled()) {
                 logger.info("Activing the task queue: " + queueType);
             }
-            this.taskProviderQueue = (TaskQueue) PAActiveObject.newActive(queueType,
-                    null, myNode);
+            this.taskProviderQueue = (TaskQueue) PAActiveObject.newActive(queueType, null, myNode);
         } catch (ActiveObjectCreationException e1) {
             logger.fatal("Couldn't create the Task Provider", e1);
             throw new ProActiveRuntimeException(e1);
@@ -167,8 +166,7 @@ public class Manager implements Serializable, InitActive {
      * @param virtualNodes the array of vitrual nodes for the computation.
      * @param queueType the class name of the task queue.
      */
-    public Manager(Task root, Node myNode, VirtualNode[] virtualNodes,
-        String queueType) {
+    public Manager(Task root, Node myNode, VirtualNode[] virtualNodes, String queueType) {
         this(root, myNode, queueType);
         this.arrayOfVns = virtualNodes;
     }
@@ -198,31 +196,25 @@ public class Manager implements Serializable, InitActive {
                 logger.info("Manager is deploying a group of workers");
                 // Node[]
                 long singleStartTime = System.currentTimeMillis();
-                this.workerGroup = (Worker) PAGroup.newGroupInParallel(Worker.class.getName(),
-                        args, this.nodes);
+                this.workerGroup = (Worker) PAGroup.newGroupInParallel(Worker.class.getName(), args,
+                        this.nodes);
                 PAGroup.getGroup(this.workerGroup).setAutomaticPurge(true);
                 this.freeWorkerList.addAll(PAGroup.getGroup(this.workerGroup));
                 long singleEndTime = System.currentTimeMillis();
                 if (logger.isInfoEnabled()) {
-                    logger.info("The  Group was created in " +
-                        (singleEndTime - singleStartTime) + " ms");
+                    logger.info("The  Group was created in " + (singleEndTime - singleStartTime) + " ms");
                 }
-            } else if ((this.arrayOfNodes != null) &&
-                    (this.arrayOfNodes.length > 0)) {
-                logger.info("Manager is deploying " + this.arrayOfNodes.length +
-                    " groups of workers");
+            } else if ((this.arrayOfNodes != null) && (this.arrayOfNodes.length > 0)) {
+                logger.info("Manager is deploying " + this.arrayOfNodes.length + " groups of workers");
                 // Node[][]
                 this.workerGroup = (Worker) PAGroup.newGroup(Worker.class.getName());
                 Group<Worker> mainGroup = PAGroup.getGroup(this.workerGroup);
                 for (int i = 0; i < this.arrayOfNodes.length; i++) {
-                    GroupThread gt = new GroupThread(this.arrayOfNodes[i],
-                            args, mainGroup);
+                    GroupThread gt = new GroupThread(this.arrayOfNodes[i], args, mainGroup);
                     new Thread(gt).start();
                 }
-            } else if ((this.arrayOfVns != null) &&
-                    (this.arrayOfVns.length > 0)) {
-                logger.info("Manager is deploying " + this.arrayOfVns.length +
-                    " groups of workers");
+            } else if ((this.arrayOfVns != null) && (this.arrayOfVns.length > 0)) {
+                logger.info("Manager is deploying " + this.arrayOfVns.length + " groups of workers");
                 // VN []
                 this.workerGroup = (Worker) PAGroup.newGroup(Worker.class.getName());
                 Group<Worker> vnGroup = PAGroup.getGroup(this.workerGroup);
@@ -232,8 +224,7 @@ public class Manager implements Serializable, InitActive {
                 }
             } else {
                 logger.fatal("No nodes for distributing the computation");
-                throw new ProActiveRuntimeException(
-                    "No nodes for distributing the computation");
+                throw new ProActiveRuntimeException("No nodes for distributing the computation");
             }
         } catch (ClassNotReifiableException e) {
             logger.fatal("The Worker is not reifiable", e);
@@ -252,8 +243,7 @@ public class Manager implements Serializable, InitActive {
         this.workerGroup.setWorkerGroup(this.workerGroup);
 
         if (logger.isInfoEnabled()) {
-            logger.info("Manager successfuly activate with " +
-                this.freeWorkerList.size() + " workers");
+            logger.info("Manager successfuly activate with " + this.freeWorkerList.size() + " workers");
         }
 
         this.nodes = null;
@@ -278,15 +268,12 @@ public class Manager implements Serializable, InitActive {
         // Serving requests and waiting for results
         boolean hasNext;
         while ((hasNext = this.taskProviderQueue.hasNext().booleanValue()) ||
-                (this.pendingTaskList.size() != 0) ||
-                (!this.toReallocTaskList.isEmpty())) {
+            (this.pendingTaskList.size() != 0) || (!this.toReallocTaskList.isEmpty())) {
             boolean hasAddedTask = false;
-            if (!this.toReallocTaskList.isEmpty() &&
-                    !this.freeWorkerList.isEmpty()) {
+            if (!this.toReallocTaskList.isEmpty() && !this.freeWorkerList.isEmpty()) {
                 Task tReallocated = this.toReallocTaskList.remove(0);
                 try {
-                    this.assignTaskToWorker(this.freeWorkerList.remove(0),
-                        tReallocated);
+                    this.assignTaskToWorker(this.freeWorkerList.remove(0), tReallocated);
                     logger.info("A task just reallocated");
                 } catch (Exception e) {
                     logger.info("A worker is down");
@@ -298,8 +285,7 @@ public class Manager implements Serializable, InitActive {
                     if ((this.freeWorkerList.size() > 0)) {
                         Task t = this.taskProviderQueue.next();
                         try {
-                            this.assignTaskToWorker(this.freeWorkerList.remove(
-                                    0), t);
+                            this.assignTaskToWorker(this.freeWorkerList.remove(0), t);
                             hasAddedTask = true;
                         } catch (Exception e) {
                             logger.info("A worker is down");
@@ -314,11 +300,8 @@ public class Manager implements Serializable, InitActive {
                         continue;
                     }
                     if (hasAddedTask && logger.isInfoEnabled()) {
-                        logger.info("Pending tasks: " +
-                            this.pendingTaskList.size() +
-                            " - Achivied tasks: " +
-                            this.taskProviderQueue.howManyResults() +
-                            " - Not calculated tasks: " +
+                        logger.info("Pending tasks: " + this.pendingTaskList.size() + " - Achivied tasks: " +
+                            this.taskProviderQueue.howManyResults() + " - Not calculated tasks: " +
                             this.taskProviderQueue.size());
                         continue;
                     }
@@ -346,11 +329,8 @@ public class Manager implements Serializable, InitActive {
                         logger.debug(currentResult);
                     }
                     if (logger.isInfoEnabled()) {
-                        logger.info("Pending tasks: " +
-                            this.pendingTaskList.size() +
-                            " - Achivied tasks: " +
-                            this.taskProviderQueue.howManyResults() +
-                            " - Not calculated tasks: " +
+                        logger.info("Pending tasks: " + this.pendingTaskList.size() + " - Achivied tasks: " +
+                            this.taskProviderQueue.howManyResults() + " - Not calculated tasks: " +
                             this.taskProviderQueue.size());
                     }
                     if (enableBackup && ((backupCounter % backupTask) == 0)) {
@@ -362,19 +342,16 @@ public class Manager implements Serializable, InitActive {
                     }
                     reallocCounter++;
                     // Reallocating tasks
-                    if (enableRealloc && !this.freeWorkerList.isEmpty() &&
-                            (reallocCounter == 60)) {
+                    if (enableRealloc && !this.freeWorkerList.isEmpty() && (reallocCounter == 60)) {
                         reallocCounter = 0;
-                        for (int i = 0; i < this.workingWorkerList.size();
-                                i++) {
+                        for (int i = 0; i < this.workingWorkerList.size(); i++) {
                             Worker current = this.workingWorkerList.get(i);
                             try {
                                 current.alive();
                             } catch (Exception down) {
                                 this.futureTaskList.remove(i);
                                 this.workingWorkerList.remove(i);
-                                this.toReallocTaskList.add(this.pendingTaskList.remove(
-                                        i));
+                                this.toReallocTaskList.add(this.pendingTaskList.remove(i));
                             }
                         }
                     }
@@ -384,15 +361,14 @@ public class Manager implements Serializable, InitActive {
                 continue;
             }
         }
-        logger.info("Total of results = " +
-            this.taskProviderQueue.howManyResults());
+        logger.info("Total of results = " + this.taskProviderQueue.howManyResults());
         logger.info("Total of tasks = " + this.taskProviderQueue.size());
 
         // Set the final result
         Collection<Result> resultsFuture = this.taskProviderQueue.getAllResults();
         PAFuture.waitFor(resultsFuture);
         Result[] results = resultsFuture.toArray(new Result[this.taskProviderQueue.howManyResults()
-                                                                                  .intValue()]);
+                .intValue()]);
         return this.rootTask.gather(results);
     }
 
@@ -407,8 +383,8 @@ public class Manager implements Serializable, InitActive {
         this.workerGroup.reset();
 
         try {
-            this.rootTask = (Task) PAActiveObject.turnActive(rootTask,
-                    PAActiveObject.getBodyOnThis().getNodeURL());
+            this.rootTask = (Task) PAActiveObject.turnActive(rootTask, PAActiveObject.getBodyOnThis()
+                    .getNodeURL());
         } catch (ActiveObjectCreationException e) {
             logger.fatal("Problem with the turn active of the root task", e);
             throw new RuntimeException(e);
@@ -464,8 +440,7 @@ public class Manager implements Serializable, InitActive {
      * @param task
      *            the task.
      */
-    private void assignTaskToWorker(Worker worker, Task task)
-        throws Exception {
+    private void assignTaskToWorker(Worker worker, Task task) throws Exception {
         this.futureTaskList.add(worker.execute(task));
         this.pendingTaskList.add(task);
         this.workingWorkerList.add(worker);
@@ -478,10 +453,9 @@ public class Manager implements Serializable, InitActive {
     private void backupAll(Task rootTask) {
         logger.info("Backuping");
         try {
-            this.taskProviderQueue.backupResults(new FileOutputStream(
-                    backupResultFile));
-            this.taskProviderQueue.backupTasks(rootTask, this.pendingTaskList,
-                new FileOutputStream(backupTaskFile));
+            this.taskProviderQueue.backupResults(new FileOutputStream(backupResultFile));
+            this.taskProviderQueue.backupTasks(rootTask, this.pendingTaskList, new FileOutputStream(
+                backupTaskFile));
         } catch (FileNotFoundException e) {
             logger.fatal("Problem with backup", e);
             throw new ProActiveRuntimeException(e);
@@ -546,11 +520,10 @@ public class Manager implements Serializable, InitActive {
             if (this.nodes.length > 0) {
                 long startTime = System.currentTimeMillis();
                 try {
-                    tmpWorkers = (Worker) PAGroup.newGroupInParallel(Worker.class.getName(),
-                            args, this.nodes);
+                    tmpWorkers = (Worker) PAGroup
+                            .newGroupInParallel(Worker.class.getName(), args, this.nodes);
                     freeWorkerList.addAll(PAGroup.getGroup(tmpWorkers));
-                    Worker activedTmpWorkers = (Worker) PAGroup.turnActiveGroup(tmpWorkers,
-                            this.nodes[0]);
+                    Worker activedTmpWorkers = (Worker) PAGroup.turnActiveGroup(tmpWorkers, this.nodes[0]);
                     this.group.add(activedTmpWorkers);
                 } catch (Exception e) {
                     logger.fatal("Problem with group creation", e);
@@ -558,16 +531,13 @@ public class Manager implements Serializable, InitActive {
                 }
                 long endTime = System.currentTimeMillis();
                 if (logger.isInfoEnabled()) {
-                    logger.info("The remote Group " +
-                        this.nodes[0].getVMInformation().getHostName() +
-                        " was created in " + (endTime - startTime) +
-                        " ms with " + PAGroup.getGroup(tmpWorkers).size() +
-                        " members");
+                    logger.info("The remote Group " + this.nodes[0].getVMInformation().getHostName() +
+                        " was created in " + (endTime - startTime) + " ms with " +
+                        PAGroup.getGroup(tmpWorkers).size() + " members");
                 }
             } else {
                 if (logger.isInfoEnabled()) {
-                    logger.info(
-                        "A remote Group was not created because no deployed nodes");
+                    logger.info("A remote Group was not created because no deployed nodes");
                 }
             }
         }
@@ -586,8 +556,7 @@ public class Manager implements Serializable, InitActive {
         long startTime;
         long endTime;
 
-        public VnThread(VirtualNode virtualNode, Object[] args,
-            Group<Worker> vnGroup) {
+        public VnThread(VirtualNode virtualNode, Object[] args, Group<Worker> vnGroup) {
             this.vn = virtualNode;
             this.args = args;
             this.group = vnGroup;
@@ -601,8 +570,7 @@ public class Manager implements Serializable, InitActive {
                 nodes = this.vn.getNodes();
                 endTime = System.currentTimeMillis();
                 if (logger.isInfoEnabled()) {
-                    logger.info("The VN " + this.vn.getName() +
-                        " was deployed in " + (endTime - startTime) +
+                    logger.info("The VN " + this.vn.getName() + " was deployed in " + (endTime - startTime) +
                         " ms with " + nodes.length + " nodes");
                 }
             } catch (NodeException e) {
@@ -615,11 +583,9 @@ public class Manager implements Serializable, InitActive {
             if (nodes.length > 0) {
                 startTime = System.currentTimeMillis();
                 try {
-                    tmpWorkers = (Worker) PAGroup.newGroupInParallel(Worker.class.getName(),
-                            args, nodes);
+                    tmpWorkers = (Worker) PAGroup.newGroupInParallel(Worker.class.getName(), args, nodes);
                     freeWorkerList.addAll(PAGroup.getGroup(tmpWorkers));
-                    Worker activedTmpWorkers = (Worker) PAGroup.turnActiveGroup(tmpWorkers,
-                            nodes[0]);
+                    Worker activedTmpWorkers = (Worker) PAGroup.turnActiveGroup(tmpWorkers, nodes[0]);
                     this.group.add(activedTmpWorkers);
                 } catch (Exception e) {
                     logger.fatal("Problem with group creation", e);
@@ -628,15 +594,13 @@ public class Manager implements Serializable, InitActive {
                 workerGroup.setWorkerGroup(workerGroup);
                 endTime = System.currentTimeMillis();
                 if (logger.isInfoEnabled()) {
-                    logger.info("The remote Group " + this.vn.getName() +
-                        " was created in " + (endTime - startTime) +
-                        " ms with " + PAGroup.getGroup(tmpWorkers).size() +
+                    logger.info("The remote Group " + this.vn.getName() + " was created in " +
+                        (endTime - startTime) + " ms with " + PAGroup.getGroup(tmpWorkers).size() +
                         " members");
                 }
             } else {
                 if (logger.isInfoEnabled()) {
-                    logger.info(
-                        "A remote Group was not created because no deployed nodes");
+                    logger.info("A remote Group was not created because no deployed nodes");
                 }
             }
         }

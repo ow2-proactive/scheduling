@@ -132,8 +132,7 @@ public class AwaitedRequest implements Request, java.io.Serializable {
 
                 if (!isArrived) {
                     UniqueID waiter = PAActiveObject.getBodyOnThis().getID();
-                    logger.info("[WAIT] " + waiter +
-                        " is waiting for a request from " + this.awaitedSender);
+                    logger.info("[WAIT] " + waiter + " is waiting for a request from " + this.awaitedSender);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
@@ -163,19 +162,15 @@ public class AwaitedRequest implements Request, java.io.Serializable {
     }
 
     public void resetSendCounter() {
-        throw new ProtocolErrorException(
-            "An active object is trying to send an awaited request");
+        throw new ProtocolErrorException("An active object is trying to send an awaited request");
     }
 
-    public void notifyReception(UniversalBody bodyReceiver)
-        throws IOException {
+    public void notifyReception(UniversalBody bodyReceiver) throws IOException {
         wrappedRequest.notifyReception(bodyReceiver);
     }
 
-    public int send(UniversalBody destinationBody)
-        throws IOException, RenegotiateSessionException {
-        throw new ProtocolErrorException(
-            "An active object is trying to send an awaited request");
+    public int send(UniversalBody destinationBody) throws IOException, RenegotiateSessionException {
+        throw new ProtocolErrorException("An active object is trying to send an awaited request");
     }
 
     public String getMethodName() {
@@ -241,13 +236,12 @@ public class AwaitedRequest implements Request, java.io.Serializable {
         return this.wrappedRequest.getSessionId();
     }
 
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException {
+    public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException {
         return this.wrappedRequest.decrypt(psm);
     }
 
-    public boolean crypt(ProActiveSecurityManager psm,
-        SecurityEntity destinationBody) throws RenegotiateSessionException {
+    public boolean crypt(ProActiveSecurityManager psm, SecurityEntity destinationBody)
+            throws RenegotiateSessionException {
         return this.wrappedRequest.crypt(psm, destinationBody);
     }
 

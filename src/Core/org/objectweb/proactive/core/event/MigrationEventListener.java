@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.event;
 
-
 /**
  * <p>
  * A class implementating this interface is listener of <code>MigrationEvent</code>

@@ -87,10 +87,8 @@ public interface LocalBodyStrategy {
      * @exception java.io.IOException if the request cannot be sent to the destination body
      * @throws CommunicationForbiddenException
      */
-    public void sendRequest(MethodCall methodCall, Future future,
-        UniversalBody destinationBody)
-        throws IOException, RenegotiateSessionException,
-            CommunicationForbiddenException;
+    public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
+            throws IOException, RenegotiateSessionException, CommunicationForbiddenException;
 
     /**
      * Serves the request <code>request</code> by the invoking the targeted method on the

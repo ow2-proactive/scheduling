@@ -83,24 +83,12 @@ import org.xml.sax.SAXParseException;
  * These exit codes must be synchronized with the C code
  */
 class Moment implements Comparable {
-    private static final int[][] CONV_INT = {
-            { Calendar.MONDAY, 0 },
-            { Calendar.TUESDAY, 1 },
-            { Calendar.WEDNESDAY, 2 },
-            { Calendar.THURSDAY, 3 },
-            { Calendar.FRIDAY, 4 },
-            { Calendar.SATURDAY, 5 },
-            { Calendar.SUNDAY, 6 }
-        };
-    private static final Object[][] CONV_STR = {
-            { "monday", new Integer(0) },
-            { "tuesday", new Integer(1) },
-            { "wednesday", new Integer(2) },
-            { "thursday", new Integer(3) },
-            { "friday", new Integer(4) },
-            { "saturday", new Integer(5) },
-            { "sunday", new Integer(6) }
-        };
+    private static final int[][] CONV_INT = { { Calendar.MONDAY, 0 }, { Calendar.TUESDAY, 1 },
+            { Calendar.WEDNESDAY, 2 }, { Calendar.THURSDAY, 3 }, { Calendar.FRIDAY, 4 },
+            { Calendar.SATURDAY, 5 }, { Calendar.SUNDAY, 6 } };
+    private static final Object[][] CONV_STR = { { "monday", new Integer(0) }, { "tuesday", new Integer(1) },
+            { "wednesday", new Integer(2) }, { "thursday", new Integer(3) }, { "friday", new Integer(4) },
+            { "saturday", new Integer(5) }, { "sunday", new Integer(6) } };
     public static final Moment END_OF_WEEK = new Moment(6, 23, 59);
     public static final Moment START_OF_WEEK = new Moment(0, 0, 0);
     public static final int MINUTES_IN_WEEK = 7 * 24 * 60;
@@ -195,7 +183,6 @@ class Moment implements Comparable {
     /* </Debug> */
 }
 
-
 class IntervalTime implements Comparable {
 
     /* <Debug> */
@@ -226,13 +213,12 @@ class IntervalTime implements Comparable {
     }
 
     public boolean contains(IntervalTime interval) {
-        return (start.compareTo(interval.start) <= 0) &&
-        (end.compareTo(interval.getEnd()) >= 0);
+        return (start.compareTo(interval.start) <= 0) && (end.compareTo(interval.getEnd()) >= 0);
     }
 
     public boolean intersect(IntervalTime interval) {
-        return contains(interval.start) || contains(interval.end) ||
-        interval.contains(start) || interval.contains(end);
+        return contains(interval.start) || contains(interval.end) || interval.contains(start) ||
+            interval.contains(end);
     }
 
     public int compareTo(Object o) {
@@ -270,14 +256,12 @@ class IntervalTime implements Comparable {
     }
 
     public static IntervalTime randomIntervalTime() {
-        return new IntervalTime(new Moment(random.nextInt(7),
-                random.nextInt(24), random.nextInt(60)),
+        return new IntervalTime(new Moment(random.nextInt(7), random.nextInt(24), random.nextInt(60)),
             new Moment(random.nextInt(8), random.nextInt(25), random.nextInt(61)));
     }
 
     /* </Debug> */
 }
-
 
 class WorkTime {
     private List<IntervalTime> intervals;
@@ -286,8 +270,8 @@ class WorkTime {
         intervals = new ArrayList<IntervalTime>();
     }
 
-    private boolean handleIntersection(ListIterator<IntervalTime> iter,
-        IntervalTime intersected, IntervalTime interval) {
+    private boolean handleIntersection(ListIterator<IntervalTime> iter, IntervalTime intersected,
+            IntervalTime interval) {
         if (interval.compareTo(intersected) < 0) {
             intersected.setStart(interval.getStart());
         }
@@ -484,10 +468,8 @@ class WorkTime {
     /* </Debug> */
 }
 
-
 class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
-    private static final String CONFIG_PREFIX = ".." + File.separator +
-        "config" + File.separator;
+    private static final String CONFIG_PREFIX = ".." + File.separator + "config" + File.separator;
     private static String hostname = null;
     private WorkTime work;
     private Vector<String> url;
@@ -508,8 +490,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
 
     public static String getLocalHostName() {
         if (hostname == null) {
-            hostname = ProActiveInet.getInstance().getInetAddress()
-                                    .getCanonicalHostName().toLowerCase();
+            hostname = ProActiveInet.getInstance().getInetAddress().getCanonicalHostName().toLowerCase();
         }
 
         return hostname;
@@ -529,8 +510,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
     }
 
     @Override
-    public void startElement(String name, Attributes attributes)
-        throws SAXException {
+    public void startElement(String name, Attributes attributes) throws SAXException {
         if (parsed) {
             return;
         }
@@ -547,8 +527,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         }
 
         if (name.equals("loadconfig")) {
-            String path = attributes.getValue("path")
-                                    .replace('/', File.separatorChar);
+            String path = attributes.getValue("path").replace('/', File.separatorChar);
 
             if (!new File(path).isAbsolute()) {
                 File current = currentConfigFile.peek();
@@ -575,8 +554,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
             return;
         }
 
-        if (name.equals("configForHost") || name.equals("default") ||
-                name.equals("p2pconfig")) {
+        if (name.equals("configForHost") || name.equals("default") || name.equals("p2pconfig")) {
             if (rightConfig) {
                 parsed = true;
                 rightConfig = false;
@@ -588,8 +566,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         java.net.URL url = null;
 
         try {
-            url = (new java.io.File(CONFIG_PREFIX + "proactivep2p.xsd")).toURI()
-                   .toURL();
+            url = (new java.io.File(CONFIG_PREFIX + "proactivep2p.xsd")).toURI().toURL();
         } catch (MalformedURLException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -613,8 +590,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
      * false --> file not found or something like that --> config not loaded
      * SAXException --> Schema not validated
      */
-    private boolean parseConfigFile(String configFile)
-        throws SAXException {
+    private boolean parseConfigFile(String configFile) throws SAXException {
         if ((configFile == null) || parsedXML.contains(configFile)) {
             return false;
         }
@@ -625,7 +601,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
             File file = new File(configFile);
             Reader reader = new FileReader(file);
             stream = new StreamReader(new InputSource(reader), this,
-                    new String[] { getXMLSchema().toString() }, this);
+                new String[] { getXMLSchema().toString() }, this);
         } catch (IOException ioe) {
             return false;
         }
@@ -651,8 +627,7 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
         parsed = false;
         parsedXML = new HashSet<String>();
 
-        if (parseConfigFile(getDefaultConfig(true)) ||
-                parseConfigFile(getDefaultConfig(false))) {
+        if (parseConfigFile(getDefaultConfig(true)) || parseConfigFile(getDefaultConfig(false))) {
 
             /* Nothing */
         }
@@ -662,13 +637,11 @@ class XMLConfig extends BasicUnmarshaller implements ErrorHandler {
     }
 }
 
-
 public class Daemon {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_DAEMON);
 
     /* Logging */
-    private static final String LOG_DIR = ".." + File.separator + "logs" +
-        File.separator;
+    private static final String LOG_DIR = ".." + File.separator + "logs" + File.separator;
     private static final String MAX_SIZE = "100KB";
     private static final String LOG_PATTERN = "%d %c %x %m\n\n";
     private static WriterAppender writerAppender;
@@ -850,9 +823,8 @@ public class Daemon {
     }
 
     void handleCommand(Socket client, String command) {
-        if (!KILL_CMD.equals(command) && !STOP_CMD.equals(command) &&
-                !RESTART_CMD.equals(command) && !ALIVE_CMD.equals(command) &&
-                !FLUSH_CMD.equals(command)) {
+        if (!KILL_CMD.equals(command) && !STOP_CMD.equals(command) && !RESTART_CMD.equals(command) &&
+            !ALIVE_CMD.equals(command) && !FLUSH_CMD.equals(command)) {
             return;
         }
 
@@ -888,50 +860,50 @@ public class Daemon {
 
     private void startCommandListener() {
         new Thread(new Runnable() {
-                public void run() {
-                    ServerSocket server;
+            public void run() {
+                ServerSocket server;
 
+                try {
+                    server = new ServerSocket(DAEMON_PORT);
+                } catch (IOException ioe) {
+                    log(ioe.getMessage(), true);
+                    System.exit(1);
+
+                    return; /* To avoid a javac error */
+                }
+
+                for (;;) {
                     try {
-                        server = new ServerSocket(DAEMON_PORT);
+                        Socket client = server.accept();
+
+                        /*
+                         * TODO: When the experimenting phase is done we should allow connections only from localhost
+                         */
+                        InputStream stream = client.getInputStream();
+                        InputStreamReader ireader = new InputStreamReader(stream);
+                        BufferedReader reader = new BufferedReader(ireader);
+                        String line = readCommand(reader);
+                        handleCommand(client, line);
+
+                        stream.close();
+                        client.close();
                     } catch (IOException ioe) {
-                        log(ioe.getMessage(), true);
-                        System.exit(1);
-
-                        return; /* To avoid a javac error */
-                    }
-
-                    for (;;) {
-                        try {
-                            Socket client = server.accept();
-
-                            /*
-                             * TODO: When the experimenting phase is done we should allow connections only from localhost
-                             */
-                            InputStream stream = client.getInputStream();
-                            InputStreamReader ireader = new InputStreamReader(stream);
-                            BufferedReader reader = new BufferedReader(ireader);
-                            String line = readCommand(reader);
-                            handleCommand(client, line);
-
-                            stream.close();
-                            client.close();
-                        } catch (IOException ioe) {
-                            ioe.printStackTrace();
-                        }
+                        ioe.printStackTrace();
                     }
                 }
-            }).start();
+            }
+        }).start();
     }
 
     private static void setDestructionTimeout(final int minutes) {
         if (minutes >= 0) {
             log("Killing the JVM in " + minutes + " minutes", false);
             new Thread(new Runnable() {
-                    public void run() {
-                        sleep(minutes);
-                        System.exit(0);
-                    }
-                }).start();
+                public void run() {
+                    sleep(minutes);
+                    System.exit(0);
+                }
+            }).start();
         } else {
             log("Never killing the JVM", false);
         }

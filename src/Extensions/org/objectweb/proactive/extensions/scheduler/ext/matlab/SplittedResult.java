@@ -39,8 +39,8 @@ import ptolemy.data.Token;
 public class SplittedResult implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private ArrayToken token;
 
     public SplittedResult(ArrayToken token) {

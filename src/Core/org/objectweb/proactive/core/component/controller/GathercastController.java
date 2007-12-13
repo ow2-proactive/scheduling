@@ -54,17 +54,15 @@ public interface GathercastController extends CollectiveInterfaceController {
      * @param sender a reference on the component connecting to the gathercast interface
      * @param clientItfName the name of the interface connecting to the gathercast interface
      */
-    public void addedBindingOnServerItf(String serverItfName,
-        ProActiveComponent sender, String clientItfName);
+    public void addedBindingOnServerItf(String serverItfName, ProActiveComponent sender, String clientItfName);
 
     /**
      * Notifies this component that a binding has been removed from one of its gathercast interfaces
-         * @param serverItfName the name of the gathercast interface
-         * @param owner a reference on the component connected to the gathercast interface
-         * @param clientItfName the name of the interface connected to the gathercast interface
+     * @param serverItfName the name of the gathercast interface
+     * @param owner a reference on the component connected to the gathercast interface
+     * @param clientItfName the name of the interface connected to the gathercast interface
      */
-    public void removedBindingOnServerItf(String serverItfName,
-        ProActiveComponent owner, String clientItfName);
+    public void removedBindingOnServerItf(String serverItfName, ProActiveComponent owner, String clientItfName);
 
     /**
      * Returns a list of references to the interfaces connected to a given gathercast interface of this component
@@ -79,6 +77,5 @@ public interface GathercastController extends CollectiveInterfaceController {
      * @return the result of the gathercast invocation
      * @throws ServeException if the request handling failed
      */
-    public Object handleRequestOnGatherItf(ComponentRequest r)
-        throws ServeException;
+    public Object handleRequestOnGatherItf(ComponentRequest r) throws ServeException;
 }

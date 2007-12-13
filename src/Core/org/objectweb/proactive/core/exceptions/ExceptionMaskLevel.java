@@ -60,8 +60,7 @@ public class ExceptionMaskLevel {
     ExceptionMaskLevel(ExceptionMaskStack parent, Class<?>[] exceptions) {
         for (int i = 0; i < exceptions.length; i++) {
             if (!Throwable.class.isAssignableFrom(exceptions[i])) {
-                throw new IllegalArgumentException(
-                    "Only exceptions can be catched");
+                throw new IllegalArgumentException("Only exceptions can be catched");
             }
 
             catchRuntimeException = catchRuntimeException ||
@@ -70,8 +69,7 @@ public class ExceptionMaskLevel {
         }
 
         if (exceptions.length < 1) {
-            throw new IllegalArgumentException(
-                "At least one exception must be catched");
+            throw new IllegalArgumentException("At least one exception must be catched");
         }
 
         caughtExceptionTypes = Arrays.asList(exceptions);
@@ -121,8 +119,7 @@ public class ExceptionMaskLevel {
             }
         }
 
-        catchRuntimeException = catchRuntimeException ||
-            level.catchRuntimeException();
+        catchRuntimeException = catchRuntimeException || level.catchRuntimeException();
     }
 
     synchronized void waitForPotentialException() {

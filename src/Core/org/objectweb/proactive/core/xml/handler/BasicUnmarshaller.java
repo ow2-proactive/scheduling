@@ -67,15 +67,13 @@ public class BasicUnmarshaller implements UnmarshallerHandler {
         return o;
     }
 
-    public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
     }
 
     //
     // -- implements XMLHandler ------------------------------------------------------
     //  
-    public void startElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+    public void startElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
     }
 
     public void endElement(String name) throws org.xml.sax.SAXException {
@@ -84,8 +82,7 @@ public class BasicUnmarshaller implements UnmarshallerHandler {
     public void readValue(String value) throws org.xml.sax.SAXException {
     }
 
-    public void startPrefixMapping(String prefix, String uri)
-        throws org.xml.sax.SAXException {
+    public void startPrefixMapping(String prefix, String uri) throws org.xml.sax.SAXException {
     }
 
     public void endPrefixMapping(String prefix) throws org.xml.sax.SAXException {

@@ -40,8 +40,7 @@ public class SimpleTestAddNode {
         System.out.println("# --oOo-- adding node Test --oOo-- ");
 
         try {
-            String url = "rmi://localhost:1099/" +
-                RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
+            String url = "rmi://localhost:1099/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
             RMAdmin admin = RMConnection.connectAsAdmin(url);
 
             for (String toAddUrl : args) {

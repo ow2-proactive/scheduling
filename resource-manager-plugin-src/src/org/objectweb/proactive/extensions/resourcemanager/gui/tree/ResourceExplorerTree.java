@@ -14,8 +14,7 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeE
 /**
  * @author FRADJ Johann
  */
-public class ResourceExplorerTree extends TreeViewer
-    implements RMNodeEventListener {
+public class ResourceExplorerTree extends TreeViewer implements RMNodeEventListener {
     public ResourceExplorerTree(ViewPart view, Composite parent) {
         super(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         TreeManager.newInstance(view);
@@ -49,10 +48,10 @@ public class ResourceExplorerTree extends TreeViewer
             }
 
             Display.getDefault().asyncExec(new Runnable() {
-                    public void run() {
-                        refresh();
-                    }
-                });
+                public void run() {
+                    refresh();
+                }
+            });
         }
     }
 
@@ -74,8 +73,7 @@ public class ResourceExplorerTree extends TreeViewer
      * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeBusyEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
      */
     public void nodeBusyEvent(RMNodeEvent nodeEvent) {
-        System.out.println("ResourceExplorerTree.nodeBusyEvent(" +
-            nodeEvent.getState() + ")");
+        System.out.println("ResourceExplorerTree.nodeBusyEvent(" + nodeEvent.getState() + ")");
         nodeStateChanged(nodeEvent);
     }
 
@@ -83,8 +81,7 @@ public class ResourceExplorerTree extends TreeViewer
      * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeDownEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
      */
     public void nodeDownEvent(RMNodeEvent nodeEvent) {
-        System.out.println("ResourceExplorerTree.nodeDownEvent(" +
-            nodeEvent.getState() + ")");
+        System.out.println("ResourceExplorerTree.nodeDownEvent(" + nodeEvent.getState() + ")");
         nodeStateChanged(nodeEvent);
     }
 
@@ -92,8 +89,7 @@ public class ResourceExplorerTree extends TreeViewer
      * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeFreeEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
      */
     public void nodeFreeEvent(RMNodeEvent nodeEvent) {
-        System.out.println("ResourceExplorerTree.nodeFreeEvent(" +
-            nodeEvent.getState() + ")");
+        System.out.println("ResourceExplorerTree.nodeFreeEvent(" + nodeEvent.getState() + ")");
         nodeStateChanged(nodeEvent);
     }
 
@@ -101,8 +97,7 @@ public class ResourceExplorerTree extends TreeViewer
      * @see org.objectweb.proactive.extensions.resourcemanager.gui.interfaces.RMNodeEventListener#nodeToReleaseEvent(org.objectweb.proactive.extra.infrastructuremanager.common.RMNodeEvent)
      */
     public void nodeToReleaseEvent(RMNodeEvent nodeEvent) {
-        System.out.println("ResourceExplorerTree.nodeToReleaseEvent(" +
-            nodeEvent.getState() + ")");
+        System.out.println("ResourceExplorerTree.nodeToReleaseEvent(" + nodeEvent.getState() + ")");
         nodeStateChanged(nodeEvent);
     }
 
@@ -133,14 +128,14 @@ public class ResourceExplorerTree extends TreeViewer
     private void actualize(TreeLeafElement element) {
         final TreeLeafElement elem = element;
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    if (elem == null) {
-                        refresh(true);
-                    } else {
-                        refresh(elem, true);
-                    }
+            public void run() {
+                if (elem == null) {
+                    refresh(true);
+                } else {
+                    refresh(elem, true);
                 }
-            });
+            }
+        });
     }
 
     // private class NameSorter extends ViewerSorter {}

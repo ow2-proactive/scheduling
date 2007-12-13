@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.observing;
 
-
 /**
  * This class encapsulates an Object ie the EventData.
  *

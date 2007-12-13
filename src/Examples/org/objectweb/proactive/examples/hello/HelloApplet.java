@@ -77,8 +77,7 @@ public class HelloApplet extends org.objectweb.proactive.examples.StandardFrame 
     @Override
     public void start() {
         receiveMessage("Applet creating active objects");
-        receiveMessage("on node " +
-            ((node == null) ? "local" : node.getNodeInformation().getURL()));
+        receiveMessage("on node " + ((node == null) ? "local" : node.getNodeInformation().getURL()));
         try {
             activeHello = (Hello) org.objectweb.proactive.api.PAActiveObject.newActive(Hello.class.getName(),
                     null, node);

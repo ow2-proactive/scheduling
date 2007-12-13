@@ -94,10 +94,9 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @exception NodeException if the new node cannot be created
      * @see Job
      */
-    public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding,
-        ProActiveSecurityManager nodeSecurityManager, String vnName,
-        String jobId) throws NodeException, AlreadyBoundException;
+    public String createLocalNode(String nodeName, boolean replacePreviousBinding,
+            ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId) throws NodeException,
+            AlreadyBoundException;
 
     /**
      * Kills all Nodes in this ProActiveRuntime
@@ -118,8 +117,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @exception java.io.IOException if the new VM cannot be created
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public void createVM(UniversalProcess remoteProcess)
-        throws java.io.IOException, ProActiveException;
+    public void createVM(UniversalProcess remoteProcess) throws java.io.IOException, ProActiveException;
 
     /**
      * Returns the name of all nodes known by this ProActiveRuntime on this VM
@@ -144,9 +142,8 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @param creationProtocol the protocol used to register the remote ProActiveRuntime when created
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
-        String vmName) throws ProActiveException;
+    public void register(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeUrl, String creatorID,
+            String creationProtocol, String vmName) throws ProActiveException;
 
     /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
@@ -158,9 +155,8 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @param creationProtocol the protocol used to register the remote ProActiveRuntime when created
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public void unregister(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
-        String vmName) throws ProActiveException;
+    public void unregister(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeUrl,
+            String creatorID, String creationProtocol, String vmName) throws ProActiveException;
 
     /**
      * Returns all the ProActiveRuntime registered on this ProActiveRuntime on this VM
@@ -175,8 +171,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return the ProActiveRuntime of specified name
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
-        throws ProActiveException;
+    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) throws ProActiveException;
 
     /**
      * <i><font size="-1" color="#FF0000">**For internal use only** </font></i>
@@ -198,8 +193,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @param proActiveRuntimeName the name of the remote ProActiveRuntime.
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public void rmAcquaintance(String proActiveRuntimeName)
-        throws ProActiveException;
+    public void rmAcquaintance(String proActiveRuntimeName) throws ProActiveException;
 
     /**
      * Kills this ProActiveRuntime and this VM
@@ -225,8 +219,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return List of UniversalBody. The latter contains [body, classname].
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public List<UniversalBody> getActiveObjects(String nodeName)
-        throws ProActiveException;
+    public List<UniversalBody> getActiveObjects(String nodeName) throws ProActiveException;
 
     /**
      * Returns all Active Objects with the specified class name, deployed on the node with the given name on
@@ -236,8 +229,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return Active Objects of the specified class name deployed on this ProactiveRuntime
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public List<UniversalBody> getActiveObjects(String nodeName,
-        String className) throws ProActiveException;
+    public List<UniversalBody> getActiveObjects(String nodeName, String className) throws ProActiveException;
 
     /**
      * Returns the VirtualNode with the given name
@@ -246,25 +238,22 @@ public interface ProActiveRuntime extends SecurityEntity {
      * does not exist, or has not been yet activated.
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public VirtualNodeInternal getVirtualNode(String virtualNodeName)
-        throws ProActiveException;
+    public VirtualNodeInternal getVirtualNode(String virtualNodeName) throws ProActiveException;
 
     /**
      * Registers the virtualNode of the given name in a registry such RMIRegistry
      * @param virtualNodeName
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding)
-        throws ProActiveException, AlreadyBoundException;
+    public void registerVirtualNode(String virtualNodeName, boolean replacePreviousBinding)
+            throws ProActiveException, AlreadyBoundException;
 
     /**
      * Unregisters the VirtualNode of the given name from the local runtime.
      * @param virtualNodeName the virtualNode to unregister.
      * @throws ProActiveException if a problem occurs when trying to unregister the virtualNode
      */
-    public void unregisterVirtualNode(String virtualNodeName)
-        throws ProActiveException;
+    public void unregisterVirtualNode(String virtualNodeName) throws ProActiveException;
 
     /**
      * Unregisters all VirtualNodes from the local runtime
@@ -297,9 +286,8 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @exception ConstructorCallExecutionFailedException if the constructor call cannot be executed
      * @exception java.lang.reflect.InvocationTargetException if the java constructor execution failed
      */
-    public UniversalBody createBody(String nodeName,
-        ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ProActiveException, ConstructorCallExecutionFailedException,
+    public UniversalBody createBody(String nodeName, ConstructorCall bodyConstructorCall, boolean isNodeLocal)
+            throws ProActiveException, ConstructorCallExecutionFailedException,
             java.lang.reflect.InvocationTargetException;
 
     /**
@@ -316,8 +304,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return a RMI stub on the migrated body.
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public UniversalBody receiveBody(String nodeName, Body body)
-        throws ProActiveException;
+    public UniversalBody receiveBody(String nodeName, Body body) throws ProActiveException;
 
     /**
      * The runtime recovers the body contained in the checkpoint ckpt.
@@ -327,8 +314,8 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return *not used*
      * @throws ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
-        int inc) throws ProActiveException;
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc)
+            throws ProActiveException;
 
     // SECURITY
     public String getVNName(String Nodename) throws ProActiveException;
@@ -341,8 +328,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return the bytecode corresponding to the given class, or null if not found
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public byte[] getClassDataFromThisRuntime(String className)
-        throws ProActiveException;
+    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException;
 
     /**
      * Looks for class bytecode in the ancestors of the current runtime : first it tries in the father runtime,
@@ -351,8 +337,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @return the bytecode corresponding to the given class, or null if not found
      * @exception ProActiveException if a problem occurs due to the remote nature of this ProActiveRuntime
      */
-    public byte[] getClassDataFromParentRuntime(String className)
-        throws ProActiveException;
+    public byte[] getClassDataFromParentRuntime(String className) throws ProActiveException;
 
     /**
      * launch the main method of the main class with parameters
@@ -362,8 +347,8 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @throws NoSuchMethodException
      * @throws ProActiveException
      */
-    public void launchMain(String className, String[] parameters)
-        throws ClassNotFoundException, NoSuchMethodException, ProActiveException;
+    public void launchMain(String className, String[] parameters) throws ClassNotFoundException,
+            NoSuchMethodException, ProActiveException;
 
     /**
      * construct a new instance remotly
@@ -371,8 +356,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @throws ClassNotFoundException
      * @throws ProActiveException
      */
-    public void newRemote(String className)
-        throws ClassNotFoundException, ProActiveException;
+    public void newRemote(String className) throws ClassNotFoundException, ProActiveException;
 
     /**
      * return the pad matching with the given url or parse it from the file system
@@ -382,8 +366,8 @@ public interface ProActiveRuntime extends SecurityEntity {
      * @throws ProActiveException
      * @throws IOException
      */
-    public ProActiveDescriptorInternal getDescriptor(String url,
-        boolean isHierarchicalSearch) throws IOException, ProActiveException;
+    public ProActiveDescriptorInternal getDescriptor(String url, boolean isHierarchicalSearch)
+            throws IOException, ProActiveException;
 
     /**
      * Set a property on the specified local node.
@@ -394,8 +378,7 @@ public interface ProActiveRuntime extends SecurityEntity {
      * or <code>null</code> if it did not have one.
      * @throws ProActiveException
      */
-    public Object setLocalNodeProperty(String nodeName, String key, String value)
-        throws ProActiveException;
+    public Object setLocalNodeProperty(String nodeName, String key, String value) throws ProActiveException;
 
     /**
      * Get a property on the specified local node.
@@ -405,16 +388,15 @@ public interface ProActiveRuntime extends SecurityEntity {
      * value.
      * @throws ProActiveException
      */
-    public String getLocalNodeProperty(String nodeName, String key)
-        throws ProActiveException;
+    public String getLocalNodeProperty(String nodeName, String key) throws ProActiveException;
 
     //
     // --- JMX
     //
 
     /**
-    * Starts the JMX ServerConnector.
-    */
+     * Starts the JMX ServerConnector.
+     */
     public void startJMXServerConnector();
 
     /**

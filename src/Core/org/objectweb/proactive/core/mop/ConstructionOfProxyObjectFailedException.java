@@ -30,8 +30,7 @@
  */
 package org.objectweb.proactive.core.mop;
 
-public class ConstructionOfProxyObjectFailedException
-    extends BehavioralException {
+public class ConstructionOfProxyObjectFailedException extends BehavioralException {
     public ConstructionOfProxyObjectFailedException() {
     }
 

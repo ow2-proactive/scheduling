@@ -59,9 +59,8 @@ public interface NonAnnotatedClientItf {
 
     public List<WrappedInteger> testRoundRobin_Itf(List<WrappedInteger> list);
 
-    public List<WrappedInteger> testAllStdModes_Param(
-        List<WrappedInteger> list1, List<WrappedInteger> list2,
-        List<WrappedInteger> list3, List<WrappedInteger> list4, WrappedInteger a);
+    public List<WrappedInteger> testAllStdModes_Param(List<WrappedInteger> list1, List<WrappedInteger> list2,
+            List<WrappedInteger> list3, List<WrappedInteger> list4, WrappedInteger a);
 
     public List<WrappedInteger> testCustom_Param(List<WrappedInteger> list);
 

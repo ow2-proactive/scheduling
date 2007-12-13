@@ -66,8 +66,7 @@ public class RuntimeNotificationData implements Serializable {
      * @param creationProtocol The protocol used to register the registered ProActiveRuntime when created
      * @param vmName The name of the registered ProActiveRuntime
      */
-    public RuntimeNotificationData(String creatorID, String runtimeUrl,
-        String creationProtocol, String vmName) {
+    public RuntimeNotificationData(String creatorID, String runtimeUrl, String creationProtocol, String vmName) {
         this.creatorID = creatorID;
         this.creationProtocol = creationProtocol;
         this.vmName = vmName;

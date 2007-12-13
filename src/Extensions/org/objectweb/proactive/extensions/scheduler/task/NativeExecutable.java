@@ -117,10 +117,8 @@ public class NativeExecutable extends Executable {
             process = Runtime.getRuntime().exec(this.command);
 
             // redirect streams
-            BufferedReader sout = new BufferedReader(new InputStreamReader(
-                        process.getInputStream()));
-            BufferedReader serr = new BufferedReader(new InputStreamReader(
-                        process.getErrorStream()));
+            BufferedReader sout = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            BufferedReader serr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
             Thread tsout = new Thread(new ThreadReader(sout, System.out));
             Thread tserr = new Thread(new ThreadReader(serr, System.err));
             tsout.start();
@@ -145,8 +143,7 @@ public class NativeExecutable extends Executable {
      */
     @Override
     public final void init(Map<String, Object> args) throws Exception {
-        throw new RuntimeException(
-            "This method should have NEVER been called in this context !!");
+        throw new RuntimeException("This method should have NEVER been called in this context !!");
     }
 
     /** Pipe between two streams */

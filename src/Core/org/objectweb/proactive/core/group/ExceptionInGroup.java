@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.group;
 
-
 /**
  * This class represents an throwable occured in a group communication.
  *

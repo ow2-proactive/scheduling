@@ -52,11 +52,10 @@ import org.objectweb.fractal.api.type.ComponentType;
  *
  * @author Paul Naoumenko
  */
-public class ProActiveNFComponentRepresentativeImpl
-    extends ProActiveComponentRepresentativeImpl
-    implements ProActiveNFComponentRepresentative {
-    public ProActiveNFComponentRepresentativeImpl(ComponentType componentType,
-        String hierarchicalType, String controllersConfigFileLocation) {
+public class ProActiveNFComponentRepresentativeImpl extends ProActiveComponentRepresentativeImpl implements
+        ProActiveNFComponentRepresentative {
+    public ProActiveNFComponentRepresentativeImpl(ComponentType componentType, String hierarchicalType,
+            String controllersConfigFileLocation) {
         super(componentType, hierarchicalType, controllersConfigFileLocation);
     }
 }

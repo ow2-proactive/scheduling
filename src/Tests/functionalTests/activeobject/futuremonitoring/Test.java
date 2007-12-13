@@ -41,12 +41,13 @@ import org.objectweb.proactive.core.node.Node;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test monitoring the futures
  */
 public class Test extends FunctionalTest {
-    private String XML_LOCATION = Test.class.getResource(
-            "/functionalTests/loadbalancing/LoadBalancing.xml").getPath();
+    private String XML_LOCATION = Test.class.getResource("/functionalTests/loadbalancing/LoadBalancing.xml")
+            .getPath();
     Node node1;
     Node node2;
 
@@ -69,8 +70,7 @@ public class Test extends FunctionalTest {
 
         // Without AC
         exception = false;
-        A a1bis = (A) PAActiveObject.newActive(A.class.getName(), null,
-                this.node1);
+        A a1bis = (A) PAActiveObject.newActive(A.class.getName(), null, this.node1);
         a1bis.crash();
         try {
             //System.out.println(future);

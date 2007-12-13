@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.basic;
 
-
 /**
  * A Basic timer in nano seconds.
  *
@@ -66,10 +65,10 @@ public class BasicTimer implements java.io.Serializable {
     private boolean isUserLevel;
 
     /**
-    * Creates an instance of a BasicTimer.
-    * @param name The name of the timer
-    * @param parent A reference to the parent timer
-    */
+     * Creates an instance of a BasicTimer.
+     * @param name The name of the timer
+     * @param parent A reference to the parent timer
+     */
     public BasicTimer(final String name, final BasicTimer parent) {
         this.name = name;
         this.id = System.identityHashCode(this);
@@ -90,16 +89,13 @@ public class BasicTimer implements java.io.Serializable {
         if (DEBUG) {
             // Check if the parent timer is started		
             if ((this.parent != null) && !this.parent.isStarted) {
-                throw new RuntimeException(
-                    "** _____ TimIt [BasicTimer.start()] : The parent timer of " +
+                throw new RuntimeException("** _____ TimIt [BasicTimer.start()] : The parent timer of " +
                     this.name + " timer is not started. Hierarchy is broken.");
             }
 
             // Check if this timer is not started twice
             if (isStarted) {
-                throw new RuntimeException(
-                    "** _____ TimIt [BasicTimer.start()] : The timer " +
-                    this.name +
+                throw new RuntimeException("** _____ TimIt [BasicTimer.start()] : The timer " + this.name +
                     " is already started. You cannot start it twice.");
             }
         }
@@ -125,16 +121,13 @@ public class BasicTimer implements java.io.Serializable {
     public final void stop(final long nanoTimeStamp) {
         if (DEBUG) {
             if ((this.parent != null) && !this.parent.isStarted) {
-                throw new RuntimeException(
-                    "** _____ TimIt [BasicTimer.stop()] : The parent timer of " +
+                throw new RuntimeException("** _____ TimIt [BasicTimer.stop()] : The parent timer of " +
                     this.name + " timer is not started. Hierarchy is broken");
             }
 
             // Check if this timer is started
             if (!isStarted) {
-                throw new RuntimeException(
-                    "** _____ TimIt [BasicTimer.stop()] : The timer " +
-                    this.name +
+                throw new RuntimeException("** _____ TimIt [BasicTimer.stop()] : The timer " + this.name +
                     " is not started. You cannot stop an unstarted timer.");
             }
         }
@@ -152,9 +145,8 @@ public class BasicTimer implements java.io.Serializable {
     public final long getTotalTime() {
         if (DEBUG) {
             if (isStarted) {
-                throw new RuntimeException(
-                    "** _____ TimIt [BasicTimer.stop()] : The timer " +
-                    this.name + " was not stopped.");
+                throw new RuntimeException("** _____ TimIt [BasicTimer.stop()] : The timer " + this.name +
+                    " was not stopped.");
             }
         }
         return this.totalTime;
@@ -174,8 +166,7 @@ public class BasicTimer implements java.io.Serializable {
     public final void undoStart() {
         if (DEBUG) {
             if (isStarted) {
-                throw new RuntimeException(
-                    "** _____ TimIt [BasicTimer.undoStart()] : The timer " +
+                throw new RuntimeException("** _____ TimIt [BasicTimer.undoStart()] : The timer " +
                     this.name + " was not stopped.");
             }
         }
@@ -189,9 +180,8 @@ public class BasicTimer implements java.io.Serializable {
     public final void reset() {
         if (DEBUG) {
             if (isStarted) {
-                throw new RuntimeException(
-                    "** _____ TimIt [BasicTimer.reset()] : The timer " +
-                    this.name + " was not stopped.");
+                throw new RuntimeException("** _____ TimIt [BasicTimer.reset()] : The timer " + this.name +
+                    " was not stopped.");
             }
         }
         this.totalTime = 0L;
@@ -236,10 +226,9 @@ public class BasicTimer implements java.io.Serializable {
      */
     @Override
     public final String toString() {
-        return "" + this.name + " " + "\t totalTime in milliseconds : " +
-        (this.totalTime / 1000000L) + " " + "\t in nanoseconds : " +
-        this.totalTime + " " +
-        ((this.parent == null) ? "" : ("\t parent : " + this.parent.getName()));
+        return "" + this.name + " " + "\t totalTime in milliseconds : " + (this.totalTime / 1000000L) + " " +
+            "\t in nanoseconds : " + this.totalTime + " " +
+            ((this.parent == null) ? "" : ("\t parent : " + this.parent.getName()));
     }
 
     /**

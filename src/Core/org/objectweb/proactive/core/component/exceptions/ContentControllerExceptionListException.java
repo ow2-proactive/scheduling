@@ -53,8 +53,8 @@ public class ContentControllerExceptionListException extends Exception {
     }
 
     public ContentControllerExceptionListException(
-        Map<Component, IllegalLifeCycleException> lifeCycleExceptions,
-        Map<Component, IllegalContentException> contentExceptions) {
+            Map<Component, IllegalLifeCycleException> lifeCycleExceptions,
+            Map<Component, IllegalContentException> contentExceptions) {
         this.lifeCycleExceptions = lifeCycleExceptions;
         this.contentExceptions = contentExceptions;
     }
@@ -68,21 +68,18 @@ public class ContentControllerExceptionListException extends Exception {
     }
 
     public boolean isEmpty() {
-        return (((lifeCycleExceptions == null) ||
-        (lifeCycleExceptions.isEmpty())) &&
-        ((contentExceptions == null) || (contentExceptions.isEmpty())));
+        return (((lifeCycleExceptions == null) || (lifeCycleExceptions.isEmpty())) && ((contentExceptions == null) || (contentExceptions
+                .isEmpty())));
     }
 
-    public void addIllegalLifeCycleException(Component c,
-        IllegalLifeCycleException e) {
+    public void addIllegalLifeCycleException(Component c, IllegalLifeCycleException e) {
         if (lifeCycleExceptions == null) {
             lifeCycleExceptions = new Hashtable<Component, IllegalLifeCycleException>();
         }
         lifeCycleExceptions.put(c, e);
     }
 
-    public void addIllegalContentException(Component c,
-        IllegalContentException e) {
+    public void addIllegalContentException(Component c, IllegalContentException e) {
         if (contentExceptions == null) {
             contentExceptions = new Hashtable<Component, IllegalContentException>();
         }

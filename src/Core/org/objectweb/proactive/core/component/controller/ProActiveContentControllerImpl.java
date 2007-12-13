@@ -65,8 +65,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class ProActiveContentControllerImpl extends AbstractProActiveController
-    implements ProActiveContentController, Serializable {
+public class ProActiveContentControllerImpl extends AbstractProActiveController implements
+        ProActiveContentController, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected List<Component> fcSubComponents;
     protected Map<Component, IllegalContentException> contentExceptions = new Hashtable<Component, IllegalContentException>();
@@ -83,25 +83,22 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(Constants.CONTENT_CONTROLLER,
-                    ProActiveContentController.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY,
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
+                    ProActiveContentController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 
     /*
-    * @see org.objectweb.fractal.api.control.ContentController#getFcInternalInterfaces()
-    *
-    * in this implementation, the external interfaces are also internal interfaces
-    */
+     * @see org.objectweb.fractal.api.control.ContentController#getFcInternalInterfaces()
+     *
+     * in this implementation, the external interfaces are also internal interfaces
+     */
     public Object[] getFcInternalInterfaces() {
-        logger.error(
-            "Internal interfaces are only accessible from the stub, i.e. from outside of this component");
+        logger
+                .error("Internal interfaces are only accessible from the stub, i.e. from outside of this component");
         return null;
     }
 
@@ -110,10 +107,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
      *
      *  in this implementation, the external interfaces are also internal interfaces
      *         */
-    public Object getFcInternalInterface(String interfaceName)
-        throws NoSuchInterfaceException {
-        return ((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis()
-                .getFcInterface(interfaceName);
+    public Object getFcInternalInterface(String interfaceName) throws NoSuchInterfaceException {
+        return ((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis().getFcInterface(interfaceName);
     }
 
     /*
@@ -143,8 +138,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
      *
      * if subComponent is a group, each element of the group is added as a subcomponent
      */
-    public void addFcSubComponent(Component subComponent)
-        throws IllegalLifeCycleException, IllegalContentException {
+    public void addFcSubComponent(Component subComponent) throws IllegalLifeCycleException,
+            IllegalContentException {
         checkLifeCycleIsStopped();
         // no sharing in the current implementation of Fractal
         // => only one parent for a given component
@@ -157,8 +152,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
                     addFcSubComponent(PAGroup.getGroup(subComponent));
                 } catch (ContentControllerExceptionListException e) {
                     e.printStackTrace();
-                    throw new IllegalContentException(
-                        "problem adding a list of component to a composite : " +
+                    throw new IllegalContentException("problem adding a list of component to a composite : " +
                         e.getMessage());
                 }
                 return;
@@ -166,13 +160,12 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
             if (Fractal.getSuperController(subComponent).getFcSuperComponents().length != 0) {
                 throw new IllegalContentException(
                     "This implementation of the Fractal model does not currently allow sharing : " +
-                    Fractal.getNameController(subComponent).getFcName() +
-                    " has no super controller");
+                        Fractal.getNameController(subComponent).getFcName() + " has no super controller");
             }
         } catch (NoSuchInterfaceException e) {
-            logger.error(
-                "could not check that the subcomponent is not shared, continuing ignoring this verification ... " +
-                e);
+            logger
+                    .error("could not check that the subcomponent is not shared, continuing ignoring this verification ... " +
+                        e);
         }
 
         ProActiveComponent this_component = ((ProActiveComponent) getFcItfOwner());
@@ -182,8 +175,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
         if (ref_on_this_component.equals(subComponent)) {
             try {
                 throw new IllegalArgumentException("cannot add " +
-                    Fractal.getNameController(getFcItfOwner()).getFcName() +
-                    " component into itself ");
+                    Fractal.getNameController(getFcItfOwner()).getFcName() + " component into itself ");
             } catch (NoSuchInterfaceException e) {
                 logger.error(e.getMessage());
             }
@@ -195,11 +187,9 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
             try {
                 name = Fractal.getNameController(subComponent).getFcName();
             } catch (NoSuchInterfaceException nsie) {
-                throw new ProActiveRuntimeException("cannot access the component parameters controller",
-                    nsie);
+                throw new ProActiveRuntimeException("cannot access the component parameters controller", nsie);
             }
-            throw new IllegalArgumentException("already a sub component : " +
-                name);
+            throw new IllegalArgumentException("already a sub component : " + name);
         }
 
         fcSubComponents.add(subComponent);
@@ -217,12 +207,12 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
     /*
      * @see org.objectweb.fractal.api.control.ContentController#removeFcSubComponent(Component)
      */
-    public void removeFcSubComponent(Component subComponent)
-        throws IllegalLifeCycleException, IllegalContentException {
+    public void removeFcSubComponent(Component subComponent) throws IllegalLifeCycleException,
+            IllegalContentException {
         checkLifeCycleIsStopped();
         try {
-            if (((ProActiveBindingController) Fractal.getBindingController(
-                        getFcItfOwner())).isBound().booleanValue()) {
+            if (((ProActiveBindingController) Fractal.getBindingController(getFcItfOwner())).isBound()
+                    .booleanValue()) {
                 throw new IllegalContentException(
                     "cannot remove a sub component that holds bindings on its external client interfaces");
             }
@@ -230,8 +220,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
             // no binding controller
         }
         if (!fcSubComponents.remove(subComponent)) {
-            throw new IllegalContentException("not a sub component : " +
-                subComponent);
+            throw new IllegalContentException("not a sub component : " + subComponent);
         }
         try {
             ((ProActiveSuperController) Fractal.getSuperController(subComponent)).removeParent(subComponent);
@@ -280,14 +269,13 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
 
     // TODO factorize code
     public void addFcSubComponent(List<Component> subComponents)
-        throws ContentControllerExceptionListException {
+            throws ContentControllerExceptionListException {
         lifeCycleExceptions.clear();
         contentExceptions.clear();
 
         ExecutorService threadPool = Executors.newCachedThreadPool();
         ContentControllerExceptionListException e = new ContentControllerExceptionListException();
-        for (Iterator<Component> iter = subComponents.iterator();
-                iter.hasNext();) {
+        for (Iterator<Component> iter = subComponents.iterator(); iter.hasNext();) {
             Component element = iter.next();
             AddSubComponentTask task = new AddSubComponentTask(e, this, element);
             threadPool.execute(task);
@@ -299,17 +287,15 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
     }
 
     public void removeFcSubComponent(List<Component> subComponents)
-        throws ContentControllerExceptionListException {
+            throws ContentControllerExceptionListException {
         lifeCycleExceptions.clear();
         contentExceptions.clear();
 
         ExecutorService threadPool = Executors.newCachedThreadPool();
         ContentControllerExceptionListException e = new ContentControllerExceptionListException();
-        for (Iterator<Component> iter = subComponents.iterator();
-                iter.hasNext();) {
+        for (Iterator<Component> iter = subComponents.iterator(); iter.hasNext();) {
             Component element = iter.next();
-            RemoveSubComponentTask task = new RemoveSubComponentTask(e, this,
-                    element);
+            RemoveSubComponentTask task = new RemoveSubComponentTask(e, this, element);
             threadPool.execute(task);
         }
         threadPool.shutdown();
@@ -323,9 +309,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
         ProActiveContentControllerImpl controller;
         Component component;
 
-        public AddSubComponentTask(
-            ContentControllerExceptionListException exceptions,
-            ProActiveContentControllerImpl controller, Component component) {
+        public AddSubComponentTask(ContentControllerExceptionListException exceptions,
+                ProActiveContentControllerImpl controller, Component component) {
             this.exceptions = exceptions;
             this.controller = controller;
             this.component = component;
@@ -349,9 +334,8 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController
         ProActiveContentControllerImpl controller;
         Component component;
 
-        public RemoveSubComponentTask(
-            ContentControllerExceptionListException exceptions,
-            ProActiveContentControllerImpl controller, Component component) {
+        public RemoveSubComponentTask(ContentControllerExceptionListException exceptions,
+                ProActiveContentControllerImpl controller, Component component) {
             this.exceptions = exceptions;
             this.controller = controller;
             this.component = component;

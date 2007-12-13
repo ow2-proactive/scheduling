@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.process;
 
-
 /**
  * A class implementing this interface is able to start an embedded ExternalProcess.
  */

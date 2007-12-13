@@ -39,8 +39,8 @@ public interface GCMDeploymentParser extends GCMParserConstants {
 
     /**
      * Returns the infrastructure declared by the descriptor
-         *
-         * @see GCMDeploymentInfrastructure
+     *
+     * @see GCMDeploymentInfrastructure
      * @return
      */
     public GCMDeploymentInfrastructure getInfrastructure();

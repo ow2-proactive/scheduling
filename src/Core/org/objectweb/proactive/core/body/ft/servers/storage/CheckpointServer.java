@@ -61,8 +61,7 @@ public interface CheckpointServer extends Remote {
      * image of the system.
      * @throws RemoteException
      */
-    public int storeCheckpoint(Checkpoint c, int incarnation)
-        throws RemoteException;
+    public int storeCheckpoint(Checkpoint c, int incarnation) throws RemoteException;
 
     /**
      * Return a checkpoint of the object identified by id.
@@ -71,8 +70,7 @@ public interface CheckpointServer extends Remote {
      * @return a checkpoint of the object identified by id
      * @throws RemoteException
      */
-    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber)
-        throws RemoteException;
+    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException;
 
     /**
      * Return the latest checkpoint of the object identified by id
@@ -90,8 +88,8 @@ public interface CheckpointServer extends Remote {
      * @param incarnation incarnation number of the caller
      * @throws RemoteException
      */
-    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id,
-        int sequenceNumber, int incarnation) throws RemoteException;
+    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int incarnation)
+            throws RemoteException;
 
     /**
      * Return informations on the given checkpoint
@@ -100,8 +98,7 @@ public interface CheckpointServer extends Remote {
      * @return informations on the given checkpoint
      * @throws RemoteException
      */
-    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber)
-        throws RemoteException;
+    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException;
 
     /**
      * Add an history to a checkpoint. Informations about the corresponding checkpoint
@@ -136,8 +133,7 @@ public interface CheckpointServer extends Remote {
      * @param request the request to log.
      * @throws RemoteException If communication with server fails.
      */
-    public void storeRequest(UniqueID receiverId, Request request)
-        throws RemoteException;
+    public void storeRequest(UniqueID receiverId, Request request) throws RemoteException;
 
     /**
      * The reply passed in paramter must be synchronously logged on the server. It must
@@ -146,8 +142,7 @@ public interface CheckpointServer extends Remote {
      * @param reply the reply to log.
      * @throws RemoteException If communication with server fails.
      */
-    public void storeReply(UniqueID receiverID, Reply reply)
-        throws RemoteException;
+    public void storeReply(UniqueID receiverID, Reply reply) throws RemoteException;
 
     /**
      * Reinit the state of the location server.

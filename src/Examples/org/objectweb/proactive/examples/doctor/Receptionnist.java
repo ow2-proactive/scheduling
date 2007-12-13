@@ -52,8 +52,7 @@ public class Receptionnist implements org.objectweb.proactive.RunActive {
 
     public synchronized void addPatient(int pat) {
         if (pat_id != NO_ONE) {
-            logger.error("ERROR: addPatient(" + pat + ") with pat_id=" +
-                pat_id);
+            logger.error("ERROR: addPatient(" + pat + ") with pat_id=" + pat_id);
             System.exit(0);
         }
         pat_id = pat;

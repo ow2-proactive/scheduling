@@ -41,14 +41,12 @@ public class ClearTimeLineAction extends Action {
 
     public ClearTimeLineAction() {
         super.setId(CLEAR_TIMELINE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "delete_obj.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "delete_obj.gif"));
         super.setToolTipText(CLEAR_TIMELINE_ACTION);
         super.setEnabled(false);
     }
 
-    public final void setTarget(
-        final TimeLineChartEditPart durationChartEditPart) {
+    public final void setTarget(final TimeLineChartEditPart durationChartEditPart) {
         super.setEnabled(true);
         this.durationChartEditPart = durationChartEditPart;
     }

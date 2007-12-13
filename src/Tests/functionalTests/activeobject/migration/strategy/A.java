@@ -44,8 +44,8 @@ import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 public class A implements Serializable, RunActive {
 
     /**
-         *
-         */
+     *
+     */
     int counter = 0;
     private MigrationStrategyManager migrationStrategyManager;
     private MigrationStrategy migrationStrategy;

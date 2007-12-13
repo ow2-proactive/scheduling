@@ -44,8 +44,7 @@ public class SigningEngine implements Serializable {
         try {
             signingEngine = Signature.getInstance("SHA-1/RSA", "BC");
         } catch (Exception e) {
-            System.out.println("Exception in SigningEngine instanciation : " +
-                e);
+            System.out.println("Exception in SigningEngine instanciation : " + e);
             e.printStackTrace();
         }
     }

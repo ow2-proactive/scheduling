@@ -162,11 +162,11 @@ public class FuturePool extends Object implements java.io.Serializable {
     static {
         bodiesDestination = new ThreadLocal<ArrayList<UniversalBody>>();
         incomingFutures = new ThreadLocal<ArrayList<Future>>() {
-                    @Override
-                    protected synchronized ArrayList<Future> initialValue() {
-                        return new ArrayList<Future>();
-                    }
-                };
+            @Override
+            protected synchronized ArrayList<Future> initialValue() {
+                return new ArrayList<Future>();
+            }
+        };
         // A HashTable cannot contain null as value so we use a syncrhonized HashMap
         forwarderThreads = Collections.synchronizedMap(new HashMap<Thread, Object>());
     }
@@ -247,11 +247,10 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param creatorID ID of the body creator of the future to update
      * @param result value to update with the futures
      */
-    public synchronized int receiveFutureValue(long id, UniqueID creatorID,
-        MethodCallResult result, Reply reply) throws java.io.IOException {
+    public synchronized int receiveFutureValue(long id, UniqueID creatorID, MethodCallResult result,
+            Reply reply) throws java.io.IOException {
         // get all aiwated futures
-        ArrayList<Future> futuresToUpdate = futures.getFuturesToUpdate(id,
-                creatorID);
+        ArrayList<Future> futuresToUpdate = futures.getFuturesToUpdate(id, creatorID);
 
         if (futuresToUpdate != null) {
             // FAULT-TOLERANCE
@@ -274,8 +273,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                 setCopyMode(true);
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
                     Future otherFuture = (futuresToUpdate.get(i));
-                    otherFuture.receiveReply((MethodCallResult) Utils.makeDeepCopy(
-                            result));
+                    otherFuture.receiveReply((MethodCallResult) Utils.makeDeepCopy(result));
                 }
                 setCopyMode(false);
                 // register futures potentially generated during the copy of result
@@ -285,11 +283,11 @@ public class FuturePool extends Object implements java.io.Serializable {
 
             // 2) create and put ACservices
             if (this.registerACs) {
-                ArrayList<UniversalBody> bodiesToContinue = (ArrayList<UniversalBody>) (futures.getAutomaticContinuation(id,
-                        creatorID).clone());
-                if ((bodiesToContinue != null) &&
-                        (bodiesToContinue.size() != 0)) {
-                    ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager();
+                ArrayList<UniversalBody> bodiesToContinue = (ArrayList<UniversalBody>) (futures
+                        .getAutomaticContinuation(id, creatorID).clone());
+                if ((bodiesToContinue != null) && (bodiesToContinue.size() != 0)) {
+                    ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis())
+                            .getProActiveSecurityManager();
 
                     // lazy starting of the AC thread
                     if (!this.queueAC.isAlive()) {
@@ -314,9 +312,8 @@ public class FuturePool extends Object implements java.io.Serializable {
                     this.removeDestinations();
 
                     // add the deepcopied AC
-                    queueAC.addACRequest(new ACService(bodiesToContinue,
-                            new ReplyImpl(creatorID, id, null, newResult, psm,
-                                true)));
+                    queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, null,
+                        newResult, psm, true)));
                 }
             }
             // 3) Remove futures from the futureMap
@@ -341,8 +338,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         UniqueID creatorID = futureObject.getCreatorID();
         if (valuesForFutures.get("" + id + creatorID) != null) {
             try {
-                this.receiveFutureValue(id, creatorID,
-                    valuesForFutures.remove("" + id + creatorID), null);
+                this.receiveFutureValue(id, creatorID, valuesForFutures.remove("" + id + creatorID), null);
             } catch (java.io.IOException e) {
                 e.printStackTrace();
             }
@@ -359,8 +355,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         futures.addAutomaticContinuation(id.getID(), id.getCreatorID(), bodyDest);
     }
 
-    public synchronized void waitForReply(long timeout)
-        throws ProActiveException {
+    public synchronized void waitForReply(long timeout) throws ProActiveException {
         this.newState = false;
         // variable used to know wether the timeout has expired or not
         int timeoutCounter = 1;
@@ -369,8 +364,7 @@ public class FuturePool extends Object implements java.io.Serializable {
             // counter < 0 means that it is the second time we enter in the loop
             // while the state has not been changed, i.e timeout has expired
             if (timeoutCounter < 0) {
-                throw new ProActiveException(
-                    "Timeout expired while waiting for future update");
+                throw new ProActiveException("Timeout expired while waiting for future update");
             }
             try {
                 wait(timeout);
@@ -414,8 +408,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     //
     // -- PRIVATE METHODS FOR SERIALIZATION -----------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         out.defaultWriteObject();
         if (this.sendACs) {
             // queue could not be created because of lazy creation
@@ -440,8 +433,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         }
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         // futuremap is empty
         // futures are registred in FutureProxy.read()
@@ -468,9 +460,8 @@ public class FuturePool extends Object implements java.io.Serializable {
      * if state is KILL_NOW, the queue must be killed even if there is some ACs to do in the futurepool.
      * if state is KILL_AFTER_COMPLETION, the queue will be killed when no more ACs remain in the futurepool.
      */
-    private enum KillStatus {ALIVE,
-        KILL_NOW,
-        KILL_AFTER_COMPLETION;
+    private enum KillStatus {
+        ALIVE, KILL_NOW, KILL_AFTER_COMPLETION;
     }
 
     /**
@@ -534,17 +525,14 @@ public class FuturePool extends Object implements java.io.Serializable {
          * To stop the thread.
          */
         public synchronized void killMe(boolean completeACs) {
-            status = completeACs ? KillStatus.KILL_AFTER_COMPLETION
-                                 : KillStatus.KILL_NOW;
+            status = completeACs ? KillStatus.KILL_AFTER_COMPLETION : KillStatus.KILL_NOW;
             notifyAll();
         }
 
         @Override
         public void run() {
             // push an initial context for this thread : associate this thread to the owner body
-            LocalBodyStore.getInstance()
-                          .pushContext(new Context(
-                    FuturePool.this.getOwnerBody(), null));
+            LocalBodyStore.getInstance().pushContext(new Context(FuturePool.this.getOwnerBody(), null));
 
             while (true) {
                 // if there is no AC to do, wait...
@@ -575,14 +563,12 @@ public class FuturePool extends Object implements java.io.Serializable {
                     // to unblock active object
                     e2.printStackTrace();
                     FuturePool.this.getOwnerBody().exitFromThreadStore();
-                    throw new ProActiveRuntimeException("Error while sending reply for AC ",
-                        e2);
+                    throw new ProActiveRuntimeException("Error while sending reply for AC ", e2);
                 }
 
                 // kill it after completion of the remaining ACs...
                 if ((status == KillStatus.KILL_AFTER_COMPLETION) &&
-                        (!FuturePool.this.getOwnerBody().getFuturePool()
-                                             .remainingAC())) {
+                    (!FuturePool.this.getOwnerBody().getFuturePool().remainingAC())) {
                     // if the body is not active, the ACthread has been killed by a call to terminateAC().
                     // Then complete the termination.
                     if (!FuturePool.this.getOwnerBody().isActive()) {
@@ -637,9 +623,8 @@ public class FuturePool extends Object implements java.io.Serializable {
                 // created to avoid the alteration of the original result.
                 int remainingSends = dests.size();
                 Reply toSend = null;
-                ProActiveSecurityManager psm = (remainingSends > 1)
-                    ? (((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager())
-                    : null;
+                ProActiveSecurityManager psm = (remainingSends > 1) ? (((AbstractBody) PAActiveObject
+                        .getBodyOnThis()).getProActiveSecurityManager()) : null;
 
                 for (int i = 0; i < dests.size(); i++) {
                     UniversalBody dest = (dests.get(i));
@@ -649,9 +634,8 @@ public class FuturePool extends Object implements java.io.Serializable {
 
                     if (remainingSends > 1) {
                         // create a new reply to keep the original copy unchanged for next sending ...
-                        toSend = new ReplyImpl(reply.getSourceBodyID(),
-                                reply.getSequenceNumber(), null,
-                                reply.getResult(), psm, true);
+                        toSend = new ReplyImpl(reply.getSourceBodyID(), reply.getSequenceNumber(), null,
+                            reply.getResult(), psm, true);
                     } else {
                         // last sending : the orignal can ben sent
                         toSend = reply;
@@ -664,8 +648,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                         try {
                             toSend.send(dest);
                         } catch (IOException ioe) {
-                            UniversalBody.sendReplyExceptionsLogger.error(ioe,
-                                ioe);
+                            UniversalBody.sendReplyExceptionsLogger.error(ioe, ioe);
                         }
                     }
                     remainingSends--;

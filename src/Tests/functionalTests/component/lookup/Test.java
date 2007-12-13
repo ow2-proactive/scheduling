@@ -50,8 +50,8 @@ import functionalTests.component.I1;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     private ComponentType typeA;
     private Component componentA;
 
@@ -64,16 +64,11 @@ public class Test extends ComponentTest {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory typeFactory = Fractal.getTypeFactory(boot);
         GenericFactory componentFactory = Fractal.getGenericFactory(boot);
-        typeA = typeFactory.createFcType(new InterfaceType[] {
-                    typeFactory.createFcItfType("i1", I1.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE)
-                });
-        componentA = componentFactory.newFcInstance(typeA,
-                new ControllerDescription("component-a", Constants.PRIMITIVE),
-                new ContentDescription(A.class.getName()));
-        String url = URIBuilder.buildURIFromProperties("localhost", "componentA")
-                               .toString();
+        typeA = typeFactory.createFcType(new InterfaceType[] { typeFactory.createFcItfType("i1", I1.class
+                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) });
+        componentA = componentFactory.newFcInstance(typeA, new ControllerDescription("component-a",
+            Constants.PRIMITIVE), new ContentDescription(A.class.getName()));
+        String url = URIBuilder.buildURIFromProperties("localhost", "componentA").toString();
         Fractive.register(componentA, url);
         Component retreived = Fractive.lookup(url);
         Assert.assertEquals(componentA, retreived);

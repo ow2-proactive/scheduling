@@ -87,11 +87,10 @@ public class MonitorThread implements Observer {
         this.ttr = DEFAULT_TTR;
 
         this.refresh = false;
-        this.refresher = new Thread(new MonitorThreadRefresher(world),
-                "Ic2d refresh thread");
+        this.refresher = new Thread(new MonitorThreadRefresher(world), "Ic2d refresh thread");
         selectiveRefresh = true;
         this.selectiveRefresher = new Thread(new MonitorThreadSelectiveRefresher(),
-                "Ic2d selective refresh thread");
+            "Ic2d selective refresh thread");
         selectiveRefresher.start();
     }
 
@@ -144,8 +143,7 @@ public class MonitorThread implements Observer {
     }
 
     public void update(Observable o, Object arg) {
-        if ((arg != null) && o instanceof WorldObject &&
-                arg instanceof MVCNotification) {
+        if ((arg != null) && o instanceof WorldObject && arg instanceof MVCNotification) {
             MVCNotificationTag notification = ((MVCNotification) arg).getMVCNotification();
             if (notification == MVCNotificationTag.WORLD_OBJECT_FIRST_CHILD_ADDED) {
                 startRefreshing((WorldObject) o);
@@ -197,18 +195,19 @@ public class MonitorThread implements Observer {
                 try {
                     world.explore();
                 } catch (Exception e) {
-                    logger.debug(
-                        "Exception when performing refresh on the WorldObject: " +
-                        e.getStackTrace());
-                    Console.getInstance(Activator.CONSOLE_NAME)
-                           .err("Refresh could not be performed. See logged errors for more details. Make shure the same ProActive version is used for IC2D and all monitored ressources.");
+                    logger
+                            .debug("Exception when performing refresh on the WorldObject: " +
+                                e.getStackTrace());
+                    Console
+                            .getInstance(Activator.CONSOLE_NAME)
+                            .err(
+                                    "Refresh could not be performed. See logged errors for more details. Make shure the same ProActive version is used for IC2D and all monitored ressources.");
                 }
 
                 try {
                     Thread.sleep(ttr * 1000);
                 } catch (InterruptedException e) { /* Do nothing */
-                    System.out.println(
-                        "Ic2d exploring thread has been interupted.");
+                    System.out.println("Ic2d exploring thread has been interupted.");
                 }
             }
         }
@@ -226,8 +225,7 @@ public class MonitorThread implements Observer {
                 try {
                     Thread.sleep(timeForSelectiveRefresh * 1000);
                 } catch (InterruptedException e) {
-                    System.out.println(
-                        "Ic2d selective exploring thread has been interupted.");
+                    System.out.println("Ic2d selective exploring thread has been interupted.");
                 }
             }
         }

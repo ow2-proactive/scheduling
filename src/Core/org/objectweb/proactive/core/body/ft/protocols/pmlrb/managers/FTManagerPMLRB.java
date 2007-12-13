@@ -68,8 +68,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class FTManagerPMLRB extends FTManager {
 
     /**
-         *
-         */
+     *
+     */
 
     /** Incarantion is not used for PML. Set to a default value */
     public static final int INC_VALUE = Integer.MAX_VALUE;
@@ -225,8 +225,7 @@ public class FTManagerPMLRB extends FTManager {
             index.setValue(msgIndex);
         } else {
             //first message
-            this.latestReceivedIndex.put(m.getSourceBodyID(),
-                new MutableLong(msgIndex));
+            this.latestReceivedIndex.put(m.getSourceBodyID(), new MutableLong(msgIndex));
         }
     }
 
@@ -235,8 +234,8 @@ public class FTManagerPMLRB extends FTManager {
      */
     private boolean alreadyReceived(Message m) {
         if ((this.potentialDuplicataSender != null) &&
-                (m.getSourceBodyID().equals(this.potentialDuplicataSender)) &&
-                (m.getSequenceNumber() == this.potentialDuplicataSequence)) {
+            (m.getSourceBodyID().equals(this.potentialDuplicataSender)) &&
+            (m.getSequenceNumber() == this.potentialDuplicataSequence)) {
             // this message has been already logged just before the failure of this.
             // no more such message can appear...
             this.potentialDuplicataSender = null;
@@ -262,8 +261,7 @@ public class FTManagerPMLRB extends FTManager {
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendReplyAfter(org.objectweb.proactive.core.body.reply.Reply, int, org.objectweb.proactive.core.body.UniversalBody)
      */
     @Override
-    public int onSendReplyAfter(Reply reply, int rdvValue,
-        UniversalBody destination) {
+    public int onSendReplyAfter(Reply reply, int rdvValue, UniversalBody destination) {
         return 0;
     }
 
@@ -281,8 +279,8 @@ public class FTManagerPMLRB extends FTManager {
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendRequestAfter(org.objectweb.proactive.core.body.request.Request, int, org.objectweb.proactive.core.body.UniversalBody)
      */
     @Override
-    public int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination) throws RenegotiateSessionException {
+    public int onSendRequestAfter(Request request, int rdvValue, UniversalBody destination)
+            throws RenegotiateSessionException {
         return 0;
     }
 
@@ -340,8 +338,8 @@ public class FTManagerPMLRB extends FTManager {
         try {
             while (itReplies.hasNext()) {
                 Reply current = itReplies.next();
-                fp.receiveFutureValue(current.getSequenceNumber(),
-                    current.getSourceBodyID(), current.getResult(), current);
+                fp.receiveFutureValue(current.getSequenceNumber(), current.getSourceBodyID(), current
+                        .getResult(), current);
             }
         } catch (IOException e) {
             e.printStackTrace();

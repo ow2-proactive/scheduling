@@ -49,8 +49,7 @@ public class ProxyOne implements org.objectweb.proactive.core.mop.Proxy {
         }
     }
 
-    public Object reify(MethodCall c)
-        throws InvocationTargetException, IllegalAccessException {
+    public Object reify(MethodCall c) throws InvocationTargetException, IllegalAccessException {
         try {
             Object o = c.execute(target);
             return o;

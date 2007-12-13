@@ -44,15 +44,13 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystemImpl;
 import org.objectweb.proactive.extensions.calcium.task.Task;
 
 
-public class DaCInst<P extends Serializable, R extends Serializable>
-    implements Instruction<P, P> {
+public class DaCInst<P extends Serializable, R extends Serializable> implements Instruction<P, P> {
     Divide<P, P> div;
     Conquer<R, R> conq;
     Condition<P> cond;
     Stack<Instruction> childStack;
 
-    public DaCInst(Divide<P, P> div, Conquer<R, R> conq, Condition<P> cond,
-        Stack<Instruction> childStack) {
+    public DaCInst(Divide<P, P> div, Conquer<R, R> conq, Condition<P> cond, Stack<Instruction> childStack) {
         super();
         this.div = div;
         this.conq = conq;
@@ -60,8 +58,7 @@ public class DaCInst<P extends Serializable, R extends Serializable>
         this.childStack = childStack;
     }
 
-    public Task<P> compute(SkeletonSystemImpl system, Task<P> t)
-        throws Exception {
+    public Task<P> compute(SkeletonSystemImpl system, Task<P> t) throws Exception {
         Timer timer = new Timer();
         boolean evalCondition = cond.evalCondition(system, t.getObject());
         timer.stop();
@@ -74,7 +71,7 @@ public class DaCInst<P extends Serializable, R extends Serializable>
             t.pushInstruction(new DivideSIMD<P, P>(div, clone));
             return t;
         } else { //else execute the child skeleton by
-                 // appending the child skeleton code to the stack
+            // appending the child skeleton code to the stack
             Vector<Instruction> currentStack = t.getStack();
             currentStack.addAll(childStack);
             t.setStack(currentStack);

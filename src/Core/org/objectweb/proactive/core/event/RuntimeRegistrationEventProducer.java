@@ -37,13 +37,11 @@ public interface RuntimeRegistrationEventProducer {
      * a remote runtime registers on this runtime.
      * @param listener the listener to add
      */
-    public void addRuntimeRegistrationEventListener(
-        RuntimeRegistrationEventListener listener);
+    public void addRuntimeRegistrationEventListener(RuntimeRegistrationEventListener listener);
 
     /**
      * Removes the RuntimeRegistrationEventListener.
      * @param listener the listener to remove
      */
-    public void removeRuntimeRegistrationEventListener(
-        RuntimeRegistrationEventListener listener);
+    public void removeRuntimeRegistrationEventListener(RuntimeRegistrationEventListener listener);
 }

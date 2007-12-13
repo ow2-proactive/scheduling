@@ -56,8 +56,8 @@ public interface RemoteObject extends SecurityEntity {
      * @throws RenegotiateSessionException if the security infrastructure needs to (re)initiate the session
      * @throws IOException if the message transfer has failed
      */
-    public Reply receiveMessage(Request message)
-        throws ProActiveException, RenegotiateSessionException, IOException;
+    public Reply receiveMessage(Request message) throws ProActiveException, RenegotiateSessionException,
+            IOException;
 
     /**
      * @return return a couple stub + proxy pointing on the current remote object
@@ -71,8 +71,7 @@ public interface RemoteObject extends SecurityEntity {
      * @return return a couple stub + proxy pointing on a reference on a remote object identified by rro
      * @throws ProActiveException
      */
-    public Object getObjectProxy(RemoteRemoteObject rro)
-        throws ProActiveException;
+    public Object getObjectProxy(RemoteRemoteObject rro) throws ProActiveException;
 
     /**
      * @return return the classname of the reified object

@@ -67,8 +67,8 @@ public interface StatsGlobal {
     public int getSolvedNumberOfTasks();
 
     /**
-    * @return The current number of solved root-tasks since the boot of the framework.
-    */
+     * @return The current number of solved root-tasks since the boot of the framework.
+     */
     public int getSolvedNumberOfRootTasks();
 
     /**

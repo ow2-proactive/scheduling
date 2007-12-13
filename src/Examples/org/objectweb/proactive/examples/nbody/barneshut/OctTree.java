@@ -111,8 +111,7 @@ public class OctTree implements Serializable {
      */
     public void init(List lplanets, Cube c) {
         this.cube = c;
-        this.radius = Math.sqrt((c.width * c.width) + (c.height * c.height) +
-                (c.depth * c.depth));
+        this.radius = Math.sqrt((c.width * c.width) + (c.height * c.height) + (c.depth * c.depth));
         this.listPlanets = lplanets;
 
         // start the creation of sons
@@ -146,8 +145,7 @@ public class OctTree implements Serializable {
             // Inserts all the Planets on the good place
             for (int i = 0; i < listPlanets.size(); i++) {
                 Planet body = (Planet) listPlanets.get(i);
-                int index = ((body.x < midx) ? 0 : 1) +
-                    ((body.y < midy) ? 0 : 2) + ((body.z < midz) ? 0 : 4);
+                int index = ((body.x < midx) ? 0 : 1) + ((body.y < midy) ? 0 : 2) + ((body.z < midz) ? 0 : 4);
                 subtree[index].add(body);
             }
 
@@ -174,36 +172,28 @@ public class OctTree implements Serializable {
              *
              */
             List tabCube = new ArrayList(8);
-            tabCube.add(new Cube(new Point3D(cube.x, cube.y, cube.z),
-                    new Point3D(midx, midy, cube.z),
-                    new Point3D(cube.x, cube.y, midz)));
-            tabCube.add(new Cube(new Point3D(midx, cube.y, cube.z),
-                    new Point3D(cube.x + cube.width, midy, cube.z),
-                    new Point3D(midx, cube.y, midz)));
-            tabCube.add(new Cube(new Point3D(cube.x, midy, cube.z),
-                    new Point3D(midx, cube.y + cube.height, cube.z),
-                    new Point3D(cube.x, midy, midz)));
-            tabCube.add(new Cube(new Point3D(midx, midy, cube.z),
-                    new Point3D(cube.x + cube.width, cube.y + cube.height,
-                        cube.z), new Point3D(midx, midy, midz)));
-            tabCube.add(new Cube(new Point3D(cube.x, cube.y, midz),
-                    new Point3D(midx, midy, midz),
-                    new Point3D(cube.x, cube.y, cube.z + cube.depth)));
-            tabCube.add(new Cube(new Point3D(midx, cube.y, midz),
-                    new Point3D(cube.x + cube.width, midy, midz),
-                    new Point3D(midx, cube.y, cube.z + cube.depth)));
-            tabCube.add(new Cube(new Point3D(cube.x, midy, midz),
-                    new Point3D(midx, cube.y + cube.height, midz),
-                    new Point3D(cube.x, midy, cube.z + cube.depth)));
-            tabCube.add(new Cube(new Point3D(midx, midy, midz),
-                    new Point3D(cube.x + cube.width, cube.y + cube.height, midz),
-                    new Point3D(midx, midy, cube.z + cube.depth)));
+            tabCube.add(new Cube(new Point3D(cube.x, cube.y, cube.z), new Point3D(midx, midy, cube.z),
+                new Point3D(cube.x, cube.y, midz)));
+            tabCube.add(new Cube(new Point3D(midx, cube.y, cube.z), new Point3D(cube.x + cube.width, midy,
+                cube.z), new Point3D(midx, cube.y, midz)));
+            tabCube.add(new Cube(new Point3D(cube.x, midy, cube.z), new Point3D(midx, cube.y + cube.height,
+                cube.z), new Point3D(cube.x, midy, midz)));
+            tabCube.add(new Cube(new Point3D(midx, midy, cube.z), new Point3D(cube.x + cube.width, cube.y +
+                cube.height, cube.z), new Point3D(midx, midy, midz)));
+            tabCube.add(new Cube(new Point3D(cube.x, cube.y, midz), new Point3D(midx, midy, midz),
+                new Point3D(cube.x, cube.y, cube.z + cube.depth)));
+            tabCube
+                    .add(new Cube(new Point3D(midx, cube.y, midz), new Point3D(cube.x + cube.width, midy,
+                        midz), new Point3D(midx, cube.y, cube.z + cube.depth)));
+            tabCube.add(new Cube(new Point3D(cube.x, midy, midz), new Point3D(midx, cube.y + cube.height,
+                midz), new Point3D(cube.x, midy, cube.z + cube.depth)));
+            tabCube.add(new Cube(new Point3D(midx, midy, midz), new Point3D(cube.x + cube.width, cube.y +
+                cube.height, midz), new Point3D(midx, midy, cube.z + cube.depth)));
 
             // Fill the sons with new OctTree if there are Planets in the cube
             for (int i = 0; i < 8; i++) {
                 if (!subtree[i].isEmpty()) {
-                    this.sons.set(i,
-                        new OctTree(subtree[i], (Cube) tabCube.get(i)));
+                    this.sons.set(i, new OctTree(subtree[i], (Cube) tabCube.get(i)));
                 }
             }
         } else { // no sons to this Node, it is a leaf
@@ -292,8 +282,7 @@ public class OctTree implements Serializable {
             // movement in the Planet's class (fonction moveWithForce)
             double coeff = (9.81 * this.mass) / (r * r);
 
-            Force fo = new Force(coeff * (x - pl.x), coeff * (y - pl.y),
-                    coeff * (z - pl.z));
+            Force fo = new Force(coeff * (x - pl.x), coeff * (y - pl.y), coeff * (z - pl.z));
             return fo;
         } else { // Then we compute the force on all of sons
             for (int i = 0; i < 8; i++) {
@@ -398,8 +387,8 @@ public class OctTree implements Serializable {
     @Override
     public String toString() {
         String ch = "Masse : " + this.mass + "\n";
-        ch += ("Cube x : " + cube.x + " - Cube y : " + cube.y + " - Cube z : " +
-        cube.z + " - Width : " + cube.width + "\n");
+        ch += ("Cube x : " + cube.x + " - Cube y : " + cube.y + " - Cube z : " + cube.z + " - Width : " +
+            cube.width + "\n");
         if (this.hasChild) {
             ch += "Descente dans les fils\n";
             ch += "---------------------\n";

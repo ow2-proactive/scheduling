@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util;
 
-
 /**
  * You worker's launcher have to implements this interface to be launched by
  * TimIt.

@@ -82,9 +82,8 @@ public class GatherRequestsQueue implements Serializable {
     boolean resultsReturned = false;
     boolean oneWayCall = true;
 
-    public GatherRequestsQueue(ProActiveComponent owner, String serverItfName,
-        Method itfTypeMethod, List<ItfID> connectedClientItfs,
-        GatherFuturesHandlerPool gatherFuturesHandlerPool) {
+    public GatherRequestsQueue(ProActiveComponent owner, String serverItfName, Method itfTypeMethod,
+            List<ItfID> connectedClientItfs, GatherFuturesHandlerPool gatherFuturesHandlerPool) {
         this.owner = owner;
         this.serverItfName = serverItfName;
         //        this.conditionChecker = gatherConditionChecker;
@@ -94,21 +93,19 @@ public class GatherRequestsQueue implements Serializable {
         this.connectedClientItfs = connectedClientItfs;
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("adding futures handler for requests on " +
-                    serverItfName + "." + itfTypeMethod.getName());
+                logger.debug("adding futures handler for requests on " + serverItfName + "." +
+                    itfTypeMethod.getName());
             }
 
             //use a pool!
             if (!Void.TYPE.equals(itfTypeMethod.getReturnType())) {
                 oneWayCall = false;
 
-                futuresHandler = GatherFuturesHandlerPool.instance()
-                                                         .borrowFuturesHandler();
+                futuresHandler = GatherFuturesHandlerPool.instance().borrowFuturesHandler();
                 futuresHandler.setConnectedClientItfs(connectedClientItfs);
             }
         } catch (Exception e) {
-            throw new ProActiveRuntimeException("cannot create futures handler for gather interface",
-                e);
+            throw new ProActiveRuntimeException("cannot create futures handler for gather interface", e);
         }
 
         requests = new HashMap<ItfID, ComponentRequest>();
@@ -131,17 +128,14 @@ public class GatherRequestsQueue implements Serializable {
             // evaluate timeout
             if (timeoutTimer == null) {
                 timeoutTimer = new Timer();
-                MethodSynchro sc = itfTypeInvokedMethod.getMethod()
-                                                       .getAnnotation(MethodSynchro.class);
+                MethodSynchro sc = itfTypeInvokedMethod.getMethod().getAnnotation(MethodSynchro.class);
                 if (sc != null) {
                     timeout = sc.timeout();
                 } else {
                     timeout = DEFAULT_TIMEOUT;
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug(
-                        "gather request queue timer starting with timeout = " +
-                        timeout);
+                    logger.debug("gather request queue timer starting with timeout = " + timeout);
                 }
                 timeoutTimer.schedule(new TimeoutTask(this), timeout);
             }
@@ -191,8 +185,7 @@ public class GatherRequestsQueue implements Serializable {
         if (requests.isEmpty()) {
             return null;
         }
-        return requests.get(requests.keySet().iterator().next()).getMethodCall()
-                       .getReifiedMethod();
+        return requests.get(requests.keySet().iterator().next()).getMethodCall().getReifiedMethod();
     }
 
     public boolean oneWayMethods() {
@@ -207,17 +200,19 @@ public class GatherRequestsQueue implements Serializable {
             // avoids race condition with small timeouts (result is replaced with a timeout exception)
             if (!thrownTimeoutException) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("timeout reached at " + timeout +
-                        "for gather request on [" +
+                    logger.debug("timeout reached at " + timeout + "for gather request on [" +
                         itfTypeInvokedMethod.getMethod().getName() + "]");
                 }
                 thrownTimeoutException = true;
-                futuresHandler.setFutureOfGatheredInvocation(new MethodCallResult(
-                        null,
-                        new GathercastTimeoutException("timeout of " + timeout +
-                            " reached before invocations from all clients were received for gather invocation (method " +
-                            itfTypeInvokedMethod.getMethod().toGenericString() +
-                            " on gather interface " + serverItfName)));
+                futuresHandler
+                        .setFutureOfGatheredInvocation(new MethodCallResult(
+                            null,
+                            new GathercastTimeoutException(
+                                "timeout of " +
+                                    timeout +
+                                    " reached before invocations from all clients were received for gather invocation (method " +
+                                    itfTypeInvokedMethod.getMethod().toGenericString() +
+                                    " on gather interface " + serverItfName)));
             }
 
             // else ignore
@@ -230,8 +225,7 @@ public class GatherRequestsQueue implements Serializable {
                 // ignore
             }
             try {
-                GatherFuturesHandlerPool.instance()
-                                        .returnFuturesHandler(futuresHandler);
+                GatherFuturesHandlerPool.instance().returnFuturesHandler(futuresHandler);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -278,14 +272,15 @@ public class GatherRequestsQueue implements Serializable {
             timedout = true;
             if (!resultsReturned) {
                 if (!thrownTimeoutException) {
-                    requestsQueue.addFutureForGatheredRequest(new MethodCallResult(
-                            null,
-                            new GathercastTimeoutException("timeout of " +
-                                timeout +
-                                " reached before invocations from all clients were received for gather invocation (method " +
-                                itfTypeInvokedMethod.getMethod()
-                                                    .toGenericString() +
-                                " on gather interface " + serverItfName)));
+                    requestsQueue
+                            .addFutureForGatheredRequest(new MethodCallResult(
+                                null,
+                                new GathercastTimeoutException(
+                                    "timeout of " +
+                                        timeout +
+                                        " reached before invocations from all clients were received for gather invocation (method " +
+                                        itfTypeInvokedMethod.getMethod().toGenericString() +
+                                        " on gather interface " + serverItfName)));
                 }
             }
         }
@@ -295,14 +290,12 @@ public class GatherRequestsQueue implements Serializable {
         futuresHandler.migrateTo(node);
     }
 
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         //    System.out.println("writing gather requests queue");
         out.defaultWriteObject();
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         //    System.out.println("reading gather requests queue");
         in.defaultReadObject();
     }

@@ -49,8 +49,8 @@ import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
 
 public class GatewayRefresher {
     private RemoteGateway gateway;
-    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(50, 60,
-            60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    private static ThreadPoolExecutor executor = new ThreadPoolExecutor(50, 60, 60L, TimeUnit.SECONDS,
+        new LinkedBlockingQueue<Runnable>());
     private FrameworkConnection connection;
     private boolean persistantData;
 
@@ -79,8 +79,8 @@ public class GatewayRefresher {
                 try {
                     onUrl = new ObjectName(Constants.ON_URL);
 
-                    String url = ((GenericTypeWrapper<String>) paConn.getAttributeAsynchronous(onUrl,
-                            "Url")).getObject();
+                    String url = ((GenericTypeWrapper<String>) paConn.getAttributeAsynchronous(onUrl, "Url"))
+                            .getObject();
                     gateway.setUrl(url);
 
                     GenericTypeWrapper<Object> gtw = paConn.getAttributeAsynchronous(gateway.getOn(),

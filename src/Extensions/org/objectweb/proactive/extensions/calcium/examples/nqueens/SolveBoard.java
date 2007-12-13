@@ -62,7 +62,7 @@ abstract public class SolveBoard implements Execute<Board, Result> {
             backtrack2((BoardBT2)board, boardBT2.row, boardBT2.left, boardBT2.down, boardBT2.right);
         }
     }
-    */
+     */
     protected Result mixBoard(Result res, int n1, int n2) {
         int i;
 

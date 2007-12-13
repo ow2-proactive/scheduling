@@ -59,8 +59,7 @@ public class CalFutureImpl<R> implements CalFuture<R> {
     FileServerClient fserver;
     File outDir;
 
-    public CalFutureImpl(TaskId taskId, FileServerClient fserver,
-        File outRootDir) {
+    public CalFutureImpl(TaskId taskId, FileServerClient fserver, File outRootDir) {
         this.task = null;
         this.taskId = taskId;
         this.fserver = fserver;
@@ -93,8 +92,7 @@ public class CalFutureImpl<R> implements CalFuture<R> {
      * @throws MuscleException Is thrown if a functional exception happens during the execution
      * of the skeleton's muscle.
      */
-    public synchronized R get()
-        throws InterruptedException, MuscleException, TaskException {
+    public synchronized R get() throws InterruptedException, MuscleException, TaskException {
         while (!isDone()) {
             wait();
         }
@@ -140,8 +138,7 @@ public class CalFutureImpl<R> implements CalFuture<R> {
         notifyAll();
     }
 
-    public synchronized void setCallBackQueue(
-        BlockingQueue<CalFuture<R>> callback) {
+    public synchronized void setCallBackQueue(BlockingQueue<CalFuture<R>> callback) {
         this.callback = callback;
     }
 

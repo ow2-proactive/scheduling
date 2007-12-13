@@ -39,13 +39,13 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Deployment descriptor technical services.
  */
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
-            "/functionalTests/descriptor/services/technicalservice/TechnicalService.xml")
-                                                   .getPath();
+            "/functionalTests/descriptor/services/technicalservice/TechnicalService.xml").getPath();
     private ProActiveDescriptor pad;
     private VirtualNode vn1;
     private VirtualNode vn2;

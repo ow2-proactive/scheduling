@@ -88,8 +88,7 @@ public class DisplayPanel extends javax.swing.JPanel implements Runnable {
         int wD = fm.stringWidth("Doctor " + Office.MAX_DOC);
         int h = fm.getAscent();
 
-        return new Dimension(130 + wP + wD + h,
-            80 + ((h + 10) * (Office.NB_PAT - 1)));
+        return new Dimension(130 + wP + wD + h, 80 + ((h + 10) * (Office.NB_PAT - 1)));
     }
 
     @Override
@@ -123,11 +122,10 @@ public class DisplayPanel extends javax.swing.JPanel implements Runnable {
                 int p = docState[i] - 1;
                 g.setColor(bg);
                 g.fillOval(60 + w, (50 + ((h + 10) * p)) - h, h, h);
-                g.drawLine(60 + w + h, (50 + ((h + 10) * p)) - (h / 2), 80 + w,
-                    (50 + ((h + 10) * p)) - (h / 2));
+                g.drawLine(60 + w + h, (50 + ((h + 10) * p)) - (h / 2), 80 + w, (50 + ((h + 10) * p)) -
+                    (h / 2));
                 g.fillOval(80 + w, (50 + ((h + 10) * p)) - h, h, h);
-                g.drawString("Doctor " + (i + 1), 90 + w + h,
-                    50 + ((h + 10) * p));
+                g.drawString("Doctor " + (i + 1), 90 + w + h, 50 + ((h + 10) * p));
                 docState[i] = Office.DOC_UNDEF;
             }
         }
@@ -137,22 +135,21 @@ public class DisplayPanel extends javax.swing.JPanel implements Runnable {
             g.drawString("Patient " + (i + 1), 50, 50 + ((h + 10) * i));
 
             switch (patState[i]) {
-            case Office.PAT_WELL:
-            case Office.PAT_SICK:
-                g.setColor((patState[i] == Office.PAT_WELL) ? wellOn : sickOn);
-                g.fillOval(60 + w, (50 + ((h + 10) * i)) - h, h, h);
-                break;
-            default:
-                g.setColor(on ? cureOn : bg);
-                g.fillOval(60 + w, (50 + ((h + 10) * i)) - h, h, h);
-                g.drawLine(60 + w + h, (50 + ((h + 10) * i)) - (h / 2), 80 + w,
-                    (50 + ((h + 10) * i)) - (h / 2));
-                g.fillOval(80 + w, (50 + ((h + 10) * i)) - h, h, h);
+                case Office.PAT_WELL:
+                case Office.PAT_SICK:
+                    g.setColor((patState[i] == Office.PAT_WELL) ? wellOn : sickOn);
+                    g.fillOval(60 + w, (50 + ((h + 10) * i)) - h, h, h);
+                    break;
+                default:
+                    g.setColor(on ? cureOn : bg);
+                    g.fillOval(60 + w, (50 + ((h + 10) * i)) - h, h, h);
+                    g.drawLine(60 + w + h, (50 + ((h + 10) * i)) - (h / 2), 80 + w, (50 + ((h + 10) * i)) -
+                        (h / 2));
+                    g.fillOval(80 + w, (50 + ((h + 10) * i)) - h, h, h);
 
-                g.setColor(docColor);
-                g.drawString("Doctor " + patState[i], 90 + w + h,
-                    50 + ((h + 10) * i));
-                break;
+                    g.setColor(docColor);
+                    g.drawString("Doctor " + patState[i], 90 + w + h, 50 + ((h + 10) * i));
+                    break;
             }
         }
     }

@@ -54,52 +54,44 @@ public abstract class AbstractGroupParser implements GroupParser {
 
         group.setId(id);
 
-        String username = GCMParserHelper.getAttributeValue(groupNode,
-                "username");
+        String username = GCMParserHelper.getAttributeValue(groupNode, "username");
         if (username != null) {
             group.setUsername(username);
         }
 
-        String commandPath = GCMParserHelper.getAttributeValue(groupNode,
-                "commandPath");
+        String commandPath = GCMParserHelper.getAttributeValue(groupNode, "commandPath");
         if (commandPath != null) {
             group.setCommandPath(commandPath);
         }
 
-        String bookedNodesAccess = GCMParserHelper.getAttributeValue(groupNode,
-                "bookedNodesAccess");
+        String bookedNodesAccess = GCMParserHelper.getAttributeValue(groupNode, "bookedNodesAccess");
         if (bookedNodesAccess != null) {
             group.setBookedNodesAccess(bookedNodesAccess);
         }
 
         try {
-            Node environmentNode = (Node) xpath.evaluate("pa:environment",
-                    groupNode, XPathConstants.NODE);
+            Node environmentNode = (Node) xpath.evaluate("pa:environment", groupNode, XPathConstants.NODE);
 
             if (environmentNode != null) {
                 Map<String, String> envVars = new HashMap<String, String>();
 
-                NodeList argNodes = (NodeList) xpath.evaluate("pa:variable",
-                        environmentNode, XPathConstants.NODESET);
+                NodeList argNodes = (NodeList) xpath.evaluate("pa:variable", environmentNode,
+                        XPathConstants.NODESET);
 
                 for (int i = 0; i < argNodes.getLength(); ++i) {
                     Node argNode = argNodes.item(i);
-                    String name = GCMParserHelper.getAttributeValue(argNode,
-                            "name");
-                    String value = GCMParserHelper.getAttributeValue(argNode,
-                            "value");
+                    String name = GCMParserHelper.getAttributeValue(argNode, "name");
+                    String value = GCMParserHelper.getAttributeValue(argNode, "value");
                     envVars.put(name, value);
                 }
 
                 group.setEnvironment(envVars);
             }
 
-            Node scriptPath = (Node) xpath.evaluate("pa:scriptPath", groupNode,
-                    XPathConstants.NODE);
+            Node scriptPath = (Node) xpath.evaluate("pa:scriptPath", groupNode, XPathConstants.NODE);
 
             if (scriptPath != null) {
-                group.setScriptPath(GCMParserHelper.parsePathElementNode(
-                        scriptPath));
+                group.setScriptPath(GCMParserHelper.parsePathElementNode(scriptPath));
             }
         } catch (XPathExpressionException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);

@@ -50,8 +50,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.ext.locationserver.LocationServer;
 
 
-public class MixedLocationServer implements org.objectweb.proactive.RunActive,
-    LocationServer {
+public class MixedLocationServer implements org.objectweb.proactive.RunActive, LocationServer {
     static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
 
     /**
@@ -119,8 +118,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
                         // the
                         // same sender for the same ID
                         UniqueID id = (UniqueID) oldest.getParameter(0);
-                        String requestID = oldest.getSender().getID().toString() +
-                            id.toString();
+                        String requestID = oldest.getSender().getID().toString() + id.toString();
 
                         LocationRequestInfo oldRequest = (LocationRequestInfo) requestTable.get(requestID);
 
@@ -133,9 +131,8 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
                             int newVersion = table.getVersion(id);
                             if (oldVersion != newVersion) {
                                 service.serve(oldest);
-                                requestTable.put(requestID,
-                                    new LocationRequestInfo(newVersion,
-                                        System.currentTimeMillis(), true));
+                                requestTable.put(requestID, new LocationRequestInfo(newVersion, System
+                                        .currentTimeMillis(), true));
                             } else {
                                 // we still have the same version
                                 // if the previous call hasn't been served ==>
@@ -143,9 +140,8 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
                                 // else put the request in the table and in the
                                 // queue
                                 if (oldRequest.hasBeenServed()) {
-                                    requestTable.put(requestID,
-                                        new LocationRequestInfo(newVersion,
-                                            System.currentTimeMillis(), false));
+                                    requestTable.put(requestID, new LocationRequestInfo(newVersion, System
+                                            .currentTimeMillis(), false));
                                     try {
                                         body.receiveRequest(oldest);
                                     } catch (IOException e) {
@@ -156,8 +152,8 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
                                 } else {
                                     // if the delay is gone, serve the request
                                     // else put it in the queue
-                                    if ((oldRequest.getCreationTime() +
-                                            DELAY_SAME_REPLY) < System.currentTimeMillis()) {
+                                    if ((oldRequest.getCreationTime() + DELAY_SAME_REPLY) < System
+                                            .currentTimeMillis()) {
                                         service.serve(oldest);
                                         oldRequest.setServed(true);
                                     } else {
@@ -176,9 +172,8 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
                             service.serve(oldest);
 
                             int version = table.getVersion(id);
-                            requestTable.put(requestID,
-                                new LocationRequestInfo(version,
-                                    System.currentTimeMillis(), true));
+                            requestTable.put(requestID, new LocationRequestInfo(version, System
+                                    .currentTimeMillis(), true));
                         }
                     } else {
                         service.serve(oldest);
@@ -280,7 +275,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
                                         e.printStackTrace();
                                 }
                         }
-                        */
+                         */
                         return ((WrappedLocationBody) o).getBody();
                     }
                 }
@@ -314,8 +309,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
             this.isMigrating = false;
         }
 
-        public WrappedLocationBody(UniversalBody body, int version,
-            boolean isMigrating) {
+        public WrappedLocationBody(UniversalBody body, int version, boolean isMigrating) {
             this.wrappedBody = body;
             this.version = version;
             this.isMigrating = isMigrating;
@@ -339,8 +333,7 @@ public class MixedLocationServer implements org.objectweb.proactive.RunActive,
         private long creationTime;
         private boolean served;
 
-        public LocationRequestInfo(int version, long creationTime,
-            boolean served) {
+        public LocationRequestInfo(int version, long creationTime, boolean served) {
             this.version = version;
             this.creationTime = creationTime;
             this.served = served;

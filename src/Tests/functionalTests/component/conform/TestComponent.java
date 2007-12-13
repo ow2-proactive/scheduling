@@ -43,10 +43,8 @@ public class TestComponent extends Conformtest {
     protected TypeFactory tf;
     protected GenericFactory gf;
     protected ComponentType t;
-    protected final static String AC = "attribute-controller/" + PKG +
-        ".CAttributes/false,false,false";
-    protected final static String sI = "server/" + PKG +
-        ".I/false,false,false";
+    protected final static String AC = "attribute-controller/" + PKG + ".CAttributes/false,false,false";
+    protected final static String sI = "server/" + PKG + ".I/false,false,false";
     protected final static String cI = "client/" + PKG + ".I/true,false,false";
 
     @Before
@@ -55,13 +53,9 @@ public class TestComponent extends Conformtest {
         tf = Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("attribute-controller",
-                        CAttributes.class.getName(), false, false, false),
-                    tf.createFcItfType("server", I.class.getName(), false,
-                        false, false),
-                    tf.createFcItfType("client", I.class.getName(), true, true,
-                        false)
-                });
+                tf.createFcItfType("attribute-controller", CAttributes.class.getName(), false, false, false),
+                tf.createFcItfType("server", I.class.getName(), false, false, false),
+                tf.createFcItfType("client", I.class.getName(), true, true, false) });
     }
 
     // -------------------------------------------------------------------------
@@ -100,8 +94,7 @@ public class TestComponent extends Conformtest {
     @Test
     @Ignore
     public void testParametricPrimitiveTemplate() throws Exception {
-        Component c = gf.newFcInstance(t, parametricPrimitiveTemplate,
-                C.class.getName());
+        Component c = gf.newFcInstance(t, parametricPrimitiveTemplate, C.class.getName());
 
         CAttributes ca = (CAttributes) c.getFcInterface("attribute-controller");
         ca.setX1(true);

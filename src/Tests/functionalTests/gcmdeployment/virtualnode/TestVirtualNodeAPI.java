@@ -50,8 +50,7 @@ public class TestVirtualNodeAPI extends Abstract {
 
     @BeforeClass
     static public void setup() throws FileNotFoundException, ProActiveException {
-        gcma = API.getGCMApplicationDescriptor(getDescriptor(
-                    TestVirtualNodeAPI.class));
+        gcma = API.getGCMApplicationDescriptor(getDescriptor(TestVirtualNodeAPI.class));
         gcma.startDeployment();
         waitAllocation();
     }
@@ -126,8 +125,7 @@ public class TestVirtualNodeAPI extends Abstract {
         // Check isolation
         Set<Node> vn5Nodes = vn5.getCurrentNodes();
         vn5Nodes.remove(vn5Nodes.iterator().next());
-        Assert.assertTrue(vn5.getCurrentNodes().size() == ((vn5Nodes.size()) +
-            1));
+        Assert.assertTrue(vn5.getCurrentNodes().size() == ((vn5Nodes.size()) + 1));
     }
 
     @Test
@@ -137,8 +135,7 @@ public class TestVirtualNodeAPI extends Abstract {
         // Check isolation
         Set<Node> vn1Nodes = vn1.getCurrentNodes();
         Set<Node> set1 = vn1.getNewNodes();
-        Assert.assertTrue(set1.containsAll(vn1Nodes) &&
-            (set1.size() == vn1Nodes.size()));
+        Assert.assertTrue(set1.containsAll(vn1Nodes) && (set1.size() == vn1Nodes.size()));
         Assert.assertTrue(vn1.getNewNodes().size() == 0);
 
         // TODO register manually some Node and check the returned set again

@@ -86,7 +86,7 @@ public class Calcium {
      * @return A {@link Stream Stream} that can input T and output  from the framework.
      */
     public <T extends java.io.Serializable, R extends java.io.Serializable> Stream<T, R> newStream(
-        Skeleton<T, R> root) {
+            Skeleton<T, R> root) {
         return new Stream<T, R>(facade, fserver, root);
     }
 

@@ -65,8 +65,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @version 1.0,  2002/09/20
  * @since   ProActive 0.9.4
  */
-public class JVMProcessImpl extends AbstractExternalProcess
-    implements JVMProcess, Serializable {
+public class JVMProcessImpl extends AbstractExternalProcess implements JVMProcess, Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
 
     //private final static String POLICY_FILE = "proactive.java.policy";
@@ -74,10 +73,10 @@ public class JVMProcessImpl extends AbstractExternalProcess
     private final static String LOG4J_OPTION = " -Dlog4j.configuration=file:";
 
     //private final static String LOG4J_FILE = "proactive-log4j";
-    public final static String DEFAULT_CLASSPATH = convertClasspathToAbsolutePath(System.getProperty(
-                "java.class.path"));
-    public final static String DEFAULT_JAVAPATH = System.getProperty(
-            "java.home") + File.separator + "bin" + File.separator + "java";
+    public final static String DEFAULT_CLASSPATH = convertClasspathToAbsolutePath(System
+            .getProperty("java.class.path"));
+    public final static String DEFAULT_JAVAPATH = System.getProperty("java.home") + File.separator + "bin" +
+        File.separator + "java";
     public static String DEFAULT_POLICY_FILE = PAProperties.SECURITY_POLICY.getValue();
     public static String DEFAULT_LOG4J_FILE = PAProperties.LOG4J.getValue();
 
@@ -147,7 +146,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
      * @param errorMessageLogger The logger that handles error stream of this process
      */
     public JVMProcessImpl(RemoteProcessMessageLogger inputMessageLogger,
-        RemoteProcessMessageLogger errorMessageLogger) {
+            RemoteProcessMessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
         this.modifiedOptions = new ArrayList<String>();
     }
@@ -294,12 +293,12 @@ public class JVMProcessImpl extends AbstractExternalProcess
 
         if (!priority.equals(PriorityLevel.normal)) {
             switch (os) {
-            case unix:
-                javaCommand.append(priority.unixCmd());
-                break;
-            case windows:
-                javaCommand.append(priority.windowsCmd());
-                break;
+                case unix:
+                    javaCommand.append(priority.unixCmd());
+                    break;
+                case windows:
+                    javaCommand.append(priority.windowsCmd());
+                    break;
             }
         }
 
@@ -342,13 +341,13 @@ public class JVMProcessImpl extends AbstractExternalProcess
         // dynamic classloading through runtimes
         // check system classloader when ProActive.jar is used (where by default : "proactive.classloader" == "disable")
         if (PAProperties.PA_CLASSLOADER.isTrue() ||
-                "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(
-                    System.getProperty("java.system.class.loader"))) {
-            javaCommand.append(
-                " -Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader ");
+            "org.objectweb.proactive.core.classloader.ProActiveClassLoader".equals(System
+                    .getProperty("java.system.class.loader"))) {
+            javaCommand
+                    .append(" -Djava.system.class.loader=org.objectweb.proactive.core.classloader.ProActiveClassLoader ");
             // the following allows the deserializing of streams that were annotated with rmi utilities
-            javaCommand.append(
-                " -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi");
+            javaCommand
+                    .append(" -Djava.rmi.server.RMIClassLoaderSpi=org.objectweb.proactive.core.classloader.ProActiveRMIClassLoaderSpi");
             // to avoid clashes due to multiple classloader, we initiate the
             // configuration of log4j ourselves 
             // (see StartRuntime.main)
@@ -367,8 +366,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
         javaCommand.append(" ");
         javaCommand.append(classname);
         if (logger.isDebugEnabled()) {
-            logger.debug("JVMProcessImpl.buildJavaCommand()  Parameters " +
-                parameters);
+            logger.debug("JVMProcessImpl.buildJavaCommand()  Parameters " + parameters);
         }
         if (parameters != null) {
             javaCommand.append(" ");
@@ -413,8 +411,7 @@ public class JVMProcessImpl extends AbstractExternalProcess
     private static String convertClasspathToAbsolutePath(String classpath) {
         StringBuffer absoluteClasspath = new StringBuffer();
         String pathSeparator = System.getProperty("path.separator");
-        java.util.StringTokenizer st = new java.util.StringTokenizer(classpath,
-                pathSeparator);
+        java.util.StringTokenizer st = new java.util.StringTokenizer(classpath, pathSeparator);
         while (st.hasMoreTokens()) {
             absoluteClasspath.append(new java.io.File(st.nextToken()).getAbsolutePath());
             absoluteClasspath.append(pathSeparator);

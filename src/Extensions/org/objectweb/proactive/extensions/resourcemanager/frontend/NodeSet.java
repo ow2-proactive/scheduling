@@ -63,7 +63,7 @@ public class NodeSet extends ArrayList<Node> {
      * Create a node containing a nodes collection.
      * @param c collection to put ion the NodeSet
      */
-    public NodeSet(Collection<?extends Node> c) {
+    public NodeSet(Collection<? extends Node> c) {
         super(c);
         // TODO Auto-generated constructor stub
     }

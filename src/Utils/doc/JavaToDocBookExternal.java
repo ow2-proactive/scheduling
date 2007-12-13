@@ -61,16 +61,14 @@ public class JavaToDocBookExternal implements LanguageToDocBook {
             // Do the highlighting, which creates the File outputFileName
             String fileToConvert = temp.getPath();
             String outputFileName = fileToConvert + ".xml";
-            String execString = path + exec + " -f docbook -i " +
-                fileToConvert + " -o " + outputFileName;
+            String execString = path + exec + " -f docbook -i " + fileToConvert + " -o " + outputFileName;
             Process converter = Runtime.getRuntime().exec(execString);
 
             try {
                 converter.waitFor();
             } catch (InterruptedException e) {
-                System.err.println("Problem with program " + exec +
-                    " used to convert " + fileToConvert + ": " +
-                    e.getMessage());
+                System.err.println("Problem with program " + exec + " used to convert " + fileToConvert +
+                    ": " + e.getMessage());
 
                 return codeString;
             }
@@ -78,8 +76,7 @@ public class JavaToDocBookExternal implements LanguageToDocBook {
             temp.delete();
 
             // read from the newly created file, and turn that into one single string. 
-            BufferedReader in = new BufferedReader(new FileReader(
-                        outputFileName));
+            BufferedReader in = new BufferedReader(new FileReader(outputFileName));
             String str;
             String result = "";
 
@@ -92,9 +89,8 @@ public class JavaToDocBookExternal implements LanguageToDocBook {
 
             return result;
         } catch (IOException e) {
-            System.err.println(
-                "Problem writing temp files used with converter " + exec +
-                ": " + e.getMessage());
+            System.err.println("Problem writing temp files used with converter " + exec + ": " +
+                e.getMessage());
 
             return codeString;
         }

@@ -52,8 +52,8 @@ public interface LocationServer extends Remote {
      * @param oldLocation last known location of the searched object
      * @return the new location of the searched object
      */
-    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation,
-        UniqueID caller) throws RemoteException;
+    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation, UniqueID caller)
+            throws RemoteException;
 
     /**
      * Set the new location of the active object identified by id.
@@ -62,8 +62,7 @@ public interface LocationServer extends Remote {
      * @param newLocation new location of the caller. If this location is null,
      * the body id is removed from the location table.
      */
-    public void updateLocation(UniqueID id, UniversalBody newLocation)
-        throws RemoteException;
+    public void updateLocation(UniqueID id, UniversalBody newLocation) throws RemoteException;
 
     /**
      * Return the list of locations of all registered bodies.
@@ -80,6 +79,5 @@ public interface LocationServer extends Remote {
     /**
      * Reinit the state of the location server.
      */
-    public void initialize() throws RemoteException;
-    ;
+    public void initialize() throws RemoteException;;
 }

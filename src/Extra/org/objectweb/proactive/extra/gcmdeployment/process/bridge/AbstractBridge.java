@@ -141,8 +141,7 @@ public abstract class AbstractBridge implements Bridge {
         hostInfo.check();
     }
 
-    public List<String> buildCommands(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma) {
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         List<String> commands = new ArrayList<String>();
 
         if (hostInfo != null) {
@@ -160,8 +159,7 @@ public abstract class AbstractBridge implements Bridge {
         // Prefix each command with this bridge
         List<String> ret = new ArrayList<String>();
         for (String command : commands) {
-            ret.add(internalBuildCommand() + " " +
-                Helpers.escapeCommand(command));
+            ret.add(internalBuildCommand() + " " + Helpers.escapeCommand(command));
         }
 
         return ret;

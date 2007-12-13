@@ -45,18 +45,16 @@ abstract public class AbstractObject implements IPropertySource {
         listeners.addPropertyChangeListener(listener);
     }
 
-    public void firePropertyChange(String propName, Object oldValue,
-        Object newValue) {
+    public void firePropertyChange(String propName, Object oldValue, Object newValue) {
         listeners.firePropertyChange(propName, oldValue, newValue);
     }
 
-    public void asyncFirePropertyChange(final String propName,
-        final Object oldValue, final Object newValue) {
+    public void asyncFirePropertyChange(final String propName, final Object oldValue, final Object newValue) {
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    listeners.firePropertyChange(propName, oldValue, newValue);
-                }
-            });
+            public void run() {
+                listeners.firePropertyChange(propName, oldValue, newValue);
+            }
+        });
     }
 
     public void removePropertyChangeListener(PropertyChangeListener listener) {

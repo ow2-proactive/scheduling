@@ -43,8 +43,7 @@ public class LoadBalancingTS implements TechnicalService, Serializable {
         // TODO Auto-generated method stub
         String metricFactoryName = (String) argValues.get("MetricFactory");
         try {
-            MetricFactory mf = (MetricFactory) Class.forName(metricFactoryName)
-                                                    .newInstance();
+            MetricFactory mf = (MetricFactory) Class.forName(metricFactoryName).newInstance();
             LoadBalancing.activate(mf);
         } catch (InstantiationException e) {
             // TODO Auto-generated catch block

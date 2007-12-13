@@ -64,8 +64,7 @@ public class InternalTaskFlowJob extends InternalJob {
      */
 
     //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
-    public InternalTaskFlowJob(String name, JobPriority priority,
-        boolean cancelOnError, String description) {
+    public InternalTaskFlowJob(String name, JobPriority priority, boolean cancelOnError, String description) {
         super(name, priority, cancelOnError, description);
     }
 

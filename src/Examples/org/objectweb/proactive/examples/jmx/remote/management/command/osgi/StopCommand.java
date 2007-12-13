@@ -55,8 +55,7 @@ public class StopCommand extends OSGiCommand implements StopCommandMBean {
         BundleInfo[] bundles = OSGiStore.getInstance().getBundles();
         for (int i = 0; i < bundles.length; i++) {
             if ((bundles[i].getId() == this.idBundle) &&
-                    ((bundles[i].getState() != Bundle.ACTIVE) &&
-                    (bundles[i].getState() != Bundle.STARTING))) {
+                ((bundles[i].getState() != Bundle.ACTIVE) && (bundles[i].getState() != Bundle.STARTING))) {
                 this.done = true;
             }
         }

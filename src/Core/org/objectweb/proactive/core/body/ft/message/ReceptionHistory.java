@@ -46,8 +46,8 @@ import org.objectweb.proactive.core.UniqueID;
 public class ReceptionHistory implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
 
     // the elements of the history
     private List<UniqueID> elements;
@@ -169,8 +169,8 @@ public class ReceptionHistory implements Serializable {
      */
     public void compactHistory() {
         if (this.lastCommited > this.lastRecoverable) {
-            this.elements.subList((int) ((this.lastRecoverable + 1) -
-                this.base), (int) ((this.lastCommited + 1) - this.base));
+            this.elements.subList((int) ((this.lastRecoverable + 1) - this.base),
+                    (int) ((this.lastCommited + 1) - this.base));
             this.lastCommited = this.lastRecoverable;
         }
     }

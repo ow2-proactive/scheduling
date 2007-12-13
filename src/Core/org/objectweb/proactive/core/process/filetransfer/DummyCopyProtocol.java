@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.process.filetransfer;
 
-
 /**
  * DummyProtocol for unkown default protocols.
  *

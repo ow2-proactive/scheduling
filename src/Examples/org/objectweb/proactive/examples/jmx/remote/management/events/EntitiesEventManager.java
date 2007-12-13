@@ -62,8 +62,8 @@ import org.objectweb.proactive.examples.jmx.remote.management.mbean.BundleInfo;
 public class EntitiesEventManager implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private static transient EntitiesEventManager instance;
     public static final String GATEWAY_ADDED = "Gateway added";
     public static final String GATEWAY_CONNECTED = "Gateway connected";
@@ -81,8 +81,7 @@ public class EntitiesEventManager implements Serializable {
     public static final String GATEWAYS_IN_GROUP_CONNECTED = "Gateways connected in a sub group";
     public static final String GATEWAY_ADDED_IN_A_GROUP = "Gateway added in a sub group";
     public static final String TRANSACTION_OPENED = "Transaction opened";
-    private static HashMap<ManageableEntity, Vector<EntitiesEventListener>> entityListeners =
-        new HashMap<ManageableEntity, Vector<EntitiesEventListener>>();
+    private static HashMap<ManageableEntity, Vector<EntitiesEventListener>> entityListeners = new HashMap<ManageableEntity, Vector<EntitiesEventListener>>();
     private static Vector<EntitiesEventListener> allListeners = new Vector<EntitiesEventListener>();
     private HashMap<ObjectName, ManageableEntity> onEntities = new HashMap<ObjectName, ManageableEntity>();
     private ActiveNotificationListener notificationListener;
@@ -93,8 +92,8 @@ public class EntitiesEventManager implements Serializable {
      */
     private EntitiesEventManager() {
         try {
-            this.notificationListener = (ActiveNotificationListener) PAActiveObject.newActive(ActiveNotificationListener.class.getName(),
-                    new Object[] {  });
+            this.notificationListener = (ActiveNotificationListener) PAActiveObject.newActive(
+                    ActiveNotificationListener.class.getName(), new Object[] {});
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -122,11 +121,11 @@ public class EntitiesEventManager implements Serializable {
     }
 
     /*
-         *
-         * @param gateway
-         * @param message
-         * @param bundle
-         */
+     *
+     * @param gateway
+     * @param message
+     * @param bundle
+     */
     public void newEvent(ManageableEntity entity, String message) {
         fireListeners(entity, message + " on " + entity);
     }
@@ -159,12 +158,11 @@ public class EntitiesEventManager implements Serializable {
     //    }
 
     /**
-       *
-       * @param listener
-       * @param entity
-       */
-    public void subscribe(EntitiesEventListener listener,
-        ManageableEntity entity) {
+     *
+     * @param listener
+     * @param entity
+     */
+    public void subscribe(EntitiesEventListener listener, ManageableEntity entity) {
         Vector<EntitiesEventListener> listeners = entityListeners.get(entity);
         if (listeners == null) {
             listeners = new Vector<EntitiesEventListener>();
@@ -231,8 +229,8 @@ public class EntitiesEventManager implements Serializable {
                     gateway.addBundle(bInfo);
                     fireListeners(gateway, notification.toString());
                 } else if ((eventType == BundleNotification.BUNDLE_STARTED) ||
-                        (eventType == BundleNotification.BUNDLE_STOPPED) ||
-                        (eventType == BundleNotification.BUNDLE_UPDATED)) {
+                    (eventType == BundleNotification.BUNDLE_STOPPED) ||
+                    (eventType == BundleNotification.BUNDLE_UPDATED)) {
                     RemoteBundle bundle = (RemoteBundle) onEntities.get(on);
                     bundle.setBundleInfo(bInfo);
                     fireListeners(bundle, notification.toString());
@@ -243,28 +241,19 @@ public class EntitiesEventManager implements Serializable {
                 }
             } else if (notification instanceof TransactionCommitedNotification) {
                 TransactionNotification n = (TransactionNotification) notification;
-                RemoteTransactionManager.getInstance()
-                                        .commitTransaction(n.getId());
-                fireListeners(RemoteTransactionManager.getInstance()
-                                                      .getTransaction(n.getId()),
-                    n.toString());
+                RemoteTransactionManager.getInstance().commitTransaction(n.getId());
+                fireListeners(RemoteTransactionManager.getInstance().getTransaction(n.getId()), n.toString());
             } else if (notification instanceof TransactionCancelledNotification) {
                 TransactionNotification n = (TransactionNotification) notification;
-                fireListeners(RemoteTransactionManager.getInstance()
-                                                      .getTransaction(n.getId()),
-                    n.toString());
-                RemoteTransactionManager.getInstance()
-                                        .cancelTransaction(n.getId());
+                fireListeners(RemoteTransactionManager.getInstance().getTransaction(n.getId()), n.toString());
+                RemoteTransactionManager.getInstance().cancelTransaction(n.getId());
             } else if (notification instanceof TransactionCommandNotification) {
                 TransactionCommandNotification n = (TransactionCommandNotification) notification;
 
-                RemoteTransaction transaction = RemoteTransactionManager.getInstance()
-                                                                        .getTransaction(n.getId());
-                transaction.addEntity(new RemoteCommand(transaction,
-                        (String) n.getSource()));
-                fireListeners(RemoteTransactionManager.getInstance()
-                                                      .getTransaction(n.getId()),
-                    n.toString());
+                RemoteTransaction transaction = RemoteTransactionManager.getInstance().getTransaction(
+                        n.getId());
+                transaction.addEntity(new RemoteCommand(transaction, (String) n.getSource()));
+                fireListeners(RemoteTransactionManager.getInstance().getTransaction(n.getId()), n.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -108,8 +108,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class ProActiveMetaObjectFactory implements MetaObjectFactory,
-    java.io.Serializable, Cloneable {
+public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Serializable, Cloneable {
     public static final String COMPONENT_PARAMETERS_KEY = "component-parameters";
     public static final String SYNCHRONOUS_COMPOSITE_COMPONENT_KEY = "synchronous-composite";
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
@@ -161,7 +160,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     public ProActiveMetaObjectFactory(Map parameters) {
         this.parameters = parameters;
         if (parameters.containsKey(COMPONENT_PARAMETERS_KEY)) {
-            ComponentParameters initialComponentParameters = (ComponentParameters) parameters.get(COMPONENT_PARAMETERS_KEY);
+            ComponentParameters initialComponentParameters = (ComponentParameters) parameters
+                    .get(COMPONENT_PARAMETERS_KEY);
             this.componentFactoryInstance = newComponentFactorySingleton(initialComponentParameters);
             this.requestFactoryInstance = newRequestFactorySingleton();
             this.replyReceiverFactoryInstance = newReplyReceiverFactorySingleton();
@@ -271,7 +271,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     }
 
     protected ProActiveComponentFactory newComponentFactorySingleton(
-        ComponentParameters initialComponentParameters) {
+            ComponentParameters initialComponentParameters) {
         return new ProActiveComponentFactoryImpl(initialComponentParameters);
     }
 
@@ -282,37 +282,33 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     //  //
     //  // -- INNER CLASSES -----------------------------------------------
     //  //
-    protected static class RequestFactoryImpl implements RequestFactory,
-        java.io.Serializable {
-        public Request newRequest(MethodCall methodCall,
-            UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
+    protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
+        public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
+                long sequenceID) {
             //########### exemple de code pour les nouvelles factories
             //			if(System.getProperty("migration.stategy").equals("locationserver")){
             //				  return new RequestWithLocationServer(methodCall, sourceBody,
             //                isOneWay, sequenceID, LocationServerFactory.getLocationServer());
             //			}else{
-            return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall,
-                sourceBody, isOneWay, sequenceID);
+            return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody,
+                isOneWay, sequenceID);
             //}
         }
     }
 
     // end inner class RequestFactoryImpl
-    protected static class ReplyReceiverFactoryImpl
-        implements ReplyReceiverFactory, java.io.Serializable {
+    protected static class ReplyReceiverFactoryImpl implements ReplyReceiverFactory, java.io.Serializable {
         public ReplyReceiver newReplyReceiver() {
             return new org.objectweb.proactive.core.body.reply.ReplyReceiverImpl();
         }
     }
 
     // end inner class ReplyReceiverFactoryImpl
-    protected class RequestReceiverFactoryImpl implements RequestReceiverFactory,
-        java.io.Serializable {
+    protected class RequestReceiverFactoryImpl implements RequestReceiverFactory, java.io.Serializable {
         public RequestReceiver newRequestReceiver() {
-            if (ProActiveMetaObjectFactory.this.parameters.containsKey(
-                        SYNCHRONOUS_COMPOSITE_COMPONENT_KEY) &&
-                    ((Boolean) ProActiveMetaObjectFactory.this.parameters.get(
-                        ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY)).booleanValue()) {
+            if (ProActiveMetaObjectFactory.this.parameters.containsKey(SYNCHRONOUS_COMPOSITE_COMPONENT_KEY) &&
+                ((Boolean) ProActiveMetaObjectFactory.this.parameters
+                        .get(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY)).booleanValue()) {
                 return new SynchronousComponentRequestReceiver();
             }
             return new org.objectweb.proactive.core.body.request.RequestReceiverImpl();
@@ -320,11 +316,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     }
 
     // end inner class RequestReceiverFactoryImpl
-    protected class RequestQueueFactoryImpl implements RequestQueueFactory,
-        java.io.Serializable {
+    protected class RequestQueueFactoryImpl implements RequestQueueFactory, java.io.Serializable {
         public BlockingRequestQueue newRequestQueue(UniqueID ownerID) {
-            if ("true".equals(ProActiveMetaObjectFactory.this.parameters.get(
-                            SYNCHRONOUS_COMPOSITE_COMPONENT_KEY))) {
+            if ("true".equals(ProActiveMetaObjectFactory.this.parameters
+                    .get(SYNCHRONOUS_COMPOSITE_COMPONENT_KEY))) {
                 return null;
             }
 
@@ -339,8 +334,8 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     }
 
     // end inner class RequestQueueFactoryImpl
-    protected static class MigrationManagerFactoryImpl
-        implements MigrationManagerFactory, java.io.Serializable {
+    protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory,
+            java.io.Serializable {
         public MigrationManager newMigrationManager() {
             //########### example de code pour les nouvelles factories
             //			if(System.getProperty("migration.stategy").equals("locationserver")){
@@ -396,29 +391,26 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     //    }
 
     // end inner class RemoteBodyFactoryImpl
-    protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory,
-        java.io.Serializable {
+    protected static class ThreadStoreFactoryImpl implements ThreadStoreFactory, java.io.Serializable {
         public ThreadStore newThreadStore() {
             return new org.objectweb.proactive.core.util.ThreadStoreImpl();
         }
     }
 
     // end inner class ThreadStoreFactoryImpl
-    protected static class ProActiveSPMDGroupManagerFactoryImpl
-        implements ProActiveSPMDGroupManagerFactory, java.io.Serializable {
+    protected static class ProActiveSPMDGroupManagerFactoryImpl implements ProActiveSPMDGroupManagerFactory,
+            java.io.Serializable {
         public ProActiveSPMDGroupManager newProActiveSPMDGroupManager() {
             return new ProActiveSPMDGroupManager();
         }
     }
 
     // end inner class ProActiveGroupManagerFactoryImpl
-    protected class ProActiveComponentFactoryImpl
-        implements ProActiveComponentFactory, java.io.Serializable {
+    protected class ProActiveComponentFactoryImpl implements ProActiveComponentFactory, java.io.Serializable {
         // COMPONENTS
         private ComponentParameters componentParameters;
 
-        public ProActiveComponentFactoryImpl(
-            ComponentParameters initialComponentParameters) {
+        public ProActiveComponentFactoryImpl(ComponentParameters initialComponentParameters) {
             this.componentParameters = initialComponentParameters;
         }
 
@@ -428,33 +420,30 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory,
     }
 
     // FAULT-TOLERANCE
-    protected class FTManagerFactoryImpl implements FTManagerFactory,
-        Serializable {
+    protected class FTManagerFactoryImpl implements FTManagerFactory, Serializable {
         public FTManager newFTManager(int protocolSelector) {
             switch (protocolSelector) {
-            case FTManagerFactory.PROTO_CIC_ID:
-                return new FTManagerCIC();
-            case FTManagerFactory.PROTO_PML_ID:
-                return new FTManagerPMLRB();
-            default:
-                logger.error("Error while creating fault-tolerance manager : " +
-                    "no protocol is associated to selector value " +
-                    protocolSelector);
-                return null;
+                case FTManagerFactory.PROTO_CIC_ID:
+                    return new FTManagerCIC();
+                case FTManagerFactory.PROTO_PML_ID:
+                    return new FTManagerPMLRB();
+                default:
+                    logger.error("Error while creating fault-tolerance manager : " +
+                        "no protocol is associated to selector value " + protocolSelector);
+                    return null;
             }
         }
 
         public FTManager newHalfFTManager(int protocolSelector) {
             switch (protocolSelector) {
-            case FTManagerFactory.PROTO_CIC_ID:
-                return new HalfFTManagerCIC();
-            case FTManagerFactory.PROTO_PML_ID:
-                return new HalfFTManagerPMLRB();
-            default:
-                logger.error("Error while creating fault-tolerance manager : " +
-                    "no protocol is associated to selector value " +
-                    protocolSelector);
-                return null;
+                case FTManagerFactory.PROTO_CIC_ID:
+                    return new HalfFTManagerCIC();
+                case FTManagerFactory.PROTO_PML_ID:
+                    return new HalfFTManagerPMLRB();
+                default:
+                    logger.error("Error while creating fault-tolerance manager : " +
+                        "no protocol is associated to selector value " + protocolSelector);
+                    return null;
             }
         }
     }

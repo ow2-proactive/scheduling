@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.boundedbuffer;
 
-
 /**
  * Simple Active consumer
  */
@@ -51,8 +50,7 @@ public abstract class ConsumerProducer implements org.objectweb.proactive.RunAct
     /**
      * The effective constructor
      */
-    public ConsumerProducer(String name, ConsumerProducerListener listener,
-        BoundedBuffer buffer) {
+    public ConsumerProducer(String name, ConsumerProducerListener listener, BoundedBuffer buffer) {
         this.name = name;
         this.buffer = buffer;
         this.listener = listener;

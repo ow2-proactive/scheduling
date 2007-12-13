@@ -61,9 +61,7 @@ public class NodeObject extends AbstractData {
 
     public NodeObject(RuntimeObject parent, String url, ObjectName objectName) {
         // Call super contructor in order to specify a TreeMap<String, AbstractData> for monitored children
-        super(objectName,
-            new TreeMap<String, AbstractData>(
-                new ActiveObject.ActiveObjectComparator()));
+        super(objectName, new TreeMap<String, AbstractData>(new ActiveObject.ActiveObjectComparator()));
         this.parent = parent;
 
         this.url = FactoryName.getCompleteUrl(url);
@@ -98,8 +96,8 @@ public class NodeObject extends AbstractData {
      */
     private NodeWrapperMBean getProxyNodeMBean() {
         if (proxyNodeMBean == null) {
-            proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),
-                    getObjectName(), NodeWrapperMBean.class, false);
+            proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
+                    getConnection(), getObjectName(), NodeWrapperMBean.class, false);
         }
         return proxyNodeMBean;
     }
@@ -145,14 +143,13 @@ public class NodeObject extends AbstractData {
         List<ActiveObject> childrentoAdd = new ArrayList<ActiveObject>();
         final Map<String, AbstractData> childrenToRemoved = this.getMonitoredChildrenAsMap();
 
-        final List<ObjectName> activeObjectNames = getProxyNodeMBean()
-                                                       .getActiveObjects();
+        final List<ObjectName> activeObjectNames = getProxyNodeMBean().getActiveObjects();
 
         // System.out.println("Node "  +this.getName()+" has: " + activeObjectNames.size()+" ao's");
         // int count=0;
         for (final ObjectName oname : activeObjectNames) {
-            final BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),
-                    oname, BodyWrapperMBean.class, false);
+            final BodyWrapperMBean proxyBodyMBean = (BodyWrapperMBean) MBeanServerInvocationHandler
+                    .newProxyInstance(getConnection(), oname, BodyWrapperMBean.class, false);
 
             // Since the id is already contained as a String in the ObjectName 
             // this call can be avoid if the UniqueID can be built from a string
@@ -169,8 +166,7 @@ public class NodeObject extends AbstractData {
             if (child == null) {
                 // Get the name of the active object
                 final String activeObjectName = proxyBodyMBean.getName();
-                child = new ActiveObject(this, id, activeObjectName, oname,
-                        proxyBodyMBean);
+                child = new ActiveObject(this, id, activeObjectName, oname, proxyBodyMBean);
                 //addChild(child);
                 //count++;
                 childrentoAdd.add(child);
@@ -187,7 +183,7 @@ public class NodeObject extends AbstractData {
         // Some child have to be removed
         for (final AbstractData child : childrenToRemoved.values()) {
             ((ActiveObject) child).stopMonitoring(true); //unsubscribes listener for this child object 
-                                                         //and call destroy() on the child object
+            //and call destroy() on the child object
         }
 
         //    setChanged();
@@ -208,13 +204,11 @@ public class NodeObject extends AbstractData {
     public void addChild(ActiveObject child) {
         super.addChild(child);
         String name = child.getClassName();
-        if ((!name.equals(ProActiveConnection.class.getName()) &&
-                (!name.equals(ProActiveServerImpl.class.getName())))) {
+        if ((!name.equals(ProActiveConnection.class.getName()) && (!name.equals(ProActiveServerImpl.class
+                .getName())))) {
             ObjectName oname = child.getObjectName();
 
-            JMXNotificationManager.getInstance()
-                                  .subscribe(oname, child.getListener(),
-                getParent().getUrl());
+            JMXNotificationManager.getInstance().subscribe(oname, child.getListener(), getParent().getUrl());
         }
 
         //    	ArrayList<ActiveObject> childrenToADD=new ArrayList<ActiveObject>();
@@ -230,19 +224,17 @@ public class NodeObject extends AbstractData {
                 childrenKeys.add(child.getKey());
                 child.explore();
                 String name = child.getClassName();
-                if ((!name.equals(ProActiveConnection.class.getName()) &&
-                        (!name.equals(ProActiveServerImpl.class.getName())))) {
+                if ((!name.equals(ProActiveConnection.class.getName()) && (!name
+                        .equals(ProActiveServerImpl.class.getName())))) {
                     ObjectName oname = child.getObjectName();
 
-                    JMXNotificationManager.getInstance()
-                                          .subscribe(oname,
-                        child.getListener(), getParent().getUrl());
+                    JMXNotificationManager.getInstance().subscribe(oname, child.getListener(),
+                            getParent().getUrl());
                 }
             }
         }
         setChanged();
-        notifyObservers(new MVCNotification(MVCNotificationTag.ADD_CHILDREN,
-                childrenKeys));
+        notifyObservers(new MVCNotification(MVCNotificationTag.ADD_CHILDREN, childrenKeys));
     }
 
     /**
@@ -269,11 +261,11 @@ public class NodeObject extends AbstractData {
     public void setHighlight(boolean highlighted) {
         this.setChanged();
         if (highlighted) {
-            this.notifyObservers(new MVCNotification(
-                    MVCNotificationTag.STATE_CHANGED, State.HIGHLIGHTED));
+            this.notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED, State.HIGHLIGHTED));
         } else {
-            this.notifyObservers(new MVCNotification(
-                    MVCNotificationTag.STATE_CHANGED, State.NOT_HIGHLIGHTED));
+            this
+                    .notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED,
+                        State.NOT_HIGHLIGHTED));
         }
     }
 }

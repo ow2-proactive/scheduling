@@ -71,26 +71,22 @@ public class RuntimeObjectListener implements NotificationListener {
             String nodeUrl = notificationData.getNodeUrl();
             String name = notificationData.getClassName();
             ObjectName oname = FactoryName.createActiveObjectName(id);
-            System.out.println("...............................Body Created " +
-                notification.getSource());
+            System.out.println("...............................Body Created " + notification.getSource());
             NodeObject node = (NodeObject) runtimeObject.getChild(nodeUrl);
             if (node != null) {
                 node.addChild(new ActiveObject(node, id, name, oname));
             } else {
-                System.out.println(
-                    "RuntimeObjectListener.handleNotification() node pas trouve nodeUrl=" +
+                System.out.println("RuntimeObjectListener.handleNotification() node pas trouve nodeUrl=" +
                     nodeUrl);
             }
         } else if (type.equals(NotificationType.bodyDestroyed)) {
             BodyNotificationData notificationData = (BodyNotificationData) notification.getUserData();
             UniqueID id = notificationData.getId();
             // ObjectName oname = Name.createActiveObjectName(id);
-            System.out.println("...............................Body Destroyed " +
-                notification.getSource());
+            System.out.println("...............................Body Destroyed " + notification.getSource());
             runtimeObject.getWorldObject().removeActiveObject(id);
         } else if (type.equals(NotificationType.runtimeRegistered)) {
-            System.out.println(
-                "...............................Runtime Registered " +
+            System.out.println("...............................Runtime Registered " +
                 notification.getSource());
             this.runtimeObject.getParent().explore();
             // this lines don't actually do anything  
@@ -98,15 +94,12 @@ public class RuntimeObjectListener implements NotificationListener {
             //RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
             runtimeObject.getParent().proposeChild();
         } else if (type.equals(NotificationType.runtimeUnregistered)) {
-            System.out.println(
-                "...............................Runtime Unregistered " +
+            System.out.println("...............................Runtime Unregistered " +
                 notification.getSource());
             this.runtimeObject.getParent().explore();
             //   RuntimeNotificationData userData = (RuntimeNotificationData) notification.getUserData();
         } else if (type.equals(NotificationType.runtimeDestroyed)) {
-            System.out.println(
-                "...............................Runtime destroyed " +
-                runtimeObject);
+            System.out.println("...............................Runtime destroyed " + runtimeObject);
             runtimeObject.runtimeKilled();
         }
         // --- NodeEvent ----------------
@@ -123,8 +116,7 @@ public class RuntimeObjectListener implements NotificationListener {
         } else if (type.equals(NotificationType.nodeDestroyed)) {
             this.runtimeObject.getParent().explore();
             String nodeUrl = (String) notification.getUserData();
-            System.out.println(
-                "...............................Node Destroyed : " + nodeUrl);
+            System.out.println("...............................Node Destroyed : " + nodeUrl);
             //            NodeObject node = (NodeObject) runtimeObject.getChild(nodeUrl);
             //            if (node != null) {
             //                node.destroy();

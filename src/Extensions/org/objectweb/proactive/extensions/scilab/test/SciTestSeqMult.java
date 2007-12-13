@@ -49,8 +49,7 @@ public class SciTestSeqMult {
         }
 
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));
-        PrintWriter writer = new PrintWriter(new BufferedWriter(
-                    new FileWriter(args[1])));
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(args[1])));
 
         double[] m1;
         double[] m2;

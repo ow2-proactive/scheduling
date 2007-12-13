@@ -56,9 +56,8 @@ public abstract class Conformtest extends ComponentTest {
     protected final static String MCC = "multicast-controller/org.objectweb.proactive.core.component.controller.MulticastController/false,false,false";
     protected final static String GC = "gathercast-controller/org.objectweb.proactive.core.component.controller.GathercastController/false,false,false";
     protected final static String CP = "component-parameters-controller/org.objectweb.proactive.core.component.controller.ComponentParametersController/false,false,false";
-    protected final static String PC = Constants.REQUEST_PRIORITY_CONTROLLER +
-        "/" + PriorityController.class.getCanonicalName() +
-        "/false,false,false";
+    protected final static String PC = Constants.REQUEST_PRIORITY_CONTROLLER + "/" +
+        PriorityController.class.getCanonicalName() + "/false,false,false";
 
     //  protected final static String COMP = "component/"+ComponentItf.TYPE.getFcItfSignature()+"/false,false,false";
     //  protected final static String BC = "binding-controller/"+BindingControllerDef.TYPE.getFcItfSignature()+"/false,false,false";
@@ -77,46 +76,34 @@ public abstract class Conformtest extends ComponentTest {
     //  protected final static String SC = "super-controller/org.objectweb.fractal.julia.control.content.SuperControllerNotifier/false,false,false";
     //  protected final static String F = "factory/org.objectweb.fractal.julia.factory.Template/false,false,false";
     protected final static String PKG = "functionalTests.component.conform.components";
-    protected final static ControllerDescription parametricPrimitive = new ControllerDescription("parametricPrimitive",
-            Constants.PRIMITIVE,
-            "/functionalTests/component/conform/membranes/parametricPrimitive.xml",
-            false);
-    protected final static ControllerDescription parametricPrimitiveTemplate = new ControllerDescription("parametricPrimitive",
-            Constants.PRIMITIVE,
-            "/functionalTests/component/conform/membranes/parametricPrimitiveTemplate.xml",
-            false);
+    protected final static ControllerDescription parametricPrimitive = new ControllerDescription(
+        "parametricPrimitive", Constants.PRIMITIVE,
+        "/functionalTests/component/conform/membranes/parametricPrimitive.xml", false);
+    protected final static ControllerDescription parametricPrimitiveTemplate = new ControllerDescription(
+        "parametricPrimitive", Constants.PRIMITIVE,
+        "/functionalTests/component/conform/membranes/parametricPrimitiveTemplate.xml", false);
     protected final static ControllerDescription flatPrimitive = new ControllerDescription("flatPrimitive",
-            Constants.PRIMITIVE,
-            "/functionalTests/component/conform/membranes/flatPrimitive.xml",
-            false);
-    protected final static ControllerDescription flatParametricPrimitive = new ControllerDescription("flatParametricPrimitive",
-            Constants.PRIMITIVE,
-            "/functionalTests/component/conform/membranes/flatParametricPrimitive.xml",
-            false);
-    protected final static ControllerDescription primitiveTemplate = new ControllerDescription("primitiveTemplate",
-            Constants.PRIMITIVE,
-            "/functionalTests/component/conform/membranes/primitiveTemplate.xml",
-            false);
-    protected final static ControllerDescription flatPrimitiveTemplate = new ControllerDescription("flatPrimitiveTemplate",
-            Constants.PRIMITIVE,
-            "/functionalTests/component/conform/membranes/flatPrimitiveTemplate.xml",
-            false);
+        Constants.PRIMITIVE, "/functionalTests/component/conform/membranes/flatPrimitive.xml", false);
+    protected final static ControllerDescription flatParametricPrimitive = new ControllerDescription(
+        "flatParametricPrimitive", Constants.PRIMITIVE,
+        "/functionalTests/component/conform/membranes/flatParametricPrimitive.xml", false);
+    protected final static ControllerDescription primitiveTemplate = new ControllerDescription(
+        "primitiveTemplate", Constants.PRIMITIVE,
+        "/functionalTests/component/conform/membranes/primitiveTemplate.xml", false);
+    protected final static ControllerDescription flatPrimitiveTemplate = new ControllerDescription(
+        "flatPrimitiveTemplate", Constants.PRIMITIVE,
+        "/functionalTests/component/conform/membranes/flatPrimitiveTemplate.xml", false);
     protected final static ControllerDescription badPrimitive = new ControllerDescription("badPrimitive",
-            Constants.PRIMITIVE,
-            "/functionalTests/component/conform/membranes/badPrimitive.xml",
-            false);
-    protected final static ControllerDescription badParametricPrimitive = new ControllerDescription("badParametricPrimitive",
-            Constants.PRIMITIVE,
-            "/functionalTests/component/conform/membranes/badParametricPrimitive.xml",
-            false);
-    protected final static ControllerDescription parametricComposite = new ControllerDescription("parametricComposite",
-            Constants.COMPOSITE,
-            "/functionalTests/component/conform/membranes/parametricComposite.xml",
-            false);
-    protected final static ControllerDescription compositeTemplate = new ControllerDescription("parametricComposite",
-            Constants.COMPOSITE,
-            "/functionalTests/component/conform/membranes/compositeTemplate.xml",
-            false);
+        Constants.PRIMITIVE, "/functionalTests/component/conform/membranes/badPrimitive.xml", false);
+    protected final static ControllerDescription badParametricPrimitive = new ControllerDescription(
+        "badParametricPrimitive", Constants.PRIMITIVE,
+        "/functionalTests/component/conform/membranes/badParametricPrimitive.xml", false);
+    protected final static ControllerDescription parametricComposite = new ControllerDescription(
+        "parametricComposite", Constants.COMPOSITE,
+        "/functionalTests/component/conform/membranes/parametricComposite.xml", false);
+    protected final static ControllerDescription compositeTemplate = new ControllerDescription(
+        "parametricComposite", Constants.COMPOSITE,
+        "/functionalTests/component/conform/membranes/compositeTemplate.xml", false);
 
     protected void checkInterface(I i) {
         i.m(true);
@@ -155,8 +142,7 @@ public abstract class Conformtest extends ComponentTest {
         return true;
     }
 
-    protected void checkComponent(Component c, Set itfs)
-        throws Exception {
+    protected void checkComponent(Component c, Set itfs) throws Exception {
         Set extItfs = getExternalItfs(c);
         //System.err.println("containAll: " + containsAll(itfs, extItfs));
         assertEquals("Wrong external interface list", itfs, extItfs);
@@ -165,8 +151,7 @@ public abstract class Conformtest extends ComponentTest {
             String itf = (String) i.next();
             String compItf = null;
             try {
-                compItf = getItf((Interface) c.getFcInterface(getItfName(itf)),
-                        false);
+                compItf = getItf((Interface) c.getFcInterface(getItfName(itf)), false);
             } catch (NoSuchInterfaceException e) {
                 fail("Missing external interface: " + itf);
             }
@@ -234,15 +219,13 @@ public abstract class Conformtest extends ComponentTest {
 
     protected static String getItf(Interface itf, boolean internal) {
         InterfaceType itfType = (InterfaceType) itf.getFcItfType();
-        return getItf(itf.getFcItfName(), itfType.getFcItfSignature(),
-            itfType.isFcClientItf() ^ internal, itfType.isFcOptionalItf(),
-            itfType.isFcCollectionItf());
+        return getItf(itf.getFcItfName(), itfType.getFcItfSignature(), itfType.isFcClientItf() ^ internal,
+                itfType.isFcOptionalItf(), itfType.isFcCollectionItf());
     }
 
-    private static String getItf(String name, String signature,
-        boolean isClient, boolean isOptional, boolean isCollection) {
-        return name + '/' + signature + '/' + isClient + ',' + isOptional +
-        ',' + isCollection;
+    private static String getItf(String name, String signature, boolean isClient, boolean isOptional,
+            boolean isCollection) {
+        return name + '/' + signature + '/' + isClient + ',' + isOptional + ',' + isCollection;
     }
 
     private static String getItfName(String itf) {

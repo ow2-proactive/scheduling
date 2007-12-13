@@ -49,15 +49,13 @@ public class TestDeployment {
             //pad.activateMappings();
             pad.activateMapping("Asterix");
 
-            System.out.println("pad name : " +
-                new File(pad.getUrl()).getName());
+            System.out.println("pad name : " + new File(pad.getUrl()).getName());
 
             VirtualNode[] vnodes = pad.getVirtualNodes();
 
             for (int i = 0; i < vnodes.length; i++) {
                 //vnodes[i].activate();
-                System.out.println("VNode n�" + i + " : " +
-                    vnodes[i].getName() + " is deployed : " +
+                System.out.println("VNode n�" + i + " : " + vnodes[i].getName() + " is deployed : " +
                     vnodes[i].isActivated());
             }
 
@@ -94,11 +92,10 @@ public class TestDeployment {
                             System.out.println(mes);
                     }
             }
-            */
+             */
             System.out.println("Map map = pad.getVirtualNodeMapping();");
 
-            Map map = pad.getProActiveDescriptorInternal()
-                         .getVirtualNodeMapping();
+            Map map = pad.getProActiveDescriptorInternal().getVirtualNodeMapping();
             for (Object vnodeObject : map.keySet()) {
                 String vnodeName = (String) vnodeObject;
                 System.out.print(vnodeName + " : ");
@@ -120,6 +117,6 @@ public class TestDeployment {
         /*
         System.out.println("Descripteur de d�ploimenent n�2 : ");
         DeployPAD(URL_PAD1);
-        */
+         */
     }
 }

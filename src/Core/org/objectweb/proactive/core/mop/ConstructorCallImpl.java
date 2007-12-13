@@ -61,8 +61,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
      * @param reifiedConstructor the constructor object which is called
      * @param effectiveArguments the array holding the effective args
      */
-    public ConstructorCallImpl(Constructor reifiedConstructor,
-        Object[] effectiveArguments) {
+    public ConstructorCallImpl(Constructor reifiedConstructor, Object[] effectiveArguments) {
         this.reifiedConstructor = reifiedConstructor;
         this.effectiveArguments = effectiveArguments;
     }
@@ -117,18 +116,14 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
      * @throws InvocationTargetException
      * @throws ConstructorCallExecutionFailedException
      */
-    public Object execute()
-        throws InvocationTargetException,
-            ConstructorCallExecutionFailedException {
+    public Object execute() throws InvocationTargetException, ConstructorCallExecutionFailedException {
         // System.out.println("ConstructorCall: The constructor is " + reifiedConstructor); 
         try {
             return reifiedConstructor.newInstance(effectiveArguments);
         } catch (IllegalAccessException e) {
-            throw new ConstructorCallExecutionFailedException(
-                "Access rights to the constructor denied: " + e);
+            throw new ConstructorCallExecutionFailedException("Access rights to the constructor denied: " + e);
         } catch (IllegalArgumentException e) {
-            throw new ConstructorCallExecutionFailedException(
-                "Illegal constructor arguments: " + e);
+            throw new ConstructorCallExecutionFailedException("Illegal constructor arguments: " + e);
         } catch (InstantiationException e) {
             if (getReifiedClass().isInterface()) {
                 throw new ConstructorCallExecutionFailedException(
@@ -137,14 +132,12 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
                 throw new ConstructorCallExecutionFailedException(
                     "Cannot build an instance of an abstract class: " + e);
             } else {
-                throw new ConstructorCallExecutionFailedException(
-                    "Instanciation problem: " + e +
+                throw new ConstructorCallExecutionFailedException("Instanciation problem: " + e +
                     ". Strange enough, the reified class is neither abstract nor an interface.");
             }
         } catch (ExceptionInInitializerError e) {
             throw new ConstructorCallExecutionFailedException(
-                "Cannot build object because the initialization of its class failed: " +
-                e);
+                "Cannot build object because the initialization of its class failed: " + e);
         }
     }
 
@@ -163,8 +156,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         // We want to implement a workaround the Constructor
         // not being Serializable
         out.writeObject(this.effectiveArguments);
@@ -180,8 +172,7 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
         out.writeObject(parameters);
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         Class<?> declaringClass = null;
         Class<?>[] parameters;
         try {
@@ -198,8 +189,10 @@ public class ConstructorCallImpl implements ConstructorCall, Serializable {
         try {
             this.reifiedConstructor = declaringClass.getConstructor(parameters);
         } catch (NoSuchMethodException e) {
-            throw new InternalException("Lookup for constructor failed: " + e +
-                ". This may be caused by having different versions of the same class on different VMs. Check your CLASSPATH settings.");
+            throw new InternalException(
+                "Lookup for constructor failed: " +
+                    e +
+                    ". This may be caused by having different versions of the same class on different VMs. Check your CLASSPATH settings.");
         }
     }
 }

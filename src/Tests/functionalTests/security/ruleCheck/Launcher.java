@@ -44,24 +44,24 @@ import org.objectweb.proactive.core.security.exceptions.RuntimeSecurityException
 public class Launcher {
     public static void main(String[] args) {
         try {
-            ProActiveDescriptor descriptor1 = PADeployment.getProactiveDescriptor(
-                    "descriptors/security/simple1.xml");
+            ProActiveDescriptor descriptor1 = PADeployment
+                    .getProactiveDescriptor("descriptors/security/simple1.xml");
             descriptor1.activateMappings();
             VirtualNode virtualNode1 = descriptor1.getVirtualNode("vn1");
             Node node1 = virtualNode1.getNodes()[0];
             SampleObject a = (SampleObject) PAActiveObject.newActive(SampleObject.class.getName(),
                     new Object[] { "CN=Garden1" }, node1);
 
-            ProActiveDescriptor descriptor2 = PADeployment.getProactiveDescriptor(
-                    "descriptors/security/simple2.xml");
+            ProActiveDescriptor descriptor2 = PADeployment
+                    .getProactiveDescriptor("descriptors/security/simple2.xml");
             descriptor2.activateMappings();
             VirtualNode virtualNode2 = descriptor2.getVirtualNode("vn2");
             Node node2 = virtualNode2.getNodes()[0];
             SampleObject b = (SampleObject) PAActiveObject.newActive(SampleObject.class.getName(),
                     new Object[] { "CN=Garden2" }, node2);
 
-            ProActiveDescriptor descriptor3 = PADeployment.getProactiveDescriptor(
-                    "descriptors/security/simple3.xml");
+            ProActiveDescriptor descriptor3 = PADeployment
+                    .getProactiveDescriptor("descriptors/security/simple3.xml");
             descriptor3.activateMappings();
             VirtualNode virtualNode3 = descriptor3.getVirtualNode("vn3");
             Node node3 = virtualNode3.getNodes()[0];

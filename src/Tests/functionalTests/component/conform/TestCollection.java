@@ -48,26 +48,16 @@ public class TestCollection extends Conformtest {
     protected TypeFactory tf;
     protected GenericFactory gf;
     protected ComponentType t;
-    protected final static String serverI = "server/" + PKG +
-        ".I/false,false,false";
-    protected final static String servers0I = "servers0/" + PKG +
-        ".I/false,false,true";
-    protected final static String servers1I = "servers1/" + PKG +
-        ".I/false,false,true";
-    protected final static String servers2I = "servers2/" + PKG +
-        ".I/true,false,true";
-    protected final static String servers3I = "servers3/" + PKG +
-        ".I/true,false,true";
-    protected final static String clientI = "client/" + PKG +
-        ".I/true,true,false";
-    protected final static String clients0I = "clients0/" + PKG +
-        ".I/true,true,true";
-    protected final static String clients1I = "clients1/" + PKG +
-        ".I/true,true,true";
-    protected final static String clients2I = "clients2/" + PKG +
-        ".I/false,true,true";
-    protected final static String clients3I = "clients3/" + PKG +
-        ".I/false,true,true";
+    protected final static String serverI = "server/" + PKG + ".I/false,false,false";
+    protected final static String servers0I = "servers0/" + PKG + ".I/false,false,true";
+    protected final static String servers1I = "servers1/" + PKG + ".I/false,false,true";
+    protected final static String servers2I = "servers2/" + PKG + ".I/true,false,true";
+    protected final static String servers3I = "servers3/" + PKG + ".I/true,false,true";
+    protected final static String clientI = "client/" + PKG + ".I/true,true,false";
+    protected final static String clients0I = "clients0/" + PKG + ".I/true,true,true";
+    protected final static String clients1I = "clients1/" + PKG + ".I/true,true,true";
+    protected final static String clients2I = "clients2/" + PKG + ".I/false,true,true";
+    protected final static String clients3I = "clients3/" + PKG + ".I/false,true,true";
 
     // -------------------------------------------------------------------------
     // Constructor ans setup
@@ -78,15 +68,10 @@ public class TestCollection extends Conformtest {
         tf = Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("server", I.class.getName(), false,
-                        false, false),
-                    tf.createFcItfType("servers", I.class.getName(), false,
-                        false, true),
-                    tf.createFcItfType("client", I.class.getName(), true, true,
-                        false),
-                    tf.createFcItfType("clients", I.class.getName(), true,
-                        true, true)
-                });
+                tf.createFcItfType("server", I.class.getName(), false, false, false),
+                tf.createFcItfType("servers", I.class.getName(), false, false, true),
+                tf.createFcItfType("client", I.class.getName(), true, true, false),
+                tf.createFcItfType("clients", I.class.getName(), true, true, true) });
     }
 
     // -------------------------------------------------------------------------
@@ -95,23 +80,16 @@ public class TestCollection extends Conformtest {
     @Test
     public void testPrimitiveWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
-        checkComponent(c,
-            new HashSet(Arrays.asList(
-                    new Object[] {
-                        COMP, BC, LC, SC, NC, CP, MCC, GC, MC, serverI, clientI
-                    })));
+        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, CP, MCC, GC, MC,
+                serverI, clientI })));
         //       new Object[] { COMP, BC, LC, SC, NC, serverI, clientI })));
     }
 
     @Test
     public void testCompositeWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "composite", null);
-        checkComponent(c,
-            new HashSet(Arrays.asList(
-                    new Object[] {
-                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, serverI,
-                        clientI
-                    })));
+        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC,
+                serverI, clientI })));
     }
 
     @Test
@@ -119,30 +97,22 @@ public class TestCollection extends Conformtest {
     // missing factory/org.objectweb.proactive.core.component.Fractive/false,false,false,
     public void testPrimitiveTemplateWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
-        checkComponent(c,
-            new HashSet(Arrays.asList(
-                    new Object[] {
-                        COMP, BC, F, SC, NC, MC, MCC, GC, CP, serverI, clientI
-                    })));
+        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, F, SC, NC, MC, MCC, GC, CP,
+                serverI, clientI })));
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c,
-            new HashSet(Arrays.asList(
-                    new Object[] {
-                        COMP, BC, LC, SC, NC, MC, MCC, GC, CP, serverI, clientI
-                    })));
+        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC, CP,
+                serverI, clientI })));
     }
 
     @Test
     @Ignore
     public void testCompositeTemplateWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, compositeTemplate, "composite");
-        checkComponent(c,
-            new HashSet(Arrays.asList(
-                    new Object[] { COMP, BC, CC, F, SC, NC, serverI, clientI })));
+        checkComponent(c, new HashSet(Arrays
+                .asList(new Object[] { COMP, BC, CC, F, SC, NC, serverI, clientI })));
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c,
-            new HashSet(Arrays.asList(
-                    new Object[] { COMP, BC, CC, LC, SC, NC, serverI, clientI })));
+        checkComponent(c, new HashSet(Arrays
+                .asList(new Object[] { COMP, BC, CC, LC, SC, NC, serverI, clientI })));
     }
 
     // -------------------------------------------------------------------------
@@ -212,11 +182,8 @@ public class TestCollection extends Conformtest {
         assertEquals("Bad interface", clients1I, getItf(i, false));
 
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c,
-            new HashSet(Arrays.asList(
-                    new Object[] {
-                        COMP, BC, LC, SC, NC, MC, MCC, GC, CP, serverI, clientI
-                    })));
+        checkComponent(c, new HashSet(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC, CP,
+                serverI, clientI })));
     }
 
     @Test
@@ -244,9 +211,8 @@ public class TestCollection extends Conformtest {
         assertEquals("Bad interface", clients3I, getItf(i, false));
 
         c = Fractal.getFactory(c).newFcInstance();
-        checkComponent(c,
-            new HashSet(Arrays.asList(
-                    new Object[] { COMP, BC, CC, LC, SC, NC, serverI, clientI })));
+        checkComponent(c, new HashSet(Arrays
+                .asList(new Object[] { COMP, BC, CC, LC, SC, NC, serverI, clientI })));
     }
 
     // -------------------------------------------------------------------------
@@ -283,8 +249,7 @@ public class TestCollection extends Conformtest {
     }
 
     @Test
-    public void testPrimitiveTemplateNoSuchCollectionItf()
-        throws Exception {
+    public void testPrimitiveTemplateNoSuchCollectionItf() throws Exception {
         Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
         try {
             c.getFcInterface("server0");
@@ -299,8 +264,7 @@ public class TestCollection extends Conformtest {
     }
 
     @Test
-    public void testCompositeTemplateNoSuchCollectionItf()
-        throws Exception {
+    public void testCompositeTemplateNoSuchCollectionItf() throws Exception {
         Component c = gf.newFcInstance(t, compositeTemplate, null);
         try {
             c.getFcInterface("server0");

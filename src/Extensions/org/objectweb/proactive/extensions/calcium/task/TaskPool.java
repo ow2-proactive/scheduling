@@ -79,8 +79,7 @@ public class TaskPool implements Serializable {
         while ((results.size() <= 0) && !isPaniqued()) {
             try {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Thread waiting for results:" +
-                        Thread.currentThread().getId());
+                    logger.debug("Thread waiting for results:" + Thread.currentThread().getId());
                 }
                 wait();
             } catch (InterruptedException e) {
@@ -117,8 +116,7 @@ public class TaskPool implements Serializable {
 
         while (ready.isEmpty()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Waiting for ready task:" +
-                    Thread.currentThread().getId());
+                logger.debug("Waiting for ready task:" + Thread.currentThread().getId());
             }
 
             try {
@@ -195,13 +193,10 @@ public class TaskPool implements Serializable {
         Task<?> processingTask = processing.remove(task.taskId);
 
         //get a snapshot of the current used resources
-        task.getStats()
-            .setMaxAvailableResources(stats.getProccessingQueueLength());
+        task.getStats().setMaxAvailableResources(stats.getProccessingQueueLength());
 
         if (processingTask == null) {
-            logger.error(
-                "Dropping Task, since it was not being processed taskId=" +
-                task);
+            logger.error("Dropping Task, since it was not being processed taskId=" + task);
         }
 
         if (logger.isDebugEnabled()) {
@@ -298,29 +293,24 @@ public class TaskPool implements Serializable {
 
             TaskId parentId = task.taskId.getParentId();
             if (!this.waiting.containsKey(parentId)) {
-                logger.error("Error. Parent task id=" + parentId +
-                    " is not waiting for child tasks");
+                logger.error("Error. Parent task id=" + parentId + " is not waiting for child tasks");
                 logger.error("Dropping task id=" + task);
                 return;
             }
 
             Task<?> parent = waiting.get(parentId);
             if (!parent.family.setFinishedChild(task)) {
-                logger.error(
-                    "Parent did not recognize child task. Dropping task id=" +
-                    task);
+                logger.error("Parent did not recognize child task. Dropping task id=" + task);
                 return;
             }
 
             //If this was the last subtask, then the parent is ready for execution
             if (parent.isReady()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Parent taskId=" + parent.taskId.value() +
-                        " is ready");
+                    logger.debug("Parent taskId=" + parent.taskId.value() + " is ready");
                 }
                 if (waiting.remove(parent.taskId) == null) {
-                    logger.error(
-                        "Error, parent not waiting when it should have been.");
+                    logger.error("Error, parent not waiting when it should have been.");
                 }
                 parent.getStats().exitWaitingState();
                 ready.addReady(parent);
@@ -334,8 +324,7 @@ public class TaskPool implements Serializable {
             ready.addReadyChilds(task.family);
 
             if (logger.isDebugEnabled()) {
-                logger.debug("Parent Task taskId=" + task.taskId.value() +
-                    " is waiting");
+                logger.debug("Parent Task taskId=" + task.taskId.value() + " is waiting");
             }
 
             waiting.put(task.taskId, task); //the parent task will wait for it's subtasks
@@ -356,8 +345,8 @@ public class TaskPool implements Serializable {
     }
 
     public synchronized StatsGlobalImpl getStatsGlobal() {
-        stats.setQueueLengths(ready.newRoots.size(), ready.older.size(),
-            processing.size(), waiting.size(), results.size());
+        stats.setQueueLengths(ready.newRoots.size(), ready.older.size(), processing.size(), waiting.size(),
+                results.size());
         return stats;
     }
 
@@ -380,8 +369,7 @@ public class TaskPool implements Serializable {
         Enumeration<Task<?>> enumeration = waiting.elements();
         while (enumeration.hasMoreElements()) {
             Task<?> task = enumeration.nextElement();
-            if (task.taskId.getFamilyId()
-                               .equals(blackSheepTask.taskId.getFamilyId())) {
+            if (task.taskId.getFamilyId().equals(blackSheepTask.taskId.getFamilyId())) {
                 waiting.remove(task.taskId);
                 task.getStats().exitWaitingState();
             }
@@ -425,13 +413,13 @@ public class TaskPool implements Serializable {
         }
 
         if (this.processing.containsKey(task.taskId.getFamilyId())) {
-            throw new PanicException("Error, root taskId=" +
-                task.taskId.getFamilyId() + " found in processing queue");
+            throw new PanicException("Error, root taskId=" + task.taskId.getFamilyId() +
+                " found in processing queue");
         }
 
         if (this.ready.contains(task)) {
-            throw new PanicException("Error, root taskId=" +
-                task.taskId.getFamilyId() + " found in ready queue");
+            throw new PanicException("Error, root taskId=" + task.taskId.getFamilyId() +
+                " found in ready queue");
         }
 
         return null;
@@ -459,8 +447,7 @@ public class TaskPool implements Serializable {
             while (family.hasReadyChildTask()) {
                 Task child = family.getReadyChild();
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Child taskId=" + child.taskId.value() +
-                        " is ready");
+                    logger.debug("Child taskId=" + child.taskId.value() + " is ready");
                 }
                 addReady(child); //child will have more priority than uncles
             }
@@ -531,8 +518,7 @@ public class TaskPool implements Serializable {
 
         public void deleteFamily(Task<?> blackSheep) {
             for (Task<?> task : older) {
-                if (task.taskId.getFamilyId()
-                                   .equals(blackSheep.taskId.getFamilyId())) {
+                if (task.taskId.getFamilyId().equals(blackSheep.taskId.getFamilyId())) {
                     older.remove(task);
                     task.getStats().exitReadyState();
                 }

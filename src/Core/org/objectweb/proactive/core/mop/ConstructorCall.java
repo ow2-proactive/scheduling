@@ -53,7 +53,6 @@ public interface ConstructorCall {
      * @throws InvocationTargetException
      * @throws ConstructorCallExecutionFailedException
      */
-    public Object execute()
-        throws java.lang.reflect.InvocationTargetException,
+    public Object execute() throws java.lang.reflect.InvocationTargetException,
             ConstructorCallExecutionFailedException;
 }

@@ -30,7 +30,6 @@
  */
 package functionalTests.component.controller;
 
-
 /**
  * @author Matthieu Morel
  *

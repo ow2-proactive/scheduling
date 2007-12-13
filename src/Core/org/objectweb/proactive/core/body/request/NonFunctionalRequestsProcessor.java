@@ -56,8 +56,7 @@ import java.util.Vector;
  * @since   ProActive 3.0.1
  *
  */
-public class NonFunctionalRequestsProcessor implements RequestProcessor,
-    Serializable {
+public class NonFunctionalRequestsProcessor implements RequestProcessor, Serializable {
     private AbstractList<Request> nfRequestsQueue;
     private RequestFilter immediateNFResquestFilter;
     private RequestFilter priorityNFRequestFilter;
@@ -82,8 +81,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
             nfRequestsQueue.add(immediateNFReqNumber, request);
             immediateNFReqNumber++;
         } else if (priorityNFRequestFilter.acceptRequest(request)) {
-            nfRequestsQueue.add(immediateNFReqNumber + priorityNFReqNumber,
-                request);
+            nfRequestsQueue.add(immediateNFReqNumber + priorityNFReqNumber, request);
             priorityNFReqNumber++;
         }
     }
@@ -146,14 +144,13 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
     @Override
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer("NFRequests Queue : ");
-        sb.append("--- NonFunctionalRequestQueue n=")
-          .append(nfRequestsQueue.size()).append("   requests --- ->\n");
+        sb.append("--- NonFunctionalRequestQueue n=").append(nfRequestsQueue.size()).append(
+                "   requests --- ->\n");
         int count = 0;
         java.util.Iterator<Request> iterator = nfRequestsQueue.iterator();
         while (iterator.hasNext()) {
             Request currentrequest = iterator.next();
-            sb.append(count).append("--> ")
-              .append(currentrequest.getMethodName()).append("\n");
+            sb.append(count).append("--> ").append(currentrequest.getMethodName()).append("\n");
             count++;
         }
         sb.append("--- End NonFunctionalRequestQueue ---");
@@ -162,7 +159,7 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
 
     public int processRequest(Request request) {
         if ((request.getNFRequestPriority() == Request.NFREQUEST_IMMEDIATE_PRIORITY) ||
-                (request.getNFRequestPriority() == Request.NFREQUEST_PRIORITY)) {
+            (request.getNFRequestPriority() == Request.NFREQUEST_PRIORITY)) {
             nfRequestsQueue.add(request);
         }
         return RequestProcessor.KEEP;
@@ -171,23 +168,21 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
     // --------------- FILTERS -----------------//
 
     /**
-    * ImmediateNFRequestFilter is a RequestFilter that matches immediate non functional requests
-    *
-    * @author  ProActive Team
-    * @version 1.0,  2006/03/03
-    * @since   ProActive 3.0.1
-    * @see RequestFilter
-    *
-    */
-    protected class ImmediateNFRequestFilter implements RequestFilter,
-        Serializable {
+     * ImmediateNFRequestFilter is a RequestFilter that matches immediate non functional requests
+     *
+     * @author  ProActive Team
+     * @version 1.0,  2006/03/03
+     * @since   ProActive 3.0.1
+     * @see RequestFilter
+     *
+     */
+    protected class ImmediateNFRequestFilter implements RequestFilter, Serializable {
 
         /**
-                 *
-                 */
+         *
+         */
         public boolean acceptRequest(Request request) {
-            return (request.isFunctionalRequest() &&
-            (request.getNFRequestPriority() == Request.NFREQUEST_IMMEDIATE_PRIORITY));
+            return (request.isFunctionalRequest() && (request.getNFRequestPriority() == Request.NFREQUEST_IMMEDIATE_PRIORITY));
         }
     }
 
@@ -200,15 +195,13 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
      * @see RequestFilter
      *
      */
-    protected class PriorityNFRequestFilter implements RequestFilter,
-        Serializable {
+    protected class PriorityNFRequestFilter implements RequestFilter, Serializable {
 
         /**
-                 *
-                 */
+         *
+         */
         public boolean acceptRequest(Request request) {
-            return (request.isFunctionalRequest() &&
-            (request.getNFRequestPriority() == Request.NFREQUEST_PRIORITY));
+            return (request.isFunctionalRequest() && (request.getNFRequestPriority() == Request.NFREQUEST_PRIORITY));
         }
     }
 
@@ -221,15 +214,13 @@ public class NonFunctionalRequestsProcessor implements RequestProcessor,
      * @see RequestFilter
      *
      */
-    protected class NoPriorityNFRequestFilter implements RequestFilter,
-        Serializable {
+    protected class NoPriorityNFRequestFilter implements RequestFilter, Serializable {
 
         /**
-                 *
-                 */
+         *
+         */
         public boolean acceptRequest(Request request) {
-            return (request.isFunctionalRequest() &&
-            (request.getNFRequestPriority() == Request.NFREQUEST_NO_PRIORITY));
+            return (request.isFunctionalRequest() && (request.getNFRequestPriority() == Request.NFREQUEST_NO_PRIORITY));
         }
     }
 

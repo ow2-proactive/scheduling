@@ -80,9 +80,8 @@ public class MonteCarlo extends JavaExecutable {
 
         while (n > 0) {
             if (print < 0) {
-                System.out.println("Calcul intermediaire (" +
-                    (100 - ((n * 100) / iterations)) + "%) : Pi = " +
-                    ((4 * res) / (((++nbPrint) * iterations) / steps)));
+                System.out.println("Calcul intermediaire (" + (100 - ((n * 100) / iterations)) +
+                    "%) : Pi = " + ((4 * res) / (((++nbPrint) * iterations) / steps)));
                 print = iterations / steps;
             }
 

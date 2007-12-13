@@ -72,8 +72,8 @@ public class PrimeNumberImpl implements PrimeNumber, java.io.Serializable {
                 next = container.newPrimeNumber(n);
             } else {
                 if (n <= nextValue) {
-                    logger.fatal(
-                        "Requests arrived out of order. Should never occur when using FIFO serving.");
+                    logger
+                            .fatal("Requests arrived out of order. Should never occur when using FIFO serving.");
                     System.exit(2);
                 }
                 next.tryModulo(n);

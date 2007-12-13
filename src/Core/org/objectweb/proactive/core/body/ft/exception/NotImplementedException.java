@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.ft.exception;
 
-
 /**
  * @author cdelbe
  * @since 2.2
@@ -38,12 +37,12 @@ package org.objectweb.proactive.core.body.ft.exception;
 public class NotImplementedException extends RuntimeException {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    *
-    */
+     *
+     */
     public NotImplementedException() {
         super();
         // TODO Auto-generated constructor stub

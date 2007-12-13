@@ -44,8 +44,8 @@ import functionalTests.ComponentTest;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     public static String MESSAGE = "-->m";
 
     //ComponentsCache componentsCache;
@@ -58,8 +58,7 @@ public class Test extends ComponentTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        DummyAO testAO = (DummyAO) PAActiveObject.newActive(DummyAO.class.getName(),
-                new Object[] {  });
+        DummyAO testAO = (DummyAO) PAActiveObject.newActive(DummyAO.class.getName(), new Object[] {});
         testAO.go();
     }
 }

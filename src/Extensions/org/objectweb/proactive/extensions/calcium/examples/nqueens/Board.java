@@ -56,8 +56,7 @@ public class Board implements java.io.Serializable {
         this.board = new int[n];
     }
 
-    public Board(int n, int solvableSize, int row, int left, int down,
-        int right, int bound1) {
+    public Board(int n, int solvableSize, int row, int left, int down, int right, int bound1) {
         this(n, solvableSize);
         this.row = row;
         this.left = left;
@@ -82,5 +81,5 @@ public class Board implements java.io.Serializable {
             v.addAll(initDivideBT2());
             return v;
     }
-    */
+     */
 }

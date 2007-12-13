@@ -143,16 +143,10 @@ public class CertTools {
         oids.put("email", X509Name.EmailAddress);
     }
 
-    private static final String[] dNObjectsForward = {
-            "emailaddress", "e", "email", "uid", "cn", "sn", "serialnumber",
-            "gn", "givenname", "initials", "surname", "t", "ou", "o", "l", "st",
-            "dc", "c"
-        };
-    private static final String[] dNObjectsReverse = {
-            "c", "dc", "st", "l", "o", "ou", "t", "surname", "initials",
-            "givenname", "gn", "serialnumber", "sn", "cn", "uid", "email", "e",
-            "emailaddress"
-        };
+    private static final String[] dNObjectsForward = { "emailaddress", "e", "email", "uid", "cn", "sn",
+            "serialnumber", "gn", "givenname", "initials", "surname", "t", "ou", "o", "l", "st", "dc", "c" };
+    private static final String[] dNObjectsReverse = { "c", "dc", "st", "l", "o", "ou", "t", "surname",
+            "initials", "givenname", "gn", "serialnumber", "sn", "cn", "uid", "email", "e", "emailaddress" };
 
     /** Change this if you want reverse order */
     private static final String[] dNObjects = dNObjectsForward;
@@ -300,7 +294,7 @@ public class CertTools {
 
                 //log.debug("checking: "+o.substring(0,dnpart.length()));
                 if ((o.length() > dnpart.length()) &&
-                        o.substring(0, dnpart.length()).equalsIgnoreCase(dnpart)) {
+                    o.substring(0, dnpart.length()).equalsIgnoreCase(dnpart)) {
                     part = o.substring(dnpart.length());
 
                     break;
@@ -351,8 +345,8 @@ public class CertTools {
         }
         try {
             CertificateFactory cf = CertTools.getCertificateFactory();
-            X509Certificate x509cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
-                        cert.getEncoded()));
+            X509Certificate x509cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(cert
+                    .getEncoded()));
 
             //log.debug("Created certificate of class: " + x509cert.getClass().getName());
             if (which == 1) {
@@ -381,8 +375,7 @@ public class CertTools {
         String dn = null;
         try {
             CertificateFactory cf = CertTools.getCertificateFactory();
-            X509CRL x509crl = (X509CRL) cf.generateCRL(new ByteArrayInputStream(
-                        crl.getEncoded()));
+            X509CRL x509crl = (X509CRL) cf.generateCRL(new ByteArrayInputStream(crl.getEncoded()));
 
             //log.debug("Created certificate of class: " + x509crl.getClass().getName());
             dn = x509crl.getIssuerDN().toString();
@@ -424,8 +417,7 @@ public class CertTools {
      * @exception IOException if the filen cannot be read.
      * @exception CertificateException if the filen does not contain a correct certificate.
      */
-    public static Collection getCertsFromPEM(String certFile)
-        throws IOException, CertificateException {
+    public static Collection getCertsFromPEM(String certFile) throws IOException, CertificateException {
         log.debug(">getCertfromPEM: certFile=" + certFile);
         InputStream inStrm = new FileInputStream(certFile);
         Collection certs = getCertsFromPEM(inStrm);
@@ -442,33 +434,29 @@ public class CertTools {
      * @exception IOException if the stream cannot be read.
      * @exception CertificateException if the stream does not contain a correct certificate.
      */
-    public static Collection getCertsFromPEM(InputStream certstream)
-        throws IOException, CertificateException {
+    public static Collection getCertsFromPEM(InputStream certstream) throws IOException, CertificateException {
         log.debug(">getCertfromPEM:");
         ArrayList<X509Certificate> ret = new ArrayList<X509Certificate>();
         String beginKey = "-----BEGIN CERTIFICATE-----";
         String endKey = "-----END CERTIFICATE-----";
-        BufferedReader bufRdr = new BufferedReader(new InputStreamReader(
-                    certstream));
+        BufferedReader bufRdr = new BufferedReader(new InputStreamReader(certstream));
         while (bufRdr.ready()) {
             ByteArrayOutputStream ostr = new ByteArrayOutputStream();
             PrintStream opstr = new PrintStream(ostr);
             String temp;
-            while (((temp = bufRdr.readLine()) != null) &&
-                    !temp.equals(beginKey)) {
+            while (((temp = bufRdr.readLine()) != null) && !temp.equals(beginKey)) {
                 continue;
             }
             if (temp == null) {
-                throw new IOException("Error in " + certstream.toString() +
-                    ", missing " + beginKey + " boundary");
+                throw new IOException("Error in " + certstream.toString() + ", missing " + beginKey +
+                    " boundary");
             }
-            while (((temp = bufRdr.readLine()) != null) &&
-                    !temp.equals(endKey)) {
+            while (((temp = bufRdr.readLine()) != null) && !temp.equals(endKey)) {
                 opstr.print(temp);
             }
             if (temp == null) {
-                throw new IOException("Error in " + certstream.toString() +
-                    ", missing " + endKey + " boundary");
+                throw new IOException("Error in " + certstream.toString() + ", missing " + endKey +
+                    " boundary");
             }
             opstr.close();
 
@@ -477,7 +465,7 @@ public class CertTools {
             // Phweeew, were done, now decode the cert from file back to X509Certificate object
             CertificateFactory cf = CertTools.getCertificateFactory();
             X509Certificate x509cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
-                        certbuf));
+                certbuf));
             //            String dn = x509cert.getSubjectDN().toString();
             ret.add(x509cert);
         }
@@ -494,8 +482,7 @@ public class CertTools {
      * @exception IOException if the stream cannot be read.
      * @exception CertificateException if the stream does not contain a correct certificate.
      */
-    public static byte[] getPEMFromCerts(Collection certs)
-        throws CertificateException {
+    public static byte[] getPEMFromCerts(Collection certs) throws CertificateException {
         String beginKey = "-----BEGIN CERTIFICATE-----";
         String endKey = "-----END CERTIFICATE-----";
         ByteArrayOutputStream ostr = new ByteArrayOutputStream();
@@ -525,13 +512,11 @@ public class CertTools {
      * @throws CertificateException if the byte array does not contain a proper certificate.
      * @throws IOException if the byte array cannot be read.
      */
-    public static X509Certificate getCertfromByteArray(byte[] cert)
-        throws IOException, CertificateException {
+    public static X509Certificate getCertfromByteArray(byte[] cert) throws IOException, CertificateException {
         log.debug(">getCertfromByteArray:");
 
         CertificateFactory cf = CertTools.getCertificateFactory();
-        X509Certificate x509cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
-                    cert));
+        X509Certificate x509cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(cert));
         log.debug("<getCertfromByteArray:");
 
         return x509cert;
@@ -548,8 +533,8 @@ public class CertTools {
      * @throws CertificateException if the byte arrayen does not contani a correct CRL.
      * @throws CRLException if the byte arrayen does not contani a correct CRL.
      */
-    public static X509CRL getCRLfromByteArray(byte[] crl)
-        throws IOException, CertificateException, CRLException {
+    public static X509CRL getCRLfromByteArray(byte[] crl) throws IOException, CertificateException,
+            CRLException {
         log.debug(">getCRLfromByteArray:");
 
         if (crl == null) {
@@ -571,11 +556,11 @@ public class CertTools {
      * @return boolean true if the certificate has the same issuer and subject, false otherwise.
      */
     public static boolean isSelfSigned(X509Certificate cert) {
-        log.debug(">isSelfSigned: cert: " + CertTools.getIssuerDN(cert) + "\n" +
-            CertTools.getSubjectDN(cert));
+        log
+                .debug(">isSelfSigned: cert: " + CertTools.getIssuerDN(cert) + "\n" +
+                    CertTools.getSubjectDN(cert));
 
-        boolean ret = CertTools.getSubjectDN(cert)
-                               .equals(CertTools.getIssuerDN(cert));
+        boolean ret = CertTools.getSubjectDN(cert).equals(CertTools.getIssuerDN(cert));
         log.debug("<isSelfSigned:" + ret);
 
         return ret;
@@ -599,10 +584,9 @@ public class CertTools {
      * @throws IllegalStateException
      * @throws CertificateEncodingException
      */
-    public static X509Certificate genSelfCert(String dn, long validity,
-        String policyId, PrivateKey privKey, PublicKey pubKey, boolean isCA)
-        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException,
-            CertificateEncodingException, IllegalStateException {
+    public static X509Certificate genSelfCert(String dn, long validity, String policyId, PrivateKey privKey,
+            PublicKey pubKey, boolean isCA) throws NoSuchAlgorithmException, SignatureException,
+            InvalidKeyException, CertificateEncodingException, IllegalStateException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
         Date firstDate = new Date();
@@ -613,8 +597,7 @@ public class CertTools {
         Date lastDate = new Date();
 
         // validity in days = validity*24*60*60*1000 milliseconds
-        lastDate.setTime(lastDate.getTime() +
-            (validity * (24 * 60 * 60 * 1000)));
+        lastDate.setTime(lastDate.getTime() + (validity * (24 * 60 * 60 * 1000)));
 
         X509V3CertificateGenerator certgen = new X509V3CertificateGenerator();
 
@@ -647,28 +630,24 @@ public class CertTools {
         try {
             if (isCA == true) {
                 SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
-                            new ByteArrayInputStream(pubKey.getEncoded())).readObject());
+                    new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 SubjectKeyIdentifier ski = new SubjectKeyIdentifier(spki);
 
                 SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
-                            new ByteArrayInputStream(pubKey.getEncoded())).readObject());
+                    new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(apki);
 
-                certgen.addExtension(X509Extensions.SubjectKeyIdentifier.getId(),
-                    false, ski);
-                certgen.addExtension(X509Extensions.AuthorityKeyIdentifier.getId(),
-                    false, aki);
+                certgen.addExtension(X509Extensions.SubjectKeyIdentifier.getId(), false, ski);
+                certgen.addExtension(X509Extensions.AuthorityKeyIdentifier.getId(), false, aki);
             }
         } catch (IOException e) { // do nothing
         }
 
         // CertificatePolicies extension if supplied policy ID, always non-critical
         if (policyId != null) {
-            PolicyInformation pi = new PolicyInformation(new DERObjectIdentifier(
-                        policyId));
+            PolicyInformation pi = new PolicyInformation(new DERObjectIdentifier(policyId));
             DERSequence seq = new DERSequence(pi);
-            certgen.addExtension(X509Extensions.CertificatePolicies.getId(),
-                false, seq);
+            certgen.addExtension(X509Extensions.CertificatePolicies.getId(), false, seq);
         }
 
         X509Certificate selfcert = certgen.generate(privKey);
@@ -676,10 +655,9 @@ public class CertTools {
         return selfcert;
     } //genselfCert
 
-    public static X509Certificate genCert(String dn, long validity,
-        String policyId, PrivateKey privKey, PublicKey pubKey, boolean isCA,
-        String caDn, PrivateKey caPrivateKey, PublicKey acPubKey)
-        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException,
+    public static X509Certificate genCert(String dn, long validity, String policyId, PrivateKey privKey,
+            PublicKey pubKey, boolean isCA, String caDn, PrivateKey caPrivateKey, PublicKey acPubKey)
+            throws NoSuchAlgorithmException, SignatureException, InvalidKeyException,
             CertificateEncodingException, IllegalStateException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
@@ -691,8 +669,7 @@ public class CertTools {
         Date lastDate = new Date();
 
         // validity in days = validity*24*60*60*1000 milliseconds
-        lastDate.setTime(lastDate.getTime() +
-            (validity * (24 * 60 * 60 * 1000)));
+        lastDate.setTime(lastDate.getTime() + (validity * (24 * 60 * 60 * 1000)));
 
         X509V3CertificateGenerator certgen = new X509V3CertificateGenerator();
 
@@ -727,28 +704,24 @@ public class CertTools {
             if (false) {
                 //if (isCA == true) {
                 SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
-                            new ByteArrayInputStream(pubKey.getEncoded())).readObject());
+                    new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 SubjectKeyIdentifier ski = new SubjectKeyIdentifier(spki);
 
                 SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
-                            new ByteArrayInputStream(acPubKey.getEncoded())).readObject());
+                    new ByteArrayInputStream(acPubKey.getEncoded())).readObject());
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(apki);
 
-                certgen.addExtension(X509Extensions.SubjectKeyIdentifier.getId(),
-                    false, ski);
-                certgen.addExtension(X509Extensions.AuthorityKeyIdentifier.getId(),
-                    false, aki);
+                certgen.addExtension(X509Extensions.SubjectKeyIdentifier.getId(), false, ski);
+                certgen.addExtension(X509Extensions.AuthorityKeyIdentifier.getId(), false, aki);
             }
         } catch (IOException e) { // do nothing
         }
 
         // CertificatePolicies extension if supplied policy ID, always non-critical
         if (policyId != null) {
-            PolicyInformation pi = new PolicyInformation(new DERObjectIdentifier(
-                        policyId));
+            PolicyInformation pi = new PolicyInformation(new DERObjectIdentifier(policyId));
             DERSequence seq = new DERSequence(pi);
-            certgen.addExtension(X509Extensions.CertificatePolicies.getId(),
-                false, seq);
+            certgen.addExtension(X509Extensions.CertificatePolicies.getId(), false, seq);
         }
 
         X509Certificate cert = certgen.generate(caPrivateKey);
@@ -763,16 +736,15 @@ public class CertTools {
      * @return byte[] containing the authority key identifier
      * @throws IOException if extension can not be parsed
      */
-    public static byte[] getAuthorityKeyId(X509Certificate cert)
-        throws IOException {
+    public static byte[] getAuthorityKeyId(X509Certificate cert) throws IOException {
         byte[] extvalue = cert.getExtensionValue("2.5.29.35");
         if (extvalue == null) {
             return null;
         }
-        DEROctetString oct = (DEROctetString) (new ASN1InputStream(new ByteArrayInputStream(
-                    extvalue)).readObject());
+        DEROctetString oct = (DEROctetString) (new ASN1InputStream(new ByteArrayInputStream(extvalue))
+                .readObject());
         AuthorityKeyIdentifier keyId = new AuthorityKeyIdentifier((ASN1Sequence) new ASN1InputStream(
-                    new ByteArrayInputStream(oct.getOctets())).readObject());
+            new ByteArrayInputStream(oct.getOctets())).readObject());
         return keyId.getKeyIdentifier();
     } // getAuthorityKeyId
 
@@ -783,16 +755,15 @@ public class CertTools {
      * @return byte[] containing the subject key identifier
      * @throws IOException if extension can not be parsed
      */
-    public static byte[] getSubjectKeyId(X509Certificate cert)
-        throws IOException {
+    public static byte[] getSubjectKeyId(X509Certificate cert) throws IOException {
         byte[] extvalue = cert.getExtensionValue("2.5.29.14");
         if (extvalue == null) {
             return null;
         }
-        ASN1OctetString str = ASN1OctetString.getInstance(new ASN1InputStream(
-                    new ByteArrayInputStream(extvalue)).readObject());
+        ASN1OctetString str = ASN1OctetString.getInstance(new ASN1InputStream(new ByteArrayInputStream(
+            extvalue)).readObject());
         SubjectKeyIdentifier keyId = SubjectKeyIdentifier.getInstance(new ASN1InputStream(
-                    new ByteArrayInputStream(str.getOctets())).readObject());
+            new ByteArrayInputStream(str.getOctets())).readObject());
         return keyId.getKeyIdentifier();
     } // getSubjectKeyId
 
@@ -804,23 +775,21 @@ public class CertTools {
      * @return String with the certificate policy OID
      * @throws IOException if extension can not be parsed
      */
-    public static String getCertificatePolicyId(X509Certificate cert, int pos)
-        throws IOException {
+    public static String getCertificatePolicyId(X509Certificate cert, int pos) throws IOException {
         byte[] extvalue = cert.getExtensionValue(X509Extensions.CertificatePolicies.getId());
         if (extvalue == null) {
             return null;
         }
-        DEROctetString oct = (DEROctetString) (new ASN1InputStream(new ByteArrayInputStream(
-                    extvalue)).readObject());
-        ASN1Sequence seq = (ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(
-                    oct.getOctets())).readObject();
+        DEROctetString oct = (DEROctetString) (new ASN1InputStream(new ByteArrayInputStream(extvalue))
+                .readObject());
+        ASN1Sequence seq = (ASN1Sequence) new ASN1InputStream(new ByteArrayInputStream(oct.getOctets()))
+                .readObject();
 
         // Check the size so we don't ArrayIndexOutOfBounds
         if (seq.size() < (pos + 1)) {
             return null;
         }
-        PolicyInformation pol = new PolicyInformation((ASN1Sequence) seq.getObjectAt(
-                    pos));
+        PolicyInformation pol = new PolicyInformation((ASN1Sequence) seq.getObjectAt(pos));
         String id = pol.getPolicyIdentifier().getId();
         return id;
     } // getCertificatePolicyId
@@ -831,8 +800,7 @@ public class CertTools {
      * @param cert certificate containing the extension
      * @return String with the UPN name
      */
-    public static String getUPNAltName(X509Certificate cert)
-        throws IOException, CertificateParsingException {
+    public static String getUPNAltName(X509Certificate cert) throws IOException, CertificateParsingException {
         Collection altNames = cert.getSubjectAlternativeNames();
         if (altNames != null) {
             Iterator i = altNames.iterator();
@@ -841,8 +809,7 @@ public class CertTools {
                 Integer no = (Integer) listitem.get(0);
                 if (no.intValue() == 0) {
                     byte[] altName = (byte[]) listitem.get(1);
-                    DERObject oct = (new ASN1InputStream(new ByteArrayInputStream(
-                                altName)).readObject());
+                    DERObject oct = (new ASN1InputStream(new ByteArrayInputStream(altName)).readObject());
                     ASN1Sequence seq = ASN1Sequence.getInstance(oct);
                     ASN1TaggedObject obj = (ASN1TaggedObject) seq.getObjectAt(1);
                     DERUTF8String str = DERUTF8String.getInstance(obj.getObject());
@@ -856,11 +823,9 @@ public class CertTools {
     /**
      * Return the CRL distribution point URL form a certificate.
      */
-    public static URL getCrlDistributionPoint(X509Certificate certificate)
-        throws CertificateParsingException {
+    public static URL getCrlDistributionPoint(X509Certificate certificate) throws CertificateParsingException {
         try {
-            DERObject obj = getExtensionValue(certificate,
-                    X509Extensions.CRLDistributionPoints.getId());
+            DERObject obj = getExtensionValue(certificate, X509Extensions.CRLDistributionPoints.getId());
             if (obj == null) {
                 return null;
             }
@@ -887,28 +852,24 @@ public class CertTools {
     /**
      * Return an Extension DERObject from a certificate
      */
-    private static DERObject getExtensionValue(X509Certificate cert, String oid)
-        throws IOException {
+    private static DERObject getExtensionValue(X509Certificate cert, String oid) throws IOException {
         byte[] bytes = cert.getExtensionValue(oid);
         if (bytes == null) {
             return null;
         }
-        ASN1InputStream aIn = new ASN1InputStream(new ByteArrayInputStream(
-                    bytes));
+        ASN1InputStream aIn = new ASN1InputStream(new ByteArrayInputStream(bytes));
         ASN1OctetString octs = (ASN1OctetString) aIn.readObject();
         aIn = new ASN1InputStream(new ByteArrayInputStream(octs.getOctets()));
         return aIn.readObject();
     } //getExtensionValue
 
     private static String getStringFromGeneralNames(DERObject names) {
-        ASN1Sequence namesSequence = ASN1Sequence.getInstance((ASN1TaggedObject) names,
-                false);
+        ASN1Sequence namesSequence = ASN1Sequence.getInstance((ASN1TaggedObject) names, false);
         if (namesSequence.size() == 0) {
             return null;
         }
         DERTaggedObject taggedObject = (DERTaggedObject) namesSequence.getObjectAt(0);
-        return new String(ASN1OctetString.getInstance(taggedObject, false)
-                                         .getOctets());
+        return new String(ASN1OctetString.getInstance(taggedObject, false).getOctets());
     } //getStringFromGeneralNames
 
     /**

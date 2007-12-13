@@ -71,9 +71,8 @@ public class SimpleHelloWorld {
             //*********************** GET SCHEDULER *************************
             //get authentication interface from existing scheduler based on scheduler host URL
             //(localhost) followed by the scheduler name (here the default one)
-            SchedulerAuthenticationInterface auth = SchedulerConnection.join(
-                    "//localhost/" +
-                    SchedulerConnection.SCHEDULER_DEFAULT_NAME);
+            SchedulerAuthenticationInterface auth = SchedulerConnection.join("//localhost/" +
+                SchedulerConnection.SCHEDULER_DEFAULT_NAME);
 
             //Now you are connected you must log on with a couple of username/password matching an entry in login and group files.
             //(groups.cfg, login.cfg in the same directory)
@@ -93,14 +92,13 @@ public class SimpleHelloWorld {
             //******************** CREATE A NEW TASK ***********************
             //creating a new task
             JavaExecutable task = new JavaExecutable() {
-                    @Override
-                    public Object execute(TaskResult... results) {
-                        System.out.println("Hello World !");
+                @Override
+                public Object execute(TaskResult... results) {
+                    System.out.println("Hello World !");
 
-                        return "HelloWorld Sample host : " +
-                        ProActiveInet.getInstance().getHostname();
-                    }
-                };
+                    return "HelloWorld Sample host : " + ProActiveInet.getInstance().getHostname();
+                }
+            };
 
             //Create the java task
             JavaTask desc = new JavaTask();
@@ -129,9 +127,8 @@ public class SimpleHelloWorld {
                 // it will launch a listener that will listen connection on any free port
                 simpleLoggerServer = SimpleLoggerServer.createLoggerServer();
                 // next, this method will forward task output on the previous loggerServer
-                scheduler.listenLog(jobId,
-                    ProActiveInet.getInstance().getHostname(),
-                    simpleLoggerServer.getPort());
+                scheduler.listenLog(jobId, ProActiveInet.getInstance().getHostname(), simpleLoggerServer
+                        .getPort());
             } catch (UnknownHostException e1) {
                 e1.printStackTrace();
             } catch (IOException e) {

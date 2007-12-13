@@ -64,8 +64,7 @@ public class BodyNotificationData implements Serializable {
      * @param nodeURL Url of the node containing this active object.
      * @param className Name of the classe used to create the active object.
      */
-    public BodyNotificationData(UniqueID bodyID, String jobID, String nodeURL,
-        String className) {
+    public BodyNotificationData(UniqueID bodyID, String jobID, String nodeURL, String className) {
         this.id = bodyID;
         this.jobID = jobID;
         this.nodeUrl = nodeURL;

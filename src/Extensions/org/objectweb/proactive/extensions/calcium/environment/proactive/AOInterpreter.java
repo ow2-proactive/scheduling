@@ -50,18 +50,18 @@ public class AOInterpreter {
     public AOInterpreter() {
     }
 
-    public AOInterpreter(AOTaskPool taskpool, FileServerClientImpl fserver)
-        throws NodeException, ActiveObjectCreationException {
+    public AOInterpreter(AOTaskPool taskpool, FileServerClientImpl fserver) throws NodeException,
+            ActiveObjectCreationException {
         Node localnode = NodeFactory.getDefaultNode();
 
-        this.stageOut = (AOStageOut) PAActiveObject.newActive(AOStageOut.class.getName(),
-                new Object[] { taskpool, fserver }, localnode);
+        this.stageOut = (AOStageOut) PAActiveObject.newActive(AOStageOut.class.getName(), new Object[] {
+                taskpool, fserver }, localnode);
 
         this.stageCompute = (AOStageCompute) PAActiveObject.newActive(AOStageCompute.class.getName(),
                 new Object[] { taskpool, stageOut }, localnode);
 
-        this.stageIn = (AOStageIn) PAActiveObject.newActive(AOStageIn.class.getName(),
-                new Object[] { taskpool, fserver, stageCompute }, localnode);
+        this.stageIn = (AOStageIn) PAActiveObject.newActive(AOStageIn.class.getName(), new Object[] {
+                taskpool, fserver, stageCompute }, localnode);
     }
 
     public AOStageIn getStageIn(AOInterpreterPool interpool) {

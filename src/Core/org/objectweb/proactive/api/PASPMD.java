@@ -80,10 +80,9 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroup(String className, Object[][] params,
-        String nodeName)
-        throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
+    public static Object newSPMDGroup(String className, Object[][] params, String nodeName)
+            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
+            NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
         return PASPMD.newSPMDGroup(className, params, nodeList);
@@ -100,10 +99,9 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroup(String className, Object[][] params,
-        String[] nodeListString)
-        throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
+    public static Object newSPMDGroup(String className, Object[][] params, String[] nodeListString)
+            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
+            NodeException {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
@@ -121,10 +119,9 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroup(String className, Object[][] params,
-        Node node)
-        throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
+    public static Object newSPMDGroup(String className, Object[][] params, Node node)
+            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
+            NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
         return PASPMD.newSPMDGroup(className, params, nodeList);
@@ -142,17 +139,15 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroup(String className, Object[][] params,
-        Node[] nodeList)
-        throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
+    public static Object newSPMDGroup(String className, Object[][] params, Node[] nodeList)
+            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
+            NodeException {
         Object result = PAGroup.newGroup(className);
         Group g = PAGroup.getGroup(result);
 
         if (params != null) {
             for (int i = 0; i < params.length; i++) {
-                g.add(PAActiveObject.newActive(className, params[i],
-                        nodeList[i % nodeList.length]));
+                g.add(PAActiveObject.newActive(className, params[i], nodeList[i % nodeList.length]));
             }
         }
         ((ProxyForGroup) g).setSPMDGroup(result);
@@ -171,10 +166,9 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroup(String className, Object[][] params,
-        VirtualNodeInternal virtualNode)
-        throws ClassNotFoundException, ClassNotReifiableException,
-            ActiveObjectCreationException, NodeException {
+    public static Object newSPMDGroup(String className, Object[][] params, VirtualNodeInternal virtualNode)
+            throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
+            NodeException {
         return PASPMD.newSPMDGroup(className, params, virtualNode.getNodes());
     }
 
@@ -192,9 +186,8 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroupInParallel(String className,
-        Object[][] params, String nodeName)
-        throws ClassNotFoundException, ClassNotReifiableException, NodeException {
+    public static Object newSPMDGroupInParallel(String className, Object[][] params, String nodeName)
+            throws ClassNotFoundException, ClassNotReifiableException, NodeException {
         Node[] nodeList = new Node[1];
         nodeList[0] = NodeFactory.getNode(nodeName);
         return PASPMD.newSPMDGroupInParallel(className, params, nodeList);
@@ -210,9 +203,8 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroupInParallel(String className,
-        Object[][] params, String[] nodeListString)
-        throws ClassNotFoundException, ClassNotReifiableException, NodeException {
+    public static Object newSPMDGroupInParallel(String className, Object[][] params, String[] nodeListString)
+            throws ClassNotFoundException, ClassNotReifiableException, NodeException {
         Node[] nodeList = new Node[nodeListString.length];
         for (int i = 0; i < nodeListString.length; i++)
             nodeList[i] = NodeFactory.getNode(nodeListString[i]);
@@ -228,9 +220,8 @@ public class PASPMD {
      * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      */
-    public static Object newSPMDGroupInParallel(String className,
-        Object[][] params, Node node)
-        throws ClassNotFoundException, ClassNotReifiableException {
+    public static Object newSPMDGroupInParallel(String className, Object[][] params, Node node)
+            throws ClassNotFoundException, ClassNotReifiableException {
         Node[] nodeList = new Node[1];
         nodeList[0] = node;
         return PASPMD.newSPMDGroupInParallel(className, params, nodeList);
@@ -247,11 +238,10 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroupInParallel(String className,
-        Object[][] params, VirtualNodeInternal virtualNode)
-        throws ClassNotFoundException, ClassNotReifiableException, NodeException {
-        return PASPMD.newSPMDGroupInParallel(className, params,
-            virtualNode.getNodes());
+    public static Object newSPMDGroupInParallel(String className, Object[][] params,
+            VirtualNodeInternal virtualNode) throws ClassNotFoundException, ClassNotReifiableException,
+            NodeException {
+        return PASPMD.newSPMDGroupInParallel(className, params, virtualNode.getNodes());
     }
 
     /**
@@ -264,9 +254,8 @@ public class PASPMD {
      * @throws ClassNotFoundException if the Class corresponding to <code>className</code> can't be found.
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      */
-    public static Object newSPMDGroupInParallel(String className,
-        Object[][] params, Node[] nodeList)
-        throws ClassNotFoundException, ClassNotReifiableException {
+    public static Object newSPMDGroupInParallel(String className, Object[][] params, Node[] nodeList)
+            throws ClassNotFoundException, ClassNotReifiableException {
         Object result = PAGroup.newGroup(className);
         ProxyForGroup proxy = (org.objectweb.proactive.core.group.ProxyForGroup) PAGroup.getGroup(result);
 
@@ -311,8 +300,7 @@ public class PASPMD {
      * @return the index of the object
      */
     public static int getMyRank() {
-        return PAGroup.getGroup(PASPMD.getSPMDGroup())
-                      .indexOf(PAActiveObject.getStubOnThis());
+        return PAGroup.getGroup(PASPMD.getSPMDGroup()).indexOf(PAActiveObject.getStubOnThis());
     }
 
     /**
@@ -335,14 +323,12 @@ public class PASPMD {
             AbstractBody body = (AbstractBody) PAActiveObject.getBodyOnThis();
             body.getProActiveSPMDGroupManager().addToBarrierTags(barrierName);
             // set the number of awaited message barriers
-            body.getProActiveSPMDGroupManager()
-                .setAwaitedBarrierCalls(barrierName, PAGroup.size(group));
+            body.getProActiveSPMDGroupManager().setAwaitedBarrierCalls(barrierName, PAGroup.size(group));
             // send the barrier messages
             ProxyForGroup proxy = (ProxyForGroup) PAGroup.getGroup(group);
             proxy.reify(new MethodCallBarrier(barrierName));
         } catch (InvocationTargetException e) {
-            System.err.println(
-                "Unable to invoke a method call to control groups");
+            System.err.println("Unable to invoke a method call to control groups");
             e.printStackTrace();
         }
     }
@@ -353,15 +339,13 @@ public class PASPMD {
      */
     public static void barrier(String[] methodNames) {
         try {
-            (PAActiveObject.getStubOnThis()).getProxy()
-             .reify(new MethodCallBarrierWithMethodName(methodNames));
+            (PAActiveObject.getStubOnThis()).getProxy().reify(
+                    new MethodCallBarrierWithMethodName(methodNames));
         } catch (InvocationTargetException e) {
-            System.err.println(
-                "Unable to invoke a method call to control groups");
+            System.err.println("Unable to invoke a method call to control groups");
             e.printStackTrace();
         } catch (Throwable e) {
-            System.err.println(
-                "Unable to invoke a method call to control groups");
+            System.err.println("Unable to invoke a method call to control groups");
             e.printStackTrace();
         }
     }

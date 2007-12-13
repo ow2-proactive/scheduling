@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-
 /** Methods which are to be implemented by users.
  * Represents which services are available for Objects unrelated with User GUIs. */
 public interface User {

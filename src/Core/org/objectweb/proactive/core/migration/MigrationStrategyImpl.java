@@ -40,8 +40,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * so that it can perform automaticly some method upon arrival on a site.
  * An migrationStrategy is instanciated by the user.
  */
-public class MigrationStrategyImpl implements java.io.Serializable,
-    MigrationStrategy {
+public class MigrationStrategyImpl implements java.io.Serializable, MigrationStrategy {
     static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     private java.util.Vector<Destination> table;
     private int index;
@@ -82,10 +81,8 @@ public class MigrationStrategyImpl implements java.io.Serializable,
             while (_in.ready()) {
                 // on le lit
                 s = _in.readLine();
-                java.util.StringTokenizer tokens = new java.util.StringTokenizer(s,
-                        " ");
-                this.add(new NodeDestination(new String(tokens.nextToken()),
-                        tokens.nextToken()));
+                java.util.StringTokenizer tokens = new java.util.StringTokenizer(s, " ");
+                this.add(new NodeDestination(new String(tokens.nextToken()), tokens.nextToken()));
             }
         } // catch (IOException e) {}
         catch (Exception e) {
@@ -144,7 +141,7 @@ public class MigrationStrategyImpl implements java.io.Serializable,
         while (i < table.size()) {
             r2 = table.elementAt(i);
             if ((r2.getDestination().equals(r.getDestination())) &&
-                    (r2.getMethodName().equals(r.getMethodName()))) {
+                (r2.getMethodName().equals(r.getMethodName()))) {
                 table.removeElementAt(i);
                 //we have removed an element before the index , so we shift the index
                 if (i < index) {
@@ -182,7 +179,7 @@ public class MigrationStrategyImpl implements java.io.Serializable,
             Destination r = table.elementAt(index);
             return (r);
         } else //should never happens
-         {
+        {
             return (null);
         }
     }

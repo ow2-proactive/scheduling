@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.group.threadpool;
 
-
 /** The threads that compose a thread pool. */
 public class ThreadInThePool extends Thread {
     protected static int counter;

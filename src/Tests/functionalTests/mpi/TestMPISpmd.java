@@ -44,6 +44,7 @@ import org.objectweb.proactive.mpi.MPISpmd;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Tests if dependency is well ensured between processes. That is MPISpmd object is created from a Virtual Node.
  */

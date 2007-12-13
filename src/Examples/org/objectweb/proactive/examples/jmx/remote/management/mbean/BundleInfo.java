@@ -81,8 +81,8 @@ import org.osgi.framework.BundleListener;
 import org.osgi.framework.ServiceReference;
 
 
-public class BundleInfo extends NotificationBroadcasterSupport
-    implements BundleListener, DynamicMBean, Serializable, IJmx {
+public class BundleInfo extends NotificationBroadcasterSupport implements BundleListener, DynamicMBean,
+        Serializable, IJmx {
     public static final int INSTALLED = Bundle.INSTALLED;
     public static final int ACTIVE = Bundle.ACTIVE;
     public static final int RESOLVED = Bundle.RESOLVED;
@@ -90,15 +90,11 @@ public class BundleInfo extends NotificationBroadcasterSupport
     public static final int STOPPING = Bundle.STOPPING;
     public static final int UNINSTALLED = Bundle.UNINSTALLED;
     private static final MethodRepresentation[] JMX_OPERATIONS = new MethodRepresentation[] {
-            new MethodRepresentation("start",
-                new String[] { Long.class.getName() }, "Starts the bundle"),
-            new MethodRepresentation("stop",
-                new String[] { Long.class.getName() }, "Stops the bundle"),
-            new MethodRepresentation("update",
-                new String[] { Long.class.getName() }, "Updates the bundle"),
-            new MethodRepresentation("uninstall",
-                new String[] { Long.class.getName() }, "Uninstall  the bundle"),
-        };
+            new MethodRepresentation("start", new String[] { Long.class.getName() }, "Starts the bundle"),
+            new MethodRepresentation("stop", new String[] { Long.class.getName() }, "Stops the bundle"),
+            new MethodRepresentation("update", new String[] { Long.class.getName() }, "Updates the bundle"),
+            new MethodRepresentation("uninstall", new String[] { Long.class.getName() },
+                "Uninstall  the bundle"), };
 
     /* JMX attributes */
     private HashMap<String, Object> headers;
@@ -131,8 +127,8 @@ public class BundleInfo extends NotificationBroadcasterSupport
         try {
             this.path = parent.getPath() + "type=bundles";
 
-            this.on = new ObjectName(this.path + ",url=" + this.urlGateway +
-                    '(' + parent.getPort() + ')' + ",name=" + this.name);
+            this.on = new ObjectName(this.path + ",url=" + this.urlGateway + '(' + parent.getPort() + ')' +
+                ",name=" + this.name);
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
@@ -167,49 +163,45 @@ public class BundleInfo extends NotificationBroadcasterSupport
     /* JMX Operations */
     public Status start(Long idTransaction) {
         try {
-            Transaction t = TransactionsManager.getInstance()
-                                               .getTransaction(idTransaction.longValue());
+            Transaction t = TransactionsManager.getInstance().getTransaction(idTransaction.longValue());
             CommandMBean c = new StartCommand(t, this.id);
             return t.executeCommand(c);
         } catch (InvalidTransactionException e) {
-            return new Status(Status.ERR, OSGiCommand.START + id,
-                e.getMessage(), OSGiStore.getInstance().getUrl());
+            return new Status(Status.ERR, OSGiCommand.START + id, e.getMessage(), OSGiStore.getInstance()
+                    .getUrl());
         }
     }
 
     public Status stop(Long idTransaction) {
         try {
-            Transaction t = TransactionsManager.getInstance()
-                                               .getTransaction(idTransaction.longValue());
+            Transaction t = TransactionsManager.getInstance().getTransaction(idTransaction.longValue());
             CommandMBean c = new StopCommand(t, this.id);
             return t.executeCommand(c);
         } catch (InvalidTransactionException e) {
-            return new Status(Status.ERR, OSGiCommand.STOP + id,
-                e.getMessage(), OSGiStore.getInstance().getUrl());
+            return new Status(Status.ERR, OSGiCommand.STOP + id, e.getMessage(), OSGiStore.getInstance()
+                    .getUrl());
         }
     }
 
     public Status update(Long idTransaction) {
         try {
-            Transaction t = TransactionsManager.getInstance()
-                                               .getTransaction(idTransaction.longValue());
+            Transaction t = TransactionsManager.getInstance().getTransaction(idTransaction.longValue());
             CommandMBean c = new UpdateCommand(t, this.id);
             return t.executeCommand(c);
         } catch (InvalidTransactionException e) {
-            return new Status(Status.ERR, OSGiCommand.UPDATE + id,
-                e.getMessage(), OSGiStore.getInstance().getUrl());
+            return new Status(Status.ERR, OSGiCommand.UPDATE + id, e.getMessage(), OSGiStore.getInstance()
+                    .getUrl());
         }
     }
 
     public Status uninstall(Long idTransaction) {
         try {
-            Transaction t = TransactionsManager.getInstance()
-                                               .getTransaction(idTransaction.longValue());
+            Transaction t = TransactionsManager.getInstance().getTransaction(idTransaction.longValue());
             CommandMBean c = new UninstallCommand(t, this.id);
             return t.executeCommand(c);
         } catch (InvalidTransactionException e) {
-            return new Status(Status.ERR, OSGiCommand.UNINSTALL + id,
-                e.getMessage(), OSGiStore.getInstance().getUrl());
+            return new Status(Status.ERR, OSGiCommand.UNINSTALL + id, e.getMessage(), OSGiStore.getInstance()
+                    .getUrl());
         }
     }
 
@@ -237,28 +229,25 @@ public class BundleInfo extends NotificationBroadcasterSupport
     }
 
     /* IJmx implementation */
-    public void register()
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
+    public void register() throws InstanceAlreadyExistsException, MBeanRegistrationException,
             NotCompliantMBeanException {
         ManagementFactory.getPlatformMBeanServer().registerMBean(this, this.on);
     }
 
-    public void unregister()
-        throws InstanceNotFoundException, MBeanRegistrationException {
+    public void unregister() throws InstanceNotFoundException, MBeanRegistrationException {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(this.on);
     }
 
     /* implementation of Dynamic MBean */
-    public Object getAttribute(String attribute)
-        throws AttributeNotFoundException, MBeanException, ReflectionException {
+    public Object getAttribute(String attribute) throws AttributeNotFoundException, MBeanException,
+            ReflectionException {
         return this.headers.get(attribute).toString();
     }
 
     public AttributeList getAttributes(String[] attributes) {
         AttributeList al = new AttributeList(attributes.length);
         for (int i = 0; i < attributes.length; i++) {
-            al.add(new Attribute(attributes[i],
-                    this.headers.get(attributes[i]).toString()));
+            al.add(new Attribute(attributes[i], this.headers.get(attributes[i]).toString()));
         }
         return al;
     }
@@ -269,9 +258,8 @@ public class BundleInfo extends NotificationBroadcasterSupport
         int j = 0;
         while (i.hasNext()) {
             String attribute = (String) i.next();
-            MBeanAttributeInfo info = new MBeanAttributeInfo(attribute,
-                    this.headers.get(attribute).getClass().getName(),
-                    attribute, true, false, false);
+            MBeanAttributeInfo info = new MBeanAttributeInfo(attribute, this.headers.get(attribute)
+                    .getClass().getName(), attribute, true, false, false);
             attInfos[j++] = info;
         }
         return attInfos;
@@ -282,9 +270,8 @@ public class BundleInfo extends NotificationBroadcasterSupport
         try {
             for (int i = 0; i < JMX_OPERATIONS.length; i++) {
                 MethodRepresentation mr = JMX_OPERATIONS[i];
-                MBeanOperationInfo mboi = new MBeanOperationInfo(mr.getDescription(),
-                        this.getClass()
-                            .getMethod(mr.getName(), mr.getParamsTypes()));
+                MBeanOperationInfo mboi = new MBeanOperationInfo(mr.getDescription(), this.getClass()
+                        .getMethod(mr.getName(), mr.getParamsTypes()));
                 mbo[i] = mboi;
             }
         } catch (IllegalArgumentException e) {
@@ -298,30 +285,25 @@ public class BundleInfo extends NotificationBroadcasterSupport
     }
 
     private MBeanNotificationInfo[] getNotificationsInfo() {
-        MBeanNotificationInfo[] mbnis = new MBeanNotificationInfo[] {
-                new MBeanNotificationInfo(new String[] {
-                        "name=ATTRIBUTE_CHANGE", "descriptorType=notification",
-                        "log=T", "severity=5",
-                        "displayName=jmx.attribute.change"
-                    }, "BundleNotification",
-                    "Emitted when a bundle event occurs")
-            };
+        MBeanNotificationInfo[] mbnis = new MBeanNotificationInfo[] { new MBeanNotificationInfo(new String[] {
+                "name=ATTRIBUTE_CHANGE", "descriptorType=notification", "log=T", "severity=5",
+                "displayName=jmx.attribute.change" }, "BundleNotification",
+            "Emitted when a bundle event occurs") };
         return mbnis;
     }
 
     public MBeanInfo getMBeanInfo() {
         MBeanAttributeInfo[] attributes = getAttributesInfos();
-        MBeanConstructorInfo[] constructors = new MBeanConstructorInfo[] {  };
+        MBeanConstructorInfo[] constructors = new MBeanConstructorInfo[] {};
         MBeanOperationInfo[] operations = getOperationsInfos();
         MBeanNotificationInfo[] notifications = getNotificationsInfo();
-        MBeanInfo mbi = new MBeanInfo(this.getClass().getName(),
-                "Mbean matching an OSGi service", attributes, constructors,
-                operations, notifications);
+        MBeanInfo mbi = new MBeanInfo(this.getClass().getName(), "Mbean matching an OSGi service",
+            attributes, constructors, operations, notifications);
         return mbi;
     }
 
-    public Object invoke(String actionName, Object[] params, String[] signature)
-        throws MBeanException, ReflectionException {
+    public Object invoke(String actionName, Object[] params, String[] signature) throws MBeanException,
+            ReflectionException {
         try {
             Class<?>[] paramTypes = new Class[signature.length];
             for (int i = 0; i < signature.length; i++) {
@@ -345,9 +327,8 @@ public class BundleInfo extends NotificationBroadcasterSupport
         return null;
     }
 
-    public void setAttribute(Attribute attribute)
-        throws AttributeNotFoundException, InvalidAttributeValueException,
-            MBeanException, ReflectionException {
+    public void setAttribute(Attribute attribute) throws AttributeNotFoundException,
+            InvalidAttributeValueException, MBeanException, ReflectionException {
     }
 
     public AttributeList setAttributes(AttributeList attributes) {
@@ -370,19 +351,16 @@ public class BundleInfo extends NotificationBroadcasterSupport
         if (event.getBundle().equals(this.bundle)) {
             copyBundleInfo();
             if (event.getType() == BundleEvent.STARTED) {
-                Notification notification = new BundleStartedNotification("osgi.started.notification",
-                        this, seqNumber++, "Bundle started", this.urlGateway,
-                        this.on);
+                Notification notification = new BundleStartedNotification("osgi.started.notification", this,
+                    seqNumber++, "Bundle started", this.urlGateway, this.on);
                 sendNotification(notification);
             } else if (event.getType() == BundleEvent.STOPPED) {
-                Notification notification = new BundleStoppedNotification("osgi.stopped.notification",
-                        this, seqNumber++, "Bundle stopped", this.urlGateway,
-                        this.on);
+                Notification notification = new BundleStoppedNotification("osgi.stopped.notification", this,
+                    seqNumber++, "Bundle stopped", this.urlGateway, this.on);
                 sendNotification(notification);
             } else if (event.getType() == BundleEvent.UPDATED) {
-                Notification notification = new BundleStartedNotification("osgi.updated.notification",
-                        this, seqNumber++, "Bundle updated", this.urlGateway,
-                        this.on);
+                Notification notification = new BundleStartedNotification("osgi.updated.notification", this,
+                    seqNumber++, "Bundle updated", this.urlGateway, this.on);
                 sendNotification(notification);
             }
         }

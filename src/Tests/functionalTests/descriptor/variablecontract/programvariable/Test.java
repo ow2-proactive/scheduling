@@ -43,13 +43,13 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Tests conditions for variables of type ProgramVariable
  */
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
-            "/functionalTests/descriptor/variablecontract/programvariable/Test.xml")
-                                                   .getPath();
+            "/functionalTests/descriptor/variablecontract/programvariable/Test.xml").getPath();
     ProActiveDescriptor pad;
     boolean bogusFromDescriptor;
     boolean bogusFromProgram;
@@ -76,44 +76,36 @@ public class Test extends FunctionalTest {
         //Setting from Program
         HashMap map = new HashMap();
         map.put("test_var", "helloworld");
-        variableContract.setVariableFromProgram(map,
-            VariableContractType.getType(
-                ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
+        variableContract.setVariableFromProgram(map, VariableContractType
+                .getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
 
         //Setting bogus empty variable from Program (this should fail)
         try {
-            variableContract.setVariableFromProgram("bogus_from_program", "",
-                VariableContractType.getType(
-                    ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
+            variableContract.setVariableFromProgram("bogus_from_program", "", VariableContractType
+                    .getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
         } catch (Exception e) {
             bogusFromProgram = false;
         }
 
         //Setting from Descriptor
-        variableContract.setDescriptorVariable("force_prog_set", "",
-            VariableContractType.getType(
-                ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
+        variableContract.setDescriptorVariable("force_prog_set", "", VariableContractType
+                .getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
         bogusCheckContract = variableContract.checkContract(); //Contract should fail (return false)
-                                                               //Now it should be ok
+        //Now it should be ok
 
-        variableContract.setVariableFromProgram("force_prog_set",
-            "forcedhelloworld",
-            VariableContractType.getType(
-                ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
+        variableContract.setVariableFromProgram("force_prog_set", "forcedhelloworld", VariableContractType
+                .getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
 
         //Setting bogus from descriptor (this should fail)
         try {
-            variableContract.setDescriptorVariable("nonempty", "non_empty",
-                VariableContractType.getType(
-                    ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
+            variableContract.setDescriptorVariable("nonempty", "non_empty", VariableContractType
+                    .getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
         } catch (Exception e) {
             bogusFromDescriptor = false;
         }
 
-        variableContract.setVariableFromProgram("forcedFromDesc",
-            "forcedhelloworldFromDesc",
-            VariableContractType.getType(
-                ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
+        variableContract.setVariableFromProgram("forcedFromDesc", "forcedhelloworldFromDesc",
+                VariableContractType.getType(ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG));
 
         pad = PADeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
 
@@ -124,10 +116,8 @@ public class Test extends FunctionalTest {
         assertTrue(!bogusFromDescriptor);
         assertTrue(!bogusFromProgram);
         assertTrue(variableContract.getValue("test_var").equals("helloworld"));
-        assertTrue(variableContract.getValue("force_prog_set")
-                                   .equals("forcedhelloworld"));
-        assertTrue(variableContract.getValue("forcedFromDesc")
-                                   .equals("forcedhelloworldFromDesc"));
+        assertTrue(variableContract.getValue("force_prog_set").equals("forcedhelloworld"));
+        assertTrue(variableContract.getValue("forcedFromDesc").equals("forcedhelloworldFromDesc"));
         assertTrue(variableContract.isClosed());
         assertTrue(variableContract.checkContract());
     }

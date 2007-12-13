@@ -96,16 +96,16 @@ public class AppletPhil extends org.objectweb.proactive.examples.StandardFrame {
         javax.swing.Icon[] imgArray = new javax.swing.Icon[5];
         try {
             ClassLoader c = this.getClass().getClassLoader();
-            imgArray[0] = new javax.swing.ImageIcon(c.getResource(
-                        "org/objectweb/proactive/examples/philosophers/think.gif"));
-            imgArray[1] = new javax.swing.ImageIcon(c.getResource(
-                        "org/objectweb/proactive/examples/philosophers/wait.gif"));
-            imgArray[2] = new javax.swing.ImageIcon(c.getResource(
-                        "org/objectweb/proactive/examples/philosophers/eat.gif"));
-            imgArray[3] = new javax.swing.ImageIcon(c.getResource(
-                        "org/objectweb/proactive/examples/philosophers/fork0.gif"));
-            imgArray[4] = new javax.swing.ImageIcon(c.getResource(
-                        "org/objectweb/proactive/examples/philosophers/fork1.gif"));
+            imgArray[0] = new javax.swing.ImageIcon(c
+                    .getResource("org/objectweb/proactive/examples/philosophers/think.gif"));
+            imgArray[1] = new javax.swing.ImageIcon(c
+                    .getResource("org/objectweb/proactive/examples/philosophers/wait.gif"));
+            imgArray[2] = new javax.swing.ImageIcon(c
+                    .getResource("org/objectweb/proactive/examples/philosophers/eat.gif"));
+            imgArray[3] = new javax.swing.ImageIcon(c
+                    .getResource("org/objectweb/proactive/examples/philosophers/fork0.gif"));
+            imgArray[4] = new javax.swing.ImageIcon(c
+                    .getResource("org/objectweb/proactive/examples/philosophers/fork1.gif"));
         } catch (Exception e) {
             e.printStackTrace();
         }

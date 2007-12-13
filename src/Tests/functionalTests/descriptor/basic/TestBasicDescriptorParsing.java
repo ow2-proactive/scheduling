@@ -37,11 +37,8 @@ import org.objectweb.proactive.api.PADeployment;
 public class TestBasicDescriptorParsing {
     @Test
     public void action() throws Exception {
-        String descriptorLocation = getClass()
-                                        .getResource("javaproperty_ERROR.xml")
-                                        .getPath();
+        String descriptorLocation = getClass().getResource("javaproperty_ERROR.xml").getPath();
 
-        Object proActiveDescriptor = PADeployment.getProactiveDescriptor(
-                "file:" + descriptorLocation);
+        Object proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + descriptorLocation);
     }
 }

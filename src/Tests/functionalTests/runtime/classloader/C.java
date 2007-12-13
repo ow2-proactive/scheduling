@@ -30,7 +30,6 @@
  */
 package functionalTests.runtime.classloader;
 
-
 /**
  * @author Matthieu Morel
  *

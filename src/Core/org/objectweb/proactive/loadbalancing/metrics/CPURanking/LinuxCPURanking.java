@@ -123,8 +123,7 @@ public class LinuxCPURanking implements Metric {
 
         double min1;
 
-        java.util.StringTokenizer st = new java.util.StringTokenizer(cpuLine,
-                " ");
+        java.util.StringTokenizer st = new java.util.StringTokenizer(cpuLine, " ");
         min1 = Double.parseDouble(st.nextToken());
 
         return min1 * normaLoad;

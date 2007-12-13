@@ -55,14 +55,12 @@ public class Main {
         System.out.println();
 
         String localAddress = null;
-        localAddress = URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                               .getInetAddress());
+        localAddress = URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
         System.out.println("Local IP Address: " + localAddress);
         System.out.println("Available properties:");
         for (PAProperties p : PAProperties.values()) {
             String type = p.isBoolean() ? "Boolean" : "String";
-            System.out.println("\t" + type + "\t" + p.getKey() + " [" +
-                p.getValue() + "]");
+            System.out.println("\t" + type + "\t" + p.getKey() + " [" + p.getValue() + "]");
         }
     }
 }

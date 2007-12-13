@@ -40,10 +40,9 @@ import org.objectweb.proactive.core.event.MessageEventListener;
 
 public class BouncingRequestReceiver implements RequestReceiver {
     private static ObjectHasMigratedException REUSABLE_EXCEPTION = new ObjectHasMigratedException(
-            "Object has migrated");
+        "Object has migrated");
 
-    public int receiveRequest(Request r, Body bodyReceiver)
-        throws java.io.IOException {
+    public int receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException {
         //System.out.println("BouncingRequestReceiver: receiveRequest()");
         //        throw REUSABLE_EXCEPTION;
         throw new ObjectHasMigratedException("Object has migrated");
@@ -58,12 +57,10 @@ public class BouncingRequestReceiver implements RequestReceiver {
     public void setImmediateService(String methodName) {
     }
 
-    public void removeImmediateService(String methodName,
-        Class<?>[] parametersTypes) throws IOException {
+    public void removeImmediateService(String methodName, Class<?>[] parametersTypes) throws IOException {
     }
 
-    public void setImmediateService(String methodName,
-        Class<?>[] parametersTypes) throws IOException {
+    public void setImmediateService(String methodName, Class<?>[] parametersTypes) throws IOException {
     }
 
     public boolean isInImmediateService() throws IOException {

@@ -33,8 +33,8 @@ package functionalTests.activeobject.acontinuation;
 public class Id implements java.io.Serializable {
 
     /**
-         *
-         */
+     *
+     */
     String name;
 
     public Id() {

@@ -44,8 +44,8 @@ public class BundleAddedNotification extends BundleNotification {
     private String url;
     private ObjectName on;
 
-    public BundleAddedNotification(String type, Object source,
-        long sequenceNumber, String url, String message, ObjectName on) {
+    public BundleAddedNotification(String type, Object source, long sequenceNumber, String url,
+            String message, ObjectName on) {
         super(type, source, sequenceNumber);
         this.url = url;
         this.bundleInfo = (BundleInfo) source;

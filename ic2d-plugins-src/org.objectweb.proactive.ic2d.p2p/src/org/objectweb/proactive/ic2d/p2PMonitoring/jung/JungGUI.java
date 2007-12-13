@@ -143,27 +143,27 @@ public class JungGUI implements ToolTipFunction, P2PNetworkListener {
      */
     public Layout useLayout(Graph g, int i) {
         switch (i) {
-        case 0: {
-            this.mutable = false;
-            return this.useCircleLayout(g);
-        }
-        case 1: {
-            this.mutable = false;
-            return this.useKKLayout(g);
-        }
-        case 2: {
-            this.mutable = true;
-            return this.useFRLayout(g);
-        }
-        case 3: {
-            this.mutable = true;
-            return this.useSpringLayout(g);
-        }
+            case 0: {
+                this.mutable = false;
+                return this.useCircleLayout(g);
+            }
+            case 1: {
+                this.mutable = false;
+                return this.useKKLayout(g);
+            }
+            case 2: {
+                this.mutable = true;
+                return this.useFRLayout(g);
+            }
+            case 3: {
+                this.mutable = true;
+                return this.useSpringLayout(g);
+            }
 
-        //return this.useFadingVertexLayout(g);
-        //         return this.useTreeLayout(g);
-        default:
-            return null;
+                //return this.useFadingVertexLayout(g);
+                //         return this.useTreeLayout(g);
+            default:
+                return null;
         }
     }
 
@@ -206,8 +206,7 @@ public class JungGUI implements ToolTipFunction, P2PNetworkListener {
 
     protected void generateGraphNodes(Dumper dump) {
         Set<Map.Entry<String, P2PNode>> map = (Set<Map.Entry<String, P2PNode>>) dump.getP2PNetwork()
-                                                                                    .getSenders()
-                                                                                    .entrySet();
+                .getSenders().entrySet();
         Iterator it = map.iterator();
         while (it.hasNext()) {
             Map.Entry<String, P2PNode> entry = (Map.Entry<String, P2PNode>) it.next();
@@ -222,9 +221,8 @@ public class JungGUI implements ToolTipFunction, P2PNetworkListener {
     protected void generateGraphLinks(Dumper dump) {
         //now dump the links
         //   int i = 0;
-        Set<Map.Entry<String, Link>> map2 = (Set<Map.Entry<String, Link>>) dump.getP2PNetwork()
-                                                                               .getLinks()
-                                                                               .entrySet();
+        Set<Map.Entry<String, Link>> map2 = (Set<Map.Entry<String, Link>>) dump.getP2PNetwork().getLinks()
+                .entrySet();
 
         Iterator it = map2.iterator();
         while (it.hasNext()) {
@@ -316,8 +314,8 @@ public class JungGUI implements ToolTipFunction, P2PNetworkListener {
 
     public String getToolTipText(Vertex v) {
         //System.out.println("JungGUI.getToolTipText() " + v);
-        return "<html> " + sl.getLabel(v) + " <br> noa = " +
-        ((P2PUndirectedSparseVertex) v).getNoa() + "</html>";
+        return "<html> " + sl.getLabel(v) + " <br> noa = " + ((P2PUndirectedSparseVertex) v).getNoa() +
+            "</html>";
         //return null;
     }
 

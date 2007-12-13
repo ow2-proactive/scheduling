@@ -90,8 +90,7 @@ public class Stateness {
      * @return A list of groups, holding the entry points objects.
      * @throws Exception
      */
-    static public <T> Collection<Collection<T>> getReferenceGroups(
-        Collection<T> list) throws Exception {
+    static public <T> Collection<Collection<T>> getReferenceGroups(Collection<T> list) throws Exception {
         Collection<Collection<T>> groups = new ArrayList<Collection<T>>();
 
         for (T muscle : list) {
@@ -132,8 +131,8 @@ public class Stateness {
         }
 
         // The default value for the annotation, when not present, is false.
-        boolean isStateFulAnnotation = cls.isAnnotationPresent(StateFul.class)
-            ? cls.getAnnotation(StateFul.class).value() : false;
+        boolean isStateFulAnnotation = cls.isAnnotationPresent(StateFul.class) ? cls.getAnnotation(
+                StateFul.class).value() : false;
 
         // Case 1.
         if (isStateFulAnnotation) {
@@ -142,7 +141,7 @@ public class Stateness {
 
         // Case 2.
         if ((getNonStaticFields(cls.getDeclaredFields()).length > 0) &&
-                !cls.isAnnotationPresent(StateFul.class)) {
+            !cls.isAnnotationPresent(StateFul.class)) {
             return true;
         }
 
@@ -179,8 +178,7 @@ public class Stateness {
      *         object in common inside their reference graphs.
      * @throws Exception
      */
-    static public boolean shareState(Object o1, Object o2)
-        throws Exception {
+    static public boolean shareState(Object o1, Object o2) throws Exception {
         // If either class is stateless then there is no shared state
         if (!isStateFul(o1.getClass()) || !isStateFul(o2.getClass())) {
             return false;
@@ -213,8 +211,7 @@ public class Stateness {
      * @return true if the object shares the state. False otherwise.
      * @throws Exception
      */
-    static private <T> boolean shareStateWithGroup(Collection<T> set, T muscle)
-        throws Exception {
+    static private <T> boolean shareStateWithGroup(Collection<T> set, T muscle) throws Exception {
         for (T m : set) {
             if (shareState(m, muscle)) {
                 return true;
@@ -224,8 +221,7 @@ public class Stateness {
         return false;
     }
 
-    public static Collection<Muscle> getStatefulMuscles(Skeleton root)
-        throws Exception {
+    public static Collection<Muscle> getStatefulMuscles(Skeleton root) throws Exception {
         GetAllClassHandler<Muscle> handler = new GetAllClassHandler<Muscle>(Muscle.class);
 
         ObjectGraph.searchForClass(root, handler);
@@ -236,14 +232,13 @@ public class Stateness {
     public static void main(String[] args) throws Exception {
         Condition<Board> div = new DivideCondition();
 
-        Skeleton<Board, Result> BT1 = new DaC<Board, Result>(new DivideBT1(),
-                div, new Seq<Board, Result>(new SolveBT1()), new ConquerBoard());
+        Skeleton<Board, Result> BT1 = new DaC<Board, Result>(new DivideBT1(), div, new Seq<Board, Result>(
+            new SolveBT1()), new ConquerBoard());
 
-        Skeleton<Board, Result> BT2 = new DaC<Board, Result>(new DivideBT2(),
-                div, new Seq<Board, Result>(new SolveBT2()), new ConquerBoard());
+        Skeleton<Board, Result> BT2 = new DaC<Board, Result>(new DivideBT2(), div, new Seq<Board, Result>(
+            new SolveBT2()), new ConquerBoard());
 
-        Skeleton<Board, Result> root = new Fork<Board, Result>(new ConquerBoard(),
-                BT1, BT2);
+        Skeleton<Board, Result> root = new Fork<Board, Result>(new ConquerBoard(), BT1, BT2);
 
         Collection<Muscle> muscles = getStatefulMuscles(root);
         System.out.println(muscles.size());
@@ -256,8 +251,7 @@ public class Stateness {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Vector<T> deepCopy(T o, int n)
-        throws IOException, ClassNotFoundException {
+    public static <T> Vector<T> deepCopy(T o, int n) throws IOException, ClassNotFoundException {
         // serialize Object into byte array
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
@@ -278,8 +272,7 @@ public class Stateness {
     }
 
     @SuppressWarnings("unchecked")
-    static public <T> T deepCopy(T o)
-        throws IOException, ClassNotFoundException {
+    static public <T> T deepCopy(T o) throws IOException, ClassNotFoundException {
         // serialize Object into byte array
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);

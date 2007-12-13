@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scilab.util;
 
-
 /**
  * This class represents a matrix of double with a waiting by necessity
  */

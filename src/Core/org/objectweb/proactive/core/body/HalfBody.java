@@ -60,8 +60,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class HalfBody extends AbstractBody {
 
     /**
-         *
-         */
+     *
+     */
 
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
@@ -84,8 +84,7 @@ public class HalfBody extends AbstractBody {
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    private HalfBody(MetaObjectFactory factory)
-        throws ActiveObjectCreationException {
+    private HalfBody(MetaObjectFactory factory) throws ActiveObjectCreationException {
         super(null, "LOCAL", factory, Job.DEFAULT_JOBID);
 
         //SECURITY
@@ -99,9 +98,8 @@ public class HalfBody extends AbstractBody {
             //            this.securityManager.setBody(this);
             this.isSecurityOn = this.securityManager.getCertificate() != null;
             this.internalBodySecurity = new InternalBodySecurity(null); // SECURITY
-            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER)
-                           .debug("  ------> HalfBody Security is " +
-                this.isSecurityOn);
+            ProActiveLogger.getLogger(Loggers.SECURITY_MANAGER).debug(
+                    "  ------> HalfBody Security is " + this.isSecurityOn);
         }
 
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
@@ -113,16 +111,13 @@ public class HalfBody extends AbstractBody {
             try {
                 // create the fault-tolerance manager
                 int protocolSelector = FTManager.getProtoSelector(PAProperties.PA_FT_PROTOCOL.getValue());
-                this.ftmanager = factory.newFTManagerFactory()
-                                        .newHalfFTManager(protocolSelector);
+                this.ftmanager = factory.newFTManagerFactory().newHalfFTManager(protocolSelector);
                 this.ftmanager.init(this);
                 if (bodyLogger.isDebugEnabled()) {
                     bodyLogger.debug("Init FTManager on " + this.getNodeURL());
                 }
             } catch (ProActiveException e) {
-                bodyLogger.error(
-                    "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
-                    e);
+                bodyLogger.error("**ERROR** Unable to init FTManager. Fault-tolerance is disabled " + e);
                 this.ftmanager = null;
             }
         } else {
@@ -154,8 +149,7 @@ public class HalfBody extends AbstractBody {
      * @exception java.io.IOException if the request cannot be accepted
      */
     @Override
-    protected int internalReceiveRequest(Request request)
-        throws java.io.IOException {
+    protected int internalReceiveRequest(Request request) throws java.io.IOException {
         throw new ProActiveRuntimeException(
             "The method 'receiveRequest' is not implemented in class HalfBody.");
     }
@@ -186,13 +180,11 @@ public class HalfBody extends AbstractBody {
         throw new HalfBodyException();
     }
 
-    public void setImmediateService(String methodName,
-        Class<?>[] parametersTypes) {
+    public void setImmediateService(String methodName, Class<?>[] parametersTypes) {
         throw new HalfBodyException();
     }
 
-    public void removeImmediateService(String methodName,
-        Class<?>[] parametersTypes) {
+    public void removeImmediateService(String methodName, Class<?>[] parametersTypes) {
         throw new HalfBodyException();
     }
 
@@ -216,12 +208,11 @@ public class HalfBody extends AbstractBody {
     //
     // -- inner classes -----------------------------------------------
     //
-    private class HalfLocalBodyStrategy implements LocalBodyStrategy,
-        java.io.Serializable {
+    private class HalfLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
 
         /**
-                 *
-                 */
+         *
+         */
 
         /** A pool future that contains the pending future objects */
         protected FuturePool futures;
@@ -266,13 +257,11 @@ public class HalfBody extends AbstractBody {
             throw new HalfBodyException();
         }
 
-        public void sendRequest(MethodCall methodCall, Future future,
-            UniversalBody destinationBody)
-            throws java.io.IOException, RenegotiateSessionException,
-                CommunicationForbiddenException {
+        public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
+                throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
-            Request request = this.internalRequestFactory.newRequest(methodCall,
-                    HalfBody.this, future == null, sequenceID);
+            Request request = this.internalRequestFactory.newRequest(methodCall, HalfBody.this,
+                    future == null, sequenceID);
 
             // COMPONENTS : generate ComponentRequest for component messages
             if (methodCall.getComponentMetadata() != null) {
@@ -307,8 +296,7 @@ public class HalfBody extends AbstractBody {
          * @return a unique identifier that can be used to tag a future, a request.
          */
         public synchronized long getNextSequenceID() {
-            return HalfBody.this.bodyID.toString().hashCode() +
-            ++this.absoluteSequenceID;
+            return HalfBody.this.bodyID.toString().hashCode() + ++this.absoluteSequenceID;
         }
     }
 

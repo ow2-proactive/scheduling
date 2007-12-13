@@ -43,30 +43,19 @@ import org.w3c.dom.NodeList;
 
 public class GroupGLiteParser extends AbstractGroupParser {
     private static final String NODE_NAME = "gLiteGroup";
-    private static final String NODE_NAME_ARGUMENTS = NODE_EXT_NAMESPACE +
-        "arguments";
-    private static final String NODE_NAME_OUTPUT_SANDBOX = NODE_EXT_NAMESPACE +
-        "outputSandbox";
-    private static final String NODE_NAME_INPUT_SANDBOX = NODE_EXT_NAMESPACE +
-        "inputSandbox";
-    private static final String NODE_NAME_CONFIG_FILE = NODE_EXT_NAMESPACE +
-        "configFile";
-    private static final String NODE_NAME_JDL_REMOTE_FILE_PATH = NODE_EXT_NAMESPACE +
-        "JDLRemoteFilePath";
-    private static final String NODE_NAME_JDL_FILE_PATH = NODE_EXT_NAMESPACE +
-        "JDLFilePath";
-    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
-        "stderr";
+    private static final String NODE_NAME_ARGUMENTS = NODE_EXT_NAMESPACE + "arguments";
+    private static final String NODE_NAME_OUTPUT_SANDBOX = NODE_EXT_NAMESPACE + "outputSandbox";
+    private static final String NODE_NAME_INPUT_SANDBOX = NODE_EXT_NAMESPACE + "inputSandbox";
+    private static final String NODE_NAME_CONFIG_FILE = NODE_EXT_NAMESPACE + "configFile";
+    private static final String NODE_NAME_JDL_REMOTE_FILE_PATH = NODE_EXT_NAMESPACE + "JDLRemoteFilePath";
+    private static final String NODE_NAME_JDL_FILE_PATH = NODE_EXT_NAMESPACE + "JDLFilePath";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
     private static final String NODE_NAME_STDIN = NODE_EXT_NAMESPACE + "stdin";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
-        "stdout";
-    private static final String NODE_NAME_INPUT_DATA = NODE_EXT_NAMESPACE +
-        "inputData";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
+    private static final String NODE_NAME_INPUT_DATA = NODE_EXT_NAMESPACE + "inputData";
     private static final String NODE_NAME_RANK = NODE_EXT_NAMESPACE + "rank";
-    private static final String NODE_NAME_REQUIREMENTS = NODE_EXT_NAMESPACE +
-        "requirements";
-    private static final String NODE_NAME_ENVIRONMENT = NODE_EXT_NAMESPACE +
-        "environment";
+    private static final String NODE_NAME_REQUIREMENTS = NODE_EXT_NAMESPACE + "requirements";
+    private static final String NODE_NAME_ENVIRONMENT = NODE_EXT_NAMESPACE + "environment";
     private static final String ATTR_STORAGE_INDEX = "storageIndex";
     private static final String ATTR_DATA_ACCESS_PROTOCOL = "dataAccessProtocol";
     private static final String ATTR_NODES = "nodes";
@@ -93,8 +82,7 @@ public class GroupGLiteParser extends AbstractGroupParser {
 
     @Override
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
-        GroupGLite gliteGroup = (GroupGLite) super.parseGroupNode(groupNode,
-                xpath);
+        GroupGLite gliteGroup = (GroupGLite) super.parseGroupNode(groupNode, xpath);
 
         String t = GCMParserHelper.getAttributeValue(groupNode, ATTR_TYPE);
         gliteGroup.setJobType(t);
@@ -115,8 +103,7 @@ public class GroupGLiteParser extends AbstractGroupParser {
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_OUTPUT_SE);
         gliteGroup.setJobOutputStorageElement(t);
 
-        t = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_VIRTUAL_ORGANISATION);
+        t = GCMParserHelper.getAttributeValue(groupNode, ATTR_VIRTUAL_ORGANISATION);
         gliteGroup.setJobVO(t);
 
         t = GCMParserHelper.getAttributeValue(groupNode, ATTR_RETRY_COUNT);
@@ -144,8 +131,7 @@ public class GroupGLiteParser extends AbstractGroupParser {
             } else if (nodeName.equals(NODE_NAME_RANK)) {
                 gliteGroup.setJobRank(nodeValue);
             } else if (nodeName.equals(NODE_NAME_INPUT_DATA)) {
-                t = GCMParserHelper.getAttributeValue(child,
-                        ATTR_DATA_ACCESS_PROTOCOL);
+                t = GCMParserHelper.getAttributeValue(child, ATTR_DATA_ACCESS_PROTOCOL);
                 gliteGroup.setJobDataAccessProtocol(t);
 
                 t = GCMParserHelper.getAttributeValue(child, ATTR_STORAGE_INDEX);

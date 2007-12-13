@@ -49,8 +49,8 @@ import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
  *
  */
 public class JVMTreeEditPart extends JobMonitoringTreeEditPart<RuntimeObject> {
-    public static final Image JVM_IMAGE = new Image(Display.getCurrent(),
-            JVMTreeEditPart.class.getResourceAsStream("jvm_icon.png"));
+    public static final Image JVM_IMAGE = new Image(Display.getCurrent(), JVMTreeEditPart.class
+            .getResourceAsStream("jvm_icon.png"));
 
     //
     // -- CONSTRUCTOR ------------------------------------------------
@@ -74,10 +74,10 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart<RuntimeObject> {
         final MVCNotification notif = (MVCNotification) arg;
         final MVCNotificationTag mvcNotificationTag = notif.getMVCNotification();
         switch (mvcNotificationTag) {
-        case RUNTIME_OBJECT_RUNTIME_KILLED:
-            this.deactivate();
-            return;
-        default:
+            case RUNTIME_OBJECT_RUNTIME_KILLED:
+                this.deactivate();
+                return;
+            default:
         }
         // Asynchronous refresh
         getViewer().getControl().getDisplay().syncExec(this);
@@ -102,9 +102,9 @@ public class JVMTreeEditPart extends JobMonitoringTreeEditPart<RuntimeObject> {
     protected final List<NodeObject> getModelChildren() {
         List<NodeObject> res;
         if ((getParent() != null) && (getParent().getParent() != null) &&
-                (getParent().getParent().getModel() != null)) {
-            res = JobMonitoringTreeUtil.getJVMChildren(getCastedModel(),
-                    (VirtualNodeObject) getParent().getParent().getModel());
+            (getParent().getParent().getModel() != null)) {
+            res = JobMonitoringTreeUtil.getJVMChildren(getCastedModel(), (VirtualNodeObject) getParent()
+                    .getParent().getModel());
         } else {
             // Return an empty list to avoid NullPointerException
             res = new java.util.ArrayList<NodeObject>(0);

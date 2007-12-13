@@ -67,8 +67,7 @@ public class Utilities {
      * @param charts
      *            array from <chart> tags in configuration file
      */
-    public static void generatingCharts(Element eTimitResult,
-        BenchmarkStatistics bstats, ConfigChart[] charts) {
+    public static void generatingCharts(Element eTimitResult, BenchmarkStatistics bstats, ConfigChart[] charts) {
         if (charts == null) {
             return;
         }
@@ -76,12 +75,10 @@ public class Utilities {
         String className = null;
 
         for (ConfigChart cChart : charts) {
-            TimIt.message(4,
-                "Generating " + cChart.get("title") + " [" +
-                cChart.get("subtitle") + "]" + "...");
+            TimIt.message(4, "Generating " + cChart.get("title") + " [" + cChart.get("subtitle") + "]" +
+                "...");
             try {
-                className = Utilities.class.getPackage().getName() + "." +
-                    cChart.get("type");
+                className = Utilities.class.getPackage().getName() + "." + cChart.get("type");
                 Class<?> chartClass = Class.forName(className);
                 Chart chart = (Chart) chartClass.newInstance();
                 chart.generateChart(eTimitResult, bstats, cChart);
@@ -107,29 +104,20 @@ public class Utilities {
      * @throws IOException
      *             if writing the svgFile fails.
      */
-    public static void saveChartAsSVG(JFreeChart chart, Rectangle bounds,
-        File svgFile) throws IOException {
+    public static void saveChartAsSVG(JFreeChart chart, Rectangle bounds, File svgFile) throws IOException {
         try {
-            Class<?> GDI = Class.forName(
-                    "org.apache.batik.dom.GenericDOMImplementation");
+            Class<?> GDI = Class.forName("org.apache.batik.dom.GenericDOMImplementation");
 
             // Get a DOMImplementation and create an XML document
-            Method getDOMImplementation = GDI.getMethod("getDOMImplementation",
-                    new Class<?>[0]);
-            DOMImplementation domImpl = (DOMImplementation) getDOMImplementation.invoke(null,
-                    new Object[0]);
+            Method getDOMImplementation = GDI.getMethod("getDOMImplementation", new Class<?>[0]);
+            DOMImplementation domImpl = (DOMImplementation) getDOMImplementation.invoke(null, new Object[0]);
 
-            org.w3c.dom.Document document = domImpl.createDocument(null, "svg",
-                    null);
+            org.w3c.dom.Document document = domImpl.createDocument(null, "svg", null);
 
             // Create an instance of the SVG Generator
-            Class<?> SG2D = Class.forName(
-                    "org.apache.batik.svggen.SVGGraphics2D");
-            Method streamMethod = SG2D.getMethod("stream",
-                    new Class<?>[] { Writer.class, boolean.class });
-            Constructor SG2DConstr = SG2D.getConstructor(new Class<?>[] {
-                        org.w3c.dom.Document.class
-                    });
+            Class<?> SG2D = Class.forName("org.apache.batik.svggen.SVGGraphics2D");
+            Method streamMethod = SG2D.getMethod("stream", new Class<?>[] { Writer.class, boolean.class });
+            Constructor SG2DConstr = SG2D.getConstructor(new Class<?>[] { org.w3c.dom.Document.class });
             Object svgGenerator = SG2DConstr.newInstance(document);
 
             // draw the chart in the SVG generator
@@ -138,8 +126,7 @@ public class Utilities {
             // Write svg file
             OutputStream outputStream = new FileOutputStream(svgFile);
             Writer out = new OutputStreamWriter(outputStream, "UTF-8");
-            streamMethod.invoke(svgGenerator,
-                new Object[] { out, true /* use css */});
+            streamMethod.invoke(svgGenerator, new Object[] { out, true /* use css */});
             outputStream.flush();
             outputStream.close();
             out.close();

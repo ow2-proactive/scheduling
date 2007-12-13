@@ -62,8 +62,7 @@ public class Legend extends ViewPart {
         parent.setLayout(new FillLayout());
 
         // Create the ScrolledComposite to scroll horizontally and vertically
-        ScrolledComposite sc = new ScrolledComposite(parent,
-                SWT.H_SCROLL | SWT.V_SCROLL);
+        ScrolledComposite sc = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL);
 
         Composite child = new Composite(sc, SWT.NONE);
 
@@ -101,16 +100,14 @@ public class Legend extends ViewPart {
 
         // Waiting for request
         FigureCanvas ao3Container = new FigureCanvas(aoDef);
-        ao3Container.setContents(new AOFigure(State.WAITING_FOR_REQUEST, 0,
-                false));
+        ao3Container.setContents(new AOFigure(State.WAITING_FOR_REQUEST, 0, false));
 
         Label ao3Text = new Label(aoDef, 0);
         ao3Text.setText("Waiting for request");
 
         // Waiting for result (wait by necessity)
         FigureCanvas ao4Container = new FigureCanvas(aoDef);
-        ao4Container.setContents(new AOFigure(
-                State.WAITING_BY_NECESSITY_WHILE_ACTIVE, 0, false));
+        ao4Container.setContents(new AOFigure(State.WAITING_BY_NECESSITY_WHILE_ACTIVE, 0, false));
 
         Label ao4Text = new Label(aoDef, 0);
         ao4Text.setText("Waiting for result\n(wait by necessity)");
@@ -143,8 +140,7 @@ public class Legend extends ViewPart {
         requestDef.setLayoutData(requestDefFormData);
 
         FigureCanvas requestContainer = new FigureCanvas(requestDef);
-        AOFigure pendingRequestFigure = new AOFigure(State.SERVING_REQUEST, 64,
-                false);
+        AOFigure pendingRequestFigure = new AOFigure(State.SERVING_REQUEST, 64, false);
         requestContainer.setContents(pendingRequestFigure);
 
         Composite requestLabels = new Composite(requestDef, 0);
@@ -188,8 +184,8 @@ public class Legend extends ViewPart {
         severalRequest.setLayoutData(severalRequestData2);
 
         FigureCanvas manyRequestCanvas = new FigureCanvas(requestLabels);
-        manyRequestCanvas.setContents(pendingRequestFigure.new RequestQueueFigure(
-                AOFigure.COLOR_REQUEST_MANY));
+        manyRequestCanvas
+                .setContents(pendingRequestFigure.new RequestQueueFigure(AOFigure.COLOR_REQUEST_MANY));
         FormData manyRequestData = new FormData();
         manyRequestData.top = new FormAttachment(requestLabel, 8);
         manyRequestData.left = new FormAttachment(severalRequest, 20);
@@ -217,24 +213,21 @@ public class Legend extends ViewPart {
 
         // RMI Node
         FigureCanvas node1Container = new FigureCanvas(nodeDef);
-        node1Container.setContents(new NodeFigure(
-                Constants.RMI_PROTOCOL_IDENTIFIER));
+        node1Container.setContents(new NodeFigure(Constants.RMI_PROTOCOL_IDENTIFIER));
 
         Label node1Text = new Label(nodeDef, 0);
         node1Text.setText("RMI Node");
 
         // HTTP Node
         FigureCanvas node2Container = new FigureCanvas(nodeDef);
-        node2Container.setContents(new NodeFigure(
-                Constants.XMLHTTP_PROTOCOL_IDENTIFIER));
+        node2Container.setContents(new NodeFigure(Constants.XMLHTTP_PROTOCOL_IDENTIFIER));
 
         Label node2Text = new Label(nodeDef, 0);
         node2Text.setText("HTTP Node");
 
         // RMI/SSH Node
         FigureCanvas node3Container = new FigureCanvas(nodeDef);
-        node3Container.setContents(new NodeFigure(
-                Constants.RMISSH_PROTOCOL_IDENTIFIER));
+        node3Container.setContents(new NodeFigure(Constants.RMISSH_PROTOCOL_IDENTIFIER));
 
         Label node3Text = new Label(nodeDef, 0);
         node3Text.setText("RMI/SSH Node");
@@ -302,8 +295,7 @@ public class Legend extends ViewPart {
 
         // Active Object
         FigureCanvas aoNoRespondingContainer = new FigureCanvas(noRespondingDef);
-        aoNoRespondingContainer.setContents(new AOFigure(State.NOT_RESPONDING,
-                0, false));
+        aoNoRespondingContainer.setContents(new AOFigure(State.NOT_RESPONDING, 0, false));
 
         Label aoNoRespondingText = new Label(noRespondingDef, 0);
         aoNoRespondingText.setText("Active Object");

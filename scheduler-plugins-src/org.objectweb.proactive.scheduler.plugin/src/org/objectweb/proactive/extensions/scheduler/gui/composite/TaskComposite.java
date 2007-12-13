@@ -165,47 +165,47 @@ public class TaskComposite extends Composite {
         TableColumn tc9 = new TableColumn(table, SWT.LEFT);
         // addSelectionListener
         tc1.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalTask.SORT_BY_ID);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalTask.SORT_BY_ID);
+            }
+        });
         tc2.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalTask.SORT_BY_STATUS);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalTask.SORT_BY_STATUS);
+            }
+        });
         tc3.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalTask.SORT_BY_NAME);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalTask.SORT_BY_NAME);
+            }
+        });
         tc4.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalTask.SORT_BY_HOST_NAME);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalTask.SORT_BY_HOST_NAME);
+            }
+        });
         tc5.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalTask.SORT_BY_STARTED_TIME);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalTask.SORT_BY_STARTED_TIME);
+            }
+        });
         tc6.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalTask.SORT_BY_FINISHED_TIME);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalTask.SORT_BY_FINISHED_TIME);
+            }
+        });
         tc7.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalTask.SORT_BY_RERUNNABLE);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalTask.SORT_BY_RERUNNABLE);
+            }
+        });
         //        tc8.addSelectionListener(new SelectionAdapter() {
         //                
         //                public void widgetSelected(SelectionEvent event) {
@@ -213,11 +213,11 @@ public class TaskComposite extends Composite {
         //                }
         //            });
         tc9.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalTask.SORT_BY_DESCRIPTION);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalTask.SORT_BY_DESCRIPTION);
+            }
+        });
         // setText
         tc1.setText(COLUMN_ID_TITLE);
         tc2.setText(COLUMN_STATUS_TITLE);
@@ -249,54 +249,50 @@ public class TaskComposite extends Composite {
         //        tc8.setMoveable(true);
         tc9.setMoveable(true);
 
-        table.addListener(SWT.Selection,
-            new Listener() {
-                public void handleEvent(Event event) {
-                    // get the taskId
-                    TaskId taskId = (TaskId) event.item.getData();
+        table.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                // get the taskId
+                TaskId taskId = (TaskId) event.item.getData();
 
-                    InternalJob job = JobsController.getLocalView()
-                                                    .getJobById(taskId.getJobId());
+                InternalJob job = JobsController.getLocalView().getJobById(taskId.getJobId());
 
-                    // set Focus on task result
-                    IWorkbench iworkbench = PlatformUI.getWorkbench();
-                    IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
-                    IWorkbenchPage page = currentWindow.getActivePage();
-                    try {
-                        IViewPart part = page.showView(ResultPreview.ID);
-                        part.setFocus();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                // set Focus on task result
+                IWorkbench iworkbench = PlatformUI.getWorkbench();
+                IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+                IWorkbenchPage page = currentWindow.getActivePage();
+                try {
+                    IViewPart part = page.showView(ResultPreview.ID);
+                    part.setFocus();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-                    // test job owner
-                    if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
-                        InternalTask task = job.getHMTasks().get(taskId);
+                // test job owner
+                if (SchedulerProxy.getInstance().isItHisJob(job.getOwner())) {
+                    InternalTask task = job.getHMTasks().get(taskId);
 
-                        ResultPreview resultPreview = ResultPreview.getInstance();
-                        if (resultPreview != null) {
-                            // update its tasks informations if task is finished
-                            if (task.getStatus() == TaskState.FINISHED) {
-                                // get result from scheduler
-                                // TODO : NO ACCESS TO SCHED HERE ...
-                                // je vien de faire un copuier collé de ce code dans JobsController...
-                                TaskResult tr = getTaskResult(job.getId(),
-                                        taskId);
-                                if (tr != null) {
-                                    resultPreview.update(tr.getGraphicalDescription());
-                                } else {
-                                    //							TODO	throw new RuntimeException("Task " + taskId
-                                    //										+ " is finished but result is null");
-                                }
-                            } else { //Available 
-                                resultPreview.update(new SimpleTextPanel(
-                                        "No preview is available because the task is " +
-                                        task.getStatus() + "..."));
+                    ResultPreview resultPreview = ResultPreview.getInstance();
+                    if (resultPreview != null) {
+                        // update its tasks informations if task is finished
+                        if (task.getStatus() == TaskState.FINISHED) {
+                            // get result from scheduler
+                            // TODO : NO ACCESS TO SCHED HERE ...
+                            // je vien de faire un copuier collé de ce code dans JobsController...
+                            TaskResult tr = getTaskResult(job.getId(), taskId);
+                            if (tr != null) {
+                                resultPreview.update(tr.getGraphicalDescription());
+                            } else {
+                                //							TODO	throw new RuntimeException("Task " + taskId
+                                //										+ " is finished but result is null");
                             }
+                        } else { //Available 
+                            resultPreview.update(new SimpleTextPanel(
+                                "No preview is available because the task is " + task.getStatus() + "..."));
                         }
                     }
                 }
-            });
+            }
+        });
 
         return table;
     }
@@ -307,8 +303,7 @@ public class TaskComposite extends Composite {
     public static TaskResult getTaskResult(JobId jid, TaskId tid) {
         TaskResult tr = cachedTaskResult.get(tid);
         if (tr == null) {
-            tr = SchedulerProxy.getInstance()
-                               .getTaskResult(jid, tid.getReadableName());
+            tr = SchedulerProxy.getInstance().getTaskResult(jid, tid.getReadableName());
             cachedTaskResult.put(tid, tr);
         }
         return tr;
@@ -318,8 +313,7 @@ public class TaskComposite extends Composite {
     private void sort(SelectionEvent event, int field) {
         if (lastSorting == field) {
             // if the new sort is the same as the last sort, invert order.
-            order = (order == InternalTask.DESC_ORDER) ? InternalTask.ASC_ORDER
-                                                       : InternalTask.DESC_ORDER;
+            order = (order == InternalTask.DESC_ORDER) ? InternalTask.ASC_ORDER : InternalTask.DESC_ORDER;
             InternalTask.setSortingOrder(order);
         }
         InternalTask.setSortingBy(field);
@@ -328,8 +322,7 @@ public class TaskComposite extends Composite {
         sort();
 
         table.setSortColumn((TableColumn) event.widget);
-        table.setSortDirection((order == InternalTask.DESC_ORDER) ? SWT.DOWN
-                                                                  : SWT.UP);
+        table.setSortDirection((order == InternalTask.DESC_ORDER) ? SWT.DOWN : SWT.UP);
     }
 
     private void sort() {
@@ -364,8 +357,7 @@ public class TaskComposite extends Composite {
             if (itemIndex == 0) {
                 fillItem(item, internalTask, null);
             } else {
-                fillItem(item, internalTask,
-                    table.getItem(itemIndex - 1).getBackground());
+                fillItem(item, internalTask, table.getItem(itemIndex - 1).getBackground());
             }
         }
     }
@@ -374,40 +366,36 @@ public class TaskComposite extends Composite {
         if (!table.isDisposed()) {
             boolean setFont = false;
             switch (internalTask.getStatus()) {
-            case ABORTED:
-                setFont = true;
-                item.setForeground(TASKS_ABORTED_BACKGROUND_COLOR);
-                break;
-            case CANCELLED:
-                setFont = true;
-                item.setForeground(TASKS_CANCELED_BACKGROUND_COLOR);
-                break;
-            case FAILED:
-                setFont = true;
-                item.setForeground(TASKS_FAILED_BACKGROUND_COLOR);
-                break;
-            case NOT_STARTED:
-                setFont = true;
-                item.setForeground(TASKS_NOT_STARTED_BACKGROUND_COLOR);
-                break;
-            case FINISHED:
-            case PAUSED:
-            case PENDING:
-            case RUNNNING:
-            case SUBMITTED:
+                case ABORTED:
+                    setFont = true;
+                    item.setForeground(TASKS_ABORTED_BACKGROUND_COLOR);
+                    break;
+                case CANCELLED:
+                    setFont = true;
+                    item.setForeground(TASKS_CANCELED_BACKGROUND_COLOR);
+                    break;
+                case FAILED:
+                    setFont = true;
+                    item.setForeground(TASKS_FAILED_BACKGROUND_COLOR);
+                    break;
+                case NOT_STARTED:
+                    setFont = true;
+                    item.setForeground(TASKS_NOT_STARTED_BACKGROUND_COLOR);
+                    break;
+                case FINISHED:
+                case PAUSED:
+                case PENDING:
+                case RUNNNING:
+                case SUBMITTED:
             }
 
-            if (!setFont &&
-                    ((internalTask.getRerunnable() -
-                    internalTask.getRerunnableLeft()) > 0)) {
+            if (!setFont && ((internalTask.getRerunnable() - internalTask.getRerunnableLeft()) > 0)) {
                 setFont = true;
             }
             if (setFont) {
                 Font font = item.getFont();
-                item.setFont(new Font(font.getDevice(),
-                        font.getFontData()[0].getName(),
-                        font.getFontData()[0].getHeight(),
-                        font.getFontData()[0].getStyle() | SWT.BOLD));
+                item.setFont(new Font(font.getDevice(), font.getFontData()[0].getName(),
+                    font.getFontData()[0].getHeight(), font.getFontData()[0].getStyle() | SWT.BOLD));
             }
 
             TableColumn[] cols = table.getColumns();
@@ -427,15 +415,11 @@ public class TaskComposite extends Composite {
                 } else if (title.equals(COLUMN_DESCRIPTION_TITLE)) {
                     item.setText(i, internalTask.getDescription());
                 } else if (title.equals(COLUMN_START_TIME_TITLE)) {
-                    item.setText(i,
-                        Tools.getFormattedDate(internalTask.getStartTime()));
+                    item.setText(i, Tools.getFormattedDate(internalTask.getStartTime()));
                 } else if (title.equals(COLUMN_FINISHED_TIME_TITLE)) {
-                    item.setText(i,
-                        Tools.getFormattedDate(internalTask.getFinishedTime()));
+                    item.setText(i, Tools.getFormattedDate(internalTask.getFinishedTime()));
                 } else if (title.equals(COLUMN_RERUN_TITLE)) {
-                    item.setText(i,
-                        (internalTask.getRerunnable() -
-                        internalTask.getRerunnableLeft()) + "/" +
+                    item.setText(i, (internalTask.getRerunnable() - internalTask.getRerunnableLeft()) + "/" +
                         internalTask.getRerunnable());
                     //                } else if (title.equals(COLUMN_RUN_TIME_LIMIT_TITLE)) {
                     //                    item.setText(i,
@@ -476,8 +460,7 @@ public class TaskComposite extends Composite {
         int tmp = tasks.size();
 
         if (!label.isDisposed()) {
-            label.setText("Job " + jobId + " has " + tmp +
-                ((tmp == 1) ? " task" : " tasks"));
+            label.setText("Job " + jobId + " has " + tmp + ((tmp == 1) ? " task" : " tasks"));
         }
         refreshTable();
     }
@@ -499,8 +482,7 @@ public class TaskComposite extends Composite {
                     if (itemIndex == 0) {
                         fillItem(item, internalTask, null);
                     } else {
-                        fillItem(item, internalTask,
-                            items[itemIndex - 1].getBackground());
+                        fillItem(item, internalTask, items[itemIndex - 1].getBackground());
                     }
                     break;
                 }
@@ -518,7 +500,7 @@ public class TaskComposite extends Composite {
     @Override
     public boolean isDisposed() {
         return super.isDisposed() || ((table != null) && (table.isDisposed())) ||
-        ((label != null) && (label.isDisposed()));
+            ((label != null) && (label.isDisposed()));
     }
 
     /**

@@ -63,8 +63,8 @@ import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
  *
  * Created on Jan 12, 2005
  */
-public class P2PNodeManager implements Serializable, InitActive, EndActive,
-    P2PConstants, ProActiveInternalObject {
+public class P2PNodeManager implements Serializable, InitActive, EndActive, P2PConstants,
+        ProActiveInternalObject {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_NODES);
     private static final int PROC = Runtime.getRuntime().availableProcessors();
     private Node p2pServiceNode = null;
@@ -99,19 +99,17 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     public P2PNode askingNode(String nodeFamilyRegexp) {
         logger.debug("Asking a node to the nodes manager");
         if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
-                System.getProperty("os.name").matches(nodeFamilyRegexp)) {
+            System.getProperty("os.name").matches(nodeFamilyRegexp)) {
             logger.debug("Family Match");
-            if ((this.availbaleNodes.size() == 0) &&
-                    (this.bookedNodes.size() == 0) &&
-                    (this.usingNodes.size() == 0)) {
+            if ((this.availbaleNodes.size() == 0) && (this.bookedNodes.size() == 0) &&
+                (this.usingNodes.size() == 0)) {
                 this.deployingDefaultSharedNodes();
             }
             if (this.availbaleNodes.size() > 0) {
                 Node node = (Node) this.availbaleNodes.remove(0);
                 this.bookedNodes.add(new Booking(node));
                 logger.debug("Yes the manager has a node");
-                return new P2PNode(node,
-                    (P2PNodeManager) PAActiveObject.getStubOnThis());
+                return new P2PNode(node, (P2PNodeManager) PAActiveObject.getStubOnThis());
             }
         }
 
@@ -123,11 +121,10 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
     public Vector<Node> askingAllNodes(String nodeFamilyRegexp) {
         logger.debug("Asking all nodes to the nodes manager");
         if ((nodeFamilyRegexp == null) || (nodeFamilyRegexp.length() == 0) ||
-                System.getProperty("os.name").matches(nodeFamilyRegexp)) {
+            System.getProperty("os.name").matches(nodeFamilyRegexp)) {
             logger.debug("Family Match");
-            if ((this.availbaleNodes.size() == 0) &&
-                    (this.bookedNodes.size() == 0) &&
-                    (this.usingNodes.size() == 0)) {
+            if ((this.availbaleNodes.size() == 0) && (this.bookedNodes.size() == 0) &&
+                (this.usingNodes.size() == 0)) {
                 this.deployingDefaultSharedNodes();
             }
             if (this.availbaleNodes.size() > 0) {
@@ -149,22 +146,19 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
             return askingNode(null);
         }
         logger.debug("Asking a node to the nodes manager");
-        if ((this.availbaleNodes.size() == 0) &&
-                (this.bookedNodes.size() == 0) &&
-                (this.usingNodes.size() == 0)) {
+        if ((this.availbaleNodes.size() == 0) && (this.bookedNodes.size() == 0) &&
+            (this.usingNodes.size() == 0)) {
             this.deployingDefaultSharedNodes();
         }
         if (this.availbaleNodes.size() > 0) {
             Node node = (Node) this.availbaleNodes.remove(0);
             this.bookedNodes.add(new Booking(node));
             logger.debug("Yes, the manager has an empty node");
-            return new P2PNode(node,
-                (P2PNodeManager) PAActiveObject.getStubOnThis());
+            return new P2PNode(node, (P2PNodeManager) PAActiveObject.getStubOnThis());
         } else if (this.bookedNodes.size() > 0) {
             Node node = ((Booking) this.bookedNodes.get(0)).getNode();
             logger.debug("Yes, the manager has a shared node");
-            return new P2PNode(node,
-                (P2PNodeManager) PAActiveObject.getStubOnThis());
+            return new P2PNode(node, (P2PNodeManager) PAActiveObject.getStubOnThis());
         } else {
             // All nodes is already assigned
             logger.debug("Sorry no availbale node for the moment");
@@ -212,8 +206,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         }
         this.availbaleNodes.add(givenNode);
         if (logger.isInfoEnabled()) {
-            logger.info("Booked node " +
-                givenNode.getNodeInformation().getURL() + " is now shared");
+            logger.info("Booked node " + givenNode.getNodeInformation().getURL() + " is now shared");
         }
     }
 
@@ -238,8 +231,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         if (logger.isDebugEnabled()) {
             logger.debug("P2P node manager is running at " +
                 this.p2pServiceNode.getNodeInformation().getURL());
-            logger.debug("ProActiveRuntime at " +
-                this.proactiveRuntime.getURL());
+            logger.debug("ProActiveRuntime at " + this.proactiveRuntime.getURL());
         }
 
         // Creating shared nodes
@@ -275,21 +267,18 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
      * @throws ProActiveException
      * @throws AlreadyBoundException
      */
-    private Node createNewNode()
-        throws NodeException, ProActiveException, AlreadyBoundException {
+    private Node createNewNode() throws NodeException, ProActiveException, AlreadyBoundException {
         // security 
         ProActiveSecurityManager newNodeSecurityManager = null;
 
-        newNodeSecurityManager = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager()
-                                  .generateSiblingCertificate(EntityType.NODE,
-                P2PConstants.VN_NAME);
+        newNodeSecurityManager = ((AbstractBody) PAActiveObject.getBodyOnThis())
+                .getProActiveSecurityManager().generateSiblingCertificate(EntityType.NODE,
+                        P2PConstants.VN_NAME);
 
-        Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME +
-                "_" + this.nodeCounter++, true, newNodeSecurityManager,
-                P2PConstants.VN_NAME, null);
+        Node newNode = NodeFactory.createNode(P2PConstants.SHARED_NODE_NAME + "_" + this.nodeCounter++, true,
+                newNodeSecurityManager, P2PConstants.VN_NAME, null);
         this.availbaleNodes.add(newNode);
-        logger.info("New shared node created @" +
-            newNode.getNodeInformation().getURL());
+        logger.info("New shared node created @" + newNode.getNodeInformation().getURL());
         return newNode;
     }
 
@@ -329,8 +318,7 @@ public class P2PNodeManager implements Serializable, InitActive, EndActive,
         try {
             this.pad = PADeployment.getProactiveDescriptor(this.descriptorPath);
         } catch (ProActiveException e) {
-            logger.fatal("Could't get ProActive Descripor at " +
-                this.descriptorPath, e);
+            logger.fatal("Could't get ProActive Descripor at " + this.descriptorPath, e);
             return;
         }
         VirtualNode[] virtualNodes = this.pad.getVirtualNodes();

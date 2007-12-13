@@ -39,12 +39,9 @@ import java.util.regex.Pattern;
 
 
 public class ListGenerator {
-    final static protected Pattern plainHostname = Pattern.compile(
-            "[a-zA-Z0-9\\-.:]+");
-    final static protected Pattern simpleInterval = Pattern.compile(
-            "\\[([\\d\\-,; ]+)\\]");
-    final static protected Pattern subInterval = Pattern.compile(
-            "(\\d+)-(\\d+);?(\\d+)?");
+    final static protected Pattern plainHostname = Pattern.compile("[a-zA-Z0-9\\-.:]+");
+    final static protected Pattern simpleInterval = Pattern.compile("\\[([\\d\\-,; ]+)\\]");
+    final static protected Pattern subInterval = Pattern.compile("(\\d+)-(\\d+);?(\\d+)?");
     final static protected String SUB_INTERVAL_SPLIT_REGEXP = " *, *";
 
     static public List<String> generateNames(String nameSetDefinition) {
@@ -85,10 +82,8 @@ public class ListGenerator {
                     // if there wasn't, or the interval doesn't start right after the '^',
                     // throw an exception
                     //
-                    if (!newIntervalFound ||
-                            (matcher.start() != (lastMatchedEnd + 1))) {
-                        throw new IllegalArgumentException(
-                            "misformed interval def : " + nameSetDefinition);
+                    if (!newIntervalFound || (matcher.start() != (lastMatchedEnd + 1))) {
+                        throw new IllegalArgumentException("misformed interval def : " + nameSetDefinition);
                     }
                     exclusionInterval = matcher.group(1);
                     lastMatchedEnd = matcher.end();
@@ -101,11 +96,10 @@ public class ListGenerator {
             }
 
             String[] subIntervals = intervalDef.split(SUB_INTERVAL_SPLIT_REGEXP);
-            String[] subExclusionIntervals = (exclusionInterval != null)
-                ? exclusionInterval.split(SUB_INTERVAL_SPLIT_REGEXP) : null;
+            String[] subExclusionIntervals = (exclusionInterval != null) ? exclusionInterval
+                    .split(SUB_INTERVAL_SPLIT_REGEXP) : null;
 
-            res = getSubNames(prefix, suffix, subIntervals,
-                    subExclusionIntervals);
+            res = getSubNames(prefix, suffix, subIntervals, subExclusionIntervals);
         } else {
             // it doesn't look like an interval ('hostname[0-9]'), but we still need to make sure
             // it looks like a normal hostname
@@ -114,16 +108,15 @@ public class ListGenerator {
                 res = new ArrayList<String>();
                 res.add(nameSetDefinition);
             } else {
-                throw new IllegalArgumentException("misformed interval def : " +
-                    nameSetDefinition);
+                throw new IllegalArgumentException("misformed interval def : " + nameSetDefinition);
             }
         }
 
         return res;
     }
 
-    static private List<String> getSubNames(String prefix, String suffix,
-        String[] subIntervalsDefs, String[] exclusionIntervalsDefs) {
+    static private List<String> getSubNames(String prefix, String suffix, String[] subIntervalsDefs,
+            String[] exclusionIntervalsDefs) {
         if (suffix == null) {
             suffix = "";
         }
@@ -141,9 +134,8 @@ public class ListGenerator {
             if (subIntervalDef.indexOf('-') > 0) {
                 generateNames(prefix, suffix, subIntervalDef, numberChecker, res);
             } else { // subIntervalDef is actually a single integer
-                     // check if that integer is within allowed interval                
-                if ((numberChecker == null) ||
-                        numberChecker.check(Integer.parseInt(subIntervalDef))) {
+                // check if that integer is within allowed interval                
+                if ((numberChecker == null) || numberChecker.check(Integer.parseInt(subIntervalDef))) {
                     res.add(prefix + subIntervalDef + suffix);
                 }
             }
@@ -169,8 +161,8 @@ public class ListGenerator {
      * @param nameSetDefinition a set definition in the form described above
      * @return
      */
-    static private void generateNames(String prefix, String suffix,
-        String subIntervalDef, NumberChecker numberChecker, List<String> names) {
+    static private void generateNames(String prefix, String suffix, String subIntervalDef,
+            NumberChecker numberChecker, List<String> names) {
         Interval interval = new Interval(subIntervalDef);
 
         String paddingFormat = getPadding(interval.startStr);
@@ -180,8 +172,8 @@ public class ListGenerator {
                 continue;
             }
 
-            String formattedName = MessageFormat.format("{0}{1,number," +
-                    paddingFormat + "}{2}", prefix, n, suffix);
+            String formattedName = MessageFormat.format("{0}{1,number," + paddingFormat + "}{2}", prefix, n,
+                    suffix);
             names.add(formattedName);
         }
     }
@@ -269,20 +261,17 @@ public class ListGenerator {
             Matcher matcher = subInterval.matcher(intervalDef);
 
             if (!matcher.matches()) {
-                throw new IllegalArgumentException("misformed interval def : " +
-                    intervalDef);
+                throw new IllegalArgumentException("misformed interval def : " + intervalDef);
             }
 
             startStr = matcher.group(1);
             endStr = matcher.group(2);
             start = Integer.parseInt(startStr);
             end = Integer.parseInt(endStr);
-            step = (matcher.group(3) != null)
-                ? Integer.parseInt(matcher.group(3)) : 1;
+            step = (matcher.group(3) != null) ? Integer.parseInt(matcher.group(3)) : 1;
 
             if (start >= end) {
-                throw new IllegalArgumentException(
-                    "wrong range : start >= end in " + intervalDef);
+                throw new IllegalArgumentException("wrong range : start >= end in " + intervalDef);
             }
         }
     }

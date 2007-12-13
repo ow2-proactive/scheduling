@@ -74,6 +74,5 @@ public interface ProActiveController {
      * @param node
      * @throws MigrationException
      */
-    public void migrateDependentActiveObjectsTo(Node node)
-        throws MigrationException;
+    public void migrateDependentActiveObjectsTo(Node node) throws MigrationException;
 }

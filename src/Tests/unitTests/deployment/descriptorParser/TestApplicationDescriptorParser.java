@@ -52,13 +52,11 @@ import org.xml.sax.SAXException;
 
 
 public class TestApplicationDescriptorParser {
-    final static String TEST_APP_DIR = TestApplicationDescriptorParser.class.getClass()
-                                                                            .getResource("/unitTests/deployment/descriptorParser/testfiles/application")
-                                                                            .getFile();
+    final static String TEST_APP_DIR = TestApplicationDescriptorParser.class.getClass().getResource(
+            "/unitTests/deployment/descriptorParser/testfiles/application").getFile();
 
     //    @Test
-    public void test()
-        throws IOException, XPathExpressionException, SAXException {
+    public void test() throws IOException, XPathExpressionException, SAXException {
         for (File descriptor : getApplicationDescriptors()) {
             if (descriptor.toString().contains("script_ext")) {
                 continue;
@@ -77,8 +75,7 @@ public class TestApplicationDescriptorParser {
      * @author glaurent
      *
      */
-    protected static class UserApplicationNodeParser
-        extends AbstractApplicationParser {
+    protected static class UserApplicationNodeParser extends AbstractApplicationParser {
         @Override
         protected CommandBuilder createCommandBuilder() {
             return new CommandBuilderScript();
@@ -89,9 +86,8 @@ public class TestApplicationDescriptorParser {
         }
 
         @Override
-        public void parseApplicationNode(Node paNode,
-            GCMApplicationParser applicationParser, XPath xpath)
-            throws XPathExpressionException, SAXException, IOException {
+        public void parseApplicationNode(Node paNode, GCMApplicationParser applicationParser, XPath xpath)
+                throws XPathExpressionException, SAXException, IOException {
             super.parseApplicationNode(paNode, applicationParser, xpath);
 
             System.out.println("User Application Parser - someattr value = " +
@@ -100,8 +96,7 @@ public class TestApplicationDescriptorParser {
     }
 
     @Test
-    public void userSchemaTest()
-        throws IOException, XPathExpressionException, SAXException {
+    public void userSchemaTest() throws IOException, XPathExpressionException, SAXException {
         for (File file : getApplicationDescriptors()) {
             if (!file.toString().contains("script_ext")) {
                 continue;
@@ -109,14 +104,14 @@ public class TestApplicationDescriptorParser {
             System.out.println(file);
 
             String userSchema = getClass()
-                                    .getResource("/unitTests/deployment/descriptorParser/testfiles/application/SampleApplicationExtension.xsd")
-                                    .toString();
+                    .getResource(
+                            "/unitTests/deployment/descriptorParser/testfiles/application/SampleApplicationExtension.xsd")
+                    .toString();
 
             ArrayList<String> schemas = new ArrayList<String>();
             schemas.add(userSchema);
 
-            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(file,
-                    schemas);
+            GCMApplicationParserImpl parser = new GCMApplicationParserImpl(file, schemas);
 
             parser.registerApplicationParser(new UserApplicationNodeParser());
 

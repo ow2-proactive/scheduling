@@ -1,6 +1,5 @@
 package org.objectweb.proactive.extensions.resourcemanager.gui.tree;
 
-
 /**
  * @author FRADJ Johann
  *

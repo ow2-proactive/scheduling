@@ -59,8 +59,7 @@ public abstract class ProActiveExecutable extends JavaExecutable {
      */
     @Override
     public final Object execute(TaskResult... results) {
-        throw new RuntimeException(
-            "This method should have NEVER been called in this context !!");
+        throw new RuntimeException("This method should have NEVER been called in this context !!");
     }
 
     /**
@@ -74,6 +73,5 @@ public abstract class ProActiveExecutable extends JavaExecutable {
      * @throws any exception thrown by the user's code
      * @return any object from the user.
      */
-    public abstract Object execute(ArrayList<Node> nodes)
-        throws Throwable;
+    public abstract Object execute(ArrayList<Node> nodes) throws Throwable;
 }

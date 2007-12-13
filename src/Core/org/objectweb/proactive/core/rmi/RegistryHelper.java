@@ -81,8 +81,7 @@ public class RegistryHelper {
         shouldCreateRegistry = v;
     }
 
-    public synchronized void initializeRegistry()
-        throws java.rmi.RemoteException {
+    public synchronized void initializeRegistry() throws java.rmi.RemoteException {
         try {
             if (!shouldCreateRegistry) {
                 return; // don't bother
@@ -108,8 +107,7 @@ public class RegistryHelper {
     //
     // -- PRIVATE METHODS -----------------------------------------------
     // 
-    private static java.rmi.registry.Registry createRegistry(int port)
-        throws java.rmi.RemoteException {
+    private static java.rmi.registry.Registry createRegistry(int port) throws java.rmi.RemoteException {
         registry = java.rmi.registry.LocateRegistry.createRegistry(port);
         registryCreator = true;
         return registry;
@@ -137,8 +135,7 @@ public class RegistryHelper {
         }
     }
 
-    private static java.rmi.registry.Registry getOrCreateRegistry(int port)
-        throws java.rmi.RemoteException {
+    private static java.rmi.registry.Registry getOrCreateRegistry(int port) throws java.rmi.RemoteException {
         registry = detectRegistry(port);
         if (registry != null) {
             return registry;
@@ -156,8 +153,7 @@ public class RegistryHelper {
             if (registry != null) {
                 return registry;
             }
-            logger.error("Cannot detect an existing RMI Registry on port " +
-                port + " nor create one e=" + e);
+            logger.error("Cannot detect an existing RMI Registry on port " + port + " nor create one e=" + e);
             throw e;
         }
     }

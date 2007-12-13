@@ -68,18 +68,15 @@ public class Line2dChart implements Chart {
     private String[] names;
     private String selectedAttributeName;
 
-    public void generateChart(Element eTimit, BenchmarkStatistics bstats,
-        ConfigChart cChart) {
+    public void generateChart(Element eTimit, BenchmarkStatistics bstats, ConfigChart cChart) {
         Element eTimitClone = (Element) eTimit.clone();
 
         // Apply filter on elements
         while (true) {
-            Iterator<Element> it = eTimitClone.getDescendants(new ElementFilter(
-                        cChart.get("tag")));
+            Iterator<Element> it = eTimitClone.getDescendants(new ElementFilter(cChart.get("tag")));
             try {
                 while (it.hasNext()) {
-                    XMLHelper.tagFiltering(it.next(),
-                        cChart.get("filter").split(","));
+                    XMLHelper.tagFiltering(it.next(), cChart.get("filter").split(","));
                 }
             } catch (java.util.ConcurrentModificationException e) {
                 continue;
@@ -125,8 +122,7 @@ public class Line2dChart implements Chart {
         double value;
 
         // Iterate through the categories
-        for (i = 0; (i < this.categories.length) && (i < this.series.length);
-                i++) {
+        for (i = 0; (i < this.categories.length) && (i < this.series.length); i++) {
             currentCategory = this.categories[i];
             currentElement = this.series[i];
             // Iterate through the selected Element
@@ -138,26 +134,20 @@ public class Line2dChart implements Chart {
                     currentTagName = iteratedElement.getName();
                     if (currentTagName.equals(this.wantedTag)) {
                         for (k = 0; k < this.names.length; k++) {
-                            attributeNameValue = iteratedElement.getAttributeValue(
-                                    "name");
-                            if ((attributeNameValue != null) &&
-                                    attributeNameValue.equals(this.names[k])) {
+                            attributeNameValue = iteratedElement.getAttributeValue("name");
+                            if ((attributeNameValue != null) && attributeNameValue.equals(this.names[k])) {
                                 stringValue = iteratedElement.getAttributeValue(this.selectedAttributeName);
                                 if (stringValue != null) {
                                     try {
                                         value = Double.parseDouble(stringValue);
-                                        dataset.setValue(value,
-                                            attributeNameValue + " (" +
-                                            this.selectedAttributeName + ")",
-                                            currentCategory);
+                                        dataset.setValue(value, attributeNameValue + " (" +
+                                            this.selectedAttributeName + ")", currentCategory);
                                     } catch (NumberFormatException ex) {
                                         ex.printStackTrace();
                                     }
                                 } else {
-                                    System.out.println("No attribute " +
-                                        this.selectedAttributeName +
-                                        " for tag " + this.wantedTag +
-                                        " with name " + this.names[k]);
+                                    System.out.println("No attribute " + this.selectedAttributeName +
+                                        " for tag " + this.wantedTag + " with name " + this.names[k]);
                                 }
                             }
                         }
@@ -174,10 +164,9 @@ public class Line2dChart implements Chart {
      * @param chartParameters
      */
     private void buildFinalChart(ConfigChart cChart) {
-        this.buildFinalChart(cChart.get("title"), cChart.get("subTitle"),
-            cChart.get("filename"), cChart.get("xaxislabel"),
-            cChart.get("yaxislabel"), Integer.valueOf(cChart.get("width")),
-            Integer.valueOf(cChart.get("height")));
+        this.buildFinalChart(cChart.get("title"), cChart.get("subTitle"), cChart.get("filename"), cChart
+                .get("xaxislabel"), cChart.get("yaxislabel"), Integer.valueOf(cChart.get("width")), Integer
+                .valueOf(cChart.get("height")));
     }
 
     /**
@@ -190,21 +179,20 @@ public class Line2dChart implements Chart {
      * @param width
      * @param height
      */
-    private void buildFinalChart(String title, String subTitle,
-        String fileName, String domainAxis, String rangeAxis, int width,
-        int height) {
+    private void buildFinalChart(String title, String subTitle, String fileName, String domainAxis,
+            String rangeAxis, int width, int height) {
         CategoryDataset dataset = this.createDataset();
 
         JFreeChart chart = ChartFactory.createLineChart(title, domainAxis, // domain
-                                                                           // axis
-                                                                           // label
+                // axis
+                // label
                 rangeAxis, // range axis label
                 dataset, // data
                 PlotOrientation.VERTICAL, // orientation
                 true, // include legend
                 true, // tooltips?
                 false // URLs?
-            );
+                );
         chart.addSubtitle(new TextTitle(subTitle));
 
         final LineAndShapeRenderer renderer = new LineAndShapeRenderer();
@@ -215,11 +203,11 @@ public class Line2dChart implements Chart {
         c.setRangeGridlinesVisible(true);
 
         try {
-            ChartUtilities.saveChartAsPNG(XMLHelper.createFileWithDirs(fileName +
-                    ".png"), chart, width, height);
+            ChartUtilities.saveChartAsPNG(XMLHelper.createFileWithDirs(fileName + ".png"), chart, width,
+                    height);
 
-            Utilities.saveChartAsSVG(chart, new Rectangle(width, height),
-                XMLHelper.createFileWithDirs(fileName + ".svg"));
+            Utilities.saveChartAsSVG(chart, new Rectangle(width, height), XMLHelper
+                    .createFileWithDirs(fileName + ".svg"));
         } catch (java.io.IOException e) {
             System.err.println("Error writing image to file");
             e.printStackTrace();

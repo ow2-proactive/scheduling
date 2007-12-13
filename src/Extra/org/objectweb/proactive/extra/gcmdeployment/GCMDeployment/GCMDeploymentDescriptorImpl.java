@@ -61,10 +61,8 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private VariableContract environment;
     private GCMDeploymentResources resources;
 
-    public GCMDeploymentDescriptorImpl(File descriptor,
-        Set<FileTransferBlock> ftBlocks)
-        throws SAXException, IOException, XPathExpressionException,
-            TransformerException, ParserConfigurationException {
+    public GCMDeploymentDescriptorImpl(File descriptor, Set<FileTransferBlock> ftBlocks) throws SAXException,
+            IOException, XPathExpressionException, TransformerException, ParserConfigurationException {
         parser = new GCMDeploymentParserImpl(descriptor);
         environment = parser.getEnvironment();
         resources = parser.getResources();
@@ -76,8 +74,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
     private GCMDeploymentDescriptorImpl() {
     }
 
-    public void start(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma) {
+    public void start(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         // Start Local JVMs
         startLocal(commandBuilder, gcma);
 
@@ -85,8 +82,7 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         startBridges(commandBuilder, gcma);
     }
 
-    private void startLocal(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma) {
+    private void startLocal(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         HostInfo hostInfo = resources.getHostInfo();
         if (hostInfo != null) {
             // Something needs to be started on this host
@@ -98,34 +94,28 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
-    private void startGroups(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma) {
+    private void startGroups(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         List<Group> groups = resources.getGroups();
         for (Group group : groups) {
             List<String> commands = group.buildCommands(commandBuilder, gcma);
-            GCMD_LOGGER.info("Starting group id=" + group.getId() +
-                " #commands=" + commands.size());
+            GCMD_LOGGER.info("Starting group id=" + group.getId() + " #commands=" + commands.size());
 
             for (String command : commands) {
-                GCMD_LOGGER.debug("group id=" + group.getId() + " command= " +
-                    command);
+                GCMD_LOGGER.debug("group id=" + group.getId() + " command= " + command);
                 Executor.getExecutor().submit(command);
             }
         }
     }
 
-    private void startBridges(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma) {
+    private void startBridges(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         List<Bridge> bridges = resources.getBridges();
         for (Bridge bridge : bridges) {
             List<String> commands = bridge.buildCommands(commandBuilder, gcma);
 
-            GCMD_LOGGER.info("Starting bridge id=" + bridge.getId() +
-                " #commands=" + commands.size());
+            GCMD_LOGGER.info("Starting bridge id=" + bridge.getId() + " #commands=" + commands.size());
 
             for (String command : commands) {
-                GCMD_LOGGER.debug("bridge id=" + bridge.getId() + " command= " +
-                    command);
+                GCMD_LOGGER.debug("bridge id=" + bridge.getId() + " command= " + command);
                 Executor.getExecutor().submit(command);
             }
         }

@@ -87,30 +87,26 @@ public class SkeletonSystemImpl implements SkeletonSystem, java.io.Serializable 
     /**
      * @see org.objectweb.proactive.extensions.calcium.system.SkeletonSystem#execCommand(File, String)
      */
-    public int execCommand(File command, String arguments)
-        throws IOException, InterruptedException {
+    public int execCommand(File command, String arguments) throws IOException, InterruptedException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Executing Command: " + command.toString() + " " +
-                arguments);
+            logger.debug("Executing Command: " + command.toString() + " " + arguments);
         }
 
         //TODO change this with JAVA 1.6 chmod features
-        Process process = execCommandInternal(wspace, new File("/bin/chmod"),
-                ("+x " + command.getPath()).split(" "), "");
+        Process process = execCommandInternal(wspace, new File("/bin/chmod"), ("+x " + command.getPath())
+                .split(" "), "");
         if (process.waitFor() != 0) {
             process.exitValue();
-            String msg = "Command did not finish successfully: " + command +
-                " " + arguments;
+            String msg = "Command did not finish successfully: " + command + " " + arguments;
             logger.error(msg);
             return process.exitValue();
         }
 
         process = execCommandInternal(wspace, command, arguments.split(" "), "");
         if (process.waitFor() != 0) {
-            BufferedReader err = new BufferedReader(new InputStreamReader(
-                        process.getErrorStream()));
-            String msg = "Command did not finish successfully: " + command +
-                " " + arguments + System.getProperty("line.separator");
+            BufferedReader err = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+            String msg = "Command did not finish successfully: " + command + " " + arguments +
+                System.getProperty("line.separator");
             logger.error(msg);
 
             String line = err.readLine();
@@ -129,8 +125,7 @@ public class SkeletonSystemImpl implements SkeletonSystem, java.io.Serializable 
     }
 
     // ************* UTILITY METHODS ******************
-    public static boolean copyFile(File src, File dst)
-        throws IOException {
+    public static boolean copyFile(File src, File dst) throws IOException {
         if (src.equals(dst)) {
             return false; //TODO maybe return IOException instead?
         }
@@ -193,8 +188,8 @@ public class SkeletonSystemImpl implements SkeletonSystem, java.io.Serializable 
         return retval;
     }
 
-    static private Process execCommandInternal(WSpaceImpl wspace, File program,
-        String[] args, String add2path) throws IOException {
+    static private Process execCommandInternal(WSpaceImpl wspace, File program, String[] args, String add2path)
+            throws IOException {
         if ((program == null) || (program.getPath().length() <= 0)) {
             throw new IllegalArgumentException("Program path is not specified");
         }
@@ -212,9 +207,7 @@ public class SkeletonSystemImpl implements SkeletonSystem, java.io.Serializable 
 
         if ((add2path != null) && (add2path.length() > 0)) {
             Map<String, String> env = pb.environment();
-            env.put("PATH",
-                env.get("PATH") + System.getProperty("path.separator") +
-                add2path);
+            env.put("PATH", env.get("PATH") + System.getProperty("path.separator") + add2path);
         }
 
         Process p = pb.start();
@@ -234,8 +227,7 @@ public class SkeletonSystemImpl implements SkeletonSystem, java.io.Serializable 
 
     static public boolean checkWritableDirectory(File rootDir) {
         if (!rootDir.exists() && !rootDir.mkdirs()) {
-            throw new IllegalArgumentException("Can't creat directory: " +
-                rootDir);
+            throw new IllegalArgumentException("Can't creat directory: " + rootDir);
         }
 
         if (!rootDir.isDirectory()) {

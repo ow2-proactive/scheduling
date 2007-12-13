@@ -54,8 +54,7 @@ import org.objectweb.proactive.p2p.service.node.P2PNodeLookup;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
-public class startLBoverP2P implements ProActiveInternalObject,
-    NodeCreationEventListener {
+public class startLBoverP2P implements ProActiveInternalObject, NodeCreationEventListener {
     Vector arrivedNodes;
     P2PNodeLookup p2pNodeLookup;
     Vector loadBalancers;
@@ -67,11 +66,10 @@ public class startLBoverP2P implements ProActiveInternalObject,
      * @throws ProActiveException
      * @throws Exception
      */
-    public static void main(String[] args)
-        throws AlreadyBoundException, ProActiveException {
+    public static void main(String[] args) throws AlreadyBoundException, ProActiveException {
         //Node n = NodeFactory.createNode("rmi://psychoquack:2805/StartTest");
-        startLBoverP2P start = (startLBoverP2P) PAActiveObject.newActive(startLBoverP2P.class.getName(),
-                null /*,n*/);
+        startLBoverP2P start = (startLBoverP2P) PAActiveObject
+                .newActive(startLBoverP2P.class.getName(), null /*,n*/);
 
         start.doit("IntegrationTest");
         start.killMe();
@@ -87,8 +85,7 @@ public class startLBoverP2P implements ProActiveInternalObject,
         VirtualNode vn = null;
         arrivedNodes = new Vector();
         try {
-            pad = PADeployment.getProactiveDescriptor(
-                    "/user/sboukhal/home/TestLB.xml");
+            pad = PADeployment.getProactiveDescriptor("/user/sboukhal/home/TestLB.xml");
             vn = pad.getVirtualNode("IntegrationTest");
             ((VirtualNodeImpl) vn).addNodeCreationEventListener(this);
             System.out.println("Activation");
@@ -146,13 +143,12 @@ public class startLBoverP2P implements ProActiveInternalObject,
         while (it.hasNext()) {
             Node n = (Node) it.next();
             itAddress = n.getNodeInformation().getURL();
-            itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
-                "/" + P2PConstants.P2P_NODE_NAME;
+            itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) + "/" + P2PConstants.P2P_NODE_NAME;
 
             p2plb = null;
             try {
-                p2plb = (P2PLoadBalancer) PAActiveObject.newActive(P2PLoadBalancer.class.getName(),
-                        null, itAddress);
+                p2plb = (P2PLoadBalancer) PAActiveObject.newActive(P2PLoadBalancer.class.getName(), null,
+                        itAddress);
                 loadBalancers.add(p2plb);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
@@ -177,8 +173,8 @@ public class startLBoverP2P implements ProActiveInternalObject,
         }
 
         try {
-            JacobiDispatcher jacobiTest = new JacobiDispatcher("400", "25",
-                    "3000", P2PService.getLocalP2PService());
+            JacobiDispatcher jacobiTest = new JacobiDispatcher("400", "25", "3000", P2PService
+                    .getLocalP2PService());
         } catch (ProActiveException e) {
         } catch (Exception e) {
         }
@@ -187,8 +183,7 @@ public class startLBoverP2P implements ProActiveInternalObject,
     public void nodeCreated(NodeCreationEvent event) {
         arrivedNodes.add(event.getNode());
         nodesBooked++;
-        System.out.println("nodeCreated : " +
-            event.getNode().getNodeInformation().getName());
+        System.out.println("nodeCreated : " + event.getNode().getNodeInformation().getName());
     }
 
     public void killMe() {

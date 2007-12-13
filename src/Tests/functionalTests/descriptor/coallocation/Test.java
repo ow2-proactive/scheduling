@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.node.Node;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test coallocation in deployment descriptors
  */
@@ -50,12 +51,10 @@ public class Test extends FunctionalTest {
     static {
         if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
             AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-                    "/functionalTests/descriptor/coallocation/coallocationIbis.xml")
-                                                .getPath();
+                    "/functionalTests/descriptor/coallocation/coallocationIbis.xml").getPath();
         } else {
             AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-                    "/functionalTests/descriptor/coallocation/coallocation.xml")
-                                                .getPath();
+                    "/functionalTests/descriptor/coallocation/coallocation.xml").getPath();
         }
     }
 
@@ -64,8 +63,7 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                AGENT_XML_LOCATION_UNIX);
+        proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + AGENT_XML_LOCATION_UNIX);
         // We activate the mapping in reverse order
         // when two vns refer to the same vm, the first vn which creates the vm becomes the creator of the vm
         // we want to verify this behavior (in addition to coallocation)
@@ -78,8 +76,7 @@ public class Test extends FunctionalTest {
 
         vn1 = proActiveDescriptor.getVirtualNode("covn1");
         VirtualMachine vm = vn1.getVirtualNodeInternal().getVirtualMachine();
-        assertTrue(node1.getProActiveRuntime().getURL()
-                        .equals(node2.getProActiveRuntime().getURL()) &&
+        assertTrue(node1.getProActiveRuntime().getURL().equals(node2.getProActiveRuntime().getURL()) &&
             vm.getCreatorId().equals("covn2"));
     }
 

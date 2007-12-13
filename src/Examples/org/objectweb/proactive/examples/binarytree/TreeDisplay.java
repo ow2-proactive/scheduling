@@ -61,16 +61,12 @@ public class TreeDisplay {
     public void add(String key, String value, boolean AC) {
         if (tree == null) {
             try {
-                tree = (Tree) org.objectweb.proactive.api.PAActiveObject.newActive(Tree.class.getName(),
-                        new Object[] {
-                            key, value,
-                            org.objectweb.proactive.api.PAActiveObject.getStubOnThis()
-                        });
-                applet.receiveMessage("Creating initial tree",
-                    new java.awt.Color(0, 150, 0));
+                tree = (Tree) org.objectweb.proactive.api.PAActiveObject
+                        .newActive(Tree.class.getName(), new Object[] { key, value,
+                                org.objectweb.proactive.api.PAActiveObject.getStubOnThis() });
+                applet.receiveMessage("Creating initial tree", new java.awt.Color(0, 150, 0));
             } catch (Exception e) {
-                applet.receiveMessage("Waiting, program is lauching...",
-                    java.awt.Color.red);
+                applet.receiveMessage("Waiting, program is lauching...", java.awt.Color.red);
                 e.printStackTrace();
             }
         } else {

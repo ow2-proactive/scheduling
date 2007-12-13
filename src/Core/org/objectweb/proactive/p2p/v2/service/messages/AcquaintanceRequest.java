@@ -54,22 +54,17 @@ public class AcquaintanceRequest extends Message implements Serializable {
 
             if (result == null) {
                 //we have accepted the acquaintance request
-                logger.info("Register request from " +
-                    PAActiveObject.getActiveObjectNodeUrl(this.sender) +
+                logger.info("Register request from " + PAActiveObject.getActiveObjectNodeUrl(this.sender) +
                     " accepted");
-                this.sender.message(new AcquaintanceReply(1,
-                        target.generateUuid(), target.stubOnThis,
-                        PAActiveObject.getActiveObjectNodeUrl(target.stubOnThis)));
+                this.sender.message(new AcquaintanceReply(1, target.generateUuid(), target.stubOnThis,
+                    PAActiveObject.getActiveObjectNodeUrl(target.stubOnThis)));
                 //service.registerAnswer(ProActive.getActiveObjectNodeUrl(target.stubOnThis),target.stubOnThis);
             } else {
-                logger.info("Register request from " +
-                    PAActiveObject.getActiveObjectNodeUrl(this.sender) +
+                logger.info("Register request from " + PAActiveObject.getActiveObjectNodeUrl(this.sender) +
                     " rejected");
                 //service.registerAnswer(ProActive.getActiveObjectNodeUrl(target.stubOnThis), result);
-                this.sender.message(new AcquaintanceReply(1,
-                        target.generateUuid(), target.stubOnThis,
-                        PAActiveObject.getActiveObjectNodeUrl(target.stubOnThis),
-                        result));
+                this.sender.message(new AcquaintanceReply(1, target.generateUuid(), target.stubOnThis,
+                    PAActiveObject.getActiveObjectNodeUrl(target.stubOnThis), result));
             }
         }
     }

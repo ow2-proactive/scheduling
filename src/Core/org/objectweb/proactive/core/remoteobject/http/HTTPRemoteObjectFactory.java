@@ -55,8 +55,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
-    implements RemoteObjectFactory {
+public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory implements RemoteObjectFactory {
     protected String protocolIdentifier = Constants.XMLHTTP_PROTOCOL_IDENTIFIER;
 
     static {
@@ -69,14 +68,12 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
                 classServerHelper = new ClassServerHelper();
                 String codebase = classServerHelper.initializeClassServer();
 
-                PAProperties.PA_XMLHTTP_PORT.setValue(URIBuilder.getPortNumber(
-                        codebase) + "");
+                PAProperties.PA_XMLHTTP_PORT.setValue(URIBuilder.getPortNumber(codebase) + "");
 
                 addCodebase(codebase);
             } catch (Exception e) {
-                ProActiveLogger.getLogger(Loggers.CLASS_SERVER)
-                               .warn("Error with the ClassServer : " +
-                    e.getMessage());
+                ProActiveLogger.getLogger(Loggers.CLASS_SERVER).warn(
+                        "Error with the ClassServer : " + e.getMessage());
             }
         }
     }
@@ -87,8 +84,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#newRemoteObject(org.objectweb.proactive.core.remoteobject.RemoteObject)
      */
-    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
-        throws ProActiveException {
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target) throws ProActiveException {
         try {
             return new HttpRemoteObjectImpl(target, null);
         } catch (Exception e) {
@@ -105,8 +101,8 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#register(org.objectweb.proactive.core.remoteobject.RemoteObject, java.net.URI, boolean)
      */
-    public RemoteRemoteObject register(InternalRemoteRemoteObject ro, URI url,
-        boolean replacePrevious) throws ProActiveException {
+    public RemoteRemoteObject register(InternalRemoteRemoteObject ro, URI url, boolean replacePrevious)
+            throws ProActiveException {
         URL u = null;
 
         int port = ClassServer.getServerSocketPort();
@@ -127,8 +123,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
 
         HttpRemoteObjectImpl rro = new HttpRemoteObjectImpl(ro, url);
 
-        ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                       .info("registering remote object  at endpoint " + url);
+        ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).info("registering remote object  at endpoint " + url);
         return rro;
     }
 
@@ -153,8 +148,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
         }
 
         String urn = url.getPath();
-        HttpRemoteObjectLookupMessage message = new HttpRemoteObjectLookupMessage(urn,
-                url, port);
+        HttpRemoteObjectLookupMessage message = new HttpRemoteObjectLookupMessage(urn, url, port);
         try {
             message.send();
         } catch (HTTPRemoteException e) {
@@ -163,8 +157,7 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
         RemoteRemoteObject result = message.getReturnedObject();
 
         if (result == null) {
-            throw new ProActiveException("The url " + url +
-                " is not bound to any known object");
+            throw new ProActiveException("The url " + url + " is not bound to any known object");
         } else {
             return new RemoteObjectAdapter(result);
         }
@@ -187,7 +180,6 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory
     //        }
     //        return null;
     //    }
-
     /**
      * List all active object previously registered in the registry
      * @param url the url of the host to scan, typically //machine_name

@@ -101,13 +101,12 @@ public class Server {
         ProActiveConfiguration.load();
         try {
             // Creates an active object for the server
-            Server theServer = (Server) org.objectweb.proactive.api.PAActiveObject.newActive(Server.class.getName(),
-                    new Object[] { "This is the first message" });
+            Server theServer = (Server) org.objectweb.proactive.api.PAActiveObject.newActive(Server.class
+                    .getName(), new Object[] { "This is the first message" });
 
             //Server theServer = (Server) org.objectweb.proactive.ProActive.newActive(Server.class.getName(), null, null);
             // Binds the server to a specific URL
-            org.objectweb.proactive.api.PAActiveObject.register(theServer,
-                "///theServer");
+            org.objectweb.proactive.api.PAActiveObject.register(theServer, "///theServer");
 
             System.out.println("Server is ready.");
         } catch (Exception e) {

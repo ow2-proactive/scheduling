@@ -116,10 +116,10 @@ public class UserIdentification implements Serializable {
     }
 
     /**
-    * @see java.lang.Object#equals(java.lang.Object)
-    *
-    * @return true if the user name of this and object are equals.
-    */
+     * @see java.lang.Object#equals(java.lang.Object)
+     *
+     * @return true if the user name of this and object are equals.
+     */
     @Override
     public boolean equals(Object object) {
         if (object instanceof UserIdentification) {

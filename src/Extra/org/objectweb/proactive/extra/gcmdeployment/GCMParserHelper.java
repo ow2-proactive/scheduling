@@ -63,11 +63,9 @@ public class GCMParserHelper implements GCMParserConstants {
 
     static public FileTransferBlock parseFileTransferNode(Node fileTransferNode) {
         FileTransferBlock fileTransferBlock = new FileTransferBlock();
-        String source = GCMParserHelper.getAttributeValue(fileTransferNode,
-                "source");
+        String source = GCMParserHelper.getAttributeValue(fileTransferNode, "source");
         fileTransferBlock.setSource(source);
-        String destination = GCMParserHelper.getAttributeValue(fileTransferNode,
-                "destination");
+        String destination = GCMParserHelper.getAttributeValue(fileTransferNode, "destination");
         fileTransferBlock.setDestination(destination);
 
         return fileTransferBlock;
@@ -131,10 +129,10 @@ public class GCMParserHelper implements GCMParserConstants {
         }
     }
 
-    static public List<PathElement> parseClasspath(XPath xpath,
-        Node classPathNode) throws XPathExpressionException {
-        NodeList pathElementNodes = (NodeList) xpath.evaluate("pa:pathElement",
-                classPathNode, XPathConstants.NODESET);
+    static public List<PathElement> parseClasspath(XPath xpath, Node classPathNode)
+            throws XPathExpressionException {
+        NodeList pathElementNodes = (NodeList) xpath.evaluate("pa:pathElement", classPathNode,
+                XPathConstants.NODESET);
 
         ArrayList<PathElement> res = new ArrayList<PathElement>();
 
@@ -149,8 +147,7 @@ public class GCMParserHelper implements GCMParserConstants {
 
     static public PathElement parsePathElementNode(Node pathElementNode) {
         PathElement pathElement = new PathElement();
-        String attr = GCMParserHelper.getAttributeValue(pathElementNode,
-                "relpath");
+        String attr = GCMParserHelper.getAttributeValue(pathElementNode, "relpath");
         pathElement.setRelPath(attr);
         attr = GCMParserHelper.getAttributeValue(pathElementNode, "base");
         if (attr != null) {
@@ -160,12 +157,11 @@ public class GCMParserHelper implements GCMParserConstants {
         return pathElement;
     }
 
-    public static List<String> parseArgumentListNode(XPath xpath,
-        Node argumentListNode) throws XPathExpressionException {
+    public static List<String> parseArgumentListNode(XPath xpath, Node argumentListNode)
+            throws XPathExpressionException {
         ArrayList<String> args = new ArrayList<String>();
 
-        NodeList argNodes = (NodeList) xpath.evaluate("pa:arg",
-                argumentListNode, XPathConstants.NODESET);
+        NodeList argNodes = (NodeList) xpath.evaluate("pa:arg", argumentListNode, XPathConstants.NODESET);
 
         for (int i = 0; i < argNodes.getLength(); ++i) {
             Node argNode = argNodes.item(i);
@@ -175,12 +171,11 @@ public class GCMParserHelper implements GCMParserConstants {
         return args;
     }
 
-    public static List<String> parseEnviromentNode(XPath xpath,
-        Node environmentNode) throws XPathExpressionException {
+    public static List<String> parseEnviromentNode(XPath xpath, Node environmentNode)
+            throws XPathExpressionException {
         ArrayList<String> environment = new ArrayList<String>();
 
-        NodeList argNodes = (NodeList) xpath.evaluate("pa:variable",
-                environmentNode, XPathConstants.NODESET);
+        NodeList argNodes = (NodeList) xpath.evaluate("pa:variable", environmentNode, XPathConstants.NODESET);
 
         for (int i = 0; i < argNodes.getLength(); ++i) {
             Node argNode = argNodes.item(i);

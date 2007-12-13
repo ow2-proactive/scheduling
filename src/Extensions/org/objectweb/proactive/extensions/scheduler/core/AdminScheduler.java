@@ -62,8 +62,7 @@ import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceMana
  * @since ProActive 3.9
  */
 @PublicAPI
-public class AdminScheduler extends UserScheduler
-    implements AdminSchedulerInterface {
+public class AdminScheduler extends UserScheduler implements AdminSchedulerInterface {
 
     /** Logger to be used for all messages related to the scheduler */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
@@ -78,28 +77,24 @@ public class AdminScheduler extends UserScheduler
      * @param rm the resource manager to plug on the scheduler.
      * @param policyFullClassName the full policy class name for the scheduler.
      */
-    public static void createScheduler(String loginFile, String groupFile,
-        ResourceManagerProxy rm, String policyFullClassName)
-        throws AdminSchedulerException {
-        logger.info(
-            "********************* STARTING NEW SCHEDULER *******************");
+    public static void createScheduler(String loginFile, String groupFile, ResourceManagerProxy rm,
+            String policyFullClassName) throws AdminSchedulerException {
+        logger.info("********************* STARTING NEW SCHEDULER *******************");
 
         //check arguments...
         if (rm == null) {
-            throw new AdminSchedulerException(
-                "The Entity manager must be set !");
+            throw new AdminSchedulerException("The Entity manager must be set !");
         }
 
         //check that the scheduler is an active object
         try {
             PAActiveObject.getActiveObjectNodeUrl(rm);
         } catch (ProActiveRuntimeException e) {
-            logger.warn(
-                "The infrastructure manager is not an active object, this will decrease the scheduler performance.");
+            logger
+                    .warn("The infrastructure manager is not an active object, this will decrease the scheduler performance.");
         } catch (Exception e) {
             e.printStackTrace();
-            throw new AdminSchedulerException(
-                "An error has occured trying to access the entity manager " +
+            throw new AdminSchedulerException("An error has occured trying to access the entity manager " +
                 e.getMessage());
         }
 
@@ -112,13 +107,13 @@ public class AdminScheduler extends UserScheduler
             // creating the scheduler proxy.
             // if this fails then it will not continue.
             logger.info("Creating scheduler frontend...");
-            schedulerFrontend = (SchedulerFrontend) PAActiveObject.newActive(SchedulerFrontend.class.getName(),
-                    new Object[] { rm, policyFullClassName });
+            schedulerFrontend = (SchedulerFrontend) PAActiveObject.newActive(SchedulerFrontend.class
+                    .getName(), new Object[] { rm, policyFullClassName });
             // creating the scheduler authentication interface.
             // if this fails then it will not continue.
             logger.info("Creating scheduler authentication interface...");
-            schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class.getName(),
-                    new Object[] { loginFile, groupFile, schedulerFrontend });
+            schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class
+                    .getName(), new Object[] { loginFile, groupFile, schedulerFrontend });
             // adding NFE listener to managed non functional exceptions
             // that occurs in Proactive Core
             //ProActive.addNFEListenerOnAO(schedulerFrontend,
@@ -128,8 +123,7 @@ public class AdminScheduler extends UserScheduler
             // registering the scheduler proxy at the given URL
             logger.info("Registering scheduler...");
 
-            String schedulerUrl = "//localhost/" +
-                SchedulerConnection.SCHEDULER_DEFAULT_NAME;
+            String schedulerUrl = "//localhost/" + SchedulerConnection.SCHEDULER_DEFAULT_NAME;
             PAActiveObject.register(schedulerAuth, schedulerUrl);
             // setting the proxy to the admin scheduler API
             adminScheduler.schedulerFrontend = schedulerFrontend;
@@ -163,10 +157,9 @@ public class AdminScheduler extends UserScheduler
      * @throws AdminSchedulerException if an admin connection exception occurs.
      * @throws LoginException if a user login/password exception occurs.
      */
-    public static AdminSchedulerInterface createScheduler(String loginFile,
-        String groupFile, String login, String password,
-        ResourceManagerProxy rm, String policyFullClassName)
-        throws AdminSchedulerException, SchedulerException, LoginException {
+    public static AdminSchedulerInterface createScheduler(String loginFile, String groupFile, String login,
+            String password, ResourceManagerProxy rm, String policyFullClassName)
+            throws AdminSchedulerException, SchedulerException, LoginException {
         createScheduler(loginFile, groupFile, rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
@@ -177,9 +170,8 @@ public class AdminScheduler extends UserScheduler
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#changePolicy(java.lang.Class)
      */
-    public BooleanWrapper changePolicy(
-        Class<?extends PolicyInterface> newPolicyFile)
-        throws SchedulerException {
+    public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
+            throws SchedulerException {
         return schedulerFrontend.changePolicy(newPolicyFile);
     }
 

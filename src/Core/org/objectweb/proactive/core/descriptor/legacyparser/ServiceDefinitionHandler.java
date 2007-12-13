@@ -44,8 +44,8 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 import org.xml.sax.SAXException;
 
 
-public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
-    implements ProActiveDescriptorConstants {
+public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller implements
+        ProActiveDescriptorConstants {
     ProActiveDescriptorInternal pad;
     protected String serviceId;
 
@@ -61,8 +61,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
      * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
      */
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws SAXException {
         UniversalService service = (UniversalService) activeHandler.getResultObject();
         pad.addService(serviceId, service);
     }
@@ -71,8 +70,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
      * @see org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
      */
     @Override
-    public void startContextElement(String name, Attributes attributes)
-        throws SAXException {
+    public void startContextElement(String name, Attributes attributes) throws SAXException {
         this.serviceId = attributes.getValue("id");
     }
 
@@ -81,8 +79,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             String lookupUrl = attributes.getValue("url");
             RMIRegistryLookupService rmiService = new RMIRegistryLookupService(lookupUrl);
             setResultObject(rmiService);
@@ -100,16 +97,14 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             p2pDescriptorService = new P2PDescriptorService();
             String askedNodes = attributes.getValue("nodesAsked");
             if (checkNonEmpty(askedNodes)) {
                 if (askedNodes.equals("MAX")) {
                     p2pDescriptorService.setNodeNumberToMAX();
                 } else {
-                    p2pDescriptorService.setNodeNumber(Integer.parseInt(
-                            askedNodes));
+                    p2pDescriptorService.setNodeNumber(Integer.parseInt(askedNodes));
                 }
             }
 
@@ -148,16 +143,15 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
                 p2pDescriptorService.setXmlPath(xml_path);
             }
 
-            String node_family_regexp = attributes.getValue(
-                    "node_family_regexp");
+            String node_family_regexp = attributes.getValue("node_family_regexp");
             if (checkNonEmpty(node_family_regexp)) {
                 p2pDescriptorService.setNodeFamilyRegexp(node_family_regexp);
             }
         }
 
         @Override
-        protected void notifyEndActiveHandler(String name,
-            UnmarshallerHandler activeHandler) throws SAXException {
+        protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+                throws SAXException {
             String[] peerList = (String[]) activeHandler.getResultObject();
             p2pDescriptorService.setPeerList(peerList);
         }
@@ -183,8 +177,7 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             this.ftService = new FaultToleranceService();
         }
 
@@ -196,28 +189,22 @@ public class ServiceDefinitionHandler extends PassiveCompositeUnmarshaller
         protected class FTConfigHandler extends BasicUnmarshaller {
             @Override
             public void startContextElement(String name, Attributes attributes)
-                throws org.xml.sax.SAXException {
+                    throws org.xml.sax.SAXException {
                 if (FT_RECPROCESS_TAG.equals(name)) {
-                    FaultToleranceHandler.this.ftService.setRecoveryProcessURL(attributes.getValue(
-                            "url"));
+                    FaultToleranceHandler.this.ftService.setRecoveryProcessURL(attributes.getValue("url"));
                 } else if (FT_LOCSERVER_TAG.equals(name)) {
-                    FaultToleranceHandler.this.ftService.setLocationServerURL(attributes.getValue(
-                            "url"));
+                    FaultToleranceHandler.this.ftService.setLocationServerURL(attributes.getValue("url"));
                 } else if (FT_CKPTSERVER_TAG.equals(name)) {
-                    FaultToleranceHandler.this.ftService.setCheckpointServerURL(attributes.getValue(
-                            "url"));
+                    FaultToleranceHandler.this.ftService.setCheckpointServerURL(attributes.getValue("url"));
                 } else if (FT_RESSERVER_TAG.equals(name)) {
-                    FaultToleranceHandler.this.ftService.setAttachedResourceServer(attributes.getValue(
-                            "url"));
+                    FaultToleranceHandler.this.ftService
+                            .setAttachedResourceServer(attributes.getValue("url"));
                 } else if (FT_TTCVALUE_TAG.equals(name)) {
-                    FaultToleranceHandler.this.ftService.setTtcValue(attributes.getValue(
-                            "value"));
+                    FaultToleranceHandler.this.ftService.setTtcValue(attributes.getValue("value"));
                 } else if (FT_GLOBALSERVER_TAG.equals(name)) {
-                    FaultToleranceHandler.this.ftService.setGlobalServerURL(attributes.getValue(
-                            "url"));
+                    FaultToleranceHandler.this.ftService.setGlobalServerURL(attributes.getValue("url"));
                 } else if (FT_PROTO_TAG.equals(name)) {
-                    FaultToleranceHandler.this.ftService.setProtocolType(attributes.getValue(
-                            "type"));
+                    FaultToleranceHandler.this.ftService.setProtocolType(attributes.getValue("type"));
                 }
             }
         }

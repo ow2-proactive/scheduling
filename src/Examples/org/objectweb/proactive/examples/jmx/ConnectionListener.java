@@ -72,12 +72,10 @@ public class ConnectionListener implements NotificationListener, Serializable {
      * @param name the object name of the MBean one want to listen to
      * @throws IOException
      */
-    public void listenTo(ObjectName name, NotificationFilter filter,
-        Object handback) throws IOException {
+    public void listenTo(ObjectName name, NotificationFilter filter, Object handback) throws IOException {
         try {
             this.connection.addNotificationListener(name,
-                (ConnectionListener) PAActiveObject.getStubOnThis(), filter,
-                handback);
+                    (ConnectionListener) PAActiveObject.getStubOnThis(), filter, handback);
         } catch (NullPointerException e) {
             e.printStackTrace();
             throw new IOException(e.getMessage());
@@ -97,8 +95,8 @@ public class ConnectionListener implements NotificationListener, Serializable {
      */
     public void stopListening(ObjectName name) throws IOException {
         try {
-            this.connection.removeNotificationListener(name,
-                (ConnectionListener) PAActiveObject.getStubOnThis());
+            this.connection.removeNotificationListener(name, (ConnectionListener) PAActiveObject
+                    .getStubOnThis());
         } catch (InstanceNotFoundException e) {
             throw new IOException(e.getMessage());
         } catch (ListenerNotFoundException e) {

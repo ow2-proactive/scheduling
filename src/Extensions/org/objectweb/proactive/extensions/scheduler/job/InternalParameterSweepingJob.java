@@ -62,8 +62,8 @@ public class InternalParameterSweepingJob extends InternalJob {
      */
 
     //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
-    public InternalParameterSweepingJob(String name, JobPriority priority,
-        boolean cancelOnError, String description) {
+    public InternalParameterSweepingJob(String name, JobPriority priority, boolean cancelOnError,
+            String description) {
         super(name, priority, cancelOnError, description);
     }
 

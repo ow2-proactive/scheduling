@@ -54,15 +54,14 @@ class GCThreadPool implements ThreadFactory {
     }
 }
 
-
 public class Referenced implements Comparable {
 
     /**
      * The threaded broadcaster
      */
-    private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(2,
-            Integer.MAX_VALUE, GarbageCollector.TTA * 2, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<Runnable>(), new GCThreadPool());
+    private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(2, Integer.MAX_VALUE,
+        GarbageCollector.TTA * 2, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(),
+        new GCThreadPool());
 
     /**
      * The body we use to communicate with the proxy
@@ -139,19 +138,18 @@ public class Referenced implements Comparable {
     void sendMessage(final GCMessage msg) {
         synchronized (this.gc) {
             if (this.isSendingMessage) {
-                this.gc.log(Level.WARN,
-                    "Sending thread for " + this + " still running");
+                this.gc.log(Level.WARN, "Sending thread for " + this + " still running");
                 return;
             }
             this.isSendingMessage = true;
             executor.execute(new Runnable() {
-                    public void run() {
-                        Referenced.this.doSendTheMessage(msg);
-                        synchronized (Referenced.this.gc) {
-                            Referenced.this.isSendingMessage = false;
-                        }
+                public void run() {
+                    Referenced.this.doSendTheMessage(msg);
+                    synchronized (Referenced.this.gc) {
+                        Referenced.this.isSendingMessage = false;
                     }
-                });
+                }
+            });
         }
     }
 
@@ -168,8 +166,7 @@ public class Referenced implements Comparable {
         }
 
         if (delay > acceptableDelay) {
-            this.gc.log(Level.WARN,
-                "Delay " + delay + " too long talking to " + this);
+            this.gc.log(Level.WARN, "Delay " + delay + " too long talking to " + this);
         }
     }
 
@@ -196,8 +193,7 @@ public class Referenced implements Comparable {
     }
 
     boolean hasTerminated() {
-        return (this.lastResponse != null) &&
-        this.lastResponse.isTerminationResponse();
+        return (this.lastResponse != null) && this.lastResponse.isTerminationResponse();
     }
 
     public int compareTo(Object o) {

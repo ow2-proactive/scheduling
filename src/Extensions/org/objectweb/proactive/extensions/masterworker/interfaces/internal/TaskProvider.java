@@ -57,6 +57,5 @@ public interface TaskProvider<R extends Serializable> {
      * @param reflooding that means the worker's stack is empty and it asks for a set a tasks bigger than one
      * @return a list of new tasks to compute
      */
-    Queue<TaskIntern<R>> sendResultAndGetTasks(ResultIntern<R> result,
-        String workerName, boolean reflooding);
+    Queue<TaskIntern<R>> sendResultAndGetTasks(ResultIntern<R> result, String workerName, boolean reflooding);
 }

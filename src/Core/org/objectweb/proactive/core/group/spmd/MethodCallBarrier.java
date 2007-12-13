@@ -78,9 +78,9 @@ public class MethodCallBarrier extends MethodCallControlForGroup {
      * @return null
      */
     @Override
-    public Object execute(Object target)
-        throws InvocationTargetException, MethodCallExecutionFailedException {
-        ProActiveSPMDGroupManager spmdManager = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSPMDGroupManager();
+    public Object execute(Object target) throws InvocationTargetException, MethodCallExecutionFailedException {
+        ProActiveSPMDGroupManager spmdManager = ((AbstractBody) PAActiveObject.getBodyOnThis())
+                .getProActiveSPMDGroupManager();
         BarrierState bs = spmdManager.getBarrierStateFor(this.getIDName());
 
         // bs == null  =>  state not found  =>  first barrier encountered for ID name

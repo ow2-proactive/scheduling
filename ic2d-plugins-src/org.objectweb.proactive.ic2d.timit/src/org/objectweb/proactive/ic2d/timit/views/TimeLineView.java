@@ -123,10 +123,15 @@ public class TimeLineView extends ViewPart {
         }
 
         // Add the target to all actions
-        ((IncreaseSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(IncreaseSizeAction.INCREASE_SIZE_ACTION)).getAction()).setTarget(target);
-        ((DecreaseSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(DecreaseSizeAction.DECREASE_SIZE_ACTION)).getAction()).setTarget(target);
-        ((FitSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(FitSizeAction.FIT_SIZE_ACTION)).getAction()).setTarget(target);
-        ((ExpandSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(ExpandSizeAction.EXPAND_TIMELINE_ACTION)).getAction()).setTarget(target);
-        ((ClearTimeLineAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager.find(ClearTimeLineAction.CLEAR_TIMELINE_ACTION)).getAction()).setTarget(target);
+        ((IncreaseSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager
+                .find(IncreaseSizeAction.INCREASE_SIZE_ACTION)).getAction()).setTarget(target);
+        ((DecreaseSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager
+                .find(DecreaseSizeAction.DECREASE_SIZE_ACTION)).getAction()).setTarget(target);
+        ((FitSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager
+                .find(FitSizeAction.FIT_SIZE_ACTION)).getAction()).setTarget(target);
+        ((ExpandSizeAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager
+                .find(ExpandSizeAction.EXPAND_TIMELINE_ACTION)).getAction()).setTarget(target);
+        ((ClearTimeLineAction) ((org.eclipse.jface.action.ActionContributionItem) this.toolBarManager
+                .find(ClearTimeLineAction.CLEAR_TIMELINE_ACTION)).getAction()).setTarget(target);
     }
 }

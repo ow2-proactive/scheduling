@@ -42,6 +42,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test newActiveInParallel method with the virtual node has been activated
  * @author Alexandre di Costanzo
@@ -50,8 +51,7 @@ import static junit.framework.Assert.assertTrue;
  */
 public class TestVnActivated extends FunctionalTest {
     private static final String XML_PATH = TestVnActivated.class.getResource(
-            "/functionalTests/activeobject/creation/parallel/4_local.xml")
-                                                                .getPath();
+            "/functionalTests/activeobject/creation/parallel/4_local.xml").getPath();
     private A[] aos;
     private VirtualNode vn;
     private ProActiveDescriptor padForActiving;
@@ -60,8 +60,7 @@ public class TestVnActivated extends FunctionalTest {
     public void action() throws Exception {
         assertTrue(vn.isActivated());
 
-        this.aos = (A[]) PAActiveObject.newActiveInParallel(A.class.getName(),
-                new Object[] { "toto" }, vn);
+        this.aos = (A[]) PAActiveObject.newActiveInParallel(A.class.getName(), new Object[] { "toto" }, vn);
 
         assertTrue(aos != null);
         assertTrue(aos.length == 4);

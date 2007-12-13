@@ -49,8 +49,8 @@ import org.objectweb.proactive.extensions.calcium.system.WSpace;
 public class ExecuteBlast implements Execute<BlastParams, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public File execute(SkeletonSystem system, BlastParams param)
-        throws IOException, InterruptedException, EnvironmentException {
+    public File execute(SkeletonSystem system, BlastParams param) throws IOException, InterruptedException,
+            EnvironmentException {
         if (logger.isDebugEnabled()) {
             logger.debug("Executing Blast");
         }

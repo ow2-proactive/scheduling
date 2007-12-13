@@ -54,15 +54,12 @@ public class AOConnection {
      * @param sourceID The source ID.
      * @param targetID The target ID.
      */
-    public static RoundedLineConnection createConnection(AOFigure source,
-        AOFigure target, Color color) {
+    public static RoundedLineConnection createConnection(AOFigure source, AOFigure target, Color color) {
         RoundedLineConnection connection = new RoundedLineConnection(color);
 
-        Point sourceCenter = source.getLocation()
-                                   .getTranslated(source.getBounds().width / 2,
+        Point sourceCenter = source.getLocation().getTranslated(source.getBounds().width / 2,
                 source.getBounds().height / 2);
-        Point targetCenter = target.getLocation()
-                                   .getTranslated(target.getBounds().width / 2,
+        Point targetCenter = target.getLocation().getTranslated(target.getBounds().width / 2,
                 target.getBounds().height / 2);
 
         Position position = getPosition(sourceCenter, targetCenter);
@@ -80,8 +77,7 @@ public class AOConnection {
 
         List<RelativeBendpoint> bendPoints = new ArrayList<RelativeBendpoint>();
 
-        RelativeBendpoint middle = calculPoint(connection, sourceCenter,
-                targetCenter, position);
+        RelativeBendpoint middle = calculPoint(connection, sourceCenter, targetCenter, position);
         if (middle != null) {
             bendPoints.add(middle);
         }
@@ -100,8 +96,8 @@ public class AOConnection {
      * @param target The target of connection
      * @param position The relative position of the target to the source
      */
-    private static RelativeBendpoint calculPoint(Connection connection,
-        Point source, Point target, Position position) {
+    private static RelativeBendpoint calculPoint(Connection connection, Point source, Point target,
+            Position position) {
         double distance = source.getDistance(target);
         RelativeBendpoint point = new RelativeBendpoint(connection);
         int value = (int) (0.4 * distance);
@@ -110,25 +106,23 @@ public class AOConnection {
             value = 90;
         }
         switch (position) {
-        case SAME:
-        case NORTH:
-            point.setRelativeDimensions(new Dimension(value, 0),
-                new Dimension(value, 0));
-            break;
-        case SOUTH:
-            point.setRelativeDimensions(new Dimension(-value, 0),
-                new Dimension(-value, 0));
-            break;
-        case EAST:
-            point.setRelativeDimensions(new Dimension(0, (value / 2) + 50),
-                new Dimension(0, (value / 2) + 50));
-            break;
-        case WEST:
-            point.setRelativeDimensions(new Dimension(0, -((value / 2) + 50)),
-                new Dimension(0, -((value / 2) + 50)));
-            break;
-        default:
-            return null;
+            case SAME:
+            case NORTH:
+                point.setRelativeDimensions(new Dimension(value, 0), new Dimension(value, 0));
+                break;
+            case SOUTH:
+                point.setRelativeDimensions(new Dimension(-value, 0), new Dimension(-value, 0));
+                break;
+            case EAST:
+                point.setRelativeDimensions(new Dimension(0, (value / 2) + 50), new Dimension(0,
+                    (value / 2) + 50));
+                break;
+            case WEST:
+                point.setRelativeDimensions(new Dimension(0, -((value / 2) + 50)), new Dimension(0,
+                    -((value / 2) + 50)));
+                break;
+            default:
+                return null;
         }
         return point;
     }

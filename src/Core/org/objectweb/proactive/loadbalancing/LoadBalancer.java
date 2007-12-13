@@ -106,8 +106,7 @@ public class LoadBalancer implements ProActiveInternalObject {
         }
     }
 
-    protected void getActiveObjectsFrom(LoadBalancer remoteBalancer,
-        double remoteRanking) {
+    protected void getActiveObjectsFrom(LoadBalancer remoteBalancer, double remoteRanking) {
         if (this.metric == null) {
             return;
         }
@@ -150,8 +149,7 @@ public class LoadBalancer implements ProActiveInternalObject {
 
                 if (activeObjectBody.isAlive()) {
                     if (activeObjectBody.isActive() && testSerialization) {
-                        int aoQueueLenght = activeObjectBody.getRequestQueue()
-                                                            .size();
+                        int aoQueueLenght = activeObjectBody.getRequestQueue().size();
                         if (aoQueueLenght < minLength) {
                             minLength = aoQueueLenght;
                             minBody = activeObjectBody;
@@ -164,16 +162,14 @@ public class LoadBalancer implements ProActiveInternalObject {
             if ((minBody != null) && minBody.isActive()) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("[Loadbalancer] Migrating (" +
-                        minBody.getReifiedObject().getClass().getName() +
-                        ") from " + myNode.getNodeInformation().getURL() +
-                        " to " + destNode.getNodeInformation().getURL());
+                        minBody.getReifiedObject().getClass().getName() + ") from " +
+                        myNode.getNodeInformation().getURL() + " to " +
+                        destNode.getNodeInformation().getURL());
                 }
 
                 PAMobileAgent.migrateTo(minBody, destNode, false);
-                informationRecover.register(this.getName(),
-                    this.metric.getLoad(),
-                    destNode.getNodeInformation().getURL(),
-                    minBody.getReifiedObject().getClass().getName());
+                informationRecover.register(this.getName(), this.metric.getLoad(), destNode
+                        .getNodeInformation().getURL(), minBody.getReifiedObject().getClass().getName());
             }
         } catch (IllegalArgumentException e) {
             logger.error("[LoadBalancer] " + e.getLocalizedMessage());
@@ -200,8 +196,7 @@ public class LoadBalancer implements ProActiveInternalObject {
         return balancerName;
     }
 
-    public void init(ArrayList<LoadBalancer> loadBalancers,
-        InformationRecover ir) {
+    public void init(ArrayList<LoadBalancer> loadBalancers, InformationRecover ir) {
         try {
             this.myNode = PAActiveObject.getNode();
             this.informationRecover = ir;
@@ -224,19 +219,16 @@ public class LoadBalancer implements ProActiveInternalObject {
         }
 
         int first = randomizer.nextInt(size);
-        for (int i = 0; (i < LoadBalancingConstants.SUBSET_SIZE) && (i < size);
-                i++) {
+        for (int i = 0; (i < LoadBalancingConstants.SUBSET_SIZE) && (i < size); i++) {
             LoadBalancer remoteLb = loadBalancers.get((first + i) % size);
             try {
                 switch (action) {
-                case STEAL:
-                    remoteLb.sendActiveObjectsTo(myNode,
-                        this.metric.getRanking());
-                    break;
-                case BALANCE:
-                    remoteLb.getActiveObjectsFrom(myThis,
-                        this.metric.getRanking());
-                    break;
+                    case STEAL:
+                        remoteLb.sendActiveObjectsTo(myNode, this.metric.getRanking());
+                        break;
+                    case BALANCE:
+                        remoteLb.getActiveObjectsFrom(myThis, this.metric.getRanking());
+                        break;
                 }
             } catch (ProActiveRuntimeException e) {
                 loadBalancers.remove((first + i) % size);

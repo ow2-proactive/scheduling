@@ -48,8 +48,7 @@ public class SetTTRAction extends Action {
         this.setId(SET_TTR);
         this.setText("Set Time To Refresh...");
         setToolTipText("Set Time To Refresh");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "ttr.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "ttr.gif"));
     }
 
     @Override

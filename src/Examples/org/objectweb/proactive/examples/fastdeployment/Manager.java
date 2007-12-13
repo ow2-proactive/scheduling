@@ -48,8 +48,7 @@ import org.objectweb.proactive.core.util.wrapper.LongWrapper;
 public class Manager implements Serializable, InitActive, RunActive {
 
     /** The application logger */
-    final static private Logger logger = ProActiveLogger.getLogger(Loggers.CORE +
-            ".app");
+    final static private Logger logger = ProActiveLogger.getLogger(Loggers.CORE + ".app");
     /** List of slaves already in the computation */
     HashMap<Integer, CPUBurner> slaves;
     final private int ITERATIONS = 3000;
@@ -100,13 +99,12 @@ public class Manager implements Serializable, InitActive, RunActive {
         if ((slaves.size() % 50) == 0) {
             long elapsed = System.currentTimeMillis() - firstNodeCreatedTime;
             double throughput = (1000.0 * slaves.size()) / elapsed;
-            logger.info(" Slaves already in the computation:  " +
-                slaves.size() + " in " + elapsed + " ms. => " + throughput);
+            logger.info(" Slaves already in the computation:  " + slaves.size() + " in " + elapsed +
+                " ms. => " + throughput);
         }
 
         /* CHANGEME: Assign a task to the slave */
-        slave.compute(new LongWrapper(
-                1L * ProActiveRandom.nextInt(60) * Integer.MAX_VALUE));
+        slave.compute(new LongWrapper(1L * ProActiveRandom.nextInt(60) * Integer.MAX_VALUE));
     }
 
     /**
@@ -123,9 +121,7 @@ public class Manager implements Serializable, InitActive, RunActive {
 
         // CHANGEME Resubmit a task to the slave if needed
         if (iteration < ITERATIONS) {
-            slaves.get(id)
-                  .compute(new LongWrapper(
-                    1L * ProActiveRandom.nextInt(60) * Integer.MAX_VALUE));
+            slaves.get(id).compute(new LongWrapper(1L * ProActiveRandom.nextInt(60) * Integer.MAX_VALUE));
             iteration++;
         }
     }

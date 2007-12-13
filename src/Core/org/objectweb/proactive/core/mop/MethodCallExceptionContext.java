@@ -51,15 +51,13 @@ public class MethodCallExceptionContext implements Serializable {
     /**
      * The default parameters, when the exception mechanism is not used.
      */
-    public static final MethodCallExceptionContext DEFAULT = new MethodCallExceptionContext(false,
-            false);
+    public static final MethodCallExceptionContext DEFAULT = new MethodCallExceptionContext(false, false);
 
     /**
      * @param runtimeExceptionHandled
      * @param exceptionAsynchronously
      */
-    public MethodCallExceptionContext(boolean runtimeExceptionHandled,
-        boolean exceptionAsynchronously) {
+    public MethodCallExceptionContext(boolean runtimeExceptionHandled, boolean exceptionAsynchronously) {
         this.runtimeExceptionHandled = runtimeExceptionHandled;
         this.exceptionAsynchronously = exceptionAsynchronously;
     }
@@ -78,8 +76,7 @@ public class MethodCallExceptionContext implements Serializable {
         return runtimeExceptionHandled;
     }
 
-    public static MethodCallExceptionContext optimize(
-        MethodCallExceptionContext context) {
+    public static MethodCallExceptionContext optimize(MethodCallExceptionContext context) {
         if (DEFAULT.equals(context)) {
             context = null;
         }
@@ -89,7 +86,6 @@ public class MethodCallExceptionContext implements Serializable {
 
     @Override
     public String toString() {
-        return "[rt:" + runtimeExceptionHandled + ", async:" +
-        exceptionAsynchronously + "]";
+        return "[rt:" + runtimeExceptionHandled + ", async:" + exceptionAsynchronously + "]";
     }
 }

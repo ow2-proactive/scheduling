@@ -56,11 +56,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author The ProActive Team 06/06 (mleyton)
  */
-public class FileTransferEngine implements ProActiveInternalObject, InitActive,
-    RunActive {
+public class FileTransferEngine implements ProActiveInternalObject, InitActive, RunActive {
     //Not Serializable on purpose: This is a service AO that cannot migrate!!
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
-    static public final int DEFAULT_MAX_FILE_TRANSFER_SERVICES = PAProperties.PA_FILETRANSFER_MAX_SERVICES.getValueAsInt();
+    static public final int DEFAULT_MAX_FILE_TRANSFER_SERVICES = PAProperties.PA_FILETRANSFER_MAX_SERVICES
+            .getValueAsInt();
     static FileTransferEngine singletonFTE = getFileTransferEngine();
     Vector<FileTransferService> ftsPool;
     int maxFTS;
@@ -93,19 +93,17 @@ public class FileTransferEngine implements ProActiveInternalObject, InitActive,
                 allowedMethodNames += "getFTS|getFTS";
             }
 
-            service.blockingServeOldest(new RequestFilterOnAllowedMethods(
-                    allowedMethodNames));
+            service.blockingServeOldest(new RequestFilterOnAllowedMethods(allowedMethodNames));
         }
     }
 
-    public FileTransferService getFTS()
-        throws ActiveObjectCreationException, NodeException {
+    public FileTransferService getFTS() throws ActiveObjectCreationException, NodeException {
         if (!ftsPool.isEmpty()) {
             return ftsPool.remove(0);
         }
 
-        FileTransferService localFTS = (FileTransferService) PAActiveObject.newActive(FileTransferService.class.getName(),
-                null);
+        FileTransferService localFTS = (FileTransferService) PAActiveObject.newActive(
+                FileTransferService.class.getName(), null);
         --maxFTS;
 
         return localFTS;
@@ -118,8 +116,8 @@ public class FileTransferEngine implements ProActiveInternalObject, InitActive,
     static synchronized public FileTransferEngine getFileTransferEngine() {
         if (singletonFTE == null) {
             try {
-                singletonFTE = (FileTransferEngine) PAActiveObject.newActive(FileTransferEngine.class.getName(),
-                        new Object[] { DEFAULT_MAX_FILE_TRANSFER_SERVICES });
+                singletonFTE = (FileTransferEngine) PAActiveObject.newActive(FileTransferEngine.class
+                        .getName(), new Object[] { DEFAULT_MAX_FILE_TRANSFER_SERVICES });
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -127,8 +125,7 @@ public class FileTransferEngine implements ProActiveInternalObject, InitActive,
         return singletonFTE;
     }
 
-    public synchronized static FileTransferEngine getFileTransferEngine(
-        Node node) {
+    public synchronized static FileTransferEngine getFileTransferEngine(Node node) {
         ProActiveRuntime runtime = node.getProActiveRuntime();
 
         FileTransferEngine fte = runtime.getFileTransferEngine();
@@ -137,12 +134,10 @@ public class FileTransferEngine implements ProActiveInternalObject, InitActive,
     }
 
     public static boolean nodeEquals(Node a, Node b) {
-        return a.getNodeInformation().getName()
-                .equals(b.getNodeInformation().getName());
+        return a.getNodeInformation().getName().equals(b.getNodeInformation().getName());
     }
 
-    protected class RequestFilterOnAllowedMethods implements RequestFilter,
-        java.io.Serializable {
+    protected class RequestFilterOnAllowedMethods implements RequestFilter, java.io.Serializable {
         private String allowedMethodNames;
 
         public RequestFilterOnAllowedMethods(String allowedMethodNames) {

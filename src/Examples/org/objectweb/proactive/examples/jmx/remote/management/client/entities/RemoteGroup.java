@@ -53,8 +53,8 @@ import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
  * @author Virginie Legrand
  *
  */
-public class RemoteGroup extends ManageableEntity implements Serializable,
-    EntitiesEventListener, Transactionnable {
+public class RemoteGroup extends ManageableEntity implements Serializable, EntitiesEventListener,
+        Transactionnable {
 
     /**
      *
@@ -73,8 +73,7 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
         this(name, null);
     }
 
-    public RemoteGroup(String name, RemoteGroup parent)
-        throws GroupAlreadyExistsException {
+    public RemoteGroup(String name, RemoteGroup parent) throws GroupAlreadyExistsException {
         this.name = name;
         this.parent = parent;
         if ((parent != null) && this.parent.hasGroup(name)) {
@@ -105,15 +104,12 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
             } else if (entity instanceof RemoteGateway) {
                 gateways.addElement((RemoteGateway) entity);
                 this.totalGateways++;
-                EntitiesEventManager.getInstance()
-                                    .newEvent(this,
-                    EntitiesEventManager.GATEWAY_ADDED_IN_A_GROUP);
+                EntitiesEventManager.getInstance().newEvent(this,
+                        EntitiesEventManager.GATEWAY_ADDED_IN_A_GROUP);
             }
             addName(entity.getName());
             EntitiesEventManager.getInstance().subscribe(this, entity);
-            EntitiesEventManager.getInstance()
-                                .newEvent(this,
-                EntitiesEventManager.ENTITY_ADDED);
+            EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.ENTITY_ADDED);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,8 +137,7 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
 
         this.parent.remove(this);
         this.parent.removeEntity(this);
-        EntitiesEventManager.getInstance()
-                            .newEvent(this, EntitiesEventManager.GROUP_REMOVED);
+        EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.GROUP_REMOVED);
     }
 
     @Override
@@ -175,8 +170,7 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
 
     @Override
     public String toString() {
-        return this.name + "[  " + this.nbConnected + " / " +
-        this.totalGateways + " ] ";
+        return this.name + "[  " + this.nbConnected + " / " + this.totalGateways + " ] ";
     }
 
     @Override
@@ -191,8 +185,7 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
         this.parent.changeName(this, name);
         this.name = name;
 
-        EntitiesEventManager.getInstance()
-                            .newEvent(this, EntitiesEventManager.GROUP_UPDATED);
+        EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.GROUP_UPDATED);
     }
 
     public ManageableEntity getEntities() {
@@ -260,11 +253,9 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
     public void handleEntityEvent(Object source, String message) {
         if (message.equals(EntitiesEventManager.GATEWAY_CONNECTED)) {
             this.nbConnected++;
-            EntitiesEventManager.getInstance()
-                                .newEvent(this,
-                EntitiesEventManager.GATEWAYS_IN_GROUP_CONNECTED);
-        } else if (message.equals(
-                    EntitiesEventManager.GATEWAYS_IN_GROUP_CONNECTED)) {
+            EntitiesEventManager.getInstance().newEvent(this,
+                    EntitiesEventManager.GATEWAYS_IN_GROUP_CONNECTED);
+        } else if (message.equals(EntitiesEventManager.GATEWAYS_IN_GROUP_CONNECTED)) {
             updateConnectedGateways(((RemoteGroup) source).getNbConnected());
         } else if (message.equals(EntitiesEventManager.GATEWAY_ADDED_IN_A_GROUP)) {
             updateTotalGateways(((RemoteGroup) source).getTotalGateways());
@@ -281,16 +272,12 @@ public class RemoteGroup extends ManageableEntity implements Serializable,
 
     private void updateTotalGateways(int toAdd) {
         this.totalGateways += toAdd;
-        EntitiesEventManager.getInstance()
-                            .newEvent(this,
-            EntitiesEventManager.GATEWAY_ADDED_IN_A_GROUP);
+        EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.GATEWAY_ADDED_IN_A_GROUP);
     }
 
     private void updateConnectedGateways(int toAdd) {
         this.nbConnected += toAdd;
-        EntitiesEventManager.getInstance()
-                            .newEvent(this,
-            EntitiesEventManager.GATEWAYS_IN_GROUP_CONNECTED);
+        EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.GATEWAYS_IN_GROUP_CONNECTED);
     }
 
     public boolean noneConnected() {

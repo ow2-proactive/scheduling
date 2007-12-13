@@ -37,14 +37,10 @@ import java.util.Date;
 
 public class TimeIntervalManager {
     public static final int MINIMAL_TIMESTAMP_VALUE_IN_MICROSECONDS = 50000;
-    private static final Format MILLISECONDS_FORMATTER = new SimpleDateFormat(
-            "SSS");
-    private static final Format SECONDS_FORMATTER = new SimpleDateFormat(
-            "ss.SSS");
-    private static final Format MINUTES_FORMATTER = new SimpleDateFormat(
-            "mm.ss.SSS");
-    private static final Format HOURS_FORMATTER = new SimpleDateFormat(
-            "HH.mm.ss.SSS");
+    private static final Format MILLISECONDS_FORMATTER = new SimpleDateFormat("SSS");
+    private static final Format SECONDS_FORMATTER = new SimpleDateFormat("ss.SSS");
+    private static final Format MINUTES_FORMATTER = new SimpleDateFormat("mm.ss.SSS");
+    private static final Format HOURS_FORMATTER = new SimpleDateFormat("HH.mm.ss.SSS");
 
     /**
      * The time interval represented in microseconds.
@@ -125,8 +121,7 @@ public class TimeIntervalManager {
      * @param timeInMicros The time in microseconds to convert
      * @return A String representation
      */
-    public static final String convertTimeInMicrosToString(
-        final long timeInMicros) {
+    public static final String convertTimeInMicrosToString(final long timeInMicros) {
         String result = "";
         if ((timeInMicros / 1000) < 1) {
             result = timeInMicros + "\u00b5s";
@@ -135,21 +130,17 @@ public class TimeIntervalManager {
             long micros = timeInMicros % 1000;
             Date date = new Date(timeInMillis);
             if ((timeInMillis / 1000) < 1) {
-                result = MILLISECONDS_FORMATTER.format(date) + "." + micros +
-                    "ms"; // use milliseconds
+                result = MILLISECONDS_FORMATTER.format(date) + "." + micros + "ms"; // use milliseconds
             } else {
                 double timeInSeconds = timeInMillis / 1000; // Check if minutes is not ok
                 if ((timeInSeconds / 60) < 1) {
-                    result = SECONDS_FORMATTER.format(date) + "." + micros +
-                        "s"; // use seconds
+                    result = SECONDS_FORMATTER.format(date) + "." + micros + "s"; // use seconds
                 } else {
                     double timeInMinutes = timeInSeconds / 60; // Check if hours is not ok
                     if ((timeInMinutes / 60) < 1) {
-                        result = MINUTES_FORMATTER.format(date) + "." + micros +
-                            "m"; // use minutes                      
+                        result = MINUTES_FORMATTER.format(date) + "." + micros + "m"; // use minutes                      
                     } else {
-                        result = HOURS_FORMATTER.format(date) + "." + micros +
-                            "h"; // use hours
+                        result = HOURS_FORMATTER.format(date) + "." + micros + "h"; // use hours
                     }
                 }
             }

@@ -80,8 +80,8 @@ public class ClassDataCache {
      */
     public void addClassData(String fullname, byte[] classData) {
         if (logger.isDebugEnabled()) {
-            logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
-                " --> " + ("ClassDataCache caching class " + fullname));
+            logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() + " --> " +
+                ("ClassDataCache caching class " + fullname));
         }
         classStorage.put(fullname, classData);
     }
@@ -92,8 +92,8 @@ public class ClassDataCache {
      */
     public byte[] getClassData(String fullname) {
         if (logger.isDebugEnabled()) {
-            logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
-                " --> " + ("ClassDataCache was asked for class " + fullname));
+            logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() + " --> " +
+                ("ClassDataCache was asked for class " + fullname));
         }
         return classStorage.get(fullname);
     }

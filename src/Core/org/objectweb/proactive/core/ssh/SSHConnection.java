@@ -54,8 +54,7 @@ public class SSHConnection {
     private Collection<LocalPortForwarder> portForwarders = null;
     private Collection<Session> sessions = null;
 
-    public SSHConnection(String username, String hostname, String port)
-        throws IOException {
+    public SSHConnection(String username, String hostname, String port) throws IOException {
         this(username, hostname, Integer.parseInt(port));
     }
 
@@ -74,12 +73,10 @@ public class SSHConnection {
      * @see SSHKeys
      * @see SshParameters
      */
-    public SSHConnection(String username, String hostname, int port)
-        throws IOException {
+    public SSHConnection(String username, String hostname, int port) throws IOException {
         if (logger.isDebugEnabled()) {
-            logger.debug("Create SSH Connection from" +
-                ProActiveInet.getInstance().getInetAddress() + " to " +
-                hostname + ":" + port);
+            logger.debug("Create SSH Connection from" + ProActiveInet.getInstance().getInetAddress() +
+                " to " + hostname + ":" + port);
         }
         connection = new Connection(hostname, port);
         connection.connect();
@@ -102,8 +99,7 @@ public class SSHConnection {
 
         // Connection cannot be opened
         if (logger.isInfoEnabled()) {
-            logger.info("Authentication failed for " + username + "@" +
-                hostname + ":" + port);
+            logger.info("Authentication failed for " + username + "@" + hostname + ":" + port);
             logger.info("Keys were:");
             for (String key : keys) {
                 logger.info("\t" + key);
@@ -197,10 +193,9 @@ public class SSHConnection {
      * is thrown
      * @see {@link LocalPortForwarder}
      */
-    public LocalPortForwarder createTunnel(int localPort, String distantHost,
-        int distantPort) throws IOException {
-        LocalPortForwarder lpf = connection.createLocalPortForwarder(localPort,
-                distantHost, distantPort);
+    public LocalPortForwarder createTunnel(int localPort, String distantHost, int distantPort)
+            throws IOException {
+        LocalPortForwarder lpf = connection.createLocalPortForwarder(localPort, distantHost, distantPort);
         portForwarders.add(lpf);
         return lpf;
     }

@@ -30,7 +30,6 @@
  */
 package functionalTests.stub.stubgeneration;
 
-
 /**
  * @author cdalmass
  *

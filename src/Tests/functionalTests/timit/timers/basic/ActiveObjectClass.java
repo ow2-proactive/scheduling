@@ -55,8 +55,7 @@ public class ActiveObjectClass implements java.io.Serializable {
         this.name = name;
     }
 
-    public ActiveObjectClass(ActiveObjectClass remoteReference,
-        ActiveObjectClass localReference, String name) {
+    public ActiveObjectClass(ActiveObjectClass remoteReference, ActiveObjectClass localReference, String name) {
         this.remoteReference = remoteReference;
         this.localReference = localReference;
         this.name = name;
@@ -75,8 +74,8 @@ public class ActiveObjectClass implements java.io.Serializable {
      * @return null if test passed
      */
     public String checkIfTotalIsStarted() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject.getBodyOnThis()
-                                                                                                      .getID());
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject
+                .getBodyOnThis().getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -96,8 +95,8 @@ public class ActiveObjectClass implements java.io.Serializable {
      * @return null if test passed
      */
     public String checkIfWfrIsStopped() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject.getBodyOnThis()
-                                                                                                      .getID());
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject
+                .getBodyOnThis().getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -120,8 +119,8 @@ public class ActiveObjectClass implements java.io.Serializable {
      * @return null if test passed
      */
     public String checkIfServeIsStarted() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject.getBodyOnThis()
-                                                                                                      .getID());
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject
+                .getBodyOnThis().getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -142,8 +141,8 @@ public class ActiveObjectClass implements java.io.Serializable {
      * @return null if test passed
      */
     public String performSyncCallOnRemote() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject.getBodyOnThis()
-                                                                                                      .getID());
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject
+                .getBodyOnThis().getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -164,8 +163,7 @@ public class ActiveObjectClass implements java.io.Serializable {
         ///////////////////////////////////////////////////
         long realSendRequestStartTime = System.nanoTime();
         this.remoteReference.syncCall();
-        long realSendRequestTime = (System.nanoTime() -
-            realSendRequestStartTime);
+        long realSendRequestTime = (System.nanoTime() - realSendRequestStartTime);
 
         ///////////////////////////////////////////////////
         // Verify that each timer was stopped
@@ -189,28 +187,25 @@ public class ActiveObjectClass implements java.io.Serializable {
         long timedAfterSerTime = afterSerTimer.getTotalTime();
 
         // Check for the SendRequest timer correctness    	
-        if ((timedSendRequestTime <= 0) ||
-                (timedSendRequestTime > realSendRequestTime)) {
+        if ((timedSendRequestTime <= 0) || (timedSendRequestTime > realSendRequestTime)) {
             return "Problem with the SendRequest timer, its value is incorrect.";
         }
 
         // Check for the BeforeSer timer correctness
-        if ((timedBeforeSerTime <= 0) ||
-                (timedBeforeSerTime > realSendRequestTime) ||
-                (timedBeforeSerTime > timedSendRequestTime)) {
+        if ((timedBeforeSerTime <= 0) || (timedBeforeSerTime > realSendRequestTime) ||
+            (timedBeforeSerTime > timedSendRequestTime)) {
             return "Problem with the BeforeSerialization timer, its value is incorrect.";
         }
 
         // Check for the Serialization timer correctness    	
         if ((timedSerTime <= 0) || (timedSerTime > realSendRequestTime) ||
-                (timedSerTime > timedSendRequestTime)) {
+            (timedSerTime > timedSendRequestTime)) {
             return "Problem with the Serialiaztion timer, its value is incorrect.";
         }
 
         // Check for the AfterSer timer correctness
-        if ((timedAfterSerTime <= 0) ||
-                (timedAfterSerTime > realSendRequestTime) ||
-                (timedAfterSerTime > timedSendRequestTime)) {
+        if ((timedAfterSerTime <= 0) || (timedAfterSerTime > realSendRequestTime) ||
+            (timedAfterSerTime > timedSendRequestTime)) {
             return "Problem with the AfterSerialization timer, its value is incorrect.";
         }
 
@@ -224,8 +219,8 @@ public class ActiveObjectClass implements java.io.Serializable {
      * @return null if test passed
      */
     public String performSyncCallOnLocal() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject.getBodyOnThis()
-                                                                                                      .getID());
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject
+                .getBodyOnThis().getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -242,8 +237,7 @@ public class ActiveObjectClass implements java.io.Serializable {
         ///////////////////////////////////////////////////
         long realSendRequestStartTime = System.nanoTime();
         this.localReference.syncCall();
-        long realSendRequestTime = (System.nanoTime() -
-            realSendRequestStartTime);
+        long realSendRequestTime = (System.nanoTime() - realSendRequestStartTime);
 
         ///////////////////////////////////////////////////
         // Verify that each timer was stopped
@@ -259,15 +253,13 @@ public class ActiveObjectClass implements java.io.Serializable {
         long timedLocalCopyTime = localCopyTimer.getTotalTime();
 
         // Check the SendRequest timer correctness 
-        if ((timedSendRequestTime <= 0) ||
-                (timedSendRequestTime > realSendRequestTime)) {
+        if ((timedSendRequestTime <= 0) || (timedSendRequestTime > realSendRequestTime)) {
             return "Problem with the SendRequest timer, its value is incorrect.";
         }
 
         // Check the LocalCopy timer correctness
-        if ((timedLocalCopyTime <= 0) ||
-                (timedLocalCopyTime > realSendRequestTime) ||
-                (timedLocalCopyTime > timedSendRequestTime)) {
+        if ((timedLocalCopyTime <= 0) || (timedLocalCopyTime > realSendRequestTime) ||
+            (timedLocalCopyTime > timedSendRequestTime)) {
             return "Problem with the LocalCopy timer, its value is incorrect.";
         }
 
@@ -289,8 +281,8 @@ public class ActiveObjectClass implements java.io.Serializable {
      * @return null if test passed
      */
     public String performAsyncCallWithWbnOnLocal() {
-        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject.getBodyOnThis()
-                                                                                                      .getID());
+        CoreTimersContainer c = (CoreTimersContainer) TimerWarehouse.getTimerProvidable(PAActiveObject
+                .getBodyOnThis().getID());
 
         // Check if the timer container is null
         if (c == null) {
@@ -308,8 +300,7 @@ public class ActiveObjectClass implements java.io.Serializable {
         ///////////////////////////////////////////////////
         long realSendRequestStartTime = System.nanoTime();
         IntWrapper wrapper = this.localReference.asyncCall();
-        long realSendRequestTime = (System.nanoTime() -
-            realSendRequestStartTime);
+        long realSendRequestTime = (System.nanoTime() - realSendRequestStartTime);
 
         // This call is blocking until the futur becomes available
         // we need to measure the wbn time that will be approx equal customWaitTimeInMillis
@@ -331,8 +322,7 @@ public class ActiveObjectClass implements java.io.Serializable {
         long timedWbnTime = wbnTimer.getTotalTime();
 
         // Check the SendRequest timer correctness 
-        if ((timedSendRequestTime <= 0) ||
-                (timedSendRequestTime > realSendRequestTime)) {
+        if ((timedSendRequestTime <= 0) || (timedSendRequestTime > realSendRequestTime)) {
             return "Problem with the SendRequest timer, its value is incorrect.";
         }
 

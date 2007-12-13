@@ -50,8 +50,7 @@ public class SetDepthAction extends Action {
         this.setId(SET_DEPTH);
         this.setText("Set Depth Control...");
         setToolTipText("Set Depth Control");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "depth.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "depth.gif"));
     }
 
     @Override

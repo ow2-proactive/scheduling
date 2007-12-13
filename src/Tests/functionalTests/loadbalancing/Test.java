@@ -42,12 +42,13 @@ import org.objectweb.proactive.loadbalancing.metrics.currenttimemillis.CurrentTi
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test load balancing
  */
 public class Test extends FunctionalTest {
-    private String XML_LOCATION = Test.class.getResource(
-            "/functionalTests/loadbalancing/LoadBalancing.xml").getPath();
+    private String XML_LOCATION = Test.class.getResource("/functionalTests/loadbalancing/LoadBalancing.xml")
+            .getPath();
     private ProActiveDescriptor pad;
     private VirtualNode vn1;
     A a;
@@ -70,7 +71,6 @@ public class Test extends FunctionalTest {
         this.nodeOne = this.vn1.getNode();
         this.nodeTwo = this.vn1.getNode();
 
-        LoadBalancing.activateOn(new Node[] { nodeOne, nodeTwo },
-            new CurrentTimeMillisMetricFactory());
+        LoadBalancing.activateOn(new Node[] { nodeOne, nodeTwo }, new CurrentTimeMillisMetricFactory());
     }
 }

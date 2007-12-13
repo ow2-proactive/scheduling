@@ -100,8 +100,7 @@ public class DatabaseManager {
      * @return a connection to the database
      */
     public Connection connect(boolean create) throws SQLException {
-        String url = protocol + databasePath + databaseName +
-            ((create) ? ";create=true" : ";");
+        String url = protocol + databasePath + databaseName + ((create) ? ";create=true" : ";");
 
         System.out.println("[SCHEDULER-DATABASE] url=" + url);
 

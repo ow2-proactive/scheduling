@@ -34,38 +34,38 @@ import java.util.Hashtable;
 
 
 /** A class to compare vectors of objects.  The result of comparison
-    is a list of <code>change</code> objects which form an
-    edit script.  The objects compared are traditionally lines
-    of text from two files.  Comparison options such as "ignore
-    whitespace" are implemented by modifying the <code>equals</code>
-    and <code>hashcode</code> methods for the objects compared.
-<p>
-   The basic algorithm is described in: </br>
-   "An O(ND) Difference Algorithm and its Variations", Eugene Myers,
-   Algorithmica Vol. 1 No. 2, 1986, p 251.
-<p>
-   This class outputs different results from GNU diff 1.15 on some
-   inputs.  Our results are actually better (smaller change list, smaller
-   total size of changes), but it would be nice to know why.  Perhaps
-   there is a memory overwrite bug in GNU diff 1.15.
+ is a list of <code>change</code> objects which form an
+ edit script.  The objects compared are traditionally lines
+ of text from two files.  Comparison options such as "ignore
+ whitespace" are implemented by modifying the <code>equals</code>
+ and <code>hashcode</code> methods for the objects compared.
+ <p>
+ The basic algorithm is described in: </br>
+ "An O(ND) Difference Algorithm and its Variations", Eugene Myers,
+ Algorithmica Vol. 1 No. 2, 1986, p 251.
+ <p>
+ This class outputs different results from GNU diff 1.15 on some
+ inputs.  Our results are actually better (smaller change list, smaller
+ total size of changes), but it would be nice to know why.  Perhaps
+ there is a memory overwrite bug in GNU diff 1.15.
 
-  @author Stuart D. Gathman, translated from GNU diff 1.15
-    Copyright (C) 2000  Business Management Systems, Inc.
-<p>
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 1, or (at your option)
-    any later version.
-<p>
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-<p>
-    You should have received a copy of the <a href=COPYING.txt>
-    GNU General Public License</a>
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ @author Stuart D. Gathman, translated from GNU diff 1.15
+ Copyright (C) 2000  Business Management Systems, Inc.
+ <p>
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 1, or (at your option)
+ any later version.
+ <p>
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ <p>
+ You should have received a copy of the <a href=COPYING.txt>
+ GNU General Public License</a>
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
  */
 public class Diff {
@@ -97,16 +97,16 @@ public class Diff {
     public boolean no_discards = false;
     private int[] xvec; /* Vectors being compared. */
     private int[] yvec; /* Vectors being compared. */
-/* Vector, indexed by diagonal, containing
-    the X coordinate of the point furthest
-    along the given diagonal in the forward
-    search of the edit matrix. */
-    private int[] fdiag; 
-/* Vector, indexed by diagonal, containing
-    the X coordinate of the point furthest
-    along the given diagonal in the backward
-    search of the edit matrix. */
-    private int[] bdiag;     
+    /* Vector, indexed by diagonal, containing
+     the X coordinate of the point furthest
+     along the given diagonal in the forward
+     search of the edit matrix. */
+    private int[] fdiag;
+    /* Vector, indexed by diagonal, containing
+     the X coordinate of the point furthest
+     along the given diagonal in the backward
+     search of the edit matrix. */
+    private int[] bdiag;
     private int fdiagoff;
     private int bdiagoff;
     private final file_data[] filevec = new file_data[2];
@@ -147,12 +147,12 @@ public class Diff {
         int fmin = fmid; // Limits of top-down search.
         int fmax = fmid; // Limits of top-down search.
         int bmin = bmid; // Limits of bottom-up search.
-                         /* True if southeast corner is on an odd
-                        diagonal with respect to the northwest. */
+        /* True if southeast corner is on an odd
+        diagonal with respect to the northwest. */
 
         int bmax = bmid; // Limits of bottom-up search.
-                         /* True if southeast corner is on an odd
-                        diagonal with respect to the northwest. */
+        /* True if southeast corner is on an odd
+        diagonal with respect to the northwest. */
 
         final boolean odd = ((fmid - bmid) & 1) != 0;
 
@@ -196,8 +196,7 @@ public class Diff {
                     big_snake = true;
                 }
                 fd[fdiagoff + d] = x;
-                if (odd && (bmin <= d) && (d <= bmax) &&
-                        (bd[bdiagoff + d] <= fd[fdiagoff + d])) {
+                if (odd && (bmin <= d) && (d <= bmax) && (bd[bdiagoff + d] <= fd[fdiagoff + d])) {
                     cost = (2 * c) - 1;
                     return d;
                 }
@@ -236,8 +235,7 @@ public class Diff {
                     big_snake = true;
                 }
                 bd[bdiagoff + d] = x;
-                if (!odd && (fmin <= d) && (d <= fmax) &&
-                        (bd[bdiagoff + d] <= fd[fdiagoff + d])) {
+                if (!odd && (fmin <= d) && (d <= fmax) && (bd[bdiagoff + d] <= fd[fdiagoff + d])) {
                     cost = 2 * c;
                     return d;
                 }
@@ -256,11 +254,9 @@ public class Diff {
 
                 for (d = fmax; d >= fmin; d -= 2) {
                     int dd = d - fmid;
-                    if ((((fd[fdiagoff + d] - xoff) * 2) - dd) > (12 * (c +
-                            ((dd > 0) ? dd : (-dd))))) {
-                        if ((((fd[fdiagoff + d] * 2) - dd) > best) &&
-                                ((fd[fdiagoff + d] - xoff) > 20) &&
-                                ((fd[fdiagoff + d] - d - yoff) > 20)) {
+                    if ((((fd[fdiagoff + d] - xoff) * 2) - dd) > (12 * (c + ((dd > 0) ? dd : (-dd))))) {
+                        if ((((fd[fdiagoff + d] * 2) - dd) > best) && ((fd[fdiagoff + d] - xoff) > 20) &&
+                            ((fd[fdiagoff + d] - d - yoff) > 20)) {
                             int k;
                             int x = fd[fdiagoff + d];
 
@@ -286,11 +282,9 @@ public class Diff {
                 best = 0;
                 for (d = bmax; d >= bmin; d -= 2) {
                     int dd = d - bmid;
-                    if ((((xlim - bd[bdiagoff + d]) * 2) + dd) > (12 * (c +
-                            ((dd > 0) ? dd : (-dd))))) {
+                    if ((((xlim - bd[bdiagoff + d]) * 2) + dd) > (12 * (c + ((dd > 0) ? dd : (-dd))))) {
                         if (((((xlim - bd[bdiagoff + d]) * 2) + dd) > best) &&
-                                ((xlim - bd[bdiagoff + d]) > 20) &&
-                                ((ylim - (bd[bdiagoff + d] - d)) > 20)) {
+                            ((xlim - bd[bdiagoff + d]) > 20) && ((ylim - (bd[bdiagoff + d] - d)) > 20)) {
 
                             /* We have a good enough best diagonal;
                                now insist that it end with a significant snake.  */
@@ -352,7 +346,7 @@ public class Diff {
             /* Find a point of correspondence in the middle of the files.  */
             int d = diag(xoff, xlim, yoff, ylim);
             int c = cost;
-//            int f = fdiag[fdiagoff + d];
+            //            int f = fdiag[fdiagoff + d];
             int b = bdiag[bdiagoff + d];
 
             if (c == 1) {
@@ -404,15 +398,13 @@ public class Diff {
          @param len1 number of lines in 2nd file
          @return a linked list of changes - or null
          */
-        public change build_script(boolean[] changed0, int len0, boolean[] changed1,
-            int len1);
+        public change build_script(boolean[] changed0, int len0, boolean[] changed1, int len1);
     }
 
     /** Scan the tables of which lines are inserted and deleted,
        producing an edit script in reverse order.  */
     static class ReverseScript implements ScriptBuilder {
-        public change build_script(final boolean[] changed0, int len0,
-            final boolean[] changed1, int len1) {
+        public change build_script(final boolean[] changed0, int len0, final boolean[] changed1, int len1) {
             change script = null;
             int i0 = 0;
             int i1 = 0;
@@ -444,8 +436,7 @@ public class Diff {
 
         /** Scan the tables of which lines are inserted and deleted,
            producing an edit script in forward order.  */
-        public change build_script(final boolean[] changed0, int len0,
-            final boolean[] changed1, int len1) {
+        public change build_script(final boolean[] changed0, int len0, final boolean[] changed1, int len1) {
             change script = null;
             int i0 = len0;
             int i1 = len1;
@@ -521,8 +512,8 @@ public class Diff {
 
         /* Get the results of comparison in the form of a chain
            of `struct change's -- an edit script.  */
-        return bld.build_script(filevec[0].changed_flag, filevec[0].buffered_lines,
-            filevec[1].changed_flag, filevec[1].buffered_lines);
+        return bld.build_script(filevec[0].changed_flag, filevec[0].buffered_lines, filevec[1].changed_flag,
+                filevec[1].buffered_lines);
     }
 
     /** The result of comparison is an "edit script": a chain of change objects.
@@ -816,7 +807,7 @@ public class Diff {
            to be the "change".  The only exception is if the preceding blank line
            would join this change to other changes.
           @param f the file being compared against
-        */
+         */
         void shift_boundaries(file_data f) {
             final boolean[] changed = changed_flag;
             final boolean[] other_changed = f.changed_flag;
@@ -863,10 +854,11 @@ public class Diff {
 
                     /* You might ask, how could this run follow right after another?
                        Only because the previous run was shifted here.  */
-                    if ((end != i_end) && (equivs[start] == equivs[end]) &&
-                            !other_changed[1 + j] && (end != i_end) &&
-                            !(((preceding >= 0) && (start == preceding)) ||
-                            ((other_preceding >= 0) && (other_start == other_preceding)))) {
+                    if ((end != i_end) &&
+                        (equivs[start] == equivs[end]) &&
+                        !other_changed[1 + j] &&
+                        (end != i_end) &&
+                        !(((preceding >= 0) && (start == preceding)) || ((other_preceding >= 0) && (other_start == other_preceding)))) {
                         changed[1 + end++] = true;
                         changed[1 + start++] = false;
                         ++i;

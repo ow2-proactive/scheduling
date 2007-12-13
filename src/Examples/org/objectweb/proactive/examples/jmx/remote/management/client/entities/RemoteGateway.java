@@ -54,8 +54,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.utils.Constants;
  * @author Virginie Legrand
  *
  */
-public class RemoteGateway extends ManageableEntity implements Serializable,
-    RemoteEntity, Transactionnable {
+public class RemoteGateway extends ManageableEntity implements Serializable, RemoteEntity, Transactionnable {
     private ObjectName on;
     private long currentTransactionId;
     private String url;
@@ -81,8 +80,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
         try {
             this.parent = parent;
             this.url = url;
-            this.port = Integer.parseInt(this.url.substring(this.url.lastIndexOf(
-                            ':') + 1));
+            this.port = Integer.parseInt(this.url.substring(this.url.lastIndexOf(':') + 1));
             this.parent.addEntity(this);
 
             this.fwConnection = new FrameworkConnection(this.url);
@@ -112,9 +110,9 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
     }
 
     public Status installBundle(String location) throws IOException {
-        GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(this.on,
-                "installBundle", new Object[] { this.idTransaction, location },
-                new String[] { Long.TYPE.getName(), "java.lang.String" });
+        GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(this.on, "installBundle",
+                new Object[] { this.idTransaction, location }, new String[] { Long.TYPE.getName(),
+                        "java.lang.String" });
         if (ow.getObject().containsErrors()) {
             throw new IOException(ow.getObject().getMessage());
         }
@@ -128,8 +126,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
         this.bundles.add(remoteBundle);
         this.namesBundles.put(remoteBundle.getName(), remoteBundle);
 
-        EntitiesEventManager.getInstance()
-                            .newEvent(this, EntitiesEventManager.ENTITY_ADDED);
+        EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.ENTITY_ADDED);
     }
 
     @Override
@@ -138,9 +135,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
             this.fwConnection.connect();
             this.connection = this.fwConnection.getConnection();
             this.connected = true;
-            EntitiesEventManager.getInstance()
-                                .newEvent(this,
-                EntitiesEventManager.GATEWAY_CONNECTED);
+            EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.GATEWAY_CONNECTED);
             refresh();
         }
     }
@@ -148,8 +143,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
     @Override
     public void refresh() {
         try {
-            GatewayRefresher refresher = new GatewayRefresher(this,
-                    this.fwConnection);
+            GatewayRefresher refresher = new GatewayRefresher(this, this.fwConnection);
             refresher.launch();
         } catch (NullPointerException e) {
             e.printStackTrace();
@@ -167,9 +161,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
             this.bundles.clear();
             this.namesBundles.clear();
             this.parent.removeEntity(this);
-            EntitiesEventManager.getInstance()
-                                .newEvent(this,
-                EntitiesEventManager.GATEWAY_REMOVED);
+            EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.GATEWAY_REMOVED);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -209,10 +201,9 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
     @Override
     public Status cancelTransaction() {
         try {
-            ObjectName tmName = new ObjectName("Transactions:id=" +
-                    this.idTransaction);
-            GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName,
-                    "rollback", new Object[] {  }, new String[] {  });
+            ObjectName tmName = new ObjectName("Transactions:id=" + this.idTransaction);
+            GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName, "rollback",
+                    new Object[] {}, new String[] {});
             return ow.getObject();
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
@@ -228,10 +219,9 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
     @Override
     public Status commitTransaction() {
         try {
-            ObjectName tmName = new ObjectName("Transactions:id=" +
-                    this.idTransaction);
-            GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName,
-                    "commit", new Object[] {  }, new String[] {  });
+            ObjectName tmName = new ObjectName("Transactions:id=" + this.idTransaction);
+            GenericTypeWrapper<Status> ow = (this.connection).invokeAsynchronous(tmName, "commit",
+                    new Object[] {}, new String[] {});
             return ow.getObject();
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
@@ -249,12 +239,11 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
         ObjectName tmName;
         try {
             tmName = new ObjectName(Constants.ON_TRANSACTION_MANAGER);
-            GenericTypeWrapper<Long> ow = (this.connection).invokeAsynchronous(tmName,
-                    "openTransaction", new Object[] {  }, new String[] {  });
+            GenericTypeWrapper<Long> ow = (this.connection).invokeAsynchronous(tmName, "openTransaction",
+                    new Object[] {}, new String[] {});
 
             this.idTransaction = ow.getObject().longValue();
-            this.transaction = new RemoteTransaction(idTransaction, this.url,
-                    this);
+            this.transaction = new RemoteTransaction(idTransaction, this.url, this);
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
         } catch (NullPointerException e) {
@@ -283,8 +272,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
     public void setUrl(String url) {
         this.url = url; // + '(' + this.port + ')' ;
 
-        String path = Constants.OSGI_JMX_PATH + Constants.ON_GATEWAYS +
-            this.url;
+        String path = Constants.OSGI_JMX_PATH + Constants.ON_GATEWAYS + this.url;
         try {
             this.on = new ObjectName(path);
         } catch (MalformedObjectNameException e) {
@@ -307,9 +295,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
                 remoteBundle.setBundleInfo(info);
             }
 
-            EntitiesEventManager.getInstance()
-                                .newEvent(this,
-                EntitiesEventManager.BUNDLE_UPDATED);
+            EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.BUNDLE_UPDATED);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -322,9 +308,7 @@ public class RemoteGateway extends ManageableEntity implements Serializable,
                 this.namesBundles.remove(rb.getName());
                 break;
             }
-            EntitiesEventManager.getInstance()
-                                .newEvent(this,
-                EntitiesEventManager.ENTITY_REMOVED);
+            EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.ENTITY_REMOVED);
         }
 
         boolean b = this.bundles.remove(info);

@@ -95,8 +95,7 @@ public class Worker implements Serializable {
             if (this.workerNodeUrl == null) {
                 this.workerNodeUrl = PAActiveObject.getBodyOnThis().getNodeURL();
             }
-            activedTask = (Task) PAActiveObject.turnActive(PAFuture.getFutureValue(
-                        task), workerNodeUrl);
+            activedTask = (Task) PAActiveObject.turnActive(PAFuture.getFutureValue(task), workerNodeUrl);
             activedTask.setWorker((Worker) PAActiveObject.getStubOnThis());
             this.currentTask = activedTask;
             this.currentTask.setImmediateServices();
@@ -144,8 +143,7 @@ public class Worker implements Serializable {
      * @param newBest a new best result.
      */
     public void setBestCurrentResult(Result newBest) {
-        if ((this.bestCurrentResult == null) ||
-                newBest.isBetterThan(this.bestCurrentResult)) {
+        if ((this.bestCurrentResult == null) || newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
             if (this.selfWorkerGroup != null) {
                 this.selfWorkerGroup.informNewBestResult(this.bestCurrentResult);
@@ -154,8 +152,7 @@ public class Worker implements Serializable {
             if (this.currentTask != null) {
                 this.currentTask.setBestKnownSolution(this.bestCurrentResult.getSolution());
             }
-            logger.debug("A new best result was localy found: " +
-                this.bestCurrentResult);
+            logger.debug("A new best result was localy found: " + this.bestCurrentResult);
         }
         logger.debug("The new best result is NOT BETTER");
     }
@@ -176,15 +173,13 @@ public class Worker implements Serializable {
      * @param newBest the best new solution.
      */
     public void informNewBestResult(Result newBest) {
-        if ((this.bestCurrentResult == null) ||
-                newBest.isBetterThan(this.bestCurrentResult)) {
+        if ((this.bestCurrentResult == null) || newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
             if (this.currentTask != null) {
                 this.currentTask.setBestKnownSolution(this.bestCurrentResult.getSolution());
             }
             if (logger.isInfoEnabled()) {
-                logger.info("I was informed from a new remote best result: " +
-                    this.bestCurrentResult);
+                logger.info("I was informed from a new remote best result: " + this.bestCurrentResult);
             }
         }
     }

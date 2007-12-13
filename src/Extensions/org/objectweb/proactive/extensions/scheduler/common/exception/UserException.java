@@ -45,10 +45,10 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class UserException extends Exception {
 
     /**
-    * Attaches a message to the Exception.
-    *
-    * @param msg message attached.
-    */
+     * Attaches a message to the Exception.
+     *
+     * @param msg message attached.
+     */
     public UserException(String msg) {
         super(msg);
     }

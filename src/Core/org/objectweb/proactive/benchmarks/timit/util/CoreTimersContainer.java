@@ -157,9 +157,8 @@ public class CoreTimersContainer implements TimerProvidable {
      * @param otherInformation
      *            Some information to send to the reductor
      */
-    private CoreTimersContainer(final UniqueID uniqueID,
-        final Object reifiedObject, final Object reductor,
-        final String propertyValue, final String otherInformation) {
+    private CoreTimersContainer(final UniqueID uniqueID, final Object reifiedObject, final Object reductor,
+            final String propertyValue, final String otherInformation) {
         this.currentID = uniqueID;
         this.timitReductor = (TimItBasicReductor) reductor;
         this.otherInformation = otherInformation;
@@ -177,12 +176,9 @@ public class CoreTimersContainer implements TimerProvidable {
         this.timersList = new ArrayList<BasicTimer>();
 
         // First create the total, serve and wfr timers  that are not filtered
-        final BasicTimer total = new BasicTimer(CoreTimersContainer.TOTAL_TIMER_NAME,
-                null);
-        final BasicTimer serve = new BasicTimer(CoreTimersContainer.SERVE_TIMER_NAME,
-                total);
-        final BasicTimer wfr = new BasicTimer(CoreTimersContainer.WAIT_FOR_REQUEST_TIMER_NAME,
-                total);
+        final BasicTimer total = new BasicTimer(CoreTimersContainer.TOTAL_TIMER_NAME, null);
+        final BasicTimer serve = new BasicTimer(CoreTimersContainer.SERVE_TIMER_NAME, total);
+        final BasicTimer wfr = new BasicTimer(CoreTimersContainer.WAIT_FOR_REQUEST_TIMER_NAME, total);
         this.timersList.add(total);
         this.timersList.add(serve);
         this.timersList.add(wfr);
@@ -193,16 +189,13 @@ public class CoreTimersContainer implements TimerProvidable {
         final Method[] methods = reifiedObjectClass.getMethods();
         for (final Method m : methods) {
             // Modifier.isPublic(mod) && !Modifier.isStatic(mod) && !Modifier.isFinal(mod)
-            if ((m.getModifiers() == 1) && !"equals".equals(m.getName()) &&
-                    !"hashCode".equals(m.getName()) &&
-                    !"toString".equals(m.getName())) {
-                String timerName = reifiedObjectClassCanonicalName + "." +
-                    m.getName() + "(";
+            if ((m.getModifiers() == 1) && !"equals".equals(m.getName()) && !"hashCode".equals(m.getName()) &&
+                !"toString".equals(m.getName())) {
+                String timerName = reifiedObjectClassCanonicalName + "." + m.getName() + "(";
                 Class<?>[] paramClasses = m.getParameterTypes();
                 int paramLength = paramClasses.length;
                 for (int i = 0; i < paramLength; i++) {
-                    timerName += (paramClasses[i].getSimpleName() +
-                    ((i < (paramLength - 1)) ? ", " : ""));
+                    timerName += (paramClasses[i].getSimpleName() + ((i < (paramLength - 1)) ? ", " : ""));
                 }
                 timerName += ")";
 
@@ -233,18 +226,16 @@ public class CoreTimersContainer implements TimerProvidable {
      *
      * @return An instance of CoreTimersContainer
      */
-    public final static CoreTimersContainer create(final UniqueID uniqueID,
-        final Object reifiedObject, final MetaObjectFactory factory,
-        final String nodeURL) {
+    public final static CoreTimersContainer create(final UniqueID uniqueID, final Object reifiedObject,
+            final MetaObjectFactory factory, final String nodeURL) {
         final String timitActivationPropertyValue = CoreTimersContainer.checkNodeProperty(nodeURL);
 
         // If there is no activated timers no need to create the container
-        if ((timitActivationPropertyValue == null) ||
-                "".equals(timitActivationPropertyValue)) {
+        if ((timitActivationPropertyValue == null) || "".equals(timitActivationPropertyValue)) {
             return null;
         }
-        return new CoreTimersContainer(uniqueID, reifiedObject,
-            factory.getTimItReductor(), timitActivationPropertyValue, "");
+        return new CoreTimersContainer(uniqueID, reifiedObject, factory.getTimItReductor(),
+            timitActivationPropertyValue, "");
     }
 
     /**
@@ -261,10 +252,8 @@ public class CoreTimersContainer implements TimerProvidable {
             final Node currentNode = NodeFactory.getNode(nodeURL);
             result = currentNode.getProperty("timitActivation");
             if ((result != null) && !"".equals(result)) {
-                TimItTechnicalService.setGenerateOutputFile(currentNode.getProperty(
-                        "generateOutputFile"));
-                TimItTechnicalService.setPrintOutput(currentNode.getProperty(
-                        "printOutput"));
+                TimItTechnicalService.setGenerateOutputFile(currentNode.getProperty("generateOutputFile"));
+                TimItTechnicalService.setPrintOutput(currentNode.getProperty("printOutput"));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -356,14 +345,12 @@ public class CoreTimersContainer implements TimerProvidable {
      * @param className The class name of the reified object
      * @param shortUniqueID The short id version of the body
      */
-    public final void sendResults(final String className,
-        final String shortUniqueID) {
+    public final void sendResults(final String className, final String shortUniqueID) {
         // Unregister this from the TimerWarehouse
         TimerWarehouse.timerProvidableStore.remove(this.currentID);
 
         // Update all user computation timers
-        CoreTimersContainer.updateAllUserComputationTimers(this.timersList.toArray(
-                new BasicTimer[] {  }));
+        CoreTimersContainer.updateAllUserComputationTimers(this.timersList.toArray(new BasicTimer[] {}));
 
         // A list of BasicTimer is made
         // During the copy filter all timers with 0 total time        
@@ -378,11 +365,9 @@ public class CoreTimersContainer implements TimerProvidable {
         // directly on the current jvm therefore a the reductor is a simple object
         if (this.timitReductor == null) {
             this.timitReductor = new TimItBasicReductor();
-            this.timitReductor.receiveTimersDirectMode(className,
-                shortUniqueID, result, otherInformation);
+            this.timitReductor.receiveTimersDirectMode(className, shortUniqueID, result, otherInformation);
         } else {
-            this.timitReductor.receiveTimers(className, shortUniqueID, result,
-                otherInformation);
+            this.timitReductor.receiveTimers(className, shortUniqueID, result, otherInformation);
         }
         this.timitReductor = null;
         this.timersList.clear();
@@ -396,15 +381,15 @@ public class CoreTimersContainer implements TimerProvidable {
      * @param timersNames A filter of timers names.
      */
     public final BasicTimer[] getSnapshot() {
-        return this.timersList.toArray(new BasicTimer[] {  });
+        return this.timersList.toArray(new BasicTimer[] {});
     }
 
     /**
      * Returns an instance of a timer from a given id.<p>
      * For example if you want to get the Serve timer :
      * <p><blockquote><pre>
-    *   BasicTimer serveTimer = TimerWarehouse.getTimerProvidable().getTimer(TimerWarehouse.SERVE);
-      * </pre></blockquote><p>
+     *   BasicTimer serveTimer = TimerWarehouse.getTimerProvidable().getTimer(TimerWarehouse.SERVE);
+     * </pre></blockquote><p>
      *
      * @param timerId
      *            The id of the wanted timer
@@ -450,15 +435,13 @@ public class CoreTimersContainer implements TimerProvidable {
      */
     public final void stopAll(final Collection<BasicTimer> timersCollection) {
         for (final BasicTimer current : timersCollection) {
-            BasicTimer startedSonOfCurrent = getStartedSonOf(current,
-                    timersCollection);
+            BasicTimer startedSonOfCurrent = getStartedSonOf(current, timersCollection);
             BasicTimer lastStarted = startedSonOfCurrent;
 
             // Get the leaf for the current timer
             while (startedSonOfCurrent != null) {
                 lastStarted = startedSonOfCurrent;
-                startedSonOfCurrent = getStartedSonOf(startedSonOfCurrent,
-                        timersCollection);
+                startedSonOfCurrent = getStartedSonOf(startedSonOfCurrent, timersCollection);
             }
 
             // If lastStarted is null the current has no started sons
@@ -513,38 +496,32 @@ public class CoreTimersContainer implements TimerProvidable {
      * Warning ! The timers in the timers array must be stopped.
      * @param timersList The array of timers
      */
-    public static final void updateAllUserComputationTimers(
-        BasicTimer[] timersArray) {
+    public static final void updateAllUserComputationTimers(BasicTimer[] timersArray) {
         BasicTimer currentTimer;
         for (int i = 0; i < timersArray.length; i++) {
             currentTimer = timersArray[i];
-            if (currentTimer.getName()
-                                .equals(CoreTimersContainer.USER_COMPUTATION_TIMER_NAME)) {
+            if (currentTimer.getName().equals(CoreTimersContainer.USER_COMPUTATION_TIMER_NAME)) {
                 // Get parent index (ie the index of the method timer)
                 final int methodTimerIndex = i - 1;
                 long sysTotalTime = 0L;
                 // Add send request total time
-                sysTotalTime += timersArray[methodTimerIndex +
-                TimerWarehouse.SEND_REQUEST].getTotalTime();
+                sysTotalTime += timersArray[methodTimerIndex + TimerWarehouse.SEND_REQUEST].getTotalTime();
                 // Add send reply total time
-                sysTotalTime += timersArray[methodTimerIndex +
-                TimerWarehouse.SEND_REPLY].getTotalTime();
+                sysTotalTime += timersArray[methodTimerIndex + TimerWarehouse.SEND_REPLY].getTotalTime();
                 // Add wait by necessity total time
-                sysTotalTime += timersArray[methodTimerIndex +
-                TimerWarehouse.WAIT_BY_NECESSITY].getTotalTime();
+                sysTotalTime += timersArray[methodTimerIndex + TimerWarehouse.WAIT_BY_NECESSITY]
+                        .getTotalTime();
                 // Add group one way call total time
-                sysTotalTime += timersArray[methodTimerIndex +
-                TimerWarehouse.GROUP_ONE_WAY_CALL].getTotalTime();
+                sysTotalTime += timersArray[methodTimerIndex + TimerWarehouse.GROUP_ONE_WAY_CALL]
+                        .getTotalTime();
                 // Add group async call total time
-                sysTotalTime += timersArray[methodTimerIndex +
-                TimerWarehouse.GROUP_ASYNC_CALL].getTotalTime();
+                sysTotalTime += timersArray[methodTimerIndex + TimerWarehouse.GROUP_ASYNC_CALL]
+                        .getTotalTime();
                 // Update current user total time 
                 // Such as userTime = methodTotalTime - sysTime, where sysTime = sum(SendRequest,SendReply,WaitByNecessity,GroupOneWayCall,GroupAsyncCall)
-                currentTimer.setTotal(currentTimer.getParent().getTotalTime() -
-                    sysTotalTime);
+                currentTimer.setTotal(currentTimer.getParent().getTotalTime() - sysTotalTime);
                 // The number of invocations of this timer is equal to its parent invocations
-                currentTimer.setStartStopCoupleCount(currentTimer.getParent()
-                                                                 .getStartStopCoupleCount());
+                currentTimer.setStartStopCoupleCount(currentTimer.getParent().getStartStopCoupleCount());
             }
         }
     }
@@ -559,26 +536,17 @@ public class CoreTimersContainer implements TimerProvidable {
      * activated.
      */
     private final void createMethodTimerChildren(final BasicTimer methodTimer) {
-        this.createOnDemand(CoreTimersContainer.USER_COMPUTATION_TIMER_NAME,
-            methodTimer);
+        this.createOnDemand(CoreTimersContainer.USER_COMPUTATION_TIMER_NAME, methodTimer);
         final BasicTimer sendRequest = this.createOnDemand(CoreTimersContainer.SEND_REQUEST_TIMER_NAME,
                 methodTimer);
-        this.createOnDemand(CoreTimersContainer.SEND_REPLY_TIMER_NAME,
-            methodTimer);
-        this.createOnDemand(CoreTimersContainer.LOCAL_COPY_TIMER_NAME,
-            sendRequest);
-        this.createOnDemand(CoreTimersContainer.BEFORE_SERIALIZATION_TIMER_NAME,
-            sendRequest);
-        this.createOnDemand(CoreTimersContainer.SERIALIZATION_TIMER_NAME,
-            sendRequest);
-        this.createOnDemand(CoreTimersContainer.AFTER_SERIALIZATION_TIMER_NAME,
-            sendRequest);
-        this.createOnDemand(CoreTimersContainer.WAIT_BY_NECESSITY_TIMER_NAME,
-            methodTimer);
-        this.createOnDemand(CoreTimersContainer.GROUP_ONE_WAY_CALL_TIMER_NAME,
-            methodTimer);
-        this.createOnDemand(CoreTimersContainer.GROUP_ASYNC_CALL_TIMER_NAME,
-            methodTimer);
+        this.createOnDemand(CoreTimersContainer.SEND_REPLY_TIMER_NAME, methodTimer);
+        this.createOnDemand(CoreTimersContainer.LOCAL_COPY_TIMER_NAME, sendRequest);
+        this.createOnDemand(CoreTimersContainer.BEFORE_SERIALIZATION_TIMER_NAME, sendRequest);
+        this.createOnDemand(CoreTimersContainer.SERIALIZATION_TIMER_NAME, sendRequest);
+        this.createOnDemand(CoreTimersContainer.AFTER_SERIALIZATION_TIMER_NAME, sendRequest);
+        this.createOnDemand(CoreTimersContainer.WAIT_BY_NECESSITY_TIMER_NAME, methodTimer);
+        this.createOnDemand(CoreTimersContainer.GROUP_ONE_WAY_CALL_TIMER_NAME, methodTimer);
+        this.createOnDemand(CoreTimersContainer.GROUP_ASYNC_CALL_TIMER_NAME, methodTimer);
     }
 
     /**
@@ -589,14 +557,11 @@ public class CoreTimersContainer implements TimerProvidable {
      * @param parent The reference on the parent of the timer
      * @return An isntance of BasicTimer
      */
-    private final BasicTimer createOnDemand(final String timerName,
-        final BasicTimer parent) {
+    private final BasicTimer createOnDemand(final String timerName, final BasicTimer parent) {
         BasicTimer timer = null;
 
         // Check if the current timer must be activated
-        if (activateAll ||
-                ((parent != null) &&
-                (Arrays.binarySearch(askedTimersNames, timerName) >= 0))) {
+        if (activateAll || ((parent != null) && (Arrays.binarySearch(askedTimersNames, timerName) >= 0))) {
             // Create the timer
             timer = new BasicTimer(timerName, parent);
         }
@@ -612,10 +577,9 @@ public class CoreTimersContainer implements TimerProvidable {
      * @return The first started son of t
      */
     private final static BasicTimer getStartedSonOf(final BasicTimer t,
-        final Collection<BasicTimer> timersCollection) {
+            final Collection<BasicTimer> timersCollection) {
         for (final BasicTimer current : timersCollection) {
-            if ((current.getParent() != null) && current.getParent().equals(t) &&
-                    current.isStarted()) {
+            if ((current.getParent() != null) && current.getParent().equals(t) && current.isStarted()) {
                 return current;
             }
         }
@@ -644,8 +608,7 @@ public class CoreTimersContainer implements TimerProvidable {
         // First check if the timerName is already used
         for (final BasicTimer t : this.timersList) {
             if (t.getName().equals(timerName)) {
-                throw new RuntimeException("This timer name is already used : " +
-                    timerName);
+                throw new RuntimeException("This timer name is already used : " + timerName);
             }
         }
 

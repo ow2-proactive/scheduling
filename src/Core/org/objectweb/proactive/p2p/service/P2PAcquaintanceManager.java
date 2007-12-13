@@ -61,8 +61,8 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  * @author Alexandre di Costanzo
  *
  */
-public class P2PAcquaintanceManager implements InitActive, RunActive,
-    Serializable, P2PConstants, ProActiveInternalObject {
+public class P2PAcquaintanceManager implements InitActive, RunActive, Serializable, P2PConstants,
+        ProActiveInternalObject {
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_ACQUAINTANCES);
     private P2PService localService = null;
     private P2PService acquaintances = null;
@@ -98,8 +98,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             this.acquaintances = (P2PService) PAGroup.newGroup(P2PService.class.getName());
             this.groupOfAcquaintances = PAGroup.getGroup(acquaintances);
             this.groupOfAcquaintances.setAutomaticPurge(true);
-            this.acquaintancesActived = (P2PService) PAGroup.turnActiveGroup(acquaintances,
-                    nodeUrl);
+            this.acquaintancesActived = (P2PService) PAGroup.turnActiveGroup(acquaintances, nodeUrl);
         } catch (ClassNotReifiableException e) {
             logger.fatal("Couldn't create the group of exportAcquaintances", e);
         } catch (ClassNotFoundException e) {
@@ -129,8 +128,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                 // How many peers ?
                 if (this.groupOfAcquaintances.size() < NOA) {
                     // Looking for new peers
-                    logger.debug("NOA is " + NOA +
-                        " - Size of P2PAcquaintanceManager is " +
+                    logger.debug("NOA is " + NOA + " - Size of P2PAcquaintanceManager is " +
                         this.groupOfAcquaintances.size());
 
                     // Sending exploring message
@@ -145,8 +143,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             service.blockingServeOldest(TTU);
             while (System.currentTimeMillis() < endTime) {
                 try {
-                    service.blockingServeOldest(endTime -
-                        System.currentTimeMillis());
+                    service.blockingServeOldest(endTime - System.currentTimeMillis());
                 } catch (ProActiveRuntimeException e) {
                     logger.debug("Certainly because the body is not active", e);
                 }
@@ -172,8 +169,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                 String peerUrl = PAActiveObject.getActiveObjectNodeUrl(peer);
                 if (!peerUrl.matches(".*cannot contact the body.*")) {
                     boolean result = this.groupOfAcquaintances.add(peer);
-                    logger.info("Acquaintance " + peerUrl + " " + result +
-                        " added");
+                    logger.info("Acquaintance " + peerUrl + " " + result + " added");
                 }
             }
         } catch (Exception e) {
@@ -211,8 +207,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      *         element.
      */
     public BooleanMutableWrapper contains(P2PService service) {
-        return new BooleanMutableWrapper(this.groupOfAcquaintances.contains(
-                service));
+        return new BooleanMutableWrapper(this.groupOfAcquaintances.contains(service));
     }
 
     private Random randomizer = new Random();

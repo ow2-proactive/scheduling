@@ -72,8 +72,7 @@ public class P2PNetwork {
         String s = i.getSender();
         P2PNode tmp = senders.get(s);
         if ((tmp == null) || (tmp.getIndex() == -1)) {
-            this.addAsSender(new P2PNode(s, index++, i.getCurrentNoa(),
-                    i.getNoa()));
+            this.addAsSender(new P2PNode(s, index++, i.getCurrentNoa(), i.getNoa()));
         } else {
             if (tmp != null) {
                 tmp.setMaxNOA(i.getNoa());
@@ -141,8 +140,7 @@ public class P2PNetwork {
 
         // System.out.println("P2PNetwork.notifyListenersNewPeer() " + node);
         while (it.hasNext()) {
-            System.out.println(
-                "            P2PNetwork.notifyListenersNewPeer() ");
+            System.out.println("            P2PNetwork.notifyListenersNewPeer() ");
             P2PNetworkListener element = (P2PNetworkListener) it.next();
             element.newPeer(node);
         }

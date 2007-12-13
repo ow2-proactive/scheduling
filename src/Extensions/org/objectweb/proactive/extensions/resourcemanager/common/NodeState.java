@@ -33,6 +33,7 @@ package org.objectweb.proactive.extensions.resourcemanager.common;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
 
+
 /**
  * Enumeration of all states of a RMNode :<BR>
  * -free : node is ready to perform a task.<BR>
@@ -48,10 +49,8 @@ import org.objectweb.proactive.extensions.resourcemanager.rmnode.RMNode;
  *
  */
 @PublicAPI
-public enum NodeState {FREE(0),
-    BUSY(1),
-    DOWN(2),
-    TO_BE_RELEASED(3);
+public enum NodeState {
+    FREE(0), BUSY(1), DOWN(2), TO_BE_RELEASED(3);
     private int state;
 
     /**

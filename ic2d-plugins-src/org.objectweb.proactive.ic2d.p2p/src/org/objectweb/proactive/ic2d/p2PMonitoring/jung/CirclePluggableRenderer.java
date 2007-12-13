@@ -59,8 +59,7 @@ public class CirclePluggableRenderer extends PluggableRenderer {
         Graphics2D g2d = (Graphics2D) g;
 
         //Component component = prepareRenderer(graphLabelRenderer, label, isPicked(v), v);
-        Component component = new RotatableLabel(label,
-                this.layout.getCircleData(v).getAngle());
+        Component component = new RotatableLabel(label, this.layout.getCircleData(v).getAngle());
         Dimension d = component.getPreferredSize();
 
         int h_offset;
@@ -75,8 +74,8 @@ public class CirclePluggableRenderer extends PluggableRenderer {
         }
         this.layout.getCircleData(v).getAngle();
 
-        rendererPane.paintComponent(g, component, screenDevice, x + h_offset,
-            y + v_offset, d.width, d.height, true);
+        rendererPane.paintComponent(g, component, screenDevice, x + h_offset, y + v_offset, d.width,
+                d.height, true);
         // g2d.rotate(1);
         //		System.out.println("CirclePluggableRenderer.labelVertex() x="+x + " y="+y);
         //		System.out.println(layout.getCircleData(v).getAngle());

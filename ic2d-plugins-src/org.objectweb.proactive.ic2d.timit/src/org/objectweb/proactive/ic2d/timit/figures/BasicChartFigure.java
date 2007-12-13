@@ -49,10 +49,9 @@ import org.eclipse.swt.widgets.Display;
 
 
 public class BasicChartFigure extends Figure {
-    public static final Color UNSELECTED_BORDER_COLOR = Display.getCurrent()
-                                                               .getSystemColor(SWT.COLOR_DARK_GRAY);
-    public static final Color SELECTED_BORDER_COLOR = Display.getCurrent()
-                                                             .getSystemColor(SWT.COLOR_RED);
+    public static final Color UNSELECTED_BORDER_COLOR = Display.getCurrent().getSystemColor(
+            SWT.COLOR_DARK_GRAY);
+    public static final Color SELECTED_BORDER_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
     private static int UNSELECTED_BORDER_SIZE = 2;
     private static int SELECTED_BORDER_SIZE = 4;
 
@@ -128,9 +127,8 @@ public class BasicChartFigure extends Figure {
             final Display d = Display.getCurrent();
 
             // OFFSCREEN IMAGE CREATION STRATEGY
-            if ((this.imgChart == null) ||
-                    (this.imgChart.getImageData().width != r.width) ||
-                    (imgChart.getImageData().height != r.height)) {
+            if ((this.imgChart == null) || (this.imgChart.getImageData().width != r.width) ||
+                (imgChart.getImageData().height != r.height)) {
                 if (this.gc != null) {
                     this.gc.dispose();
                 }
@@ -158,10 +156,8 @@ public class BasicChartFigure extends Figure {
         }
         graphics.setLineWidth(this.currentBorderSize);
         graphics.setForegroundColor(this.currentBorderColor);
-        graphics.drawRectangle(r.x + (this.currentBorderSize / 2),
-            r.y + (this.currentBorderSize / 2),
-            r.width - this.currentBorderSize, r.height -
-            this.currentBorderSize);
+        graphics.drawRectangle(r.x + (this.currentBorderSize / 2), r.y + (this.currentBorderSize / 2),
+                r.width - this.currentBorderSize, r.height - this.currentBorderSize);
     }
 
     private final void computeState() {
@@ -170,8 +166,7 @@ public class BasicChartFigure extends Figure {
             this.bo.setWidth(getClientArea().width);
             this.bo.setHeight(getClientArea().height);
             this.bo.scale(this.scaleValue);
-            this.state = gr.build(this.idr.getDisplayServer(), this.chart,
-                    this.bo, null, null, null);
+            this.state = gr.build(this.idr.getDisplayServer(), this.chart, this.bo, null, null, null);
         } catch (Exception e) {
             e.printStackTrace();
         }

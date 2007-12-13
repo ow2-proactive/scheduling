@@ -53,21 +53,17 @@ public class DummySSLSocketFactory extends SocketFactory {
 
     static {
         // create a dummy trust manager
-        TrustManager[] dummyTrustMan = new TrustManager[] {
-                new X509TrustManager() {
-                        public X509Certificate[] getAcceptedIssuers() {
-                            return null;
-                        }
+        TrustManager[] dummyTrustMan = new TrustManager[] { new X509TrustManager() {
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
 
-                        public void checkClientTrusted(X509Certificate[] c,
-                            String a) {
-                        }
+            public void checkClientTrusted(X509Certificate[] c, String a) {
+            }
 
-                        public void checkServerTrusted(X509Certificate[] c,
-                            String a) {
-                        }
-                    }
-            };
+            public void checkServerTrusted(X509Certificate[] c, String a) {
+            }
+        } };
 
         // create our "dummy" ssl socket factory with our lazy trust manager
         try {
@@ -90,8 +86,7 @@ public class DummySSLSocketFactory extends SocketFactory {
      * @see javax.net.SocketFactory#createSocket(java.lang.String, int)
      */
     @Override
-    public Socket createSocket(String arg0, int arg1)
-        throws IOException, UnknownHostException {
+    public Socket createSocket(String arg0, int arg1) throws IOException, UnknownHostException {
         return dummyFactory.createSocket(arg0, arg1);
     }
 
@@ -99,8 +94,7 @@ public class DummySSLSocketFactory extends SocketFactory {
      * @see javax.net.SocketFactory#createSocket(java.net.InetAddress, int)
      */
     @Override
-    public Socket createSocket(InetAddress arg0, int arg1)
-        throws IOException {
+    public Socket createSocket(InetAddress arg0, int arg1) throws IOException {
         return dummyFactory.createSocket(arg0, arg1);
     }
 
@@ -109,8 +103,8 @@ public class DummySSLSocketFactory extends SocketFactory {
      *      java.net.InetAddress, int)
      */
     @Override
-    public Socket createSocket(String arg0, int arg1, InetAddress arg2, int arg3)
-        throws IOException, UnknownHostException {
+    public Socket createSocket(String arg0, int arg1, InetAddress arg2, int arg3) throws IOException,
+            UnknownHostException {
         return dummyFactory.createSocket(arg0, arg1, arg2, arg3);
     }
 
@@ -119,8 +113,7 @@ public class DummySSLSocketFactory extends SocketFactory {
      *      java.net.InetAddress, int)
      */
     @Override
-    public Socket createSocket(InetAddress arg0, int arg1, InetAddress arg2,
-        int arg3) throws IOException {
+    public Socket createSocket(InetAddress arg0, int arg1, InetAddress arg2, int arg3) throws IOException {
         return dummyFactory.createSocket(arg0, arg1, arg2, arg3);
     }
 }

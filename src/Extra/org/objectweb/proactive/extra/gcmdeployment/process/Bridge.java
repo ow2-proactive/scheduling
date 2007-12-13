@@ -119,6 +119,5 @@ public interface Bridge extends Serializable {
      */
     public void check() throws IllegalStateException;
 
-    public List<String> buildCommands(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma);
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma);
 }

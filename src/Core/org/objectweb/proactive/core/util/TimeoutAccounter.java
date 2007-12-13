@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.util;
 
-
 /**
  * All time are in milliseconds
  * We use System.nanoTime() as it tries to be monotonic
@@ -59,8 +58,7 @@ public class TimeoutAccounter {
     }
 
     public boolean isTimeoutElapsed() {
-        return (this.timeout != 0) &&
-        (((System.nanoTime() / 1000000) - this.start) >= this.timeout);
+        return (this.timeout != 0) && (((System.nanoTime() / 1000000) - this.start) >= this.timeout);
     }
 
     /**

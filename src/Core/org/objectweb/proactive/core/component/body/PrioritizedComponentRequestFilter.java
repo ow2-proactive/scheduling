@@ -53,8 +53,7 @@ public class PrioritizedComponentRequestFilter extends NFRequestFilterImpl {
         if (super.acceptRequest(componentRequest)) {
             short priority = componentRequest.getPriority();
             return ((ComponentRequest.IMMEDIATE_PRIORITY == priority) ||
-            (ComponentRequest.BEFORE_FUNCTIONAL_PRIORITY == priority) ||
-            (ComponentRequest.STRICT_FIFO_PRIORITY == priority));
+                (ComponentRequest.BEFORE_FUNCTIONAL_PRIORITY == priority) || (ComponentRequest.STRICT_FIFO_PRIORITY == priority));
         } else {
             return false;
         }

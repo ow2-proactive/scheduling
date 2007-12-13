@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.scheduler.common.job;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * This is the different job priorities.
  *

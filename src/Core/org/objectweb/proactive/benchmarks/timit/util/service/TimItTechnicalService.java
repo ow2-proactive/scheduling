@@ -41,8 +41,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
  * A Technical Service for timing purpose.
  * @author vbodnart
  */
-public class TimItTechnicalService implements TechnicalService,
-    java.io.Serializable {
+public class TimItTechnicalService implements TechnicalService, java.io.Serializable {
     private String timitActivation;
     private String reduceResults;
     private static String generateOutputFile;
@@ -55,8 +54,7 @@ public class TimItTechnicalService implements TechnicalService,
     public void init(Map argValues) {
         // First activate timers on the deploying VM
         this.timitActivation = (String) argValues.get("timitActivation");
-        if ((this.timitActivation != null) &&
-                (!"".equals(this.timitActivation))) {
+        if ((this.timitActivation != null) && (!"".equals(this.timitActivation))) {
             TimerWarehouse.enableTimers();
         }
         this.reduceResults = (String) argValues.get("reduceResults");

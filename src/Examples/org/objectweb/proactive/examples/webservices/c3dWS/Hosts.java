@@ -40,8 +40,7 @@ class Hosts {
 
         if (f.canRead()) {
             byte[] b = getBytesFromInputStream(new java.io.FileInputStream(f));
-            java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(new String(
-                        b));
+            java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(new String(b));
 
             while (tokenizer.hasMoreTokens()) {
                 allNodes.addElement(tokenizer.nextToken());
@@ -69,8 +68,7 @@ class Hosts {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private static byte[] getBytesFromInputStream(java.io.InputStream in)
-        throws java.io.IOException {
+    private static byte[] getBytesFromInputStream(java.io.InputStream in) throws java.io.IOException {
         java.io.DataInputStream din = new java.io.DataInputStream(in);
         byte[] bytecodes = new byte[in.available()];
 

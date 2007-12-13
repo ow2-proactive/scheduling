@@ -42,8 +42,8 @@ import java.io.Serializable;
 public class GenericTypeWrapper<T extends Object> implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private T o;
 
     /**

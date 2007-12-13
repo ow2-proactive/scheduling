@@ -42,6 +42,7 @@ import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test launching an application via the launcher and deploys it.
  *
@@ -54,13 +55,11 @@ public class Test extends FunctionalTest {
 
     static {
         if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
-            XML_LOCATION = Test.class.getResource(
-                    "/functionalTests/descriptor/launcher/TestLauncherIbis.xml")
-                                     .getPath();
+            XML_LOCATION = Test.class
+                    .getResource("/functionalTests/descriptor/launcher/TestLauncherIbis.xml").getPath();
         } else {
-            XML_LOCATION = Test.class.getResource(
-                    "/functionalTests/descriptor/launcher/TestLauncher.xml")
-                                     .getPath();
+            XML_LOCATION = Test.class.getResource("/functionalTests/descriptor/launcher/TestLauncher.xml")
+                    .getPath();
         }
     }
 
@@ -93,20 +92,14 @@ public class Test extends FunctionalTest {
         assertTrue(nodeTab2.length == 1);
 
         // 2) test equality between job ids
-        assertTrue(vnMain.getJobID()
-                         .equals(nodeTab[0].getNodeInformation().getJobID()));
-        assertTrue(vnMain.getJobID()
-                         .equals(nodeTab2[0].getNodeInformation().getJobID()));
+        assertTrue(vnMain.getJobID().equals(nodeTab[0].getNodeInformation().getJobID()));
+        assertTrue(vnMain.getJobID().equals(nodeTab2[0].getNodeInformation().getJobID()));
 
         // 3) all nodes must be in different VM, and mainNode in current VM
-        assertFalse((nodeTab[0].getVMInformation().getVMID()
-                               .equals(nodeTab2[0].getVMInformation().getVMID())));
-        assertFalse(nodeTab[0].getVMInformation().getVMID()
-                              .equals(mainNode.getVMInformation().getVMID()));
-        assertFalse(nodeTab2[0].getVMInformation().getVMID()
-                               .equals(mainNode.getVMInformation().getVMID()));
-        assertTrue(part.getVMInformation().getVMID()
-                       .equals(mainNode.getVMInformation().getVMID()));
+        assertFalse((nodeTab[0].getVMInformation().getVMID().equals(nodeTab2[0].getVMInformation().getVMID())));
+        assertFalse(nodeTab[0].getVMInformation().getVMID().equals(mainNode.getVMInformation().getVMID()));
+        assertFalse(nodeTab2[0].getVMInformation().getVMID().equals(mainNode.getVMInformation().getVMID()));
+        assertTrue(part.getVMInformation().getVMID().equals(mainNode.getVMInformation().getVMID()));
     }
 
     @After

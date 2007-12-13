@@ -65,21 +65,18 @@ public class RmiSshRemoteObjectFactory extends RmiRemoteObjectFactory {
             }
             String codebase = classServerHelper.initializeClassServer();
 
-            codebase = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(
-                        codebase), "/", Constants.HTTPSSH_PROTOCOL_IDENTIFIER,
-                    ClassServer.getServerSocketPort()).toString();
+            codebase = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(codebase), "/",
+                    Constants.HTTPSSH_PROTOCOL_IDENTIFIER, ClassServer.getServerSocketPort()).toString();
 
             codebase = addCodebase(codebase);
         } catch (Exception e) {
-            ProActiveLogger.getLogger(Loggers.CLASS_SERVER)
-                           .warn("Error with the ClassServer : " +
-                e.getMessage());
+            ProActiveLogger.getLogger(Loggers.CLASS_SERVER).warn(
+                    "Error with the ClassServer : " + e.getMessage());
         }
     }
 
     @Override
-    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
-        throws ProActiveException {
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target) throws ProActiveException {
         try {
             return new RmiSshRemoteObjectImpl(target);
         } catch (RemoteException e) {
@@ -90,8 +87,8 @@ public class RmiSshRemoteObjectFactory extends RmiRemoteObjectFactory {
     @Override
     public URI[] list(URI url) throws ProActiveException {
         try {
-            Registry registry = LocateRegistry.getRegistry(url.getHost(),
-                    url.getPort(), new SshRMIClientSocketFactory());
+            Registry registry = LocateRegistry.getRegistry(url.getHost(), url.getPort(),
+                    new SshRMIClientSocketFactory());
 
             String[] names = registry.list();
             if (names != null) {
@@ -115,14 +112,11 @@ public class RmiSshRemoteObjectFactory extends RmiRemoteObjectFactory {
 
         int port = URIBuilder.getPortNumber(url1);
         try {
-            Registry registry = LocateRegistry.getRegistry(host, port,
-                    new SshRMIClientSocketFactory());
-            RmiRemoteObject objectStub = (RmiRemoteObject) registry.lookup(URIBuilder.getNameFromURI(
-                        url1));
+            Registry registry = LocateRegistry.getRegistry(host, port, new SshRMIClientSocketFactory());
+            RmiRemoteObject objectStub = (RmiRemoteObject) registry.lookup(URIBuilder.getNameFromURI(url1));
             return new RemoteObjectAdapter(objectStub);
         } catch (java.rmi.NotBoundException e) {
-            throw new ProActiveException("The url " + url1 +
-                " is not bound to any known object");
+            throw new ProActiveException("The url " + url1 + " is not bound to any known object");
         } catch (RemoteException e) {
             e.printStackTrace();
         }

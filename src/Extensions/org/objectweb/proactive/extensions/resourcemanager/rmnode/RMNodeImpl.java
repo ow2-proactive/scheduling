@@ -117,16 +117,14 @@ public class RMNodeImpl implements RMNode, Serializable {
      * @param padName {@link ProActiveDescriptor} name of the node.
      * @param nodeSource {@link NodeSource} Stub of NodeSource that handle the RMNode.
      */
-    public RMNodeImpl(Node node, String vnodeName, String padName,
-        NodeSource nodeSource) {
+    public RMNodeImpl(Node node, String vnodeName, String padName, NodeSource nodeSource) {
         this.node = node;
         this.nodeSource = nodeSource;
         this.vnodeName = vnodeName;
         this.padName = padName;
         this.nodeName = node.getNodeInformation().getName();
         this.nodeURL = node.getNodeInformation().getURL();
-        this.hostName = node.getNodeInformation().getVMInformation()
-                            .getHostName();
+        this.hostName = node.getNodeInformation().getVMInformation().getHostName();
         this.vmName = node.getNodeInformation().getVMInformation().getName();
         this.scriptStatus = new HashMap<SelectionScript, Integer>();
         this.status = NodeState.FREE;
@@ -308,8 +306,7 @@ public class RMNodeImpl implements RMNode, Serializable {
         mes += ("| Name of PAD	  	: " + padName + "\n");
         mes += ("| VNode 		  	: " + vnodeName + "\n");
         mes += ("| Host  		  	: " + getHostName() + "\n");
-        mes += ("| Name of the VM 	: " +
-        getNodeInformation().getVMInformation().getDescriptorVMName() + "\n");
+        mes += ("| Name of the VM 	: " + getNodeInformation().getVMInformation().getDescriptorVMName() + "\n");
         mes += "+-----------------------------------------------+\n";
         return mes;
     }
@@ -328,7 +325,7 @@ public class RMNodeImpl implements RMNode, Serializable {
                 handler = ScriptLoader.createHandler(this.node);
             } catch (Exception e) {
                 return new ScriptResult<Boolean>(new NodeException(
-                        "Unable to create Script Handler on node ", e));
+                    "Unable to create Script Handler on node ", e));
             }
         }
 
@@ -388,12 +385,10 @@ public class RMNodeImpl implements RMNode, Serializable {
         if (this.getPADName().equals(imnode.getPADName())) {
             if (this.getVNodeName().equals(imnode.getVNodeName())) {
                 if (this.getHostName().equals(imnode.getHostName())) {
-                    if (this.getDescriptorVMName()
-                                .equals(imnode.getDescriptorVMName())) {
+                    if (this.getDescriptorVMName().equals(imnode.getDescriptorVMName())) {
                         return this.getNodeURL().compareTo(imnode.getNodeURL());
                     } else {
-                        return this.getDescriptorVMName()
-                                   .compareTo(imnode.getDescriptorVMName());
+                        return this.getDescriptorVMName().compareTo(imnode.getDescriptorVMName());
                     }
                 } else {
                     return this.getHostName().compareTo(imnode.getHostName());
@@ -454,10 +449,9 @@ public class RMNodeImpl implements RMNode, Serializable {
     /**
      *  build the RMNodeEvent object for the RMNode
      *  @return the RMNodeEvent object related to the RMNode.
-    */
+     */
     public RMNodeEvent getNodeEvent() {
-        return new RMNodeEvent(this.nodeURL, this.getNodeSourceId(),
-            this.padName, this.vnodeName, this.hostName, this.vmName,
-            this.status);
+        return new RMNodeEvent(this.nodeURL, this.getNodeSourceId(), this.padName, this.vnodeName,
+            this.hostName, this.vmName, this.status);
     }
 }

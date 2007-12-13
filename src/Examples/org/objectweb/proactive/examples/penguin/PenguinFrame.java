@@ -39,14 +39,13 @@ public class PenguinFrame extends javax.swing.JFrame {
         super("Agent " + index);
         imagePanel = buildImagePanel(f);
         this.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosing(java.awt.event.WindowEvent e) {
-                    System.exit(0);
-                }
-            });
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                System.exit(0);
+            }
+        });
         getContentPane().setLayout(new java.awt.BorderLayout());
-        getContentPane()
-            .add(new javax.swing.JLabel(location), java.awt.BorderLayout.NORTH);
+        getContentPane().add(new javax.swing.JLabel(location), java.awt.BorderLayout.NORTH);
         getContentPane().add(imagePanel, java.awt.BorderLayout.CENTER);
         pack();
         toFront();

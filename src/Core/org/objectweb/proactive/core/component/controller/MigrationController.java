@@ -42,8 +42,7 @@ import org.objectweb.proactive.core.node.Node;
  */
 @PublicAPI
 public interface MigrationController {
-    public void migrateDependentActiveObjectsTo(Node node)
-        throws MigrationException;
+    public void migrateDependentActiveObjectsTo(Node node) throws MigrationException;
 
     public void migrateTo(URL url) throws MigrationException;
 

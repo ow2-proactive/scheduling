@@ -122,8 +122,7 @@ public class CommEventData implements EventData {
         int length = this.markedCommunication.length;
         if (this.allValues == null) {
             this.allValues = new int[length][length];
-            System.arraycopy(this.markedCommunication, 0,
-                this.allValues[this.subjectRank], 0, length);
+            System.arraycopy(this.markedCommunication, 0, this.allValues[this.subjectRank], 0, length);
         }
         if (anotherData.equals(this)) {
             return this.allValues.clone();
@@ -182,8 +181,7 @@ public class CommEventData implements EventData {
             lines[i] = "";
             for (j = 0; j < this.allValues.length; j++) {
                 sb = new StringBuilder(lines[i]);
-                sb.append(String.format("%1$" + maxLength + "s",
-                        this.allValues[i][j]) + " ");
+                sb.append(String.format("%1$" + maxLength + "s", this.allValues[i][j]) + " ");
                 lines[i] = sb.toString();
             }
         }

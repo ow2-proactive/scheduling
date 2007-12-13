@@ -85,8 +85,8 @@ public class RuntimeObject extends AbstractData {
     /** JMX Notification listener */
     private final javax.management.NotificationListener listener;
 
-    public RuntimeObject(HostObject parent, String runtimeUrl,
-        ObjectName objectName, String hostUrl, String serverName) {
+    public RuntimeObject(HostObject parent, String runtimeUrl, ObjectName objectName, String hostUrl,
+            String serverName) {
         super(objectName);
         this.parent = parent;
 
@@ -151,9 +151,7 @@ public class RuntimeObject extends AbstractData {
     @Override
     public void stopMonitoring(boolean log) {
         super.stopMonitoring(log);
-        JMXNotificationManager.getInstance()
-                              .unsubscribe(this.getObjectName(),
-            this.getListener());
+        JMXNotificationManager.getInstance().unsubscribe(this.getObjectName(), this.getListener());
     }
 
     /**
@@ -161,33 +159,32 @@ public class RuntimeObject extends AbstractData {
      */
     public void killRuntime() {
         new Thread() {
-                @Override
-                public void run() {
-                    Object[] params = {  };
-                    String[] signature = {  };
-                    invokeAsynchronous("killRuntime", params, signature);
-                    runtimeKilled();
-                }
-            }.start();
+            @Override
+            public void run() {
+                Object[] params = {};
+                String[] signature = {};
+                invokeAsynchronous("killRuntime", params, signature);
+                runtimeKilled();
+            }
+        }.start();
     }
 
     public void runtimeKilled() {
         setChanged();
-        notifyObservers(new MVCNotification(
-                MVCNotificationTag.RUNTIME_OBJECT_RUNTIME_KILLED));
+        notifyObservers(new MVCNotification(MVCNotificationTag.RUNTIME_OBJECT_RUNTIME_KILLED));
         ;
         new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        sleep(3000);
-                    } catch (InterruptedException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                    RuntimeObject.this.destroy();
+            @Override
+            public void run() {
+                try {
+                    sleep(3000);
+                } catch (InterruptedException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
-            }.start();
+                RuntimeObject.this.destroy();
+            }
+        }.start();
     }
 
     /**
@@ -199,13 +196,12 @@ public class RuntimeObject extends AbstractData {
     @SuppressWarnings("unchecked")
     private void findNodes() {
         if (this.proxyMBean == null) {
-            this.proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),
-                    getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
+            this.proxyMBean = (ProActiveRuntimeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(
+                    getConnection(), getObjectName(), ProActiveRuntimeWrapperMBean.class, false);
         }
 
         if (!PAActiveObject.pingActiveObject(getConnection())) {
-            System.out.println("Connection to runtime closed: " +
-                this.getName());
+            System.out.println("Connection to runtime closed: " + this.getName());
             return;
         }
 
@@ -231,8 +227,7 @@ public class RuntimeObject extends AbstractData {
         for (final ObjectName name : nodeNames) {
             // Search if the node is a P2P node
             final String nodeName = name.getKeyProperty(FactoryName.NODE_NAME_PROPERTY);
-            if (nodeName.startsWith(P2PConstants.P2P_NODE_NAME) &&
-                    getWorldObject().isP2PHidden()) {
+            if (nodeName.startsWith(P2PConstants.P2P_NODE_NAME) && getWorldObject().isP2PHidden()) {
                 // We have to skeep this node because it is a P2PNode
                 continue;
             }
@@ -250,8 +245,8 @@ public class RuntimeObject extends AbstractData {
             // If this child is not monitored.
             if (child == null) {
                 // Get the mbean proxy for the current node
-                final NodeWrapperMBean proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler.newProxyInstance(getConnection(),
-                        name, NodeWrapperMBean.class, false);
+                final NodeWrapperMBean proxyNodeMBean = (NodeWrapperMBean) MBeanServerInvocationHandler
+                        .newProxyInstance(getConnection(), name, NodeWrapperMBean.class, false);
 
                 // Get the jobId and the virtualNodeName in one call
                 final String[] res = proxyNodeMBean.getJobIdAndVirtualNodeName();
@@ -260,23 +255,23 @@ public class RuntimeObject extends AbstractData {
                 final String virtualNodeName = res[1];
 
                 if (virtualNodeName == null) {
-                    Console.getInstance(Activator.CONSOLE_NAME)
-                           .err("Problem when getting virtual node name from the remote NodeWrapperNbean for node " +
-                        name);
-                    logger.error(
-                        "Problem when getting virtual node name from the remote NodeWrapperNbean for node " +
-                        nodeName + ". A null value was received.");
+                    Console
+                            .getInstance(Activator.CONSOLE_NAME)
+                            .err(
+                                    "Problem when getting virtual node name from the remote NodeWrapperNbean for node " +
+                                        name);
+                    logger
+                            .error("Problem when getting virtual node name from the remote NodeWrapperNbean for node " +
+                                nodeName + ". A null value was received.");
                     continue;
                 }
 
                 // Find the virtualNode if already monitored
-                VirtualNodeObject vn = getWorldObject()
-                                           .getVirtualNode(virtualNodeName);
+                VirtualNodeObject vn = getWorldObject().getVirtualNode(virtualNodeName);
 
                 // This virtual node is not monitored
                 if (vn == null) {
-                    vn = new VirtualNodeObject(virtualNodeName, jobId,
-                            getWorldObject());
+                    vn = new VirtualNodeObject(virtualNodeName, jobId, getWorldObject());
                     getWorldObject().addVirtualNode(vn);
                 }
 

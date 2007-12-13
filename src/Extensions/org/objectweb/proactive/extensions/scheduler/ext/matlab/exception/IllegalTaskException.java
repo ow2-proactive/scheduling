@@ -34,7 +34,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.Task;
 
 
 public class IllegalTaskException extends Exception {
-    public IllegalTaskException(Class<?extends Task> class1) {
+    public IllegalTaskException(Class<? extends Task> class1) {
         super(class1.getCanonicalName());
     }
 }

@@ -66,20 +66,18 @@ public class Maestro implements Serializable {
      * @param aDomainArray all the Domain of the simulation.
      */
     public Maestro(Integer id, Domain[] aDomainArray,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.identification = id.intValue();
 
         // We put only the Domain that correspond with this Maestro
         if (aDomainArray.length < (8 * (this.identification + 1))) {
-            this.domainArray = new Domain[aDomainArray.length -
-                (8 * this.identification)];
+            this.domainArray = new Domain[aDomainArray.length - (8 * this.identification)];
         } else {
             this.domainArray = new Domain[8];
         }
         for (int i = 0; i < 8; i++) {
             if (((this.identification * 8) + i) < aDomainArray.length) {
-                this.domainArray[i] = aDomainArray[(this.identification * 8) +
-                    i];
+                this.domainArray[i] = aDomainArray[(this.identification * 8) + i];
             }
         }
 

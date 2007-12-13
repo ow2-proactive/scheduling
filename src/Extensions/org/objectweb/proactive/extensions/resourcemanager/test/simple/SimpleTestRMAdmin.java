@@ -50,13 +50,11 @@ public class SimpleTestRMAdmin {
             if (args.length > 0) {
                 url = args[0];
             } else {
-                url = "rmi://localhost:1099/" +
-                    RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
+                url = "rmi://localhost:1099/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
             }
 
             RMAdmin admin = RMConnection.connectAsAdmin(url);
-            System.out.println("#[SimpleTestRMAdmin] deployAllVirtualNodes : " +
-                URL_PAD_LOCAL);
+            System.out.println("#[SimpleTestRMAdmin] deployAllVirtualNodes : " + URL_PAD_LOCAL);
 
             ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(URL_PAD_LOCAL);
             ArrayList<ProActiveDescriptor> padList = new ArrayList<ProActiveDescriptor>();

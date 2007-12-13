@@ -42,8 +42,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  *
  */
 @PublicAPI
-public class Seq<P extends java.io.Serializable, R extends java.io.Serializable>
-    implements Skeleton<P, R> {
+public class Seq<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {
     Execute<P, R> secCode;
 
     /**

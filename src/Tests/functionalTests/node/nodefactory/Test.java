@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test the creation of rmi, ibis node whith the factory
  */
@@ -61,13 +62,10 @@ public class Test extends FunctionalTest {
     public void initTest() throws Exception {
         String port = PAProperties.PA_RMI_PORT.getValue();
         if (port != null) {
-            rmiURL = URIBuilder.buildURI("localhost",
-                    "RMINode" + System.currentTimeMillis(),
-                    Constants.RMI_PROTOCOL_IDENTIFIER,
-                    new Integer(port).intValue()).toString();
+            rmiURL = URIBuilder.buildURI("localhost", "RMINode" + System.currentTimeMillis(),
+                    Constants.RMI_PROTOCOL_IDENTIFIER, new Integer(port).intValue()).toString();
         } else {
-            rmiURL = URIBuilder.buildURI("localhost",
-                    "RMINode" + System.currentTimeMillis(),
+            rmiURL = URIBuilder.buildURI("localhost", "RMINode" + System.currentTimeMillis(),
                     Constants.RMI_PROTOCOL_IDENTIFIER).toString();
         }
     }

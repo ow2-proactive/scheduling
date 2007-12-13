@@ -148,8 +148,7 @@ public class ProActiveInet {
         return null;
     }
 
-    private List<NetworkInterface> getNetworkInterfaces()
-        throws SocketException {
+    private List<NetworkInterface> getNetworkInterfaces() throws SocketException {
         List<NetworkInterface> interfaces = new ArrayList<NetworkInterface>();
 
         if (PAProperties.PA_NET_INTERFACE.isSet()) {

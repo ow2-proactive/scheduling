@@ -45,8 +45,7 @@ public class ForkInst<P, R> implements Instruction<P, P> {
     Conquer<?, R> conq;
     Vector<Stack<Instruction>> instList;
 
-    public ForkInst(Divide<P, ?> div, Conquer<?, R> conq,
-        Vector<Stack<Instruction>> instList) {
+    public ForkInst(Divide<P, ?> div, Conquer<?, R> conq, Vector<Stack<Instruction>> instList) {
         super();
         this.div = div;
         this.conq = conq;
@@ -54,8 +53,7 @@ public class ForkInst<P, R> implements Instruction<P, P> {
     }
 
     @SuppressWarnings("unchecked")
-    public Task<P> compute(SkeletonSystemImpl system, Task<P> t)
-        throws Exception {
+    public Task<P> compute(SkeletonSystemImpl system, Task<P> t) throws Exception {
         t.pushInstruction(new ConquerInst(conq));
         t.pushInstruction(new DivideMIMD(div, instList));
 

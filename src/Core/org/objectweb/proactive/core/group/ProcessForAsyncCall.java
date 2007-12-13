@@ -48,15 +48,14 @@ import org.objectweb.proactive.core.mop.StubObject;
  *
  * @author Laurent Baduel
  */
-public class ProcessForAsyncCall extends AbstractProcessForGroup
-    implements Runnable {
+public class ProcessForAsyncCall extends AbstractProcessForGroup implements Runnable {
     private Vector memberListOfResultGroup;
     private int index;
     private MethodCall mc;
     private Body body;
 
-    public ProcessForAsyncCall(ProxyForGroup proxyGroup, Vector memberList,
-        Vector memberListOfResultGroup, int index, MethodCall mc, Body body) {
+    public ProcessForAsyncCall(ProxyForGroup proxyGroup, Vector memberList, Vector memberListOfResultGroup,
+            int index, MethodCall mc, Body body) {
         this.proxyGroup = proxyGroup;
         this.memberList = memberList;
         this.memberListOfResultGroup = memberListOfResultGroup;
@@ -81,14 +80,14 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                         // a call on the Component interface
                         target = object;
                     } else {
-                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentMetadata()
-                                                                                              .getComponentInterfaceName());
+                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc
+                                .getComponentMetadata().getComponentInterfaceName());
                     }
-                    this.proxyGroup.addToListOfResult(memberListOfResultGroup,
-                        this.mc.execute(target), this.index);
+                    this.proxyGroup.addToListOfResult(memberListOfResultGroup, this.mc.execute(target),
+                            this.index);
                 } else if (object instanceof ProActiveInterface) {
-                    this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                        this.mc.execute(object), this.index);
+                    this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, this.mc.execute(object),
+                            this.index);
                 } else {
                     Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);
                     if (lastProxy instanceof UniversalBodyProxy) {
@@ -96,31 +95,27 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup
                     }
                     if (lastProxy == null) {
                         // means we are dealing with a standard Java Object 
-                        this.proxyGroup.addToListOfResult(memberListOfResultGroup,
-                            this.mc.execute(object), this.index);
+                        this.proxyGroup.addToListOfResult(memberListOfResultGroup, this.mc.execute(object),
+                                this.index);
                     } else if (!objectIsLocal) {
                         /* add the return value into the result group */
-                        this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                            ((StubObject) object).getProxy().reify(this.mc),
-                            this.index);
+                        this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, ((StubObject) object)
+                                .getProxy().reify(this.mc), this.index);
                     } else {
                         /* add the return value into the result group */
-                        this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                            ((StubObject) object).getProxy()
-                             .reify(this.mc.getShallowCopy()), this.index);
+                        this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, ((StubObject) object)
+                                .getProxy().reify(this.mc.getShallowCopy()), this.index);
                     }
                 }
             } catch (Throwable e) {
                 /* when an exception occurs, put it in the result group instead of the (unreturned) value */
-                this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                    new ExceptionInGroup(this.memberList.get(
-                            this.index % getMemberListSize()), this.index,
-                        e.fillInStackTrace()), this.index);
+                this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, new ExceptionInGroup(
+                    this.memberList.get(this.index % getMemberListSize()), this.index, e.fillInStackTrace()),
+                        this.index);
             }
         } else {
             /* when there is a Throwable instead of an Object, a method call is impossible, add null to the result group */
-            this.proxyGroup.addToListOfResult(this.memberListOfResultGroup,
-                null, this.index);
+            this.proxyGroup.addToListOfResult(this.memberListOfResultGroup, null, this.index);
         }
     }
 }

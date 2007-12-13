@@ -75,8 +75,7 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
         if (editorPart == null) {
             return;
         }
-        String path = ((PathEditorInput) editorPart.getEditorInput()).getPath()
-                       .toString();
+        String path = ((PathEditorInput) editorPart.getEditorInput()).getPath().toString();
 
         launch(window.getActivePage(), path);
     }
@@ -124,8 +123,7 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
             launcher = new Launcher(path);
             XMLDescriptorSet.getInstance().getFile(path).setLauncher(launcher);
         } catch (TagMissingException e) {
-            XMLDescriptorSet.getInstance().getFile(path)
-                            .setState(XMLDescriptor.FileState.ERROR);
+            XMLDescriptorSet.getInstance().getFile(path).setState(XMLDescriptor.FileState.ERROR);
             Console.getInstance(Activator.CONSOLE_NAME).debug(e);
             return;
         } catch (Exception e) {
@@ -137,28 +135,25 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
             if (!launcher.isActivated()) {
                 final Launcher l = launcher;
                 Thread thread = new Thread(new Runnable() {
-                            public void run() {
-                                try {
-                                    l.activate();
-                                    Console.getInstance(Activator.CONSOLE_NAME)
-                                           .log(path + " - activated");
-                                    Console.getInstance(Activator.CONSOLE_NAME)
-                                           .log("Open the log4j console for more details");
-                                    Display.getDefault().asyncExec(new Runnable() {
-                                            public void run() {
-                                                XMLDescriptorSet.getInstance()
-                                                                .getFile(path)
-                                                                .setState(XMLDescriptor.FileState.LAUNCHED);
-                                            }
-                                        });
-                                } catch (Exception e) {
-                                    Console.getInstance(Activator.CONSOLE_NAME)
-                                           .logException(e);
-                                    XMLDescriptorSet.getInstance().getFile(path)
-                                                    .setState(XMLDescriptor.FileState.ERROR);
+                    public void run() {
+                        try {
+                            l.activate();
+                            Console.getInstance(Activator.CONSOLE_NAME).log(path + " - activated");
+                            Console.getInstance(Activator.CONSOLE_NAME).log(
+                                    "Open the log4j console for more details");
+                            Display.getDefault().asyncExec(new Runnable() {
+                                public void run() {
+                                    XMLDescriptorSet.getInstance().getFile(path).setState(
+                                            XMLDescriptor.FileState.LAUNCHED);
                                 }
-                            }
-                        });
+                            });
+                        } catch (Exception e) {
+                            Console.getInstance(Activator.CONSOLE_NAME).logException(e);
+                            XMLDescriptorSet.getInstance().getFile(path).setState(
+                                    XMLDescriptor.FileState.ERROR);
+                        }
+                    }
+                });
                 thread.start();
             }
         } catch (Exception e) {
@@ -182,9 +177,7 @@ public class Launch extends Action implements IWorkbenchWindowActionDelegate {
         IWorkbenchPage page = window.getActivePage();
         IWorkbench workbench = window.getWorkbench();
         IPerspectiveRegistry reg = workbench.getPerspectiveRegistry();
-        goodPerspective = page.getPerspective()
-                              .equals(reg.findPerspectiveWithId(
-                    LauncherPerspective.ID));
+        goodPerspective = page.getPerspective().equals(reg.findPerspectiveWithId(LauncherPerspective.ID));
 
         return (goodPerspective && (page.getEditorReferences().length > 0));
     }

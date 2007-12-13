@@ -74,8 +74,7 @@ public class Tracer implements java.io.Serializable {
         Dumper dumper = null;
 
         try {
-            dumper = (Dumper) PAActiveObject.newActive(Dumper.class.getName(),
-                    new Object[] {  });
+            dumper = (Dumper) PAActiveObject.newActive(Dumper.class.getName(), new Object[] {});
             Dumper.requestAcquaintances(addr, dumper);
         } catch (Exception e) {
             e.printStackTrace();
@@ -94,9 +93,8 @@ public class Tracer implements java.io.Serializable {
                 cache[i] = 0;
             }
 
-            distP2PService.dumpAcquaintances(new TracerWithCallbackMessage(
-                    TTL, UniversalUniqueID.randomUUID(),
-                    (Tracer) PAActiveObject.getStubOnThis()));
+            distP2PService.dumpAcquaintances(new TracerWithCallbackMessage(TTL, UniversalUniqueID
+                    .randomUUID(), (Tracer) PAActiveObject.getStubOnThis()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -138,8 +136,8 @@ public class Tracer implements java.io.Serializable {
      */
     public void trace(String addr, int nbAcquaintances) {
         if (DEBUG) {
-            System.out.println("addr [" + getTabPositionOf(addr) + "]:" + addr +
-                " Acquaintances :" + nbAcquaintances);
+            System.out.println("addr [" + getTabPositionOf(addr) + "]:" + addr + " Acquaintances :" +
+                nbAcquaintances);
         }
 
         cache[getTabPositionOf(addr)] = nbAcquaintances;
@@ -158,8 +156,7 @@ public class Tracer implements java.io.Serializable {
             dumpP2PNetwork(addr);
         } else if (args[1].equalsIgnoreCase("trace")) {
             try {
-                Tracer t = (Tracer) PAActiveObject.newActive(Tracer.class.getName(),
-                        null);
+                Tracer t = (Tracer) PAActiveObject.newActive(Tracer.class.getName(), null);
 
                 Node distNode = NodeFactory.getNode(addr);
                 P2PService p2p = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];

@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.scheduler.common.task;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * This class represents every state that a task is able to be in.<br>
  * Each state are best describe below.

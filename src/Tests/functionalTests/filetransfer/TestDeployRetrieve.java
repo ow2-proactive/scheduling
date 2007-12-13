@@ -51,6 +51,7 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Tests that both schemes work using the ProActive FileTransfer API
  */
@@ -75,8 +76,7 @@ public class TestDeployRetrieve extends FunctionalTest {
     @Before
     public void initTest() throws Exception {
         if (logger.isDebugEnabled()) {
-            logger.debug("Creating " + filesize +
-                "Mb random test file in /tmp");
+            logger.debug("Creating " + filesize + "Mb random test file in /tmp");
         }
 
         //creates a new 2MB test file
@@ -115,8 +115,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         System.setProperty("schema.validation", "false");
 
         VariableContract vc = new VariableContract();
-        vc.setVariableFromProgram("HOST_NAME", hostName,
-            VariableContractType.DescriptorDefaultVariable);
+        vc.setVariableFromProgram("HOST_NAME", hostName, VariableContractType.DescriptorDefaultVariable);
 
         pad = PADeployment.getProactiveDescriptor(XML_LOCATION, vc);
 
@@ -135,15 +134,13 @@ public class TestDeployRetrieve extends FunctionalTest {
 
         assertTrue(node.length > 0);
         if (logger.isDebugEnabled()) {
-            logger.debug("Deployed " + node.length + " node from VirtualNode " +
-                testVNode.getName() + " in " +
-                (finitDeployment - initDeployment) + "[ms]");
+            logger.debug("Deployed " + node.length + " node from VirtualNode " + testVNode.getName() +
+                " in " + (finitDeployment - initDeployment) + "[ms]");
         }
 
         //Checking correct FileTransferDeploy
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                "Checking the integrity of the test file transfer at deployment time.");
+            logger.debug("Checking the integrity of the test file transfer at deployment time.");
         }
         long fileDeployedSum = TestAPI.checkSum(fileDeployed);
         assertTrue(fileTestSum == fileDeployedSum);
@@ -154,8 +151,7 @@ public class TestDeployRetrieve extends FunctionalTest {
         }
         long initRetrieve = System.currentTimeMillis();
 
-        List<RemoteFile> list = testVNode.getVirtualNodeInternal()
-                                         .fileTransferRetrieve(); //async
+        List<RemoteFile> list = testVNode.getVirtualNodeInternal().fileTransferRetrieve(); //async
         for (RemoteFile rfile : list) {
             rfile.waitFor(); //sync here
         }
@@ -163,17 +159,16 @@ public class TestDeployRetrieve extends FunctionalTest {
         long finitRetrieve = System.currentTimeMillis();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Retrieved " + list.size() +
-                " files from VirtualNode " + testVNode.getName() + " in " +
-                (finitRetrieve - initRetrieve) + "[ms]");
+            logger.debug("Retrieved " + list.size() + " files from VirtualNode " + testVNode.getName() +
+                " in " + (finitRetrieve - initRetrieve) + "[ms]");
         }
 
         assertTrue(list.size() == 2);
 
         fileRetrieved = new File(fileRetrieved.getAbsoluteFile() + "-" +
-                node[0].getNodeInformation().getName());
+            node[0].getNodeInformation().getName());
         fileRetrieved2 = new File(fileRetrieved2.getAbsoluteFile() + "-" +
-                node[0].getNodeInformation().getName());
+            node[0].getNodeInformation().getName());
 
         long fileRetrievedSum = TestAPI.checkSum(fileRetrieved);
 
@@ -192,8 +187,7 @@ public class TestDeployRetrieve extends FunctionalTest {
     private void cleanIfNecessary(File f) {
         if (f.exists()) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Deleting old randomly generated file:" +
-                    f.getName());
+                logger.debug("Deleting old randomly generated file:" + f.getName());
             }
             f.delete();
         }
@@ -209,8 +203,8 @@ public class TestDeployRetrieve extends FunctionalTest {
             testflyingblocks = Integer.parseInt(args[2]);
             XML_LOCATION = args[3];
         } else if (args.length != 0) {
-            System.out.println(
-                "Use with arguments: filesize[mb] fileblocksize[bytes] maxflyingblocks xmldescriptorpath");
+            System.out
+                    .println("Use with arguments: filesize[mb] fileblocksize[bytes] maxflyingblocks xmldescriptorpath");
         }
 
         TestDeployRetrieve test = new TestDeployRetrieve();

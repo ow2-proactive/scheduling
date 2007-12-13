@@ -30,7 +30,6 @@
  */
 package doc;
 
-
 /** All possible ways of transforming a code file into a decorated
  * code file should implement this interface. */
 public interface LanguageToDocBook {

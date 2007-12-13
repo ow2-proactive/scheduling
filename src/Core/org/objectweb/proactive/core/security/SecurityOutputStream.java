@@ -52,14 +52,13 @@ public class SecurityOutputStream extends ObjectOutputStream {
      */
     public SecurityOutputStream(OutputStream out) throws IOException {
         super(out);
-        System.out.println(
-            "-*-**-*--*-*-*-**--**-*--*-**- instanciating securtityoutpoutstream");
+        System.out.println("-*-**-*--*-*-*-**--**-*--*-**- instanciating securtityoutpoutstream");
         java.security.AccessController.doPrivileged(new java.security.PrivilegedAction<Object>() {
-                public Object run() {
-                    enableReplaceObject(true);
-                    return null;
-                }
-            });
+            public Object run() {
+                enableReplaceObject(true);
+                return null;
+            }
+        });
     }
 
     /**
@@ -77,19 +76,17 @@ public class SecurityOutputStream extends ObjectOutputStream {
      */
     @Override
     protected Object replaceObject(Object obj) throws IOException {
-        System.out.println(
-            " */*/*/*/*/*/*/* /*/*/**//**/ Inside replaceObject /*/**/*//*/**//*/*/**//*/*");
+        System.out.println(" */*/*/*/*/*/*/* /*/*/**//**/ Inside replaceObject /*/**/*//*/**//*/*/**//*/*");
         if ((obj instanceof Remote) && !(obj instanceof RemoteStub)) {
-            System.out.println(
-                " */*/*/*/*/*/*/* /*/*/**//**/ found a Remote object " + obj +
+            System.out.println(" */*/*/*/*/*/*/* /*/*/**//**/ found a Remote object " + obj +
                 " /*/**/*//*/**//*/*/**//*/*");
             Remote target = RemoteObject.toStub((Remote) obj);
             if (target != null) {
                 return target;
             }
         }
-        System.out.println(" */*/*/*/*/*/*/* /*/*/**//**/ Normal obj : " + obj +
-            "/*/**/*//*/**//*/*/**//*/*");
+        System.out
+                .println(" */*/*/*/*/*/*/* /*/*/**//**/ Normal obj : " + obj + "/*/**/*//*/**//*/*/**//*/*");
         return obj;
     }
 }

@@ -62,8 +62,8 @@ public interface SchedulerAuthenticationInterface extends Serializable {
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
-    public UserSchedulerInterface logAsUser(String user, String password)
-        throws LoginException, SchedulerException;
+    public UserSchedulerInterface logAsUser(String user, String password) throws LoginException,
+            SchedulerException;
 
     /**
      * Connect the administrator interface to a scheduler with the given scheduler URL.<br>
@@ -78,6 +78,6 @@ public interface SchedulerAuthenticationInterface extends Serializable {
      * @throws LoginException thrown if this user/password does not match any entries.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
-    public AdminSchedulerInterface logAsAdmin(String user, String password)
-        throws LoginException, SchedulerException;
+    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException,
+            SchedulerException;
 }

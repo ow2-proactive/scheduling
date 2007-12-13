@@ -41,8 +41,7 @@ import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.examples.jmx.remote.management.events.EntitiesEventManager;
 
 
-public class RemoteTransactionGroup extends ManageableEntity
-    implements Serializable {
+public class RemoteTransactionGroup extends ManageableEntity implements Serializable {
 
     /**
      *
@@ -66,8 +65,7 @@ public class RemoteTransactionGroup extends ManageableEntity
     @Override
     public void addEntity(ManageableEntity entity) {
         this.gEntities.add(entity);
-        EntitiesEventManager.getInstance()
-                            .newEvent(this, EntitiesEventManager.ENTITY_ADDED);
+        EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.ENTITY_ADDED);
     }
 
     @Override

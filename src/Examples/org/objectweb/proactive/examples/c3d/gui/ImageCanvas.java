@@ -56,8 +56,7 @@ public class ImageCanvas extends Canvas {
     public ImageCanvas() {
         this.my_HEIGHT = 200; // this will change on first image received (see setPixels)
         this.my_WIDTH = 200;
-        this.display = new BufferedImage(my_WIDTH, my_HEIGHT,
-                BufferedImage.TYPE_INT_RGB);
+        this.display = new BufferedImage(my_WIDTH, my_HEIGHT, BufferedImage.TYPE_INT_RGB);
     }
 
     /** Drawing the Component with a double-buffer.
@@ -73,8 +72,7 @@ public class ImageCanvas extends Canvas {
         // We need to make sure we keep our offscreen buffer the same size
         // as the graphics context we're working with.
         if ((this.offScreenBuffer == null) ||
-                (!((this.offScreenBuffer.getWidth(this) == size.width) &&
-                (this.offScreenBuffer.getHeight(this) == size.height)))) {
+            (!((this.offScreenBuffer.getWidth(this) == size.width) && (this.offScreenBuffer.getHeight(this) == size.height)))) {
             this.offScreenBuffer = this.createImage(size.width, size.height);
         }
 
@@ -82,8 +80,8 @@ public class ImageCanvas extends Canvas {
         gr = this.offScreenBuffer.getGraphics();
 
         paint(gr); // Passes our off-screen buffer to our paint method, which,
-                   // unsuspecting, paints on it just as it would on the Graphics
-                   // passed by the browser or applet viewer.
+        // unsuspecting, paints on it just as it would on the Graphics
+        // passed by the browser or applet viewer.
 
         g.drawImage(this.offScreenBuffer, 0, 0, this);
         // And now we transfer the info in the buffer onto the
@@ -105,8 +103,7 @@ public class ImageCanvas extends Canvas {
             at.translate(0, ((float) dim.height - dim.width) / 2);
         }
         at.scale(rescale, rescale);
-        AffineTransformOp rh = new AffineTransformOp(at,
-                AffineTransformOp.TYPE_BILINEAR);
+        AffineTransformOp rh = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
         graphics.drawImage(this.display, rh, 0, 0);
     }
 
@@ -116,18 +113,15 @@ public class ImageCanvas extends Canvas {
      */
     public void setPixels(Image2D image) {
         Interval interval = image.getInterval();
-        if ((interval.totalImageHeight != my_HEIGHT) ||
-                (interval.totalImageWidth != my_WIDTH)) {
+        if ((interval.totalImageHeight != my_HEIGHT) || (interval.totalImageWidth != my_WIDTH)) {
             // just in case image format has unsuspectedly been changed
             this.my_WIDTH = interval.totalImageWidth;
             this.my_HEIGHT = interval.totalImageHeight;
-            this.display = new BufferedImage(my_WIDTH, my_HEIGHT,
-                    BufferedImage.TYPE_INT_RGB);
+            this.display = new BufferedImage(my_WIDTH, my_HEIGHT, BufferedImage.TYPE_INT_RGB);
             setPreferredSize(new Dimension(this.my_WIDTH, this.my_HEIGHT));
         }
-        this.display.setRGB(0, interval.yfrom, interval.totalImageWidth,
-            interval.yto - interval.yfrom, image.getPixels(), 0,
-            interval.totalImageWidth);
+        this.display.setRGB(0, interval.yfrom, interval.totalImageWidth, interval.yto - interval.yfrom, image
+                .getPixels(), 0, interval.totalImageWidth);
         repaint();
     }
 

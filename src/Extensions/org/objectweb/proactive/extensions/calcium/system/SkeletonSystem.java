@@ -71,6 +71,5 @@ public interface SkeletonSystem {
      * @throws IOException If an exception takes place.
      * @throws InterruptedException If the thread was interrupted while waiting for the command's execution.
      */
-    public int execCommand(File command, String arguments)
-        throws IOException, InterruptedException;
+    public int execCommand(File command, String arguments) throws IOException, InterruptedException;
 }

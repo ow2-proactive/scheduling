@@ -54,8 +54,7 @@ import org.objectweb.proactive.core.mop.Proxy;
 public class SynchronousProxy implements Proxy, Serializable {
     protected RemoteObject remoteObject;
 
-    public SynchronousProxy(ConstructorCall contructorCall, Object[] params)
-        throws ProActiveException {
+    public SynchronousProxy(ConstructorCall contructorCall, Object[] params) throws ProActiveException {
         Object p0 = params[0];
         if (p0 instanceof RemoteObject) {
             this.remoteObject = (RemoteObject) p0;
@@ -68,8 +67,7 @@ public class SynchronousProxy implements Proxy, Serializable {
      * @see org.objectweb.proactive.core.mop.Proxy#reify(org.objectweb.proactive.core.mop.MethodCall)
      */
     public Object reify(MethodCall c) throws Throwable {
-        Request r = new RequestImpl(c,
-                c.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE));
+        Request r = new RequestImpl(c, c.getReifiedMethod().getReturnType().equals(java.lang.Void.TYPE));
 
         SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
 
@@ -113,8 +111,7 @@ public class SynchronousProxy implements Proxy, Serializable {
      * @param rro the remote remote object identified as target by this proxy
      * @throws ProActiveException if the remote remote object does not exist
      */
-    public void setRemoteObject(RemoteRemoteObject rro)
-        throws ProActiveException {
+    public void setRemoteObject(RemoteRemoteObject rro) throws ProActiveException {
         this.remoteObject = new RemoteObjectAdapter(rro);
     }
 
@@ -130,8 +127,7 @@ public class SynchronousProxy implements Proxy, Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) +
-            ((remoteObject == null) ? 0 : remoteObject.hashCode());
+        result = (prime * result) + ((remoteObject == null) ? 0 : remoteObject.hashCode());
         return result;
     }
 

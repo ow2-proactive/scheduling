@@ -44,8 +44,7 @@ public class MSEngineInfo {
     private MSEngine mSEngine;
     private BooleanWrapper isActivate; //a future to test if the Scilab engine is activated
 
-    public MSEngineInfo(String idEngine, MSEngine mSEngine,
-        BooleanWrapper isActivate) {
+    public MSEngineInfo(String idEngine, MSEngine mSEngine, BooleanWrapper isActivate) {
         this.idEngine = idEngine;
         this.mSEngine = mSEngine;
         this.isActivate = isActivate;

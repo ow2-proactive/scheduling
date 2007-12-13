@@ -71,10 +71,8 @@ import org.objectweb.proactive.extensions.branchnbound.core.queue.BasicQueueImpl
  *
  */
 public class Main {
-    public static final Logger logger = ProActiveLogger.getLogger(
-            "proactive.examples.flowshop");
-    private static final String USAGE = "java " + Main.class.getName() +
-        " -bench taillard_bench_file " +
+    public static final Logger logger = ProActiveLogger.getLogger("proactive.examples.flowshop");
+    private static final String USAGE = "java " + Main.class.getName() + " -bench taillard_bench_file " +
         "-desc xml_descriptor [-lb lower_bound] [-up upper_bound]";
 
     private static class Args {
@@ -98,12 +96,10 @@ public class Main {
                 com = "yes".equals(System.getProperty("flowshoptask.com"));
             }
             if (System.getProperty("flowshoptask.randominit") != null) {
-                randominit = "yes".equals(System.getProperty(
-                            "flowshoptask.randominit"));
+                randominit = "yes".equals(System.getProperty("flowshoptask.randominit"));
             }
             if (System.getProperty("flowshopparser.taillard") != null) {
-                taillard = "yes".equals(System.getProperty(
-                            "flowshopparser.taillard"));
+                taillard = "yes".equals(System.getProperty("flowshopparser.taillard"));
                 if (taillard) {
                     Main.logger.warn("WE PARSE ORIGINAL TAILLARD FILE");
                 }
@@ -149,8 +145,7 @@ public class Main {
                 }
                 parsed.xmlDescriptor.add(args[index]);
                 while ((++index < args.length) &&
-                        (!"-ub".equalsIgnoreCase(args[index]) ||
-                        !"-lb".equalsIgnoreCase(args[index]))) {
+                    (!"-ub".equalsIgnoreCase(args[index]) || !"-lb".equalsIgnoreCase(args[index]))) {
                     parsed.xmlDescriptor.add(args[index]);
                 }
                 continue;
@@ -186,8 +181,7 @@ public class Main {
 
     public static void exit(ArrayList<ProActiveDescriptor> pads, int returnCode) {
         try {
-            for (Iterator<ProActiveDescriptor> iter = pads.iterator();
-                    iter.hasNext();) {
+            for (Iterator<ProActiveDescriptor> iter = pads.iterator(); iter.hasNext();) {
                 ProActiveDescriptor pad = iter.next();
                 pad.killall(false);
             }
@@ -203,25 +197,22 @@ public class Main {
     public static void main(String[] args) {
         // Parsing command line
         if ((args.length < 4)) {
-            usage("Bad number of arguments (" + args.length +
-                ", expected 4 or more)");
+            usage("Bad number of arguments (" + args.length + ", expected 4 or more)");
         }
         Args parsed = parseArgs(args);
 
         if (logger.isDebugEnabled()) {
             logger.debug("Command line arguments:");
-            logger.debug("Taillard bench file path: " +
-                parsed.taillardBenchFile);
-            logger.debug(parsed.xmlDescriptor.size() +
-                " XML deployment descriptor path: " + parsed.xmlDescriptor);
+            logger.debug("Taillard bench file path: " + parsed.taillardBenchFile);
+            logger.debug(parsed.xmlDescriptor.size() + " XML deployment descriptor path: " +
+                parsed.xmlDescriptor);
         }
 
         // Activate the deployment
         ArrayList<ProActiveDescriptor> pads = new ArrayList<ProActiveDescriptor>();
         ArrayList<VirtualNode> vns = new ArrayList<VirtualNode>();
         try {
-            for (Iterator<String> iter = parsed.xmlDescriptor.iterator();
-                    iter.hasNext();) {
+            for (Iterator<String> iter = parsed.xmlDescriptor.iterator(); iter.hasNext();) {
                 String descriptor = iter.next();
                 ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptor);
                 pads.add(pad);
@@ -238,43 +229,36 @@ public class Main {
 
         // Parsing taillard file
         try {
-            fs = FileParser.parseFile(new File(parsed.taillardBenchFile),
-                    FSProperties.taillard);
+            fs = FileParser.parseFile(new File(parsed.taillardBenchFile), FSProperties.taillard);
         } catch (IOException e) {
-            Main.logger.fatal("Failed to open file : " +
-                parsed.taillardBenchFile + ". Exit!");
+            Main.logger.fatal("Failed to open file : " + parsed.taillardBenchFile + ". Exit!");
             Main.exit(pads, 1);
         } catch (BabFileFormatException e) {
             e.printStackTrace();
-            Main.logger.fatal("Unparsable file's format : " +
-                parsed.taillardBenchFile + ". Exit!");
+            Main.logger.fatal("Unparsable file's format : " + parsed.taillardBenchFile + ". Exit!");
             Main.exit(pads, 1);
         }
 
-        Main.logger.info("Communication in FlowShopTask are " +
-            ((FSProperties.com) ? "enable" : "disable") +
+        Main.logger.info("Communication in FlowShopTask are " + ((FSProperties.com) ? "enable" : "disable") +
             "\nRandom initialisation in FlowShopTask are " +
             ((FSProperties.randominit) ? "enable" : "disable"));
-        Task task = new FlowShopTask(fs, parsed.lowerBound, parsed.upperBound,
-                FSProperties.com, FSProperties.randominit);
+        Task task = new FlowShopTask(fs, parsed.lowerBound, parsed.upperBound, FSProperties.com,
+            FSProperties.randominit);
 
         Manager manager = null;
 
         try {
             if (vns.size() > 1) {
-                manager = ProActiveBranchNBound.newBnB(task,
-                        vns.toArray(new VirtualNode[vns.size()]),
+                manager = ProActiveBranchNBound.newBnB(task, vns.toArray(new VirtualNode[vns.size()]),
                         BasicQueueImpl.class.getName());
             } else {
-                manager = ProActiveBranchNBound.newBnB(task, vns.get(0),
-                        BasicQueueImpl.class.getName());
+                manager = ProActiveBranchNBound.newBnB(task, vns.get(0), BasicQueueImpl.class.getName());
             }
         } catch (ActiveObjectCreationException e) {
             Main.logger.error("A problem occur while creating the manager.", e);
             return;
         } catch (NodeException e) {
-            Main.logger.error("An error occur with a node while creating the manager.",
-                e);
+            Main.logger.error("An error occur with a node while creating the manager.", e);
             return;
         }
 
@@ -284,9 +268,8 @@ public class Main {
         System.out.println("Manager started ...");
         PAFuture.waitFor(result);
         computationTime = System.currentTimeMillis() - computationTime;
-        System.out.println("The best solution is:\n" + result +
-            " and the total time " + computationTime + " " +
-            fs.cumulateTimeOnLastMachine);
+        System.out.println("The best solution is:\n" + result + " and the total time " + computationTime +
+            " " + fs.cumulateTimeOnLastMachine);
         exit(pads, 0);
     }
 }

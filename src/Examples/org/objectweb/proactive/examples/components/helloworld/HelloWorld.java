@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.components.helloworld;
 
-
 /***
  *
  * Author: Eric Bruneton
@@ -92,8 +91,7 @@ public class HelloWorld {
             String arg1; // which component definition to load
             String arg2 = "r";
             String arg3 = HelloWorld.class.getResource(
-                    "/org/objectweb/proactive/examples/components/helloworld/deployment.xml")
-                                          .toString(); // the deployment descriptor for proactive
+                    "/org/objectweb/proactive/examples/components/helloworld/deployment.xml").toString(); // the deployment descriptor for proactive
 
             if (distributed) {
                 if (useWrapper) {
@@ -118,27 +116,19 @@ public class HelloWorld {
             Component rComp = null;
 
             // type of root component
-            ComponentType rType = tf.createFcType(new InterfaceType[] {
-                        tf.createFcItfType("r", Runnable.class.getName(),
-                            false, false, false)
-                    });
+            ComponentType rType = tf.createFcType(new InterfaceType[] { tf.createFcItfType("r",
+                    Runnable.class.getName(), false, false, false) });
 
             // type of client component
             ComponentType cType = tf.createFcType(new InterfaceType[] {
-                        tf.createFcItfType("r", Runnable.class.getName(),
-                            false, false, false),
-                        tf.createFcItfType("s", Service.class.getName(), true,
-                            false, false)
-                    });
+                    tf.createFcItfType("r", Runnable.class.getName(), false, false, false),
+                    tf.createFcItfType("s", Service.class.getName(), true, false, false) });
 
             // type of server component
             ComponentType sType = tf.createFcType(new InterfaceType[] {
-                        tf.createFcItfType("s", Service.class.getName(), false,
-                            false, false),
-                        tf.createFcItfType("attribute-controller",
-                            ServiceAttributes.class.getName(), false, false,
-                            false)
-                    });
+                    tf.createFcItfType("s", Service.class.getName(), false, false, false),
+                    tf.createFcItfType("attribute-controller", ServiceAttributes.class.getName(), false,
+                            false, false) });
 
             GenericFactory cf = Fractal.getGenericFactory(boot);
 
@@ -147,50 +137,37 @@ public class HelloWorld {
                 // OPTION 2.1 : CREATE COMPONENTS DIRECTLY
                 // -------------------------------------------------------------------
                 // create root component
-                rComp = cf.newFcInstance(rType,
-                        new ControllerDescription("root", Constants.COMPOSITE),
-                        null);
+                rComp = cf.newFcInstance(rType, new ControllerDescription("root", Constants.COMPOSITE), null);
                 // create client component
-                Component cComp = cf.newFcInstance(cType,
-                        new ControllerDescription("client", Constants.PRIMITIVE),
-                        new ContentDescription(ClientImpl.class.getName())); // other properties could be added (activity for example)
+                Component cComp = cf.newFcInstance(cType, new ControllerDescription("client",
+                    Constants.PRIMITIVE), new ContentDescription(ClientImpl.class.getName())); // other properties could be added (activity for example)
 
                 // create server component
-                Component sComp = cf.newFcInstance(sType,
-                        new ControllerDescription("server", Constants.PRIMITIVE),
-                        new ContentDescription(ServerImpl.class.getName()));
+                Component sComp = cf.newFcInstance(sType, new ControllerDescription("server",
+                    Constants.PRIMITIVE), new ContentDescription(ServerImpl.class.getName()));
 
-                ((ServiceAttributes) Fractal.getAttributeController(sComp)).setHeader(
-                    "--------> ");
+                ((ServiceAttributes) Fractal.getAttributeController(sComp)).setHeader("--------> ");
                 ((ServiceAttributes) Fractal.getAttributeController(sComp)).setCount(1);
 
                 if (useWrapper) {
-                    sType = tf.createFcType(new InterfaceType[] {
-                                tf.createFcItfType("s",
-                                    Service.class.getName(), false, false, false)
-                            });
+                    sType = tf.createFcType(new InterfaceType[] { tf.createFcItfType("s", Service.class
+                            .getName(), false, false, false) });
                     // create client component "wrapper" component
-                    Component CComp = cf.newFcInstance(cType,
-                            new ControllerDescription("client-wrapper",
-                                Constants.COMPOSITE), null);
+                    Component CComp = cf.newFcInstance(cType, new ControllerDescription("client-wrapper",
+                        Constants.COMPOSITE), null);
 
                     // create server component "wrapper" component
-                    Component SComp = cf.newFcInstance(sType,
-                            new ControllerDescription("server-wrapper",
-                                Constants.COMPOSITE), null);
+                    Component SComp = cf.newFcInstance(sType, new ControllerDescription("server-wrapper",
+                        Constants.COMPOSITE), null);
 
                     // component assembly
                     Fractal.getContentController(CComp).addFcSubComponent(cComp);
                     Fractal.getContentController(SComp).addFcSubComponent(sComp);
-                    Fractal.getBindingController(CComp)
-                           .bindFc("r", cComp.getFcInterface("r"));
-                    Fractal.getBindingController(cComp)
-                           .bindFc("s",
-                        Fractal.getContentController(CComp)
-                               .getFcInternalInterface("s"));
+                    Fractal.getBindingController(CComp).bindFc("r", cComp.getFcInterface("r"));
+                    Fractal.getBindingController(cComp).bindFc("s",
+                            Fractal.getContentController(CComp).getFcInternalInterface("s"));
                     //Fractal.getBindingController(cComp).bindFc("s", CComp.getFcInterface("s"));
-                    Fractal.getBindingController(SComp)
-                           .bindFc("s", sComp.getFcInterface("s"));
+                    Fractal.getBindingController(SComp).bindFc("s", sComp.getFcInterface("s"));
                     // replaces client and server components by "wrapper" components
                     // THIS CHANGES REFERENCES (STUBS)
                     cComp = CComp;
@@ -200,10 +177,8 @@ public class HelloWorld {
                 // component assembly
                 Fractal.getContentController(rComp).addFcSubComponent(cComp);
                 Fractal.getContentController(rComp).addFcSubComponent(sComp);
-                Fractal.getBindingController(rComp)
-                       .bindFc("r", cComp.getFcInterface("r"));
-                Fractal.getBindingController(cComp)
-                       .bindFc("s", sComp.getFcInterface("s"));
+                Fractal.getBindingController(rComp).bindFc("r", cComp.getFcInterface("r"));
+                Fractal.getBindingController(cComp).bindFc("s", sComp.getFcInterface("s"));
             }
 
             // start root component

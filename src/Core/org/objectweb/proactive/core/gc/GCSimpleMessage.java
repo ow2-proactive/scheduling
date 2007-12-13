@@ -41,8 +41,7 @@ public class GCSimpleMessage implements Serializable {
     private final boolean consensus;
     private final Activity lastActivity;
 
-    GCSimpleMessage(Referenced referenced, UniqueID sender, boolean consensus,
-        Activity lastActivity) {
+    GCSimpleMessage(Referenced referenced, UniqueID sender, boolean consensus, Activity lastActivity) {
         this.referenced = referenced;
         this.sender = sender;
         this.consensus = consensus;

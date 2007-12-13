@@ -90,8 +90,7 @@ public class Domain implements Serializable {
     public Domain(Integer i, Planet planet) {
         this.identification = i.intValue();
         this.info = planet;
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /**
@@ -100,7 +99,7 @@ public class Domain implements Serializable {
      * @param maxIter The number of iterations to compute before stoppping
      */
     public void init(Displayer dp, int maxIter,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.killsupport = killsupport;
         this.display = dp;
         this.maxIter = maxIter;
@@ -152,19 +151,17 @@ public class Domain implements Serializable {
                 logger.info("Compute movement. " + iter);
             }
         } else {
-            this.display.drawBody(this.info.x, this.info.y, this.info.z,
-                this.info.vx, this.info.vy, this.info.vz, (int) this.info.mass,
-                (int) this.info.diameter, this.identification, this.hostName);
+            this.display.drawBody(this.info.x, this.info.y, this.info.z, this.info.vx, this.info.vy,
+                    this.info.vz, (int) this.info.mass, (int) this.info.diameter, this.identification,
+                    this.hostName);
         }
     }
 
     /**
      * Method called when the object is redeployed on a new Node (Fault recovery, or migration).
      */
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

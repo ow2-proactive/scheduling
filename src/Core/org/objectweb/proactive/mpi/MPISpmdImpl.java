@@ -93,11 +93,8 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
      * API method for creating a new MPISPMD object from an existing Virtual Node
      * @throws NodeException
      */
-    public MPISpmdImpl(VirtualNodeInternal vn)
-        throws RuntimeException, NodeException {
-        MPI_IMPL_LOGGER.debug(
-            "[MPISpmd object] creating MPI SPMD active object: " +
-            vn.getName());
+    public MPISpmdImpl(VirtualNodeInternal vn) throws RuntimeException, NodeException {
+        MPI_IMPL_LOGGER.debug("[MPISpmd object] creating MPI SPMD active object: " + vn.getName());
         //  active
         if (!(vn.isActivated())) {
             vn.activate();
@@ -114,7 +111,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         } else {
             throw new RuntimeException(
                 "!!! ERROR: Cannot create MPISpmd object Cause: No MPI process attached with the virtual node " +
-                vn.getName());
+                    vn.getName());
         }
     }
 
@@ -132,8 +129,7 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             return result;
         } catch (IOException e) {
             e.printStackTrace();
-            MPI_IMPL_LOGGER.error(
-                "!!! ERROR startMPI: cannot start MPI process " + this.name +
+            MPI_IMPL_LOGGER.error("!!! ERROR startMPI: cannot start MPI process " + this.name +
                 " with command " + mpiProcess.getCommand());
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -168,15 +164,13 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
             Thread.sleep(200);
             return true;
         } catch (IllegalStateException e) {
-            MPI_IMPL_LOGGER.error(
-                "Exception caught, waiting process to start to kill it.");
+            MPI_IMPL_LOGGER.error("Exception caught, waiting process to start to kill it.");
             while (!mpiProcess.isStarted()) {
             }
             mpiProcess.stopProcess();
         } catch (InterruptedException e) {
             e.printStackTrace();
-            MPI_IMPL_LOGGER.error("!!! ERROR killMPI: cannot kill MPI process " +
-                this.name);
+            MPI_IMPL_LOGGER.error("!!! ERROR killMPI: cannot kill MPI process " + this.name);
         }
         return false;
     }
@@ -310,12 +304,9 @@ public class MPISpmdImpl implements MPISpmd, java.io.Serializable {
         }
     }
 
-    public void newActive(String cl, Object[] params, int rank)
-        throws ArrayIndexOutOfBoundsException {
+    public void newActive(String cl, Object[] params, int rank) throws ArrayIndexOutOfBoundsException {
         if (spmdClasses.contains(cl) ||
-                (classes.contains(cl) &&
-                (rank < this.classesParamsByRank.length) &&
-                (this.classesParamsByRank[rank] != null))) {
+            (classes.contains(cl) && (rank < this.classesParamsByRank.length) && (this.classesParamsByRank[rank] != null))) {
             MPI_IMPL_LOGGER.info("!!! ERROR newActive: " + cl +
                 " class has already been added to the list of user classes to instanciate ");
         } else if (rank < this.classesParamsByRank.length) {

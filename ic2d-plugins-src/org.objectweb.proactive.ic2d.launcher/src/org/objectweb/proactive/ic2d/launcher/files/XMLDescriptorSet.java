@@ -86,16 +86,16 @@ public class XMLDescriptorSet extends Observable {
         if (file != null) {
             String name = file.getName();
             switch (file.getState()) {
-            case LAUNCHED:
-                return name + " - activated";
-            case ERROR:
-                return name + " - error";
-            case KILLED:
-                return name + " - killed";
-            case TERMINATED:
-                return name + " - terminated";
-            default:
-                return name;
+                case LAUNCHED:
+                    return name + " - activated";
+                case ERROR:
+                    return name + " - error";
+                case KILLED:
+                    return name + " - killed";
+                case TERMINATED:
+                    return name + " - terminated";
+                default:
+                    return name;
             }
         } else {
             return null;

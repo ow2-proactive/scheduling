@@ -40,8 +40,7 @@ public class SimpleTestRemovesource {
         System.out.println("# --oOo-- Simple Test remove source --oOo-- ");
 
         try {
-            String url = "rmi://localhost:1099/" +
-                RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
+            String url = "rmi://localhost:1099/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
             RMAdmin admin = RMConnection.connectAsAdmin(url);
 
             for (String toRemoveNodeSourceId : args) {

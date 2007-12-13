@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-
 /**
  * <p>
  * A class implementing this interface is a factory of RequestReceiver objects.

@@ -44,8 +44,7 @@ public class GCMDeploymentEnvironment {
     public void addValue(String varname, String value) {
         for (int i = 0; i < varname.length(); ++i) {
             if (Character.isWhitespace(varname.charAt(i))) {
-                throw new RuntimeException(
-                    "no whitespace allowed in environment variable name");
+                throw new RuntimeException("no whitespace allowed in environment variable name");
             }
         }
         environment.put(varname, value);

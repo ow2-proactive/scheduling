@@ -79,10 +79,8 @@ public class XMLEditor extends TextEditor {
             path = ((IPathEditorInput) input).getPath().toOSString();
             changePerspective();
             XMLDescriptorSet.getInstance().addFile(new XMLDescriptor(path));
-            Console.getInstance(Activator.CONSOLE_NAME)
-                   .log("File selected : " + path);
-            System.out.println("XMLEditor.doSetInput() " +
-                this.getEditorSite().getPage());
+            Console.getInstance(Activator.CONSOLE_NAME).log("File selected : " + path);
+            System.out.println("XMLEditor.doSetInput() " + this.getEditorSite().getPage());
         }
     }
 

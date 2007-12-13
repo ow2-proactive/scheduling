@@ -53,8 +53,8 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 public class NativeTask implements Task<String[]> {
 
     /**
-         *
-         */
+     *
+     */
     private String[] commandArray = null;
     private String[] envp = null;
     private URL urlDir = null;
@@ -143,8 +143,7 @@ public class NativeTask implements Task<String[]> {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.extensions.masterworker.interfaces.Task#run(org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory)
      */
-    public String[] run(WorkerMemory memory)
-        throws IOException, URISyntaxException {
+    public String[] run(WorkerMemory memory) throws IOException, URISyntaxException {
         ArrayList<String> lines = new ArrayList<String>();
         Runtime runtime = Runtime.getRuntime();
         Process process = null;
@@ -153,8 +152,7 @@ public class NativeTask implements Task<String[]> {
         } else {
             process = runtime.exec(commandArray, envp, null);
         }
-        BufferedReader d = new BufferedReader(new InputStreamReader(
-                    process.getInputStream()));
+        BufferedReader d = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String line;
         while ((line = d.readLine()) != null) {
             lines.add(line);

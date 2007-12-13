@@ -40,12 +40,10 @@ import org.junit.Test;
 public class TestHashSum {
     @Test
     public void TestSha1Sum() throws Exception {
-        String shakespeare = "If music be the food of love, play on\n" +
-            "Give me excess of it, that, surfeiting,\n" +
-            "The appetite may sicken, and so die.";
+        String shakespeare = "If music be the food of love, play on\n"
+            + "Give me excess of it, that, surfeiting,\n" + "The appetite may sicken, and so die.";
 
-        File testfile = new File(System.getProperty("java.io.tmpdir"),
-                "test-calcium-hashsum-shakespeare");
+        File testfile = new File(System.getProperty("java.io.tmpdir"), "test-calcium-hashsum-shakespeare");
 
         if (testfile.exists()) {
             testfile.delete();
@@ -61,8 +59,7 @@ public class TestHashSum {
 
         String hexStringHash = org.objectweb.proactive.extensions.calcium.system.HashSum.hashsum(testfile,
                 "SHA-1");
-        assertTrue(hexStringHash.equals(
-                "404d69b17da9a666fe8db79eec8483d94a43babc"));
+        assertTrue(hexStringHash.equals("404d69b17da9a666fe8db79eec8483d94a43babc"));
 
         testfile.delete();
 

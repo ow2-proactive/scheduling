@@ -72,14 +72,13 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class MulticastControllerImpl extends AbstractProActiveController
-    implements MulticastController, Serializable {
+public class MulticastControllerImpl extends AbstractProActiveController implements MulticastController,
+        Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     private static Logger multicastLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST);
     private Map<String, ProActiveInterface> multicastItfs = new HashMap<String, ProActiveInterface>();
     private Map clientSideProxies = new HashMap();
-    private Map<String, Map<SerializableMethod, SerializableMethod>> matchingMethods =
-        new HashMap<String, Map<SerializableMethod, SerializableMethod>>();
+    private Map<String, Map<SerializableMethod, SerializableMethod>> matchingMethods = new HashMap<String, Map<SerializableMethod, SerializableMethod>>();
 
     public MulticastControllerImpl(Component owner) {
         super(owner);
@@ -93,15 +92,15 @@ public class MulticastControllerImpl extends AbstractProActiveController
             ProActiveInterfaceType type = (ProActiveInterfaceType) itfTypes[i];
             if (type.isFcMulticastItf()) {
                 try {
-                    addClientSideProxy(type.getFcItfName(),
-                        (ProActiveInterface) owner.getFcInterface(
-                            type.getFcItfName()));
+                    addClientSideProxy(type.getFcItfName(), (ProActiveInterface) owner.getFcInterface(type
+                            .getFcItfName()));
                 } catch (NoSuchInterfaceException e) {
                     throw new ProActiveRuntimeException(e);
                 }
             }
         }
-        List<InterfaceType> interfaceTypes = Arrays.asList(((ComponentType) owner.getFcType()).getFcInterfaceTypes());
+        List<InterfaceType> interfaceTypes = Arrays.asList(((ComponentType) owner.getFcType())
+                .getFcInterfaceTypes());
         Iterator<InterfaceType> it = interfaceTypes.iterator();
 
         while (it.hasNext()) {
@@ -111,14 +110,14 @@ public class MulticastControllerImpl extends AbstractProActiveController
     }
 
     /**
-    * client and server interfaces must have the same methods, except that
-    * the client methods always returns a java.util.List<E>, whereas
-    * the server methods return E. (for multicast interfaces)
-    * <br>
-    *
-    */
-    public void ensureCompatibility(ProActiveInterfaceType clientSideItfType,
-        ProActiveInterface serverSideItf) throws IllegalBindingException {
+     * client and server interfaces must have the same methods, except that
+     * the client methods always returns a java.util.List<E>, whereas
+     * the server methods return E. (for multicast interfaces)
+     * <br>
+     *
+     */
+    public void ensureCompatibility(ProActiveInterfaceType clientSideItfType, ProActiveInterface serverSideItf)
+            throws IllegalBindingException {
         try {
             ProActiveInterfaceType serverSideItfType = (ProActiveInterfaceType) serverSideItf.getFcItfType();
             Class<?> clientSideItfClass;
@@ -129,40 +128,32 @@ public class MulticastControllerImpl extends AbstractProActiveController
             Method[] serverSideItfMethods = serverSideItfClass.getMethods();
 
             if (clientSideItfMethods.length != serverSideItfMethods.length) {
-                throw new IllegalBindingException(
-                    "incompatible binding between client interface " +
-                    clientSideItfType.getFcItfName() + " (" +
-                    clientSideItfType.getFcItfSignature() +
-                    ")  and server interface " +
-                    serverSideItfType.getFcItfName() + " (" +
+                throw new IllegalBindingException("incompatible binding between client interface " +
+                    clientSideItfType.getFcItfName() + " (" + clientSideItfType.getFcItfSignature() +
+                    ")  and server interface " + serverSideItfType.getFcItfName() + " (" +
                     serverSideItfType.getFcItfSignature() +
                     ") : there is not the same number of methods (including those inherited) in both interfaces !");
             }
 
-            Map<SerializableMethod, SerializableMethod> matchingMethodsForThisItf =
-                new HashMap<SerializableMethod, SerializableMethod>(clientSideItfMethods.length);
+            Map<SerializableMethod, SerializableMethod> matchingMethodsForThisItf = new HashMap<SerializableMethod, SerializableMethod>(
+                clientSideItfMethods.length);
 
             for (Method method : clientSideItfMethods) {
-                Method serverSideMatchingMethod = searchMatchingMethod(method,
-                        serverSideItfMethods,
-                        clientSideItfType.isFcMulticastItf(),
-                        serverSideItfType.isFcGathercastItf(), serverSideItf);
+                Method serverSideMatchingMethod = searchMatchingMethod(method, serverSideItfMethods,
+                        clientSideItfType.isFcMulticastItf(), serverSideItfType.isFcGathercastItf(),
+                        serverSideItf);
                 if (serverSideMatchingMethod == null) {
-                    throw new IllegalBindingException(
-                        "binding incompatibility between " +
-                        clientSideItfType.getFcItfName() + " and " +
-                        serverSideItfType.getFcItfName() +
+                    throw new IllegalBindingException("binding incompatibility between " +
+                        clientSideItfType.getFcItfName() + " and " + serverSideItfType.getFcItfName() +
                         " : cannot find matching method");
                 }
-                matchingMethodsForThisItf.put(new SerializableMethod(method),
-                    new SerializableMethod(serverSideMatchingMethod));
+                matchingMethodsForThisItf.put(new SerializableMethod(method), new SerializableMethod(
+                    serverSideMatchingMethod));
             }
 
-            matchingMethods.put(clientSideItfType.getFcItfName(),
-                matchingMethodsForThisItf);
+            matchingMethods.put(clientSideItfType.getFcItfName(), matchingMethodsForThisItf);
         } catch (ClassNotFoundException e) {
-            throw new IllegalBindingException(
-                "cannot find class corresponding to given signature " +
+            throw new IllegalBindingException("cannot find class corresponding to given signature " +
                 e.getMessage());
         }
     }
@@ -170,12 +161,11 @@ public class MulticastControllerImpl extends AbstractProActiveController
     /*
      * @see org.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#searchMatchingMethod(java.lang.reflect.Method, java.lang.reflect.Method[])
      */
-    protected Method searchMatchingMethod(Method clientSideMethod,
-        Method[] serverSideMethods, boolean clientItfIsMulticast,
-        boolean serverItfIsGathercast, ProActiveInterface serverSideItf) {
+    protected Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
+            boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf) {
         try {
-            return MulticastBindingChecker.searchMatchingMethod(clientSideMethod,
-                serverSideMethods, serverItfIsGathercast, serverSideItf);
+            return MulticastBindingChecker.searchMatchingMethod(clientSideMethod, serverSideMethods,
+                    serverItfIsGathercast, serverSideItf);
         } catch (ParameterDispatchException e) {
             e.printStackTrace();
             return null;
@@ -188,13 +178,11 @@ public class MulticastControllerImpl extends AbstractProActiveController
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(Constants.MULTICAST_CONTROLLER,
-                    MulticastController.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.MULTICAST_CONTROLLER,
+                    MulticastController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException(
-                "cannot create controller type for controller " +
+            throw new ProActiveRuntimeException("cannot create controller type for controller " +
                 this.getClass().getName());
         }
     }
@@ -210,7 +198,8 @@ public class MulticastControllerImpl extends AbstractProActiveController
         }
 
         try {
-            ProActiveInterface multicastItf = (ProActiveInterface) owner.getFcInterface(itfType.getFcItfName());
+            ProActiveInterface multicastItf = (ProActiveInterface) owner.getFcInterface(itfType
+                    .getFcItfName());
             multicastItfs.put(itfType.getFcItfName(), multicastItf);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
@@ -223,8 +212,7 @@ public class MulticastControllerImpl extends AbstractProActiveController
     /*
      * @see org.objectweb.proactive.core.component.controller.MulticastController#bindFc(java.lang.String, org.objectweb.proactive.core.component.ProActiveInterface)
      */
-    public void bindFcMulticast(String clientItfName,
-        ProActiveInterface serverItf) {
+    public void bindFcMulticast(String clientItfName, ProActiveInterface serverItf) {
         try {
             // bindFcMulticast is just a renaming of the bindFc method in the BindingController
             // this avoid to rewrite similar code
@@ -233,29 +221,22 @@ public class MulticastControllerImpl extends AbstractProActiveController
         } catch (NoSuchInterfaceException e) {
             logger.warn("No such interface: " + clientItfName, e);
         } catch (IllegalBindingException e) {
-            logger.warn("Illegal binding between " + clientItfName + " and " +
-                serverItf.getFcItfName(), e);
+            logger.warn("Illegal binding between " + clientItfName + " and " + serverItf.getFcItfName(), e);
         } catch (IllegalLifeCycleException e) {
-            logger.warn("Illegal life cycle component for binding " +
-                clientItfName + " and " + serverItf.getFcItfName(), e);
+            logger.warn("Illegal life cycle component for binding " + clientItfName + " and " +
+                serverItf.getFcItfName(), e);
         }
     }
 
     /*
      * @see org.objectweb.proactive.core.component.controller.MulticastController#unbindFc(java.lang.String, org.objectweb.proactive.core.component.ProActiveInterface)
      */
-    public void unbindFcMulticast(String clientItfName,
-        ProActiveInterface serverItf) {
+    public void unbindFcMulticast(String clientItfName, ProActiveInterface serverItf) {
         if (multicastItfs.containsKey(clientItfName)) {
-            if (PAGroup.getGroup(multicastItfs.get(clientItfName))
-                           .remove(serverItf)) {
-                logger.debug(
-                    "removed connected interface from multicast interface : " +
-                    clientItfName);
+            if (PAGroup.getGroup(multicastItfs.get(clientItfName)).remove(serverItf)) {
+                logger.debug("removed connected interface from multicast interface : " + clientItfName);
             } else {
-                logger.error(
-                    "cannot remove connected interface from multicast interface : " +
-                    clientItfName);
+                logger.error("cannot remove connected interface from multicast interface : " + clientItfName);
             }
         }
     }
@@ -263,40 +244,36 @@ public class MulticastControllerImpl extends AbstractProActiveController
     /*
      * @see org.objectweb.proactive.core.component.controller.MulticastController#lookupFc(java.lang.String)
      */
-    public ProxyForComponentInterfaceGroup lookupFcMulticast(
-        String clientItfName) {
+    public ProxyForComponentInterfaceGroup lookupFcMulticast(String clientItfName) {
         if (multicastItfs.containsKey(clientItfName)) {
             return (ProxyForComponentInterfaceGroup) ((ProActiveInterface) multicastItfs.get(clientItfName)
-                                                                                        .getFcItfImpl()).getProxy();
+                    .getFcItfImpl()).getProxy();
         } else {
             return null;
         }
     }
 
-    public Map<MethodCall, Integer> generateMethodCallsForMulticastDelegatee(
-        MethodCall mc, ProxyForComponentInterfaceGroup delegatee)
-        throws ParameterDispatchException {
+    public Map<MethodCall, Integer> generateMethodCallsForMulticastDelegatee(MethodCall mc,
+            ProxyForComponentInterfaceGroup delegatee) throws ParameterDispatchException {
         // read from annotations
         Object[] clientSideEffectiveArguments = mc.getEffectiveArguments();
 
-        ProActiveInterfaceType itfType = (ProActiveInterfaceType) multicastItfs.get(mc.getComponentMetadata()
-                                                                                      .getComponentInterfaceName())
-                                                                               .getFcItfType();
+        ProActiveInterfaceType itfType = (ProActiveInterfaceType) multicastItfs.get(
+                mc.getComponentMetadata().getComponentInterfaceName()).getFcItfType();
 
         Method matchingMethodInClientInterface; // client itf as well as parent interfaces
 
         try {
-            matchingMethodInClientInterface = Class.forName(itfType.getFcItfSignature())
-                                                   .getMethod(mc.getReifiedMethod()
-                                                                .getName(),
-                    mc.getReifiedMethod().getParameterTypes());
+            matchingMethodInClientInterface = Class.forName(itfType.getFcItfSignature()).getMethod(
+                    mc.getReifiedMethod().getName(), mc.getReifiedMethod().getParameterTypes());
         } catch (Exception e) {
             e.printStackTrace();
             throw new ParameterDispatchException(e.fillInStackTrace());
         }
 
         Class<?>[] clientSideParamTypes = matchingMethodInClientInterface.getParameterTypes();
-        ParamDispatch[] clientSideParamDispatchModes = MulticastBindingChecker.getDispatchModes(matchingMethodInClientInterface);
+        ParamDispatch[] clientSideParamDispatchModes = MulticastBindingChecker
+                .getDispatchModes(matchingMethodInClientInterface);
 
         List<List<Object>> dispatchedParameters = new ArrayList<List<Object>>();
 
@@ -337,12 +314,10 @@ public class MulticastControllerImpl extends AbstractProActiveController
             for (int i = 1; i < dispatchSizes.size(); i++) {
                 if (dispatchSizes.get(i).intValue() != expectedMethodCallsNb) {
                     throw new ParameterDispatchException(
-                        "cannot generate invocation for multicast interface " +
-                        itfType.getFcItfName() +
-                        " because the specified distribution of parameters is incorrect in method " +
-                        matchingMethodInClientInterface.getName() + "(" +
-                        dispatchSizes.get(i).intValue() + " instead of " +
-                        expectedMethodCallsNb + ")");
+                        "cannot generate invocation for multicast interface " + itfType.getFcItfName() +
+                            " because the specified distribution of parameters is incorrect in method " +
+                            matchingMethodInClientInterface.getName() + "(" +
+                            dispatchSizes.get(i).intValue() + " instead of " + expectedMethodCallsNb + ")");
                 }
             }
         } else {
@@ -352,8 +327,8 @@ public class MulticastControllerImpl extends AbstractProActiveController
 
         // get distributed parameters
         for (int i = 0; i < clientSideParamTypes.length; i++) {
-            List<Object> dispatchedParameter = clientSideParamDispatchModes[i].dispatch(clientSideEffectiveArguments[i],
-                    expectedMethodCallsNb);
+            List<Object> dispatchedParameter = clientSideParamDispatchModes[i].dispatch(
+                    clientSideEffectiveArguments[i], expectedMethodCallsNb);
             //delegatee.size()); FIXME 
             dispatchedParameters.add(dispatchedParameter);
         }
@@ -367,29 +342,23 @@ public class MulticastControllerImpl extends AbstractProActiveController
             //                System.out.println("########## \n" +
             //                    matchingMethods.toString());
             //            }
-            Method matchingMethodInServerInterface = matchingMethods.get(mc.getComponentMetadata()
-                                                                           .getComponentInterfaceName())
-                                                                    .get(new SerializableMethod(
-                        mc.getReifiedMethod())).getMethod();
+            Method matchingMethodInServerInterface = matchingMethods.get(
+                    mc.getComponentMetadata().getComponentInterfaceName()).get(
+                    new SerializableMethod(mc.getReifiedMethod())).getMethod();
 
             // now we have all dispatched parameters
             // proceed to generation of method calls
-            for (int generatedMethodCallIndex = 0;
-                    generatedMethodCallIndex < expectedMethodCallsNb;
-                    generatedMethodCallIndex++) {
-                Object[] individualEffectiveArguments = new Object[matchingMethodInServerInterface.getParameterTypes().length];
+            for (int generatedMethodCallIndex = 0; generatedMethodCallIndex < expectedMethodCallsNb; generatedMethodCallIndex++) {
+                Object[] individualEffectiveArguments = new Object[matchingMethodInServerInterface
+                        .getParameterTypes().length];
 
-                for (int parameterIndex = 0;
-                        parameterIndex < individualEffectiveArguments.length;
-                        parameterIndex++) {
+                for (int parameterIndex = 0; parameterIndex < individualEffectiveArguments.length; parameterIndex++) {
                     individualEffectiveArguments[parameterIndex] = dispatchedParameters.get(parameterIndex)
-                                                                                       .get(generatedMethodCallIndex); // initialize
+                            .get(generatedMethodCallIndex); // initialize
                 }
 
-                result.put(new MethodCall(matchingMethodInServerInterface,
-                        mc.getGenericTypesMapping(),
-                        individualEffectiveArguments, mc.getExceptionContext()),
-                    generatedMethodCallIndex);
+                result.put(new MethodCall(matchingMethodInServerInterface, mc.getGenericTypesMapping(),
+                    individualEffectiveArguments, mc.getExceptionContext()), generatedMethodCallIndex);
                 //                      generatedMethodCallIndex % delegatee.size());
                 // default is to do some round robin when nbGeneratedMethodCalls > nbReceivers
             }
@@ -406,10 +375,9 @@ public class MulticastControllerImpl extends AbstractProActiveController
         if (logger.isDebugEnabled()) {
             try {
                 if (!PAGroup.isGroup(serverItf.getFcItfOwner())) {
-                    logger.debug("multicast binding : " + clientItfName +
-                        " to : " +
-                        Fractal.getNameController(serverItf.getFcItfOwner())
-                               .getFcName() + "." + serverItf.getFcItfName());
+                    logger.debug("multicast binding : " + clientItfName + " to : " +
+                        Fractal.getNameController(serverItf.getFcItfOwner()).getFcName() + "." +
+                        serverItf.getFcItfName());
                 }
             } catch (NoSuchInterfaceException e) {
                 e.printStackTrace();
@@ -417,12 +385,14 @@ public class MulticastControllerImpl extends AbstractProActiveController
         }
         if (multicastItfs.containsKey(clientItfName)) {
             try {
-                ProxyForComponentInterfaceGroup clientSideProxy = (ProxyForComponentInterfaceGroup) clientSideProxies.get(clientItfName);
+                ProxyForComponentInterfaceGroup clientSideProxy = (ProxyForComponentInterfaceGroup) clientSideProxies
+                        .get(clientItfName);
 
                 if (clientSideProxy.getDelegatee() == null) {
-                    ProActiveInterface groupItf = ProActiveComponentGroup.newComponentInterfaceGroup((ProActiveInterfaceType) serverItf.getFcItfType(),
-                            owner);
-                    ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) groupItf).getProxy();
+                    ProActiveInterface groupItf = ProActiveComponentGroup.newComponentInterfaceGroup(
+                            (ProActiveInterfaceType) serverItf.getFcItfType(), owner);
+                    ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) groupItf)
+                            .getProxy();
                     clientSideProxy.setDelegatee(proxy);
                 }
 

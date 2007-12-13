@@ -49,20 +49,17 @@ import functionalTests.security.policyserver.SecurityTestPolicyServer;
 import functionalTests.security.securitymanager.SecurityTestSecurityManager;
 import functionalTests.security.sessionkeyexchange.SecurityTestSessionKeyExchange;
 import static junit.framework.Assert.assertTrue;
+
+
 @RunWith(Suite.class)
-@SuiteClasses({SecurityTestKeyGen.class,
-    SecurityTestPolicyServer.class,
-    SecurityTestSecurityManager.class,
-    SecurityTestSessionKeyExchange.class,
-    SecurityTestApplicationLifeCycle.class,
-    SecurityTestContextPropagation.class
-})
+@SuiteClasses( { SecurityTestKeyGen.class, SecurityTestPolicyServer.class, SecurityTestSecurityManager.class,
+        SecurityTestSessionKeyExchange.class, SecurityTestApplicationLifeCycle.class,
+        SecurityTestContextPropagation.class })
 public class TestUnlimitedCrypto {
     static private final int KSIZE = 4096;
 
     @BeforeClass
-    public static void checkUnlimitedCryptoIsAvailable()
-        throws Exception {
+    public static void checkUnlimitedCryptoIsAvailable() throws Exception {
         java.security.Security.addProvider(new BouncyCastleProvider());
 
         try {
@@ -76,8 +73,8 @@ public class TestUnlimitedCrypto {
             cipher.init(Cipher.ENCRYPT_MODE, key.getPublic());
             cipher.doFinal(new byte[50]);
         } catch (InvalidKeyException e) {
-            System.err.println(
-                "Strong Juridiction Policy Files detected, please install the Unlimited Juridiction Policy Files to be able to use ProActive' Security Framework");
+            System.err
+                    .println("Strong Juridiction Policy Files detected, please install the Unlimited Juridiction Policy Files to be able to use ProActive' Security Framework");
             assertTrue(false);
         }
     }

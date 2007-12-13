@@ -46,8 +46,8 @@ public class GCMRuntimeRegistrationNotificationData implements Serializable {
         // No-args constructor
     }
 
-    public GCMRuntimeRegistrationNotificationData(String childURL,
-        long deploymentId, long topologyId, Set<Node> nodes) {
+    public GCMRuntimeRegistrationNotificationData(String childURL, long deploymentId, long topologyId,
+            Set<Node> nodes) {
         this.childURL = childURL;
         this.deploymentId = deploymentId;
         this.topologyId = topologyId;

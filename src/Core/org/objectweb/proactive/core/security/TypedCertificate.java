@@ -51,8 +51,7 @@ public class TypedCertificate implements Serializable {
     private final PrivateKey privateKey;
     private byte[] encodedCert;
 
-    public TypedCertificate(X509Certificate cert, EntityType type,
-        PrivateKey privateKey) {
+    public TypedCertificate(X509Certificate cert, EntityType type, PrivateKey privateKey) {
         this.cert = cert;
         this.type = type;
         this.privateKey = privateKey;
@@ -96,8 +95,7 @@ public class TypedCertificate implements Serializable {
         this.encodedCert = null;
     }
 
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         if (this.encodedCert != null) {
             this.cert = ProActiveSecurity.decodeCertificate(this.encodedCert);

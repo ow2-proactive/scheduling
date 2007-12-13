@@ -50,7 +50,6 @@ public interface CollectiveInterfaceController {
      * @param itf a component interface
      * @throws org.objectweb.fractal.api.control.IllegalBindingException
      */
-    public void ensureCompatibility(ProActiveInterfaceType itfType,
-        ProActiveInterface itf)
-        throws org.objectweb.fractal.api.control.IllegalBindingException;
+    public void ensureCompatibility(ProActiveInterfaceType itfType, ProActiveInterface itf)
+            throws org.objectweb.fractal.api.control.IllegalBindingException;
 }

@@ -49,8 +49,8 @@ import org.objectweb.proactive.core.body.request.Request;
 public class CheckpointInfoCIC implements org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo {
 
     /**
-         *
-         */
+     *
+     */
 
     /** The index of the linked checkpoint */
     public int checkpointIndex;

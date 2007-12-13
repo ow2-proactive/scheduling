@@ -50,8 +50,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class LocationServerMetaObjectFactory
-    extends ProActiveRmiMetaObjectFactory {
+public class LocationServerMetaObjectFactory extends ProActiveRmiMetaObjectFactory {
     //
     // -- PRIVATE MEMBERS -----------------------------------------------
     //
@@ -94,19 +93,17 @@ public class LocationServerMetaObjectFactory
     //
     // -- INNER CLASSES -----------------------------------------------
     //
-    protected class RequestWithLocationServerFactory implements RequestFactory,
-        java.io.Serializable {
+    protected class RequestWithLocationServerFactory implements RequestFactory, java.io.Serializable {
         transient private LocationServer server = LocationServerFactory.getLocationServer();
 
-        public Request newRequest(MethodCall methodCall,
-            UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-            return new RequestWithLocationServer(methodCall, sourceBody,
-                isOneWay, sequenceID, server);
+        public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
+                long sequenceID) {
+            return new RequestWithLocationServer(methodCall, sourceBody, isOneWay, sequenceID, server);
         }
     }
 
-    protected static class MigrationManagerFactoryImpl
-        implements MigrationManagerFactory, java.io.Serializable {
+    protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory,
+            java.io.Serializable {
         public MigrationManager newMigrationManager() {
             return new MigrationManagerWithLocationServer(LocationServerFactory.getLocationServer());
         }

@@ -297,23 +297,21 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
             JLabel cmd = new JLabel(" killall java  ");
             JButton kill = new JButton("Execute");
             kill.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        try {
-                            Runtime.getRuntime()
-                                   .exec("" + protocol.getSelectedItem() + " " +
-                                listVMs.getSelectedItem() +
-                                " killall -KILL java");
-                        } catch (IOException e1) {
-                            e1.printStackTrace();
-                        }
+                public void actionPerformed(ActionEvent evt) {
+                    try {
+                        Runtime.getRuntime().exec(
+                                "" + protocol.getSelectedItem() + " " + listVMs.getSelectedItem() +
+                                    " killall -KILL java");
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
                     }
-                });
+                }
+            });
             killingPanel.add(protocol);
             killingPanel.add(listVMs);
             killingPanel.add(cmd);
             killingPanel.add(kill);
-            killingPanel.setBorder(BorderFactory.createTitledBorder(
-                    "Execution control"));
+            killingPanel.setBorder(BorderFactory.createTitledBorder("Execution control"));
 
             south.add(killingPanel);
         }
@@ -321,29 +319,29 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
         traceButton = new JCheckBox();
         traceButton.setText("Plots");
         traceButton.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    traceButtonActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                traceButtonActionPerformed(evt);
+            }
+        });
         south.add(traceButton);
 
         labelButton = new JCheckBox();
         labelButton.setText("Host Names");
         labelButton.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    labelButtonActionPerformed(evt);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                labelButtonActionPerformed(evt);
+            }
+        });
         labelButton.setSelected(true);
         south.add(labelButton);
 
         JButton centreButton = new JButton();
         centreButton.setText("Center");
         centreButton.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    centrer();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                centrer();
+            }
+        });
         south.add(centreButton);
 
         //main.add(controlPanel, BorderLayout.SOUTH);
@@ -364,8 +362,8 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      * @param identification id of the body who call the method
      * @param hostName where the body is hosted
      */
-    public void drawBody(double x, double y, double z, double vx, double vy,
-        double vz, int mass, int diameter, int identification, String hostName) {
+    public void drawBody(double x, double y, double z, double vx, double vy, double vz, int mass,
+            int diameter, int identification, String hostName) {
         // Deplacement
         //this.movePlanete(identification, x, y,z);
         synchronized (this.bodies[identification]) {
@@ -472,8 +470,7 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      */
     private BranchGroup createScene(SimpleUniverse simpleU) {
         BoundingSphere bounds = new BoundingSphere(new Point3d(), 10000.0);
-        TransformGroup vpTrans = simpleU.getViewingPlatform()
-                                        .getViewPlatformTransform();
+        TransformGroup vpTrans = simpleU.getViewingPlatform().getViewPlatformTransform();
 
         // RAW ROOT
         BranchGroup objRoot = new BranchGroup();
@@ -511,20 +508,16 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      * @param root root of the 3d scene
      * @param schedulingBounds bounds
      */
-    private void applyBackgroundImage(BranchGroup root,
-        BoundingSphere schedulingBounds) {
+    private void applyBackgroundImage(BranchGroup root, BoundingSphere schedulingBounds) {
         ClassLoader cl = this.getClass().getClassLoader();
-        java.net.URL u = cl.getResource(
-                "org/objectweb/proactive/examples/nbody/common/fondnbody3d.jpg");
+        java.net.URL u = cl.getResource("org/objectweb/proactive/examples/nbody/common/fondnbody3d.jpg");
         final Image backGround = getToolkit().getImage(u);
         TextureLoader starsTexture = new TextureLoader(backGround, this);
 
-        Dimension tailleEcran = java.awt.Toolkit.getDefaultToolkit()
-                                                .getScreenSize();
+        Dimension tailleEcran = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
         double hauteur = tailleEcran.getHeight();
         double largeur = tailleEcran.getWidth();
-        Background stars = new Background(starsTexture.getScaledImage(
-                    (int) largeur, (int) hauteur));
+        Background stars = new Background(starsTexture.getScaledImage((int) largeur, (int) hauteur));
         //Background stars = new Background (starsTexture.getScaledImage(10000,10000));
         stars.setApplicationBounds(schedulingBounds);
         root.addChild(stars);
@@ -543,51 +536,50 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
         float blue = 0.0f;
 
         switch (index % 8) {
-        case 0: //red
-            red = 1.0f;
-            green = 0.0f;
-            blue = 0.0f;
-            break;
-        case 1: //green
-            red = 0.0f;
-            green = 1.0f;
-            blue = 0.0f;
-            break;
-        case 3: //blue
-            red = 0.0f;
-            green = 0.0f;
-            blue = 1.0f;
-            break;
-        case 2: //yellow
-            red = 1.0f;
-            green = 1.0f;
-            blue = 0.0f;
-            break;
-        case 4: //violet
-            red = 1.0f;
-            green = 0.0f;
-            blue = 1.0f;
-            break;
-        case 5: //light blue
-            red = 0.5f;
-            green = 0.5f;
-            blue = 1.0f;
-            break;
-        case 6: //pink
-            red = 1.0f;
-            green = 0.5f;
-            blue = 0.5f;
-            break;
-        case 7: //light green
-            red = 0.5f;
-            green = 1.0f;
-            blue = 0.5f;
-            break;
+            case 0: //red
+                red = 1.0f;
+                green = 0.0f;
+                blue = 0.0f;
+                break;
+            case 1: //green
+                red = 0.0f;
+                green = 1.0f;
+                blue = 0.0f;
+                break;
+            case 3: //blue
+                red = 0.0f;
+                green = 0.0f;
+                blue = 1.0f;
+                break;
+            case 2: //yellow
+                red = 1.0f;
+                green = 1.0f;
+                blue = 0.0f;
+                break;
+            case 4: //violet
+                red = 1.0f;
+                green = 0.0f;
+                blue = 1.0f;
+                break;
+            case 5: //light blue
+                red = 0.5f;
+                green = 0.5f;
+                blue = 1.0f;
+                break;
+            case 6: //pink
+                red = 1.0f;
+                green = 0.5f;
+                blue = 0.5f;
+                break;
+            case 7: //light green
+                red = 0.5f;
+                green = 1.0f;
+                blue = 0.5f;
+                break;
         }
 
-        planeteAppareance.setMaterial(new Material(new Color3f(0, 0, 0),
-                new Color3f(0.2f, 0.2f, 0.2f), new Color3f(red, green, blue),
-                new Color3f(0f, 0f, 0f), 128));
+        planeteAppareance.setMaterial(new Material(new Color3f(0, 0, 0), new Color3f(0.2f, 0.2f, 0.2f),
+            new Color3f(red, green, blue), new Color3f(0f, 0f, 0f), 128));
         return planeteAppareance;
     }
 
@@ -618,10 +610,8 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
         TransformGroup planeteRotationGroup = new TransformGroup();
         planeteRotationGroup.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
         Alpha planeteRotationAlpha = new Alpha(-1, 4000);
-        RotationInterpolator rotator = new RotationInterpolator(planeteRotationAlpha,
-                planeteRotationGroup);
-        rotator.setSchedulingBounds(new BoundingSphere(new Point3d(0, 0, 0),
-                999999999));
+        RotationInterpolator rotator = new RotationInterpolator(planeteRotationAlpha, planeteRotationGroup);
+        rotator.setSchedulingBounds(new BoundingSphere(new Point3d(0, 0, 0), 999999999));
         planetesScalingGroup[i] = planeteRotationGroup;
 
         // Allow to change the Scale of the sphere representing the planet
@@ -648,24 +638,21 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
         // Lumiere principale
         Color3f lightColor1 = new Color3f(1.0f, 1.0f, 1.0f);
         Vector3f lightDirection1 = new Vector3f(2.0f, -3.0f, -6.0f);
-        DirectionalLight light1 = new DirectionalLight(lightColor1,
-                lightDirection1);
+        DirectionalLight light1 = new DirectionalLight(lightColor1, lightDirection1);
         light1.setInfluencingBounds(bounds);
         root.addChild(light1);
 
         // Lumiere de support 1
         Color3f lightColor2 = new Color3f(0.25f, 0.25f, 0.25f);
         Vector3f lightDirection2 = new Vector3f(-2.0f, 3.0f, 6.0f);
-        DirectionalLight light2 = new DirectionalLight(lightColor2,
-                lightDirection2);
+        DirectionalLight light2 = new DirectionalLight(lightColor2, lightDirection2);
         light2.setInfluencingBounds(bounds);
         root.addChild(light2);
 
         // Lumiere de support 2
         Color3f lightColor3 = new Color3f(0.3f, 0.3f, 0.3f);
         Vector3f lightDirection3 = new Vector3f(2.0f, -3.0f, 6.0f);
-        DirectionalLight light3 = new DirectionalLight(lightColor3,
-                lightDirection3);
+        DirectionalLight light3 = new DirectionalLight(lightColor3, lightDirection3);
         light3.setInfluencingBounds(bounds);
         root.addChild(light3);
     }
@@ -727,16 +714,14 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
             // Translating & scaling
             TransformGroup labelGroup = new TransformGroup();
             Transform3D scaling = new Transform3D();
-            scaling.setTranslation(new Vector3d(0.01 +
-                    ((0.005 * diameter) / MASS_RATIO),
-                    0.01 + ((0.005 * diameter) / MASS_RATIO), 0.0));
+            scaling.setTranslation(new Vector3d(0.01 + ((0.005 * diameter) / MASS_RATIO),
+                0.01 + ((0.005 * diameter) / MASS_RATIO), 0.0));
             //scaling.setTranslation(new Vector3d(0.15,0.15,0.0));
             scaling.setScale(0.5);
             labelGroup.setTransform(scaling);
 
             // Assembling and creating the text2D
-            labelGroup.addChild(new Text2D(label,
-                    new Color3f(1.0f, 1.0f, 1.0f), "Arial", 14, Font.PLAIN));
+            labelGroup.addChild(new Text2D(label, new Color3f(1.0f, 1.0f, 1.0f), "Arial", 14, Font.PLAIN));
             bg.addChild(labelGroup);
             bg.compile();
 
@@ -837,8 +822,7 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
         } else {
             // Show Label
             for (int i = 0; i < this.nbBodies; i++) {
-                this.writeLabel(i, this.bodies[i].getHostName(),
-                    this.bodies[i].getDiameter());
+                this.writeLabel(i, this.bodies[i].getHostName(), this.bodies[i].getDiameter());
             }
         }
     }
@@ -854,8 +838,7 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      * @param root root of the 3D scene
      * @param vpTrans 3D scene first transformation group
      */
-    private void enableKeyBoardNavigation(BranchGroup root,
-        TransformGroup vpTrans) {
+    private void enableKeyBoardNavigation(BranchGroup root, TransformGroup vpTrans) {
         // Navigation au clavier
         KeyNavigatorBehavior keyNavBeh = new KeyNavigatorBehavior(vpTrans);
         keyNavBeh.setSchedulingBounds(root.getBounds());
@@ -875,8 +858,7 @@ public class NBody3DFrame extends JFrame implements NBodyFrame, WindowListener {
      * @param bounds bounds of the scene
      * @return return a Transform Group when navigation with mouse is possible
      */
-    private TransformGroup enableMouseNavigation(BranchGroup root,
-        BoundingSphere bounds) {
+    private TransformGroup enableMouseNavigation(BranchGroup root, BoundingSphere bounds) {
         TransformGroup manipulator = new TransformGroup();
         manipulator.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
 

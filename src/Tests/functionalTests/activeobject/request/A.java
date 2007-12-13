@@ -46,8 +46,8 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 public class A implements Serializable, RunActive {
 
     /**
-         *
-         */
+     *
+     */
     int counter = 0;
 
     // for ACs after termination test
@@ -58,8 +58,7 @@ public class A implements Serializable, RunActive {
 
     public void initDeleguate() {
         try {
-            this.delegate = (A) PAActiveObject.newActive(A.class.getName(),
-                    new Object[0]);
+            this.delegate = (A) PAActiveObject.newActive(A.class.getName(), new Object[0]);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {

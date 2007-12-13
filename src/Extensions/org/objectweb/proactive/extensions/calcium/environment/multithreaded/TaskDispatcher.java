@@ -59,8 +59,7 @@ class TaskDispatcher extends Thread {
     ExecutorService threadPool;
     BlockingQueue<CallableInterpreter> intPool;
 
-    public TaskDispatcher(TaskPool taskpool, FileServerClient fserver,
-        int numThreads) {
+    public TaskDispatcher(TaskPool taskpool, FileServerClient fserver, int numThreads) {
         this.taskpool = taskpool;
         this.fserver = fserver;
         this.maxSimulatenusTasks = numThreads;
@@ -182,8 +181,7 @@ class TaskDispatcher extends Thread {
                 taskpool.putProcessedTask(pTask);
                 intPool.put(callable); //recycle CallableObject
             } catch (Exception e) {
-                logger.error(
-                    "Unable to store processed task back into the taskpool.");
+                logger.error("Unable to store processed task back into the taskpool.");
                 //TODO put panice exception in taskpool
                 e.printStackTrace();
             }

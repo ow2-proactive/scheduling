@@ -109,14 +109,12 @@ public class JMXNotificationManager implements NotificationListener {
 
         try {
             // Initalise the JMXNotificationListener which is an active object listening all needed MBeans
-            this.notificationlistener = (JMXNotificationListener) PAActiveObject.newActive(JMXNotificationListener.class.getName(),
-                    new Object[] {  });
+            this.notificationlistener = (JMXNotificationListener) PAActiveObject.newActive(
+                    JMXNotificationListener.class.getName(), new Object[] {});
         } catch (ActiveObjectCreationException e) {
-            logger.error("Can't create the JMX notifications listener active object",
-                e);
+            logger.error("Can't create the JMX notifications listener active object", e);
         } catch (NodeException e) {
-            logger.error("Can't create the JMX notifications listener active object",
-                e);
+            logger.error("Can't create the JMX notifications listener active object", e);
         }
     }
 
@@ -153,15 +151,13 @@ public class JMXNotificationManager implements NotificationListener {
      * @param handback The context to be sent to the listener when a
      * notification is emitted.
      */
-    public void subscribe(ObjectName objectName, NotificationListener listener,
-        NotificationFilter filter, Object handback) {
+    public void subscribe(ObjectName objectName, NotificationListener listener, NotificationFilter filter,
+            Object handback) {
         try {
-            ManagementFactory.getPlatformMBeanServer()
-                             .addNotificationListener(objectName, listener,
-                filter, handback);
+            ManagementFactory.getPlatformMBeanServer().addNotificationListener(objectName, listener, filter,
+                    handback);
         } catch (InstanceNotFoundException e) {
-            logger.error("The objectName: " + objectName +
-                " cooresponds tot none registered MBeans", e);
+            logger.error("The objectName: " + objectName + " cooresponds tot none registered MBeans", e);
         }
     }
 
@@ -171,8 +167,7 @@ public class JMXNotificationManager implements NotificationListener {
      * @param listener The notification listener.
      * @param runtimeUrl The url of the remote ProActiveRuntime where the MBean is located
      */
-    public void subscribe(ObjectName objectName, NotificationListener listener,
-        String runtimeUrl) {
+    public void subscribe(ObjectName objectName, NotificationListener listener, String runtimeUrl) {
         // Search if this objectName is already listened
         ConcurrentLinkedQueue<NotificationListener> listeners = allListeners.get(objectName);
 
@@ -198,8 +193,7 @@ public class JMXNotificationManager implements NotificationListener {
                 // Subscribes the JMXNotificationManager to the notifications of this MBean.
                 // this.notificationlistener.subscribe(connection.getConnection(),
                 //    objectName, null, null);
-                this.subscribeObjectToRemoteMBean(connection.getConnection(),
-                    objectName, null, null);
+                this.subscribeObjectToRemoteMBean(connection.getConnection(), objectName, null, null);
                 // Updates our map
                 connectionsWithObjectName.put(objectName, connection);
             } //if not contains
@@ -220,8 +214,8 @@ public class JMXNotificationManager implements NotificationListener {
 
         // No listener listen this objectName, so we display an error message.
         if (listeners == null) {
-            logger.warn("The unsubscribe action has failed : The objectName=" +
-                objectName + " has been already unsubscribe");
+            logger.warn("The unsubscribe action has failed : The objectName=" + objectName +
+                " has been already unsubscribe");
             return;
         }
         // We have to remove the listener.
@@ -231,9 +225,9 @@ public class JMXNotificationManager implements NotificationListener {
 
             // The listener didn't be listening this objectName, so we display an error message.
             if (!isRemoved) {
-                logger.warn(
-                    "The unsubscribe action has failed : The given listener doesn't listen the objectName=" +
-                    objectName);
+                logger
+                        .warn("The unsubscribe action has failed : The given listener doesn't listen the objectName=" +
+                            objectName);
                 return;
             }
 
@@ -245,8 +239,7 @@ public class JMXNotificationManager implements NotificationListener {
                 connection.removeObjectName(objectName);
                 // notificationlistener.unsubscribe(connection.getConnection(),
                 //     objectName, null, null);
-                unsubscribeObjectFromRemoteMBean(connection.getConnection(),
-                    objectName, null, null);
+                unsubscribeObjectFromRemoteMBean(connection.getConnection(), objectName, null, null);
 
                 // The connection is not used, so we close this connection
                 if (!connection.isUsed()) {
@@ -255,10 +248,8 @@ public class JMXNotificationManager implements NotificationListener {
                     connection.getConnection().unsubscribeFromRegistry();
                     //TODO: terminates the connection active object 
                     //Next line throws:  org.objectweb.proactive.core.ProActiveRuntimeException: FutureProxy: Illegal arguments in call _terminateAO
-                    System.out.println("Terminating connection with runtime :" +
-                        connection.getRuntimeUrl());
-                    PAActiveObject.terminateActiveObject(connection.getConnection(),
-                        false);
+                    System.out.println("Terminating connection with runtime :" + connection.getRuntimeUrl());
+                    PAActiveObject.terminateActiveObject(connection.getConnection(), false);
                 }
                 // Updates our map
                 connectionsWithObjectName.remove(objectName);
@@ -266,23 +257,18 @@ public class JMXNotificationManager implements NotificationListener {
         }
     }
 
-    public void subscribeObjectToRemoteMBean(ProActiveConnection connection,
-        ObjectName oname, NotificationFilter filter, Object handback) {
+    public void subscribeObjectToRemoteMBean(ProActiveConnection connection, ObjectName oname,
+            NotificationFilter filter, Object handback) {
         try {
             if (!connection.isRegistered(oname)) {
-                System.err.println(
-                    "JMXNotificationListener.subscribe() Oooops oname not known:" +
-                    oname);
+                System.err.println("JMXNotificationListener.subscribe() Oooops oname not known:" + oname);
                 return;
             }
-            connection.addNotificationListener(oname, notificationlistener,
-                filter, handback);
+            connection.addNotificationListener(oname, notificationlistener, filter, handback);
         } catch (InstanceNotFoundException e) {
-            logger.error("Doesn't find the object name " + oname +
-                " during the registration", e);
+            logger.error("Doesn't find the object name " + oname + " during the registration", e);
         } catch (IOException e) {
-            logger.error("Doesn't subscribe the JMX Notification listener to the Notifications",
-                e);
+            logger.error("Doesn't subscribe the JMX Notification listener to the Notifications", e);
         }
     }
 
@@ -294,30 +280,26 @@ public class JMXNotificationManager implements NotificationListener {
      * @param handback A hanback
      *
      */
-    public void unsubscribeObjectFromRemoteMBean(
-        ProActiveConnection connection, ObjectName oname,
-        NotificationFilter filter, Object handback) {
+    public void unsubscribeObjectFromRemoteMBean(ProActiveConnection connection, ObjectName oname,
+            NotificationFilter filter, Object handback) {
         if (!PAActiveObject.pingActiveObject(connection)) {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "Trying to unregister listener on a connection with terminated body. Ping faild on the connection object: " +
-                    connection.toString());
+                logger
+                        .debug("Trying to unregister listener on a connection with terminated body. Ping faild on the connection object: " +
+                            connection.toString());
             }
             return;
         }
         try {
             if (connection.isRegistered(oname)) {
-                connection.removeNotificationListener(oname,
-                    notificationlistener, filter, handback);
+                connection.removeNotificationListener(oname, notificationlistener, filter, handback);
             }
         } catch (InstanceNotFoundException e) {
-            logger.error("Doesn't find the object name " + oname +
-                " during the registration", e);
+            logger.error("Doesn't find the object name " + oname + " during the registration", e);
         } catch (ListenerNotFoundException e) {
             logger.error("Doesn't find the Notification Listener", e);
         } catch (IOException e) {
-            logger.error("Can't unsubscribe the JMX Notification listener to the Notifications",
-                e);
+            logger.error("Can't unsubscribe the JMX Notification listener to the Notifications", e);
         }
     }
 
@@ -326,13 +308,13 @@ public class JMXNotificationManager implements NotificationListener {
         ObjectName oname = (ObjectName) notification.getSource();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("[" + type + "]\n[JMXNotificationManager] source=" +
-                oname);
+            logger.debug("[" + type + "]\n[JMXNotificationManager] source=" + oname);
         }
 
         if (type.equals(NotificationType.setOfNotifications)) {
             @SuppressWarnings("unchecked")
-            ConcurrentLinkedQueue<Notification> notifications = (ConcurrentLinkedQueue<Notification>) notification.getUserData();
+            ConcurrentLinkedQueue<Notification> notifications = (ConcurrentLinkedQueue<Notification>) notification
+                    .getUserData();
             String msg = notification.getMessage();
 
             // The active object containing the MBean has migrated, so we have to connect to a new remote host.
@@ -349,26 +331,23 @@ public class JMXNotificationManager implements NotificationListener {
                     establishedConnection = new Connection(runtimeUrl);
 
                     // Updates our map
-                    connectionsWithRuntimeUrl.put(runtimeUrl,
-                        establishedConnection);
+                    connectionsWithRuntimeUrl.put(runtimeUrl, establishedConnection);
                 }
                 // Add the objectName to the established connection
                 establishedConnection.addObjectName(ob);
 
                 // Subscribes to the JMX notifications
-                subscribeObjectToRemoteMBean(establishedConnection.getConnection(),
-                    ob, null, null);
+                subscribeObjectToRemoteMBean(establishedConnection.getConnection(), ob, null, null);
 
                 //Unsubscribes to the JMXNotifications within the old connection 
                 // (the one used before the migration)
                 Connection oldConnection = connectionsWithObjectName.get(ob);
                 if (oldConnection == null) {
-                    logger.warn("Could not unsubscribe listener for object " +
-                        ob + " from the old host after migration");
+                    logger.warn("Could not unsubscribe listener for object " + ob +
+                        " from the old host after migration");
                 } else {
                     oldConnection.removeObjectName(ob);
-                    unsubscribeObjectFromRemoteMBean(oldConnection.getConnection(),
-                        ob, null, null);
+                    unsubscribeObjectFromRemoteMBean(oldConnection.getConnection(), ob, null, null);
                 }
                 // Updates our map
                 connectionsWithObjectName.put(ob, establishedConnection);
@@ -421,16 +400,16 @@ public class JMXNotificationManager implements NotificationListener {
             proActiveRuntime.startJMXServerConnector();
 
             // Create a new connection
-            ClientConnector cc = new ClientConnector(runtimeURI.toString(),
-                    FactoryName.getJMXServerName(runtimeURI));
+            ClientConnector cc = new ClientConnector(runtimeURI.toString(), FactoryName
+                    .getJMXServerName(runtimeURI));
             // Connect to the remote JMX Server Connector
             cc.connect();
 
             ProActiveConnection connection = cc.getConnection();
             return connection;
         } else {
-            logger.error(
-                "Can't create a JMX/ProActive connection: the object is not an instance of ProActiveRuntime");
+            logger
+                    .error("Can't create a JMX/ProActive connection: the object is not an instance of ProActiveRuntime");
             return null;
         }
     }
@@ -445,24 +424,24 @@ public class JMXNotificationManager implements NotificationListener {
     private class Connection {
 
         /**
-             * The url of the runtime
-             */
+         * The url of the runtime
+         */
         private String runtimeUrl;
 
         /**
-             * The collection of objectName representing the MBeans listened with the connection
-             */
+         * The collection of objectName representing the MBeans listened with the connection
+         */
         private Collection<ObjectName> objectNames;
 
         /**
-             * The connection
-             */
+         * The connection
+         */
         private ProActiveConnection connection;
 
         /**
-             * Creates a new Connection
-             * @param runtimeUrl The url of the remote ProActive Runtime
-             */
+         * Creates a new Connection
+         * @param runtimeUrl The url of the remote ProActive Runtime
+         */
         public Connection(String runtimeUrl) {
             this.runtimeUrl = runtimeUrl;
             this.objectNames = new ConcurrentLinkedQueue<ObjectName>();
@@ -470,38 +449,38 @@ public class JMXNotificationManager implements NotificationListener {
         }
 
         /**
-             * Add a MBean to listen.
-             * @param objectName The objectName of the MBean
-             */
+         * Add a MBean to listen.
+         * @param objectName The objectName of the MBean
+         */
         public void addObjectName(ObjectName objectName) {
             objectNames.add(objectName);
         }
 
         /**
-             * Removes an MBean to listen
-             * @param objectName The objectName of the MBean
-             */
+         * Removes an MBean to listen
+         * @param objectName The objectName of the MBean
+         */
         public void removeObjectName(ObjectName objectName) {
             objectNames.remove(objectName);
         }
 
         /**
-             * @return true if this connection is used to listen a MBean, false otherwise.
-             */
+         * @return true if this connection is used to listen a MBean, false otherwise.
+         */
         public boolean isUsed() {
             return !objectNames.isEmpty();
         }
 
         /**
-             * @return The url of the remote runtime, where the MBean Server is located.
-             */
+         * @return The url of the remote runtime, where the MBean Server is located.
+         */
         public String getRuntimeUrl() {
             return runtimeUrl;
         }
 
         /**
-             * @return The ProActiveConnection used to connect to the JMX Bean Server.
-             */
+         * @return The ProActiveConnection used to connect to the JMX Bean Server.
+         */
         public ProActiveConnection getConnection() {
             return connection;
         }
@@ -539,8 +518,7 @@ public class JMXNotificationManager implements NotificationListener {
 
     private void unsubscribeAll() {
         //Unregisters the notificationlistener for all objectNames
-        Iterator<ObjectName> allObjectNames = connectionsWithObjectName.keySet()
-                                                                       .iterator();
+        Iterator<ObjectName> allObjectNames = connectionsWithObjectName.keySet().iterator();
         while (allObjectNames.hasNext()) {
             ObjectName objectName = allObjectNames.next();
             ConcurrentLinkedQueue<NotificationListener> listeners = allListeners.get(objectName);
@@ -556,15 +534,14 @@ public class JMXNotificationManager implements NotificationListener {
         //Removes the reference for the notificationlistener from the local registry(ies);
         try {
             if (!notificationlistener.unsubscribeFromRegistry()) {
-                System.out.println(
-                    "could not unregister JMXNotificationListener");
+                System.out.println("could not unregister JMXNotificationListener");
             }
             ;
 
             //System.out.println("Unregistered the JMXNotificationListener for IC2D from the regisrty.");
         } catch (Exception e) {
-            System.out.println(
-                "Could not unregistered the JMXNotificationListener for IC2D from the regisrty.");
+            System.out
+                    .println("Could not unregistered the JMXNotificationListener for IC2D from the regisrty.");
             e.printStackTrace();
         }
 

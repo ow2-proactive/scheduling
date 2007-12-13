@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertNotNull;
 
+
 /**
  * Test if the policy server is able to load a policy file, to be serialized and unserialized
  *
@@ -58,7 +59,7 @@ public class SecurityTestPolicyServer extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestPolicyServer.class.getResource(
-                    "/functionalTests/security/applicationPolicy.xml").getPath());
+        policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestPolicyServer.class
+                .getResource("/functionalTests/security/applicationPolicy.xml").getPath());
     }
 }

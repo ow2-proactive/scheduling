@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.mop;
 
-
 /**
  * This class holds the type of a method call (OneWay, Asynchronous and Synchronous)
  * along with the reason associated if it is synchronous
@@ -38,14 +37,14 @@ package org.objectweb.proactive.core.mop;
  *
  */
 public class MethodCallInfo {
-    public enum CallType {OneWay,
-        Asynchronous,
-        Synchronous;
+    public enum CallType {
+        OneWay, Asynchronous, Synchronous;
     }
-    public enum SynchronousReason {NotApplicable,
-        ThrowsCheckedException,
-        NotReifiable;
+
+    public enum SynchronousReason {
+        NotApplicable, ThrowsCheckedException, NotReifiable;
     }
+
     private CallType type;
     private SynchronousReason reason;
     private String message;
@@ -63,8 +62,7 @@ public class MethodCallInfo {
         this.setMessage(null);
     }
 
-    public MethodCallInfo(CallType type, SynchronousReason reason,
-        String message) {
+    public MethodCallInfo(CallType type, SynchronousReason reason, String message) {
         this.setType(type);
         this.setReason(reason);
         this.setMessage(message);

@@ -45,8 +45,8 @@ public class BundleStoppedNotification extends BundleNotification {
     private String message;
     private BundleInfo bundleInfo;
 
-    public BundleStoppedNotification(String type, Object source,
-        long sequenceNumber, String message, String url, ObjectName on) {
+    public BundleStoppedNotification(String type, Object source, long sequenceNumber, String message,
+            String url, ObjectName on) {
         super(type, source, sequenceNumber);
         this.url = url;
         this.on = on;

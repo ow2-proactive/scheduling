@@ -43,8 +43,8 @@ import org.objectweb.proactive.core.ProActiveException;
 public class UnknownProtocolException extends ProActiveException {
 
     /**
-    *
-    */
+     *
+     */
     public UnknownProtocolException() {
         super();
     }

@@ -40,6 +40,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test lookup and register in deployment descriptors
  */
@@ -50,12 +51,10 @@ public class Test extends FunctionalTest {
     static {
         if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
             AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-                    "/functionalTests/descriptor/lookupregister/AgentIbis.xml")
-                                                .getPath();
+                    "/functionalTests/descriptor/lookupregister/AgentIbis.xml").getPath();
         } else {
             AGENT_XML_LOCATION_UNIX = Test.class.getResource(
-                    "/functionalTests/descriptor/lookupregister/Agent.xml")
-                                                .getPath();
+                    "/functionalTests/descriptor/lookupregister/Agent.xml").getPath();
         }
     }
 
@@ -64,14 +63,12 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        proActiveDescriptorAgent = PADeployment.getProactiveDescriptor("file:" +
-                AGENT_XML_LOCATION_UNIX);
+        proActiveDescriptorAgent = PADeployment.getProactiveDescriptor("file:" + AGENT_XML_LOCATION_UNIX);
         proActiveDescriptorAgent.activateMappings();
         VirtualNode vnAgent = proActiveDescriptorAgent.getVirtualNode("Agent");
-        PAActiveObject.newActive(A.class.getName(), new Object[] { "local" },
-            vnAgent.getNode());
-        VirtualNode vnLookup = PADeployment.lookupVirtualNode(URIBuilder.buildURIFromProperties(
-                    "localhost", "Agent").toString());
+        PAActiveObject.newActive(A.class.getName(), new Object[] { "local" }, vnAgent.getNode());
+        VirtualNode vnLookup = PADeployment.lookupVirtualNode(URIBuilder.buildURIFromProperties("localhost",
+                "Agent").toString());
         a = (A) vnLookup.getUniqueAO();
 
         assertTrue((a.getName().equals("local")));

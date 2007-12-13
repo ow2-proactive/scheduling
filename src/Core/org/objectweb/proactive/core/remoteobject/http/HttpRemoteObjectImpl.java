@@ -50,19 +50,17 @@ public class HttpRemoteObjectImpl implements RemoteRemoteObject, Serializable {
     private URI remoteObjectURL;
     protected transient InternalRemoteRemoteObject remoteObject;
 
-    public HttpRemoteObjectImpl(InternalRemoteRemoteObject remoteObject,
-        URI remoteObjectURL) {
+    public HttpRemoteObjectImpl(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL) {
         this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
     }
 
-    public Reply receiveMessage(Request message)
-        throws IOException, RenegotiateSessionException, ProActiveException {
+    public Reply receiveMessage(Request message) throws IOException, RenegotiateSessionException,
+            ProActiveException {
         ArrayList<Object> paramsList = new ArrayList<Object>();
         paramsList.add(message);
 
-        HTTPRemoteObjectRequest req = new HTTPRemoteObjectRequest(message,
-                this.remoteObjectURL.toString());
+        HTTPRemoteObjectRequest req = new HTTPRemoteObjectRequest(message, this.remoteObjectURL.toString());
 
         req.send();
 

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.component.exceptions;
 
-
 /**
  * Exception thrown when a named component cannot be found
  *

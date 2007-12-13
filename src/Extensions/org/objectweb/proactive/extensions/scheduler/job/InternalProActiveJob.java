@@ -70,8 +70,7 @@ public class InternalProActiveJob extends InternalJob {
      */
 
     //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
-    public InternalProActiveJob(String name, JobPriority priority,
-        boolean cancelOnError, String description) {
+    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description) {
         super(name, priority, cancelOnError, description);
 
         createTask();
@@ -89,8 +88,8 @@ public class InternalProActiveJob extends InternalJob {
      */
 
     //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
-    public InternalProActiveJob(String name, JobPriority priority,
-        boolean cancelOnError, String description, int numberOfNodesNeeded) {
+    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
+            int numberOfNodesNeeded) {
         this(name, priority, cancelOnError, description);
         getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
     }
@@ -107,9 +106,8 @@ public class InternalProActiveJob extends InternalJob {
      * @param numberOfNodesNeeded the number of node needed by the user.
      * @param taskClass the Class instance of the class to instantiate.
      */
-    public InternalProActiveJob(String name, JobPriority priority,
-        boolean cancelOnError, String description, int numberOfNodesNeeded,
-        Class<ProActiveExecutable> taskClass) {
+    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
+            int numberOfNodesNeeded, Class<ProActiveExecutable> taskClass) {
         this(name, priority, cancelOnError, description, numberOfNodesNeeded);
         getTask().setTaskClass(taskClass);
     }
@@ -126,9 +124,8 @@ public class InternalProActiveJob extends InternalJob {
      * @param numberOfNodesNeeded the number of node needed by the user.
      * @param task the instantiated class task object.
      */
-    public InternalProActiveJob(String name, JobPriority priority,
-        boolean cancelOnError, String description, int numberOfNodesNeeded,
-        ProActiveExecutable task) {
+    public InternalProActiveJob(String name, JobPriority priority, boolean cancelOnError, String description,
+            int numberOfNodesNeeded, ProActiveExecutable task) {
         this(name, priority, cancelOnError, description, numberOfNodesNeeded);
         getTask().setTask(task);
     }
@@ -140,8 +137,7 @@ public class InternalProActiveJob extends InternalJob {
      * @param numberOfNodesNeeded the number of node needed by the user.
      * @param taskClass the Class instance of the class to instantiate.
      */
-    public InternalProActiveJob(int numberOfNodesNeeded,
-        Class<ProActiveExecutable> taskClass) {
+    public InternalProActiveJob(int numberOfNodesNeeded, Class<ProActiveExecutable> taskClass) {
         createTask();
         getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
         getTask().setTaskClass(taskClass);
@@ -154,8 +150,7 @@ public class InternalProActiveJob extends InternalJob {
      * @param numberOfNodesNeeded the number of node needed by the user.
      * @param task the instantiated class task object.
      */
-    public InternalProActiveJob(int numberOfNodesNeeded,
-        ProActiveExecutable task) {
+    public InternalProActiveJob(int numberOfNodesNeeded, ProActiveExecutable task) {
         createTask();
         getTask().setNumberOfNodesNeeded(numberOfNodesNeeded);
         getTask().setTask(task);
@@ -166,8 +161,7 @@ public class InternalProActiveJob extends InternalJob {
      */
     @Override
     public boolean addTask(InternalTask task) {
-        throw new RuntimeException(
-            "This method should have NEVER been called in ProActiveJob.");
+        throw new RuntimeException("This method should have NEVER been called in ProActiveJob.");
     }
 
     /**

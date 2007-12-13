@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.observing;
 
-
 /**
  * This interface represents adds 2 methods reduceEventData and treatEventData.
  * Part of the specialized Observer/Observable pattern.

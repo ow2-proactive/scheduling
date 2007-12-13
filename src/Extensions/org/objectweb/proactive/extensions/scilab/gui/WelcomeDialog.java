@@ -42,28 +42,27 @@ import javax.swing.JPanel;
 public class WelcomeDialog extends JDialog {
 
     /**
-         *
-         */
+     *
+     */
     private JPanel panelLogo = null;
     private Image logo;
 
     public WelcomeDialog() {
         super();
 
-        logo = Toolkit.getDefaultToolkit()
-                      .getImage(getClass().getResource("img/logo.jpg"));
+        logo = Toolkit.getDefaultToolkit().getImage(getClass().getResource("img/logo.jpg"));
         panelLogo = new JPanel() {
 
-                    /**
-                         *
-                         */
-                    @Override
-                    public void paintComponent(Graphics g) {
-                        super.paintComponent(g);
+            /**
+             *
+             */
+            @Override
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
 
-                        g.drawImage(logo, 0, 0, this);
-                    }
-                };
+                g.drawImage(logo, 0, 0, this);
+            }
+        };
 
         this.setSize(510, 300);
         this.setResizable(false);

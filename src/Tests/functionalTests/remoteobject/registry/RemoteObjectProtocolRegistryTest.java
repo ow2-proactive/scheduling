@@ -37,6 +37,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test for the remote object protocol registry
  * registration and deletion of a 'dummy' protocol
@@ -48,13 +49,12 @@ public class RemoteObjectProtocolRegistryTest {
     public void addRemoveAProtocol() throws Exception {
         RemoteObjectProtocolFactoryRegistry.put("dummy", DummyProtocol.class);
 
-        Class<?extends RemoteObjectFactory> dummyFactoryClass = RemoteObjectProtocolFactoryRegistry.get(
-                "dummy");
+        Class<? extends RemoteObjectFactory> dummyFactoryClass = RemoteObjectProtocolFactoryRegistry
+                .get("dummy");
 
         assertNotNull(dummyFactoryClass);
 
-        RemoteObjectFactory dummyFactory = RemoteObjectHelper.getRemoteObjectFactory(
-                "dummy");
+        RemoteObjectFactory dummyFactory = RemoteObjectHelper.getRemoteObjectFactory("dummy");
 
         assertTrue(dummyFactory instanceof DummyProtocol);
 

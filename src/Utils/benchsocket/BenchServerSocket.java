@@ -43,14 +43,13 @@ public class BenchServerSocket extends ServerSocket {
         super();
     }
 
-    public BenchServerSocket(int port, BenchFactoryInterface parent)
-        throws IOException {
+    public BenchServerSocket(int port, BenchFactoryInterface parent) throws IOException {
         super(port);
         this.parent = parent;
     }
 
-    public BenchServerSocket(int port, InetAddress localAddress,
-        BenchFactoryInterface parent) throws IOException {
+    public BenchServerSocket(int port, InetAddress localAddress, BenchFactoryInterface parent)
+            throws IOException {
         super(port, -1, localAddress);
         this.parent = parent;
     }

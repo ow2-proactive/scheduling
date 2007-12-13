@@ -51,8 +51,7 @@ public class NF3RequestFilter implements RequestFilter {
     }
 
     public boolean acceptRequest(Request request) {
-        if (pc.getPriority(null, request.getMethodName(), null)
-                  .equals(RequestPriority.NF3)) {
+        if (pc.getPriority(null, request.getMethodName(), null).equals(RequestPriority.NF3)) {
             return true;
         }
         return false;

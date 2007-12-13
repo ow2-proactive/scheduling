@@ -260,8 +260,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
 
         Set<Map.Entry<String, List<String>>> set = _properties.entrySet();
-        for (java.util.Iterator<Map.Entry<String, List<String>>> i = set.iterator();
-                i.hasNext();) {
+        for (java.util.Iterator<Map.Entry<String, List<String>>> i = set.iterator(); i.hasNext();) {
             Map.Entry<String, List<String>> entry = i.next();
             String key = entry.getKey();
             List<String> values = entry.getValue();
@@ -285,8 +284,7 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         String host = u.getHost();
         int port = u.getPort();
         String path = u.getPath();
-        if (PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() &&
-                getTryCache().needToTry(host, port)) {
+        if (PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() && getTryCache().needToTry(host, port)) {
             if (!getTryCache().everTried(host, port)) {
                 try {
                     logger.debug("try http socket probing");
@@ -302,13 +300,11 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
             }
             if (getTryCache().needToTry(host, port)) {
                 try {
-                    java.net.URL httpURL = new java.net.URL("http://" + host +
-                            ":" +
-                            port // uncomment the following line and comment the one above to make sure
-                                 // you test that connections fallback to tunneling if the main
-                                 // connection fails.
-                                 //+ 1
-                             +path);
+                    java.net.URL httpURL = new java.net.URL("http://" + host + ":" + port // uncomment the following line and comment the one above to make sure
+                        // you test that connections fallback to tunneling if the main
+                        // connection fails.
+                        //+ 1
+                        + path);
                     logger.debug("try http not tunneled");
                     _httpConnection = (HttpURLConnection) httpURL.openConnection();
                     ensureSetup(_httpConnection);
@@ -325,12 +321,10 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         }
         logger.debug("try http ssh tunneled");
         _tunnel = SshTunnelFactory.createTunnel(host, port);
-        java.net.URL httpURL = new java.net.URL("http://127.0.0.1:" +
-                _tunnel.getPort() + path);
+        java.net.URL httpURL = new java.net.URL("http://127.0.0.1:" + _tunnel.getPort() + path);
         _httpConnection = (HttpURLConnection) httpURL.openConnection();
         ensureSetup(_httpConnection);
-        logger.debug("Opened http connection through tunnel 127.0.0.1:" +
-            _tunnel.getPort() + " -> " + host + ":" + port + " ressource " +
-            path + " -- " + _httpConnection.toString());
+        logger.debug("Opened http connection through tunnel 127.0.0.1:" + _tunnel.getPort() + " -> " + host +
+            ":" + port + " ressource " + path + " -- " + _httpConnection.toString());
     }
 }

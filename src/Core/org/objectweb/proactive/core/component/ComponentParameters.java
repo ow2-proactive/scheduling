@@ -57,8 +57,7 @@ public class ComponentParameters implements Serializable {
      * @param hierarchicalType the hierarchical type, either PRIMITIVE or COMPOSITE or PARALLEL
      * @param componentType
      */
-    public ComponentParameters(String name, String hierarchicalType,
-        ComponentType componentType) {
+    public ComponentParameters(String name, String hierarchicalType, ComponentType componentType) {
         this(componentType, new ControllerDescription(name, hierarchicalType));
     }
 
@@ -69,11 +68,9 @@ public class ComponentParameters implements Serializable {
      * @param componentType ComponentType
      * @param controllerConfigFileLocation String
      */
-    public ComponentParameters(String name, String hierarchicalType,
-        ComponentType componentType, String controllerConfigFileLocation) {
-        this(componentType,
-            new ControllerDescription(name, hierarchicalType,
-                controllerConfigFileLocation));
+    public ComponentParameters(String name, String hierarchicalType, ComponentType componentType,
+            String controllerConfigFileLocation) {
+        this(componentType, new ControllerDescription(name, hierarchicalType, controllerConfigFileLocation));
     }
 
     /**
@@ -81,8 +78,7 @@ public class ComponentParameters implements Serializable {
      * @param componentType the type of the component
      * @param controllerDesc a ControllerDescription object
      */
-    public ComponentParameters(ComponentType componentType,
-        ControllerDescription controllerDesc) {
+    public ComponentParameters(ComponentType componentType, ControllerDescription controllerDesc) {
         this.componentType = componentType;
         this.controllerDesc = controllerDesc;
     }

@@ -41,24 +41,20 @@ import org.objectweb.proactive.core.node.Node;
 public interface MigrationManager {
     public Node checkNode(Node node) throws MigrationException;
 
-    public UniversalBody migrateTo(Node node, Body body)
-        throws MigrationException;
+    public UniversalBody migrateTo(Node node, Body body) throws MigrationException;
 
-    public void changeBodyAfterMigration(MigratableBody body,
-        UniversalBody migratedBody);
+    public void changeBodyAfterMigration(MigratableBody body, UniversalBody migratedBody);
 
     public void startingAfterMigration(Body body);
 
     public RequestReceiver createRequestReceiver(UniversalBody remoteBody,
-        RequestReceiver currentRequestReceiver);
+            RequestReceiver currentRequestReceiver);
 
-    public ReplyReceiver createReplyReceiver(UniversalBody remoteBody,
-        ReplyReceiver currentReplyReceiver);
+    public ReplyReceiver createReplyReceiver(UniversalBody remoteBody, ReplyReceiver currentReplyReceiver);
 
     public void addMigrationEventListener(MigrationEventListener listener);
 
     public void removeMigrationEventListener(MigrationEventListener listener);
 
-    public void setMigrationStrategy(int ttl, boolean updatingForwarder,
-        int maxMigrationNb, int maxTimeOnSite);
+    public void setMigrationStrategy(int ttl, boolean updatingForwarder, int maxMigrationNb, int maxTimeOnSite);
 }

@@ -32,7 +32,6 @@ package org.objectweb.proactive.ic2d.jmxmonitoring;
 
 import java.util.Iterator;
 
-
 //import javassist.ClassClassPath;
 //import javassist.ClassPool;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -108,8 +107,7 @@ public class Activator extends AbstractUIPlugin {
         ProActiveRuntimeImpl.getProActiveRuntime().killAllNodes();
 
         //Unregister the IC2d runtime from all registries
-        ProActiveRuntimeImpl.getProActiveRuntime().getRemoteObjectExposer()
-                            .unregisterAll();
+        ProActiveRuntimeImpl.getProActiveRuntime().getRemoteObjectExposer().unregisterAll();
 
         //
         unregisterAllHalfBodiesFromRegistry();
@@ -142,11 +140,10 @@ public class Activator extends AbstractUIPlugin {
                     RemoteObjectExposer roe = ((AbstractBody) universalBody).getRemoteObjectExposer();
 
                     roe.unregisterAll();
-                    System.out.println("Unregistered Half Body: " +
-                        universalBody.toString() + " ");
+                    System.out.println("Unregistered Half Body: " + universalBody.toString() + " ");
                 } catch (Exception e) {
-                    System.out.println("Could not unregister HalfBody " +
-                        universalBody + " from registry." + e.getMessage());
+                    System.out.println("Could not unregister HalfBody " + universalBody + " from registry." +
+                        e.getMessage());
                 }
             }
         }

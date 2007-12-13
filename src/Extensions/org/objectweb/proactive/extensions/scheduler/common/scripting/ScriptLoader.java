@@ -51,10 +51,8 @@ import org.objectweb.proactive.core.node.NodeException;
  * @since ProActive 3.2
  */
 public class ScriptLoader {
-    public static ScriptHandler createHandler(Node node)
-        throws ActiveObjectCreationException, NodeException {
-        return (ScriptHandler) PAActiveObject.newActive(ScriptHandler.class.getCanonicalName(),
-            null, node);
+    public static ScriptHandler createHandler(Node node) throws ActiveObjectCreationException, NodeException {
+        return (ScriptHandler) PAActiveObject.newActive(ScriptHandler.class.getCanonicalName(), null, node);
     }
 
     /**

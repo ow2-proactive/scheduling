@@ -121,42 +121,39 @@ public class TimerTreeView extends ViewPart {
 
         //////////////////////////////////////////
         Listener sortListener = new Listener() {
-                public void handleEvent(Event e) {
-                    if (tree.getItems().length == 0) {
-                        return;
-                    }
-
-                    // determine new sort column and direction
-                    TreeColumn sortColumn = tree.getSortColumn();
-                    TreeColumn currentColumn = (TreeColumn) e.widget;
-                    int dir = tree.getSortDirection();
-                    if (sortColumn == currentColumn) {
-                        dir = (dir == SWT.UP) ? SWT.DOWN : SWT.UP;
-                    } else {
-                        tree.setSortColumn(currentColumn);
-                        dir = SWT.UP;
-                    }
-                    final int columnIndex = tree.indexOf(currentColumn);
-                    boolean up = (dir == SWT.UP);
-                    for (final TimerTreeNodeObject t : timerTreeHolder.getDummyRoots()) {
-                        // Get first child of each dummy root and fire sort event
-                        TimerTreeNodeObject target = t.getChildren().get(0);
-                        target.firePropertyChange(TimerTreeNodeObject.P_SORT,
-                            columnIndex, up);
-                        target.firePropertyChange(TimerTreeNodeObject.P_EXPAND_STATE,
-                            null, true);
-                    }
-                    tree.setSortDirection(dir);
+            public void handleEvent(Event e) {
+                if (tree.getItems().length == 0) {
+                    return;
                 }
-            };
+
+                // determine new sort column and direction
+                TreeColumn sortColumn = tree.getSortColumn();
+                TreeColumn currentColumn = (TreeColumn) e.widget;
+                int dir = tree.getSortDirection();
+                if (sortColumn == currentColumn) {
+                    dir = (dir == SWT.UP) ? SWT.DOWN : SWT.UP;
+                } else {
+                    tree.setSortColumn(currentColumn);
+                    dir = SWT.UP;
+                }
+                final int columnIndex = tree.indexOf(currentColumn);
+                boolean up = (dir == SWT.UP);
+                for (final TimerTreeNodeObject t : timerTreeHolder.getDummyRoots()) {
+                    // Get first child of each dummy root and fire sort event
+                    TimerTreeNodeObject target = t.getChildren().get(0);
+                    target.firePropertyChange(TimerTreeNodeObject.P_SORT, columnIndex, up);
+                    target.firePropertyChange(TimerTreeNodeObject.P_EXPAND_STATE, null, true);
+                }
+                tree.setSortDirection(dir);
+            }
+        };
         timeColumn.addListener(SWT.Selection, sortListener);
         totalPercentColumn.addListener(SWT.Selection, sortListener);
         invocationsColumn.addListener(SWT.Selection, sortListener);
         parentPercentColumn.addListener(SWT.Selection, sortListener);
 
         // --------------------
-        IToolBarManager toolBarManager = getViewSite().getActionBars()
-                                             .getToolBarManager();
+        IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
         // Adds "DeleteTreeAction" action to the view's toolbar
         this.deleteTreeAction = new DeleteTreeAction();

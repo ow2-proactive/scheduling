@@ -242,8 +242,7 @@ public class ResourceManagerController implements RMEventListener, Serializable 
             l.nodeSourceAddedEvent(nodeSourceEvent);
     }
 
-    private void nodeSourceRemovedEventInternal(
-        RMNodeSourceEvent nodeSourceEvent) {
+    private void nodeSourceRemovedEventInternal(RMNodeSourceEvent nodeSourceEvent) {
         for (RMNodeEventListener l : nodeListeners)
             l.nodeSourceRemovedEvent(nodeSourceEvent);
     }

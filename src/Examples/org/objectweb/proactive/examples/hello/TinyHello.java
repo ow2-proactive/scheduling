@@ -53,10 +53,8 @@ public class TinyHello implements java.io.Serializable {
     /** The Active Object creates and returns information on its location
      * @return a StringWrapper which is a Serialized version, for asynchrony */
     public StringMutableWrapper sayHello() {
-        return new StringMutableWrapper(this.message + "\n from " +
-            getHostName() + "\n at " +
-            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(
-                new java.util.Date()));
+        return new StringMutableWrapper(this.message + "\n from " + getHostName() + "\n at " +
+            new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new java.util.Date()));
     }
 
     /** finds the name of the local machine */
@@ -70,13 +68,12 @@ public class TinyHello implements java.io.Serializable {
         // Creates an active instance of class Tiny on the local node
         TinyHello tiny = (TinyHello) PAActiveObject.newActive(TinyHello.class.getName(), // the class to deploy
                 null // the arguments to pass to the constructor, here none
-            ); // which jvm should be used to hold the Active Object
+                ); // which jvm should be used to hold the Active Object
 
         // get and display a value 
         StringMutableWrapper received = tiny.sayHello(); // possibly remote call
-        logger.info("On " + getHostName() + ", a message was received: " +
-            received); // potential wait-by-necessity
-                       // quitting
+        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity
+        // quitting
 
         PALifeCycle.exitSuccess();
     }

@@ -42,6 +42,7 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * do a oneway call on a previously created group
  *
@@ -67,15 +68,8 @@ public class Test extends FunctionalTest {
     public void preConditions() throws Exception {
         new TestNodes().action();
 
-        Object[][] params = {
-                { "Agent0" },
-                { "Agent1" },
-                { "Agent2" }
-            };
-        Node[] nodes = {
-                TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-                TestNodes.getRemoteVMNode()
-            };
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
         PAGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);
 

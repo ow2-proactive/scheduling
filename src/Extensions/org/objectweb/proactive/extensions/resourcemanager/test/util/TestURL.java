@@ -49,8 +49,7 @@ public class TestURL {
             System.out.println("URL 2 : " + url2);
             System.out.println("URL 3 : " + url3);
 
-            System.out.println(
-                "-------------------------------------------------");
+            System.out.println("-------------------------------------------------");
             System.out.println("URL 1 :");
             System.out.println(url1);
             System.out.println("+--> protocol : " + url1.getProtocol());
@@ -59,8 +58,7 @@ public class TestURL {
             System.out.println("+--> query    : " + url1.getQuery());
             System.out.println("+--> ref      : " + url1.getRef());
             System.out.println("+--> path     : " + url1.getPath());
-            System.out.println(
-                "-------------------------------------------------");
+            System.out.println("-------------------------------------------------");
 
             //URI uri = url1.toURI();
             URI uri = new URI("rmi://localhost/titi/truc/machin/HelloLocal.xml");
@@ -72,8 +70,7 @@ public class TestURL {
             System.out.println("+--> fragment : " + uri.getFragment());
             System.out.println("+--> query    : " + uri.getQuery());
             System.out.println("+--> scheme   : " + uri.getScheme());
-            System.out.println(
-                "-------------------------------------------------");
+            System.out.println("-------------------------------------------------");
 
             System.out.println("Slitons un peu le path de l'uri : ");
 

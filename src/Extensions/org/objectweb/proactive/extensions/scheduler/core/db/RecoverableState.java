@@ -69,9 +69,8 @@ public class RecoverableState {
      * @param tasksEvents all task events
      * @param jobsResults all job result
      */
-    public RecoverableState(List<InternalJob> jobs,
-        List<JobResult> jobsResults, Map<JobId, JobEvent> jobsEvents,
-        Map<TaskId, TaskEvent> tasksEvents) {
+    public RecoverableState(List<InternalJob> jobs, List<JobResult> jobsResults,
+            Map<JobId, JobEvent> jobsEvents, Map<TaskId, TaskEvent> tasksEvents) {
         this.jobs = jobs;
         this.jobResults = jobsResults;
         this.jobEvents = jobsEvents;

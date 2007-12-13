@@ -100,8 +100,8 @@ public class RMNodeEvent extends RMEvent {
      * @param vm Java virtual machine name of the node.
      * @param state state of the node.
      */
-    public RMNodeEvent(String url, String nodeSource, String PADName,
-        String VnName, String hostname, String vm, NodeState state) {
+    public RMNodeEvent(String url, String nodeSource, String PADName, String VnName, String hostname,
+            String vm, NodeState state) {
         this.nodeUrl = url;
         this.nodeSource = nodeSource;
         this.PADName = PADName;

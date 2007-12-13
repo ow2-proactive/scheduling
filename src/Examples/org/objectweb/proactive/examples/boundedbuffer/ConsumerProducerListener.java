@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.boundedbuffer;
 
-
 /**
  * Title:
  * Description:

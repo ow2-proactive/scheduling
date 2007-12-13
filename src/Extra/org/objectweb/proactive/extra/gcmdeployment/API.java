@@ -38,8 +38,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplication
 
 
 public class API {
-    public static GCMApplicationDescriptor getGCMApplicationDescriptor(
-        File file) throws ProActiveException {
+    public static GCMApplicationDescriptor getGCMApplicationDescriptor(File file) throws ProActiveException {
         return new GCMApplicationDescriptorImpl(file);
     }
 }

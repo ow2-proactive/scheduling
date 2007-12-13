@@ -51,48 +51,37 @@ public abstract class Utils extends Object {
     /**
      * Static variables
      */
-    public static final Class<?> JAVA_LANG_NUMBER = silentForName(
-            "java.lang.Number");
-    public static final Class<?> JAVA_LANG_CHARACTER = silentForName(
-            "java.lang.Character");
-    public static final Class<?> JAVA_LANG_BOOLEAN = silentForName(
-            "java.lang.Boolean");
-    public static final Class<?> JAVA_LANG_VOID = silentForName(
-            "java.lang.Void");
-    public static final Class<?> JAVA_LANG_RUNTIMEEXCEPTION = silentForName(
-            "java.lang.RuntimeException");
-    public static final Class<?> JAVA_LANG_EXCEPTION = silentForName(
-            "java.lang.Exception");
-    public static final Class<?> JAVA_LANG_THROWABLE = silentForName(
-            "java.lang.Throwable");
+    public static final Class<?> JAVA_LANG_NUMBER = silentForName("java.lang.Number");
+    public static final Class<?> JAVA_LANG_CHARACTER = silentForName("java.lang.Character");
+    public static final Class<?> JAVA_LANG_BOOLEAN = silentForName("java.lang.Boolean");
+    public static final Class<?> JAVA_LANG_VOID = silentForName("java.lang.Void");
+    public static final Class<?> JAVA_LANG_RUNTIMEEXCEPTION = silentForName("java.lang.RuntimeException");
+    public static final Class<?> JAVA_LANG_EXCEPTION = silentForName("java.lang.Exception");
+    public static final Class<?> JAVA_LANG_THROWABLE = silentForName("java.lang.Throwable");
 
     /**
      * The char used to escaped "meta" information in generated classname.
      */
     public static final char STUB_ESCAPE_CHAR = '_';
-    public static final String STUB_ESCAPE = "" + STUB_ESCAPE_CHAR +
-        STUB_ESCAPE_CHAR;
+    public static final String STUB_ESCAPE = "" + STUB_ESCAPE_CHAR + STUB_ESCAPE_CHAR;
 
     /**
      * Used to replace '.'
      */
     public static final char STUB_PACKAGE_SEPARATOR_CHAR = 'P';
-    public static final String STUB_PACKAGE_SEPARATOR = "" + STUB_ESCAPE_CHAR +
-        STUB_PACKAGE_SEPARATOR_CHAR;
+    public static final String STUB_PACKAGE_SEPARATOR = "" + STUB_ESCAPE_CHAR + STUB_PACKAGE_SEPARATOR_CHAR;
 
     /**
      * Separate many Type classname in case of parameterizing Type.
      */
     public static final char STUB_GENERICS_SEPARATOR_CHAR = 'D';
-    public static final String STUB_GENERICS_SEPARATOR = "" + STUB_ESCAPE_CHAR +
-        STUB_GENERICS_SEPARATOR_CHAR;
+    public static final String STUB_GENERICS_SEPARATOR = "" + STUB_ESCAPE_CHAR + STUB_GENERICS_SEPARATOR_CHAR;
 
     //prefix and suffix
     public static final String STUB_DEFAULT_PREFIX = STUB_ESCAPE_CHAR + "Stub";
 
     // stub on generic types are generated with a suffix that indicates the parameterizing types
-    public static final String STUB_GENERICS_SUFFIX = STUB_ESCAPE_CHAR +
-        "Generics";
+    public static final String STUB_GENERICS_SUFFIX = STUB_ESCAPE_CHAR + "Generics";
 
     //  packages
     public static final String STUB_DEFAULT_PACKAGE = "pa.stub.";
@@ -123,8 +112,7 @@ public abstract class Utils extends Object {
         }
         rightindex = leftindex + 6;
 
-        result = in.substring(0, leftindex) +
-            in.substring(rightindex, in.length());
+        result = in.substring(0, leftindex) + in.substring(rightindex, in.length());
         return result;
     }
 
@@ -139,8 +127,7 @@ public abstract class Utils extends Object {
         }
         rightindex = leftindex + 8;
 
-        result = in.substring(0, leftindex) +
-            in.substring(rightindex, in.length());
+        result = in.substring(0, leftindex) + in.substring(rightindex, in.length());
         return result;
     }
 
@@ -181,8 +168,7 @@ public abstract class Utils extends Object {
         }
 
         // If method is finalize (), don't reify it
-        if ((met.getName().equals("finalize")) &&
-                (met.getParameterTypes().length == 0)) {
+        if ((met.getName().equals("finalize")) && (met.getParameterTypes().length == 0)) {
             return false;
         }
         return true;
@@ -249,8 +235,7 @@ public abstract class Utils extends Object {
             } else if (str.equals("char")) {
                 return "java.lang.Character";
             } else {
-                throw new InternalException("Unknown primitive type: " +
-                    cl.getName());
+                throw new InternalException("Unknown primitive type: " + cl.getName());
             }
         } else {
             return null;
@@ -279,7 +264,7 @@ public abstract class Utils extends Object {
     public static String getSimpleName(String fullyQualifiedNameOfClass) {
         int indexOfLastDot = fullyQualifiedNameOfClass.lastIndexOf('.');
         if (indexOfLastDot == -1) // There are no dots
-         {
+        {
             return fullyQualifiedNameOfClass;
         } else {
             // If last character is a dot, returns an empty string
@@ -319,14 +304,11 @@ public abstract class Utils extends Object {
                 cst = cl.getField("TYPE");
                 return (Class<?>) cst.get(null);
             } catch (NoSuchFieldException e) {
-                throw new InternalException(
-                    "Cannot locate constant TYPE in class " + cl.getName());
+                throw new InternalException("Cannot locate constant TYPE in class " + cl.getName());
             } catch (SecurityException e) {
-                throw new InternalException("Access to field TYPE in class " +
-                    cl.getName() + " denied");
+                throw new InternalException("Access to field TYPE in class " + cl.getName() + " denied");
             } catch (IllegalAccessException e) {
-                throw new InternalException("Access to field TYPE in class " +
-                    cl.getName() + " denied");
+                throw new InternalException("Access to field TYPE in class " + cl.getName() + " denied");
             }
         } else {
             throw new InternalException("Not a wrapper class: " + cl.getName());
@@ -364,8 +346,7 @@ public abstract class Utils extends Object {
         indexOfLastDot = 0;
 
         while (indexOfDot != -1) {
-            result = result + File.separator +
-                packageName.substring(indexOfLastDot, indexOfDot);
+            result = result + File.separator + packageName.substring(indexOfLastDot, indexOfDot);
             indexOfLastDot = indexOfDot + 1;
             indexOfDot = packageName.indexOf('.', indexOfDot + 1);
             if (indexOfDot == -1) {
@@ -457,8 +438,7 @@ public abstract class Utils extends Object {
      * @param source The source array to copy
      * @return The deep copy of the source array
      */
-    public static final Object[] makeDeepCopy(final Object[] source)
-        throws java.io.IOException {
+    public static final Object[] makeDeepCopy(final Object[] source) throws java.io.IOException {
         if (source == null) {
             return null;
         }
@@ -473,9 +453,8 @@ public abstract class Utils extends Object {
 
             // If the class of the current obj is not a string or a primitive wrapper or an
             // array of primitive type use the classic deep copy method
-            if (((cl = obj.getClass()) != String.class) &&
-                    !Utils.isWrapperClass(cl) &&
-                    (!cl.isArray() || !cl.getComponentType().isPrimitive())) {
+            if (((cl = obj.getClass()) != String.class) && !Utils.isWrapperClass(cl) &&
+                (!cl.isArray() || !cl.getComponentType().isPrimitive())) {
                 return (Object[]) Utils.makeDeepCopy((Object) source);
             }
         }
@@ -533,8 +512,7 @@ public abstract class Utils extends Object {
         }
     }
 
-    public static String convertClassNameToStubClassName(String classname,
-        Class<?>[] genericParameters) {
+    public static String convertClassNameToStubClassName(String classname, Class<?>[] genericParameters) {
         if (classname.length() == 0) {
             return classname;
         }
@@ -543,8 +521,8 @@ public abstract class Utils extends Object {
             packageName += ".";
         }
         packageName = STUB_DEFAULT_PACKAGE +
-            (((genericParameters == null) || (genericParameters.length == 0))
-            ? "" : STUB_GENERICS_PACKAGE) + packageName;
+            (((genericParameters == null) || (genericParameters.length == 0)) ? "" : STUB_GENERICS_PACKAGE) +
+            packageName;
 
         String genericsDifferentiator = "";
         if (genericParameters != null) {
@@ -555,13 +533,12 @@ public abstract class Utils extends Object {
                 genericsDifferentiator += escapeClassName(gClassName.getName());
             }
             if (!genericsDifferentiator.equals("")) {
-                genericsDifferentiator = STUB_GENERICS_SUFFIX +
-                    genericsDifferentiator;
+                genericsDifferentiator = STUB_GENERICS_SUFFIX + genericsDifferentiator;
             }
         }
 
-        return packageName + STUB_DEFAULT_PREFIX +
-        escapeClassName(getSimpleName(classname)) + genericsDifferentiator;
+        return packageName + STUB_DEFAULT_PREFIX + escapeClassName(getSimpleName(classname)) +
+            genericsDifferentiator;
     }
 
     public static boolean isStubClassName(String classname) {
@@ -569,8 +546,7 @@ public abstract class Utils extends Object {
             // Extracts the simple name from the fully-qualified class name
             int index = classname.lastIndexOf(".");
             if (index != -1) {
-                return classname.startsWith(Utils.STUB_DEFAULT_PREFIX, index +
-                    1);
+                return classname.startsWith(Utils.STUB_DEFAULT_PREFIX, index + 1);
             } else {
                 return classname.startsWith(Utils.STUB_DEFAULT_PREFIX);
             }
@@ -583,18 +559,15 @@ public abstract class Utils extends Object {
         return unEscapeStubClassesName(stubclassname, false).get(0).toString();
     }
 
-    public static String[] getNamesOfParameterizingTypesFromStubClassName(
-        String stubClassName) {
+    public static String[] getNamesOfParameterizingTypesFromStubClassName(String stubClassName) {
         if (!isStubClassName(stubClassName)) {
-            return new String[] {  };
+            return new String[] {};
         }
-        if (!stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE +
-                    Utils.STUB_GENERICS_PACKAGE)) {
+        if (!stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE + Utils.STUB_GENERICS_PACKAGE)) {
             // no generics
-            return new String[] {  };
+            return new String[] {};
         }
-        List<CharSequence> classesName = unEscapeStubClassesName(stubClassName,
-                true);
+        List<CharSequence> classesName = unEscapeStubClassesName(stubClassName, true);
         classesName.remove(0);
         String[] result = new String[classesName.size()];
         for (int i = 0; i < result.length; i++) {
@@ -613,15 +586,15 @@ public abstract class Utils extends Object {
         StringBuilder sb = new StringBuilder(className.length() * 2);
         for (int i = 0; i < className.length(); i++) {
             switch (className.charAt(i)) {
-            case '.':
-                sb.append(STUB_PACKAGE_SEPARATOR);
-                break;
-            case STUB_ESCAPE_CHAR:
-                sb.append(STUB_ESCAPE);
-                break;
-            default:
-                sb.append(className.charAt(i));
-                break;
+                case '.':
+                    sb.append(STUB_PACKAGE_SEPARATOR);
+                    break;
+                case STUB_ESCAPE_CHAR:
+                    sb.append(STUB_ESCAPE);
+                    break;
+                default:
+                    sb.append(className.charAt(i));
+                    break;
             }
         }
         return sb.toString();
@@ -633,9 +606,8 @@ public abstract class Utils extends Object {
      * @return the list of elements containing in the given stubClassName
      * @throws IllegalArgumentException if the given escapedClassesName isn't well escaped
      */
-    private static List<CharSequence> unEscapeStubClassesName(
-        String stubClassName, boolean withParameterizingTypes)
-        throws IllegalArgumentException {
+    private static List<CharSequence> unEscapeStubClassesName(String stubClassName,
+            boolean withParameterizingTypes) throws IllegalArgumentException {
         ArrayList<CharSequence> result = new ArrayList<CharSequence>();
         StringBuilder sb = new StringBuilder(stubClassName.length());
         boolean stubFlag = false;
@@ -644,12 +616,11 @@ public abstract class Utils extends Object {
 
         if (isStubClassName(stubClassName)) {
             String temp = "";
-            if (stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE +
-                        Utils.STUB_GENERICS_PACKAGE)) {
+            if (stubClassName.startsWith(Utils.STUB_DEFAULT_PACKAGE + Utils.STUB_GENERICS_PACKAGE)) {
                 genericPackage = true;
                 // remove generics stuff
-                temp = stubClassName.substring((Utils.STUB_DEFAULT_PACKAGE +
-                        Utils.STUB_GENERICS_PACKAGE).length());
+                temp = stubClassName.substring((Utils.STUB_DEFAULT_PACKAGE + Utils.STUB_GENERICS_PACKAGE)
+                        .length());
             } else {
                 temp = stubClassName.substring(Utils.STUB_DEFAULT_PACKAGE.length());
             }
@@ -671,63 +642,64 @@ public abstract class Utils extends Object {
                 } else {
                     i++;
                     switch (stubClassName.charAt(i)) {
-                    // one char Flags : 'STUB_ESCAPE_CHAR''a_char'
-                    case STUB_PACKAGE_SEPARATOR_CHAR:
-                        sb.append('.');
-                        break;
-                    case STUB_ESCAPE_CHAR:
-                        sb.append(STUB_ESCAPE_CHAR);
-                        ;
-                        break;
-                    case STUB_GENERICS_SEPARATOR_CHAR:
-                        result.add(sb);
-                        sb = new StringBuilder(stubClassName.length());
-                        break;
-
-                    // multiple char Flags <=> 'STUB_ESCAPE_CHAR'"a_string"
-                    case 'S':
-                        if (stubClassName.startsWith(STUB_DEFAULT_PREFIX, i -
-                                    1)) { //Stub
-                            if (stubFlag) {
-                                throw new IllegalArgumentException(
-                                    "The escapedClassesName is not a well formed escaped string at index " +
-                                    i + ", the flag STUB_DEFAULT_PREFIX (" +
-                                    STUB_DEFAULT_PREFIX +
-                                    ") are present twice : " + stubClassName);
-                            }
-                            stubFlag = true;
-                            i += (STUB_DEFAULT_PREFIX.length() - 2); // 2 char _S
-                        }
-                        break;
-                    case 'G':
-                        if (stubClassName.startsWith(STUB_GENERICS_SUFFIX, i -
-                                    1)) { //Generics
-                            if (genericFlag || !genericPackage) {
-                                throw new IllegalArgumentException(
-                                    "The escapedClassesName is not a well formed escaped string at index " +
-                                    i + ", the flag STUB_GENERICS_SUFFIX (" +
-                                    STUB_GENERICS_SUFFIX +
-                                    ") are present twice  or this class is not in the STUB_GENERICS_PACKAGE (" +
-                                    STUB_DEFAULT_PACKAGE +
-                                    STUB_GENERICS_PACKAGE + "): " +
-                                    stubClassName);
-                            }
-                            genericFlag = true;
-                            i += (STUB_GENERICS_SUFFIX.length() - 2); // 2 char _G
-
+                        // one char Flags : 'STUB_ESCAPE_CHAR''a_char'
+                        case STUB_PACKAGE_SEPARATOR_CHAR:
+                            sb.append('.');
+                            break;
+                        case STUB_ESCAPE_CHAR:
+                            sb.append(STUB_ESCAPE_CHAR);
+                            ;
+                            break;
+                        case STUB_GENERICS_SEPARATOR_CHAR:
                             result.add(sb);
-                            if (!withParameterizingTypes) {
-                                return result;
-                            } else {
-                                sb = new StringBuilder(stubClassName.length());
+                            sb = new StringBuilder(stubClassName.length());
+                            break;
+
+                        // multiple char Flags <=> 'STUB_ESCAPE_CHAR'"a_string"
+                        case 'S':
+                            if (stubClassName.startsWith(STUB_DEFAULT_PREFIX, i - 1)) { //Stub
+                                if (stubFlag) {
+                                    throw new IllegalArgumentException(
+                                        "The escapedClassesName is not a well formed escaped string at index " +
+                                            i +
+                                            ", the flag STUB_DEFAULT_PREFIX (" +
+                                            STUB_DEFAULT_PREFIX +
+                                            ") are present twice : " + stubClassName);
+                                }
+                                stubFlag = true;
+                                i += (STUB_DEFAULT_PREFIX.length() - 2); // 2 char _S
                             }
-                        }
-                        break;
-                    default:
-                        //ERROR
-                        throw new IllegalArgumentException(
-                            "The escapedClassesName is not a well formed escaped string at index " +
-                            i + " : " + stubClassName);
+                            break;
+                        case 'G':
+                            if (stubClassName.startsWith(STUB_GENERICS_SUFFIX, i - 1)) { //Generics
+                                if (genericFlag || !genericPackage) {
+                                    throw new IllegalArgumentException(
+                                        "The escapedClassesName is not a well formed escaped string at index " +
+                                            i +
+                                            ", the flag STUB_GENERICS_SUFFIX (" +
+                                            STUB_GENERICS_SUFFIX +
+                                            ") are present twice  or this class is not in the STUB_GENERICS_PACKAGE (" +
+                                            STUB_DEFAULT_PACKAGE +
+                                            STUB_GENERICS_PACKAGE +
+                                            "): " +
+                                            stubClassName);
+                                }
+                                genericFlag = true;
+                                i += (STUB_GENERICS_SUFFIX.length() - 2); // 2 char _G
+
+                                result.add(sb);
+                                if (!withParameterizingTypes) {
+                                    return result;
+                                } else {
+                                    sb = new StringBuilder(stubClassName.length());
+                                }
+                            }
+                            break;
+                        default:
+                            //ERROR
+                            throw new IllegalArgumentException(
+                                "The escapedClassesName is not a well formed escaped string at index " + i +
+                                    " : " + stubClassName);
                     }
                 }
             }
@@ -780,9 +752,9 @@ public abstract class Utils extends Object {
         try {
             return MOP.forName(classname);
         } catch (ClassNotFoundException e) {
-            System.err.println(
-                "Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load class " +
-                classname);
+            System.err
+                    .println("Static initializer in class org.objectweb.proactive.core.mop.Utils: Cannot load class " +
+                        classname);
             return null;
         }
     }
@@ -796,8 +768,8 @@ public abstract class Utils extends Object {
      * @param parametersTypes the parametersTypes list
      * @return true if the method was found, false otherwise
      */
-    public static boolean checkMethodExistence(Class<?> reifiedClass,
-        String methodName, Class<?>[] parametersTypes) {
+    public static boolean checkMethodExistence(Class<?> reifiedClass, String methodName,
+            Class<?>[] parametersTypes) {
         Method[] methods = reifiedClass.getMethods();
         for (Method m : methods) {
             // is it the right method name

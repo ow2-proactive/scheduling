@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.security.exceptions;
 
-
 /**
  * This exception is thrown when an entity try to communicate
  * with another one without accreditation.

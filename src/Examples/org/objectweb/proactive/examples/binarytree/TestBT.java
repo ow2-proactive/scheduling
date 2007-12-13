@@ -69,7 +69,7 @@ public class TestBT {
         bt.put(2, "twoTer");
         s2 = bt.get(2); // non-blocking
         s1 = bt.get(1); // non-blocking
-                        // Blocking operations
+        // Blocking operations
 
         System.out.println("Value associated to key 2 is " + s2); // prints "twoTer"
         System.out.println("Value associated to key 1 is " + s1); // prints "one"

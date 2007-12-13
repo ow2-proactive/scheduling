@@ -52,8 +52,7 @@ public class Jacobi {
         Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
         if (args.length != 1) {
-            logger.error("Usage: java " + Jacobi.class.getName() +
-                " <deployment file>");
+            logger.error("Usage: java " + Jacobi.class.getName() + " <deployment file>");
             System.exit(0);
         }
 

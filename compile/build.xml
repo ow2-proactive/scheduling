@@ -684,7 +684,7 @@
 	</macrodef>
 
 
-	<target name="format" description="Formats the project source files">
+	<target name="jalopyformat" description="Formats the project source files">
 		<parallel threadsperprocessor="1">
 			<format_m srcdir="${src.proactive.dir}" />
 			<format_m srcdir="${src.extensions.dir}" />
@@ -697,80 +697,83 @@
 		</parallel>
 	</target>
 
-	<target name="eclipseformat" description="hibernate's eclipse-based formatter">
-		<taskdef name="javaformatter" classname="org.hibernate.tool.ant.JavaFormatterTask">
-			<classpath>
-				<fileset dir="${dev.dir}/lib">
-					<include name="*.jar" />
-				</fileset>
-			</classpath>
-		</taskdef>
+	<macrodef name="eclipse_format_m">
+		<attribute name="loglevel" default="WARN" />
+		<element name="sourcefileset" optional="false"/>
 		
-		<copy 
-			file="${compile.dir}/eclipse_formatter_config.xml"
-			tofile="${compile.dir}/eclipse_formatter_config.properties" />
+		<sequential>
+			<taskdef name="javaformatter" classname="org.hibernate.tool.ant.JavaFormatterTask">
+				<classpath>
+					<fileset dir="${dev.dir}/lib">
+						<include name="*.jar" />
+					</fileset>
+				</classpath>
+			</taskdef>
+	
+			<copy 
+				file="${compile.dir}/eclipse_formatter_config.xml"
+				tofile="${compile.dir}/eclipse_formatter_config.properties" />
 
-		<replaceregexp 
-			file="${compile.dir}/eclipse_formatter_config.properties" 
-			match='^&lt;(.xml|/?profile).*' 
-			replace="" 
-			byline="true" />
+			<replaceregexp 
+				file="${compile.dir}/eclipse_formatter_config.properties" 
+				match='^&lt;(.xml|/?profile).*' 
+				replace="" 
+				byline="true" />
 
-		<replaceregexp 
-			file="${compile.dir}/eclipse_formatter_config.properties" 
-			match='.*\"(.*)\".*\"(.*)\".*' 
-			replace="\1=\2" 
-			byline="true" />
+			<replaceregexp 
+				file="${compile.dir}/eclipse_formatter_config.properties" 
+				match='.*\"(.*)\".*\"(.*)\".*' 
+				replace="\1=\2" 
+				byline="true" />
 
-		<javaformatter configurationFile="eclipse_formatter_config.properties">
-			<fileset dir="${src.dir}" includes="**/*.java"/>
+			<javaformatter configurationFile="eclipse_formatter_config.properties">
+				<sourcefileset/>
+			</javaformatter>
+		</sequential>
+	</macrodef>
 
-		</javaformatter>
+	<target name="format" description="hibernate's eclipse-based formatter">
+		<eclipse_format_m>
+			<sourcefileset>
+				<fileset dir="${src.dir}" includes="**/*.java" />
+				<fileset dir="${ic2d-plugin.dir}" includes="**/*.java" />
+				<fileset dir="${scheduler-plugin.dir}" includes="**/*.java" />
+				<fileset dir="${resourcemanager-plugin.dir}" includes="**/*.java" />			
+				</sourcefileset>			
+		</eclipse_format_m>
 	</target>
 
 
 	<target name="check" depends="-init,compile.util">
-		<macrodef name="checkDir">
-			<attribute name="dir" />
-			<attribute name="tmpdir" />
-			<attribute name="prop" />
-			<sequential>
-				<delete dir="@{tmpdir}" />
-				<copy todir="@{tmpdir}">
-					<fileset dir="@{dir}" />
-				</copy>
+		<delete dir="${classes.dir}/tmp"/>
+		<copy todir="${classes.dir}/tmp">
+				<fileset dir="${src.dir}">
+					<include name="**/*.java"/>
+				</fileset>
+				<!-- 
+				<fileset dir="${ic2d-plugin.dir}" includes="**/*.java" />
+				<fileset dir="${scheduler-plugin.dir}" includes="**/*.java" />
+				<fileset dir="${resourcemanager-plugin.dir}" includes="**/*.java" />			
+				-->
+		</copy>
 
-				<format_m srcDir="@{tmpdir}" />
+		<eclipse_format_m>
+			<sourcefileset>
+				<fileset dir="${classes.dir}/tmp">
+					<include name="**/*.java"/>
+				</fileset>
+			</sourcefileset>			
+		</eclipse_format_m>
 
-				<java fork="true" resultproperty="@{prop}" classname="diff.DiffJavaDir">
-					<classpath refid="project.classpath" />
-					<arg value="@{dir}" />
-					<arg value="@{tmpdir}" />
-				</java>
-				<delete dir="@{tmpdir}" />
-			</sequential>
-		</macrodef>
+		<java resultproperty="check.failed" classname="diff.DiffJavaDir" fork="true" failonerror="false">
+			<classpath refid="project.classpath" />
+			<arg value="${src.dir}" />
+			<arg value="${classes.dir}/tmp" />
+		</java>
 
-		<parallel threadsperprocessor="1">
-			<checkDir prop="check.proactive" dir="${src.proactive.dir}" tmpdir="${classes.dir}/tmp/ProActive" />
-			<checkDir prop="check.extensions" dir="${src.extensions.dir}" tmpdir="${classes.dir}/tmp/Extensions" />
-			<checkDir prop="check.extra" dir="${src.extra.dir}" tmpdir="${classes.dir}/tmp/Extra" />
-			<checkDir prop="check.examples" dir="${src.examples.dir}" tmpdir="${classes.dir}/tmp/Examples" />
-			<checkDir prop="check.test" dir="${src.test.dir}" tmpdir="${classes.dir}/tmp/Tests" />
-		</parallel>
-
-		<condition property="check.failed">
-			<or>
-				<isfailure code="${check.proactive}" />
-				<isfailure code="${check.extensions}" />
-				<isfailure code="${check.extra}" />
-				<isfailure code="${check.examples}" />
-				<isfailure code="${check.test}" />
-			</or>
-		</condition>
-
-		<if name="check.failed" exists="true">
-			<fail message="Please use Jalopy (,/build format)" />
+		<delete dir="${classes.dir}/tmp"/>		
+		<if name="check.failed" value="1">
+			<fail message="Please format your source code"/>
 		</if>
 	</target>
 

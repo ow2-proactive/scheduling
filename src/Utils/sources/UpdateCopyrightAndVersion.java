@@ -36,69 +36,48 @@ import java.net.URI;
 
 
 public class UpdateCopyrightAndVersion {
-    private static String LGPLcopyright = "/*\n" +
-        " * ################################################################\n" +
-        " *\n" +
-        " * ProActive: The Java(TM) library for Parallel, Distributed,\n" +
-        " *            Concurrent computing with Security and Mobility\n" +
-        " *\n" +
-        " * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis\n" +
-        " * Contact: proactive@objectweb.org" + "\n" + 
-        " *\n" +
-        " * This library is free software; you can redistribute it and/or\n" +
-        " * modify it under the terms of the GNU Lesser General Public\n" +
-        " * License as published by the Free Software Foundation; either\n" +
-        " * version 2.1 of the License, or any later version.\n" +
-        " *\n" +
-        " * This library is distributed in the hope that it will be useful,\n" +
-        " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
-        " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n" +
-        " * Lesser General Public License for more details.\n" +
-        " *\n" +
-        " * You should have received a copy of the GNU Lesser General Public\n" +
-        " * License along with this library; if not, write to the Free Software\n" +
-        " * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307\n" +
-        " * USA\n" + 
-	" *\n" +
-        " *  Initial developer(s):               The ProActive Team\n" +
-        " *                        http://proactive.inria.fr/team_members.htm\n" +
-        " *  Contributor(s):\n" + 
-        " *\n" +
-        " * ################################################################\n" +
-        " */\n";
-    
-    
-    private static String GPLcopyright = "/*\n" +
-    " * ################################################################\n" +
-    " *\n" +
-    " * ProActive: The Java(TM) library for Parallel, Distributed,\n" +
-    " *            Concurrent computing with Security and Mobility\n" +
-    " *\n" +
-    " * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis\n" +
-    " * Contact: proactive@objectweb.org" + "\n" + 
-    " *\n" +
-    " * This library is free software; you can redistribute it and/or\n" +
-    " * modify it under the terms of the GNU General Public License\n" +
-    " * as published by the Free Software Foundation; either version\n" +
-    " * 2 of the License, or any later version.\n" +
-    " *\n" +
-    " * This library is distributed in the hope that it will be useful,\n" +
-    " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n" +
-    " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n" +
-    " * General Public License for more details.\n" +
-    " *\n" +
-    " * You should have received a copy of the GNU General Public License\n" +
-    " * along with this library; if not, write to the Free Software\n" +
-    " * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307\n" +
-    " * USA\n" + 
-" *\n" +
-    " *  Initial developer(s):               The ProActive Team\n" +
-    " *                        http://proactive.inria.fr/team_members.htm\n" +
-    " *  Contributor(s):\n" + 
-    " *\n" +
-    " * ################################################################\n" +
-    " */\n";
-    
+    private static String LGPLcopyright = "/*\n"
+        + " * ################################################################\n" + " *\n"
+        + " * ProActive: The Java(TM) library for Parallel, Distributed,\n"
+        + " *            Concurrent computing with Security and Mobility\n" + " *\n"
+        + " * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis\n"
+        + " * Contact: proactive@objectweb.org" + "\n" + " *\n"
+        + " * This library is free software; you can redistribute it and/or\n"
+        + " * modify it under the terms of the GNU Lesser General Public\n"
+        + " * License as published by the Free Software Foundation; either\n"
+        + " * version 2.1 of the License, or any later version.\n" + " *\n"
+        + " * This library is distributed in the hope that it will be useful,\n"
+        + " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        + " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
+        + " * Lesser General Public License for more details.\n" + " *\n"
+        + " * You should have received a copy of the GNU Lesser General Public\n"
+        + " * License along with this library; if not, write to the Free Software\n"
+        + " * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307\n" + " * USA\n" + " *\n"
+        + " *  Initial developer(s):               The ProActive Team\n"
+        + " *                        http://proactive.inria.fr/team_members.htm\n" + " *  Contributor(s):\n"
+        + " *\n" + " * ################################################################\n" + " */\n";
+
+    private static String GPLcopyright = "/*\n"
+        + " * ################################################################\n" + " *\n"
+        + " * ProActive: The Java(TM) library for Parallel, Distributed,\n"
+        + " *            Concurrent computing with Security and Mobility\n" + " *\n"
+        + " * Copyright (C) 1997-2007 INRIA/University of Nice-Sophia Antipolis\n"
+        + " * Contact: proactive@objectweb.org" + "\n" + " *\n"
+        + " * This library is free software; you can redistribute it and/or\n"
+        + " * modify it under the terms of the GNU General Public License\n"
+        + " * as published by the Free Software Foundation; either version\n"
+        + " * 2 of the License, or any later version.\n" + " *\n"
+        + " * This library is distributed in the hope that it will be useful,\n"
+        + " * but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        + " * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\n"
+        + " * General Public License for more details.\n" + " *\n"
+        + " * You should have received a copy of the GNU General Public License\n"
+        + " * along with this library; if not, write to the Free Software\n"
+        + " * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307\n" + " * USA\n" + " *\n"
+        + " *  Initial developer(s):               The ProActive Team\n"
+        + " *                        http://proactive.inria.fr/team_members.htm\n" + " *  Contributor(s):\n"
+        + " *\n" + " * ################################################################\n" + " */\n";
+
     private static String PatternBegin = "$$%%";
     private static String PatternEnd = "%%$$";
     private static String VersionPattern = "ProActiveVersion";
@@ -117,47 +96,41 @@ public class UpdateCopyrightAndVersion {
     private static String LastYearShortCopyright = "07";
     private static String FirstYearCopyright = "1997";
     private static String FirstYearShortCopyright = "97";
-    private static String[][] replacements = {
-            { VersionPattern, CurrentVersion },
+    private static String[][] replacements = { { VersionPattern, CurrentVersion },
             { VersionUnderscorePattern, CurrentVersionUnderscore },
-            { CopyrightYearsPattern, CopyrightYears },
-            { CopyrightYearsShortPattern, CopyrightYearsShort },
+            { CopyrightYearsPattern, CopyrightYears }, { CopyrightYearsShortPattern, CopyrightYearsShort },
             { LastYearCopyrightPattern, LastYearCopyright },
             { LastYearShortCopyrightPattern, LastYearShortCopyright },
             { FirstYearCopyrightPattern, FirstYearCopyright },
-            { FirstYearShortCopyrightPattern, FirstYearShortCopyright }
-        };
+            { FirstYearShortCopyrightPattern, FirstYearShortCopyright } };
     private static URI rootDir;
     private static File[] excludeDirs;
 
     public static void main(String[] arg) throws java.io.IOException {
-    	
-    	
+
         java.io.File sourceDir = new java.io.File(arg[0]);
         rootDir = sourceDir.toURI();
 
-       	excludeDirs = new File[0];
+        excludeDirs = new File[0];
         if (arg.length > 1) {
-        	excludeDirs = new File[arg.length - 1];
+            excludeDirs = new File[arg.length - 1];
 
-        	// we retrieve the exclusion patterns
-        	for (int i = 1; i < arg.length; i++) {
+            // we retrieve the exclusion patterns
+            for (int i = 1; i < arg.length; i++) {
 
-        		URI uriexclude = new File(arg[i]).toURI();
-        		if (!uriexclude.isAbsolute()) {
-        			excludeDirs[i - 1] = new File(rootDir.resolve(uriexclude));
-        		}
-        		else {
-        			excludeDirs[i - 1] = new File(arg[i]);
-        		}
-        	}
+                URI uriexclude = new File(arg[i]).toURI();
+                if (!uriexclude.isAbsolute()) {
+                    excludeDirs[i - 1] = new File(rootDir.resolve(uriexclude));
+                } else {
+                    excludeDirs[i - 1] = new File(arg[i]);
+                }
+            }
         }
 
         addCopyrightToDir(sourceDir);
     }
 
-    private static void addCopyrightToFile(java.io.File file)
-        throws java.io.IOException {
+    private static void addCopyrightToFile(java.io.File file) throws java.io.IOException {
         String name = file.getName();
 
         if (!name.endsWith(".java")) {
@@ -176,9 +149,8 @@ public class UpdateCopyrightAndVersion {
             return;
         }
         String copyrightInFile = program.substring(0, packageStart);
-        if (copyrightInFile.contains("Copyright") &&
-                !copyrightInFile.contains("ProActive")) {
-        	System.out.println("Skipping " + file + ", other copyright exists.");
+        if (copyrightInFile.contains("Copyright") && !copyrightInFile.contains("ProActive")) {
+            System.out.println("Skipping " + file + ", other copyright exists.");
             return;
         }
         System.out.println("Processing " + file);
@@ -188,28 +160,24 @@ public class UpdateCopyrightAndVersion {
         b = copyrightedProgram.getBytes();
         file.delete();
 
-        java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(
-                    file));
+        java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(file));
         out.write(b, 0, b.length);
         out.flush();
         out.close();
     }
 
-    private static void patternReplacementsInFile(java.io.File file)
-        throws java.io.IOException {
+    private static void patternReplacementsInFile(java.io.File file) throws java.io.IOException {
         String name = file.getName();
 
         // selection of files where patterns will be found
-        if (name.endsWith(".java") || name.endsWith(".xml") ||
-                name.endsWith(".xsl") || name.endsWith(".xslt") ||
-                name.endsWith(".html") || name.endsWith(".htm")) {
+        if (name.endsWith(".java") || name.endsWith(".xml") || name.endsWith(".xsl") ||
+            name.endsWith(".xslt") || name.endsWith(".html") || name.endsWith(".htm")) {
             byte[] b = getBytesFromInputStream(new java.io.FileInputStream(file));
             String filetext = new String(b);
 
             file.delete();
 
-            java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(
-                        file));
+            java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(file));
 
             String currentText = filetext;
             filetext = null;
@@ -224,11 +192,10 @@ public class UpdateCopyrightAndVersion {
 
                 // we try to locate each pattern in the replacements list 
                 for (int i = 0; i < replacements.length; i++) {
-                    int indexfound = currentText.indexOf(PatternBegin +
-                            replacements[i][0] + PatternEnd);
+                    int indexfound = currentText.indexOf(PatternBegin + replacements[i][0] + PatternEnd);
 
                     if ((indexfound != -1) && (indexfound < lowestindex)) {
-                    	// we save the pattern which happens first
+                        // we save the pattern which happens first
                         indexoffirstword = i;
                         lowestindex = indexfound;
                         anyReplacement = true;
@@ -236,7 +203,7 @@ public class UpdateCopyrightAndVersion {
                 }
 
                 String toWrite = currentText.substring(0, lowestindex);
-                
+
                 // we writes what's before the first pattern
                 b = toWrite.getBytes();
                 out.write(b, 0, b.length);
@@ -247,23 +214,22 @@ public class UpdateCopyrightAndVersion {
                     b = replacements[indexoffirstword][1].getBytes();
                     out.write(b, 0, b.length);
                     out.flush();
-                    
+
                     // we skip the pattern in the source
-                    currentText = currentText.substring(lowestindex+PatternBegin.length() +
-                            replacements[indexoffirstword][0].length() + PatternEnd.length());
+                    currentText = currentText.substring(lowestindex + PatternBegin.length() +
+                        replacements[indexoffirstword][0].length() + PatternEnd.length());
                 }
                 // if there are still more patterns, go on
             } while (indexoffirstword != -1);
 
             out.close();
             if (anyReplacement) {
-            System.out.println("Patterns replaced in " + file);
+                System.out.println("Patterns replaced in " + file);
             }
         }
     }
 
-    private static void addCopyrightToDir(java.io.File file)
-        throws java.io.IOException {
+    private static void addCopyrightToDir(java.io.File file) throws java.io.IOException {
         for (File exclude : excludeDirs) {
             if (file.equals(exclude)) {
                 return;
@@ -297,8 +263,7 @@ public class UpdateCopyrightAndVersion {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private static byte[] getBytesFromInputStream(java.io.InputStream in)
-        throws java.io.IOException {
+    private static byte[] getBytesFromInputStream(java.io.InputStream in) throws java.io.IOException {
         java.io.DataInputStream din = new java.io.DataInputStream(in);
         byte[] bytecodes = new byte[in.available()];
 

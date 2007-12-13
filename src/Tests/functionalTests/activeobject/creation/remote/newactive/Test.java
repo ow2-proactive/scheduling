@@ -38,6 +38,7 @@ import functionalTests.activeobject.creation.A;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test newActive method on a remote node
  */
@@ -56,8 +57,8 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         assertTrue(TestNodes.getRemoteHostname() != null);
 
-        a = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { "toto" }, TestNodes.getRemoteVMNode());
+        a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" }, TestNodes
+                .getRemoteVMNode());
         name = a.getName();
         nodeUrl = a.getNodeUrl();
 

@@ -66,9 +66,8 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  */
 public class OARSubProcess extends AbstractExternalProcessDecorator {
     public final static String DEFAULT_OARSUBPATH = "oarsub";
-    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + File.separator + "ProActive" + File.separator +
-        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home") + File.separator +
+        "ProActive" + File.separator + "scripts" + File.separator + "unix" + File.separator + "cluster" +
         File.separator + "oarStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected String hostNumber = DEFAULT_HOSTS_NUMBER;
@@ -227,8 +226,7 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     //        return buildEnvironmentCommand(); // + buildPSubCommand();
     //    }
     @Override
-    protected void internalStartProcess(String commandToExecute)
-        throws java.io.IOException {
+    protected void internalStartProcess(String commandToExecute) throws java.io.IOException {
         ArrayList<String> al = new ArrayList<String>();
 
         //we divide the command into tokens
@@ -243,16 +241,16 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
             //            System.out.println(m.group(i));
             al.add(m.group(i));
         }
-        String[] command = al.toArray(new String[] {  });
+        String[] command = al.toArray(new String[] {});
 
         try {
             externalProcess = Runtime.getRuntime().exec(command);
             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getInputStream()));
+                externalProcess.getInputStream()));
             java.io.BufferedReader err = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getErrorStream()));
+                externalProcess.getErrorStream()));
             java.io.BufferedWriter out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(
-                        externalProcess.getOutputStream()));
+                externalProcess.getOutputStream()));
             handleProcess(in, out, err);
         } catch (java.io.IOException e) {
             isFinished = true;
@@ -269,9 +267,8 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
     @Override
     protected String internalBuildCommand() {
         StringBuilder oarsubCommand = new StringBuilder();
-        oarsubCommand.append(
-            "/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do " +
-            accessProtocol + " \\$i  ");
+        oarsubCommand.append("/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do " + accessProtocol +
+            " \\$i  ");
         oarsubCommand.append(targetProcess.getCommand());
         oarsubCommand.append(" \\&  done  \\; wait > ");
         oarsubCommand.append(scriptLocation).append(" ; ");
@@ -299,12 +296,10 @@ public class OARSubProcess extends AbstractExternalProcessDecorator {
         String[] resTab = res.split(",");
         for (int i = 0; i < resTab.length; i++) {
             if (!(resTab[i].indexOf("nodes") < 0)) {
-                hostNumber = resTab[i].substring(resTab[i].indexOf("=") + 1,
-                        resTab[i].length());
+                hostNumber = resTab[i].substring(resTab[i].indexOf("=") + 1, resTab[i].length());
             }
             if (!(resTab[i].indexOf("weight") < 0)) {
-                weight = resTab[i].substring(resTab[i].indexOf("=") + 1,
-                        resTab[i].length());
+                weight = resTab[i].substring(resTab[i].indexOf("=") + 1, resTab[i].length());
             }
         }
     }

@@ -102,8 +102,7 @@ public class SimpleLogMonitor implements Monitor {
                 }
 
                 StatsGlobal stats = calcium.getStatsGlobal();
-                System.out.println("[" + System.currentTimeMillis() + "]" +
-                    stats);
+                System.out.println("[" + System.currentTimeMillis() + "]" + stats);
             }
         }
     }

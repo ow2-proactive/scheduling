@@ -51,8 +51,7 @@ public class Benchmark extends Tag {
         Iterator it = eBench.getChildren("descriptorVariable").iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();
-            this.variables.put(var.getAttributeValue("name"),
-                var.getAttributeValue("value"));
+            this.variables.put(var.getAttributeValue("name"), var.getAttributeValue("value"));
         }
     }
 
@@ -85,8 +84,7 @@ public class Benchmark extends Tag {
             return "";
         }
 
-        throw new RuntimeException("Variable benchmark.'" + name +
-            "' missing in configuration file");
+        throw new RuntimeException("Variable benchmark.'" + name + "' missing in configuration file");
     }
 
     public HashMap<String, String> getVariables() {
@@ -99,8 +97,8 @@ public class Benchmark extends Tag {
         ArrayList<Benchmark> result = new ArrayList<Benchmark>();
 
         Pattern p = Pattern.compile("[^\\x23\\x7B\\x7D]*\\x23\\x7B" + // *#{
-                "([^\\x7D]*)" + // A,B,C
-                "\\x7D[^\\x7D\\x23\\x7B]*"); // }*
+            "([^\\x7D]*)" + // A,B,C
+            "\\x7D[^\\x7D\\x23\\x7B]*"); // }*
 
         for (int i = 0; i < quantity; i++) {
             Element eBench = (Element) benchmarkList.get(i);
@@ -124,8 +122,7 @@ public class Benchmark extends Tag {
         return result.toArray(new Benchmark[1]);
     }
 
-    private static void searchSequences(Element elt, Pattern p,
-        ArrayList<String> seqList) {
+    private static void searchSequences(Element elt, Pattern p, ArrayList<String> seqList) {
         Iterator itAttr = elt.getAttributes().iterator();
         while (itAttr.hasNext()) {
             Attribute attr = (Attribute) itAttr.next();
@@ -139,22 +136,20 @@ public class Benchmark extends Tag {
         }
     }
 
-    private static void expand(Element eBench, ArrayList<String> seqList,
-        int index, ArrayList<Benchmark> out) {
+    private static void expand(Element eBench, ArrayList<String> seqList, int index, ArrayList<Benchmark> out) {
         String seq = seqList.get(index);
         String[] values = seq.split(",");
 
         for (String value : values) {
             Element eBenchClone = (Element) eBench.clone();
             XMLHelper.replaceAll(eBenchClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
-                value);
+                    value);
             Iterator itDesc = eBenchClone.getDescendants();
             while (itDesc.hasNext()) {
                 Object eDesc = itDesc.next();
                 if (eDesc instanceof Element) {
-                    XMLHelper.replaceAll((Element) eDesc,
-                        "\\x23\\x7B" + seq + "\\x7D", // #{*},
-                        value);
+                    XMLHelper.replaceAll((Element) eDesc, "\\x23\\x7B" + seq + "\\x7D", // #{*},
+                            value);
                 }
             }
 

@@ -34,8 +34,8 @@ import java.util.Date;
 
 
 public class TransactionCommitedNotification extends TransactionNotification {
-    public TransactionCommitedNotification(String type, Object source,
-        long sequenceNumber, String message, long id, Date date) {
+    public TransactionCommitedNotification(String type, Object source, long sequenceNumber, String message,
+            long id, Date date) {
         super(type, source, sequenceNumber, message, id, date);
     }
 

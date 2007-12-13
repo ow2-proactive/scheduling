@@ -51,8 +51,8 @@ public class SAXParserErrorHandler extends DefaultHandler {
 
     @Override
     public void error(SAXParseException ex) throws SAXException {
-        logger.error("ERROR: " + ex.getSystemId() + " Line:" +
-            ex.getLineNumber() + " Message:" + ex.getMessage());
+        logger.error("ERROR: " + ex.getSystemId() + " Line:" + ex.getLineNumber() + " Message:" +
+            ex.getMessage());
     }
 
     @Override

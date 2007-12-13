@@ -81,8 +81,7 @@ public class ResultPreviewTool {
         System.out.println("[RESULT_PREVIEW] UNIXHOME: [" + unixHome + "]");
 
         if ((winHome == null) || (unixHome == null)) {
-            System.err.println(
-                "[RESULT_PREVIEW] Warning : home directories variables are not set !");
+            System.err.println("[RESULT_PREVIEW] Warning : home directories variables are not set !");
             return path;
         }
 
@@ -119,8 +118,7 @@ public class ResultPreviewTool {
             this.img = new ImageIcon(path).getImage();
             setBackground(Color.DARK_GRAY);
             setDoubleBuffered(true);
-            Dimension size = new Dimension(img.getWidth(null),
-                    img.getHeight(null));
+            Dimension size = new Dimension(img.getWidth(null), img.getHeight(null));
             setPreferredSize(size);
             setMinimumSize(size);
             setMaximumSize(size);

@@ -69,11 +69,10 @@ public class VMEditPart extends AbstractMonitoringEditPart {
 
         final MVCNotificationTag mvcNotification = ((MVCNotification) arg).getMVCNotification();
         getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-                public void run() {
-                    switch (mvcNotification) {
+            public void run() {
+                switch (mvcNotification) {
                     case RUNTIME_OBJECT_RUNTIME_KILLED:
-                        Console.getInstance(Activator.CONSOLE_NAME)
-                               .log(getModel() + " killed!");
+                        Console.getInstance(Activator.CONSOLE_NAME).log(getModel() + " killed!");
                         getCastedFigure().notResponding();
                         break;
                     default:
@@ -83,9 +82,9 @@ public class VMEditPart extends AbstractMonitoringEditPart {
                         if (isActive()) {
                             refresh();
                         }
-                    }
                 }
-            });
+            }
+        });
 
         /*
         if(param instanceof State && (State)param == State.NOT_RESPONDING)
@@ -109,8 +108,7 @@ public class VMEditPart extends AbstractMonitoringEditPart {
      */
     protected IFigure createFigure() {
         VMFigure figure = new VMFigure(getCastedModel().getName() /*FullName()*/);
-        JVMListener listener = new JVMListener(getCastedModel(),
-                getMonitoringView());
+        JVMListener listener = new JVMListener(getCastedModel(), getMonitoringView());
         figure.addMouseListener(listener);
         figure.addMouseMotionListener(listener);
         return figure;

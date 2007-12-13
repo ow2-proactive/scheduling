@@ -92,8 +92,8 @@ public class LDAPLoginModule implements LoginModule {
      *            user, must work with <code>NoCallback</code> callbacks.
      *            <p>
      */
-    public void initialize(Subject subject, CallbackHandler callbackHandler,
-        Map<String, ?> sharedState, Map<String, ?> options) {
+    public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
+            Map<String, ?> options) {
         this.callbackHandler = callbackHandler;
 
         // initialize any configured options
@@ -120,8 +120,8 @@ public class LDAPLoginModule implements LoginModule {
     public boolean login() throws LoginException {
         // prompt for a user name and password
         if (callbackHandler == null) {
-            throw new LoginException("Error: no CallbackHandler available " +
-                "to garner authentication information from the user");
+            throw new LoginException("Error: no CallbackHandler available "
+                + "to garner authentication information from the user");
         }
 
         Callback[] callbacks = new Callback[] { new NoCallback() };
@@ -145,16 +145,13 @@ public class LDAPLoginModule implements LoginModule {
             throw new LoginException(ioe.toString());
         } catch (UnsupportedCallbackException uce) {
             throw new LoginException("Error: " + uce.getCallback().toString() +
-                " not available to garner authentication information " +
-                "from the user");
+                " not available to garner authentication information " + "from the user");
         }
 
         // print debugging information
         if (debug) {
-            System.out.println("\t\t[LDAPLoginModule] " +
-                "user entered user name: " + username);
-            System.out.println("\t\t[LDAPLoginModule] " +
-                "user entered password: " + password);
+            System.out.println("\t\t[LDAPLoginModule] " + "user entered user name: " + username);
+            System.out.println("\t\t[LDAPLoginModule] " + "user entered password: " + password);
         }
 
         // verify the username and password
@@ -178,8 +175,7 @@ public class LDAPLoginModule implements LoginModule {
         if (usernameExists && passwordMatch) {
             // authentication succeeded!!!
             if (debug) {
-                System.out.println("\t\t[LDAPLoginModule] " +
-                    "authentication succeeded");
+                System.out.println("\t\t[LDAPLoginModule] " + "authentication succeeded");
             }
 
             succeeded = true;
@@ -187,8 +183,7 @@ public class LDAPLoginModule implements LoginModule {
         } else {
             // authentication failed -- clean out state
             if (debug) {
-                System.out.println("\t\t[LDAPLoginModule] " +
-                    "authentication failed");
+                System.out.println("\t\t[LDAPLoginModule] " + "authentication failed");
             }
             succeeded = false;
             username = null;
@@ -267,14 +262,12 @@ public class LDAPLoginModule implements LoginModule {
      * @return the String containing the UID of the user or null if the user is
      *         not found.
      */
-    private String getLDAPUserID(String url, String username)
-        throws NamingException {
+    private String getLDAPUserID(String url, String username) throws NamingException {
         String userID = null;
 
         // Anonymous connection to get the uid and the group of the user
         Hashtable<String, String> env = new Hashtable<String, String>();
-        env.put(Context.INITIAL_CONTEXT_FACTORY,
-            "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 
         // url of the LDAP server
         env.put(Context.PROVIDER_URL, "ldap://" + url + "/");
@@ -289,8 +282,7 @@ public class LDAPLoginModule implements LoginModule {
         }
 
         // Set the attribute to match in the search
-        Attributes matchAttrs = new BasicAttributes("inriaLocalLogin",
-                username, true);
+        Attributes matchAttrs = new BasicAttributes("inriaLocalLogin", username, true);
 
         // Specify the ids of the attributes to return
         String[] attrIDs = { "inriaLocalLogin", "uid" };
@@ -298,20 +290,18 @@ public class LDAPLoginModule implements LoginModule {
         String resultUsername = null;
         try {
             // Search for objects matching these attributes
-            NamingEnumeration<SearchResult> answer = ctx.search("ou=People,dc=inria,dc=fr",
-                    matchAttrs, attrIDs);
+            NamingEnumeration<SearchResult> answer = ctx.search("ou=People,dc=inria,dc=fr", matchAttrs,
+                    attrIDs);
 
             if (answer.hasMoreElements()) {
                 Attributes attr = answer.nextElement().getAttributes();
-                resultUsername = new String(attr.get("inriaLocalLogin").get()
-                                                .toString());
+                resultUsername = new String(attr.get("inriaLocalLogin").get().toString());
                 if (username.equals(resultUsername)) {
                     userID = new String(attr.get("uid").get().toString());
                 }
             }
         } catch (NamingException e) {
-            System.err.println("Problem with the search in anonymous mode : " +
-                e);
+            System.err.println("Problem with the search in anonymous mode : " + e);
         }
 
         // Close the context when we're done
@@ -338,15 +328,13 @@ public class LDAPLoginModule implements LoginModule {
 
         // Secured connection to check the user password
         Hashtable<String, String> env = new Hashtable<String, String>();
-        env.put(Context.INITIAL_CONTEXT_FACTORY,
-            "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 
         // url of the LDAP server
         env.put(Context.PROVIDER_URL, "ldaps://" + url + "/");
 
         // secure connection that does not check certificates
-        env.put("java.naming.ldap.factory.socket",
-            DummySSLSocketFactory.class.getName());
+        env.put("java.naming.ldap.factory.socket", DummySSLSocketFactory.class.getName());
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
         env.put(Context.SECURITY_PRINCIPAL, uid);
         env.put(Context.SECURITY_CREDENTIALS, password);
@@ -356,8 +344,7 @@ public class LDAPLoginModule implements LoginModule {
             // Create the initial directory context
             ctx = new InitialDirContext(env);
         } catch (NamingException e) {
-            System.err.println("Problem connecting securely to LDAP server : " +
-                e);
+            System.err.println("Problem connecting securely to LDAP server : " + e);
             // Connexion failed, password is incorrect
             return false;
         }

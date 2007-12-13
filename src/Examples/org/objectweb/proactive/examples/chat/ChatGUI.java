@@ -103,8 +103,7 @@ public class ChatGUI extends JFrame {
         Box verticalBoxMessage = Box.createVerticalBox();
         verticalBoxMessage.add(new JLabel("Message to send :"));
         verticalBoxMessage.add(message);
-        verticalBoxMessage.setBorder(BorderFactory.createTitledBorder(
-                writerName));
+        verticalBoxMessage.setBorder(BorderFactory.createTitledBorder(writerName));
 
         Box horizontalBoxMessage = Box.createHorizontalBox();
         horizontalBoxMessage.add(verticalBoxMessage);
@@ -126,24 +125,23 @@ public class ChatGUI extends JFrame {
         getContentPane().add(panel);
 
         addWindowListener(new WindowAdapter() {
-                // Focus on the edit message field
-                @Override
-                public void windowOpened(WindowEvent e) {
-                    message.requestFocus();
-                }
+            // Focus on the edit message field
+            @Override
+            public void windowOpened(WindowEvent e) {
+                message.requestFocus();
+            }
 
-                // Pop a windows to confirm the close of the application
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    int reponse = JOptionPane.showConfirmDialog(ChatGUI.this,
-                            "Are you sure you want to quit ?", "Quit the chat",
-                            JOptionPane.YES_NO_OPTION);
-                    if (reponse == JOptionPane.YES_OPTION) {
-                        oa.disconnect();
-                        ChatGUI.this.dispose();
-                    }
+            // Pop a windows to confirm the close of the application
+            @Override
+            public void windowClosing(WindowEvent e) {
+                int reponse = JOptionPane.showConfirmDialog(ChatGUI.this, "Are you sure you want to quit ?",
+                        "Quit the chat", JOptionPane.YES_NO_OPTION);
+                if (reponse == JOptionPane.YES_OPTION) {
+                    oa.disconnect();
+                    ChatGUI.this.dispose();
                 }
-            });
+            }
+        });
 
         pack();
         setVisible(true);
@@ -164,9 +162,8 @@ public class ChatGUI extends JFrame {
 
         public void actionPerformed(ActionEvent e) {
             // Pop a windows to confirm the close of the application
-            int reponse = JOptionPane.showConfirmDialog(ChatGUI.this,
-                    "Are you sure you want to quit ?", "Quit the chat",
-                    JOptionPane.YES_NO_OPTION);
+            int reponse = JOptionPane.showConfirmDialog(ChatGUI.this, "Are you sure you want to quit ?",
+                    "Quit the chat", JOptionPane.YES_NO_OPTION);
             if (reponse == JOptionPane.YES_OPTION) {
                 oa.disconnect();
                 //				oa.disposeFrame();

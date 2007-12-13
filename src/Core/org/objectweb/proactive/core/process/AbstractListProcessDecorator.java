@@ -45,8 +45,7 @@ import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
  * @since ProActive 2.2
  *
  */
-public abstract class AbstractListProcessDecorator
-    implements ExternalProcessDecorator {
+public abstract class AbstractListProcessDecorator implements ExternalProcessDecorator {
     //Array of processes
     protected ArrayList<ExternalProcessDecorator> processes;
 
@@ -70,16 +69,14 @@ public abstract class AbstractListProcessDecorator
         processes = new ArrayList<ExternalProcessDecorator>();
     }
 
-    public void setHostConfig(String fixedName, String list, String domain,
-        int padding, int repeat) {
+    public void setHostConfig(String fixedName, String list, String domain, int padding, int repeat) {
         this.fixedName = fixedName;
         this.domain = domain;
         this.padding = padding;
         this.repeat = repeat;
         this.list = list.replaceAll("\\s", "");
         setAllIndex(this.list);
-        for (int i = Integer.parseInt(beginIndex);
-                i <= Integer.parseInt(endIndex); i = i + step) {
+        for (int i = Integer.parseInt(beginIndex); i <= Integer.parseInt(endIndex); i = i + step) {
             tmp = "" + i; //we change as String to check the array
             if (!excludeArray.contains(tmp)) {
                 for (int count = 0; count < repeat; count++) {
@@ -207,8 +204,7 @@ public abstract class AbstractListProcessDecorator
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#setInputMessageLogger(org.objectweb.proactive.core.util.RemoteProcessMessageLogger)
      */
-    public void setInputMessageLogger(
-        RemoteProcessMessageLogger inputMessageLogger) {
+    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
             (processes.get(i)).setInputMessageLogger(inputMessageLogger);
         }
@@ -217,8 +213,7 @@ public abstract class AbstractListProcessDecorator
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#setErrorMessageLogger(org.objectweb.proactive.core.util.RemoteProcessMessageLogger)
      */
-    public void setErrorMessageLogger(
-        RemoteProcessMessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
             (processes.get(i)).setErrorMessageLogger(errorMessageLogger);
         }
@@ -285,8 +280,7 @@ public abstract class AbstractListProcessDecorator
      * @see org.objectweb.proactive.core.process.UniversalProcess#getCommand()
      */
     public String getCommand() {
-        return baseProcess.getCommandPath() + " " + fixedName + " " + list +
-        " " + domain;
+        return baseProcess.getCommandPath() + " " + fixedName + " " + list + " " + domain;
     }
 
     /**
@@ -424,18 +418,16 @@ public abstract class AbstractListProcessDecorator
             step = new Integer(scount).intValue();
         }
         if (index3 != -1) {
-            String[] listexclude = list.substring(list.lastIndexOf('[') + 1,
-                    list.lastIndexOf(']')).split(",");
+            String[] listexclude = list.substring(list.lastIndexOf('[') + 1, list.lastIndexOf(']'))
+                    .split(",");
             for (int i = 0; i < listexclude.length; i++) {
                 if (listexclude[i].indexOf("-") < 0) {
                     excludeArray.add(listexclude[i]);
                 } else {
-                    String init = listexclude[i].substring(0,
-                            listexclude[i].indexOf("-"));
-                    String end = listexclude[i].substring(listexclude[i].indexOf(
-                                "-") + 1, listexclude[i].length());
-                    for (int j = Integer.parseInt(init);
-                            j <= Integer.parseInt(end); j++) {
+                    String init = listexclude[i].substring(0, listexclude[i].indexOf("-"));
+                    String end = listexclude[i].substring(listexclude[i].indexOf("-") + 1, listexclude[i]
+                            .length());
+                    for (int j = Integer.parseInt(init); j <= Integer.parseInt(end); j++) {
                         excludeArray.add(new Integer(j).toString());
                     }
                 }

@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertNotNull;
 
+
 /**
  * Test the generation of entity certificate from an application one
  * @author arnaud
@@ -59,8 +60,9 @@ public class SecurityTestApplicationLifeCycle extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestApplicationLifeCycle.class.getResource(
-                    "/functionalTests/security/applicationPolicy.xml").getPath());
+        PolicyServer ps = ProActiveSecurityDescriptorHandler
+                .createPolicyServer(SecurityTestApplicationLifeCycle.class.getResource(
+                        "/functionalTests/security/applicationPolicy.xml").getPath());
         psm = new ProActiveSecurityManager(EntityType.UNKNOWN, ps);
     }
 }

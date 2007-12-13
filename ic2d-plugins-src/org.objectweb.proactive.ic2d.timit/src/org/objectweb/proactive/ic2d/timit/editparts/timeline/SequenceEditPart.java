@@ -51,8 +51,8 @@ public class SequenceEditPart extends AbstractGraphicalEditPart {
     protected IFigure createFigure() {
         SequenceObject model = (SequenceObject) getModel();
         TimeLineChartEditPart parent = (TimeLineChartEditPart) getParent();
-        this.sequenceFigure = new SequenceFigure(parent.getTimeIntervalManager(),
-                model, (ScrollingGraphicalViewer) parent.getViewer());
+        this.sequenceFigure = new SequenceFigure(parent.getTimeIntervalManager(), model,
+            (ScrollingGraphicalViewer) parent.getViewer());
         return sequenceFigure;
     }
 

@@ -56,7 +56,7 @@ public class CertificateForm extends FormPage {
      */
     public CertificateForm(FormEditor editor, String id, String title) {
         super(editor, "certificate", "Certificates"); //$NON-NLS-1$ //$NON-NLS-2$
-                                                      // TODO Auto-generated constructor stub
+        // TODO Auto-generated constructor stub
     }
 
     @Override
@@ -71,12 +71,9 @@ public class CertificateForm extends FormPage {
         createTableSection(form, toolkit, "SecondPage.secondSection"); //$NON-NLS-1$
     }
 
-    private void createTableSection(final ScrolledForm form,
-        FormToolkit toolkit, String title) {
-        Section section = toolkit.createSection(form.getBody(),
-                Section.TWISTIE | Section.DESCRIPTION);
-        section.setActiveToggleColor(toolkit.getHyperlinkGroup()
-                                            .getActiveForeground());
+    private void createTableSection(final ScrolledForm form, FormToolkit toolkit, String title) {
+        Section section = toolkit.createSection(form.getBody(), Section.TWISTIE | Section.DESCRIPTION);
+        section.setActiveToggleColor(toolkit.getHyperlinkGroup().getActiveForeground());
         section.setToggleColor(toolkit.getColors().getColor(FormColors.SEPARATOR));
         toolkit.createCompositeSeparator(section);
         Composite client = toolkit.createComposite(section, SWT.WRAP);
@@ -98,11 +95,11 @@ public class CertificateForm extends FormPage {
         section.setClient(client);
         section.setExpanded(true);
         section.addExpansionListener(new ExpansionAdapter() {
-                @Override
-                public void expansionStateChanged(ExpansionEvent e) {
-                    form.reflow(false);
-                }
-            });
+            @Override
+            public void expansionStateChanged(ExpansionEvent e) {
+                form.reflow(false);
+            }
+        });
         gd = new GridData(GridData.FILL_BOTH);
         section.setLayoutData(gd);
     }

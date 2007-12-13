@@ -49,31 +49,28 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
     public XmlToDocBookRegexp() {
         pattern = new Pattern[] { //   \b in a regexp means a word boundary
 
-                Pattern.compile("(\\t)"), // Replace all tabs 
+        Pattern.compile("(\\t)"), // Replace all tabs 
                 Pattern.compile("(\\s)(\\w*)(=)(\".*?\")()"), // the attributes construct, like: role="toto"
                 Pattern.compile("(&lt;/?)([a-zA-Z_0-9:-]*)(\\b)"), // the tag name, opening or ending
-            };
+        };
         replacement = new String[] {
                 "  ", // replacement for a tab is two spaces
-                "$1" + OPENTYPE + "$2" + CLOSETYPE + "$3" + OPENSTRING + "$4" +
-                CLOSESTRING + "$5", "$1" + OPENKEYWORD + "$2" + CLOSEKEY +
-                "$3",
-            };
+                "$1" + OPENTYPE + "$2" + CLOSETYPE + "$3" + OPENSTRING + "$4" + CLOSESTRING + "$5",
+                "$1" + OPENKEYWORD + "$2" + CLOSEKEY + "$3", };
         reset();
     }
 
     /** Add tags around xml constructs in the given string
      * @return the initial string with xml tags highlighting parts of it */
     @Override
-	protected String decorate(String xmlString) {
+    protected String decorate(String xmlString) {
         String result = xmlString; // the returned highlighted string
 
         if (this.docBookTag != null) {
             int index = xmlString.indexOf(this.docBookTag);
 
             if (index >= 0) {
-                result = xmlString.substring(0, index +
-                        this.docBookTag.length());
+                result = xmlString.substring(0, index + this.docBookTag.length());
                 index += this.docBookTag.length();
                 this.docBookTag = null;
                 result += decorate(xmlString.substring(index));
@@ -85,10 +82,8 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
 
             if (index >= 0) {
                 this.inComment = false;
-                result = xmlString.substring(0, index +
-                        XML_COMMENT_END.length()) + CLOSECOMMENT;
-                result += decorate(xmlString.substring(index +
-                        XML_COMMENT_END.length()));
+                result = xmlString.substring(0, index + XML_COMMENT_END.length()) + CLOSECOMMENT;
+                result += decorate(xmlString.substring(index + XML_COMMENT_END.length()));
             }
 
             //else result = xmlString;  already set
@@ -98,9 +93,8 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
 
             if (ind >= 0) {
                 result = decorate(xmlString.substring(0, ind));
-                this.docBookTag = xmlString.substring(ind + 1)
-                                           .replaceAll("(\\w*)(\\b.*)", "$1") // hide the tag parameters
-                    .replaceAll("\n", "");
+                this.docBookTag = xmlString.substring(ind + 1).replaceAll("(\\w*)(\\b.*)", "$1") // hide the tag parameters
+                        .replaceAll("\n", "");
                 result += ("<" + this.docBookTag);
                 ind += ("<" + this.docBookTag).length();
                 this.docBookTag = "</" + this.docBookTag + ">";
@@ -113,15 +107,12 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
                     result = decorate(xmlString.substring(0, index));
                     result += (OPENCOMMENT + XML_COMMENT_START);
                     inComment = true;
-                    result += decorate(xmlString.substring(index +
-                            XML_COMMENT_START.length()));
-                }
-                else {
+                    result += decorate(xmlString.substring(index + XML_COMMENT_START.length()));
+                } else {
                     //  result = xmlString; already set
                     // for all the patterns defined, do regexp replacement 
                     for (int i = 0; i < pattern.length; i++)
-                        result = pattern[i].matcher(result)
-                                           .replaceAll(replacement[i]);
+                        result = pattern[i].matcher(result).replaceAll(replacement[i]);
 
                     // pattern reuse is faster than String.replaceAll(regexp, replacement)
                 }
@@ -133,7 +124,7 @@ public class XmlToDocBookRegexp extends RegexpHighLighter {
 
     /** Put all fields back to inital value */
     @Override
-	protected void reset() {
+    protected void reset() {
         this.inComment = false;
         this.docBookTag = null;
     }

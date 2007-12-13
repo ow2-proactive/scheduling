@@ -41,8 +41,8 @@ import org.objectweb.proactive.core.event.MigrationEventListener;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
-public class MigrationStrategyManagerImpl implements MigrationStrategyManager,
-    MigrationEventListener, java.io.Serializable {
+public class MigrationStrategyManagerImpl implements MigrationStrategyManager, MigrationEventListener,
+        java.io.Serializable {
 
     /**
      * Name of the method to be called when the agent reaches a new site
@@ -156,8 +156,7 @@ public class MigrationStrategyManagerImpl implements MigrationStrategyManager,
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected void executeMethodOnDeparture(Body body)
-        throws MigrationException {
+    protected void executeMethodOnDeparture(Body body) throws MigrationException {
         if (methodOnDeparture == null) {
             return;
         }
@@ -193,20 +192,18 @@ public class MigrationStrategyManagerImpl implements MigrationStrategyManager,
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    private void executeMethod(Object target, String methodName)
-        throws MigrationException {
+    private void executeMethod(Object target, String methodName) throws MigrationException {
         try {
             Method m = target.getClass().getMethod(methodName, (Class[]) null);
             m.invoke(target, (Object[]) null);
         } catch (NoSuchMethodException e) {
-            throw new MigrationException("Cannot find method " + methodName +
-                " in class " + target.getClass().getName(), e);
+            throw new MigrationException("Cannot find method " + methodName + " in class " +
+                target.getClass().getName(), e);
         } catch (IllegalAccessException e) {
-            throw new MigrationException("Cannot access method " + methodName +
-                " in class " + target.getClass().getName(), e);
+            throw new MigrationException("Cannot access method " + methodName + " in class " +
+                target.getClass().getName(), e);
         } catch (java.lang.reflect.InvocationTargetException e) {
-            throw new MigrationException(
-                "Error while trying to execute method " + methodName, e);
+            throw new MigrationException("Error while trying to execute method " + methodName, e);
         }
     }
 }

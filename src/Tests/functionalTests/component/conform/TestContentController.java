@@ -64,11 +64,8 @@ public class TestContentController extends Conformtest {
         tf = Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("server", I.class.getName(), false,
-                        false, false),
-                    tf.createFcItfType("client", I.class.getName(), true, true,
-                        false)
-                });
+                tf.createFcItfType("server", I.class.getName(), false, false, false),
+                tf.createFcItfType("client", I.class.getName(), true, true, false) });
         setUpComponents();
     }
 
@@ -140,24 +137,20 @@ public class TestContentController extends Conformtest {
     }
 
     @Test(expected = IllegalContentException.class)
-    public void testWouldCreateNonLocalExportBinding()
-        throws Exception {
+    public void testWouldCreateNonLocalExportBinding() throws Exception {
         ContentController cc = Fractal.getContentController(c);
         cc.addFcSubComponent(e);
-        Fractal.getBindingController(c)
-               .bindFc("client", e.getFcInterface("client"));
+        Fractal.getBindingController(c).bindFc("client", e.getFcInterface("client"));
         // must throw an IllegalContentException
         cc.removeFcSubComponent(e);
     }
 
     @Test
     @Ignore
-    public void testWouldCreateNonLocalImportBinding()
-        throws Exception {
+    public void testWouldCreateNonLocalImportBinding() throws Exception {
         ContentController cc = Fractal.getContentController(c);
         cc.addFcSubComponent(e);
-        Fractal.getBindingController(e)
-               .bindFc("client", cc.getFcInternalInterface("client"));
+        Fractal.getBindingController(e).bindFc("client", cc.getFcInternalInterface("client"));
         try {
             cc.removeFcSubComponent(e);
             fail();
@@ -167,13 +160,11 @@ public class TestContentController extends Conformtest {
 
     @Test
     @Ignore
-    public void testWouldCreateNonLocalNormalBinding()
-        throws Exception {
+    public void testWouldCreateNonLocalNormalBinding() throws Exception {
         ContentController cc = Fractal.getContentController(c);
         cc.addFcSubComponent(d);
         cc.addFcSubComponent(e);
-        Fractal.getBindingController(d)
-               .bindFc("client", e.getFcInterface("server"));
+        Fractal.getBindingController(d).bindFc("client", e.getFcInterface("server"));
         try {
             cc.removeFcSubComponent(e);
             fail();
@@ -193,21 +184,17 @@ public class TestContentController extends Conformtest {
         @Test
         @Ignore
         public void testInstanceContent() throws Exception {
-            Component r = gf.newFcInstance(t, "compositeTemplate",
-                    new Object[] { "composite", null });
+            Component r = gf.newFcInstance(t, "compositeTemplate", new Object[] { "composite", null });
             Fractal.getContentController(r).addFcSubComponent(c);
             Fractal.getContentController(r).addFcSubComponent(d);
             Fractal.getContentController(c).addFcSubComponent(e);
             Fractal.getContentController(d).addFcSubComponent(e);
 
             Component root = Fractal.getFactory(r).newFcInstance();
-            Component[] comps = Fractal.getContentController(root)
-                                       .getFcSubComponents();
+            Component[] comps = Fractal.getContentController(root).getFcSubComponents();
             assertEquals(2, comps.length);
-            Component[] cComps = Fractal.getContentController(comps[0])
-                                        .getFcSubComponents();
-            Component[] dComps = Fractal.getContentController(comps[1])
-                                        .getFcSubComponents();
+            Component[] cComps = Fractal.getContentController(comps[0]).getFcSubComponents();
+            Component[] dComps = Fractal.getContentController(comps[1]).getFcSubComponents();
             assertEquals(1, cComps.length);
             assertEquals(1, dComps.length);
             assertEquals(cComps[0], dComps[0]);

@@ -119,14 +119,13 @@ public class StartRuntime {
                     File f = new File(log4jConfiguration);
                     PropertyConfigurator.configure(new URL(f.getPath()));
                 } catch (IOException e) {
-                    System.err.println(
-                        "Error : incorrect path for log4j configuration : " +
+                    System.err.println("Error : incorrect path for log4j configuration : " +
                         PAProperties.LOG4J.getValue());
                     ret &= false;
                 }
             } else {
-                System.err.println(
-                    "-Dlog4.defaultInitOverride is specified but -Dlog4j.configuration property is missing");
+                System.err
+                        .println("-Dlog4.defaultInitOverride is specified but -Dlog4j.configuration property is missing");
                 ret &= false;
             }
         }
@@ -142,14 +141,11 @@ public class StartRuntime {
         CommandLineParser parser = new PosixParser();
 
         Options options = new Options();
-        options.addOption(Params.parent.sOpt, Params.parent.toString(), true,
-            Params.parent.desc);
-        options.addOption(Params.capacity.sOpt, Params.capacity.toString(),
-            true, Params.capacity.desc);
-        options.addOption(Params.deploymentId.sOpt,
-            Params.deploymentId.toString(), true, Params.deploymentId.desc);
-        options.addOption(Params.topologyId.sOpt, Params.topologyId.toString(),
-            true, Params.topologyId.desc);
+        options.addOption(Params.parent.sOpt, Params.parent.toString(), true, Params.parent.desc);
+        options.addOption(Params.capacity.sOpt, Params.capacity.toString(), true, Params.capacity.desc);
+        options.addOption(Params.deploymentId.sOpt, Params.deploymentId.toString(), true,
+                Params.deploymentId.desc);
+        options.addOption(Params.topologyId.sOpt, Params.topologyId.toString(), true, Params.topologyId.desc);
 
         CommandLine line = null;
 
@@ -163,8 +159,7 @@ public class StartRuntime {
             arg = line.getOptionValue(Params.capacity.sOpt);
             if (arg == null) {
                 capacity = Runtime.getRuntime().availableProcessors();
-                logger.info(capacity + " cores found. Capacity set to " +
-                    capacity);
+                logger.info(capacity + " cores found. Capacity set to " + capacity);
             } else {
                 capacity = new Long(arg);
             }
@@ -187,8 +182,7 @@ public class StartRuntime {
             abort();
         } catch (NumberFormatException e) {
             // TODO cmathieu gracefully handle errors
-            logger.error("Capacity must be a number: " +
-                line.getOptionValue(Params.capacity.toString()));
+            logger.error("Capacity must be a number: " + line.getOptionValue(Params.capacity.toString()));
             abort();
         }
     }
@@ -196,21 +190,19 @@ public class StartRuntime {
     private void start() {
         // Print some information message
         logger.info("Starting a ProActiveRuntime on " +
-            URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                    .getInetAddress()));
+            URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress()));
 
         if (logger.isDebugEnabled()) {
-            logger.debug("**** Starting jvm with classpath " +
-                System.getProperty("java.class.path"));
-            logger.debug("****              with bootclasspath " +
-                System.getProperty("sun.boot.class.path"));
+            logger.debug("**** Starting jvm with classpath " + System.getProperty("java.class.path"));
+            logger.debug("****              with bootclasspath " + System.getProperty("sun.boot.class.path"));
         }
 
         // Creation & Setup of the local ProActive Runtime
         ProActiveRuntimeImpl localRuntimeImpl = ProActiveRuntimeImpl.getProActiveRuntime();
         ProActiveRuntime localRuntime = null;
         try {
-            localRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+            localRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL
+                    .getValue());
         } catch (ProActiveException e1) {
             logger.warn("Cannot get the local ProActive Runtime", e1);
             abort();
@@ -223,8 +215,7 @@ public class StartRuntime {
             try {
                 nodes.add(NodeFactory.getNode(url));
             } catch (NodeException e) {
-                logger.error("Unable to get a GCM Deployment node on the local runtime",
-                    e);
+                logger.error("Unable to get a GCM Deployment node on the local runtime", e);
             }
         }
 
@@ -237,8 +228,8 @@ public class StartRuntime {
                 localRuntimeImpl.setParent(parentRuntime);
 
                 // Register
-                GCMRuntimeRegistrationNotificationData notification = new GCMRuntimeRegistrationNotificationData(localRuntime.getURL(),
-                        deploymendId, topologyId, nodes);
+                GCMRuntimeRegistrationNotificationData notification = new GCMRuntimeRegistrationNotificationData(
+                    localRuntime.getURL(), deploymendId, topologyId, nodes);
                 parentRuntime.register(notification);
 
                 waitUntilInterupted();
@@ -263,10 +254,10 @@ public class StartRuntime {
             }
         }
     }
-    public enum Params {parent("p", "URL of the parent ProActive Runtime"),
-        topologyId("i", "Topology Node"),
-        deploymentId("d", "GCM Application identifier"),
-        capacity("c", "Number of Node to be created");
+
+    public enum Params {
+        parent("p", "URL of the parent ProActive Runtime"), topologyId("i", "Topology Node"), deploymentId(
+                "d", "GCM Application identifier"), capacity("c", "Number of Node to be created");
         protected String sOpt;
         protected String desc;
 

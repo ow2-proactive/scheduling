@@ -56,9 +56,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 @Deprecated
 public class UrlBuilder {
-    private static String[] LOCAL_URLS = {
-            "", "localhost.localdomain", "localhost", "127.0.0.1"
-        };
+    private static String[] LOCAL_URLS = { "", "localhost.localdomain", "localhost", "127.0.0.1" };
     static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
 
     //
@@ -82,8 +80,7 @@ public class UrlBuilder {
                 path = "/" + path;
             }
 
-            URI u2 = new URI(u.getScheme(), null, hostname, u.getPort(), path,
-                    u.getQuery(), u.getFragment());
+            URI u2 = new URI(u.getScheme(), null, hostname, u.getPort(), path, u.getQuery(), u.getFragment());
             return u2.toString();
         } catch (UnknownHostException e) {
             throw new URISyntaxException(url, "host unknown");
@@ -100,8 +97,7 @@ public class UrlBuilder {
      */
     public static String buildUrl(String host, String name, String protocol) {
         try {
-            return buildUrl(host, name, protocol,
-                RemoteObjectHelper.getDefaultPortForProtocol(protocol));
+            return buildUrl(host, name, protocol, RemoteObjectHelper.getDefaultPortForProtocol(protocol));
         } catch (UnknownProtocolException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -129,8 +125,7 @@ public class UrlBuilder {
      * @param port Url's port
      * @returnan url under the form [protocol:][//host[:port]][[/]name]
      */
-    public static String buildUrl(String host, String name, String protocol,
-        int port) {
+    public static String buildUrl(String host, String name, String protocol, int port) {
         return buildUrl(host, name, protocol, port, true);
     }
 
@@ -145,8 +140,7 @@ public class UrlBuilder {
      * @see #getHostNameorIP(InetAddress address)
      * @returnan url under the form [protocol:][//host[:port]][[/]name]
      */
-    public static String buildUrl(String host, String name, String protocol,
-        int port, boolean replaceHost) {
+    public static String buildUrl(String host, String name, String protocol, int port, boolean replaceHost) {
         //        if (protocol == null) {
         //            protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         //        }
@@ -186,7 +180,7 @@ public class UrlBuilder {
         String port = null;
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
-                protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
+            protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
             port = PAProperties.PA_RMI_PORT.getValue();
         }
         if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
@@ -212,8 +206,7 @@ public class UrlBuilder {
      * @return
      * @throws java.net.UnknownHostException if no network interface was found
      */
-    public static String buildVirtualNodeUrl(String url)
-        throws java.net.UnknownHostException {
+    public static String buildVirtualNodeUrl(String url) throws java.net.UnknownHostException {
         String vnName = getNameFromUrl(url);
         vnName = vnName.concat("_VN");
         String host = getHostNameFromUrl(url);
@@ -277,9 +270,8 @@ public class UrlBuilder {
     //        return url;
     //    }
     public static String removeProtocol(String url) {
-        String tmp = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(url),
-                URIBuilder.getNameFromURI(url), null,
-                URIBuilder.getPortNumber(url)).toString();
+        String tmp = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(url), URIBuilder.getNameFromURI(url),
+                null, URIBuilder.getPortNumber(url)).toString();
         return tmp;
     }
 
@@ -359,14 +351,12 @@ public class UrlBuilder {
      * @throws UnknownHostException if no network interface was found
      * @see getHostNameorIP(InetAddress address)
      */
-    public static String fromLocalhostToHostname(String localName)
-        throws UnknownHostException {
+    public static String fromLocalhostToHostname(String localName) throws UnknownHostException {
         if (localName == null) {
             localName = "localhost";
         }
 
-        java.net.InetAddress hostInetAddress = ProActiveInet.getInstance()
-                                                            .getInetAddress();
+        java.net.InetAddress hostInetAddress = ProActiveInet.getInstance().getInetAddress();
 
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {
@@ -404,8 +394,8 @@ public class UrlBuilder {
         URI u = URI.create(url);
         URI u2;
         try {
-            u2 = new URI(u.getScheme(), u.getUserInfo(), u.getHost(), port,
-                    u.getPath(), u.getQuery(), u.getFragment());
+            u2 = new URI(u.getScheme(), u.getUserInfo(), u.getHost(), port, u.getPath(), u.getQuery(), u
+                    .getFragment());
             return u2.toString();
         } catch (URISyntaxException e) {
             e.printStackTrace();

@@ -41,8 +41,7 @@ public class KillVMAction extends Action {
 
     public KillVMAction() {
         this.setId(KILLVM);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "stop_monitoring.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "stop_monitoring.gif"));
         this.setText("Kill this VM");
         this.setToolTipText("Kill this VM");
     }

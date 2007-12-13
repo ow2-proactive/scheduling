@@ -61,10 +61,9 @@ public class HelloWorld {
         }
         System.out.println("Deploy an hello world service on : " + url);
         try {
-            HelloWorld hw = (HelloWorld) PAActiveObject.newActive("org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld",
-                    new Object[] {  });
-            WebServices.exposeAsWebService(hw, url, "helloWorld",
-                new String[] { "helloWorld" });
+            HelloWorld hw = (HelloWorld) PAActiveObject.newActive(
+                    "org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld", new Object[] {});
+            WebServices.exposeAsWebService(hw, url, "helloWorld", new String[] { "helloWorld" });
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {

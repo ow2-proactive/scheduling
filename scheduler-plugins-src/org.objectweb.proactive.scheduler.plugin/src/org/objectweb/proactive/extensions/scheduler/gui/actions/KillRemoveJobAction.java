@@ -52,18 +52,16 @@ public class KillRemoveJobAction extends Action {
     private KillRemoveJobAction(Shell shell) {
         this.shell = shell;
         this.setText("Kill job");
-        this.setToolTipText(
-            "To kill a job (this will remove this job from the scheduler)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/job_kill.gif"));
+        this.setToolTipText("To kill a job (this will remove this job from the scheduler)");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_kill.gif"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
     @Override
     public void run() {
         if (killMode) {
-            if (MessageDialog.openConfirm(shell, "Confirm please",
-                        "Are you sure you want to Kill this job ?")) {
+            if (MessageDialog
+                    .openConfirm(shell, "Confirm please", "Are you sure you want to Kill this job ?")) {
                 TableItem item = TableManager.getInstance().getLastSelectedItem();
                 if (item != null) {
                     JobId jobId = (JobId) item.getData();
@@ -72,7 +70,7 @@ public class KillRemoveJobAction extends Action {
             }
         } else {
             if (MessageDialog.openConfirm(shell, "Confirm please",
-                        "Are you sure you want to Remove this job ?")) {
+                    "Are you sure you want to Remove this job ?")) {
                 TableItem item = TableManager.getInstance().getLastSelectedItem();
                 if (item != null) {
                     JobId jobId = (JobId) item.getData();
@@ -93,8 +91,7 @@ public class KillRemoveJobAction extends Action {
         killMode = true;
 
         this.setText("Kill job");
-        this.setToolTipText(
-            "To kill a job (this will remove this job from the scheduler)");
+        this.setToolTipText("To kill a job (this will remove this job from the scheduler)");
     }
 
     public static KillRemoveJobAction newInstance(Shell shell) {

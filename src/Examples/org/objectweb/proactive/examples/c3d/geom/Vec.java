@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d.geom;
 
-
 /**
  * This class reflects the 3d vectors used in 3d computations
  */
@@ -117,8 +116,7 @@ public class Vec implements java.io.Serializable {
 
     /** Cross product a ^ b*/
     public static Vec cross(Vec a, Vec b) {
-        return new Vec((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z),
-            (a.x * b.y) - (a.y * b.x));
+        return new Vec((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
     }
 
     /** Dot product  a.b */
@@ -128,8 +126,7 @@ public class Vec implements java.io.Serializable {
 
     /** @return vec such as vec = aA + bB */
     public static Vec comb(double a, Vec A, double b, Vec B) {
-        return new Vec((a * A.x) + (b * B.x), (a * A.y) + (b * B.y),
-            (a * A.z) + (b * B.z));
+        return new Vec((a * A.x) + (b * B.x), (a * A.y) + (b * B.y), (a * A.z) + (b * B.z));
     }
 
     /** Set this so that this = aA + bB */
@@ -191,8 +188,7 @@ public class Vec implements java.io.Serializable {
     public boolean equals(Object o) {
         if (o instanceof Vec) {
             Vec v = (Vec) o;
-            return ((v.x - this.x) == 0) & ((v.y - this.y) == 0) &
-            ((v.z - this.z) == 0);
+            return ((v.x - this.x) == 0) & ((v.y - this.y) == 0) & ((v.z - this.z) == 0);
         }
         return false;
     }

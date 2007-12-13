@@ -80,24 +80,21 @@ public class PolicyEditorView extends ViewPart {
 
         this.form.setText("Policy Editor");
         this.form.getBody().setLayout(new GridLayout());
-        this.tabFolder = new CTabFolder(this.form.getBody(), SWT.FLAT |
-                SWT.TOP);
+        this.tabFolder = new CTabFolder(this.form.getBody(), SWT.FLAT | SWT.TOP);
         toolkit.adapt(this.tabFolder, true, true);
         this.tabFolder.setLayoutData(new GridData(GridData.FILL_BOTH));
         Color selectedColor = toolkit.getColors().getColor(FormColors.SEPARATOR);
-        this.tabFolder.setSelectionBackground(new Color[] {
-                selectedColor, toolkit.getColors().getBackground()
-            }, new int[] { 50 });
+        this.tabFolder.setSelectionBackground(new Color[] { selectedColor,
+                toolkit.getColors().getBackground() }, new int[] { 50 });
         this.tabFolder.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    ((UpdatableTab) PolicyEditorView.this.tabFolder.getSelection()).update();
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ((UpdatableTab) PolicyEditorView.this.tabFolder.getSelection()).update();
+            }
+        });
 
         toolkit.paintBordersFor(this.tabFolder);
-        this.cgt = new CertificateGenerationTab(this.tabFolder, this.keystore,
-                toolkit);
+        this.cgt = new CertificateGenerationTab(this.tabFolder, this.keystore, toolkit);
         this.kt = new KeystoreTab(this.tabFolder, this.keystore, toolkit);
         this.rt = new RuleTab(this.tabFolder, this.keystore, toolkit);
         this.st = new SessionTab(this.tabFolder, toolkit);
@@ -105,9 +102,8 @@ public class PolicyEditorView extends ViewPart {
         this.tabFolder.setSelection(0);
     }
 
-    public void update(CertificateTreeList list,
-        List<SimplePolicyRule> policies, String appName,
-        List<String> authorizedUsers, Hashtable<Long, Session> sessions) {
+    public void update(CertificateTreeList list, List<SimplePolicyRule> policies, String appName,
+            List<String> authorizedUsers, Hashtable<Long, Session> sessions) {
         if (list != null) {
             this.keystore.clear();
             this.keystore.addAll(list);

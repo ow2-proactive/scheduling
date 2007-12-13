@@ -151,8 +151,7 @@ public interface RMMonitoring {
      * @param events list of wanted events that must be received.
      * @return RMInitialState snapshot of RM's current state : nodes and node sources.
      *  */
-    public RMInitialState addRMEventListener(RMEventListener listener,
-        RMEventType... events);
+    public RMInitialState addRMEventListener(RMEventListener listener, RMEventType... events);
 
     /** Stop and remove monitoring active object */
     public void shutdown();

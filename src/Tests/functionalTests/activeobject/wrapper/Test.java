@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test if a futre is created for primitive wrappers
  * Test primitive wrapper for asynchronous call.

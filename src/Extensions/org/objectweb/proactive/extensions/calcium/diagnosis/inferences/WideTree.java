@@ -48,8 +48,7 @@ public class WideTree extends AbstractInference {
     boolean hasSymptom(Stats stats) {
         double value = stats.getTreeSpan();
         if (logger.isDebugEnabled() && (threshold < value)) {
-            logger.debug(this.getClass().getSimpleName() + ": " + threshold +
-                " !> " + value);
+            logger.debug(this.getClass().getSimpleName() + ": " + threshold + " !> " + value);
         }
 
         if (threshold < value) {

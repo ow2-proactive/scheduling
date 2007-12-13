@@ -67,13 +67,11 @@ public class ServerConnector {
         this.serverName = serverName;
 
         String url = "service:jmx:proactive:///jndi/proactive://localhost/" +
-            ProActiveJMXConstants.SERVER_REGISTERED_NAME + "_" +
-            this.serverName;
+            ProActiveJMXConstants.SERVER_REGISTERED_NAME + "_" + this.serverName;
         JMXServiceURL jmxUrl;
         try {
             jmxUrl = new JMXServiceURL(url);
-            Thread.currentThread()
-                  .setContextClassLoader(ServerConnector.class.getClassLoader());
+            Thread.currentThread().setContextClassLoader(ServerConnector.class.getClassLoader());
             cs = JMXConnectorServerFactory.newJMXConnectorServer(jmxUrl,
                     ProActiveJMXConstants.PROACTIVE_JMX_ENV, this.mbs);
         } catch (MalformedURLException e) {

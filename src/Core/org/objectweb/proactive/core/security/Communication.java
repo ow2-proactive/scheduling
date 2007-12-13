@@ -100,8 +100,8 @@ public class Communication implements Serializable {
      * @param integrity
      *            specifies if integrity is required, optional, or denied
      */
-    public Communication(boolean allowed, Authorization authentication,
-        Authorization confidentiality, Authorization integrity) {
+    public Communication(boolean allowed, Authorization authentication, Authorization confidentiality,
+            Authorization integrity) {
         this.communication = allowed;
         this.authentication = authentication;
         this.confidentiality = confidentiality;
@@ -170,9 +170,8 @@ public class Communication implements Serializable {
 
     @Override
     public String toString() {
-        return "\n\tCom : " + this.communication + "\n\tAuth : " +
-        this.authentication + "\n\tConf : " + this.confidentiality +
-        "\n\tIntegrity : " + this.integrity + "\n";
+        return "\n\tCom : " + this.communication + "\n\tAuth : " + this.authentication + "\n\tConf : " +
+            this.confidentiality + "\n\tIntegrity : " + this.integrity + "\n";
     }
 
     /**
@@ -187,12 +186,11 @@ public class Communication implements Serializable {
      *             policies are incomptables, conflicting communication
      *             attributes
      */
-    public static Communication computeCommunication(Communication from,
-        Communication to) throws IncompatiblePolicyException {
-        return new Communication(from.communication && to.communication,
-            Authorization.compute(from.authentication, to.authentication),
-            Authorization.compute(from.confidentiality, to.confidentiality),
-            Authorization.compute(from.integrity, to.integrity));
+    public static Communication computeCommunication(Communication from, Communication to)
+            throws IncompatiblePolicyException {
+        return new Communication(from.communication && to.communication, Authorization.compute(
+                from.authentication, to.authentication), Authorization.compute(from.confidentiality,
+                to.confidentiality), Authorization.compute(from.integrity, to.integrity));
     }
 
     /**

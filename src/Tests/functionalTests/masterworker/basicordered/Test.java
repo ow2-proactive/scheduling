@@ -44,12 +44,12 @@ import functionalTests.FunctionalTest;
 import functionalTests.masterworker.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test load balancing
  */
 public class Test extends FunctionalTest {
-    private URL descriptor = Test.class.getResource(
-            "/functionalTests/masterworker/MasterWorker.xml");
+    private URL descriptor = Test.class.getResource("/functionalTests/masterworker/MasterWorker.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
     public static final int NB_TASKS = 4;

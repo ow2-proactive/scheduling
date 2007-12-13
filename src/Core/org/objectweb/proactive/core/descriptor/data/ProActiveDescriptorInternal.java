@@ -128,11 +128,9 @@ public interface ProActiveDescriptorInternal extends ProActiveDescriptor {
      */
     public Map<String, VirtualNodeInternal> getVirtualNodeMapping();
 
-    public void setMainDefinitionMapping(
-        HashMap<String, MainDefinition> newMapping);
+    public void setMainDefinitionMapping(HashMap<String, MainDefinition> newMapping);
 
-    public void setVirtualNodeMapping(
-        HashMap<String, VirtualNodeInternal> newMapping);
+    public void setVirtualNodeMapping(HashMap<String, VirtualNodeInternal> newMapping);
 
     /**
      * Returns a table containing all mainDefinitions conserving order
@@ -180,8 +178,7 @@ public interface ProActiveDescriptorInternal extends ProActiveDescriptor {
      * @param isMainVN true if the virtual node is linked to a main definition
      * @return VirtualNode
      */
-    public VirtualNodeInternal createVirtualNode(String vnName, boolean lookup,
-        boolean isMainVN);
+    public VirtualNodeInternal createVirtualNode(String vnName, boolean lookup, boolean isMainVN);
 
     /**
      * Creates a VirtualMachine of the given name
@@ -196,8 +193,7 @@ public interface ProActiveDescriptorInternal extends ProActiveDescriptor {
      * @param processClassName
      * @throws ProActiveException if a problem occurs during process creation
      */
-    public ExternalProcess createProcess(String processID,
-        String processClassName) throws ProActiveException;
+    public ExternalProcess createProcess(String processID, String processClassName) throws ProActiveException;
 
     /**
      * Gets an instance of the FileTransfer description. If
@@ -222,8 +218,7 @@ public interface ProActiveDescriptorInternal extends ProActiveDescriptor {
      * @param processClassName
      * @throws ProActiveException if a problem occurs during process creation
      */
-    public ExternalProcess createProcess(String processClassName)
-        throws ProActiveException;
+    public ExternalProcess createProcess(String processClassName) throws ProActiveException;
 
     /**
      * Maps the process given by the specified processID with the specified virtualMachine.
@@ -237,8 +232,7 @@ public interface ProActiveDescriptorInternal extends ProActiveDescriptor {
      * @param compositeProcess
      * @param processID
      */
-    public void registerProcess(ExternalProcessDecorator compositeProcess,
-        String processID);
+    public void registerProcess(ExternalProcessDecorator compositeProcess, String processID);
 
     /**
      * Maps the given jvmProcess with the extended JVMProcess defined with processID.
@@ -248,8 +242,7 @@ public interface ProActiveDescriptorInternal extends ProActiveDescriptor {
      * In fact, it means that if the extended jvm is defined later on in the descriptor the exception
      * is thrown. The extended jvm must be defined before every other jvms that extend it.
      */
-    public void mapToExtendedJVM(JVMProcess jvmProcess, String processID)
-        throws ProActiveException;
+    public void mapToExtendedJVM(JVMProcess jvmProcess, String processID) throws ProActiveException;
 
     /**
      * Maps the service given by the specified serviceID with the specified virtualMachine.
@@ -296,25 +289,22 @@ public interface ProActiveDescriptorInternal extends ProActiveDescriptor {
      * @param sequentialListProcess
      * @param string a processID
      */
-    public void addProcessToSequenceList(
-        AbstractSequentialListProcessDecorator sequentialListProcess,
-        String string);
+    public void addProcessToSequenceList(AbstractSequentialListProcessDecorator sequentialListProcess,
+            String string);
 
     /**
      * Add the service given by the specified processID in the list of sequential services.
      * @param sequentialListProcess
      * @param string a processID
      */
-    public void addServiceToSequenceList(
-        AbstractSequentialListProcessDecorator sequentialListProcess,
-        String string);
+    public void addServiceToSequenceList(AbstractSequentialListProcessDecorator sequentialListProcess,
+            String string);
 
     /**
      * Add a technical service.
      * @param tsParsed id, class, and args.
      */
-    public void addTechnicalService(TechnicalServiceXmlType tsParsed)
-        throws Exception;
+    public void addTechnicalService(TechnicalServiceXmlType tsParsed) throws Exception;
 
     public TechnicalService getTechnicalService(String technicalServiceId);
 }

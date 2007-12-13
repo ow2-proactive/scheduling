@@ -55,11 +55,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public abstract class AbstractProActiveController extends AbstractRequestHandler
-    implements Interface, Serializable, ProActiveController {
+public abstract class AbstractProActiveController extends AbstractRequestHandler implements Interface,
+        Serializable, ProActiveController {
     private boolean isInternal = true;
     private InterfaceType interfaceType;
-    final protected static Logger controllerLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
+    final protected static Logger controllerLogger = ProActiveLogger
+            .getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
     /**
      * Constructor for AbstractProActiveController.
@@ -117,15 +118,13 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
      */
     protected void checkLifeCycleIsStopped() throws IllegalLifeCycleException {
         try {
-            if (!((LifeCycleController) getFcItfOwner()
-                      .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).getFcState()
-                      .equals(LifeCycleController.STOPPED)) {
+            if (!((LifeCycleController) getFcItfOwner().getFcInterface(Constants.LIFECYCLE_CONTROLLER))
+                    .getFcState().equals(LifeCycleController.STOPPED)) {
                 throw new IllegalLifeCycleException(
                     "this control operation should be performed while the component is stopped");
             }
         } catch (NoSuchInterfaceException nsie) {
-            throw new ProActiveRuntimeException(
-                "life cycle controller interface not found");
+            throw new ProActiveRuntimeException("life cycle controller interface not found");
         }
     }
 
@@ -141,8 +140,7 @@ public abstract class AbstractProActiveController extends AbstractRequestHandler
      * @param node
      * @throws MigrationException
      */
-    public void migrateDependentActiveObjectsTo(Node node)
-        throws MigrationException {
+    public void migrateDependentActiveObjectsTo(Node node) throws MigrationException {
         // nothing by default
     }
 }

@@ -46,8 +46,7 @@ public class TimItEditPartFactory implements EditPartFactory {
 
     public EditPart createEditPart(EditPart context, Object model) {
         if (model instanceof BasicChartContainerObject) {
-            return new BasicChartContainerEditPart((BasicChartContainerObject) model,
-                this.timItView);
+            return new BasicChartContainerEditPart((BasicChartContainerObject) model, this.timItView);
         } else if (model instanceof BasicChartObject) {
             return new BasicChartEditPart((BasicChartObject) model);
         } else {

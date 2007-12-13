@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.mop;
 
-
 /**
  * The proxy interface
  * This interface only defines one method.

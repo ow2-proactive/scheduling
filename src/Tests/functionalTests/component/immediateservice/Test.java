@@ -49,8 +49,8 @@ import functionalTests.ComponentTest;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
      * Use immediate service while the loopQueueMethod is serving.
@@ -61,13 +61,10 @@ public class Test extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
 
-        Component comp = cf.newFcInstance(type_factory.createFcType(
-                    new InterfaceType[] {
-                        type_factory.createFcItfType("itf",
-                            Itf.class.getName(), false, false, false)
-                    }),
-                new ControllerDescription("component", Constants.PRIMITIVE),
-                new ContentDescription(A.class.getName(), new Object[] {  }));
+        Component comp = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
+                .createFcItfType("itf", Itf.class.getName(), false, false, false) }),
+                new ControllerDescription("component", Constants.PRIMITIVE), new ContentDescription(A.class
+                        .getName(), new Object[] {}));
         Fractal.getLifeCycleController(comp).startFc();
 
         LifeCycleController lcc = Fractal.getLifeCycleController(comp);
@@ -81,8 +78,7 @@ public class Test extends ComponentTest {
         //lcc.startFc();
 
         // call an immediate service: it is executed concurrently with the activity 
-        System.err.println("MAIN: result is '" + itf.immediateMethod("a ") +
-            "'");
+        System.err.println("MAIN: result is '" + itf.immediateMethod("a ") + "'");
 
         // call an immediate service to set the condition false and thus terminate the loopQueueMethod
         itf.immediateStopLoopMethod();

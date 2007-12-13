@@ -43,6 +43,7 @@ import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Checks that ProActive correctly handles generics.
  *
@@ -57,9 +58,9 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         //      new active with '_' in classname of a parametized type.
         //pa.stub.parameterized.nonregressiontest.activeobject.generics.Stub_Pair_Generics_[nonregressiontest_activeobject_generics_My_Type5org_objectweb_proactive_core_util_wrapper_IntWrapper]
-        Pair<My_DType, IntWrapper> p_ = (Pair<My_DType, IntWrapper>) PAActiveObject.newActive(Pair.class.getName(),
-                new Class[] { My_DType.class, IntWrapper.class },
-                new Object[] { new My_DType("toto"), new IntWrapper(12) });
+        Pair<My_DType, IntWrapper> p_ = (Pair<My_DType, IntWrapper>) PAActiveObject.newActive(Pair.class
+                .getName(), new Class[] { My_DType.class, IntWrapper.class }, new Object[] {
+                new My_DType("toto"), new IntWrapper(12) });
         assertTrue(My_DType.class.isAssignableFrom(p_.getFirst().getClass()));
         assertTrue(IntWrapper.class.isAssignableFrom(p_.getSecond().getClass()));
         assertEquals("toto", p_.getFirst().toString());
@@ -68,9 +69,9 @@ public class Test extends FunctionalTest {
         // new active with reifiable parameter types
         // test before non reifiable return types to verify caching of synchronous/asynchrous method calls 
         // works fine with parameterized types
-        Pair<StringWrapper, IntWrapper> b = (Pair<StringWrapper, IntWrapper>) PAActiveObject.newActive(Pair.class.getName(),
-                new Class[] { StringWrapper.class, IntWrapper.class },
-                new Object[] { new StringWrapper("toto"), new IntWrapper(12) });
+        Pair<StringWrapper, IntWrapper> b = (Pair<StringWrapper, IntWrapper>) PAActiveObject.newActive(
+                Pair.class.getName(), new Class[] { StringWrapper.class, IntWrapper.class }, new Object[] {
+                        new StringWrapper("toto"), new IntWrapper(12) });
         assertTrue(StringWrapper.class.isAssignableFrom(b.getFirst().getClass()));
         assertTrue(IntWrapper.class.isAssignableFrom(b.getSecond().getClass()));
         assertEquals("toto", b.getFirst().stringValue());
@@ -78,8 +79,7 @@ public class Test extends FunctionalTest {
 
         // new active with non reifiable parameter types
         Pair<String, Integer> a = (Pair<String, Integer>) PAActiveObject.newActive(Pair.class.getName(),
-                new Class[] { String.class, Integer.class },
-                new Object[] { "A", 42 });
+                new Class[] { String.class, Integer.class }, new Object[] { "A", 42 });
         assertTrue(String.class.isAssignableFrom(a.getFirst().getClass()));
         assertTrue(Integer.class.isAssignableFrom(a.getSecond().getClass()));
         assertEquals("A", a.getFirst());
@@ -92,22 +92,17 @@ public class Test extends FunctionalTest {
 
         Pair<Integer, String> activePair = (Pair<Integer, String>) PAActiveObject.turnActive(pair,
                 new Class[] { Integer.class, String.class });
-        assertTrue(Integer.class.isAssignableFrom(activePair.getFirst()
-                                                            .getClass()));
-        assertTrue(String.class.isAssignableFrom(activePair.getSecond()
-                                                           .getClass()));
+        assertTrue(Integer.class.isAssignableFrom(activePair.getFirst().getClass()));
+        assertTrue(String.class.isAssignableFrom(activePair.getSecond().getClass()));
         assertTrue(42 == activePair.getFirst());
         assertEquals("X", activePair.getSecond());
 
         // new active group with reifiable parameter types
-        Pair<StringWrapper, IntWrapper> gb = (Pair<StringWrapper, IntWrapper>) PAGroup.newGroup(Pair.class.getName(),
-                new Class[] { StringWrapper.class, IntWrapper.class },
-                new Object[][] {
-                    { new StringWrapper("A"), new IntWrapper(1) },
-                    { new StringWrapper("B"), new IntWrapper(2) }
-                });
-        assertTrue(StringWrapper.class.isAssignableFrom(
-                gb.getFirst().getClass()));
+        Pair<StringWrapper, IntWrapper> gb = (Pair<StringWrapper, IntWrapper>) PAGroup.newGroup(Pair.class
+                .getName(), new Class[] { StringWrapper.class, IntWrapper.class },
+                new Object[][] { { new StringWrapper("A"), new IntWrapper(1) },
+                        { new StringWrapper("B"), new IntWrapper(2) } });
+        assertTrue(StringWrapper.class.isAssignableFrom(gb.getFirst().getClass()));
         assertTrue(IntWrapper.class.isAssignableFrom(gb.getSecond().getClass()));
 
         StringWrapper stringWrapperResult = gb.getFirst();
@@ -123,11 +118,7 @@ public class Test extends FunctionalTest {
         // new active group with non reifiable parameter types (which is not allowed with groups)
         boolean invocationTargetException = false;
         Pair<String, Integer> ga = (Pair<String, Integer>) PAGroup.newGroup(Pair.class.getName(),
-                new Class[] { String.class, Integer.class },
-                new Object[][] {
-                    { "A", 1 },
-                    { "B", 2 }
-                });
+                new Class[] { String.class, Integer.class }, new Object[][] { { "A", 1 }, { "B", 2 } });
         try {
             // verify this invocation is not possible
             ga.getFirst();
@@ -137,18 +128,17 @@ public class Test extends FunctionalTest {
         assertTrue(invocationTargetException);
 
         // test name escaping with generics, main test are done in nonregressiontest.stub.stubgeneration
-        assertEquals("pa.stub._StubMy__P__DType",
-            Utils.convertClassNameToStubClassName("My_P_DType", new Class[] {  }));
-        String escape = Utils.convertClassNameToStubClassName(Pair.class.getName(),
-                new Class[] { My_DType.class, IntWrapper.class });
-        assertEquals(escape,
-            "pa.stub.parameterized.functionalTests.activeobject.generics._StubPair_GenericsfunctionalTests_Pactiveobject_Pgenerics_PMy__DType_Dorg_Pobjectweb_Pproactive_Pcore_Putil_Pwrapper_PIntWrapper");
+        assertEquals("pa.stub._StubMy__P__DType", Utils.convertClassNameToStubClassName("My_P_DType",
+                new Class[] {}));
+        String escape = Utils.convertClassNameToStubClassName(Pair.class.getName(), new Class[] {
+                My_DType.class, IntWrapper.class });
+        assertEquals(
+                escape,
+                "pa.stub.parameterized.functionalTests.activeobject.generics._StubPair_GenericsfunctionalTests_Pactiveobject_Pgenerics_PMy__DType_Dorg_Pobjectweb_Pproactive_Pcore_Putil_Pwrapper_PIntWrapper");
 
         String[] unescape = Utils.getNamesOfParameterizingTypesFromStubClassName(escape);
-        String[] result = new String[] {
-                "functionalTests.activeobject.generics.My_DType",
-                "org.objectweb.proactive.core.util.wrapper.IntWrapper"
-            };
+        String[] result = new String[] { "functionalTests.activeobject.generics.My_DType",
+                "org.objectweb.proactive.core.util.wrapper.IntWrapper" };
         assertTrue(Arrays.equals(unescape, result));
     }
 }

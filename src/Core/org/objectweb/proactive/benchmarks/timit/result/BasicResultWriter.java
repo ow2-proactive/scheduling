@@ -54,8 +54,8 @@ import org.objectweb.proactive.core.mop.Utils;
  * @author Brian Amedro, Vladimir Bodnartchouk
  */
 public class BasicResultWriter {
-    public static final DecimalFormat df = new DecimalFormat("###.###",
-            new DecimalFormatSymbols(java.util.Locale.US));
+    public static final DecimalFormat df = new DecimalFormat("###.###", new DecimalFormatSymbols(
+        java.util.Locale.US));
 
     /** The xml document */
     private Document document;
@@ -108,8 +108,7 @@ public class BasicResultWriter {
 
         // Create the globalInformation element
         Element globalInformationElement = new Element("globalInformation");
-        globalInformationElement.setAttribute(new Attribute("value",
-                globalInformation));
+        globalInformationElement.setAttribute(new Attribute("value", globalInformation));
         // Attach the globalInformationElement element as a child to the timit element
         this.eTimit.addContent(globalInformationElement);
     }
@@ -119,8 +118,7 @@ public class BasicResultWriter {
      * @param rootElement The root element that will be filled
      * @param bag A bag of timer results
      */
-    private void fillTimersResults(final Element rootElement,
-        final ResultBag bag) {
+    private void fillTimersResults(final Element rootElement, final ResultBag bag) {
         String className = bag.getClassName();
         String uniqueID = bag.getUniqueID();
         List<BasicTimer> timersList = bag.getTimersList();
@@ -130,11 +128,9 @@ public class BasicResultWriter {
         // Set the uniqueID value
         rootElement.setAttribute(new Attribute("uniqueID", uniqueID));
         // Set the otherInformation value as an attribute value
-        rootElement.setAttribute(new Attribute("otherInformation",
-                otherInformation));
+        rootElement.setAttribute(new Attribute("otherInformation", otherInformation));
         // Set the proActiveVersion values as an attribute value
-        rootElement.setAttribute(new Attribute("proActiveVersion",
-                PAVersion.getProActiveVersion()));
+        rootElement.setAttribute(new Attribute("proActiveVersion", PAVersion.getProActiveVersion()));
         // Create the timers element
         Element timersElement = new Element("timers");
         rootElement.addContent(timersElement);
@@ -172,8 +168,7 @@ public class BasicResultWriter {
                 // Then the parent should be in the tree and we can try to add
                 // the current to the tree
                 if (addTimerToItsParentElement(currentTimer, timersElement) == false) {
-                    throw new RuntimeException("The timer " +
-                        currentTimer.getName() +
+                    throw new RuntimeException("The timer " + currentTimer.getName() +
                         " has no parent in the tree and no parent in the list.");
                 } else {
                     // Else remove the current from the list
@@ -184,8 +179,7 @@ public class BasicResultWriter {
                 // If the parent is in the list
             } else {
                 // Then try to add the parent to the tree
-                if (addTimerToItsParentElement(currentTimer.getParent(),
-                            timersElement)) {
+                if (addTimerToItsParentElement(currentTimer.getParent(), timersElement)) {
                     // Remove the current.parent from the list
                     timersList.remove(indexOfParent);
                     i--;
@@ -201,16 +195,14 @@ public class BasicResultWriter {
      * @param rootElement The root element
      * @return true if the parent was found and timer attached else return false
      */
-    private boolean addTimerToItsParentElement(BasicTimer timerToAdd,
-        Element rootElement) {
+    private boolean addTimerToItsParentElement(BasicTimer timerToAdd, Element rootElement) {
         // If the current element is the parent of the timerToAdd then add it
         Iterator<Element> it = rootElement.getDescendants();
         while (it.hasNext()) {
             Element ee = it.next();
-            if (timerToAdd.getParent().getName()
-                              .equals(ee.getAttributeValue("name")) &&
-                    (timerToAdd.getParent().getParent().getId() == Integer.valueOf(
-                        ee.getAttributeValue("parentId")))) {
+            if (timerToAdd.getParent().getName().equals(ee.getAttributeValue("name")) &&
+                (timerToAdd.getParent().getParent().getId() == Integer.valueOf(ee
+                        .getAttributeValue("parentId")))) {
                 ee.addContent(createTimerElement(timerToAdd));
                 return true;
             }
@@ -219,34 +211,28 @@ public class BasicResultWriter {
     }
 
     /**
-         * Creates an element timer from an instance of a timer
-         *
-         * @param currentTimer
-         *            The timer to create an element of.
-         * @return The created element.
-         */
-    private static final Element createTimerElement(
-        final BasicTimer currentTimer) {
+     * Creates an element timer from an instance of a timer
+     *
+     * @param currentTimer
+     *            The timer to create an element of.
+     * @return The created element.
+     */
+    private static final Element createTimerElement(final BasicTimer currentTimer) {
         final Element newTimerElement = new Element("timer");
         // Set the name as an attribute
-        newTimerElement.setAttribute(new Attribute("name",
-                currentTimer.getName()));
+        newTimerElement.setAttribute(new Attribute("name", currentTimer.getName()));
         double totalTimeValueInMillis = (currentTimer.getTotalTime()) / 1000000d;
         // Set the totalTime in millis of the timer as an attribute
-        newTimerElement.setAttribute(new Attribute("totalTimeInMillis",
-                "" + totalTimeValueInMillis));
+        newTimerElement.setAttribute(new Attribute("totalTimeInMillis", "" + totalTimeValueInMillis));
         // Set the avgTime in millis of the timer as an attribute
-        newTimerElement.setAttribute(new Attribute("avgTimeInMillis",
-                "" +
-                (totalTimeValueInMillis / currentTimer.getStartStopCoupleCount())));
+        newTimerElement.setAttribute(new Attribute("avgTimeInMillis", "" +
+            (totalTimeValueInMillis / currentTimer.getStartStopCoupleCount())));
         // Set the number of startStopCoupleCount value
-        newTimerElement.setAttribute(new Attribute("startStopCoupleCount",
-                "" + currentTimer.getStartStopCoupleCount()));
+        newTimerElement.setAttribute(new Attribute("startStopCoupleCount", "" +
+            currentTimer.getStartStopCoupleCount()));
         // Set the temporary parent name
-        newTimerElement.setAttribute(new Attribute("parentId",
-                ((currentTimer.getParent() == null) ? ""
-                                                    : ("" +
-                currentTimer.getParent().getId()))));
+        newTimerElement.setAttribute(new Attribute("parentId", ((currentTimer.getParent() == null) ? ""
+                : ("" + currentTimer.getParent().getId()))));
         return newTimerElement;
     }
 
@@ -331,8 +317,7 @@ public class BasicResultWriter {
         // Iterate through the root to fill the map
         java.util.Map<String, Element> resultElementsMap = new java.util.HashMap<String, Element>();
 
-        Iterator<Element> itResultElements = result.getRootElement()
-                                                   .getDescendants();
+        Iterator<Element> itResultElements = result.getRootElement().getDescendants();
         String currentParentName = "";
         while (itResultElements.hasNext()) {
             Object o = itResultElements.next();
@@ -343,8 +328,7 @@ public class BasicResultWriter {
                 }
                 if (current.getName().equals("timer")) {
                     String timerName = current.getAttributeValue("name");
-                    resultElementsMap.put(timerName + "_" + currentParentName,
-                        current);
+                    resultElementsMap.put(timerName + "_" + currentParentName, current);
                 }
             }
         }
@@ -363,8 +347,7 @@ public class BasicResultWriter {
         int listSize = documents.size();
 
         while (itDocuments.hasNext()) {
-            itResultElements = itDocuments.next().getRootElement()
-                                          .getDescendants();
+            itResultElements = itDocuments.next().getRootElement().getDescendants();
             currentParentName = "";
             while (itResultElements.hasNext()) {
                 Object o = itResultElements.next();
@@ -373,22 +356,19 @@ public class BasicResultWriter {
                 if (o instanceof Element) {
                     Element current = (Element) o;
                     if (current.getName().equals("ao")) {
-                        currentParentName = current.getAttributeValue(
-                                "className");
+                        currentParentName = current.getAttributeValue("className");
                     }
                     if (current.getName().equals("timer")) {
                         String timerName = current.getAttributeValue("name");
-                        double currentTotalValue = Double.valueOf(current.getAttributeValue(
-                                    "totalTimeInMillis"));
-                        double currentAvgValue = Double.valueOf(current.getAttributeValue(
-                                    "avgTimeInMillis"));
-                        Element resultElement = resultElementsMap.get(timerName +
-                                "_" + currentParentName);
+                        double currentTotalValue = Double.valueOf(current
+                                .getAttributeValue("totalTimeInMillis"));
+                        double currentAvgValue = Double.valueOf(current.getAttributeValue("avgTimeInMillis"));
+                        Element resultElement = resultElementsMap.get(timerName + "_" + currentParentName);
                         if (resultElement != null) {
-                            double resultTotalValue = Double.valueOf(resultElement.getAttributeValue(
-                                        "totalTimeInMillis"));
-                            double resultAvgValue = Double.valueOf(resultElement.getAttributeValue(
-                                        "avgTimeInMillis"));
+                            double resultTotalValue = Double.valueOf(resultElement
+                                    .getAttributeValue("totalTimeInMillis"));
+                            double resultAvgValue = Double.valueOf(resultElement
+                                    .getAttributeValue("avgTimeInMillis"));
                             resultTotalValue += currentTotalValue;
                             resultAvgValue += currentAvgValue;
                             // If last doc then add and make average
@@ -396,10 +376,8 @@ public class BasicResultWriter {
                                 resultTotalValue = resultTotalValue / listSize;
                                 resultAvgValue = resultAvgValue / listSize;
                             }
-                            resultElement.setAttribute("totalTimeInMillis",
-                                "" + resultTotalValue);
-                            resultElement.setAttribute("avgTimeInMillis",
-                                "" + resultAvgValue);
+                            resultElement.setAttribute("totalTimeInMillis", "" + resultTotalValue);
+                            resultElement.setAttribute("avgTimeInMillis", "" + resultAvgValue);
                         }
                     }
                 }

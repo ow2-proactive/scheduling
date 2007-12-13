@@ -64,8 +64,7 @@ public class BasicPrimeExample extends AbstractExample {
      * @param endTime ending time of the test
      * @param nbWorkers number of workers used during the test
      */
-    public static void displayResult(Collection<Boolean> results,
-        long startTime, long endTime, int nbWorkers) {
+    public static void displayResult(Collection<Boolean> results, long startTime, long endTime, int nbWorkers) {
         // Post processing, calculates the statistics
         boolean prime = true;
 
@@ -75,8 +74,7 @@ public class BasicPrimeExample extends AbstractExample {
 
         long effective_time = (int) (endTime - startTime);
         //      Displaying the result
-        System.out.println("" + prime_to_find +
-            (prime ? " is prime." : " is not prime."));
+        System.out.println("" + prime_to_find + (prime ? " is prime." : " is not prime."));
 
         System.out.println("Calculation time (ms): " + effective_time);
     }
@@ -89,19 +87,16 @@ public class BasicPrimeExample extends AbstractExample {
         List<FindPrimeTask> tasks = new ArrayList<FindPrimeTask>();
 
         // We don't need to check numbers greater than the square-root of the candidate in this algorithm
-        long square_root_of_candidate = (long) Math.ceil(Math.sqrt(
-                    prime_to_find));
+        long square_root_of_candidate = (long) Math.ceil(Math.sqrt(prime_to_find));
         // 
-        tasks.add(new FindPrimeTask(prime_to_find, 2,
-                square_root_of_candidate / number_of_intervals));
+        tasks.add(new FindPrimeTask(prime_to_find, 2, square_root_of_candidate / number_of_intervals));
         for (int i = 1; i < (number_of_intervals - 1); i++) {
             tasks.add(new FindPrimeTask(prime_to_find,
-                    ((square_root_of_candidate / number_of_intervals) * i) + 1,
-                    (square_root_of_candidate / number_of_intervals) * (i + 1)));
+                ((square_root_of_candidate / number_of_intervals) * i) + 1,
+                (square_root_of_candidate / number_of_intervals) * (i + 1)));
         }
-        tasks.add(new FindPrimeTask(prime_to_find,
-                (square_root_of_candidate / number_of_intervals) * (number_of_intervals -
-                1), square_root_of_candidate));
+        tasks.add(new FindPrimeTask(prime_to_find, (square_root_of_candidate / number_of_intervals) *
+            (number_of_intervals - 1), square_root_of_candidate));
         return tasks;
     }
 
@@ -111,8 +106,7 @@ public class BasicPrimeExample extends AbstractExample {
      * @throws MalformedURLException
      * @throws TaskAlreadySubmittedException
      */
-    public static void main(String[] args)
-        throws TaskException, MalformedURLException,
+    public static void main(String[] args) throws TaskException, MalformedURLException,
             TaskAlreadySubmittedException {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
@@ -121,10 +115,10 @@ public class BasicPrimeExample extends AbstractExample {
         master = new ProActiveMaster<FindPrimeTask, Boolean>();
 
         registerShutdownHook(new Runnable() {
-                public void run() {
-                    master.terminate(true);
-                }
-            });
+            public void run() {
+                master.terminate(true);
+            }
+        });
 
         // Adding ressources
         if (vn_name == null) {
@@ -133,9 +127,8 @@ public class BasicPrimeExample extends AbstractExample {
             master.addResources(descriptor_url, vn_name);
         }
 
-        System.out.println("Primality test launched for n=" + prime_to_find +
-            " with " + number_of_intervals + " intervals, using descriptor " +
-            descriptor_url);
+        System.out.println("Primality test launched for n=" + prime_to_find + " with " + number_of_intervals +
+            " intervals, using descriptor " + descriptor_url);
 
         long startTime = System.currentTimeMillis();
         // Creating and Submitting the tasks
@@ -184,8 +177,8 @@ public class BasicPrimeExample extends AbstractExample {
     public static class FindPrimeTask implements Task<Boolean> {
 
         /**
-                 *
-                 */
+         *
+         */
         private long begin;
         private long end;
         private long candidate;

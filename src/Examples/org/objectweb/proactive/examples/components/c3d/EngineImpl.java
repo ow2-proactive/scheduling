@@ -38,8 +38,7 @@ import org.objectweb.proactive.examples.c3d.RenderingEngine;
  * The component container for an Engine.
  * Here, we only care about setting attributes
  */
-public class EngineImpl extends C3DRenderingEngine implements RenderingEngine,
-    EngineAttributes {
+public class EngineImpl extends C3DRenderingEngine implements RenderingEngine, EngineAttributes {
 
     /** The name of the Engine, which is used to be displayed */
     public String getName() {

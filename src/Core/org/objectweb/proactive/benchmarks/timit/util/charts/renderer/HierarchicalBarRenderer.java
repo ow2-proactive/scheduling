@@ -157,8 +157,8 @@ public class HierarchicalBarRenderer extends BarRenderer {
      *            the renderer state.
      */
     @Override
-    protected void calculateBarWidth(CategoryPlot plot, Rectangle2D dataArea,
-        int rendererIndex, CategoryItemRendererState state) {
+    protected void calculateBarWidth(CategoryPlot plot, Rectangle2D dataArea, int rendererIndex,
+            CategoryItemRendererState state) {
         // calculate the bar width - this calculation differs from the
         // BarRenderer calculation because the bars are layered on top of one
         // another, so there is effectively only one bar per category for
@@ -174,11 +174,10 @@ public class HierarchicalBarRenderer extends BarRenderer {
             if (columns > 1) {
                 categoryMargin = domainAxis.getCategoryMargin();
             }
-            double used = space * (1 - domainAxis.getLowerMargin() -
-                domainAxis.getUpperMargin() - categoryMargin);
+            double used = space *
+                (1 - domainAxis.getLowerMargin() - domainAxis.getUpperMargin() - categoryMargin);
             if ((rows * columns) > 0) {
-                state.setBarWidth(Math.min(used / (dataset.getColumnCount()),
-                        maxWidth));
+                state.setBarWidth(Math.min(used / (dataset.getColumnCount()), maxWidth));
             } else {
                 state.setBarWidth(Math.min(used, maxWidth));
             }
@@ -210,9 +209,9 @@ public class HierarchicalBarRenderer extends BarRenderer {
      *            the pass index.
      */
     @Override
-    public void drawItem(Graphics2D g2, CategoryItemRendererState state,
-        Rectangle2D dataArea, CategoryPlot plot, CategoryAxis domainAxis,
-        ValueAxis rangeAxis, CategoryDataset data, int row, int column, int pass) {
+    public void drawItem(Graphics2D g2, CategoryItemRendererState state, Rectangle2D dataArea,
+            CategoryPlot plot, CategoryAxis domainAxis, ValueAxis rangeAxis, CategoryDataset data, int row,
+            int column, int pass) {
         // nothing is drawn for null values...
         Number dataValue = data.getValue(row, column);
         if (dataValue == null) {
@@ -220,8 +219,8 @@ public class HierarchicalBarRenderer extends BarRenderer {
         }
 
         // BAR X
-        double rectX = domainAxis.getCategoryMiddle(column,
-                this.getColumnCount(), dataArea, plot.getDomainAxisEdge()) -
+        double rectX = domainAxis.getCategoryMiddle(column, this.getColumnCount(), dataArea, plot
+                .getDomainAxisEdge()) -
             (state.getBarWidth() / 2.0);
 
         int seriesCount = this.getRowCount();
@@ -281,9 +280,8 @@ public class HierarchicalBarRenderer extends BarRenderer {
             shift = (rectWidth * 0.20) / (seriesCount - 1);
         }
 
-        Rectangle2D bar = new Rectangle2D.Double((rectX +
-                ((seriesCount - 1 - row) * shift)), rectY,
-                (rectWidth - ((seriesCount - 1 - row) * shift * 2)), rectHeight);
+        Rectangle2D bar = new Rectangle2D.Double((rectX + ((seriesCount - 1 - row) * shift)), rectY,
+            (rectWidth - ((seriesCount - 1 - row) * shift * 2)), rectHeight);
 
         double rrX;
         double rrY;
@@ -301,9 +299,8 @@ public class HierarchicalBarRenderer extends BarRenderer {
                     // System.out.println("["+column+"] "+name+" \t-->
                     // "+dataValue);
                     // BAR X
-                    rectX = domainAxis.getCategoryMiddle(column,
-                            this.getColumnCount(), dataArea,
-                            plot.getDomainAxisEdge()) -
+                    rectX = domainAxis.getCategoryMiddle(column, this.getColumnCount(), dataArea, plot
+                            .getDomainAxisEdge()) -
                         (state.getBarWidth() / 2.0);
 
                     seriesCount = this.getRowCount();
@@ -357,8 +354,7 @@ public class HierarchicalBarRenderer extends BarRenderer {
                         widthFactor = seriesBarWidth;
                     }
                     rectWidth = widthFactor * state.getBarWidth();
-                    rectX = rectX +
-                        (((1 - widthFactor) * state.getBarWidth()) / 2.0);
+                    rectX = rectX + (((1 - widthFactor) * state.getBarWidth()) / 2.0);
                     if (seriesCount > 1) {
                         // needs to be improved !!!
                         shift = (rectWidth * 0.20) / (seriesCount - 1);
@@ -386,12 +382,9 @@ public class HierarchicalBarRenderer extends BarRenderer {
                         // + parent.getAttributeValue("min")+"/"
                         // + parent.getAttributeValue("dev")+"/"
                         // + parent.getAttributeValue("max") );
-                        double pW = Double.valueOf(parent.getAttributeValue(
-                                    "dev"));
-                        double pX = Double.valueOf(parent.getAttributeValue(
-                                    "min"));
-                        int numChild = Integer.valueOf(parent.getAttributeValue(
-                                    "max"));
+                        double pW = Double.valueOf(parent.getAttributeValue("dev"));
+                        double pX = Double.valueOf(parent.getAttributeValue("min"));
+                        int numChild = Integer.valueOf(parent.getAttributeValue("max"));
 
                         rrW = pW / parent.getChildren().size();
                         rrX = pX + (rrW * numChild);
@@ -402,24 +395,20 @@ public class HierarchicalBarRenderer extends BarRenderer {
                         parent.setAttribute("max", "" + (numChild + 1));
                     }
 
-                    RoundRectangle2D rbar = new RoundRectangle2D.Double(rrX,
-                            rrY, rrW, rrH, HierarchicalBarRenderer.CORNER,
-                            HierarchicalBarRenderer.CORNER);
+                    RoundRectangle2D rbar = new RoundRectangle2D.Double(rrX, rrY, rrW, rrH,
+                        HierarchicalBarRenderer.CORNER, HierarchicalBarRenderer.CORNER);
 
                     Rectangle2D childSumLine = null;
-                    double childSum = Double.valueOf(elt.getAttributeValue(
-                                "sum"));
+                    double childSum = Double.valueOf(elt.getAttributeValue("sum"));
                     transY1 = rangeAxis.valueToJava2D(base, dataArea, edge);
                     transY2 = rangeAxis.valueToJava2D(childSum, dataArea, edge);
                     rectY = Math.min(transY2, transY1);
 
                     childSum = (childSum / dataValue.doubleValue()) * rrH;
-                    if ((childSum < rrH) && (childSum > 0) &&
-                            ((childSum / rrH) < 0.95)) {
+                    if ((childSum < rrH) && (childSum > 0) && ((childSum / rrH) < 0.95)) {
                         childSumLine = new Rectangle2D.Double(rrX, rectY, rrW, 1);
                     }
-                    Paint itemPaint = this.getItemPaintFromName(name,
-                            this.series, column);
+                    Paint itemPaint = this.getItemPaintFromName(name, this.series, column);
                     GradientPaintTransformer t = this.getGradientPaintTransformer();
                     if ((t != null) && itemPaint instanceof GradientPaint) {
                         itemPaint = t.transform((GradientPaint) itemPaint, bar);
@@ -427,8 +416,7 @@ public class HierarchicalBarRenderer extends BarRenderer {
                     g2.setPaint(itemPaint);
 
                     Color c = g2.getColor();
-                    g2.setColor(new Color(c.getRed(), c.getGreen(),
-                            c.getBlue(), this.alpha));
+                    g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), this.alpha));
                     g2.fill(rbar);
                     g2.setColor(Color.DARK_GRAY);
                     if (childSumLine != null) {
@@ -437,7 +425,7 @@ public class HierarchicalBarRenderer extends BarRenderer {
 
                     // draw the outline...
                     if (this.isDrawBarOutline() &&
-                            (state.getBarWidth() > BarRenderer.BAR_OUTLINE_WIDTH_THRESHOLD)) {
+                        (state.getBarWidth() > BarRenderer.BAR_OUTLINE_WIDTH_THRESHOLD)) {
                         Stroke stroke = this.getItemOutlineStroke(row, column);
                         Paint paint = this.getItemOutlinePaint(row, column);
                         if ((stroke != null) && (paint != null)) {
@@ -458,11 +446,9 @@ public class HierarchicalBarRenderer extends BarRenderer {
         double transX1 = rangeAxis.valueToJava2D(base, dataArea, edge);
         double transX2 = rangeAxis.valueToJava2D(value, dataArea, edge);
 
-        CategoryItemLabelGenerator generator = this.getItemLabelGenerator(row,
-                column);
+        CategoryItemLabelGenerator generator = this.getItemLabelGenerator(row, column);
         if ((generator != null) && this.isItemLabelVisible(row, column)) {
-            this.drawItemLabel(g2, data, row, column, plot, generator, bar,
-                (transX1 > transX2));
+            this.drawItemLabel(g2, data, row, column, plot, generator, bar, (transX1 > transX2));
         }
 
         // collect entity and tool tip information...
@@ -470,25 +456,22 @@ public class HierarchicalBarRenderer extends BarRenderer {
             EntityCollection entities = state.getEntityCollection();
             if (entities != null) {
                 String tip = null;
-                CategoryToolTipGenerator tipster = this.getToolTipGenerator(row,
-                        column);
+                CategoryToolTipGenerator tipster = this.getToolTipGenerator(row, column);
                 if (tipster != null) {
                     tip = tipster.generateToolTip(data, row, column);
                 }
                 String url = null;
                 if (this.getItemURLGenerator(row, column) != null) {
-                    url = this.getItemURLGenerator(row, column)
-                              .generateURL(data, row, column);
+                    url = this.getItemURLGenerator(row, column).generateURL(data, row, column);
                 }
-                CategoryItemEntity entity = new CategoryItemEntity(bar, tip,
-                        url, data, row, data.getColumnKey(column), column);
+                CategoryItemEntity entity = new CategoryItemEntity(bar, tip, url, data, row, data
+                        .getColumnKey(column), column);
                 entities.add(entity);
             }
         }
     }
 
-    private Paint getItemPaintFromName(String name, Comparable[] series,
-        int column) {
+    private Paint getItemPaintFromName(String name, Comparable[] series, int column) {
         for (int i = 0; i < series.length; i++) {
             if (series[i].equals(name)) {
                 return this.getItemPaint(i, column);

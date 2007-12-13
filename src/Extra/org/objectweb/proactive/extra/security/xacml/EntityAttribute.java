@@ -42,8 +42,8 @@ public class EntityAttribute extends AttributeValue {
     /**
      * Official name of this type
      */
-    public static final String identifier = "org.objectweb.proactive.core.security.securityentity.Entity".replace('.',
-            ':');
+    public static final String identifier = "org.objectweb.proactive.core.security.securityentity.Entity"
+            .replace('.', ':');
 
     /**
      * URI version of name for this type
@@ -68,8 +68,7 @@ public class EntityAttribute extends AttributeValue {
             earlyException = new IllegalArgumentException();
             earlyException.initCause(e);
         }
-    }
-    ;
+    };
 
     /**
      * 7 The actual String value that this object represents.
@@ -195,7 +194,6 @@ public class EntityAttribute extends AttributeValue {
      */
     @Override
     public String encode() {
-        return "<Entity type=\"" + value.getType() + "\" name=\"" +
-        value.getName() + "\">";
+        return "<Entity type=\"" + value.getType() + "\" name=\"" + value.getName() + "\">";
     }
 }

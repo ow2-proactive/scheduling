@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.node.Node;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * @author Alexandre di Costanzo
  *
@@ -49,8 +50,7 @@ public class Test extends FunctionalTest {
      */
     @Before
     public void initTest() throws Exception {
-        this.ao = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { "bernard Lavilliers" });
+        this.ao = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "bernard Lavilliers" });
     }
 
     @org.junit.Test

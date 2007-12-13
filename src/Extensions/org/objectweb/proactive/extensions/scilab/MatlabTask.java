@@ -55,8 +55,7 @@ public class MatlabTask extends AbstractGeneralTask {
     private HashMap<String, Token> listDataIn;
     private static Engine matlabEngine = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_TASK);
-    private OperatingSystem os = OperatingSystem.getOperatingSystem();
-    ;
+    private OperatingSystem os = OperatingSystem.getOperatingSystem();;
     private static long[] engineHandle;
 
     /**
@@ -135,8 +134,7 @@ public class MatlabTask extends AbstractGeneralTask {
         if (matlabEngine == null) {
             String matlab_command = System.getenv().get("MATLAB");
             if (matlab_command == null) {
-                logger.fatal(
-                    "MATLAB environment variable must contain the name of the matlab command.");
+                logger.fatal("MATLAB environment variable must contain the name of the matlab command.");
                 throw new MatlabException(
                     "MATLAB environment variable must contain the name of the matlab command");
             }
@@ -146,20 +144,18 @@ public class MatlabTask extends AbstractGeneralTask {
                     matlabEngine.setDebugging((byte) 2);
                 }
                 if (os.equals(OperatingSystem.unix)) {
-                    engineHandle = matlabEngine.open(matlab_command +
-                            " -nosplash -nodesktop -nojvm", true);
+                    engineHandle = matlabEngine.open(matlab_command + " -nosplash -nodesktop -nojvm", true);
                 } else {
-                    engineHandle = matlabEngine.open(matlab_command +
-                            " -nosplash -minimize", true);
+                    engineHandle = matlabEngine.open(matlab_command + " -nosplash -minimize", true);
                 }
             } catch (Throwable e) {
                 throw new MatlabException(e);
             }
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                    public void run() {
-                        terminateEngine();
-                    }
-                }));
+                public void run() {
+                    terminateEngine();
+                }
+            }));
         }
     }
 

@@ -61,8 +61,7 @@ public class DependentListProcess extends AbstractSequentialListProcessDecorator
         else if (process instanceof DependentProcess) {
             this.processes.add(process);
         } else {
-            throw new ClassCastException(
-                " process must be a dependent process !");
+            throw new ClassCastException(" process must be a dependent process !");
         }
     }
 

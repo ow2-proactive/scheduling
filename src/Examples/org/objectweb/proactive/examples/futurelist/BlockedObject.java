@@ -35,8 +35,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class BlockedObject implements org.objectweb.proactive.RunActive,
-    java.io.Serializable {
+public class BlockedObject implements org.objectweb.proactive.RunActive, java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     public BlockedObject() {

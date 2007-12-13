@@ -55,8 +55,8 @@ public class ActiveDisplay implements ConsumerProducerListener {
 
         // Active Buffer creation
         try {
-            buffer = (BoundedBuffer) org.objectweb.proactive.api.PAActiveObject.newActive(BoundedBuffer.class.getName(),
-                    new Object[] { new Integer(size), o });
+            buffer = (BoundedBuffer) org.objectweb.proactive.api.PAActiveObject.newActive(BoundedBuffer.class
+                    .getName(), new Object[] { new Integer(size), o });
         } catch (Exception e) {
         }
 
@@ -68,16 +68,16 @@ public class ActiveDisplay implements ConsumerProducerListener {
         // Producer
         displayMessage("Creating producer...");
         try {
-            producer = (Producer) org.objectweb.proactive.api.PAActiveObject.newActive(Producer.class.getName(),
-                    new Object[] { o, buffer });
+            producer = (Producer) org.objectweb.proactive.api.PAActiveObject.newActive(Producer.class
+                    .getName(), new Object[] { o, buffer });
         } catch (Exception e) {
         }
 
         // Consumer
         displayMessage("Creating Consumer...");
         try {
-            consumer = (Consumer) org.objectweb.proactive.api.PAActiveObject.newActive(Consumer.class.getName(),
-                    new Object[] { o, buffer });
+            consumer = (Consumer) org.objectweb.proactive.api.PAActiveObject.newActive(Consumer.class
+                    .getName(), new Object[] { o, buffer });
         } catch (Exception e) {
         }
         displayMessage("Remote objects created...");

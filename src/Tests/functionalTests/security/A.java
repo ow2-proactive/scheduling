@@ -30,7 +30,6 @@
  */
 package functionalTests.security;
 
-
 /**
  * @author acontes
  *

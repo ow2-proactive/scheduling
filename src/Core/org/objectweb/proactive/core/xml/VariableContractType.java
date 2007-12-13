@@ -42,29 +42,23 @@ import org.objectweb.proactive.core.descriptor.legacyparser.ProActiveDescriptorC
  * @since ProActive 3.0 (December 2005)
  */
 public class VariableContractType implements Serializable {
-    static final public VariableContractType DescriptorVariable = new VariableContractType(0,
-            new String[] { "Descriptor", "Program" },
-            new String[] { "Descriptor" }, new String[] { "Program" });
-    static final public VariableContractType ProgramVariable = new VariableContractType(1,
-            new String[] { "Program", "Descriptor" },
-            new String[] { "Program" }, new String[] { "Descriptor" });
+    static final public VariableContractType DescriptorVariable = new VariableContractType(0, new String[] {
+            "Descriptor", "Program" }, new String[] { "Descriptor" }, new String[] { "Program" });
+    static final public VariableContractType ProgramVariable = new VariableContractType(1, new String[] {
+            "Program", "Descriptor" }, new String[] { "Program" }, new String[] { "Descriptor" });
     static final public VariableContractType JavaPropertyVariable = new VariableContractType(2,
-            new String[] { "JavaProperty" }, new String[] { "JavaProperty" },
-            new String[] { "Program", "Descriptor" });
+        new String[] { "JavaProperty" }, new String[] { "JavaProperty" }, new String[] { "Program",
+                "Descriptor" });
     static final public VariableContractType ProgramDefaultVariable = new VariableContractType(3,
-            new String[] { "Descriptor", "Program" },
-            new String[] { "Descriptor", "Program" }, new String[0]);
+        new String[] { "Descriptor", "Program" }, new String[] { "Descriptor", "Program" }, new String[0]);
     static final public VariableContractType DescriptorDefaultVariable = new VariableContractType(4,
-            new String[] { "Program", "Descriptor" },
-            new String[] { "Descriptor", "Program" }, new String[0]);
+        new String[] { "Program", "Descriptor" }, new String[] { "Descriptor", "Program" }, new String[0]);
     static final public VariableContractType JavaPropertyDescriptorDefault = new VariableContractType(5,
-            new String[] { "JavaProperty", "Descriptor", "Program" },
-            new String[] { "JavaProperty", "Descriptor", "Program" },
-            new String[] { "Program" });
+        new String[] { "JavaProperty", "Descriptor", "Program" }, new String[] { "JavaProperty",
+                "Descriptor", "Program" }, new String[] { "Program" });
     static final public VariableContractType JavaPropertyProgramDefault = new VariableContractType(6,
-            new String[] { "JavaProperty", "Program", "Descriptor" },
-            new String[] { "JavaProperty", "Program", "Descriptor" },
-            new String[] { "Descriptor" });
+        new String[] { "JavaProperty", "Program", "Descriptor" }, new String[] { "JavaProperty", "Program",
+                "Descriptor" }, new String[] { "Descriptor" });
     private int type; //Type internal identefier
     private String[] priority; //The lower indexed element has higher priority
     private String[] setAbility; //Who can set a non empty value
@@ -77,8 +71,7 @@ public class VariableContractType implements Serializable {
      * @param setAbility An array with the names of the elements that can set a non empty value.
      * @param setEmptyAbility An array with the names of the elements that can set an empty value.
      */
-    private VariableContractType(int type, String[] priority,
-        String[] setAbility, String[] setEmptyAbility) {
+    private VariableContractType(int type, String[] priority, String[] setAbility, String[] setEmptyAbility) {
         this.type = type;
         this.priority = priority;
         this.setAbility = setAbility;
@@ -117,22 +110,22 @@ public class VariableContractType implements Serializable {
     @Override
     public String toString() {
         switch (type) {
-        case 0:
-            return ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_TAG;
-        case 1:
-            return ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG;
-        case 2:
-            return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG;
-        case 3:
-            return ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG;
-        case 4:
-            return ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_DEFAULT_TAG;
-        case 5:
-            return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG;
-        case 6:
-            return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG;
-        default:
-            return "UnkownVariable";
+            case 0:
+                return ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_TAG;
+            case 1:
+                return ProActiveDescriptorConstants.VARIABLES_PROGRAM_TAG;
+            case 2:
+                return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG;
+            case 3:
+                return ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG;
+            case 4:
+                return ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_DEFAULT_TAG;
+            case 5:
+                return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG;
+            case 6:
+                return ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG;
+            default:
+                return "UnkownVariable";
         }
     }
 
@@ -150,20 +143,16 @@ public class VariableContractType implements Serializable {
         if (type.equals(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG)) {
             return JavaPropertyVariable;
         }
-        if (type.equals(
-                    ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG)) {
+        if (type.equals(ProActiveDescriptorConstants.VARIABLES_PROGRAM_DEFAULT_TAG)) {
             return ProgramDefaultVariable;
         }
-        if (type.equals(
-                    ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_DEFAULT_TAG)) {
+        if (type.equals(ProActiveDescriptorConstants.VARIABLES_DESCRIPTOR_DEFAULT_TAG)) {
             return DescriptorDefaultVariable;
         }
-        if (type.equals(
-                    ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG)) {
+        if (type.equals(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG)) {
             return JavaPropertyDescriptorDefault;
         }
-        if (type.equals(
-                    ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG)) {
+        if (type.equals(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_PROGRAM_TAG)) {
             return JavaPropertyProgramDefault;
         }
 
@@ -229,7 +218,7 @@ public class VariableContractType implements Serializable {
             canSetValue = setAbility[i] + " ";
         }
 
-        return "Empty value for variable" + this.toString() + " " + name +
-        " value can be set by: " + canSetValue;
+        return "Empty value for variable" + this.toString() + " " + name + " value can be set by: " +
+            canSetValue;
     }
 }

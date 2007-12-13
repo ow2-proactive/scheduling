@@ -36,6 +36,7 @@ import java.net.URISyntaxException;
 import org.objectweb.proactive.core.util.URIBuilder;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  *
  * unit test for the URIBuilder
@@ -69,8 +70,7 @@ public class URITest {
 
         // check the setProtocol
         u = URIBuilder.setProtocol(uri, "http");
-        assertTrue("http://localhost.localdomain:1258/apath".equals(
-                u.toString()));
+        assertTrue("http://localhost.localdomain:1258/apath".equals(u.toString()));
 
         // validate an URI
         try {

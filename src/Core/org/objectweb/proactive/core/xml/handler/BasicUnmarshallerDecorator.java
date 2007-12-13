@@ -72,16 +72,15 @@ public class BasicUnmarshallerDecorator extends AbstractUnmarshallerDecorator {
         return o;
     }
 
-    public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
     }
 
     //
     // -- PROTECTED METHODS ------------------------------------------------------
     //
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+            throws org.xml.sax.SAXException {
         setResultObject(activeHandler.getResultObject());
     }
 

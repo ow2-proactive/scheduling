@@ -59,9 +59,8 @@ import org.objectweb.proactive.examples.c3d.RenderingEngine;
  * The Component wrapper class for our Dispatcher.
  * Most interesting bit of this code is the runComponentActivity redefinition.
  */
-public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
-    DispatcherLogic, DispatcherAttributes, BindingController,
-    ComponentRunActive {
+public class DispatcherImpl extends C3DDispatcher implements Dispatcher, DispatcherLogic,
+        DispatcherAttributes, BindingController, ComponentRunActive {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     // Engine component bindings
@@ -83,7 +82,7 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
         while (e.hasMoreElements())
             v.add(e.nextElement());
 
-        return (String[]) v.toArray(new String[] {  });
+        return (String[]) v.toArray(new String[] {});
 
         //      return new String [] {"dispatcher2engine"};
     }
@@ -103,8 +102,8 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
         if (interfaceName.startsWith("dispatcher2engine")) {
             this.engines.put(interfaceName, serverInterface);
 
-            String name = interfaceName.substring("dispatcher2".length()) +
-                "@" + Integer.toHexString(serverInterface.hashCode());
+            String name = interfaceName.substring("dispatcher2".length()) + "@" +
+                Integer.toHexString(serverInterface.hashCode());
             addEngine((RenderingEngine) serverInterface, name);
             turnOnEngine(name);
         }
@@ -136,10 +135,8 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
                 ComponentBody componentBody = (ComponentBody) body;
 
                 // treat non functional requests before component is started
-                while (LifeCycleController.STOPPED.equals(
-                            Fractal.getLifeCycleController(
-                                componentBody.getProActiveComponentImpl())
-                                       .getFcState())) {
+                while (LifeCycleController.STOPPED.equals(Fractal.getLifeCycleController(
+                        componentBody.getProActiveComponentImpl()).getFcState())) {
                     componentService.blockingServeOldest(nfRequestFilter);
                 }
 
@@ -148,9 +145,8 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
                     initActivity(body);
 
                     try {
-                        Fractive.register(Fractive.getComponentRepresentativeOnThis(),
-                            URIBuilder.buildURIFromProperties("localhost",
-                                "Dispatcher").toString());
+                        Fractive.register(Fractive.getComponentRepresentativeOnThis(), URIBuilder
+                                .buildURIFromProperties("localhost", "Dispatcher").toString());
                     } catch (IOException e) {
                         System.err.println("HEY, couldn't register dispatcher");
                         e.printStackTrace();
@@ -172,9 +168,9 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher,
             //          endActivity(body);
             //          }
         } catch (NoSuchInterfaceException e) {
-            logger.error(
-                "could not retreive an interface, probably the life cycle controller of this component; terminating the component. Error message is : " +
-                e.getMessage());
+            logger
+                    .error("could not retreive an interface, probably the life cycle controller of this component; terminating the component. Error message is : " +
+                        e.getMessage());
         }
     }
 

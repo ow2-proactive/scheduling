@@ -59,8 +59,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Implementation of a NodeWrapper MBean.
  * @author ProActive Team
  */
-public class NodeWrapper extends NotificationBroadcasterSupport
-    implements Serializable, NodeWrapperMBean {
+public class NodeWrapper extends NotificationBroadcasterSupport implements Serializable, NodeWrapperMBean {
 
     /** JMX Logger */
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
@@ -91,8 +90,7 @@ public class NodeWrapper extends NotificationBroadcasterSupport
      * @param localNode
      * @param runtimeUrl
      */
-    public NodeWrapper(ObjectName objectName, LocalNode localNode,
-        String runtimeUrl) {
+    public NodeWrapper(ObjectName objectName, LocalNode localNode, String runtimeUrl) {
         this.objectName = objectName;
         this.localNode = localNode;
         this.runtimeUrl = runtimeUrl;
@@ -102,8 +100,7 @@ public class NodeWrapper extends NotificationBroadcasterSupport
         String protocol = URIBuilder.getProtocol(runtimeURI);
         int port = runtimeURI.getPort();
 
-        this.nodeUrl = URIBuilder.buildURI(host, localNode.getName(), protocol,
-                port).toString();
+        this.nodeUrl = URIBuilder.buildURI(host, localNode.getName(), protocol, port).toString();
     }
 
     public String getURL() {
@@ -111,7 +108,8 @@ public class NodeWrapper extends NotificationBroadcasterSupport
     }
 
     public List<ObjectName> getActiveObjects() {
-        List<UniversalBody> activeObjects = this.localNode.getActiveObjects(new ProActiveInternalObjectFilter());
+        List<UniversalBody> activeObjects = this.localNode
+                .getActiveObjects(new ProActiveInternalObjectFilter());
 
         List<ObjectName> onames = new ArrayList<ObjectName>();
         for (UniversalBody ub : activeObjects) {
@@ -140,9 +138,7 @@ public class NodeWrapper extends NotificationBroadcasterSupport
      * @see org.objectweb.proactive.core.jmx.mbean.NodeWrapperMBean#getJobIdAndVirtualNodeName()
      */
     public String[] getJobIdAndVirtualNodeName() {
-        return new String[] {
-            this.localNode.getJobId(), this.localNode.getVirtualNodeName()
-        };
+        return new String[] { this.localNode.getJobId(), this.localNode.getVirtualNodeName() };
     }
 
     public void sendNotification(String type) {
@@ -153,9 +149,8 @@ public class NodeWrapper extends NotificationBroadcasterSupport
         ObjectName source = getObjectName();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("[" + type +
-                "]#[NodeWrapper.sendNotification] source=" + source +
-                ", userData=" + userData);
+            logger.debug("[" + type + "]#[NodeWrapper.sendNotification] source=" + source + ", userData=" +
+                userData);
         }
         Notification notification = new Notification(type, source, counter++);
         notification.setUserData(userData);

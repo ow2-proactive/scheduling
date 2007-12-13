@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.process.filetransfer;
 
-
 /**
  * Principal interface for implementing a CopyProtocol
  *
@@ -53,12 +52,9 @@ public interface CopyProtocol {
 
     public boolean isDummyProtocol();
 
-    public void setFileTransferDefinitions(
-        FileTransferDefinition[] fileTransfer);
+    public void setFileTransferDefinitions(FileTransferDefinition[] fileTransfer);
 
-    public void setSrcInfo(
-        FileTransferWorkShop.StructureInformation srcInfoParams);
+    public void setSrcInfo(FileTransferWorkShop.StructureInformation srcInfoParams);
 
-    public void setDstInfo(
-        FileTransferWorkShop.StructureInformation dstInfoParams);
+    public void setDstInfo(FileTransferWorkShop.StructureInformation dstInfoParams);
 }

@@ -41,8 +41,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntMutableWrapper;
 
 
-public class GatherClient implements GatherClientAttributes, TotoItf,
-    BindingController {
+public class GatherClient implements GatherClientAttributes, TotoItf, BindingController {
     DummyItf client2primitive;
     DummyItf client2composite;
     String id;
@@ -102,9 +101,8 @@ public class GatherClient implements GatherClientAttributes, TotoItf,
         this.id = id;
     }
 
-    public void bindFc(String clientItfName, Object serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException,
-            IllegalLifeCycleException {
+    public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
+            IllegalBindingException, IllegalLifeCycleException {
         if ("client2composite".equals(clientItfName)) {
             client2composite = (DummyItf) serverItf;
         } else if ("client2primitive".equals(clientItfName)) {
@@ -118,8 +116,7 @@ public class GatherClient implements GatherClientAttributes, TotoItf,
         return new String[] { "client2composite", "client2primitive" };
     }
 
-    public Object lookupFc(String clientItfName)
-        throws NoSuchInterfaceException {
+    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
         if ("client2composite".equals(clientItfName)) {
             return client2composite;
         } else if ("client2primitive".equals(clientItfName)) {
@@ -129,8 +126,7 @@ public class GatherClient implements GatherClientAttributes, TotoItf,
         }
     }
 
-    public void unbindFc(String arg0)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String arg0) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         throw new ProActiveRuntimeException("not implemented!");
     }

@@ -120,13 +120,11 @@ public class OpenFile implements IWorkbenchWindowActionDelegate {
         String path = dialog.open();
         if ((path != null) && (path.length() > 0)) {
             changePerspective();
-            Console.getInstance(Activator.CONSOLE_NAME)
-                   .log("File selected : " + path);
+            Console.getInstance(Activator.CONSOLE_NAME).log("File selected : " + path);
             XMLDescriptorSet.getInstance().addFile(new XMLDescriptor(path));
             return new File(path);
         } else {
-            Console.getInstance(Activator.CONSOLE_NAME)
-                   .warn("No file was selected");
+            Console.getInstance(Activator.CONSOLE_NAME).warn("No file was selected");
         }
         return null;
     }

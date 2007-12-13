@@ -42,8 +42,7 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
  * @author Matthieu Morel
  *
  */
-public abstract class AbstractCollectiveInterfaceController
-    extends AbstractProActiveController {
+public abstract class AbstractCollectiveInterfaceController extends AbstractProActiveController {
 
     /**
      * called after creation of all controllers and interfaces
@@ -57,7 +56,6 @@ public abstract class AbstractCollectiveInterfaceController
     }
 
     //    
-    protected abstract Method searchMatchingMethod(Method clientSideMethod,
-        Method[] serverSideMethods, boolean clientItfIsMulticast,
-        boolean serverItfIsGathercast, ProActiveInterface serverSideItf);
+    protected abstract Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
+            boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf);
 }

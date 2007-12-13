@@ -72,14 +72,12 @@ public class Launcher {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    public Launcher(String fileDescriptorPath)
-        throws ProActiveException, NodeException {
+    public Launcher(String fileDescriptorPath) throws ProActiveException, NodeException {
         // replace spaces by %20 char (hexadecimal space code) to avoid bug with the property
         String filePathWithoutSpaces = fileDescriptorPath.replaceAll(" ", "%20");
 
         // parse and reify the descriptor
-        pad = PADeployment.getProactiveDescriptor(filePathWithoutSpaces)
-                          .getProActiveDescriptorInternal();
+        pad = PADeployment.getProactiveDescriptor(filePathWithoutSpaces).getProActiveDescriptorInternal();
         activated = false;
     }
 
@@ -90,8 +88,7 @@ public class Launcher {
      * @throws ClassNotFoundException
      * @throws NoSuchMethodException
      */
-    public void activate()
-        throws ProActiveException, NodeException, ClassNotFoundException,
+    public void activate() throws ProActiveException, NodeException, ClassNotFoundException,
             NoSuchMethodException {
         MainDefinition[] mainDefinitions = pad.getMainDefinitions();
 
@@ -106,8 +103,7 @@ public class Launcher {
                 VirtualNodeInternal virtualNode = virtualNodes[j];
                 Node node = virtualNode.getNode();
 
-                PALauncher.newMain(mainDefinition.getMainClass(),
-                    mainDefinition.getParameters(), node);
+                PALauncher.newMain(mainDefinition.getMainClass(), mainDefinition.getParameters(), node);
             }
         }
         activated = true;

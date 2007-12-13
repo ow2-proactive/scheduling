@@ -74,8 +74,7 @@ public class DumpP2PNetworkDialog extends Dialog {
 
         /* Get the machine's name */
         try {
-            initialHostValue = URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                                       .getLocal());
+            initialHostValue = URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getLocal());
         } catch (UnknownHostException e) {
             // TODO catch this exception, and do something
             e.printStackTrace();
@@ -223,8 +222,7 @@ public class DumpP2PNetworkDialog extends Dialog {
 
     protected void buildURL() {
         try {
-            this.URL = "//" + hostText.getText() + ":" +
-                Integer.parseInt(portText.getText());
+            this.URL = "//" + hostText.getText() + ":" + Integer.parseInt(portText.getText());
         } catch (NumberFormatException e) {
             this.URL = "";
         }

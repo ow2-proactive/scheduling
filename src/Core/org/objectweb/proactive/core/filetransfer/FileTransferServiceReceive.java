@@ -41,11 +41,9 @@ public interface FileTransferServiceReceive {
 
     public BooleanWrapper closeWrite(File f);
 
-    public void saveFileBlock(File dstFile, FileBlock block)
-        throws IOException;
+    public void saveFileBlock(File dstFile, FileBlock block) throws IOException;
 
-    public void saveFileBlockWithoutThrowingException(File dstFile,
-        FileBlock block);
+    public void saveFileBlockWithoutThrowingException(File dstFile, FileBlock block);
 
     public void putBackInLocalPool();
 

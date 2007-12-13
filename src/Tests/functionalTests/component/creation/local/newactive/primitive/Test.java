@@ -55,15 +55,15 @@ import functionalTests.component.creation.ComponentInfo;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     Component componentA;
     String name;
     String nodeUrl;
 
     public Test() {
         super("Creation of a primitive component on the local default node",
-            "Test newActiveComponent method for a primitive component on the local default node");
+                "Test newActiveComponent method for a primitive component on the local default node");
     }
 
     /**
@@ -75,25 +75,20 @@ public class Test extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
 
-        componentA = cf.newFcInstance(type_factory.createFcType(
-                    new InterfaceType[] {
-                        type_factory.createFcItfType("componentInfo",
-                            ComponentInfo.class.getName(), TypeFactory.SERVER,
-                            TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                    }),
-                new ControllerDescription("componentA", Constants.PRIMITIVE),
-                new ContentDescription(ComponentA.class.getName(),
-                    new Object[] { "toto" }));
+        componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
+                .createFcItfType("componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE), }), new ControllerDescription(
+            "componentA", Constants.PRIMITIVE), new ContentDescription(ComponentA.class.getName(),
+            new Object[] { "toto" }));
         //logger.debug("OK, instantiated the component");
         // start the component!
         Fractal.getLifeCycleController(componentA).startFc();
-        ComponentInfo ref = (ComponentInfo) componentA.getFcInterface(
-                "componentInfo");
+        ComponentInfo ref = (ComponentInfo) componentA.getFcInterface("componentInfo");
         name = ref.getName();
         nodeUrl = ((ComponentInfo) componentA.getFcInterface("componentInfo")).getNodeUrl();
 
         Assert.assertEquals(name, "toto");
-        Assert.assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(
-                    ProActiveInet.getInstance().getInetAddress())) != -1);
+        Assert.assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
+                .getInetAddress())) != -1);
     }
 }

@@ -73,8 +73,7 @@ public class FileTransferDefinition implements Serializable {
     }
 
     public void addFile(String srcname, String destname) {
-        if ((srcname == null) || (srcname.length() < 0) || (destname == null) ||
-                (destname.length() < 0)) {
+        if ((srcname == null) || (srcname.length() < 0) || (destname == null) || (destname.length() < 0)) {
             logger.debug("Discarding empty or null filename");
 
             return;
@@ -92,17 +91,14 @@ public class FileTransferDefinition implements Serializable {
         all.add(newFile);
     }
 
-    public void addDir(String srcname, String destname, String includes,
-        String excludes) {
-        if ((srcname == null) || (srcname.length() < 0) || (destname == null) ||
-                (destname.length() < 0)) {
+    public void addDir(String srcname, String destname, String includes, String excludes) {
+        if ((srcname == null) || (srcname.length() < 0) || (destname == null) || (destname.length() < 0)) {
             logger.debug("Discarding empty or null directory name");
 
             return;
         }
 
-        DirectoryDescription newDir = new DirectoryDescription(srcname,
-                destname, includes, excludes);
+        DirectoryDescription newDir = new DirectoryDescription(srcname, destname, includes, excludes);
 
         if (newDir.isHomonymous()) {
             homonymousDirs.add(newDir);
@@ -175,7 +171,7 @@ public class FileTransferDefinition implements Serializable {
 
     public boolean equals(FileTransferDefinition fileTransfer) {
         return (name.length() > 0) && (fileTransfer.getId().length() > 0) &&
-        name.equalsIgnoreCase(fileTransfer.getId());
+            name.equalsIgnoreCase(fileTransfer.getId());
     }
 
     public boolean isEmpty() {
@@ -239,8 +235,7 @@ public class FileTransferDefinition implements Serializable {
         String includes;
         String excludes;
 
-        public DirectoryDescription(String srcname, String destname,
-            String includes, String excludes) {
+        public DirectoryDescription(String srcname, String destname, String includes, String excludes) {
             super(srcname, destname);
 
             this.includes = includes;

@@ -108,8 +108,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * If tshouldSerializeListeners is true, the secong is ignored, i.e Weak Ref won't be used
      * @param shouldSerializeListeners true if the registered listeners should be serialized, false else.
      */
-    public AbstractEventProducer(boolean shouldSerializeListeners,
-        boolean useWeakRef) {
+    public AbstractEventProducer(boolean shouldSerializeListeners, boolean useWeakRef) {
         this.shouldSerializeListeners = shouldSerializeListeners;
         if (!shouldSerializeListeners && useWeakRef) {
             eventListeners = new WeakReferenceListenerList();
@@ -174,8 +173,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * @param listener the listener to notify.
      * @param event the event to fire to the listener.
      */
-    protected abstract void notifyOneListener(ProActiveListener listener,
-        ProActiveEvent event);
+    protected abstract void notifyOneListener(ProActiveListener listener, ProActiveEvent event);
 
     //
     // -- PRIVATE METHODS -----------------------------------------------
@@ -184,8 +182,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
     /**
      * @serialData Write serializable fields, if any exist.
      */
-    private void writeObject(java.io.ObjectOutputStream s)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream s) throws java.io.IOException {
         s.writeBoolean(shouldSerializeListeners);
         if (shouldSerializeListeners) {
             s.writeObject(eventListeners);
@@ -197,8 +194,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * @serialData Read serializable fields, if any exist.
      *             Recreate eventListeners.
      */
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream s) throws java.io.IOException, ClassNotFoundException {
         shouldSerializeListeners = s.readBoolean();
         if (shouldSerializeListeners) {
             eventListeners = (ListenerList) s.readObject();
@@ -273,8 +269,7 @@ public abstract class AbstractEventProducer implements java.io.Serializable {
      * @since   ProActive 0.9
      *
      */
-    private class PlainListenerList implements java.io.Serializable,
-        ListenerList {
+    private class PlainListenerList implements java.io.Serializable, ListenerList {
         protected java.util.ArrayList list;
 
         public PlainListenerList() {

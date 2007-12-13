@@ -89,8 +89,7 @@ public class QueryGenerator {
         return split(profondeur, v);
     }
 
-    public static Vector generateQueries(int nbQueens, int queenLine,
-        int profondeur) {
+    public static Vector generateQueries(int nbQueens, int queenLine, int profondeur) {
         Vector v = new Vector();
         if (queenLine == 0) {
             v.add(new FirstDiagQuery(nbQueens, 2));

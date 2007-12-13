@@ -67,16 +67,14 @@ public class SchedulerConnection implements Serializable {
      * @return the scheduler authentication at the specified URL.
      * @throws SchedulerException thrown if the connection to the scheduler cannot be established.
      */
-    public static SchedulerAuthenticationInterface join(String schedulerURL)
-        throws SchedulerException {
+    public static SchedulerAuthenticationInterface join(String schedulerURL) throws SchedulerException {
         // Get the scheduler authentication at the specified URL
         SchedulerAuthenticationInterface schedulerAuth = null;
-        logger.info(
-            "******************* TRYING TO JOIN EXISTING SCHEDULER *****************");
+        logger.info("******************* TRYING TO JOIN EXISTING SCHEDULER *****************");
 
         if (schedulerURL == null) {
-            logger.info(
-                "Scheduler URL was null, looking for scheduler on localhost with the default port and scheduler name...");
+            logger
+                    .info("Scheduler URL was null, looking for scheduler on localhost with the default port and scheduler name...");
             schedulerURL = "//localhost/";
         } else {
             if (!schedulerURL.endsWith("/")) {
@@ -85,20 +83,17 @@ public class SchedulerConnection implements Serializable {
         }
 
         schedulerURL += SCHEDULER_DEFAULT_NAME;
-        logger.info("Trying to join ProActive Scheduler at '" + schedulerURL +
-            "'");
+        logger.info("Trying to join ProActive Scheduler at '" + schedulerURL + "'");
 
         try {
-            schedulerAuth = (SchedulerAuthenticationInterface) (PAActiveObject.lookupActive(SchedulerAuthenticationInterface.class.getName(),
-                    schedulerURL));
+            schedulerAuth = (SchedulerAuthenticationInterface) (PAActiveObject.lookupActive(
+                    SchedulerAuthenticationInterface.class.getName(), schedulerURL));
 
             return schedulerAuth;
         } catch (ActiveObjectCreationException e) {
-            throw new SchedulerException("Error while getting scheduler interface !",
-                e);
+            throw new SchedulerException("Error while getting scheduler interface !", e);
         } catch (IOException e) {
-            throw new SchedulerException("Error while connecting the scheduler !",
-                e);
+            throw new SchedulerException("Error while connecting the scheduler !", e);
         }
     }
 }

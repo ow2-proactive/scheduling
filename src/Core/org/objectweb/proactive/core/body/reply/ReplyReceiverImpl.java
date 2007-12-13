@@ -38,9 +38,7 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     public ReplyReceiverImpl() {
     }
 
-    public int receiveReply(Reply r, Body receiverBody, FuturePool futurePool)
-        throws java.io.IOException {
-        return futurePool.receiveFutureValue(r.getSequenceNumber(),
-            r.getSourceBodyID(), r.getResult(), r);
+    public int receiveReply(Reply r, Body receiverBody, FuturePool futurePool) throws java.io.IOException {
+        return futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult(), r);
     }
 }

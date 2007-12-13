@@ -45,8 +45,7 @@ import functionalTests.gcmdeployment.Abstract;
 public class TestVirtualNode9 extends Abstract {
     @Test
     public void test() throws ProActiveException, FileNotFoundException {
-        GCMApplicationDescriptor gcma = API.getGCMApplicationDescriptor(getDescriptor(
-                    this));
+        GCMApplicationDescriptor gcma = API.getGCMApplicationDescriptor(getDescriptor(this));
         gcma.startDeployment();
         waitAllocation();
 

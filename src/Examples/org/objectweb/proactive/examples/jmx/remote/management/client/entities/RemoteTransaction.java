@@ -56,8 +56,7 @@ public class RemoteTransaction extends ManageableEntity implements Serializable 
         this.id = id;
         this.url = url;
         RemoteTransactionManager.getInstance().addTransaction(this);
-        this.parent = RemoteTransactionManager.getInstance()
-                                              .getTransactionsGroup();
+        this.parent = RemoteTransactionManager.getInstance().getTransactionsGroup();
         this.state = ACTIVE;
         this.gateway = gateway;
         try {
@@ -67,17 +66,13 @@ public class RemoteTransaction extends ManageableEntity implements Serializable 
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
-        EntitiesEventManager.getInstance()
-                            .newEvent(this,
-            EntitiesEventManager.TRANSACTION_OPENED);
+        EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.TRANSACTION_OPENED);
         EntitiesEventManager.getInstance().listenTo(this);
     }
 
     public void setState(long state) {
         this.state = state;
-        EntitiesEventManager.getInstance()
-                            .newEvent(this,
-            "Transaction " + this.id + " changed state.");
+        EntitiesEventManager.getInstance().newEvent(this, "Transaction " + this.id + " changed state.");
     }
 
     public long getState() {

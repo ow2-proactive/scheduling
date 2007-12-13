@@ -83,8 +83,7 @@ public interface Node {
      * Returns all activeObjects deployed on this Node
      * @return Object[] contains all activeObjects deployed on this Node
      */
-    public Object[] getActiveObjects()
-        throws NodeException, ActiveObjectCreationException;
+    public Object[] getActiveObjects() throws NodeException, ActiveObjectCreationException;
 
     /**
      * Returns all activeObjects with the given name deployed on this Node
@@ -92,8 +91,7 @@ public interface Node {
      * @param className the class of the Active Objects
      * @return Object[].The set of activeObjects deployed on this node of the given class
      */
-    public Object[] getActiveObjects(String className)
-        throws NodeException, ActiveObjectCreationException;
+    public Object[] getActiveObjects(String className) throws NodeException, ActiveObjectCreationException;
 
     /**
      * @return The number of active objects deployed in this Node.
@@ -116,8 +114,7 @@ public interface Node {
      * or <code>null</code> if it did not have one.
      * @throws ProActiveException
      */
-    public Object setProperty(String key, String value)
-        throws ProActiveException;
+    public Object setProperty(String key, String value) throws ProActiveException;
 
     /**
      * Searches for the property with the specified key in this node property

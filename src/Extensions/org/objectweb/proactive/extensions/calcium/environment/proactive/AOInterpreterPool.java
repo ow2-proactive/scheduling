@@ -117,13 +117,11 @@ public class AOInterpreterPool implements RunActive, InitActive {
                 allowedMethodNames += "get";
             }
 
-            service.blockingServeOldest(new RequestFilterOnAllowedMethods(
-                    allowedMethodNames));
+            service.blockingServeOldest(new RequestFilterOnAllowedMethods(allowedMethodNames));
         }
     }
 
-    protected class RequestFilterOnAllowedMethods implements RequestFilter,
-        java.io.Serializable {
+    protected class RequestFilterOnAllowedMethods implements RequestFilter, java.io.Serializable {
         private String allowedMethodNames;
 
         public RequestFilterOnAllowedMethods(String allowedMethodNames) {

@@ -49,7 +49,7 @@ class HandlerPreLazyProxyFile implements Handler<ProxyFile> {
     IdentityHashMap<ProxyFile, ProxyFile> allFiles;
 
     public HandlerPreLazyProxyFile(FileServerClient fserver, WSpaceImpl wspace,
-        IdentityHashMap<ProxyFile, ProxyFile> allFiles) {
+            IdentityHashMap<ProxyFile, ProxyFile> allFiles) {
         this.fserver = fserver;
         this.wspace = wspace;
         this.allFiles = allFiles;

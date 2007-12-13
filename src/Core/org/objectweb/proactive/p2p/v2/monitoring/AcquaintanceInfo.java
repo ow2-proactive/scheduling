@@ -55,8 +55,7 @@ public class AcquaintanceInfo implements Serializable {
         this.currentNoa = currentNoa;
     }
 
-    public AcquaintanceInfo(String sender, String[] acq, int noa,
-        int currentNoa, String[] awaited) {
+    public AcquaintanceInfo(String sender, String[] acq, int noa, int currentNoa, String[] awaited) {
         this(sender, acq, noa, currentNoa);
         this.awaitedReplies = awaited;
     }

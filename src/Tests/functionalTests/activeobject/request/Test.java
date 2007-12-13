@@ -36,6 +36,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test blocking request, and calling void, int returned type and object returned type method
  */

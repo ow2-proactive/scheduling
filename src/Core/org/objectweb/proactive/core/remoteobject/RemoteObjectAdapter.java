@@ -101,44 +101,30 @@ public class RemoteObjectAdapter implements RemoteObject {
     static {
         try {
             methods = new Method[20];
-            methods[0] = RemoteObject.class.getDeclaredMethod("getObjectProxy",
-                    new Class<?>[0]);
+            methods[0] = RemoteObject.class.getDeclaredMethod("getObjectProxy", new Class<?>[0]);
             methods[1] = RemoteObject.class.getDeclaredMethod("getObjectProxy",
                     new Class<?>[] { RemoteRemoteObject.class });
-            methods[2] = RemoteObject.class.getDeclaredMethod("getClassName",
-                    new Class<?>[0]);
-            methods[3] = RemoteObject.class.getDeclaredMethod("getTargetClass",
-                    new Class<?>[0]);
-            methods[4] = RemoteObject.class.getDeclaredMethod("getProxyName",
-                    new Class<?>[0]);
-            methods[5] = RemoteObject.class.getDeclaredMethod("getAdapterClass",
-                    new Class<?>[0]);
+            methods[2] = RemoteObject.class.getDeclaredMethod("getClassName", new Class<?>[0]);
+            methods[3] = RemoteObject.class.getDeclaredMethod("getTargetClass", new Class<?>[0]);
+            methods[4] = RemoteObject.class.getDeclaredMethod("getProxyName", new Class<?>[0]);
+            methods[5] = RemoteObject.class.getDeclaredMethod("getAdapterClass", new Class<?>[0]);
 
             securityMethods = new Method[20];
-            securityMethods[0] = SecurityEntity.class.getDeclaredMethod("getCertificate",
-                    new Class<?>[0]);
-            securityMethods[1] = SecurityEntity.class.getDeclaredMethod("startNewSession",
-                    new Class<?>[] {
-                        long.class, SecurityContext.class,
-                        TypedCertificate.class
-                    });
-            securityMethods[2] = SecurityEntity.class.getDeclaredMethod("getPublicKey",
-                    new Class<?>[0]);
-            securityMethods[3] = SecurityEntity.class.getDeclaredMethod("publicKeyExchange",
-                    new Class<?>[] { long.class, byte[].class });
-            securityMethods[4] = SecurityEntity.class.getDeclaredMethod("secretKeyExchange",
-                    new Class<?>[] {
-                        long.class, byte[].class, byte[].class, byte[].class,
-                        byte[].class, byte[].class
-                    });
-            securityMethods[5] = SecurityEntity.class.getDeclaredMethod("getPolicy",
-                    new Class<?>[] { Entities.class, Entities.class });
-            securityMethods[7] = SecurityEntity.class.getDeclaredMethod("getEntities",
-                    new Class<?>[0]);
+            securityMethods[0] = SecurityEntity.class.getDeclaredMethod("getCertificate", new Class<?>[0]);
+            securityMethods[1] = SecurityEntity.class.getDeclaredMethod("startNewSession", new Class<?>[] {
+                    long.class, SecurityContext.class, TypedCertificate.class });
+            securityMethods[2] = SecurityEntity.class.getDeclaredMethod("getPublicKey", new Class<?>[0]);
+            securityMethods[3] = SecurityEntity.class.getDeclaredMethod("publicKeyExchange", new Class<?>[] {
+                    long.class, byte[].class });
+            securityMethods[4] = SecurityEntity.class.getDeclaredMethod("secretKeyExchange", new Class<?>[] {
+                    long.class, byte[].class, byte[].class, byte[].class, byte[].class, byte[].class });
+            securityMethods[5] = SecurityEntity.class.getDeclaredMethod("getPolicy", new Class<?>[] {
+                    Entities.class, Entities.class });
+            securityMethods[7] = SecurityEntity.class.getDeclaredMethod("getEntities", new Class<?>[0]);
             securityMethods[8] = SecurityEntity.class.getDeclaredMethod("terminateSession",
                     new Class<?>[] { long.class });
-            securityMethods[9] = SecurityEntity.class.getDeclaredMethod("randomValue",
-                    new Class<?>[] { long.class, byte[].class });
+            securityMethods[9] = SecurityEntity.class.getDeclaredMethod("randomValue", new Class<?>[] {
+                    long.class, byte[].class });
 
             securityMethods[10] = SecurityEntity.class.getDeclaredMethod("getProActiveSecurityManager",
                     new Class<?>[] { Entity.class });
@@ -147,7 +133,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
             internalRROMethods = new Method[20];
             internalRROMethods[0] = InternalRemoteRemoteObject.class.getDeclaredMethod("getObjectProxy",
-                    new Class<?>[] {  });
+                    new Class<?>[] {});
             internalRROMethods[2] = InternalRemoteRemoteObject.class.getDeclaredMethod("getURI",
                     new Class<?>[0]);
         } catch (NoSuchMethodException e) {
@@ -163,21 +149,20 @@ public class RemoteObjectAdapter implements RemoteObject {
         this.uri = getURI();
     }
 
-    public Reply receiveMessage(Request message)
-        throws ProActiveException, RenegotiateSessionException, IOException {
+    public Reply receiveMessage(Request message) throws ProActiveException, RenegotiateSessionException,
+            IOException {
         try {
             return this.remoteObject.receiveMessage(message);
         } catch (EOFException e) {
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .debug("EOFException while calling method " +
-                message.getMethodName());
+            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).debug(
+                    "EOFException while calling method " + message.getMethodName());
             return new SynchronousReplyImpl();
         } catch (ProActiveException e) {
             throw new IOException(e.getMessage());
         } catch (IOException e) {
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .warn("unable to contact remote object at " +
-                this.uri + " when calling " + message.getMethodName());
+            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).warn(
+                    "unable to contact remote object at " + this.uri + " when calling " +
+                        message.getMethodName());
             return new SynchronousReplyImpl(new MethodCallResult(null, e));
         }
 
@@ -185,11 +170,9 @@ public class RemoteObjectAdapter implements RemoteObject {
     }
 
     // Implements SecurityEntity
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
+    public TypedCertificate getCertificate() throws SecurityNotAvailableException, IOException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(securityMethods[0],
-                    new Object[0], new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(securityMethods[0], new Object[0], new HashMap());
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -215,11 +198,9 @@ public class RemoteObjectAdapter implements RemoteObject {
     //        throws SecurityNotAvailableException, IOException {
     //        return this.remoteObject.getCertificateEncoded();
     //    }
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException {
+    public Entities getEntities() throws SecurityNotAvailableException, IOException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(securityMethods[6],
-                    new Object[0], new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(securityMethods[6], new Object[0], new HashMap());
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -241,11 +222,11 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException, IOException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException,
+            IOException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(securityMethods[5],
-                    new Object[] { local, distant }, new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(securityMethods[5], new Object[] { local, distant },
+                    new HashMap());
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -267,11 +248,9 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException {
+    public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(securityMethods[2],
-                    new Object[0], new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(securityMethods[2], new Object[0], new HashMap());
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -293,9 +272,8 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException, KeyExchangeException, IOException {
         try {
             MethodCall mc = MethodCall.getMethodCall(securityMethods[3],
                     new Object[] { sessionID, signature }, new HashMap());
@@ -320,12 +298,11 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
+            RenegotiateSessionException, IOException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(securityMethods[9],
-                    new Object[] { sessionID, clientRandomValue }, new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(securityMethods[9], new Object[] { sessionID,
+                    clientRandomValue }, new HashMap());
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -347,18 +324,13 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException, RenegotiateSessionException, IOException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(securityMethods[4],
-                    new Object[] {
-                        sessionID, encodedAESKey, encodedIVParameters,
-                        encodedClientMacKey, encodedLockData,
-                        parametersSignature
-                    }, new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(securityMethods[4], new Object[] { sessionID,
+                    encodedAESKey, encodedIVParameters, encodedClientMacKey, encodedLockData,
+                    parametersSignature }, new HashMap());
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -381,12 +353,11 @@ public class RemoteObjectAdapter implements RemoteObject {
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SecurityNotAvailableException, IOException, SessionException {
+            TypedCertificate distantCertificate) throws SecurityNotAvailableException, IOException,
+            SessionException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(securityMethods[1],
-                    new Object[] { distantSessionID, policy, distantCertificate },
-                    new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(securityMethods[1], new Object[] { distantSessionID,
+                    policy, distantCertificate }, new HashMap());
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -408,11 +379,10 @@ public class RemoteObjectAdapter implements RemoteObject {
         return 0;
     }
 
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException {
+    public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(securityMethods[8],
-                    new Object[] { sessionID }, new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(securityMethods[8], new Object[] { sessionID },
+                    new HashMap());
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -436,8 +406,7 @@ public class RemoteObjectAdapter implements RemoteObject {
         if (this.stub == null) {
             //                this.stub = this.remoteObject.getObjectProxy();
             try {
-                MethodCall mc = MethodCall.getMethodCall(internalRROMethods[0],
-                        new Object[0], new HashMap());
+                MethodCall mc = MethodCall.getMethodCall(internalRROMethods[0], new Object[0], new HashMap());
                 Request r = new InternalRemoteRemoteObjectRequest(mc);
 
                 SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -460,8 +429,7 @@ public class RemoteObjectAdapter implements RemoteObject {
         return this.stub;
     }
 
-    public Object getObjectProxy(RemoteRemoteObject rmo)
-        throws ProActiveException {
+    public Object getObjectProxy(RemoteRemoteObject rmo) throws ProActiveException {
         if (this.stub == null) {
             this.getObjectProxy();
         }
@@ -470,8 +438,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
     public String getClassName() {
         try {
-            MethodCall mc = MethodCall.getMethodCall(methods[2], new Object[0],
-                    new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(methods[2], new Object[0], new HashMap());
             Request r = new RemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -496,8 +463,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
     public String getProxyName() {
         try {
-            MethodCall mc = MethodCall.getMethodCall(methods[4], new Object[0],
-                    new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(methods[4], new Object[0], new HashMap());
             Request r = new RemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -520,8 +486,7 @@ public class RemoteObjectAdapter implements RemoteObject {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) +
-            ((remoteObject == null) ? 0 : remoteObject.hashCode());
+        result = (prime * result) + ((remoteObject == null) ? 0 : remoteObject.hashCode());
         return result;
     }
 
@@ -549,8 +514,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
     public Class<?> getTargetClass() {
         try {
-            MethodCall mc = MethodCall.getMethodCall(methods[3], new Object[0],
-                    new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(methods[3], new Object[0], new HashMap());
             Request r = new RemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -571,8 +535,7 @@ public class RemoteObjectAdapter implements RemoteObject {
 
     public Class<?> getAdapterClass() {
         try {
-            MethodCall mc = MethodCall.getMethodCall(methods[5], new Object[0],
-                    new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(methods[5], new Object[0], new HashMap());
             Request r = new RemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -592,11 +555,10 @@ public class RemoteObjectAdapter implements RemoteObject {
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(securityMethods[10],
-                    new Object[] { user }, new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(securityMethods[10], new Object[] { user },
+                    new HashMap());
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 
             SynchronousReplyImpl reply = (SynchronousReplyImpl) this.remoteObject.receiveMessage(r);
@@ -618,10 +580,8 @@ public class RemoteObjectAdapter implements RemoteObject {
         return null;
     }
 
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         try {
             MethodCall mc = MethodCall.getMethodCall(securityMethods[11],
                     new Object[] { user, policyServer }, new HashMap());
@@ -647,8 +607,7 @@ public class RemoteObjectAdapter implements RemoteObject {
     //TODO: write a public method which does't throw exception.
     protected URI getURI() throws ProActiveException {
         try {
-            MethodCall mc = MethodCall.getMethodCall(internalRROMethods[2],
-                    new Object[0], new HashMap());
+            MethodCall mc = MethodCall.getMethodCall(internalRROMethods[2], new Object[0], new HashMap());
 
             Request r = new InternalRemoteRemoteObjectRequest(mc);
 

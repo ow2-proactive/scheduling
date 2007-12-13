@@ -92,8 +92,7 @@ public class KeystoreTab extends UpdatableTab {
     protected CertificateDetailsSection certDetailsSection;
 
     //  protected Text passwordText;
-    public KeystoreTab(CTabFolder folder, CertificateTreeList keystore,
-        FormToolkit tk) {
+    public KeystoreTab(CTabFolder folder, CertificateTreeList keystore, FormToolkit tk) {
         super(folder, SWT.NULL);
         setText("Keystore Editor");
 
@@ -105,17 +104,13 @@ public class KeystoreTab extends UpdatableTab {
 
         body.setLayout(new GridLayout(3, true));
 
-        createSectionLoadSave(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 3, 1));
+        createSectionLoadSave(body).setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 3, 1));
 
-        createSectionKeystoreList(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        createSectionKeystoreList(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createSectionActiveKeystore(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        createSectionActiveKeystore(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createSectionCertDetails(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        createSectionCertDetails(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         setControl(body);
     }
@@ -124,11 +119,9 @@ public class KeystoreTab extends UpdatableTab {
         Composite client = this.toolkit.createComposite(parent);
         client.setLayout(new GridLayout(4, false));
 
-        createButtonLoad(client)
-            .setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        createButtonLoad(client).setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
-        createButtonSave(client)
-            .setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        createButtonSave(client).setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         //this.toolkit.createLabel(client, "Keystore Password :");
 
@@ -139,102 +132,94 @@ public class KeystoreTab extends UpdatableTab {
     }
 
     private Button createButtonLoad(Composite parent) {
-        Button b = this.toolkit.createButton(parent, "Load a keystore",
-                SWT.BUTTON1);
+        Button b = this.toolkit.createButton(parent, "Load a keystore", SWT.BUTTON1);
         b.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseUp(MouseEvent e) {
-                    FileDialog fd = new FileDialog(new Shell(), SWT.OPEN);
-                    fd.setText("Open a keystore");
-                    fd.setFilterExtensions(new String[] { "*.p12", "*.crt", "*.*" });
-                    String name = fd.open();
-                    try {
-                        new PasswordDialog(null);
+            @Override
+            public void mouseUp(MouseEvent e) {
+                FileDialog fd = new FileDialog(new Shell(), SWT.OPEN);
+                fd.setText("Open a keystore");
+                fd.setFilterExtensions(new String[] { "*.p12", "*.crt", "*.*" });
+                String name = fd.open();
+                try {
+                    new PasswordDialog(null);
 
-                        KeystoreTab.this.keystoreFileList.add(new KeystoreFile(
-                                name, KeystoreUtils.loadKeystore(name, "ha")));
-                    } catch (NoSuchAlgorithmException e1) {
-                        e1.printStackTrace();
-                    } catch (CertificateException e1) {
-                        e1.printStackTrace();
-                    } catch (FileNotFoundException e1) {
-                        ErrorDialog.openError(Display.getCurrent()
-                                                     .getActiveShell(),
-                            "File Error", "Unable to open file",
-                            new Status(IStatus.ERROR, ID, IStatus.OK,
+                    KeystoreTab.this.keystoreFileList.add(new KeystoreFile(name, KeystoreUtils.loadKeystore(
+                            name, "ha")));
+                } catch (NoSuchAlgorithmException e1) {
+                    e1.printStackTrace();
+                } catch (CertificateException e1) {
+                    e1.printStackTrace();
+                } catch (FileNotFoundException e1) {
+                    ErrorDialog.openError(Display.getCurrent().getActiveShell(), "File Error",
+                            "Unable to open file", new Status(IStatus.ERROR, ID, IStatus.OK, "See details",
+                                e1));
+                    return;
+                } catch (IOException e1) {
+                    ErrorDialog.openError(Display.getCurrent().getActiveShell(), "Keystore Error",
+                            "Unable to open keystore", new Status(IStatus.ERROR, ID, IStatus.OK,
                                 "See details", e1));
-                        return;
-                    } catch (IOException e1) {
-                        ErrorDialog.openError(Display.getCurrent()
-                                                     .getActiveShell(),
-                            "Keystore Error", "Unable to open keystore",
-                            new Status(IStatus.ERROR, ID, IStatus.OK,
-                                "See details", e1));
-                        return;
-                    } catch (KeyStoreException e1) {
-                        e1.printStackTrace();
-                    } catch (NoSuchProviderException e1) {
-                        e1.printStackTrace();
-                    } catch (UnrecoverableKeyException eke) {
-                        eke.printStackTrace();
-                    }
-                    updateKeystoreTree();
-
-                    super.mouseUp(e);
+                    return;
+                } catch (KeyStoreException e1) {
+                    e1.printStackTrace();
+                } catch (NoSuchProviderException e1) {
+                    e1.printStackTrace();
+                } catch (UnrecoverableKeyException eke) {
+                    eke.printStackTrace();
                 }
-            });
+                updateKeystoreTree();
+
+                super.mouseUp(e);
+            }
+        });
 
         return b;
     }
 
     private Button createButtonSave(Composite parent) {
-        Button b = this.toolkit.createButton(parent, "Save active keystore",
-                SWT.BUTTON1);
+        Button b = this.toolkit.createButton(parent, "Save active keystore", SWT.BUTTON1);
         b.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseUp(MouseEvent e) {
-                    Map<CertificateTree, Boolean> keepPrivateKeyMap = getSelected();
+            @Override
+            public void mouseUp(MouseEvent e) {
+                Map<CertificateTree, Boolean> keepPrivateKeyMap = getSelected();
 
-                    FileDialog fd = new FileDialog(new Shell(), SWT.SAVE);
-                    fd.setText("Save the active keystore as");
-                    fd.setFilterExtensions(new String[] { "*.p12", "*.crt", "*.*" });
-                    String name = fd.open();
-                    try {
-                        KeystoreUtils.saveKeystore(name, "ha",
-                            KeystoreTab.this.activeKeystore, keepPrivateKeyMap);
-                    } catch (FileNotFoundException fnfe) {
-                        fnfe.printStackTrace();
-                    } catch (KeyStoreException kse) {
-                        kse.printStackTrace();
-                    } catch (NoSuchProviderException nspe) {
-                        nspe.printStackTrace();
-                    } catch (NoSuchAlgorithmException nsae) {
-                        nsae.printStackTrace();
-                    } catch (CertificateException ce) {
-                        ce.printStackTrace();
-                    } catch (IOException oie) {
-                        oie.printStackTrace();
-                    } catch (UnrecoverableKeyException uke) {
-                        uke.printStackTrace();
-                    }
-
-                    super.mouseUp(e);
+                FileDialog fd = new FileDialog(new Shell(), SWT.SAVE);
+                fd.setText("Save the active keystore as");
+                fd.setFilterExtensions(new String[] { "*.p12", "*.crt", "*.*" });
+                String name = fd.open();
+                try {
+                    KeystoreUtils
+                            .saveKeystore(name, "ha", KeystoreTab.this.activeKeystore, keepPrivateKeyMap);
+                } catch (FileNotFoundException fnfe) {
+                    fnfe.printStackTrace();
+                } catch (KeyStoreException kse) {
+                    kse.printStackTrace();
+                } catch (NoSuchProviderException nspe) {
+                    nspe.printStackTrace();
+                } catch (NoSuchAlgorithmException nsae) {
+                    nsae.printStackTrace();
+                } catch (CertificateException ce) {
+                    ce.printStackTrace();
+                } catch (IOException oie) {
+                    oie.printStackTrace();
+                } catch (UnrecoverableKeyException uke) {
+                    uke.printStackTrace();
                 }
-            });
+
+                super.mouseUp(e);
+            }
+        });
 
         return b;
     }
 
     private Section createSectionKeystoreList(Composite parent) {
-        Section section = this.toolkit.createSection(parent,
-                ExpandableComposite.TITLE_BAR);
+        Section section = this.toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
         section.setText("Loaded Keystores List");
 
         Composite client = this.toolkit.createComposite(section);
         client.setLayout(new GridLayout());
 
-        createTreeKeystore(client)
-            .setLayoutData(new GridData(GridData.FILL_BOTH));
+        createTreeKeystore(client).setLayoutData(new GridData(GridData.FILL_BOTH));
 
         section.setClient(client);
 
@@ -251,8 +236,7 @@ public class KeystoreTab extends UpdatableTab {
 
     private void addSelected(TreeItem item, Map<CertificateTree, Boolean> map) {
         CertificateTree tree = (CertificateTree) item.getData();
-        if (item.getChecked() &&
-                (tree.getCertificate().getPrivateKey() != null)) {
+        if (item.getChecked() && (tree.getCertificate().getPrivateKey() != null)) {
             map.put(tree, new Boolean(true));
         }
         for (TreeItem child : item.getItems()) {
@@ -263,72 +247,70 @@ public class KeystoreTab extends UpdatableTab {
     private Tree createTreeKeystore(Composite parent) {
         this.keystoreTree = this.toolkit.createTree(parent, SWT.SINGLE);
         this.keystoreTree.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    Object data = KeystoreTab.this.keystoreTree.getSelection()[0].getData();
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Object data = KeystoreTab.this.keystoreTree.getSelection()[0].getData();
 
-                    if (data instanceof CertificateTree) {
-                        CertificateTree ct = (CertificateTree) data;
+                if (data instanceof CertificateTree) {
+                    CertificateTree ct = (CertificateTree) data;
 
-                        KeystoreTab.this.certDetailsSection.update(ct.getCertificate());
-                    } else {
-                        KeystoreTab.this.certDetailsSection.update(null);
-                    }
-
-                    super.widgetSelected(e);
+                    KeystoreTab.this.certDetailsSection.update(ct.getCertificate());
+                } else {
+                    KeystoreTab.this.certDetailsSection.update(null);
                 }
-            });
+
+                super.widgetSelected(e);
+            }
+        });
 
         this.keystoreTree.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    if ((e.character == SWT.DEL) || (e.character == SWT.BS)) {
-                        TreeItem ks = KeystoreTab.this.keystoreTree.getSelection()[0];
-                        CertificateTree selectedTree = (CertificateTree) ks.getData();
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if ((e.character == SWT.DEL) || (e.character == SWT.BS)) {
+                    TreeItem ks = KeystoreTab.this.keystoreTree.getSelection()[0];
+                    CertificateTree selectedTree = (CertificateTree) ks.getData();
 
-                        while (ks.getParentItem() != null) {
-                            ks = ks.getParentItem();
-                        }
-
-                        CertificateTreeList list = (CertificateTreeList) ks.getData();
-                        list.remove(selectedTree);
-
-                        updateKeystoreTree();
+                    while (ks.getParentItem() != null) {
+                        ks = ks.getParentItem();
                     }
 
-                    super.keyPressed(e);
+                    CertificateTreeList list = (CertificateTreeList) ks.getData();
+                    list.remove(selectedTree);
+
+                    updateKeystoreTree();
                 }
-            });
+
+                super.keyPressed(e);
+            }
+        });
 
         // drag n drop
         DragSource source = new DragSource(this.keystoreTree, DND.DROP_COPY);
 
-        source.setTransfer(new Transfer[] {
-                CertificateTreeMapTransfer.getInstance()
-            });
+        source.setTransfer(new Transfer[] { CertificateTreeMapTransfer.getInstance() });
 
         source.addDragListener(new DragSourceAdapter() {
-                @Override
-                public void dragSetData(DragSourceEvent event) {
-                    // Provide the data of the requested type.
-                    CertificateTreeMap map = new CertificateTreeMap();
-                    Object data = KeystoreTab.this.keystoreTree.getSelection()[0].getData();
+            @Override
+            public void dragSetData(DragSourceEvent event) {
+                // Provide the data of the requested type.
+                CertificateTreeMap map = new CertificateTreeMap();
+                Object data = KeystoreTab.this.keystoreTree.getSelection()[0].getData();
 
-                    if (data instanceof KeystoreFile) {
-                        KeystoreFile ksf = (KeystoreFile) data;
+                if (data instanceof KeystoreFile) {
+                    KeystoreFile ksf = (KeystoreFile) data;
 
-                        for (CertificateTree tree : ksf) {
-                            map.put(tree, tree.getCertChain());
-                        }
-                    } else if (data instanceof CertificateTree) {
-                        CertificateTree ct = (CertificateTree) data;
-
-                        map.put(ct, ct.getCertChain());
+                    for (CertificateTree tree : ksf) {
+                        map.put(tree, tree.getCertChain());
                     }
+                } else if (data instanceof CertificateTree) {
+                    CertificateTree ct = (CertificateTree) data;
 
-                    event.data = map;
+                    map.put(ct, ct.getCertChain());
                 }
-            });
+
+                event.data = map;
+            }
+        });
 
         return this.keystoreTree;
     }
@@ -361,26 +343,24 @@ public class KeystoreTab extends UpdatableTab {
     }
 
     private Section createSectionActiveKeystore(Composite parent) {
-        this.activeKeystoreSection = new CertificateTreeListSection(parent,
-                this.toolkit, "ActiveKeystore", this.activeKeystore, true,
-                false, true, true);
+        this.activeKeystoreSection = new CertificateTreeListSection(parent, this.toolkit, "ActiveKeystore",
+            this.activeKeystore, true, false, true, true);
 
         this.activeKeystoreSection.getTree().addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    KeystoreTab.this.certDetailsSection.update(KeystoreTab.this.activeKeystoreSection.getSelectionData()
-                                                                                                     .getCertificate());
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                KeystoreTab.this.certDetailsSection.update(KeystoreTab.this.activeKeystoreSection
+                        .getSelectionData().getCertificate());
 
-                    super.widgetSelected(e);
-                }
-            });
+                super.widgetSelected(e);
+            }
+        });
 
         return this.activeKeystoreSection.get();
     }
 
     private Section createSectionCertDetails(Composite parent) {
-        this.certDetailsSection = new CertificateDetailsSection(parent,
-                this.toolkit);
+        this.certDetailsSection = new CertificateDetailsSection(parent, this.toolkit);
 
         return this.certDetailsSection.get();
     }

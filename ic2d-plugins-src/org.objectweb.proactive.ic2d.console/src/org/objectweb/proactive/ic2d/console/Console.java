@@ -115,11 +115,10 @@ public class Console extends MessageConsole {
         Logger logger = LogManager.getRootLogger();
         WriterAppender app = new WriterAppender(new SimpleLayout(), log4jStream);
         //		logger.addAppender(app);
-        ConsolePlugin.getDefault().getConsoleManager()
-                     .addConsoles(new IConsole[] {  /*console,*/log4jConsole });
+        ConsolePlugin.getDefault().getConsoleManager().addConsoles(
+                new IConsole[] { /*console,*/log4jConsole });
         //-------------------------
-        ConsolePlugin.getDefault().getConsoleManager()
-                     .addConsoles(new IConsole[] { this });
+        ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { this });
     }
 
     //
@@ -150,12 +149,12 @@ public class Console extends MessageConsole {
 
         // Print the message in the UI Thread in async mode
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageConsoleStream stream = newMessageStream();
-                    stream.setColor(Console.BLUE);
-                    stream.println(text);
-                }
-            });
+            public void run() {
+                MessageConsoleStream stream = newMessageStream();
+                stream.setColor(Console.BLUE);
+                stream.println(text);
+            }
+        });
     }
 
     /**
@@ -169,12 +168,12 @@ public class Console extends MessageConsole {
 
         // Print the message in the UI Thread in async mode
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageConsoleStream stream = newMessageStream();
-                    stream.setColor(Console.RED);
-                    stream.println(text);
-                }
-            });
+            public void run() {
+                MessageConsoleStream stream = newMessageStream();
+                stream.setColor(Console.RED);
+                stream.println(text);
+            }
+        });
     }
 
     /**
@@ -188,12 +187,12 @@ public class Console extends MessageConsole {
 
         // Print the message in the UI Thread in async mode
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageConsoleStream stream = newMessageStream();
-                    stream.setColor(Console.GRAY);
-                    stream.println(text);
-                }
-            });
+            public void run() {
+                MessageConsoleStream stream = newMessageStream();
+                stream.setColor(Console.GRAY);
+                stream.println(text);
+            }
+        });
     }
 
     /**
@@ -245,17 +244,15 @@ public class Console extends MessageConsole {
     public void printTime() {
         // Print the message in the UI Thread in async mode
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageConsoleStream stream = newMessageStream();
-                    stream.setColor(Console.BLACK);
-                    stream.print(dateFormat.format(new java.util.Date()) +
-                        " => ");
-                }
-            });
+            public void run() {
+                MessageConsoleStream stream = newMessageStream();
+                stream.setColor(Console.BLACK);
+                stream.print(dateFormat.format(new java.util.Date()) + " => ");
+            }
+        });
     }
 
-    private synchronized void logExceptionWhithoutTime(Throwable e,
-        boolean cause) {
+    private synchronized void logExceptionWhithoutTime(Throwable e, boolean cause) {
         StringBuilder builder = new StringBuilder();
         if (cause) {
             builder.append("Caused by: ");
@@ -269,12 +266,12 @@ public class Console extends MessageConsole {
         final String log = builder.toString();
 
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageConsoleStream stream = newMessageStream();
-                    stream.setColor(Console.GRAY);
-                    stream.print(log);
-                }
-            });
+            public void run() {
+                MessageConsoleStream stream = newMessageStream();
+                stream.setColor(Console.GRAY);
+                stream.print(log);
+            }
+        });
 
         if (e.getCause() != null) {
             logExceptionWhithoutTime(e.getCause(), true);

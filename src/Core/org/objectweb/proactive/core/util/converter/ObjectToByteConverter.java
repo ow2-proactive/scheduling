@@ -104,8 +104,7 @@ public class ObjectToByteConverter {
         }
     }
 
-    private static byte[] convert(Object o, ConversionMode conversionMode)
-        throws IOException {
+    private static byte[] convert(Object o, ConversionMode conversionMode) throws IOException {
         final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
         //here we check wether or not we are running in ibis
@@ -116,14 +115,12 @@ public class ObjectToByteConverter {
         }
     }
 
-    private static void writeToStream(ObjectOutputStream objectOutputStream,
-        Object o) throws IOException {
+    private static void writeToStream(ObjectOutputStream objectOutputStream, Object o) throws IOException {
         objectOutputStream.writeObject(o);
         objectOutputStream.flush();
     }
 
-    private static byte[] standardConvert(Object o,
-        ConversionMode conversionMode) throws IOException {
+    private static byte[] standardConvert(Object o, ConversionMode conversionMode) throws IOException {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ObjectOutputStream objectOutputStream = null;
 
@@ -155,17 +152,14 @@ public class ObjectToByteConverter {
             final Class cl_buaos = Class.forName(BUFFERED_ARRAY_OUTPUT_STREAM);
             final Class cl_isos = Class.forName(IBIS_SERIALIZATION_OUTPUT_STREAM);
             final Constructor c_baos = cl_baos.getConstructor();
-            final Constructor c_buaos = cl_buaos.getConstructor(new Class[] {
-                        java.io.OutputStream.class
-                    });
-            final Constructor c_isos = cl_isos.getConstructor(new Class[] {
-                        Class.forName("ibis.io.DataOutputStream")
-                    });
+            final Constructor c_buaos = cl_buaos.getConstructor(new Class[] { java.io.OutputStream.class });
+            final Constructor c_isos = cl_isos.getConstructor(new Class[] { Class
+                    .forName("ibis.io.DataOutputStream") });
 
             //          final ByteArrayOutputStream bo = new ByteArrayOutputStream();
             final ByteArrayOutputStream i_baos = (ByteArrayOutputStream) c_baos.newInstance(new Object[] {
-                        
-                    });
+
+            });
 
             //	        final BufferedArrayOutputStream ao = new BufferedArrayOutputStream(bo);
             final Object i_buaos = c_buaos.newInstance(new Object[] { i_baos });
@@ -173,8 +167,7 @@ public class ObjectToByteConverter {
             //	        final IbisSerializationOutputStream so = new IbisSerializationOutputStream(ao);
             final Object i_isos = c_isos.newInstance(new Object[] { i_buaos });
 
-            final Method writeObjectMth = cl_isos.getMethod(WRITE_OBJECT,
-                    new Class[] { Object.class });
+            final Method writeObjectMth = cl_isos.getMethod(WRITE_OBJECT, new Class[] { Object.class });
             final Method flushMth = cl_isos.getMethod(FLUSH);
             final Method closeMth = cl_isos.getMethod(CLOSE);
 
@@ -182,10 +175,10 @@ public class ObjectToByteConverter {
             writeObjectMth.invoke(i_isos, new Object[] { o });
 
             //			so.flush();
-            flushMth.invoke(i_isos, new Object[] {  });
+            flushMth.invoke(i_isos, new Object[] {});
 
             //			so.close();
-            closeMth.invoke(i_isos, new Object[] {  });
+            closeMth.invoke(i_isos, new Object[] {});
 
             return i_baos.toByteArray();
         } catch (ClassNotFoundException e) {

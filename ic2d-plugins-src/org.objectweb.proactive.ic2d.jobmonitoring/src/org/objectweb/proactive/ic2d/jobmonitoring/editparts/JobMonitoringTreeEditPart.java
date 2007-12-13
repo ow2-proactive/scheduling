@@ -43,8 +43,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.data.AbstractData;
  * @author Mich&egrave;le Reynier, Jean-Michael Legait and vbodnart
  *
  */
-public abstract class JobMonitoringTreeEditPart<T extends AbstractData>
-    extends AbstractTreeEditPart implements Observer, Runnable {
+public abstract class JobMonitoringTreeEditPart<T extends AbstractData> extends AbstractTreeEditPart
+        implements Observer, Runnable {
     //
     // -- CONSTRUCTOR ------------------------------------------------
     //

@@ -38,6 +38,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.activeobject.request.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test sending termination method
  */

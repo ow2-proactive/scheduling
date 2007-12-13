@@ -55,7 +55,6 @@ public interface ExportedVirtualNodesBuilder {
      * @param currentComponentVN the virtual node to export
      * @throws Exception in case of a composition error
      */
-    void compose(String componentName,
-        ExportedVirtualNode[] exportedVirtualNodes,
-        VirtualNode currentComponentVN) throws Exception;
+    void compose(String componentName, ExportedVirtualNode[] exportedVirtualNodes,
+            VirtualNode currentComponentVN) throws Exception;
 }

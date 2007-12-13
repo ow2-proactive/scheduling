@@ -57,8 +57,7 @@ public class NodeCreationEvent extends ProActiveEvent {
      * @param node the newly created node
      * @param nodeCreated the number of nodes already created
      */
-    public NodeCreationEvent(VirtualNodeInternal vn, int messageType,
-        Node node, int nodeCreated) {
+    public NodeCreationEvent(VirtualNodeInternal vn, int messageType, Node node, int nodeCreated) {
         super(vn, messageType);
         this.node = node;
         this.vn = vn;

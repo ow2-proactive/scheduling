@@ -38,6 +38,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test getActiveObjects method on a node
  */
@@ -57,8 +58,7 @@ public class Test extends FunctionalTest {
             new TestNodes().action();
             node = TestNodes.getLocalVMNode();
         }
-        PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" },
-            node);
+        PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" }, node);
         // Thread.sleep(3000);
         a = (A) node.getActiveObjects(A.class.getName())[0];
 

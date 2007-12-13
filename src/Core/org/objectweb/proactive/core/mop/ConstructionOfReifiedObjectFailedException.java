@@ -30,8 +30,7 @@
  */
 package org.objectweb.proactive.core.mop;
 
-public class ConstructionOfReifiedObjectFailedException
-    extends BehavioralException {
+public class ConstructionOfReifiedObjectFailedException extends BehavioralException {
     public ConstructionOfReifiedObjectFailedException() {
     }
 

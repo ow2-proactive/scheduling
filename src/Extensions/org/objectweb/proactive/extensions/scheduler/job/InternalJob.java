@@ -109,8 +109,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
 
     //   * @param runtimeLimit the maximum execution time for this job given in millisecond.
-    public InternalJob(String name, JobPriority priority,
-        boolean cancelOnError, String description) {
+    public InternalJob(String name, JobPriority priority, boolean cancelOnError, String description) {
         this.name = name;
         this.jobInfo.setPriority(priority);
         //this.runtimeLimit = runtimeLimit;
@@ -146,9 +145,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             for (TaskId id : tasks.keySet()) {
                 if (jobInfo.getTaskFinishedTimeModify().containsKey(id)) {
                     //a null send to a long setter throws a NullPointerException so, here is the fix
-                    tasks.get(id)
-                         .setFinishedTime(jobInfo.getTaskFinishedTimeModify()
-                                                 .get(id));
+                    tasks.get(id).setFinishedTime(jobInfo.getTaskFinishedTimeModify().get(id));
                 }
             }
         }
@@ -191,33 +188,27 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      */
     public int compareTo(InternalJob job) {
         switch (currentSort) {
-        case SORT_BY_DESCRIPTION:
-            return (currentOrder == ASC_ORDER)
-            ? (description.compareTo(job.description))
-            : (job.description.compareTo(description));
-        case SORT_BY_NAME:
-            return (currentOrder == ASC_ORDER) ? (name.compareTo(job.name))
-                                               : (job.name.compareTo(name));
-        case SORT_BY_PRIORITY:
-            return (currentOrder == ASC_ORDER)
-            ? (jobInfo.getPriority().getPriority() -
-            job.jobInfo.getPriority().getPriority())
-            : (job.jobInfo.getPriority().getPriority() -
-            jobInfo.getPriority().getPriority());
-        case SORT_BY_TYPE:
-            return (currentOrder == ASC_ORDER)
-            ? (getType().compareTo(job.getType()))
-            : (job.getType().compareTo(getType()));
-        case SORT_BY_OWNER:
-            return (currentOrder == ASC_ORDER) ? (owner.compareTo(job.owner))
-                                               : (job.owner.compareTo(owner));
-        case SORT_BY_STATE:
-            return (currentOrder == ASC_ORDER)
-            ? (jobInfo.getState().compareTo(job.jobInfo.getState()))
-            : (job.jobInfo.getState().compareTo(jobInfo.getState()));
-        default:
-            return (currentOrder == ASC_ORDER) ? (getId().compareTo(job.getId()))
-                                               : (job.getId().compareTo(getId()));
+            case SORT_BY_DESCRIPTION:
+                return (currentOrder == ASC_ORDER) ? (description.compareTo(job.description))
+                        : (job.description.compareTo(description));
+            case SORT_BY_NAME:
+                return (currentOrder == ASC_ORDER) ? (name.compareTo(job.name)) : (job.name.compareTo(name));
+            case SORT_BY_PRIORITY:
+                return (currentOrder == ASC_ORDER) ? (jobInfo.getPriority().getPriority() - job.jobInfo
+                        .getPriority().getPriority()) : (job.jobInfo.getPriority().getPriority() - jobInfo
+                        .getPriority().getPriority());
+            case SORT_BY_TYPE:
+                return (currentOrder == ASC_ORDER) ? (getType().compareTo(job.getType())) : (job.getType()
+                        .compareTo(getType()));
+            case SORT_BY_OWNER:
+                return (currentOrder == ASC_ORDER) ? (owner.compareTo(job.owner)) : (job.owner
+                        .compareTo(owner));
+            case SORT_BY_STATE:
+                return (currentOrder == ASC_ORDER) ? (jobInfo.getState().compareTo(job.jobInfo.getState()))
+                        : (job.jobInfo.getState().compareTo(jobInfo.getState()));
+            default:
+                return (currentOrder == ASC_ORDER) ? (getId().compareTo(job.getId())) : (job.getId()
+                        .compareTo(getId()));
         }
     }
 
@@ -301,8 +292,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         setNumberOfRunningTasks(getNumberOfRunningTask() - 1);
         setNumberOfFinishedTasks(getNumberOfFinishedTask() + 1);
 
-        if ((getState() == JobState.RUNNING) &&
-                (getNumberOfRunningTask() == 0)) {
+        if ((getState() == JobState.RUNNING) && (getNumberOfRunningTask() == 0)) {
             setState(JobState.STALLED);
         }
 
@@ -345,8 +335,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         setFinishedTime(System.currentTimeMillis());
         setNumberOfPendingTasks(0);
         setNumberOfRunningTasks(0);
-        descriptor.setStatus((jobState == JobState.FAILED) ? TaskState.FAILED
-                                                           : TaskState.CANCELLED);
+        descriptor.setStatus((jobState == JobState.FAILED) ? TaskState.FAILED : TaskState.CANCELLED);
         setState(jobState);
         //terminate this job descriptor
         jobDescriptor.failed();
@@ -425,8 +414,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         HashMap<TaskId, TaskState> hts = new HashMap<TaskId, TaskState>();
 
         for (InternalTask td : tasks.values()) {
-            if ((td.getStatus() != TaskState.FINISHED) &&
-                    (td.getStatus() != TaskState.RUNNNING)) {
+            if ((td.getStatus() != TaskState.FINISHED) && (td.getStatus() != TaskState.RUNNNING)) {
                 td.setStatus(TaskState.PAUSED);
             }
 
@@ -449,8 +437,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
             return false;
         }
 
-        if ((getNumberOfPendingTask() + getNumberOfRunningTask() +
-                getNumberOfFinishedTask()) == 0) {
+        if ((getNumberOfPendingTask() + getNumberOfRunningTask() + getNumberOfFinishedTask()) == 0) {
             jobInfo.setState(JobState.PENDING);
         } else if (getNumberOfRunningTask() == 0) {
             jobInfo.setState(JobState.STALLED);
@@ -463,10 +450,8 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
         for (InternalTask td : tasks.values()) {
             if (jobInfo.getState() == JobState.PENDING) {
                 td.setStatus(TaskState.SUBMITTED);
-            } else if ((jobInfo.getState() == JobState.RUNNING) ||
-                    (jobInfo.getState() == JobState.STALLED)) {
-                if ((td.getStatus() != TaskState.FINISHED) &&
-                        (td.getStatus() != TaskState.RUNNNING)) {
+            } else if ((jobInfo.getState() == JobState.RUNNING) || (jobInfo.getState() == JobState.STALLED)) {
+                if ((td.getStatus() != TaskState.FINISHED) && (td.getStatus() != TaskState.RUNNNING)) {
                     td.setStatus(TaskState.PENDING);
                 }
             }
@@ -540,8 +525,7 @@ public abstract class InternalJob extends Job implements Comparable<InternalJob>
      *
      * @param taskFinishedTimeModify the taskFinishedTimeModify to set
      */
-    public void setTaskFinishedTimeModify(
-        HashMap<TaskId, Long> taskFinishedTimeModify) {
+    public void setTaskFinishedTimeModify(HashMap<TaskId, Long> taskFinishedTimeModify) {
         jobInfo.setTaskFinishedTimeModify(taskFinishedTimeModify);
     }
 

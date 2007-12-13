@@ -85,17 +85,14 @@ public class TimerWarehouse {
     public static final int GROUP_ASYNC_CALL = 10;
 
     /** HashMap to store TimerProvidable objects */
-    public static final ConcurrentHashMap<UniqueID, TimerProvidable> timerProvidableStore =
-        new ConcurrentHashMap<UniqueID, TimerProvidable>();
+    public static final ConcurrentHashMap<UniqueID, TimerProvidable> timerProvidableStore = new ConcurrentHashMap<UniqueID, TimerProvidable>();
 
     /**
      * Adds an instance of a timers provider to the local store.
      * @param timerProvidable The provider of timers. This object must implement TimerProvidable interface.
      */
-    public static final void addTimerProvidable(
-        final TimerProvidable timerProvidable) {
-        TimerWarehouse.timerProvidableStore.put(timerProvidable.getTimerProvidableID(),
-            timerProvidable);
+    public static final void addTimerProvidable(final TimerProvidable timerProvidable) {
+        TimerWarehouse.timerProvidableStore.put(timerProvidable.getTimerProvidableID(), timerProvidable);
     }
 
     /**
@@ -104,8 +101,7 @@ public class TimerWarehouse {
      * @return An instance of timer provider object.
      */
     public static final TimerProvidable getTimerProvidable() {
-        return TimerWarehouse.timerProvidableStore.get(PAActiveObject.getBodyOnThis()
-                                                                     .getID());
+        return TimerWarehouse.timerProvidableStore.get(PAActiveObject.getBodyOnThis().getID());
     }
 
     /**
@@ -113,8 +109,7 @@ public class TimerWarehouse {
      * @param uniqueID The unique id of the timer providable object
      * @return The instance of the TimerProvidable object associated to the specified id
      */
-    public static final TimerProvidable getTimerProvidable(
-        final UniqueID uniqueID) {
+    public static final TimerProvidable getTimerProvidable(final UniqueID uniqueID) {
         return TimerWarehouse.timerProvidableStore.get(uniqueID);
     }
 
@@ -123,8 +118,7 @@ public class TimerWarehouse {
      * @param uniqueID The unique id of the timer providable object
      * @param timerId The id of the timer to start
      */
-    public static final void startTimer(final UniqueID uniqueID,
-        final int timerId) {
+    public static final void startTimer(final UniqueID uniqueID, final int timerId) {
         final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
@@ -137,8 +131,7 @@ public class TimerWarehouse {
      * @param uniqueID The unique id of the timer providable object
      * @param timerId The id of the timer to stop
      */
-    public static final void stopTimer(final UniqueID uniqueID,
-        final int timerId) {
+    public static final void stopTimer(final UniqueID uniqueID, final int timerId) {
         final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
@@ -151,8 +144,7 @@ public class TimerWarehouse {
      * @param uniqueID The unique id of the timer providable object
      * @param timerId The id of timer to stop
      */
-    public static final void startXAndDisable(final UniqueID uniqueID,
-        int timerId) {
+    public static final void startXAndDisable(final UniqueID uniqueID, int timerId) {
         final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;
@@ -178,8 +170,7 @@ public class TimerWarehouse {
      * @param uniqueID The unique id of the timer providable object
      * @param method The name of the timer associated to this method
      */
-    public static final void startServeTimer(final UniqueID uniqueID,
-        final Method method) {
+    public static final void startServeTimer(final UniqueID uniqueID, final Method method) {
         final TimerProvidable timerProvidable = TimerWarehouse.timerProvidableStore.get(uniqueID);
         if (timerProvidable == null) {
             return;

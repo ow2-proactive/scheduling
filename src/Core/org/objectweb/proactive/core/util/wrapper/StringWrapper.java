@@ -81,8 +81,7 @@ public class StringWrapper implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        return ((obj instanceof StringWrapper) &&
-        ((StringWrapper) obj).stringValue().equals(value));
+        return ((obj instanceof StringWrapper) && ((StringWrapper) obj).stringValue().equals(value));
     }
 
     @Override

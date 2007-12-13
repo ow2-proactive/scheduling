@@ -77,8 +77,7 @@ public class ArrowButton extends JButton {
             this.dimension = getPreferredSize();
         } else { // just set the button to look like the Image
             setIcon(icon);
-            this.dimension = new Dimension(icon.getIconWidth(),
-                    icon.getIconHeight());
+            this.dimension = new Dimension(icon.getIconWidth(), icon.getIconHeight());
             setPreferredSize(this.dimension);
         }
     }

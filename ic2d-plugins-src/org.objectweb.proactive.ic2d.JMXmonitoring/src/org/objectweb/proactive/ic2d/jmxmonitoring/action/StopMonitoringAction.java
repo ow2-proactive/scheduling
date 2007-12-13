@@ -41,8 +41,7 @@ public class StopMonitoringAction extends Action {
 
     public StopMonitoringAction() {
         this.setId(STOP_MONITORING);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "stop_monitoring.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "stop_monitoring.gif"));
     }
 
     public void setObject(AbstractData object) {

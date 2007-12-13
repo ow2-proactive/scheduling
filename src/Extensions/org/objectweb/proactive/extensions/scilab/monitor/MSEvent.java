@@ -41,8 +41,8 @@ import java.util.EventObject;
 public class MSEvent extends EventObject {
 
     /**
-         *
-         */
+     *
+     */
     public MSEvent(Object source) {
         super(source);
     }

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.security;
 
-
 /**
  * @author acontes
  * Objects implementing this interface have access to ProActive security methods.

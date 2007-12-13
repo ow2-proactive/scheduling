@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
 import org.objectweb.proactive.core.config.PAProperties;
 
+
 /**
  * Remember if we terminated and why.
  */
@@ -96,8 +97,7 @@ public class GarbageCollector {
         }
 
         if (dgcIsEnabled()) {
-            AsyncLogger.queueLog(Level.INFO,
-                "Starting DGC, TTB:" + TTB + " TTA:" + TTA);
+            AsyncLogger.queueLog(Level.INFO, "Starting DGC, TTB:" + TTB + " TTA:" + TTA);
             GarbageCollectorThread.start();
         }
     }
@@ -226,8 +226,7 @@ public class GarbageCollector {
      * Something happened on the active object
      */
     public synchronized void incActivity() {
-        Activity newActivity = new Activity(this.body.getID(),
-                this.lastActivity.getCounter() + 1);
+        Activity newActivity = new Activity(this.body.getID(), this.lastActivity.getCounter() + 1);
         this.setLastActivity(newActivity);
     }
 
@@ -249,8 +248,7 @@ public class GarbageCollector {
         }
 
         if (!removed.isEmpty()) {
-            this.log(Level.DEBUG,
-                "Removed " + removed.size() + " referencers: " + removed);
+            this.log(Level.DEBUG, "Removed " + removed.size() + " referencers: " + removed);
             this.incActivity();
             for (UniqueID i : removedId) {
                 this.referencers.remove(i);
@@ -264,13 +262,11 @@ public class GarbageCollector {
     /**
      * Build the message we are going to send to the referenced p
      */
-    private GCSimpleMessage buildMessageForProxy(boolean isMyActivity,
-        Referenced parent, Referenced p) {
+    private GCSimpleMessage buildMessageForProxy(boolean isMyActivity, Referenced parent, Referenced p) {
         boolean consensus = false;
         GCSimpleResponse resp = p.getLastResponse();
-        if (!isBusy() && (resp != null) &&
-                resp.getConsensusActivity().equals(this.lastActivity) &&
-                (isMyActivity || (parent != null))) {
+        if (!isBusy() && (resp != null) && resp.getConsensusActivity().equals(this.lastActivity) &&
+            (isMyActivity || (parent != null))) {
             consensus = true;
             if (p.equals(parent)) {
                 for (Map.Entry<UniqueID, Referencer> entry : this.referencers.entrySet()) {
@@ -283,8 +279,7 @@ public class GarbageCollector {
                 }
             }
         }
-        return new GCSimpleMessage(p, this.body.getID(), consensus,
-            this.lastActivity);
+        return new GCSimpleMessage(p, this.body.getID(), consensus, this.lastActivity);
     }
 
     /**
@@ -337,8 +332,7 @@ public class GarbageCollector {
             GCSimpleResponse lastResp = ref.getLastResponse();
             if (lastResp.hasParent()) {
                 Activity refActivity = lastResp.getConsensusActivity();
-                if (this.lastActivity.equals(refActivity) &&
-                        !isLastActivityMine()) {
+                if (this.lastActivity.equals(refActivity) && !isLastActivityMine()) {
                     this.parent = ref;
                 }
             }
@@ -363,16 +357,14 @@ public class GarbageCollector {
 
         boolean isMyActivity = this.isLastActivityMine();
         Collection<Referenced> refs = this.referenced.values();
-        this.log(Level.DEBUG,
-            "Sending GC Message to " + refs.size() + " referenceds: " + refs);
+        this.log(Level.DEBUG, "Sending GC Message to " + refs.size() + " referenceds: " + refs);
         Vector<GCSimpleMessage> messages = new Vector<GCSimpleMessage>(refs.size());
         for (Referenced p : refs) {
             messages.add(buildMessageForProxy(isMyActivity, parent, p));
         }
 
         if (!deleted.isEmpty()) {
-            this.log(Level.DEBUG,
-                "Deleting " + deleted.size() + " referenced: " + deleted);
+            this.log(Level.DEBUG, "Deleting " + deleted.size() + " referenced: " + deleted);
         }
 
         return messages;
@@ -383,8 +375,7 @@ public class GarbageCollector {
      */
     private void terminateBody() {
         try {
-            BodyRequest br = new BodyRequest(this.body, "terminate",
-                    new Class[0], new Object[0], false);
+            BodyRequest br = new BodyRequest(this.body, "terminate", new Class[0], new Object[0], false);
 
             br.send(this.body);
             // this.body.terminate(); Does not wake up the AO
@@ -408,8 +399,7 @@ public class GarbageCollector {
      */
     void setFinishedState(FinishedState state) {
         if (this.finished != FinishedState.NOT_FINISHED) {
-            throw new IllegalStateException("Was already finished:" +
-                this.finished);
+            throw new IllegalStateException("Was already finished:" + this.finished);
         }
         this.finished = state;
     }
@@ -437,9 +427,8 @@ public class GarbageCollector {
         if (!consensusAlreadyReached) {
             for (Map.Entry<UniqueID, Referenced> entry : this.referenced.entrySet()) {
                 if (entry.getValue().hasTerminated()) {
-                    goodbye = "####### Noticed of garbage cycle from " +
-                        entry.getKey().shortString() + " => PAF: " +
-                        this.lastActivity;
+                    goodbye = "####### Noticed of garbage cycle from " + entry.getKey().shortString() +
+                        " => PAF: " + this.lastActivity;
                     this.cycleTimestamp = System.currentTimeMillis();
                     consensusAlreadyReached = true;
                     return goodbye;
@@ -470,8 +459,7 @@ public class GarbageCollector {
                         this.nrReachedConsensus = backupNrReachedConsensus;
                         return null;
                     }
-                    goodbye = "####### Detected garbage cycle => PAF: " +
-                        this.lastActivity;
+                    goodbye = "####### Detected garbage cycle => PAF: " + this.lastActivity;
                     this.cycleTimestamp = System.currentTimeMillis();
                     return goodbye;
                 } else {
@@ -502,8 +490,7 @@ public class GarbageCollector {
         }
 
         try {
-            currentlyBusy = currentlyBusy ||
-                !this.body.getRequestQueue().isWaitingForRequest();
+            currentlyBusy = currentlyBusy || !this.body.getRequestQueue().isWaitingForRequest();
         } catch (ProActiveRuntimeException pre) {
 
             /* Cannot perform this call because this body is inactive */
@@ -526,8 +513,7 @@ public class GarbageCollector {
                 String goodbye = this.checkConsensus();
                 this.iterations++;
                 if (goodbye != null) {
-                    this.log(Level.INFO,
-                        "Goodbye because: " + goodbye + " after " + iterations +
+                    this.log(Level.INFO, "Goodbye because: " + goodbye + " after " + iterations +
                         " iterations");
                 }
                 if ((this.cycleTimestamp == 0) && !this.isFinished()) {
@@ -543,8 +529,7 @@ public class GarbageCollector {
     /**
      * A new referenced was deserialized
      */
-    public synchronized void addProxy(AbstractBody body,
-        UniversalBodyProxy proxy) {
+    public synchronized void addProxy(AbstractBody body, UniversalBodyProxy proxy) {
         if (proxy.getBody() == null) {
             return;
         }
@@ -552,11 +537,9 @@ public class GarbageCollector {
             this.log(Level.FATAL, "Wrong body");
         }
         UniqueID proxyID = proxy.getBodyID();
-        if (!proxyID.equals(this.body.getID()) &&
-                !this.referenced.containsKey(proxyID)) {
+        if (!proxyID.equals(this.body.getID()) && !this.referenced.containsKey(proxyID)) {
             newReferenced.add(proxy);
-            this.log(Level.DEBUG,
-                "New referenced: " + proxy.getBodyID().shortString());
+            this.log(Level.DEBUG, "New referenced: " + proxy.getBodyID().shortString());
         }
     }
 
@@ -576,8 +559,7 @@ public class GarbageCollector {
             return "DGC Disabled";
         }
 
-        AbstractBody body = (AbstractBody) LocalBodyStore.getInstance()
-                                                         .getLocalBody(bodyID);
+        AbstractBody body = (AbstractBody) LocalBodyStore.getInstance().getLocalBody(bodyID);
         if (body == null) {
             AsyncLogger.queueLog(Level.WARN, "Body " + bodyID + " not found");
             return "Body not found";
@@ -610,15 +592,12 @@ public class GarbageCollector {
     public synchronized GCResponse receiveGCMessage(GCMessage mesg) {
         long start = System.currentTimeMillis();
         GCResponse response = new GCResponse();
-        this.log(Level.DEBUG,
-            "Beginning processing of " + mesg.size() + " messages");
+        this.log(Level.DEBUG, "Beginning processing of " + mesg.size() + " messages");
         for (GCSimpleMessage m : mesg) {
             response.add(this.receiveSimpleGCMessage(m));
         }
         long duration = System.currentTimeMillis() - start;
-        this.log(Level.DEBUG,
-            "Ending processing of " + mesg.size() + " messages in " + duration +
-            " ms");
+        this.log(Level.DEBUG, "Ending processing of " + mesg.size() + " messages in " + duration + " ms");
         return response;
     }
 
@@ -631,15 +610,13 @@ public class GarbageCollector {
         GCSimpleResponse resp = null;
         try {
             if (this.cycleTimestamp > 0) {
-                this.log(Level.DEBUG,
-                    "cycle to " + mesg.getSender().shortString());
+                this.log(Level.DEBUG, "cycle to " + mesg.getSender().shortString());
                 if (kr == null) {
                     this.log(Level.FATAL, "Cycle notification to a newcomer");
                 }
                 kr.setNotifiedCycle();
                 if (allReferencersNotifiedCycle()) {
-                    this.log(Level.INFO,
-                        "####### notified cycle to every known referencer => PAF");
+                    this.log(Level.INFO, "####### notified cycle to every known referencer => PAF");
                     this.setFinishedState(FinishedState.CYCLIC);
                     this.terminateBody();
                 }
@@ -656,8 +633,7 @@ public class GarbageCollector {
             this.setLastActivity(mesg.getLastActivity());
         }
         if (resp == null) {
-            resp = new GCSimpleResponse(this.lastActivity,
-                    (this.parent != null) || this.isLastActivityMine());
+            resp = new GCSimpleResponse(this.lastActivity, (this.parent != null) || this.isLastActivityMine());
         }
         if (kr == null) {
             /* new known referencer */

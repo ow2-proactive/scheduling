@@ -89,12 +89,11 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Resul
  * @param <R> Result Object
  */
 @PublicAPI
-public class ProActiveMaster<T extends Task<R>, R extends Serializable>
-    implements Master<T, R>, Serializable {
+public class ProActiveMaster<T extends Task<R>, R extends Serializable> implements Master<T, R>, Serializable {
 
     /**
-         *
-         */
+     *
+     */
     protected AOMaster aomaster = null;
     protected AOTaskRepository aorepository = null;
 
@@ -119,15 +118,13 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @param remoteNodeToUse this Node will be used to create the remote master
      * @param initialMemory initial memory that every workers deployed by the master will have
      */
-    public ProActiveMaster(Node remoteNodeToUse,
-        Map<String, Object> initialMemory) {
+    public ProActiveMaster(Node remoteNodeToUse, Map<String, Object> initialMemory) {
         try {
             aorepository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
-                    new Object[] {  }, remoteNodeToUse);
+                    new Object[] {}, remoteNodeToUse);
 
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
-                    new Object[] { aorepository, initialMemory },
-                    remoteNodeToUse);
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
+                    aorepository, initialMemory }, remoteNodeToUse);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -142,10 +139,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
     public ProActiveMaster(Map<String, Object> initialMemory) {
         try {
             aorepository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
-                    new Object[] {  });
+                    new Object[] {});
 
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
-                    new Object[] { aorepository, initialMemory });
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
+                    aorepository, initialMemory });
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -170,8 +167,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @param masterVNName name of the virtual node to deploy inside the ProActive descriptor
      * @param initialMemory initial memory that every workers deployed by the master will have
      */
-    public ProActiveMaster(URL descriptorURL, String masterVNName,
-        Map<String, Object> initialMemory) {
+    public ProActiveMaster(URL descriptorURL, String masterVNName, Map<String, Object> initialMemory) {
         try {
             ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
             VirtualNode masterVN = pad.getVirtualNode(masterVNName);
@@ -179,10 +175,10 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
 
             Node masterNode = masterVN.getNode();
             aorepository = (AOTaskRepository) PAActiveObject.newActive(AOTaskRepository.class.getName(),
-                    new Object[] {  }, masterNode);
+                    new Object[] {}, masterNode);
 
-            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(),
-                    new Object[] { aorepository, initialMemory }, masterNode);
+            aomaster = (AOMaster) PAActiveObject.newActive(AOMaster.class.getName(), new Object[] {
+                    aorepository, initialMemory }, masterNode);
         } catch (ActiveObjectCreationException e) {
             throw new IllegalArgumentException(e);
         } catch (NodeException e) {
@@ -257,8 +253,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * @return wrapped version
      * @throws TaskAlreadySubmittedException if the same task has already been wrapped
      */
-    private List<Long> createIds(List<T> tasks)
-        throws TaskAlreadySubmittedException {
+    private List<Long> createIds(List<T> tasks) throws TaskAlreadySubmittedException {
         List<Long> wrappings = new ArrayList<Long>();
         for (T task : tasks) {
             wrappings.add(createId(task));
@@ -285,7 +280,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * {@inheritDoc}
      */
     public void setResultReceptionOrder(
-        org.objectweb.proactive.extensions.masterworker.interfaces.Master.OrderingMode mode) {
+            org.objectweb.proactive.extensions.masterworker.interfaces.Master.OrderingMode mode) {
         aomaster.setResultReceptionOrder(mode);
     }
 
@@ -308,8 +303,7 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      */
     public void solve(List<T> tasks) throws TaskAlreadySubmittedException {
         List<Long> wrappers = createIds(tasks);
-        System.out.println("ProActiveMaster.solve() : " +
-            aomaster.getClass().getName());
+        System.out.println("ProActiveMaster.solve() : " + aomaster.getClass().getName());
         aomaster.solveIds(wrappers);
     }
 
@@ -327,7 +321,8 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      */
     @SuppressWarnings("unchecked")
     public List<R> waitAllResults() throws TaskException {
-        List<ResultIntern<R>> completed = (List<ResultIntern<R>>) PAFuture.getFutureValue(aomaster.waitAllResults());
+        List<ResultIntern<R>> completed = (List<ResultIntern<R>>) PAFuture.getFutureValue(aomaster
+                .waitAllResults());
         List<R> results = new ArrayList<R>();
         for (ResultIntern<R> res : completed) {
             if (res.threwException()) {
@@ -351,10 +346,9 @@ public class ProActiveMaster<T extends Task<R>, R extends Serializable>
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public List<R> waitKResults(int k)
-        throws IllegalStateException, IllegalArgumentException, TaskException {
-        List<ResultIntern<R>> completed = (List<ResultIntern<R>>) PAFuture.getFutureValue(aomaster.waitKResults(
-                    k));
+    public List<R> waitKResults(int k) throws IllegalStateException, IllegalArgumentException, TaskException {
+        List<ResultIntern<R>> completed = (List<ResultIntern<R>>) PAFuture.getFutureValue(aomaster
+                .waitKResults(k));
         List<R> results = new ArrayList<R>();
         for (ResultIntern<R> res : completed) {
             if (res.threwException()) {

@@ -126,35 +126,34 @@ public class TableManager {
         final int tId = tableId;
         final JobId jId = jobId;
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    // get the table
-                    Table table = getTableById(tId);
+            public void run() {
+                // get the table
+                Table table = getTableById(tId);
 
-                    // get all items
-                    TableItem[] items = table.getItems();
-                    for (int i = 0; i < items.length; i++)
-                        if (((JobId) items[i].getData()).equals(jId)) {
-                            // select the job
-                            table.select(i);
+                // get all items
+                TableItem[] items = table.getItems();
+                for (int i = 0; i < items.length; i++)
+                    if (((JobId) items[i].getData()).equals(jId)) {
+                        // select the job
+                        table.select(i);
 
-                            // get the job by jobId
-                            InternalJob job = JobsController.getLocalView()
-                                                            .getJobById(jId);
+                        // get the job by jobId
+                        InternalJob job = JobsController.getLocalView().getJobById(jId);
 
-                            // update its informations
-                            JobInfo jobInfo = JobInfo.getInstance();
-                            if (jobInfo != null) {
-                                jobInfo.updateInfos(job);
-                            }
-
-                            // update its tasks informations
-                            TaskView taskView = TaskView.getInstance();
-                            if (taskView != null) {
-                                taskView.fullUpdate(job);
-                            }
+                        // update its informations
+                        JobInfo jobInfo = JobInfo.getInstance();
+                        if (jobInfo != null) {
+                            jobInfo.updateInfos(job);
                         }
-                }
-            });
+
+                        // update its tasks informations
+                        TaskView taskView = TaskView.getInstance();
+                        if (taskView != null) {
+                            taskView.fullUpdate(job);
+                        }
+                    }
+            }
+        });
     }
 
     /**
@@ -166,8 +165,7 @@ public class TableManager {
      * @return true if the job is selected in the table
      */
     public boolean isJobSelectedInThisTable(JobId jobId, int tableId) {
-        if ((lastSelectedTable == null) || (lastSelectedItem == null) ||
-                (jobIdOfLastSelectedItem == null)) {
+        if ((lastSelectedTable == null) || (lastSelectedItem == null) || (jobIdOfLastSelectedItem == null)) {
             return false;
         }
         return jobIdOfLastSelectedItem.equals(jobId);
@@ -185,8 +183,7 @@ public class TableManager {
             if (((Integer) table.getData()).equals(tableId)) {
                 return table;
             }
-        throw new IllegalArgumentException("the tableId : " + tableId +
-            " is unknwon !");
+        throw new IllegalArgumentException("the tableId : " + tableId + " is unknwon !");
     }
 
     // -------------------------------------------------------------------- //

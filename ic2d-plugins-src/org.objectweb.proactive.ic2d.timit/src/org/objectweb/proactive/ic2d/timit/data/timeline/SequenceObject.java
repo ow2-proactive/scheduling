@@ -70,8 +70,7 @@ public class SequenceObject implements NotificationListener {
     private FileAppender app;
     private ReverseFileReader reverseFileReader;
 
-    public SequenceObject(String name, ObjectName objectName,
-        TimeLineChartObject parent) {
+    public SequenceObject(String name, ObjectName objectName, TimeLineChartObject parent) {
         this.name = name;
         this.objectName = objectName;
         this.firstTimeStampValue = 0;
@@ -84,8 +83,7 @@ public class SequenceObject implements NotificationListener {
         // programmatically
         OutputFormatLayout outputFormatLayout = new OutputFormatLayout();
         try {
-            app = new FileAppender(outputFormatLayout,
-                    DEFAULT_LOG_FILE_DIRECTORY + "/" + this.name, false);
+            app = new FileAppender(outputFormatLayout, DEFAULT_LOG_FILE_DIRECTORY + "/" + this.name, false);
             this.outputFileName = app.getFile();
 
             // Assign appender to the logger programmatically
@@ -102,8 +100,7 @@ public class SequenceObject implements NotificationListener {
     /**
      * Handles time stamps (in microseconds only)
      */
-    public final void handleNotification(final Notification notifications,
-        final Object handback) {
+    public final void handleNotification(final Notification notifications, final Object handback) {
         if (!isRecording) {
             return;
         }
@@ -114,8 +111,7 @@ public class SequenceObject implements NotificationListener {
             if (this.firstTimeStampValue == 0) {
                 this.firstTimeStampValue = notificationTimeStamp;
             } else {
-                this.lastTimeStampValue = (notificationTimeStamp -
-                    this.firstTimeStampValue);
+                this.lastTimeStampValue = (notificationTimeStamp - this.firstTimeStampValue);
             }
 
             // Service time stamp START
@@ -127,7 +123,7 @@ public class SequenceObject implements NotificationListener {
                 this.currentServiceStamp.startTime = this.lastTimeStampValue;
                 // Service time stamp STOP
             } else if (type.equals(NotificationType.voidRequestServed) ||
-                    type.equals(NotificationType.replySent)) {
+                type.equals(NotificationType.replySent)) {
                 if (this.currentServiceStamp != null) {
                     this.currentServiceStamp.endTime = this.lastTimeStampValue;
                     this.currentLogger.info(this.currentServiceStamp);
@@ -231,8 +227,7 @@ public class SequenceObject implements NotificationListener {
         @Override
         public final String format(LoggingEvent event) {
             sbuf.setLength(0);
-            return sbuf.append(event.getRenderedMessage()).append(LINE_SEP)
-                       .toString();
+            return sbuf.append(event.getRenderedMessage()).append(LINE_SEP).toString();
         }
 
         @Override

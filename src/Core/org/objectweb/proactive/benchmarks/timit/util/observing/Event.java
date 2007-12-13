@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.observing;
 
-
 /**
  *
  * @author Brian Amedro, Vladimir Bodnartchouk

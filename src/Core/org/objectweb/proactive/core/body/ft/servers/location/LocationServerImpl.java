@@ -65,18 +65,16 @@ public class LocationServerImpl implements LocationServer {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#searchObject(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.UniversalBody, org.objectweb.proactive.core.UniqueID)
      */
-    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation,
-        UniqueID caller) throws RemoteException {
+    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation, UniqueID caller)
+            throws RemoteException {
         synchronized (this.locations) {
             UniversalBody currentLocation = this.locations.get(id);
             if (currentLocation == null) {
-                logger.error("[LOCATION] **ERROR** " + id +
-                    " is not registered !");
+                logger.error("[LOCATION] **ERROR** " + id + " is not registered !");
                 //throw new RuntimeException("TEST");
                 return null;
             } else if (currentLocation.equals(oldLocation)) {
-                System.out.println(
-                    "LocationServerImpl.searchObject() : SEARCHING FOR " + id);
+                System.out.println("LocationServerImpl.searchObject() : SEARCHING FOR " + id);
                 this.server.forceDetection();
                 return null;
             } else {
@@ -90,14 +88,12 @@ public class LocationServerImpl implements LocationServer {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#updateLocation(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.UniversalBody)
      */
-    public void updateLocation(UniqueID id, UniversalBody newLocation)
-        throws RemoteException {
+    public void updateLocation(UniqueID id, UniversalBody newLocation) throws RemoteException {
         synchronized (this.locations) {
             UniversalBody currentLocation = (this.locations.get(id));
             if (newLocation == null) {
                 // the body id is no more localized. Remove it from the location table
-                logger.info("[LOCATION] " + id +
-                    " is removed from the location table");
+                logger.info("[LOCATION] " + id + " is removed from the location table");
                 this.locations.remove(id);
                 return;
             } else if (currentLocation == null) {
@@ -105,11 +101,9 @@ public class LocationServerImpl implements LocationServer {
                 this.locations.put(id, newLocation);
             } else {
                 if (currentLocation.equals(newLocation)) {
-                    logger.info("[LOCATION] location of " + id +
-                        " is already " + newLocation.getNodeURL());
+                    logger.info("[LOCATION] location of " + id + " is already " + newLocation.getNodeURL());
                 } else {
-                    logger.info("[LOCATION] " + id +
-                        " is updating its location : " +
+                    logger.info("[LOCATION] " + id + " is updating its location : " +
                         newLocation.getNodeURL());
                     this.locations.put(id, newLocation);
                 }

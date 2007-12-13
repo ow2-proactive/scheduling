@@ -67,15 +67,13 @@ public interface ExternalProcess extends UniversalProcess {
      * sets the RemoteProcessMessageLogger handling the input stream of the process
      * @param inputMessageLogger the handler of the input stream of the process
      */
-    public void setInputMessageLogger(
-        RemoteProcessMessageLogger inputMessageLogger);
+    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger);
 
     /**
      * sets the RemoteProcessMessageLogger handling the error stream of the process
      * @param errorMessageLogger the handler of the error stream of the process
      */
-    public void setErrorMessageLogger(
-        RemoteProcessMessageLogger errorMessageLogger);
+    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger);
 
     /**
      * sets the MessageSink handling the output stream of the process
@@ -118,7 +116,7 @@ public interface ExternalProcess extends UniversalProcess {
      * This method will return true when a process requires that
      * a File Transfer Deploy takes place to a node deployed
      * from this process.
-         * @return Returns the requiresFileTransferDeployOnNodeCreation.
-         */
+     * @return Returns the requiresFileTransferDeployOnNodeCreation.
+     */
     public boolean isRequiredFileTransferDeployOnNodeCreation();
 }

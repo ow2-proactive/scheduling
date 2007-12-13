@@ -124,8 +124,7 @@ public class Table implements org.objectweb.proactive.RunActive {
         public GetForkRequestFilter() {
         }
 
-        public boolean acceptRequest(
-            org.objectweb.proactive.core.body.request.Request request) {
+        public boolean acceptRequest(org.objectweb.proactive.core.body.request.Request request) {
             if (!request.getMethodName().equals("getForks")) {
                 return false;
             }

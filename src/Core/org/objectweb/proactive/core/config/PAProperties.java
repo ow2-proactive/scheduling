@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.runtime.StartRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
+
 /**
  * All ProActive Properties
  *
@@ -64,8 +65,7 @@ public enum PAProperties {
     /**
      * If IPv6 is available on the operating system the default preference is to prefer an IPv4-mapped address over an IPv6 address
      */
-    PREFER_IPV6_ADDRESSES("java.net.preferIPv6Addresses",
-        PAPropertiesType.BOOLEAN),
+    PREFER_IPV6_ADDRESSES("java.net.preferIPv6Addresses", PAPropertiesType.BOOLEAN),
 
     /**
      * If IPv6 is available on the operating system the underlying native socket will be an IPv6 socket. This allows Java(tm) applications to connect too, and accept connections from, both IPv4 and IPv6 hosts.
@@ -116,8 +116,7 @@ public enum PAProperties {
      * activated. See log4j documentation
      * @see StartRuntime
      */
-    LOG4J_DEFAULT_INIT_OVERRIDE("log4j.defaultInitOverride",
-        PAPropertiesType.BOOLEAN),
+    LOG4J_DEFAULT_INIT_OVERRIDE("log4j.defaultInitOverride", PAPropertiesType.BOOLEAN),
 
     /**
      * Activates ProActive classloader
@@ -154,8 +153,7 @@ public enum PAProperties {
     /**
      * Period of the future monitoring ping, in milliseconds
      */
-    PA_FUTUREMONITORING_TTM("proactive.futuremonitoring.ttm",
-        PAPropertiesType.INTEGER),
+    PA_FUTUREMONITORING_TTM("proactive.futuremonitoring.ttm", PAPropertiesType.INTEGER),
 
     /**
      * Include client side calls in stack traces
@@ -178,8 +176,7 @@ public enum PAProperties {
      *
      * Suppported values are: rmi, rmissh, ibis, http
      */
-    PA_COMMUNICATION_PROTOCOL("proactive.communication.protocol",
-        PAPropertiesType.STRING),
+    PA_COMMUNICATION_PROTOCOL("proactive.communication.protocol", PAPropertiesType.STRING),
 
     /**
      * ProActive Runtime Hostname (or IP Address)
@@ -230,9 +227,8 @@ public enum PAProperties {
      * Can be used to fix broken networks (multihomed, broken DNS etc.). You probably want
      * to post on the public ProActive mailing list before using this property.
      */
-    PA_NET_SECONDARYNAMES("proactive.net.secondaryNames",
-        PAPropertiesType.STRING),
-    SCHEMA_VALIDATION("schema.validation", PAPropertiesType.BOOLEAN),
+    PA_NET_SECONDARYNAMES("proactive.net.secondaryNames", PAPropertiesType.STRING), SCHEMA_VALIDATION(
+            "schema.validation", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
      *  RMI
@@ -243,8 +239,8 @@ public enum PAProperties {
      *
      * this property identifies the default port used by the RMI communication protocol
      */
-    PA_RMI_PORT("proactive.rmi.port", PAPropertiesType.INTEGER),
-    JAVA_RMI_SERVER_CODEBASE("java.rmi.server.codebase", PAPropertiesType.STRING),
+    PA_RMI_PORT("proactive.rmi.port", PAPropertiesType.INTEGER), JAVA_RMI_SERVER_CODEBASE(
+            "java.rmi.server.codebase", PAPropertiesType.STRING),
 
     /* ------------------------------------
      *  HTTP
@@ -265,12 +261,10 @@ public enum PAProperties {
      */
 
     /** Timeout in seconds for parallel creation of components */
-    PA_COMPONENT_CREATION_TIMEOUT("components.creation.timeout",
-        PAPropertiesType.INTEGER),
+    PA_COMPONENT_CREATION_TIMEOUT("components.creation.timeout", PAPropertiesType.INTEGER),
 
     /** If 'true', the component framework should optimize communication between component using shortcut mechanism */
-    PA_COMPONENT_USE_SHORTCUTS("proactive.components.use_shortcuts",
-        PAPropertiesType.BOOLEAN),
+    PA_COMPONENT_USE_SHORTCUTS("proactive.components.use_shortcuts", PAPropertiesType.BOOLEAN),
 
     /* ------------------------------------
      *  MIGRATION
@@ -280,24 +274,20 @@ public enum PAProperties {
     PA_LOCATION_SERVER("proactive.locationserver", PAPropertiesType.STRING),
 
     /** The bind name of a location server, used during lookup */
-    PA_LOCATION_SERVER_RMI("proactive.locationserver.rmi",
-        PAPropertiesType.STRING),
+    PA_LOCATION_SERVER_RMI("proactive.locationserver.rmi", PAPropertiesType.STRING),
 
     /** The lifetime (in seconds) of a forwarder left after a migration when using the mixed location scheme */
     PA_MIXEDLOCATION_TTL("proactive.mixedlocation.ttl", PAPropertiesType.INTEGER),
 
     /** If set to true, a forwarder will send an update to a location server when reaching
      * the end of its lifetime */
-    PA_MIXEDLOCATION_UPDATINGFORWARDER("proactive.mixedlocation.updatingForwarder",
-        PAPropertiesType.BOOLEAN),
+    PA_MIXEDLOCATION_UPDATINGFORWARDER("proactive.mixedlocation.updatingForwarder", PAPropertiesType.BOOLEAN),
 
     /** The maximum number of migration allowed before an object must send its new location to a location server */
-    PA_MIXEDLOCATION_MAXMIGRATIONNB("proactive.mixedlocation.maxMigrationNb",
-        PAPropertiesType.INTEGER),
+    PA_MIXEDLOCATION_MAXMIGRATIONNB("proactive.mixedlocation.maxMigrationNb", PAPropertiesType.INTEGER),
 
     /** The maximum time (in seconds) an object can spend on a site before updating its location to a location server */
-    PA_MIXEDLOCATION_MAXTIMEONSITE("proactive.mixedlocation.maxTimeOnSite",
-        PAPropertiesType.INTEGER),
+    PA_MIXEDLOCATION_MAXTIMEONSITE("proactive.mixedlocation.maxTimeOnSite", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
      *  SSH
@@ -319,22 +309,18 @@ public enum PAProperties {
     PA_SSH_KEY_DIR("proactive.ssh.key_directory", PAPropertiesType.STRING),
 
     /** this property identifies that when using SSH tunneling, a normal connection should be tried before tunneling */
-    PA_SSH_TUNNELING_TRY_NORMAL_FIRST("proactive.tunneling.try_normal_first",
-        PAPropertiesType.BOOLEAN),
+    PA_SSH_TUNNELING_TRY_NORMAL_FIRST("proactive.tunneling.try_normal_first", PAPropertiesType.BOOLEAN),
 
     /** this property identifies if the garbage collector should be turned on when using SSH tunneling */
-    PA_SSH_TUNNELING_USE_GC("proactive.tunneling.use_gc",
-        PAPropertiesType.BOOLEAN),
+    PA_SSH_TUNNELING_USE_GC("proactive.tunneling.use_gc", PAPropertiesType.BOOLEAN),
 
     /** this property identifies the garbage collector period when using SSH tunneling */
-    PA_SSH_TUNNELING_GC_PERIOD("proactive.tunneling.gc_period",
-        PAPropertiesType.INTEGER),
+    PA_SSH_TUNNELING_GC_PERIOD("proactive.tunneling.gc_period", PAPropertiesType.INTEGER),
 
     /** this property identifies the know hosts file location when using ssh tunneling
      *  if undefined, the default value is user.home property concatenated to SSH_TUNNELING_DEFAULT_KNOW_HOSTS
      */
-    PA_SSH_TUNNELING_KNOW_HOSTS("proactive.ssh.known_hosts",
-        PAPropertiesType.STRING),
+    PA_SSH_TUNNELING_KNOW_HOSTS("proactive.ssh.known_hosts", PAPropertiesType.STRING),
 
     /**
      * SSH Tunnel connect timeout, in ms
@@ -344,8 +330,7 @@ public enum PAProperties {
      *
      * @see Socket
      */
-    PA_SSH_TUNNELING_CONNECT_TIMEOUT("proactive.tunneling.connect_timeout",
-        PAPropertiesType.INTEGER),
+    PA_SSH_TUNNELING_CONNECT_TIMEOUT("proactive.tunneling.connect_timeout", PAPropertiesType.INTEGER),
 
     /**
      * username on remote machines
@@ -362,16 +347,13 @@ public enum PAProperties {
     PA_FT("proactive.ft", PAPropertiesType.BOOLEAN),
 
     /** URL of the checkpoint server */
-    PA_FT_SERVER_CHECKPOINT("proactive.ft.server.checkpoint",
-        PAPropertiesType.STRING),
+    PA_FT_SERVER_CHECKPOINT("proactive.ft.server.checkpoint", PAPropertiesType.STRING),
 
     /** URL of the location server */
-    PA_FT_SERVER_LOCATION("proactive.ft.server.location",
-        PAPropertiesType.STRING),
+    PA_FT_SERVER_LOCATION("proactive.ft.server.location", PAPropertiesType.STRING),
 
     /** URL of the recovery server */
-    PA_FT_SERVER_RECOVERY("proactive.ft.server.recovery",
-        PAPropertiesType.STRING),
+    PA_FT_SERVER_RECOVERY("proactive.ft.server.recovery", PAPropertiesType.STRING),
 
     /** URL of the global server */
     PA_FT_SERVER_GLOBAL("proactive.ft.server.global", PAPropertiesType.STRING),
@@ -380,8 +362,7 @@ public enum PAProperties {
     PA_FT_TTC("proactive.ft.ttc", PAPropertiesType.INTEGER),
 
     /** URL of the resource server */
-    PA_FT_SERVER_RESOURCE("proactive.ft.server.resource",
-        PAPropertiesType.STRING),
+    PA_FT_SERVER_RESOURCE("proactive.ft.server.resource", PAPropertiesType.STRING),
 
     /** Protocol type, could be "cic" or "pml" */
     PA_FT_PROTOCOL("proactive.ft.protocol", PAPropertiesType.STRING),
@@ -397,8 +378,7 @@ public enum PAProperties {
     PA_RUNTIME_SECURITY("proactive.runtime.security", PAPropertiesType.STRING),
 
     /** this property indicates the url of the security domain the runtime depends on */
-    PA_RUNTIME_DOMAIN_URL("proactive.runtime.domain.url",
-        PAPropertiesType.STRING),
+    PA_RUNTIME_DOMAIN_URL("proactive.runtime.domain.url", PAPropertiesType.STRING),
 
     /* ------------------------------------
      *  TIMIT
@@ -417,8 +397,7 @@ public enum PAProperties {
      * The ping period is the default interval at which workers receive a ping message
      * (to check if they're alive).
      */
-    PA_MASTERWORKER_PINGPERIOD("proactive.masterworker.pingperiod",
-        PAPropertiesType.INTEGER),
+    PA_MASTERWORKER_PINGPERIOD("proactive.masterworker.pingperiod", PAPropertiesType.INTEGER),
 
     /* ------------------------------------
      *  PEER TO PEER
@@ -446,15 +425,13 @@ public enum PAProperties {
     PA_P2P_EXPLORING_MSG("proactive.p2p.expl_msg", PAPropertiesType.INTEGER),
 
     /** Timeout for node acquisition. */
-    PA_P2P_NODES_ACQUISITION_T0("proactive.p2p.nodes_acq_to",
-        PAPropertiesType.INTEGER),
+    PA_P2P_NODES_ACQUISITION_T0("proactive.p2p.nodes_acq_to", PAPropertiesType.INTEGER),
 
     /** Lookup frequency for nodes. */
     PA_P2P_LOOKUP_FREQ("proactive.p2p.lookup_freq", PAPropertiesType.INTEGER),
 
     /** If true deploying one shared nodes by CPU, else only one node is shared. */
-    PA_P2P_MULTI_PROC_NODES("proactive.p2p.multi_proc_nodes",
-        PAPropertiesType.BOOLEAN),
+    PA_P2P_MULTI_PROC_NODES("proactive.p2p.multi_proc_nodes", PAPropertiesType.BOOLEAN),
 
     /** Path of the xml deployment descriptor, for deploying shared nodes. */
     PA_P2P_XML_PATH("proactive.p2p.xml_path", PAPropertiesType.STRING),
@@ -491,27 +468,23 @@ public enum PAProperties {
      * The maximum number of {@link FileTransferService} objects that can be spawned
      * on a Node to handle file transfer requests in parallel.
      */
-    PA_FILETRANSFER_MAX_SERVICES("proactive.filetransfer.services_number",
-        PAPropertiesType.INTEGER),
+    PA_FILETRANSFER_MAX_SERVICES("proactive.filetransfer.services_number", PAPropertiesType.INTEGER),
 
     /**
      * When sending a file, the maximum number of file blocks (parts) that can
      * be sent asynchronously before blocking for their arrival.
      */
-    PA_FILETRANSFER_MAX_SIMULTANEOUS_BLOCKS("proactive.filetransfer.blocks_number",
-        PAPropertiesType.INTEGER),
+    PA_FILETRANSFER_MAX_SIMULTANEOUS_BLOCKS("proactive.filetransfer.blocks_number", PAPropertiesType.INTEGER),
 
     /**
      * The size, in [KB], of file blocks (parts) used to send files.
      */
-    PA_FILETRANSFER_MAX_BLOCK_SIZE("proactive.filetransfer.blocks_size_kb",
-        PAPropertiesType.INTEGER),
+    PA_FILETRANSFER_MAX_BLOCK_SIZE("proactive.filetransfer.blocks_size_kb", PAPropertiesType.INTEGER),
 
     /**
      * The size, in [KB], of the buffers to use when reading and writing a file.
      */
-    PA_FILETRANSFER_MAX_BUFFER_SIZE("proactive.filetransfer.buffer_size_kb",
-        PAPropertiesType.INTEGER),
+    PA_FILETRANSFER_MAX_BUFFER_SIZE("proactive.filetransfer.buffer_size_kb", PAPropertiesType.INTEGER),
 
     // -------------- Misc
 
@@ -539,8 +512,8 @@ public enum PAProperties {
     /**
      * TODO
      */
-    PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient",
-        PAPropertiesType.BOOLEAN);static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
+    PA_UNICORE_FORKCLIENT("proactive.unicore.forkclient", PAPropertiesType.BOOLEAN);
+    static final Logger logger = ProActiveLogger.getLogger(Loggers.CONFIGURATION);
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     private String key;
@@ -574,7 +547,7 @@ public enum PAProperties {
     public int getValueAsInt() {
         if (type != PAPropertiesType.INTEGER) {
             RuntimeException e = new IllegalArgumentException(key +
-                    " is not an integer property. getValueAsInt cannot be called on this property");
+                " is not an integer property. getValueAsInt cannot be called on this property");
             logger.error(e);
             throw e;
         }
@@ -625,7 +598,7 @@ public enum PAProperties {
     public boolean isTrue() {
         if (type != PAPropertiesType.BOOLEAN) {
             RuntimeException e = new IllegalArgumentException(key +
-                    " is not a boolean property. isTrue cannot be called on this property");
+                " is not a boolean property. isTrue cannot be called on this property");
             logger.error(e);
             throw e;
         }
@@ -643,8 +616,8 @@ public enum PAProperties {
             return false;
         }
 
-        logger.warn(key + " is a boolean property but its value is nor " +
-            TRUE + " nor " + FALSE + " " + "(" + val + "). ");
+        logger.warn(key + " is a boolean property but its value is nor " + TRUE + " nor " + FALSE + " " +
+            "(" + val + "). ");
         return false;
     }
 
@@ -665,22 +638,22 @@ public enum PAProperties {
 
     public boolean isValid(String value) {
         switch (type) {
-        case BOOLEAN:
-            if (TRUE.equals(value) || FALSE.equals(value)) {
+            case BOOLEAN:
+                if (TRUE.equals(value) || FALSE.equals(value)) {
+                    return true;
+                }
+                return false;
+            case INTEGER:
+                try {
+                    Integer.parseInt(value);
+                    return true;
+                } catch (NumberFormatException e) {
+                }
+                return false;
+            case STRING:
                 return true;
-            }
-            return false;
-        case INTEGER:
-            try {
-                Integer.parseInt(value);
-                return true;
-            } catch (NumberFormatException e) {
-            }
-            return false;
-        case STRING:
-            return true;
-        default:
-            return false;
+            default:
+                return false;
         }
     }
 
@@ -692,8 +665,8 @@ public enum PAProperties {
         }
         return null;
     }
-    public enum PAPropertiesType {STRING,
-        INTEGER,
-        BOOLEAN;
+
+    public enum PAPropertiesType {
+        STRING, INTEGER, BOOLEAN;
     }
 }

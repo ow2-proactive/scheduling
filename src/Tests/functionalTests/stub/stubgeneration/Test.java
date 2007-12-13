@@ -41,6 +41,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Testing on-the-fly generation of stub classes in bytecode form
  * @author rquilici
@@ -56,59 +57,48 @@ public class Test extends FunctionalTest {
 
         //not a stub
         String notAStubClassName = "functionalTests.stub.stubgeneration.A";
-        assertEquals(Utils.convertStubClassNameToClassName(notAStubClassName),
-            notAStubClassName);
+        assertEquals(Utils.convertStubClassNameToClassName(notAStubClassName), notAStubClassName);
 
         // Class not in a package 
-        assertEquals(Utils.convertStubClassNameToClassName("pa.stub._StubA"),
-            "A");
+        assertEquals(Utils.convertStubClassNameToClassName("pa.stub._StubA"), "A");
 
         //tests with a simple name
         String baseclassName = "functionalTests.stub.stubgeneration.A";
         data = JavassistByteCodeStubBuilder.create(baseclassName, null);
         assertNotNull(data);
-        Class<?> stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.functionalTests.stub.stubgeneration._StubA",
-                data);
-        assertTrue("A isn't parent of its Stub!",
-            A.class.isAssignableFrom(stubClass));
-        stubClassName = Utils.convertClassNameToStubClassName(baseclassName,
-                null);
-        assertEquals(stubClassName +
-            " not equals pa.stub.functionalTests.stub.stubgeneration._StubA",
-            stubClassName, "pa.stub.functionalTests.stub.stubgeneration._StubA");
-        assertEquals(Utils.convertStubClassNameToClassName(stubClassName),
-            baseclassName);
-        assertTrue(Arrays.equals(
-                Utils.getNamesOfParameterizingTypesFromStubClassName(
-                    stubClassName), new String[0]));
+        Class<?> stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass(
+                "pa.stub.functionalTests.stub.stubgeneration._StubA", data);
+        assertTrue("A isn't parent of its Stub!", A.class.isAssignableFrom(stubClass));
+        stubClassName = Utils.convertClassNameToStubClassName(baseclassName, null);
+        assertEquals(stubClassName + " not equals pa.stub.functionalTests.stub.stubgeneration._StubA",
+                stubClassName, "pa.stub.functionalTests.stub.stubgeneration._StubA");
+        assertEquals(Utils.convertStubClassNameToClassName(stubClassName), baseclassName);
+        assertTrue(Arrays.equals(Utils.getNamesOfParameterizingTypesFromStubClassName(stubClassName),
+                new String[0]));
 
         //tests with a more complicated name, test char escaping
         baseclassName = "functionalTests.stub.stubgeneration._StubA_PTy_Dpe_Generics";
-        data = JavassistByteCodeStubBuilder.create(baseclassName,
-                new Class[] { My_PFirst_PType.class, My_DSecond_PType.class });
+        data = JavassistByteCodeStubBuilder.create(baseclassName, new Class[] { My_PFirst_PType.class,
+                My_DSecond_PType.class });
         assertNotNull(data);
-        stubClass = org.objectweb.proactive.core.component.gen.Utils.defineClass("pa.stub.parameterized.functionalTests.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_GenericsfunctionalTests_Pstub_Pstubgeneration_PMy__PFirst__PType_DfunctionalTests_Pstub_Pstubgeneration_PMy__DSecond__PType",
-                data);
-        assertTrue("_StubA_PTy_Dpe_Generics isn't parent of its Stub!",
-            _StubA_PTy_Dpe_Generics.class.isAssignableFrom(stubClass));
-        stubClassName = Utils.convertClassNameToStubClassName(baseclassName,
-                new Class[] { My_PFirst_PType.class, My_DSecond_PType.class });
-        assertEquals(stubClassName +
-            " not equals pa.stub.functionalTests.stub.stubgeneration._StubA",
-            stubClassName,
-            "pa.stub.parameterized.functionalTests.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_GenericsfunctionalTests_Pstub_Pstubgeneration_PMy__PFirst__PType_DfunctionalTests_Pstub_Pstubgeneration_PMy__DSecond__PType");
-        assertEquals(Utils.convertStubClassNameToClassName(stubClassName),
-            baseclassName);
-        assertTrue(Arrays.equals(
-                Utils.getNamesOfParameterizingTypesFromStubClassName(
-                    stubClassName),
-                new String[] {
-                    My_PFirst_PType.class.getName(),
-                    My_DSecond_PType.class.getName()
-                }));
+        stubClass = org.objectweb.proactive.core.component.gen.Utils
+                .defineClass(
+                        "pa.stub.parameterized.functionalTests.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_GenericsfunctionalTests_Pstub_Pstubgeneration_PMy__PFirst__PType_DfunctionalTests_Pstub_Pstubgeneration_PMy__DSecond__PType",
+                        data);
+        assertTrue("_StubA_PTy_Dpe_Generics isn't parent of its Stub!", _StubA_PTy_Dpe_Generics.class
+                .isAssignableFrom(stubClass));
+        stubClassName = Utils.convertClassNameToStubClassName(baseclassName, new Class[] {
+                My_PFirst_PType.class, My_DSecond_PType.class });
+        assertEquals(
+                stubClassName + " not equals pa.stub.functionalTests.stub.stubgeneration._StubA",
+                stubClassName,
+                "pa.stub.parameterized.functionalTests.stub.stubgeneration._Stub__StubA__PTy__Dpe__Generics_GenericsfunctionalTests_Pstub_Pstubgeneration_PMy__PFirst__PType_DfunctionalTests_Pstub_Pstubgeneration_PMy__DSecond__PType");
+        assertEquals(Utils.convertStubClassNameToClassName(stubClassName), baseclassName);
+        assertTrue(Arrays.equals(Utils.getNamesOfParameterizingTypesFromStubClassName(stubClassName),
+                new String[] { My_PFirst_PType.class.getName(), My_DSecond_PType.class.getName() }));
 
         // test Serializable return type
-        A a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {  });
+        A a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {});
         assertEquals(A.RESULT, a.foo().toString());
 
         //BENCH

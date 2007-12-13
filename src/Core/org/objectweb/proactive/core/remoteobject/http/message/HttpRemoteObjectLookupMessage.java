@@ -47,8 +47,7 @@ import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
  * @author vlegrand
  * @see HttpMessage
  */
-public class HttpRemoteObjectLookupMessage extends HttpMessage
-    implements Serializable {
+public class HttpRemoteObjectLookupMessage extends HttpMessage implements Serializable {
     private String urn;
 
     //Caller Side
@@ -82,8 +81,7 @@ public class HttpRemoteObjectLookupMessage extends HttpMessage
     @Override
     public Object processMessage() {
         if (this.urn != null) {
-            InternalRemoteRemoteObject irro = HTTPRegistry.getInstance()
-                                                          .lookup(url);
+            InternalRemoteRemoteObject irro = HTTPRegistry.getInstance().lookup(url);
 
             //            System.out.println("HttpRemoteObjectLookupMessage.processMessage() ++ ro at " + url +" : " +ro) ;
             if (irro != null) {

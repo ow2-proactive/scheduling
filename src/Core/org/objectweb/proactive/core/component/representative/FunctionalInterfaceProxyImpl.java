@@ -67,8 +67,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author Matthieu Morel
  */
-public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
-    Serializable {
+public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy, Serializable {
     protected transient final static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
     private static Field universalBodyField;
     private static Field bodyIDField;
@@ -78,11 +77,9 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
 
     static {
         try {
-            universalBodyField = UniversalBodyProxy.class.getDeclaredField(
-                    "universalBody");
+            universalBodyField = UniversalBodyProxy.class.getDeclaredField("universalBody");
             universalBodyField.setAccessible(true);
-            bodyIDField = UniversalBodyProxy.class.getSuperclass()
-                                                  .getDeclaredField("bodyID");
+            bodyIDField = UniversalBodyProxy.class.getSuperclass().getDeclaredField("bodyID");
             bodyIDField.setAccessible(true);
         } catch (NoSuchFieldException e) {
             logger.error(e.getMessage());
@@ -92,8 +89,7 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
     private FunctionalInterfaceProxyImpl() {
     }
 
-    public FunctionalInterfaceProxyImpl(Proxy bodyProxyDelegatee,
-        String fcItfName) {
+    public FunctionalInterfaceProxyImpl(Proxy bodyProxyDelegatee, String fcItfName) {
         nonShortcutProxy = this.bodyProxyDelegatee = bodyProxyDelegatee;
         this.fcItfName = fcItfName;
     }
@@ -117,11 +113,10 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy,
     public Object reify(MethodCall c) throws Throwable {
         // check shortcut by asking source body (LocalBodyStore.currentThreadBody)
         // if shortcut : change ref on Body
-        UniversalBody newDestinationBody = LocalBodyStore.getInstance()
-                                                         .getContext().getBody()
-                                                         .getShortcutTargetBody(new ItfID(
-                    c.getComponentMetadata().getComponentInterfaceName(),
-                    ((UniversalBodyProxy) bodyProxyDelegatee).getBody().getID()));
+        UniversalBody newDestinationBody = LocalBodyStore.getInstance().getContext().getBody()
+                .getShortcutTargetBody(
+                        new ItfID(c.getComponentMetadata().getComponentInterfaceName(),
+                            ((UniversalBodyProxy) bodyProxyDelegatee).getBody().getID()));
         if (newDestinationBody != null) {
             changeRefOnBody(newDestinationBody);
         }

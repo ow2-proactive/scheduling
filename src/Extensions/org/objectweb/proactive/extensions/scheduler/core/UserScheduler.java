@@ -73,8 +73,7 @@ public class UserScheduler implements UserSchedulerInterface {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId, java.lang.String)
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName)
-        throws SchedulerException {
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException {
         return schedulerFrontend.getTaskResult(jobId, taskName);
     }
 
@@ -88,17 +87,15 @@ public class UserScheduler implements UserSchedulerInterface {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.objectweb.proactive.extensions.scheduler.job.JobId, java.lang.String, int)
      */
-    public void listenLog(JobId jobId, String hostname, int port)
-        throws SchedulerException {
+    public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
         schedulerFrontend.listenLog(jobId, hostname, port);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener)
      */
-    public SchedulerInitialState<?extends Job> addSchedulerEventListener(
-        SchedulerEventListener<?extends Job> sel, SchedulerEvent... events)
-        throws SchedulerException {
+    public SchedulerInitialState<? extends Job> addSchedulerEventListener(
+            SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
         return schedulerFrontend.addSchedulerEventListener(sel);
     }
 
@@ -136,8 +133,7 @@ public class UserScheduler implements UserSchedulerInterface {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#changePriority(org.objectweb.proactive.extensions.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
      */
-    public void changePriority(JobId jobId, JobPriority priority)
-        throws SchedulerException {
+    public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
         schedulerFrontend.changePriority(jobId, priority);
     }
 

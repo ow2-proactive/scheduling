@@ -41,15 +41,13 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 /**
  * @author mlacage
  */
-public class SshRMIClientSocketFactory implements RMIClientSocketFactory,
-    java.io.Serializable {
+public class SshRMIClientSocketFactory implements RMIClientSocketFactory, java.io.Serializable {
     String username;
     String hostname;
 
     public SshRMIClientSocketFactory() {
         this.username = System.getProperty("user.name");
-        this.hostname = ProActiveInet.getInstance().getInetAddress()
-                                     .getCanonicalHostName();
+        this.hostname = ProActiveInet.getInstance().getInetAddress().getCanonicalHostName();
     }
 
     public Socket createSocket(String host, int port) throws IOException {
@@ -75,8 +73,7 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory,
         return this.getClass().hashCode();
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         HostsInfos.setUserName(hostname, username);
     }

@@ -43,12 +43,13 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test load balancing
  */
 public class Test extends FunctionalTest {
-    private URL descriptor = Test.class.getResource(
-            "/functionalTests/masterworker/workermemory/MasterWorkerMemory.xml");
+    private URL descriptor = Test.class
+            .getResource("/functionalTests/masterworker/workermemory/MasterWorkerMemory.xml");
     private Master<MemoryTask, String> master;
     private List<MemoryTask> tasks;
     public static final int NB_TASKS = 3;

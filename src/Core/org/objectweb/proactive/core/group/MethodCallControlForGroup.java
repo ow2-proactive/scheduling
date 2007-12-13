@@ -65,25 +65,21 @@ public abstract class MethodCallControlForGroup extends MethodCall {
     //
     // --- PRIVATE METHODS FOR SERIALIZATION --------------------------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         this.writeTheObject(out);
     }
 
     @Override
-    protected void writeTheObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    protected void writeTheObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         out.defaultWriteObject();
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         this.readTheObject(in);
     }
 
     @Override
-    protected void readTheObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    protected void readTheObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
     }
 
@@ -95,8 +91,8 @@ public abstract class MethodCallControlForGroup extends MethodCall {
 
     // return null
     @Override
-    public Object execute(Object targetObject)
-        throws InvocationTargetException, MethodCallExecutionFailedException {
+    public Object execute(Object targetObject) throws InvocationTargetException,
+            MethodCallExecutionFailedException {
         return null;
     }
 

@@ -45,8 +45,7 @@ import org.objectweb.proactive.extensions.calcium.task.Task;
  * @param <T>
  */
 public interface Instruction<P, R> extends Serializable {
-    public Task<R> compute(SkeletonSystemImpl system, Task<P> t)
-        throws Exception;
+    public Task<R> compute(SkeletonSystemImpl system, Task<P> t) throws Exception;
 
     public boolean isStateFul();
 

@@ -64,8 +64,7 @@ public class ProActiveClassLoaderHelper {
      * <li>2. runtime parents</li>
      * <li>3. tries to generate it (stub, component interface representative, or component interface metaobject)</li></ul>
      */
-    public synchronized byte[] getClassData(String className)
-        throws ClassNotFoundException {
+    public synchronized byte[] getClassData(String className) throws ClassNotFoundException {
         byte[] class_data = null;
 
         // 1. look in class cache
@@ -80,8 +79,7 @@ public class ProActiveClassLoaderHelper {
         try {
             debug("looking for " + className + " in parent runtimes");
 
-            class_data = ProActiveRuntimeImpl.getProActiveRuntime()
-                                             .getClassDataFromParentRuntime(className);
+            class_data = ProActiveRuntimeImpl.getProActiveRuntime().getClassDataFromParentRuntime(className);
             if (class_data != null) {
                 debug("found " + className + " in ancestor runtime");
                 return class_data;
@@ -127,8 +125,7 @@ public class ProActiveClassLoaderHelper {
 
     private void debug(String message) {
         if (logger.isDebugEnabled()) {
-            logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() +
-                " --> " + message);
+            logger.debug(ProActiveRuntimeImpl.getProActiveRuntime().getURL() + " --> " + message);
         }
     }
 }

@@ -41,23 +41,18 @@ import org.objectweb.proactive.core.remoteobject.rmissh.RmiSshRemoteObjectFactor
 
 
 public class RemoteObjectProtocolFactoryRegistry {
-    protected static Hashtable<String, Class<?extends RemoteObjectFactory>> remoteObjectFactories;
+    protected static Hashtable<String, Class<? extends RemoteObjectFactory>> remoteObjectFactories;
 
     static {
         // set the default supported protocols
-        remoteObjectFactories = new Hashtable<String, Class<?extends RemoteObjectFactory>>();
-        remoteObjectFactories.put(Constants.RMI_PROTOCOL_IDENTIFIER,
-            RmiRemoteObjectFactory.class);
-        remoteObjectFactories.put(Constants.XMLHTTP_PROTOCOL_IDENTIFIER,
-            HTTPRemoteObjectFactory.class);
-        remoteObjectFactories.put(Constants.RMISSH_PROTOCOL_IDENTIFIER,
-            RmiSshRemoteObjectFactory.class);
-        remoteObjectFactories.put(Constants.IBIS_PROTOCOL_IDENTIFIER,
-            IbisRemoteObjectFactory.class);
+        remoteObjectFactories = new Hashtable<String, Class<? extends RemoteObjectFactory>>();
+        remoteObjectFactories.put(Constants.RMI_PROTOCOL_IDENTIFIER, RmiRemoteObjectFactory.class);
+        remoteObjectFactories.put(Constants.XMLHTTP_PROTOCOL_IDENTIFIER, HTTPRemoteObjectFactory.class);
+        remoteObjectFactories.put(Constants.RMISSH_PROTOCOL_IDENTIFIER, RmiSshRemoteObjectFactory.class);
+        remoteObjectFactories.put(Constants.IBIS_PROTOCOL_IDENTIFIER, IbisRemoteObjectFactory.class);
     }
 
-    public static void put(String protocol,
-        Class<?extends RemoteObjectFactory> factory) {
+    public static void put(String protocol, Class<? extends RemoteObjectFactory> factory) {
         remoteObjectFactories.put(protocol, factory);
     }
 
@@ -65,7 +60,7 @@ public class RemoteObjectProtocolFactoryRegistry {
         remoteObjectFactories.remove(protocol);
     }
 
-    public static Class<?extends RemoteObjectFactory> get(String protocol) {
+    public static Class<? extends RemoteObjectFactory> get(String protocol) {
         return remoteObjectFactories.get(protocol);
     }
 

@@ -30,7 +30,6 @@
  */
 package functionalTests.stub.stubgeneration;
 
-
 /**
  * This class have a strange name in order to test stub name generation and escapment.
  * My_PFirst_PType  My_DSecond_PType

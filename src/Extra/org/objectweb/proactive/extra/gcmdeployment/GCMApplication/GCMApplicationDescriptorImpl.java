@@ -60,8 +60,7 @@ import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
 
 
-public class GCMApplicationDescriptorImpl
-    implements GCMApplicationDescriptorInternal {
+public class GCMApplicationDescriptorImpl implements GCMApplicationDescriptorInternal {
 
     /** An unique identifier for this deployment*/
     private long deploymentId;
@@ -94,8 +93,7 @@ public class GCMApplicationDescriptorImpl
     private Object deploymentMutex = new Object();
     private boolean isStarted;
 
-    public GCMApplicationDescriptorImpl(String filename)
-        throws ProActiveException {
+    public GCMApplicationDescriptorImpl(String filename) throws ProActiveException {
         this(new File(filename));
     }
 
@@ -126,8 +124,7 @@ public class GCMApplicationDescriptorImpl
     public void startDeployment() {
         synchronized (deploymentMutex) {
             if (isStarted) {
-                GCMA_LOGGER.warn("A GCM Application descriptor cannot be started twice",
-                    new Exception());
+                GCMA_LOGGER.warn("A GCM Application descriptor cannot be started twice", new Exception());
             }
 
             isStarted = true;
@@ -152,7 +149,7 @@ public class GCMApplicationDescriptorImpl
         return virtualNodes.get(vnName);
     }
 
-    public Map<String, ?extends VirtualNode> getVirtualNodes() {
+    public Map<String, ? extends VirtualNode> getVirtualNodes() {
         return virtualNodes;
     }
 
@@ -248,18 +245,15 @@ public class GCMApplicationDescriptorImpl
 
                 HostInfo hostInfo = resources.getHostInfo();
                 if (hostInfo != null) {
-                    buildHostInfoTreeNode(rootNode, rootNode, hostInfo,
-                        nodeProvider, gdd);
+                    buildHostInfoTreeNode(rootNode, rootNode, hostInfo, nodeProvider, gdd);
                 }
 
                 for (Group group : resources.getGroups()) {
-                    buildGroupTreeNode(rootNode, rootNode, group, nodeProvider,
-                        gdd);
+                    buildGroupTreeNode(rootNode, rootNode, group, nodeProvider, gdd);
                 }
 
                 for (Bridge bridge : resources.getBridges()) {
-                    buildBridgeTree(rootNode, rootNode, bridge, nodeProvider,
-                        gdd);
+                    buildBridgeTree(rootNode, rootNode, bridge, nodeProvider, gdd);
                 }
             }
         }
@@ -276,9 +270,8 @@ public class GCMApplicationDescriptorImpl
         return new ArrayList<String>(currentDeploymentPath);
     }
 
-    private TopologyImpl buildHostInfoTreeNode(TopologyRootImpl rootNode,
-        TopologyImpl parentNode, HostInfo hostInfo, NodeProvider nodeProvider,
-        GCMDeploymentDescriptor gcmd) {
+    private TopologyImpl buildHostInfoTreeNode(TopologyRootImpl rootNode, TopologyImpl parentNode,
+            HostInfo hostInfo, NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
         pushDeploymentPath(hostInfo.getId());
         TopologyImpl node = new TopologyImpl();
         node.setDeploymentDescriptorPath(gcmd.getDescriptorFilePath());
@@ -292,18 +285,15 @@ public class GCMApplicationDescriptorImpl
         return node;
     }
 
-    private void buildGroupTreeNode(TopologyRootImpl rootNode,
-        TopologyImpl parentNode, Group group, NodeProvider nodeProvider,
-        GCMDeploymentDescriptor gcmd) {
+    private void buildGroupTreeNode(TopologyRootImpl rootNode, TopologyImpl parentNode, Group group,
+            NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
         pushDeploymentPath(group.getId());
-        buildHostInfoTreeNode(rootNode, parentNode, group.getHostInfo(),
-            nodeProvider, gcmd);
+        buildHostInfoTreeNode(rootNode, parentNode, group.getHostInfo(), nodeProvider, gcmd);
         popDeploymentPath();
     }
 
-    private void buildBridgeTree(TopologyRootImpl rootNode,
-        TopologyImpl parentNode, Bridge bridge, NodeProvider nodeProvider,
-        GCMDeploymentDescriptor gcmd) {
+    private void buildBridgeTree(TopologyRootImpl rootNode, TopologyImpl parentNode, Bridge bridge,
+            NodeProvider nodeProvider, GCMDeploymentDescriptor gcmd) {
         pushDeploymentPath(bridge.getId());
 
         TopologyImpl node = parentNode;
@@ -312,8 +302,7 @@ public class GCMApplicationDescriptorImpl
         //
         if (bridge.getHostInfo() != null) {
             HostInfo hostInfo = bridge.getHostInfo();
-            node = buildHostInfoTreeNode(rootNode, parentNode, hostInfo,
-                    nodeProvider, gcmd);
+            node = buildHostInfoTreeNode(rootNode, parentNode, hostInfo, nodeProvider, gcmd);
         }
 
         // then groups...

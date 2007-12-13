@@ -61,8 +61,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author cdelbe
  * @since 3.0
  */
-public class FTServer extends UnicastRemoteObject implements FaultDetector,
-    LocationServer, RecoveryProcess, ResourceServer, CheckpointServer {
+public class FTServer extends UnicastRemoteObject implements FaultDetector, LocationServer, RecoveryProcess,
+        ResourceServer, CheckpointServer {
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE);
 
@@ -94,8 +94,8 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
      * Initialized server with each needed subservers
      *
      */
-    public void init(FaultDetector fd, LocationServer ls, RecoveryProcess rp,
-        ResourceServer rs, CheckpointServer cs) {
+    public void init(FaultDetector fd, LocationServer ls, RecoveryProcess rp, ResourceServer rs,
+            CheckpointServer cs) {
         this.faultDetector = fd;
         this.locationServer = ls;
         this.recoveryProcess = rp;
@@ -145,16 +145,15 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#searchObject(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.UniversalBody, org.objectweb.proactive.core.UniqueID)
      */
-    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation,
-        UniqueID caller) throws RemoteException {
+    public UniversalBody searchObject(UniqueID id, UniversalBody oldLocation, UniqueID caller)
+            throws RemoteException {
         return this.locationServer.searchObject(id, oldLocation, caller);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.location.LocationServer#updateLocation(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.UniversalBody)
      */
-    public void updateLocation(UniqueID id, UniversalBody newLocation)
-        throws RemoteException {
+    public void updateLocation(UniqueID id, UniversalBody newLocation) throws RemoteException {
         this.locationServer.updateLocation(id, newLocation);
     }
 
@@ -217,8 +216,7 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcess#submitJobWithBarrier(org.objectweb.proactive.core.body.ft.servers.util.ActiveQueueJob)
      */
-    public JobBarrier submitJobWithBarrier(ActiveQueueJob job)
-        throws RemoteException {
+    public JobBarrier submitJobWithBarrier(ActiveQueueJob job) throws RemoteException {
         return this.recoveryProcess.submitJobWithBarrier(job);
     }
 
@@ -239,16 +237,14 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-    public int storeCheckpoint(Checkpoint c, int incarnation)
-        throws RemoteException {
+    public int storeCheckpoint(Checkpoint c, int incarnation) throws RemoteException {
         return this.checkpointServer.storeCheckpoint(c, incarnation);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber)
-        throws RemoteException {
+    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
         return this.checkpointServer.getCheckpoint(id, sequenceNumber);
     }
 
@@ -262,17 +258,15 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#addInfoToCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo, org.objectweb.proactive.core.UniqueID, int, int)
      */
-    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id,
-        int sequenceNumber, int incarnation) throws RemoteException {
-        this.checkpointServer.addInfoToCheckpoint(ci, id, sequenceNumber,
-            incarnation);
+    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int incarnation)
+            throws RemoteException {
+        this.checkpointServer.addInfoToCheckpoint(ci, id, sequenceNumber, incarnation);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getInfoFromCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber)
-        throws RemoteException {
+    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
         return this.checkpointServer.getInfoFromCheckpoint(id, sequenceNumber);
     }
 
@@ -300,16 +294,14 @@ public class FTServer extends UnicastRemoteObject implements FaultDetector,
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeRequest(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.request.Request)
      */
-    public void storeRequest(UniqueID receiverId, Request request)
-        throws RemoteException {
+    public void storeRequest(UniqueID receiverId, Request request) throws RemoteException {
         this.checkpointServer.storeRequest(receiverId, request);
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeReply(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.reply.Reply)
      */
-    public void storeReply(UniqueID receiverID, Reply reply)
-        throws RemoteException {
+    public void storeReply(UniqueID receiverID, Reply reply) throws RemoteException {
         this.checkpointServer.storeReply(receiverID, reply);
     }
 

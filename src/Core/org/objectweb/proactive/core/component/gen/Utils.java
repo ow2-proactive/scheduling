@@ -60,48 +60,39 @@ public class Utils {
      * The char used to escaped "meta" information in generated classname.
      */
     public static final char GEN_ESCAPE_CHAR = 'C';
-    public static final String GEN_ESCAPE = "" + GEN_ESCAPE_CHAR +
-        GEN_ESCAPE_CHAR;
+    public static final String GEN_ESCAPE = "" + GEN_ESCAPE_CHAR + GEN_ESCAPE_CHAR;
 
     /**
      * Used to replace '.'
      */
     public static final char GEN_PACKAGE_SEPARATOR_CHAR = 'P';
-    public static final String GEN_PACKAGE_SEPARATOR = "" + GEN_ESCAPE_CHAR +
-        GEN_PACKAGE_SEPARATOR_CHAR;
+    public static final String GEN_PACKAGE_SEPARATOR = "" + GEN_ESCAPE_CHAR + GEN_PACKAGE_SEPARATOR_CHAR;
 
     /**
      * Separate many interface name.
      */
     public static final char GEN_ITF_NAME_SEPARATOR_CHAR = 'I';
-    public static final String GEN_ITF_NAME_SEPARATOR = "" + GEN_ESCAPE_CHAR +
-        GEN_ITF_NAME_SEPARATOR_CHAR;
+    public static final String GEN_ITF_NAME_SEPARATOR = "" + GEN_ESCAPE_CHAR + GEN_ITF_NAME_SEPARATOR_CHAR;
 
     /**
      * Separate the signature part (a classname, ...) and the name part of an interface.
      */
     public static final char GEN_MIDDLE_SEPARATOR_CHAR = 'O';
-    public static final String GEN_MIDDLE_SEPARATOR = "" + GEN_ESCAPE_CHAR +
-        GEN_MIDDLE_SEPARATOR_CHAR;
+    public static final String GEN_MIDDLE_SEPARATOR = "" + GEN_ESCAPE_CHAR + GEN_MIDDLE_SEPARATOR_CHAR;
 
     // prefix and suffix
-    public static final String GENERATED_DEFAULT_PREFIX = GEN_ESCAPE_CHAR +
-        "generated";
-    public static final String REPRESENTATIVE_DEFAULT_SUFFIX = GEN_ESCAPE_CHAR +
-        "representative";
-    public static final String GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX = GEN_ESCAPE_CHAR +
-        "gathercastItfProxy";
-    public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = GEN_ESCAPE_CHAR +
-        "composite";
-    public static final String OUTPUT_INTERCEPTOR_SUFFIX = GEN_ESCAPE_CHAR +
-        "outputInterceptor";
+    public static final String GENERATED_DEFAULT_PREFIX = GEN_ESCAPE_CHAR + "generated";
+    public static final String REPRESENTATIVE_DEFAULT_SUFFIX = GEN_ESCAPE_CHAR + "representative";
+    public static final String GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX = GEN_ESCAPE_CHAR + "gathercastItfProxy";
+    public static final String COMPOSITE_REPRESENTATIVE_SUFFIX = GEN_ESCAPE_CHAR + "composite";
+    public static final String OUTPUT_INTERCEPTOR_SUFFIX = GEN_ESCAPE_CHAR + "outputInterceptor";
 
     // packages
     public static final String STUB_DEFAULT_PACKAGE = null;
 
     public static boolean isRepresentativeClassName(String classname) {
-        return (classname.startsWith(GENERATED_DEFAULT_PREFIX) &&
-        classname.endsWith(REPRESENTATIVE_DEFAULT_SUFFIX));
+        return (classname.startsWith(GENERATED_DEFAULT_PREFIX) && classname
+                .endsWith(REPRESENTATIVE_DEFAULT_SUFFIX));
     }
 
     public static boolean isMetaObjectClassName(String classname) {
@@ -109,8 +100,8 @@ public class Utils {
     }
 
     public static boolean isGathercastProxyClassName(String classname) {
-        return (classname.startsWith(GENERATED_DEFAULT_PREFIX) &&
-        classname.endsWith(GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX));
+        return (classname.startsWith(GENERATED_DEFAULT_PREFIX) && classname
+                .endsWith(GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX));
     }
 
     /**
@@ -118,8 +109,7 @@ public class Utils {
      * @param className
      * @return the interface signature
      */
-    public static String getInterfaceSignatureFromRepresentativeClassName(
-        String className) {
+    public static String getInterfaceSignatureFromRepresentativeClassName(String className) {
         if (!isRepresentativeClassName(className)) {
             return null;
         }
@@ -130,8 +120,7 @@ public class Utils {
         return tmp;
     }
 
-    public static String getInterfaceNameFromRepresentativeClassName(
-        String className) {
+    public static String getInterfaceNameFromRepresentativeClassName(String className) {
         if (!isRepresentativeClassName(className)) {
             return null;
         }
@@ -142,8 +131,7 @@ public class Utils {
         return tmp;
     }
 
-    public static String getInterfaceSignatureFromGathercastProxyClassName(
-        String className) {
+    public static String getInterfaceSignatureFromGathercastProxyClassName(String className) {
         if (!isGathercastProxyClassName(className)) {
             return null;
         }
@@ -154,39 +142,30 @@ public class Utils {
         return tmp;
     }
 
-    public static String getMetaObjectClassName(
-        String functionalInterfaceName, String javaInterfaceName) {
+    public static String getMetaObjectClassName(String functionalInterfaceName, String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ? ... but readable)
-        return (GENERATED_DEFAULT_PREFIX + escapeString(javaInterfaceName) +
-        GEN_MIDDLE_SEPARATOR + escapeString(functionalInterfaceName));
+        return (GENERATED_DEFAULT_PREFIX + escapeString(javaInterfaceName) + GEN_MIDDLE_SEPARATOR + escapeString(functionalInterfaceName));
     }
 
-    public static String getMetaObjectComponentRepresentativeClassName(
-        String functionalInterfaceName, String javaInterfaceName) {
+    public static String getMetaObjectComponentRepresentativeClassName(String functionalInterfaceName,
+            String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ... but readable)
-        return (getMetaObjectClassName(functionalInterfaceName,
-            javaInterfaceName) + REPRESENTATIVE_DEFAULT_SUFFIX);
+        return (getMetaObjectClassName(functionalInterfaceName, javaInterfaceName) + REPRESENTATIVE_DEFAULT_SUFFIX);
     }
 
-    public static String getGatherProxyItfClassName(
-        ProActiveInterfaceType gatherItfType) {
-        return (getMetaObjectClassName(gatherItfType.getFcItfName(),
-            gatherItfType.getFcItfSignature()) +
-        GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX);
+    public static String getGatherProxyItfClassName(ProActiveInterfaceType gatherItfType) {
+        return (getMetaObjectClassName(gatherItfType.getFcItfName(), gatherItfType.getFcItfSignature()) + GATHERCAST_ITF_PROXY_DEFAULT_SUFFIX);
     }
 
-    public static String getOutputInterceptorClassName(
-        String functionalInterfaceName, String javaInterfaceName) {
+    public static String getOutputInterceptorClassName(String functionalInterfaceName,
+            String javaInterfaceName) {
         // just a way to have an identifier (possibly not unique ... but readable)
-        return (getMetaObjectClassName(functionalInterfaceName,
-            javaInterfaceName) + OUTPUT_INTERCEPTOR_SUFFIX);
+        return (getMetaObjectClassName(functionalInterfaceName, javaInterfaceName) + OUTPUT_INTERCEPTOR_SUFFIX);
     }
 
-    public static Class<?> defineClass(final String className,
-        final byte[] bytes)
-        throws ClassNotFoundException, SecurityException, NoSuchMethodException,
-            IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException {
+    public static Class<?> defineClass(final String className, final byte[] bytes)
+            throws ClassNotFoundException, SecurityException, NoSuchMethodException,
+            IllegalArgumentException, IllegalAccessException, InvocationTargetException {
         // The following code invokes defineClass on the current thread classloader by reflection
         Class<?> clc = Class.forName("java.lang.ClassLoader");
         Class<?>[] argumentTypes = new Class<?>[4];
@@ -204,24 +183,19 @@ public class Utils {
         effectiveArguments[2] = new Integer(0);
         effectiveArguments[3] = new Integer(bytes.length);
 
-        return (Class<?>) method.invoke(Thread.currentThread()
-                                              .getContextClassLoader(),
-            effectiveArguments);
+        return (Class<?>) method.invoke(Thread.currentThread().getContextClassLoader(), effectiveArguments);
     }
 
-    public static void createItfStubObjectMethods(CtClass generatedClass)
-        throws CannotCompileException, NotFoundException {
+    public static void createItfStubObjectMethods(CtClass generatedClass) throws CannotCompileException,
+            NotFoundException {
         // FIXME namespace pollution !
-        CtField senderItfIDField = new CtField(ClassPool.getDefault()
-                                                        .get(ItfID.class.getName()),
-                "senderItfID", generatedClass);
+        CtField senderItfIDField = new CtField(ClassPool.getDefault().get(ItfID.class.getName()),
+            "senderItfID", generatedClass);
         CtField.Initializer initializer = CtField.Initializer.byExpr("null");
         generatedClass.addField(senderItfIDField, initializer);
-        CtMethod senderItfIDGetter = CtNewMethod.getter("getSenderItfID",
-                senderItfIDField);
+        CtMethod senderItfIDGetter = CtNewMethod.getter("getSenderItfID", senderItfIDField);
         generatedClass.addMethod(senderItfIDGetter);
-        CtMethod senderItfIDSetter = CtNewMethod.setter("setSenderItfID",
-                senderItfIDField);
+        CtMethod senderItfIDSetter = CtNewMethod.setter("setSenderItfID", senderItfIDField);
         generatedClass.addMethod(senderItfIDSetter);
     }
 
@@ -236,8 +210,7 @@ public class Utils {
         if (Utils.isRepresentativeClassName(classname)) {
             // try to generate a representative
             //            logger.info("Trying to generate representative class : " + classname);
-            bytecode = RepresentativeInterfaceClassGenerator.generateInterfaceByteCode(classname,
-                    null);
+            bytecode = RepresentativeInterfaceClassGenerator.generateInterfaceByteCode(classname, null);
 
             if (bytecode != null) {
                 return bytecode;
@@ -266,18 +239,18 @@ public class Utils {
         StringBuilder sb = new StringBuilder(str.length() * 2);
         for (int i = 0; i < str.length(); i++) {
             switch (str.charAt(i)) {
-            case GEN_ESCAPE_CHAR:
-                sb.append(GEN_ESCAPE);
-                break;
-            case '.':
-                sb.append(GEN_PACKAGE_SEPARATOR);
-                break;
-            case '-':
-                sb.append(GEN_ITF_NAME_SEPARATOR);
-                break;
-            default:
-                sb.append(str.charAt(i));
-                break;
+                case GEN_ESCAPE_CHAR:
+                    sb.append(GEN_ESCAPE);
+                    break;
+                case '.':
+                    sb.append(GEN_PACKAGE_SEPARATOR);
+                    break;
+                case '-':
+                    sb.append(GEN_ITF_NAME_SEPARATOR);
+                    break;
+                default:
+                    sb.append(str.charAt(i));
+                    break;
             }
         }
         return sb.toString();
@@ -289,9 +262,8 @@ public class Utils {
      * @return
      * @throws IllegalArgumentException if the given escapedClassesName aren't well escaped
      */
-    private static ArrayList<CharSequence> unEscapeClassesName(
-        String generatedClassName, boolean withItfName)
-        throws IllegalArgumentException {
+    private static ArrayList<CharSequence> unEscapeClassesName(String generatedClassName, boolean withItfName)
+            throws IllegalArgumentException {
         ArrayList<CharSequence> result = new ArrayList<CharSequence>();
         StringBuilder sb = new StringBuilder(generatedClassName.length());
         boolean middleFlag = false;
@@ -308,37 +280,36 @@ public class Utils {
             } else {
                 i++;
                 switch (generatedClassName.charAt(i)) {
-                // one char Flags : 'GEN_ESCAPE_CHAR''a_char' 
-                case GEN_ESCAPE_CHAR:
-                    sb.append(GEN_ESCAPE_CHAR);
-                    break;
-                case GEN_PACKAGE_SEPARATOR_CHAR:
-                    sb.append('.');
-                    break;
-                case GEN_ITF_NAME_SEPARATOR_CHAR:
-                    if (!middleFlag) {
+                    // one char Flags : 'GEN_ESCAPE_CHAR''a_char' 
+                    case GEN_ESCAPE_CHAR:
+                        sb.append(GEN_ESCAPE_CHAR);
+                        break;
+                    case GEN_PACKAGE_SEPARATOR_CHAR:
+                        sb.append('.');
+                        break;
+                    case GEN_ITF_NAME_SEPARATOR_CHAR:
+                        if (!middleFlag) {
+                            throw new IllegalArgumentException(
+                                "The generatedClassName is not a well formed escaped string at index " + i +
+                                    ", the flag GEN_ITF_NAME_SEPARATOR (" + GEN_ITF_NAME_SEPARATOR +
+                                    ") is present whereasthis is not the interface name part : " +
+                                    generatedClassName);
+                        }
+                        sb.append('-');
+                        break;
+                    case GEN_MIDDLE_SEPARATOR_CHAR:
+                        result.add(sb);
+                        middleFlag = true;
+                        if (!withItfName) {
+                            return result;
+                        }
+                        sb = new StringBuilder(generatedClassName.length());
+                        break;
+                    default:
+                        //ERROR
                         throw new IllegalArgumentException(
-                            "The generatedClassName is not a well formed escaped string at index " +
-                            i + ", the flag GEN_ITF_NAME_SEPARATOR (" +
-                            GEN_ITF_NAME_SEPARATOR +
-                            ") is present whereasthis is not the interface name part : " +
-                            generatedClassName);
-                    }
-                    sb.append('-');
-                    break;
-                case GEN_MIDDLE_SEPARATOR_CHAR:
-                    result.add(sb);
-                    middleFlag = true;
-                    if (!withItfName) {
-                        return result;
-                    }
-                    sb = new StringBuilder(generatedClassName.length());
-                    break;
-                default:
-                    //ERROR
-                    throw new IllegalArgumentException(
-                        "The generatedClassName is not a well formed escaped string at index " +
-                        i + " : " + generatedClassName);
+                            "The generatedClassName is not a well formed escaped string at index " + i +
+                                " : " + generatedClassName);
                 }
             }
         }

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.event;
 
-
 /**
  * <p>
  * Base class of all events occuring in ProActive. <code>ProActiveEvent</code>

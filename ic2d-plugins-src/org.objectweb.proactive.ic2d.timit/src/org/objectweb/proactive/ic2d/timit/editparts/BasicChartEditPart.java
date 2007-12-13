@@ -42,8 +42,7 @@ import org.objectweb.proactive.ic2d.timit.figures.BasicChartFigure;
 import org.objectweb.proactive.ic2d.timit.views.TimItView;
 
 
-public class BasicChartEditPart extends AbstractGraphicalEditPart
-    implements MouseListener, Runnable {
+public class BasicChartEditPart extends AbstractGraphicalEditPart implements MouseListener, Runnable {
     public static final int CHART_HEIGHT = 280;
     protected TimItView timItView;
     protected BasicChartObject basicChartObject;
@@ -58,9 +57,7 @@ public class BasicChartEditPart extends AbstractGraphicalEditPart
     @Override
     protected final IFigure createFigure() {
         BasicChartFigure basicChartFigure = new BasicChartFigure(this.basicChartObject.provideChart());
-        basicChartFigure.setPreferredSize(this.getViewer().getControl()
-                                              .getBounds().width - 20,
-            CHART_HEIGHT);
+        basicChartFigure.setPreferredSize(this.getViewer().getControl().getBounds().width - 20, CHART_HEIGHT);
         basicChartFigure.setMinimumSize(new Dimension(300, CHART_HEIGHT));
         basicChartFigure.addMouseListener(this);
         return basicChartFigure;
@@ -75,25 +72,23 @@ public class BasicChartEditPart extends AbstractGraphicalEditPart
 
         BasicChartObject model = (BasicChartObject) this.getModel();
         switch (this.getSelected()) {
-        case BasicChartEditPart.SELECTED_PRIMARY:
-            this.timItView.getRefreshSelectedButton().setEnabled(true);
-            // Update the text of the timerLevelButton
-            this.timItView.getTimerLevelButton()
-                          .setText("Switch to " +
-                model.getInversedTimerLevel());
-            // Enable timerLevelButton
-            this.timItView.getTimerLevelButton().setEnabled(true);
-            this.timItView.getShowInTreeViewAction().setTarget(model);
-            // Delegate the selection to the figure
-            ((BasicChartFigure) this.getFigure()).setSelected();
-            // If Tree View is used then set selected the tree view of the this
-            // chart
-            if (TimerTreeHolder.getInstance() != null) {
-                TimerTreeHolder.getInstance().provideChartObject(model, true);
-            }
-            break;
-        case BasicChartEditPart.SELECTED_NONE:
-            ((BasicChartFigure) this.getFigure()).setUnselected();
+            case BasicChartEditPart.SELECTED_PRIMARY:
+                this.timItView.getRefreshSelectedButton().setEnabled(true);
+                // Update the text of the timerLevelButton
+                this.timItView.getTimerLevelButton().setText("Switch to " + model.getInversedTimerLevel());
+                // Enable timerLevelButton
+                this.timItView.getTimerLevelButton().setEnabled(true);
+                this.timItView.getShowInTreeViewAction().setTarget(model);
+                // Delegate the selection to the figure
+                ((BasicChartFigure) this.getFigure()).setSelected();
+                // If Tree View is used then set selected the tree view of the this
+                // chart
+                if (TimerTreeHolder.getInstance() != null) {
+                    TimerTreeHolder.getInstance().provideChartObject(model, true);
+                }
+                break;
+            case BasicChartEditPart.SELECTED_NONE:
+                ((BasicChartFigure) this.getFigure()).setUnselected();
         }
     }
 
@@ -103,9 +98,8 @@ public class BasicChartEditPart extends AbstractGraphicalEditPart
         }
         if (this.getViewer().getSelectedEditParts().size() != 0) {
             // Only one object can be selected at time
-            BasicChartEditPart lastSelected = (BasicChartEditPart) this.getViewer()
-                                                                       .getSelectedEditParts()
-                                                                       .get(0);
+            BasicChartEditPart lastSelected = (BasicChartEditPart) this.getViewer().getSelectedEditParts()
+                    .get(0);
             // deselect it
             lastSelected.getViewer().deselect(lastSelected);
         }
@@ -120,11 +114,10 @@ public class BasicChartEditPart extends AbstractGraphicalEditPart
     public final void run() {
         BasicChartFigure figure = (BasicChartFigure) getFigure();
         figure.setChart(this.basicChartObject.provideChart());
-        figure.setPreferredSize(this.getViewer().getControl().getBounds().width -
-            20, CHART_HEIGHT); // HERE SOMETIMES SOMTHING IS NULL TODO: FIND IT !
+        figure.setPreferredSize(this.getViewer().getControl().getBounds().width - 20, CHART_HEIGHT); // HERE SOMETIMES SOMTHING IS NULL TODO: FIND IT !
         refresh();
         figure.repaint(); // TODO : check if refresh() calls the
-                          // figure.repaint() method
+        // figure.repaint() method
     }
 
     @Override

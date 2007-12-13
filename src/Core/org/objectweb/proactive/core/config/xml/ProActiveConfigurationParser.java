@@ -80,8 +80,7 @@ public class ProActiveConfigurationParser {
                 /* osgi mode, get the ProActiveConfiguration in the jar root */
                 filename = "/ProActiveConfiguration.xml";
                 //filename = "/org/objectweb/proactive/core/config/ProActiveConfiguration.xml";
-                source = new InputSource(ProActiveConfigurationParser.class.getResourceAsStream(
-                            filename));
+                source = new InputSource(ProActiveConfigurationParser.class.getResourceAsStream(filename));
             } else {
                 source = new org.xml.sax.InputSource(filename);
             }
@@ -95,14 +94,13 @@ public class ProActiveConfigurationParser {
             domFactory.setValidating(false);
             domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-            URL url = ProActiveConfigurationParser.class.getClass()
-                                                        .getResource("/org/objectweb/proactive/core/config/xml/ProActiveConfiguration.xsd");
+            URL url = ProActiveConfigurationParser.class.getClass().getResource(
+                    "/org/objectweb/proactive/core/config/xml/ProActiveConfiguration.xsd");
 
             if ((url != null) && (!url.toString().startsWith("bundle"))) {
                 String schema = url.toString();
                 domFactory.setValidating(true);
-                domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
-                    new Object[] { schema });
+                domFactory.setAttribute(JAXP_SCHEMA_SOURCE, new Object[] { schema });
             }
 
             XPathFactory factory = XPathFactory.newInstance();
@@ -116,8 +114,7 @@ public class ProActiveConfigurationParser {
 
             NodeList nodes;
 
-            nodes = (NodeList) xpath.evaluate(XPATH_PAPROPS, document,
-                    XPathConstants.NODESET);
+            nodes = (NodeList) xpath.evaluate(XPATH_PAPROPS, document, XPathConstants.NODESET);
 
             boolean unknownProperty = false;
             for (int i = 0; i < nodes.getLength(); i++) {
@@ -130,25 +127,21 @@ public class ProActiveConfigurationParser {
                     if (prop.isValid(value)) {
                         properties.setProperty(key, value);
                     } else {
-                        logger.warn("Invalid value, " + value + " for key " +
-                            key + ". Must be a " + prop.getType().toString());
+                        logger.warn("Invalid value, " + value + " for key " + key + ". Must be a " +
+                            prop.getType().toString());
                     }
                 } else {
-                    logger.warn("Skiped unknown ProActive Java property: " +
-                        key);
+                    logger.warn("Skiped unknown ProActive Java property: " + key);
                     unknownProperty = true;
                 }
             }
             if (unknownProperty) {
-                logger.warn(
-                    "All supported ProActive Java properties are declared inside " +
-                    PAProperties.class.getName() +
-                    ". Please check your ProActive Configuration file: " +
+                logger.warn("All supported ProActive Java properties are declared inside " +
+                    PAProperties.class.getName() + ". Please check your ProActive Configuration file: " +
                     filename);
             }
 
-            nodes = (NodeList) xpath.evaluate(XPATH_JAVAPROPS, document,
-                    XPathConstants.NODESET);
+            nodes = (NodeList) xpath.evaluate(XPATH_JAVAPROPS, document, XPathConstants.NODESET);
 
             for (int i = 0; i < nodes.getLength(); i++) {
                 Node node = nodes.item(i);
@@ -201,22 +194,19 @@ public class ProActiveConfigurationParser {
     private static class MyDefaultHandler extends DefaultHandler {
         @Override
         public void warning(SAXParseException e) {
-            logger.warn("Warning Line " + e.getLineNumber() + ": " +
-                e.getMessage() + "\n");
+            logger.warn("Warning Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
         }
 
         @Override
         public void error(SAXParseException e) throws SAXParseException {
-            String errMessage = new String("Error Line " + e.getLineNumber() +
-                    ": " + e.getMessage() + "\n");
+            String errMessage = new String("Error Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
             logger.error(errMessage);
             throw e;
         }
 
         @Override
         public void fatalError(SAXParseException e) throws SAXParseException {
-            String errMessage = new String("Error Line " + e.getLineNumber() +
-                    ": " + e.getMessage() + "\n");
+            String errMessage = new String("Error Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
             logger.fatal(errMessage);
             throw e;
         }

@@ -37,6 +37,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test migration strategy, with onDeparture and onArrival method
  * @author cmathieu
@@ -56,8 +57,7 @@ public class Test extends FunctionalTest {
         nodesUrl[0] = TestNodes.getLocalVMNode().getNodeInformation().getURL();
         nodesUrl[1] = TestNodes.getSameVMNode().getNodeInformation().getURL();
         nodesUrl[2] = TestNodes.getRemoteVMNode().getNodeInformation().getURL();
-        a = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { nodesUrl });
+        a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { nodesUrl });
 
         assertTrue(a.getCounter() == 7);
     }

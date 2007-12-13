@@ -104,28 +104,23 @@ public class FileServer {
         return rfile;
     }
 
-    public synchronized StoredFile dataHasBeenStored(StoredFile rfile, int count)
-        throws IOException {
+    public synchronized StoredFile dataHasBeenStored(StoredFile rfile, int count) throws IOException {
         if (count <= 0) {
-            throw new IllegalArgumentException(
-                "Illegal initial reference count:" + count);
+            throw new IllegalArgumentException("Illegal initial reference count:" + count);
         }
 
         if (!unstored.containsKey(rfile.fileId)) {
-            throw new IllegalArgumentException(
-                "RemoteFile is not marked as unstored" + rfile.fileId);
+            throw new IllegalArgumentException("RemoteFile is not marked as unstored" + rfile.fileId);
         }
 
         if (stored.containsKey(rfile.fileId)) {
-            throw new IllegalArgumentException(
-                "RemoteFile is already marked as stored" + rfile.fileId);
+            throw new IllegalArgumentException("RemoteFile is already marked as stored" + rfile.fileId);
         }
 
         StoredFile rf = unstored.remove(rfile.fileId);
 
         if (!rfile.equals(rf)) {
-            throw new IllegalArgumentException("RemoteFile was modified " +
-                rfile);
+            throw new IllegalArgumentException("RemoteFile was modified " + rfile);
         }
 
         stored.put(rfile.fileId, new Long(count));
@@ -140,11 +135,9 @@ public class FileServer {
         return rf;
     }
 
-    public synchronized void canFetch(StoredFile rfile)
-        throws IOException {
+    public synchronized void canFetch(StoredFile rfile) throws IOException {
         if (!stored.containsKey(rfile.fileId)) {
-            throw new IllegalArgumentException("RemoteFile in stored list: " +
-                rfile.fileId);
+            throw new IllegalArgumentException("RemoteFile in stored list: " + rfile.fileId);
         }
 
         if (!rfile.location.exists()) {
@@ -160,8 +153,7 @@ public class FileServer {
         }
     }
 
-    public synchronized StoredFile registerAndStore(URL remoteURL)
-        throws IOException {
+    public synchronized StoredFile registerAndStore(URL remoteURL) throws IOException {
         long fileId = getNewId();
         File dst = new File(rootDir, fileId + ".dat");
 
@@ -180,16 +172,14 @@ public class FileServer {
 
     public void shutdown() {
         if (logger.isDebugEnabled()) {
-            logger.debug("Shutting down File Server. Cleaning root directory:" +
-                this.rootDir);
+            logger.debug("Shutting down File Server. Cleaning root directory:" + this.rootDir);
         }
         SkeletonSystemImpl.deleteDirectory(this.rootDir);
     }
 
     public synchronized void commit(long fileId, int delta) {
         if (!stored.containsKey(fileId)) {
-            throw new IllegalArgumentException(
-                "Cannot change reference count on if file is not stored:" +
+            throw new IllegalArgumentException("Cannot change reference count on if file is not stored:" +
                 fileId);
         }
 
@@ -201,8 +191,9 @@ public class FileServer {
             stored.put(fileId, c);
         } else { //remove the file from storage
             if (logger.isDebugEnabled()) {
-                logger.debug("FileServer file " + fileId +
-                    " is deleted (refererence decreased to:" + c + ")");
+                logger
+                        .debug("FileServer file " + fileId + " is deleted (refererence decreased to:" + c +
+                            ")");
             }
 
             stored.remove(fileId);

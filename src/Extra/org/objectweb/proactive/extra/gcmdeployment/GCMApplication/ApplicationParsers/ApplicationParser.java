@@ -42,9 +42,8 @@ import org.xml.sax.SAXException;
 
 
 public interface ApplicationParser {
-    public void parseApplicationNode(Node applicationNode,
-        GCMApplicationParser applicationParser, XPath xpath)
-        throws XPathExpressionException, SAXException, IOException;
+    public void parseApplicationNode(Node applicationNode, GCMApplicationParser applicationParser, XPath xpath)
+            throws XPathExpressionException, SAXException, IOException;
 
     CommandBuilder getCommandBuilder();
 

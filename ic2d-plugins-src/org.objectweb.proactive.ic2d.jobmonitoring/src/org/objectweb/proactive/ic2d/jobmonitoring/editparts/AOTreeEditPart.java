@@ -49,8 +49,8 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.State;
  *
  */
 public class AOTreeEditPart extends JobMonitoringTreeEditPart<ActiveObject> {
-    public static final Image AO_IMAGE = new Image(Display.getCurrent(),
-            AOTreeEditPart.class.getResourceAsStream("ao_icon.png"));
+    public static final Image AO_IMAGE = new Image(Display.getCurrent(), AOTreeEditPart.class
+            .getResourceAsStream("ao_icon.png"));
 
     /**
      * The contructor of this controller part.
@@ -70,8 +70,7 @@ public class AOTreeEditPart extends JobMonitoringTreeEditPart<ActiveObject> {
         final MVCNotification notif = (MVCNotification) arg;
         final MVCNotificationTag mvcNotificationTag = notif.getMVCNotification();
         final Object data = notif.getData();
-        if ((mvcNotificationTag == MVCNotificationTag.STATE_CHANGED) &&
-                (data == State.NOT_MONITORED)) {
+        if ((mvcNotificationTag == MVCNotificationTag.STATE_CHANGED) && (data == State.NOT_MONITORED)) {
             deactivate();
             return;
         }
@@ -102,7 +101,6 @@ public class AOTreeEditPart extends JobMonitoringTreeEditPart<ActiveObject> {
      */
     @Override
     protected final String getText() {
-        return getCastedModel().getName() + "(" + getCastedModel().getJobId() +
-        ")";
+        return getCastedModel().getName() + "(" + getCastedModel().getJobId() + ")";
     }
 }

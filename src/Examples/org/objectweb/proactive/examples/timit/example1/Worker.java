@@ -99,26 +99,22 @@ public class Worker extends Timed {
     public void start() {
         this.rank = PASPMD.getMyRank();
         this.workers = (Worker) PASPMD.getSPMDGroup();
-        this.workersArray = (Worker[]) PAGroup.getGroup(this.workers)
-                                              .toArray(new Worker[0]);
+        this.workersArray = (Worker[]) PAGroup.getGroup(this.workers).toArray(new Worker[0]);
         this.groupSize = PASPMD.getMySPMDGroupSize();
 
         // The defaultObserver will perform two
         // operations. The first operation is performed between
         // workers and second between notifications ( notifications
         // are of course internal to a worker )
-        this.defaultObserver = new DefaultEventObserver("nbComms",
-                DefaultEventData.SUM, DefaultEventData.SUM);
+        this.defaultObserver = new DefaultEventObserver("nbComms", DefaultEventData.SUM, DefaultEventData.SUM);
         // The nbCommObserver is used to build
         // the message density pattern, a chart will be built from
         // the gathered data.
-        this.nbCommObserver = new CommEventObserver("commPattern",
-                this.groupSize, this.rank);
+        this.nbCommObserver = new CommEventObserver("commPattern", this.groupSize, this.rank);
         // The commSizeObserver comunication observer is used to build
         // the message density pattern, a chart will be built from
         // the gathered data.
-        this.commSizeObserver = new CommEventObserver("densityPattern",
-                this.groupSize, this.rank);
+        this.commSizeObserver = new CommEventObserver("densityPattern", this.groupSize, this.rank);
 
         // ************** READY
         this.msg("Ready");
@@ -126,9 +122,9 @@ public class Worker extends Timed {
         // Then, you have to specify all counters you want to activate. That
         // means all counters defined in this class, but also counter defined
         // in other class, thanks to the TimerStore instance.
-        super.activate(new EventObserver[] {
-                this.defaultObserver, this.nbCommObserver, this.commSizeObserver
-            });
+        super
+                .activate(new EventObserver[] { this.defaultObserver, this.nbCommObserver,
+                        this.commSizeObserver });
 
         try {
             // ************** INITIALIZATION
@@ -142,16 +138,11 @@ public class Worker extends Timed {
             for (int i = 0; i < 10; i++) {
                 destRank = (this.rank + 1) % this.groupSize;
                 // Notification of the nbCommObserver observer
-                super.getEventObservable()
-                     .notifyObservers(new CommEvent(this.nbCommObserver,
-                        destRank, 1));
+                super.getEventObservable().notifyObservers(new CommEvent(this.nbCommObserver, destRank, 1));
                 // Notification of the commSizeObserver observer
-                super.getEventObservable()
-                     .notifyObservers(new CommEvent(this.commSizeObserver,
-                        destRank, 2));
+                super.getEventObservable().notifyObservers(new CommEvent(this.commSizeObserver, destRank, 2));
                 // Notification of the defaultObserver observer
-                super.getEventObservable()
-                     .notifyObservers(new Event(this.defaultObserver, 1.0));
+                super.getEventObservable().notifyObservers(new Event(this.defaultObserver, 1.0));
                 // Perform the distant call
                 this.workersArray[destRank].toto(i);
             }
@@ -160,16 +151,12 @@ public class Worker extends Timed {
             for (int i = 0; i < 10; i++) {
                 destRank = (this.rank + 2) % this.groupSize;
                 // Notification of the nbCommObserver observer
-                super.getEventObservable()
-                     .notifyObservers(new CommEvent(this.nbCommObserver,
-                        destRank, 1));
+                super.getEventObservable().notifyObservers(new CommEvent(this.nbCommObserver, destRank, 1));
                 // Notification of the commSizeObserver observer
-                super.getEventObservable()
-                     .notifyObservers(new CommEvent(this.commSizeObserver,
-                        destRank, 160));
+                super.getEventObservable().notifyObservers(
+                        new CommEvent(this.commSizeObserver, destRank, 160));
                 // Notification of the defaultObserver observer
-                super.getEventObservable()
-                     .notifyObservers(new Event(this.defaultObserver, 1));
+                super.getEventObservable().notifyObservers(new Event(this.defaultObserver, 1));
                 // Perform the distant call
                 this.workersArray[destRank].toto(i);
             }

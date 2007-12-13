@@ -49,18 +49,18 @@ public class NOAVertexPaintFunction implements VertexPaintFunction {
     public Paint getFillPaint(Vertex v) {
         int noa = v.degree();
         switch (noa) {
-        case 0:
-            return Color.BLACK;
-        case 1:
-            return Color.GRAY;
-        case 3:
-            return Color.BLUE;
-        case 5:
-            return Color.GREEN;
-        case 10:
-            return Color.RED;
-        default:
-            return Color.ORANGE;
+            case 0:
+                return Color.BLACK;
+            case 1:
+                return Color.GRAY;
+            case 3:
+                return Color.BLUE;
+            case 5:
+                return Color.GREEN;
+            case 10:
+                return Color.RED;
+            default:
+                return Color.ORANGE;
         }
     }
 

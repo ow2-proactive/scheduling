@@ -65,8 +65,7 @@ public class Entity implements Serializable {
     }
 
     public String getName() {
-        return this.certChain.get(0).getCert().getSubjectX500Principal()
-                             .getName();
+        return this.certChain.get(0).getCert().getSubjectX500Principal().getName();
     }
 
     public TypedCertificateList getCertificateChain() {

@@ -50,8 +50,7 @@ public class GraphicalCommunication {
      * @param target the target of the connection
      * @param panel the connection is added to this panel
      */
-    public GraphicalCommunication(AOFigure source, AOFigure destination,
-        IFigure panel, Color color) {
+    public GraphicalCommunication(AOFigure source, AOFigure destination, IFigure panel, Color color) {
         this.source = source;
         this.destination = destination;
         this.panel = panel;
@@ -59,8 +58,8 @@ public class GraphicalCommunication {
         // To achieve unicity for a directed communication
         // we take the right 16 bits of the source hashcode and 16 bits of dest hashcode
         // this is used to avoid a + b = b + a
-        this.hashcode = (this.source.hashCode() & RIGHT_MASK) +
-            (this.destination.hashCode() & LEFT_MASK) + this.panel.hashCode();
+        this.hashcode = (this.source.hashCode() & RIGHT_MASK) + (this.destination.hashCode() & LEFT_MASK) +
+            this.panel.hashCode();
     }
 
     public Color getColor() {
@@ -95,8 +94,7 @@ public class GraphicalCommunication {
     public boolean equals(Object o) {
         GraphicalCommunication communication = (GraphicalCommunication) o;
         return ((this.source == communication.getSource()) &&
-        (this.destination == communication.getDestination()) &&
-        (this.panel == communication.getPanel()) &&
-        (this.color == communication.getColor()));
+            (this.destination == communication.getDestination()) && (this.panel == communication.getPanel()) && (this.color == communication
+                .getColor()));
     }
 }

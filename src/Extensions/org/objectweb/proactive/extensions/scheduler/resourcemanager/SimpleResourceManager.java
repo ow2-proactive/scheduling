@@ -49,8 +49,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 
 
-public class SimpleResourceManager implements GenericResourceManager,
-    NodeCreationEventListener, InitActive {
+public class SimpleResourceManager implements GenericResourceManager, NodeCreationEventListener, InitActive {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.RESOURCE_MANAGER);
     //holds the nodes
     Vector<Node> freeNodes;
@@ -78,8 +77,7 @@ public class SimpleResourceManager implements GenericResourceManager,
             }
 
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "finished deactivating nodes, will terminate Resource Manager");
+                logger.debug("finished deactivating nodes, will terminate Resource Manager");
             }
 
             PAActiveObject.terminateActiveObject(true);
@@ -87,8 +85,7 @@ public class SimpleResourceManager implements GenericResourceManager,
             //sucess
             return new BooleanWrapper(true);
         } catch (Exception e) {
-            logger.error("Couldnt Terminate the Resource manager" +
-                e.toString());
+            logger.error("Couldnt Terminate the Resource manager" + e.toString());
 
             return new BooleanWrapper(false);
         }
@@ -106,8 +103,7 @@ public class SimpleResourceManager implements GenericResourceManager,
                 vn.add(virtualNodes[i]);
 
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Virtual Node " + virtualNodes[i].getName() +
-                        " added to resource manager");
+                    logger.debug("Virtual Node " + virtualNodes[i].getName() + " added to resource manager");
                 }
             }
         } catch (Exception e) {
@@ -119,8 +115,7 @@ public class SimpleResourceManager implements GenericResourceManager,
         Vector<Node> nodesToSend = new Vector<Node>();
 
         //exits the loop when there are no more free 
-        while (!freeNodes.isEmpty() &&
-                (nodesToSend.size() < maxNodeNb.intValue())) {
+        while (!freeNodes.isEmpty() && (nodesToSend.size() < maxNodeNb.intValue())) {
             nodesToSend.add(freeNodes.remove(0));
         }
 
@@ -155,8 +150,7 @@ public class SimpleResourceManager implements GenericResourceManager,
         freeNodes.add(event.getNode());
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Node at " +
-                event.getNode().getNodeInformation().getURL() +
+            logger.debug("Node at " + event.getNode().getNodeInformation().getURL() +
                 " added to Resource Manager");
         }
     }

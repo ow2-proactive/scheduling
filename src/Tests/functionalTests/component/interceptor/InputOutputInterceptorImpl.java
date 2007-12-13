@@ -46,16 +46,15 @@ import functionalTests.component.controller.DummyController;
  * @author Matthieu Morel
  *
  */
-public class InputOutputInterceptorImpl extends AbstractProActiveController
-    implements InputOutputInterceptor {
+public class InputOutputInterceptorImpl extends AbstractProActiveController implements InputOutputInterceptor {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * @param owner
-    */
+     * @param owner
+     */
     public InputOutputInterceptorImpl(Component owner) {
         super(owner);
     }
@@ -63,20 +62,19 @@ public class InputOutputInterceptorImpl extends AbstractProActiveController
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(InputOutputInterceptor.INPUT_OUTPUT_INTERCEPTOR_NAME,
-                    InputOutputInterceptor.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(
+                    InputOutputInterceptor.INPUT_OUTPUT_INTERCEPTOR_NAME,
+                    InputOutputInterceptor.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 
     public void setDummyValue(String value) {
         try {
-            ((DummyController) getFcItfOwner()
-                                   .getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
+            ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
+                    .setDummyValue(value);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
         }
@@ -84,8 +82,8 @@ public class InputOutputInterceptorImpl extends AbstractProActiveController
 
     public String getDummyValue() {
         try {
-            return ((DummyController) getFcItfOwner()
-                                          .getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
+            return ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
+                    .getDummyValue();
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
             return null;
@@ -94,23 +92,19 @@ public class InputOutputInterceptorImpl extends AbstractProActiveController
 
     public void afterInputMethodInvocation(MethodCall methodCall) {
         //System.out.println("after method invocation");
-        setDummyValue(getDummyValue() +
-            InputOutputInterceptor.AFTER_INPUT_INTERCEPTION);
+        setDummyValue(getDummyValue() + InputOutputInterceptor.AFTER_INPUT_INTERCEPTION);
     }
 
     public void beforeInputMethodInvocation(MethodCall methodCall) {
         //        System.out.println("before method invocation");
-        setDummyValue(getDummyValue() +
-            InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION);
+        setDummyValue(getDummyValue() + InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION);
     }
 
     public void afterOutputMethodInvocation(MethodCall methodCall) {
-        setDummyValue(getDummyValue() +
-            InputOutputInterceptor.AFTER_OUTPUT_INTERCEPTION);
+        setDummyValue(getDummyValue() + InputOutputInterceptor.AFTER_OUTPUT_INTERCEPTION);
     }
 
     public void beforeOutputMethodInvocation(MethodCall methodCall) {
-        setDummyValue(getDummyValue() +
-            InputOutputInterceptor.BEFORE_OUTPUT_INTERCEPTION);
+        setDummyValue(getDummyValue() + InputOutputInterceptor.BEFORE_OUTPUT_INTERCEPTION);
     }
 }

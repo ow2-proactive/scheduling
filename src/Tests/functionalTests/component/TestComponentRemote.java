@@ -95,35 +95,22 @@ public class TestComponentRemote extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
         ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
-                    type_factory.createFcItfType("i1", I1.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE),
-                    type_factory.createFcItfType("i2", I2.class.getName(),
-                        TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE)
-                });
+                type_factory.createFcItfType("i1", I1.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                type_factory.createFcItfType("i2", I2.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE) });
 
-        p1 = cf.newFcInstance(i1_i2_type,
-                new ControllerDescription(P1_NAME, Constants.PRIMITIVE),
-                new ContentDescription(PrimitiveComponentA.class.getName(),
-                    new Object[] {  }));
-        p2 = cf.newFcInstance(type_factory.createFcType(
-                    new InterfaceType[] {
-                        type_factory.createFcItfType("i2", I2.class.getName(),
-                            TypeFactory.SERVER, TypeFactory.MANDATORY,
-                            TypeFactory.SINGLE)
-                    }),
-                new ControllerDescription(P2_NAME, Constants.PRIMITIVE),
-                new ContentDescription(PrimitiveComponentB.class.getName(),
-                    new Object[] {  }), TestNodes.getRemoteACVMNode());
-        c1 = cf.newFcInstance(i1_i2_type,
-                new ControllerDescription(C1_NAME, Constants.COMPOSITE),
-                new ContentDescription(Composite.class.getName(),
-                    new Object[] {  }), TestNodes.getRemoteACVMNode());
-        c2 = cf.newFcInstance(i1_i2_type,
-                new ControllerDescription(C2_NAME, Constants.COMPOSITE),
-                new ContentDescription(Composite.class.getName(),
-                    new Object[] {  }));
+        p1 = cf.newFcInstance(i1_i2_type, new ControllerDescription(P1_NAME, Constants.PRIMITIVE),
+                new ContentDescription(PrimitiveComponentA.class.getName(), new Object[] {}));
+        p2 = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
+                "i2", I2.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
+                new ControllerDescription(P2_NAME, Constants.PRIMITIVE), new ContentDescription(
+                    PrimitiveComponentB.class.getName(), new Object[] {}), TestNodes.getRemoteACVMNode());
+        c1 = cf.newFcInstance(i1_i2_type, new ControllerDescription(C1_NAME, Constants.COMPOSITE),
+                new ContentDescription(Composite.class.getName(), new Object[] {}), TestNodes
+                        .getRemoteACVMNode());
+        c2 = cf.newFcInstance(i1_i2_type, new ControllerDescription(C2_NAME, Constants.COMPOSITE),
+                new ContentDescription(Composite.class.getName(), new Object[] {}));
 
         Assert.assertEquals(Fractal.getNameController(p1).getFcName(), P1_NAME);
         Assert.assertEquals(Fractal.getNameController(p2).getFcName(), P2_NAME);
@@ -160,10 +147,8 @@ public class TestComponentRemote extends ComponentTest {
         Fractal.getContentController(c1).addFcSubComponent(p1);
         Fractal.getContentController(c2).addFcSubComponent(c1);
 
-        Component[] c2SubComponents = Fractal.getContentController(c2)
-                                             .getFcSubComponents();
-        Component[] c1SubComponents = Fractal.getContentController(c1)
-                                             .getFcSubComponents();
+        Component[] c2SubComponents = Fractal.getContentController(c2).getFcSubComponents();
+        Component[] c1SubComponents = Fractal.getContentController(c1).getFcSubComponents();
         Component[] c2_sub_components = { c1 };
         Component[] c1_sub_components = { p1 };
 
@@ -207,12 +192,9 @@ public class TestComponentRemote extends ComponentTest {
         I1 i1 = (I1) c2.getFcInterface("i1");
 
         //I1 i1= (I1)p1.getFcInterface("i1");
-        Message message = i1.processInputMessage(new Message(MESSAGE))
-                            .append(MESSAGE);
+        Message message = i1.processInputMessage(new Message(MESSAGE)).append(MESSAGE);
 
-        Assert.assertEquals(message.toString(),
-            TestComponentRemote.MESSAGE + PrimitiveComponentA.MESSAGE +
-            PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE +
-            TestComponentRemote.MESSAGE);
+        Assert.assertEquals(message.toString(), TestComponentRemote.MESSAGE + PrimitiveComponentA.MESSAGE +
+            PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE + TestComponentRemote.MESSAGE);
     }
 }

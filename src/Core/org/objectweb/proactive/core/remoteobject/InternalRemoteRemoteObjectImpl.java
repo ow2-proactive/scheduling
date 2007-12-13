@@ -64,8 +64,7 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  * object, hidden to the level on the protocol dependant part of the remote object it represents
  * that only provides a transport layer
  */
-public class InternalRemoteRemoteObjectImpl
-    implements InternalRemoteRemoteObject {
+public class InternalRemoteRemoteObjectImpl implements InternalRemoteRemoteObject {
 
     /**
      * the remote remote object of the internal remote remote object.
@@ -103,8 +102,7 @@ public class InternalRemoteRemoteObjectImpl
      * @param rro the remote remote object activated on a given URI for a given
      * protocol
      */
-    public InternalRemoteRemoteObjectImpl(RemoteObject ro, URI uri,
-        RemoteRemoteObject rro) {
+    public InternalRemoteRemoteObjectImpl(RemoteObject ro, URI uri, RemoteRemoteObject rro) {
         this.remoteObject = ro;
         this.uri = uri;
         this.remoteRemoteObject = rro;
@@ -127,8 +125,8 @@ public class InternalRemoteRemoteObjectImpl
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.remoteobject.RemoteRemoteObject#receiveMessage(org.objectweb.proactive.core.body.request.Request)
      */
-    public Reply receiveMessage(Request message)
-        throws ProActiveException, IOException, RenegotiateSessionException {
+    public Reply receiveMessage(Request message) throws ProActiveException, IOException,
+            RenegotiateSessionException {
         if (message instanceof InternalRemoteRemoteObjectRequest) {
             Object o;
             try {
@@ -149,81 +147,71 @@ public class InternalRemoteRemoteObjectImpl
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#getCertificate()
      */
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
+    public TypedCertificate getCertificate() throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getCertificate();
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#getEntities()
      */
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException {
+    public Entities getEntities() throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getEntities();
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#getPolicy(org.objectweb.proactive.core.security.securityentity.Entities, org.objectweb.proactive.core.security.securityentity.Entities)
      */
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException, IOException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException,
+            IOException {
         return this.remoteObject.getPolicy(local, distant);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#getPublicKey()
      */
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException {
+    public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
         return this.remoteObject.getPublicKey();
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#publicKeyExchange(long, byte[])
      */
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException, KeyExchangeException, IOException {
         return this.remoteObject.publicKeyExchange(sessionID, signature);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#randomValue(long, byte[])
      */
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
+            RenegotiateSessionException, IOException {
         return this.remoteObject.randomValue(sessionID, clientRandomValue);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#secretKeyExchange(long, byte[], byte[], byte[], byte[], byte[])
      */
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return this.remoteObject.secretKeyExchange(sessionID, encodedAESKey,
-            encodedIVParameters, encodedClientMacKey, encodedLockData,
-            parametersSignature);
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException, RenegotiateSessionException, IOException {
+        return this.remoteObject.secretKeyExchange(sessionID, encodedAESKey, encodedIVParameters,
+                encodedClientMacKey, encodedLockData, parametersSignature);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#startNewSession(long, org.objectweb.proactive.core.security.SecurityContext, org.objectweb.proactive.core.security.TypedCertificate)
      */
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SessionException, SecurityNotAvailableException, IOException {
-        return this.remoteObject.startNewSession(distantSessionID, policy,
-            distantCertificate);
+            TypedCertificate distantCertificate) throws SessionException, SecurityNotAvailableException,
+            IOException {
+        return this.remoteObject.startNewSession(distantSessionID, policy, distantCertificate);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#terminateSession(long)
      */
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException {
+    public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         this.remoteObject.terminateSession(sessionID);
     }
 
@@ -272,18 +260,15 @@ public class InternalRemoteRemoteObjectImpl
      * @see org.objectweb.proactive.core.security.SecurityEntity#getProActiveSecurityManager(org.objectweb.proactive.core.security.securityentity.Entity)
      */
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         return this.remoteObject.getProActiveSecurityManager(user);
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.security.SecurityEntity#setProActiveSecurityManager(org.objectweb.proactive.core.security.securityentity.Entity, org.objectweb.proactive.core.security.PolicyServer)
      */
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         this.remoteObject.setProActiveSecurityManager(user, policyServer);
     }
 }

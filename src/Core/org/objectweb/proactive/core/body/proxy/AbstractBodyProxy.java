@@ -59,8 +59,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public abstract class AbstractBodyProxy extends AbstractProxy
-    implements BodyProxy, java.io.Serializable {
+public abstract class AbstractBodyProxy extends AbstractProxy implements BodyProxy, java.io.Serializable {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
@@ -121,19 +120,17 @@ public abstract class AbstractBodyProxy extends AbstractProxy
      * for toString().
      */
     private static boolean isToString(MethodCall methodCall) {
-        return (methodCall.getNumberOfParameter() == 0) &&
-        "toString".equals(methodCall.getName());
+        return (methodCall.getNumberOfParameter() == 0) && "toString".equals(methodCall.getName());
     }
 
     private static boolean isHashCode(MethodCall methodCall) {
-        return (methodCall.getNumberOfParameter() == 0) &&
-        "hashCode".equals(methodCall.getName());
+        return (methodCall.getNumberOfParameter() == 0) && "hashCode".equals(methodCall.getName());
     }
 
     private static Set<String> loggedSyncCalls = Collections.synchronizedSet(new HashSet<String>());
 
-    private Object invokeOnBody(MethodCall methodCall)
-        throws Exception, RenegotiateSessionException, Throwable {
+    private Object invokeOnBody(MethodCall methodCall) throws Exception, RenegotiateSessionException,
+            Throwable {
         // Now gives the MethodCall object to the body
         try {
             MethodCallInfo mci = methodCall.getMethodCallInfo();
@@ -148,13 +145,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy
             }
 
             if (!isToString(methodCall) && !isHashCode(methodCall) &&
-                    syncCallLogger.isEnabledFor(Level.DEBUG)) {
+                syncCallLogger.isEnabledFor(Level.DEBUG)) {
                 String msg = "[DEBUG: synchronous call] All calls to the method below are synchronous " +
                     "(not an error, but may lead to performance issues or deadlocks):" +
-                    System.getProperty("line.separator") +
-                    methodCall.getReifiedMethod() +
-                    System.getProperty("line.separator") +
-                    "They are synchronous for the following reason: " +
+                    System.getProperty("line.separator") + methodCall.getReifiedMethod() +
+                    System.getProperty("line.separator") + "They are synchronous for the following reason: " +
                     mci.getMessage();
 
                 if (loggedSyncCalls.add(msg)) {
@@ -164,31 +159,27 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
             return reifyAsSynchronous(methodCall);
         } catch (MethodCallExecutionFailedException e) {
-            throw new ProActiveRuntimeException(e.getMessage(),
-                e.getTargetException());
+            throw new ProActiveRuntimeException(e.getMessage(), e.getTargetException());
         }
     }
 
     // optimization may be a local execution or a caching mechanism
     // returns null if not applicable
-    private Object checkOptimizedMethod(MethodCall methodCall)
-        throws Exception, RenegotiateSessionException, Throwable {
-        if (methodCall.getName().equals("equals") &&
-                (methodCall.getNumberOfParameter() == 1)) {
+    private Object checkOptimizedMethod(MethodCall methodCall) throws Exception, RenegotiateSessionException,
+            Throwable {
+        if (methodCall.getName().equals("equals") && (methodCall.getNumberOfParameter() == 1)) {
             Object arg = methodCall.getParameter(0);
             if (MOP.isReifiedObject(arg)) {
                 Proxy proxy = ((StubObject) arg).getProxy();
                 if (proxy instanceof AbstractBodyProxy) {
-                    return new Boolean(getBodyID()
-                                           .equals(((AbstractBodyProxy) proxy).getBodyID()));
+                    return new Boolean(getBodyID().equals(((AbstractBodyProxy) proxy).getBodyID()));
                 }
             }
 
             return new Boolean(false);
         }
 
-        if (methodCall.getName().equals("hashCode") &&
-                (methodCall.getNumberOfParameter() == 0)) {
+        if (methodCall.getName().equals("hashCode") && (methodCall.getNumberOfParameter() == 0)) {
             if (cachedHashCode == null) {
                 return cachedHashCode = (Integer) invokeOnBody(methodCall);
             } else {
@@ -202,8 +193,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
     /**
      *
      */
-    protected void reifyAsOneWay(MethodCall methodCall)
-        throws Exception, RenegotiateSessionException {
+    protected void reifyAsOneWay(MethodCall methodCall) throws Exception, RenegotiateSessionException {
         sendRequest(methodCall, null);
     }
 
@@ -216,8 +206,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         }
     }
 
-    protected Object reifyAsAsynchronous(MethodCall methodCall)
-        throws Exception, RenegotiateSessionException {
+    protected Object reifyAsAsynchronous(MethodCall methodCall) throws Exception, RenegotiateSessionException {
         StubObject futureobject = null;
 
         // Creates a stub + FutureProxy for representing the result
@@ -232,8 +221,8 @@ public abstract class AbstractBodyProxy extends AbstractProxy
 
             if (returnType.equals(java.lang.Void.TYPE)) {
                 /* A future for a void call is used to put the potential exception inside */
-                futureobject = (StubObject) MOP.newInstance(VoidFuture.class,
-                        null, Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
+                futureobject = (StubObject) MOP.newInstance(VoidFuture.class, null,
+                        Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
             } else {
                 futureobject = (StubObject) MOP.newInstance(returnType, null,
                         Constants.DEFAULT_FUTURE_PROXY_CLASS_NAME, null);
@@ -241,11 +230,11 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         } catch (MOPException e) {
             throw new FutureCreationException(
                 "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
-                methodCall.getName(), e);
+                    methodCall.getName(), e);
         } catch (ClassNotFoundException e) {
             throw new FutureCreationException(
                 "Exception occured in reifyAsAsynchronous while creating future for methodcall = " +
-                methodCall.getName(), e);
+                    methodCall.getName(), e);
         }
 
         // Set the id of the body creator in the created future
@@ -258,15 +247,15 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         } catch (java.io.IOException e) {
             throw new SendRequestCommunicationException(
                 "Exception occured in reifyAsAsynchronous while sending request for methodcall = " +
-                methodCall.getName(), e);
+                    methodCall.getName(), e);
         }
 
         // And return the future object
         return futureobject;
     }
 
-    protected Object reifyAsSynchronous(MethodCall methodCall)
-        throws Throwable, Exception, RenegotiateSessionException {
+    protected Object reifyAsSynchronous(MethodCall methodCall) throws Throwable, Exception,
+            RenegotiateSessionException {
         // Setting methodCall.res to null means that we do not use the future mechanism
         FutureProxy fp = FutureProxy.getFutureProxy();
         fp.setCreatorID(this.getBodyID());
@@ -277,7 +266,7 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         } catch (java.io.IOException e) {
             throw new SendRequestCommunicationException(
                 "Exception occured in reifyAsSynchronous while sending request for methodcall = " +
-                methodCall.getName(), e);
+                    methodCall.getName(), e);
         }
 
         // Returns the result or throws the exception
@@ -288,12 +277,9 @@ public abstract class AbstractBodyProxy extends AbstractProxy
         }
     }
 
-    protected abstract void sendRequest(MethodCall methodCall, Future future)
-        throws java.io.IOException, RenegotiateSessionException,
-            CommunicationForbiddenException;
+    protected abstract void sendRequest(MethodCall methodCall, Future future) throws java.io.IOException,
+            RenegotiateSessionException, CommunicationForbiddenException;
 
-    protected abstract void sendRequest(MethodCall methodCall, Future future,
-        Body sourceBody)
-        throws java.io.IOException, RenegotiateSessionException,
-            CommunicationForbiddenException;
+    protected abstract void sendRequest(MethodCall methodCall, Future future, Body sourceBody)
+            throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException;
 }

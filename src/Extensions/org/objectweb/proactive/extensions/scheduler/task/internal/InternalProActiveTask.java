@@ -88,11 +88,9 @@ public class InternalProActiveTask extends InternalAbstractJavaTask {
             try {
                 task = (ProActiveExecutable) taskClass.newInstance();
             } catch (InstantiationException e) {
-                throw new TaskCreationException("Cannot create ProActive task from task class ",
-                    e);
+                throw new TaskCreationException("Cannot create ProActive task from task class ", e);
             } catch (IllegalAccessException e) {
-                throw new TaskCreationException("Cannot create ProActive task from task class ",
-                    e);
+                throw new TaskCreationException("Cannot create ProActive task from task class ", e);
             }
         }
 
@@ -105,16 +103,15 @@ public class InternalProActiveTask extends InternalAbstractJavaTask {
      * @see org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask#createLauncher(org.objectweb.proactive.core.node.Node)
      */
     @Override
-    public TaskLauncher createLauncher(Node node)
-        throws ActiveObjectCreationException, NodeException {
+    public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         ProActiveTaskLauncher launcher;
 
         if (getPreScript() == null) {
-            launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(ProActiveTaskLauncher.class.getName(),
-                    new Object[] { getId() }, node);
+            launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(
+                    ProActiveTaskLauncher.class.getName(), new Object[] { getId() }, node);
         } else {
-            launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(ProActiveTaskLauncher.class.getName(),
-                    new Object[] { getId(), getPreScript() }, node);
+            launcher = (ProActiveTaskLauncher) PAActiveObject.newActive(
+                    ProActiveTaskLauncher.class.getName(), new Object[] { getId(), getPreScript() }, node);
         }
 
         setExecuterInformations(new ExecuterInformations(launcher, node));

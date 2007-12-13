@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Jvm extension in deployment descriptor
  */
@@ -61,12 +62,9 @@ public class Test extends FunctionalTest {
         VirtualNode vn1 = descriptor.getVirtualNode("evn1");
         VirtualNode vn2 = descriptor.getVirtualNode("evn2");
         VirtualNode vn3 = descriptor.getVirtualNode("evn3");
-        a1 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {  },
-                vn1.getNode());
-        a2 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {  },
-                vn2.getNode());
-        a3 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {  },
-                vn3.getNode());
+        a1 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {}, vn1.getNode());
+        a2 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {}, vn2.getNode());
+        a3 = (A) PAActiveObject.newActive(A.class.getName(), new Object[] {}, vn3.getNode());
 
         assertTrue(a2.getTiti() == null);
         assertTrue(a2.getTata() != null);
@@ -86,11 +84,9 @@ public class Test extends FunctionalTest {
         } else {
             fileName = "JVMExtension";
         }
-        String oldFilePath = getClass()
-                                 .getResource("/functionalTests/descriptor/extendedjvm/" +
-                fileName + ".xml").getPath();
-        String newFilePath = oldFilePath.replaceFirst(fileName + ".xml",
-                fileName + "-tmp.xml");
+        String oldFilePath = getClass().getResource(
+                "/functionalTests/descriptor/extendedjvm/" + fileName + ".xml").getPath();
+        String newFilePath = oldFilePath.replaceFirst(fileName + ".xml", fileName + "-tmp.xml");
 
         // if tests are run from the /compile directory : getParent for root directory 
         File userDir = new File(System.getProperty("user.dir"));
@@ -100,11 +96,9 @@ public class Test extends FunctionalTest {
         } else {
             proactiveDir = userDir.getPath();
         }
-        searchAndReplace(oldFilePath, newFilePath, "proactive.home",
-            proactiveDir);
-        descriptor = PADeployment.getProactiveDescriptor(getClass()
-                                                             .getResource("/functionalTests/descriptor/extendedjvm/" +
-                    fileName + "-tmp.xml").getPath());
+        searchAndReplace(oldFilePath, newFilePath, "proactive.home", proactiveDir);
+        descriptor = PADeployment.getProactiveDescriptor(getClass().getResource(
+                "/functionalTests/descriptor/extendedjvm/" + fileName + "-tmp.xml").getPath());
         descriptor.activateMappings();
     }
 
@@ -113,13 +107,10 @@ public class Test extends FunctionalTest {
         descriptor.killall(false);
     }
 
-    private void searchAndReplace(String oldFilePath, String newFilePath,
-        String oldString, String newString) {
+    private void searchAndReplace(String oldFilePath, String newFilePath, String oldString, String newString) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(
-                        oldFilePath));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(
-                        newFilePath));
+            BufferedReader reader = new BufferedReader(new FileReader(oldFilePath));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(newFilePath));
             while (true) {
                 String oldLine = reader.readLine();
                 if (oldLine == null) {

@@ -43,8 +43,8 @@ import ptolemy.data.Token;
 public class AOSimpleMatlab implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     static String nl = System.getProperty("line.separator");
     private String inputScript = null;
     private ArrayList<String> scriptLines = new ArrayList<String>();
@@ -58,20 +58,18 @@ public class AOSimpleMatlab implements Serializable {
      * @param inputScript  a pre-matlab script that will be launched before the main one (e.g. to set input params)
      * @param scriptLines a list of lines which represent the main script
      */
-    public AOSimpleMatlab(String matlabCommandName, String inputScript,
-        ArrayList<String> scriptLines) {
+    public AOSimpleMatlab(String matlabCommandName, String inputScript, ArrayList<String> scriptLines) {
         this.inputScript = inputScript;
         this.scriptLines = scriptLines;
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                public void run() {
-                    MatlabEngine.close();
-                }
-            }));
+            public void run() {
+                MatlabEngine.close();
+            }
+        }));
         MatlabEngine.setCommandName(matlabCommandName);
     }
 
-    public Object execute(int index, TaskResult... results)
-        throws Throwable {
+    public Object execute(int index, TaskResult... results) throws Throwable {
         if (results.length > 1) {
             throw new InvalidNumberOfParametersException(results.length);
         }

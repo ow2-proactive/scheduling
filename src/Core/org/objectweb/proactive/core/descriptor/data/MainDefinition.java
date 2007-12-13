@@ -63,16 +63,14 @@ public class MainDefinition implements Serializable {
     //
     //  ----- CONSTRUCTORS -----------------------------------------------------------------------------------
     //
-    public MainDefinition(String mainClass, List<String> parameters,
-        List<VirtualNodeInternal> virtualNodeList) {
+    public MainDefinition(String mainClass, List<String> parameters, List<VirtualNodeInternal> virtualNodeList) {
         this.virtualNodeList = virtualNodeList;
         this.mainClass = mainClass;
         this.parameters = parameters;
     }
 
     public MainDefinition(String mainClass) {
-        this(mainClass, new ArrayList<String>(),
-            new ArrayList<VirtualNodeInternal>());
+        this(mainClass, new ArrayList<String>(), new ArrayList<VirtualNodeInternal>());
     }
 
     public MainDefinition() {

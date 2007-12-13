@@ -52,8 +52,7 @@ public class WSConstants {
     public static final String PROACTIVE_STUB = "Stub";
     public static final String WSDL_FILE = "Wsdl";
     public static final String WEBAPP_NAME = "proactive";
-    public static final String ROUTER = "/" + WEBAPP_NAME +
-        "/servlet/rpcrouter";
+    public static final String ROUTER = "/" + WEBAPP_NAME + "/servlet/rpcrouter";
     public static final String DOCUMENTATION = "ProActive Active Object";
     public static final String COMPONENT_INTERFACE = "Compoment Interface";
     public static final String URL_PUBLICATION = "URL";

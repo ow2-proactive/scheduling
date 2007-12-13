@@ -50,26 +50,19 @@ interface Thrower {
     public void throwException(Throwable t);
 }
 
-
 public class ExceptionThrower {
     private static final String THROWER_CLASS_NAME = "TheActualExceptionThrower";
-    private static final String THROWER_CLASS_PACKAGE = ExceptionThrower.class.getPackage()
-                                                                              .getName();
-    private static final String THROWER_CLASS_FULLNAME = THROWER_CLASS_PACKAGE +
-        "." + THROWER_CLASS_NAME;
+    private static final String THROWER_CLASS_PACKAGE = ExceptionThrower.class.getPackage().getName();
+    private static final String THROWER_CLASS_FULLNAME = THROWER_CLASS_PACKAGE + "." + THROWER_CLASS_NAME;
     private static Thrower thrower = null;
 
     private static Class<?> loadClassJavassist() {
         try {
-            CtClass throwerClass = ClassPool.getDefault()
-                                            .makeClass(THROWER_CLASS_FULLNAME);
-            throwerClass.addInterface(ClassPool.getDefault()
-                                               .get(Thrower.class.getName()));
-            throwerClass.addConstructor(CtNewConstructor.defaultConstructor(
-                    throwerClass));
-            CtMethod throwException = CtNewMethod.make("" +
-                    "public void throwException(Throwable t) {" +
-                    "    throw t;}", throwerClass);
+            CtClass throwerClass = ClassPool.getDefault().makeClass(THROWER_CLASS_FULLNAME);
+            throwerClass.addInterface(ClassPool.getDefault().get(Thrower.class.getName()));
+            throwerClass.addConstructor(CtNewConstructor.defaultConstructor(throwerClass));
+            CtMethod throwException = CtNewMethod.make("" + "public void throwException(Throwable t) {"
+                + "    throw t;}", throwerClass);
             throwerClass.addMethod(throwException);
             return loadClass(THROWER_CLASS_FULLNAME, throwerClass.toBytecode());
         } catch (Exception e) {
@@ -79,20 +72,17 @@ public class ExceptionThrower {
     }
 
     /* We load a class given its name and its binary representation */
-    private static Class<?> loadClass(String className, byte[] b)
-        throws Exception {
+    private static Class<?> loadClass(String className, byte[] b) throws Exception {
         Class<?> clazz = null;
         ClassLoader loader = ClassLoader.getSystemClassLoader();
         Class<?> cls = Class.forName("java.lang.ClassLoader");
-        java.lang.reflect.Method method = cls.getDeclaredMethod("defineClass",
-                new Class<?>[] { String.class, byte[].class, int.class, int.class });
+        java.lang.reflect.Method method = cls.getDeclaredMethod("defineClass", new Class<?>[] { String.class,
+                byte[].class, int.class, int.class });
 
         /* protected method invocaton */
         method.setAccessible(true);
         try {
-            Object[] args = new Object[] {
-                    className, b, new Integer(0), new Integer(b.length)
-                };
+            Object[] args = new Object[] { className, b, new Integer(0), new Integer(b.length) };
             clazz = (Class<?>) method.invoke(loader, args);
         } finally {
             method.setAccessible(false);

@@ -69,8 +69,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
     }
 
     @Override
-    protected void internalStartProcess(String commandToExecute)
-        throws java.io.IOException {
+    protected void internalStartProcess(String commandToExecute) throws java.io.IOException {
         if (logger.isDebugEnabled()) {
             logger.debug(commandToExecute);
         }
@@ -93,11 +92,11 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
             try {
                 externalProcess = Runtime.getRuntime().exec(command);
                 java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
-                            externalProcess.getInputStream()));
+                    externalProcess.getInputStream()));
                 java.io.BufferedReader err = new java.io.BufferedReader(new java.io.InputStreamReader(
-                            externalProcess.getErrorStream()));
+                    externalProcess.getErrorStream()));
                 java.io.BufferedWriter out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(
-                            externalProcess.getOutputStream()));
+                    externalProcess.getOutputStream()));
                 handleProcess(in, out, err);
             } catch (java.io.IOException e) {
                 isFinished = true;
@@ -131,9 +130,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
                 //Skipping non existant filenames
                 if (!FileTransferWorkShop.isLocalReadable(fullfilename)) {
                     if (fileTransferLogger.isDebugEnabled()) {
-                        fileTransferLogger.debug(
-                            "Skiping. Unreadable for FileTransfer:" +
-                            fullfilename);
+                        fileTransferLogger.debug("Skiping. Unreadable for FileTransfer:" + fullfilename);
                     }
                     continue;
                 }
@@ -161,8 +158,7 @@ public class UnicoreProcess extends AbstractExternalProcessDecorator {
                 }
 
                 if (fileTransferLogger.isDebugEnabled()) {
-                    fileTransferLogger.debug("Unicore FileTransfer:" +
-                        sb.toString());
+                    fileTransferLogger.debug("Unicore FileTransfer:" + sb.toString());
                 }
             }
         }

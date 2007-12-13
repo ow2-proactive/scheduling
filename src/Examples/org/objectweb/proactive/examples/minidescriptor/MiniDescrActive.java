@@ -36,11 +36,9 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 public class MiniDescrActive {
     public Message getComputerInfo() {
         try {
-            return new Message(ProActiveInet.getInstance().getInetAddress() +
-                "");
+            return new Message(ProActiveInet.getInstance().getInetAddress() + "");
         } catch (Exception e) {
-            return new Message(
-                "ProActiveInet.getInstance().getLocal() IMPOSSIBLE");
+            return new Message("ProActiveInet.getInstance().getLocal() IMPOSSIBLE");
         }
     }
 }

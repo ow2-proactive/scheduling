@@ -40,14 +40,10 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupOARParser extends AbstractGroupParser {
-    private static final String NODE_NAME_RESOURCES = NODE_EXT_NAMESPACE +
-        "resources";
-    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE +
-        "directory";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
-        "stdout";
-    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
-        "stderr";
+    private static final String NODE_NAME_RESOURCES = NODE_EXT_NAMESPACE + "resources";
+    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE + "directory";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
     private static final String ATTR_QUEUE = "queue";
     private static final String ATTR_INTERACTIVE = "interactive";
     private static final String ATTR_TYPE = "type";
@@ -70,15 +66,13 @@ public class GroupOARParser extends AbstractGroupParser {
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         GroupOAR oarGroup = (GroupOAR) super.parseGroupNode(groupNode, xpath);
 
-        String interactive = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_INTERACTIVE);
+        String interactive = GCMParserHelper.getAttributeValue(groupNode, ATTR_INTERACTIVE);
 
         if (interactive != null) {
             oarGroup.setInteractive(interactive);
         }
 
-        String queueName = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_QUEUE);
+        String queueName = GCMParserHelper.getAttributeValue(groupNode, ATTR_QUEUE);
 
         if (queueName != null) {
             oarGroup.setQueueName(queueName);
@@ -106,18 +100,15 @@ public class GroupOARParser extends AbstractGroupParser {
                 if ((nodeValue != null) && (nodeValue.trim().length() != 0)) {
                     oarGroup.setResources(nodeValue);
                 } else {
-                    String nodes = GCMParserHelper.getAttributeValue(childNode,
-                            ATTR_RESOURCES_NODES);
+                    String nodes = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_NODES);
                     if (nodes != null) {
                         oarGroup.setNodes(Integer.parseInt(nodes));
                     }
-                    String cpu = GCMParserHelper.getAttributeValue(childNode,
-                            ATTR_RESOURCES_CPU);
+                    String cpu = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_CPU);
                     if (cpu != null) {
                         oarGroup.setCpu(Integer.parseInt(cpu));
                     }
-                    String core = GCMParserHelper.getAttributeValue(childNode,
-                            ATTR_RESOURCES_CORE);
+                    String core = GCMParserHelper.getAttributeValue(childNode, ATTR_RESOURCES_CORE);
                     if (core != null) {
                         oarGroup.setCore(Integer.parseInt(core));
                     }

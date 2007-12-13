@@ -52,13 +52,11 @@ public class DumpACQWithCallback extends DumpAcquaintancesMessage {
     @Override
     public void execute(P2PService target) {
         //        try {
-        AcquaintanceInfo info = new AcquaintanceInfo(P2PService.getHostNameAndPortFromUrl(
-                    target.getAddress().toString()),
-                target.getAcquaintanceManager().getAcquaintancesURLs()
-                      .toArray(new String[] {  }),
-                target.getAcquaintanceManager().getMaxNOA(),
-                target.acquaintanceManager_active.size().intValue(),
-                target.acquaintanceManager_active.getAwaitedRepliesUrls());
+        AcquaintanceInfo info = new AcquaintanceInfo(P2PService.getHostNameAndPortFromUrl(target.getAddress()
+                .toString()),
+            target.getAcquaintanceManager().getAcquaintancesURLs().toArray(new String[] {}), target
+                    .getAcquaintanceManager().getMaxNOA(), target.acquaintanceManager_active.size()
+                    .intValue(), target.acquaintanceManager_active.getAwaitedRepliesUrls());
 
         this.d.receiveAcqInfo(info);
         //        } catch (UnknownHostException e) {

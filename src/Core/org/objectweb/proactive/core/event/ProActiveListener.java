@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.event;
 
-
 /**
  * <p>
  * An empty marker interface for all the listeners in ProActive

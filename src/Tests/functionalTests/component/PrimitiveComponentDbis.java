@@ -57,8 +57,7 @@ public class PrimitiveComponentDbis extends PrimitiveComponentD {
     }
 
     @Override
-    public void unbindFc(String clientItf)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String clientItf) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if (i2Group.containsKey(clientItf)) {
             i2Group.removeNamedElement(clientItf);

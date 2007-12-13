@@ -110,8 +110,7 @@ public class HttpMessageSender {
             connection.setDoInput(true);
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Length", "" + bytes.length);
-            connection.setRequestProperty("Content-Type",
-                SERVICE_REQUEST_CONTENT_TYPE);
+            connection.setRequestProperty("Content-Type", SERVICE_REQUEST_CONTENT_TYPE);
             connection.setUseCaches(false);
             connection.connect();
 
@@ -125,8 +124,7 @@ public class HttpMessageSender {
             //Get data returned in the connection
             DataInputStream in = null;
 
-            in = new DataInputStream(new BufferedInputStream(
-                        connection.getInputStream()));
+            in = new DataInputStream(new BufferedInputStream(connection.getInputStream()));
 
             int a = connection.getContentLength();
 
@@ -139,13 +137,11 @@ public class HttpMessageSender {
             //            if (returnedObject instanceof Exception)
             //                throw (Exception)returnedObject;
         } catch (ConnectException e) {
-            throw new HTTPRemoteException(
-                "Error while connecting the remote host: " + url, e);
+            throw new HTTPRemoteException("Error while connecting the remote host: " + url, e);
         } catch (UnknownHostException e) {
             throw new HTTPRemoteException("Unknown remote host: " + url, e);
         } catch (IOException e) {
-            throw new HTTPRemoteException(
-                "Error during connection with remote host" + url, e);
+            throw new HTTPRemoteException("Error during connection with remote host" + url, e);
         }
     }
 }

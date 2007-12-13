@@ -53,8 +53,7 @@ public class SynchronousReplyImpl implements Reply, Serializable {
         this.reply = reply;
     }
 
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException {
+    public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException {
         // TODO Auto-generated method stub
         return false;
     }

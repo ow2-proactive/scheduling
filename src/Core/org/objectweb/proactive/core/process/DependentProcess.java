@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.process;
 
-
 /**
  * A Dependent process must implement this interface.
  *

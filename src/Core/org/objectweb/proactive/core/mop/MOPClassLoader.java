@@ -61,7 +61,7 @@ public class MOPClassLoader extends URLClassLoader {
     }
 
     public MOPClassLoader() {
-        super(new URL[] {  });
+        super(new URL[] {});
     }
 
     /**
@@ -76,8 +76,7 @@ public class MOPClassLoader extends URLClassLoader {
         cb = classDataCache.get(classname);
         if (cb == null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("MOPClassLoader: class " + classname +
-                    " not found, trying to generate it");
+                logger.debug("MOPClassLoader: class " + classname + " not found, trying to generate it");
             }
             try {
                 this.loadClass(classname);
@@ -124,8 +123,7 @@ public class MOPClassLoader extends URLClassLoader {
         ClassLoader currentClassLoader = null;
 
         try {
-            Class<?> c = Class.forName(
-                    "org.objectweb.proactive.core.mop.MOPClassLoader");
+            Class<?> c = Class.forName("org.objectweb.proactive.core.mop.MOPClassLoader");
             currentClassLoader = c.getClassLoader();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -155,19 +153,17 @@ public class MOPClassLoader extends URLClassLoader {
         return this.loadClass(name, null, null, false);
     }
 
-    public Class<?> loadClass(String name, Class<?>[] genericParameters)
-        throws ClassNotFoundException {
+    public Class<?> loadClass(String name, Class<?>[] genericParameters) throws ClassNotFoundException {
         return this.loadClass(name, genericParameters, null, false);
     }
 
-    public Class<?> loadClass(String name, Class<?>[] genericParameters,
-        ClassLoader cl) throws ClassNotFoundException {
+    public Class<?> loadClass(String name, Class<?>[] genericParameters, ClassLoader cl)
+            throws ClassNotFoundException {
         return this.loadClass(name, genericParameters, cl, false);
     }
 
-    protected synchronized Class<?> loadClass(String name,
-        Class<?>[] genericParameters, ClassLoader cl, boolean resolve)
-        throws ClassNotFoundException {
+    protected synchronized Class<?> loadClass(String name, Class<?>[] genericParameters, ClassLoader cl,
+            boolean resolve) throws ClassNotFoundException {
         if (this.getParent() != null) {
             try {
                 return this.getParent().loadClass(name);
@@ -179,8 +175,7 @@ public class MOPClassLoader extends URLClassLoader {
             //defined the stub class using the context class loader
             //we check here
             try {
-                return Thread.currentThread().getContextClassLoader()
-                             .loadClass(name);
+                return Thread.currentThread().getContextClassLoader().loadClass(name);
             } catch (ClassNotFoundException e) {
                 //no luck, proceed
             }
@@ -201,8 +196,7 @@ public class MOPClassLoader extends URLClassLoader {
 
                 byte[] data = null;
 
-                data = JavassistByteCodeStubBuilder.create(classname,
-                        genericParameters);
+                data = JavassistByteCodeStubBuilder.create(classname, genericParameters);
                 MOPClassLoader.classDataCache.put(name, data);
 
                 // We use introspection to invoke the defineClass method to avoid the normal 
@@ -215,11 +209,9 @@ public class MOPClassLoader extends URLClassLoader {
                     argumentTypes[1] = data.getClass();
                     argumentTypes[2] = Integer.TYPE;
                     argumentTypes[3] = Integer.TYPE;
-                    argumentTypes[4] = Class.forName(
-                            "java.security.ProtectionDomain");
+                    argumentTypes[4] = Class.forName("java.security.ProtectionDomain");
 
-                    Method m = clc.getDeclaredMethod("defineClass",
-                            argumentTypes);
+                    Method m = clc.getDeclaredMethod("defineClass", argumentTypes);
                     m.setAccessible(true);
 
                     Object[] effectiveArguments = new Object[5];
@@ -232,20 +224,17 @@ public class MOPClassLoader extends URLClassLoader {
                     //  we have been loaded through the bootclasspath
                     // so we use the context classloader
                     if (this.getParent() == null) {
-                        return (Class<?>) m.invoke(Thread.currentThread()
-                                                         .getContextClassLoader(),
-                            effectiveArguments);
+                        return (Class<?>) m.invoke(Thread.currentThread().getContextClassLoader(),
+                                effectiveArguments);
                     } else {
-                        return (Class<?>) m.invoke(this.getParent(),
-                            effectiveArguments);
+                        return (Class<?>) m.invoke(this.getParent(), effectiveArguments);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     throw new ClassNotFoundException(ex.getMessage());
                 }
             } else {
-                logger.debug("Cannot generate class " + name +
-                    " as a stub class");
+                logger.debug("Cannot generate class " + name + " as a stub class");
                 throw e;
             }
         }

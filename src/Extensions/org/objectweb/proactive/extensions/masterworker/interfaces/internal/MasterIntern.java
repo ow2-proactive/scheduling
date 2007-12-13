@@ -36,6 +36,7 @@ import java.util.List;
 import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 
 
-public interface MasterIntern extends Master<TaskIntern<ResultIntern<Serializable>>, ResultIntern<Serializable>> {
+public interface MasterIntern extends
+        Master<TaskIntern<ResultIntern<Serializable>>, ResultIntern<Serializable>> {
     public void solveIds(final List<Long> taskIds);
 }

@@ -68,8 +68,7 @@ public class Cube implements Serializable {
      * @param height height of the cube
      * @param depth depth of the cube
      */
-    public Cube(double x, double y, double z, double width, double height,
-        double depth) {
+    public Cube(double x, double y, double z, double width, double height, double depth) {
         this.x = x;
         this.y = y;
         this.z = z;
@@ -96,7 +95,6 @@ public class Cube implements Serializable {
     /** For displaying a Point3D */
     @Override
     public String toString() {
-        return "x=" + x + " y=" + y + " y=" + y + " width=" + width +
-        " height=" + height + " depth=" + depth;
+        return "x=" + x + " y=" + y + " y=" + y + " width=" + width + " height=" + height + " depth=" + depth;
     }
 }

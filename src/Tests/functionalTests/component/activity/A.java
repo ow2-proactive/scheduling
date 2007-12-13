@@ -40,8 +40,8 @@ import org.objectweb.proactive.core.component.body.ComponentInitActive;
 import org.objectweb.proactive.core.component.body.ComponentRunActive;
 
 
-public class A implements ComponentInitActive, ComponentEndActive,
-    ComponentRunActive, InitActive, RunActive, EndActive {
+public class A implements ComponentInitActive, ComponentEndActive, ComponentRunActive, InitActive, RunActive,
+        EndActive {
     public static String message = "";
     public static final String INIT_COMPONENT_ACTIVITY = "init-component-activity";
     public static final String RUN_COMPONENT_ACTIVITY = "run-component-activity";

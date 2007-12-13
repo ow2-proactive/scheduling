@@ -70,18 +70,16 @@ public class InternalJobFactory implements Serializable {
         InternalJob iJob = null;
 
         switch (job.getType()) {
-        case PARAMETER_SWEEPING:
-            throw new SchedulerException(
-                "The type of the given job is not yet implemented !");
-        case PROACTIVE:
-            iJob = createJob((ProActiveJob) job);
-            break;
-        case TASKSFLOW:
-            iJob = createJob((TaskFlowJob) job);
-            break;
-        default:
-            throw new SchedulerException(
-                "The type of the given job is unknown !");
+            case PARAMETER_SWEEPING:
+                throw new SchedulerException("The type of the given job is not yet implemented !");
+            case PROACTIVE:
+                iJob = createJob((ProActiveJob) job);
+                break;
+            case TASKSFLOW:
+                iJob = createJob((TaskFlowJob) job);
+                break;
+            default:
+                throw new SchedulerException("The type of the given job is unknown !");
         }
 
         try {
@@ -93,22 +91,20 @@ public class InternalJobFactory implements Serializable {
 
             return iJob;
         } catch (Exception e) {
-            throw new SchedulerException("Error while creating the internalJob !",
-                e);
+            throw new SchedulerException("Error while creating the internalJob !", e);
         }
     }
 
     /**
-         * Create an internal ProActive job with the given ProActive job (user)
-         *
-         * @param job
-         *            the user job that will be used to create the internal job.
-         * @return the created internal job.
-         * @throws SchedulerException
-         *             an exception if the factory cannot create the given job.
-         */
-    private static InternalJob createJob(ProActiveJob userJob)
-        throws SchedulerException {
+     * Create an internal ProActive job with the given ProActive job (user)
+     *
+     * @param job
+     *            the user job that will be used to create the internal job.
+     * @return the created internal job.
+     * @throws SchedulerException
+     *             an exception if the factory cannot create the given job.
+     */
+    private static InternalJob createJob(ProActiveJob userJob) throws SchedulerException {
         InternalProActiveJob job;
         ProActiveTask userTask = userJob.getTask();
 
@@ -117,11 +113,9 @@ public class InternalJobFactory implements Serializable {
         }
 
         if (userTask.getTaskClass() != null) {
-            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(),
-                    userTask.getTaskClass());
+            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(), userTask.getTaskClass());
         } else if (userTask.getTaskInstance() != null) {
-            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(),
-                    userTask.getTaskInstance());
+            job = new InternalProActiveJob(userTask.getNumberOfNodesNeeded(), userTask.getTaskInstance());
         } else {
             throw new SchedulerException(
                 "You must specify your own executable ProActive task to be launched (in the application task) !");
@@ -142,8 +136,7 @@ public class InternalJobFactory implements Serializable {
      * @return the created internal job.
      * @throws SchedulerException an exception if the factory cannot create the given job.
      */
-    private static InternalJob createJob(TaskFlowJob userJob)
-        throws SchedulerException {
+    private static InternalJob createJob(TaskFlowJob userJob) throws SchedulerException {
         if (userJob.getTasks().size() == 0) {
             throw new SchedulerException("This job must contains tasks !");
         }
@@ -161,8 +154,7 @@ public class InternalJobFactory implements Serializable {
         }
 
         if (!hasPreciousResult) {
-            throw new SchedulerException(
-                "You must specify at least on precious result in your job !");
+            throw new SchedulerException("You must specify at least on precious result in your job !");
         }
 
         for (Entry<Task, InternalTask> entry : tasksList.entrySet()) {
@@ -184,8 +176,7 @@ public class InternalJobFactory implements Serializable {
         } else if (task instanceof JavaTask) {
             return createTask((JavaTask) task);
         } else {
-            throw new SchedulerException(
-                "The task you intend to add is unknown !");
+            throw new SchedulerException("The task you intend to add is unknown !");
         }
     }
 
@@ -196,8 +187,7 @@ public class InternalJobFactory implements Serializable {
      * @return the created internal task.
      * @throws SchedulerException an exception if the factory cannot create the given task.
      */
-    private static InternalTask createTask(JavaTask task)
-        throws SchedulerException {
+    private static InternalTask createTask(JavaTask task) throws SchedulerException {
         InternalJavaTask javaTask;
 
         if (task.getTaskClass() != null) {
@@ -222,16 +212,14 @@ public class InternalJobFactory implements Serializable {
      * @return the created internal task.
      * @throws SchedulerException an exception if the factory cannot create the given task.
      */
-    private static InternalTask createTask(NativeTask task)
-        throws SchedulerException {
+    private static InternalTask createTask(NativeTask task) throws SchedulerException {
         if (((task.getCommandLine() == null) || (task.getCommandLine() == "")) &&
-                (task.getGenerationScript() == null)) {
-            throw new SchedulerException(
-                "The command line is null or empty and not generated !!");
+            (task.getGenerationScript() == null)) {
+            throw new SchedulerException("The command line is null or empty and not generated !!");
         }
 
-        InternalNativeTask nativeTask = new InternalNativeTask(task.getCommandLine(),
-                task.getGenerationScript());
+        InternalNativeTask nativeTask = new InternalNativeTask(task.getCommandLine(), task
+                .getGenerationScript());
         setProperties(task, nativeTask);
 
         return nativeTask;

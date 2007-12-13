@@ -57,8 +57,7 @@ public class DefaultEventData implements EventData {
     private Vector<Object> collapsedValues;
 
     /** Creates a new instance of DefaultStatData */
-    public DefaultEventData(String name, int collapseOperation,
-        int notifyOperation) {
+    public DefaultEventData(String name, int collapseOperation, int notifyOperation) {
         this.name = name;
         this.collapseOperation = collapseOperation;
         this.notifyOperation = notifyOperation;
@@ -66,35 +65,35 @@ public class DefaultEventData implements EventData {
         this.result = 0;
 
         switch (this.notifyOperation) {
-        case DefaultEventData.MIN:
-            this.value = Double.MAX_VALUE;
-            break;
-        case DefaultEventData.MAX:
-            this.value = Double.MIN_VALUE;
-            break;
-        default:
-            this.value = 0;
+            case DefaultEventData.MIN:
+                this.value = Double.MAX_VALUE;
+                break;
+            case DefaultEventData.MAX:
+                this.value = Double.MIN_VALUE;
+                break;
+            default:
+                this.value = 0;
         }
     }
 
     public void performNotifyOperation(double value) {
         switch (this.notifyOperation) {
-        case DefaultEventData.MIN:
-            if (value < this.value) {
-                this.value = value;
-            }
-            break;
-        case DefaultEventData.MAX:
-            if (value > this.value) {
-                this.value = value;
-            }
-            break;
-        case DefaultEventData.AVERAGE:
-            this.nbNotify++;
-            this.value += value;
-            break;
-        default:
-            this.value += value;
+            case DefaultEventData.MIN:
+                if (value < this.value) {
+                    this.value = value;
+                }
+                break;
+            case DefaultEventData.MAX:
+                if (value > this.value) {
+                    this.value = value;
+                }
+                break;
+            case DefaultEventData.AVERAGE:
+                this.nbNotify++;
+                this.value += value;
+                break;
+            default:
+                this.value += value;
         }
     }
 
@@ -131,33 +130,35 @@ public class DefaultEventData implements EventData {
 
         this.collapsedValues.add(anotherData.getData());
         switch (this.collapseOperation) {
-        case DefaultEventData.MIN:
-            this.result = Double.MAX_VALUE;
-            for (int i = 0; i < this.collapsedValues.size(); i++) {
-                this.result = (((Double) this.collapsedValues.get(i) < this.result)
-                    ? (Double) this.collapsedValues.get(i) : this.result);
-            }
-            break;
-        case DefaultEventData.MAX:
-            this.result = Double.MIN_VALUE;
-            for (int i = 0; i < this.collapsedValues.size(); i++) {
-                this.result = (((Double) this.collapsedValues.get(i) > this.result)
-                    ? (Double) this.collapsedValues.get(i) : this.result);
-            }
-            break;
-        case DefaultEventData.AVERAGE:
-            this.result = 0;
-            for (int i = 0; i < this.collapsedValues.size(); i++) {
-                this.result += (Double) this.collapsedValues.get(i);
-            }
-            this.result /= this.collapsedValues.size();
-            break;
-        default:
-            this.result = 0;
-            for (int i = 0; i < this.collapsedValues.size(); i++) {
-                this.result += (Double) this.collapsedValues.get(i);
-            }
-            break;
+            case DefaultEventData.MIN:
+                this.result = Double.MAX_VALUE;
+                for (int i = 0; i < this.collapsedValues.size(); i++) {
+                    this.result = (((Double) this.collapsedValues.get(i) < this.result) ? (Double) this.collapsedValues
+                            .get(i)
+                            : this.result);
+                }
+                break;
+            case DefaultEventData.MAX:
+                this.result = Double.MIN_VALUE;
+                for (int i = 0; i < this.collapsedValues.size(); i++) {
+                    this.result = (((Double) this.collapsedValues.get(i) > this.result) ? (Double) this.collapsedValues
+                            .get(i)
+                            : this.result);
+                }
+                break;
+            case DefaultEventData.AVERAGE:
+                this.result = 0;
+                for (int i = 0; i < this.collapsedValues.size(); i++) {
+                    this.result += (Double) this.collapsedValues.get(i);
+                }
+                this.result /= this.collapsedValues.size();
+                break;
+            default:
+                this.result = 0;
+                for (int i = 0; i < this.collapsedValues.size(); i++) {
+                    this.result += (Double) this.collapsedValues.get(i);
+                }
+                break;
         }
         return this.collapsedValues;
     }

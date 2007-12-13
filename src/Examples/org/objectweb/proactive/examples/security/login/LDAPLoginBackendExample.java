@@ -62,8 +62,8 @@ public class LDAPLoginBackendExample {
         // example) with the jvm parameter
         // -Djava.security.auth.login.config==jaas.config or like this
         // :
-        System.setProperty("java.security.auth.login.config",
-            Login.class.getResource("jaas.config").getFile());
+        System.setProperty("java.security.auth.login.config", Login.class.getResource("jaas.config")
+                .getFile());
 
         Map<String, Object> params = new HashMap<String, Object>(3);
 

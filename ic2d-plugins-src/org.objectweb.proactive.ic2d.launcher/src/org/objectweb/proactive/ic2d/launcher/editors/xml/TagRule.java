@@ -46,8 +46,7 @@ public class TagRule extends MultiLineRule {
     //
     // -- PROTECTED METHODS ---------------------------------------------
     //
-    protected boolean sequenceDetected(ICharacterScanner scanner,
-        char[] sequence, boolean eofAllowed) {
+    protected boolean sequenceDetected(ICharacterScanner scanner, char[] sequence, boolean eofAllowed) {
         int c = scanner.read();
         if (sequence[0] == '<') {
             if (c == '?') {

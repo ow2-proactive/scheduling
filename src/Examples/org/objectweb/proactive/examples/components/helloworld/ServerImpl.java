@@ -42,11 +42,11 @@ public class ServerImpl implements Service, ServiceAttributes {
 
     public void print(final String msg) {
         new Exception() {
-                @Override
-                public String toString() {
-                    return "Server: print method called";
-                }
-            }.printStackTrace();
+            @Override
+            public String toString() {
+                return "Server: print method called";
+            }
+        }.printStackTrace();
         System.err.println("Server: begin printing...");
         for (int i = 0; i < count; ++i) {
             System.err.println(header + msg);

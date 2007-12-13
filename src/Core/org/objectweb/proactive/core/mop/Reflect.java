@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.mop;
 
-
 /**
  * This interface is used to tag an object and deosn't define any method
  */

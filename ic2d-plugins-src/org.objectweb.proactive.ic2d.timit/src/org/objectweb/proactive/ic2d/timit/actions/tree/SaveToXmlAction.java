@@ -56,70 +56,61 @@ public class SaveToXmlAction extends Action {
     public SaveToXmlAction(final TimerTreeHolder t) {
         this.timerTreeHolder = t;
         super.setId(SAVE_TO_XML_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "save_edit.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "save_edit.gif"));
         super.setToolTipText(SAVE_TO_XML_ACTION);
         super.setEnabled(true);
     }
 
     @Override
     public final void run() {
-        if ((this.timerTreeHolder == null) ||
-                (this.timerTreeHolder.getChartObjectSources() == null) ||
-                (this.timerTreeHolder.getChartObjectSources().size() == 0)) {
-            Console.getInstance(Activator.CONSOLE_NAME)
-                   .log("Cannot generate XML output file. Nothing to save.");
+        if ((this.timerTreeHolder == null) || (this.timerTreeHolder.getChartObjectSources() == null) ||
+            (this.timerTreeHolder.getChartObjectSources().size() == 0)) {
+            Console.getInstance(Activator.CONSOLE_NAME).log(
+                    "Cannot generate XML output file. Nothing to save.");
             return;
         }
 
-        final SafeSaveDialog safeSaveDialog = new SafeSaveDialog(Display.getDefault()
-                                                                        .getActiveShell());
+        final SafeSaveDialog safeSaveDialog = new SafeSaveDialog(Display.getDefault().getActiveShell());
 
         final String path = safeSaveDialog.open();
 
         // Bad path
         if ((path == null) || "".equals(path)) {
-            Console.getInstance(Activator.CONSOLE_NAME)
-                   .log("Cannot generate XML output file. Please provide a correct output file path.");
+            Console.getInstance(Activator.CONSOLE_NAME).log(
+                    "Cannot generate XML output file. Please provide a correct output file path.");
             return;
         }
 
         // Create the global list of result bags
-        final List<ResultBag> results = new java.util.ArrayList<ResultBag>(this.timerTreeHolder.getChartObjectSources()
-                                                                                               .size());
+        final List<ResultBag> results = new java.util.ArrayList<ResultBag>(this.timerTreeHolder
+                .getChartObjectSources().size());
 
         for (final BasicChartObject c : this.timerTreeHolder.getChartObjectSources()) {
-            final List<BasicTimer> timersList = new ArrayList<BasicTimer>(c.getTimersList()
-                                                                           .size());
+            final List<BasicTimer> timersList = new ArrayList<BasicTimer>(c.getTimersList().size());
 
             // Fill the timers list with original basic timers
             for (final TimerTreeNodeObject t : c.getTimersList()) {
-                if ((t.getCurrentTimer() != null) &&
-                        (t.getCurrentTimer().getTotalTime() != 0L)) {
+                if ((t.getCurrentTimer() != null) && (t.getCurrentTimer().getTotalTime() != 0L)) {
                     timersList.add(t.getCurrentTimer());
                 }
             }
 
             // Add current bag to the
-            results.add(new ResultBag(c.getAoObject().getName(),
-                    c.getAoObject().getUniqueID().shortString(), timersList,
-                    c.getAoObject().getName() + " on " +
-                    c.getAoObject().getParent().getName()));
+            results.add(new ResultBag(c.getAoObject().getName(), c.getAoObject().getUniqueID().shortString(),
+                timersList, c.getAoObject().getName() + " on " + c.getAoObject().getParent().getName()));
         }
 
         final BasicResultWriter finalWriter = new BasicResultWriter(path);
 
         // Load date formatter
-        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-                DateFormat.MEDIUM);
+        final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
 
         // Get Current date
         final Date now = new Date();
         now.setTime(System.currentTimeMillis());
 
         // Can possibly add the current JVM version
-        finalWriter.addGlobalInformationElement(
-            "This XML file was generated : " + df.format(now));
+        finalWriter.addGlobalInformationElement("This XML file was generated : " + df.format(now));
 
         // Add results to the output writer
         for (final ResultBag resultBag : results) {
@@ -128,7 +119,7 @@ public class SaveToXmlAction extends Action {
 
         finalWriter.writeToFile();
 
-        Console.getInstance(Activator.CONSOLE_NAME)
-               .log("Successful XML output file generation. See : " + path);
+        Console.getInstance(Activator.CONSOLE_NAME).log(
+                "Successful XML output file generation. See : " + path);
     }
 }

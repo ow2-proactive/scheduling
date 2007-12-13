@@ -83,9 +83,8 @@ public abstract class AbstractRemoteObjectFactory {
 
                 addCodebase(codebase);
             } catch (Exception e) {
-                ProActiveLogger.getLogger(Loggers.CLASS_SERVER)
-                               .warn("Error with the ClassServer : " +
-                    e.getMessage());
+                ProActiveLogger.getLogger(Loggers.CLASS_SERVER).warn(
+                        "Error with the ClassServer : " + e.getMessage());
             }
         }
     }
@@ -95,8 +94,7 @@ public abstract class AbstractRemoteObjectFactory {
      * @return return the remote object factory associated to the given protocol
      * @throws UnknownProtocolException
      */
-    public static RemoteObjectFactory getRemoteObjectFactory(String protocol)
-        throws UnknownProtocolException {
+    public static RemoteObjectFactory getRemoteObjectFactory(String protocol) throws UnknownProtocolException {
         try {
             RemoteObjectFactory rof = activatedRemoteObjectFactories.get(protocol);
             if (rof != null) {
@@ -118,8 +116,7 @@ public abstract class AbstractRemoteObjectFactory {
             e.printStackTrace();
         }
 
-        throw new UnknownProtocolException(
-            "there is no RemoteObjectFactory defined for the protocol : " +
+        throw new UnknownProtocolException("there is no RemoteObjectFactory defined for the protocol : " +
             protocol);
     }
 }

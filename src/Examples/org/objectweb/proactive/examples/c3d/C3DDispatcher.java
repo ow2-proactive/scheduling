@@ -71,8 +71,7 @@ import timer.AverageMicroTimer;
  * It handles the logic of asking renderers to draw partial images. It then forwards them to the users.
  * It also allows users to hold conversations, in a chat-like way.
  */
-public class C3DDispatcher implements InitActive, RunActive, Serializable,
-    Dispatcher, DispatcherLogic {
+public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispatcher, DispatcherLogic {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private static int IMAGE_HEIGHT = 500;
     private static int IMAGE_WIDTH = 500;
@@ -147,15 +146,14 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                 RenderingEngine tmpEngine;
 
                 try {
-                    tmpEngine = (RenderingEngine) PAActiveObject.newActive(C3DRenderingEngine.class.getName(),
-                            param, this.rendererNodes[i]);
+                    tmpEngine = (RenderingEngine) PAActiveObject.newActive(
+                            C3DRenderingEngine.class.getName(), param, this.rendererNodes[i]);
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(e.toString());
                 }
 
-                log("New rendering engine " + i + " created at " +
-                    this.rendererNodes[i]);
+                log("New rendering engine " + i + " created at " + this.rendererNodes[i]);
 
                 // always put all renderers as in use, when launching the program
                 // put this <renderer string> in the "used list" of the <GUI>
@@ -181,10 +179,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             // show users in the GUI, and give these users the new dispatcher host information
             for (userBag.newIterator(); userBag.hasNext();) {
                 userBag.next();
-                this.gui.addUser(userBag.currentName() + " (" +
-                    userBag.currentKey() + ")");
-                userBag.currentUser()
-                       .setDispatcherMachine(getMachineName(), getOSString());
+                this.gui.addUser(userBag.currentName() + " (" + userBag.currentKey() + ")");
+                userBag.currentUser().setDispatcherMachine(getMachineName(), getOSString());
             }
         }
     }
@@ -225,21 +221,21 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         // create all intervals except last one
         for (int i = 0; i < (nbTasks - 1); i++) {
-            Interval newint = new Interval(i, IMAGE_WIDTH, IMAGE_HEIGHT,
-                    i * intheight, (i + 1) * intheight);
+            Interval newint = new Interval(i, IMAGE_WIDTH, IMAGE_HEIGHT, i * intheight, (i + 1) * intheight);
             intervalsToDraw[i] = newint;
         }
 
         // last Interval goes to end of picture, ie IMAGE_HEIGHT
-        Interval newint = new Interval(nbTasks - 1, IMAGE_WIDTH, IMAGE_HEIGHT,
-                (nbTasks - 1) * intheight, IMAGE_HEIGHT);
+        Interval newint = new Interval(nbTasks - 1, IMAGE_WIDTH, IMAGE_HEIGHT, (nbTasks - 1) * intheight,
+            IMAGE_HEIGHT);
         intervalsToDraw[intervalsToDraw.length - 1] = newint;
 
         // To store future ImagePart values
         Vector<Image2D> images = new Vector<Image2D>();
         int counter = 0; // says which interval is to assign next 
 
-        for (int i = 0; i < nbTasks; i++) // no value has come back yet    
+        for (int i = 0; i < nbTasks; i++)
+            // no value has come back yet    
 
             received[i] = false;
 
@@ -250,8 +246,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
                 Interval interval = intervalsToDraw[counter++];
                 images.add(engine[i].render(i, interval));
-                log("Interval " + interval.number + " assigned to engine " +
-                    engineToName(engine[i]) + " [" + i + "]");
+                log("Interval " + interval.number + " assigned to engine " + engineToName(engine[i]) + " [" +
+                    i + "]");
             } catch (Exception e) {
                 log("OUPS , " + engineToName(engine[i]) + " is  dead");
             }
@@ -262,8 +258,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             try {
                 Interval interval = intervalsToDraw[counter++];
                 images.add(engine[i].render(i, interval));
-                log("Interval " + interval.number + " assigned to engine " +
-                    engineToName(engine[i]) + " [" + i + "]");
+                log("Interval " + interval.number + " assigned to engine " + engineToName(engine[i]) + " [" +
+                    i + "]");
             } catch (Exception e) {
                 log("OUPS , " + engineToName(engine[i]) + "  dead");
             }
@@ -277,8 +273,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             // log("RECEIVED interval " + returnedImage.getInterval().number + " from " + engineFree);
             Interval newInterval = intervalsToDraw[counter++];
             images.add(engine[engineFree].render(engineFree, newInterval));
-            log("Interval " + newInterval.number + " assigned to engine " +
-                engineToName(engine[engineFree]) + "[" + engineFree + "]");
+            log("Interval " + newInterval.number + " assigned to engine " + engineToName(engine[engineFree]) +
+                "[" + engineFree + "]");
         }
 
         this.pointer = 0;
@@ -292,14 +288,13 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         int intervalToRecompute;
 
         while (-1 != (intervalToRecompute = allArrived(received))) { // we're sure not all have yet arrived
-                                                                     // intervalToRecompute is the next not-yet-returned interval
-                                                                     //assert !received[stillComputing] : "Oups, recomputing one already received! " + stillComputing;
-                                                                     // assign to newly freed engine an interval not yet received
+            // intervalToRecompute is the next not-yet-returned interval
+            //assert !received[stillComputing] : "Oups, recomputing one already received! " + stillComputing;
+            // assign to newly freed engine an interval not yet received
             Interval redrawInterval = intervalsToDraw[intervalToRecompute];
             images.add(engine[engineFree].render(engineFree, redrawInterval));
-            log("Interval " + redrawInterval.number +
-                " re-assigned to engine " + engineToName(engine[engineFree]) +
-                "[" + engineFree + "]");
+            log("Interval " + redrawInterval.number + " re-assigned to engine " +
+                engineToName(engine[engineFree]) + "[" + engineFree + "]");
 
             returnedImage = getReturned(images, received);
             engineFree = returnedImage.getEngineNb();
@@ -366,9 +361,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         // Stores the newly rendered interval in this.localCopyOfImage. 
         // this.localCopyOfImage is later used to initialize the images of newcoming consumers 
-        System.arraycopy(image.getPixels(), 0, this.localCopyOfImage,
-            image.getInterval().totalImageWidth * image.getInterval().yfrom,
-            image.getPixels().length);
+        System.arraycopy(image.getPixels(), 0, this.localCopyOfImage, image.getInterval().totalImageWidth *
+            image.getInterval().yfrom, image.getPixels().length);
     }
 
     /**
@@ -402,17 +396,15 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
     /** Tells what are the operations to perform before starting the activity of the AO.
      * Here, we state that if migration asked, procedure  is : leaveHost, migrate */
     public void initActivity(Body body) {
-        MigrationStrategyManagerImpl myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) body);
+        MigrationStrategyManagerImpl myStrategyManager = new MigrationStrategyManagerImpl(
+            (org.objectweb.proactive.core.body.migration.Migratable) body);
         myStrategyManager.onDeparture("leaveHost");
 
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(),
-                "//" +
-                ProActiveInet.getInstance().getInetAddress().getHostName() +
-                "/" + "Dispatcher");
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//" +
+                ProActiveInet.getInstance().getInetAddress().getHostName() + "/" + "Dispatcher");
         } catch (IOException ioe) {
-            logger.error("Coudn't register the Dispatcher! " +
-                ioe.getMessage());
+            logger.error("Coudn't register the Dispatcher! " + ioe.getMessage());
         }
     }
 
@@ -489,8 +481,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         for (this.userBag.newIterator(); this.userBag.hasNext();) {
             this.userBag.next();
             this.userBag.currentUser().informNewUser(this.lastUserID, userName);
-            c3duser.informNewUser(this.userBag.currentKey(),
-                this.userBag.currentName());
+            c3duser.informNewUser(this.userBag.currentKey(), this.userBag.currentName());
         }
 
         // Adds this User to the list 
@@ -507,8 +498,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         } else {
 
             /* Initializes the image of the new-coming consumer */
-            Interval inter = new Interval(0, IMAGE_WIDTH, IMAGE_HEIGHT, 0,
-                    IMAGE_HEIGHT);
+            Interval inter = new Interval(0, IMAGE_WIDTH, IMAGE_HEIGHT, 0, IMAGE_HEIGHT);
             c3duser.setPixels(new Image2D(this.localCopyOfImage, inter, 0));
         }
 
@@ -541,8 +531,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         /* Initializes the image of the migrated consumer
          * (user's copy of image is destroyed before user's migration) */
-        Interval inter = new Interval(0, IMAGE_WIDTH, IMAGE_HEIGHT, 0,
-                IMAGE_HEIGHT);
+        Interval inter = new Interval(0, IMAGE_WIDTH, IMAGE_HEIGHT, 0, IMAGE_HEIGHT);
         c3duser.setPixels(new Image2D(this.localCopyOfImage, inter, 0));
     }
 
@@ -570,17 +559,17 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
         // depending on nb users left, reset fields  
         switch (nbUsers) {
-        case 0:
-            this.lastUserID = 0;
-            break;
-        case 1:
-            this.election.terminate();
-            this.election = null; // when only one user in simulation, election should not be used, 
+            case 0:
+                this.lastUserID = 0;
+                break;
+            case 1:
+                this.election.terminate();
+                this.election = null; // when only one user in simulation, election should not be used, 
 
-            break;
-        default:
-            this.election.setNbUsers(nbUsers);
-            break;
+                break;
+            default:
+                this.election.setNbUsers(nbUsers);
+                break;
         }
     }
 
@@ -638,8 +627,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
 
     /** Find the name of the OS the Dispatcher is running on */
     public String getOSString() {
-        return System.getProperty("os.name") + " " +
-        System.getProperty("os.version");
+        return System.getProperty("os.name") + " " + System.getProperty("os.version");
     }
 
     /** Get the list of users in an asynchronous call, entries being separated by \n */
@@ -676,8 +664,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             proActiveDescriptor.killall(true);
             System.exit(0);
         } catch (Exception e) {
-            logger.info(
-                "C3DDispatcher: WARNING occurs when killing the application!");
+            logger.info("C3DDispatcher: WARNING occurs when killing the application!");
         }
     }
 
@@ -701,8 +688,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             for (int i = 1; i <= max; i++) {
                 log("##########   Testing with " + i + " engine(s)");
 
-                AverageMicroTimer timer = new AverageMicroTimer("Engines : " +
-                        i);
+                AverageMicroTimer timer = new AverageMicroTimer("Engines : " + i);
 
                 // A too long way to say "use only i engines"
                 String[] enginesNowUsed = this.gui.setEngines(i);
@@ -734,8 +720,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
                 log("End test " + i);
                 // write to file + to system.out
                 plot.writeChars(i + "\t" + timer.getAverage() + "\n");
-                logger.info("-------------------- nb of renderers" + i +
-                    "------------");
+                logger.info("-------------------- nb of renderers" + i + "------------");
                 logger.info(timer);
             }
 
@@ -778,13 +763,12 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         updateGUI();
 
         if (name == null) {
-            throw new ArrayIndexOutOfBoundsException("Can't remove engine " +
-                engine);
+            throw new ArrayIndexOutOfBoundsException("Can't remove engine " + engine);
         }
     }
 
     /** Add to the GUI all the engines that where bound to the Dispatcher.
-    * This also sets all engines to "available". */
+     * This also sets all engines to "available". */
     protected void updateGUI() {
         if (this.gui != null) {
             this.engineVector.removeAllElements();
@@ -825,8 +809,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             }
         }
 
-        throw new ArrayIndexOutOfBoundsException("Can't find engine named " +
-            name);
+        throw new ArrayIndexOutOfBoundsException("Can't find engine named " + name);
     }
 
     /**
@@ -844,8 +827,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             }
         }
 
-        throw new ArrayIndexOutOfBoundsException("Can't find name of " +
-            engine);
+        throw new ArrayIndexOutOfBoundsException("Can't find name of " + engine);
     }
 
     /**
@@ -857,8 +839,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                    argv[0]);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + argv[0]);
 
             proActiveDescriptor.activateMappings();
         } catch (Exception e) {
@@ -866,16 +847,13 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable,
             logger.error("Pb in main, trouble loading descriptor");
         }
 
-        String[] rendererNodes = proActiveDescriptor.getVirtualNode("Renderer")
-                                                    .getNodesURL();
+        String[] rendererNodes = proActiveDescriptor.getVirtualNode("Renderer").getNodesURL();
         Object[] param = new Object[] { rendererNodes, proActiveDescriptor };
 
-        Node dispatcherNode = proActiveDescriptor.getVirtualNode("Dispatcher")
-                                                 .getNode();
+        Node dispatcherNode = proActiveDescriptor.getVirtualNode("Dispatcher").getNode();
 
         try {
-            PAActiveObject.newActive(C3DDispatcher.class.getName(), param,
-                dispatcherNode);
+            PAActiveObject.newActive(C3DDispatcher.class.getName(), param, dispatcherNode);
         } catch (Exception e) {
             logger.error("Problemn with C3DDispatcher Active Object creation:");
             e.printStackTrace();

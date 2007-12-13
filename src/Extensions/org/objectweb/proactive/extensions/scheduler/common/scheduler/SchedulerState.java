@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.scheduler.common.scheduler;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * State of the scheduler.
  * The state and what you can do with the scheduler according to the current state

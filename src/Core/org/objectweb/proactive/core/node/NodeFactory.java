@@ -104,16 +104,16 @@ public class NodeFactory {
             try {
                 defaultRuntime = RuntimeFactory.getDefaultRuntime();
                 nodeURL = defaultRuntime.createLocalNode(DEFAULT_NODE_NAME +
-                        Integer.toString(ProActiveRandom.nextPosInt()), false,
-                        securityManager, DEFAULT_VIRTUAL_NODE_NAME, jobID);
+                    Integer.toString(ProActiveRandom.nextPosInt()), false, securityManager,
+                        DEFAULT_VIRTUAL_NODE_NAME, jobID);
             } catch (ProActiveException e) {
                 throw new NodeException("Cannot create the default Node", e);
             } catch (AlreadyBoundException e) { //if this exception is risen, we generate an othe random name for the node
                 getDefaultNode();
             }
 
-            defaultNode = new NodeImpl(defaultRuntime, nodeURL,
-                    PAProperties.PA_COMMUNICATION_PROTOCOL.getValue(), jobID);
+            defaultNode = new NodeImpl(defaultRuntime, nodeURL, PAProperties.PA_COMMUNICATION_PROTOCOL
+                    .getValue(), jobID);
         }
 
         return defaultNode;
@@ -124,8 +124,7 @@ public class NodeFactory {
      * @return true if the given node belongs to this JVM false else
      */
     public static boolean isNodeLocal(Node node) {
-        return node.getVMInformation().getVMID()
-                   .equals(UniqueID.getCurrentVMID());
+        return node.getVMInformation().getVMID().equals(UniqueID.getCurrentVMID());
     }
 
     /**
@@ -142,8 +141,7 @@ public class NodeFactory {
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
      */
-    public static Node createNode(String nodeURL)
-        throws NodeException, AlreadyBoundException {
+    public static Node createNode(String nodeURL) throws NodeException, AlreadyBoundException {
         return createNode(nodeURL, false, null, null, null);
     }
 
@@ -162,9 +160,8 @@ public class NodeFactory {
      * @return the newly created node on the local JVM
      * @exception NodeException if the node cannot be created
      */
-    public static Node createNode(String url, boolean replacePreviousBinding,
-        ProActiveSecurityManager psm, String vnname, String jobId)
-        throws NodeException, AlreadyBoundException {
+    public static Node createNode(String url, boolean replacePreviousBinding, ProActiveSecurityManager psm,
+            String vnname, String jobId) throws NodeException, AlreadyBoundException {
         ProActiveRuntime proActiveRuntime;
         String nodeURL;
 
@@ -183,8 +180,7 @@ public class NodeFactory {
         //then create a node
         try {
             proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(protocol);
-            nodeURL = proActiveRuntime.createLocalNode(url,
-                    replacePreviousBinding, psm, vnname, jobId);
+            nodeURL = proActiveRuntime.createLocalNode(url, replacePreviousBinding, psm, vnname, jobId);
         } catch (ProActiveException e) {
             throw new NodeException("Cannot create a Node based on " + url, e);
         }

@@ -75,8 +75,7 @@ public class TransactionsManager implements TransactionsManagerMBean, IJmx {
         return instance;
     }
 
-    public static TransactionsManager getInstance(String url)
-        throws JMXException {
+    public static TransactionsManager getInstance(String url) throws JMXException {
         if (instance == null) {
             instance = new TransactionsManager(url);
             try {
@@ -101,12 +100,10 @@ public class TransactionsManager implements TransactionsManagerMBean, IJmx {
         return new Long(t.getId());
     }
 
-    public Transaction getTransaction(long id)
-        throws InvalidTransactionException {
+    public Transaction getTransaction(long id) throws InvalidTransactionException {
         Transaction t = this.transactionsMap.get(id);
 
-        if ((t != null) && (t.getState() != Transaction.COMMITED) &&
-                (t.getState() != Transaction.DEAD)) {
+        if ((t != null) && (t.getState() != Transaction.COMMITED) && (t.getState() != Transaction.DEAD)) {
             return t;
         }
         throw new InvalidTransactionException(id);
@@ -114,8 +111,7 @@ public class TransactionsManager implements TransactionsManagerMBean, IJmx {
 
     public void update(Transaction transaction) {
         if (transaction.getState() == Transaction.ACTIVE) {
-            Iterator<Transaction> i = this.concurrentTransactions.keySet()
-                                                                 .iterator();
+            Iterator<Transaction> i = this.concurrentTransactions.keySet().iterator();
             while (i.hasNext()) {
                 Transaction t = i.next();
                 if (t.getState() == Transaction.ACTIVE) {
@@ -156,14 +152,12 @@ public class TransactionsManager implements TransactionsManagerMBean, IJmx {
     /**
      * IJMx implementation
      */
-    public void register()
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
+    public void register() throws InstanceAlreadyExistsException, MBeanRegistrationException,
             NotCompliantMBeanException {
         ManagementFactory.getPlatformMBeanServer().registerMBean(this, on);
     }
 
-    public void unregister()
-        throws InstanceNotFoundException, MBeanRegistrationException {
+    public void unregister() throws InstanceNotFoundException, MBeanRegistrationException {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(on);
     }
 }

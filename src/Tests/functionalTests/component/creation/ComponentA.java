@@ -42,8 +42,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 public class ComponentA implements Serializable, ComponentInfo {
 
     /**
-         *
-         */
+     *
+     */
     String name;
 
     public ComponentA() {

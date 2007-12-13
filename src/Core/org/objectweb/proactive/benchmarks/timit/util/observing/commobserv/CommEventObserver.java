@@ -76,11 +76,9 @@ public class CommEventObserver implements EventObserver {
      *            Argument that contains the information
      */
     public void update(EventObservable s, Object arg) {
-        if (arg instanceof CommEvent &&
-                (((CommEvent) arg).getObserver() == this)) {
-            this.commStatData.mark(((CommEvent) arg).getDestRank(),
-                ((CommEvent) arg).getValue()); // increment the value each
-                                               // time we speak to sombody
+        if (arg instanceof CommEvent && (((CommEvent) arg).getObserver() == this)) {
+            this.commStatData.mark(((CommEvent) arg).getDestRank(), ((CommEvent) arg).getValue()); // increment the value each
+            // time we speak to sombody
         }
     }
 

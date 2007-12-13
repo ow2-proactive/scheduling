@@ -50,7 +50,6 @@ public interface ClientTestItf {
 
     List<WrappedInteger> testCustom_Method(List<WrappedInteger> list);
 
-    List<WrappedInteger> testAllStdModes_Param(List<WrappedInteger> list1,
-        List<WrappedInteger> list2, List<WrappedInteger> list3,
-        List<WrappedInteger> list4, WrappedInteger a);
+    List<WrappedInteger> testAllStdModes_Param(List<WrappedInteger> list1, List<WrappedInteger> list2,
+            List<WrappedInteger> list3, List<WrappedInteger> list4, WrappedInteger a);
 }

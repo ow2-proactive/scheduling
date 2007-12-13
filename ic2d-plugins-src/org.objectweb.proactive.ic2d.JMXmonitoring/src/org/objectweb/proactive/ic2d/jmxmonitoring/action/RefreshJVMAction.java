@@ -41,8 +41,7 @@ public class RefreshJVMAction extends Action {
 
     public RefreshJVMAction() {
         this.setId(REFRESH_JVM);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "refresh.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
         this.setText("Look for new Nodes");
         this.setToolTipText("Look for new Nodes");
     }

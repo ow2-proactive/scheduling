@@ -54,13 +54,11 @@ public class B {
     }
 
     public void createActiveObjectC() throws Exception {
-        ProActiveDescriptor descriptor = PADeployment.getProactiveDescriptor(getClass()
-                                                                                 .getResource("/deployment-tmp.xml")
-                                                                                 .getPath());
+        ProActiveDescriptor descriptor = PADeployment.getProactiveDescriptor(getClass().getResource(
+                "/deployment-tmp.xml").getPath());
         descriptor.activateMappings();
         Object ao = PAActiveObject.newActive("functionalTests.runtime.classloader.C",
-                new Object[] { "sdfasdf" },
-                descriptor.getVirtualNode("VN1").getNode());
+                new Object[] { "sdfasdf" }, descriptor.getVirtualNode("VN1").getNode());
         descriptor.killall(false);
     }
 }

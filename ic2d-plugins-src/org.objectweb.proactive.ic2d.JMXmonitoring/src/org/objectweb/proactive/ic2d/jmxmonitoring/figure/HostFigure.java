@@ -136,15 +136,13 @@ public class HostFigure extends AbstractRectangleFigure {
     // -- INNER CLASS --------------------------------------------
     //
     private class HostBorderLayout extends BorderLayout {
-        protected Dimension calculatePreferredSize(IFigure container,
-            int wHint, int hHint) {
+        protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
             if (legend) {
                 return super.calculatePreferredSize(container, wHint, hHint).expand( /*100*/
-                    50, /*10*/
-                    0);
+                50, /*10*/
+                0);
             }
-            return super.calculatePreferredSize(container, wHint, hHint)
-                        .expand(10, 0);
+            return super.calculatePreferredSize(container, wHint, hHint).expand(10, 0);
         }
     }
 
@@ -153,10 +151,8 @@ public class HostFigure extends AbstractRectangleFigure {
             super(true);
         }
 
-        protected Dimension calculatePreferredSize(IFigure container,
-            int wHint, int hHint) {
-            return super.calculatePreferredSize(container, wHint, hHint)
-                        .expand(0, 13);
+        protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
+            return super.calculatePreferredSize(container, wHint, hHint).expand(0, 13);
         }
 
         public void layout(IFigure figure) {
@@ -170,10 +166,8 @@ public class HostFigure extends AbstractRectangleFigure {
             super(false);
         }
 
-        protected Dimension calculatePreferredSize(IFigure container,
-            int wHint, int hHint) {
-            return super.calculatePreferredSize(container, wHint, hHint)
-                        .expand(0, 13);
+        protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
+            return super.calculatePreferredSize(container, wHint, hHint).expand(0, 13);
         }
 
         public void layout(IFigure figure) {

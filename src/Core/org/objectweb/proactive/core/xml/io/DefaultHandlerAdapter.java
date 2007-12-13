@@ -77,14 +77,12 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
     //    //System.out.println("endPrefixMapping prefix="+prefix);
     //    targetHandler.endPrefixMapping(prefix);
     //  }
-
     /**
      * Start element.
      */
     @Override
-    public void startElement(String namespaceURI, String localName,
-        String qName, org.xml.sax.Attributes atts)
-        throws org.xml.sax.SAXException {
+    public void startElement(String namespaceURI, String localName, String qName, org.xml.sax.Attributes atts)
+            throws org.xml.sax.SAXException {
         //System.out.println("DefaultHandlerAdaptor startElement localName="+localName+" qName="+qName);
         targetHandler.startElement(qName, new AttributesImpl(atts));
     }
@@ -94,7 +92,7 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
      */
     @Override
     public void endElement(String namespaceURI, String localName, String qName)
-        throws org.xml.sax.SAXException {
+            throws org.xml.sax.SAXException {
         //System.out.println("DefaultHandlerAdaptor endElement localName="+localName+" qName="+qName);
         targetHandler.endElement(qName);
     }
@@ -114,8 +112,7 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
      * Characters.
      */
     @Override
-    public void characters(char[] ch, int start, int length)
-        throws org.xml.sax.SAXException {
+    public void characters(char[] ch, int start, int length) throws org.xml.sax.SAXException {
         if (length > 0) {
             char[] c = new char[length];
             System.arraycopy(ch, start, c, 0, length);
@@ -172,8 +169,7 @@ public class DefaultHandlerAdapter extends org.xml.sax.helpers.DefaultHandler {
             return attribute;
         }
 
-        public String getValue(String uri, String localPart)
-            throws SAXException {
+        public String getValue(String uri, String localPart) throws SAXException {
             String attribut = attributes.getValue(uri, localPart);
             if ((attribut != null) && (attribut.indexOf("${") >= 0)) {
                 return org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(attribut);

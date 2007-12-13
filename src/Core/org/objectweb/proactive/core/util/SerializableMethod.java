@@ -45,8 +45,7 @@ public class SerializableMethod implements Serializable {
         return m;
     }
 
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         System.out.println("writing WrappedMethod");
         out.writeObject(m.getDeclaringClass());
         out.writeObject(m.getName());
@@ -70,8 +69,7 @@ public class SerializableMethod implements Serializable {
     //        }
     //        return tmp;
     //    }
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         System.out.println("reading WrappedMethod");
         Class<?> declaringClass = (Class<?>) in.readObject();
         String name = (String) in.readObject();

@@ -54,8 +54,7 @@ public class EWMATimer extends AverageMicroTimer {
             currentElapsed += timer.getCumulatedTime();
             this.total += currentElapsed;
             this.nbrValues++;
-            this.average = ((this.average * this.alpha) +
-                ((1 - this.alpha) * currentElapsed));
+            this.average = ((this.average * this.alpha) + ((1 - this.alpha) * currentElapsed));
             currentElapsed = 0;
             running = false;
         }
@@ -106,10 +105,9 @@ public class EWMATimer extends AverageMicroTimer {
         long[] memory = tm.getMemory();
         System.err.println("Dumping memory ");
         for (int i = 0; i < ewmaMemory.length; i++) {
-            System.out.println(tMemory[i] + " " + ewmaMemory[i] + " " +
-                ewmaMemory2[i] + " " + memory[i]);
+            System.out.println(tMemory[i] + " " + ewmaMemory[i] + " " + ewmaMemory2[i] + " " + memory[i]);
         }
-        System.err.println(
-            "Command in gnuplot: plot 'file' using 1 title 'Average' with lp, 'file' using 2 title 'EMWA 0.9' with lp, 'file' using 3 title 'EWMA 0.5' with lp, 'file' using 4 title 'Raw' with lp");
+        System.err
+                .println("Command in gnuplot: plot 'file' using 1 title 'Average' with lp, 'file' using 2 title 'EMWA 0.9' with lp, 'file' using 3 title 'EWMA 0.5' with lp, 'file' using 4 title 'Raw' with lp");
     }
 }

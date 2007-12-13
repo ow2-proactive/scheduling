@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.component.adl.vnexportation;
 
-
 /**
  * An AST node interface to define a set of exported virtual nodes.
  *

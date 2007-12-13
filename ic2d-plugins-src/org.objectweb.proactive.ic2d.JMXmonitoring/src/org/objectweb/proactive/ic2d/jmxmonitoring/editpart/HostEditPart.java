@@ -91,16 +91,16 @@ public class HostEditPart extends AbstractMonitoringEditPart {
         MVCNotificationTag mvcNotif = notif.getMVCNotification();
         Object data = notif.getData();
         switch (mvcNotif) {
-        case STATE_CHANGED: {
-            if (data == State.NOT_MONITORED) {
-                deactivate();
+            case STATE_CHANGED: {
+                if (data == State.NOT_MONITORED) {
+                    deactivate();
+                }
             }
-        }
-        case HOST_OBJECT_UPDATED_OSNAME_AND_VERSON: {
-            if (data instanceof String) {
-                getCastedFigure().changeTitle((String) data);
+            case HOST_OBJECT_UPDATED_OSNAME_AND_VERSON: {
+                if (data instanceof String) {
+                    getCastedFigure().changeTitle((String) data);
+                }
             }
-        }
         } //switch
 
         getViewer().getControl().getDisplay().asyncExec(this);
@@ -123,8 +123,7 @@ public class HostEditPart extends AbstractMonitoringEditPart {
      */
     protected IFigure createFigure() {
         HostFigure figure = new HostFigure(getCastedModel().toString());
-        HostListener listener = new HostListener(getCastedModel(), figure,
-                getMonitoringView());
+        HostListener listener = new HostListener(getCastedModel(), figure, getMonitoringView());
         figure.addMouseListener(listener);
         figure.addMouseMotionListener(listener);
         return figure;

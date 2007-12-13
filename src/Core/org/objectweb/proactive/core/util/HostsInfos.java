@@ -120,8 +120,7 @@ public class HostsInfos {
         }
     }
 
-    protected static Hashtable<String, String> getHostInfos(String _hostname,
-        boolean common) {
+    protected static Hashtable<String, String> getHostInfos(String _hostname, boolean common) {
         String hostname = hostnameToIP(_hostname);
         Hashtable<String, String> host_infos = findHostInfos(hostname);
         if (host_infos == null) {
@@ -151,15 +150,13 @@ public class HostsInfos {
 
         String secondaryNames = PAProperties.PA_NET_SECONDARYNAMES.getValue();
         if (secondaryNames != null) {
-            if (secondaryNames.matches(REGEXP_KEYVAL + "(," + REGEXP_KEYVAL +
-                        ")?")) {
+            if (secondaryNames.matches(REGEXP_KEYVAL + "(," + REGEXP_KEYVAL + ")?")) {
                 for (String keyval : secondaryNames.split(",")) {
                     String[] tmp = keyval.split(":");
                     setSecondaryName(tmp[0], tmp[1]);
                 }
             } else {
-                logger.error("Invalid value for proactive.secondaryNames: " +
-                    secondaryNames);
+                logger.error("Invalid value for proactive.secondaryNames: " + secondaryNames);
             }
         }
     }
@@ -173,15 +170,13 @@ public class HostsInfos {
             int index = unames[i].indexOf("@");
             if (index < 0) {
                 if (unames.length > 1) {
-                    logger.error(
-                        "ERROR: malformed usernames. Should be username1@host1;username2@host2");
+                    logger.error("ERROR: malformed usernames. Should be username1@host1;username2@host2");
                 } else {
                     setUserName("all", unames[0]);
                 }
             } else {
                 String username = unames[i].substring(0, index);
-                String hostname = unames[i].substring(index + 1,
-                        unames[i].length());
+                String hostname = unames[i].substring(index + 1, unames[i].length());
                 setUserName(hostname, username);
             }
         }
@@ -194,8 +189,7 @@ public class HostsInfos {
             try {
                 //we have to identify the mapping between host and IP
                 //we try with the canonical hostname
-                String host = InetAddress.getByName(hostname)
-                                         .getCanonicalHostName();
+                String host = InetAddress.getByName(hostname).getCanonicalHostName();
                 if (!hostsTable.containsKey(host)) {
                     //we try with the IP
                     host = InetAddress.getByName(hostname).getHostAddress();

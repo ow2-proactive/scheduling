@@ -35,7 +35,6 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
 
 
-@ClassDispatchMetadata(mode = @ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE)
-)
+@ClassDispatchMetadata(mode = @ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE))
 public interface OneToOneItfAnnotatedClientItf extends MulticastTestItf {
 }

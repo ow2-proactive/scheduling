@@ -52,8 +52,7 @@ public class EventLog implements EntitiesEventListener {
         return instance;
     }
 
-    public void handleEntityEvent(RemoteEntity entity, String message,
-        Object bundle) {
+    public void handleEntityEvent(RemoteEntity entity, String message, Object bundle) {
         String msg = "[" + message + "] " + entity;
         firelisteners(msg);
     }

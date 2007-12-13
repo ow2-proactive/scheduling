@@ -55,8 +55,7 @@ public class UserImpl extends C3DUser implements BindingController, User {
     public void initActivity(Body body) {
         // Maybe 'binding to dispatcher' has been done before
         if (this.c3ddispatcher == null) {
-            logger.error(
-                "User component could not find a dispatcher. Performing lookup");
+            logger.error("User component could not find a dispatcher. Performing lookup");
 
             // ask user through Dialog for userName & host
             NameAndHostDialog userAndHostNameDialog = new NameAndHostDialogForComponent();
@@ -75,8 +74,8 @@ public class UserImpl extends C3DUser implements BindingController, User {
 
         // Register the User in the Registry.
         try {
-            Fractive.register(Fractive.getComponentRepresentativeOnThis(),
-                URIBuilder.buildURIFromProperties("localhost", "User").toString());
+            Fractive.register(Fractive.getComponentRepresentativeOnThis(), URIBuilder.buildURIFromProperties(
+                    "localhost", "User").toString());
         } catch (IOException e) {
             logger.error("Registering 'User' for future lookup failed");
             e.printStackTrace();

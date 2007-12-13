@@ -56,8 +56,7 @@ public interface SecurityEntity extends Serializable {
      * @throws SecurityNotAvailableException if security is not available
      * @throws java.io.IOException if communication fails
      */
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException, IOException;
+    public TypedCertificate getCertificate() throws SecurityNotAvailableException, IOException;
 
     /**
      * start an unvalidated empty session
@@ -69,16 +68,15 @@ public interface SecurityEntity extends Serializable {
      * @throws SecurityNotAvailableException
      */
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SessionException, SecurityNotAvailableException, IOException;
+            TypedCertificate distantCertificate) throws SessionException, SecurityNotAvailableException,
+            IOException;
 
     /**
      * entity public key
      * @return returns entity public key
      * @throws SecurityNotAvailableException
      */
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException;
+    public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException;
 
     /**
      * Exchange random value between client and server entity
@@ -88,9 +86,8 @@ public interface SecurityEntity extends Serializable {
      * @throws SecurityNotAvailableException if the security is not available
      * @throws RenegotiateSessionException if the session has expired
      */
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException;
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
+            RenegotiateSessionException, IOException;
 
     /**
      * exchange entity certificate and/or public key if certificate are not available
@@ -103,9 +100,8 @@ public interface SecurityEntity extends Serializable {
      * @throws RenegotiateSessionException if the session has expired
      * @throws KeyExchangeException if a key data/length/algorithm is not supported
      */
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException;
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException, KeyExchangeException, IOException;
 
     /**
      * this method sends encoded secret parameters to the target entity
@@ -125,11 +121,9 @@ public interface SecurityEntity extends Serializable {
      * @throws RenegotiateSessionException if the session has expired or has been cancelled during this exchange
      * @throws java.io.IOException if communication fails
      */
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException;
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException, RenegotiateSessionException, IOException;
 
     /**
      * Ask the entity to fill the securityContext parameters with its own policy
@@ -139,40 +133,37 @@ public interface SecurityEntity extends Serializable {
      * @return securityContext filled with this entity's policy
      * @throws SecurityNotAvailableException thrown the entity doest not support the security
      */
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException, IOException;
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException,
+            IOException;
 
     /**
      * Retrieves all the entity's ID which contain this entity plus this entity ID.
      * @return returns all the entity's ID which contain this entity plus this entity ID.
      * @throws SecurityNotAvailableException if the target entity does not support security
      */
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException;
+    public Entities getEntities() throws SecurityNotAvailableException, IOException;
 
     /**
      * terminate a given session
      * @param sessionID
      * @throws SecurityNotAvailableException id security is not available
      */
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException;
+    public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException;
 
     /**
-         * Returns this entity's security manager
-         *
-         * @param user
-         *            an entity representing the user asking for the security
-         *            manager
-         * @throws SecurityNotAvailableException
-         *             if security is not available
-         * @throws AccessControlException
-         *             if the user does not have the right to see the security
-         *             manager
-         */
+     * Returns this entity's security manager
+     *
+     * @param user
+     *            an entity representing the user asking for the security
+     *            manager
+     * @throws SecurityNotAvailableException
+     *             if security is not available
+     * @throws AccessControlException
+     *             if the user does not have the right to see the security
+     *             manager
+     */
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException;
+            throws SecurityNotAvailableException, AccessControlException, IOException;
 
     /**
      * Modifiy this entity's security manager
@@ -189,8 +180,6 @@ public interface SecurityEntity extends Serializable {
      *             manager
      * @throws IOException
      */
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException;
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException, IOException;
 }

@@ -51,8 +51,7 @@ import org.objectweb.proactive.extensions.calcium.system.WSpace;
 public class ConquerResults implements Conquer<File, File> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public File conquer(SkeletonSystem system, File[] param)
-        throws Exception {
+    public File conquer(SkeletonSystem system, File[] param) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Conquering Results");
         }
@@ -60,8 +59,7 @@ public class ConquerResults implements Conquer<File, File> {
         WSpace wspace = system.getWorkingSpace();
 
         //Create a reference on the result merged file
-        File merged = wspace.newFile("merged.result" +
-                ProActiveRandom.nextPosInt());
+        File merged = wspace.newFile("merged.result" + ProActiveRandom.nextPosInt());
 
         //Merge the files
         mergeFiles(merged, param);
@@ -81,8 +79,7 @@ public class ConquerResults implements Conquer<File, File> {
      *
      * @throws IOException
      */
-    private void mergeFiles(File merged, File[] files)
-        throws IOException {
+    private void mergeFiles(File merged, File[] files) throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("Conquering results into File: " + merged);
         }

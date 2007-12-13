@@ -52,8 +52,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
-public class DaC<P extends java.io.Serializable, R extends java.io.Serializable>
-    implements Skeleton<P, R> {
+public class DaC<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {
     Divide<P, P> div;
     Conquer<R, R> conq;
     Condition<P> cond;
@@ -71,8 +70,7 @@ public class DaC<P extends java.io.Serializable, R extends java.io.Serializable>
      * @param conq
      *            {@link Conquer}s the results of the nested {@link Skeleton} into a single task.
      */
-    public DaC(Divide<P, P> div, Condition<P> cond, Skeleton<P, R> child,
-        Conquer<R, R> conq) {
+    public DaC(Divide<P, P> div, Condition<P> cond, Skeleton<P, R> child, Conquer<R, R> conq) {
         this.div = div;
         this.cond = cond;
         this.child = child;
@@ -85,8 +83,7 @@ public class DaC<P extends java.io.Serializable, R extends java.io.Serializable>
      *
      * @param muscle The muscle to wrap in a {@link Seq} {@link Skeleton}
      */
-    public DaC(Divide<P, P> div, Condition<P> cond, Execute<P, R> muscle,
-        Conquer<R, R> conq) {
+    public DaC(Divide<P, P> div, Condition<P> cond, Execute<P, R> muscle, Conquer<R, R> conq) {
         this.div = div;
         this.cond = cond;
         this.child = new Seq<P, R>(muscle);

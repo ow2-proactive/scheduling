@@ -59,8 +59,8 @@ public abstract class Query implements Serializable {
     @Override
     public String toString() {
         //return(mask((left | down | right), n));
-        return ("<" + n + "," + done + type() + "{" + mask(left, n) + "," +
-        mask(down, n) + "," + mask(right, n) + "}>");
+        return ("<" + n + "," + done + type() + "{" + mask(left, n) + "," + mask(down, n) + "," +
+            mask(right, n) + "}>");
     }
 
     public String type() {

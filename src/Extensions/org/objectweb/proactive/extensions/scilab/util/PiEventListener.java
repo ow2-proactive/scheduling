@@ -66,17 +66,15 @@ public class PiEventListener implements MSEventListener {
             return;
         }
 
-        System.out.println("IDTASK: " + sciTaskInfo.getIdTask() + " IDRES: " +
-            res.getName());
+        System.out.println("IDTASK: " + sciTaskInfo.getIdTask() + " IDRES: " + res.getName());
         if (!sciTaskInfo.getIdTask().startsWith(res.getName())) {
             return;
         }
 
         service.removeTask(sciTaskInfo.getIdTask());
 
-        System.out.println("---------------- Task:" + sciTaskInfo.getIdTask() +
-            " " + sciTaskInfo.getIdEngine() + " " +
-            service.getMapTaskRun().size() + " SUCCESS -----------------");
+        System.out.println("---------------- Task:" + sciTaskInfo.getIdTask() + " " +
+            sciTaskInfo.getIdEngine() + " " + service.getMapTaskRun().size() + " SUCCESS -----------------");
 
         GeneralResult sciResult = sciTaskInfo.getResult();
 
@@ -85,8 +83,7 @@ public class PiEventListener implements MSEventListener {
             return;
         }
 
-        SciDoubleMatrix sciData = (SciDoubleMatrix) sciResult.getList().get(0)
-                                                             .getData();
+        SciDoubleMatrix sciData = (SciDoubleMatrix) sciResult.getList().get(0).getData();
         pi += sciData.getData()[0];
 
         count++;

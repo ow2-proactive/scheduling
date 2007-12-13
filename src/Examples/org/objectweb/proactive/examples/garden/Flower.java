@@ -67,8 +67,7 @@ public class Flower {
     }
 
     public void acceptReference(Flower f) {
-        logger.info("I am flower " + this.myName +
-            " and I received a reference on flower " + f.getName());
+        logger.info("I am flower " + this.myName + " and I received a reference on flower " + f.getName());
     }
 
     public int bob() {

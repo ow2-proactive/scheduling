@@ -63,8 +63,7 @@ public class RMDeploymentFactory {
      * @param padName : name of the ProActive descriptor.
      * @param pad     : the ProcAtive descriptor.
      */
-    public static void deployAllVirtualNodes(PadDeployInterface nodeSource,
-        ProActiveDescriptor pad) {
+    public static void deployAllVirtualNodes(PadDeployInterface nodeSource, ProActiveDescriptor pad) {
         if (logger.isInfoEnabled()) {
             logger.info("deployAllVirtualNodes");
         }
@@ -78,8 +77,7 @@ public class RMDeploymentFactory {
      * @param pad     : ProActive descriptor to deploy.
      * @param vnName  : name of the virtual node to deploy.
      */
-    public static void deployVirtualNode(PadDeployInterface nodeSource,
-        ProActiveDescriptor pad, String vnName) {
+    public static void deployVirtualNode(PadDeployInterface nodeSource, ProActiveDescriptor pad, String vnName) {
         if (logger.isInfoEnabled()) {
             logger.info("deployVirtualNode : " + vnName);
         }
@@ -92,8 +90,8 @@ public class RMDeploymentFactory {
      * @param pad     : the ProActive descriptor
      * @param vnNames : the name of the virtual nodes to deploy
      */
-    public static void deployVirtualNodes(PadDeployInterface nodeSource,
-        ProActiveDescriptor pad, String[] vnNames) {
+    public static void deployVirtualNodes(PadDeployInterface nodeSource, ProActiveDescriptor pad,
+            String[] vnNames) {
         if (logger.isInfoEnabled()) {
             String concatVnNames = "";
             for (String vnName : vnNames) {

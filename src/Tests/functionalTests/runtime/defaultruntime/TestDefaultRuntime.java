@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test default runtime creation
  */

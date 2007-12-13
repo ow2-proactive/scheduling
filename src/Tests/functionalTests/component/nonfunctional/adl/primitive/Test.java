@@ -52,8 +52,7 @@ public class Test extends ComponentTest {
     Component root;
 
     public Test() {
-        super("Basic creation of non-functional components",
-            "Basic creation of non-functional components");
+        super("Basic creation of non-functional components", "Basic creation of non-functional components");
     }
 
     @org.junit.Test
@@ -66,8 +65,7 @@ public class Test extends ComponentTest {
 
         Fractal.getLifeCycleController(root).startFc();
 
-        DummyControllerItf ref = (DummyControllerItf) root.getFcInterface(
-                "dummy-membrane");
+        DummyControllerItf ref = (DummyControllerItf) root.getFcInterface("dummy-membrane");
         String name = ref.dummyMethodWithResult();
         ref.dummyVoidMethod("Message");
         Assert.assertTrue(root instanceof ProActiveNFComponentRepresentative);

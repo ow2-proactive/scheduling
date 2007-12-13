@@ -53,8 +53,7 @@ public class DivideBT1 implements Divide<Board, Board> {
         //We set row 0 and 1 for backtrack1
         for (int i = board.n - 2; i >= 2; i--) {
             int bit = 1 << i;
-            v.add(new BoardBT1(board.n, board.solvableSize, 2, (2 | bit) << 1,
-                    1 | bit, bit >> 1, i, null));
+            v.add(new BoardBT1(board.n, board.solvableSize, 2, (2 | bit) << 1, 1 | bit, bit >> 1, i, null));
         }
 
         return v;
@@ -76,9 +75,8 @@ public class DivideBT1 implements Divide<Board, Board> {
         while (bitmap != 0) {
             bitmap ^= (param.board[param.row] = bit = -bitmap & bitmap);
 
-            v.add(new BoardBT1(param.n, param.solvableSize, param.row + 1,
-                    (param.left | bit) << 1, param.down | bit,
-                    (param.right | bit) >> 1, param.bound1, param.board));
+            v.add(new BoardBT1(param.n, param.solvableSize, param.row + 1, (param.left | bit) << 1,
+                param.down | bit, (param.right | bit) >> 1, param.bound1, param.board));
         }
 
         return v;

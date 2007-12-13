@@ -40,8 +40,7 @@ public class Patient {
     public Patient() {
     }
 
-    public Patient(Integer _id, Long _meanWell, Long _sigmaWell, Office _off,
-        RandomTime _rand) {
+    public Patient(Integer _id, Long _meanWell, Long _sigmaWell, Office _off, RandomTime _rand) {
         id = _id.intValue();
         meanWell = _meanWell.longValue();
         sigmaWell = _sigmaWell.longValue();

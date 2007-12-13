@@ -56,43 +56,34 @@ import org.xml.sax.SAXException;
  * @version 1.0, 2002/09/20
  * @since ProActive 0.9.3
  */
-public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
-    implements ProActiveDescriptorConstants {
+public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator implements
+        ProActiveDescriptorConstants {
     protected ProActiveDescriptorInternal proActiveDescriptor;
 
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public ProActiveDescriptorHandler(String xmlDescriptorUrl,
-        VariableContract variableContract) {
+    public ProActiveDescriptorHandler(String xmlDescriptorUrl, VariableContract variableContract) {
         super(false);
         proActiveDescriptor = new ProActiveDescriptorImpl(xmlDescriptorUrl);
         // keep a reference of the variable contract for future use
         proActiveDescriptor.setVariableContract(variableContract);
 
-        addHandler(MAIN_DEFINITION_TAG,
-            new MainDefinitionHandler(proActiveDescriptor));
+        addHandler(MAIN_DEFINITION_TAG, new MainDefinitionHandler(proActiveDescriptor));
         addHandler(DEPLOYMENT_TAG, new DeploymentHandler(proActiveDescriptor));
-        addHandler(INFRASTRUCTURE_TAG,
-            new InfrastructureHandler(proActiveDescriptor));
-        addHandler(FILE_TRANSFER_DEFINITIONS_TAG,
-            new FileTransferDefinitionsHandler(proActiveDescriptor));
-        addHandler(TECHNICAL_SERVICES_TAG,
-            new TechnicalServicesHandler(proActiveDescriptor));
+        addHandler(INFRASTRUCTURE_TAG, new InfrastructureHandler(proActiveDescriptor));
+        addHandler(FILE_TRANSFER_DEFINITIONS_TAG, new FileTransferDefinitionsHandler(proActiveDescriptor));
+        addHandler(TECHNICAL_SERVICES_TAG, new TechnicalServicesHandler(proActiveDescriptor));
         addHandler(SECURITY_TAG, new SecurityHandler(proActiveDescriptor));
 
         {
             PassiveCompositeUnmarshaller compDefHandler = new PassiveCompositeUnmarshaller();
             PassiveCompositeUnmarshaller vNodesDefHandler = new PassiveCompositeUnmarshaller();
             PassiveCompositeUnmarshaller vNodesAcqHandler = new PassiveCompositeUnmarshaller();
-            vNodesDefHandler.addHandler(VIRTUAL_NODE_TAG,
-                new VirtualNodeHandler(proActiveDescriptor));
-            vNodesAcqHandler.addHandler(VIRTUAL_NODE_TAG,
-                new VirtualNodeLookupHandler());
-            compDefHandler.addHandler(VIRTUAL_NODES_DEFINITION_TAG,
-                vNodesDefHandler);
-            compDefHandler.addHandler(VIRTUAL_NODES_ACQUISITION_TAG,
-                vNodesAcqHandler);
+            vNodesDefHandler.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeHandler(proActiveDescriptor));
+            vNodesAcqHandler.addHandler(VIRTUAL_NODE_TAG, new VirtualNodeLookupHandler());
+            compDefHandler.addHandler(VIRTUAL_NODES_DEFINITION_TAG, vNodesDefHandler);
+            compDefHandler.addHandler(VIRTUAL_NODES_ACQUISITION_TAG, vNodesAcqHandler);
             this.addHandler(COMPONENT_DEFINITION_TAG, compDefHandler);
         }
 
@@ -134,9 +125,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         // we get the schema from the class location
         ClassLoader classLoader = ProActiveDescriptorHandler.class.getClassLoader();
 
-        Enumeration<URL> schemaURLs = classLoader.getResources(
-                "org/objectweb/proactive/core/descriptor/xml/schemas/" +
-                schema);
+        Enumeration<URL> schemaURLs = classLoader
+                .getResources("org/objectweb/proactive/core/descriptor/xml/schemas/" + schema);
 
         // among the various descriptor schema that we may find, we will always
         // favor the one that is in the jar file
@@ -160,16 +150,13 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         return schemaURLcandidate;
     }
 
-    public static ProActiveDescriptorHandler createProActiveDescriptor(
-        String xmlDescriptorUrl, VariableContract variableContract)
-        throws java.io.IOException, org.xml.sax.SAXException {
+    public static ProActiveDescriptorHandler createProActiveDescriptor(String xmlDescriptorUrl,
+            VariableContract variableContract) throws java.io.IOException, org.xml.sax.SAXException {
         // static method added to replace main method
         InitialHandler h = new InitialHandler(xmlDescriptorUrl, variableContract);
         String uri = xmlDescriptorUrl;
 
-        String[] schemas = new String[] {
-                "deployment/3.3/deployment.xsd", "security/1.0/security.xsd"
-            };
+        String[] schemas = new String[] { "deployment/3.3/deployment.xsd", "security/1.0/security.xsd" };
 
         Vector<String> selectedSchemas = new Vector<String>();
 
@@ -178,11 +165,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
 
             if (schemaURLcandidate != null) {
                 selectedSchemas.add(schemaURLcandidate.toString());
-                logger.debug("Using XML schema: " +
-                    schemaURLcandidate.toString());
+                logger.debug("Using XML schema: " + schemaURLcandidate.toString());
             } else {
-                logger.error("No schema instance (file) found for " +
-                    schemas[i]);
+                logger.error("No schema instance (file) found for " + schemas[i]);
             }
         }
 
@@ -196,12 +181,10 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             if (selectedSchemasArray.length == 0) {
                 selectedSchemasArray = null;
             }
-            sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
-                        uri), h, selectedSchemasArray,
-                    new SAXParserErrorHandlerTerminating());
+            sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(uri), h,
+                selectedSchemasArray, new SAXParserErrorHandlerTerminating());
         } else {
-            sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(
-                        uri), h);
+            sr = new org.objectweb.proactive.core.xml.io.StreamReader(new org.xml.sax.InputSource(uri), h);
         }
 
         sr.read();
@@ -223,8 +206,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         return proActiveDescriptor;
     }
 
-    public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
     }
 
     //
@@ -232,8 +214,8 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     // ------------------------------------------------------
     //
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+            throws org.xml.sax.SAXException {
 
         /*
          * if(name.equals(VARIABLES_TAG)){ //Check XMLProperties Runtime
@@ -256,11 +238,9 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         // line added to return a ProactiveDescriptorHandler object
         private ProActiveDescriptorHandler proActiveDescriptorHandler;
 
-        private InitialHandler(String xmlDescriptorUrl,
-            VariableContract variableContract) {
+        private InitialHandler(String xmlDescriptorUrl, VariableContract variableContract) {
             super();
-            proActiveDescriptorHandler = new ProActiveDescriptorHandler(xmlDescriptorUrl,
-                    variableContract);
+            proActiveDescriptorHandler = new ProActiveDescriptorHandler(xmlDescriptorUrl, variableContract);
             this.addHandler(PROACTIVE_DESCRIPTOR_TAG, proActiveDescriptorHandler);
         }
 
@@ -268,13 +248,12 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             return proActiveDescriptorHandler;
         }
 
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
         }
 
         @Override
-        protected void notifyEndActiveHandler(String name,
-            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+        protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
         }
     }
 
@@ -289,20 +268,17 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             // create and register a VirtualNode
             String vnName = attributes.getValue("name");
 
             if (!checkNonEmpty(vnName)) {
-                throw new org.xml.sax.SAXException(
-                    "VirtualNode defined without name");
+                throw new org.xml.sax.SAXException("VirtualNode defined without name");
             }
 
             // underneath, we know that it is a VirtualNodeImpl, since the
             // bollean in the method is false
-            VirtualNodeImpl vn = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(vnName,
-                    false);
+            VirtualNodeImpl vn = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(vnName, false);
 
             // property
             String property = attributes.getValue("property");
@@ -312,8 +288,7 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             }
 
             String timeout = attributes.getValue("timeout");
-            String waitForTimeoutAsString = attributes.getValue(
-                    "waitForTimeout");
+            String waitForTimeoutAsString = attributes.getValue("waitForTimeout");
             boolean waitForTimeout = false;
 
             if (checkNonEmpty(waitForTimeoutAsString)) {
@@ -339,22 +314,19 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
             String fileTransferDeployName = attributes.getValue(FILE_TRANSFER_DEPLOY_TAG);
 
             if (checkNonEmpty(fileTransferDeployName)) {
-                vn.addFileTransferDeploy(pad.getFileTransfer(
-                        fileTransferDeployName));
+                vn.addFileTransferDeploy(pad.getFileTransfer(fileTransferDeployName));
             }
 
             String fileTransferRetrieveName = attributes.getValue(FILE_TRANSFER_RETRIEVE_TAG);
 
             if (checkNonEmpty(fileTransferRetrieveName)) {
-                vn.addFileTransferRetrieve(pad.getFileTransfer(
-                        fileTransferRetrieveName));
+                vn.addFileTransferRetrieve(pad.getFileTransfer(fileTransferRetrieveName));
             }
 
             String technicalServiceId = attributes.getValue(TECHNICAL_SERVICE_ID);
 
             if (checkNonEmpty(technicalServiceId)) {
-                vn.addTechnicalService(pad.getTechnicalService(
-                        technicalServiceId));
+                vn.addTechnicalService(pad.getTechnicalService(technicalServiceId));
             }
         }
     } // end inner class VirtualNodeHandler
@@ -367,14 +339,12 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             // create and register a VirtualNode
             String vnName = attributes.getValue("name");
 
             if (!checkNonEmpty(vnName)) {
-                throw new org.xml.sax.SAXException(
-                    "VirtualNode defined without name");
+                throw new org.xml.sax.SAXException("VirtualNode defined without name");
             }
 
             proActiveDescriptor.createVirtualNode(vnName, true);
@@ -392,21 +362,19 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
         public SecurityHandler(ProActiveDescriptorInternal proActiveDescriptor) {
             super();
             this.proActiveDescriptor = proActiveDescriptor;
-            this.addHandler(SECURITY_FILE_TAG,
-                new SecurityFileHandler(proActiveDescriptor));
+            this.addHandler(SECURITY_FILE_TAG, new SecurityFileHandler(proActiveDescriptor));
         }
 
         @Override
-        protected void notifyEndActiveHandler(String name,
-            UnmarshallerHandler activeHandler) throws SAXException {
+        protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+                throws SAXException {
         }
 
         public Object getResultObject() throws SAXException {
             return proActiveDescriptor;
         }
 
-        public void startContextElement(String name, Attributes attributes)
-            throws SAXException {
+        public void startContextElement(String name, Attributes attributes) throws SAXException {
         }
     }
 
@@ -416,15 +384,13 @@ public class ProActiveDescriptorHandler extends AbstractUnmarshallerDecorator
     private class SecurityFileHandler extends BasicUnmarshaller {
         private ProActiveDescriptorInternal proActiveDescriptor;
 
-        public SecurityFileHandler(
-            ProActiveDescriptorInternal proActiveDescriptor) {
+        public SecurityFileHandler(ProActiveDescriptorInternal proActiveDescriptor) {
             super();
             this.proActiveDescriptor = proActiveDescriptor;
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             // create and register a VirtualNode
             String path = attributes.getValue("uri");
 

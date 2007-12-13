@@ -67,8 +67,8 @@ import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
  * @version 1.0,  2002/05
  * @since   ProActive 0.9.2
  */
-public class ProActiveIbisMetaObjectFactory extends ProActiveMetaObjectFactory
-    implements java.io.Serializable {
+public class ProActiveIbisMetaObjectFactory extends ProActiveMetaObjectFactory implements
+        java.io.Serializable {
     //static {
     //IbisProperties.load();
     //}

@@ -56,14 +56,12 @@ public class NodeProvider {
 
     public void addGCMDeploymentDescriptor(GCMDeploymentDescriptor desc) {
         if (descriptors.contains(desc)) {
-            GCMA_LOGGER.warn(desc.getDescriptorFilePath() +
-                " already the Node Provider named " + id);
+            GCMA_LOGGER.warn(desc.getDescriptorFilePath() + " already the Node Provider named " + id);
         }
         descriptors.add(desc);
     }
 
-    public void start(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma) {
+    public void start(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         for (GCMDeploymentDescriptor desc : descriptors) {
             desc.start(commandBuilder, gcma);
         }

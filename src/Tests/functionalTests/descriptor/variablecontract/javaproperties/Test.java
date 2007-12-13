@@ -43,13 +43,13 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Tests conditions for variables of type JavaProperties
  */
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
-            "/functionalTests/descriptor/variablecontract/javaproperties/Test.xml")
-                                                   .getPath();
+            "/functionalTests/descriptor/variablecontract/javaproperties/Test.xml").getPath();
     ProActiveDescriptor pad;
     boolean bogusFromProgram;
     boolean bogusFromDescriptor;
@@ -74,28 +74,24 @@ public class Test extends FunctionalTest {
         //Setting from Program
         HashMap map = new HashMap();
         map.put("user.home", "");
-        variableContract.setVariableFromProgram(map,
-            VariableContractType.getType(
-                ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
+        variableContract.setVariableFromProgram(map, VariableContractType
+                .getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
 
         //Setting Bogus from program
         try {
-            variableContract.setVariableFromProgram("bogus.property", "value",
-                VariableContractType.getType(
-                    ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
+            variableContract.setVariableFromProgram("bogus.property", "value", VariableContractType
+                    .getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
         } catch (Exception e) {
             bogusFromProgram = false;
         }
 
         //Setting from Descriptor
-        variableContract.setDescriptorVariable("user.dir", "",
-            VariableContractType.getType(
-                ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
+        variableContract.setDescriptorVariable("user.dir", "", VariableContractType
+                .getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
         //Setting bogus from program
         try {
-            variableContract.setDescriptorVariable("bogus.property", "value",
-                VariableContractType.getType(
-                    ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
+            variableContract.setDescriptorVariable("bogus.property", "value", VariableContractType
+                    .getType(ProActiveDescriptorConstants.VARIABLES_JAVAPROPERTY_TAG));
         } catch (Exception e) {
             bogusFromDescriptor = false;
         }
@@ -106,12 +102,9 @@ public class Test extends FunctionalTest {
         //System.out.println(variableContract);
         assertTrue(!bogusFromProgram);
         assertTrue(!bogusFromDescriptor);
-        assertTrue(variableContract.getValue("user.home")
-                                   .equals(System.getProperty("user.home")));
-        assertTrue(variableContract.getValue("user.dir")
-                                   .equals(System.getProperty("user.dir")));
-        assertTrue(variableContract.getValue("user.name")
-                                   .equals(System.getProperty("user.name")));
+        assertTrue(variableContract.getValue("user.home").equals(System.getProperty("user.home")));
+        assertTrue(variableContract.getValue("user.dir").equals(System.getProperty("user.dir")));
+        assertTrue(variableContract.getValue("user.name").equals(System.getProperty("user.name")));
         assertTrue(variableContract.isClosed());
     }
 

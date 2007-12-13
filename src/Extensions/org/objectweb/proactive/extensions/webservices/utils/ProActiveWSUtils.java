@@ -112,8 +112,7 @@ public class ProActiveWSUtils {
      * @param message
      * @param file
      */
-    public static SOAPMessage attachFile(SOAPMessage message, File file,
-        String contentId) {
+    public static SOAPMessage attachFile(SOAPMessage message, File file, String contentId) {
         init();
 
         String pathUrl = "file://" + file.getAbsoluteFile();

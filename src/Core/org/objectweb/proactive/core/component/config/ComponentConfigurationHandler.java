@@ -56,8 +56,8 @@ import org.xml.sax.SAXException;
  *
  * @author Matthieu Morel
  */
-public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
-    implements ComponentConfigurationConstants {
+public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator implements
+        ComponentConfigurationConstants {
     Map<String, String> controllers = new HashMap<String, String>();
     List inputInterceptors = new ArrayList();
     List outputInterceptors = new ArrayList();
@@ -84,29 +84,25 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
     }
 
     public static ComponentConfigurationHandler createComponentConfigurationHandler(
-        String componentsConfigurationLocation)
-        throws IOException, SAXException, ProActiveException {
+            String componentsConfigurationLocation) throws IOException, SAXException, ProActiveException {
         String url = null;
         try {
             InitialHandler initial_handler = new InitialHandler();
 
-            if (ComponentConfigurationHandler.class.getResource(
-                        componentsConfigurationLocation) != null) {
+            if (ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation) != null) {
                 // it's in the classpath
                 url = ComponentConfigurationHandler.class.getResource(componentsConfigurationLocation)
-                                                         .toString();
+                        .toString();
             } else {
                 // user-specified
                 url = new File(componentsConfigurationLocation).getAbsolutePath();
             }
-            StreamReader stream_reader = new StreamReader(new InputSource(url),
-                    initial_handler);
+            StreamReader stream_reader = new StreamReader(new InputSource(url), initial_handler);
             stream_reader.read();
             return (ComponentConfigurationHandler) initial_handler.getResultObject();
         } catch (SAXException se) {
-            logger.fatal(
-                "a problem occured while parsing the components descriptor \"" +
-                url + "\": " + se.getMessage());
+            logger.fatal("a problem occured while parsing the components descriptor \"" + url + "\": " +
+                se.getMessage());
             se.printStackTrace();
             throw se;
         }
@@ -116,15 +112,13 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
      * see {@link org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)}
      */
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws SAXException {
     }
 
     /**
      * see {@link org.objectweb.proactive.core.xml.handler.UnmarshallerHandler#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)}
      */
-    public void startContextElement(String name, Attributes attributes)
-        throws SAXException {
+    public void startContextElement(String name, Attributes attributes) throws SAXException {
     }
 
     public Object getResultObject() throws SAXException {
@@ -139,8 +133,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
 
         private InitialHandler() {
             componentConfigurationHandler = new ComponentConfigurationHandler();
-            this.addHandler(COMPONENT_CONFIGURATION_ELEMENT,
-                componentConfigurationHandler);
+            this.addHandler(COMPONENT_CONFIGURATION_ELEMENT, componentConfigurationHandler);
         }
 
         public Object getResultObject() throws org.xml.sax.SAXException {
@@ -148,33 +141,30 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
         }
 
         @Override
-        protected void notifyEndActiveHandler(String name,
-            UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+        protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+                throws org.xml.sax.SAXException {
         }
 
-        public void startContextElement(String name, Attributes attributes)
-            throws SAXException {
+        public void startContextElement(String name, Attributes attributes) throws SAXException {
         }
     }
 
     /******************************************************************************************************************/
     private class ControllersHandler extends CollectionUnmarshaller {
         public ControllersHandler() {
-            addHandler(ComponentConfigurationConstants.CONTROLLER_ELEMENT,
-                new ControllerHandler());
+            addHandler(ComponentConfigurationConstants.CONTROLLER_ELEMENT, new ControllerHandler());
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws SAXException {
+        public void startContextElement(String name, Attributes attributes) throws SAXException {
         }
 
         /* (non-Javadoc)
          * @see org.objectweb.proactive.core.xml.handler.AbstractUnmarshallerDecorator#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
          */
         @Override
-        protected void notifyEndActiveHandler(String name,
-            UnmarshallerHandler activeHandler) throws SAXException {
+        protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+                throws SAXException {
             if (name.equals(ComponentConfigurationConstants.CONTROLLER_ELEMENT)) {
                 activeHandler.getResultObject();
             }
@@ -202,8 +192,7 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
             addHandler(IMPLEMENTATION_ELEMENT, singleValueHandler);
         }
 
-        public void startContextElement(String name, Attributes attributes)
-            throws SAXException {
+        public void startContextElement(String name, Attributes attributes) throws SAXException {
             if ("true".equals(attributes.getValue(INPUT_INTERCEPTOR_ATTRIBUTE))) {
                 inputInterception = true;
             }
@@ -213,8 +202,8 @@ public class ComponentConfigurationHandler extends AbstractUnmarshallerDecorator
         }
 
         @Override
-        protected void notifyEndActiveHandler(String name,
-            UnmarshallerHandler activeHandler) throws SAXException {
+        protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+                throws SAXException {
             if (name.equals(INTERFACE_ELEMENT)) {
                 interfaceSignature = ((String) activeHandler.getResultObject()).trim();
             }

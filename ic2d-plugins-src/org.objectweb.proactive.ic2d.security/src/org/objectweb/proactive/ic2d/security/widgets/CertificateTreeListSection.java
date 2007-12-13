@@ -68,11 +68,10 @@ public class CertificateTreeListSection {
     private Tree tree;
     protected CertificateTreeList certTreeList;
 
-    public CertificateTreeListSection(Composite parent, FormToolkit toolkit,
-        String title, CertificateTreeList data, boolean allowDeletion,
-        boolean allowDrag, boolean allowDrop, boolean withChecks) {
-        this.section = toolkit.createSection(parent,
-                ExpandableComposite.TITLE_BAR);
+    public CertificateTreeListSection(Composite parent, FormToolkit toolkit, String title,
+            CertificateTreeList data, boolean allowDeletion, boolean allowDrag, boolean allowDrop,
+            boolean withChecks) {
+        this.section = toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
         this.section.setText(title);
         this.certTreeList = data;
 
@@ -85,77 +84,69 @@ public class CertificateTreeListSection {
 
         if (allowDeletion) {
             this.tree.addKeyListener(new KeyAdapter() {
-                    @Override
-                    public void keyPressed(KeyEvent e) {
-                        if ((e.character == SWT.DEL) ||
-                                (e.character == SWT.BS)) {
-                            CertificateTreeListSection.this.certTreeList.remove(getSelectionData());
+                @Override
+                public void keyPressed(KeyEvent e) {
+                    if ((e.character == SWT.DEL) || (e.character == SWT.BS)) {
+                        CertificateTreeListSection.this.certTreeList.remove(getSelectionData());
 
-                            updateSection();
-                        }
-
-                        super.keyPressed(e);
+                        updateSection();
                     }
-                });
+
+                    super.keyPressed(e);
+                }
+            });
         }
 
         if (allowDrag) {
             DragSource source = new DragSource(this.tree, DND.DROP_COPY);
 
-            source.setTransfer(new Transfer[] {
-                    CertificateTreeMapTransfer.getInstance()
-                });
+            source.setTransfer(new Transfer[] { CertificateTreeMapTransfer.getInstance() });
 
             source.addDragListener(new DragSourceAdapter() {
-                    @Override
-                    public void dragSetData(DragSourceEvent event) {
-                        // Provide the data of the requested type.
-                        CertificateTreeMap map = new CertificateTreeMap();
-                        map.put(getSelectionData(),
-                            getSelectionData().getCertChain());
-                        event.data = map;
-                    }
-                });
+                @Override
+                public void dragSetData(DragSourceEvent event) {
+                    // Provide the data of the requested type.
+                    CertificateTreeMap map = new CertificateTreeMap();
+                    map.put(getSelectionData(), getSelectionData().getCertChain());
+                    event.data = map;
+                }
+            });
         }
 
         if (allowDrop) {
-            DropTarget target = new DropTarget(this.tree,
-                    DND.DROP_DEFAULT | DND.DROP_COPY);
+            DropTarget target = new DropTarget(this.tree, DND.DROP_DEFAULT | DND.DROP_COPY);
 
-            target.setTransfer(new Transfer[] {
-                    CertificateTreeMapTransfer.getInstance()
-                });
+            target.setTransfer(new Transfer[] { CertificateTreeMapTransfer.getInstance() });
             target.addDropListener(new DropTargetAdapter() {
-                    @Override
-                    public void dragEnter(DropTargetEvent event) {
-                        if (event.detail == DND.DROP_DEFAULT) {
-                            event.detail = DND.DROP_COPY;
-                        }
+                @Override
+                public void dragEnter(DropTargetEvent event) {
+                    if (event.detail == DND.DROP_DEFAULT) {
+                        event.detail = DND.DROP_COPY;
                     }
+                }
 
-                    @Override
-                    public void dragOperationChanged(DropTargetEvent event) {
-                        if (event.detail == DND.DROP_DEFAULT) {
-                            event.detail = DND.DROP_COPY;
-                        }
+                @Override
+                public void dragOperationChanged(DropTargetEvent event) {
+                    if (event.detail == DND.DROP_DEFAULT) {
+                        event.detail = DND.DROP_COPY;
                     }
+                }
 
-                    @Override
-                    public void drop(DropTargetEvent event) {
-                        if (CertificateTreeMapTransfer.getInstance()
-                                                          .isSupportedType(event.currentDataType)) {
-                            CertificateTreeMap map = (CertificateTreeMap) event.data;
+                @Override
+                public void drop(DropTargetEvent event) {
+                    if (CertificateTreeMapTransfer.getInstance().isSupportedType(event.currentDataType)) {
+                        CertificateTreeMap map = (CertificateTreeMap) event.data;
 
-                            for (Entry<CertificateTree, List<TypedCertificate>> entry : map.entrySet()) {
-                                CertificateTree newTree = CertificateTree.newTree(entry.getValue());
-                                newTree.merge(entry.getKey());
-                                CertificateTreeListSection.this.certTreeList.add(newTree.getRoot());
-                            }
-
-                            updateSection();
+                        for (Entry<CertificateTree, List<TypedCertificate>> entry : map.entrySet()) {
+                            CertificateTree newTree = CertificateTree.newTree(entry.getValue());
+                            newTree.merge(entry.getKey());
+                            CertificateTreeListSection.this.certTreeList.add(newTree.getRoot());
                         }
+
+                        updateSection();
                     }
-                });
+                }
+            });
         }
 
         this.section.setClient(client);
@@ -191,8 +182,7 @@ public class CertificateTreeListSection {
     private Map<TypedCertificate, Boolean> getExpanded(TreeItem item) {
         Map<TypedCertificate, Boolean> state = new HashMap<TypedCertificate, Boolean>();
 
-        state.put(((CertificateTree) item.getData()).getCertificate(),
-            new Boolean(item.getExpanded()));
+        state.put(((CertificateTree) item.getData()).getCertificate(), new Boolean(item.getExpanded()));
         for (TreeItem child : item.getItems()) {
             state.putAll(getExpanded(child));
         }
@@ -204,8 +194,7 @@ public class CertificateTreeListSection {
         Map<TypedCertificate, Boolean> state = new HashMap<TypedCertificate, Boolean>();
 
         if (!item.getGrayed()) {
-            state.put(((CertificateTree) item.getData()).getCertificate(),
-                new Boolean(item.getChecked()));
+            state.put(((CertificateTree) item.getData()).getCertificate(), new Boolean(item.getChecked()));
         }
         for (TreeItem child : item.getItems()) {
             state.putAll(getChecked(child));
@@ -214,8 +203,7 @@ public class CertificateTreeListSection {
         return state;
     }
 
-    private void setExpanded(TreeItem item,
-        Map<TypedCertificate, Boolean> expanded) {
+    private void setExpanded(TreeItem item, Map<TypedCertificate, Boolean> expanded) {
         TypedCertificate cert = ((CertificateTree) item.getData()).getCertificate();
         if (expanded.containsKey(cert)) {
             item.setExpanded(expanded.get(cert).booleanValue());
@@ -225,8 +213,7 @@ public class CertificateTreeListSection {
         }
     }
 
-    private void setChecked(TreeItem item,
-        Map<TypedCertificate, Boolean> checked) {
+    private void setChecked(TreeItem item, Map<TypedCertificate, Boolean> checked) {
         TypedCertificate cert = ((CertificateTree) item.getData()).getCertificate();
         if (checked.containsKey(cert)) {
             item.setChecked(checked.get(cert).booleanValue());

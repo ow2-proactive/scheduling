@@ -86,8 +86,7 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
         IWorkbench iworkbench = PlatformUI.getWorkbench();
         IWorkbenchPage page = null;
         try {
-            page = iworkbench.showPerspective(SecurityPerspective.ID,
-                    iworkbench.getActiveWorkbenchWindow());
+            page = iworkbench.showPerspective(SecurityPerspective.ID, iworkbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -103,9 +102,8 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
         PolicyEditorView pev = (PolicyEditorView) part;
 
         try {
-            iworkbench.showPerspective(MonitoringPerspective.ID,
-                iworkbench.getActiveWorkbenchWindow())
-                      .showView(MonitoringView.ID);
+            iworkbench.showPerspective(MonitoringPerspective.ID, iworkbench.getActiveWorkbenchWindow())
+                    .showView(MonitoringView.ID);
         } catch (PartInitException e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -116,8 +114,7 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 
         KeyStore keystore = null;
         try {
-            keystore = KeystoreUtils.createKeystore(pev.getKeystore(),
-                    pev.getKeysToKeep());
+            keystore = KeystoreUtils.createKeystore(pev.getKeystore(), pev.getKeysToKeep());
         } catch (UnrecoverableKeyException e) {
             e.printStackTrace();
         } catch (KeyStoreException e) {
@@ -137,10 +134,8 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
             RuleEntities entitiesFrom = new RuleEntities();
             for (String name : policy.getFrom()) {
                 try {
-                    entitiesFrom.add(new CertificatedRuleEntity(
-                            EntityType.fromString(name.substring(0,
-                                    name.indexOf(':'))), keystore,
-                            name.substring(name.indexOf(':') + 1)));
+                    entitiesFrom.add(new CertificatedRuleEntity(EntityType.fromString(name.substring(0, name
+                            .indexOf(':'))), keystore, name.substring(name.indexOf(':') + 1)));
                 } catch (UnrecoverableKeyException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -155,10 +150,8 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
             RuleEntities entitiesTo = new RuleEntities();
             for (String name : policy.getTo()) {
                 try {
-                    entitiesTo.add(new CertificatedRuleEntity(
-                            EntityType.fromString(name.substring(0,
-                                    name.indexOf(':'))), keystore,
-                            name.substring(name.indexOf(':') + 1)));
+                    entitiesTo.add(new CertificatedRuleEntity(EntityType.fromString(name.substring(0, name
+                            .indexOf(':'))), keystore, name.substring(name.indexOf(':') + 1)));
                 } catch (UnrecoverableKeyException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -170,21 +163,20 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
                     e.printStackTrace();
                 }
             }
-            Communication reply = new Communication(policy.isReply(),
-                    policy.getRepAuth(), policy.getRepConf(), policy.getRepInt());
-            Communication request = new Communication(policy.isRequest(),
-                    policy.getReqAuth(), policy.getReqConf(), policy.getReqInt());
+            Communication reply = new Communication(policy.isReply(), policy.getRepAuth(), policy
+                    .getRepConf(), policy.getRepInt());
+            Communication request = new Communication(policy.isRequest(), policy.getReqAuth(), policy
+                    .getReqConf(), policy.getReqInt());
 
-            policyRules.add(new PolicyRule(entitiesFrom, entitiesTo, request,
-                    reply, policy.isAoCreation(), policy.isMigration()));
+            policyRules.add(new PolicyRule(entitiesFrom, entitiesTo, request, reply, policy.isAoCreation(),
+                policy.isMigration()));
         }
 
         RuleEntities users = new RuleEntities();
         for (String user : pev.getRt().getAuthorizedUsers()) {
             try {
-                users.add(new CertificatedRuleEntity(EntityType.fromString(
-                            user.substring(0, user.indexOf(':'))), keystore,
-                        user.substring(user.indexOf(':') + 1)));
+                users.add(new CertificatedRuleEntity(EntityType.fromString(user.substring(0, user
+                        .indexOf(':'))), keystore, user.substring(user.indexOf(':') + 1)));
             } catch (UnrecoverableKeyException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -197,15 +189,12 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
             }
         }
 
-        PolicyServer ps = new PolicyServer(keystore, policyRules,
-                pev.getAppName(), "unknown", users);
+        PolicyServer ps = new PolicyServer(keystore, policyRules, pev.getAppName(), "unknown", users);
 
         try {
-            this.object.invoke("setSecurityManager", new Object[] { null, ps },
-                new String[] {
+            this.object.invoke("setSecurityManager", new Object[] { null, ps }, new String[] {
                     "org.objectweb.proactive.core.security.securityentity.Entity",
-                    "org.objectweb.proactive.core.security.PolicyServer"
-                });
+                    "org.objectweb.proactive.core.security.PolicyServer" });
         } catch (InstanceNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -223,8 +212,7 @@ public class SetSecurityManager extends Action implements IActionExtPoint {
 
     public void setAbstractDataObject(AbstractData ref) {
         this.object = ref;
-        super.setEnabled(this.object instanceof ActiveObject ||
-            this.object instanceof RuntimeObject ||
+        super.setEnabled(this.object instanceof ActiveObject || this.object instanceof RuntimeObject ||
             this.object instanceof NodeObject);
     }
 

@@ -77,32 +77,27 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      * @param nodeURL node url
      * @param factory factory for the corresponding metaobjects
      */
-    public ComponentBodyImpl(Object reifiedObject, String nodeURL,
-        Active activity, MetaObjectFactory factory, String jobID)
-        throws java.lang.reflect.InvocationTargetException,
-            ConstructorCallExecutionFailedException,
-            ActiveObjectCreationException {
+    public ComponentBodyImpl(Object reifiedObject, String nodeURL, Active activity,
+            MetaObjectFactory factory, String jobID) throws java.lang.reflect.InvocationTargetException,
+            ConstructorCallExecutionFailedException, ActiveObjectCreationException {
         super(reifiedObject, nodeURL, factory, jobID);
         //        filterOnNFRequests = new RequestFilterOnPrioritizedNFRequests();
         // create the component metaobject if necessary
         // --> check the value of the "parameters" field
         Map factory_parameters = factory.getParameters();
         if ((null != factory_parameters)) {
-            if (null != factory_parameters.get(
-                        ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY)) {
-                if (factory_parameters.get(
-                            ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters) {
+            if (null != factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY)) {
+                if (factory_parameters.get(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY) instanceof ComponentParameters) {
                     if (logger.isDebugEnabled()) {
                         logger.debug("creating metaobject component identity");
                     }
-                    this.componentIdentity = factory.newComponentFactory()
-                                                    .newProActiveComponent(this);
+                    this.componentIdentity = factory.newComponentFactory().newProActiveComponent(this);
 
                     // change activity into a component activity
                     // activity = new ComponentActivity(activity, reifiedObject);
                 } else {
-                    logger.error(
-                        "component parameters for the components factory are not of type ComponentParameters");
+                    logger
+                            .error("component parameters for the components factory are not of type ComponentParameters");
                 }
             }
         }
@@ -132,8 +127,7 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
                 return LifeCycleController.STARTED.equals(Fractal.getLifeCycleController(
                         getProActiveComponentImpl()).getFcState());
             } catch (NoSuchInterfaceException e) {
-                logger.error(
-                    "could not find the life cycle controller of this component");
+                logger.error("could not find the life cycle controller of this component");
                 return false;
             }
         } else {
@@ -166,7 +160,6 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
         if (this.shortcutsOnThis == null) {
             this.shortcutsOnThis = new HashMap<String, Shortcut>();
         }
-        this.shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(),
-            shortcut);
+        this.shortcutsOnThis.put(shortcut.getFcFunctionalInterfaceName(), shortcut);
     }
 }

@@ -59,9 +59,8 @@ public interface MembraneController {
      * @param component The name of the component to remove
      * @throws IllegalContentException If the specified component can not be removed
      */
-    void removeNFSubComponent(Component componentname)
-        throws IllegalContentException, IllegalLifeCycleException,
-            NoSuchComponentException;
+    void removeNFSubComponent(Component componentname) throws IllegalContentException,
+            IllegalLifeCycleException, NoSuchComponentException;
 
     /**
      * Retrurns an array containing all the components inside the membrane
@@ -81,8 +80,7 @@ public interface MembraneController {
      * @param controllerclass The controller object
      * @throws NoSuchInterfaceException If the specified interface doesn't exist
      */
-    void setControllerObject(String itf, Object controllerclass)
-        throws NoSuchInterfaceException;
+    void setControllerObject(String itf, Object controllerclass) throws NoSuchInterfaceException;
 
     /**
      * Starts all non functional components inside the membrane
@@ -94,8 +92,7 @@ public interface MembraneController {
      * Stops all non functional components inside the membrane
      * @throws IllegalLifeCycleException if one of the non functional components is in inconsistent lifecycle state
      */
-    public void stopMembrane()
-        throws NoSuchInterfaceException, IllegalLifeCycleException;
+    public void stopMembrane() throws NoSuchInterfaceException, IllegalLifeCycleException;
 
     /**
      * Performs bindings inside the membrane, and with non-functional interfaces of internal  functional components
@@ -111,9 +108,8 @@ public interface MembraneController {
      * @throws IllegalLifeCycleException If one of the component is in inconsistent lifecycle state
      * @throws IllegalBindingException If the type of the interfaces doesn't match
      */
-    void bindNFc(String clientItf, String serverItf)
-        throws NoSuchInterfaceException, IllegalLifeCycleException,
-            IllegalBindingException, NoSuchComponentException;
+    void bindNFc(String clientItf, String serverItf) throws NoSuchInterfaceException,
+            IllegalLifeCycleException, IllegalBindingException, NoSuchComponentException;
 
     /**
      * Performs bindings with non-functional external interfaces
@@ -127,9 +123,8 @@ public interface MembraneController {
      * @throws IllegalLifeCycleException If one of the component is in inconsistent lifecycle state
      * @throws IllegalBindingException If the type of the interfaces doesn't match
      */
-    void bindNFc(String clientItf, Object serverItf)
-        throws NoSuchInterfaceException, IllegalLifeCycleException,
-            IllegalBindingException, NoSuchComponentException;
+    void bindNFc(String clientItf, Object serverItf) throws NoSuchInterfaceException,
+            IllegalLifeCycleException, IllegalBindingException, NoSuchComponentException;
 
     /**
      * Removes non-functional bindings
@@ -141,8 +136,7 @@ public interface MembraneController {
      * @throws IllegalLifeCycleException If the component is in inconsistent lifecycle state
      * @throws IllegalBindingException If the binding can not be removed
      */
-    void unbindNFc(String clientItf)
-        throws NoSuchInterfaceException, IllegalLifeCycleException,
+    void unbindNFc(String clientItf) throws NoSuchInterfaceException, IllegalLifeCycleException,
             IllegalBindingException, NoSuchComponentException;
 
     /**
@@ -150,8 +144,7 @@ public interface MembraneController {
      * @param component The name of the component
      * @return An array containing the name of the client interfaces(we suppose that non-functional components don't have client NF interfaces).
      */
-    String[] listNFc(String component)
-        throws NoSuchComponentException, NoSuchInterfaceException;
+    String[] listNFc(String component) throws NoSuchComponentException, NoSuchInterfaceException;
 
     /**
      * Returns the stub and proxy of the server interface the client interface is connected to (for components inside the membrane)
@@ -161,16 +154,14 @@ public interface MembraneController {
      * @return the stubs and the proxy of the server interface the client interface is connected to
      * @throws NoSuchInterfaceException If the specified interface doesn't exist
      */
-    Object lookupNFc(String itfname)
-        throws NoSuchInterfaceException, NoSuchComponentException;
+    Object lookupNFc(String itfname) throws NoSuchInterfaceException, NoSuchComponentException;
 
     /**
      * Starts the specified component
      * @param component The name of the component to stop
      * @throws IllegalLifeCycleException If the lifecycle state is inconsistent
      */
-    void startNFc(String component)
-        throws IllegalLifeCycleException, NoSuchComponentException,
+    void startNFc(String component) throws IllegalLifeCycleException, NoSuchComponentException,
             NoSuchInterfaceException;
 
     /**
@@ -178,8 +169,7 @@ public interface MembraneController {
      * @param component The name of the component to stop
      * @throws IllegalLifeCycleException If the lifecycle state is inconsistent
      */
-    void stopNFc(String component)
-        throws IllegalLifeCycleException, NoSuchComponentException,
+    void stopNFc(String component) throws IllegalLifeCycleException, NoSuchComponentException,
             NoSuchInterfaceException;
 
     /**
@@ -187,6 +177,5 @@ public interface MembraneController {
      * @param component The name of the component
      * @return The current state of the specified component
      */
-    String getNFcState(String component)
-        throws NoSuchComponentException, NoSuchInterfaceException;
+    String getNFcState(String component) throws NoSuchComponentException, NoSuchInterfaceException;
 }

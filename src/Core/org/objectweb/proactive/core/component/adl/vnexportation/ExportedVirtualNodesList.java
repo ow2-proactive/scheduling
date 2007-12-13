@@ -89,11 +89,9 @@ public class ExportedVirtualNodesList {
      * @param baseVN the name of a base (composing) virtual node
      * @param composingVNIsMultiple true if the virtual node is multiple, false if it is single
      */
-    public void compose(String exportedVNComponent, String exportedVN,
-        String baseVNComponent, String baseVN, boolean composingVNIsMultiple)
-        throws ADLException {
-        LinkedVirtualNode composerNode = getNode(exportedVNComponent,
-                exportedVN, true);
+    public void compose(String exportedVNComponent, String exportedVN, String baseVNComponent, String baseVN,
+            boolean composingVNIsMultiple) throws ADLException {
+        LinkedVirtualNode composerNode = getNode(exportedVNComponent, exportedVN, true);
         LinkedVirtualNode composingNode = getNode(baseVNComponent, baseVN, true);
 
         //        if (exportedVNComponent.equals(baseVNComponent)) {
@@ -105,35 +103,28 @@ public class ExportedVirtualNodesList {
             boolean added = composerNode.addComposingVirtualNode(composingNode);
             if (added) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("COMPOSED " + exportedVNComponent + "." +
-                        exportedVN + " from " + baseVNComponent + "." + baseVN);
+                    logger.debug("COMPOSED " + exportedVNComponent + "." + exportedVN + " from " +
+                        baseVNComponent + "." + baseVN);
                 }
             }
         }
     }
 
-    private void checkComposition(LinkedVirtualNode composerNode,
-        LinkedVirtualNode composingNode) throws ADLException {
+    private void checkComposition(LinkedVirtualNode composerNode, LinkedVirtualNode composingNode)
+            throws ADLException {
         if (composerNode.isMultiple()) {
             if (!composingNode.isMultiple()) {
-                throw new ADLException("cannot compose " +
-                    composingNode.getDefiningComponentName() + '.' +
-                    composingNode.getVirtualNodeName() +
-                    " which is SINGLE, whith composer virtual node " +
-                    composerNode.getDefiningComponentName() + '.' +
-                    composerNode.getVirtualNodeName() +
-                    " because it is already composed from a virtual node of cardinality MULTIPLE",
-                    null);
+                throw new ADLException("cannot compose " + composingNode.getDefiningComponentName() + '.' +
+                    composingNode.getVirtualNodeName() + " which is SINGLE, whith composer virtual node " +
+                    composerNode.getDefiningComponentName() + '.' + composerNode.getVirtualNodeName() +
+                    " because it is already composed from a virtual node of cardinality MULTIPLE", null);
             }
         } else {
-            if (!composerNode.getComposingVirtualNodes().isEmpty() &&
-                    composingNode.isMultiple()) {
+            if (!composerNode.getComposingVirtualNodes().isEmpty() && composingNode.isMultiple()) {
                 throw new ADLException("cannot mix a MULTIPLE virtual node (" +
-                    composingNode.getDefiningComponentName() + '.' +
-                    composingNode.getVirtualNodeName() +
-                    " with SINGLE virtual nodes in composer node " +
-                    composerNode.getDefiningComponentName() + '.' +
-                    composerNode.getVirtualNodeName(), null);
+                    composingNode.getDefiningComponentName() + '.' + composingNode.getVirtualNodeName() +
+                    " with SINGLE virtual nodes in composer node " + composerNode.getDefiningComponentName() +
+                    '.' + composerNode.getVirtualNodeName(), null);
             }
         }
     }
@@ -146,29 +137,22 @@ public class ExportedVirtualNodesList {
      * @param composingVNIsMultiple the name of the composing virtual node inside the
      */
     public void compose(String componentName, ExportedVirtualNode exportedVN,
-        ComposingVirtualNode composingVN, boolean composingVNIsMultiple)
-        throws ADLException {
-        compose(componentName, exportedVN.getName(),
-            composingVN.getComponent(),
-            "this".equals(composingVN.getName()) ? componentName
-                                                 : composingVN.getName(),
-            composingVNIsMultiple);
+            ComposingVirtualNode composingVN, boolean composingVNIsMultiple) throws ADLException {
+        compose(componentName, exportedVN.getName(), composingVN.getComponent(), "this".equals(composingVN
+                .getName()) ? componentName : composingVN.getName(), composingVNIsMultiple);
     }
 
-    public boolean addLeafVirtualNode(String componentName,
-        String virtualNodeName, String cardinality) {
+    public boolean addLeafVirtualNode(String componentName, String virtualNodeName, String cardinality) {
         LinkedVirtualNode oldLeaf = getLeafVirtualNode(componentName);
         if (oldLeaf != null) {
             // ensure only 1 leaf per component
-            logger.info("removing old leaf virtual node : " +
-                oldLeaf.toString());
+            logger.info("removing old leaf virtual node : " + oldLeaf.toString());
             ((List) linkedVirtualNodes.get(componentName)).remove(oldLeaf);
             oldLeaf = null;
         }
         if (cardinality.equals(VirtualNode.MULTIPLE)) {
             // remove *
-            virtualNodeName = virtualNodeName.substring(0,
-                    virtualNodeName.length() - 1);
+            virtualNodeName = virtualNodeName.substring(0, virtualNodeName.length() - 1);
         }
         LinkedVirtualNode lvn = getNode(componentName, virtualNodeName, false);
 
@@ -211,8 +195,7 @@ public class ExportedVirtualNodesList {
      * and virtual node name. Exportation and composition is still empty for this newly created virtual node.
      * @return a linked virtual node
      */
-    public LinkedVirtualNode getNode(String componentName,
-        String virtualNodeName, boolean createIfNotFound) {
+    public LinkedVirtualNode getNode(String componentName, String virtualNodeName, boolean createIfNotFound) {
         LinkedVirtualNode lvn = null;
         if (linkedVirtualNodes.containsKey(componentName)) {
             List exportedVNs = (List) linkedVirtualNodes.get(componentName);
@@ -222,8 +205,7 @@ public class ExportedVirtualNodesList {
                 if (lvn.getVirtualNodeName().equals(virtualNodeName)) {
                     return lvn;
                 }
-                if (lvn.getExportedVirtualNodeNameAfterComposition()
-                           .equals(virtualNodeName)) {
+                if (lvn.getExportedVirtualNodeNameAfterComposition().equals(virtualNodeName)) {
                     return lvn;
                 }
             }
@@ -237,8 +219,7 @@ public class ExportedVirtualNodesList {
             if (createIfNotFound) {
                 // component not listed
                 List list = new ArrayList();
-                list.add(lvn = new LinkedVirtualNode(componentName,
-                            virtualNodeName));
+                list.add(lvn = new LinkedVirtualNode(componentName, virtualNodeName));
                 linkedVirtualNodes.put(componentName, list);
                 return lvn;
             }
@@ -267,16 +248,14 @@ public class ExportedVirtualNodesList {
         return list;
     }
 
-    public String getExportedVirtualNodesBeforeCompositionAsString(
-        String componentName) {
+    public String getExportedVirtualNodesBeforeCompositionAsString(String componentName) {
         List evn = getExportedVirtualNodes(componentName);
         Iterator it = evn.iterator();
         StringBuffer buffer = new StringBuffer();
         LinkedVirtualNode lvn;
         while (it.hasNext()) {
             lvn = (LinkedVirtualNode) it.next();
-            buffer.append(lvn.getExportedVirtualNodeNameBeforeComposition() +
-                (lvn.isMultiple() ? "*" : ""));
+            buffer.append(lvn.getExportedVirtualNodeNameBeforeComposition() + (lvn.isMultiple() ? "*" : ""));
             if (it.hasNext()) {
                 buffer.append(";");
             }
@@ -289,16 +268,14 @@ public class ExportedVirtualNodesList {
      * @param componentName the name of the component we are interested in
      * @return a String representation of the exported virtual nodes.
      */
-    public String getExportedVirtualNodesAfterCompositionAsString(
-        String componentName) {
+    public String getExportedVirtualNodesAfterCompositionAsString(String componentName) {
         List evn = getExportedVirtualNodes(componentName);
         Iterator it = evn.iterator();
         StringBuffer buffer = new StringBuffer();
         LinkedVirtualNode lvn;
         while (it.hasNext()) {
             lvn = (LinkedVirtualNode) it.next();
-            buffer.append(lvn.getExportedVirtualNodeNameAfterComposition() +
-                (lvn.isMultiple() ? "*" : ""));
+            buffer.append(lvn.getExportedVirtualNodeNameAfterComposition() + (lvn.isMultiple() ? "*" : ""));
             if (it.hasNext()) {
                 buffer.append(";");
             }
@@ -314,21 +291,22 @@ public class ExportedVirtualNodesList {
      * @param composingVirtualNodes  a String of composing virtual nodes, which should match the following
      * regular expression : [^.;]+[.][^.;]+[;]? (example : comp1.VN1 ; comp2.VN2)
      */
-    public void addExportedVirtualNode(String componentName,
-        String virtualNode, String composingVirtualNodes) {
+    public void addExportedVirtualNode(String componentName, String virtualNode, String composingVirtualNodes) {
         if (!composingVirtualNodes.equals(EMPTY_COMPOSING_VIRTUAL_NODES) &&
-                !(composingVirtualNodes.replaceAll(
-                    COMPOSING_VIRTUAL_NODES_REGEX, "").length() == 0)) {
+            !(composingVirtualNodes.replaceAll(COMPOSING_VIRTUAL_NODES_REGEX, "").length() == 0)) {
             throw new IllegalArgumentException(
                 "exported virtual nodes can only be made of one or several regular expressions like : [^.;]+[.][^.;]+[;]?\n" +
-                "and this exported virtual node is : " + componentName + "." +
-                virtualNode + "-->" + composingVirtualNodes);
+                    "and this exported virtual node is : " +
+                    componentName +
+                    "." +
+                    virtualNode +
+                    "-->" +
+                    composingVirtualNodes);
         }
         LinkedVirtualNode exported_vn = getNode(componentName, virtualNode, true);
         if (virtualNode.equals(LinkedVirtualNode.EMPTY_VIRTUAL_NODE_NAME) ||
-                composingVirtualNodes.equals(EMPTY_COMPOSING_VIRTUAL_NODES)) {
-            exported_vn.addComposingVirtualNode(getNode(
-                    LinkedVirtualNode.EMPTY_COMPONENT_NAME,
+            composingVirtualNodes.equals(EMPTY_COMPOSING_VIRTUAL_NODES)) {
+            exported_vn.addComposingVirtualNode(getNode(LinkedVirtualNode.EMPTY_COMPONENT_NAME,
                     LinkedVirtualNode.EMPTY_VIRTUAL_NODE_NAME, true));
             return;
         }
@@ -342,10 +320,8 @@ public class ExportedVirtualNodesList {
                 vn = "";
             } else {
                 String component = split[i].substring(0, split[i].indexOf("."));
-                vn = split[i].substring(split[i].indexOf(".") + 1,
-                        ((split[i].indexOf(";") == -1) ? split[i].length()
-                                                       : (split[i].length() -
-                        1)));
+                vn = split[i].substring(split[i].indexOf(".") + 1, ((split[i].indexOf(";") == -1) ? split[i]
+                        .length() : (split[i].length() - 1)));
 
                 // compose composing vn into composer vn
                 exported_vn.addComposingVirtualNode(getNode(component, vn, true));
@@ -358,8 +334,7 @@ public class ExportedVirtualNodesList {
      * @param componentName the name of the component
      * @param virtualNodeName the name of the virtual node
      */
-    public void removeExportedVirtualNode(String componentName,
-        String virtualNodeName) {
+    public void removeExportedVirtualNode(String componentName, String virtualNodeName) {
         if (linkedVirtualNodes.containsKey(componentName)) {
             List exportedVNs = (List) linkedVirtualNodes.get(componentName);
             Iterator it = exportedVNs.iterator();
@@ -369,23 +344,21 @@ public class ExportedVirtualNodesList {
             while (it.hasNext()) {
                 LinkedVirtualNode lvn = (LinkedVirtualNode) it.next();
                 if (lvn.getVirtualNodeName().equals(virtualNodeName) ||
-                        lvn.getExportedVirtualNodeNameAfterComposition()
-                               .equals(virtualNodeName)) {
+                    lvn.getExportedVirtualNodeNameAfterComposition().equals(virtualNodeName)) {
                     // as the current list should not be modified while iterated, keep a list
                     // of elements to remove
                     to_remove = lvn;
                 }
             }
             if (to_remove == null) {
-                logger.error("trying to remove virtual node " + componentName +
-                    "." + virtualNodeName + ", but could not find it");
+                logger.error("trying to remove virtual node " + componentName + "." + virtualNodeName +
+                    ", but could not find it");
                 return;
             }
 
             // remove from composer
             if (to_remove.getComposer() != null) {
-                to_remove.getComposer().getComposingVirtualNodes()
-                         .remove(to_remove);
+                to_remove.getComposer().getComposingVirtualNodes().remove(to_remove);
             }
             exportedVNs.remove(to_remove);
             //            it = to_remove.iterator();
@@ -404,8 +377,7 @@ public class ExportedVirtualNodesList {
      * @param virtualNodeName the name of the exported virtual node
      * @return a list of linked virtual nodes corresponding to the virtual nodes composing the specified exported virtual node
      */
-    public List getComposingVirtualNodes(String componentName,
-        String virtualNodeName) {
+    public List getComposingVirtualNodes(String componentName, String virtualNodeName) {
         LinkedVirtualNode lvn;
         if (linkedVirtualNodes.containsKey(componentName)) {
             List exportedVNs = (List) linkedVirtualNodes.get(componentName);
@@ -415,8 +387,7 @@ public class ExportedVirtualNodesList {
                 if (lvn.getVirtualNodeName().equals(virtualNodeName)) {
                     return lvn.getComposingVirtualNodes();
                 }
-                if (lvn.getExportedVirtualNodeNameAfterComposition()
-                           .equals(virtualNodeName)) {
+                if (lvn.getExportedVirtualNodeNameAfterComposition().equals(virtualNodeName)) {
                     return lvn.getComposingVirtualNodes();
                 }
             }
@@ -431,14 +402,13 @@ public class ExportedVirtualNodesList {
      * @param composingVirtualNodes the list of composing virtual nodes  as a String matching the following
      * regular expression : "[^.;]+[.][^.;]+[;]?" (example : comp1.VN1 ; comp2.VN2)
      */
-    public void setComposingVirtualNodes(String componentName,
-        String virtualNodeName, String composingVirtualNodes) {
+    public void setComposingVirtualNodes(String componentName, String virtualNodeName,
+            String composingVirtualNodes) {
         checkComposingVirtualNodesSyntax(composingVirtualNodes);
-        LinkedVirtualNode exported_vn = getNode(componentName, virtualNodeName,
-                false);
+        LinkedVirtualNode exported_vn = getNode(componentName, virtualNodeName, false);
         if (exported_vn == null) {
-            throw new ProActiveRuntimeException("exported virtual node " +
-                componentName + '.' + virtualNodeName + " not found");
+            throw new ProActiveRuntimeException("exported virtual node " + componentName + '.' +
+                virtualNodeName + " not found");
         }
 
         // 1. clean up existing composing virtual nodes
@@ -454,8 +424,7 @@ public class ExportedVirtualNodesList {
         for (int i = 0; i < split.length; i++) {
             String component = split[i].substring(0, split[i].indexOf("."));
             String vn = split[i].substring(split[i].indexOf(".") + 1,
-                    ((split[i].indexOf(";") == -1) ? split[i].length()
-                                                   : (split[i].length() - 1)));
+                    ((split[i].indexOf(";") == -1) ? split[i].length() : (split[i].length() - 1)));
 
             // compose composing vn into composer vn
             exported_vn.addComposingVirtualNode(getNode(component, vn, true));
@@ -466,11 +435,9 @@ public class ExportedVirtualNodesList {
      * Checks the syntax of the given String of composing virtual nodes
      * @param composingVirtualNodes a String of composing virtual nodes
      */
-    public static void checkComposingVirtualNodesSyntax(
-        String composingVirtualNodes) {
-        if (!(composingVirtualNodes.replaceAll(
-                    ExportedVirtualNodesList.COMPOSING_VIRTUAL_NODES_REGEX, "")
-                                       .length() == 0)) {
+    public static void checkComposingVirtualNodesSyntax(String composingVirtualNodes) {
+        if (!(composingVirtualNodes.replaceAll(ExportedVirtualNodesList.COMPOSING_VIRTUAL_NODES_REGEX, "")
+                .length() == 0)) {
             throw new IllegalArgumentException(
                 "composing virtual nodes can only be made of one or several regular expressions like : [^.;]+[.][^.;]+[;]?");
         }
@@ -484,8 +451,7 @@ public class ExportedVirtualNodesList {
         List wrong_exported_vns = new ArrayList();
 
         // 1. get iterator on lists of virtual nodes for each component
-        Iterator iterator_on_lists_of_lvns = linkedVirtualNodes.values()
-                                                               .iterator();
+        Iterator iterator_on_lists_of_lvns = linkedVirtualNodes.values().iterator();
 
         // 2. loop : for each list (i.e. for each component), get lvns
         List lvns;
@@ -497,8 +463,7 @@ public class ExportedVirtualNodesList {
             // 3. loop : for each lvn of the list, check consistency
             while (iterator_on_lvns.hasNext()) {
                 lvn = (LinkedVirtualNode) iterator_on_lvns.next();
-                if (lvn.getComposingVirtualNodes().isEmpty() &&
-                        !lvn.isSelfExported()) {
+                if (lvn.getComposingVirtualNodes().isEmpty() && !lvn.isSelfExported()) {
                     wrong_exported_vns.add(lvn);
                 }
             }

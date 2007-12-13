@@ -51,11 +51,9 @@ public class ServerImpl implements ServerTestItf, Identifiable {
     /*
      * @see functionalTests.component.collectiveitf.multicast.ServerTestItf#testAllModes(java.util.List, java.util.List, java.lang.MyObject, java.lang.MyObject)
      */
-    public WrappedInteger testAllStdModes_Param(
-        List<WrappedInteger> defaultDispatch,
-        List<WrappedInteger> broadcastDispatch,
-        WrappedInteger oneToOneDispatch, WrappedInteger roundRobinDispatch,
-        WrappedInteger singleElement) {
+    public WrappedInteger testAllStdModes_Param(List<WrappedInteger> defaultDispatch,
+            List<WrappedInteger> broadcastDispatch, WrappedInteger oneToOneDispatch,
+            WrappedInteger roundRobinDispatch, WrappedInteger singleElement) {
         testBroadcast_Param(defaultDispatch);
         testBroadcast_Param(broadcastDispatch);
         testOneToOne_Param(oneToOneDispatch);
@@ -67,8 +65,7 @@ public class ServerImpl implements ServerTestItf, Identifiable {
     /*
      * @see functionalTests.component.collectiveitf.multicast.ServerTestItf#testBroadcast(java.util.List)
      */
-    public WrappedInteger testBroadcast_Param(
-        List<WrappedInteger> listOfMyObject) {
+    public WrappedInteger testBroadcast_Param(List<WrappedInteger> listOfMyObject) {
         Assert.assertTrue(listOfMyObject.size() == Test.NB_CONNECTED_ITFS);
         Assert.assertTrue(listOfMyObject.get(0).equals(new WrappedInteger(0)) &&
             listOfMyObject.get(1).equals(new WrappedInteger(1)));
@@ -119,8 +116,7 @@ public class ServerImpl implements ServerTestItf, Identifiable {
     /*
      * @see functionalTests.component.collectiveitf.multicast.ServerTestItf#testBroadcast_Method(java.util.List)
      */
-    public WrappedInteger testBroadcast_Method(
-        List<WrappedInteger> listOfMyObject) {
+    public WrappedInteger testBroadcast_Method(List<WrappedInteger> listOfMyObject) {
         return testBroadcast_Param(listOfMyObject);
     }
 

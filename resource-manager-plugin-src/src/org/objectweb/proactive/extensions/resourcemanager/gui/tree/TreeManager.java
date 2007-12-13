@@ -16,8 +16,7 @@ import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSou
 /**
  * @author FRADJ Johann
  */
-public class TreeManager extends LabelProvider
-    implements IStructuredContentProvider, ITreeContentProvider {
+public class TreeManager extends LabelProvider implements IStructuredContentProvider, ITreeContentProvider {
     private static TreeManager instance = null;
     private ViewPart view = null;
     private Root root = null;
@@ -103,29 +102,26 @@ public class TreeManager extends LabelProvider
     @Override
     public Image getImage(Object obj) {
         switch (((TreeLeafElement) obj).getType()) {
-        case HOST:
-            return ImageDescriptor.createFromFile(this.getClass(),
-                "icons/host.gif").createImage();
-        case NODE:
-            switch (((Node) obj).getState()) {
-            case DOWN:
-                return ImageDescriptor.createFromFile(this.getClass(),
-                    "icons/down.gif").createImage();
-            case FREE:
-                return ImageDescriptor.createFromFile(this.getClass(),
-                    "icons/free.gif").createImage();
-            case BUSY:
-            case TO_BE_RELEASED:
-                return ImageDescriptor.createFromFile(this.getClass(),
-                    "icons/busy.gif").createImage();
-            }
-            break;
-        case SOURCE:
-            return ImageDescriptor.createFromFile(this.getClass(),
-                "icons/source.gif").createImage();
-        case VIRTUAL_MACHINE:
-            return PlatformUI.getWorkbench().getSharedImages()
-                             .getImage(ISharedImages.IMG_OBJ_ELEMENT);
+            case HOST:
+                return ImageDescriptor.createFromFile(this.getClass(), "icons/host.gif").createImage();
+            case NODE:
+                switch (((Node) obj).getState()) {
+                    case DOWN:
+                        return ImageDescriptor.createFromFile(this.getClass(), "icons/down.gif")
+                                .createImage();
+                    case FREE:
+                        return ImageDescriptor.createFromFile(this.getClass(), "icons/free.gif")
+                                .createImage();
+                    case BUSY:
+                    case TO_BE_RELEASED:
+                        return ImageDescriptor.createFromFile(this.getClass(), "icons/busy.gif")
+                                .createImage();
+                }
+                break;
+            case SOURCE:
+                return ImageDescriptor.createFromFile(this.getClass(), "icons/source.gif").createImage();
+            case VIRTUAL_MACHINE:
+                return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
         }
         return null;
     }
@@ -133,15 +129,13 @@ public class TreeManager extends LabelProvider
     public TreeParentElement addNode(RMNodeEvent nodeEvent) {
         TreeParentElement parentToRefresh = null;
 
-        TreeParentElement source = (TreeParentElement) find(root,
-                nodeEvent.getNodeSource());
+        TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
         if (source == null) { // if the source is null, then add it
             source = new Source(nodeEvent.getNodeSource());
             root.addChild(source);
             parentToRefresh = root;
         }
-        TreeParentElement host = (TreeParentElement) find(source,
-                nodeEvent.getHostName());
+        TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
         if (host == null) { // if the host is null, then add it
             host = new Host(nodeEvent.getHostName());
             source.addChild(host);
@@ -149,8 +143,7 @@ public class TreeManager extends LabelProvider
                 parentToRefresh = source;
             }
         }
-        TreeParentElement vm = (TreeParentElement) find(host,
-                nodeEvent.getVMName());
+        TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
         if (vm == null) { // if the vm is null, then add it
             vm = new VirtualMachine(nodeEvent.getVMName());
             host.addChild(vm);
@@ -170,12 +163,9 @@ public class TreeManager extends LabelProvider
     public TreeParentElement removeNode(RMNodeEvent nodeEvent) {
         TreeParentElement parentToRefresh = null;
 
-        TreeParentElement source = (TreeParentElement) find(root,
-                nodeEvent.getNodeSource());
-        TreeParentElement host = (TreeParentElement) find(source,
-                nodeEvent.getHostName());
-        TreeParentElement vm = (TreeParentElement) find(host,
-                nodeEvent.getVMName());
+        TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
+        TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
+        TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
 
         remove(vm, nodeEvent.getNodeUrl());
         parentToRefresh = vm;
@@ -196,26 +186,21 @@ public class TreeManager extends LabelProvider
     }
 
     public TreeLeafElement changeNodeState(RMNodeEvent nodeEvent) {
-        TreeParentElement source = (TreeParentElement) find(root,
-                nodeEvent.getNodeSource());
-        TreeParentElement host = (TreeParentElement) find(source,
-                nodeEvent.getHostName());
-        TreeParentElement vm = (TreeParentElement) find(host,
-                nodeEvent.getVMName());
+        TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
+        TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
+        TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
         Node node = (Node) find(vm, nodeEvent.getNodeUrl());
         node.setState(nodeEvent.getState());
         return node;
     }
 
     public void addNodeSource(RMNodeSourceEvent nodeSourceEvent) {
-        TreeParentElement source = (TreeParentElement) find(root,
-                nodeSourceEvent.getSourceName());
+        TreeParentElement source = (TreeParentElement) find(root, nodeSourceEvent.getSourceName());
         if (source == null) {
             source = new Source(nodeSourceEvent.getSourceName());
             root.addChild(source);
         } else {
-            System.err.println("ADD NODE SOURCE QUI EXISTE DEJA... " +
-                nodeSourceEvent.getSourceName());
+            System.err.println("ADD NODE SOURCE QUI EXISTE DEJA... " + nodeSourceEvent.getSourceName());
         }
     }
 
@@ -229,8 +214,7 @@ public class TreeManager extends LabelProvider
             }
         }
         if (!debug) {
-            System.err.println(
-                "REMOVE NODESOURCE RECU MAIS PAS DE NODESOURCE A ENLEVE... " +
+            System.err.println("REMOVE NODESOURCE RECU MAIS PAS DE NODESOURCE A ENLEVE... " +
                 nodeSourceEvent.getSourceName());
         }
     }

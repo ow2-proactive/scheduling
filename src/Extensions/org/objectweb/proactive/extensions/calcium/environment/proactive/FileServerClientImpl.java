@@ -42,8 +42,7 @@ import org.objectweb.proactive.extensions.calcium.environment.FileServerClient;
 import org.objectweb.proactive.extensions.calcium.environment.StoredFile;
 
 
-public class FileServerClientImpl implements FileServerClient,
-    java.io.Serializable {
+public class FileServerClientImpl implements FileServerClient, java.io.Serializable {
     Node node;
     FileServer fserver;
 
@@ -57,17 +56,14 @@ public class FileServerClientImpl implements FileServerClient,
         fserver.commit(fileId, refCountDelta);
     }
 
-    public void fetch(StoredFile rfile, File localDst)
-        throws IOException {
+    public void fetch(StoredFile rfile, File localDst) throws IOException {
         fserver.canFetch(rfile);
 
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("Pulling file:" + rfile.location + " -> " +
-                    localDst);
+                logger.debug("Pulling file:" + rfile.location + " -> " + localDst);
             }
-            RemoteFile fetchedFile = PAFileTransfer.pull(node, rfile.location,
-                    localDst);
+            RemoteFile fetchedFile = PAFileTransfer.pull(node, rfile.location, localDst);
             fetchedFile.waitFor();
         } catch (Exception e) {
             e.printStackTrace();
@@ -75,8 +71,7 @@ public class FileServerClientImpl implements FileServerClient,
         }
     }
 
-    public StoredFile store(File current, int refCount)
-        throws IOException {
+    public StoredFile store(File current, int refCount) throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("Storing data for file:" + current);
         }
@@ -84,15 +79,13 @@ public class FileServerClientImpl implements FileServerClient,
 
         try {
             //SkeletonSystemImpl.copyFile(localFile, dst);
-            RemoteFile sentFile = PAFileTransfer.push(current, node,
-                    rfile.location);
+            RemoteFile sentFile = PAFileTransfer.push(current, node, rfile.location);
             sentFile.waitFor();
         } catch (Exception e) {
             //If exception happens, then unstore the file.
             fserver.unregister(rfile.fileId);
             e.printStackTrace();
-            throw new IOException("Unable to store file on File Server: src=" +
-                current);
+            throw new IOException("Unable to store file on File Server: src=" + current);
         }
 
         //now mark as stored

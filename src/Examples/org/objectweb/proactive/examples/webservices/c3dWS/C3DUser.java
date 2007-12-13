@@ -81,15 +81,14 @@ import org.objectweb.proactive.examples.webservices.c3dWS.prim.Primitive;
 import org.objectweb.proactive.examples.webservices.c3dWS.prim.Sphere;
 
 
-public class C3DUser implements org.objectweb.proactive.RunActive,
-    java.io.Serializable {
+public class C3DUser implements org.objectweb.proactive.RunActive, java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /**
      * The array of random colors
      */
     private static Vec[] color = {
-            //    new Vec(0,0,0), // Black 
+    //    new Vec(0,0,0), // Black 
             new Vec(1, 1, 1), // White
             new Vec(0, 0, 0.5), // Navy
             new Vec(0, 0.5, 0), // darkgreen
@@ -97,7 +96,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             new Vec(1, 0.6, 0), // Orange
             new Vec(1, 0.7, 0.8), // Pink
             new Vec(0.8, 0.8, 1) // Lavender
-        };
+    };
     private MigrationStrategyManagerImpl myStrategyManager;
     private boolean onMigration;
     private String dispatcher_host;
@@ -170,7 +169,6 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
      */
 
     //@@ADDON Florian 13/8/98
-
     /**
      * Hashtable containing the name and ID of each user<br>
      * Used for direct messaging
@@ -247,7 +245,8 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
 
         //System.out.println("migration "+getOnMigration());
         org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(body);
-        myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) body);
+        myStrategyManager = new MigrationStrategyManagerImpl(
+            (org.objectweb.proactive.core.body.migration.Migratable) body);
         myStrategyManager.onDeparture("clean");
 
         if (getOnMigration()) {
@@ -279,8 +278,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                    argv[0]);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + argv[0]);
             proActiveDescriptor.activateMappings();
         } catch (Exception e) {
             e.printStackTrace();
@@ -293,8 +291,9 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
         Object[] params = { new Boolean(false), new Boolean(false), "" };
 
         try {
-            C3DUser c3duser = (C3DUser) org.objectweb.proactive.api.PAActiveObject.newActive("org.objectweb.proactive.examples.webservices.c3dWS.C3DUser",
-                    params, node.getNodeInformation().getURL());
+            C3DUser c3duser = (C3DUser) org.objectweb.proactive.api.PAActiveObject.newActive(
+                    "org.objectweb.proactive.examples.webservices.c3dWS.C3DUser", params, node
+                            .getNodeInformation().getURL());
 
             c3duser.go(proActiveDescriptor);
         } catch (Exception e) {
@@ -549,8 +548,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
         PAActiveObject.terminateActiveObject(true);
     }
 
-    public class UserFrame extends Frame implements ActionListener,
-        ItemListener {
+    public class UserFrame extends Frame implements ActionListener, ItemListener {
 
         /**
          * Button UP
@@ -636,8 +634,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
 
             s_localhost = "";
 
-            s_localhost = ProActiveInet.getInstance().getInetAddress()
-                                       .getCanonicalHostName();
+            s_localhost = ProActiveInet.getInstance().getInetAddress().getCanonicalHostName();
         }
 
         public UserFrame(C3DUser c3d, boolean value) {
@@ -649,8 +646,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             c3duser = c3d;
             s_localhost = "";
 
-            s_localhost = ProActiveInet.getInstance().getInetAddress()
-                                       .getCanonicalHostName();
+            s_localhost = ProActiveInet.getInstance().getInetAddress().getCanonicalHostName();
         }
 
         public Button getB_up() {
@@ -687,8 +683,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
         }
 
         private void createWelcomePanel() {
-            Label l1 = new Label("Welcome to the Collaborative 3D Environment -",
-                    Label.CENTER);
+            Label l1 = new Label("Welcome to the Collaborative 3D Environment -", Label.CENTER);
             c.insets = new Insets(5, 5, 0, 5);
             c.gridwidth = GridBagConstraints.REMAINDER;
             c.weightx = 1.0;
@@ -700,8 +695,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             gridbag.setConstraints(l2, c);
             add(l2);
 
-            Label l3 = new Label("Please enter your name and the host of the C3DDispatcher.",
-                    Label.CENTER);
+            Label l3 = new Label("Please enter your name and the host of the C3DDispatcher.", Label.CENTER);
             c.insets = new Insets(15, 5, 10, 5);
             gridbag.setConstraints(l3, c);
             add(l3);
@@ -814,8 +808,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             gridbag.setConstraints(p_image, c);
 
             //System.out.println("p image "+p_image.getSize().width);
-            p_image.add(new MyImageContainer(createImage(mis), i_width,
-                    i_height, p_image));
+            p_image.add(new MyImageContainer(createImage(mis), i_width, i_height, p_image));
             add(p_image);
 
             /**
@@ -851,9 +844,8 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             p_log.add(l_user);
 
             // Label displaying local machine informations 
-            Label l_machine = new Label("Local host: " + s_localhost + " (" +
-                    System.getProperty("os.name") + " " +
-                    System.getProperty("os.version") + ")");
+            Label l_machine = new Label("Local host: " + s_localhost + " (" + System.getProperty("os.name") +
+                " " + System.getProperty("os.version") + ")");
 
             // Adds the label in the panel
             pc.gridy = 1;
@@ -1039,13 +1031,10 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             createPanel(s_host, s_name);
 
             try {
-                vnDispatcher.getVirtualNodeInternal()
-                            .setRuntimeInformations("LOOKUP_HOST", s_host);
+                vnDispatcher.getVirtualNodeInternal().setRuntimeInformations("LOOKUP_HOST", s_host);
                 c3ddispatcher = (C3DDispatcher) vnDispatcher.getUniqueAO();
-                i_user = c3ddispatcher.registerConsumer(me, createScene(),
-                        s_name);
-                l_c3ddispatcher.setText(l_c3ddispatcher.getText() + " (" +
-                    c3ddispatcher.getOSString() + ")");
+                i_user = c3ddispatcher.registerConsumer(me, createScene(), s_name);
+                l_c3ddispatcher.setText(l_c3ddispatcher.getText() + " (" + c3ddispatcher.getOSString() + ")");
             } catch (Exception ex) {
                 log("Exception caught: " + ex);
                 ex.printStackTrace();
@@ -1059,8 +1048,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
             c3ddispatcher.registerMigratedUser(i_user);
 
             //System.out.println("i am here");
-            l_c3ddispatcher.setText(l_c3ddispatcher.getText() + " (" +
-                c3ddispatcher.getOSString() + ")");
+            l_c3ddispatcher.setText(l_c3ddispatcher.getText() + " (" + c3ddispatcher.getOSString() + ")");
 
             //System.out.println("i am there");
         }
@@ -1122,14 +1110,13 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
                         if (talkId == -1) {
                             // BroadCast
                             ta_mess.append("<to all> " + s_mess + '\n');
-                            c3ddispatcher.showUserMessageExcept(i_user,
-                                "[from " + s_username + "] " + s_mess);
+                            c3ddispatcher
+                                    .showUserMessageExcept(i_user, "[from " + s_username + "] " + s_mess);
                         } else {
                             // Private message
-                            ta_mess.append("<to " + li_users.getSelectedItem() +
-                                "> " + s_mess + '\n');
-                            c3ddispatcher.showUserMessage(talkId,
-                                "[Private from " + s_username + "] " + s_mess);
+                            ta_mess.append("<to " + li_users.getSelectedItem() + "> " + s_mess + '\n');
+                            c3ddispatcher.showUserMessage(talkId, "[Private from " + s_username + "] " +
+                                s_mess);
                         }
 
                         tf_mess.setText("");
@@ -1138,8 +1125,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
                         tf_mess.selectAll();
                     }
                 }
-            } else if ((source == b_connect) || (source == tf_name) ||
-                    (source == tf_host)) {
+            } else if ((source == b_connect) || (source == tf_name) || (source == tf_host)) {
 
                 /* The Welcome panel has been validated */
                 String s_name = tf_name.getText();
@@ -1201,8 +1187,7 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
                 // sets the color to a specific color chosen arbitrary in the color[] array (which btw is a Vec array..)
                 // Hm.. well, I'm really sorry for the person who'll maintain this code...
                 // I _DO_ apologize for the following line.
-                sphere.surf.color = (color[Math.round((float) (Math.random() * (color.length -
-                        1)))]);
+                sphere.surf.color = (color[Math.round((float) (Math.random() * (color.length - 1)))]);
 
                 // Voodoo stuff...
                 sphere.surf.kd = Math.random();
@@ -1269,11 +1254,9 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
     /**
      * The about box
      */
-    class MyDialog extends Dialog implements ActionListener, MouseListener,
-        java.io.Serializable {
+    class MyDialog extends Dialog implements ActionListener, MouseListener, java.io.Serializable {
         private Label d_title = new Label("ProActive PDC", Label.CENTER);
-        private Label d_url = new Label("http://www.inria.fr/proactive/",
-                Label.CENTER);
+        private Label d_url = new Label("http://www.inria.fr/proactive/", Label.CENTER);
 
         /**
          * Button to close the about box
@@ -1350,7 +1333,6 @@ public class C3DUser implements org.objectweb.proactive.RunActive,
     }
 }
 
-
 /**
  * This class encapsulates the <code>Image</code> in an AWT
  * <code>Container</code>. It integrates easily with other AWT components
@@ -1384,16 +1366,14 @@ class MyImageContainer extends Canvas implements java.io.Serializable {
     public Dimension getPreferredSize() {
         insets = p.getInsets();
 
-        return new Dimension(minwidth + insets.left + insets.right,
-            minheight + insets.left + insets.right);
+        return new Dimension(minwidth + insets.left + insets.right, minheight + insets.left + insets.right);
     }
 
     @Override
     public Dimension getMinimumSize() {
         insets = p.getInsets();
 
-        return new Dimension(minwidth + insets.left + insets.right,
-            minheight + insets.left + insets.right);
+        return new Dimension(minwidth + insets.left + insets.right, minheight + insets.left + insets.right);
     }
 
     @Override

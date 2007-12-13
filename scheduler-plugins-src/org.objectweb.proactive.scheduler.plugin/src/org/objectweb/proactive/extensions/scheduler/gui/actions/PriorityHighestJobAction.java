@@ -54,8 +54,7 @@ public class PriorityHighestJobAction extends Action {
     public void run() {
         JobId jobId = TableManager.getInstance().getLastJobIdOfLastSelectedItem();
         if (jobId != null) {
-            SchedulerProxy.getInstance()
-                          .changePriority(jobId, JobPriority.HIGHEST);
+            SchedulerProxy.getInstance().changePriority(jobId, JobPriority.HIGHEST);
         }
     }
 

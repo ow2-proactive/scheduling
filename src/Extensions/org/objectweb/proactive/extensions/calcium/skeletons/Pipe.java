@@ -45,19 +45,17 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
-public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable>
-    implements Skeleton<P, R> {
+public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {
     Vector<Skeleton<?, ?>> stages;
 
     /**
      * The basic constructor. Will execute <code>stage1</code> and the result of
      * <code>stage1</code> will be passed as parameter to <code>stage2</code>
-         *
+     *
      * @param stage1 The first stage to execute.
      * @param stage2 The second stage to execute.
      */
-    public <X extends Serializable>Pipe(Skeleton<P, X> stage1,
-        Skeleton<X, R> stage2) {
+    public <X extends Serializable> Pipe(Skeleton<P, X> stage1, Skeleton<X, R> stage2) {
         stages = new Vector<Skeleton<?, ?>>();
 
         stages.add(stage1);
@@ -73,8 +71,7 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
      * @param stage1 The first stage of computation.
      * @param stage2 The second stage of computation.
      */
-    public <X extends Serializable>Pipe(Execute<P, X> stage1,
-        Execute<X, R> stage2) {
+    public <X extends Serializable> Pipe(Execute<P, X> stage1, Execute<X, R> stage2) {
         stages = new Vector<Skeleton<?, ?>>();
 
         stages.add(new Seq<P, X>(stage1));
@@ -89,8 +86,8 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
      * @param stage2 The second stage of computation.
      * @param child3 The third stage of computation.
      */
-    public <X extends Serializable, Y extends Serializable>Pipe(
-        Skeleton<P, X> child1, Skeleton<X, Y> child2, Skeleton<Y, R> child3) {
+    public <X extends Serializable, Y extends Serializable> Pipe(Skeleton<P, X> child1,
+            Skeleton<X, Y> child2, Skeleton<Y, R> child3) {
         stages = new Vector<Skeleton<?, ?>>();
 
         stages.add(child1);
@@ -108,8 +105,8 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
      * @param stage2 The second stage of computation.
      * @param child3 The third stage of computation.
      */
-    public <X extends Serializable, Y extends Serializable>Pipe(
-        Execute<P, X> child1, Execute<X, Y> child2, Execute<Y, R> child3) {
+    public <X extends Serializable, Y extends Serializable> Pipe(Execute<P, X> child1, Execute<X, Y> child2,
+            Execute<Y, R> child3) {
         stages = new Vector<Skeleton<?, ?>>();
 
         stages.add(new Seq<P, X>(child1));
@@ -128,9 +125,8 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
      * @param child3 The third stage of computation.
      * @param child4 The third stage of computation.
      */
-    public <X extends Serializable, Y extends Serializable, Z extends Serializable>Pipe(
-        Skeleton<P, X> child1, Skeleton<X, Y> child2, Skeleton<Y, Z> child3,
-        Skeleton<Z, R> child4) {
+    public <X extends Serializable, Y extends Serializable, Z extends Serializable> Pipe(
+            Skeleton<P, X> child1, Skeleton<X, Y> child2, Skeleton<Y, Z> child3, Skeleton<Z, R> child4) {
         stages = new Vector<Skeleton<?, ?>>();
 
         stages.add(child1);
@@ -150,9 +146,8 @@ public class Pipe<P extends java.io.Serializable, R extends java.io.Serializable
      * @param child3 The third stage of computation.
      * @param child4 The third stage of computation.
      */
-    public <X extends Serializable, Y extends Serializable, Z extends Serializable>Pipe(
-        Execute<P, X> child1, Execute<X, Y> child2, Execute<Y, Z> child3,
-        Execute<Z, R> child4) {
+    public <X extends Serializable, Y extends Serializable, Z extends Serializable> Pipe(
+            Execute<P, X> child1, Execute<X, Y> child2, Execute<Y, Z> child3, Execute<Z, R> child4) {
         stages = new Vector<Skeleton<?, ?>>();
 
         stages.add(new Seq<P, X>(child1));

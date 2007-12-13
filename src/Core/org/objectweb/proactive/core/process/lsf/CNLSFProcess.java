@@ -72,8 +72,7 @@ public class CNLSFProcess extends LSFBSubProcess {
     // -- PROTECTED METHODS -----------------------------------------------
     //
     @Override
-    protected void internalStartProcess(String commandToExecute)
-        throws java.io.IOException {
+    protected void internalStartProcess(String commandToExecute) throws java.io.IOException {
         ArrayList<String> al = new ArrayList<String>();
 
         //we divide the command into tokens
@@ -88,16 +87,16 @@ public class CNLSFProcess extends LSFBSubProcess {
             //            System.out.println(m.group(i));
             al.add(m.group(i));
         }
-        String[] command = al.toArray(new String[] {  });
+        String[] command = al.toArray(new String[] {});
 
         try {
             externalProcess = Runtime.getRuntime().exec(command);
             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getInputStream()));
+                externalProcess.getInputStream()));
             java.io.BufferedReader err = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getErrorStream()));
+                externalProcess.getErrorStream()));
             java.io.BufferedWriter out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(
-                        externalProcess.getOutputStream()));
+                externalProcess.getOutputStream()));
             handleProcess(in, out, err);
         } catch (java.io.IOException e) {
             isFinished = true;
@@ -112,8 +111,8 @@ public class CNLSFProcess extends LSFBSubProcess {
     }
 
     protected String buildCNBSubCommand() {
-        String executable = scriptLocation.substring(0,
-                scriptLocation.lastIndexOf("/") + 1) + "startExecutable.sh";
+        String executable = scriptLocation.substring(0, scriptLocation.lastIndexOf("/") + 1) +
+            "startExecutable.sh";
         StringBuilder bSubCommand = new StringBuilder();
         bSubCommand.append("/bin/sh -c  'echo ");
         bSubCommand.append(targetProcess.getCommand());

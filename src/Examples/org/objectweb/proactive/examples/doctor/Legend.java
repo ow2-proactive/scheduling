@@ -93,10 +93,10 @@ public class Legend extends Dialog {
         pack();
 
         this.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    setVisible(false);
-                }
-            });
+            @Override
+            public void windowClosing(WindowEvent e) {
+                setVisible(false);
+            }
+        });
     }
 }

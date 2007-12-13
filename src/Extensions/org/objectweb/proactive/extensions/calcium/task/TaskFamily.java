@@ -91,8 +91,7 @@ public class TaskFamily<T> implements Serializable {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public void splitfReadyTasksSpace()
-        throws IOException, ClassNotFoundException {
+    public void splitfReadyTasksSpace() throws IOException, ClassNotFoundException {
         for (Task<T> task : this.childrenReady) {
             task.setObject(Stateness.deepCopy(task.getObject()));
         }
@@ -124,14 +123,14 @@ public class TaskFamily<T> implements Serializable {
         }
 
         if (task.taskId.getParentId().value() != parent.taskId.value()) {
-            logger.error("Setting other task's child as my child: child.id=" +
-                " task.parent.id=" + task.taskId.getParentId());
+            logger.error("Setting other task's child as my child: child.id=" + " task.parent.id=" +
+                task.taskId.getParentId());
             return false; //not my child
         }
 
         if (!this.childrenWaiting.containsKey(task.taskId)) {
-            logger.error("Parent id=" + parent.taskId.value() +
-                " not waiting for child: task.id=" + task.taskId.value());
+            logger.error("Parent id=" + parent.taskId.value() + " not waiting for child: task.id=" +
+                task.taskId.value());
             return false;
         }
 
@@ -162,8 +161,8 @@ public class TaskFamily<T> implements Serializable {
 
     static private <Y> void setParams(Vector<Task<Y>> queue, Y[] param) {
         if (param.length != queue.size()) {
-            String msg = "Number of parameters (" + param.length +
-                ") does not match number of subtasks (" + queue.size() + ")";
+            String msg = "Number of parameters (" + param.length + ") does not match number of subtasks (" +
+                queue.size() + ")";
             logger.error(msg);
             throw new IllegalArgumentException(msg);
         }
@@ -190,8 +189,7 @@ public class TaskFamily<T> implements Serializable {
             childResults.add(t.getObject());
         }
 
-        T[] res = (T[]) Array.newInstance(childResults.get(0).getClass(),
-                childResults.size());
+        T[] res = (T[]) Array.newInstance(childResults.get(0).getClass(), childResults.size());
         return childResults.toArray(res);
     }
 }

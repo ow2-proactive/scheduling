@@ -71,20 +71,19 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
     protected ProActiveComponent owner;
     protected ProxyForComponentInterfaceGroup delegatee = null;
 
-    public ProxyForComponentInterfaceGroup()
-        throws ConstructionOfReifiedObjectFailedException {
+    public ProxyForComponentInterfaceGroup() throws ConstructionOfReifiedObjectFailedException {
         super();
         className = Interface.class.getName();
     }
 
     public ProxyForComponentInterfaceGroup(ConstructorCall c, Object[] p)
-        throws ConstructionOfReifiedObjectFailedException {
+            throws ConstructionOfReifiedObjectFailedException {
         super(c, p);
         className = Interface.class.getName();
     }
 
     public ProxyForComponentInterfaceGroup(String nameOfClass)
-        throws ConstructionOfReifiedObjectFailedException {
+            throws ConstructionOfReifiedObjectFailedException {
         this();
         className = Interface.class.getName();
     }
@@ -100,42 +99,34 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
      * @see org.objectweb.proactive.core.group.ProxyForGroup#reify(org.objectweb.proactive.core.mop.MethodCall)
      */
     @Override
-    public synchronized Object reify(MethodCall mc)
-        throws InvocationTargetException {
+    public synchronized Object reify(MethodCall mc) throws InvocationTargetException {
         if (delegatee != null) {
             // check
-            if (itfSignatureClass.equals(mc.getReifiedMethod()
-                                               .getDeclaringClass())) {
+            if (itfSignatureClass.equals(mc.getReifiedMethod().getDeclaringClass())) {
                 // nothing to do
-            } else if (mc.getReifiedMethod().getDeclaringClass()
-                             .isAssignableFrom(itfSignatureClass)) {
+            } else if (mc.getReifiedMethod().getDeclaringClass().isAssignableFrom(itfSignatureClass)) {
                 // need to adapt method call
                 Method adaptedMethod;
                 try {
                     // TODO optimize (avoid reflective calls!)
-                    adaptedMethod = itfSignatureClass.getMethod(mc.getReifiedMethod()
-                                                                  .getName(),
-                            mc.getReifiedMethod().getParameterTypes());
+                    adaptedMethod = itfSignatureClass.getMethod(mc.getReifiedMethod().getName(), mc
+                            .getReifiedMethod().getParameterTypes());
                 } catch (SecurityException e) {
                     throw new InvocationTargetException(e,
                         "could not adapt client interface to multicast server interface " +
-                        interfaceType.getFcItfName());
+                            interfaceType.getFcItfName());
                 } catch (NoSuchMethodException e) {
                     throw new InvocationTargetException(e,
                         "could not adapt client interface to multicast server interface " +
-                        interfaceType.getFcItfName());
+                            interfaceType.getFcItfName());
                 }
-                mc = MethodCall.getComponentMethodCall(adaptedMethod,
-                        mc.getEffectiveArguments(),
-                        mc.getGenericTypesMapping(),
-                        mc.getComponentMetadata().getComponentInterfaceName(),
-                        mc.getComponentMetadata().getSenderItfID(),
-                        mc.getComponentMetadata().getPriority());
+                mc = MethodCall.getComponentMethodCall(adaptedMethod, mc.getEffectiveArguments(), mc
+                        .getGenericTypesMapping(), mc.getComponentMetadata().getComponentInterfaceName(), mc
+                        .getComponentMetadata().getSenderItfID(), mc.getComponentMetadata().getPriority());
             } else {
-                throw new InvocationTargetException(null,
-                    "method " + mc.getName() + " defined in " +
-                    mc.getReifiedMethod().getDeclaringClass() +
-                    " cannot be invoked on " + itfSignatureClass.getName());
+                throw new InvocationTargetException(null, "method " + mc.getName() + " defined in " +
+                    mc.getReifiedMethod().getDeclaringClass() + " cannot be invoked on " +
+                    itfSignatureClass.getName());
             }
         }
 
@@ -148,10 +139,10 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
     @Override
     public Object getGroupByType() {
         try {
-            Interface result = ProActiveComponentGroup.newComponentInterfaceGroup(interfaceType,
-                    owner);
+            Interface result = ProActiveComponentGroup.newComponentInterfaceGroup(interfaceType, owner);
 
-            ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result).getProxy();
+            ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result)
+                    .getProxy();
             proxy.memberList = this.memberList;
             proxy.className = this.className;
             proxy.interfaceType = this.interfaceType;
@@ -172,8 +163,7 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
      * @see org.objectweb.proactive.core.group.ProxyForGroup#asynchronousCallOnGroup(org.objectweb.proactive.core.mop.MethodCall)
      */
     @Override
-    protected Object asynchronousCallOnGroup(MethodCall mc)
-        throws InvocationTargetException {
+    protected Object asynchronousCallOnGroup(MethodCall mc) throws InvocationTargetException {
         if (((ProActiveInterfaceTypeImpl) interfaceType).isFcCollective()) {
             if (delegatee != null) {
                 Object result;
@@ -187,16 +177,15 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                     if (!(mc.getReifiedMethod().getGenericReturnType() instanceof ParameterizedType)) {
                         throw new ProActiveRuntimeException(
                             "all methods in multicast interfaces must return parameterized lists, " +
-                            "which is not the case for method " +
-                            mc.getReifiedMethod().toString());
+                                "which is not the case for method " + mc.getReifiedMethod().toString());
                     }
 
                     Class<?> returnTypeForGroup = (Class<?>) ((ParameterizedType) mc.getReifiedMethod()
-                                                                                    .getGenericReturnType()).getActualTypeArguments()[0];
-                    result = MOP.newInstance(returnTypeForGroup.getName(),
-                            null, null, ProxyForGroup.class.getName(),
-                            paramProxy);
-                    ((ProxyForGroup) ((StubObject) result).getProxy()).setClassName(returnTypeForGroup.getName());
+                            .getGenericReturnType()).getActualTypeArguments()[0];
+                    result = MOP.newInstance(returnTypeForGroup.getName(), null, null, ProxyForGroup.class
+                            .getName(), paramProxy);
+                    ((ProxyForGroup) ((StubObject) result).getProxy()).setClassName(returnTypeForGroup
+                            .getName());
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;
@@ -210,13 +199,13 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
                 } catch (ParameterDispatchException e) {
                     throw new InvocationTargetException(e,
                         "cannot dispatch invocation parameters for method " +
-                        mc.getReifiedMethod().toString() +
-                        " from collective interface " +
-                        interfaceType.getFcItfName());
+                            mc.getReifiedMethod().toString() + " from collective interface " +
+                            interfaceType.getFcItfName());
                 }
 
                 // Init the lists of result with null value to permit the "set(index)" operation
-                Vector memberListOfResultGroup = ((ProxyForGroup) ((StubObject) result).getProxy()).getMemberList();
+                Vector memberListOfResultGroup = ((ProxyForGroup) ((StubObject) result).getProxy())
+                        .getMemberList();
 
                 // there are as many results expected as there are method invocations
                 for (int i = 0; i < generatedMethodCalls.size(); i++) {
@@ -225,9 +214,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
 
                 for (MethodCall currentMc : generatedMethodCalls.keySet()) {
                     // delegate invocations
-                    this.threadpool.addAJob(new ProcessForAsyncCall(delegatee,
-                            delegatee.memberList, memberListOfResultGroup,
-                            generatedMethodCalls.get(currentMc), currentMc, body));
+                    this.threadpool.addAJob(new ProcessForAsyncCall(delegatee, delegatee.memberList,
+                        memberListOfResultGroup, generatedMethodCalls.get(currentMc), currentMc, body));
                 }
 
                 //                LocalBodyStore.getInstance().setCurrentThreadBody(body);
@@ -245,10 +233,9 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
      * @see org.objectweb.proactive.core.group.ProxyForGroup#oneWayCallOnGroup(org.objectweb.proactive.core.mop.MethodCall, org.objectweb.proactive.core.group.ExceptionListException)
      */
     @Override
-    protected void oneWayCallOnGroup(MethodCall mc,
-        ExceptionListException exceptionList) throws InvocationTargetException {
-        if (((ProActiveInterfaceTypeImpl) interfaceType).isFcCollective() &&
-                (delegatee != null)) {
+    protected void oneWayCallOnGroup(MethodCall mc, ExceptionListException exceptionList)
+            throws InvocationTargetException {
+        if (((ProActiveInterfaceTypeImpl) interfaceType).isFcCollective() && (delegatee != null)) {
             // 2. generate adapted method calls depending on nb members and parameters distribution
             // each method call is assigned a given member index
             Body body = PAActiveObject.getBodyOnThis();
@@ -256,22 +243,18 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
             Map<MethodCall, Integer> generatedMethodCalls;
 
             try {
-                generatedMethodCalls = MulticastHelper.generateMethodCallsForMulticastDelegatee(owner,
-                        mc, delegatee);
+                generatedMethodCalls = MulticastHelper.generateMethodCallsForMulticastDelegatee(owner, mc,
+                        delegatee);
             } catch (ParameterDispatchException e) {
-                throw new InvocationTargetException(e,
-                    "cannot dispatch invocation parameters for method " +
-                    mc.getReifiedMethod().toString() +
-                    " from collective interface " +
+                throw new InvocationTargetException(e, "cannot dispatch invocation parameters for method " +
+                    mc.getReifiedMethod().toString() + " from collective interface " +
                     interfaceType.getFcItfName());
             }
 
             for (MethodCall currentMc : generatedMethodCalls.keySet()) {
                 // delegate invocations
-                this.threadpool.addAJob(new ProcessForOneWayCall(delegatee,
-                        delegatee.memberList,
-                        generatedMethodCalls.get(currentMc), currentMc, body,
-                        exceptionList));
+                this.threadpool.addAJob(new ProcessForOneWayCall(delegatee, delegatee.memberList,
+                    generatedMethodCalls.get(currentMc), currentMc, body, exceptionList));
             }
 
             //            LocalBodyStore.getInstance().setCurrentThreadBody(body);
@@ -330,8 +313,8 @@ public class ProxyForComponentInterfaceGroup extends ProxyForGroup {
             itfSignatureClass = Class.forName(interfaceType.getFcItfSignature());
         } catch (ClassNotFoundException e) {
             throw new ProActiveRuntimeException("cannot find Java interface " +
-                interfaceType.getFcItfSignature() +
-                " defined in interface named " + interfaceType.getFcItfName(), e);
+                interfaceType.getFcItfSignature() + " defined in interface named " +
+                interfaceType.getFcItfName(), e);
         }
     }
 }

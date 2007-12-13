@@ -30,7 +30,6 @@
  */
 package timer;
 
-
 /**
  * @author Alexandre di Costanzo
  *

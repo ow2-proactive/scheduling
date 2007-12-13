@@ -50,8 +50,8 @@ import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
  *
  */
 public class HostTreeEditPart extends JobMonitoringTreeEditPart<HostObject> {
-    public static final Image HOST_IMAGE = new Image(Display.getCurrent(),
-            HostTreeEditPart.class.getResourceAsStream("host_icon.png"));
+    public static final Image HOST_IMAGE = new Image(Display.getCurrent(), HostTreeEditPart.class
+            .getResourceAsStream("host_icon.png"));
 
     //
     // -- CONSTRUCTOR ------------------------------------------------
@@ -76,18 +76,18 @@ public class HostTreeEditPart extends JobMonitoringTreeEditPart<HostObject> {
         final MVCNotificationTag mvcNotificationTag = notif.getMVCNotification();
         final Object data = notif.getData();
         switch (mvcNotificationTag) {
-        case STATE_CHANGED:
-            if (data == State.NOT_MONITORED) {
-                this.deactivate();
-                return;
-            }
-            break;
-        case HOST_OBJECT_UPDATED_OSNAME_AND_VERSON:
-            if (data.getClass() == String.class) {
-                setWidgetText((String) data);
-            }
-            break;
-        default:
+            case STATE_CHANGED:
+                if (data == State.NOT_MONITORED) {
+                    this.deactivate();
+                    return;
+                }
+                break;
+            case HOST_OBJECT_UPDATED_OSNAME_AND_VERSON:
+                if (data.getClass() == String.class) {
+                    setWidgetText((String) data);
+                }
+                break;
+            default:
         } //switch
 
         // Asynchronous refresh
@@ -111,7 +111,7 @@ public class HostTreeEditPart extends JobMonitoringTreeEditPart<HostObject> {
      */
     @Override
     protected final List<RuntimeObject> getModelChildren() {
-        return JobMonitoringTreeUtil.getHostChildren(getCastedModel(),
-            (VirtualNodeObject) getParent().getModel());
+        return JobMonitoringTreeUtil.getHostChildren(getCastedModel(), (VirtualNodeObject) getParent()
+                .getModel());
     }
 }

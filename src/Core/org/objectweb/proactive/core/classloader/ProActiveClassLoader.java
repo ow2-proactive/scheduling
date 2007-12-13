@@ -89,8 +89,7 @@ public class ProActiveClassLoader extends URLClassLoader {
         try {
             // use a helper class so that the current class does not include any
             // other proactive or application type
-            Class proActiveClassLoaderHelper = loadClass(
-                    "org.objectweb.proactive.core.classloader.ProActiveClassLoaderHelper");
+            Class proActiveClassLoaderHelper = loadClass("org.objectweb.proactive.core.classloader.ProActiveClassLoaderHelper");
             helper = proActiveClassLoaderHelper.newInstance();
             helper_getClassData = proActiveClassLoaderHelper.getDeclaredMethod("getClassData",
                     new Class[] { String.class });
@@ -156,11 +155,10 @@ public class ProActiveClassLoader extends URLClassLoader {
                 /* 3- ProActiveClassLoaderHelper: find classes from Parent Runtime */
                 byte[] class_data = null;
                 try {
-                    class_data = (byte[]) helper_getClassData.invoke(helper,
-                            new Object[] { name });
+                    class_data = (byte[]) helper_getClassData.invoke(helper, new Object[] { name });
                     if (class_data != null) {
-                        c = defineClass(name, class_data, 0, class_data.length,
-                                getClass().getProtectionDomain());
+                        c = defineClass(name, class_data, 0, class_data.length, getClass()
+                                .getProtectionDomain());
                     }
 
                     //                     System.out.println("Loaded " + name + " using the PAClassLoader");
@@ -205,8 +203,7 @@ public class ProActiveClassLoader extends URLClassLoader {
                 urlArray[i] = (new File(pathList.get(i))).toURI().toURL();
                 count++;
             } catch (MalformedURLException e) {
-                System.out.println("MalformedURLException occured for " +
-                    urlArray[i].toString() +
+                System.out.println("MalformedURLException occured for " + urlArray[i].toString() +
                     " during the ProActiveClassLoader creation");
             }
         }

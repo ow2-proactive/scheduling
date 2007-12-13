@@ -66,11 +66,10 @@ public class WorldObject extends AbstractData {
     // 7 s
     public static int DEFAULT_AUTO_RESET_TIME = 7;
     private static int DEFAULT_MAX_DEPTH = 3;
-    public enum methodName {ADD_CHILD,
-        REMOVE_CHILD,
-        RESET_COMMUNICATIONS;
-    }
-    ;
+
+    public enum methodName {
+        ADD_CHILD, REMOVE_CHILD, RESET_COMMUNICATIONS;
+    };
 
     // -------------------------------------------
     // --- Variables -----------------------------
@@ -153,8 +152,7 @@ public class WorldObject extends AbstractData {
         //this notification will be handled by the MonitorThread only for 
         //the first child added. It will start a refreshing thread
         if (getMonitoredChildrenSize() == 1) {
-            notifyObservers(new MVCNotification(
-                    MVCNotificationTag.WORLD_OBJECT_FIRST_CHILD_ADDED));
+            notifyObservers(new MVCNotification(MVCNotificationTag.WORLD_OBJECT_FIRST_CHILD_ADDED));
         }
 
         // notifyObservers(new Notification(MVCNotifications.ADD_CHILD));
@@ -175,8 +173,7 @@ public class WorldObject extends AbstractData {
         //this notification will be handled by the MonitorThread only for 
         //the last child added. It will stop a refreshing thread
         if (getMonitoredChildrenSize() == 0) {
-            notifyObservers(new MVCNotification(
-                    MVCNotificationTag.WORLD_OBJECT_LAST_CHILD_REMOVED));
+            notifyObservers(new MVCNotification(MVCNotificationTag.WORLD_OBJECT_LAST_CHILD_REMOVED));
         }
         notifyObservers(new MVCNotification(MVCNotificationTag.REMOVE_CHILD));
     }
@@ -202,8 +199,7 @@ public class WorldObject extends AbstractData {
                 if (oldAO != null) {
                     // It's maybe a migration
                     // If the url of the two active objects are different, this is a migration
-                    if (!ao.getParent().getUrl()
-                               .equals(oldAO.getParent().getUrl())) {
+                    if (!ao.getParent().getUrl().equals(oldAO.getParent().getUrl())) {
                         migrations.put(ao.getUniqueID(), oldAO);
                     }
                 }
@@ -228,11 +224,9 @@ public class WorldObject extends AbstractData {
         }
 
         if (ao == null) {
-            System.out.println("Represntation of Active Object " + id +
-                " already removed.");
+            System.out.println("Represntation of Active Object " + id + " already removed.");
         } else {
-            System.out.println("Stop monitoring " + ao + ", on " +
-                ao.getParent());
+            System.out.println("Stop monitoring " + ao + ", on " + ao.getParent());
             ao.resetCommunications();
             ao.getParent().removeChild(ao);
         }
@@ -353,8 +347,7 @@ public class WorldObject extends AbstractData {
         Hashtable<String, VirtualNodeObject> data = new Hashtable<String, VirtualNodeObject>();
         data.put(ADD_VN_MESSAGE, vn);
         //VirtualNodesGroup object will use the information within data
-        notifyObservers(new MVCNotification(
-                MVCNotificationTag.WORLD_OBJECT_ADD_VIRTUAL_NODE, data));
+        notifyObservers(new MVCNotification(MVCNotificationTag.WORLD_OBJECT_ADD_VIRTUAL_NODE, data));
     }
 
     /**
@@ -366,8 +359,7 @@ public class WorldObject extends AbstractData {
         setChanged();
         Hashtable<String, VirtualNodeObject> data = new Hashtable<String, VirtualNodeObject>();
         data.put(REMOVE_VN_MESSAGE, vn);
-        notifyObservers(new MVCNotification(
-                MVCNotificationTag.WORLD_OBJECT_REMOVE_VIRTUAL_NODE, data));
+        notifyObservers(new MVCNotification(MVCNotificationTag.WORLD_OBJECT_REMOVE_VIRTUAL_NODE, data));
     }
 
     public VirtualNodeObject getVirtualNode(String virtualNodeName) {

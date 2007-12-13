@@ -61,7 +61,7 @@ public class Test extends ComponentTest {
 
     public Test() {
         super("Creation of a primitive non functional-component on the local default node",
-            "Test newActiveComponent method for a primitive component on the local default node");
+                "Test newActiveComponent method for a primitive component on the local default node");
     }
 
     @org.junit.Test
@@ -71,28 +71,20 @@ public class Test extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
         ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
 
-        ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class.getResource(
-                    "/functionalTests/component/nonfunctional/creation/descriptor.xml")
-                                                                                                 .getPath());
+        ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class
+                .getResource("/functionalTests/component/nonfunctional/creation/descriptor.xml").getPath());
         deploymentDescriptor.activateMappings();
         VirtualNode vn = deploymentDescriptor.getVirtualNode("computers-vn");
-        dummyNFComponent = cf.newNFcInstance(type_factory.createFcType(
-                    new InterfaceType[] {
-                        type_factory.createFcItfType(
-                            "fitness-controller-membrane",
-                            DummyControllerItf.class.getName(),
-                            TypeFactory.SERVER, TypeFactory.MANDATORY,
-                            TypeFactory.SINGLE),
-                    }),
-                new ControllerDescription("fitnessController",
-                    Constants.PRIMITIVE),
-                new ContentDescription(DummyControllerComponentImpl.class.getName()),
-                vn);
+        dummyNFComponent = cf.newNFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
+                .createFcItfType("fitness-controller-membrane", DummyControllerItf.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), }),
+                new ControllerDescription("fitnessController", Constants.PRIMITIVE), new ContentDescription(
+                    DummyControllerComponentImpl.class.getName()), vn);
         //logger.debug("OK, instantiated the component");
         // start the component!
         Fractal.getLifeCycleController(dummyNFComponent).startFc();
-        DummyControllerItf ref = (DummyControllerItf) dummyNFComponent.getFcInterface(
-                "fitness-controller-membrane");
+        DummyControllerItf ref = (DummyControllerItf) dummyNFComponent
+                .getFcInterface("fitness-controller-membrane");
         name = ref.dummyMethodWithResult();
         System.out.println("Received result is : " + name);
         ref.dummyVoidMethod("Message");

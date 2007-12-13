@@ -64,15 +64,12 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
     private String localDefaultNodeUrl;
 
     public RemoteObjectHostRTFinder() {
-        this.localRuntimeUrl = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                   .getURL();
+        this.localRuntimeUrl = ProActiveRuntimeImpl.getProActiveRuntime().getURL();
         try {
-            this.localDefaultNodeUrl = NodeFactory.getDefaultNode()
-                                                  .getNodeInformation().getURL();
+            this.localDefaultNodeUrl = NodeFactory.getDefaultNode().getNodeInformation().getURL();
         } catch (Exception e) {
-            Console.getInstance(Activator.CONSOLE_NAME)
-                   .err("Could not get local default node url on local runtime " +
-                this.localRuntimeUrl);
+            Console.getInstance(Activator.CONSOLE_NAME).err(
+                    "Could not get local default node url on local runtime " + this.localRuntimeUrl);
         }
     }
 
@@ -92,20 +89,16 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
         Map<String, RuntimeObject> runtimeObjects = new HashMap<String, RuntimeObject>();
 
         Console console = Console.getInstance(Activator.CONSOLE_NAME);
-        console.log("Exploring " + host + " with RMI on port " +
-            host.getPort());
+        console.log("Exploring " + host + " with RMI on port " + host.getPort());
 
         URI[] uris = null;
         try {
-            URI target = URIBuilder.buildURI(host.getHostName(), null,
-                    host.getProtocol(), host.getPort());
+            URI target = URIBuilder.buildURI(host.getHostName(), null, host.getProtocol(), host.getPort());
             try {
-                uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol())
-                                         .list(target);
+                uris = RemoteObjectHelper.getRemoteObjectFactory(host.getProtocol()).list(target);
             } catch (ProActiveException e) {
                 if (e.getCause() instanceof ConnectException) {
-                    Console.getInstance(Activator.CONSOLE_NAME)
-                           .err("Connection refused to " + host);
+                    Console.getInstance(Activator.CONSOLE_NAME).err("Connection refused to " + host);
                     return runtimeObjects.values();
                 } else {
                     throw e;
@@ -118,8 +111,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                     final String urlString = url.toString();
 
                     // In order to avoid self-monitoring we must skip the local runtime url or the local node name 
-                    if (urlString.equals(this.localRuntimeUrl) ||
-                            urlString.equals(this.localDefaultNodeUrl)) {
+                    if (urlString.equals(this.localRuntimeUrl) || urlString.equals(this.localDefaultNodeUrl)) {
                         continue;
                     }
 
@@ -141,8 +133,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                             stub = RemoteObjectHelper.generatedObjectStub(ro);
                         } catch (ProActiveException e) {
                             nbZombieStubs++;
-                            System.out.println("Could not generate stub for " +
-                                url);
+                            System.out.println("Could not generate stub for " + url);
                             continue;
                         }
 
@@ -163,8 +154,7 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                             RuntimeObject runtime = (RuntimeObject) host.getChild(runtimeUrl);
                             if (runtime == null) {
                                 // This runtime is not yet monitored
-                                runtime = new RuntimeObject(host, runtimeUrl,
-                                        oname, hostUrl, mbeanServerName);
+                                runtime = new RuntimeObject(host, runtimeUrl, oname, hostUrl, mbeanServerName);
                             }
                             runtimeObjects.put(runtimeUrl, runtime);
                         }
@@ -172,15 +162,13 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
                         // the lookup returned an active object, and an active object is
                         // not a remote object (for now...)
                         e.printStackTrace();
-                        console.warn("Error when getting remote object at : " +
-                            url);
+                        console.warn("Error when getting remote object at : " + url);
                         continue;
                     }
                 }
             }
         } catch (Exception e) {
-            if (e instanceof ConnectException ||
-                    e instanceof ConnectIOException) {
+            if (e instanceof ConnectException || e instanceof ConnectIOException) {
                 console.debug(e);
             } else {
                 console.logException(e);
@@ -188,8 +176,8 @@ public class RemoteObjectHostRTFinder implements RuntimeFinder {
         }
 
         if (nbZombieStubs > 0) {
-            console.log(nbZombieStubs + " invalid urls in registry at host " +
-                host.getHostName() + ":" + host.getPort());
+            console.log(nbZombieStubs + " invalid urls in registry at host " + host.getHostName() + ":" +
+                host.getPort());
         }
         return runtimeObjects.values();
     }

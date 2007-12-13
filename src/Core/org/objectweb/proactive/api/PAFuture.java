@@ -140,8 +140,7 @@ public class PAFuture {
      * @param timeout to wait in ms
      * @throws ProActiveException if the timeout expire
      */
-    public static void waitFor(Object future, long timeout)
-        throws ProActiveException {
+    public static void waitFor(Object future, long timeout) throws ProActiveException {
         // If the object is not reified, it cannot be a future
         if ((MOP.isReifiedObject(future)) == false) {
             return;
@@ -158,9 +157,9 @@ public class PAFuture {
     }
 
     /**
-    * Blocks the calling thread until all futures in the vector are available.
-    * @param futures vector of futures
-    */
+     * Blocks the calling thread until all futures in the vector are available.
+     * @param futures vector of futures
+     */
     public static void waitForAll(java.util.Vector futures) {
         try {
             PAFuture.waitForAll(futures, 0);
@@ -177,24 +176,22 @@ public class PAFuture {
      * @param timeout to wait in ms
      * @throws ProActiveException if the timeout expires
      */
-    public static void waitForAll(java.util.Vector futures, long timeout)
-        throws ProActiveException {
+    public static void waitForAll(java.util.Vector futures, long timeout) throws ProActiveException {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         for (Object future : futures) {
             if (time.isTimeoutElapsed()) {
-                throw new ProActiveException(
-                    "Timeout expired while waiting for future update");
+                throw new ProActiveException("Timeout expired while waiting for future update");
             }
             PAFuture.waitFor(future, time.getRemainingTimeout());
         }
     }
 
     /**
-    * Blocks the calling thread until one of the futures in the vector is available.
-    * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
-    * @param futures vector of futures
-    * @return index of the available future in the vector
-    */
+     * Blocks the calling thread until one of the futures in the vector is available.
+     * THIS METHOD MUST BE CALLED FROM AN ACTIVE OBJECT.
+     * @param futures vector of futures
+     * @return index of the available future in the vector
+     */
     public static int waitForAny(java.util.Vector futures) {
         try {
             return PAFuture.waitForAny(futures, 0);
@@ -214,8 +211,7 @@ public class PAFuture {
      * @return index of the available future in the vector
      * @throws ProActiveException if the timeout expires
      */
-    public static int waitForAny(java.util.Collection futures, long timeout)
-        throws ProActiveException {
+    public static int waitForAny(java.util.Collection futures, long timeout) throws ProActiveException {
         if (futures.isEmpty()) {
 
             /*
@@ -248,8 +244,7 @@ public class PAFuture {
                     index++;
                 }
                 if (time.isTimeoutElapsed()) {
-                    throw new ProActiveException(
-                        "Timeout expired while waiting for future update");
+                    throw new ProActiveException("Timeout expired while waiting for future update");
                 }
                 fp.waitForReply(time.getRemainingTimeout());
             }
@@ -257,23 +252,22 @@ public class PAFuture {
     }
 
     /**
-    * Blocks the calling thread until the N-th of the futures in the vector is available.
-    * @param futures vector of futures
-    * @param n index of future to wait
-    */
+     * Blocks the calling thread until the N-th of the futures in the vector is available.
+     * @param futures vector of futures
+     * @param n index of future to wait
+     */
     public static void waitForTheNth(java.util.Vector futures, int n) {
         PAFuture.waitFor(futures.get(n));
     }
 
     /**
-         * Blocks the calling thread until the N-th of the futures in the vector is available.
-         * @param futures vector of futures
-         * @param n
-         * @param timeout to wait in ms
-         * @throws ProActiveException if the timeout expires
-         */
-    public static void waitForTheNth(java.util.Vector futures, int n,
-        long timeout) throws ProActiveException {
+     * Blocks the calling thread until the N-th of the futures in the vector is available.
+     * @param futures vector of futures
+     * @param n
+     * @param timeout to wait in ms
+     * @throws ProActiveException if the timeout expires
+     */
+    public static void waitForTheNth(java.util.Vector futures, int n, long timeout) throws ProActiveException {
         PAFuture.waitFor(futures.get(n), timeout);
     }
 
@@ -316,8 +310,7 @@ public class PAFuture {
         try {
             f = (FutureProxy) ((StubObject) future).getProxy();
         } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Expected a future, got a " +
-                future.getClass());
+            throw new IllegalArgumentException("Expected a future, got a " + future.getClass());
         }
 
         f.addCallback(methodName);
@@ -331,8 +324,7 @@ public class PAFuture {
      */
     public static void monitorFuture(Object future) {
         if (!MOP.isReifiedObject(future)) {
-            throw new IllegalArgumentException(
-                "Parameter is not a future object (actual type is " +
+            throw new IllegalArgumentException("Parameter is not a future object (actual type is " +
                 future.getClass().getName() + ")");
         }
         FutureProxy fp = (FutureProxy) ((StubObject) future).getProxy();

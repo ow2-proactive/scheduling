@@ -46,23 +46,15 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupARCParser extends AbstractGroupParser {
-    private static final String XPATH_TRANSFER = NODE_EXT_NAMESPACE +
-        "transfer";
-    private static final String NODE_NAME_NOTIFY = NODE_EXT_NAMESPACE +
-        "notify";
-    private static final String NODE_NAME_MAX_TIME = NODE_EXT_NAMESPACE +
-        "maxTime";
+    private static final String XPATH_TRANSFER = NODE_EXT_NAMESPACE + "transfer";
+    private static final String NODE_NAME_NOTIFY = NODE_EXT_NAMESPACE + "notify";
+    private static final String NODE_NAME_MAX_TIME = NODE_EXT_NAMESPACE + "maxTime";
     private static final String NODE_NAME_STDIN = NODE_EXT_NAMESPACE + "stdin";
-    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
-        "stderr";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
-        "stdout";
-    private static final String NODE_NAME_OUTPUT_FILES = NODE_EXT_NAMESPACE +
-        "outputFiles";
-    private static final String NODE_NAME_INPUT_FILES = NODE_EXT_NAMESPACE +
-        "inputFiles";
-    private static final String NODE_NAME_ARGUMENTS = NODE_EXT_NAMESPACE +
-        "arguments";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
+    private static final String NODE_NAME_OUTPUT_FILES = NODE_EXT_NAMESPACE + "outputFiles";
+    private static final String NODE_NAME_INPUT_FILES = NODE_EXT_NAMESPACE + "inputFiles";
+    private static final String NODE_NAME_ARGUMENTS = NODE_EXT_NAMESPACE + "arguments";
     private static final String NODE_NAME_COUNT = NODE_EXT_NAMESPACE + "count";
     private static final String NODE_NAME = "arcGroup";
     private static final String ATTR_JOB_NAME = "jobName";
@@ -82,8 +74,7 @@ public class GroupARCParser extends AbstractGroupParser {
         GroupARC arcGroup = (GroupARC) super.parseGroupNode(groupNode, xpath);
 
         try {
-            String t = GCMParserHelper.getAttributeValue(groupNode,
-                    ATTR_JOB_NAME);
+            String t = GCMParserHelper.getAttributeValue(groupNode, ATTR_JOB_NAME);
             arcGroup.setJobName(t);
 
             NodeList childNodes = groupNode.getChildNodes();
@@ -99,16 +90,13 @@ public class GroupARCParser extends AbstractGroupParser {
                 if (nodeName.equals(NODE_NAME_COUNT)) {
                     arcGroup.setCount(nodeValue);
                 } else if (nodeName.equals(NODE_NAME_ARGUMENTS)) {
-                    List<String> args = GCMParserHelper.parseArgumentListNode(xpath,
-                            child);
+                    List<String> args = GCMParserHelper.parseArgumentListNode(xpath, child);
                     arcGroup.setArguments(args);
                 } else if (nodeName.equals(NODE_NAME_INPUT_FILES)) {
-                    List<FileTransfer> inputFilesList = parseFileTransferList(child,
-                            xpath);
+                    List<FileTransfer> inputFilesList = parseFileTransferList(child, xpath);
                     arcGroup.setInputFiles(inputFilesList);
                 } else if (nodeName.equals(NODE_NAME_OUTPUT_FILES)) {
-                    List<FileTransfer> outputFilesList = parseFileTransferList(child,
-                            xpath);
+                    List<FileTransfer> outputFilesList = parseFileTransferList(child, xpath);
                     arcGroup.setOutputFiles(outputFilesList);
                 } else if (nodeName.equals(NODE_NAME_STDOUT)) {
                     arcGroup.setStdout(nodeValue);
@@ -136,19 +124,17 @@ public class GroupARCParser extends AbstractGroupParser {
         public String location;
 
         FileTransfer(Node fileTransferNode) {
-            filename = GCMParserHelper.getAttributeValue(fileTransferNode,
-                    ATTR_FILENAME);
-            location = GCMParserHelper.getAttributeValue(fileTransferNode,
-                    ATTR_LOCATION);
+            filename = GCMParserHelper.getAttributeValue(fileTransferNode, ATTR_FILENAME);
+            location = GCMParserHelper.getAttributeValue(fileTransferNode, ATTR_LOCATION);
         }
     }
 
-    protected List<FileTransfer> parseFileTransferList(
-        Node fileTransferListNode, XPath xpath) throws XPathExpressionException {
+    protected List<FileTransfer> parseFileTransferList(Node fileTransferListNode, XPath xpath)
+            throws XPathExpressionException {
         List<FileTransfer> res = new ArrayList<FileTransfer>();
 
-        NodeList ftNodes = (NodeList) xpath.evaluate(XPATH_TRANSFER,
-                fileTransferListNode, XPathConstants.NODESET);
+        NodeList ftNodes = (NodeList) xpath.evaluate(XPATH_TRANSFER, fileTransferListNode,
+                XPathConstants.NODESET);
 
         for (int i = 0; i < ftNodes.getLength(); ++i) {
             Node ftNode = ftNodes.item(i);

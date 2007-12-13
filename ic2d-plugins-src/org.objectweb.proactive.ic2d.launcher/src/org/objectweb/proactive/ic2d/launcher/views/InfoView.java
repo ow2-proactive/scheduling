@@ -119,8 +119,7 @@ public class InfoView extends ViewPart implements Observer {
      * to create the viewer and initialize it.
      */
     public void createPartControl(Composite parent) {
-        viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL |
-                SWT.V_SCROLL);
+        viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
         ViewContentProvider vcp = new ViewContentProvider();
         viewer.setContentProvider(vcp);
         viewer.setLabelProvider(new ViewLabelProvider());
@@ -152,9 +151,9 @@ public class InfoView extends ViewPart implements Observer {
             if (this.viewer != null) {
                 IWorkbench workbench = PlatformUI.getWorkbench();
                 IPerspectiveRegistry perspectiveRegistry = workbench.getPerspectiveRegistry();
-                IPerspectiveDescriptor perspective = perspectiveRegistry.findPerspectiveWithId(LauncherPerspective.ID);
-                if ((perspective != null) &&
-                        !this.viewer.getControl().isDisposed()) {
+                IPerspectiveDescriptor perspective = perspectiveRegistry
+                        .findPerspectiveWithId(LauncherPerspective.ID);
+                if ((perspective != null) && !this.viewer.getControl().isDisposed()) {
                     this.viewer.refresh();
                 }
             }
@@ -166,9 +165,9 @@ public class InfoView extends ViewPart implements Observer {
                 if (this.viewer != null) {
                     IWorkbench workbench = PlatformUI.getWorkbench();
                     IPerspectiveRegistry perspectiveRegistry = workbench.getPerspectiveRegistry();
-                    IPerspectiveDescriptor perspective = perspectiveRegistry.findPerspectiveWithId(LauncherPerspective.ID);
-                    if ((perspective != null) &
-                            !this.viewer.getControl().isDisposed()) {
+                    IPerspectiveDescriptor perspective = perspectiveRegistry
+                            .findPerspectiveWithId(LauncherPerspective.ID);
+                    if ((perspective != null) & !this.viewer.getControl().isDisposed()) {
                         this.viewer.refresh();
                     }
                 }
@@ -183,10 +182,10 @@ public class InfoView extends ViewPart implements Observer {
         MenuManager menuMgr = new MenuManager("#PopupMenu");
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-                public void menuAboutToShow(IMenuManager manager) {
-                    InfoView.this.fillContextMenu(manager);
-                }
-            });
+            public void menuAboutToShow(IMenuManager manager) {
+                InfoView.this.fillContextMenu(manager);
+            }
+        });
 
         Menu menu = menuMgr.createContextMenu(viewer.getControl());
         viewer.getControl().setMenu(menu);
@@ -224,103 +223,95 @@ public class InfoView extends ViewPart implements Observer {
     private void makeActions() {
         // Action 1 : Launches an application
         action1 = new Action() {
-                    public void run() {
-                        ISelection selection = viewer.getSelection();
-                        if ((((IStructuredSelection) selection).size() == 0) ||
-                                (((IStructuredSelection) selection).getFirstElement() == null)) {
-                            return;
-                        }
-                        Object obj = ((IStructuredSelection) selection).getFirstElement();
-                        IWorkbenchWindow workbenchWindow = getSite()
-                                                               .getWorkbenchWindow();
-                        IWorkbenchPage page = workbenchWindow.getActivePage();
-                        Launch.launch(page, obj.toString());
-                    }
-                };
+            public void run() {
+                ISelection selection = viewer.getSelection();
+                if ((((IStructuredSelection) selection).size() == 0) ||
+                    (((IStructuredSelection) selection).getFirstElement() == null)) {
+                    return;
+                }
+                Object obj = ((IStructuredSelection) selection).getFirstElement();
+                IWorkbenchWindow workbenchWindow = getSite().getWorkbenchWindow();
+                IWorkbenchPage page = workbenchWindow.getActivePage();
+                Launch.launch(page, obj.toString());
+            }
+        };
         action1.setText("Launch the application");
         action1.setToolTipText("Launch the application");
-        action1.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "launch.gif"));
+        action1.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "launch.gif"));
 
         // Action 2 : Display some informations about the application
         action2 = new Action() {
-                    public void run() {
-                        ISelection selection = viewer.getSelection();
-                        if ((((IStructuredSelection) selection).size() == 0) ||
-                                (((IStructuredSelection) selection).getFirstElement() == null)) {
-                            return;
-                        }
-                        Object obj = ((IStructuredSelection) selection).getFirstElement();
-                        showInfo(obj.toString());
-                    }
-                };
+            public void run() {
+                ISelection selection = viewer.getSelection();
+                if ((((IStructuredSelection) selection).size() == 0) ||
+                    (((IStructuredSelection) selection).getFirstElement() == null)) {
+                    return;
+                }
+                Object obj = ((IStructuredSelection) selection).getFirstElement();
+                showInfo(obj.toString());
+            }
+        };
         action2.setText("Informations");
         action2.setToolTipText("Informations");
-        action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-                                             .getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+        action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(
+                ISharedImages.IMG_OBJS_INFO_TSK));
 
         // Action 3 : Kills the application
         action3 = new Action() {
-                    public void run() {
-                        ISelection selection = viewer.getSelection();
-                        if ((((IStructuredSelection) selection).size() == 0) ||
-                                (((IStructuredSelection) selection).getFirstElement() == null)) {
-                            return;
-                        }
-                        Object obj = ((IStructuredSelection) selection).getFirstElement();
-                        XMLDescriptor file = XMLDescriptorSet.getInstance()
-                                                             .getFile(obj.toString());
-                        FileState state = file.getState();
-                        if (state != FileState.LAUNCHED) {
-                            showWarning("The " + file.getShortName() +
-                                " application  was not launched!");
-                            return;
-                        }
+            public void run() {
+                ISelection selection = viewer.getSelection();
+                if ((((IStructuredSelection) selection).size() == 0) ||
+                    (((IStructuredSelection) selection).getFirstElement() == null)) {
+                    return;
+                }
+                Object obj = ((IStructuredSelection) selection).getFirstElement();
+                XMLDescriptor file = XMLDescriptorSet.getInstance().getFile(obj.toString());
+                FileState state = file.getState();
+                if (state != FileState.LAUNCHED) {
+                    showWarning("The " + file.getShortName() + " application  was not launched!");
+                    return;
+                }
 
-                        Launcher launcher = file.getLauncher();
-                        if (launcher.isActivated()) {
-                            try {
-                                launcher.getProActiveDescriptor().killall(true);
-                                file.setState(FileState.KILLED);
-                            } catch (ProActiveException e) {
-                                Console.getInstance(Activator.CONSOLE_NAME)
-                                       .logException(e);
-                            }
-                        }
+                Launcher launcher = file.getLauncher();
+                if (launcher.isActivated()) {
+                    try {
+                        launcher.getProActiveDescriptor().killall(true);
+                        file.setState(FileState.KILLED);
+                    } catch (ProActiveException e) {
+                        Console.getInstance(Activator.CONSOLE_NAME).logException(e);
                     }
-                };
+                }
+            }
+        };
         action3.setText("Kill the application");
         action3.setToolTipText("Kill the application");
-        action3.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "kill.gif"));
+        action3.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "kill.gif"));
 
         // doubleClickAction : Open the descriptor into an XML editor.
         doubleClickAction = new Action() {
-                    public void run() {
-                        ISelection selection = viewer.getSelection();
-                        Object obj = ((IStructuredSelection) selection).getFirstElement();
+            public void run() {
+                ISelection selection = viewer.getSelection();
+                Object obj = ((IStructuredSelection) selection).getFirstElement();
 
-                        IWorkbenchWindow workbenchWindow = getSite()
-                                                               .getWorkbenchWindow();
-                        IWorkbenchPage page =  /*workbenchWindow.getActivePage();*/getSite()
-                                                                                       .getPage();
-                        IWorkbench workbench = workbenchWindow.getWorkbench();
+                IWorkbenchWindow workbenchWindow = getSite().getWorkbenchWindow();
+                IWorkbenchPage page = /*workbenchWindow.getActivePage();*/getSite().getPage();
+                IWorkbench workbench = workbenchWindow.getWorkbench();
 
-                        // Opens the corresponding page.
-                        openPerspective(workbench, page);
+                // Opens the corresponding page.
+                openPerspective(workbench, page);
 
-                        // Opens the corresponding editor.
-                        openEditor(workbench, page, obj.toString());
-                    }
-                };
+                // Opens the corresponding editor.
+                openEditor(workbench, page, obj.toString());
+            }
+        };
     }
 
     private void hookDoubleClickAction() {
         viewer.addDoubleClickListener(new IDoubleClickListener() {
-                public void doubleClick(DoubleClickEvent event) {
-                    doubleClickAction.run();
-                }
-            });
+            public void doubleClick(DoubleClickEvent event) {
+                doubleClickAction.run();
+            }
+        });
     }
 
     /**
@@ -342,8 +333,7 @@ public class InfoView extends ViewPart implements Observer {
             msg = name + status;
         }
         msg = msg + "\nPath = " + path;
-        MessageDialog.openInformation(viewer.getControl().getShell(), "Info",
-            msg);
+        MessageDialog.openInformation(viewer.getControl().getShell(), "Info", msg);
     }
 
     /**
@@ -360,8 +350,7 @@ public class InfoView extends ViewPart implements Observer {
      * @param message The massage to display.
      */
     private void showWarning(String message) {
-        MessageDialog.openWarning(viewer.getControl().getShell(), "Warning",
-            message);
+        MessageDialog.openWarning(viewer.getControl().getShell(), "Warning", message);
     }
 
     /**
@@ -380,8 +369,7 @@ public class InfoView extends ViewPart implements Observer {
      * @param page
      * @param path The file path.
      */
-    private void openEditor(IWorkbench workbench, IWorkbenchPage page,
-        String path) {
+    private void openEditor(IWorkbench workbench, IWorkbenchPage page, String path) {
         IEditorInput input = new PathEditorInput(new Path(path));
         IEditorRegistry editorRegistry = workbench.getEditorRegistry();
         IEditorDescriptor descriptor = editorRegistry.getDefaultEditor(path);
@@ -421,8 +409,7 @@ public class InfoView extends ViewPart implements Observer {
 
     class ViewLabelProvider extends LabelProvider implements ITableLabelProvider {
         public String getColumnText(Object obj, int index) {
-            return XMLDescriptorSet.getInstance()
-                                   .getFileNameToDisplay((String) obj);
+            return XMLDescriptorSet.getInstance().getFileNameToDisplay((String) obj);
         }
 
         public Image getColumnImage(Object obj, int index) {
@@ -430,10 +417,8 @@ public class InfoView extends ViewPart implements Observer {
         }
 
         public Image getImage(Object obj) {
-            String image = XMLDescriptorSet.getInstance().getFile((String) obj)
-                                           .getImage();
-            return new Image(Display.getCurrent(),
-                this.getClass().getResourceAsStream(image));
+            String image = XMLDescriptorSet.getInstance().getFile((String) obj).getImage();
+            return new Image(Display.getCurrent(), this.getClass().getResourceAsStream(image));
         }
     }
 

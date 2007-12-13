@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.scheduler.common.job;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * Scheduling state of a job.
  * The different job states are best described below.

@@ -73,8 +73,7 @@ public class RecoveryProcessPMLRB extends RecoveryProcessImpl {
             Node node = this.server.getFreeNode();
 
             //if (node==null)return;
-            RecoveryJob job = new RecoveryJob(toSend,
-                    FTManager.DEFAULT_TTC_VALUE, node);
+            RecoveryJob job = new RecoveryJob(toSend, FTManager.DEFAULT_TTC_VALUE, node);
             this.submitJob(job);
         } catch (RemoteException e) {
             logger.error("[RECOVERY] **ERROR** Cannot contact other servers : ");

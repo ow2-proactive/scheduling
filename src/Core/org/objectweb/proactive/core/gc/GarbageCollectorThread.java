@@ -45,8 +45,7 @@ import org.objectweb.proactive.core.util.ProActiveRandom;
  * A single Garbage Collector thread for the whole JVM
  */
 public class GarbageCollectorThread implements Runnable {
-    private static final Thread singleton = new Thread(new GarbageCollectorThread(),
-            "ProActive GC");
+    private static final Thread singleton = new Thread(new GarbageCollectorThread(), "ProActive GC");
 
     public void run() {
         try {
@@ -66,31 +65,24 @@ public class GarbageCollectorThread implements Runnable {
                 ie.printStackTrace();
             }
             long start = System.currentTimeMillis();
-            Iterator<UniversalBody> bodies = LocalBodyStore.getInstance()
-                                                           .getLocalBodies()
-                                                           .bodiesIterator();
+            Iterator<UniversalBody> bodies = LocalBodyStore.getInstance().getLocalBodies().bodiesIterator();
             Collection<GCSimpleMessage> toSend = new LinkedList<GCSimpleMessage>();
             while (bodies.hasNext()) {
                 AbstractBody body = (AbstractBody) bodies.next();
-                Collection<GCSimpleMessage> messages = body.getGarbageCollector()
-                                                           .iteration();
+                Collection<GCSimpleMessage> messages = body.getGarbageCollector().iteration();
                 if (messages != null) {
                     toSend.addAll(messages);
                 }
             }
-            Collection<GCSimpleMessage> messages = HalfBodies.getInstance()
-                                                             .iteration();
+            Collection<GCSimpleMessage> messages = HalfBodies.getInstance().iteration();
             if (messages != null) {
                 toSend.addAll(messages);
             }
             MessageSender.sendMessages(toSend);
-            sleepDuration = GarbageCollector.TTB -
-                (System.currentTimeMillis() - start);
+            sleepDuration = GarbageCollector.TTB - (System.currentTimeMillis() - start);
             if (sleepDuration <= 0) {
-                AsyncLogger.queueLog(Level.WARN,
-                    "Broadcasting took longer than TTB (" +
-                    GarbageCollector.TTB + "): " +
-                    (GarbageCollector.TTB - sleepDuration));
+                AsyncLogger.queueLog(Level.WARN, "Broadcasting took longer than TTB (" +
+                    GarbageCollector.TTB + "): " + (GarbageCollector.TTB - sleepDuration));
                 sleepDuration = 1;
             }
         }

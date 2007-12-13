@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.io.Serializable,
-    BlockingRequestQueue {
+        BlockingRequestQueue {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
@@ -136,13 +136,11 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         return ftres;
     }
 
-    public synchronized Request blockingRemoveOldest(
-        RequestFilter requestFilter) {
+    public synchronized Request blockingRemoveOldest(RequestFilter requestFilter) {
         return blockingRemove(requestFilter, true, 0);
     }
 
-    public synchronized Request blockingRemoveOldest(
-        RequestFilter requestFilter, long timeout) {
+    public synchronized Request blockingRemoveOldest(RequestFilter requestFilter, long timeout) {
         return blockingRemove(requestFilter, true, timeout);
     }
 
@@ -159,13 +157,11 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         return blockingRemove(null, true, timeout);
     }
 
-    public synchronized Request blockingRemoveYoungest(
-        RequestFilter requestFilter) {
+    public synchronized Request blockingRemoveYoungest(RequestFilter requestFilter) {
         return blockingRemove(requestFilter, false);
     }
 
-    public synchronized Request blockingRemoveYoungest(
-        RequestFilter requestFilter, long timeout) {
+    public synchronized Request blockingRemoveYoungest(RequestFilter requestFilter, long timeout) {
         return blockingRemove(requestFilter, false, timeout);
     }
 
@@ -190,14 +186,12 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
      */
     private synchronized void internalWaitForRequest(long timeout) {
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.startTimer(this.ownerID,
-                TimerWarehouse.WAIT_FOR_REQUEST);
+            TimerWarehouse.startTimer(this.ownerID, TimerWarehouse.WAIT_FOR_REQUEST);
         }
 
         // ProActiveEvent
         if (hasListeners()) {
-            notifyAllListeners(new RequestQueueEvent(ownerID,
-                    RequestQueueEvent.WAIT_FOR_REQUEST));
+            notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.WAIT_FOR_REQUEST));
         }
 
         // END ProActiveEvent
@@ -221,8 +215,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
             this.waitingForRequest = false;
             // THIS CODE IS NEVER EXECUTED IF THE ACTIVE OBJECT IS TERMINATED
             if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.stopTimer(this.ownerID,
-                    TimerWarehouse.WAIT_FOR_REQUEST);
+                TimerWarehouse.stopTimer(this.ownerID, TimerWarehouse.WAIT_FOR_REQUEST);
             }
         }
     }
@@ -245,11 +238,11 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         return blockingRemove(requestFilter, oldest, 0);
     }
 
-    protected Request blockingRemove(RequestFilter requestFilter,
-        boolean oldest, long timeout) {
+    protected Request blockingRemove(RequestFilter requestFilter, boolean oldest, long timeout) {
         if (oldest && (requestFilter == null) && (timeout == 0)) {
             if (this.spmdManager == null) {
-                this.spmdManager = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSPMDGroupManager();
+                this.spmdManager = ((AbstractBody) PAActiveObject.getBodyOnThis())
+                        .getProActiveSPMDGroupManager();
             }
             if (!spmdManager.isCurrentBarriersEmpty()) {
                 return this.barrierBlockingRemove(); // the oospmd way ...
@@ -260,21 +253,14 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
         if (timeout > 0) {
             timeStartWaiting = System.currentTimeMillis();
         }
-        Request r = oldest
-            ? ((requestFilter == null) ? removeOldest()
-                                       : removeOldest(requestFilter))
-            : ((requestFilter == null) ? removeYoungest()
-                                       : removeYoungest(requestFilter));
+        Request r = oldest ? ((requestFilter == null) ? removeOldest() : removeOldest(requestFilter))
+                : ((requestFilter == null) ? removeYoungest() : removeYoungest(requestFilter));
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while ((r == null) && shouldWait && !time.isTimeoutElapsed()) {
             internalWaitForRequest(time.getRemainingTimeout());
-            r = oldest
-                ? ((requestFilter == null) ? removeOldest()
-                                           : removeOldest(requestFilter))
-                : ((requestFilter == null) ? removeYoungest()
-                                           : removeYoungest(requestFilter));
-            if ((timeout != 0) &&
-                    ((System.currentTimeMillis() - timeStartWaiting) > timeout)) {
+            r = oldest ? ((requestFilter == null) ? removeOldest() : removeOldest(requestFilter))
+                    : ((requestFilter == null) ? removeYoungest() : removeYoungest(requestFilter));
+            if ((timeout != 0) && ((System.currentTimeMillis() - timeStartWaiting) > timeout)) {
                 // force return when timeout exceeded
                 return r;
             }
@@ -327,9 +313,8 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
      */
     protected Request barrierBlockingRemoveOldest(long timeout) {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
-        while (((this.isEmpty() && this.shouldWait) || this.suspended ||
-                (this.indexOfRequestToServe() == -1)) &&
-                !this.specialExecution) {
+        while (((this.isEmpty() && this.shouldWait) || this.suspended || (this.indexOfRequestToServe() == -1)) &&
+            !this.specialExecution) {
             if (time.isTimeoutElapsed()) {
                 return removeOldest();
             }
@@ -347,8 +332,7 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
 
         // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-            notifyAllListeners(new RequestQueueEvent(ownerID,
-                    RequestQueueEvent.REMOVE_REQUEST));
+            notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
         }
 
         // END ProActiveEvent
@@ -362,9 +346,8 @@ public class BlockingRequestQueueImpl extends RequestQueueImpl implements java.i
      * @return the request found in the queue.
      */
     protected Request barrierBlockingRemove() {
-        while (((this.isEmpty() && this.shouldWait) || this.suspended ||
-                (this.indexOfRequestToServe() == -1)) &&
-                !this.specialExecution) {
+        while (((this.isEmpty() && this.shouldWait) || this.suspended || (this.indexOfRequestToServe() == -1)) &&
+            !this.specialExecution) {
             internalWaitForRequest(0);
         }
         if (this.specialExecution) {

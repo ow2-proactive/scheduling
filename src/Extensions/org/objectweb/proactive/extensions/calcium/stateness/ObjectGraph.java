@@ -38,8 +38,7 @@ import java.util.Iterator;
 
 
 public class ObjectGraph {
-    static public <T> Object searchForClass(Object root, Handler<T> handler)
-        throws Exception {
+    static public <T> Object searchForClass(Object root, Handler<T> handler) throws Exception {
         IdentityHashMap<Object, Object> visited = new IdentityHashMap<Object, Object>();
         IdentityHashMap<Object, ArrayList<Reference>> found = new IdentityHashMap<Object, ArrayList<Reference>>();
 
@@ -65,9 +64,8 @@ public class ObjectGraph {
     }
 
     static private <T> void searchForClass(Object parent, Handler<T> handler,
-        IdentityHashMap<Object, Object> visited,
-        IdentityHashMap<Object, ArrayList<Reference>> found)
-        throws Exception {
+            IdentityHashMap<Object, Object> visited, IdentityHashMap<Object, ArrayList<Reference>> found)
+            throws Exception {
         if (visited.containsKey(parent)) {
             return; //already visited (this is a loop)
         }
@@ -157,8 +155,7 @@ public class ObjectGraph {
             this.f = f;
         }
 
-        public void updateReferenceWith(Object o)
-            throws IllegalArgumentException, IllegalAccessException {
+        public void updateReferenceWith(Object o) throws IllegalArgumentException, IllegalAccessException {
             f.set(referencer, o);
         }
     }

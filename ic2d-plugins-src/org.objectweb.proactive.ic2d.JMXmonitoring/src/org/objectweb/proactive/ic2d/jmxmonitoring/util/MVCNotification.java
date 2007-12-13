@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.util;
 
-
 /**
  *  MVCNotifications are used in the IC2D MVC Pattern.
  *  The model objects send MVCNotification which are treated by the EditParts.

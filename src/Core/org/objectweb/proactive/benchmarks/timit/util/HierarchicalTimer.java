@@ -197,8 +197,7 @@ public class HierarchicalTimer implements Serializable {
      * @return true if started, false otherwise
      */
     public boolean isStarted(int n) {
-        return (this.parent[0] == n) || (this.parent[1] == n) ||
-        (this.parent[2] == n);
+        return (this.parent[0] == n) || (this.parent[1] == n) || (this.parent[2] == n);
     }
 
     /**
@@ -215,22 +214,22 @@ public class HierarchicalTimer implements Serializable {
     public void startAsync(int n) {
         this.start(n);
         switch (this.level) {
-        case 0:
-            this.parentStarted[0] = this.parent[0];
-            this.parentStarted[1] = this.parent[0];
-            this.parentStarted[2] = this.parent[0];
-            break;
-        case 1:
-            this.parentStarted[0] = this.parent[0];
-            this.parentStarted[1] = this.parent[1];
-            this.parentStarted[2] = this.parent[1];
-            break;
-        case 2:
-        case 3:
-            this.parentStarted[0] = this.parent[0];
-            this.parentStarted[1] = this.parent[1];
-            this.parentStarted[2] = this.parent[2];
-            break;
+            case 0:
+                this.parentStarted[0] = this.parent[0];
+                this.parentStarted[1] = this.parent[0];
+                this.parentStarted[2] = this.parent[0];
+                break;
+            case 1:
+                this.parentStarted[0] = this.parent[0];
+                this.parentStarted[1] = this.parent[1];
+                this.parentStarted[2] = this.parent[1];
+                break;
+            case 2:
+            case 3:
+                this.parentStarted[0] = this.parent[0];
+                this.parentStarted[1] = this.parent[1];
+                this.parentStarted[2] = this.parent[2];
+                break;
         }
     }
 
@@ -242,27 +241,24 @@ public class HierarchicalTimer implements Serializable {
      */
     public void stop(int n) {
         switch (this.level) {
-        case 0:
-            if (this.total[this.parent[0]][this.parent[0]][this.parent[0]] < 0) {
-                this.total[this.parent[0]][this.parent[0]][this.parent[0]] = 1;
-            }
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] += (HierarchicalTimer.getCtm() -
-            this.start[this.level]);
-            break;
-        case 1:
-            if (this.total[this.parent[0]][this.parent[1]][this.parent[1]] < 0) {
-                this.total[this.parent[0]][this.parent[1]][this.parent[1]] = 1;
-            }
-            this.total[this.parent[0]][this.parent[1]][this.parent[1]] += (HierarchicalTimer.getCtm() -
-            this.start[this.level]);
-            break;
-        case 2:
-        case 3:
-            if (this.total[this.parent[0]][this.parent[1]][this.parent[2]] < 0) {
-                this.total[this.parent[0]][this.parent[1]][this.parent[2]] = 1;
-            }
-            this.total[this.parent[0]][this.parent[1]][this.parent[2]] += (HierarchicalTimer.getCtm() -
-            this.start[this.level]);
+            case 0:
+                if (this.total[this.parent[0]][this.parent[0]][this.parent[0]] < 0) {
+                    this.total[this.parent[0]][this.parent[0]][this.parent[0]] = 1;
+                }
+                this.total[this.parent[0]][this.parent[0]][this.parent[0]] += (HierarchicalTimer.getCtm() - this.start[this.level]);
+                break;
+            case 1:
+                if (this.total[this.parent[0]][this.parent[1]][this.parent[1]] < 0) {
+                    this.total[this.parent[0]][this.parent[1]][this.parent[1]] = 1;
+                }
+                this.total[this.parent[0]][this.parent[1]][this.parent[1]] += (HierarchicalTimer.getCtm() - this.start[this.level]);
+                break;
+            case 2:
+            case 3:
+                if (this.total[this.parent[0]][this.parent[1]][this.parent[2]] < 0) {
+                    this.total[this.parent[0]][this.parent[1]][this.parent[2]] = 1;
+                }
+                this.total[this.parent[0]][this.parent[1]][this.parent[2]] += (HierarchicalTimer.getCtm() - this.start[this.level]);
         }
         this.level--;
     }
@@ -271,32 +267,32 @@ public class HierarchicalTimer implements Serializable {
         if (this.total[this.parent[0]][this.parent[1]][this.parent[2]] < 0) {
             this.total[this.parent[0]][this.parent[1]][this.parent[2]] = 1;
         }
-        this.total[this.parentStarted[0]][this.parentStarted[1]][this.parentStarted[2]] += (HierarchicalTimer.getCtm() -
-        this.start[this.level]);
+        this.total[this.parentStarted[0]][this.parentStarted[1]][this.parentStarted[2]] += (HierarchicalTimer
+                .getCtm() - this.start[this.level]);
         this.level--;
     }
 
     public void setValue(int n, int time) {
         this.parent[++this.level] = n;
         switch (this.level) {
-        case 0:
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] = time;
-            break;
-        case 1:
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] -= this.total[this.parent[0]][this.parent[1]][this.parent[1]];
-            this.total[this.parent[0]][this.parent[1]][this.parent[1]] = time;
+            case 0:
+                this.total[this.parent[0]][this.parent[0]][this.parent[0]] = time;
+                break;
+            case 1:
+                this.total[this.parent[0]][this.parent[0]][this.parent[0]] -= this.total[this.parent[0]][this.parent[1]][this.parent[1]];
+                this.total[this.parent[0]][this.parent[1]][this.parent[1]] = time;
 
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
-            break;
-        case 2:
-        case 3:
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] -= this.total[this.parent[0]][this.parent[1]][this.parent[2]];
-            this.total[this.parent[0]][this.parent[1]][this.parent[1]] -= this.total[this.parent[0]][this.parent[1]][this.parent[2]];
+                this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
+                break;
+            case 2:
+            case 3:
+                this.total[this.parent[0]][this.parent[0]][this.parent[0]] -= this.total[this.parent[0]][this.parent[1]][this.parent[2]];
+                this.total[this.parent[0]][this.parent[1]][this.parent[1]] -= this.total[this.parent[0]][this.parent[1]][this.parent[2]];
 
-            this.total[this.parent[0]][this.parent[1]][this.parent[2]] = time;
+                this.total[this.parent[0]][this.parent[1]][this.parent[2]] = time;
 
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
-            this.total[this.parent[0]][this.parent[1]][this.parent[1]] += time;
+                this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
+                this.total[this.parent[0]][this.parent[1]][this.parent[1]] += time;
         }
         this.level--;
     }
@@ -304,18 +300,18 @@ public class HierarchicalTimer implements Serializable {
     public void addValue(int n, int time) {
         this.parent[++this.level] = n;
         switch (this.level) {
-        case 0:
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
-            break;
-        case 1:
-            this.total[this.parent[0]][this.parent[1]][this.parent[1]] += time;
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
-            break;
-        case 2:
-        case 3:
-            this.total[this.parent[0]][this.parent[1]][this.parent[2]] += time;
-            this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
-            this.total[this.parent[0]][this.parent[1]][this.parent[1]] += time;
+            case 0:
+                this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
+                break;
+            case 1:
+                this.total[this.parent[0]][this.parent[1]][this.parent[1]] += time;
+                this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
+                break;
+            case 2:
+            case 3:
+                this.total[this.parent[0]][this.parent[1]][this.parent[2]] += time;
+                this.total[this.parent[0]][this.parent[0]][this.parent[0]] += time;
+                this.total[this.parent[0]][this.parent[1]][this.parent[1]] += time;
         }
         this.level--;
     }
@@ -347,18 +343,15 @@ public class HierarchicalTimer implements Serializable {
      */
     public int getHierarchicalTime(int n) {
         switch (this.level) {
-        case 0:
-            return this.total[this.parent[0]][this.parent[0]][this.parent[0]] +
-            this.getElapsedTime(n);
-        case 1:
-            return this.total[this.parent[0]][this.parent[1]][this.parent[1]] +
-            this.getElapsedTime(n);
-        case 2:
-        case 3:
-            return this.total[this.parent[0]][this.parent[1]][this.parent[2]] +
-            this.getElapsedTime(n);
-        default:
-            return 0;
+            case 0:
+                return this.total[this.parent[0]][this.parent[0]][this.parent[0]] + this.getElapsedTime(n);
+            case 1:
+                return this.total[this.parent[0]][this.parent[1]][this.parent[1]] + this.getElapsedTime(n);
+            case 2:
+            case 3:
+                return this.total[this.parent[0]][this.parent[1]][this.parent[2]] + this.getElapsedTime(n);
+            default:
+                return 0;
         }
     }
 
@@ -394,9 +387,8 @@ public class HierarchicalTimer implements Serializable {
             for (j = 0; j < this.total.length; j++) {
                 for (k = 0; k < this.total.length; k++) {
                     if (this.total[i][j][k] != -1) {
-                        result += (this.counter_name[i] + " -> " +
-                        this.counter_name[j] + " -> " + this.counter_name[k] +
-                        "\t = " + this.total[i][j][k] + " ms\n");
+                        result += (this.counter_name[i] + " -> " + this.counter_name[j] + " -> " +
+                            this.counter_name[k] + "\t = " + this.total[i][j][k] + " ms\n");
                     }
                 }
             }
@@ -487,18 +479,16 @@ public class HierarchicalTimer implements Serializable {
         for (i = 0; i < this.nbCounters; i++) {
             for (j = 0; j < this.nbCounters; j++) {
                 for (k = 0; k < this.nbCounters; k++) {
-                    if ((average[i][j][k] != -1d) &&
-                            (deviation[i][j][k] != -1d)) {
+                    if ((average[i][j][k] != -1d) && (deviation[i][j][k] != -1d)) {
                         average[i][j][k] /= groupSize;
                         tempValue = average[i][j][k] * average[i][j][k];
-                        deviation[i][j][k] = Math.sqrt((deviation[i][j][k] / groupSize) -
-                                tempValue);
+                        deviation[i][j][k] = Math.sqrt((deviation[i][j][k] / groupSize) - tempValue);
                     }
                 }
             }
         }
-        return new HierarchicalTimerStatistics(this.counter_name, deviation,
-            average, min, max, this.parent, this.nbCounters);
+        return new HierarchicalTimerStatistics(this.counter_name, deviation, average, min, max, this.parent,
+            this.nbCounters);
     }
 
     /**
@@ -512,8 +502,7 @@ public class HierarchicalTimer implements Serializable {
      * @param n
      *            The number of counters.
      */
-    public static void printArray(double[][][] array, String[] counterName,
-        int n) {
+    public static void printArray(double[][][] array, String[] counterName, int n) {
         String result = "";
         int i;
         int j;
@@ -522,9 +511,8 @@ public class HierarchicalTimer implements Serializable {
             for (j = 0; j < n; j++) {
                 for (k = 0; k < n; k++) {
                     if (array[i][j][k] != -1d) {
-                        result += (counterName[i] + " -> " + counterName[j] +
-                        " -> " + counterName[k] + "\t = " + array[i][j][k] +
-                        " s\n");
+                        result += (counterName[i] + " -> " + counterName[j] + " -> " + counterName[k] +
+                            "\t = " + array[i][j][k] + " s\n");
                     }
                 }
             }

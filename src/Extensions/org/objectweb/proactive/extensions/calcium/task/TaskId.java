@@ -60,8 +60,8 @@ public class TaskId implements Serializable {
     }
 
     /**
-    * @return the familyId
-    */
+     * @return the familyId
+     */
     public TaskId getFamilyId() {
         return familyId;
     }
@@ -137,16 +137,14 @@ public class TaskId implements Serializable {
         if (getClass() != obj.getClass()){
                 return false;
         }
-        */
+         */
         final TaskId other = (TaskId) obj;
 
         if (isRootTaskId()) {
-            return (this.id == other.id) &&
-            (familyId.value() == other.familyId.value());
+            return (this.id == other.id) && (familyId.value() == other.familyId.value());
         }
-        return (this.id == other.id) &&
-        (familyId.value() == other.familyId.value()) &&
-        (parentId.value() == other.parentId.value());
+        return (this.id == other.id) && (familyId.value() == other.familyId.value()) &&
+            (parentId.value() == other.parentId.value());
         //return true;
     }
 

@@ -56,8 +56,7 @@ public interface FileServerClient {
      * @return A {@link StoredFile StoredFile} object representing the file on the FileServer.
      * @throws IOException if an error is detected
      */
-    public StoredFile store(File current, int refCount)
-        throws IOException;
+    public StoredFile store(File current, int refCount) throws IOException;
 
     /**
      * Retrieves a file from the FileServer
@@ -66,8 +65,7 @@ public interface FileServerClient {
      * @param localDst The local destination of the file.
      * @throws IOException if an error is detected.
      */
-    public void fetch(StoredFile rfile, File localDst)
-        throws IOException;
+    public void fetch(StoredFile rfile, File localDst) throws IOException;
 
     /**
      * Stores a file reachable through an URL on the FileServer.

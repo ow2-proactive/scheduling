@@ -69,15 +69,15 @@ public class B {
         choosed = "C7";
     }
 
-    public B(Collection<?extends Object> o) {
+    public B(Collection<? extends Object> o) {
         choosed = "C8";
     }
 
-    public B(List<?extends Object> o) {
+    public B(List<? extends Object> o) {
         choosed = "C9";
     }
 
-    public B(ArrayList<?extends Object> o) {
+    public B(ArrayList<? extends Object> o) {
         choosed = "C10";
     }
 

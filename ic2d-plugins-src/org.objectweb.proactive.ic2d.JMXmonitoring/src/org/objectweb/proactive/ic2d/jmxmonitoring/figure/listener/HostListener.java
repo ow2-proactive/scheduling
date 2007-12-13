@@ -57,8 +57,7 @@ public class HostListener implements MouseListener, MouseMotionListener {
     private DragAndDrop dnd;
     private DragHost dragHost;
 
-    public HostListener(HostObject host, HostFigure figure,
-        MonitoringView monitoringView) {
+    public HostListener(HostObject host, HostFigure figure, MonitoringView monitoringView) {
         this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
         this.host = host;
         this.figure = figure;
@@ -102,8 +101,7 @@ public class HostListener implements MouseListener, MouseMotionListener {
                     horizontalLayoutAction.setEnabled(true);
                 } else if (act instanceof IActionExtPoint) {
                     ((IActionExtPoint) act).setAbstractDataObject(this.host);
-                } else if (act instanceof ZoomOutAction ||
-                        act instanceof ZoomInAction) {
+                } else if (act instanceof ZoomOutAction || act instanceof ZoomInAction) {
                     act.setEnabled(true);
                 } else {
                     act.setEnabled(false);

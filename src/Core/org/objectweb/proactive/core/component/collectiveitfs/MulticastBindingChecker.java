@@ -69,18 +69,16 @@ public class MulticastBindingChecker implements Serializable {
      * @throws ParameterDispatchException
      * @throws NoSuchMethodException
      */
-    public static Method searchMatchingMethod(Method clientSideMethod,
-        Method[] serverSideMethods, boolean serverItfIsGathercast,
-        Interface serverSideItf)
-        throws ParameterDispatchException, NoSuchMethodException {
+    public static Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
+            boolean serverItfIsGathercast, Interface serverSideItf) throws ParameterDispatchException,
+            NoSuchMethodException {
         Method result = null;
         Type clientSideReturnType = clientSideMethod.getGenericReturnType();
         Type[] clientSideParametersTypes = clientSideMethod.getGenericParameterTypes();
         Class<?>[] clientSideExceptionTypes = clientSideMethod.getExceptionTypes();
         ParamDispatch[] paramDispatchModes = getDispatchModes(clientSideMethod);
 
-serverSideMethodsLoop: 
-        for (Method serverSideMethod : serverSideMethods) {
+        serverSideMethodsLoop: for (Method serverSideMethod : serverSideMethods) {
             if (serverItfIsGathercast) {
                 // look for corresponding method in the gather proxy itf
                 Type[] genericParamTypes = serverSideMethod.getGenericParameterTypes();
@@ -89,8 +87,7 @@ serverSideMethodsLoop:
                     ParameterizedType t = (ParameterizedType) genericParamTypes[i];
                     correspondingParamTypes[i] = (Class<?>) t.getActualTypeArguments()[0];
                 }
-                serverSideMethod = serverSideItf.getClass()
-                                                .getMethod(serverSideMethod.getName(),
+                serverSideMethod = serverSideItf.getClass().getMethod(serverSideMethod.getName(),
                         correspondingParamTypes);
             }
 
@@ -101,15 +98,15 @@ serverSideMethodsLoop:
 
             // 2. check return types
             if (!(clientSideReturnType == Void.TYPE)) {
-                Type cType = ((ParameterizedType) clientSideMethod.getGenericReturnType()).getActualTypeArguments()[0];
+                Type cType = ((ParameterizedType) clientSideMethod.getGenericReturnType())
+                        .getActualTypeArguments()[0];
                 Class<?> clientSideReturnTypeArgument = null;
                 if (cType instanceof ParameterizedType) {
                     clientSideReturnTypeArgument = (Class<?>) ((ParameterizedType) cType).getRawType();
                 } else {
                     clientSideReturnTypeArgument = (Class<?>) cType;
                 }
-                if (!(clientSideReturnTypeArgument.isAssignableFrom(
-                            serverSideMethod.getReturnType()))) {
+                if (!(clientSideReturnTypeArgument.isAssignableFrom(serverSideMethod.getReturnType()))) {
                     continue serverSideMethodsLoop;
                 }
             } else {
@@ -121,12 +118,8 @@ serverSideMethodsLoop:
             // 3. check parameters types
             Type[] serverSideParametersTypes = serverSideMethod.getGenericParameterTypes();
 
-            for (int i = 0;
-                    i < serverSideMethod.getGenericParameterTypes().length;
-                    i++) {
-                if (!(paramDispatchModes[i].match(
-                            clientSideParametersTypes[i],
-                            serverSideParametersTypes[i]))) {
+            for (int i = 0; i < serverSideMethod.getGenericParameterTypes().length; i++) {
+                if (!(paramDispatchModes[i].match(clientSideParametersTypes[i], serverSideParametersTypes[i]))) {
                     continue serverSideMethodsLoop;
                 }
             }
@@ -136,23 +129,20 @@ serverSideMethodsLoop:
             for (Class<?> clientExceptionType : clientSideExceptionTypes) {
                 boolean match = false;
                 for (Class<?> serverExceptionType : serverSideExceptionTypes) {
-                    if (clientExceptionType.isAssignableFrom(
-                                serverExceptionType)) {
+                    if (clientExceptionType.isAssignableFrom(serverExceptionType)) {
                         match = true;
                         break;
                     }
                 }
                 if (!match) {
-                    throw new NoSuchMethodException(
-                        "found a matching method in server interface for " +
+                    throw new NoSuchMethodException("found a matching method in server interface for " +
                         clientSideMethod.toGenericString() +
                         " but the types of thrown exceptions do not match");
                 }
             }
 
             if (result != null) {
-                throw new NoSuchMethodException(
-                    "cannot find matching method for " +
+                throw new NoSuchMethodException("cannot find matching method for " +
                     clientSideMethod.toGenericString() +
                     " because there are several matches in the server interface ");
             } else {
@@ -175,7 +165,7 @@ serverSideMethodsLoop:
      * @throws ParameterDispatchException
      */
     public static ParamDispatch getParamDispatchMode(ParamDispatchMetadata a)
-        throws ParameterDispatchException {
+            throws ParameterDispatchException {
         ParamDispatch mode = null;
         if (a == null) {
             return ParamDispatchMode.BROADCAST;
@@ -189,11 +179,11 @@ serverSideMethodsLoop:
             } catch (InstantiationException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                    a.customMode(), e);
+                        a.customMode(), e);
             } catch (IllegalAccessException e) {
                 throw new ParameterDispatchException(
                     "custom annotation refers to a class containing the dispatch algorithm, but this class that cannot be instantiated : " +
-                    a.customMode(), e);
+                        a.customMode(), e);
             }
         }
 
@@ -206,23 +196,18 @@ serverSideMethodsLoop:
      * @return an array of dispatch modes (default for non-annotated parameters is broadcast)
      * @throws ParameterDispatchException
      */
-    public static ParamDispatch[] getDispatchModes(
-        Method matchingMethodInClientInterface)
-        throws ParameterDispatchException {
+    public static ParamDispatch[] getDispatchModes(Method matchingMethodInClientInterface)
+            throws ParameterDispatchException {
         ParamDispatch[] result = new ParamDispatch[matchingMethodInClientInterface.getParameterTypes().length];
 
-        Annotation[] classAnnotations = matchingMethodInClientInterface.getDeclaringClass()
-                                                                       .getAnnotations();
+        Annotation[] classAnnotations = matchingMethodInClientInterface.getDeclaringClass().getAnnotations();
         Annotation[] methodAnnotations = matchingMethodInClientInterface.getAnnotations();
         Annotation[][] paramsAnnotations = matchingMethodInClientInterface.getParameterAnnotations();
 
         // class annotation
         for (Annotation annotation : classAnnotations) {
-            if (ClassDispatchMetadata.class.isAssignableFrom(
-                        annotation.annotationType())) {
-                for (int i = 0;
-                        i < matchingMethodInClientInterface.getParameterTypes().length;
-                        i++) {
+            if (ClassDispatchMetadata.class.isAssignableFrom(annotation.annotationType())) {
+                for (int i = 0; i < matchingMethodInClientInterface.getParameterTypes().length; i++) {
                     result[i] = getParamDispatchMode(((ClassDispatchMetadata) annotation).mode());
                     if (result[i] == null) {
                         result[i] = ParamDispatchMode.BROADCAST;
@@ -234,11 +219,8 @@ serverSideMethodsLoop:
 
         // method annotation
         for (Annotation annotation : methodAnnotations) {
-            if (MethodDispatchMetadata.class.isAssignableFrom(
-                        annotation.annotationType())) {
-                for (int i = 0;
-                        i < matchingMethodInClientInterface.getParameterTypes().length;
-                        i++) {
+            if (MethodDispatchMetadata.class.isAssignableFrom(annotation.annotationType())) {
+                for (int i = 0; i < matchingMethodInClientInterface.getParameterTypes().length; i++) {
                     result[i] = getParamDispatchMode(((MethodDispatchMetadata) annotation).mode());
                     if (result[i] == null) {
                         result[i] = ParamDispatchMode.BROADCAST;
@@ -249,14 +231,11 @@ serverSideMethodsLoop:
         }
 
         // param annotation
-        for (int i = 0;
-                i < matchingMethodInClientInterface.getParameterTypes().length;
-                i++) {
+        for (int i = 0; i < matchingMethodInClientInterface.getParameterTypes().length; i++) {
             Annotation[] currentParamAnnotations = paramsAnnotations[i];
             for (int j = 0; j < currentParamAnnotations.length; j++) {
                 if ((currentParamAnnotations[j] != null) &&
-                        ParamDispatchMetadata.class.isAssignableFrom(
-                            currentParamAnnotations[j].annotationType())) {
+                    ParamDispatchMetadata.class.isAssignableFrom(currentParamAnnotations[j].annotationType())) {
                     result[i] = getParamDispatchMode((ParamDispatchMetadata) currentParamAnnotations[j]);
                     if (result[i] == null) {
                         result[i] = ParamDispatchMode.BROADCAST;

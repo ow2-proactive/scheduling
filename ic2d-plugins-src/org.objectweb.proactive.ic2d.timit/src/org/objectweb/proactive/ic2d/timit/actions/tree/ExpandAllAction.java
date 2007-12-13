@@ -43,16 +43,14 @@ public class ExpandAllAction extends Action {
     public ExpandAllAction(TimerTreeHolder t) {
         this.timerTreeHolder = t;
         this.setId(EXPAND_ALL);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "expandall.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "expandall.gif"));
         this.setToolTipText(EXPAND_ALL);
         this.setEnabled(true);
     }
 
     @Override
     public void run() {
-        if ((this.timerTreeHolder == null) ||
-                (this.timerTreeHolder.getChildren() == null)) {
+        if ((this.timerTreeHolder == null) || (this.timerTreeHolder.getChildren() == null)) {
             return;
         }
         for (TimerTreeNodeObject t : timerTreeHolder.getChildren()) {

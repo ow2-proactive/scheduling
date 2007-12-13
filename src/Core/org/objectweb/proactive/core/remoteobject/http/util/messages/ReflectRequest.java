@@ -56,8 +56,7 @@ public abstract class ReflectRequest extends HttpMessage {
      * @param theclass we want to get all the methods
      * @return an HasMap containing methods and parameters
      */
-    protected static HashMap<String, Object> getHashMapReflect(
-        Class<?> theclass) {
+    protected static HashMap<String, Object> getHashMapReflect(Class<?> theclass) {
         // init the hashmap, that contains all the methods of  ProActiveRuntimeImpl
         // in 'Object' (value) and the name of funtions in key
         // (Warning two functions can t have the same name (for now))
@@ -95,8 +94,7 @@ public abstract class ReflectRequest extends HttpMessage {
      * @param hashobjet  ???
      * @return a Method representing the method in the ProActiveRuntime
      */
-    protected Method getMethod(String methodsearch, List<Object> paramsearch,
-        Object hashobjet) {
+    protected Method getMethod(String methodsearch, List<Object> paramsearch, Object hashobjet) {
         Object mret = hashobjet;
 
         if (mret instanceof ArrayList) {
@@ -124,8 +122,7 @@ public abstract class ReflectRequest extends HttpMessage {
                     paramtypes = ((Method) allSameMethod.get(i)).getParameterTypes();
 
                     for (int j = 0; j < paramsearchsize; j++) {
-                        Class<?extends Object> classtest = paramsearch.get(j)
-                                                                      .getClass();
+                        Class<? extends Object> classtest = paramsearch.get(j).getClass();
 
                         if (paramtypes[j] != classtest) {
                             isgood = false;
@@ -154,25 +151,17 @@ public abstract class ReflectRequest extends HttpMessage {
             if (allSameMethod.size() == 1) {
                 mret = allSameMethod.get(0);
             } else {
-                logger.error(
-                    "----------------------------------------------------------------------------");
-                logger.error(
-                    "----- ERROR : two functions in ProActiveRuntimeImpl can t have the same name");
-                logger.error(
-                    "----- ERROR : and the same type of paramters (Extends Implements)");
-                logger.error("----- search   : " + methodsearch + " nb param " +
-                    paramsearch.size());
-                logger.error(
-                    "----------------------------------------------------------------------------");
+                logger.error("----------------------------------------------------------------------------");
+                logger.error("----- ERROR : two functions in ProActiveRuntimeImpl can t have the same name");
+                logger.error("----- ERROR : and the same type of paramters (Extends Implements)");
+                logger.error("----- search   : " + methodsearch + " nb param " + paramsearch.size());
+                logger.error("----------------------------------------------------------------------------");
             }
         } else if (mret == null) {
-            logger.error(
-                "----------------------------------------------------------------------------");
+            logger.error("----------------------------------------------------------------------------");
             logger.error("----- ERROR : no method (invoke) find ");
-            logger.error("----- search   : " + methodsearch + " nb param " +
-                paramsearch.size());
-            logger.error(
-                "----------------------------------------------------------------------------");
+            logger.error("----- search   : " + methodsearch + " nb param " + paramsearch.size());
+            logger.error("----------------------------------------------------------------------------");
         }
 
         return (Method) mret;

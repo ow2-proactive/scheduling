@@ -98,8 +98,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
  * @see UniqueID
  *
  */
-public abstract class BodyImpl extends AbstractBody implements java.io.Serializable,
-    BodyImplMBean {
+public abstract class BodyImpl extends AbstractBody implements java.io.Serializable, BodyImplMBean {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
@@ -136,15 +135,13 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      * @param factory the factory able to construct new factories for each type of meta objects
      *                needed by this body
      */
-    public BodyImpl(Object reifiedObject, String nodeURL,
-        MetaObjectFactory factory, String jobId)
-        throws ActiveObjectCreationException {
+    public BodyImpl(Object reifiedObject, String nodeURL, MetaObjectFactory factory, String jobId)
+            throws ActiveObjectCreationException {
         super(reifiedObject, nodeURL, factory, jobId);
 
         // TIMING
         if (!(reifiedObject instanceof ProActiveInternalObject)) {
-            super.timersContainer = CoreTimersContainer.create(super.bodyID,
-                    reifiedObject, factory, nodeURL);
+            super.timersContainer = CoreTimersContainer.create(super.bodyID, reifiedObject, factory, nodeURL);
             if (super.timersContainer != null) {
                 TimerWarehouse.enableTimers();
                 // START TOTAL TIMER
@@ -154,16 +151,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
         this.checkedMethodNames = new HashMap<String, HashSet<List<Class<?>>>>();
 
-        this.requestReceiver = factory.newRequestReceiverFactory()
-                                      .newRequestReceiver();
+        this.requestReceiver = factory.newRequestReceiverFactory().newRequestReceiver();
         this.replyReceiver = factory.newReplyReceiverFactory().newReplyReceiver();
 
         // ProActiveEvent
         this.messageEventProducer = new MessageEventProducerImpl();
         // END ProActiveEvent
-        setLocalBodyImpl(new ActiveLocalBodyStrategy(reifiedObject,
-                factory.newRequestQueueFactory().newRequestQueue(this.bodyID),
-                factory.newRequestFactory()));
+        setLocalBodyImpl(new ActiveLocalBodyStrategy(reifiedObject, factory.newRequestQueueFactory()
+                .newRequestQueue(this.bodyID), factory.newRequestFactory()));
         this.localBodyStrategy.getFuturePool().setOwnerBody(this);
 
         // FAULT TOLERANCE
@@ -174,24 +169,22 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 if (this.localBodyStrategy.getReifiedObject() instanceof Serializable) {
                     try {
                         // create the fault tolerance manager
-                        int protocolSelector = FTManager.getProtoSelector(PAProperties.PA_FT_PROTOCOL.getValue());
-                        this.ftmanager = factory.newFTManagerFactory()
-                                                .newFTManager(protocolSelector);
+                        int protocolSelector = FTManager.getProtoSelector(PAProperties.PA_FT_PROTOCOL
+                                .getValue());
+                        this.ftmanager = factory.newFTManagerFactory().newFTManager(protocolSelector);
                         this.ftmanager.init(this);
                         if (bodyLogger.isDebugEnabled()) {
-                            bodyLogger.debug("Init FTManager on " +
-                                this.getNodeURL());
+                            bodyLogger.debug("Init FTManager on " + this.getNodeURL());
                         }
                     } catch (ProActiveException e) {
-                        bodyLogger.error(
-                            "**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
+                        bodyLogger.error("**ERROR** Unable to init FTManager. Fault-tolerance is disabled " +
                             e);
                         this.ftmanager = null;
                     }
                 } else {
                     // target body is not serilizable
-                    bodyLogger.error(
-                        "**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
+                    bodyLogger
+                            .error("**ERROR** Activated object is not serializable. Fault-tolerance is disabled");
                     this.ftmanager = null;
                 }
             }
@@ -230,13 +223,12 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      * @exception java.io.IOException if the request cannot be accepted
      */
     @Override
-    protected int internalReceiveRequest(Request request)
-        throws java.io.IOException, RenegotiateSessionException {
+    protected int internalReceiveRequest(Request request) throws java.io.IOException,
+            RenegotiateSessionException {
         // ProActiveEvent
         if (this.messageEventProducer != null) {
-            this.messageEventProducer.notifyListeners(request,
-                MessageEvent.REQUEST_RECEIVED, this.bodyID,
-                getRequestQueue().size() + 1);
+            this.messageEventProducer.notifyListeners(request, MessageEvent.REQUEST_RECEIVED, this.bodyID,
+                    getRequestQueue().size() + 1);
         }
 
         // END ProActiveEvent
@@ -245,12 +237,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         if (!isProActiveInternalObject && (this.mbean != null)) {
             // If the node is not a HalfBody
             if (!(request.getSender().getNodeURL().equals("LOCAL"))) {
-                RequestNotificationData requestNotificationData = new RequestNotificationData(request.getSourceBodyID(),
-                        request.getSender().getNodeURL(), this.bodyID,
-                        this.nodeURL, request.getMethodName(),
-                        getRequestQueue().size() + 1);
-                this.mbean.sendNotification(NotificationType.requestReceived,
-                    requestNotificationData);
+                RequestNotificationData requestNotificationData = new RequestNotificationData(request
+                        .getSourceBodyID(), request.getSender().getNodeURL(), this.bodyID, this.nodeURL,
+                    request.getMethodName(), getRequestQueue().size() + 1);
+                this.mbean.sendNotification(NotificationType.requestReceived, requestNotificationData);
             }
         }
 
@@ -276,8 +266,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
         // ProActiveEvent
         if (messageEventProducer != null) {
-            messageEventProducer.notifyListeners(reply,
-                MessageEvent.REPLY_RECEIVED, bodyID);
+            messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_RECEIVED, bodyID);
         }
 
         // END ProActiveEvent
@@ -305,8 +294,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         } catch (ProActiveRuntimeException e) {
             // this method can be called twos times if the automatic contunation thread
             // is killed *after* the activity thread.
-            bodyLogger.debug("Terminating already terminated body " +
-                this.getID());
+            bodyLogger.debug("Terminating already terminated body " + this.getID());
         }
         this.getFuturePool().terminateAC(completeACs);
         if (!completeACs) {
@@ -330,8 +318,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName);
     }
 
-    public void setImmediateService(String methodName,
-        Class<?>[] parametersTypes) {
+    public void setImmediateService(String methodName, Class<?>[] parametersTypes) {
         // TODO uncomment this code after the getComponentParameters immediate service issue has been resolved
         //    	if (!checkMethod(methodName, parametersTypes)) {
         //    		String signature = methodName+"(";
@@ -342,18 +329,15 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         //            getReifiedObject().getClass().getName();
         //            throw new NoSuchMethodError(signature);
         //        }
-        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName,
-            parametersTypes);
+        ((RequestReceiverImpl) this.requestReceiver).setImmediateService(methodName, parametersTypes);
     }
 
     public void removeImmediateService(String methodName) {
         ((RequestReceiverImpl) this.requestReceiver).removeImmediateService(methodName);
     }
 
-    public void removeImmediateService(String methodName,
-        Class<?>[] parametersTypes) {
-        ((RequestReceiverImpl) this.requestReceiver).removeImmediateService(methodName,
-            parametersTypes);
+    public void removeImmediateService(String methodName, Class<?>[] parametersTypes) {
+        ((RequestReceiverImpl) this.requestReceiver).removeImmediateService(methodName, parametersTypes);
     }
 
     public void updateNodeURL(String newNodeURL) {
@@ -396,16 +380,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      * @param methodName name of the method
      * @param parametersTypes parameter type list
      */
-    private void storeInMethodCache(String methodName,
-        Class<?>[] parametersTypes) {
+    private void storeInMethodCache(String methodName, Class<?>[] parametersTypes) {
         List<Class<?>> parameterTlist = null;
         if (parametersTypes != null) {
             parameterTlist = Arrays.asList(parametersTypes);
         }
 
         // if we already know a version of this method, we store the new version in the existing set
-        if (this.checkedMethodNames.containsKey(methodName) &&
-                (parameterTlist != null)) {
+        if (this.checkedMethodNames.containsKey(methodName) && (parameterTlist != null)) {
             HashSet<List<Class<?>>> signatures = this.checkedMethodNames.get(methodName);
             signatures.add(parameterTlist);
         }
@@ -425,8 +407,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     //
     // -- inner classes -----------------------------------------------
     //
-    private class ActiveLocalBodyStrategy implements LocalBodyStrategy,
-        java.io.Serializable {
+    private class ActiveLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
 
         /** A pool future that contains the pending future objects */
         protected FuturePool futures;
@@ -440,8 +421,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         //
         // -- CONSTRUCTORS -----------------------------------------------
         //
-        public ActiveLocalBodyStrategy(Object reifiedObject,
-            BlockingRequestQueue requestQueue, RequestFactory requestFactory) {
+        public ActiveLocalBodyStrategy(Object reifiedObject, BlockingRequestQueue requestQueue,
+                RequestFactory requestFactory) {
             this.reifiedObject = reifiedObject;
             this.futures = new FuturePool();
             this.requestQueue = requestQueue;
@@ -476,12 +457,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
          */
         public void serve(Request request) {
             if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.startServeTimer(bodyID,
-                    request.getMethodCall().getReifiedMethod());
+                TimerWarehouse.startServeTimer(bodyID, request.getMethodCall().getReifiedMethod());
             }
             // push the new context
-            LocalBodyStore.getInstance()
-                          .pushContext(new Context(BodyImpl.this, request));
+            LocalBodyStore.getInstance().pushContext(new Context(BodyImpl.this, request));
             try {
                 serveInternal(request);
             } finally {
@@ -497,14 +476,15 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 return;
             }
             // ProActiveEvent
-            messageEventProducer.notifyListeners(request,
-                MessageEvent.SERVING_STARTED, bodyID, getRequestQueue().size());
+            messageEventProducer.notifyListeners(request, MessageEvent.SERVING_STARTED, bodyID,
+                    getRequestQueue().size());
             // END ProActiveEvent
 
             // JMX Notification
             if (!isProActiveInternalObject && (mbean != null)) {
-                mbean.sendNotification(NotificationType.servingStarted,
-                    new Integer(getRequestQueue().size()));
+                mbean
+                        .sendNotification(NotificationType.servingStarted, new Integer(getRequestQueue()
+                                .size()));
             }
 
             // END JMX Notification
@@ -523,17 +503,16 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
                 // ProActiveEvent
                 if (messageEventProducer != null) {
-                    messageEventProducer.notifyListeners(request,
-                        MessageEvent.VOID_REQUEST_SERVED, bodyID,
-                        getRequestQueue().size());
+                    messageEventProducer.notifyListeners(request, MessageEvent.VOID_REQUEST_SERVED, bodyID,
+                            getRequestQueue().size());
                 }
 
                 // END ProActiveEvent
 
                 // JMX Notification
                 if (!isProActiveInternalObject && (mbean != null)) {
-                    mbean.sendNotification(NotificationType.voidRequestServed,
-                        new Integer(getRequestQueue().size()));
+                    mbean.sendNotification(NotificationType.voidRequestServed, new Integer(getRequestQueue()
+                            .size()));
                 }
 
                 // END JMX Notification
@@ -541,25 +520,21 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.startTimer(BodyImpl.this.bodyID,
-                    TimerWarehouse.SEND_REPLY);
+                TimerWarehouse.startTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
             }
 
             // ProActiveEvent
             UniqueID destinationBodyId = request.getSourceBodyID();
-            if ((destinationBodyId != null) &&
-                    (BodyImpl.this.messageEventProducer != null)) {
-                BodyImpl.this.messageEventProducer.notifyListeners(reply,
-                    MessageEvent.REPLY_SENT, destinationBodyId,
-                    getRequestQueue().size());
+            if ((destinationBodyId != null) && (BodyImpl.this.messageEventProducer != null)) {
+                BodyImpl.this.messageEventProducer.notifyListeners(reply, MessageEvent.REPLY_SENT,
+                        destinationBodyId, getRequestQueue().size());
             }
 
             // END ProActiveEvent
 
             // JMX Notification
             if (!isProActiveInternalObject && (mbean != null)) {
-                mbean.sendNotification(NotificationType.replySent,
-                    new Integer(getRequestQueue().size()));
+                mbean.sendNotification(NotificationType.replySent, new Integer(getRequestQueue().size()));
             }
 
             // END JMX Notification
@@ -578,20 +553,17 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 }
             }
             if (Profiling.TIMERS_COMPILED) {
-                TimerWarehouse.stopTimer(BodyImpl.this.bodyID,
-                    TimerWarehouse.SEND_REPLY);
+                TimerWarehouse.stopTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
             }
 
             this.getFuturePool().removeDestinations();
         }
 
-        public void sendRequest(MethodCall methodCall, Future future,
-            UniversalBody destinationBody)
-            throws IOException, RenegotiateSessionException,
-                CommunicationForbiddenException {
+        public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
+                throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
-            Request request = this.internalRequestFactory.newRequest(methodCall,
-                    BodyImpl.this, future == null, sequenceID);
+            Request request = this.internalRequestFactory.newRequest(methodCall, BodyImpl.this,
+                    future == null, sequenceID);
 
             // COMPONENTS : generate ComponentRequest for component messages
             if (methodCall.getComponentMetadata() != null) {
@@ -603,8 +575,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             }
 
             // ProActiveEvent
-            messageEventProducer.notifyListeners(request,
-                MessageEvent.REQUEST_SENT, destinationBody.getID());
+            messageEventProducer.notifyListeners(request, MessageEvent.REQUEST_SENT, destinationBody.getID());
             // END ProActiveEvent
 
             // JMX Notification
@@ -612,19 +583,15 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // TODO Send a notification only if the destination doesn't implement ProActiveInternalObject
             if (!isProActiveInternalObject && (mbean != null)) {
                 ServerConnector serverConnector = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                      .getJMXServerConnector();
+                        .getJMXServerConnector();
 
                 // If the connector server is not active the connectorID can be null
-                if ((serverConnector != null) &&
-                        serverConnector.getConnectorServer().isActive()) {
+                if ((serverConnector != null) && serverConnector.getConnectorServer().isActive()) {
                     UniqueID connectorID = serverConnector.getUniqueID();
                     if (!connectorID.equals(destinationBody.getID())) {
-                        mbean.sendNotification(NotificationType.requestSent,
-                            new RequestNotificationData(BodyImpl.this.bodyID,
-                                BodyImpl.this.getNodeURL(),
-                                destinationBody.getID(),
-                                destinationBody.getNodeURL(),
-                                methodCall.getName(), -1));
+                        mbean.sendNotification(NotificationType.requestSent, new RequestNotificationData(
+                            BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), destinationBody.getID(),
+                            destinationBody.getNodeURL(), methodCall.getName(), -1));
                     }
                 }
             }
@@ -640,15 +607,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         /**
-                 * Returns a unique identifier that can be used to tag a future, a
-                 * request
-                 *
-                 * @return a unique identifier that can be used to tag a future, a
-                 *         request.
-                 */
+         * Returns a unique identifier that can be used to tag a future, a
+         * request
+         *
+         * @return a unique identifier that can be used to tag a future, a
+         *         request.
+         */
         public synchronized long getNextSequenceID() {
-            return BodyImpl.this.bodyID.toString().hashCode() +
-            ++this.absoluteSequenceID;
+            return BodyImpl.this.bodyID.toString().hashCode() + ++this.absoluteSequenceID;
         }
 
         //
@@ -662,8 +628,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
          * @return true if the name of the method is "terminateAO" or "terminateAOImmediately".
          */
         private boolean isTerminateAORequest(Request request) {
-            boolean terminateRequest = (request.getMethodName()).startsWith(
-                    "_terminateAO");
+            boolean terminateRequest = (request.getMethodName()).startsWith("_terminateAO");
             if (terminateRequest) {
                 terminate();
             }
@@ -672,8 +637,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     }
 
     // end inner class LocalBodyImpl
-    private class InactiveLocalBodyStrategy implements LocalBodyStrategy,
-        java.io.Serializable {
+    private class InactiveLocalBodyStrategy implements LocalBodyStrategy, java.io.Serializable {
         // An inactive body strategy can have a futurepool if some ACs to do
         // remain after the termination of the active object
         private FuturePool futures;
@@ -715,15 +679,13 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         }
 
         public void serve(Request request) {
-            throw new InactiveBodyException(BodyImpl.this,
-                request.getMethodName());
+            throw new InactiveBodyException(BodyImpl.this, request.getMethodName());
         }
 
-        public void sendRequest(MethodCall methodCall, Future future,
-            UniversalBody destinationBody) throws java.io.IOException {
-            throw new InactiveBodyException(BodyImpl.this,
-                destinationBody.getNodeURL(), destinationBody.getID(),
-                methodCall.getName());
+        public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
+                throws java.io.IOException {
+            throw new InactiveBodyException(BodyImpl.this, destinationBody.getNodeURL(), destinationBody
+                    .getID(), methodCall.getName());
         }
 
         /*

@@ -74,23 +74,19 @@ public class HostInfoImpl implements HostInfo {
      */
     public void check() throws IllegalStateException {
         if (id == null) {
-            throw new IllegalStateException(
-                "id field is not set in this HostInfo\n" + toString());
+            throw new IllegalStateException("id field is not set in this HostInfo\n" + toString());
         }
 
         if (homeDirectory == null) {
-            throw new IllegalStateException("homeDirectory is not set for id=" +
-                id + "\n" + toString());
+            throw new IllegalStateException("homeDirectory is not set for id=" + id + "\n" + toString());
         }
 
         if (os == null) {
-            throw new IllegalStateException("os is not set for id=" + id +
-                "\n" + toString());
+            throw new IllegalStateException("os is not set for id=" + id + "\n" + toString());
         }
 
         if ((hostCapacity % vmCapacity) != 0) {
-            throw new IllegalStateException(
-                "hostCapacity is not a multiple of vmCapacity for HostInfo=" +
+            throw new IllegalStateException("hostCapacity is not a multiple of vmCapacity for HostInfo=" +
                 id + "\n" + toString());
         }
 
@@ -155,8 +151,7 @@ public class HostInfoImpl implements HostInfo {
     }
 
     public void setHomeDirectory(String homeDirectory) {
-        GCMD_LOGGER.trace("HostInfo " + id + ".homeDirectory <-- " +
-            homeDirectory);
+        GCMD_LOGGER.trace("HostInfo " + id + ".homeDirectory <-- " + homeDirectory);
         this.homeDirectory = homeDirectory;
     }
 
@@ -171,8 +166,7 @@ public class HostInfoImpl implements HostInfo {
     }
 
     public void setHostCapacity(int hostCapacity) {
-        GCMD_LOGGER.trace("HostInfo " + id + ".hostCapacity <-- " +
-            hostCapacity);
+        GCMD_LOGGER.trace("HostInfo " + id + ".hostCapacity <-- " + hostCapacity);
         this.hostCapacity = hostCapacity;
     }
 

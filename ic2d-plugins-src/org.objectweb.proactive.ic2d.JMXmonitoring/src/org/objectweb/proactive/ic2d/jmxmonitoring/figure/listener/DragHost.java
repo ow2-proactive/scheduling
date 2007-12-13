@@ -90,8 +90,8 @@ public class DragHost extends MouseMotionListener.Stub implements MouseListener 
     private void moveFigure(MouseEvent e) {
         if (this.figure != null) {
             Rectangle rectangle = this.figure.getBounds();
-            this.figure.setBounds(new Rectangle(e.x - deltaX, e.y - deltaY,
-                    rectangle.width, rectangle.height));
+            this.figure
+                    .setBounds(new Rectangle(e.x - deltaX, e.y - deltaY, rectangle.width, rectangle.height));
         }
     }
 }

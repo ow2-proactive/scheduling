@@ -40,11 +40,9 @@ import org.xml.sax.SAXException;
 
 
 public class GCMDeploymentDescriptorFactory {
-    public static GCMDeploymentDescriptor createDescriptor(
-        GCMDeploymentDescriptorParams params)
-        throws SAXException, IOException, XPathExpressionException,
-            TransformerException, ParserConfigurationException {
-        return new GCMDeploymentDescriptorImpl(params.getGCMDescriptor(),
-            params.getFtBlocks());
+    public static GCMDeploymentDescriptor createDescriptor(GCMDeploymentDescriptorParams params)
+            throws SAXException, IOException, XPathExpressionException, TransformerException,
+            ParserConfigurationException {
+        return new GCMDeploymentDescriptorImpl(params.getGCMDescriptor(), params.getFtBlocks());
     }
 }

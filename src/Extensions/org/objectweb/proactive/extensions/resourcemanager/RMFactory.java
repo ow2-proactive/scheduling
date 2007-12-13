@@ -79,15 +79,13 @@ public class RMFactory implements RMConstants {
      * @throws AlreadyBoundException
      * @throws IOException
      */
-    public static void startLocal()
-        throws NodeException, ActiveObjectCreationException,
+    public static void startLocal() throws NodeException, ActiveObjectCreationException,
             AlreadyBoundException, IOException {
         if (rmcore == null) {
             Node nodeIM = NodeFactory.createNode(NAME_NODE_RM);
             rmcore = (RMCoreInterface) PAActiveObject.newActive(RMCore.class.getName(), // the class to deploy
                     new Object[] { "IMCORE", nodeIM }, nodeIM);
-            PAActiveObject.register(rmcore,
-                "//localhost/" + NAME_ACTIVE_OBJECT_RMCORE);
+            PAActiveObject.register(rmcore, "//localhost/" + NAME_ACTIVE_OBJECT_RMCORE);
 
             if (logger.isInfoEnabled()) {
                 logger.info("New RM core localy started");
@@ -111,8 +109,7 @@ public class RMFactory implements RMConstants {
             }
             return rmcore.getAdmin();
         } else {
-            throw new RMException(
-                "resource Manager has not been created before");
+            throw new RMException("resource Manager has not been created before");
         }
     }
 
@@ -124,8 +121,7 @@ public class RMFactory implements RMConstants {
         if (rmcore != null) {
             return rmcore.getMonitoring();
         } else {
-            throw new RMException(
-                "resource Manager has not been created before");
+            throw new RMException("resource Manager has not been created before");
         }
     }
 
@@ -137,8 +133,7 @@ public class RMFactory implements RMConstants {
         if (rmcore != null) {
             return rmcore.getUser();
         } else {
-            throw new RMException(
-                "resource Manager has not been created before");
+            throw new RMException("resource Manager has not been created before");
         }
     }
 

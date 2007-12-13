@@ -39,9 +39,8 @@ public class BoardBT2 extends Board {
     int lastmask;
     int endbit;
 
-    public BoardBT2(int n, int solvableSize, int row, int left, int down,
-        int right, int bound1, int bound2, int sidemask, int lastmask,
-        int topbit, int mask, int endbit, int[] board) {
+    public BoardBT2(int n, int solvableSize, int row, int left, int down, int right, int bound1, int bound2,
+            int sidemask, int lastmask, int topbit, int mask, int endbit, int[] board) {
         super(n, solvableSize, row, left, down, right, bound1);
 
         this.topbit = topbit;

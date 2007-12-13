@@ -92,8 +92,7 @@ public class JVMListener implements MouseListener, MouseMotionListener {
                     killVMAction.setEnabled(true);
                 } else if (act instanceof IActionExtPoint) {
                     ((IActionExtPoint) act).setAbstractDataObject(this.jvm);
-                } else if (act instanceof ZoomOutAction ||
-                        act instanceof ZoomInAction) {
+                } else if (act instanceof ZoomOutAction || act instanceof ZoomInAction) {
                     act.setEnabled(true);
                 } else {
                     act.setEnabled(false);

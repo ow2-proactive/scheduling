@@ -40,8 +40,7 @@ public class SimpleTestRemoveNode {
         System.out.println("# --oOo-- Simple Test remove --oOo-- ");
 
         try {
-            String url = "rmi://localhost:1099/" +
-                RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
+            String url = "rmi://localhost:1099/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN;
             RMAdmin admin = RMConnection.connectAsAdmin(url);
 
             for (String toRemoveUrl : args) {

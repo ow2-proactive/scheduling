@@ -55,22 +55,22 @@ import functionalTests.component.Setup;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     private static final int NB_WRAPPERS = 5;
     private Message result1;
     private Message result2;
     private Message result3;
     private Message result4;
-    private final String expectedResult = "foo" + PrimitiveComponentA.MESSAGE +
-        PrimitiveComponentB.MESSAGE + PrimitiveComponentA.MESSAGE;
+    private final String expectedResult = "foo" + PrimitiveComponentA.MESSAGE + PrimitiveComponentB.MESSAGE +
+        PrimitiveComponentA.MESSAGE;
     private Component systemWithWrappingWithShortcuts;
     private Component systemWithWrappingWithoutShortcuts;
     private Component systemWithoutWrapping;
 
     public Test() {
         super("Shortcut communications through composite components",
-            "Shortcut communications through composite components");
+                "Shortcut communications through composite components");
     }
 
     @org.junit.Test
@@ -80,27 +80,24 @@ public class Test extends ComponentTest {
         //System.out.println("testing unwrapped system");
         Fractal.getLifeCycleController(systemWithoutWrapping).stopFc();
         Fractal.getLifeCycleController(systemWithoutWrapping).startFc();
-        result1 = ((I1) systemWithoutWrapping.getFcInterface("i1")).processInputMessage(new Message(
-                    "foo"));
+        result1 = ((I1) systemWithoutWrapping.getFcInterface("i1")).processInputMessage(new Message("foo"));
         // waiting for the future is only for having an ordered logging output
         PAFuture.waitFor(result1);
         Thread.sleep(2000);
 
         //System.out.println("testing wrapped system without shortcuts");
-        Fractal.getLifeCycleController(systemWithWrappingWithoutShortcuts)
-               .stopFc();
-        Fractal.getLifeCycleController(systemWithWrappingWithoutShortcuts)
-               .startFc();
+        Fractal.getLifeCycleController(systemWithWrappingWithoutShortcuts).stopFc();
+        Fractal.getLifeCycleController(systemWithWrappingWithoutShortcuts).startFc();
 
-        result2 = ((I1) systemWithWrappingWithoutShortcuts.getFcInterface("i1")).processInputMessage(new Message(
-                    "foo"));
+        result2 = ((I1) systemWithWrappingWithoutShortcuts.getFcInterface("i1"))
+                .processInputMessage(new Message("foo"));
         PAFuture.waitFor(result2);
         Thread.sleep(2000);
 
         //System.out.println("testing wrapped system with shortcuts -- fist invocation");
         // first call, which performs tensioning
-        result3 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message(
-                    "foo"));
+        result3 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1"))
+                .processInputMessage(new Message("foo"));
         PAFuture.waitFor(result3);
         Thread.sleep(2000);
 
@@ -109,8 +106,8 @@ public class Test extends ComponentTest {
 
         // second call, which goes directly through the shortcut
         //System.out.println("testing wrapped system with shortcuts -- second invocation");
-        result4 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message(
-                    "foo"));
+        result4 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1"))
+                .processInputMessage(new Message("foo"));
         PAFuture.waitFor(result4);
         Thread.sleep(2000);
 
@@ -122,22 +119,17 @@ public class Test extends ComponentTest {
         //        result5 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message("foo"));
         // a shortcut is now realized. Compare with previous result
         //        result6 = ((I1) systemWithWrappingWithShortcuts.getFcInterface("i1")).processInputMessage(new Message("foo"));
-        Assert.assertEquals(expectedResult,
-            ((Message) PAFuture.getFutureValue(result4)).getMessage());
-        Assert.assertEquals(expectedResult,
-            ((Message) PAFuture.getFutureValue(result3)).getMessage());
-        Assert.assertEquals(expectedResult,
-            ((Message) PAFuture.getFutureValue(result2)).getMessage());
-        Assert.assertEquals(expectedResult,
-            ((Message) PAFuture.getFutureValue(result1)).getMessage());
+        Assert.assertEquals(expectedResult, ((Message) PAFuture.getFutureValue(result4)).getMessage());
+        Assert.assertEquals(expectedResult, ((Message) PAFuture.getFutureValue(result3)).getMessage());
+        Assert.assertEquals(expectedResult, ((Message) PAFuture.getFutureValue(result2)).getMessage());
+        Assert.assertEquals(expectedResult, ((Message) PAFuture.getFutureValue(result1)).getMessage());
     }
 
     private void initializeComponentSystems() throws Exception {
         // system without wrapped components
         Component unwrappedA = Setup.createPrimitiveA();
         Component unwrappedB = Setup.createPrimitiveB1();
-        Fractal.getBindingController(unwrappedA)
-               .bindFc("i2", unwrappedB.getFcInterface("i2"));
+        Fractal.getBindingController(unwrappedA).bindFc("i2", unwrappedB.getFcInterface("i2"));
         Fractal.getLifeCycleController(unwrappedA).startFc();
         Fractal.getLifeCycleController(unwrappedB).startFc();
         systemWithoutWrapping = unwrappedA;
@@ -145,18 +137,16 @@ public class Test extends ComponentTest {
         // system with wrapping but without shortcuts
         Component wrappedAWithoutShortcuts = Setup.createPrimitiveA();
         for (int i = 0; i < NB_WRAPPERS; i++) {
-            wrappedAWithoutShortcuts = wrapWithCompositeOfTypeA(NB_WRAPPERS -
-                    i, wrappedAWithoutShortcuts);
+            wrappedAWithoutShortcuts = wrapWithCompositeOfTypeA(NB_WRAPPERS - i, wrappedAWithoutShortcuts);
         }
 
         Component wrappedBWithoutShortcuts = Setup.createPrimitiveB1();
         for (int i = 0; i < NB_WRAPPERS; i++) {
-            wrappedBWithoutShortcuts = wrapWithCompositeOfTypeB(NB_WRAPPERS -
-                    i, wrappedBWithoutShortcuts);
+            wrappedBWithoutShortcuts = wrapWithCompositeOfTypeB(NB_WRAPPERS - i, wrappedBWithoutShortcuts);
         }
 
-        Fractal.getBindingController(wrappedAWithoutShortcuts)
-               .bindFc("i2", wrappedBWithoutShortcuts.getFcInterface("i2"));
+        Fractal.getBindingController(wrappedAWithoutShortcuts).bindFc("i2",
+                wrappedBWithoutShortcuts.getFcInterface("i2"));
         Fractal.getLifeCycleController(wrappedAWithoutShortcuts).startFc();
         Fractal.getLifeCycleController(wrappedBWithoutShortcuts).startFc();
 
@@ -165,69 +155,56 @@ public class Test extends ComponentTest {
         // system with wrapping and with shortcuts
         Component wrappedAWithShortcuts = Setup.createPrimitiveA();
         for (int i = 0; i < NB_WRAPPERS; i++) {
-            wrappedAWithShortcuts = wrapWithSynchronousCompositeOfTypeA(NB_WRAPPERS -
-                    i, wrappedAWithShortcuts);
+            wrappedAWithShortcuts = wrapWithSynchronousCompositeOfTypeA(NB_WRAPPERS - i,
+                    wrappedAWithShortcuts);
         }
 
         Component wrappedBWithShortcuts = Setup.createPrimitiveB1();
         for (int i = 0; i < NB_WRAPPERS; i++) {
-            wrappedBWithShortcuts = wrapWithSynchronousCompositeOfTypeB(NB_WRAPPERS -
-                    i, wrappedBWithShortcuts);
+            wrappedBWithShortcuts = wrapWithSynchronousCompositeOfTypeB(NB_WRAPPERS - i,
+                    wrappedBWithShortcuts);
         }
 
-        Fractal.getBindingController(wrappedAWithShortcuts)
-               .bindFc("i2", wrappedBWithShortcuts.getFcInterface("i2"));
+        Fractal.getBindingController(wrappedAWithShortcuts).bindFc("i2",
+                wrappedBWithShortcuts.getFcInterface("i2"));
         Fractal.getLifeCycleController(wrappedAWithShortcuts).startFc();
         Fractal.getLifeCycleController(wrappedBWithShortcuts).startFc();
 
         systemWithWrappingWithShortcuts = wrappedAWithShortcuts;
     }
 
-    private void resetComponentSystem()
-        throws IllegalContentException, IllegalLifeCycleException,
+    private void resetComponentSystem() throws IllegalContentException, IllegalLifeCycleException,
             NoSuchInterfaceException, IllegalBindingException {
         // TODO_M change the inner wrapped components and check the shortcut is aware of the reconfiguration
     }
 
-    private Component wrapWithSynchronousCompositeOfTypeB(int index,
-        Component wrappee) throws Exception {
-        Component wrapper = Setup.createSynchronousCompositeOfTypeB(
-                "sync_composite_b" + index);
+    private Component wrapWithSynchronousCompositeOfTypeB(int index, Component wrappee) throws Exception {
+        Component wrapper = Setup.createSynchronousCompositeOfTypeB("sync_composite_b" + index);
         Fractal.getContentController(wrapper).addFcSubComponent(wrappee);
-        Fractal.getBindingController(wrapper)
-               .bindFc("i2", wrappee.getFcInterface("i2"));
+        Fractal.getBindingController(wrapper).bindFc("i2", wrappee.getFcInterface("i2"));
         return wrapper;
     }
 
-    private Component wrapWithCompositeOfTypeB(int index, Component wrappee)
-        throws Exception {
+    private Component wrapWithCompositeOfTypeB(int index, Component wrappee) throws Exception {
         Component wrapper = Setup.createCompositeOfTypeB("composite_b" + index);
         Fractal.getContentController(wrapper).addFcSubComponent(wrappee);
-        Fractal.getBindingController(wrapper)
-               .bindFc("i2", wrappee.getFcInterface("i2"));
+        Fractal.getBindingController(wrapper).bindFc("i2", wrappee.getFcInterface("i2"));
         return wrapper;
     }
 
-    private Component wrapWithSynchronousCompositeOfTypeA(int index,
-        Component wrappee) throws Exception {
-        Component wrapper = Setup.createSynchronousCompositeOfTypeA(
-                "sync_composite_a" + index);
+    private Component wrapWithSynchronousCompositeOfTypeA(int index, Component wrappee) throws Exception {
+        Component wrapper = Setup.createSynchronousCompositeOfTypeA("sync_composite_a" + index);
         Fractal.getContentController(wrapper).addFcSubComponent(wrappee);
-        Fractal.getBindingController(wrapper)
-               .bindFc("i1", wrappee.getFcInterface("i1"));
-        Fractal.getBindingController(wrappee)
-               .bindFc("i2", wrapper.getFcInterface("i2"));
+        Fractal.getBindingController(wrapper).bindFc("i1", wrappee.getFcInterface("i1"));
+        Fractal.getBindingController(wrappee).bindFc("i2", wrapper.getFcInterface("i2"));
         return wrapper;
     }
 
-    private Component wrapWithCompositeOfTypeA(int index, Component wrappee)
-        throws Exception {
+    private Component wrapWithCompositeOfTypeA(int index, Component wrappee) throws Exception {
         Component wrapper = Setup.createCompositeOfTypeA("composite_a" + index);
         Fractal.getContentController(wrapper).addFcSubComponent(wrappee);
-        Fractal.getBindingController(wrapper)
-               .bindFc("i1", wrappee.getFcInterface("i1"));
-        Fractal.getBindingController(wrappee)
-               .bindFc("i2", wrapper.getFcInterface("i2"));
+        Fractal.getBindingController(wrapper).bindFc("i1", wrappee.getFcInterface("i1"));
+        Fractal.getBindingController(wrappee).bindFc("i2", wrapper.getFcInterface("i2"));
         return wrapper;
     }
 

@@ -56,18 +56,17 @@ public class CreateDataBase {
 
             stmt = conn.createStatement();
 
-            stmt.execute(
-                "create table JOB_AND_JOB_EVENTS(jobid_hashcode INTEGER,job BLOB," +
-                "jobevent BLOB,CONSTRAINT JOB_AND_JOB_EVENTS_PK PRIMARY KEY(jobid_hashcode))");
+            stmt.execute("create table JOB_AND_JOB_EVENTS(jobid_hashcode INTEGER,job BLOB,"
+                + "jobevent BLOB,CONSTRAINT JOB_AND_JOB_EVENTS_PK PRIMARY KEY(jobid_hashcode))");
 
-            stmt.execute("create table TASK_EVENTS_AND_TASK_RESULTS(" +
-                "jobid_hashcode INTEGER, taskid_hashcode INTEGER, " +
-                "taskevent BLOB, taskresult BLOB," +
-                "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_PK PRIMARY KEY(jobid_hashcode, taskid_hashcode)," +
-                "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_FK FOREIGN KEY (jobid_hashcode) REFERENCES JOB_AND_JOB_EVENTS)");
+            stmt
+                    .execute("create table TASK_EVENTS_AND_TASK_RESULTS("
+                        + "jobid_hashcode INTEGER, taskid_hashcode INTEGER, "
+                        + "taskevent BLOB, taskresult BLOB,"
+                        + "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_PK PRIMARY KEY(jobid_hashcode, taskid_hashcode),"
+                        + "CONSTRAINT TASK_EVENTS_AND_TASK_RESULTS_FK FOREIGN KEY (jobid_hashcode) REFERENCES JOB_AND_JOB_EVENTS)");
 
-            System.out.println(
-                "Tables JOB_AND_JOB_EVENTS and TASK_EVENTS_AND_TASK_RESULTS created");
+            System.out.println("Tables JOB_AND_JOB_EVENTS and TASK_EVENTS_AND_TASK_RESULTS created");
             conn.commit();
             System.out.println("Committed successfully");
             stmt.close();

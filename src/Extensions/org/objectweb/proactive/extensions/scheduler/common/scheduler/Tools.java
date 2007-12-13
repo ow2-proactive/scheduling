@@ -116,8 +116,7 @@ public class Tools implements Serializable {
         tmp = (int) duration;
 
         if (tmp > 0) {
-            formatted = tmp + " day" + ((tmp > 1) ? "s" : "") + " - " +
-                formatted;
+            formatted = tmp + " day" + ((tmp > 1) ? "s" : "") + " - " + formatted;
         }
 
         return formatted;

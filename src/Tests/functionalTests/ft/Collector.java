@@ -38,8 +38,8 @@ import org.objectweb.proactive.api.PAActiveObject;
 public class Collector implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private int result = 0;
 
     public Collector() {

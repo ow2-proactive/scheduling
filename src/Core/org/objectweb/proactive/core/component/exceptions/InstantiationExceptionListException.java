@@ -54,8 +54,7 @@ public class InstantiationExceptionListException extends InstantiationException 
         super(msg);
     }
 
-    public InstantiationExceptionListException(
-        List<InstantiationException> exceptions) {
+    public InstantiationExceptionListException(List<InstantiationException> exceptions) {
         super("The creation of some components failed");
         this.exceptions = exceptions;
     }

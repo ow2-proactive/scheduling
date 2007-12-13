@@ -40,8 +40,7 @@ import org.objectweb.fractal.api.Component;
  * @author Paul Naoumenko
  *
  */
-public class ProActiveNFBindingControllerImpl
-    extends ProActiveBindingControllerImpl {
+public class ProActiveNFBindingControllerImpl extends ProActiveBindingControllerImpl {
 
     /**
      * Constructor for ProActiveNFBindingController

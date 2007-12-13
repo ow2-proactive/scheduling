@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.util;
 
-
 /**
  * <p>
  * A straightford implementation of the threadstore interface.
@@ -113,13 +112,11 @@ public class ThreadStoreImpl implements ThreadStore, java.io.Serializable {
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         out.defaultWriteObject();
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         // set open to the default value
         open = defaultOpenState;

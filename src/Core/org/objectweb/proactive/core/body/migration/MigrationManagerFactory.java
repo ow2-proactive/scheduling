@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.migration;
 
-
 /**
  * <p>
  * A class implementing this interface is a factory of MigrationManager objects.

@@ -46,7 +46,7 @@ public class ProActiveMPI {
             // create manager
             try {
                 manager = (ProActiveMPIManager) PAActiveObject.newActive(ProActiveMPIManager.class.getName(),
-                        new Object[] {  });
+                        new Object[] {});
                 //  VectorResult vres = 
                 manager.deploy(spmdList);
                 return null;
@@ -59,8 +59,7 @@ public class ProActiveMPI {
                 e.printStackTrace();
             }
         } else {
-            throw new IllegalStateException(
-                " ERROR: Application has already been deployed once !!!!!!!");
+            throw new IllegalStateException(" ERROR: Application has already been deployed once !!!!!!!");
         }
 
         return null;

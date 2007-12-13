@@ -73,8 +73,7 @@ public class SshTunnel {
      *             an exception is thrown if either the authentication or the
      *             tunnel establishment fails.
      */
-    public SshTunnel(String distantHost, int distantPort)
-        throws IOException {
+    public SshTunnel(String distantHost, int distantPort) throws IOException {
         String username = SshParameters.getSshUsername(distantHost);
         String sshPort = SshParameters.getSshPort();
 
@@ -85,21 +84,17 @@ public class SshTunnel {
         try {
             connection = scc.getConnection(username, distantHost, sshPort);
         } catch (IOException e) {
-            logger.info("Connection to " + distantHost + ":" + sshPort +
-                "cannot be opened");
+            logger.info("Connection to " + distantHost + ":" + sshPort + "cannot be opened");
             throw e;
         }
 
         int initialPort = ProActiveRandom.nextInt(65536 - 1024) + 1024;
 
-        for (localPort = (initialPort == 65535) ? 1024 : (initialPort + 1);
-                localPort != initialPort;
-                localPort = (localPort == 65535) ? 1024 : (localPort + 1)) {
-            logger.debug("initialPort:" + initialPort + " localPort:" +
-                localPort);
+        for (localPort = (initialPort == 65535) ? 1024 : (initialPort + 1); localPort != initialPort; localPort = (localPort == 65535) ? 1024
+                : (localPort + 1)) {
+            logger.debug("initialPort:" + initialPort + " localPort:" + localPort);
             try {
-                lpf = connection.createTunnel(localPort, distantHost,
-                        distantPort);
+                lpf = connection.createTunnel(localPort, distantHost, distantPort);
                 return;
             } catch (BindException e) {
                 // Try another port
@@ -110,16 +105,15 @@ public class SshTunnel {
         }
 
         // Looped all over the port range
-        logger.error(
-            "No free local port can be found to establish a new SSH-2 tunnel");
+        logger.error("No free local port can be found to establish a new SSH-2 tunnel");
         throw new BindException("No free local port found");
     }
 
     public void realClose() throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Closing tunnel from " +
-                ProActiveInet.getInstance().getInetAddress().getHostAddress() +
-                ":" + localPort + "to " + distantHost + ":" + distantPort);
+                ProActiveInet.getInstance().getInetAddress().getHostAddress() + ":" + localPort + "to " +
+                distantHost + ":" + distantPort);
         }
         lpf.close();
         lpf = null;

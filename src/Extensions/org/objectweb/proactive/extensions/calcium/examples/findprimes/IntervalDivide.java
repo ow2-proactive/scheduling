@@ -39,11 +39,11 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 public class IntervalDivide implements Divide<Interval, Interval> {
     public List<Interval> divide(SkeletonSystem system, Interval param) {
-        Interval ttUp = new Interval(1 + param.min +
-                ((param.max - param.min) / 2), param.max, param.solvableSize);
+        Interval ttUp = new Interval(1 + param.min + ((param.max - param.min) / 2), param.max,
+            param.solvableSize);
 
-        Interval ttDown = new Interval(param.min,
-                param.min + ((param.max - param.min) / 2), param.solvableSize);
+        Interval ttDown = new Interval(param.min, param.min + ((param.max - param.min) / 2),
+            param.solvableSize);
 
         Vector<Interval> v = new Vector<Interval>();
         v.add(ttUp);

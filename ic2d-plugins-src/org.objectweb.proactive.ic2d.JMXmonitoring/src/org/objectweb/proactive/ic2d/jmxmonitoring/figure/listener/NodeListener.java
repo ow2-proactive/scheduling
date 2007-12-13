@@ -59,8 +59,7 @@ public class NodeListener implements MouseListener, MouseMotionListener {
     private NodeFigure figure;
     private DragAndDrop dnd;
 
-    public NodeListener(NodeObject node, NodeFigure figure,
-        MonitoringView monitoringView) {
+    public NodeListener(NodeObject node, NodeFigure figure, MonitoringView monitoringView) {
         this.registry = monitoringView.getGraphicalViewer().getActionRegistry();
         this.node = node;
         this.figure = figure;
@@ -92,8 +91,7 @@ public class NodeListener implements MouseListener, MouseMotionListener {
                     setUpdateFrequenceAction.setEnabled(true);
                 } else if (act instanceof IActionExtPoint) {
                     ((IActionExtPoint) act).setAbstractDataObject(this.node);
-                } else if (act instanceof ZoomOutAction ||
-                        act instanceof ZoomInAction) {
+                } else if (act instanceof ZoomOutAction || act instanceof ZoomInAction) {
                     act.setEnabled(true);
                 } else {
                     act.setEnabled(false);
@@ -113,9 +111,9 @@ public class NodeListener implements MouseListener, MouseMotionListener {
                     return;
                 }
                 if ((sourceNode.getParent().equals(node.getParent())) ||
-                        (node.getChild(source.getKey()) != null)) {
-                    Console.getInstance(Activator.CONSOLE_NAME)
-                           .warn("The active object originates from the same VM you're trying to migrate it to !");
+                    (node.getChild(source.getKey()) != null)) {
+                    Console.getInstance(Activator.CONSOLE_NAME).warn(
+                            "The active object originates from the same VM you're trying to migrate it to !");
                     figure.setHighlight(null);
                     dnd.reset();
                     return;
@@ -123,10 +121,10 @@ public class NodeListener implements MouseListener, MouseMotionListener {
 
                 /*------------ Migration ------------*/
                 new Thread(new Runnable() {
-                        public void run() {
-                            source.migrateTo(node.getUrl());
-                        }
-                    }).start();
+                    public void run() {
+                        source.migrateTo(node.getUrl());
+                    }
+                }).start();
                 /*----------------------------------*/
                 figure.setHighlight(null);
                 dnd.reset();

@@ -77,8 +77,8 @@ public class MethodCallSetSPMDGroup extends MethodCallControlForGroup {
      * @see org.objectweb.proactive.core.mop.MethodCall#execute(java.lang.Object)
      */
     @Override
-    public Object execute(Object targetObject)
-        throws InvocationTargetException, MethodCallExecutionFailedException {
+    public Object execute(Object targetObject) throws InvocationTargetException,
+            MethodCallExecutionFailedException {
         AbstractBody body = (AbstractBody) PAActiveObject.getBodyOnThis();
         body.setSPMDGroup(this.getParameter(0));
         return null;

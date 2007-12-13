@@ -58,9 +58,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class FileTransferWorkShop implements Serializable {
     private static final String PROCESSDEFAULT_KEYWORD = "processDefault";
     private static final String IMPLICIT_KEYWORD = "implicit";
-    private static final String[] ALLOWED_COPY_PROTOCOLS = {
-            PROCESSDEFAULT_KEYWORD, "scp", "unicore", "rcp", "nordugrid", "pftp"
-        };
+    private static final String[] ALLOWED_COPY_PROTOCOLS = { PROCESSDEFAULT_KEYWORD, "scp", "unicore", "rcp",
+            "nordugrid", "pftp" };
     private static final String[] URLPROTOCOLS = { "file://", "http://", "ftp://" };
     final protected static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
 
@@ -82,9 +81,9 @@ public class FileTransferWorkShop implements Serializable {
     public FileTransferWorkShop(String processDefault) {
         //Verification of ilegal name for processDefault=="processDefault"
         if ((processDefault == null) || (processDefault.length() <= 0) ||
-                processDefault.equalsIgnoreCase(PROCESSDEFAULT_KEYWORD)) {
-            logger.error("Illegal processDefault value=" + processDefault +
-                " in " + this.getClass() + ". Falling back to dummy.");
+            processDefault.equalsIgnoreCase(PROCESSDEFAULT_KEYWORD)) {
+            logger.error("Illegal processDefault value=" + processDefault + " in " + this.getClass() +
+                ". Falling back to dummy.");
             this.processDefault = "dummy";
         } else {
             this.processDefault = processDefault;
@@ -142,8 +141,7 @@ public class FileTransferWorkShop implements Serializable {
             return;
         }
         if (ft.getId().equalsIgnoreCase(IMPLICIT_KEYWORD)) {
-            logger.warn("Warning, ignoring addFileTransfer with keyword id=" +
-                IMPLICIT_KEYWORD);
+            logger.warn("Warning, ignoring addFileTransfer with keyword id=" + IMPLICIT_KEYWORD);
             return;
         }
 
@@ -179,15 +177,13 @@ public class FileTransferWorkShop implements Serializable {
         }
 
         if (skippedProtocols.length() > 0) {
-            logger.warn("Unknown copyprotocols will be skipped:" +
-                skippedProtocols.toString());
+            logger.warn("Unknown copyprotocols will be skipped:" + skippedProtocols.toString());
         }
 
         //if no Protocol is defined use the default
         if (alist.size() <= 0) {
             if (logger.isDebugEnabled()) {
-                logger.debug("No CopyProtocols found, using default protocol:" +
-                    processDefault);
+                logger.debug("No CopyProtocols found, using default protocol:" + processDefault);
             }
 
             alist.add(copyProtocolFactory(PROCESSDEFAULT_KEYWORD));
@@ -292,8 +288,7 @@ public class FileTransferWorkShop implements Serializable {
         Collection<FileTransferDefinition> list = fileTransfers.values();
         for (FileTransferDefinition ft : list) {
             if (ft.isEmpty()) {
-                logger.warn("Warning: FileTransfer definition id=" +
-                    ft.getId() + " is empty or undefined.");
+                logger.warn("Warning: FileTransfer definition id=" + ft.getId() + " is empty or undefined.");
                 continue;
             }
 
@@ -361,23 +356,20 @@ public class FileTransferWorkShop implements Serializable {
      * @return The full path String
      */
     public String getAbsoluteSrcPath(FileDescription fileDesc) {
-        return buildFilePathString(srcInfoParams.getPrefix(),
-            srcInfoParams.getFileSeparator(), fileDesc.getSrcName());
+        return buildFilePathString(srcInfoParams.getPrefix(), srcInfoParams.getFileSeparator(), fileDesc
+                .getSrcName());
     }
 
     public String getAbsoluteDstPath(FileDescription fileDesc) {
-        return buildFilePathString(dstInfoParams.getPrefix(),
-            dstInfoParams.getFileSeparator(), fileDesc.getDestName());
+        return buildFilePathString(dstInfoParams.getPrefix(), dstInfoParams.getFileSeparator(), fileDesc
+                .getDestName());
     }
 
-    public static String buildFilePathString(StructureInformation infoParam,
-        String filename) {
-        return buildFilePathString(infoParam.getPrefix(),
-            infoParam.getFileSeparator(), filename);
+    public static String buildFilePathString(StructureInformation infoParam, String filename) {
+        return buildFilePathString(infoParam.getPrefix(), infoParam.getFileSeparator(), filename);
     }
 
-    public static String buildFilePathString(String prefix, String fileSep,
-        String filename) {
+    public static String buildFilePathString(String prefix, String fileSep, String filename) {
         /*
          *BORDER CONDITIONS
          */
@@ -409,8 +401,8 @@ public class FileTransferWorkShop implements Serializable {
         // -case1: filename starts from root path, nothing to do
         // -case2: filename starts with procol "http://", "ftp://", nothing to do
         // -case3: no prefix, nothing to do
-        if ((filename.charAt(0) == fileSep.charAt(0)) ||
-                begginsWithProtocol(filename) || (prefix.length() <= 0)) {
+        if ((filename.charAt(0) == fileSep.charAt(0)) || begginsWithProtocol(filename) ||
+            (prefix.length() <= 0)) {
             return filename;
         }
 
@@ -487,8 +479,7 @@ public class FileTransferWorkShop implements Serializable {
     }
 
     public static boolean isRemote(String filenamepath) {
-        if (begginsWithProtocol(filenamepath) &&
-                !filenamepath.startsWith("file://")) {
+        if (begginsWithProtocol(filenamepath) && !filenamepath.startsWith("file://")) {
             return true;
         }
         return false;
@@ -525,8 +516,7 @@ public class FileTransferWorkShop implements Serializable {
             if (name.equalsIgnoreCase("prefix")) {
                 value = value.trim();
                 //delete ending file separators
-                while ((value.length() > 0) &&
-                        (value.endsWith("/") || value.endsWith("\\")))
+                while ((value.length() > 0) && (value.endsWith("/") || value.endsWith("\\")))
                     value = value.substring(0, value.length() - 1);
 
                 if (value.length() > 0) {

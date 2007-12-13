@@ -67,8 +67,7 @@ public class SshParameters {
 
     static public boolean getSshTunneling() {
         String tunneling = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
-        if ((tunneling != null) &&
-                tunneling.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
+        if ((tunneling != null) && tunneling.equals(Constants.RMISSH_PROTOCOL_IDENTIFIER)) {
             return true;
         } else {
             return false;
@@ -91,8 +90,7 @@ public class SshParameters {
         if (PAProperties.PA_SSH_KNOWN_HOST.getValue() != null) {
             return PAProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
         }
-        return System.getProperty("user.home") +
-        PAProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
+        return System.getProperty("user.home") + PAProperties.PA_SSH_TUNNELING_KNOW_HOSTS.getValue();
     }
 
     static public String getSshKeyDirectory() {

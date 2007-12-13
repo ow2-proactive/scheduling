@@ -61,8 +61,7 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal {
         solvedNumberTasks = solvedRootTasks = readyQueueLength = readyNewQueueLength = 0;
     }
 
-    public void setQueueLengths(int readQNew, int readyQ, int processingQ,
-        int waitingQ, int resultsQ) {
+    public void setQueueLengths(int readQNew, int readyQ, int processingQ, int waitingQ, int resultsQ) {
         this.readyNewQueueLength = readQNew;
         this.readyQueueLength = readyQ;
         this.processingQueueLength = processingQ;
@@ -89,16 +88,15 @@ public class StatsGlobalImpl implements java.io.Serializable, StatsGlobal {
     public String toString() {
         String ls = System.getProperty("line.separator");
 
-        return "Queue Lengths:  " + readyNewQueueLength + "/" +
-        readyQueueLength + "R " + processingQueueLength + "P " +
-        waitingQueueLength + "W " + resultsQueueLength + "F" + ", " +
-        /*
-        "Average Times:  "+getAverageReadyTime()+"R "+getAverageProcessingTime()+"P "+
-        getAverageWaitingTime()+"W "+getAverageResultsTime()+"F "+
-        getAverageWallClockTime()+"L "+getAverageComputationTime()+"C [ms]"+ls+
-        */
-        "Computed Tasks: " + getSolvedNumberOfRootTasks() + "[Root] " +
-        getSolvedNumberOfTasks() + "[Total]";
+        return "Queue Lengths:  " + readyNewQueueLength + "/" + readyQueueLength + "R " +
+            processingQueueLength + "P " + waitingQueueLength + "W " + resultsQueueLength + "F" + ", " +
+            /*
+            "Average Times:  "+getAverageReadyTime()+"R "+getAverageProcessingTime()+"P "+
+            getAverageWaitingTime()+"W "+getAverageResultsTime()+"F "+
+            getAverageWallClockTime()+"L "+getAverageComputationTime()+"C [ms]"+ls+
+             */
+            "Computed Tasks: " + getSolvedNumberOfRootTasks() + "[Root] " + getSolvedNumberOfTasks() +
+            "[Total]";
     }
 
     // ********* INTERFACE METHODS BEGIN HERE   ************

@@ -51,8 +51,8 @@ public class ProcessForAoCreation implements Runnable {
     private Object[] param;
     private Node node;
 
-    public ProcessForAoCreation(Vector result, String className,
-        Class<?>[] genericParameters, Object[] param, Node node) {
+    public ProcessForAoCreation(Vector result, String className, Class<?>[] genericParameters,
+            Object[] param, Node node) {
         this.result = result;
         this.className = className;
         this.genericParameters = genericParameters;
@@ -62,8 +62,8 @@ public class ProcessForAoCreation implements Runnable {
 
     public void run() {
         try {
-            this.result.add(PAActiveObject.newActive(this.className,
-                    this.genericParameters, this.param, this.node));
+            this.result.add(PAActiveObject.newActive(this.className, this.genericParameters, this.param,
+                    this.node));
         } catch (Exception e) {
             e.printStackTrace();
         }

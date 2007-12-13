@@ -40,6 +40,7 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * do an (a)synchronous call on a previously created group
  * @author Laurent Baduel
@@ -63,8 +64,8 @@ public class Test extends FunctionalTest {
 
         boolean rightRankingOfResults = true;
         for (int i = 0; i < group.size(); i++) {
-            rightRankingOfResults &= ((A) groupOfResult.get(i)).getName()
-                                      .equals((((A) group.get(i)).asynchronousCall()).getName());
+            rightRankingOfResults &= ((A) groupOfResult.get(i)).getName().equals(
+                    (((A) group.get(i)).asynchronousCall()).getName());
         }
 
         // is the result of the n-th group member at the n-th position in the result group ?
@@ -75,15 +76,8 @@ public class Test extends FunctionalTest {
     public void preConditions() throws Exception {
         new TestNodes().action();
 
-        Object[][] params = {
-                { "Agent0" },
-                { "Agent1" },
-                { "Agent2" }
-            };
-        Node[] nodes = {
-                TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-                TestNodes.getRemoteVMNode()
-            };
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
 
         PAGroup.getGroup(this.typedGroup).setRatioMemberToThread(1);

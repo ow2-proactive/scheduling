@@ -70,8 +70,8 @@ public class TestPolicyBuilder {
      *
      * @return the matching element
      */
-    public static TargetMatch createTargetMatch(int type, String functionId,
-        AttributeDesignator designator, AttributeValue value) {
+    public static TargetMatch createTargetMatch(int type, String functionId, AttributeDesignator designator,
+            AttributeValue value) {
         try {
             // get the factory that handles Target functions and get an
             // instance of the right function
@@ -107,35 +107,29 @@ public class TestPolicyBuilder {
 
         String subjectMatchId = "urn:oasis:names:tc:xacml:1.0:function:rfc822Name-match";
 
-        URI subjectDesignatorType = new URI(
-                "urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name");
-        URI subjectDesignatorId = new URI(
-                "urn:oasis:names:tc:xacml:1.0:subject:subject-id");
+        URI subjectDesignatorType = new URI("urn:oasis:names:tc:xacml:1.0:data-type:rfc822Name");
+        URI subjectDesignatorId = new URI("urn:oasis:names:tc:xacml:1.0:subject:subject-id");
         AttributeDesignator subjectDesignator = new AttributeDesignator(AttributeDesignator.SUBJECT_TARGET,
-                subjectDesignatorType, subjectDesignatorId, false);
+            subjectDesignatorType, subjectDesignatorId, false);
 
         StringAttribute subjectValue = new StringAttribute("users.example.com");
 
-        subject.add(createTargetMatch(TargetMatch.SUBJECT, subjectMatchId,
-                subjectDesignator, subjectValue));
+        subject.add(createTargetMatch(TargetMatch.SUBJECT, subjectMatchId, subjectDesignator, subjectValue));
 
         // create the Resource section
         List<TargetMatch> resource = new ArrayList<TargetMatch>();
 
         String resourceMatchId = "urn:oasis:names:tc:xacml:1.0:function:anyURI-equal";
 
-        URI resourceDesignatorType = new URI(
-                "http://www.w3.org/2001/XMLSchema#anyURI");
-        URI resourceDesignatorId = new URI(
-                "urn:oasis:names:tc:xacml:1.0:resource:resource-id");
+        URI resourceDesignatorType = new URI("http://www.w3.org/2001/XMLSchema#anyURI");
+        URI resourceDesignatorId = new URI("urn:oasis:names:tc:xacml:1.0:resource:resource-id");
         AttributeDesignator resourceDesignator = new AttributeDesignator(AttributeDesignator.RESOURCE_TARGET,
-                resourceDesignatorType, resourceDesignatorId, false);
+            resourceDesignatorType, resourceDesignatorId, false);
 
-        AnyURIAttribute resourceValue = new AnyURIAttribute(new URI(
-                    "http://server.example.com/"));
+        AnyURIAttribute resourceValue = new AnyURIAttribute(new URI("http://server.example.com/"));
 
-        resource.add(createTargetMatch(TargetMatch.RESOURCE, resourceMatchId,
-                resourceDesignator, resourceValue));
+        resource.add(createTargetMatch(TargetMatch.RESOURCE, resourceMatchId, resourceDesignator,
+                resourceValue));
 
         // put the Subject and Resource sections into their lists
         subjects.add(subject);
@@ -163,15 +157,13 @@ public class TestPolicyBuilder {
         String actionMatchId = "urn:oasis:names:tc:xacml:1.0:function:string-equal";
 
         URI actionDesignatorType = new URI(EntityAttribute.identifier);
-        URI actionDesignatorId = new URI(
-                "urn:oasis:names:tc:xacml:1.0:action:action-id");
+        URI actionDesignatorId = new URI("urn:oasis:names:tc:xacml:1.0:action:action-id");
         AttributeDesignator actionDesignator = new AttributeDesignator(AttributeDesignator.ACTION_TARGET,
-                actionDesignatorType, actionDesignatorId, false);
+            actionDesignatorType, actionDesignatorId, false);
 
         StringAttribute actionValue = new StringAttribute("commit");
 
-        action.add(createTargetMatch(TargetMatch.ACTION, actionMatchId,
-                actionDesignator, actionValue));
+        action.add(createTargetMatch(TargetMatch.ACTION, actionMatchId, actionDesignator, actionValue));
 
         // put the Action section in the Actions list
         actions.add(action);
@@ -196,8 +188,8 @@ public class TestPolicyBuilder {
         FunctionFactory factory = FunctionFactory.getConditionInstance();
         Function conditionFunction = null;
         try {
-            conditionFunction = factory.createFunction(
-                    "urn:oasis:names:tc:xacml:1.0:function:" + "string-equal");
+            conditionFunction = factory.createFunction("urn:oasis:names:tc:xacml:1.0:function:"
+                + "string-equal");
         } catch (Exception e) {
             // see comment in createTargetMatch()
             return null;
@@ -209,9 +201,8 @@ public class TestPolicyBuilder {
         factory = FunctionFactory.getGeneralInstance();
         Function applyFunction = null;
         try {
-            applyFunction = factory.createFunction(
-                    "urn:oasis:names:tc:xacml:1.0:function:" +
-                    "string-one-and-only");
+            applyFunction = factory.createFunction("urn:oasis:names:tc:xacml:1.0:function:"
+                + "string-one-and-only");
         } catch (Exception e) {
             // see comment in createTargetMatch()
             return null;
@@ -221,7 +212,7 @@ public class TestPolicyBuilder {
         URI designatorId = new URI("group");
         URI designatorIssuer = new URI("admin@users.example.com");
         AttributeDesignator designator = new AttributeDesignator(AttributeDesignator.SUBJECT_TARGET,
-                designatorType, designatorId, false, designatorIssuer);
+            designatorType, designatorId, false, designatorIssuer);
         applyArgs.add(designator);
 
         Apply apply = new Apply(applyFunction, applyArgs, false);
@@ -272,15 +263,16 @@ public class TestPolicyBuilder {
         // get the combining algorithm for the policy
         URI combiningAlgId = new URI(OrderedPermitOverridesRuleAlg.algId);
         CombiningAlgFactory factory = CombiningAlgFactory.getInstance();
-        RuleCombiningAlgorithm combiningAlg = (RuleCombiningAlgorithm) (factory.createAlgorithm(combiningAlgId));
+        RuleCombiningAlgorithm combiningAlg = (RuleCombiningAlgorithm) (factory
+                .createAlgorithm(combiningAlgId));
 
         // add a description for the policy
-        String description = "This policy applies to any accounts at users.example.com " +
-            "accessing server.example.com. The one Rule applies to the " +
-            "specific action of doing a CVS commit, but other Rules could " +
-            "be defined that handled other actions. In this case, only " +
-            "certain groups of people are allowed to commit. There is a " +
-            "final fall-through rule that always returns Deny.";
+        String description = "This policy applies to any accounts at users.example.com "
+            + "accessing server.example.com. The one Rule applies to the "
+            + "specific action of doing a CVS commit, but other Rules could "
+            + "be defined that handled other actions. In this case, only "
+            + "certain groups of people are allowed to commit. There is a "
+            + "final fall-through rule that always returns Deny.";
 
         // create the target for the policy
         Target policyTarget = createPolicyTarget();
@@ -289,8 +281,7 @@ public class TestPolicyBuilder {
         Rule commitRule = createRule();
 
         // create the default, fall-through rule
-        Rule defaultRule = new Rule(new URI("FinalRule"), Result.DECISION_DENY,
-                null, null, null);
+        Rule defaultRule = new Rule(new URI("FinalRule"), Result.DECISION_DENY, null, null, null);
 
         // create a list for the rules and add our rules in order
         List<Rule> ruleList = new ArrayList<Rule>();
@@ -298,8 +289,7 @@ public class TestPolicyBuilder {
         ruleList.add(defaultRule);
 
         // create the policy
-        Policy policy = new Policy(policyId, combiningAlg, description,
-                policyTarget, ruleList);
+        Policy policy = new Policy(policyId, combiningAlg, description, policyTarget, ruleList);
 
         // finally, encode the policy and print it to standard out
         policy.encode(System.out, new Indenter());

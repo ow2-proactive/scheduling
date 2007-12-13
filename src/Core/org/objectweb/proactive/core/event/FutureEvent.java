@@ -84,7 +84,6 @@ public class FutureEvent extends ProActiveEvent implements java.io.Serializable 
 
     @Override
     public String toString() {
-        return "FutureEvent bodyID=" + getBodyID() + " creatorID=" +
-        getCreatorID();
+        return "FutureEvent bodyID=" + getBodyID() + " creatorID=" + getCreatorID();
     }
 }

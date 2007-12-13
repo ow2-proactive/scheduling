@@ -53,8 +53,8 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public class MSEngine implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private MSEngineWorker mSEngineWorker;
     private String idEngine;
     private JVMProcessImpl process;
@@ -112,8 +112,7 @@ public class MSEngine implements Serializable {
             logger.debug("->MSEngine In:activate");
         }
 
-        String uri = URIBuilder.buildURI("localhost",
-                "" + idEngine + (new Date()).getTime()).toString();
+        String uri = URIBuilder.buildURI("localhost", "" + idEngine + (new Date()).getTime()).toString();
         try {
             process = new JVMProcessImpl();
             process.setInputMessageLogger(new AbstractExternalProcess.StandardOutputMessageLogger());
@@ -126,8 +125,8 @@ public class MSEngine implements Serializable {
         for (int i = 0; i < 30; i++) {
             try {
                 try {
-                    mSEngineWorker = (MSEngineWorker) PAActiveObject.newActive(MSEngineWorker.class.getName(),
-                            null, uri);
+                    mSEngineWorker = (MSEngineWorker) PAActiveObject.newActive(
+                            MSEngineWorker.class.getName(), null, uri);
                     return new BooleanWrapper(true);
                 } catch (ProActiveException e) {
                 }

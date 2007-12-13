@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util;
 
-
 /**
  * This class is a reimplementation of HierarchicalTimer which perform many
  * tests on timers counters start/stop.<br>
@@ -48,16 +47,13 @@ public class SecuredHierarchicalTimer extends HierarchicalTimer {
 
     private void checkRange(int n) {
         if ((n < 0) || (n >= this.getNbCounter())) {
-            throw new IllegalArgumentException(
-                "Incorrect counter id. Maybe it has be set by a wrong " +
-                "Timed instance. If it is a stop, maybe you never start" +
-                "this counter.");
+            throw new IllegalArgumentException("Incorrect counter id. Maybe it has be set by a wrong "
+                + "Timed instance. If it is a stop, maybe you never start" + "this counter.");
         }
     }
 
     private boolean internalIsStarted(int n) {
-        return (this.parent[0] == n) || (this.parent[1] == n) ||
-        (this.parent[2] == n);
+        return (this.parent[0] == n) || (this.parent[1] == n) || (this.parent[2] == n);
     }
 
     private boolean isJustStarted(int n) {
@@ -65,8 +61,7 @@ public class SecuredHierarchicalTimer extends HierarchicalTimer {
     }
 
     private String getInfos(int n, int lev) {
-        return "'" + this.getCounterName(n) + "' [id=" + n + ", level=" + lev +
-        "]";
+        return "'" + this.getCounterName(n) + "' [id=" + n + ", level=" + lev + "]";
     }
 
     /**
@@ -91,18 +86,16 @@ public class SecuredHierarchicalTimer extends HierarchicalTimer {
     public void start(int n) {
         this.checkRange(n);
         if (this.internalIsStarted(n)) {
-            throw new IllegalStateException("TimerCounter " +
-                this.getInfos(n, this.level + 1) + " already started !");
+            throw new IllegalStateException("TimerCounter " + this.getInfos(n, this.level + 1) +
+                " already started !");
         }
         if (this.headCounterID == -1) {
             this.headCounterID = n;
         }
         if (((this.level + 1) == 0) && (n != this.headCounterID)) {
-            throw new IllegalStateException(
-                "Bad counters placement: not hierarchical. TimerCounter " +
-                this.getInfos(this.headCounterID, 0) + " is already the " +
-                "counter's head and " + this.getInfos(n, 0) + " can't be set " +
-                "as head also. Try to make a global TOTAL counter " +
+            throw new IllegalStateException("Bad counters placement: not hierarchical. TimerCounter " +
+                this.getInfos(this.headCounterID, 0) + " is already the " + "counter's head and " +
+                this.getInfos(n, 0) + " can't be set " + "as head also. Try to make a global TOTAL counter " +
                 "which include the others.");
         }
         super.start(n);
@@ -119,15 +112,12 @@ public class SecuredHierarchicalTimer extends HierarchicalTimer {
         this.checkRange(n);
         if (!this.isJustStarted(n)) {
             if (!this.internalIsStarted(n)) {
-                throw new IllegalStateException("TimerCounter " +
-                    this.getInfos(n, this.level) +
+                throw new IllegalStateException("TimerCounter " + this.getInfos(n, this.level) +
                     " must be started before being stopped !");
             } else {
-                throw new IllegalStateException("TimerCounter " +
-                    this.getInfos(n, this.level) +
+                throw new IllegalStateException("TimerCounter " + this.getInfos(n, this.level) +
                     " stop misplaced. The last started counter is " +
-                    this.getCounterName(this.parent[this.level]) +
-                    " and you should " +
+                    this.getCounterName(this.parent[this.level]) + " and you should " +
                     "stop this one. Maybe your start/stop are imbricated.");
             }
         } else {

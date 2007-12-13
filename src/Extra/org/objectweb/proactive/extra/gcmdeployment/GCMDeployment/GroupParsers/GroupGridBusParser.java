@@ -44,8 +44,7 @@ import org.w3c.dom.Node;
 
 
 public class GroupGridBusParser extends AbstractGroupParser {
-    private static final String XPATH_ARGUMENTS = NODE_EXT_NAMESPACE +
-        "arguments";
+    private static final String XPATH_ARGUMENTS = NODE_EXT_NAMESPACE + "arguments";
     private static final String NODE_NAME = "gridbusGroup";
 
     @Override
@@ -60,14 +59,11 @@ public class GroupGridBusParser extends AbstractGroupParser {
 
     @Override
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
-        GroupGridBus gridbusGroup = (GroupGridBus) super.parseGroupNode(groupNode,
-                xpath);
+        GroupGridBus gridbusGroup = (GroupGridBus) super.parseGroupNode(groupNode, xpath);
 
         try {
-            Node argumentsNode = (Node) xpath.evaluate(XPATH_ARGUMENTS,
-                    groupNode, XPathConstants.NODE);
-            List<String> argumentsList = GCMParserHelper.parseArgumentListNode(xpath,
-                    argumentsNode);
+            Node argumentsNode = (Node) xpath.evaluate(XPATH_ARGUMENTS, groupNode, XPathConstants.NODE);
+            List<String> argumentsList = GCMParserHelper.parseArgumentListNode(xpath, argumentsNode);
 
             gridbusGroup.setArgumentsList(argumentsList);
         } catch (XPathExpressionException e) {

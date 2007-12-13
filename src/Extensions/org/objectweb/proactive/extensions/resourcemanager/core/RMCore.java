@@ -118,8 +118,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scripting.SelectionSc
  * @since ProActive 3.9
  *
  */
-public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
-    Serializable {
+public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Serializable {
 
     /** Log4J logger name for RMCore */
     private final static Logger logger = ProActiveLogger.getLogger(Loggers.RM_CORE);
@@ -177,8 +176,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @throws ActiveObjectCreationException.
      * @throws NodeException.
      */
-    public RMCore(String id, Node nodeRM)
-        throws ActiveObjectCreationException, NodeException {
+    public RMCore(String id, Node nodeRM) throws ActiveObjectCreationException, NodeException {
         this.id = id;
         this.nodeRM = nodeRM;
 
@@ -229,8 +227,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                 logger.debug("instanciation RMNodeManager");
             }
 
-            this.createStaticNodesource(null,
-                RMConstants.DEFAULT_STATIC_SOURCE_NAME);
+            this.createStaticNodesource(null, RMConstants.DEFAULT_STATIC_SOURCE_NAME);
 
             //Creating RM started event 
             this.monitoring.imStartedEvent(new RMEvent());
@@ -279,8 +276,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
         //set all dynamic script results to the state of ALREADY_VERIFIED_SCRIPT
         HashMap<SelectionScript, Integer> verifs = rmnode.getScriptStatus();
         for (Entry<SelectionScript, Integer> entry : verifs.entrySet()) {
-            if (entry.getKey().isDynamic() &&
-                    (entry.getValue() == RMNode.VERIFIED_SCRIPT)) {
+            if (entry.getKey().isDynamic() && (entry.getValue() == RMNode.VERIFIED_SCRIPT)) {
                 entry.setValue(RMNode.ALREADY_VERIFIED_SCRIPT);
             }
         }
@@ -338,10 +334,10 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * An event informing the node state's change is thrown to RMMonitoring
      */
     private void setDown(RMNode rmnode) {
-        logger.info("[RMCORE] down node : " + rmnode.getNodeURL() +
-            ", from Source : " + rmnode.getNodeSourceId());
-        assert (this.busyNodes.contains(rmnode) ||
-        this.freeNodes.contains(rmnode) || this.toBeReleased.contains(rmnode));
+        logger.info("[RMCORE] down node : " + rmnode.getNodeURL() + ", from Source : " +
+            rmnode.getNodeSourceId());
+        assert (this.busyNodes.contains(rmnode) || this.freeNodes.contains(rmnode) || this.toBeReleased
+                .contains(rmnode));
         removeFromAllLists(rmnode);
         this.downNodes.add(rmnode);
         rmnode.setDown();
@@ -358,11 +354,10 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      */
     private void releaseNode(RMNode rmnode) {
         assert (rmnode.isFree() || rmnode.isBusy());
-        assert ((rmnode.isFree() && this.freeNodes.contains(rmnode)) ||
-        (rmnode.isBusy() && this.busyNodes.contains(rmnode)));
+        assert ((rmnode.isFree() && this.freeNodes.contains(rmnode)) || (rmnode.isBusy() && this.busyNodes
+                .contains(rmnode)));
         if (logger.isInfoEnabled()) {
-            logger.info("[RMCORE] prepare to release node " +
-                rmnode.getNodeURL());
+            logger.info("[RMCORE] prepare to release node " + rmnode.getNodeURL());
         }
         if (rmnode.isFree()) {
             doRelease(rmnode);
@@ -379,8 +374,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      */
     private void doRelease(RMNode rmnode) {
         assert rmnode.isFree() || rmnode.isToRelease();
-        assert ((rmnode.isFree() && this.freeNodes.contains(rmnode)) ||
-        (rmnode.isToRelease() && this.toBeReleased.contains(rmnode)));
+        assert ((rmnode.isFree() && this.freeNodes.contains(rmnode)) || (rmnode.isToRelease() && this.toBeReleased
+                .contains(rmnode)));
 
         if (logger.isInfoEnabled()) {
             logger.info("[RMCORE] releasing node " + rmnode.getNodeURL());
@@ -451,20 +446,18 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param nodes list of free nodes.
      * @return NodeSet of nodes verifying the SelectionScript.
      */
-    private NodeSet selectNodeWithStaticVerifScript(int nb,
-        SelectionScript selectionScript, ArrayList<RMNode> nodes) {
+    private NodeSet selectNodeWithStaticVerifScript(int nb, SelectionScript selectionScript,
+            ArrayList<RMNode> nodes) {
         NodeSet result = new NodeSet();
         int found = 0;
 
-        logger.info("[RMCORE] Searching for " + nb +
-            " nodes  with static verif script on " +
+        logger.info("[RMCORE] Searching for " + nb + " nodes  with static verif script on " +
             this.getSizeListFreeRMNode() + " free nodes.");
         //select nodes where the static script has already be launched and satisfied
         while (!nodes.isEmpty() && (found < nb)) {
             RMNode node = nodes.remove(0);
             if (node.getScriptStatus().containsKey(selectionScript) &&
-                    node.getScriptStatus().get(selectionScript)
-                            .equals(RMNode.VERIFIED_SCRIPT)) {
+                node.getScriptStatus().get(selectionScript).equals(RMNode.VERIFIED_SCRIPT)) {
                 try {
                     result.add(node.getNode());
                     setBusy(node);
@@ -484,8 +477,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
         //if other nodes needed, launching the script on nodes Remaining 
         while (!nodes.isEmpty() && (launched++ < nb)) {
             nodeResults.add(nodes.get(0));
-            ScriptResult<Boolean> sr = nodes.get(0)
-                                            .executeScript(selectionScript);
+            ScriptResult<Boolean> sr = nodes.get(0).executeScript(selectionScript);
 
             // if r is not a future, the script has not been executed
             if (MOP.isReifiedObject(sr)) {
@@ -493,8 +485,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
             } else {
                 // script has not been executed on remote host
                 // nothing to do, just let the node in the free list
-                logger.info("Error occured executing verifying script",
-                    sr.getException());
+                logger.info("Error occured executing verifying script", sr.getException());
             }
             nodes.remove(0);
         }
@@ -507,8 +498,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                 ScriptResult<Boolean> res = scriptResults.remove(idx);
                 if (res.errorOccured()) {
                     // nothing to do, just let the node in the free list
-                    logger.info("Error occured executing verifying script",
-                        res.getException());
+                    logger.info("Error occured executing verifying script", res.getException());
                 } else if (res.getResult()) {
                     // Result OK
                     try {
@@ -521,8 +511,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                         // try on a new node if any
                         if (!nodes.isEmpty()) {
                             nodeResults.add(nodes.get(0));
-                            scriptResults.add(nodes.remove(0)
-                                                   .executeScript(selectionScript));
+                            scriptResults.add(nodes.remove(0).executeScript(selectionScript));
                         }
                     }
                 } else {
@@ -531,8 +520,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                     // try on a new node if any
                     if (!nodes.isEmpty()) {
                         nodeResults.add(nodes.get(0));
-                        scriptResults.add(nodes.remove(0)
-                                               .executeScript(selectionScript));
+                        scriptResults.add(nodes.remove(0).executeScript(selectionScript));
                     }
                 }
             } catch (ProActiveException e) {
@@ -541,8 +529,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                 // traitement special
                 e.printStackTrace();
             }
-        } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) &&
-                (found < nb));
+        } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) && (found < nb));
 
         return result;
     }
@@ -557,10 +544,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param nodes list of free nodes.
      * @return NodeSet of nodes verifying the SelectionScript.
      */
-    private NodeSet selectNodeWithDynamicVerifScript(int nb,
-        SelectionScript selectionScript, ArrayList<RMNode> nodes) {
-        logger.info("[RMCORE] Searching for " + nb +
-            " nodes  with dynamic verif script on " +
+    private NodeSet selectNodeWithDynamicVerifScript(int nb, SelectionScript selectionScript,
+            ArrayList<RMNode> nodes) {
+        logger.info("[RMCORE] Searching for " + nb + " nodes  with dynamic verif script on " +
             this.getSizeListFreeRMNode() + " free nodes.");
 
         StringBuffer order = new StringBuffer();
@@ -585,8 +571,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
             } else {
                 // script has not been executed on remote host
                 // nothing to do, just let the node in the free list
-                logger.info("Error occured executing verifying script",
-                    r.getException());
+                logger.info("Error occured executing verifying script", r.getException());
             }
             nodes.remove(0);
         }
@@ -602,8 +587,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                 ScriptResult<Boolean> res = scriptResults.remove(idx);
                 if (res.errorOccured()) {
                     // nothing to do, just let the node in the free list
-                    logger.info("Error occured executing verifying script",
-                        res.getException());
+                    logger.info("Error occured executing verifying script", res.getException());
                 } else if (res.getResult()) {
                     // Result OK
                     try {
@@ -616,8 +600,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                         // try on a new node if any
                         if (!nodes.isEmpty()) {
                             nodeResults.add(nodes.get(0));
-                            scriptResults.add(nodes.remove(0)
-                                                   .executeScript(selectionScript));
+                            scriptResults.add(nodes.remove(0).executeScript(selectionScript));
                         }
                     }
                 } else {
@@ -626,8 +609,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                     // try on a new node if any
                     if (!nodes.isEmpty()) {
                         nodeResults.add(nodes.get(0));
-                        scriptResults.add(nodes.remove(0)
-                                               .executeScript(selectionScript));
+                        scriptResults.add(nodes.remove(0).executeScript(selectionScript));
                     }
                 }
             } catch (Exception e) {
@@ -636,8 +618,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                 // traitement special
                 e.printStackTrace();
             }
-        } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) &&
-                (found < nb));
+        } while ((!scriptResults.isEmpty() || !nodes.isEmpty()) && (found < nb));
         return result;
     }
 
@@ -655,18 +636,16 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param pad a ProActiveDescriptor object to deploy at the node source creation.
      * @param sourceName name given to the static node source.
      */
-    public void createStaticNodesource(List<ProActiveDescriptor> padList,
-        String sourceName) throws RMException {
+    public void createStaticNodesource(List<ProActiveDescriptor> padList, String sourceName)
+            throws RMException {
         logger.info("[RMCORE] Creating a Static source : " + sourceName);
         if (this.nodeSources.containsKey(sourceName)) {
             throw new RMException("Node Source name already existing");
         } else {
             try {
-                NodeSource padSource = (NodeSource) PAActiveObject.newActive(PADNodeSource.class.getName(),
-                        new Object[] {
-                            sourceName,
-                            (RMCoreSourceInt) PAActiveObject.getStubOnThis()
-                        }, nodeRM);
+                NodeSource padSource = (NodeSource) PAActiveObject
+                        .newActive(PADNodeSource.class.getName(), new Object[] { sourceName,
+                                (RMCoreSourceInt) PAActiveObject.getStubOnThis() }, nodeRM);
                 if (padList != null) {
                     for (ProActiveDescriptor pad : padList) {
                         padSource.addNodes(pad);
@@ -688,18 +667,16 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param ttr Time to release in ms, time during the node will be kept by the nodes source and the Core.
      * @param peerUrls vector of ProActive P2P living peers and able to provide nodes.
      */
-    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr, Vector<String> peerUrls) throws RMException {
+    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
+            throws RMException {
         logger.info("[RMCORE] Creating a P2P source " + id);
         if (this.nodeSources.containsKey(id)) {
             throw new RMException("Node Source name already existing");
         } else {
             try {
-                PAActiveObject.newActive(P2PNodeSource.class.getName(),
-                    new Object[] {
-                        id, (RMCoreSourceInt) PAActiveObject.getStubOnThis(),
-                        nbMaxNodes, nice, ttr, peerUrls
-                    }, nodeRM);
+                PAActiveObject.newActive(P2PNodeSource.class.getName(), new Object[] { id,
+                        (RMCoreSourceInt) PAActiveObject.getStubOnThis(), nbMaxNodes, nice, ttr, peerUrls },
+                        nodeRM);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {
@@ -715,8 +692,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param pad ProActiveDescriptor to deploy
      * @param sourceName name of an existing PADNodesource
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName)
-        throws RMException {
+    public void addNodes(ProActiveDescriptor pad, String sourceName) throws RMException {
         if (this.nodeSources.containsKey(sourceName)) {
             try {
                 this.nodeSources.get(sourceName).addNodes(pad);
@@ -736,8 +712,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      */
     public void addNodes(ProActiveDescriptor pad) {
         try {
-            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME)
-                            .addNodes(pad);
+            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME).addNodes(pad);
         } catch (AddingNodesException e) {
             e.printStackTrace();
         }
@@ -749,8 +724,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      */
     public void addNode(String nodeUrl) throws RMException {
         try {
-            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME)
-                            .addNode(nodeUrl);
+            this.nodeSources.get(RMConstants.DEFAULT_STATIC_SOURCE_NAME).addNode(nodeUrl);
         } catch (AddingNodesException e) {
             e.printStackTrace();
         }
@@ -762,8 +736,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param pad ProActive deployment descriptor to deploy.
      * @param sourceName name of the static node source that perform the deployment.
      */
-    public void addNode(String nodeUrl, String sourceName)
-        throws RMException {
+    public void addNode(String nodeUrl, String sourceName) throws RMException {
         if (this.nodeSources.containsKey(sourceName)) {
             try {
                 this.nodeSources.get(sourceName).addNode(nodeUrl);
@@ -798,8 +771,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                 assert this.downNodes.contains(imnode);
                 this.removeNodeFromCore(imnode);
             } else {
-                this.allNodes.get(nodeUrl).getNodeSource()
-                             .forwardRemoveNode(nodeUrl, preempt);
+                this.allNodes.get(nodeUrl).getNodeSource().forwardRemoveNode(nodeUrl, preempt);
             }
         }
     }
@@ -823,11 +795,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param preempt true all the nodes must be removed immediately, without waiting job ending if nodes are busy,
      * false nodes are removed just after the job ending, if busy.
      */
-    public void removeSource(String sourceName, boolean preempt)
-        throws RMException {
+    public void removeSource(String sourceName, boolean preempt) throws RMException {
         if (sourceName.equals(RMConstants.DEFAULT_STATIC_SOURCE_NAME)) {
-            throw new RMException(
-                "Default static node source cannot be removed");
+            throw new RMException("Default static node source cannot be removed");
         } else if (nodeSources.containsKey(sourceName)) {
             this.nodeSources.get(sourceName).shutdown(preempt);
         } else {
@@ -956,8 +926,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
             nodeSourcesList.add(s.getSourceEvent());
         }
 
-        return new RMInitialState(freeNodesList, busyNodesList,
-            toReleaseNodesList, downNodeslist, nodeSourcesList);
+        return new RMInitialState(freeNodesList, busyNodesList, toReleaseNodesList, downNodeslist,
+            nodeSourcesList);
     }
 
     /**
@@ -993,21 +963,20 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
     }
 
     /**
-    * free a node after a work.
-    * RMUser active object wants to free a node that ended a task.
-    * If the node is 'to be released', perform the removing mechanism with
-    * the {@link NodeSource} object corresponding to the node,
-    * otherwise just set the node to free.
-    * @param node node that has terminated a task and must be freed.
-    */
+     * free a node after a work.
+     * RMUser active object wants to free a node that ended a task.
+     * If the node is 'to be released', perform the removing mechanism with
+     * the {@link NodeSource} object corresponding to the node,
+     * otherwise just set the node to free.
+     * @param node node that has terminated a task and must be freed.
+     */
     public void freeNode(Node node) {
         String nodeURL = null;
         try {
             nodeURL = node.getNodeInformation().getURL();
         } catch (RuntimeException e) {
-            logger.debug("A Runtime exception occured " +
-                "while obtaining information on the node," +
-                "the node must be down (it will be detected later)", e);
+            logger.debug("A Runtime exception occured " + "while obtaining information on the node,"
+                + "the node must be down (it will be detected later)", e);
             // node is down,
             // will be detected later
             return;
@@ -1038,20 +1007,20 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
     }
 
     /**
-    * Gives a set of nodes that verify a selection script.
-    * This method has three way to handle the request :<BR>
-    *  - if there is no script, it returns at most the
-    * first nb free nodes asked.<BR>
-    * - If the script is a dynamic script, the method will
-    * test the resources, until nb nodes verify the script or if there is no
-    * node left.<BR>
-    * - If the script is a static script, it will return in priority the
-    * nodes on which the given script has already been verified,
-    * and test on other nodes if needed.<BR>
-    *
-    * @param nb number of node to provide
-    * @param selectionScript selection script that nodes must verify.
-    */
+     * Gives a set of nodes that verify a selection script.
+     * This method has three way to handle the request :<BR>
+     *  - if there is no script, it returns at most the
+     * first nb free nodes asked.<BR>
+     * - If the script is a dynamic script, the method will
+     * test the resources, until nb nodes verify the script or if there is no
+     * node left.<BR>
+     * - If the script is a static script, it will return in priority the
+     * nodes on which the given script has already been verified,
+     * and test on other nodes if needed.<BR>
+     *
+     * @param nb number of node to provide
+     * @param selectionScript selection script that nodes must verify.
+     */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript) {
         //if RM is in shutdown state, don't provide nodes
         if (this.toShutDown) {
@@ -1063,8 +1032,8 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
 
             //no verifying script
             if (selectionScript == null) {
-                logger.info("[RMCORE] Searching for " + nb + " nodes on " +
-                    this.getSizeListFreeRMNode() + " free nodes.");
+                logger.info("[RMCORE] Searching for " + nb + " nodes on " + this.getSizeListFreeRMNode() +
+                    " free nodes.");
                 result = new NodeSet();
                 while (!nodes.isEmpty() && (found < nb.intValue())) {
                     RMNode node = nodes.remove(0);
@@ -1077,11 +1046,9 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
                     }
                 }
             } else if (selectionScript.isDynamic()) {
-                result = this.selectNodeWithDynamicVerifScript(nb.intValue(),
-                        selectionScript, nodes);
+                result = this.selectNodeWithDynamicVerifScript(nb.intValue(), selectionScript, nodes);
             } else {
-                result = this.selectNodeWithStaticVerifScript(nb.intValue(),
-                        selectionScript, nodes);
+                result = this.selectNodeWithStaticVerifScript(nb.intValue(), selectionScript, nodes);
             }
             return result;
         }
@@ -1093,8 +1060,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param nb exactly number of nodes to provide.
      * @param selectionScript  that nodes must verify.
      */
-    public NodeSet getExactlyNodes(IntWrapper nb,
-        SelectionScript selectionScript) {
+    public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript) {
         // TODO
         return null;
     }
@@ -1105,11 +1071,11 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
     //
 
     /**
-    * add a NodeSource to the core with its Id.
-    * NodeSource is registered in the RMcore.
-    * @param source Stub of the {@link NodeSource} object to add.
-    * @param sourceId name of the {@link NodeSource} object to add.
-    */
+     * add a NodeSource to the core with its Id.
+     * NodeSource is registered in the RMcore.
+     * @param source Stub of the {@link NodeSource} object to add.
+     * @param sourceId name of the {@link NodeSource} object to add.
+     */
     public void internalAddSource(NodeSource source, String sourceId) {
         this.nodeSources.put(sourceId, source);
         //create the event
@@ -1153,8 +1119,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
      * @param PADName ProActive descriptor name of the node.
      * @param nodeSource Stub of the {@link NodeSource} object that handle the node.
      */
-    public void internalAddNode(Node node, String VNodeName, String PADName,
-        NodeSource nodeSource) {
+    public void internalAddNode(Node node, String VNodeName, String PADName, NodeSource nodeSource) {
         RMNode imnode = new RMNodeImpl(node, VNodeName, PADName, nodeSource);
         try {
             imnode.clean();
@@ -1168,8 +1133,7 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt,
             e.printStackTrace();
         }
         if (logger.isInfoEnabled()) {
-            logger.info("[RMCORE] New node added, node ID is : " +
-                imnode.getNodeURL() + ", node Source : " +
+            logger.info("[RMCORE] New node added, node ID is : " + imnode.getNodeURL() + ", node Source : " +
                 nodeSource.getSourceId());
         }
     }

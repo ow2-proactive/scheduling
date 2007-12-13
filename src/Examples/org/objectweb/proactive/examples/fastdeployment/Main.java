@@ -112,16 +112,13 @@ public class Main {
 
         try {
             // Create the manager on this ProActive Runtime
-            Manager manager = (Manager) PAActiveObject.newActive(Manager.class.getName(),
-                    new Object[] {  });
+            Manager manager = (Manager) PAActiveObject.newActive(Manager.class.getName(), new Object[] {});
 
             // Create the Virtual Node Activator on this ProActive Runtime
             // For optimal performances, the manager & VNActivator should be in 
             // the same ProActive Runtime.
-            PAActiveObject.newActive(VNActivator.class.getName(),
-                new Object[] {
-                    manager, descriptors, virtualNodes, concurrency, pause
-                });
+            PAActiveObject.newActive(VNActivator.class.getName(), new Object[] { manager, descriptors,
+                    virtualNodes, concurrency, pause });
         } catch (ProActiveException e) {
             logger.error("Manager or VNActivator cannot be created", e);
             PALifeCycle.exitFailure();
@@ -132,20 +129,19 @@ public class Main {
         CommandLineParser parser = new PosixParser();
 
         Options options = new Options();
-        options.addOption(Params.concurrency.sOpt,
-            Params.concurrency.toString(), true, Params.concurrency.desc);
-        options.addOption(Params.pause.sOpt, Params.pause.toString(), true,
-            Params.pause.desc);
+        options.addOption(Params.concurrency.sOpt, Params.concurrency.toString(), true,
+                Params.concurrency.desc);
+        options.addOption(Params.pause.sOpt, Params.pause.toString(), true, Params.pause.desc);
 
         Option descOption;
-        descOption = new Option(Params.descriptor.sOpt,
-                Params.descriptor.toString(), true, Params.descriptor.desc);
+        descOption = new Option(Params.descriptor.sOpt, Params.descriptor.toString(), true,
+            Params.descriptor.desc);
         descOption.setArgs(Option.UNLIMITED_VALUES);
         options.addOption(descOption);
 
         Option vnOption;
-        vnOption = new Option(Params.virtualNode.sOpt,
-                Params.virtualNode.toString(), true, Params.virtualNode.desc);
+        vnOption = new Option(Params.virtualNode.sOpt, Params.virtualNode.toString(), true,
+            Params.virtualNode.desc);
         vnOption.setArgs(Option.UNLIMITED_VALUES);
         options.addOption(vnOption);
 
@@ -194,10 +190,10 @@ public class Main {
             }
         }
     }
-    public enum Params {virtualNode("v", "Virtual Node name to be activated"),
-        descriptor("d", "Descritpor to be activated"),
-        concurrency("c", "Number of VNActivator threads"),
-        pause("p", "pause time between VN activation");
+
+    public enum Params {
+        virtualNode("v", "Virtual Node name to be activated"), descriptor("d", "Descritpor to be activated"), concurrency(
+                "c", "Number of VNActivator threads"), pause("p", "pause time between VN activation");
         protected String sOpt;
         protected String desc;
 

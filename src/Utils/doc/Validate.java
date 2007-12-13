@@ -60,8 +60,8 @@ public class Validate extends DefaultHandler implements LexicalHandler {
     public static void main(String[] args) {
         if (args.length != 1) {
             System.out.println("Syntax:      java Validate fileName");
-            System.out.println(
-                "This parser tries compares an XML document to its dtd: is it conforming to its DOCTYPE?");
+            System.out
+                    .println("This parser tries compares an XML document to its dtd: is it conforming to its DOCTYPE?");
 
             return;
         }
@@ -92,28 +92,23 @@ public class Validate extends DefaultHandler implements LexicalHandler {
 
             //Instantiate inner-class error and lexical handler.
             Validate handler = new Validate(filename, errorBuff);
-            reader.setProperty("http://xml.org/sax/properties/lexical-handler",
-                handler);
+            reader.setProperty("http://xml.org/sax/properties/lexical-handler", handler);
             parser.parse(input, handler);
 
             if (!handler.hasDTD) {
-                returnedBuffer.append("[WARNING] NO DOCTYPE DECLARATION in " +
-                    filename + "\n");
+                returnedBuffer.append("[WARNING] NO DOCTYPE DECLARATION in " + filename + "\n");
             } else if (handler.troubleFound) {
-                returnedBuffer.append(
-                    "[ERROR] XML is NOT VALID: it does not comply to dtd in " +
-                    filename + "\n");
-                returnedBuffer.append(
-                    "[HINT] If you have trouble spotting exactly where the errors are, set util.DocBookize.SHORT_LINES to true.\n");
+                returnedBuffer.append("[ERROR] XML is NOT VALID: it does not comply to dtd in " + filename +
+                    "\n");
+                returnedBuffer
+                        .append("[HINT] If you have trouble spotting exactly where the errors are, set util.DocBookize.SHORT_LINES to true.\n");
                 returnedBuffer.append(handler.errorBuffer);
             } else {
-                returnedBuffer.append("[INFO] XML is VALID and complies to dtd (" +
-                    filename + ")\n");
+                returnedBuffer.append("[INFO] XML is VALID and complies to dtd (" + filename + ")\n");
             }
         } catch (Exception e) // Any problem related to xml structure or file existence
-         {
-            returnedBuffer.append("[ERROR] File NOT WELL-FORMED :" + filename + ". " +
-                e.getMessage() + "\n");
+        {
+            returnedBuffer.append("[ERROR] File NOT WELL-FORMED :" + filename + ". " + e.getMessage() + "\n");
         }
 
         return returnedBuffer;
@@ -121,15 +116,13 @@ public class Validate extends DefaultHandler implements LexicalHandler {
 
     /** When an error is encountered, store it for future recall */
     @Override
-	public void error(SAXParseException exc) {
+    public void error(SAXParseException exc) {
         String message = exc.getMessage();
-        this.errorBuffer.append("[ERROR] " + this.inputFile + "[" +
-            exc.getLineNumber() + "] " + message + "\n");
+        this.errorBuffer.append("[ERROR] " + this.inputFile + "[" + exc.getLineNumber() + "] " + message +
+            "\n");
 
-        if (message.startsWith("Element type \"") &&
-                message.endsWith("\" must be declared.")) {
-            this.errorBuffer.append(
-                "[HINT] The dtd does not allow such a tag! ");
+        if (message.startsWith("Element type \"") && message.endsWith("\" must be declared.")) {
+            this.errorBuffer.append("[HINT] The dtd does not allow such a tag! ");
         }
 
         this.troubleFound = true;
@@ -137,15 +130,14 @@ public class Validate extends DefaultHandler implements LexicalHandler {
 
     /** When a warning is encountered, store it for future recall */
     @Override
-	public void warning(SAXParseException exc) {
-        this.errorBuffer.append("[WARNING] " + this.inputFile + "[" +
-                exc.getLineNumber() + "] " + exc.getMessage() + "\n");
+    public void warning(SAXParseException exc) {
+        this.errorBuffer.append("[WARNING] " + this.inputFile + "[" + exc.getLineNumber() + "] " +
+            exc.getMessage() + "\n");
         this.troubleFound = true;
     }
 
     /** Set hasDTD to true when dtd is found. */
-    public void startDTD(String name, String publicId, String systemId)
-        throws SAXException {
+    public void startDTD(String name, String publicId, String systemId) throws SAXException {
         this.hasDTD = true;
     }
 
@@ -164,7 +156,6 @@ public class Validate extends DefaultHandler implements LexicalHandler {
     public void endCDATA() throws SAXException {
     }
 
-    public void comment(char[] ch, int start, int length)
-        throws SAXException {
+    public void comment(char[] ch, int start, int length) throws SAXException {
     }
 }

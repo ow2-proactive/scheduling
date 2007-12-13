@@ -56,12 +56,11 @@ public class SciTest4 {
             return;
         }
 
-        MSEngineWorker mSEngineWorker = (MSEngineWorker) PAActiveObject.newActive(MSEngineWorker.class.getName(),
-                null);
+        MSEngineWorker mSEngineWorker = (MSEngineWorker) PAActiveObject.newActive(MSEngineWorker.class
+                .getName(), null);
 
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));
-        PrintWriter writer = new PrintWriter(new BufferedWriter(
-                    new FileWriter(args[1])));
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(args[1])));
 
         double[] m1;
         double[] m2;
@@ -92,17 +91,14 @@ public class SciTest4 {
                 m2[i] = (Math.random() * 10);
             }
 
-            SciDoubleMatrix sciMatrix1 = new SciDoubleMatrix("M1", nbRow,
-                    nbCol, m1);
-            SciDoubleMatrix sciMatrix2 = new SciDoubleMatrix("M2", nbRow,
-                    nbCol, m2);
+            SciDoubleMatrix sciMatrix1 = new SciDoubleMatrix("M1", nbRow, nbCol, m1);
+            SciDoubleMatrix sciMatrix2 = new SciDoubleMatrix("M2", nbRow, nbCol, m2);
 
             SciTask sciTask = new SciTask("mult");
             sciTask.addDataIn(sciMatrix1);
             sciTask.addDataIn(sciMatrix2);
             sciTask.addDataOut("M3");
-            sciTask.setJob("M3=" + sciMatrix1.getName() + "*" +
-                sciMatrix1.getName() + ";");
+            sciTask.setJob("M3=" + sciMatrix1.getName() + "*" + sciMatrix1.getName() + ";");
 
             startTime = System.currentTimeMillis();
 

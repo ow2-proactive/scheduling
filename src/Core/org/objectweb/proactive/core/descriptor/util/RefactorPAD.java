@@ -58,8 +58,8 @@ public class RefactorPAD {
      * @return ProActiveDescriptor
      * @throws IOException
      */
-    private static ProActiveDescriptorInternal makeDeepCopy(
-        ProActiveDescriptorInternal pad) throws IOException {
+    private static ProActiveDescriptorInternal makeDeepCopy(ProActiveDescriptorInternal pad)
+            throws IOException {
         ProActiveDescriptorInternal padCopy = (ProActiveDescriptorInternal) Utils.makeDeepCopy(pad);
         return padCopy;
     }
@@ -70,8 +70,8 @@ public class RefactorPAD {
      * @return refactored pad
      * @throws IOException
      */
-    public static ProActiveDescriptorInternal buildNoMainPAD(
-        ProActiveDescriptorInternal pad) throws IOException {
+    public static ProActiveDescriptorInternal buildNoMainPAD(ProActiveDescriptorInternal pad)
+            throws IOException {
         ProActiveDescriptorInternal noMain = makeDeepCopy(pad);
 
         // first remove all main definitions references by clearing the map

@@ -53,10 +53,8 @@ public class DefaultEventObserver implements EventObserver {
         this(name, DefaultEventData.SUM, DefaultEventData.SUM);
     }
 
-    public DefaultEventObserver(String name, int collapseOperation,
-        int notifyOperation) {
-        this.eventData = new DefaultEventData(name, collapseOperation,
-                notifyOperation);
+    public DefaultEventObserver(String name, int collapseOperation, int notifyOperation) {
+        this.eventData = new DefaultEventData(name, collapseOperation, notifyOperation);
         this.name = name;
     }
 

@@ -79,8 +79,7 @@ public class Activity implements Serializable {
     public boolean equals(Object o) {
         if (o instanceof Activity) {
             Activity a = (Activity) o;
-            return (this.activityCounter == a.activityCounter) &&
-            this.bodyID.equals(a.bodyID);
+            return (this.activityCounter == a.activityCounter) && this.bodyID.equals(a.bodyID);
         }
         return false;
     }

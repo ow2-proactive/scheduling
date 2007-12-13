@@ -49,8 +49,7 @@ import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
 public class Hello implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private final String message = "Hello World!";
-    private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat(
-            "dd/MM/yyyy HH:mm:ss");
+    private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     /** ProActive compulsory no-args constructor */
     public Hello() {
@@ -59,8 +58,8 @@ public class Hello implements java.io.Serializable {
     /** The Active Object creates and returns information on its location
      * @return a StringWrapper which is a Serialized version, for asynchrony */
     public StringMutableWrapper sayHello() {
-        return new StringMutableWrapper(this.message + "\n from " +
-            getHostName() + "\n at " + dateFormat.format(new java.util.Date()));
+        return new StringMutableWrapper(this.message + "\n from " + getHostName() + "\n at " +
+            dateFormat.format(new java.util.Date()));
     }
 
     /** finds the name of the local machine */
@@ -84,8 +83,7 @@ public class Hello implements java.io.Serializable {
 
         // get and display a value 
         StringMutableWrapper received = hello.sayHello(); // possibly remote call
-        logger.info("On " + getHostName() + ", a message was received: " +
-            received); // potential wait-by-necessity 
+        logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity 
         descriptorPad.killall(true);
         PALifeCycle.exitSuccess();
     }

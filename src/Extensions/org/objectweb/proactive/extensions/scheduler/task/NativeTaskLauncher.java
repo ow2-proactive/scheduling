@@ -93,8 +93,7 @@ public class NativeTaskLauncher extends TaskLauncher {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, Executable executable,
-        TaskResult... results) {
+    public TaskResult doTask(SchedulerCore core, Executable executable, TaskResult... results) {
         this.initLoggers();
 
         try {
@@ -102,13 +101,13 @@ public class NativeTaskLauncher extends TaskLauncher {
 
             //launch generation script
             if (toBeLaunched.getGenerationScript() != null) {
-                String preScriptDefinedCommand = this.executeGenerationScript(toBeLaunched.getGenerationScript());
+                String preScriptDefinedCommand = this.executeGenerationScript(toBeLaunched
+                        .getGenerationScript());
 
                 // if preScriptDefinedCommand is not null, a new command 
                 // has been defined by the generation script
                 if ((preScriptDefinedCommand != null) &&
-                        (!GenerationScript.DEFAULT_COMMAND_VALUE.equals(
-                            preScriptDefinedCommand))) {
+                    (!GenerationScript.DEFAULT_COMMAND_VALUE.equals(preScriptDefinedCommand))) {
                     // the command is set
                     toBeLaunched.setCommand(preScriptDefinedCommand);
                 }
@@ -128,8 +127,7 @@ public class NativeTaskLauncher extends TaskLauncher {
             return result;
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex,
-                new Log4JTaskLogs(this.logBuffer.getBuffer()));
+            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
             // reset stdout/err
             try {
@@ -153,16 +151,15 @@ public class NativeTaskLauncher extends TaskLauncher {
      * @throws UserException if an error occurred during the execution of the script
      * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
      */
-    protected String executeGenerationScript(GenerationScript script)
-        throws ActiveObjectCreationException, NodeException, UserException {
+    protected String executeGenerationScript(GenerationScript script) throws ActiveObjectCreationException,
+            NodeException, UserException {
         ScriptHandler handler = ScriptLoader.createHandler(null);
         ScriptResult<String> res = handler.handle(script);
 
         if (res.errorOccured()) {
             System.err.println("Error on pre-script occured : ");
             res.getException().printStackTrace();
-            throw new UserException(
-                "PreTask script has failed on the current node");
+            throw new UserException("PreTask script has failed on the current node");
         }
 
         return res.getResult();

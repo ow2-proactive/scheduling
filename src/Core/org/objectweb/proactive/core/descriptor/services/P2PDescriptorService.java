@@ -84,15 +84,13 @@ public class P2PDescriptorService implements UniversalService, P2PConstants {
                 // Start a new one
                 try {
                     JVMProcessImpl process = new JVMProcessImpl(new StandardOutputMessageLogger());
-                    process.setClassname(
-                        "org.objectweb.proactive.p2p.service.StartP2PService");
+                    process.setClassname("org.objectweb.proactive.p2p.service.StartP2PService");
 
                     if (this.acquistion == null) {
                         this.acquistion = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
                     }
 
-                    process.setParameters("-port " + this.port + " -acq " +
-                        this.acquistion);
+                    process.setParameters("-port " + this.port + " -acq " + this.acquistion);
 
                     process.startProcess();
                     Thread.sleep(7000);

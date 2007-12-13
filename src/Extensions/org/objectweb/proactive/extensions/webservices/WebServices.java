@@ -45,8 +45,7 @@ public final class WebServices {
      * @param urn The name of the object
      * @param methods The methods that will be exposed as web services functionnalities
      */
-    public static void exposeAsWebService(Object o, String url, String urn,
-        String[] methods) {
+    public static void exposeAsWebService(Object o, String url, String urn, String[] methods) {
         ProActiveDeployer.deploy(urn, url, o, methods);
     }
 
@@ -70,8 +69,7 @@ public final class WebServices {
      * @param url  The web server url  where to deploy the service - typically "http://localhost:8080"
      * @param component The component owning the interfaces that will be deployed as web services.
      */
-    public static void exposeComponentAsWebService(Component component,
-        String url, String componentName) {
+    public static void exposeComponentAsWebService(Component component, String url, String componentName) {
         ProActiveDeployer.deployComponent(componentName, url, component);
     }
 
@@ -81,8 +79,7 @@ public final class WebServices {
      * @param url The url of the web server
      * @param component  The component owning the services interfaces
      */
-    public static void unExposeComponentAsWebService(String componentName,
-        String url, Component component) {
+    public static void unExposeComponentAsWebService(String componentName, String url, Component component) {
         ProActiveDeployer.undeployComponent(componentName, url, component);
     }
 }

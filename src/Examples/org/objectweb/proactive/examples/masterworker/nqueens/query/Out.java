@@ -54,8 +54,7 @@ public class Out {
             for (int ptn = 2; own <= size; own++, ptn <<= 1) {
                 int bit = 1;
                 int bown = BOARD[own];
-                for (int you = size; (BOARD[you] != ptn) && (bown >= bit);
-                        you--)
+                for (int you = size; (BOARD[you] != ptn) && (bown >= bit); you--)
                     bit <<= 1;
                 if (bown > bit) {
                     return;
@@ -77,8 +76,7 @@ public class Out {
                 int bit = 1;
                 int bown = BOARD[own];
                 int byou = BOARD[you];
-                for (int ptn = TOPBIT; (ptn != byou) && (bown >= bit);
-                        ptn >>= 1)
+                for (int ptn = TOPBIT; (ptn != byou) && (bown >= bit); ptn >>= 1)
                     bit <<= 1;
                 if (bown > bit) {
                     return;
@@ -99,8 +97,7 @@ public class Out {
             for (int ptn = TOPBIT >> 1; own <= size; own++, ptn >>= 1) {
                 int bit = 1;
                 int bown = BOARD[own];
-                for (int you = 0; (BOARD[you] != ptn) && (bown >= bit);
-                        you++) {
+                for (int you = 0; (BOARD[you] != ptn) && (bown >= bit); you++) {
                     bit <<= 1;
                 }
                 if (bown > bit) {
@@ -125,8 +122,7 @@ public class Out {
                 int bit = -bitmap & bitmap;
                 BBOUND1 = bit;
                 bitmap ^= (BOARD[y] = bit);
-                Backtrack3(y + 1, (left | bit) << 1, down | bit,
-                    (right | bit) >> 1);
+                Backtrack3(y + 1, (left | bit) << 1, down | bit, (right | bit) >> 1);
             }
         } else {
             bitmap |= SIDEMASK;
@@ -134,8 +130,7 @@ public class Out {
             while (bitmap != 0) {
                 int bit = -bitmap & bitmap;
                 bitmap ^= (BOARD[y] = bit);
-                Backtrack2(y + 1, (left | bit) << 1, down | bit,
-                    (right | bit) >> 1);
+                Backtrack2(y + 1, (left | bit) << 1, down | bit, (right | bit) >> 1);
             }
         }
     }
@@ -154,15 +149,13 @@ public class Out {
                 int bit = -bitmap & bitmap;
                 BBOUND2 = bit;
                 bitmap ^= (BOARD[y] = bit);
-                Backtrack4(y + 1, (left | bit) << 1, down | bit,
-                    (right | bit) >> 1);
+                Backtrack4(y + 1, (left | bit) << 1, down | bit, (right | bit) >> 1);
             }
         } else {
             while (bitmap != 0) {
                 int bit = -bitmap & bitmap;
                 bitmap ^= (BOARD[y] = bit);
-                Backtrack3(y + 1, (left | bit) << 1, down | bit,
-                    (right | bit) >> 1);
+                Backtrack3(y + 1, (left | bit) << 1, down | bit, (right | bit) >> 1);
             }
         }
     }
@@ -180,8 +173,7 @@ public class Out {
             while (bitmap != 0) {
                 int bit = -bitmap & bitmap;
                 bitmap ^= (BOARD[y] = bit);
-                Backtrack4(y + 1, (left | bit) << 1, down | bit,
-                    (right | bit) >> 1);
+                Backtrack4(y + 1, (left | bit) << 1, down | bit, (right | bit) >> 1);
             }
         }
     }

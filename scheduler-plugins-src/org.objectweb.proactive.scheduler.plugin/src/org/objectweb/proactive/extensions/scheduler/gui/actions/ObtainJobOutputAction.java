@@ -48,8 +48,7 @@ public class ObtainJobOutputAction extends Action {
     private ObtainJobOutputAction() {
         this.setText("Get job output");
         this.setToolTipText("To get the job output");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/job_output.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/job_output.gif"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 

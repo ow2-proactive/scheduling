@@ -51,6 +51,6 @@ public interface RequestFactory {
      * Creates a request object based on the given parameter
      * @return the newly created Request object.
      */
-    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody,
-        boolean isOneWay, long sequenceID);
+    public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
+            long sequenceID);
 }

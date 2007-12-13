@@ -50,8 +50,7 @@ public class Launcher {
     }
 
     protected static void printUsage() {
-        logger.error(
-            "Usage: java org.objectweb.proactive.core.mop <name of class>");
+        logger.error("Usage: java org.objectweb.proactive.core.mop <name of class>");
         return;
     }
 }

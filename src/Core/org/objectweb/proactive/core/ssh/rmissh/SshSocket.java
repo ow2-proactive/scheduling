@@ -78,8 +78,7 @@ public class SshSocket extends Socket {
     }
 
     public SshSocket(String host, int port) throws IOException {
-        if (PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() &&
-                getTryCache().needToTry(host, port)) {
+        if (PAProperties.PA_SSH_TUNNELING_TRY_NORMAL_FIRST.isTrue() && getTryCache().needToTry(host, port)) {
             try {
                 if (logger.isDebugEnabled()) {
                     logger.debug("try socket to " + host + ":" + port);
@@ -89,14 +88,12 @@ public class SshSocket extends Socket {
                 _socket.connect(address, SshParameters.getConnectTimeout());
                 getTryCache().recordTrySuccess(host, port);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("success normal socket to " + host + ":" +
-                        port);
+                    logger.debug("success normal socket to " + host + ":" + port);
                 }
                 return;
             } catch (Exception e) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("failure normal socket to " + host + ":" +
-                        port);
+                    logger.debug("failure normal socket to " + host + ":" + port);
                 }
                 getTryCache().recordTryFailure(host, port);
                 _socket = null;
@@ -107,13 +104,11 @@ public class SshSocket extends Socket {
             logger.debug("try ssh socket to " + host + ":" + port);
         }
         _tunnel = SshTunnelFactory.createTunnel(host, port);
-        InetSocketAddress address = new InetSocketAddress("127.0.0.1",
-                _tunnel.getPort());
+        InetSocketAddress address = new InetSocketAddress("127.0.0.1", _tunnel.getPort());
         _socket = new Socket();
         _socket.connect(address, SshParameters.getConnectTimeout());
         if (logger.isDebugEnabled()) {
-            logger.debug("Opened TCP connection 127.0.0.1:" +
-                _tunnel.getPort() + " -> " + host + ":" + port);
+            logger.debug("Opened TCP connection 127.0.0.1:" + _tunnel.getPort() + " -> " + host + ":" + port);
         }
     }
 
@@ -122,8 +117,7 @@ public class SshSocket extends Socket {
     }
 
     @Override
-    public void connect(SocketAddress endpoint, int timeout)
-        throws IOException {
+    public void connect(SocketAddress endpoint, int timeout) throws IOException {
         // assert false;
     }
 
@@ -217,8 +211,7 @@ public class SshSocket extends Socket {
     }
 
     @Override
-    public synchronized void setSoTimeout(int timeout)
-        throws SocketException {
+    public synchronized void setSoTimeout(int timeout) throws SocketException {
         _socket.setSoTimeout(timeout);
     }
 
@@ -228,8 +221,7 @@ public class SshSocket extends Socket {
     }
 
     @Override
-    public synchronized void setSendBufferSize(int size)
-        throws SocketException {
+    public synchronized void setSendBufferSize(int size) throws SocketException {
         _socket.setSendBufferSize(size);
     }
 
@@ -239,8 +231,7 @@ public class SshSocket extends Socket {
     }
 
     @Override
-    public synchronized void setReceiveBufferSize(int size)
-        throws SocketException {
+    public synchronized void setReceiveBufferSize(int size) throws SocketException {
         _socket.setReceiveBufferSize(size);
     }
 

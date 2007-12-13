@@ -68,12 +68,11 @@ public class TestIMProxy {
     public void testPrincipal() {
         try {
             // selection script
-            SelectionScript verif = new SelectionScript(new File(
-                        "/user/jmartin/home/scripts/test.js"), null);
-            SelectionScript post1 = new SelectionScript(new File(
-                        "/user/jmartin/home/scripts/clean2.js"), null);
-            SelectionScript post2 = new SelectionScript(new File(
-                        "/user/jmartin/home/scripts/clean5.js"), null);
+            SelectionScript verif = new SelectionScript(new File("/user/jmartin/home/scripts/test.js"), null);
+            SelectionScript post1 = new SelectionScript(new File("/user/jmartin/home/scripts/clean2.js"),
+                null);
+            SelectionScript post2 = new SelectionScript(new File("/user/jmartin/home/scripts/clean5.js"),
+                null);
 
             // Display total nodes
             int total = proxy.getNumberOfAllResources().intValue();
@@ -107,8 +106,7 @@ public class TestIMProxy {
                     System.err.println(n.getNodeInformation().getURL());
 
                 PAFuture.waitFor(nodes);
-                System.err.println("Free nodes = " +
-                    proxy.getNumberOfFreeResource());
+                System.err.println("Free nodes = " + proxy.getNumberOfFreeResource());
 
                 // Release thoose nodes
                 if (nodes.size() > 1) {
@@ -123,10 +121,9 @@ public class TestIMProxy {
                 int max = 5;
 
                 while ((max-- > 0) &&
-                        ((tot = proxy.getNumberOfAllResources().intValue()) != (free = proxy.getNumberOfFreeResource()
-                                                                                                .intValue()))) {
-                    System.out.println("Waiting for freeing resources (" +
-                        free + "/" + tot + "available)");
+                    ((tot = proxy.getNumberOfAllResources().intValue()) != (free = proxy
+                            .getNumberOfFreeResource().intValue()))) {
+                    System.out.println("Waiting for freeing resources (" + free + "/" + tot + "available)");
                     Thread.sleep(2000);
                 }
             }

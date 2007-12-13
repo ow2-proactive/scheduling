@@ -55,8 +55,7 @@ public interface Reply extends Message {
 
     public long getSessionId();
 
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException;
+    public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException;
 
     // AUTOMATIC CONTINUATION
     public boolean isAutomaticContinuation();

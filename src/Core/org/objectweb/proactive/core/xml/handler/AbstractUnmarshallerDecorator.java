@@ -41,8 +41,7 @@ import org.objectweb.proactive.core.xml.io.Attributes;
  * @version      0.91
  *
  */
-public abstract class AbstractUnmarshallerDecorator
-    implements UnmarshallerHandler {
+public abstract class AbstractUnmarshallerDecorator implements UnmarshallerHandler {
     private java.util.HashMap handlersMap;
     private int elementCounter = 0;
     private UnmarshallerHandler currentActiveHandler;
@@ -74,8 +73,7 @@ public abstract class AbstractUnmarshallerDecorator
     //
     // -- implements XMLHandler ------------------------------------------------------
     //  
-    public void startElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+    public void startElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
         //System.out.println("AbstractCompositeUnmarshaller "+this.getClass().getName()+" startElement="+name);
         elementCounter++;
         if (currentActiveHandler == null) {
@@ -85,8 +83,7 @@ public abstract class AbstractUnmarshallerDecorator
                 if (lenient) {
                     currentActiveHandler = new NullUnmarshallerHandler();
                 } else {
-                    throw new org.xml.sax.SAXException(
-                        "Cannot find an handler registered for element " +
+                    throw new org.xml.sax.SAXException("Cannot find an handler registered for element " +
                         name);
                 }
             }
@@ -117,8 +114,7 @@ public abstract class AbstractUnmarshallerDecorator
         }
     }
 
-    public void startPrefixMapping(String prefix, String uri)
-        throws org.xml.sax.SAXException {
+    public void startPrefixMapping(String prefix, String uri) throws org.xml.sax.SAXException {
         //  	System.out.println("prefix "+prefix+" uri "+uri);
         checkActiveHandler();
         currentActiveHandler.startPrefixMapping(prefix, uri);
@@ -134,13 +130,12 @@ public abstract class AbstractUnmarshallerDecorator
     //  
     protected void checkActiveHandler() throws org.xml.sax.SAXException {
         if (currentActiveHandler == null) {
-            throw new org.xml.sax.SAXException(
-                "No handler is currently defined");
+            throw new org.xml.sax.SAXException("No handler is currently defined");
         }
     }
 
-    protected abstract void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException;
+    protected abstract void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+            throws org.xml.sax.SAXException;
 
     protected boolean checkNonEmpty(String s) {
         return (s != null) && (s.length() > 0);
@@ -162,14 +157,12 @@ public abstract class AbstractUnmarshallerDecorator
     //
     private class NullUnmarshallerHandler extends BasicUnmarshaller {
         @Override
-        public void startElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             //System.out.println(name+"  ignored");
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
             //System.out.println(name+"  ignored");
         }
 

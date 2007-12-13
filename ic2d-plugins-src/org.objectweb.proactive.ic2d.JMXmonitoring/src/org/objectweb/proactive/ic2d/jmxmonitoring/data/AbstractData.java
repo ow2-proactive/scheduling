@@ -85,8 +85,7 @@ public abstract class AbstractData extends Observable {
      * @param objectName An instance of ObjectName for this model
      */
     public AbstractData(final ObjectName objectName) {
-        this(objectName, new HashMap<String, AbstractData>(),
-            new HashMap<String, AbstractData>());
+        this(objectName, new HashMap<String, AbstractData>(), new HashMap<String, AbstractData>());
     }
 
     /**
@@ -95,8 +94,7 @@ public abstract class AbstractData extends Observable {
      * @param objectName An instance of ObjectName for this model
      * @param monitoredChildren An instance of map for monitored children
      */
-    public AbstractData(final ObjectName objectName,
-        final Map<String, AbstractData> monitoredChildren) {
+    public AbstractData(final ObjectName objectName, final Map<String, AbstractData> monitoredChildren) {
         this(objectName, monitoredChildren, new HashMap<String, AbstractData>());
     }
 
@@ -107,9 +105,8 @@ public abstract class AbstractData extends Observable {
      * @param monitoredChildren An instance of map for monitored children
      * @param notMonitoredChildren An instance of map for not monitored children
      */
-    public AbstractData(final ObjectName objectName,
-        final Map<String, AbstractData> monitoredChildren,
-        final Map<String, AbstractData> notMonitoredChildren) {
+    public AbstractData(final ObjectName objectName, final Map<String, AbstractData> monitoredChildren,
+            final Map<String, AbstractData> notMonitoredChildren) {
         this.objectName = objectName;
         this.monitoredChildren = monitoredChildren;
         this.notMonitoredChildren = notMonitoredChildren;
@@ -136,8 +133,7 @@ public abstract class AbstractData extends Observable {
         if (!this.monitoredChildren.containsKey(child.getKey())) {
             this.monitoredChildren.put(child.getKey(), child);
             setChanged();
-            notifyObservers(new MVCNotification(MVCNotificationTag.ADD_CHILD,
-                    child.getKey()));
+            notifyObservers(new MVCNotification(MVCNotificationTag.ADD_CHILD, child.getKey()));
             child.explore();
         }
     }
@@ -165,9 +161,8 @@ public abstract class AbstractData extends Observable {
         monitoredChildren.remove(child.getKey());
         notMonitoredChildren.put(child.getKey(), child);
         setChanged();
-        notifyObservers(new MVCNotification(
-                MVCNotificationTag.REMOVE_CHILD_FROM_MONITORED_CHILDREN,
-                child.getKey()));
+        notifyObservers(new MVCNotification(MVCNotificationTag.REMOVE_CHILD_FROM_MONITORED_CHILDREN, child
+                .getKey()));
     }
 
     /**
@@ -224,8 +219,7 @@ public abstract class AbstractData extends Observable {
      * @return True if this object has associated a child with this key.
      */
     public boolean containsChild(String keyChild) {
-        return containsChildInMonitoredChildren(keyChild) ||
-        containsChildInNOTMonitoredChildren(keyChild);
+        return containsChildInMonitoredChildren(keyChild) || containsChildInNOTMonitoredChildren(keyChild);
     }
 
     /**
@@ -284,8 +278,8 @@ public abstract class AbstractData extends Observable {
      */
     public void stopMonitoring(boolean log) {
         if (log) {
-            Console.getInstance(Activator.CONSOLE_NAME)
-                   .log("Stop monitoring the " + getType() + " " + getName());
+            Console.getInstance(Activator.CONSOLE_NAME).log(
+                    "Stop monitoring the " + getType() + " " + getName());
         }
         if (this.monitoredChildren != null) {
             for (final AbstractData child : this.getMonitoredChildrenAsList()) {
@@ -294,8 +288,7 @@ public abstract class AbstractData extends Observable {
         }
         getParent().removeChildFromMonitoredChildren(this);
         setChanged();
-        notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED,
-                State.NOT_MONITORED));
+        notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED, State.NOT_MONITORED));
     }
 
     /**
@@ -331,28 +324,25 @@ public abstract class AbstractData extends Observable {
      *
      * @param operationName The name of the operation to be invoked.
      * @param params An array containing the parameters to be set when
-    * the operation is invoked
+     * the operation is invoked
      * @param signature An array containing the signature of the
-    * operation.
-    *
+     * operation.
+     *
      * @return The object returned by the operation, which represents
-    * the result of invoking the operation on the ProActive object.
-    *
+     * the result of invoking the operation on the ProActive object.
+     *
      * @throws IOException
      * @throws ReflectionException Wraps a
-    * <CODE>java.lang.Exception</CODE> thrown while trying to invoke
-    * the method.
+     * <CODE>java.lang.Exception</CODE> thrown while trying to invoke
+     * the method.
      * @throws MBeanException Wraps an exception thrown by the
-    * MBean's invoked method.
+     * MBean's invoked method.
      * @throws InstanceNotFoundException The MBean representing the ProActive object is not
-    * registered in the remote MBean server.
+     * registered in the remote MBean server.
      */
-    public Object invoke(String operationName, Object[] params,
-        String[] signature)
-        throws InstanceNotFoundException, MBeanException, ReflectionException,
-            IOException {
-        return getConnection()
-                   .invoke(getObjectName(), operationName, params, signature);
+    public Object invoke(String operationName, Object[] params, String[] signature)
+            throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
+        return getConnection().invoke(getObjectName(), operationName, params, signature);
     }
 
     /**
@@ -360,29 +350,24 @@ public abstract class AbstractData extends Observable {
      *
      * @param operationName The name of the operation to be invoked.
      * @param params An array containing the parameters to be set when
-    * the operation is invoked
+     * the operation is invoked
      * @param signature An array containing the signature of the
-    * operation.
-    *
+     * operation.
+     *
      * @return The object returned by the operation, which represents
-    * the result of invoking the operation on the ProActive object.
+     * the result of invoking the operation on the ProActive object.
      */
-    public Object invokeAsynchronous(String operationName, Object[] params,
-        String[] signature) {
-        return getConnection()
-                   .invokeAsynchronous(getObjectName(), operationName, params,
-            signature);
+    public Object invokeAsynchronous(String operationName, Object[] params, String[] signature) {
+        return getConnection().invokeAsynchronous(getObjectName(), operationName, params, signature);
     }
 
-    public Object getAttribute(String attribute)
-        throws AttributeNotFoundException, InstanceNotFoundException,
-            MBeanException, ReflectionException, IOException {
+    public Object getAttribute(String attribute) throws AttributeNotFoundException,
+            InstanceNotFoundException, MBeanException, ReflectionException, IOException {
         return getConnection().getAttribute(getObjectName(), attribute);
     }
 
     public Object getAttributeAsynchronous(String attribute) {
-        return getConnection()
-                   .getAttributeAsynchronous(getObjectName(), attribute);
+        return getConnection().getAttributeAsynchronous(getObjectName(), attribute);
     }
 
     protected String getHostUrlServer() {

@@ -77,8 +77,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  *
  */
 @PublicAPI
-public class P2PService implements InitActive, P2PConstants, Serializable,
-    ProActiveInternalObject {
+public class P2PService implements InitActive, P2PConstants, Serializable, ProActiveInternalObject {
 
     /** Logger. */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SERVICE);
@@ -97,8 +96,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     private Node p2pServiceNode = null;
     private static final int MSG_MEMORY = Integer.parseInt(PAProperties.PA_P2P_MSG_MEMORY.getValue());
     private static final int NOA = Integer.parseInt(PAProperties.PA_P2P_NOA.getValue());
-    private static final int EXPL_MSG = Integer.parseInt(PAProperties.PA_P2P_EXPLORING_MSG.getValue()) -
-        1;
+    private static final int EXPL_MSG = Integer.parseInt(PAProperties.PA_P2P_EXPLORING_MSG.getValue()) - 1;
     private static final long ACQ_TO = Long.parseLong(PAProperties.PA_P2P_NODES_ACQUISITION_T0.getValue());
 
     /**
@@ -123,14 +121,14 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
     private Service service = null;
     private RequestFilter filter = new RequestFilter() {
 
-            /**
-             * @see org.objectweb.proactive.core.body.request.RequestFilter#acceptRequest(org.objectweb.proactive.core.body.request.Request)
-             */
-            public boolean acceptRequest(Request request) {
-                String requestName = request.getMethodName();
-                return requestName.compareToIgnoreCase("askingNode") != 0;
-            }
-        };
+        /**
+         * @see org.objectweb.proactive.core.body.request.RequestFilter#acceptRequest(org.objectweb.proactive.core.body.request.Request)
+         */
+        public boolean acceptRequest(Request request) {
+            String requestName = request.getMethodName();
+            return requestName.compareToIgnoreCase("askingNode") != 0;
+        }
+    };
 
     //--------------------------------------------------------------------------
     // Class Constructors
@@ -163,8 +161,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             System.out.println("<<<<<<<<<<<<< p2pServiceMode " +
                 this.p2pServiceNode.getNodeInformation().getURL());
 
-            PAActiveObject.newActive(P2PFirstContact.class.getName(), params,
-                this.p2pServiceNode);
+            PAActiveObject.newActive(P2PFirstContact.class.getName(), params, this.p2pServiceNode);
         } catch (ActiveObjectCreationException e) {
             logger.warn("Couldn't active P2PFirstContact", e);
         } catch (NodeException e) {
@@ -253,9 +250,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @param vnName Virtual node name.
      * @param jobId  Job ID
      */
-    public void askingNode(int ttl, UUID uuid, P2PService remoteService,
-        int numberOfNodes, P2PNodeLookup lookup, String vnName, String jobId,
-        String nodeFamilyRegexp) {
+    public void askingNode(int ttl, UUID uuid, P2PService remoteService, int numberOfNodes,
+            P2PNodeLookup lookup, String vnName, String jobId, String nodeFamilyRegexp) {
         boolean broadcast;
         if (uuid != null) {
             logger.debug("AskingNode message received with #" + uuid);
@@ -277,11 +273,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                     Node current = (Node) nodes.get(i);
                     if (vnName != null) {
                         try {
-                            current.getProActiveRuntime()
-                                   .registerVirtualNode(vnName, true);
+                            current.getProActiveRuntime().registerVirtualNode(vnName, true);
                         } catch (Exception e) {
-                            logger.warn("Couldn't register " + vnName +
-                                " in the PAR", e);
+                            logger.warn("Couldn't register " + vnName + " in the PAR", e);
                         }
                     }
                     if (jobId != null) {
@@ -300,19 +294,16 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                     IntWrapper nodeAck;
 
                     try {
-                        nodeAck = lookup.giveNode(nodeAvailable,
-                                askedNode.getNodeManager());
+                        nodeAck = lookup.giveNode(nodeAvailable, askedNode.getNodeManager());
                     } catch (Exception lookupExcption) {
-                        logger.info("Cannot contact the remote lookup",
-                            lookupExcption);
+                        logger.info("Cannot contact the remote lookup", lookupExcption);
                         this.nodeManager.noMoreNodeNeeded(nodeAvailable);
                         return;
                     }
                     if (nodeAck != null) {
                         // Waitng the ACK
                         long endTime = System.currentTimeMillis() + ACQ_TO;
-                        while ((System.currentTimeMillis() < endTime) &&
-                                PAFuture.isAwaited(nodeAck)) {
+                        while ((System.currentTimeMillis() < endTime) && PAFuture.isAwaited(nodeAck)) {
                             if (this.service.hasRequestToServe()) {
                                 service.serveAll(this.filter);
                             } else {
@@ -338,18 +329,15 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                         // Setting vnInformation and JobId
                         if (vnName != null) {
                             try {
-                                nodeAvailable.getProActiveRuntime()
-                                             .registerVirtualNode(vnName, true);
+                                nodeAvailable.getProActiveRuntime().registerVirtualNode(vnName, true);
                             } catch (Exception e) {
-                                logger.warn("Couldn't register " + vnName +
-                                    " in the PAR", e);
+                                logger.warn("Couldn't register " + vnName + " in the PAR", e);
                             }
                         }
                         if (jobId != null) {
                             nodeAvailable.getNodeInformation().setJobID(jobId);
                         }
-                        numberOfNodes = (numberOfNodes == MAX_NODE) ? MAX_NODE
-                                                                    : nodeAck.intValue();
+                        numberOfNodes = (numberOfNodes == MAX_NODE) ? MAX_NODE : nodeAck.intValue();
                         logger.info("Giving 1 node to vn: " + vnName);
                     } else {
                         // It's a NACK node
@@ -376,8 +364,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
                 logger.debug("Generating uuid for askingNode message");
                 uuid = UUID.randomUUID();
             }
-            this.acquaintances.askingNode(ttl, uuid, remoteService,
-                numberOfNodes, lookup, vnName, jobId, nodeFamilyRegexp);
+            this.acquaintances.askingNode(ttl, uuid, remoteService, numberOfNodes, lookup, vnName, jobId,
+                    nodeFamilyRegexp);
             logger.debug("Broadcast askingNode message with #" + uuid);
         }
     }
@@ -389,8 +377,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @param jobId of the vn, cannot be null.
      * @return the number of asked nodes.
      */
-    public P2PNodeLookup getNodes(int numberOfNodes, String nodeFamilyRegexp,
-        String vnName, String jobId) {
+    public P2PNodeLookup getNodes(int numberOfNodes, String nodeFamilyRegexp, String vnName, String jobId) {
         assert vnName != null : vnName;
         assert jobId != null : jobId;
         Object[] params = new Object[5];
@@ -402,8 +389,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
         P2PNodeLookup lookup = null;
         try {
-            lookup = (P2PNodeLookup) PAActiveObject.newActive(P2PNodeLookup.class.getName(),
-                    params, this.p2pServiceNode);
+            lookup = (P2PNodeLookup) PAActiveObject.newActive(P2PNodeLookup.class.getName(), params,
+                    this.p2pServiceNode);
             PAActiveObject.enableAC(lookup);
             if (numberOfNodes == MAX_NODE) {
                 this.waitingMaximunNodesLookup.add(lookup);
@@ -473,8 +460,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         if (nodeAvailable != null) {
             if (vnName != null) {
                 try {
-                    nodeAvailable.getProActiveRuntime()
-                                 .registerVirtualNode(vnName, true);
+                    nodeAvailable.getProActiveRuntime().registerVirtualNode(vnName, true);
                 } catch (Exception e) {
                     logger.warn("Couldn't register " + vnName + " in the PAR", e);
                 }
@@ -484,14 +470,13 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             }
             return nodeAvailable;
         }
-        return this.acquaintanceManager.randomPeer()
-                                       .getANode(vnName, jobId, service);
+        return this.acquaintanceManager.randomPeer().getANode(vnName, jobId, service);
     }
 
     /**
-    * Kill the given node.
-    * @param node the node url to kill.
-    */
+     * Kill the given node.
+     * @param node the node url to kill.
+     */
     public void killNode(String node) {
         try {
             ProActiveRuntime paRuntime = RuntimeFactory.getDefaultRuntime();
@@ -500,11 +485,11 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
             Node remoteNode = NodeFactory.getNode(node);
             ProActiveRuntime remoteRuntime = remoteNode.getProActiveRuntime();
             String remoteRuntimeUrl = remoteRuntime.getURL();
-            P2PNodeManager remoteNodeManager = (P2PNodeManager) PAActiveObject.lookupActive(P2PNodeManager.class.getName(),
-                    URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(
-                            remoteRuntimeUrl), "P2PNodeManager",
-                        URIBuilder.getProtocol(remoteRuntimeUrl),
-                        URIBuilder.getPortNumber(remoteRuntimeUrl)).toString());
+            P2PNodeManager remoteNodeManager = (P2PNodeManager) PAActiveObject.lookupActive(
+                    P2PNodeManager.class.getName(), URIBuilder.buildURI(
+                            URIBuilder.getHostNameFromUrl(remoteRuntimeUrl), "P2PNodeManager",
+                            URIBuilder.getProtocol(remoteRuntimeUrl),
+                            URIBuilder.getPortNumber(remoteRuntimeUrl)).toString());
 
             remoteNodeManager.leaveNode(remoteNode);
             remoteRuntime.rmAcquaintance(parUrl);
@@ -514,20 +499,20 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
 
             // Unregister the remote runtime
             paRuntime.unregister(remoteRuntime, remoteRuntime.getURL(), "p2p",
-                PAProperties.PA_P2P_ACQUISITION.getValue() + ":",
-                remoteRuntime.getVMInformation().getName());
+                    PAProperties.PA_P2P_ACQUISITION.getValue() + ":", remoteRuntime.getVMInformation()
+                            .getName());
         } catch (Exception e) {
             logger.info("Node @" + node + " already down", e);
         }
     }
 
     /**
-    * Put in a <code>P2PNodeLookup</code> all available nodes during all the
-    * time where it is actived.
-    * @param vnName Virtual node name, cannot be null.
-    * @param jobId cannot be null
-    * @return an active object where nodes are received.
-    */
+     * Put in a <code>P2PNodeLookup</code> all available nodes during all the
+     * time where it is actived.
+     * @param vnName Virtual node name, cannot be null.
+     * @param jobId cannot be null
+     * @return an active object where nodes are received.
+     */
     public P2PNodeLookup getMaximunNodes(String vnName, String jobId) {
         return this.getNodes(P2PConstants.MAX_NODE, vnName, jobId);
     }
@@ -537,8 +522,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @return URL of the node where the P2P service is running.
      */
     public StringWrapper getAddress() {
-        return new StringWrapper(this.p2pServiceNode.getNodeInformation()
-                                                    .getURL());
+        return new StringWrapper(this.p2pServiceNode.getNodeInformation().getURL());
     }
 
     /**
@@ -570,8 +554,7 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @return tur if you should broadcats, false else.
      * @throws org.objectweb.proactive.p2p.service.exception.P2POldMessageException it is an old message
      */
-    private boolean broadcaster(int ttl, UUID uuid, P2PService remoteService)
-        throws P2POldMessageException {
+    private boolean broadcaster(int ttl, UUID uuid, P2PService remoteService) throws P2POldMessageException {
         // is it an old message?
         boolean isAnOldMessage = this.isAnOldMessage(uuid);
 
@@ -686,8 +669,8 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
         params[0] = this.stubOnThis;
         try {
             // Active acquaintances
-            this.acquaintanceManager = (P2PAcquaintanceManager) PAActiveObject.newActive(P2PAcquaintanceManager.class.getName(),
-                    params, this.p2pServiceNode);
+            this.acquaintanceManager = (P2PAcquaintanceManager) PAActiveObject.newActive(
+                    P2PAcquaintanceManager.class.getName(), params, this.p2pServiceNode);
             logger.debug("P2P acquaintance manager activated");
 
             // Get active group
@@ -711,11 +694,9 @@ public class P2PService implements InitActive, P2PConstants, Serializable,
      * @throws Exception no P2PService in this local JVM.
      */
     public static P2PService getLocalP2PService() throws Exception {
-        UniversalBody body = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                 .getActiveObjects(P2P_NODE_NAME,
+        UniversalBody body = ProActiveRuntimeImpl.getProActiveRuntime().getActiveObjects(P2P_NODE_NAME,
                 P2PService.class.getName()).get(0);
-        return (P2PService) MOP.newInstance(P2PService.class.getName(), null,
-            (Object[]) null, Constants.DEFAULT_BODY_PROXY_CLASS_NAME,
-            new Object[] { body });
+        return (P2PService) MOP.newInstance(P2PService.class.getName(), null, (Object[]) null,
+                Constants.DEFAULT_BODY_PROXY_CLASS_NAME, new Object[] { body });
     }
 }

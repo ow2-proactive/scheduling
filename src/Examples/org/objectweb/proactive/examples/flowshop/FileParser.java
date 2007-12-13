@@ -51,8 +51,8 @@ public class FileParser {
      * @throws IOException
      * @throws BabFileFormatExcpetion
      */
-    public static FlowShop parseFile(File inputFile, boolean isTaillard)
-        throws IOException, BabFileFormatException {
+    public static FlowShop parseFile(File inputFile, boolean isTaillard) throws IOException,
+            BabFileFormatException {
         Main.logger.info("Start reading file at " + inputFile.getPath());
 
         StreamTokenizer st = new StreamTokenizer(new FileReader(inputFile));
@@ -68,8 +68,7 @@ public class FileParser {
             Main.logger.debug("Number of jobs was read " + nbJobs);
             st.nextToken();
         } else {
-            throw new BabFileFormatException(
-                "The number of jobs is awaited here: " + st);
+            throw new BabFileFormatException("The number of jobs is awaited here: " + st);
         }
 
         // Reading number of machines
@@ -78,8 +77,7 @@ public class FileParser {
             Main.logger.debug("Number of machines was read " + nbMachines);
             st.nextToken();
         } else {
-            throw new BabFileFormatException(
-                "The number of machines is awaited here: " + st);
+            throw new BabFileFormatException("The number of machines is awaited here: " + st);
         }
 
         // Reading all jobs
@@ -89,32 +87,26 @@ public class FileParser {
                 int[] operations = new int[nbMachines];
 
                 // Reading the 0
-                if (!((st.ttype == StreamTokenizer.TT_NUMBER) &&
-                        (st.nval == 0))) {
-                    throw new BabFileFormatException("A 0 is awaited here: " +
-                        st);
+                if (!((st.ttype == StreamTokenizer.TT_NUMBER) && (st.nval == 0))) {
+                    throw new BabFileFormatException("A 0 is awaited here: " + st);
                 }
                 st.nextToken();
 
                 // Reading the secret value
                 if (!((st.ttype == StreamTokenizer.TT_NUMBER))) {
-                    throw new BabFileFormatException(
-                        "A secret number is awaited here: " + st);
+                    throw new BabFileFormatException("A secret number is awaited here: " + st);
                 }
                 st.nextToken();
 
                 // Reading all operations
-                for (int currentOperation = 0; currentOperation < nbMachines;
-                        currentOperation++) {
+                for (int currentOperation = 0; currentOperation < nbMachines; currentOperation++) {
                     if (st.ttype == StreamTokenizer.TT_NUMBER) {
                         operations[currentOperation] = (int) st.nval;
-                        Main.logger.debug("Time for operation " +
-                            currentOperation + "/" + currentJob + " was read " +
-                            operations[currentOperation]);
+                        Main.logger.debug("Time for operation " + currentOperation + "/" + currentJob +
+                            " was read " + operations[currentOperation]);
                         st.nextToken();
                     } else {
-                        throw new BabFileFormatException(
-                            "A time for an operation is awaited here: " + st);
+                        throw new BabFileFormatException("A time for an operation is awaited here: " + st);
                     }
                 }
                 jobs[currentJob] = operations;
@@ -130,14 +122,12 @@ public class FileParser {
                         jobs[job][operation] = (int) st.nval;
                         st.nextToken();
                     } else {
-                        throw new BabFileFormatException(
-                            "A time for an operation is awaited here: " + st);
+                        throw new BabFileFormatException("A time for an operation is awaited here: " + st);
                     }
                 }
             }
             for (int i = 0; i < jobs.length; i++) {
-                Main.logger.debug("Time for job " + i + " was read " +
-                    Permutation.string(jobs[i]));
+                Main.logger.debug("Time for job " + i + " was read " + Permutation.string(jobs[i]));
             }
         }
 

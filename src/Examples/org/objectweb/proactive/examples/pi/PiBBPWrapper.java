@@ -41,8 +41,7 @@ import org.objectweb.fractal.api.control.BindingController;
  * @author ProActive team
  *
  */
-public class PiBBPWrapper extends PiBBP implements MasterComputation,
-    BindingController {
+public class PiBBPWrapper extends PiBBP implements MasterComputation, BindingController {
     HashMap nameToComputer = new HashMap(); // map between binding names and Components 
     PiCompMultiCast clientMultiCast;
 
@@ -90,15 +89,16 @@ public class PiBBPWrapper extends PiBBP implements MasterComputation,
         // * results
         // *************************************************************/
         System.out.println("\nComputation finished ...");
-        System.out.println("Computed PI value is : " +
-            total.getNumericalResult().toString());
+        System.out.println("Computed PI value is : " + total.getNumericalResult().toString());
         System.out.println("Time waiting for result : " +
             (timeAtEndOfComputation - timeAtBeginningOfComputation) + " ms");
-        System.out.println("Cumulated time from all computers is : " +
-            total.getComputationTime() + " ms");
-        System.out.println("Ratio for " + results.size() + " processors is : " +
-            (((double) total.getComputationTime() / ((double) (timeAtEndOfComputation -
-            timeAtBeginningOfComputation))) * 100) + " %");
+        System.out.println("Cumulated time from all computers is : " + total.getComputationTime() + " ms");
+        System.out
+                .println("Ratio for " +
+                    results.size() +
+                    " processors is : " +
+                    (((double) total.getComputationTime() / ((double) (timeAtEndOfComputation - timeAtBeginningOfComputation))) * 100) +
+                    " %");
 
         System.out.println(total.getNumericalResult().toString());
 

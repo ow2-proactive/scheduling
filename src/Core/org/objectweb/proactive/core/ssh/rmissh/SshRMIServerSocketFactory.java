@@ -35,8 +35,7 @@ import java.net.ServerSocket;
 import java.rmi.server.RMIServerSocketFactory;
 
 
-public class SshRMIServerSocketFactory implements RMIServerSocketFactory,
-    java.io.Serializable {
+public class SshRMIServerSocketFactory implements RMIServerSocketFactory, java.io.Serializable {
     public SshRMIServerSocketFactory() {
     }
 

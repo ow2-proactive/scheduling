@@ -45,8 +45,7 @@ import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
  * @since ProActive 3.0
  *
  */
-public abstract class AbstractSequentialListProcessDecorator
-    implements ExternalProcessDecorator {
+public abstract class AbstractSequentialListProcessDecorator implements ExternalProcessDecorator {
     boolean isFirstElementService = false;
 
     //Array of processes
@@ -217,8 +216,7 @@ public abstract class AbstractSequentialListProcessDecorator
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#setInputMessageLogger(org.objectweb.proactive.core.util.RemoteProcessMessageLogger)
      */
-    public void setInputMessageLogger(
-        RemoteProcessMessageLogger inputMessageLogger) {
+    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
             ((ExternalProcess) processes.get(i)).setInputMessageLogger(inputMessageLogger);
         }
@@ -227,8 +225,7 @@ public abstract class AbstractSequentialListProcessDecorator
     /**
      * @see org.objectweb.proactive.core.process.ExternalProcess#setErrorMessageLogger(org.objectweb.proactive.core.util.RemoteProcessMessageLogger)
      */
-    public void setErrorMessageLogger(
-        RemoteProcessMessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
         for (int i = 0; i < processes.size(); i++) {
             ((ExternalProcess) processes.get(i)).setErrorMessageLogger(errorMessageLogger);
         }

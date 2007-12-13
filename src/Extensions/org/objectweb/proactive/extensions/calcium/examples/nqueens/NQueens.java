@@ -57,30 +57,26 @@ public class NQueens implements Serializable {
         NQueens nq = new NQueens();
 
         if (args.length != 5) {
-            nq.solve(16, 14, 5,
-                NQueens.class.getResource("../LocalDescriptor.xml").getPath(),
-                "local");
+            nq.solve(16, 14, 5, NQueens.class.getResource("../LocalDescriptor.xml").getPath(), "local");
         } else {
-            nq.solve(Integer.parseInt(args[0]), Integer.parseInt(args[1]),
-                Integer.parseInt(args[2]), args[3], args[4]);
+            nq.solve(Integer.parseInt(args[0]), Integer.parseInt(args[1]), Integer.parseInt(args[2]),
+                    args[3], args[4]);
         }
     }
 
     @SuppressWarnings("unchecked")
     public NQueens() {
-        Skeleton<Board, Result> BT1 = new DaC<Board, Result>(new DivideBT1(),
-                new DivideCondition(), new Seq<Board, Result>(new SolveBT1()),
-                new ConquerBoard());
+        Skeleton<Board, Result> BT1 = new DaC<Board, Result>(new DivideBT1(), new DivideCondition(),
+            new Seq<Board, Result>(new SolveBT1()), new ConquerBoard());
 
-        Skeleton<Board, Result> BT2 = new DaC<Board, Result>(new DivideBT2(),
-                new DivideCondition(), new Seq<Board, Result>(new SolveBT2()),
-                new ConquerBoard());
+        Skeleton<Board, Result> BT2 = new DaC<Board, Result>(new DivideBT2(), new DivideCondition(),
+            new Seq<Board, Result>(new SolveBT2()), new ConquerBoard());
 
         root = new Fork<Board, Result>(new ConquerBoard(), BT1, BT2);
     }
 
-    public void solve(int boardSize, int solvableSize, int times,
-        String descriptor, String virtualNode) throws Exception {
+    public void solve(int boardSize, int solvableSize, int times, String descriptor, String virtualNode)
+            throws Exception {
         //EnvironmentFactory environment = new MultiThreadedEnvironment(2);
         EnvironmentFactory environment = new ProActiveEnvironment(descriptor);
 

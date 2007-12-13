@@ -204,13 +204,10 @@ public class ChangeNOADialog extends Dialog {
 
         public void widgetSelected(SelectionEvent e) {
             if (e.widget == okButton) {
-                System.out.println(
-                    "ChangeNOAListener.widgetSelected() it's ok baby");
-                System.out.println(
-                    "ChangeNOAListener.widgetSelected() now trying to contact " +
-                    "//" + name + "/P2PNode");
-                this.changeNOA("//" + name + "/P2PNode",
-                    Integer.parseInt(noaText.getText()));
+                System.out.println("ChangeNOAListener.widgetSelected() it's ok baby");
+                System.out.println("ChangeNOAListener.widgetSelected() now trying to contact " + "//" + name +
+                    "/P2PNode");
+                this.changeNOA("//" + name + "/P2PNode", Integer.parseInt(noaText.getText()));
                 // this.dialog.getUrl();
                 //     this.dialog.buildURL();
                 shell.close();

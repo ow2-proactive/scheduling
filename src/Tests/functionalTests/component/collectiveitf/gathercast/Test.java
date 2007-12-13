@@ -45,8 +45,8 @@ import functionalTests.ComponentTest;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     public static final String MESSAGE = "-Main-";
     public static final int NB_CONNECTED_ITFS = 2;
     public static final String VALUE_1 = "10";
@@ -63,8 +63,8 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
-        Component testcase = (Component) f.newComponent("functionalTests.component.collectiveitf.gathercast.testcase",
-                context);
+        Component testcase = (Component) f.newComponent(
+                "functionalTests.component.collectiveitf.gathercast.testcase", context);
         //        Component clientB = (Component) f.newComponent("functionalTests.component.collectiveitf.gather.GatherClient("+VALUE_2+")",context);
         //        Component server = (Component) f.newComponent("functionalTests.component.collectiveitf.gather.GatherServer",context);
         //        Fractal.getBindingController(clientA).bindFc("client", server.getFcInterface("serverGather"));

@@ -51,15 +51,13 @@ import org.objectweb.proactive.extensions.calcium.system.WSpace;
 public class DivideDB implements Divide<BlastParams, BlastParams> {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_APPLICATION);
 
-    public List<BlastParams> divide(SkeletonSystem system, BlastParams param)
-        throws Exception {
+    public List<BlastParams> divide(SkeletonSystem system, BlastParams param) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Dividing database file");
         }
 
         //Divide the file
-        Vector<File> files = divideFile(system.getWorkingSpace(), param.dbFile,
-                param.divideDBInto);
+        Vector<File> files = divideFile(system.getWorkingSpace(), param.dbFile, param.divideDBInto);
 
         //Create a new object for each file
         Vector<BlastParams> children = new Vector<BlastParams>();
@@ -89,8 +87,7 @@ public class DivideDB implements Divide<BlastParams, BlastParams> {
      * @return A vector containing File representations of the divided files.
      * @throws IOException In case there are reading/writing problems.
      */
-    private static Vector<File> divideFile(WSpace wspace, File file,
-        int numParts) throws IOException {
+    private static Vector<File> divideFile(WSpace wspace, File file, int numParts) throws IOException {
         Vector<File> children = new Vector<File>();
 
         //Create the ouput files
@@ -137,8 +134,7 @@ public class DivideDB implements Divide<BlastParams, BlastParams> {
      * @return The sequence lines, including the header. If no more sequences are available from the buffer null is returned.
      * @throws IOException If problems are encountered when reading from the stream.
      */
-    private static String getNextRegistry(BufferedReader br, int readAheadLimit)
-        throws IOException {
+    private static String getNextRegistry(BufferedReader br, int readAheadLimit) throws IOException {
         String line = br.readLine();
         if ((line != null) && (line.indexOf(">") == 0)) { //look for the header line
             String registry = line;
@@ -168,5 +164,5 @@ public class DivideDB implements Divide<BlastParams, BlastParams> {
                 System.out.println(f.getAbsolutePath() + " " + f.length() +  "[bytes]");
             }
         }
-        */
+     */
 }

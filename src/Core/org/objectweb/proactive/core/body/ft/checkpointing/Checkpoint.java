@@ -54,8 +54,8 @@ import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
 public class Checkpoint implements java.io.Serializable {
 
     /**
-         *
-         */
+     *
+     */
 
     //id of the checkpointed body
     private UniqueID bodyID;
@@ -81,8 +81,8 @@ public class Checkpoint implements java.io.Serializable {
             this.bodyID = bodyToCheckpoint.getID();
             String codebase = PAProperties.JAVA_RMI_SERVER_CODEBASE.getValue();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            CheckpointingOutputStream objectOutputStream = new CheckpointingOutputStream(byteArrayOutputStream,
-                    codebase + " " + additionalCodebase);
+            CheckpointingOutputStream objectOutputStream = new CheckpointingOutputStream(
+                byteArrayOutputStream, codebase + " " + additionalCodebase);
             objectOutputStream.writeObject(bodyToCheckpoint);
             objectOutputStream.flush();
             objectOutputStream.close();
@@ -90,8 +90,7 @@ public class Checkpoint implements java.io.Serializable {
             this.checkpointedBody = byteArrayOutputStream.toByteArray();
             bodyToCheckpoint.getFuturePool().setCopyMode(false);
         } catch (IOException e) {
-            System.err.println("Error while checkpointing the body " +
-                bodyToCheckpoint);
+            System.err.println("Error while checkpointing the body " + bodyToCheckpoint);
             e.printStackTrace();
         }
     }
@@ -124,13 +123,11 @@ public class Checkpoint implements java.io.Serializable {
             recoveredBody.blockCommunication();
             return recoveredBody;
         } catch (IOException e) {
-            System.err.println("Error while recovering the body with ID = " +
-                this.bodyID);
+            System.err.println("Error while recovering the body with ID = " + this.bodyID);
             e.printStackTrace();
             return null;
         } catch (ClassNotFoundException e) {
-            System.err.println("Error while recovering the body with ID = " +
-                this.bodyID);
+            System.err.println("Error while recovering the body with ID = " + this.bodyID);
             e.printStackTrace();
             return null;
         }
@@ -154,8 +151,7 @@ public class Checkpoint implements java.io.Serializable {
     private static class CheckpointingOutputStream extends ObjectOutputStream {
         private String codebase;
 
-        public CheckpointingOutputStream(OutputStream out, String codebase)
-            throws IOException {
+        public CheckpointingOutputStream(OutputStream out, String codebase) throws IOException {
             super(out);
             this.enableReplaceObject(true);
             this.codebase = codebase;
@@ -174,8 +170,7 @@ public class Checkpoint implements java.io.Serializable {
          * that need to be serialized as RMI stubs !
          */
         @Override
-        protected final Object replaceObject(Object obj)
-            throws IOException {
+        protected final Object replaceObject(Object obj) throws IOException {
             if ((obj instanceof RemoteObject) && !(obj instanceof RemoteStub)) {
                 return RemoteObject.toStub((RemoteObject) obj);
             } else {

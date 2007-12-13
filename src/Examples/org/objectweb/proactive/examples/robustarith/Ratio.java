@@ -47,8 +47,7 @@ public class Ratio implements Serializable {
     public Ratio() {
     }
 
-    private static BigInteger lcm(BigInteger u, BigInteger v)
-        throws OverflowException {
+    private static BigInteger lcm(BigInteger u, BigInteger v) throws OverflowException {
         return Int.mul(u, v).divide(u.gcd(v));
     }
 

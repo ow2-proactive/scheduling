@@ -36,8 +36,8 @@ import java.io.Serializable;
 public class WrappedInteger implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private Integer intValue;
 
     public WrappedInteger() {

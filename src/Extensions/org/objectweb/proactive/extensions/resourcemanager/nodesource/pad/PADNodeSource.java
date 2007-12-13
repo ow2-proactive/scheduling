@@ -65,8 +65,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.Pa
  * @author ProActive team
  *
  */
-public class PADNodeSource extends NodeSource implements PADNSInterface,
-    PadDeployInterface {
+public class PADNodeSource extends NodeSource implements PADNSInterface, PadDeployInterface {
 
     /** PADs list of pad handled by the source */
     private HashMap<String, ProActiveDescriptor> listPad;
@@ -149,8 +148,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
         //all nodes has been removed and NodeSource has been asked to shutdown:
         //shutdown the Node source
         if (this.toShutdown && (this.nodes.size() == 0)) {
-            this.imCore.internalRemoveSource(this.SourceId,
-                this.getSourceEvent());
+            this.imCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
             // object should be terminated NON preemptively 
             // pinger thread can wait for last results (getNodes)
             PAActiveObject.terminateActiveObject(false);
@@ -182,8 +180,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
     @Override
     public void addNodes(ProActiveDescriptor pad) {
         this.listPad.put(pad.getUrl(), pad);
-        RMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) PAActiveObject.getStubOnThis(),
-            pad);
+        RMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) PAActiveObject.getStubOnThis(), pad);
     }
 
     /**
@@ -217,8 +214,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
             }
         } else {
             //no nodes to remove, shutdown directly the NodeSource
-            this.imCore.internalRemoveSource(this.SourceId,
-                this.getSourceEvent());
+            this.imCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
             // object should be terminated NON preemptively 
             // pinger thread can wait for last results (getNodes)
             PAActiveObject.terminateActiveObject(false);
@@ -266,8 +262,7 @@ public class PADNodeSource extends NodeSource implements PADNSInterface,
      */
     @Override
     public RMNodeSourceEvent getSourceEvent() {
-        return new RMNodeSourceEvent(this.getSourceId(),
-            RMConstants.PAD_NODE_SOURCE_TYPE);
+        return new RMNodeSourceEvent(this.getSourceId(), RMConstants.PAD_NODE_SOURCE_TYPE);
     }
 
     // ----------------------------------------------------------------------//

@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.scheduler.common.scheduler;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * Enumeration of all different events that scheduler can invoke.<br>
  * This is also used to choose which events you want to received from the scheduler.
@@ -44,23 +45,14 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public enum SchedulerEvent {
-    IMMEDIATE_PAUSED("schedulerImmediatePausedEvent"),
-    RESUMED("schedulerResumedEvent"),SHUTDOWN("schedulerShutDownEvent"),
-    SHUTTING_DOWN("schedulerShuttingDownEvent"),
-    STARTED("schedulerStartedEvent"),
-    STOPPED("schedulerStoppedEvent"),
-    KILLED("schedulerKilledEvent"),
-    JOB_KILLED("jobKilledEvent"),
-    JOB_PAUSED("jobPausedEvent"),
-    JOB_PENDING_TO_RUNNING("jobPendingToRunningEvent"),
-    JOB_RESUMED("jobResumedEvent"),
-    JOB_SUBMITTED("jobSubmittedEvent"),
-    JOB_RUNNING_TO_FINISHED("jobRunningToFinishedEvent"),
-    JOB_REMOVE_FINISHED("jobRemoveFinishedEvent"),
-    TASK_PENDING_TO_RUNNING("taskPendingToRunningEvent"),
-    TASK_RUNNING_TO_FINISHED("taskRunningToFinishedEvent"),
-    JOB_CHANGE_PRIORITY("jobChangePriorityEvent"),
-    PAUSED("schedulerPausedEvent");
+    IMMEDIATE_PAUSED("schedulerImmediatePausedEvent"), RESUMED("schedulerResumedEvent"), SHUTDOWN(
+            "schedulerShutDownEvent"), SHUTTING_DOWN("schedulerShuttingDownEvent"), STARTED(
+            "schedulerStartedEvent"), STOPPED("schedulerStoppedEvent"), KILLED("schedulerKilledEvent"), JOB_KILLED(
+            "jobKilledEvent"), JOB_PAUSED("jobPausedEvent"), JOB_PENDING_TO_RUNNING(
+            "jobPendingToRunningEvent"), JOB_RESUMED("jobResumedEvent"), JOB_SUBMITTED("jobSubmittedEvent"), JOB_RUNNING_TO_FINISHED(
+            "jobRunningToFinishedEvent"), JOB_REMOVE_FINISHED("jobRemoveFinishedEvent"), TASK_PENDING_TO_RUNNING(
+            "taskPendingToRunningEvent"), TASK_RUNNING_TO_FINISHED("taskRunningToFinishedEvent"), JOB_CHANGE_PRIORITY(
+            "jobChangePriorityEvent"), PAUSED("schedulerPausedEvent");
     private String methodName;
 
     /**

@@ -372,8 +372,7 @@ public class UnicoreParameters implements java.io.Serializable {
         String[] info = f.split(",");
 
         if (info.length != 2) {
-            System.err.println("Skipping file, syntax error on file parameter:" +
-                f);
+            System.err.println("Skipping file, syntax error on file parameter:" + f);
             return;
         }
 
@@ -385,8 +384,7 @@ public class UnicoreParameters implements java.io.Serializable {
 
         //TODO improve de syntax error checking
         if (info.length != 2) {
-            System.err.println("Skipping file, syntax error on file parameter:" +
-                f);
+            System.err.println("Skipping file, syntax error on file parameter:" + f);
             return;
         }
 
@@ -440,16 +438,14 @@ public class UnicoreParameters implements java.io.Serializable {
         } else if (name.equalsIgnoreCase("deploymentDir")) {
             addDeploymentDir(value);
         } else {
-            System.err.println("Skipping unkown parameter: -" + name + " " +
-                value);
+            System.err.println("Skipping unkown parameter: -" + name + " " + value);
         }
     }
 
     public String getCommandString() {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(
-            "java org.objectweb.proactive.core.process.unicore.UnicoreProActiveClient ");
+        sb.append("java org.objectweb.proactive.core.process.unicore.UnicoreProActiveClient ");
         sb.append("-jobname " + quoteIfNeeded(jobName) + " ");
         if ((keyPassword != null) && (keyPassword.length() > 0)) {
             sb.append("-keypassword " + quoteIfNeeded(keyPassword) + " ");
@@ -505,10 +501,8 @@ public class UnicoreParameters implements java.io.Serializable {
             //skip if no prefix is defined
             //Noprefix happens if there is no fileSep 
             //in the middle of the String
-            if ((f[1].indexOf(fileSep) >= 0) &&
-                    (f[1].indexOf(fileSep) != (f[1].length() - 1))) {
-                sb.append("mv ").append(getFileName(f[1])).append(" ")
-                  .append(f[1]).append("\n");
+            if ((f[1].indexOf(fileSep) >= 0) && (f[1].indexOf(fileSep) != (f[1].length() - 1))) {
+                sb.append("mv ").append(getFileName(f[1])).append(" ").append(f[1]).append("\n");
             }
         }
 
@@ -529,8 +523,7 @@ public class UnicoreParameters implements java.io.Serializable {
         submitJob = true;
         saveJob = false;
 
-        unicoreDir = System.getProperty("user.home") + File.separator +
-            ".unicore";
+        unicoreDir = System.getProperty("user.home") + File.separator + ".unicore";
         keyFilePath = unicoreDir + File.separator + "keystore";
 
         usiteName = null;

@@ -33,8 +33,7 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.core.node.Node;
 
 
-public interface GCMApplicationDescriptorInternal
-    extends GCMApplicationDescriptor {
+public interface GCMApplicationDescriptorInternal extends GCMApplicationDescriptor {
 
     /**
      * Adds a Node to the application

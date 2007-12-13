@@ -53,15 +53,14 @@ class HandlerPreHybridProxyFile implements Handler<ProxyFile> {
     DataFetchMatcher fetchMatcher;
     IdentityHashMap<ProxyFile, ProxyFile> allFiles;
 
-    public HandlerPreHybridProxyFile(Task<?> task, FileServerClient fserver,
-        WSpaceImpl wspace, IdentityHashMap<ProxyFile, ProxyFile> allFiles) {
-        PrefetchFilesMatching annotation = task.getStack().get(0)
-                                               .getPrefetchFilesAnnotation();
+    public HandlerPreHybridProxyFile(Task<?> task, FileServerClient fserver, WSpaceImpl wspace,
+            IdentityHashMap<ProxyFile, ProxyFile> allFiles) {
+        PrefetchFilesMatching annotation = task.getStack().get(0).getPrefetchFilesAnnotation();
         fetchMatcher = null;
 
         if (annotation != null) {
-            fetchMatcher = new DataFetchMatcher(annotation.name(),
-                    annotation.sizeBiggerThan(), annotation.sizeSmallerThan());
+            fetchMatcher = new DataFetchMatcher(annotation.name(), annotation.sizeBiggerThan(), annotation
+                    .sizeSmallerThan());
         }
 
         this.allFiles = allFiles;
@@ -78,8 +77,7 @@ class HandlerPreHybridProxyFile implements Handler<ProxyFile> {
 
         if ((fetchMatcher != null) && fetchMatcher.matches(pfile)) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Pre-fetching annotated file: " +
-                    pfile.getWSpaceFile() + "/" + pfile.getName());
+                logger.debug("Pre-fetching annotated file: " + pfile.getWSpaceFile() + "/" + pfile.getName());
             }
 
             pfile.saveRemoteDataInWSpace(); //Set current & download data
@@ -106,8 +104,7 @@ class HandlerPreHybridProxyFile implements Handler<ProxyFile> {
 
         public boolean matches(ProxyFile f) {
             //logger.debug("$$$$ "+f.length() +">="+ this.sizeBT + " "+ f.length() +"<="+ this.sizeST + " "+ f.getName() +"==" +nameRegEx);
-            boolean res = (f.length() >= this.sizeBT) ||
-                (f.length() <= this.sizeST) ||
+            boolean res = (f.length() >= this.sizeBT) || (f.length() <= this.sizeST) ||
                 (f.getName().matches(nameRegEx));
 
             if (res && logger.isDebugEnabled()) {

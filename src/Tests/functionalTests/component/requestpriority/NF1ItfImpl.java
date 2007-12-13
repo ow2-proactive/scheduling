@@ -66,14 +66,11 @@ public class NF1ItfImpl extends AbstractProActiveController implements NF1Itf {
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(NF1Itf.CONTROLLER_NAME,
-                    NF1Itf.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(NF1Itf.CONTROLLER_NAME,
+                    NF1Itf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             e.printStackTrace();
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 

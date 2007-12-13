@@ -38,10 +38,8 @@ import org.eclipse.swt.graphics.Color;
 
 
 public class VNColors {
-    private static final Color[] colors = {
-            ColorConstants.cyan, ColorConstants.yellow, ColorConstants.lightBlue,
-            ColorConstants.orange, ColorConstants.green
-        };
+    private static final Color[] colors = { ColorConstants.cyan, ColorConstants.yellow,
+            ColorConstants.lightBlue, ColorConstants.orange, ColorConstants.green };
     private Map<String, Color> vnColors;
 
     public VNColors() {

@@ -57,8 +57,7 @@ public class NQueensExample extends AbstractExample {
     private static ProActiveMaster<QueryExtern, Pair<Long, Long>> master;
 
     @SuppressWarnings("unchecked")
-    public static void main(String[] args)
-        throws MalformedURLException, TaskAlreadySubmittedException {
+    public static void main(String[] args) throws MalformedURLException, TaskAlreadySubmittedException {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
 
@@ -72,8 +71,8 @@ public class NQueensExample extends AbstractExample {
             master.addResources(descriptor_url, vn_name);
         }
 
-        System.out.println("Launching NQUEENS solutions finder for n = " +
-            nqueen_board_size + " with a depth of " + nqueen_algorithm_depth);
+        System.out.println("Launching NQUEENS solutions finder for n = " + nqueen_board_size +
+            " with a depth of " + nqueen_algorithm_depth);
 
         long sumResults = 0;
         long sumTime = 0;
@@ -115,14 +114,11 @@ public class NQueensExample extends AbstractExample {
         long end = System.currentTimeMillis();
         int nbworkers = master.workerpoolSize();
 
-        System.out.println("Total number of configurations found for n = " +
-            nqueen_board_size + " and with " + nbworkers + " workers : " +
-            sumResults);
-        System.out.println("Time needed with " + nbworkers + " workers : " +
-            ((end - begin) / 3600000) +
+        System.out.println("Total number of configurations found for n = " + nqueen_board_size +
+            " and with " + nbworkers + " workers : " + sumResults);
+        System.out.println("Time needed with " + nbworkers + " workers : " + ((end - begin) / 3600000) +
             String.format("h %1$tMm %1$tSs %1$tLms", end - begin));
-        System.out.println("Total workers calculation time : " +
-            (sumTime / 3600000) +
+        System.out.println("Total workers calculation time : " + (sumTime / 3600000) +
             String.format("h %1$tMm %1$tSs %1$tLms", sumTime));
 
         System.exit(0);

@@ -126,8 +126,8 @@ public class JacobiWorker implements java.io.Serializable {
     //////
     // INITIALIZATION
     //////
-    public int setSubMatrix(int globalMatrixSize, int subMatrixSize,
-        int upperLeftX, int upperLeftY, double[][] subMatrix) {
+    public int setSubMatrix(int globalMatrixSize, int subMatrixSize, int upperLeftX, int upperLeftY,
+            double[][] subMatrix) {
         this.globalMatrixSize = globalMatrixSize;
         this.subMatrixSize = subMatrixSize;
         this.upperLeftX = upperLeftX;
@@ -139,8 +139,7 @@ public class JacobiWorker implements java.io.Serializable {
         return 0;
     }
 
-    public int setNeighbours(JacobiWorker up, JacobiWorker down,
-        JacobiWorker left, JacobiWorker right) {
+    public int setNeighbours(JacobiWorker up, JacobiWorker down, JacobiWorker left, JacobiWorker right) {
         this.up = up;
         this.down = down;
         this.left = left;
@@ -150,8 +149,7 @@ public class JacobiWorker implements java.io.Serializable {
         this.nbNeighbours += ((down == null) ? 0 : 1);
         this.nbNeighbours += ((left == null) ? 0 : 1);
         this.nbNeighbours += ((right == null) ? 0 : 1);
-        System.out.println("[JACOBI] worker " + id +
-            " : neighboroud initialized (" + this.nbNeighbours +
+        System.out.println("[JACOBI] worker " + id + " : neighboroud initialized (" + this.nbNeighbours +
             " neighbours)");
         return 0;
     }
@@ -173,8 +171,7 @@ public class JacobiWorker implements java.io.Serializable {
         this.sendBoundaries();
 
         // compute INSIDE the submatrix
-        for (int line = this.upperLeftY + 1;
-                line < ((this.upperLeftY + this.subMatrixSize) - 1); line++) {
+        for (int line = this.upperLeftY + 1; line < ((this.upperLeftY + this.subMatrixSize) - 1); line++) {
             this.computeInsideLine(line);
         }
 
@@ -200,11 +197,9 @@ public class JacobiWorker implements java.io.Serializable {
      */
     public void computeInsideLine(int line) {
         int i;
-        for (i = this.upperLeftX + 1;
-                i < ((this.upperLeftX + this.subMatrixSize) - 1); i++) {
-            this.subTemp[i - this.upperLeftX][line - this.upperLeftY] = (this.getLeftValue(i,
-                    line) + this.getRightValue(i, line) +
-                this.getUpperValue(i, line) + this.getDownerValue(i, line)) * 0.25;
+        for (i = this.upperLeftX + 1; i < ((this.upperLeftX + this.subMatrixSize) - 1); i++) {
+            this.subTemp[i - this.upperLeftX][line - this.upperLeftY] = (this.getLeftValue(i, line) +
+                this.getRightValue(i, line) + this.getUpperValue(i, line) + this.getDownerValue(i, line)) * 0.25;
         }
     }
 
@@ -213,15 +208,13 @@ public class JacobiWorker implements java.io.Serializable {
      */
     public void computeBorderLine() {
         //	compute first and last line
-        for (int i = this.upperLeftX;
-                i < ((this.subMatrixSize + this.upperLeftX) - 1); i++) {
+        for (int i = this.upperLeftX; i < ((this.subMatrixSize + this.upperLeftX) - 1); i++) {
             this.computeOnePoint(i, this.upperLeftY);
             this.computeOnePoint(i, (this.subMatrixSize + this.upperLeftY) - 1);
         }
 
         // compute fisrt and last column
-        for (int j = this.upperLeftY;
-                j < (this.upperLeftY + this.subMatrixSize); j++) {
+        for (int j = this.upperLeftY; j < (this.upperLeftY + this.subMatrixSize); j++) {
             this.computeOnePoint(this.upperLeftX, j);
             this.computeOnePoint((this.upperLeftX + this.subMatrixSize) - 1, j);
         }
@@ -234,9 +227,8 @@ public class JacobiWorker implements java.io.Serializable {
      * @param j
      */
     private void computeOnePoint(int i, int j) {
-        this.subTemp[i - this.upperLeftX][j - this.upperLeftY] = (this.getLeftValue(i,
-                j) + this.getRightValue(i, j) + this.getUpperValue(i, j) +
-            this.getDownerValue(i, j)) * 0.25;
+        this.subTemp[i - this.upperLeftX][j - this.upperLeftY] = (this.getLeftValue(i, j) +
+            this.getRightValue(i, j) + this.getUpperValue(i, j) + this.getDownerValue(i, j)) * 0.25;
     }
 
     /**
@@ -320,12 +312,11 @@ public class JacobiWorker implements java.io.Serializable {
             this.down.receiveBoundary(JacobiWorker.UP, downline, this.iteration);
         }
         if (this.left != null) {
-            this.left.receiveBoundary(JacobiWorker.RIGHT, this.subMatrix[0],
-                this.iteration);
+            this.left.receiveBoundary(JacobiWorker.RIGHT, this.subMatrix[0], this.iteration);
         }
         if (this.right != null) {
-            this.right.receiveBoundary(JacobiWorker.LEFT,
-                this.subMatrix[this.subMatrixSize - 1], this.iteration);
+            this.right.receiveBoundary(JacobiWorker.LEFT, this.subMatrix[this.subMatrixSize - 1],
+                    this.iteration);
         }
     }
 
@@ -336,11 +327,9 @@ public class JacobiWorker implements java.io.Serializable {
             if (this.iteration == this.maxIter) {
                 // end of the computation
                 this.elapsedTime = System.currentTimeMillis() - this.startTime;
-                System.out.println("[JACOBI] Worker " + this.id +
-                    " : computation ended after " + this.iteration + "(" +
-                    this.subMatrix[10][10] + ").");
-                System.out.println("[JACOBI] Time elapsed for Worker " +
-                    this.id + " : " + this.elapsedTime);
+                System.out.println("[JACOBI] Worker " + this.id + " : computation ended after " +
+                    this.iteration + "(" + this.subMatrix[10][10] + ").");
+                System.out.println("[JACOBI] Time elapsed for Worker " + this.id + " : " + this.elapsedTime);
                 return;
             } else {
                 // iter again
@@ -354,18 +343,18 @@ public class JacobiWorker implements java.io.Serializable {
         //        System.out.println("[JACOBI] Worker " + this.id +  " receives boundary " + iter + " from " + fromWho);
         this.nbGetBoundRcvd++;
         switch (fromWho) {
-        case JacobiWorker.UP:
-            this.vbUp = boundary;
-            break;
-        case JacobiWorker.DOWN:
-            this.vbDown = boundary;
-            break;
-        case JacobiWorker.LEFT:
-            this.vbLeft = boundary;
-            break;
-        case JacobiWorker.RIGHT:
-            this.vbRight = boundary;
-            break;
+            case JacobiWorker.UP:
+                this.vbUp = boundary;
+                break;
+            case JacobiWorker.DOWN:
+                this.vbDown = boundary;
+                break;
+            case JacobiWorker.LEFT:
+                this.vbLeft = boundary;
+                break;
+            case JacobiWorker.RIGHT:
+                this.vbRight = boundary;
+                break;
         }
         UniqueID idpa = PAActiveObject.getBodyOnThis().getID();
 
@@ -375,9 +364,8 @@ public class JacobiWorker implements java.io.Serializable {
                 this.alreadyRcvBound = true;
             } else {
                 if (iter != this.iteration) {
-                    System.err.println(PAActiveObject.getBodyOnThis().getID() +
-                        " ITER ERROR : local = " + this.iteration +
-                        " ; remote = " + iter + "\n\n\n\n\n\n");
+                    System.err.println(PAActiveObject.getBodyOnThis().getID() + " ITER ERROR : local = " +
+                        this.iteration + " ; remote = " + iter + "\n\n\n\n\n\n");
                     try {
                         Thread.sleep(100000);
                     } catch (InterruptedException e) {
@@ -393,9 +381,8 @@ public class JacobiWorker implements java.io.Serializable {
                 this.updateMatrix();
                 this.iteration++;
                 if ((iteration % 50) == 0) {
-                    System.out.println("Worker " + id + " : " + iteration +
-                        " (" + this.subMatrix[10][10] + ") in " +
-                        (System.currentTimeMillis() - this.startTime) + " ms");
+                    System.out.println("Worker " + id + " : " + iteration + " (" + this.subMatrix[10][10] +
+                        ") in " + (System.currentTimeMillis() - this.startTime) + " ms");
                 }
                 this.nbGetBoundRcvd = 0;
                 //send ack to neighbors

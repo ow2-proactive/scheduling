@@ -60,16 +60,15 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
  * @author fviale
  *
  */
-public class AOPinger implements WorkerWatcher, RunActive, InitActive,
-    Serializable {
+public class AOPinger implements WorkerWatcher, RunActive, InitActive, Serializable {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * pinger log4j logger
-    */
+     * pinger log4j logger
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERS);
 
     /**
@@ -203,8 +202,7 @@ public class AOPinger implements WorkerWatcher, RunActive, InitActive,
     public void workerMissing(final Worker worker) {
         synchronized (workerGroup) {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "A worker is missing...reporting back to the Master");
+                logger.debug("A worker is missing...reporting back to the Master");
             }
 
             if (workerGroup.contains(worker)) {

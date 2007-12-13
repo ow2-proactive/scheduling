@@ -95,8 +95,7 @@ public class JobResultImpl implements JobResult {
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.job.JobResult#addTaskResult(java.lang.String, org.objectweb.proactive.extensions.scheduler.common.task.TaskResult, boolean)
      */
-    public void addTaskResult(String taskName, TaskResult taskResult,
-        boolean isPrecious) {
+    public void addTaskResult(String taskName, TaskResult taskResult, boolean isPrecious) {
         //allResults
         if (allResults == null) {
             allResults = new HashMap<String, TaskResult>();
@@ -131,8 +130,8 @@ public class JobResultImpl implements JobResult {
     }
 
     /**
-         * @see org.objectweb.proactive.extensions.scheduler.common.job.JobResult#getExceptionResults()
-         */
+     * @see org.objectweb.proactive.extensions.scheduler.common.job.JobResult#getExceptionResults()
+     */
     public HashMap<String, TaskResult> getExceptionResults() {
         return exceptionResults;
     }

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.security;
 
-
 /**
  * @author acontes
  *
@@ -40,8 +39,8 @@ package org.objectweb.proactive.core.security;
 public class DefaultPolicyServer extends PolicyServer {
 
     /**
-         *
-         */
+     *
+     */
     public DefaultPolicyServer() {
         super();
     }

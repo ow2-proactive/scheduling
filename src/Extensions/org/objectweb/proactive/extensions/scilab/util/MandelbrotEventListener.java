@@ -50,8 +50,7 @@ public class MandelbrotEventListener implements MSEventListener {
     private int count;
     private double[] matrixResult;
 
-    public MandelbrotEventListener(MSService service, int nbBloc,
-        FutureDoubleMatrix res) {
+    public MandelbrotEventListener(MSService service, int nbBloc, FutureDoubleMatrix res) {
         this.service = service;
         this.res = res;
         this.nbBloc = nbBloc;
@@ -64,31 +63,27 @@ public class MandelbrotEventListener implements MSEventListener {
 
         if (sciTaskInfo.getState() != GenTaskInfo.SUCCEEDED) {
             if (sciTaskInfo.getState() == GenTaskInfo.ABORTED) {
-                System.out.println("---------------- Task:" +
-                    sciTaskInfo.getIdTask() + " ABORT -----------------");
+                System.out.println("---------------- Task:" + sciTaskInfo.getIdTask() +
+                    " ABORT -----------------");
             }
 
             return;
         }
 
-        System.out.println("IDTASK: " + sciTaskInfo.getIdTask() + " IDRES: " +
-            res.getName());
+        System.out.println("IDTASK: " + sciTaskInfo.getIdTask() + " IDRES: " + res.getName());
         if (!sciTaskInfo.getIdTask().startsWith(res.getName())) {
             return;
         }
 
         service.removeTask(sciTaskInfo.getIdTask());
 
-        System.out.println("---------------- Task:" + sciTaskInfo.getIdTask() +
-            " SUCCESS -----------------");
+        System.out.println("---------------- Task:" + sciTaskInfo.getIdTask() + " SUCCESS -----------------");
 
         GeneralResult sciResult = sciTaskInfo.getResult();
 
         //System.out.println(sciTaskInfo.getTimeGlobal() +" " + sciResult.getTimeExecution());
-        SciDoubleMatrix sciMatrix = (SciDoubleMatrix) sciResult.getList().get(0)
-                                                               .getData();
-        int iBloc = Integer.parseInt(sciMatrix.getName()
-                                              .substring(res.getName().length()));
+        SciDoubleMatrix sciMatrix = (SciDoubleMatrix) sciResult.getList().get(0).getData();
+        int iBloc = Integer.parseInt(sciMatrix.getName().substring(res.getName().length()));
 
         //System.out.println(iBloc + "\n "+ sciMatrix);
         double[] array = sciMatrix.getData();

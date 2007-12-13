@@ -57,42 +57,31 @@ public abstract class AbstractInterfaceClassGenerator {
     protected static final transient Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS);
     protected static ClassPool pool = ClassPool.getDefault();
 
-    protected Class<?> loadClass(final String className)
-        throws ClassNotFoundException {
+    protected Class<?> loadClass(final String className) throws ClassNotFoundException {
         // try to fetch the class from the default class loader
-        return Thread.currentThread().getContextClassLoader()
-                     .loadClass(className);
+        return Thread.currentThread().getContextClassLoader().loadClass(className);
     }
 
-    public ProActiveInterface generateControllerInterface(
-        final String controllerInterfaceName, Component owner,
-        ProActiveInterfaceType interfaceType)
-        throws InterfaceGenerationFailedException {
-        return generateInterface(controllerInterfaceName, owner, interfaceType,
-            false, false);
+    public ProActiveInterface generateControllerInterface(final String controllerInterfaceName,
+            Component owner, ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        return generateInterface(controllerInterfaceName, owner, interfaceType, false, false);
     }
 
-    public ProActiveInterface generateFunctionalInterface(
-        final String functionalInterfaceName, Component owner,
-        ProActiveInterfaceType interfaceType)
-        throws InterfaceGenerationFailedException {
-        return generateInterface(functionalInterfaceName, owner, interfaceType,
-            false, true);
+    public ProActiveInterface generateFunctionalInterface(final String functionalInterfaceName,
+            Component owner, ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
+        return generateInterface(functionalInterfaceName, owner, interfaceType, false, true);
     }
 
-    public abstract ProActiveInterface generateInterface(
-        final String interfaceName, Component owner,
-        ProActiveInterfaceType interfaceType, boolean isInternal,
-        boolean isFunctionalInterface)
-        throws InterfaceGenerationFailedException;
+    public abstract ProActiveInterface generateInterface(final String interfaceName, Component owner,
+            ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            throws InterfaceGenerationFailedException;
 
     /**
      * Gets all super-interfaces from the interfaces of this list, and
      * adds them to this list.
      * @param interfaces a list of interfaces
      */
-    public static void addSuperInterfaces(List<CtClass> interfaces)
-        throws NotFoundException {
+    public static void addSuperInterfaces(List<CtClass> interfaces) throws NotFoundException {
         for (int i = 0; i < interfaces.size(); i++) {
             CtClass[] super_itfs_table = interfaces.get(i).getInterfaces();
             List<CtClass> super_itfs = new ArrayList<CtClass>(super_itfs_table.length); // resizable list
@@ -104,9 +93,8 @@ public abstract class AbstractInterfaceClassGenerator {
             for (int j = 0; j < super_itfs.size(); j++) {
                 if (!interfaces.contains(super_itfs.get(j))) {
                     super_itf = super_itfs.get(j);
-                    if (!(super_itf.equals(pool.get(
-                                    ProActiveInterface.class.getName())) ||
-                            super_itf.equals(pool.get(Interface.class.getName())))) {
+                    if (!(super_itf.equals(pool.get(ProActiveInterface.class.getName())) || super_itf
+                            .equals(pool.get(Interface.class.getName())))) {
                         interfaces.add(super_itfs.get(j));
                     }
                 }

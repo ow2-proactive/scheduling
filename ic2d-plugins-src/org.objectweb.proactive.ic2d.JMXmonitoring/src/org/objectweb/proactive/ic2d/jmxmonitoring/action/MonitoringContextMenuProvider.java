@@ -87,8 +87,7 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
             actions.add(registry.getAction(StopMonitoringAction.STOP_MONITORING));
 
             // Set update frequence...
-            actions.add(registry.getAction(
-                    SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE));
+            actions.add(registry.getAction(SetUpdateFrequenceAction.SET_UPDATE_FREQUENCE));
 
             // Kill this VM
             actions.add(registry.getAction(KillVMAction.KILLVM));
@@ -103,8 +102,7 @@ public class MonitoringContextMenuProvider extends ContextMenuProvider {
             actions.add(registry.getAction(VerticalLayoutAction.VERTICAL_LAYOUT));
 
             // Horizontal Layout
-            actions.add(registry.getAction(
-                    HorizontalLayoutAction.HORIZONTAL_LAYOUT));
+            actions.add(registry.getAction(HorizontalLayoutAction.HORIZONTAL_LAYOUT));
         }
 
         for (IAction a : this.actions) {

@@ -43,8 +43,7 @@ public class SelectSchedulerDialogResult implements Serializable {
     private String password = null;
     private Boolean logAsAdmin = false;
 
-    public SelectSchedulerDialogResult(String url, String login,
-        String password, Boolean logAsAdmin) {
+    public SelectSchedulerDialogResult(String url, String login, String password, Boolean logAsAdmin) {
         this.url = url;
         this.login = login;
         this.password = password;

@@ -63,9 +63,9 @@ public class Catcher {
         }
 
         try {
-        	for (Anything a : parseData) {
-        		 a.work(this);
-        	}
+            for (Anything a : parseData) {
+                a.work(this);
+            }
             completeFile();
         } catch (IOException ioe) {
             ioe.printStackTrace();

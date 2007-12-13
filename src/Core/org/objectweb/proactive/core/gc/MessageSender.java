@@ -58,8 +58,7 @@ public class MessageSender {
             if (body != null) {
 
                 /* Local body, directly deliver */
-                GCSimpleResponse resp = ((AbstractBody) body).getGarbageCollector()
-                                         .receiveSimpleGCMessage(m);
+                GCSimpleResponse resp = ((AbstractBody) body).getGarbageCollector().receiveSimpleGCMessage(m);
                 destination.setLastResponse(resp);
                 continue;
             }

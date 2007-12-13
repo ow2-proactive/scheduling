@@ -87,8 +87,7 @@ public class ExceptionHandler {
     /* Called by ProActive on the client side */
     public static void addRequest(MethodCall methodCall, FutureProxy future) {
         MethodCallExceptionContext context = methodCall.getExceptionContext();
-        if (context.isExceptionAsynchronously() ||
-                context.isRuntimeExceptionHandled()) {
+        if (context.isExceptionAsynchronously() || context.isRuntimeExceptionHandled()) {
             ExceptionMaskStack stack = ExceptionMaskStack.get();
             synchronized (stack) {
                 Method m = methodCall.getReifiedMethod();
@@ -110,8 +109,7 @@ public class ExceptionHandler {
         synchronized (stack) {
             boolean runtime = stack.isRuntimeExceptionHandled();
             boolean async = stack.areExceptionTypesCaught(m.getExceptionTypes());
-            MethodCallExceptionContext res = new MethodCallExceptionContext(runtime,
-                    async);
+            MethodCallExceptionContext res = new MethodCallExceptionContext(runtime, async);
 
             //            System.out.println(m + " => " + res);
             return res;
@@ -130,8 +128,7 @@ public class ExceptionHandler {
         ExceptionMaskStack stack = ExceptionMaskStack.get();
         synchronized (stack) {
             if (!stack.isExceptionTypeCaught(exception.getClass())) {
-                RuntimeException re = new IllegalStateException(
-                        "Invalid Future Usage");
+                RuntimeException re = new IllegalStateException("Invalid Future Usage");
                 re.initCause(exception);
                 throw re;
             }

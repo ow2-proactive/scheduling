@@ -74,16 +74,15 @@ public class FlowShopResult implements Comparable, Serializable {
         this(permutation, makespan, -1, -1);
     }
 
-    public FlowShopResult(int[] permutation, long makespan,
-        long nbPermutationTested, long time) {
+    public FlowShopResult(int[] permutation, long makespan, long nbPermutationTested, long time) {
         this.permutation = permutation;
         this.makespan = makespan;
         this.nbPermutationTested = nbPermutationTested;
         this.time = time;
     }
 
-    public FlowShopResult(int[] permutation, long makespan,
-        long nbPermutationTested, long time, int[] cutbacks) {
+    public FlowShopResult(int[] permutation, long makespan, long nbPermutationTested, long time,
+            int[] cutbacks) {
         this(permutation, makespan, nbPermutationTested, time);
         this.makespanCut = cutbacks;
     }
@@ -136,8 +135,8 @@ public class FlowShopResult implements Comparable, Serializable {
 
     @Override
     public String toString() {
-        return "FSR : permutation " + Permutation.string(permutation) +
-        ", makespan " + makespan + " and time " + time;
+        return "FSR : permutation " + Permutation.string(permutation) + ", makespan " + makespan +
+            " and time " + time;
     }
 
     /**

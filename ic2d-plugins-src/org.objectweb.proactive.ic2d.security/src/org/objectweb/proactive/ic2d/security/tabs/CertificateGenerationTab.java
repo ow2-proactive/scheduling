@@ -64,8 +64,7 @@ public class CertificateGenerationTab extends UpdatableTab {
     /**
      * The constructor.
      */
-    public CertificateGenerationTab(CTabFolder folder,
-        CertificateTreeList keystore, FormToolkit tk) {
+    public CertificateGenerationTab(CTabFolder folder, CertificateTreeList keystore, FormToolkit tk) {
         super(folder, SWT.NULL);
         setText("Certificate chain editor");
 
@@ -77,21 +76,17 @@ public class CertificateGenerationTab extends UpdatableTab {
 
         body.setLayout(new GridLayout(3, true));
 
-        createSectionOptions(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
+        createSectionOptions(body).setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
 
-        createSectionCertTreeList(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        createSectionCertTreeList(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createSectionActiveKeystore(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        createSectionActiveKeystore(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         setControl(body);
     }
 
     private Section createSectionOptions(Composite parent) {
-        Section section = this.toolkit.createSection(parent,
-                ExpandableComposite.TITLE_BAR);
+        Section section = this.toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
         section.setText("Stuff");
 
         Composite client = this.toolkit.createComposite(section);
@@ -102,13 +97,11 @@ public class CertificateGenerationTab extends UpdatableTab {
         this.nameText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
         this.toolkit.createLabel(client, "Validity (days) :");
         this.validityText = this.toolkit.createText(client, "365");
-        this.validityText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
-                true));
+        this.validityText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
 
         this.toolkit.createLabel(client, "Key size :");
         this.keySizeText = this.toolkit.createText(client, "512");
-        this.keySizeText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true,
-                true));
+        this.keySizeText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, true));
 
         this.toolkit.createLabel(client, "Type : ");
         this.typeCombo = new Combo(client, SWT.DROP_DOWN | SWT.READ_ONLY);
@@ -127,104 +120,98 @@ public class CertificateGenerationTab extends UpdatableTab {
     }
 
     private Button createButtonNewChain(Composite parent) {
-        Button button = this.toolkit.createButton(parent,
-                "Generate self signed certificate", SWT.BUTTON1);
+        Button button = this.toolkit.createButton(parent, "Generate self signed certificate", SWT.BUTTON1);
         button.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseUp(MouseEvent e) {
-                    int keySize;
-                    try {
-                        keySize = Integer.valueOf(CertificateGenerationTab.this.keySizeText.getText())
-                                         .intValue();
-                    } catch (NumberFormatException nfe) {
-                        System.out.println("keysizepabo!!11");
-                        return;
-                    }
-                    int validity;
-                    try {
-                        validity = Integer.valueOf(CertificateGenerationTab.this.validityText.getText())
-                                          .intValue();
-                    } catch (NumberFormatException nfe) {
-                        System.out.println("validitymeuchan!!1oneoneone");
-                        return;
-                    }
-                    String name = CertificateGenerationTab.this.nameText.getText();
-                    if (!name.matches("CN=.+")) {
-                        System.out.println("nomcassai!!1oneeleven");
-                        return;
-                    }
-                    System.out.println("Generate self signed certificate");
-                    EntityType type = EntityType.fromString(CertificateGenerationTab.this.typeCombo.getItem(
-                                CertificateGenerationTab.this.typeCombo.getSelectionIndex()));
-
-                    CertificateGenerationTab.this.certTreeList.add(new CertificateTree(
-                            name, keySize, validity, type));
-
-                    CertificateGenerationTab.this.certTreeListSection.updateSection();
-
-                    super.mouseUp(e);
+            @Override
+            public void mouseUp(MouseEvent e) {
+                int keySize;
+                try {
+                    keySize = Integer.valueOf(CertificateGenerationTab.this.keySizeText.getText()).intValue();
+                } catch (NumberFormatException nfe) {
+                    System.out.println("keysizepabo!!11");
+                    return;
                 }
-            });
+                int validity;
+                try {
+                    validity = Integer.valueOf(CertificateGenerationTab.this.validityText.getText())
+                            .intValue();
+                } catch (NumberFormatException nfe) {
+                    System.out.println("validitymeuchan!!1oneoneone");
+                    return;
+                }
+                String name = CertificateGenerationTab.this.nameText.getText();
+                if (!name.matches("CN=.+")) {
+                    System.out.println("nomcassai!!1oneeleven");
+                    return;
+                }
+                System.out.println("Generate self signed certificate");
+                EntityType type = EntityType.fromString(CertificateGenerationTab.this.typeCombo
+                        .getItem(CertificateGenerationTab.this.typeCombo.getSelectionIndex()));
+
+                CertificateGenerationTab.this.certTreeList.add(new CertificateTree(name, keySize, validity,
+                    type));
+
+                CertificateGenerationTab.this.certTreeListSection.updateSection();
+
+                super.mouseUp(e);
+            }
+        });
 
         return button;
     }
 
     private Button createButtonChildCert(Composite parent) {
-        Button button = this.toolkit.createButton(parent,
-                "Generate child certificate", SWT.BUTTON1);
+        Button button = this.toolkit.createButton(parent, "Generate child certificate", SWT.BUTTON1);
         button.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseUp(MouseEvent e) {
-                    int keySize;
-                    try {
-                        keySize = Integer.valueOf(CertificateGenerationTab.this.keySizeText.getText())
-                                         .intValue();
-                    } catch (NumberFormatException nfe) {
-                        System.out.println("keysizepabo!!11");
-                        return;
-                    }
-                    int validity;
-                    try {
-                        validity = Integer.valueOf(CertificateGenerationTab.this.validityText.getText())
-                                          .intValue();
-                    } catch (NumberFormatException nfe) {
-                        System.out.println("validitymeuchan!!1oneoneone");
-                        return;
-                    }
-                    String name = CertificateGenerationTab.this.nameText.getText();
-                    if (!name.matches("CN=.+")) {
-                        System.out.println("nomcassai!!1oneeleven");
-                        return;
-                    }
-                    CertificateTree tree = CertificateGenerationTab.this.certTreeListSection.getSelectionData();
-                    if (tree.getCertificate().getPrivateKey() == null) {
-                        System.out.println(
-                            "Impossible to create a child of a certificate without a private key.");
-                        return;
-                    }
-                    System.out.println("Generating child certificate");
-                    EntityType type = EntityType.fromString(CertificateGenerationTab.this.typeCombo.getItem(
-                                CertificateGenerationTab.this.typeCombo.getSelectionIndex()));
-                    tree.add(name, keySize, validity, type);
-
-                    CertificateGenerationTab.this.certTreeListSection.updateSection();
+            @Override
+            public void mouseUp(MouseEvent e) {
+                int keySize;
+                try {
+                    keySize = Integer.valueOf(CertificateGenerationTab.this.keySizeText.getText()).intValue();
+                } catch (NumberFormatException nfe) {
+                    System.out.println("keysizepabo!!11");
+                    return;
                 }
-            });
+                int validity;
+                try {
+                    validity = Integer.valueOf(CertificateGenerationTab.this.validityText.getText())
+                            .intValue();
+                } catch (NumberFormatException nfe) {
+                    System.out.println("validitymeuchan!!1oneoneone");
+                    return;
+                }
+                String name = CertificateGenerationTab.this.nameText.getText();
+                if (!name.matches("CN=.+")) {
+                    System.out.println("nomcassai!!1oneeleven");
+                    return;
+                }
+                CertificateTree tree = CertificateGenerationTab.this.certTreeListSection.getSelectionData();
+                if (tree.getCertificate().getPrivateKey() == null) {
+                    System.out
+                            .println("Impossible to create a child of a certificate without a private key.");
+                    return;
+                }
+                System.out.println("Generating child certificate");
+                EntityType type = EntityType.fromString(CertificateGenerationTab.this.typeCombo
+                        .getItem(CertificateGenerationTab.this.typeCombo.getSelectionIndex()));
+                tree.add(name, keySize, validity, type);
+
+                CertificateGenerationTab.this.certTreeListSection.updateSection();
+            }
+        });
 
         return button;
     }
 
     private Section createSectionCertTreeList(Composite parent) {
-        this.certTreeListSection = new CertificateTreeListSection(parent,
-                this.toolkit, "Certificate Tree", this.certTreeList, true,
-                true, true, false);
+        this.certTreeListSection = new CertificateTreeListSection(parent, this.toolkit, "Certificate Tree",
+            this.certTreeList, true, true, true, false);
         return this.certTreeListSection.get();
     }
 
     private Section createSectionActiveKeystore(Composite parent) {
-        this.activeKeystoreSection = new CertificateTreeListSection(parent,
-                this.toolkit, "ActiveKeystore", this.activeKeystore, true,
-                true, true, false);
+        this.activeKeystoreSection = new CertificateTreeListSection(parent, this.toolkit, "ActiveKeystore",
+            this.activeKeystore, true, true, true, false);
         return this.activeKeystoreSection.get();
     }
 

@@ -113,8 +113,7 @@ public class MiniDescrClient {
         }
 
         void appendZeros(StringBuffer buf, int n, int maxDigits) {
-            int nbZeros = maxDigits -
-                (int) Math.ceil((Math.log(n + 1) / Math.log(10)));
+            int nbZeros = maxDigits - (int) Math.ceil((Math.log(n + 1) / Math.log(10)));
 
             for (int i = 0; i < nbZeros; i++)
                 buf.append('0');
@@ -124,12 +123,11 @@ public class MiniDescrClient {
         public void run() {
             try {
                 // Create remote object on the node
-                MiniDescrActive desc = (MiniDescrActive) PAActiveObject.newActive(MiniDescrActive.class.getName(),
-                        null, node);
+                MiniDescrActive desc = (MiniDescrActive) PAActiveObject.newActive(MiniDescrActive.class
+                        .getName(), null, node);
 
                 // Thread number trace
-                int threadNbDigits = (int) Math.ceil((Math.log(NB_THREADS + 1) / Math.log(
-                            10)));
+                int threadNbDigits = (int) Math.ceil((Math.log(NB_THREADS + 1) / Math.log(10)));
                 String threadTrace;
                 {
                     StringBuffer buf = new StringBuffer();
@@ -140,8 +138,7 @@ public class MiniDescrClient {
                     threadTrace = buf.toString();
                 }
 
-                int callsNbDigits = (int) Math.ceil((Math.log(NB_CALLS_PER_THREAD +
-                            1) / Math.log(10)));
+                int callsNbDigits = (int) Math.ceil((Math.log(NB_CALLS_PER_THREAD + 1) / Math.log(10)));
                 for (int k = 0; k < NB_CALLS_PER_THREAD; k++) {
                     // Call remote object
                     Message msg = desc.getComputerInfo();

@@ -51,9 +51,9 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
 public class AddingNodesException extends Exception {
 
     /**
-    * Attaches a message to the Exception
-    * @param msg message attached
-    */
+     * Attaches a message to the Exception
+     * @param msg message attached
+     */
     public AddingNodesException(String msg) {
         super(msg);
     }

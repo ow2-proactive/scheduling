@@ -52,14 +52,12 @@ public class A implements java.io.Serializable {
     }
 
     public void initFirstDeleguate() throws Exception {
-        this.deleguate = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { "deleguate1" });
+        this.deleguate = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "deleguate1" });
         deleguate.initSecondDeleguate();
     }
 
     public void initSecondDeleguate() throws Exception {
-        this.deleguate = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { "deleguate2" });
+        this.deleguate = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "deleguate2" });
     }
 
     public Id getId(String name) {

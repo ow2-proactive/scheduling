@@ -127,8 +127,7 @@ public class Task<T> implements Serializable, Comparable<Task> {
         }
 
         //if priority is tied then consider fifo order of root task
-        comp = taskId.getFamilyId().value() -
-            this.taskId.getFamilyId().value();
+        comp = taskId.getFamilyId().value() - this.taskId.getFamilyId().value();
         if (comp != 0) {
             return comp;
         }
@@ -139,10 +138,8 @@ public class Task<T> implements Serializable, Comparable<Task> {
             return comp;
         }
 
-        int taskParentValue = (task.taskId.getParentId() != null)
-            ? task.taskId.getParentId().value() : (-1);
-        int thisParentValue = (this.taskId.getParentId() != null)
-            ? this.taskId.getParentId().value() : (-1);
+        int taskParentValue = (task.taskId.getParentId() != null) ? task.taskId.getParentId().value() : (-1);
+        int thisParentValue = (this.taskId.getParentId() != null) ? this.taskId.getParentId().value() : (-1);
         return taskParentValue - thisParentValue;
     }
 
@@ -158,7 +155,7 @@ public class Task<T> implements Serializable, Comparable<Task> {
             if(!(o instanceof Task)){
                     return false;
             }
-            */
+         */
         Task other = (Task) o;
         return this.taskId.equals(other.taskId);
     }
@@ -218,8 +215,8 @@ public class Task<T> implements Serializable, Comparable<Task> {
         Task task = inst.compute(system, this);
 
         if (oldId != task.taskId.value()) {
-            String msg = "Task Error, task id changed while interpreting! " +
-                inst + " (" + oldId + "->" + task.taskId + ")";
+            String msg = "Task Error, task id changed while interpreting! " + inst + " (" + oldId + "->" +
+                task.taskId + ")";
             logger.error(msg);
             throw new TaskException(msg);
         }
@@ -236,8 +233,7 @@ public class Task<T> implements Serializable, Comparable<Task> {
     }
 
     public synchronized boolean isReady() {
-        return family.childrenReady.isEmpty() &&
-        family.childrenWaiting.isEmpty();
+        return family.childrenReady.isEmpty() && family.childrenWaiting.isEmpty();
     }
 
     public synchronized boolean isFinished() {
@@ -295,9 +291,8 @@ public class Task<T> implements Serializable, Comparable<Task> {
     }
 
     public String stackToString() {
-        String res = "--Stack Top-- (Size=" + stack.size() + ") Task=" +
-            taskId + " " + param.getClass().getSimpleName() + "@" +
-            System.identityHashCode(param) + "\n";
+        String res = "--Stack Top-- (Size=" + stack.size() + ") Task=" + taskId + " " +
+            param.getClass().getSimpleName() + "@" + System.identityHashCode(param) + "\n";
 
         for (int i = stack.size() - 1; i >= 0; i--) {
             res = res + "   " + stack.get(i).getClass().getSimpleName() + "\n";
@@ -318,5 +313,5 @@ public class Task<T> implements Serializable, Comparable<Task> {
                     file.saveRemoteFileInWSpace();
             }
     }
-    */
+     */
 }

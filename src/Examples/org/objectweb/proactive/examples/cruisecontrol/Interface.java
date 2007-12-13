@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.cruisecontrol;
 
-
 /** This class is the main dispatcher for the active objects.
  * it acts as link between the distributed active objects
  * and the Applet.
@@ -99,8 +98,8 @@ public class Interface {
 
         //System.out.println("initialize Method");
         try {
-            activeSpeed = (CarModel) org.objectweb.proactive.api.PAActiveObject.newActive(CarModel.class.getName(),
-                    arg);
+            activeSpeed = (CarModel) org.objectweb.proactive.api.PAActiveObject.newActive(CarModel.class
+                    .getName(), arg);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
@@ -109,8 +108,8 @@ public class Interface {
         arg[0] = org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
 
         try {
-            activeCruise = (CruiseControl) org.objectweb.proactive.api.PAActiveObject.newActive(CruiseControl.class.getName(),
-                    arg);
+            activeCruise = (CruiseControl) org.objectweb.proactive.api.PAActiveObject.newActive(
+                    CruiseControl.class.getName(), arg);
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);

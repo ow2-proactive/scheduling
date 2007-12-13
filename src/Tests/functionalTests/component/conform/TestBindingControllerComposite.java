@@ -82,13 +82,11 @@ public class TestBindingControllerComposite extends TestBindingController {
 
     @Test
     @Ignore
-    public void testCompositeCollectionExportBindLookupUnbind()
-        throws Exception {
+    public void testCompositeCollectionExportBindLookupUnbind() throws Exception {
         BindingController bc = Fractal.getBindingController(r);
         bc.bindFc("servers0", c.getFcInterface("server"));
         if (isTemplate) {
-            checkList(bc,
-                new String[] { "client", "server", "servers0", "factory" });
+            checkList(bc, new String[] { "client", "server", "servers0", "factory" });
         } else {
             checkList(bc, new String[] { "client", "server", "servers0" });
         }
@@ -119,19 +117,16 @@ public class TestBindingControllerComposite extends TestBindingController {
 
     @Test
     @Ignore
-    public void testCompositeCollectionImportBindLookupUnbind()
-        throws Exception {
+    public void testCompositeCollectionImportBindLookupUnbind() throws Exception {
         ContentController cc = Fractal.getContentController(r);
         BindingController bc = Fractal.getBindingController(d);
         bc.bindFc("clients0", cc.getFcInternalInterface("client"));
         if (isTemplate) {
-            checkList(bc,
-                new String[] { "client", "clients0", "server", "factory" });
+            checkList(bc, new String[] { "client", "clients0", "server", "factory" });
         } else {
             checkList(bc, new String[] { "client", "clients0", "server" });
         }
-        assertEquals(cc.getFcInternalInterface("client"),
-            bc.lookupFc("clients0"));
+        assertEquals(cc.getFcInternalInterface("client"), bc.lookupFc("clients0"));
         bc.unbindFc("clients0");
         try {
             assertEquals(null, bc.lookupFc("clients0"));
@@ -143,8 +138,7 @@ public class TestBindingControllerComposite extends TestBindingController {
     @Test
     @Ignore
     public void testCompositeSelfBindLookupUnbind() throws Exception {
-        Object itf = Fractal.getContentController(r)
-                            .getFcInternalInterface("client");
+        Object itf = Fractal.getContentController(r).getFcInternalInterface("client");
         BindingController bc = Fractal.getBindingController(r);
         bc.bindFc("server", itf);
         if (isTemplate) {
@@ -159,15 +153,12 @@ public class TestBindingControllerComposite extends TestBindingController {
 
     @Test
     @Ignore
-    public void testCompositeCollectionSelfBindLookupUnbind()
-        throws Exception {
-        Object itf = Fractal.getContentController(r)
-                            .getFcInternalInterface("clients0");
+    public void testCompositeCollectionSelfBindLookupUnbind() throws Exception {
+        Object itf = Fractal.getContentController(r).getFcInternalInterface("clients0");
         BindingController bc = Fractal.getBindingController(r);
         bc.bindFc("servers0", itf);
         if (isTemplate) {
-            checkList(bc,
-                new String[] { "client", "server", "servers0", "factory" });
+            checkList(bc, new String[] { "client", "server", "servers0", "factory" });
         } else {
             checkList(bc, new String[] { "client", "server", "servers0" });
         }
@@ -262,8 +253,7 @@ public class TestBindingControllerComposite extends TestBindingController {
     @Test
     @Ignore
     public void testWouldCreateInvalidExportBinding() throws Exception {
-        Fractal.getBindingController(r)
-               .bindFc("server", c.getFcInterface("server"));
+        Fractal.getBindingController(r).bindFc("server", c.getFcInterface("server"));
         try {
             Fractal.getContentController(r).removeFcSubComponent(c);
             fail();
@@ -274,8 +264,7 @@ public class TestBindingControllerComposite extends TestBindingController {
     @Test
     @Ignore
     public void testWouldCreateInvalidLocalBinding() throws Exception {
-        Fractal.getBindingController(c)
-               .bindFc("client", d.getFcInterface("server"));
+        Fractal.getBindingController(c).bindFc("client", d.getFcInterface("server"));
         try {
             Fractal.getContentController(r).removeFcSubComponent(c);
             fail();
@@ -287,8 +276,7 @@ public class TestBindingControllerComposite extends TestBindingController {
     @Ignore
     public void testWouldCreateInvalidImportBinding() throws Exception {
         ContentController cc = Fractal.getContentController(r);
-        Fractal.getBindingController(d)
-               .bindFc("client", cc.getFcInternalInterface("client"));
+        Fractal.getBindingController(d).bindFc("client", cc.getFcInternalInterface("client"));
         try {
             cc.removeFcSubComponent(d);
             fail();

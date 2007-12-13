@@ -71,8 +71,8 @@ public class Dumper {
     public void receiveAcqInfo(AcquaintanceInfo info) {
         //use the size of the hashmap to give each sender a unique index
         System.out.println(">>>>");
-        System.out.println(info.getSender() + " current Noa =  " +
-            info.getCurrentNoa() + " max Noa= " + info.getNoa());
+        System.out.println(info.getSender() + " current Noa =  " + info.getCurrentNoa() + " max Noa= " +
+            info.getNoa());
         //     this.addAsSender(info);
         this.network.addAsSender(info);
         //senders.put(info.getSender(), senders.size());
@@ -127,11 +127,10 @@ public class Dumper {
             if (entry.getValue().getIndex() == -1) {
                 entry.getValue().setIndex(index++);
             }
-            System.out.println("? " + entry.getValue().getIndex() + " " +
-                entry.getKey());
+            System.out.println("? " + entry.getValue().getIndex() + " " + entry.getKey());
             //and its associated noa
-            System.out.println("v " + entry.getValue().getIndex() + " 1 " +
-                entry.getValue().getNoa() + "'" + entry.getValue().getMaxNOA());
+            System.out.println("v " + entry.getValue().getIndex() + " 1 " + entry.getValue().getNoa() + "'" +
+                entry.getValue().getMaxNOA());
             // System.out.println("v " + entry.getValue().getIndex() + " 1 " + entry.getValue().getNoa());
         }
 
@@ -144,8 +143,7 @@ public class Dumper {
         while (it.hasNext()) {
             Link entry = ((Map.Entry<String, Link>) it.next()).getValue();
             //  System.out.println("---- looking for sender " + entry.getSource());
-            System.out.println("L " + i++ + " " +
-                senders.get(entry.getSource()).getIndex() + " " +
+            System.out.println("L " + i++ + " " + senders.get(entry.getSource()).getIndex() + " " +
                 senders.get(entry.getDestination()).getIndex());
         }
     }
@@ -238,8 +236,7 @@ public class Dumper {
         while (it.hasNext()) {
             Link entry = ((Map.Entry<String, Link>) it.next()).getValue();
             //  System.out.println("---- looking for sender " + entry.getSource());
-            System.out.println(entry.getSource() + " <---> " +
-                entry.getDestination());
+            System.out.println(entry.getSource() + " <---> " + entry.getDestination());
         }
     }
 
@@ -274,8 +271,7 @@ public class Dumper {
             distNode = NodeFactory.getNode(ref);
             p2p = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
             System.out.println("Dumper ready to call!");
-            p2p.dumpAcquaintances(new DumpACQWithCallback(10,
-                    UniversalUniqueID.randomUUID(), d));
+            p2p.dumpAcquaintances(new DumpACQWithCallback(10, UniversalUniqueID.randomUUID(), d));
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
@@ -336,54 +332,52 @@ public class Dumper {
                 } else {
                     //reading some peer name
                     switch (readingStatus) {
-                    case 1: {
-                        // example of string
-                        // "trinidad.inria.fr:2410 current Noa =  1 max Noa= 3"
-                        Pattern pattern = Pattern.compile(
-                                "(.*) current .* =  (.*) max Noa= (.*)");
-                        Matcher matcher = pattern.matcher(s);
-                        boolean matchFound = matcher.find();
+                        case 1: {
+                            // example of string
+                            // "trinidad.inria.fr:2410 current Noa =  1 max Noa= 3"
+                            Pattern pattern = Pattern.compile("(.*) current .* =  (.*) max Noa= (.*)");
+                            Matcher matcher = pattern.matcher(s);
+                            boolean matchFound = matcher.find();
 
-                        if (matchFound) {
-                            // Get all groups for this match
-                            //    for (int i=1; i<=matcher.groupCount(); i++) {
-                            s = matcher.group(1);
-                            //System.out.println(groupStr);
-                            //  }
-                            //}
+                            if (matchFound) {
+                                // Get all groups for this match
+                                //    for (int i=1; i<=matcher.groupCount(); i++) {
+                                s = matcher.group(1);
+                                //System.out.println(groupStr);
+                                //  }
+                                //}
 
-                            //s= s.substring(0, s.indexOf("current")-1);
-                            this.network.addAsSender(s,
-                                Integer.parseInt(matcher.group(2)),
-                                Integer.parseInt(matcher.group(3)));
-                            current = s;
-                            readingStatus = 2;
-                        }
-                        break;
-                    }
-                    case 2: {
-                        //we are either reading a machine name or some garbage
-                        if (s.indexOf("---") < 0) {
-                            //System.out.println(s);
-                            s = this.cleanURL(s);
-
-                            this.network.addAsSender(s);
-                            this.network.addLink(current, s);
-                            try {
-                            } catch (Exception e) {
-                                e.printStackTrace();
+                                //s= s.substring(0, s.indexOf("current")-1);
+                                this.network.addAsSender(s, Integer.parseInt(matcher.group(2)), Integer
+                                        .parseInt(matcher.group(3)));
+                                current = s;
+                                readingStatus = 2;
                             }
-                        } else {
-                            readingStatus = 3;
+                            break;
                         }
-                        break;
-                    }
-                    case 3: {
-                        if (s.indexOf("---") >= 0) {
-                            readingStatus = 2;
+                        case 2: {
+                            //we are either reading a machine name or some garbage
+                            if (s.indexOf("---") < 0) {
+                                //System.out.println(s);
+                                s = this.cleanURL(s);
+
+                                this.network.addAsSender(s);
+                                this.network.addLink(current, s);
+                                try {
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            } else {
+                                readingStatus = 3;
+                            }
+                            break;
                         }
-                        break;
-                    }
+                        case 3: {
+                            if (s.indexOf("---") >= 0) {
+                                readingStatus = 2;
+                            }
+                            break;
+                        }
                     }
                 }
             }
@@ -416,8 +410,7 @@ public class Dumper {
 
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.err.println("Usage : " + Dumper.class.getName() + " <URL> " +
-                "<descriptor>  or <file>");
+            System.err.println("Usage : " + Dumper.class.getName() + " <URL> " + "<descriptor>  or <file>");
             System.exit(-1);
         }
 
@@ -428,8 +421,7 @@ public class Dumper {
             d.dumpForPeerSim();
         } else {
             try {
-                d = (Dumper) PAActiveObject.newActive(Dumper.class.getName(),
-                        null);
+                d = (Dumper) PAActiveObject.newActive(Dumper.class.getName(), null);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();
             } catch (NodeException e) {

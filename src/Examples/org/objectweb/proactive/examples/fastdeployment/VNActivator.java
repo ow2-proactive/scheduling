@@ -58,8 +58,7 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 /**
  * Activate a set of ProActive descriptor
  */
-public class VNActivator implements Serializable, RunActive,
-    NodeCreationEventListener, InitActive {
+public class VNActivator implements Serializable, RunActive, NodeCreationEventListener, InitActive {
     final static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /** Created slave are returned to this manager */
@@ -89,8 +88,8 @@ public class VNActivator implements Serializable, RunActive,
         // No-args empty descriptor
     }
 
-    public VNActivator(Manager manager, Set<String> descriptors,
-        Set<String> virtualNodes, int concurrency, int pause) {
+    public VNActivator(Manager manager, Set<String> descriptors, Set<String> virtualNodes, int concurrency,
+            int pause) {
         this.manager = manager;
         this.descriptors = descriptors;
         this.virtualNodeNames = virtualNodes;
@@ -118,8 +117,7 @@ public class VNActivator implements Serializable, RunActive,
 
             try {
                 pad = PADeployment.getProactiveDescriptor(descriptor);
-                logger.debug("Loaded Descriptor: " +
-                    pad.getProActiveDescriptorURL());
+                logger.debug("Loaded Descriptor: " + pad.getProActiveDescriptorURL());
 
                 Set<VirtualNode> virtualNodes = new HashSet<VirtualNode>();
 
@@ -134,17 +132,18 @@ public class VNActivator implements Serializable, RunActive,
                         if (vn != null) {
                             virtualNodes.add(vn);
                         } else {
-                            logger.warn("Virtual Node " + vnName +
-                                " not found in " +
+                            logger.warn("Virtual Node " + vnName + " not found in " +
                                 pad.getProActiveDescriptorURL());
                         }
                     }
                 }
 
                 for (VirtualNode vn : virtualNodes) {
-                    logger.info("Activating Virtual Node " + vn.getName() +
-                        " from " + pad.getProActiveDescriptorURL());
-                    ((VirtualNodeImpl) vn).addNodeCreationEventListener((NodeCreationEventListener) PAActiveObject.getStubOnThis());
+                    logger.info("Activating Virtual Node " + vn.getName() + " from " +
+                        pad.getProActiveDescriptorURL());
+                    ((VirtualNodeImpl) vn)
+                            .addNodeCreationEventListener((NodeCreationEventListener) PAActiveObject
+                                    .getStubOnThis());
                     vn.activate();
 
                     try {
@@ -195,13 +194,12 @@ public class VNActivator implements Serializable, RunActive,
                 logger.info("Creating Active Object on " + nodeUrl);
 
                 // CHANGEME: Create your active object here !
-                CPUBurner ao = (CPUBurner) PAActiveObject.newActive(CPUBurner.class.getName(),
-                        new Object[] { new IntWrapper(slaveID), manager }, node);
+                CPUBurner ao = (CPUBurner) PAActiveObject.newActive(CPUBurner.class.getName(), new Object[] {
+                        new IntWrapper(slaveID), manager }, node);
 
                 logger.info("Created Active Object on " + nodeUrl);
 
-                logger.info("The " + slaveID +
-                    "th slave is ready, sending it to the manager");
+                logger.info("The " + slaveID + "th slave is ready, sending it to the manager");
 
                 // The slave is ready, send it to the manager
                 manager.nodeAvailable(new IntWrapper(slaveID), ao);

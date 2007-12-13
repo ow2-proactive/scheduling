@@ -107,37 +107,35 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
         final MVCNotification notif = (MVCNotification) arg;
 
         if ((notif.getMVCNotification() == MVCNotificationTag.STATE_CHANGED) &&
-                (notif.getData() == State.NOT_MONITORED)) {
+            (notif.getData() == State.NOT_MONITORED)) {
             deactivate();
         } else if ((notif.getMVCNotification() == MVCNotificationTag.STATE_CHANGED) &&
-                (notif.getData() != State.NOT_MONITORED)) //in this case we know we have changed highlight state
-         {
+            (notif.getData() != State.NOT_MONITORED)) //in this case we know we have changed highlight state
+        {
             //method VirtualNodesGroup.getColor(virtualNode vn)
             //returns the color for the virtual node if the virtual node is selected
             //or null if it is not. 
             //if the collor is null, setHighlight(null) colors the figure 
             //node to the default color
             getViewer().getControl().getDisplay().asyncExec(new Runnable() {
-                    public void run() {
-                        getCastedFigure()
-                            .setHighlight(getMonitoringView()
-                                              .getVirtualNodesGroup()
-                                              .getColor(getCastedModel()
-                                                            .getVirtualNode()));
-                        refresh();
-                    }
-                });
+                public void run() {
+                    getCastedFigure().setHighlight(
+                            getMonitoringView().getVirtualNodesGroup().getColor(
+                                    getCastedModel().getVirtualNode()));
+                    refresh();
+                }
+            });
         } else {
             getViewer().getControl().getDisplay().syncExec(new Runnable() {
-                    public void run() {
-                        // Refresh only if this editpart is active
-                        // remember edit parts are active after activate() is called
-                        // and until deactivate() is called.
-                        if (NodeEditPart.this.isActive()) {
-                            refresh();
-                        }
+                public void run() {
+                    // Refresh only if this editpart is active
+                    // remember edit parts are active after activate() is called
+                    // and until deactivate() is called.
+                    if (NodeEditPart.this.isActive()) {
+                        refresh();
                     }
-                });
+                }
+            });
         }
     }
 
@@ -166,11 +164,9 @@ public class NodeEditPart extends AbstractMonitoringEditPart {
     protected IFigure createFigure() {
         //TODO A faire
         NodeObject model = getCastedModel();
-        NodeFigure figure = new NodeFigure("Node " + model.getName(),
-                URIBuilder.getProtocol(model.getUrl()) /*getCastedModel().getFullName(),getCastedModel().getParentProtocol()*/);
+        NodeFigure figure = new NodeFigure("Node " + model.getName(), URIBuilder.getProtocol(model.getUrl()) /*getCastedModel().getFullName(),getCastedModel().getParentProtocol()*/);
 
-        NodeListener listener = new NodeListener(getCastedModel(), figure,
-                getMonitoringView());
+        NodeListener listener = new NodeListener(getCastedModel(), figure, getMonitoringView());
         figure.addMouseListener(listener);
         figure.addMouseMotionListener(listener);
         return figure;

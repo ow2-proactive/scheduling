@@ -100,8 +100,7 @@ public class PAFileTransfer {
      * @return A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instances representing the file transfer operation of each file.
      * @throws IOException If an initialization error was detected.
      */
-    public static List<RemoteFile> push(File[] srcFile, Node dstNode,
-        File[] dstFile) throws IOException {
+    public static List<RemoteFile> push(File[] srcFile, Node dstNode, File[] dstFile) throws IOException {
         return transfer(getLocalNode(), srcFile, dstNode, dstFile);
     }
 
@@ -109,8 +108,7 @@ public class PAFileTransfer {
      * Push a single local file to the remote node/location.
      * @see  #push(File[], Node,  File[])
      */
-    public static RemoteFile push(File srcFile, Node dstNode, File dstFile)
-        throws IOException {
+    public static RemoteFile push(File srcFile, Node dstNode, File dstFile) throws IOException {
         return transfer(getLocalNode(), srcFile, dstNode, dstFile);
     }
 
@@ -123,8 +121,7 @@ public class PAFileTransfer {
      * @return A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instances representing the file transfer operation of each file.
      * @throws IOException If an initialization error was detected.
      */
-    public static RemoteFile pull(Node srcNode, File srcFile, File dstFile)
-        throws IOException {
+    public static RemoteFile pull(Node srcNode, File srcFile, File dstFile) throws IOException {
         return transfer(srcNode, srcFile, getLocalNode(), dstFile);
     }
 
@@ -132,8 +129,7 @@ public class PAFileTransfer {
      * Pull a single remote file to the local node and location.
      * @see  #pull(File[], Node,  File[])
      */
-    public static List<RemoteFile> pull(Node srcNode, File[] srcFile,
-        File[] dstFile) throws IOException {
+    public static List<RemoteFile> pull(Node srcNode, File[] srcFile, File[] dstFile) throws IOException {
         return transfer(srcNode, srcFile, getLocalNode(), dstFile);
     }
 
@@ -141,10 +137,9 @@ public class PAFileTransfer {
      * Transfers a single file between third parties.
      * @see #transfer(Node, File[], Node, File[])
      */
-    public static RemoteFile transfer(Node srcNode, File srcFile, Node dstNode,
-        File dstFile) throws IOException {
-        List<RemoteFile> rfiles = transfer(srcNode, new File[] { srcFile },
-                dstNode, new File[] { dstFile });
+    public static RemoteFile transfer(Node srcNode, File srcFile, Node dstNode, File dstFile)
+            throws IOException {
+        List<RemoteFile> rfiles = transfer(srcNode, new File[] { srcFile }, dstNode, new File[] { dstFile });
 
         return rfiles.get(0);
     }
@@ -159,11 +154,10 @@ public class PAFileTransfer {
      * @return A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile}.
      * @throws IOException  If an initialization error was detected.
      */
-    public static List<RemoteFile> transfer(Node srcNode, File[] srcFile,
-        Node dstNode, File[] dstFile) throws IOException {
-        return transfer(srcNode, srcFile, dstNode, dstFile,
-            FileBlock.DEFAULT_BLOCK_SIZE,
-            FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
+    public static List<RemoteFile> transfer(Node srcNode, File[] srcFile, Node dstNode, File[] dstFile)
+            throws IOException {
+        return transfer(srcNode, srcFile, dstNode, dstFile, FileBlock.DEFAULT_BLOCK_SIZE,
+                FileTransferService.DEFAULT_MAX_SIMULTANEOUS_BLOCKS);
     }
 
     /**
@@ -174,12 +168,10 @@ public class PAFileTransfer {
      *
      * @see #transfer(Node, File[], Node, File[])
      */
-    public static List<RemoteFile> transfer(Node srcNode, File[] srcFile,
-        Node dstNode, File[] dstFile, int bsize, int numFlyingBlocks)
-        throws IOException {
+    public static List<RemoteFile> transfer(Node srcNode, File[] srcFile, Node dstNode, File[] dstFile,
+            int bsize, int numFlyingBlocks) throws IOException {
         if (srcFile.length != dstFile.length) {
-            throw new IOException(
-                "Error, number destination and source file lists do not match in length");
+            throw new IOException("Error, number destination and source file lists do not match in length");
         }
 
         Node localNode = getLocalNode();
@@ -191,35 +183,29 @@ public class PAFileTransfer {
             //Case srcNode is local
             if (FileTransferEngine.nodeEquals(srcNode, localNode)) {
                 if (!srcFile[i].canRead()) {
-                    logger.error("Can't read or doesn't exist: " +
-                        srcFile[i].getAbsoluteFile());
-                    throw new IOException("Can't read or doesn't exist: " +
-                        srcFile[i].getAbsoluteFile());
+                    logger.error("Can't read or doesn't exist: " + srcFile[i].getAbsoluteFile());
+                    throw new IOException("Can't read or doesn't exist: " + srcFile[i].getAbsoluteFile());
                 }
             }
 
             //Case dstNode is local
             if (FileTransferEngine.nodeEquals(dstNode, localNode)) {
                 if (dstFile[i].exists() && !dstFile[i].canWrite()) {
-                    logger.error("Can't write to file: " +
-                        dstFile[i].getAbsoluteFile());
-                    throw new IOException("Can't overrite existant file: " +
-                        dstFile[i].getAbsoluteFile());
+                    logger.error("Can't write to file: " + dstFile[i].getAbsoluteFile());
+                    throw new IOException("Can't overrite existant file: " + dstFile[i].getAbsoluteFile());
                 }
             }
 
             //Case srcNode == dstNode
             if (FileTransferEngine.nodeEquals(srcNode, dstNode)) {
                 if (dstFile[i].equals(srcFile[i])) {
-                    logger.error(
-                        "Can't copy, src and destination are the same: " +
+                    logger.error("Can't copy, src and destination are the same: " +
                         srcFile[i].getAbsolutePath());
                 }
             }
         }
 
-        return internalTransfer(srcNode, srcFile, dstNode, dstFile, bsize,
-            numFlyingBlocks);
+        return internalTransfer(srcNode, srcFile, dstNode, dstFile, bsize, numFlyingBlocks);
     }
 
     /**
@@ -234,9 +220,8 @@ public class PAFileTransfer {
      * @return  A list of {@link org.objectweb.proactive.core.filetransfer.RemoteFile  RemoteFile} instances representing the file transfer operation of each file.
      * @throws IOException  If an initialization error was detected.
      */
-    protected static List<RemoteFile> internalTransfer(Node srcNode,
-        File[] srcFile, Node dstNode, File[] dstFile, int bsize,
-        int numFlyingBlocks) throws IOException {
+    protected static List<RemoteFile> internalTransfer(Node srcNode, File[] srcFile, Node dstNode,
+            File[] dstFile, int bsize, int numFlyingBlocks) throws IOException {
         FileTransferServiceSend ftsSrc;
         FileTransferServiceReceive ftsDst;
 
@@ -246,15 +231,14 @@ public class PAFileTransfer {
         } catch (Exception e) {
             //TODO change when moving to Java 1.6
             //throw new IOException("Unable to connect or use ProActive Node: " + srcNode + " -> " + dstNode, e);
-            throw new IOException("Unable to connect or use ProActive Node: " +
-                srcNode + " -> " + dstNode + " " + e.getMessage());
+            throw new IOException("Unable to connect or use ProActive Node: " + srcNode + " -> " + dstNode +
+                " " + e.getMessage());
         }
 
         ArrayList<RemoteFile> rfile = new ArrayList<RemoteFile>(srcFile.length);
 
         for (int i = 0; i < srcFile.length; i++) {
-            OperationStatus status = ftsSrc.send(srcFile[i], ftsDst,
-                    dstFile[i], bsize, numFlyingBlocks);
+            OperationStatus status = ftsSrc.send(srcFile[i], ftsDst, dstFile[i], bsize, numFlyingBlocks);
 
             rfile.add(new RemoteFileImpl(dstNode, dstFile[i], status));
         }
@@ -278,8 +262,7 @@ public class PAFileTransfer {
         } catch (Exception e) {
             //TODO change when moving to Java 1.6
             //throw new IOException("Unable to connect or use ProActive Node: " + node, e);
-            throw new IOException("Unable to connect or use ProActive Node: " +
-                node + e.getMessage());
+            throw new IOException("Unable to connect or use ProActive Node: " + node + e.getMessage());
         }
 
         OperationStatus status = ftsDst.mkdirs(path);

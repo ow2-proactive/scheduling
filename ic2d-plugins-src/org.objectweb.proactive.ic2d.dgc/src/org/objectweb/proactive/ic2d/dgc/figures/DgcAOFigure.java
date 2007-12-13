@@ -67,7 +67,6 @@ class DgcLabel extends Label {
     }
 }
 
-
 public class DgcAOFigure extends AOFigure {
     public DgcAOFigure(String text) {
         super(text);

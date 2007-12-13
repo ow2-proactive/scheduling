@@ -60,8 +60,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
  * @author ProActive Team
  *
  */
-public class ProActiveConnector implements JMXConnector, Serializable,
-    NotificationListener {
+public class ProActiveConnector implements JMXConnector, Serializable, NotificationListener {
     private static final int CLOSED = 0;
     private static final int OPEN = 1;
     private ProActiveConnection connection;
@@ -85,11 +84,9 @@ public class ProActiveConnector implements JMXConnector, Serializable,
     /*
      * creates a ProActive Connector
      */
-    private ProActiveConnector(ProActiveServerImpl paServer,
-        JMXServiceURL address, Map environment) {
+    private ProActiveConnector(ProActiveServerImpl paServer, JMXServiceURL address, Map environment) {
         if ((paServer == null) && (address == null)) {
-            throw new IllegalArgumentException(
-                "proactive server jmxServiceURL both null");
+            throw new IllegalArgumentException("proactive server jmxServiceURL both null");
         }
         this.emitter = new ProActiveConnectionNotificationEmitter(this);
         this.paServer = paServer;
@@ -124,12 +121,10 @@ public class ProActiveConnector implements JMXConnector, Serializable,
             int index = path.indexOf(ProActiveJMXConstants.SERVER_REGISTERED_NAME);
             String serverName = path.substring(index);
             String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
-            String lookupUrl = URIBuilder.buildURI(hostname, serverName,
-                    protocol, port).toString();
-            System.out.println("ProActiveConnector.connect() lookup url = " +
-                lookupUrl);
-            ProActiveServerImpl paServer = (ProActiveServerImpl) PAActiveObject.lookupActive(ProActiveServerImpl.class.getName(),
-                    lookupUrl);
+            String lookupUrl = URIBuilder.buildURI(hostname, serverName, protocol, port).toString();
+            System.out.println("ProActiveConnector.connect() lookup url = " + lookupUrl);
+            ProActiveServerImpl paServer = (ProActiveServerImpl) PAActiveObject.lookupActive(
+                    ProActiveServerImpl.class.getName(), lookupUrl);
 
             this.connection = paServer.newClient();
         } catch (ActiveObjectCreationException e) {
@@ -148,16 +143,15 @@ public class ProActiveConnector implements JMXConnector, Serializable,
     /**
      * @see javax.management.remote.JMXConnector#getMBeanServerConnection()
      */
-    public synchronized MBeanServerConnection getMBeanServerConnection()
-        throws IOException {
+    public synchronized MBeanServerConnection getMBeanServerConnection() throws IOException {
         return getMBeanServerConnection(null);
     }
 
     /**
      * @see javax.management.remote.JMXConnector#getMBeanServerConnection(javax.security.auth.Subject)
      */
-    public synchronized MBeanServerConnection getMBeanServerConnection(
-        Subject delegationSubject) throws IOException {
+    public synchronized MBeanServerConnection getMBeanServerConnection(Subject delegationSubject)
+            throws IOException {
         return connection;
     }
 
@@ -172,9 +166,8 @@ public class ProActiveConnector implements JMXConnector, Serializable,
     /**
      * @see javax.management.remote.JMXConnector#addConnectionNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
-    public void addConnectionNotificationListener(
-        NotificationListener listener, NotificationFilter filter,
-        Object handback) {
+    public void addConnectionNotificationListener(NotificationListener listener, NotificationFilter filter,
+            Object handback) {
         this.listeners.addElement(listener);
         this.emitter.addNotificationListener(this, filter, handback);
     }
@@ -182,17 +175,16 @@ public class ProActiveConnector implements JMXConnector, Serializable,
     /**
      * @see javax.management.remote.JMXConnector#removeConnectionNotificationListener(javax.management.NotificationListener)
      */
-    public void removeConnectionNotificationListener(
-        NotificationListener listener) throws ListenerNotFoundException {
+    public void removeConnectionNotificationListener(NotificationListener listener)
+            throws ListenerNotFoundException {
         this.emitter.removeNotificationListener(listener);
     }
 
     /**
      * @see javax.management.remote.JMXConnector#removeConnectionNotificationListener(javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
-    public void removeConnectionNotificationListener(
-        NotificationListener listener, NotificationFilter filter,
-        Object handback) throws ListenerNotFoundException {
+    public void removeConnectionNotificationListener(NotificationListener listener,
+            NotificationFilter filter, Object handback) throws ListenerNotFoundException {
         this.emitter.removeNotificationListener(listener, filter, handback);
     }
 

@@ -33,8 +33,8 @@ package org.objectweb.proactive.core.event;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 
 
-public class RuntimeRegistrationEventProducerImpl extends AbstractEventProducer
-    implements RuntimeRegistrationEventProducer {
+public class RuntimeRegistrationEventProducerImpl extends AbstractEventProducer implements
+        RuntimeRegistrationEventProducer {
     //
     //-------------------implements RuntimeRegistrationEventProducer------------------
     //
@@ -42,16 +42,14 @@ public class RuntimeRegistrationEventProducerImpl extends AbstractEventProducer
     /**
      * @see org.objectweb.proactive.core.event.RuntimeRegistrationEventProducer#addRuntimeRegistrationEventListener(RuntimeRegistrationEventListener)
      */
-    public void addRuntimeRegistrationEventListener(
-        RuntimeRegistrationEventListener listener) {
+    public void addRuntimeRegistrationEventListener(RuntimeRegistrationEventListener listener) {
         addListener(listener);
     }
 
     /**
      * @see org.objectweb.proactive.core.event.RuntimeRegistrationEventProducer#removeRuntimeRegistrationEventListener(RuntimeRegistrationEventListener)
      */
-    public void removeRuntimeRegistrationEventListener(
-        RuntimeRegistrationEventListener listener) {
+    public void removeRuntimeRegistrationEventListener(RuntimeRegistrationEventListener listener) {
         removeListener(listener);
     }
 
@@ -63,8 +61,7 @@ public class RuntimeRegistrationEventProducerImpl extends AbstractEventProducer
      * @see org.objectweb.proactive.core.event.AbstractEventProducer#notifyOneListener(ProActiveListener, ProActiveEvent)
      */
     @Override
-    protected void notifyOneListener(ProActiveListener proActiveListener,
-        ProActiveEvent event) {
+    protected void notifyOneListener(ProActiveListener proActiveListener, ProActiveEvent event) {
         RuntimeRegistrationEvent runtimeRegistrationEvent = (RuntimeRegistrationEvent) event;
         RuntimeRegistrationEventListener runtimeRegistrationEventListener = (RuntimeRegistrationEventListener) proActiveListener;
 
@@ -76,11 +73,10 @@ public class RuntimeRegistrationEventProducerImpl extends AbstractEventProducer
     //-------------------PROTECTED METHODS------------------
     //
     protected void notifyListeners(ProActiveRuntime proActiveRuntime, int type,
-        ProActiveRuntime registeredRuntime, String creatorID, String protocol,
-        String vmName) {
+            ProActiveRuntime registeredRuntime, String creatorID, String protocol, String vmName) {
         if (hasListeners()) {
-            notifyAllListeners(new RuntimeRegistrationEvent(proActiveRuntime,
-                    type, registeredRuntime, creatorID, protocol, vmName));
+            notifyAllListeners(new RuntimeRegistrationEvent(proActiveRuntime, type, registeredRuntime,
+                creatorID, protocol, vmName));
         } else {
             if (logger.isDebugEnabled()) {
                 logger.debug("no listener");

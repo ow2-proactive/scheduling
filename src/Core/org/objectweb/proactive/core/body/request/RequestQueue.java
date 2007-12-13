@@ -169,8 +169,7 @@ public interface RequestQueue {
 
     public void addRequestQueueEventListener(RequestQueueEventListener listener);
 
-    public void removeRequestQueueEventListener(
-        RequestQueueEventListener listener);
+    public void removeRequestQueueEventListener(RequestQueueEventListener listener);
 
     /**
      * Return the internal queue as a CircularArrayList

@@ -62,17 +62,13 @@ import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
  * @since   ProActive 0.9.4
  */
 public class LSFBSubProcess extends AbstractExternalProcessDecorator {
-    protected static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + File.separator + "ProActive" + File.separator +
-        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+    protected static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home") + File.separator +
+        "ProActive" + File.separator + "scripts" + File.separator + "unix" + File.separator + "cluster" +
         File.separator + "startRuntime.sh ";
-    public final static String DEFAULT_LSFPATH = File.separator + "usr" +
-        File.separator + "local" + File.separator + "lsf" + File.separator +
-        "bin";
-    public final static String DEFAULT_BSUBPATH = DEFAULT_LSFPATH +
-        File.separator + "bsub";
-    public final static String DEFAULT_BJOBPATH = DEFAULT_LSFPATH +
-        File.separator + "bjobs";
+    public final static String DEFAULT_LSFPATH = File.separator + "usr" + File.separator + "local" +
+        File.separator + "lsf" + File.separator + "bin";
+    public final static String DEFAULT_BSUBPATH = DEFAULT_LSFPATH + File.separator + "bsub";
+    public final static String DEFAULT_BJOBPATH = DEFAULT_LSFPATH + File.separator + "bjobs";
     public static final String DEFAULT_QUEUE_NAME = "normal";
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected int jobID;
@@ -114,10 +110,10 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     // -- PUBLIC METHODS -----------------------------------------------
     //
     @Override
-    public void setInputMessageLogger(
-        RemoteProcessMessageLogger inputMessageLogger) {
-        super.setInputMessageLogger(new CompositeMessageLogger(
-                new ParserMessageLogger(), inputMessageLogger));
+    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger) {
+        super
+                .setInputMessageLogger(new CompositeMessageLogger(new ParserMessageLogger(),
+                    inputMessageLogger));
     }
 
     @Override
@@ -140,8 +136,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
 
     public static void main(String[] args) {
         try {
-            LSFBSubProcess p = new LSFBSubProcess(new SimpleExternalProcess(
-                        "ls -lsa"));
+            LSFBSubProcess p = new LSFBSubProcess(new SimpleExternalProcess("ls -lsa"));
             p.startProcess();
         } catch (Exception e) {
             e.printStackTrace();
@@ -291,8 +286,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
             bSubCommand.append("-J " + jobname + " ");
         }
         if (getCompositionType() == GIVE_COMMAND_AS_PARAMETER) {
-            bSubCommand.append(getRes_requirement() + scriptLocation + " " +
-                getTargetProcess().getCommand());
+            bSubCommand.append(getRes_requirement() + scriptLocation + " " + getTargetProcess().getCommand());
         }
 
         //logger.info("bsub command is "+bSubCommand.toString());
@@ -320,8 +314,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
         if (n1 == -1) {
             return 0;
         }
-        int n2 = message.indexOf(endJobIDMarkup, n1 +
-                beginJobIDMarkup.length());
+        int n2 = message.indexOf(endJobIDMarkup, n1 + beginJobIDMarkup.length());
         if (n2 == -1) {
             return 0;
         }
@@ -395,8 +388,7 @@ public class LSFBSubProcess extends AbstractExternalProcessDecorator {
     /**
      * Implementation of a RemoteProcessMessageLogger that look for the jobID of the launched job
      */
-    public class ParserMessageLogger implements RemoteProcessMessageLogger,
-        java.io.Serializable {
+    public class ParserMessageLogger implements RemoteProcessMessageLogger, java.io.Serializable {
         private boolean foundJobID;
         private boolean foundHostname;
 

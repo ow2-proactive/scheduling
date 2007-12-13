@@ -92,72 +92,71 @@ public class Start implements Serializable {
 
         // Set arguments as read on command line
         switch (args.length) {
-        case 0:
-            usage();
-            logger.info("No xml descriptor specified - aborting");
-            quit();
-        case 2:
-            if (args[1].equals("-nodisplay")) {
-                display = false;
+            case 0:
+                usage();
+                logger.info("No xml descriptor specified - aborting");
+                quit();
+            case 2:
+                if (args[1].equals("-nodisplay")) {
+                    display = false;
+                    break;
+                } else if (args[1].equals("-displayft")) {
+                    displayft = true;
+                    break;
+                } else if (args[1].equals("-3d")) {
+                    ddd = true;
+                    break;
+                } else if (args[1].equals("-3dft")) {
+                    displayft = true;
+                    ddd = true;
+                    break;
+                }
+            case 3:
+                totalNbBodies = Integer.parseInt(args[1]);
+                maxIter = Integer.parseInt(args[2]);
                 break;
-            } else if (args[1].equals("-displayft")) {
-                displayft = true;
-                break;
-            } else if (args[1].equals("-3d")) {
-                ddd = true;
-                break;
-            } else if (args[1].equals("-3dft")) {
-                displayft = true;
-                ddd = true;
-                break;
-            }
-        case 3:
-            totalNbBodies = Integer.parseInt(args[1]);
-            maxIter = Integer.parseInt(args[2]);
-            break;
-        case 4:
-            if (args[1].equals("-nodisplay")) {
-                display = false;
-                totalNbBodies = Integer.parseInt(args[2]);
-                maxIter = Integer.parseInt(args[3]);
-                break;
-            } else if (args[1].equals("-displayft")) {
-                displayft = true;
-                totalNbBodies = Integer.parseInt(args[2]);
-                maxIter = Integer.parseInt(args[3]);
-                break;
-            } else if (args[1].equals("-3d")) {
-                ddd = true;
-                totalNbBodies = Integer.parseInt(args[2]);
-                maxIter = Integer.parseInt(args[3]);
-                break;
-            } else if (args[1].equals("-3dft")) {
-                ddd = true;
-                displayft = true;
-                totalNbBodies = Integer.parseInt(args[2]);
-                maxIter = Integer.parseInt(args[3]);
-                break;
-            }
+            case 4:
+                if (args[1].equals("-nodisplay")) {
+                    display = false;
+                    totalNbBodies = Integer.parseInt(args[2]);
+                    maxIter = Integer.parseInt(args[3]);
+                    break;
+                } else if (args[1].equals("-displayft")) {
+                    displayft = true;
+                    totalNbBodies = Integer.parseInt(args[2]);
+                    maxIter = Integer.parseInt(args[3]);
+                    break;
+                } else if (args[1].equals("-3d")) {
+                    ddd = true;
+                    totalNbBodies = Integer.parseInt(args[2]);
+                    maxIter = Integer.parseInt(args[3]);
+                    break;
+                } else if (args[1].equals("-3dft")) {
+                    ddd = true;
+                    displayft = true;
+                    totalNbBodies = Integer.parseInt(args[2]);
+                    maxIter = Integer.parseInt(args[3]);
+                    break;
+                }
 
-        // else : don't break, which means go to the default case
-        default:
-            usage();
+                // else : don't break, which means go to the default case
+            default:
+                usage();
         }
 
         // testing java3d installation
         if (ddd) {
             try {
                 Class.forName("com.sun.j3d.utils.behaviors.mouse.MouseRotate");
-                Class.forName(
-                    "org.objectweb.proactive.examples.nbody.common.NBody3DFrame");
+                Class.forName("org.objectweb.proactive.examples.nbody.common.NBody3DFrame");
             } catch (Exception e) {
                 ddd = false;
                 logger.warn("Java 3D not installed, switching to 2D");
             }
         }
 
-        logger.info("        Running with options set to " + totalNbBodies +
-            " bodies, " + maxIter + " iterations, display " + display);
+        logger.info("        Running with options set to " + totalNbBodies + " bodies, " + maxIter +
+            " iterations, display " + display);
         xmlFileName = args[0];
 
         logger.info(" 1: Simplest version, one-to-one communication and master");
@@ -201,11 +200,8 @@ public class Start implements Serializable {
         Displayer displayer = null;
         if (display) {
             try {
-                displayer = (Displayer) (PAActiveObject.newActive(Displayer.class.getName(),
-                        new Object[] {
-                            new Integer(totalNbBodies), new Boolean(displayft),
-                            this, new BooleanWrapper(ddd)
-                        }));
+                displayer = (Displayer) (PAActiveObject.newActive(Displayer.class.getName(), new Object[] {
+                        new Integer(totalNbBodies), new Boolean(displayft), this, new BooleanWrapper(ddd) }));
             } catch (ActiveObjectCreationException e) {
                 abort(e);
             } catch (NodeException e) {
@@ -214,26 +210,26 @@ public class Start implements Serializable {
         }
 
         switch (input) {
-        case 49:
-            org.objectweb.proactive.examples.nbody.simple.Start.main(totalNbBodies,
-                maxIter, displayer, nodes, this);
-            break;
-        case 50:
-            org.objectweb.proactive.examples.nbody.groupcom.Start.main(totalNbBodies,
-                maxIter, displayer, nodes, this);
-            break;
-        case 51:
-            org.objectweb.proactive.examples.nbody.groupdistrib.Start.main(totalNbBodies,
-                maxIter, displayer, nodes, this);
-            break;
-        case 52:
-            org.objectweb.proactive.examples.nbody.groupoospmd.Start.main(totalNbBodies,
-                maxIter, displayer, nodes, this);
-            break;
-        case 53:
-            org.objectweb.proactive.examples.nbody.barneshut.Start.main(totalNbBodies,
-                maxIter, displayer, nodes, this);
-            break;
+            case 49:
+                org.objectweb.proactive.examples.nbody.simple.Start.main(totalNbBodies, maxIter, displayer,
+                        nodes, this);
+                break;
+            case 50:
+                org.objectweb.proactive.examples.nbody.groupcom.Start.main(totalNbBodies, maxIter, displayer,
+                        nodes, this);
+                break;
+            case 51:
+                org.objectweb.proactive.examples.nbody.groupdistrib.Start.main(totalNbBodies, maxIter,
+                        displayer, nodes, this);
+                break;
+            case 52:
+                org.objectweb.proactive.examples.nbody.groupoospmd.Start.main(totalNbBodies, maxIter,
+                        displayer, nodes, this);
+                break;
+            case 53:
+                org.objectweb.proactive.examples.nbody.barneshut.Start.main(totalNbBodies, maxIter,
+                        displayer, nodes, this);
+                break;
         }
     }
 
@@ -243,9 +239,7 @@ public class Start implements Serializable {
     private void usage() {
         String options = "[-nodisplay | -displayft | -3d | -3dft] totalNbBodies maxIter";
         logger.info("        Usage : nbody.[bat|sh] " + options);
-        logger.info(
-            "        from the command line, it would be   java Start xmlFile " +
-            options);
+        logger.info("        from the command line, it would be   java Start xmlFile " + options);
     }
 
     /**

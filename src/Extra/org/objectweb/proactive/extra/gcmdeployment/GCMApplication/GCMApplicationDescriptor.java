@@ -80,7 +80,7 @@ public interface GCMApplicationDescriptor {
      *
      * @return All the Virtual Nodes declared inside the GCM Application Descriptor.
      */
-    public Map<String, ?extends VirtualNode> getVirtualNodes();
+    public Map<String, ? extends VirtualNode> getVirtualNodes();
 
     /**
      * Terminates all the ProActive Runtime started by this Application

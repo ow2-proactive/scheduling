@@ -94,8 +94,8 @@ public class BarChartBuilder {
     /**
      * A formatter for date
      */
-    protected final static DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT,
-            DateFormat.MEDIUM);
+    protected final static DateFormat df = DateFormat
+            .getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
 
     /**
      * The title for generated charts
@@ -161,85 +161,116 @@ public class BarChartBuilder {
         this.chart.setDimension(ChartDimension.TWO_DIMENSIONAL_LITERAL);
 
         this.chart.setScript( // ///////////////////////////////////////////////////////
-            "function adaptTime( timeInMillis ) {" + "form = null;" +
-            "var result = 0;" // Check if seconds is not ok
-             +"if ((timeInMillis / 1000) < 1) {" + "	    form = \"ms\";" +
-            "	    result = timeInMillis;" // use milliseconds
-             +" } else {" +
-            "   timeInSeconds = timeInMillis / 1000;" // Check if
-                                                      // minutes
-                                                      // is not ok
-             +"	   if ((timeInSeconds / 60) < 1) {" + "		   form = \"s\";" +
-            "		   result = timeInSeconds;" // use seconds
-             +"	   } else {" +
-            "       timeInMinutes = timeInSeconds / 60;" // Check
-                                                         // if
-                                                         // hours
-                                                         // is
-                                                         // not
-                                                         // ok
-             +"       if ( (timeInMinutes / 60) < 1 ) {" +
-            "		      form = \"m\";" +
-            "		      result = timeInSeconds / 60;" // use
-                                                   // minutes
-             +"       } else {" + "		      form = \"h\";" +
-            "		      result = timeInMinutes / 60;" // use hours
-             +"       }" + "    } " + " }" +
-            " var res = new java.lang.String(result);" +
-            " var dotIndex = res.indexOf('.');" + " if ( dotIndex != -1 ){" +
-            "     var postDot = res.substring(dotIndex+1, res.length());" +
-            "     if ( postDot != 0 ){" +
-            "         if ( postDot.length() > 2 ){ " +
-            "            res = res.substring(0,dotIndex+3); " + "         }" +
-            "     } else {" + "        res = res.substring(0, dotIndex);" +
-            "     }" + " }" + "return res+form;" +
-            "}" // /////////////////////////////////////////////////////////
-             +"function beforeDrawDataPointLabel(dataPoints, label, scriptContext) {" +
-            " if ( dataPoints.getOrthogonalValue() != -1 ) {" +
-            " 	label.getCaption( ).getColor( ).set( 0, 0, 0 );" +
-            " 	label.getCaption( ).getFont( ).setBold(true);" +
-            "   label.getCaption().getFont().setSize(" + FONT_SIZE + ");" +
-            " 	label.setVisible( true );" +
-            " 	label.getCaption().setValue(adaptTime(dataPoints.getOrthogonalValue()));" +
-            " }" +
-            "}" // //////////////////////////////////////////////////////
-             +"function beforeDrawAxisLabel( axis, label, context )" + "{" +
-            " if ( axis.getType() == 'Logarithmic' ) {" +
-            "   label.getCaption().setValue(adaptTime(label.getCaption().getValue()));" +
-            " } else {" + "   if ( label.getCaption().getValue() == '" +
-            USER_DEFINED_LABEL_VALUE + "' ) {" +
-            " 	label.getCaption( ).getColor( ).set( 0, 0, 0 );" +
-            " 	label.getCaption( ).getFont( ).setBold(true);" +
-            "     label.getCaption().getFont().setSize(" + (FONT_SIZE + 1) +
-            ");" + " 	label.setVisible( true );" + "   } else {" +
-            "     label.getCaption().getFont().setSize(" + FONT_SIZE + ");" +
-            " 	label.getCaption( ).getFont( ).setBold(false);" + "   }" +
-            " } " +
-            "}" // //////////////////////////////////////////////////////
-             +"function beforeDrawElement(dataPointHints, fill) {" // + "
-                                                                   // java.lang.System.out.println('________
-                                                                   // ' +
-                                                                   // fill.getClass().getName());"
-                                                                   // Color of Total
-             +" if ( dataPointHints.getBaseValue() == 'Total' ) {" +
-            "  fill.set(225, 225, 255);" // Color of Serve
-             +" } else if ( dataPointHints.getBaseValue() == 'Serve' ) { " +
-            "  fill.set(" + AOFigure.COLOR_WHEN_SERVING_REQUEST.getRed() + "," +
-            AOFigure.COLOR_WHEN_SERVING_REQUEST.getGreen() + "," +
-            AOFigure.COLOR_WHEN_SERVING_REQUEST.getBlue() +
-            ");" // Color of SendRequest and SendReply
-             +" } else if ( dataPointHints.getBaseValue() == 'SendRequest' || dataPointHints.getBaseValue() == 'SendReply' ) {" +
-            "  fill.set(40,255,200);" // Color of WaitByNecessity
-             +" } else if ( dataPointHints.getBaseValue() == 'WaitByNecessity') {" +
-            "  fill.set(" + AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY.getRed() +
-            "," + AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY.getGreen() + "," +
-            AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY.getBlue() +
-            ");" // Color of WaitForRequest
-             +" } else if ( dataPointHints.getBaseValue() == 'WaitForRequest') {" +
-            "  fill.set(" + AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST.getRed() +
-            "," + AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST.getGreen() + "," +
-            AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST.getBlue() + ");" + " }" +
-            "}");
+                "function adaptTime( timeInMillis ) {"
+                    + "form = null;"
+                    + "var result = 0;" // Check if seconds is not ok
+                    + "if ((timeInMillis / 1000) < 1) {"
+                    + "	    form = \"ms\";"
+                    + "	    result = timeInMillis;" // use milliseconds
+                    + " } else {"
+                    + "   timeInSeconds = timeInMillis / 1000;" // Check if
+                    // minutes
+                    // is not ok
+                    + "	   if ((timeInSeconds / 60) < 1) {"
+                    + "		   form = \"s\";"
+                    + "		   result = timeInSeconds;" // use seconds
+                    + "	   } else {"
+                    + "       timeInMinutes = timeInSeconds / 60;" // Check
+                    // if
+                    // hours
+                    // is
+                    // not
+                    // ok
+                    + "       if ( (timeInMinutes / 60) < 1 ) {"
+                    + "		      form = \"m\";"
+                    + "		      result = timeInSeconds / 60;" // use
+                    // minutes
+                    + "       } else {"
+                    + "		      form = \"h\";"
+                    + "		      result = timeInMinutes / 60;" // use hours
+                    + "       }" + "    } " + " }" + " var res = new java.lang.String(result);"
+                    + " var dotIndex = res.indexOf('.');" + " if ( dotIndex != -1 ){"
+                    + "     var postDot = res.substring(dotIndex+1, res.length());"
+                    + "     if ( postDot != 0 ){" + "         if ( postDot.length() > 2 ){ "
+                    + "            res = res.substring(0,dotIndex+3); " + "         }"
+                    + "     } else {"
+                    + "        res = res.substring(0, dotIndex);"
+                    + "     }"
+                    + " }"
+                    + "return res+form;"
+                    + "}" // /////////////////////////////////////////////////////////
+                    + "function beforeDrawDataPointLabel(dataPoints, label, scriptContext) {"
+                    + " if ( dataPoints.getOrthogonalValue() != -1 ) {"
+                    + " 	label.getCaption( ).getColor( ).set( 0, 0, 0 );"
+                    + " 	label.getCaption( ).getFont( ).setBold(true);"
+                    + "   label.getCaption().getFont().setSize(" +
+                    FONT_SIZE +
+                    ");" +
+                    " 	label.setVisible( true );" +
+                    " 	label.getCaption().setValue(adaptTime(dataPoints.getOrthogonalValue()));" +
+                    " }" +
+                    "}" // //////////////////////////////////////////////////////
+                    +
+                    "function beforeDrawAxisLabel( axis, label, context )" +
+                    "{" +
+                    " if ( axis.getType() == 'Logarithmic' ) {" +
+                    "   label.getCaption().setValue(adaptTime(label.getCaption().getValue()));" +
+                    " } else {" +
+                    "   if ( label.getCaption().getValue() == '" +
+                    USER_DEFINED_LABEL_VALUE +
+                    "' ) {" +
+                    " 	label.getCaption( ).getColor( ).set( 0, 0, 0 );" +
+                    " 	label.getCaption( ).getFont( ).setBold(true);" +
+                    "     label.getCaption().getFont().setSize(" +
+                    (FONT_SIZE + 1) +
+                    ");" +
+                    " 	label.setVisible( true );" +
+                    "   } else {" +
+                    "     label.getCaption().getFont().setSize(" +
+                    FONT_SIZE +
+                    ");" +
+                    " 	label.getCaption( ).getFont( ).setBold(false);" +
+                    "   }" +
+                    " } " +
+                    "}" // //////////////////////////////////////////////////////
+                    +
+                    "function beforeDrawElement(dataPointHints, fill) {" // + "
+                    // java.lang.System.out.println('________
+                    // ' +
+                    // fill.getClass().getName());"
+                    // Color of Total
+                    +
+                    " if ( dataPointHints.getBaseValue() == 'Total' ) {" +
+                    "  fill.set(225, 225, 255);" // Color of Serve
+                    +
+                    " } else if ( dataPointHints.getBaseValue() == 'Serve' ) { " +
+                    "  fill.set(" +
+                    AOFigure.COLOR_WHEN_SERVING_REQUEST.getRed() +
+                    "," +
+                    AOFigure.COLOR_WHEN_SERVING_REQUEST.getGreen() +
+                    "," +
+                    AOFigure.COLOR_WHEN_SERVING_REQUEST.getBlue() +
+                    ");" // Color of SendRequest and SendReply
+                    +
+                    " } else if ( dataPointHints.getBaseValue() == 'SendRequest' || dataPointHints.getBaseValue() == 'SendReply' ) {" +
+                    "  fill.set(40,255,200);" // Color of WaitByNecessity
+                    +
+                    " } else if ( dataPointHints.getBaseValue() == 'WaitByNecessity') {" +
+                    "  fill.set(" +
+                    AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY.getRed() +
+                    "," +
+                    AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY.getGreen() +
+                    "," +
+                    AOFigure.COLOR_WHEN_WAITING_BY_NECESSITY.getBlue() +
+                    ");" // Color of WaitForRequest
+                    +
+                    " } else if ( dataPointHints.getBaseValue() == 'WaitForRequest') {" +
+                    "  fill.set(" +
+                    AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST.getRed() +
+                    "," +
+                    AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST.getGreen() +
+                    "," +
+                    AOFigure.COLOR_WHEN_WAITING_FOR_REQUEST.getBlue() + ");" + " }" + "}");
     }
 
     /**
@@ -248,14 +279,12 @@ public class BarChartBuilder {
      * @param filter Used to filter timers
      * @return The instance of the chart created from the list of tree node objects
      */
-    public final Chart createChart(
-        final List<TimerTreeNodeObject> timerTreeNodeObjectList,
-        final String[] filter) {
+    public final Chart createChart(final List<TimerTreeNodeObject> timerTreeNodeObjectList,
+            final String[] filter) {
         // That map will contain all collapsed timers except methodTimers
         final Map<String, Double> collapsedTimersMap = new HashMap<String, Double>();
         for (final TimerTreeNodeObject t : timerTreeNodeObjectList) {
-            if (BasicChartObject.contains(filter, t.getLabelName()) ||
-                    t.getCurrentTimer().isUserLevel()) {
+            if (BasicChartObject.contains(filter, t.getLabelName()) || t.getCurrentTimer().isUserLevel()) {
                 Double d = collapsedTimersMap.get(t.getLabelName());
                 if (d == null) {
                     d = new Double(t.getCurrentTotalTimeInMsInDouble());
@@ -291,9 +320,8 @@ public class BarChartBuilder {
      * @param collapsedTimesMap The collapsed map of times
      * @param filter An array of timers names
      */
-    private final void fillDataFromCollapsedMap(
-        final java.util.Map<String, Double> collapsedTimesMap,
-        final String[] filter) {
+    private final void fillDataFromCollapsedMap(final java.util.Map<String, Double> collapsedTimesMap,
+            final String[] filter) {
         String timerName = null;
         Double value = null;
         for (int i = 0; i < filter.length; i++) {
@@ -309,9 +337,8 @@ public class BarChartBuilder {
      */
     public final void updateTitle() {
         this.now.setTime(System.currentTimeMillis());
-        this.chart.getTitle().getLabel().getCaption()
-                  .setValue(title + " \nLast Refresh : " +
-            BarChartBuilder.df.format(this.now));
+        this.chart.getTitle().getLabel().getCaption().setValue(
+                title + " \nLast Refresh : " + BarChartBuilder.df.format(this.now));
     }
 
     /**
@@ -348,10 +375,8 @@ public class BarChartBuilder {
         yAxis.getLabel().getCaption().getFont().setSize(FONT_SIZE);
         yAxis.getLabel().getCaption().getFont().setName(FONT_NAME);
         yAxis.getMajorGrid().getLineAttributes().setVisible(true);
-        yAxis.getMajorGrid().getLineAttributes()
-             .setColor(ColorDefinitionImpl.GREY());
-        yAxis.getMajorGrid().getLineAttributes()
-             .setStyle(LineStyle.DASHED_LITERAL);
+        yAxis.getMajorGrid().getLineAttributes().setColor(ColorDefinitionImpl.GREY());
+        yAxis.getMajorGrid().getLineAttributes().setStyle(LineStyle.DASHED_LITERAL);
         yAxis.getMajorGrid().setTickStyle(TickStyle.LEFT_LITERAL);
 
         yAxis.setType(AxisType.LOGARITHMIC_LITERAL);

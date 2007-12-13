@@ -82,21 +82,19 @@ public class ProActiveComponentGroup {
      * @throws ClassNotFoundException
      * @throws ClassNotReifiableException
      */
-    public static ProActiveInterface newComponentInterfaceGroup(
-        ProActiveInterfaceType interfaceType, Component owner)
-        throws ClassNotFoundException, ClassNotReifiableException {
+    public static ProActiveInterface newComponentInterfaceGroup(ProActiveInterfaceType interfaceType,
+            Component owner) throws ClassNotFoundException, ClassNotReifiableException {
         try {
-            Object result = MOP.newInstance(ProActiveInterfaceImpl.class.getName(),
-                    null, null,
+            Object result = MOP.newInstance(ProActiveInterfaceImpl.class.getName(), null, null,
                     ProxyForComponentInterfaceGroup.class.getName(), null);
 
-            ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result).getProxy();
+            ProxyForComponentInterfaceGroup proxy = (ProxyForComponentInterfaceGroup) ((StubObject) result)
+                    .getProxy();
             proxy.className = Interface.class.getName();
 
             //return a reference on the generated interface reference corresponding to the interface type
             ProActiveInterface generated = RepresentativeInterfaceClassGenerator.instance()
-                                                                                .generateFunctionalInterface(interfaceType.getFcItfName(),
-                    owner, interfaceType);
+                    .generateFunctionalInterface(interfaceType.getFcItfName(), owner, interfaceType);
             ((StubObject) generated).setProxy(proxy);
 
             proxy.setInterfaceType(interfaceType);
@@ -110,8 +108,7 @@ public class ProActiveComponentGroup {
         } catch (ConstructionOfReifiedObjectFailedException e) {
             logger.error("**** ConstructionOfReifiedObjectFailedException ****");
         } catch (InterfaceGenerationFailedException e) {
-            logger.error("**** Interface could not be generated **** " +
-                e.getMessage());
+            logger.error("**** Interface could not be generated **** " + e.getMessage());
         }
         return null;
     }
@@ -127,30 +124,27 @@ public class ProActiveComponentGroup {
      * @throws java.lang.InstantiationException
      */
     public static ProActiveComponentRepresentative newComponentRepresentativeGroup(
-        ComponentType componentType, ControllerDescription controllerDesc)
-        throws ClassNotFoundException, InstantiationException {
+            ComponentType componentType, ControllerDescription controllerDesc) throws ClassNotFoundException,
+            InstantiationException {
         try {
             ProActiveComponentRepresentative result = null;
 
             // create the stub with the appropriate parameters
             Constructor constructor = ProActiveComponentRepresentativeImpl.class.getConstructor(new Class[] {
-                        ComponentType.class, String.class, String.class
-                    });
-            result = (ProActiveComponentRepresentative) constructor.newInstance(new Object[] {
-                        componentType, controllerDesc.getHierarchicalType(),
-                        controllerDesc.getControllersConfigFileLocation()
-                    });
+                    ComponentType.class, String.class, String.class });
+            result = (ProActiveComponentRepresentative) constructor
+                    .newInstance(new Object[] { componentType, controllerDesc.getHierarchicalType(),
+                            controllerDesc.getControllersConfigFileLocation() });
 
             // build the constructor call for the proxy object to create
-            ConstructorCall reifiedCall = MOP.buildTargetObjectConstructorCall(ProActiveComponentRepresentativeImpl.class,
-                    new Object[] {
-                        componentType, controllerDesc.getHierarchicalType(),
-                        controllerDesc.getControllersConfigFileLocation()
-                    });
+            ConstructorCall reifiedCall = MOP.buildTargetObjectConstructorCall(
+                    ProActiveComponentRepresentativeImpl.class, new Object[] { componentType,
+                            controllerDesc.getHierarchicalType(),
+                            controllerDesc.getControllersConfigFileLocation() });
 
             // Instanciates the proxy object
-            ProxyForComponentGroup proxy = (ProxyForComponentGroup) MOP.createProxyObject(ProxyForComponentGroup.class.getName(),
-                    MOP.EMPTY_OBJECT_ARRAY, reifiedCall);
+            ProxyForComponentGroup proxy = (ProxyForComponentGroup) MOP.createProxyObject(
+                    ProxyForComponentGroup.class.getName(), MOP.EMPTY_OBJECT_ARRAY, reifiedCall);
 
             // connect the stub to the proxy
             result.setProxy(proxy);
@@ -161,8 +155,7 @@ public class ProActiveComponentGroup {
 
             return result;
         } catch (Exception e) {
-            throw new InstantiationException(
-                "cannot create group of component representatives : " +
+            throw new InstantiationException("cannot create group of component representatives : " +
                 e.getMessage());
         }
     }
@@ -178,30 +171,27 @@ public class ProActiveComponentGroup {
      * @throws java.lang.InstantiationException
      */
     public static ProActiveComponentRepresentative newNFComponentRepresentativeGroup(
-        ComponentType componentType, ControllerDescription controllerDesc)
-        throws ClassNotFoundException, InstantiationException {
+            ComponentType componentType, ControllerDescription controllerDesc) throws ClassNotFoundException,
+            InstantiationException {
         try {
             ProActiveComponentRepresentative result = null;
 
             // create the stub with the appropriate parameters
-            Constructor constructor = ProActiveNFComponentRepresentativeImpl.class.getConstructor(new Class[] {
-                        ComponentType.class, String.class, String.class
-                    });
-            result = (ProActiveComponentRepresentative) constructor.newInstance(new Object[] {
-                        componentType, controllerDesc.getHierarchicalType(),
-                        controllerDesc.getControllersConfigFileLocation()
-                    });
+            Constructor constructor = ProActiveNFComponentRepresentativeImpl.class
+                    .getConstructor(new Class[] { ComponentType.class, String.class, String.class });
+            result = (ProActiveComponentRepresentative) constructor
+                    .newInstance(new Object[] { componentType, controllerDesc.getHierarchicalType(),
+                            controllerDesc.getControllersConfigFileLocation() });
 
             // build the constructor call for the proxy object to create
-            ConstructorCall reifiedCall = MOP.buildTargetObjectConstructorCall(ProActiveNFComponentRepresentativeImpl.class,
-                    new Object[] {
-                        componentType, controllerDesc.getHierarchicalType(),
-                        controllerDesc.getControllersConfigFileLocation()
-                    });
+            ConstructorCall reifiedCall = MOP.buildTargetObjectConstructorCall(
+                    ProActiveNFComponentRepresentativeImpl.class, new Object[] { componentType,
+                            controllerDesc.getHierarchicalType(),
+                            controllerDesc.getControllersConfigFileLocation() });
 
             // Instanciates the proxy object
-            ProxyForComponentGroup proxy = (ProxyForComponentGroup) MOP.createProxyObject(ProxyForComponentGroup.class.getName(),
-                    MOP.EMPTY_OBJECT_ARRAY, reifiedCall);
+            ProxyForComponentGroup proxy = (ProxyForComponentGroup) MOP.createProxyObject(
+                    ProxyForComponentGroup.class.getName(), MOP.EMPTY_OBJECT_ARRAY, reifiedCall);
 
             // connect the stub to the proxy
             result.setProxy(proxy);
@@ -212,8 +202,7 @@ public class ProActiveComponentGroup {
 
             return result;
         } catch (Exception e) {
-            throw new InstantiationException(
-                "cannot create group of component representatives : " +
+            throw new InstantiationException("cannot create group of component representatives : " +
                 e.getMessage());
         }
     }

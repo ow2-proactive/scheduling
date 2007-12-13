@@ -35,16 +35,14 @@ import java.io.Serializable;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 
-public class DefaultProActiveSecurityManager extends ProActiveSecurityManager
-    implements Serializable {
+public class DefaultProActiveSecurityManager extends ProActiveSecurityManager implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
 
     //	private transient Logger logger;
-    public DefaultProActiveSecurityManager(EntityType type)
-        throws Exception {
+    public DefaultProActiveSecurityManager(EntityType type) throws Exception {
         super(type, new DefaultPolicyServer());
     }
 }

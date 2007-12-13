@@ -147,8 +147,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * register itself to the {@link RMCore}.
      */
     public void initActivity(Body body) {
-        this.imCore.internalAddSource((NodeSource) PAActiveObject.getStubOnThis(),
-            this.SourceId);
+        this.imCore.internalAddSource((NodeSource) PAActiveObject.getStubOnThis(), this.SourceId);
         // TODO gsigety, cdelbe : giving a stub on the source to Pinger can 
         // lead to a lock if source is blocked
         pinger = new Pinger((NodeSource) PAActiveObject.getStubOnThis());
@@ -200,8 +199,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      * @param padName a name associated with the ProActive Descriptor.
      * @throws AddingNodesException thrown if this method is asked on a {@link DynamicNodeSource}.
      */
-    public abstract void addNodes(ProActiveDescriptor pad)
-        throws AddingNodesException;
+    public abstract void addNodes(ProActiveDescriptor pad) throws AddingNodesException;
 
     /**
      * Adds an  already deployed node to the NodeSource.
@@ -278,8 +276,7 @@ public abstract class NodeSource implements Serializable, InitActive, EndActive 
      */
     protected void addNewAvailableNode(Node node, String VnName, String PADName) {
         if (logger.isInfoEnabled()) {
-            logger.info("[" + this.SourceId + "] new node available : " +
-                node.getNodeInformation().getURL());
+            logger.info("[" + this.SourceId + "] new node available : " + node.getNodeInformation().getURL());
         }
         this.nodes.put(node.getNodeInformation().getURL(), node);
         NodeSource s = (NodeSource) PAActiveObject.getStubOnThis();

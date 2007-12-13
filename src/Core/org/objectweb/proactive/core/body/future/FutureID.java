@@ -38,8 +38,8 @@ import org.objectweb.proactive.core.UniqueID;
 public class FutureID implements Serializable {
 
     /**
-    * The ID of the "evaluator" of the future.
-    */
+     * The ID of the "evaluator" of the future.
+     */
     private UniqueID creatorID;
 
     /**
@@ -69,8 +69,7 @@ public class FutureID implements Serializable {
         final int prime = 31;
         int result = 1;
         result = (prime * result) + (int) (ID ^ (ID >>> 32));
-        result = (prime * result) +
-            ((creatorID == null) ? 0 : creatorID.hashCode());
+        result = (prime * result) + ((creatorID == null) ? 0 : creatorID.hashCode());
         return result;
     }
 

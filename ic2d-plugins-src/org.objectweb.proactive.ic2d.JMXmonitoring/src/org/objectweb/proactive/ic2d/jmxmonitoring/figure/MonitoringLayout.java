@@ -130,8 +130,7 @@ public class MonitoringLayout extends ToolbarLayout {
          * amntShrinkHeight is the combined amount that the children must shrink
          * amntShrinkCurrentHeight is the amount each child will shrink respectively
          */
-        int amntShrinkHeight = totalHeight -
-            Math.max(availableHeight, totalMinHeight);
+        int amntShrinkHeight = totalHeight - Math.max(availableHeight, totalMinHeight);
 
         if (amntShrinkHeight < 0) {
             amntShrinkHeight = 0;
@@ -150,8 +149,7 @@ public class MonitoringLayout extends ToolbarLayout {
                 amntShrinkCurrentHeight = ((prefHeight - minHeight) * amntShrinkHeight) / (prefMinSumHeight);
             }
 
-            int width = Math.min(prefWidth,
-                    transposer.t(child.getMaximumSize()).width);
+            int width = Math.min(prefWidth, transposer.t(child.getMaximumSize()).width);
             if (matchWidth) {
                 width = transposer.t(child.getMaximumSize()).width;
             }
@@ -160,17 +158,17 @@ public class MonitoringLayout extends ToolbarLayout {
 
             int adjust = clientArea.width - width;
             switch (minorAlignment) {
-            case ALIGN_TOPLEFT:
-                adjust = 0;
-                break;
-            case ALIGN_CENTER:
-                adjust /= 2;
-                break;
-            case ALIGN_BOTTOMRIGHT:
-                break;
-            case ALIGN_CENTER_CENTER:
-                adjust /= 2;
-                break;
+                case ALIGN_TOPLEFT:
+                    adjust = 0;
+                    break;
+                case ALIGN_CENTER:
+                    adjust /= 2;
+                    break;
+                case ALIGN_BOTTOMRIGHT:
+                    break;
+                case ALIGN_CENTER_CENTER:
+                    adjust /= 2;
+                    break;
             }
             newBounds.x += (adjust + 50);
             newBounds.y += 400;

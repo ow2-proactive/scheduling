@@ -41,18 +41,25 @@ import org.objectweb.proactive.core.component.gen.Utils;
 public class TestGeneration {
     @org.junit.Test
     public void testEscapementInGeneratedClassName() throws Exception {
-        Assert.assertEquals("CgeneratednonregressiontestCPcomponentCPgenerationCPItfCCOTypeCOitfCIunCrepresentative",
-            Utils.getMetaObjectComponentRepresentativeClassName("itf-un",
-                "nonregressiontest.component.generation.ItfCOType"));
+        Assert.assertEquals(
+                "CgeneratednonregressiontestCPcomponentCPgenerationCPItfCCOTypeCOitfCIunCrepresentative",
+                Utils.getMetaObjectComponentRepresentativeClassName("itf-un",
+                        "nonregressiontest.component.generation.ItfCOType"));
         //Utils.getGatherProxyItfClassName(TODO_C);
-        Assert.assertEquals("nonregressiontest.component.generation.ItfCOType",
-            Utils.getInterfaceSignatureFromRepresentativeClassName(
-                "CgeneratednonregressiontestCPcomponentCPgenerationCPItfCCOTypeCOitfCIunCrepresentative"));
-        Assert.assertEquals("itf-un",
-            Utils.getInterfaceNameFromRepresentativeClassName(
-                "CgeneratednonregressiontestCPcomponentCPgenerationCPItfCCOTypeCOitfCIunCrepresentative"));
-        Assert.assertEquals("nonregressiontest.component.generation.GatherCODummyItf",
-            Utils.getInterfaceSignatureFromGathercastProxyClassName(
-                "CgeneratednonregressiontestCPcomponentCPgenerationCPGatherCCODummyItfCOgatherCCOServerItfCgathercastItfProxy"));
+        Assert
+                .assertEquals(
+                        "nonregressiontest.component.generation.ItfCOType",
+                        Utils
+                                .getInterfaceSignatureFromRepresentativeClassName("CgeneratednonregressiontestCPcomponentCPgenerationCPItfCCOTypeCOitfCIunCrepresentative"));
+        Assert
+                .assertEquals(
+                        "itf-un",
+                        Utils
+                                .getInterfaceNameFromRepresentativeClassName("CgeneratednonregressiontestCPcomponentCPgenerationCPItfCCOTypeCOitfCIunCrepresentative"));
+        Assert
+                .assertEquals(
+                        "nonregressiontest.component.generation.GatherCODummyItf",
+                        Utils
+                                .getInterfaceSignatureFromGathercastProxyClassName("CgeneratednonregressiontestCPcomponentCPgenerationCPGatherCCODummyItfCOgatherCCOServerItfCgathercastItfProxy"));
     }
 }

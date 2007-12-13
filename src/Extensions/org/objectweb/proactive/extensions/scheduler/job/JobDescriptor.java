@@ -158,8 +158,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
      * @param taskId the task that has just been started.
      */
     void reStart(TaskId taskId) {
-        eligibleTasks.put(taskId,
-            (EligibleTaskDescriptor) runningTasks.remove(taskId));
+        eligibleTasks.put(taskId, (EligibleTaskDescriptor) runningTasks.remove(taskId));
     }
 
     /**
@@ -177,8 +176,7 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
                 task.setCount(task.getCount() - 1);
 
                 if (task.getCount() == 0) {
-                    eligibleTasks.put(task.getId(),
-                        (EligibleTaskDescriptor) task);
+                    eligibleTasks.put(task.getId(), (EligibleTaskDescriptor) task);
                 }
             }
         }
@@ -208,11 +206,9 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
                 TaskDescriptor lt = eligibleTasks.get(tid.getKey());
 
                 if (lt != null) {
-                    pausedTasks.put(tid.getKey(),
-                        eligibleTasks.remove(tid.getKey()));
+                    pausedTasks.put(tid.getKey(), eligibleTasks.remove(tid.getKey()));
                 }
-            } else if ((tid.getValue() == TaskState.PENDING) ||
-                    (tid.getValue() == TaskState.SUBMITTED)) {
+            } else if ((tid.getValue() == TaskState.PENDING) || (tid.getValue() == TaskState.SUBMITTED)) {
                 EligibleTaskDescriptor lt = (EligibleTaskDescriptor) pausedTasks.get(tid.getKey());
 
                 if (lt != null) {
@@ -278,8 +274,8 @@ public class JobDescriptor implements Serializable, Comparable<JobDescriptor> {
     }
 
     /**
-    * @see java.lang.Comparable#compareTo(java.lang.Object)
-    */
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     public int compareTo(JobDescriptor o) {
         return o.priority.compareTo(priority);
     }

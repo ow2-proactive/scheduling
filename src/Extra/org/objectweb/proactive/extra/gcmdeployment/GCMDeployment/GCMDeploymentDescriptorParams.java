@@ -35,6 +35,8 @@ import java.util.Set;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+
+
 public class GCMDeploymentDescriptorParams {
 
     /** The GCM Descriptor describing the resources to be used */
@@ -68,14 +70,12 @@ public class GCMDeploymentDescriptorParams {
 
     public void setId(String id) {
         if (id == null) {
-            GCMD_LOGGER.warn(this.getClass().getName() +
-                ".setId called with id==null", new Exception());
+            GCMD_LOGGER.warn(this.getClass().getName() + ".setId called with id==null", new Exception());
             return;
         }
 
         if (id.equals("")) {
-            GCMD_LOGGER.warn(this.getClass().getName() +
-                ".setId called with id==\"\"", new Exception());
+            GCMD_LOGGER.warn(this.getClass().getName() + ".setId called with id==\"\"", new Exception());
             return;
         }
 

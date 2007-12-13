@@ -43,8 +43,8 @@ import ptolemy.data.Token;
 public class AOMatlabCollector extends AOSimpleMatlab {
 
     /**
-         *
-         */
+     *
+     */
     public AOMatlabCollector() {
     }
 
@@ -54,8 +54,7 @@ public class AOMatlabCollector extends AOSimpleMatlab {
      * @param inputScript  a pre-matlab script that will be launched before the main one (e.g. to set input params)
      * @param scriptLines a list of lines which represent the main script
      */
-    public AOMatlabCollector(String matlabCommandName, String inputScript,
-        ArrayList<String> scriptLines) {
+    public AOMatlabCollector(String matlabCommandName, String inputScript, ArrayList<String> scriptLines) {
         super(matlabCommandName, inputScript, scriptLines);
     }
 
@@ -81,8 +80,7 @@ public class AOMatlabCollector extends AOSimpleMatlab {
 
             if (i > 0) {
                 if (!tokens[i - 1].getType().equals(token.getType())) {
-                    throw new InvalidParameterException(token.getType(),
-                        tokens[i - 1].getType());
+                    throw new InvalidParameterException(token.getType(), tokens[i - 1].getType());
                 }
             }
 

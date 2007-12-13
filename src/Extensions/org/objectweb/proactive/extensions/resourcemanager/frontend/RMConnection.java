@@ -68,8 +68,7 @@ public class RMConnection implements RMConstants {
         }
 
         try {
-            RMAdmin admin = (RMAdmin) PAActiveObject.lookupActive(RMAdmin.class.getName(),
-                    url);
+            RMAdmin admin = (RMAdmin) PAActiveObject.lookupActive(RMAdmin.class.getName(), url);
             return admin;
         } catch (ActiveObjectCreationException e) {
             throw new RMException(e);
@@ -89,8 +88,7 @@ public class RMConnection implements RMConstants {
             url = "//localhost/" + NAME_ACTIVE_OBJECT_RMUSER;
         }
         try {
-            RMUser user = (RMUser) PAActiveObject.lookupActive(RMUser.class.getName(),
-                    url);
+            RMUser user = (RMUser) PAActiveObject.lookupActive(RMUser.class.getName(), url);
             return user;
         } catch (ActiveObjectCreationException e) {
             throw new RMException(e);
@@ -105,14 +103,12 @@ public class RMConnection implements RMConstants {
      * @return RMMonitoring Stub of monitoring active object.
      * @throws RMException if the lookup fails.
      */
-    public static RMMonitoring connectAsMonitor(String url)
-        throws RMException {
+    public static RMMonitoring connectAsMonitor(String url) throws RMException {
         if (url == null) {
             url = "//localhost/" + NAME_ACTIVE_OBJECT_RMMONITORING;
         }
         try {
-            RMMonitoring mon = (RMMonitoring) PAActiveObject.lookupActive(RMMonitoring.class.getName(),
-                    url);
+            RMMonitoring mon = (RMMonitoring) PAActiveObject.lookupActive(RMMonitoring.class.getName(), url);
             return mon;
         } catch (ActiveObjectCreationException e) {
             throw new RMException(e);

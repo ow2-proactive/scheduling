@@ -64,7 +64,7 @@ public class TaskResultImpl implements TaskResult {
     private TaskLogs output = null;
 
     /** Description definition of this result */
-    private Class<?extends ResultPreview> descriptorClass = null;
+    private Class<? extends ResultPreview> descriptorClass = null;
     private transient ResultPreview descriptor = null;
 
     /** ProActive empty constructor. */
@@ -137,7 +137,7 @@ public class TaskResultImpl implements TaskResult {
     /**
      *  @see org.objectweb.proactive.extensions.scheduler.common.task.TaskResult#setDescriptorClass(Class)
      */
-    public void setDescriptorClass(Class<?extends ResultPreview> descClass) {
+    public void setDescriptorClass(Class<? extends ResultPreview> descClass) {
         if (this.descriptorClass != null) {
             throw new RuntimeException("Descriptor class cannot be changed");
         } else {
@@ -154,11 +154,9 @@ public class TaskResultImpl implements TaskResult {
         try {
             instanciation = this.instanciateDescriptor();
         } catch (InstantiationException e) {
-            return new SimpleTextPanel(
-                "[SCHEDULER] Cannot create descriptor : " + e.getMessage());
+            return new SimpleTextPanel("[SCHEDULER] Cannot create descriptor : " + e.getMessage());
         } catch (IllegalAccessException e) {
-            return new SimpleTextPanel(
-                "[SCHEDULER] Cannot create descriptor : " + e.getMessage());
+            return new SimpleTextPanel("[SCHEDULER] Cannot create descriptor : " + e.getMessage());
         }
 
         if (instanciation) {
@@ -196,8 +194,7 @@ public class TaskResultImpl implements TaskResult {
      * Create the descriptor instance if descriptor class is available.
      * @return true if the creation occurs, false otherwise
      */
-    private boolean instanciateDescriptor()
-        throws InstantiationException, IllegalAccessException {
+    private boolean instanciateDescriptor() throws InstantiationException, IllegalAccessException {
         if (this.descriptorClass == null) {
             // no descriptor available
             return false;

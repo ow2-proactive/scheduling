@@ -44,8 +44,7 @@ import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityEntity;
 
 
-public class BodyRequest extends MessageImpl implements Request,
-    java.io.Serializable {
+public class BodyRequest extends MessageImpl implements Request, java.io.Serializable {
     protected MethodCall methodCall;
     protected boolean isPriority;
     protected boolean isNFRequest;
@@ -54,9 +53,8 @@ public class BodyRequest extends MessageImpl implements Request,
     //
     // -- CONSTRUCTORS -----------------------------------------------
     //
-    public BodyRequest(Body targetBody, String methodName,
-        Class<?>[] paramClasses, Object[] params, boolean isPriority)
-        throws NoSuchMethodException {
+    public BodyRequest(Body targetBody, String methodName, Class<?>[] paramClasses, Object[] params,
+            boolean isPriority) throws NoSuchMethodException {
         super(null, 0, true, methodName);
         if (paramClasses == null) {
             paramClasses = new Class<?>[params.length];
@@ -64,16 +62,14 @@ public class BodyRequest extends MessageImpl implements Request,
                 paramClasses[i] = params[i].getClass();
             }
         }
-        methodCall = MethodCall.getMethodCall(targetBody.getClass()
-                                                        .getMethod(methodName,
-                    paramClasses), params, (Map<TypeVariable, Class<?>>) null);
+        methodCall = MethodCall.getMethodCall(targetBody.getClass().getMethod(methodName, paramClasses),
+                params, (Map<TypeVariable, Class<?>>) null);
         this.isPriority = isPriority;
     }
 
     //Non functional BodyRequests constructor
-    public BodyRequest(Body targetBody, String methodName,
-        Class<?>[] paramClasses, Object[] params, boolean isNFRequest,
-        int nfRequestPriority) throws NoSuchMethodException {
+    public BodyRequest(Body targetBody, String methodName, Class<?>[] paramClasses, Object[] params,
+            boolean isNFRequest, int nfRequestPriority) throws NoSuchMethodException {
         super(null, 0, true, methodName);
         if (paramClasses == null) {
             paramClasses = new Class<?>[params.length];
@@ -81,9 +77,8 @@ public class BodyRequest extends MessageImpl implements Request,
                 paramClasses[i] = params[i].getClass();
             }
         }
-        methodCall = MethodCall.getMethodCall(targetBody.getClass()
-                                                        .getMethod(methodName,
-                    paramClasses), params, (Map<TypeVariable, Class<?>>) null);
+        methodCall = MethodCall.getMethodCall(targetBody.getClass().getMethod(methodName, paramClasses),
+                params, (Map<TypeVariable, Class<?>>) null);
 
         this.isNFRequest = isNFRequest;
         this.nfRequestPriority = nfRequestPriority;
@@ -105,8 +100,7 @@ public class BodyRequest extends MessageImpl implements Request,
         return 0;
     }
 
-    public boolean crypt(ProActiveSecurityManager psm,
-        SecurityEntity destinationBody) {
+    public boolean crypt(ProActiveSecurityManager psm, SecurityEntity destinationBody) {
         return true;
     }
 
@@ -119,8 +113,7 @@ public class BodyRequest extends MessageImpl implements Request,
     public int send(UniversalBody destinationBody) throws java.io.IOException {
         int ftres;
         if (!(destinationBody instanceof Body)) {
-            throw new java.io.IOException(
-                "The destination body is not a local body");
+            throw new java.io.IOException("The destination body is not a local body");
         }
         if (!isPriority) {
             ftres = ((Body) destinationBody).getRequestQueue().add(this);
@@ -159,8 +152,7 @@ public class BodyRequest extends MessageImpl implements Request,
         return methodCall;
     }
 
-    public void notifyReception(UniversalBody bodyReceiver)
-        throws java.io.IOException {
+    public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException {
     }
 
     //

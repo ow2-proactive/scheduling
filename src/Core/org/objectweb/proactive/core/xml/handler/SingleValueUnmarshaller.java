@@ -59,7 +59,7 @@ public class SingleValueUnmarshaller extends BasicUnmarshaller {
         } else {
             setResultObject(resultObject + value);
         }
-        */
+         */
 
         //Fix chunk reading problem
         if (resultObject != null) {

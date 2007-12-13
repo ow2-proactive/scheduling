@@ -52,8 +52,7 @@ public class LoadBalancing {
         LoadBalancer lb = null;
 
         try {
-            ir = (InformationRecover) PAActiveObject.newActive(InformationRecover.class.getName(),
-                    null);
+            ir = (InformationRecover) PAActiveObject.newActive(InformationRecover.class.getName(), null);
 
             for (int i = 0; i < nodes.length; i++) {
                 lb = (LoadBalancer) PAActiveObject.newActive(LoadBalancer.class.getName(),
@@ -83,8 +82,7 @@ public class LoadBalancing {
         activated = true;
 
         try {
-            ir = (InformationRecover) PAActiveObject.newActive(InformationRecover.class.getName(),
-                    null);
+            ir = (InformationRecover) PAActiveObject.newActive(InformationRecover.class.getName(), null);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {

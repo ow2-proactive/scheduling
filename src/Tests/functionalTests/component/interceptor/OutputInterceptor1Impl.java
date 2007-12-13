@@ -43,12 +43,12 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import functionalTests.component.controller.DummyController;
 
 
-public class OutputInterceptor1Impl extends AbstractProActiveController
-    implements OutputInterceptor1, OutputInterceptor {
+public class OutputInterceptor1Impl extends AbstractProActiveController implements OutputInterceptor1,
+        OutputInterceptor {
 
     /**
-         *
-         */
+     *
+     */
     public OutputInterceptor1Impl(Component owner) {
         super(owner);
     }
@@ -56,20 +56,18 @@ public class OutputInterceptor1Impl extends AbstractProActiveController
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(OUTPUT_INTERCEPTOR_1_NAME,
-                    OutputInterceptor1.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(OUTPUT_INTERCEPTOR_1_NAME,
+                    OutputInterceptor1.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 
     public void setDummyValue(String value) {
         try {
-            ((DummyController) getFcItfOwner()
-                                   .getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(value);
+            ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
+                    .setDummyValue(value);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
         }
@@ -77,8 +75,8 @@ public class OutputInterceptor1Impl extends AbstractProActiveController
 
     public String getDummyValue() {
         try {
-            return ((DummyController) getFcItfOwner()
-                                          .getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
+            return ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
+                    .getDummyValue();
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
             return null;

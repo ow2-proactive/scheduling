@@ -66,25 +66,22 @@ public class LocalSchedulerExample {
                 try {
                     imp = ResourceManagerProxy.getProxy(new URI(args[0]));
 
-                    logger.info("[SCHEDULER] Connect to ResourceManager on " +
-                        args[0]);
+                    logger.info("[SCHEDULER] Connect to ResourceManager on " + args[0]);
                 } catch (Exception e) {
-                    throw new Exception("ResourceManager doesn't exist on " +
-                        args[0]);
+                    throw new Exception("ResourceManager doesn't exist on " + args[0]);
                 }
             } else {
                 RMFactory.startLocal();
                 admin = RMFactory.getAdmin();
-                logger.info(
-                    "[SCHEDULER] Start local Resource Manager with 4 local nodes.");
+                logger.info("[SCHEDULER] Start local Resource Manager with 4 local nodes.");
                 try {
                     Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
 
-                ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(
-                        "../../../descriptors/scheduler/deployment/Local4JVM.xml");
+                ProActiveDescriptor pad = PADeployment
+                        .getProactiveDescriptor("../../../descriptors/scheduler/deployment/Local4JVM.xml");
                 admin.addNodes(pad);
 
                 //                Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -98,17 +95,14 @@ public class LocalSchedulerExample {
                 //                        }
                 //                    });
                 imp = ResourceManagerProxy.getProxy(new URI("rmi://localhost:" +
-                            System.getProperty("proactive.rmi.port") + "/"));
+                    System.getProperty("proactive.rmi.port") + "/"));
 
-                logger.info("ResourceManager created on " +
-                    PAActiveObject.getActiveObjectNodeUrl(imp));
+                logger.info("ResourceManager created on " + PAActiveObject.getActiveObjectNodeUrl(imp));
             }
 
-            AdminScheduler.createScheduler(LocalSchedulerExample.class.getResource(
-                    "login.cfg").getFile(),
-                LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
-                imp,
-                "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
+            AdminScheduler.createScheduler(LocalSchedulerExample.class.getResource("login.cfg").getFile(),
+                    LocalSchedulerExample.class.getResource("groups.cfg").getFile(), imp,
+                    "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
         } catch (Exception e) {
             e.printStackTrace();
         }

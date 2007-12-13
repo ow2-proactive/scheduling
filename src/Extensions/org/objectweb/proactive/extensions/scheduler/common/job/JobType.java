@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.scheduler.common.job;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * Class representing the type of the job.
  * Type are best describe below.
@@ -59,7 +60,8 @@ public enum JobType implements java.io.Serializable {
      * Only the task that have their dependences finished
      * can be executed.
      */
-    TASKSFLOW("Tasks Flow");private String name;
+    TASKSFLOW("Tasks Flow");
+    private String name;
 
     JobType(String name) {
         this.name = name;

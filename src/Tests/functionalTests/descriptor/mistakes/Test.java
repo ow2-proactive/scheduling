@@ -37,6 +37,7 @@ import org.objectweb.proactive.core.xml.VariableContract;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test service: variable support and mistakes in deployment descriptor
  */
@@ -75,8 +76,7 @@ public class Test extends FunctionalTest {
         // released.
         VariableContract variableContract = new VariableContract();
         try {
-            pad1 = PADeployment.getProactiveDescriptor(TESTVARIABLES_XML_LOCATION_UNIX,
-                    variableContract);
+            pad1 = PADeployment.getProactiveDescriptor(TESTVARIABLES_XML_LOCATION_UNIX, variableContract);
             // Descriptor parsed witout mistakes
         } catch (Exception e) {
             // Mistake found but not expected

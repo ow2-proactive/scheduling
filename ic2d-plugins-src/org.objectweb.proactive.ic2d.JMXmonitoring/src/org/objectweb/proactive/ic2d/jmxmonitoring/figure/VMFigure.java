@@ -131,16 +131,14 @@ public class VMFigure extends AbstractRectangleFigure {
     // -- INNER CLASS --------------------------------------------
     //
     private class VMBorderLayout extends BorderLayout {
-        protected Dimension calculatePreferredSize(IFigure container,
-            int wHint, int hHint) {
+        protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
             if (legend) {
                 return super.calculatePreferredSize(container, wHint, hHint).expand( /*90*/
-                    50, /*5*/
-                    0);
+                50, /*5*/
+                0);
             }
 
-            return super.calculatePreferredSize(container, wHint, hHint)
-                        .expand(5, 0);
+            return super.calculatePreferredSize(container, wHint, hHint).expand(5, 0);
         }
     }
 
@@ -149,10 +147,8 @@ public class VMFigure extends AbstractRectangleFigure {
             super(false);
         }
 
-        protected Dimension calculatePreferredSize(IFigure container,
-            int wHint, int hHint) {
-            return super.calculatePreferredSize(container, wHint, hHint)
-                        .expand(0, 8);
+        protected Dimension calculatePreferredSize(IFigure container, int wHint, int hHint) {
+            return super.calculatePreferredSize(container, wHint, hHint).expand(0, 8);
         }
     }
 }

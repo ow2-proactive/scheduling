@@ -61,10 +61,8 @@ public class Login {
      *             If the authentication fails (incorrect credentials) or if
      *             there is an error during the attempt to verify them.
      */
-    public static Boolean login(Map<String, Object> params, String loginMethod)
-        throws LoginException {
-        LoginContext lc = new LoginContext(loginMethod,
-                new NoCallbackHandler(params));
+    public static Boolean login(Map<String, Object> params, String loginMethod) throws LoginException {
+        LoginContext lc = new LoginContext(loginMethod, new NoCallbackHandler(params));
 
         lc.login();
 

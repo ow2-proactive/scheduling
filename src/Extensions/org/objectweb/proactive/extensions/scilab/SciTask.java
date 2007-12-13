@@ -54,8 +54,8 @@ public class SciTask extends AbstractGeneralTask {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCILAB_TASK);
 
     /**
-         *
-         */
+     *
+     */
     private static boolean initialized = false;
     private ArrayList<SciData> listDataIn;
 
@@ -123,16 +123,15 @@ public class SciTask extends AbstractGeneralTask {
     public void init() {
         if (!initialized) {
             if (logger.isInfoEnabled()) {
-                logger.info("Initializing Scilab engine using :" +
-                    System.getenv("SCI"));
+                logger.info("Initializing Scilab engine using :" + System.getenv("SCI"));
             }
             Scilab.init();
             initialized = true;
             Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                    public void run() {
-                        terminateEngine();
-                    }
-                }));
+                public void run() {
+                    terminateEngine();
+                }
+            }));
         }
     }
 

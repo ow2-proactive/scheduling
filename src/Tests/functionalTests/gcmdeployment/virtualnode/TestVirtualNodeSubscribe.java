@@ -59,8 +59,7 @@ public class TestVirtualNodeSubscribe extends Abstract {
         Assert.assertFalse(vnGreedy.subscribeIsReady(this, "isReady"));
 
         Assert.assertFalse(vnMaster.subscribeNodeAttachment(this, "LOL"));
-        Assert.assertFalse(vnMaster.subscribeNodeAttachment(this,
-                "brokenNodeAttached"));
+        Assert.assertFalse(vnMaster.subscribeNodeAttachment(this, "brokenNodeAttached"));
         Assert.assertFalse(vnMaster.subscribeIsReady(this, "brokenIsReady"));
 
         Assert.assertTrue(vnMaster.subscribeNodeAttachment(this, "nodeAttached"));

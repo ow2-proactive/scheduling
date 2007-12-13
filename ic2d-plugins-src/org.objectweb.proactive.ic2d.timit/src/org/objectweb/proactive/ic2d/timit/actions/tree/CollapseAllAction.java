@@ -43,16 +43,14 @@ public class CollapseAllAction extends Action {
     public CollapseAllAction(TimerTreeHolder t) {
         this.timerTreeHolder = t;
         this.setId(COLLAPSE_ALL);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "collapseall.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "collapseall.gif"));
         this.setToolTipText(COLLAPSE_ALL);
         this.setEnabled(true);
     }
 
     @Override
     public void run() {
-        if ((this.timerTreeHolder == null) ||
-                (this.timerTreeHolder.getChildren() == null)) {
+        if ((this.timerTreeHolder == null) || (this.timerTreeHolder.getChildren() == null)) {
             return;
         }
         for (TimerTreeNodeObject t : timerTreeHolder.getChildren()) {

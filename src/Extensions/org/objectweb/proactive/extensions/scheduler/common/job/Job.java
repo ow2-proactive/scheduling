@@ -62,7 +62,6 @@ public abstract class Job implements Serializable {
 
     /** Maximum amount of running time that the job can not exceed */
     //protected long runtimeLimit = -1;
-
     /** Is this job has to cancel when an exception occurs in a task */
     protected boolean cancelOnError = false;
 
@@ -156,7 +155,6 @@ public abstract class Job implements Serializable {
     //    public long getRuntimeLimit() {
     //        return runtimeLimit;
     //    }
-
     /**
      * @param runtimeLimit the runtimeLimit to set
      */
@@ -164,7 +162,6 @@ public abstract class Job implements Serializable {
     //    public void setRuntimeLimit(long runtimeLimit) {
     //        this.runtimeLimit = runtimeLimit;
     //    }
-
     /**
      * To get the priority of the job.
      *

@@ -53,8 +53,7 @@ public class CertificateTreeList extends ArrayList<CertificateTree> {
         addAll(list);
     }
 
-    public TypedCertificate search(String name, EntityType type)
-        throws NotFoundException {
+    public TypedCertificate search(String name, EntityType type) throws NotFoundException {
         for (CertificateTree ct : this) {
             try {
                 return ct.search(name, type);
@@ -63,8 +62,7 @@ public class CertificateTreeList extends ArrayList<CertificateTree> {
             }
         }
 
-        throw new NotFoundException("Certificate " + name + " : " + type +
-            " not found.");
+        throw new NotFoundException("Certificate " + name + " : " + type + " not found.");
     }
 
     @Override
@@ -79,7 +77,7 @@ public class CertificateTreeList extends ArrayList<CertificateTree> {
     }
 
     @Override
-    public boolean addAll(Collection<?extends CertificateTree> c) {
+    public boolean addAll(Collection<? extends CertificateTree> c) {
         for (CertificateTree tree : c) {
             add(tree);
         }

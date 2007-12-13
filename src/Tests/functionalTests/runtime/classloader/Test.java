@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * 2 steps hierarchical deployment with dynamic classloading through runtimes.
  * <p>
@@ -65,11 +66,9 @@ public class Test extends FunctionalTest {
     @Before
     public void initTest() throws Exception {
         PAProperties.PA_CLASSLOADER.setValue(PAProperties.TRUE);
-        String oldFilePath = getClass()
-                                 .getResource("/functionalTests/runtime/classloader/deployment.xml")
-                                 .getPath();
-        String newFilePath = oldFilePath.replaceFirst("deployment.xml",
-                "deployment-tmp.xml");
+        String oldFilePath = getClass().getResource("/functionalTests/runtime/classloader/deployment.xml")
+                .getPath();
+        String newFilePath = oldFilePath.replaceFirst("deployment.xml", "deployment-tmp.xml");
 
         // if tests are run from the /compile directory : getParent for root directory 
         File userDir = new File(System.getProperty("user.dir"));
@@ -79,30 +78,25 @@ public class Test extends FunctionalTest {
         } else {
             proactiveDir = userDir.getPath();
         }
-        searchAndReplace(oldFilePath, newFilePath, "proactive.home",
-            proactiveDir);
-        descriptor = PADeployment.getProactiveDescriptor(getClass()
-                                                             .getResource("/functionalTests/runtime/classloader/deployment-tmp.xml")
-                                                             .getPath());
+        searchAndReplace(oldFilePath, newFilePath, "proactive.home", proactiveDir);
+        descriptor = PADeployment.getProactiveDescriptor(getClass().getResource(
+                "/functionalTests/runtime/classloader/deployment-tmp.xml").getPath());
         descriptor.activateMappings();
     }
 
     @org.junit.Test
     public void action() throws Exception {
-        A a = (A) PAActiveObject.newActive("functionalTests.runtime.classloader.A",
-                new Object[] {  }, descriptor.getVirtualNode("VN1").getNode());
+        A a = (A) PAActiveObject.newActive("functionalTests.runtime.classloader.A", new Object[] {},
+                descriptor.getVirtualNode("VN1").getNode());
         a.createActiveObjectB();
 
         assertTrue(true);
     }
 
-    private void searchAndReplace(String oldFilePath, String newFilePath,
-        String oldString, String newString) {
+    private void searchAndReplace(String oldFilePath, String newFilePath, String oldString, String newString) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(
-                        oldFilePath));
-            BufferedWriter writer = new BufferedWriter(new FileWriter(
-                        newFilePath));
+            BufferedReader reader = new BufferedReader(new FileReader(oldFilePath));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(newFilePath));
             while (true) {
                 String oldLine = reader.readLine();
                 if (oldLine == null) {

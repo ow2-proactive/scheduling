@@ -102,15 +102,14 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      * @param node the node on which to create the launcher.
      * @return the created launcher as an activeObject.
      */
-    public TaskLauncher createLauncher(Node node)
-        throws ActiveObjectCreationException, NodeException {
+    public TaskLauncher createLauncher(Node node) throws ActiveObjectCreationException, NodeException {
         TaskLauncher launcher;
         if (getPreScript() == null) {
             launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
                     new Object[] { getId() }, node);
         } else {
-            launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(),
-                    new Object[] { getId(), getPreScript() }, node);
+            launcher = (TaskLauncher) PAActiveObject.newActive(TaskLauncher.class.getName(), new Object[] {
+                    getId(), getPreScript() }, node);
         }
         setExecuterInformations(new ExecuterInformations(launcher, node));
 
@@ -145,48 +144,40 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      */
     public int compareTo(InternalTask task) {
         switch (currentSort) {
-        case SORT_BY_DESCRIPTION:
-            return (currentOrder == ASC_ORDER)
-            ? (description.compareTo(task.description))
-            : (task.description.compareTo(description));
-        case SORT_BY_NAME:
-            return (currentOrder == ASC_ORDER) ? (name.compareTo(task.name))
-                                               : (task.name.compareTo(name));
-        case SORT_BY_STATUS:
-            return (currentOrder == ASC_ORDER)
-            ? (getStatus().compareTo(task.getStatus()))
-            : (task.getStatus().compareTo(getStatus()));
-        case SORT_BY_SUBMITTED_TIME:
-            return (currentOrder == ASC_ORDER)
-            ? ((int) (getSubmitTime() - task.getSubmitTime()))
-            : ((int) (task.getSubmitTime() - getSubmitTime()));
-        case SORT_BY_STARTED_TIME:
-            return (currentOrder == ASC_ORDER)
-            ? ((int) (getStartTime() - task.getStartTime()))
-            : ((int) (task.getStartTime() - getStartTime()));
-        case SORT_BY_FINISHED_TIME:
-            return (currentOrder == ASC_ORDER)
-            ? ((int) (getFinishedTime() - task.getFinishedTime()))
-            : ((int) (task.getFinishedTime() - getFinishedTime()));
-        case SORT_BY_RERUNNABLE:
-            return (currentOrder == ASC_ORDER)
-            ? (Integer.valueOf(getRerunnable())
-                      .compareTo(Integer.valueOf(task.getRerunnable())))
-            : (Integer.valueOf(task.getRerunnable())
-                      .compareTo(Integer.valueOf(getRerunnable())));
+            case SORT_BY_DESCRIPTION:
+                return (currentOrder == ASC_ORDER) ? (description.compareTo(task.description))
+                        : (task.description.compareTo(description));
+            case SORT_BY_NAME:
+                return (currentOrder == ASC_ORDER) ? (name.compareTo(task.name))
+                        : (task.name.compareTo(name));
+            case SORT_BY_STATUS:
+                return (currentOrder == ASC_ORDER) ? (getStatus().compareTo(task.getStatus())) : (task
+                        .getStatus().compareTo(getStatus()));
+            case SORT_BY_SUBMITTED_TIME:
+                return (currentOrder == ASC_ORDER) ? ((int) (getSubmitTime() - task.getSubmitTime()))
+                        : ((int) (task.getSubmitTime() - getSubmitTime()));
+            case SORT_BY_STARTED_TIME:
+                return (currentOrder == ASC_ORDER) ? ((int) (getStartTime() - task.getStartTime()))
+                        : ((int) (task.getStartTime() - getStartTime()));
+            case SORT_BY_FINISHED_TIME:
+                return (currentOrder == ASC_ORDER) ? ((int) (getFinishedTime() - task.getFinishedTime()))
+                        : ((int) (task.getFinishedTime() - getFinishedTime()));
+            case SORT_BY_RERUNNABLE:
+                return (currentOrder == ASC_ORDER) ? (Integer.valueOf(getRerunnable()).compareTo(Integer
+                        .valueOf(task.getRerunnable()))) : (Integer.valueOf(task.getRerunnable())
+                        .compareTo(Integer.valueOf(getRerunnable())));
 
-        //        case SORT_BY_RUN_TIME_LIMIT:
-        //            return (currentOrder == ASC_ORDER)
-        //            ? ((int) (getRunTimeLimit() - task.getRunTimeLimit()))
-        //            : ((int) (task.getRunTimeLimit() - getRunTimeLimit()));
-        case SORT_BY_HOST_NAME:
-            return (currentOrder == ASC_ORDER)
-            ? (getExecutionHostName().compareTo(task.getExecutionHostName()))
-            : (task.getExecutionHostName().compareTo(getExecutionHostName()));
-        default:
-            return (currentOrder == ASC_ORDER)
-            ? (getId().compareTo(task.getId())) : (task.getId()
-                                                       .compareTo(getId()));
+                //        case SORT_BY_RUN_TIME_LIMIT:
+                //            return (currentOrder == ASC_ORDER)
+                //            ? ((int) (getRunTimeLimit() - task.getRunTimeLimit()))
+                //            : ((int) (task.getRunTimeLimit() - getRunTimeLimit()));
+            case SORT_BY_HOST_NAME:
+                return (currentOrder == ASC_ORDER) ? (getExecutionHostName().compareTo(task
+                        .getExecutionHostName())) : (task.getExecutionHostName()
+                        .compareTo(getExecutionHostName()));
+            default:
+                return (currentOrder == ASC_ORDER) ? (getId().compareTo(task.getId())) : (task.getId()
+                        .compareTo(getId()));
         }
     }
 
@@ -424,8 +415,7 @@ public abstract class InternalTask extends Task implements Comparable<InternalTa
      *
      * @param executerInformations the executerInformations to set
      */
-    public void setExecuterInformations(
-        ExecuterInformations executerInformations) {
+    public void setExecuterInformations(ExecuterInformations executerInformations) {
         this.executerInformations = executerInformations;
     }
 

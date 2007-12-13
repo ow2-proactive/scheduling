@@ -41,8 +41,7 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
  * @author Matthieu Morel
  *
  */
-public class RequestFilterOnComponentControllerClasses implements RequestFilter,
-    java.io.Serializable {
+public class RequestFilterOnComponentControllerClasses implements RequestFilter, java.io.Serializable {
     public RequestFilterOnComponentControllerClasses() {
     }
 

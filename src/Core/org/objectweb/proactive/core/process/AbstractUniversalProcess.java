@@ -40,8 +40,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public abstract class AbstractUniversalProcess implements UniversalProcess {
     protected static final String LOCALHOST = getLocalHost();
-    public final static String DEFAULT_USERNAME = System.getProperty(
-            "user.name");
+    public final static String DEFAULT_USERNAME = System.getProperty("user.name");
     public final static String DEFAULT_HOSTNAME = LOCALHOST;
     protected String hostname = DEFAULT_HOSTNAME;
     protected String username;
@@ -79,10 +78,8 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     }
 
     public void startFileTransfer() {
-        if (ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER)
-                               .isDebugEnabled()) {
-            ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER)
-                           .debug("FileTransfer initializations ");
+        if (ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER).isDebugEnabled()) {
+            ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER).debug("FileTransfer initializations ");
         }
 
         FileTransferWorkShop ftwDeploy = getFileTransferWorkShopDeploy();
@@ -248,8 +245,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
 
     protected abstract String buildCommand();
 
-    protected abstract void internalStartProcess(String commandToExecute)
-        throws java.io.IOException;
+    protected abstract void internalStartProcess(String commandToExecute) throws java.io.IOException;
 
     /**
      * Starts the FileTransfer specified by the parameter.
@@ -260,8 +256,7 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
 
     protected abstract int internalWaitFor() throws InterruptedException;
 
-    protected abstract int internalExitValue()
-        throws IllegalThreadStateException;
+    protected abstract int internalExitValue() throws IllegalThreadStateException;
 
     /**
      * This method sets attributes into the FileTransferWorkshop.StructureInformation
@@ -274,16 +269,13 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
      * the FileTransfer.
      * @param infoParams
      */
-    protected void pushProcessAttributes(
-        FileTransferWorkShop.StructureInformation infoParams) {
-        if ((infoParams.getUsername().length() <= 0) && (username != null) &&
-                (username.length() > 0)) {
+    protected void pushProcessAttributes(FileTransferWorkShop.StructureInformation infoParams) {
+        if ((infoParams.getUsername().length() <= 0) && (username != null) && (username.length() > 0)) {
             infoParams.setUsername(username);
         }
 
-        if ((infoParams.getHostname().length() <= 0) && (hostname != null) &&
-                (hostname.length() > 0) &&
-                !hostname.equalsIgnoreCase(DEFAULT_HOSTNAME)) {
+        if ((infoParams.getHostname().length() <= 0) && (hostname != null) && (hostname.length() > 0) &&
+            !hostname.equalsIgnoreCase(DEFAULT_HOSTNAME)) {
             infoParams.setHostname(hostname);
         }
     }
@@ -291,7 +283,6 @@ public abstract class AbstractUniversalProcess implements UniversalProcess {
     // -- PRIVATE METHODS -----------------------------------------------
     //
     private static String getLocalHost() {
-        return URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                       .getInetAddress());
+        return URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
     }
 }

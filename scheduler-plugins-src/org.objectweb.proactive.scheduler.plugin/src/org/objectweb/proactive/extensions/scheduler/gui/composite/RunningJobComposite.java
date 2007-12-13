@@ -74,8 +74,8 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public class RunningJobComposite extends AbstractJobComposite
-    implements RunningJobsListener, EventTasksListener, EventJobsListener {
+public class RunningJobComposite extends AbstractJobComposite implements RunningJobsListener,
+        EventTasksListener, EventJobsListener {
 
     /** the unique id and the title for the column "Progress" */
     public static final String COLUMN_PROGRESS_TEXT_TITLE = "# Finished Tasks";
@@ -97,8 +97,7 @@ public class RunningJobComposite extends AbstractJobComposite
      * @param title
      * @param jobsController
      */
-    public RunningJobComposite(Composite parent, String title,
-        JobsController jobsController) {
+    public RunningJobComposite(Composite parent, String title, JobsController jobsController) {
         super(parent, title, RUNNING_TABLE_ID);
         jobsController.addRunningJobsListener(this);
         jobsController.addEventTasksListener(this);
@@ -136,39 +135,38 @@ public class RunningJobComposite extends AbstractJobComposite
         PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
 
         switch (JobsController.getSchedulerState()) {
-        case SHUTTING_DOWN:
-        case KILLED:
-            PriorityJobAction.getInstance().setEnabled(false);
-            PriorityIdleJobAction.getInstance().setEnabled(false);
-            PriorityLowestJobAction.getInstance().setEnabled(false);
-            PriorityLowJobAction.getInstance().setEnabled(false);
-            PriorityNormalJobAction.getInstance().setEnabled(false);
-            PriorityHighJobAction.getInstance().setEnabled(false);
-            PriorityHighestJobAction.getInstance().setEnabled(false);
+            case SHUTTING_DOWN:
+            case KILLED:
+                PriorityJobAction.getInstance().setEnabled(false);
+                PriorityIdleJobAction.getInstance().setEnabled(false);
+                PriorityLowestJobAction.getInstance().setEnabled(false);
+                PriorityLowJobAction.getInstance().setEnabled(false);
+                PriorityNormalJobAction.getInstance().setEnabled(false);
+                PriorityHighJobAction.getInstance().setEnabled(false);
+                PriorityHighestJobAction.getInstance().setEnabled(false);
 
-            pauseResumeJobAction.setEnabled(false);
-            pauseResumeJobAction.setPauseResumeMode();
-            break;
-        default:
-            PriorityJobAction.getInstance().setEnabled(enabled);
-            PriorityIdleJobAction.getInstance().setEnabled(enabled);
-            PriorityLowestJobAction.getInstance().setEnabled(enabled);
-            PriorityLowJobAction.getInstance().setEnabled(enabled);
-            PriorityNormalJobAction.getInstance().setEnabled(enabled);
-            PriorityHighJobAction.getInstance().setEnabled(enabled);
-            PriorityHighestJobAction.getInstance().setEnabled(enabled);
-
-            pauseResumeJobAction.setEnabled(enabled);
-            JobState jobState = job.getState();
-            if (jobState.equals(JobState.PAUSED)) {
-                pauseResumeJobAction.setResumeMode();
-            } else if (jobState.equals(JobState.RUNNING) ||
-                    jobState.equals(JobState.PENDING) ||
-                    jobState.equals(JobState.STALLED)) {
-                pauseResumeJobAction.setPauseMode();
-            } else {
+                pauseResumeJobAction.setEnabled(false);
                 pauseResumeJobAction.setPauseResumeMode();
-            }
+                break;
+            default:
+                PriorityJobAction.getInstance().setEnabled(enabled);
+                PriorityIdleJobAction.getInstance().setEnabled(enabled);
+                PriorityLowestJobAction.getInstance().setEnabled(enabled);
+                PriorityLowJobAction.getInstance().setEnabled(enabled);
+                PriorityNormalJobAction.getInstance().setEnabled(enabled);
+                PriorityHighJobAction.getInstance().setEnabled(enabled);
+                PriorityHighestJobAction.getInstance().setEnabled(enabled);
+
+                pauseResumeJobAction.setEnabled(enabled);
+                JobState jobState = job.getState();
+                if (jobState.equals(JobState.PAUSED)) {
+                    pauseResumeJobAction.setResumeMode();
+                } else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING) ||
+                    jobState.equals(JobState.STALLED)) {
+                    pauseResumeJobAction.setPauseMode();
+                } else {
+                    pauseResumeJobAction.setPauseResumeMode();
+                }
         }
 
         ObtainJobOutputAction.getInstance().setEnabled(enabled);
@@ -237,9 +235,7 @@ public class RunningJobComposite extends AbstractJobComposite
                 tableEditors.add(editor);
                 progressBars.add(bar);
             } else if (title.equals(COLUMN_PROGRESS_TEXT_TITLE)) {
-                item.setText(i,
-                    job.getNumberOfFinishedTask() + "/" +
-                    job.getTotalNumberOfTasks());
+                item.setText(i, job.getNumberOfFinishedTask() + "/" + job.getTotalNumberOfTasks());
             }
         }
         return item;
@@ -275,57 +271,52 @@ public class RunningJobComposite extends AbstractJobComposite
             }
             final int i = tmp;
             getDisplay().asyncExec(new Runnable() {
-                    public void run() {
-                        int j = getTable().getSelectionIndex();
-                        if (i == j) {
-                            JobInfo jobInfo = JobInfo.getInstance();
-                            if (jobInfo != null) {
-                                jobInfo.clear();
-                            }
-
-                            ResultPreview resultPreview = ResultPreview.getInstance();
-                            if (resultPreview != null) {
-                                resultPreview.update(new SimpleTextPanel(
-                                        "No selected task"));
-                            }
-
-                            TaskView taskView = TaskView.getInstance();
-                            if (taskView != null) {
-                                taskView.clear();
-                            }
-
-                            // enabling/disabling button permitted with this job
-                            ObtainJobOutputAction.getInstance().setEnabled(false);
-                            PriorityJobAction.getInstance().setEnabled(false);
-                            PriorityIdleJobAction.getInstance().setEnabled(false);
-                            PriorityLowestJobAction.getInstance()
-                                                   .setEnabled(false);
-                            PriorityLowJobAction.getInstance().setEnabled(false);
-                            PriorityNormalJobAction.getInstance()
-                                                   .setEnabled(false);
-                            PriorityHighJobAction.getInstance().setEnabled(false);
-                            PriorityHighestJobAction.getInstance()
-                                                    .setEnabled(false);
-                            PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
-                            pauseResumeJobAction.setEnabled(false);
-                            pauseResumeJobAction.setPauseResumeMode();
-                            KillRemoveJobAction.getInstance().setEnabled(false);
+                public void run() {
+                    int j = getTable().getSelectionIndex();
+                    if (i == j) {
+                        JobInfo jobInfo = JobInfo.getInstance();
+                        if (jobInfo != null) {
+                            jobInfo.clear();
                         }
-                        TableItem item = getTable().getItem(i);
-                        ProgressBar bar = ((ProgressBar) item.getData("bar"));
-                        TableEditor editor = ((TableEditor) item.getData(
-                                "editor"));
-                        bar.dispose();
-                        progressBars.remove(bar);
-                        editor.dispose();
-                        tableEditors.remove(editor);
-                        getTable().remove(i);
-                        TableColumn[] cols = getTable().getColumns();
-                        for (TableColumn col : cols)
-                            col.notifyListeners(SWT.Move, null);
-                        decreaseCount();
+
+                        ResultPreview resultPreview = ResultPreview.getInstance();
+                        if (resultPreview != null) {
+                            resultPreview.update(new SimpleTextPanel("No selected task"));
+                        }
+
+                        TaskView taskView = TaskView.getInstance();
+                        if (taskView != null) {
+                            taskView.clear();
+                        }
+
+                        // enabling/disabling button permitted with this job
+                        ObtainJobOutputAction.getInstance().setEnabled(false);
+                        PriorityJobAction.getInstance().setEnabled(false);
+                        PriorityIdleJobAction.getInstance().setEnabled(false);
+                        PriorityLowestJobAction.getInstance().setEnabled(false);
+                        PriorityLowJobAction.getInstance().setEnabled(false);
+                        PriorityNormalJobAction.getInstance().setEnabled(false);
+                        PriorityHighJobAction.getInstance().setEnabled(false);
+                        PriorityHighestJobAction.getInstance().setEnabled(false);
+                        PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
+                        pauseResumeJobAction.setEnabled(false);
+                        pauseResumeJobAction.setPauseResumeMode();
+                        KillRemoveJobAction.getInstance().setEnabled(false);
                     }
-                });
+                    TableItem item = getTable().getItem(i);
+                    ProgressBar bar = ((ProgressBar) item.getData("bar"));
+                    TableEditor editor = ((TableEditor) item.getData("editor"));
+                    bar.dispose();
+                    progressBars.remove(bar);
+                    editor.dispose();
+                    tableEditors.remove(editor);
+                    getTable().remove(i);
+                    TableColumn[] cols = getTable().getColumns();
+                    for (TableColumn col : cols)
+                        col.notifyListeners(SWT.Move, null);
+                    decreaseCount();
+                }
+            });
         }
     }
 
@@ -348,42 +339,38 @@ public class RunningJobComposite extends AbstractJobComposite
             final TaskEvent taskEvent = event;
 
             getDisplay().asyncExec(new Runnable() {
-                    public void run() {
-                        Table table = getTable();
-                        TableItem[] items = table.getItems();
-                        TableItem item = null;
-                        for (TableItem it : items)
-                            if (((JobId) (it.getData())).equals(
-                                        taskEvent.getJobId())) {
-                                item = it;
-                                break;
-                            }
-
-                        if (item == null) {
-                            // TODO throw new IllegalArgumentException("the item
-                            // which represent the job : "
-                            // + taskEvent.getJobId() + " is unknown !");
-                            return;
+                public void run() {
+                    Table table = getTable();
+                    TableItem[] items = table.getItems();
+                    TableItem item = null;
+                    for (TableItem it : items)
+                        if (((JobId) (it.getData())).equals(taskEvent.getJobId())) {
+                            item = it;
+                            break;
                         }
 
-                        TableColumn[] cols = table.getColumns();
-                        InternalJob job = JobsController.getLocalView()
-                                                        .getJobById(taskEvent.getJobId());
-                        for (int i = 0; i < cols.length; i++) {
-                            String title = cols[i].getText();
-                            if ((title != null) &&
-                                    (title.equals(COLUMN_PROGRESS_BAR_TITLE) &&
-                                    (!item.isDisposed()))) {
-                                ((ProgressBar) item.getData("bar")).setSelection(job.getNumberOfFinishedTask());
-                            } else if ((title != null) &&
-                                    (title.equals(COLUMN_PROGRESS_TEXT_TITLE))) {
-                                item.setText(i,
-                                    job.getNumberOfFinishedTask() + "/" +
-                                    job.getTotalNumberOfTasks());
-                            }
+                    if (item == null) {
+                        // TODO throw new IllegalArgumentException("the item
+                        // which represent the job : "
+                        // + taskEvent.getJobId() + " is unknown !");
+                        return;
+                    }
+
+                    TableColumn[] cols = table.getColumns();
+                    InternalJob job = JobsController.getLocalView().getJobById(taskEvent.getJobId());
+                    for (int i = 0; i < cols.length; i++) {
+                        String title = cols[i].getText();
+                        if ((title != null) &&
+                            (title.equals(COLUMN_PROGRESS_BAR_TITLE) && (!item.isDisposed()))) {
+                            ((ProgressBar) item.getData("bar")).setSelection(job.getNumberOfFinishedTask());
+                        } else if ((title != null) && (title.equals(COLUMN_PROGRESS_TEXT_TITLE))) {
+                            item
+                                    .setText(i, job.getNumberOfFinishedTask() + "/" +
+                                        job.getTotalNumberOfTasks());
                         }
                     }
-                });
+                }
+            });
         }
     }
 

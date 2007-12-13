@@ -57,8 +57,7 @@ public class ListenerAdapter implements NotificationListener {
      *
      * @param listener
      */
-    public ListenerAdapter(NotificationListener listener, MBeanServer mbs,
-        ObjectName name) {
+    public ListenerAdapter(NotificationListener listener, MBeanServer mbs, ObjectName name) {
         this.listener = listener;
         this.mbs = mbs;
         this.name = name;

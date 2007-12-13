@@ -56,22 +56,19 @@ public class Client {
     protected String myName;
     protected String serverHostName;
     protected Server theServer;
-    private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat(
-            "dd/MM/yyyy HH:mm:ss");
+    private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
     public Client() {
     }
 
-    public Client(String clientName, String serverHostName)
-        throws Exception {
+    public Client(String clientName, String serverHostName) throws Exception {
         this.myName = clientName;
         this.serverHostName = serverHostName;
         // Looks up for the server
         String urlAsString = "//" + serverHostName + "/theServer";
-        logger.info("Client " + clientName + " is looking up server at " +
-            urlAsString);
-        this.theServer = (Server) org.objectweb.proactive.api.PAActiveObject.lookupActive(Server.class.getName(),
-                urlAsString);
+        logger.info("Client " + clientName + " is looking up server at " + urlAsString);
+        this.theServer = (Server) org.objectweb.proactive.api.PAActiveObject.lookupActive(Server.class
+                .getName(), urlAsString);
         logger.info("Client " + this.myName + " successfully found the server");
     }
 
@@ -102,8 +99,7 @@ public class Client {
         String clientName;
         String serverHostName;
         if (args.length < 1) {
-            System.out.println(
-                "Correct syntax is: client <client name> [server host name]");
+            System.out.println("Correct syntax is: client <client name> [server host name]");
             return;
         } else if (args.length == 1) {
             clientName = args[0];
@@ -115,8 +111,8 @@ public class Client {
 
         try {
             // Creates an active object for the client
-            Client theClient = (Client) org.objectweb.proactive.api.PAActiveObject.newActive(Client.class.getName(),
-                    new Object[] { clientName, serverHostName });
+            Client theClient = (Client) org.objectweb.proactive.api.PAActiveObject.newActive(Client.class
+                    .getName(), new Object[] { clientName, serverHostName });
             theClient.init();
             Thread t = new Thread(new RunClient(theClient));
             t.start();

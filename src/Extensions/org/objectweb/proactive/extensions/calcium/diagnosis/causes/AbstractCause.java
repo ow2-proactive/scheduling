@@ -53,15 +53,14 @@ public abstract class AbstractCause implements Cause {
             try {
                 Method[] mall = c.getMethods();
                 for (Method m : mall) {
-                    if (!m.isBridge() &&
-                            (m.getName() == getMethodSearchString())) {
+                    if (!m.isBridge() && (m.getName() == getMethodSearchString())) {
                         blamed.add(m);
                         break;
                     }
                 }
             } catch (Exception e) {
-                logger.error("Unable to find method: " +
-                    getMethodSearchString() + " in class: " + c.getName());
+                logger.error("Unable to find method: " + getMethodSearchString() + " in class: " +
+                    c.getName());
             }
         }
 

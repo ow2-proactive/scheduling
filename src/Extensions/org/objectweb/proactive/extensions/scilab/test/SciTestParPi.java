@@ -54,8 +54,7 @@ public class SciTestParPi {
         service.deployEngine(args[0], args[1], nbEngine);
 
         BufferedReader reader = new BufferedReader(new FileReader(args[3]));
-        PrintWriter writer = new PrintWriter(new BufferedWriter(
-                    new FileWriter(args[4])));
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(args[4])));
 
         int precision;
         int nbBloc;
@@ -86,8 +85,7 @@ public class SciTestParPi {
             service.removeAllEventListenerTask();
             endTime = System.currentTimeMillis();
             System.out.println("Pi = " + result);
-            writer.println(nbEngine + " " + precision + " " + nbBloc + " " +
-                (endTime - startTime));
+            writer.println(nbEngine + " " + precision + " " + nbBloc + " " + (endTime - startTime));
         }
 
         reader.close();

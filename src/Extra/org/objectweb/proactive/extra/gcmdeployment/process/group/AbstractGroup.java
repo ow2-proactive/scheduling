@@ -59,18 +59,15 @@ public abstract class AbstractGroup implements Group {
 
     public AbstractGroup(AbstractGroup group) {
         try {
-            this.hostInfo = (HostInfo) ((group.hostInfo != null)
-                ? Utils.makeDeepCopy(group.hostInfo) : null);
+            this.hostInfo = (HostInfo) ((group.hostInfo != null) ? Utils.makeDeepCopy(group.hostInfo) : null);
             this.commandPath = group.commandPath;
-            this.env = (group.env != null)
-                ? new HashMap<String, String>(group.env) : null;
+            this.env = (group.env != null) ? new HashMap<String, String>(group.env) : null;
             this.id = (group.id != null) ? new String(group.id) : null;
-            this.username = (group.username != null)
-                ? new String(group.username) : null;
-            this.bookedNodesAccess = (group.bookedNodesAccess != null)
-                ? new String(group.bookedNodesAccess) : null;
-            this.scriptPath = (PathElement) ((group.scriptPath != null)
-                ? Utils.makeDeepCopy(group.scriptPath) : null);
+            this.username = (group.username != null) ? new String(group.username) : null;
+            this.bookedNodesAccess = (group.bookedNodesAccess != null) ? new String(group.bookedNodesAccess)
+                    : null;
+            this.scriptPath = (PathElement) ((group.scriptPath != null) ? Utils
+                    .makeDeepCopy(group.scriptPath) : null);
         } catch (IOException e) {
             // can't happen
         }
@@ -124,13 +121,11 @@ public abstract class AbstractGroup implements Group {
         this.hostInfo = hostInfo;
     }
 
-    public List<String> buildCommands(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma) {
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         List<String> commands = internalBuildCommands();
         List<String> ret = new ArrayList<String>();
         for (String comnand : commands) {
-            ret.add(comnand + " " +
-                Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo, gcma)));
+            ret.add(comnand + " " + Helpers.escapeCommand(commandBuilder.buildCommand(hostInfo, gcma)));
         }
 
         return ret;

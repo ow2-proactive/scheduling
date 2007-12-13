@@ -40,9 +40,7 @@ public class RefreshHostAction extends Action {
     private HostObject host;
 
     public RefreshHostAction() {
-        super("Look for new JVM",
-            ImageDescriptor.createFromFile(RefreshHostAction.class,
-                "refresh.gif"));
+        super("Look for new JVM", ImageDescriptor.createFromFile(RefreshHostAction.class, "refresh.gif"));
         this.setId(REFRESH_HOST);
         this.setToolTipText("Look for new JVM");
     }

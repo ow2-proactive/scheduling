@@ -85,24 +85,20 @@ public class SerieResultWriter {
      *            the total number of timeout errors which occured
      *            during the serie run
      */
-    public void addResult(Element bResults, String name, int runs,
-        int totalTimeoutErrors) {
+    public void addResult(Element bResults, String name, int runs, int totalTimeoutErrors) {
         Element benchResult = new Element("FinalStatistics");
         this.eTimit.addContent(benchResult);
         benchResult.setAttribute(new Attribute("name", name));
         benchResult.setAttribute(new Attribute("runs", "" + runs));
-        benchResult.setAttribute(new Attribute("timeoutErrors",
-                "" + totalTimeoutErrors));
-        benchResult.setAttribute(new Attribute("date",
-                "" + (new java.sql.Timestamp(System.currentTimeMillis()))));
+        benchResult.setAttribute(new Attribute("timeoutErrors", "" + totalTimeoutErrors));
+        benchResult.setAttribute(new Attribute("date", "" +
+            (new java.sql.Timestamp(System.currentTimeMillis()))));
 
         // Timer statistics
-        this.fillTimersResults(benchResult,
-            bResults.getDescendants(new ElementFilter("timers")));
+        this.fillTimersResults(benchResult, bResults.getDescendants(new ElementFilter("timers")));
 
         // Event statistics
-        this.fillEventsResults(benchResult,
-            bResults.getDescendants(new ElementFilter("events")));
+        this.fillEventsResults(benchResult, bResults.getDescendants(new ElementFilter("events")));
 
         // Informations
         this.fillInformations(benchResult);
@@ -153,10 +149,8 @@ public class SerieResultWriter {
             while (targetIterator.hasNext() && finalIterator.hasNext()) {
                 Element e1 = (Element) targetIterator.next();
                 Element e2 = (Element) finalIterator.next();
-                if (!e1.getAttributeValue("name")
-                           .equals(e2.getAttributeValue("name"))) {
-                    throw new IllegalStateException(
-                        "You are trying to finalize different timers !");
+                if (!e1.getAttributeValue("name").equals(e2.getAttributeValue("name"))) {
+                    throw new IllegalStateException("You are trying to finalize different timers !");
                 }
                 // Get current target element ie timer values
                 tab1[0] = Double.valueOf(e1.getAttributeValue("min"));
@@ -227,11 +221,9 @@ public class SerieResultWriter {
             childrenSum = 0.0;
             children = e1.getChildren().iterator();
             while (children.hasNext()) {
-                childrenSum += Double.valueOf(((Element) children.next()).getAttributeValue(
-                        "avg"));
+                childrenSum += Double.valueOf(((Element) children.next()).getAttributeValue("avg"));
             }
-            e1.setAttribute(new Attribute("sum",
-                    TimIt.df.format(childrenSum / run)));
+            e1.setAttribute(new Attribute("sum", TimIt.df.format(childrenSum / run)));
         }
     }
 
@@ -270,8 +262,7 @@ public class SerieResultWriter {
                 temp.setAttribute(dev);
             } catch (NumberFormatException e) {
                 // We can't perform a min/avg/max/dev computation on this value
-                temp.setAttribute(new Attribute("value",
-                        "Too complex value, first run shown"));
+                temp.setAttribute(new Attribute("value", "Too complex value, first run shown"));
             }
         }
 
@@ -292,17 +283,13 @@ public class SerieResultWriter {
         int run = 0;
         do {
             run++;
-            Iterator targetIterator = eCurrentEvents.getDescendants(new ElementFilter(
-                        "event"));
-            Iterator finalIterator = eCloneEvents.getDescendants(new ElementFilter(
-                        "event"));
+            Iterator targetIterator = eCurrentEvents.getDescendants(new ElementFilter("event"));
+            Iterator finalIterator = eCloneEvents.getDescendants(new ElementFilter("event"));
             while (targetIterator.hasNext() && finalIterator.hasNext()) {
                 Element e1 = (Element) targetIterator.next();
                 Element e2 = (Element) finalIterator.next();
-                if (!e1.getAttributeValue("name")
-                           .equals(e2.getAttributeValue("name"))) {
-                    throw new IllegalStateException(
-                        "You are trying to finalize different events !");
+                if (!e1.getAttributeValue("name").equals(e2.getAttributeValue("name"))) {
+                    throw new IllegalStateException("You are trying to finalize different events !");
                 }
                 try {
                     if (e2.getAttribute("value") == null) {
@@ -363,7 +350,7 @@ public class SerieResultWriter {
                 average = average * average;
                 // Compute Deviation
                 sqrt = (deviation / run) - average; // avoid truncatures
-                                                    // problems
+                // problems
 
                 deviation = Math.sqrt((sqrt > 0) ? sqrt : 0);
                 // Set back the final deviation value
@@ -386,20 +373,16 @@ public class SerieResultWriter {
         Element eDeployer = new Element("deployer");
         eInfos.addContent(eDeployer);
         // JVM version
-        String jvmVersion = System.getProperty("java.vm.vendor") + " " +
-            System.getProperty("java.vm.name") + " " +
-            System.getProperty("java.vm.version") + " - Version " +
-            System.getProperty("java.version");
+        String jvmVersion = System.getProperty("java.vm.vendor") + " " + System.getProperty("java.vm.name") +
+            " " + System.getProperty("java.vm.version") + " - Version " + System.getProperty("java.version");
         eDeployer.setAttribute(new Attribute("jvm", jvmVersion));
 
         // OS Version
-        String osVersion = System.getProperty("os.arch") + " " +
-            System.getProperty("os.name") + " " +
+        String osVersion = System.getProperty("os.arch") + " " + System.getProperty("os.name") + " " +
             System.getProperty("os.version");
         eDeployer.setAttribute(new Attribute("os", osVersion));
 
         // Processor count
-        eDeployer.setAttribute(new Attribute("processors",
-                "" + Runtime.getRuntime().availableProcessors()));
+        eDeployer.setAttribute(new Attribute("processors", "" + Runtime.getRuntime().availableProcessors()));
     }
 }

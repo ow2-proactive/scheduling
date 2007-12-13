@@ -116,8 +116,7 @@ public class RequestInfo {
             requestURI = triplet[1];
             String HTTPVersion = triplet[2];
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new java.io.IOException(
-                "Malformed Request Line, expected 3 elements: " + line);
+            throw new java.io.IOException("Malformed Request Line, expected 3 elements: " + line);
         }
 
         if (method.equals(METHOD_GET)) {
@@ -132,25 +131,21 @@ public class RequestInfo {
             int index = requestURI.indexOf(".class");
 
             if (index > 1) {
-                this.classFileName = requestURI.substring(1, index)
-                                               .replace('/', '.');
+                this.classFileName = requestURI.substring(1, index).replace('/', '.');
             } else {
-                throw new java.io.IOException(
-                    "Malformed Request Line, expected a path to a .class file: " +
+                throw new java.io.IOException("Malformed Request Line, expected a path to a .class file: " +
                     line);
             }
 
             // Eat up headers, the ClassServer do not need them
             do {
                 if ((line = in.getLine()) == null) {
-                    throw new IOException(
-                        "Connection ended before reading all headers");
+                    throw new IOException("Connection ended before reading all headers");
                 }
             } while (line.length() > 0); // empty line, end of headers
         } else if (method.equals(METHOD_POST)) {
             if (!requestURI.equals(HttpUtils.SERVICE_REQUEST_URI)) {
-                throw new java.io.IOException(
-                    "Malformed Request Line, expected " +
+                throw new java.io.IOException("Malformed Request Line, expected " +
                     HttpUtils.SERVICE_REQUEST_URI + " as path: " + line);
             }
 
@@ -161,16 +156,13 @@ public class RequestInfo {
             this.contentLength = Integer.parseInt(in.getHeader("Content-Length"));
             this.contentType = in.getHeader("Content-Type");
             if (!contentType.equals(HttpUtils.SERVICE_REQUEST_CONTENT_TYPE)) {
-                throw new java.io.IOException(
-                    "Malformed header, expected Content-Type = " +
-                    HttpUtils.SERVICE_REQUEST_CONTENT_TYPE + ": " +
-                    contentType);
+                throw new java.io.IOException("Malformed header, expected Content-Type = " +
+                    HttpUtils.SERVICE_REQUEST_CONTENT_TYPE + ": " + contentType);
             }
 
             //            this.action = in.getHeader("ProActive-Action");
         } else {
-            throw new java.io.IOException(
-                "Malformed Request Line, expected method GET or POST: " + line);
+            throw new java.io.IOException("Malformed Request Line, expected method GET or POST: " + line);
         }
     }
 }

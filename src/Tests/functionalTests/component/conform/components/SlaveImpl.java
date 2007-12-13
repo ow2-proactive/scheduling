@@ -40,16 +40,15 @@ public class SlaveImpl implements Slave {
     }
 
     public void computeOneWay(String arg, String other) {
-        System.err.println(PAActiveObject.getBodyOnThis().getNodeURL() +
-            "Slave: " + this + " arg: " + arg + " other: " + other);
+        System.err.println(PAActiveObject.getBodyOnThis().getNodeURL() + "Slave: " + this + " arg: " + arg +
+            " other: " + other);
     }
 
     public StringWrapper computeAsync(String arg, String other) {
         return new StringWrapper(computeSync(arg, other));
     }
 
-    public GenericTypeWrapper<String> computeAsyncGenerics(String arg,
-        String other) {
+    public GenericTypeWrapper<String> computeAsyncGenerics(String arg, String other) {
         return new GenericTypeWrapper<String>(computeSync(arg, other));
     }
 

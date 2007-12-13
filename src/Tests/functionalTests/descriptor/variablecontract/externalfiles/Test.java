@@ -40,13 +40,13 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Tests conditions for external files
  */
 public class Test extends FunctionalTest {
     private static String XML_LOCATION = Test.class.getResource(
-            "/functionalTests/descriptor/variablecontract/externalfiles/Test.xml")
-                                                   .getPath();
+            "/functionalTests/descriptor/variablecontract/externalfiles/Test.xml").getPath();
     ProActiveDescriptor pad;
     boolean bogusFromDescriptor;
     boolean bogusFromProgram;
@@ -67,10 +67,9 @@ public class Test extends FunctionalTest {
     @org.junit.Test
     public void action() throws Exception {
         VariableContract variableContract = new VariableContract();
-        variableContract.setVariableFromProgram("RPATH",
-            Test.class.getResource(
-                "/functionalTests/descriptor/variablecontract/externalfiles/")
-                      .getPath(), VariableContractType.ProgramVariable);
+        variableContract.setVariableFromProgram("RPATH", Test.class.getResource(
+                "/functionalTests/descriptor/variablecontract/externalfiles/").getPath(),
+                VariableContractType.ProgramVariable);
 
         /*
         //Setting from Program
@@ -98,7 +97,7 @@ public class Test extends FunctionalTest {
         }
 
         //test_var3=value3
-        */
+         */
         pad = PADeployment.getProactiveDescriptor(XML_LOCATION, variableContract);
 
         variableContract = pad.getVariableContract();

@@ -46,6 +46,7 @@ import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test for the remote objects, registration of a remote object with several protocols and lookup
  */
@@ -56,8 +57,7 @@ public class RemoteObjectTest extends FunctionalTest {
         ProActiveRuntime p = ProActiveRuntimeImpl.getProActiveRuntime();
 
         // create a remote object exposer for this object
-        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(),
-                p);
+        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(), p);
 
         // generate an uri where to rebind the runtime
         URI uri = RemoteObjectHelper.generateUrl("myruntime");
@@ -77,8 +77,7 @@ public class RemoteObjectTest extends FunctionalTest {
         ProActiveRuntime p = ProActiveRuntimeImpl.getProActiveRuntime();
 
         // create a remote object exposer for this object
-        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(),
-                p);
+        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(), p);
 
         RemoteObject ro = roe.getRemoteObject();
 
@@ -111,8 +110,7 @@ public class RemoteObjectTest extends FunctionalTest {
         ProActiveRuntime p = ProActiveRuntimeImpl.getProActiveRuntime();
 
         // create a remote object exposer for this object
-        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(),
-                p);
+        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(), p);
 
         // generate an uri where to rebind the runtime
         URI uri = RemoteObjectHelper.generateUrl("myruntime");
@@ -125,8 +123,7 @@ public class RemoteObjectTest extends FunctionalTest {
         ProActiveRuntime p1 = (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(ro);
 
         // second binding
-        URI uri2 = RemoteObjectHelper.generateUrl(Constants.XMLHTTP_PROTOCOL_IDENTIFIER,
-                "myruntime");
+        URI uri2 = RemoteObjectHelper.generateUrl(Constants.XMLHTTP_PROTOCOL_IDENTIFIER, "myruntime");
 
         InternalRemoteRemoteObject irro2 = roe.activateProtocol(uri2);
 
@@ -144,8 +141,7 @@ public class RemoteObjectTest extends FunctionalTest {
         ProActiveRuntime p = ProActiveRuntimeImpl.getProActiveRuntime();
 
         // create a remote object exposer for this object
-        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(),
-                p);
+        RemoteObjectExposer roe = new RemoteObjectExposer(ProActiveRuntime.class.getName(), p);
 
         // generate an uri where to rebind the runtime
         URI uri = RemoteObjectHelper.generateUrl("myruntime");

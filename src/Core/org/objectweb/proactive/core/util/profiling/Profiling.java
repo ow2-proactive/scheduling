@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.util.profiling;
 
-
 /**
  * @author fabrice
  *

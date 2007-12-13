@@ -50,8 +50,7 @@ public class ReferencesTracer {
 
     private static Field[] getFields(Class<?> c) {
         Vector<Field> returnedFields = new Vector<Field>();
-        for (Class<?> current = c; current != null;
-                current = current.getSuperclass()) {
+        for (Class<?> current = c; current != null; current = current.getSuperclass()) {
             try {
                 Field[] fields = current.getDeclaredFields();
                 for (int i = 0; i < fields.length; i++) {
@@ -68,8 +67,7 @@ public class ReferencesTracer {
         return array;
     }
 
-    private static void printAllReferences(int indentation,
-        Collection<Object> items, Object o) {
+    private static void printAllReferences(int indentation, Collection<Object> items, Object o) {
         try {
             if ((o == null) || !items.add(o)) {
                 return;
@@ -84,8 +82,7 @@ public class ReferencesTracer {
                 /* int[] for example */
                 return;
             }
-            indentedPrint(indentation,
-                "<array name=\"" + c.getSimpleName() + "\">");
+            indentedPrint(indentation, "<array name=\"" + c.getSimpleName() + "\">");
             Object[] array = (Object[]) o;
             for (int i = 0; i < array.length; i++) {
                 printAllReferences(indentation + 1, items, array[i]);
@@ -100,9 +97,8 @@ public class ReferencesTracer {
                 if (Modifier.isStatic(modifier) || f.getType().isPrimitive()) {
                     continue;
                 }
-                indentedPrint(indentation + 1,
-                    "<field class=\"" + f.getType() + "\" name=\"" +
-                    f.getName() + "\">");
+                indentedPrint(indentation + 1, "<field class=\"" + f.getType() + "\" name=\"" + f.getName() +
+                    "\">");
                 try {
                     printAllReferences(indentation + 2, items, f.get(o));
                 } catch (IllegalAccessException iae) {
@@ -171,15 +167,13 @@ public class ReferencesTracer {
         }
     }
 
-    public static Collection<Object> getAllTypedReferences(Object root,
-        Class<?> type) {
+    public static Collection<Object> getAllTypedReferences(Object root, Class<?> type) {
         return getAllTypedReferences(root, type, new HashSet<Object>());
     }
 
     private static Collection<Object> EMPTY_COLLECTION = new Vector<Object>();
 
-    private static Collection<Object> getAllTypedReferences(Object o,
-        Class<?> type, Collection<Object> items) {
+    private static Collection<Object> getAllTypedReferences(Object o, Class<?> type, Collection<Object> items) {
         try {
             if ((o == null) || !items.add(o)) {
                 return EMPTY_COLLECTION;

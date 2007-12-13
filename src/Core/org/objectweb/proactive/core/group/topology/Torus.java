@@ -52,8 +52,7 @@ public class Torus extends Ring { // implements Topology2D {
      * @param width - the width of the two-dimensional topology group
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public Torus(Group g, int height, int width)
-        throws ConstructionOfReifiedObjectFailedException {
+    public Torus(Group g, int height, int width) throws ConstructionOfReifiedObjectFailedException {
         super(g, height * width);
         this.height = height;
         this.width = width;
@@ -65,8 +64,7 @@ public class Torus extends Ring { // implements Topology2D {
      * @param nbMembers - the number of members of this Torus
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    protected Torus(Group g, int nbMembers)
-        throws ConstructionOfReifiedObjectFailedException {
+    protected Torus(Group g, int nbMembers) throws ConstructionOfReifiedObjectFailedException {
         super(g, nbMembers);
     }
 

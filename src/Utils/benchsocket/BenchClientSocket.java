@@ -57,8 +57,7 @@ public class BenchClientSocket extends Socket {
         }
     }
 
-    public BenchClientSocket(Socket s, BenchFactoryInterface parent)
-        throws IOException {
+    public BenchClientSocket(Socket s, BenchFactoryInterface parent) throws IOException {
         synchronized (BenchClientSocket.class) {
             BenchClientSocket.counter++;
             this.number = BenchClientSocket.counter;
@@ -68,8 +67,7 @@ public class BenchClientSocket extends Socket {
         }
     }
 
-    public BenchClientSocket(String host, int port, BenchFactoryInterface parent)
-        throws IOException {
+    public BenchClientSocket(String host, int port, BenchFactoryInterface parent) throws IOException {
         synchronized (BenchClientSocket.class) {
             BenchClientSocket.counter++;
             this.number = BenchClientSocket.counter;
@@ -79,8 +77,7 @@ public class BenchClientSocket extends Socket {
         }
     }
 
-    public BenchClientSocket(InetAddress address, int port,
-        BenchFactoryInterface parent) throws IOException {
+    public BenchClientSocket(InetAddress address, int port, BenchFactoryInterface parent) throws IOException {
         synchronized (BenchClientSocket.class) {
             BenchClientSocket.counter++;
             this.number = BenchClientSocket.counter;
@@ -95,12 +92,10 @@ public class BenchClientSocket extends Socket {
             this.number = BenchClientSocket.counter;
         }
 
-        this.output = new BenchOutputStream(realSocket.getOutputStream(),
-                this.number, this);
+        this.output = new BenchOutputStream(realSocket.getOutputStream(), this.number, this);
         this.parent.addStream(this.output);
 
-        this.input = new BenchInputStream(realSocket.getInputStream(),
-                this.number, this);
+        this.input = new BenchInputStream(realSocket.getInputStream(), this.number, this);
         this.parent.addStream(this.input);
     }
 
@@ -134,8 +129,7 @@ public class BenchClientSocket extends Socket {
      * @see java.net.Socket#connect(java.net.SocketAddress, int)
      */
     @Override
-    public void connect(SocketAddress endpoint, int timeout)
-        throws IOException {
+    public void connect(SocketAddress endpoint, int timeout) throws IOException {
         this.realSocket.connect(endpoint, timeout);
     }
 
@@ -363,8 +357,7 @@ public class BenchClientSocket extends Socket {
      * @see java.net.Socket#setReceiveBufferSize(int)
      */
     @Override
-    public synchronized void setReceiveBufferSize(int size)
-        throws SocketException {
+    public synchronized void setReceiveBufferSize(int size) throws SocketException {
         this.realSocket.setReceiveBufferSize(size);
     }
 
@@ -380,8 +373,7 @@ public class BenchClientSocket extends Socket {
      * @see java.net.Socket#setSendBufferSize(int)
      */
     @Override
-    public synchronized void setSendBufferSize(int size)
-        throws SocketException {
+    public synchronized void setSendBufferSize(int size) throws SocketException {
         this.realSocket.setSendBufferSize(size);
     }
 
@@ -397,8 +389,7 @@ public class BenchClientSocket extends Socket {
      * @see java.net.Socket#setSoTimeout(int)
      */
     @Override
-    public synchronized void setSoTimeout(int timeout)
-        throws SocketException {
+    public synchronized void setSoTimeout(int timeout) throws SocketException {
         this.realSocket.setSoTimeout(timeout);
     }
 

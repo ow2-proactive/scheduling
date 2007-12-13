@@ -90,8 +90,7 @@ public class ActiveObject extends AbstractData {
      * @param className The active object's name
      * @param objectName The object name associated to this active object.
      */
-    public ActiveObject(NodeObject parent, UniqueID id, String className,
-        ObjectName objectName) {
+    public ActiveObject(NodeObject parent, UniqueID id, String className, ObjectName objectName) {
         this(parent, id, className, objectName, null);
     }
 
@@ -103,8 +102,8 @@ public class ActiveObject extends AbstractData {
      * @param objectName The object name associated to this active object.
      * @param proxyMBean The mbean associated to this active object.
      */
-    public ActiveObject(NodeObject parent, UniqueID id, String className,
-        ObjectName objectName, BodyWrapperMBean proxyMBean) {
+    public ActiveObject(NodeObject parent, UniqueID id, String className, ObjectName objectName,
+            BodyWrapperMBean proxyMBean) {
         // Since this active object model doesn't have children use the adequate constructor    
         super(objectName, null, null);
         this.parent = parent;
@@ -156,27 +155,26 @@ public class ActiveObject extends AbstractData {
             return;
         }
         switch (newState) {
-        case WAITING_BY_NECESSITY:
-            if (currentState == State.SERVING_REQUEST) {
-                currentState = State.WAITING_BY_NECESSITY_WHILE_SERVING;
-            } else {
-                currentState = State.WAITING_BY_NECESSITY_WHILE_ACTIVE;
-            }
-            break;
-        case RECEIVED_FUTURE_RESULT:
-            if (currentState == State.WAITING_BY_NECESSITY_WHILE_SERVING) {
-                currentState = State.SERVING_REQUEST;
-            } else {
-                currentState = State.ACTIVE;
-            }
-            break;
-        default:
-            currentState = newState;
-            break;
+            case WAITING_BY_NECESSITY:
+                if (currentState == State.SERVING_REQUEST) {
+                    currentState = State.WAITING_BY_NECESSITY_WHILE_SERVING;
+                } else {
+                    currentState = State.WAITING_BY_NECESSITY_WHILE_ACTIVE;
+                }
+                break;
+            case RECEIVED_FUTURE_RESULT:
+                if (currentState == State.WAITING_BY_NECESSITY_WHILE_SERVING) {
+                    currentState = State.SERVING_REQUEST;
+                } else {
+                    currentState = State.ACTIVE;
+                }
+                break;
+            default:
+                currentState = newState;
+                break;
         }
         setChanged();
-        notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED,
-                this.currentState));
+        notifyObservers(new MVCNotification(MVCNotificationTag.STATE_CHANGED, this.currentState));
     }
 
     /**
@@ -222,9 +220,8 @@ public class ActiveObject extends AbstractData {
      * @param migrationException
      */
     public void migrationFailed(MigrationException migrationException) {
-        Console.getInstance(Activator.CONSOLE_NAME)
-               .logException("The active object " + this + " didn't migrate!",
-            migrationException);
+        Console.getInstance(Activator.CONSOLE_NAME).logException(
+                "The active object " + this + " didn't migrate!", migrationException);
     }
 
     @SuppressWarnings("unchecked")
@@ -271,8 +268,7 @@ public class ActiveObject extends AbstractData {
             return;
         }
         setChanged();
-        notifyObservers(new MVCNotification(
-                MVCNotificationTag.ACTIVE_OBJECT_ADD_COMMUNICATION, aoSource));
+        notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_ADD_COMMUNICATION, aoSource));
     }
 
     /**
@@ -297,8 +293,7 @@ public class ActiveObject extends AbstractData {
      * @param destinationID The unique id of the destination of the request.
      */
     public void addCommunicationTo(UniqueID destinationID) {
-        ActiveObject destination = getWorldObject()
-                                       .findActiveObject(destinationID);
+        ActiveObject destination = getWorldObject().findActiveObject(destinationID);
         if (destination == null) {
             //TODO A faire Traiter l'erreur
             //     System.err.println("Can't draw a communication from " + this +
@@ -315,24 +310,21 @@ public class ActiveObject extends AbstractData {
     @Override
     public void resetCommunications() {
         setChanged();
-        notifyObservers(new MVCNotification(
-                MVCNotificationTag.ACTIVE_OBJECT_RESET_COMMUNICATIONS, null));
+        notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_RESET_COMMUNICATIONS, null));
     }
 
     public void addRequest() {
         this.requestQueueLength++;
         setChanged();
-        notifyObservers(new MVCNotification(
-                MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
-                requestQueueLength));
+        notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+            requestQueueLength));
     }
 
     public void removeRequest() {
         this.requestQueueLength--;
         setChanged();
-        notifyObservers(new MVCNotification(
-                MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
-                requestQueueLength));
+        notifyObservers(new MVCNotification(MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
+            requestQueueLength));
         ;
     }
 
@@ -341,8 +333,7 @@ public class ActiveObject extends AbstractData {
             this.requestQueueLength = requestQueueLength;
             setChanged();
             notifyObservers(new MVCNotification(
-                    MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED,
-                    requestQueueLength));
+                MVCNotificationTag.ACTIVE_OBJECT_REQUEST_QUEUE_LENGHT_CHANGED, requestQueueLength));
             ;
         }
     }
@@ -350,9 +341,7 @@ public class ActiveObject extends AbstractData {
     @Override
     public void stopMonitoring(boolean log) {
         super.stopMonitoring(log);
-        JMXNotificationManager.getInstance()
-                              .unsubscribe(this.getObjectName(),
-            this.getListener());
+        JMXNotificationManager.getInstance().unsubscribe(this.getObjectName(), this.getListener());
         this.destroy();
     }
 

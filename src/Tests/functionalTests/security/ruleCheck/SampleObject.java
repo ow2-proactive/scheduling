@@ -43,8 +43,8 @@ import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableExce
 public class SampleObject implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private String name;
 
     public SampleObject() {
@@ -58,8 +58,7 @@ public class SampleObject implements Serializable {
     public SerializableString doSomething() {
         System.out.println(this.name + " is doing something.");
 
-        return new SerializableString(this.name +
-            " did something and returned this.");
+        return new SerializableString(this.name + " did something and returned this.");
     }
 
     public SerializableString sayhello(SampleObject target) {
@@ -69,16 +68,15 @@ public class SampleObject implements Serializable {
     public void makeTargetDoSomething(SampleObject target) {
         String targetString = "the target";
         try {
-            targetString = ((BodyProxy) ((StubObject) target).getProxy()).getBody()
-                            .getCertificate().getCert().getIssuerDN().getName();
+            targetString = ((BodyProxy) ((StubObject) target).getProxy()).getBody().getCertificate()
+                    .getCert().getIssuerDN().getName();
         } catch (SecurityNotAvailableException e) {
             // TODO Auto-generated catch block
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        System.out.println(this.name + " is asking " + targetString +
-            " to do something.");
+        System.out.println(this.name + " is asking " + targetString + " to do something.");
 
         PAActiveObject.setImmediateService("doSomething");
         SerializableString result = null;
@@ -87,7 +85,6 @@ public class SampleObject implements Serializable {
         } catch (RuntimeSecurityException e) {
             System.out.println("-- Security Exception " + e.getMessage());
         }
-        System.out.println(this.name + " got a result from " + targetString +
-            " >> " + result);
+        System.out.println(this.name + " got a result from " + targetString + " >> " + result);
     }
 }

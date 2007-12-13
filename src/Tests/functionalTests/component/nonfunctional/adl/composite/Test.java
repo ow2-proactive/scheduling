@@ -52,8 +52,7 @@ public class Test extends ComponentTest {
     Component root;
 
     public Test() {
-        super("Basic creation of non-functional components",
-            "Basic creation of non-functional components");
+        super("Basic creation of non-functional components", "Basic creation of non-functional components");
     }
 
     /* (non-Javadoc)
@@ -67,8 +66,7 @@ public class Test extends ComponentTest {
         root = (Component) f.newComponent("functionalTests.component.nonfunctional.adl.dummyComposite",
                 context);
         Fractal.getLifeCycleController(root).startFc();
-        DummyControllerItf ref = (DummyControllerItf) root.getFcInterface(
-                "dummy-membrane-composite");
+        DummyControllerItf ref = (DummyControllerItf) root.getFcInterface("dummy-membrane-composite");
         String name = ref.dummyMethodWithResult();
         System.out.println("The string is : " + name);
         ref.dummyVoidMethod("Message");

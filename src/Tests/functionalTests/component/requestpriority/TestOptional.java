@@ -56,27 +56,22 @@ public class TestOptional extends ComponentTest {
     private static String P2_NAME = "standard_component";
 
     /**
-         *
-         */
+     *
+     */
     @Test
     public void testPriorityController() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
 
-        ControllerDescription myController = new ControllerDescription(P1_NAME,
-                Constants.PRIMITIVE,
-                "/functionalTests/component/requestpriority/my-component-config.xml",
-                false);
-        ComponentType pc_type = type_factory.createFcType(new InterfaceType[] {
-                    type_factory.createFcItfType(FItf.ITF_NAME,
-                        FItf.class.getName(), TypeFactory.SERVER,
-                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                });
+        ControllerDescription myController = new ControllerDescription(P1_NAME, Constants.PRIMITIVE,
+            "/functionalTests/component/requestpriority/my-component-config.xml", false);
+        ComponentType pc_type = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
+                FItf.ITF_NAME, FItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                TypeFactory.SINGLE), });
 
-        Component p1 = cf.newFcInstance(pc_type, myController,
-                new ContentDescription(PriotirizedComponent.class.getName(),
-                    new Object[] {  }));
+        Component p1 = cf.newFcInstance(pc_type, myController, new ContentDescription(
+            PriotirizedComponent.class.getName(), new Object[] {}));
 
         assertEquals(Fractal.getNameController(p1).getFcName(), P1_NAME);
 
@@ -89,15 +84,11 @@ public class TestOptional extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
 
-        ComponentType pc_type = type_factory.createFcType(new InterfaceType[] {
-                    type_factory.createFcItfType(FItf.ITF_NAME,
-                        FItf.class.getName(), TypeFactory.SERVER,
-                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                });
-        Component p1 = cf.newFcInstance(pc_type,
-                new ControllerDescription(P2_NAME, Constants.PRIMITIVE),
-                new ContentDescription(PriotirizedComponent.class.getName(),
-                    new Object[] {  }));
+        ComponentType pc_type = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
+                FItf.ITF_NAME, FItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                TypeFactory.SINGLE), });
+        Component p1 = cf.newFcInstance(pc_type, new ControllerDescription(P2_NAME, Constants.PRIMITIVE),
+                new ContentDescription(PriotirizedComponent.class.getName(), new Object[] {}));
 
         assertEquals(Fractal.getNameController(p1).getFcName(), P2_NAME);
 

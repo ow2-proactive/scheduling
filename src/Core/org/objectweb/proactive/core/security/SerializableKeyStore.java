@@ -50,8 +50,8 @@ import java.security.cert.CertificateException;
 public class SerializableKeyStore implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     protected transient KeyStore keyStore;
     protected byte[] encodedKeyStore;
 
@@ -85,14 +85,12 @@ public class SerializableKeyStore implements Serializable {
         this.encodedKeyStore = null;
     }
 
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
         try {
             this.keyStore = KeyStore.getInstance("PKCS12", "BC");
-            this.keyStore.load(new ByteArrayInputStream(this.encodedKeyStore),
-                "ha".toCharArray());
+            this.keyStore.load(new ByteArrayInputStream(this.encodedKeyStore), "ha".toCharArray());
         } catch (KeyStoreException e) {
             // TODOSECURITYSECURITY Auto-generated catch block
             e.printStackTrace();

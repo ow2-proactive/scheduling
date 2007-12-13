@@ -41,7 +41,6 @@ class ThisIsNotAnException extends Exception {
     }
 }
 
-
 /**
  * This class is a placeholder for the result of a method call,
  * it can be an Object or a thrown Exception.

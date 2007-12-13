@@ -56,8 +56,7 @@ public class StartDomain {
         ProActiveSecurity.loadProvider();
 
         if (args.length != 2) {
-            System.out.println(
-                "Usage StartDomain <domain name> <path to security file>");
+            System.out.println("Usage StartDomain <domain name> <path to security file>");
             System.exit(-1);
         }
 

@@ -107,8 +107,7 @@ public abstract class AbstractExample {
         if (descPath == null) {
             descriptor_url = AbstractExample.class.getResource(DEFAULT_DESCRIPTOR);
             if (descriptor_url == null) {
-                System.err.println("Couldn't find internal ressource: " +
-                    DEFAULT_DESCRIPTOR);
+                System.err.println("Couldn't find internal ressource: " + DEFAULT_DESCRIPTOR);
                 System.exit(1);
             }
         } else {
@@ -121,8 +120,7 @@ public abstract class AbstractExample {
                 System.err.println("" + descriptorFile + " can't be read");
                 System.exit(1);
             } else if (!descriptorFile.isFile()) {
-                System.err.println("" + descriptorFile +
-                    " is not a regular file");
+                System.err.println("" + descriptorFile + " is not a regular file");
                 System.exit(1);
             }
             descriptor_url = descriptorFile.toURI().toURL();

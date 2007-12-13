@@ -80,9 +80,8 @@ import org.objectweb.proactive.extensions.scheduler.task.internal.InternalTask;
  * @version 3.9, Jun 28, 2007
  * @since ProActive 3.9
  */
-public class SchedulerFrontend implements InitActive,
-    SchedulerEventListener<InternalJob>, UserSchedulerInterface,
-    SchedulerCoreInterface {
+public class SchedulerFrontend implements InitActive, SchedulerEventListener<InternalJob>,
+        UserSchedulerInterface, SchedulerCoreInterface {
 
     /** Scheduler logger */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
@@ -109,8 +108,7 @@ public class SchedulerFrontend implements InitActive,
     private HashMap<JobId, IdentifyJob> jobs;
 
     /** scheduler listeners */
-    private HashMap<UniqueID, SchedulerEventListener<?extends Job>> schedulerListeners =
-        new HashMap<UniqueID, SchedulerEventListener<?extends Job>>();
+    private HashMap<UniqueID, SchedulerEventListener<? extends Job>> schedulerListeners = new HashMap<UniqueID, SchedulerEventListener<? extends Job>>();
 
     /** Scheduler's statistics */
     //TODO not restored after a scheduler failure.
@@ -136,9 +134,8 @@ public class SchedulerFrontend implements InitActive,
      * @throws NodeException
      * @throws ActiveObjectCreationException
      */
-    public SchedulerFrontend(ResourceManagerProxy imp,
-        String policyFullClassName)
-        throws ActiveObjectCreationException, NodeException {
+    public SchedulerFrontend(ResourceManagerProxy imp, String policyFullClassName)
+            throws ActiveObjectCreationException, NodeException {
         logger.info("Creating scheduler core...");
         resourceManager = imp;
         policyFullName = policyFullClassName;
@@ -150,16 +147,12 @@ public class SchedulerFrontend implements InitActive,
      */
     public void initActivity(Body body) {
         try {
-            scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(),
-                    new Object[] {
-                        resourceManager, PAActiveObject.getStubOnThis(),
-                        policyFullName
-                    });
+            scheduler = (SchedulerCore) PAActiveObject.newActive(SchedulerCore.class.getName(), new Object[] {
+                    resourceManager, PAActiveObject.getStubOnThis(), policyFullName });
             //ProActive.addNFEListenerOnAO(scheduler,
             //    new NFEHandler("Scheduler Core"));
             logger.info("Scheduler successfully created on " +
-                PAActiveObject.getNode().getNodeInformation().getVMInformation()
-                              .getHostName());
+                PAActiveObject.getNode().getNodeInformation().getVMInformation().getHostName());
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
@@ -177,8 +170,7 @@ public class SchedulerFrontend implements InitActive,
      * Connect the scheduler front-end to the scheduler authentication.
      */
     public void connect() {
-        authenticationInterface = (SchedulerAuthentication) PAActiveObject.getContext()
-                                                                          .getStubOnCaller();
+        authenticationInterface = (SchedulerAuthentication) PAActiveObject.getContext().getStubOnCaller();
     }
 
     /**
@@ -189,18 +181,17 @@ public class SchedulerFrontend implements InitActive,
     public void recover(HashMap<JobId, InternalJob> jobList) {
         if (jobList != null) {
             for (Entry<JobId, InternalJob> e : jobList.entrySet()) {
-                UserIdentification uIdent = new UserIdentification(e.getValue()
-                                                                    .getOwner());
+                UserIdentification uIdent = new UserIdentification(e.getValue().getOwner());
                 IdentifyJob ij = new IdentifyJob(e.getKey(), uIdent);
                 jobs.put(e.getKey(), ij);
 
                 //if the job is finished set it
                 switch (e.getValue().getState()) {
-                case CANCELLED:
-                case FINISHED:
-                case FAILED:
-                    ij.setFinished(true);
-                    break;
+                    case CANCELLED:
+                    case FINISHED:
+                    case FAILED:
+                        ij.setFinished(true);
+                        break;
                 }
             }
         }
@@ -216,12 +207,10 @@ public class SchedulerFrontend implements InitActive,
      * @param sourceBodyID the source ID of the connected object representing a user
      * @param identification the identification of the connected user
      */
-    public void connect(UniqueID sourceBodyID, UserIdentification identification)
-        throws SchedulerException {
+    public void connect(UniqueID sourceBodyID, UserIdentification identification) throws SchedulerException {
         if (identifications.containsKey(sourceBodyID)) {
             logger.warn("Active object already connected !");
-            throw new SchedulerException(
-                "This active object is already connected to the scheduler !");
+            throw new SchedulerException("This active object is already connected to the scheduler !");
         }
 
         logger.info(identification.getUsername() + " successfully connected !");
@@ -233,8 +222,7 @@ public class SchedulerFrontend implements InitActive,
      */
     public JobResult getJobResult(JobId jobId) throws SchedulerException {
         //checking permissions
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
@@ -243,13 +231,11 @@ public class SchedulerFrontend implements InitActive,
         IdentifyJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            throw new SchedulerException(
-                "The job represented by this ID is unknow !");
+            throw new SchedulerException("The job represented by this ID is unknow !");
         }
 
         if (!ij.hasRight(identifications.get(id))) {
-            throw new SchedulerException(
-                "You do not have permission to access this job !");
+            throw new SchedulerException("You do not have permission to access this job !");
         }
 
         if (!ij.isFinished()) {
@@ -260,8 +246,7 @@ public class SchedulerFrontend implements InitActive,
         JobResult result = scheduler.getJobResult(jobId);
 
         if (result == null) {
-            throw new SchedulerException(
-                "The result of this job is no longer available !");
+            throw new SchedulerException("The result of this job is no longer available !");
         }
 
         //removing jobs from the global list : this job is no more managed
@@ -273,11 +258,9 @@ public class SchedulerFrontend implements InitActive,
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getTaskResult(org.objectweb.proactive.extensions.scheduler.common.job.JobId, java.lang.String)
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName)
-        throws SchedulerException {
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException {
         //checking permissions
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
@@ -286,13 +269,11 @@ public class SchedulerFrontend implements InitActive,
         IdentifyJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            throw new SchedulerException(
-                "The job represented by this ID is unknow !");
+            throw new SchedulerException("The job represented by this ID is unknow !");
         }
 
         if (!ij.hasRight(identifications.get(id))) {
-            throw new SchedulerException(
-                "You do not have permission to access this job !");
+            throw new SchedulerException("You do not have permission to access this job !");
         }
 
         //asking the scheduler for the result
@@ -310,8 +291,7 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#submit(org.objectweb.proactive.extensions.scheduler.common.job.Job)
      */
     public JobId submit(Job userJob) throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
@@ -328,10 +308,8 @@ public class SchedulerFrontend implements InitActive,
 
         //verifying that the user has right to set the given priority to his job. 
         if (!identifications.get(id).isAdmin()) {
-            if ((job.getPriority().getPriority() > 3) ||
-                    (job.getPriority() == JobPriority.IDLE)) {
-                throw new SchedulerException(
-                    "Only the administrator can submit a job with such priority : " +
+            if ((job.getPriority().getPriority() > 3) || (job.getPriority() == JobPriority.IDLE)) {
+                throw new SchedulerException("Only the administrator can submit a job with such priority : " +
                     job.getPriority());
             }
         }
@@ -346,8 +324,7 @@ public class SchedulerFrontend implements InitActive,
             td.setJobInfo(job.getJobInfo());
         }
 
-        jobs.put(job.getId(),
-            new IdentifyJob(job.getId(), identifications.get(id)));
+        jobs.put(job.getId(), new IdentifyJob(job.getId(), identifications.get(id)));
         //make the job descriptor
         job.setJobDescriptor(new JobDescriptor(job));
         scheduler.submit(job);
@@ -360,10 +337,8 @@ public class SchedulerFrontend implements InitActive,
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#listenLog(org.objectweb.proactive.extensions.scheduler.common.job.JobId, java.lang.String, int)
      */
-    public void listenLog(JobId jobId, String hostname, int port)
-        throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+    public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException {
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
@@ -372,13 +347,11 @@ public class SchedulerFrontend implements InitActive,
         IdentifyJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            throw new SchedulerException(
-                "The job represented by this ID is unknow !");
+            throw new SchedulerException("The job represented by this ID is unknow !");
         }
 
         if (!ij.hasRight(identifications.get(id))) {
-            throw new SchedulerException(
-                "You do not have permission to listen the log of this job !");
+            throw new SchedulerException("You do not have permission to listen the log of this job !");
         }
 
         scheduler.listenLog(jobId, hostname, port);
@@ -387,11 +360,9 @@ public class SchedulerFrontend implements InitActive,
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#addSchedulerEventListener(org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener)
      */
-    public SchedulerInitialState<?extends Job> addSchedulerEventListener(
-        SchedulerEventListener<?extends Job> sel, SchedulerEvent... events)
-        throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+    public SchedulerInitialState<? extends Job> addSchedulerEventListener(
+            SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException {
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
@@ -410,8 +381,7 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#getStats()
      */
     public Stats getStats() throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
@@ -433,8 +403,7 @@ public class SchedulerFrontend implements InitActive,
      * @return true if order can continue, false if not.
      */
     private boolean ssprsc(String permissionMsg) {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
             logger.warn(ACCESS_DENIED);
@@ -544,8 +513,7 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#disconnect()
      */
     public void disconnect() throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
@@ -564,10 +532,8 @@ public class SchedulerFrontend implements InitActive,
      * @param permissionMsg the message to send the user if he has no right.
      * @throws SchedulerException the exception send if there is a probleme of authentication.
      */
-    private void prkcp(JobId jobId, String permissionMsg)
-        throws SchedulerException {
-        UniqueID id = PAActiveObject.getContext().getCurrentRequest()
-                                    .getSourceBodyID();
+    private void prkcp(JobId jobId, String permissionMsg) throws SchedulerException {
+        UniqueID id = PAActiveObject.getContext().getCurrentRequest().getSourceBodyID();
 
         if (!identifications.containsKey(id)) {
             throw new SchedulerException(ACCESS_DENIED);
@@ -576,8 +542,7 @@ public class SchedulerFrontend implements InitActive,
         IdentifyJob ij = jobs.get(jobId);
 
         if (ij == null) {
-            throw new SchedulerException(
-                "The job represented by this ID is unknow !");
+            throw new SchedulerException("The job represented by this ID is unknow !");
         }
 
         if (!ij.hasRight(identifications.get(id))) {
@@ -615,25 +580,19 @@ public class SchedulerFrontend implements InitActive,
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedulerInterface#changePriority(org.objectweb.proactive.extensions.scheduler.job.JobId, javax.print.attribute.standard.JobPriority)
      */
-    public void changePriority(JobId jobId, JobPriority priority)
-        throws SchedulerException {
-        prkcp(jobId,
-            "You do not have permission to change the priority of this job !");
+    public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException {
+        prkcp(jobId, "You do not have permission to change the priority of this job !");
 
-        UserIdentification ui = identifications.get(PAActiveObject.getContext()
-                                                                  .getCurrentRequest()
-                                                                  .getSourceBodyID());
+        UserIdentification ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
+                .getSourceBodyID());
 
         if (!ui.isAdmin()) {
             if (priority == JobPriority.HIGHEST) {
-                throw new SchedulerException(
-                    "Only an administrator can change the priority to HIGHEST");
+                throw new SchedulerException("Only an administrator can change the priority to HIGHEST");
             } else if (priority == JobPriority.HIGH) {
-                throw new SchedulerException(
-                    "Only an administrator can change the priority to HIGH");
+                throw new SchedulerException("Only an administrator can change the priority to HIGH");
             } else if (priority == JobPriority.IDLE) {
-                throw new SchedulerException(
-                    "Only an administrator can change the priority to IDLE");
+                throw new SchedulerException("Only an administrator can change the priority to IDLE");
             }
         }
 
@@ -648,16 +607,13 @@ public class SchedulerFrontend implements InitActive,
      * @return true if the policy has been correctly change, false if not.
      * @throws SchedulerException (can be due to insufficient permission)
      */
-    public BooleanWrapper changePolicy(
-        Class<?extends PolicyInterface> newPolicyFile)
-        throws SchedulerException {
-        UserIdentification ui = identifications.get(PAActiveObject.getContext()
-                                                                  .getCurrentRequest()
-                                                                  .getSourceBodyID());
+    public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
+            throws SchedulerException {
+        UserIdentification ui = identifications.get(PAActiveObject.getContext().getCurrentRequest()
+                .getSourceBodyID());
 
         if (!ui.isAdmin()) {
-            throw new SchedulerException(
-                "You do not have permission to change the policy of the scheduler !");
+            throw new SchedulerException("You do not have permission to change the policy of the scheduler !");
         }
 
         return scheduler.changePolicy(newPolicyFile);
@@ -693,11 +649,9 @@ public class SchedulerFrontend implements InitActive,
      * @param types the class type to select the right method.
      * @param params the arguments to send to the method.
      */
-    private void dispatch(SchedulerEvent methodName, Class<?>[] types,
-        Object... params) {
+    private void dispatch(SchedulerEvent methodName, Class<?>[] types, Object... params) {
         try {
-            Method method = SchedulerEventListener.class.getMethod(methodName.toString(),
-                    types);
+            Method method = SchedulerEventListener.class.getMethod(methodName.toString(), types);
             Iterator<UniqueID> iter = schedulerListeners.keySet().iterator();
 
             while (iter.hasNext()) {
@@ -706,15 +660,14 @@ public class SchedulerFrontend implements InitActive,
                 try {
                     UserIdentification userId = identifications.get(id);
 
-                    if ((userId.getUserEvents() == null) ||
-                            userId.getUserEvents().contains(methodName)) {
+                    if ((userId.getUserEvents() == null) || userId.getUserEvents().contains(methodName)) {
                         method.invoke(schedulerListeners.get(id), params);
                     }
                 } catch (Exception e) {
                     iter.remove();
                     identifications.remove(id);
-                    logger.error(
-                        "!!!!!!!!!!!!!! Scheduler has detected that a listener is not connected anymore !");
+                    logger
+                            .error("!!!!!!!!!!!!!! Scheduler has detected that a listener is not connected anymore !");
                 }
             }
         } catch (SecurityException e) {
@@ -784,8 +737,7 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#jobKilledEvent(org.objectweb.proactive.extensions.scheduler.job.JobId)
      */
     public void jobKilledEvent(JobId jobId) {
-        dispatch(SchedulerEvent.JOB_KILLED, new Class<?>[] { JobId.class },
-            jobId);
+        dispatch(SchedulerEvent.JOB_KILLED, new Class<?>[] { JobId.class }, jobId);
         jobs.remove(jobId);
     }
 
@@ -793,16 +745,14 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#jobPausedEvent(org.objectweb.proactive.extensions.scheduler.common.job.JobEvent)
      */
     public void jobPausedEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_PAUSED, new Class<?>[] { JobEvent.class },
-            event);
+        dispatch(SchedulerEvent.JOB_PAUSED, new Class<?>[] { JobEvent.class }, event);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#jobResumedEvent(org.objectweb.proactive.extensions.scheduler.common.job.JobEvent)
      */
     public void jobResumedEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_RESUMED, new Class<?>[] { JobEvent.class },
-            event);
+        dispatch(SchedulerEvent.JOB_RESUMED, new Class<?>[] { JobEvent.class }, event);
     }
 
     /**
@@ -816,16 +766,14 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#pendingToRunningJobEvent(org.objectweb.proactive.extensions.scheduler.common.job.JobEvent)
      */
     public void jobPendingToRunningEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_PENDING_TO_RUNNING,
-            new Class<?>[] { JobEvent.class }, event);
+        dispatch(SchedulerEvent.JOB_PENDING_TO_RUNNING, new Class<?>[] { JobEvent.class }, event);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#runningToFinishedJobEvent(org.objectweb.proactive.extensions.scheduler.common.job.JobEvent)
      */
     public void jobRunningToFinishedEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_RUNNING_TO_FINISHED,
-            new Class<?>[] { JobEvent.class }, event);
+        dispatch(SchedulerEvent.JOB_RUNNING_TO_FINISHED, new Class<?>[] { JobEvent.class }, event);
         jobs.get(event.getJobId()).setFinished(true);
         //stats
         stats.increaseFinishedJobCount(event.getNumberOfFinishedTasks());
@@ -835,31 +783,27 @@ public class SchedulerFrontend implements InitActive,
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#removeFinishedJobEvent(org.objectweb.proactive.extensions.scheduler.common.job.JobEvent)
      */
     public void jobRemoveFinishedEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_REMOVE_FINISHED,
-            new Class<?>[] { JobEvent.class }, event);
+        dispatch(SchedulerEvent.JOB_REMOVE_FINISHED, new Class<?>[] { JobEvent.class }, event);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#pendingToRunningTaskEvent(org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent)
      */
     public void taskPendingToRunningEvent(TaskEvent event) {
-        dispatch(SchedulerEvent.TASK_PENDING_TO_RUNNING,
-            new Class<?>[] { TaskEvent.class }, event);
+        dispatch(SchedulerEvent.TASK_PENDING_TO_RUNNING, new Class<?>[] { TaskEvent.class }, event);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#runningToFinishedTaskEvent(org.objectweb.proactive.extensions.scheduler.common.task.TaskEvent)
      */
     public void taskRunningToFinishedEvent(TaskEvent event) {
-        dispatch(SchedulerEvent.TASK_RUNNING_TO_FINISHED,
-            new Class<?>[] { TaskEvent.class }, event);
+        dispatch(SchedulerEvent.TASK_RUNNING_TO_FINISHED, new Class<?>[] { TaskEvent.class }, event);
     }
 
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerEventListener#changeJobPriorityEvent(org.objectweb.proactive.extensions.scheduler.common.job.JobEvent)
      */
     public void jobChangePriorityEvent(JobEvent event) {
-        dispatch(SchedulerEvent.JOB_CHANGE_PRIORITY,
-            new Class<?>[] { JobEvent.class }, event);
+        dispatch(SchedulerEvent.JOB_CHANGE_PRIORITY, new Class<?>[] { JobEvent.class }, event);
     }
 }

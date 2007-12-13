@@ -41,14 +41,13 @@ public class AcquaintanceReply extends Message implements Serializable {
     protected String senderURL;
     protected Vector<String> urls;
 
-    public AcquaintanceReply(int i, UniversalUniqueID uniqueID,
-        P2PService sender, String activeObjectNodeUrl) {
+    public AcquaintanceReply(int i, UniversalUniqueID uniqueID, P2PService sender, String activeObjectNodeUrl) {
         super(i, uniqueID, sender);
         this.senderURL = activeObjectNodeUrl;
     }
 
-    public AcquaintanceReply(int i, UniversalUniqueID uniqueID,
-        P2PService sender, String activeObjectNodeUrl, Vector<String> result) {
+    public AcquaintanceReply(int i, UniversalUniqueID uniqueID, P2PService sender,
+            String activeObjectNodeUrl, Vector<String> result) {
         super(i, uniqueID, sender);
         this.urls = result;
         this.senderURL = activeObjectNodeUrl;

@@ -40,8 +40,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 
-public class BenchIbisSocketFactory
-    implements BenchFactoryInterface {
+public class BenchIbisSocketFactory implements BenchFactoryInterface {
     protected static ArrayList<BenchStream> streamList = new ArrayList<BenchStream>();
 
     public void addStream(BenchStream s) {
@@ -85,23 +84,21 @@ public class BenchIbisSocketFactory
         return 0;
     }
 
-    public ServerSocket createServerSocket(int port, int backlog,
-        InetAddress addr) throws IOException {
+    public ServerSocket createServerSocket(int port, int backlog, InetAddress addr) throws IOException {
         return new BenchServerSocket(port, addr, this);
     }
 
-    public Socket createSocket(InetAddress rAddr, int rPort)
-        throws IOException {
+    public Socket createSocket(InetAddress rAddr, int rPort) throws IOException {
         return new BenchClientSocket(rAddr, rPort, this);
     }
 
-    public Socket createSocket(InetAddress dest, int port, InetAddress localIP,
-        long timeoutMillis) throws IOException {
+    public Socket createSocket(InetAddress dest, int port, InetAddress localIP, long timeoutMillis)
+            throws IOException {
         return new BenchClientSocket(dest, port, this);
     }
 
-    public ServerSocket createServerSocket(int port, InetAddress localAddress,
-        boolean retry) throws IOException {
+    public ServerSocket createServerSocket(int port, InetAddress localAddress, boolean retry)
+            throws IOException {
         return new BenchServerSocket(port, localAddress, this);
     }
 }

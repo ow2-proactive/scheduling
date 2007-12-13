@@ -63,16 +63,15 @@ public class PassiveCompositeUnmarshaller extends AbstractUnmarshallerDecorator 
         return null;
     }
 
-    public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
     }
 
     //
     // -- PROTECTED METHODS ------------------------------------------------------
     //
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+            throws org.xml.sax.SAXException {
     }
 
     //

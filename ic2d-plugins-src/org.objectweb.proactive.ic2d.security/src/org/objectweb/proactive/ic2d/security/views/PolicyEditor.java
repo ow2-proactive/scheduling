@@ -87,14 +87,13 @@ public class PolicyEditor extends ViewPart {
         GridLayout layout = new GridLayout();
         this.form.getBody().setLayout(layout);
 
-        Hyperlink link = this.toolkit.createHyperlink(this.form.getBody(),
-                "Click here.", SWT.WRAP);
+        Hyperlink link = this.toolkit.createHyperlink(this.form.getBody(), "Click here.", SWT.WRAP);
         link.addHyperlinkListener(new HyperlinkAdapter() {
-                @Override
-                public void linkActivated(HyperlinkEvent e) {
-                    System.out.println("Link activated!");
-                }
-            });
+            @Override
+            public void linkActivated(HyperlinkEvent e) {
+                System.out.println("Link activated!");
+            }
+        });
 
         FormText ft = this.toolkit.createFormText(this.form.getBody(), false);
         ft.setToolTipText("blaaaaaaaaaaaaaaaaaaaaaaa");
@@ -182,7 +181,7 @@ public class PolicyEditor extends ViewPart {
                     "Policy Editor",
                     message);
     }
-    */
+     */
 
     /**
      * Passing the focus request to the viewer's control.

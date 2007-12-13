@@ -59,7 +59,6 @@ class LogMessage {
     }
 }
 
-
 /**
  * Logging can print to stdout which can block, we don't want to be blocked
  * for an arbitrary amount of time, hence the thread.
@@ -67,8 +66,8 @@ class LogMessage {
 public class AsyncLogger implements Runnable {
 
     /**
-    * The category name is "proactive.gc".
-    */
+     * The category name is "proactive.gc".
+     */
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.GC);
 
     /**
@@ -79,8 +78,7 @@ public class AsyncLogger implements Runnable {
     /**
      * The thread that will log all messages in FIFO order
      */
-    private static final Thread loggingThread = new Thread(new AsyncLogger(),
-            "GC Logging Thread");
+    private static final Thread loggingThread = new Thread(new AsyncLogger(), "GC Logging Thread");
 
     static {
         loggingThread.setDaemon(true);

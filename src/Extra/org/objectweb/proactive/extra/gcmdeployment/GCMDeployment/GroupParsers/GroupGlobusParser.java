@@ -42,15 +42,11 @@ import org.w3c.dom.NodeList;
 public class GroupGlobusParser extends AbstractGroupParser {
     private static final String ATTR_QUEUE = "queue";
     private static final String ATTR_HOSTNAME = "hostname";
-    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
-        "stderr";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
-        "stdout";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
     private static final String NODE_NAME_STDIN = NODE_EXT_NAMESPACE + "stdin";
-    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE +
-        "directory";
-    private static final String NODE_NAME_MAX_TIME = NODE_EXT_NAMESPACE +
-        "maxTime";
+    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE + "directory";
+    private static final String NODE_NAME_MAX_TIME = NODE_EXT_NAMESPACE + "maxTime";
     private static final String NODE_NAME_COUNT = NODE_EXT_NAMESPACE + "count";
     private static final String NODE_NAME = "globusGroup";
 
@@ -66,11 +62,9 @@ public class GroupGlobusParser extends AbstractGroupParser {
 
     @Override
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
-        GroupGlobus globusGroup = (GroupGlobus) super.parseGroupNode(groupNode,
-                xpath);
+        GroupGlobus globusGroup = (GroupGlobus) super.parseGroupNode(groupNode, xpath);
 
-        String hostname = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_HOSTNAME);
+        String hostname = GCMParserHelper.getAttributeValue(groupNode, ATTR_HOSTNAME);
 
         globusGroup.setHostname(hostname);
 

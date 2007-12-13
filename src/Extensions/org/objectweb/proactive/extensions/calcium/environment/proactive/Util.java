@@ -50,37 +50,36 @@ public class Util {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_ENVIRONMENT);
 
     // LocalNode node= NodeFactory.getDefaultNode();
-    static public AOTaskPool createActiveTaskPool(Node frameworkNode)
-        throws ActiveObjectCreationException, NodeException {
+    static public AOTaskPool createActiveTaskPool(Node frameworkNode) throws ActiveObjectCreationException,
+            NodeException {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating Active Object TaskPool.");
         }
 
-        AOTaskPool aom = (AOTaskPool) PAActiveObject.newActive(AOTaskPool.class.getName(),
-                new Object[] {  }, frameworkNode);
+        AOTaskPool aom = (AOTaskPool) PAActiveObject.newActive(AOTaskPool.class.getName(), new Object[] {},
+                frameworkNode);
 
         return aom;
     }
 
     public static FileServerClientImpl createFileServer(Node frameworkNode)
-        throws ActiveObjectCreationException, NodeException {
+            throws ActiveObjectCreationException, NodeException {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating File Server Proxy.");
         }
 
         FileServer fserver = (FileServer) PAActiveObject.newActive(FileServer.class.getName(),
-                new Object[] {  }, frameworkNode);
+                new Object[] {}, frameworkNode);
         fserver.initFileServer();
 
-        FileServerClientImpl fserverclient = new FileServerClientImpl(frameworkNode,
-                fserver);
+        FileServerClientImpl fserverclient = new FileServerClientImpl(frameworkNode, fserver);
 
         return fserverclient;
     }
 
-    static public AOInterpreterPool createAOInterpreterPool(
-        AOTaskPool taskpool, FileServerClientImpl fserver, Node frameworknode,
-        Node[] nodes, int times) throws ProActiveException {
+    static public AOInterpreterPool createAOInterpreterPool(AOTaskPool taskpool,
+            FileServerClientImpl fserver, Node frameworknode, Node[] nodes, int times)
+            throws ProActiveException {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating Active Object Interpreters in nodes.");
         }
@@ -93,44 +92,38 @@ public class Util {
         AOInterpreter[] ai;
         try {
             ai = (AOInterpreter[]) PAActiveObject.newActiveInParallel(AOInterpreter.class.getName(),
-                    new Object[][] {
-                        { taskpool, fserver }
-                    }, nodes);
+                    new Object[][] { { taskpool, fserver } }, nodes);
         } catch (ClassNotFoundException e) {
             throw new ProActiveException(e);
         }
 
-        AOInterpreterPool interpool = (AOInterpreterPool) PAActiveObject.newActive(AOInterpreterPool.class.getName(),
-                new Object[] { Arrays.asList(ai), new Integer(times) },
-                frameworknode);
+        AOInterpreterPool interpool = (AOInterpreterPool) PAActiveObject.newActive(AOInterpreterPool.class
+                .getName(), new Object[] { Arrays.asList(ai), new Integer(times) }, frameworknode);
 
         return interpool;
     }
 
-    public static Node getFrameWorkNode(ProActiveDescriptor pad,
-        VariableContract vc) throws NodeException {
+    public static Node getFrameWorkNode(ProActiveDescriptor pad, VariableContract vc) throws NodeException {
         String vnName = vc.getValue("SKELETON_FRAMEWORK_VN");
 
         return getNode(pad, vnName);
     }
 
-    public static Node[] getInterpreterNodes(ProActiveDescriptor pad,
-        VariableContract vc) throws NodeException {
+    public static Node[] getInterpreterNodes(ProActiveDescriptor pad, VariableContract vc)
+            throws NodeException {
         String vnName = vc.getValue("INTERPRETERS_VN");
 
         return getNodes(pad, vnName);
     }
 
-    static public Node[] getNodes(ProActiveDescriptor pad,
-        String virtualNodeName) throws NodeException {
+    static public Node[] getNodes(ProActiveDescriptor pad, String virtualNodeName) throws NodeException {
         VirtualNode vn = pad.getVirtualNode(virtualNodeName);
         vn.activate();
 
         return vn.getNodes();
     }
 
-    static public Node getNode(ProActiveDescriptor pad, String virtualNodeName)
-        throws NodeException {
+    static public Node getNode(ProActiveDescriptor pad, String virtualNodeName) throws NodeException {
         VirtualNode vn = pad.getVirtualNode(virtualNodeName);
         vn.activate();
 

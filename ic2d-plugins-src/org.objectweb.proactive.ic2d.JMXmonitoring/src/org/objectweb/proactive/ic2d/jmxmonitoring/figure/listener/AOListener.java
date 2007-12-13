@@ -55,8 +55,7 @@ public class AOListener implements MouseListener, MouseMotionListener {
     private DragAndDrop dnd;
     private NodeFigure parentFigure;
 
-    public AOListener(ActiveObject ao, AOFigure figure,
-        MonitoringView monitoringView, NodeFigure parentFigure) {
+    public AOListener(ActiveObject ao, AOFigure figure, MonitoringView monitoringView, NodeFigure parentFigure) {
         this.ao = ao;
         this.figure = figure;
         this.parentFigure = parentFigure;
@@ -85,8 +84,7 @@ public class AOListener implements MouseListener, MouseMotionListener {
                 if (act instanceof IActionExtPoint) {
                     IActionExtPoint extensionAction = (IActionExtPoint) act;
                     extensionAction.setAbstractDataObject(this.ao);
-                } else if (act instanceof ZoomOutAction ||
-                        act instanceof ZoomInAction) {
+                } else if (act instanceof ZoomOutAction || act instanceof ZoomInAction) {
                     act.setEnabled(true);
                 } else {
                     act.setEnabled(false);

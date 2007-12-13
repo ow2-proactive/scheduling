@@ -60,14 +60,11 @@ public class RecoveryJob implements ActiveQueueJob {
 
     public void doTheJob() {
         try {
-            receiver.getProActiveRuntime()
-                    .receiveCheckpoint(receiver.getNodeInformation().getURL(),
-                toSend, incarnation);
-            RecoveryProcessImpl.logger.info("[RECOVERY] " +
-                this.toSend.getBodyID() + " recovered.");
+            receiver.getProActiveRuntime().receiveCheckpoint(receiver.getNodeInformation().getURL(), toSend,
+                    incarnation);
+            RecoveryProcessImpl.logger.info("[RECOVERY] " + this.toSend.getBodyID() + " recovered.");
         } catch (ProActiveException e) {
-            RecoveryProcessImpl.logger.error(
-                "[RECOVERY] **ERROR** Unable to recover " +
+            RecoveryProcessImpl.logger.error("[RECOVERY] **ERROR** Unable to recover " +
                 this.toSend.getBodyID());
             e.printStackTrace();
         }

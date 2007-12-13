@@ -52,10 +52,8 @@ public class TimeAxisFigure extends Figure {
     public static int referenceYSize = 10;
     public static int DEFAULT_DASH_SIZE = 5;
     public static int DEFAULT_TIME_TEXT_HEIGHT_MARGIN = 15;
-    private static final Font DEFAULT_TEXT_FONT = new Font(Display.getCurrent(),
-            "Courrier New", 10, SWT.NONE);
-    private static final Color DEFAULT_TIME_LINE_COLOR = new Color(Display.getCurrent(),
-            225, 225, 225);
+    private static final Font DEFAULT_TEXT_FONT = new Font(Display.getCurrent(), "Courrier New", 10, SWT.NONE);
+    private static final Color DEFAULT_TIME_LINE_COLOR = new Color(Display.getCurrent(), 225, 225, 225);
     protected TimeIntervalManager timeIntervalManager;
     protected boolean bDirty = false;
 
@@ -77,8 +75,7 @@ public class TimeAxisFigure extends Figure {
 
         // Get visible rectangle area
         final Rectangle visibleR = graphics.getClip(Rectangle.SINGLETON);
-        if ((visibleR.width <= 0) || (visibleR.height <= 0) ||
-                (this.timeIntervalManager.getEndTime() == 0)) {
+        if ((visibleR.width <= 0) || (visibleR.height <= 0) || (this.timeIntervalManager.getEndTime() == 0)) {
             return;
         }
 
@@ -86,15 +83,14 @@ public class TimeAxisFigure extends Figure {
         final Rectangle r = this.getBounds();
 
         graphics.setForegroundColor(DEFAULT_TIME_LINE_COLOR);
-        graphics.drawLine(visibleR.x, (r.y + r.height) - 20,
-            visibleR.x + visibleR.width, (r.y + r.height) - 20);
+        graphics.drawLine(visibleR.x, (r.y + r.height) - 20, visibleR.x + visibleR.width,
+                (r.y + r.height) - 20);
 
         double nrReferences = r.width / referenceXSize;
         long timeStep = Math.round(this.timeIntervalManager.getTimeInterval() / nrReferences);
         this.timeIntervalManager.setTimeStep(timeStep);
 
-        int stepInPixels = this.timeIntervalManager.getXPosition(timeStep,
-                r.width);
+        int stepInPixels = this.timeIntervalManager.getXPosition(timeStep, r.width);
         long rawTimeCounter = timeStep; // Skip the first step
         int timeStepPosInPixels = r.x + stepInPixels; // Skip the first step							
 
@@ -107,25 +103,20 @@ public class TimeAxisFigure extends Figure {
         graphics.setForegroundColor(ColorConstants.gray);
         int defaultNbDash = (r.height - DEFAULT_TIME_TEXT_HEIGHT_MARGIN) / DEFAULT_DASH_SIZE;
         int nbDash = defaultNbDash;
-        int correctCrop = FigureUtilities.getTextExtents(sTime,
-                DEFAULT_TEXT_FONT).width;
+        int correctCrop = FigureUtilities.getTextExtents(sTime, DEFAULT_TEXT_FONT).width;
 
         // DRAW IF AND ONLY IF THESE COORDS ARE VISIBLE 
-        if ((visibleR.x <= timeStepPosInPixels) &&
-                (timeStepPosInPixels <= (visibleR.x + visibleR.width))) {
+        if ((visibleR.x <= timeStepPosInPixels) && (timeStepPosInPixels <= (visibleR.x + visibleR.width))) {
             while (nbDash > 0) {
-                graphics.drawLine(timeStepPosInPixels,
-                    r.y + (nbDash * DEFAULT_DASH_SIZE), timeStepPosInPixels,
-                    r.y + ((nbDash - 1) * DEFAULT_DASH_SIZE));
+                graphics.drawLine(timeStepPosInPixels, r.y + (nbDash * DEFAULT_DASH_SIZE),
+                        timeStepPosInPixels, r.y + ((nbDash - 1) * DEFAULT_DASH_SIZE));
                 nbDash -= 2;
             }
             graphics.setForegroundColor(ColorConstants.black);
-            graphics.drawString("0ms", r.x,
-                (r.y + r.height) - DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
+            graphics.drawString("0ms", r.x, (r.y + r.height) - DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
 
-            graphics.drawString(sTime,
-                (timeStepPosInPixels - (correctCrop / 2)),
-                (r.y + r.height) - DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
+            graphics.drawString(sTime, (timeStepPosInPixels - (correctCrop / 2)), (r.y + r.height) -
+                DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
         }
 
         // Write other time values
@@ -145,18 +136,14 @@ public class TimeAxisFigure extends Figure {
 
                 // Draw the dotted line 
                 while (nbDash > 0) {
-                    graphics.drawLine(timeStepPosInPixels,
-                        r.y + (nbDash * DEFAULT_DASH_SIZE),
-                        timeStepPosInPixels,
-                        r.y + ((nbDash - 1) * DEFAULT_DASH_SIZE));
+                    graphics.drawLine(timeStepPosInPixels, r.y + (nbDash * DEFAULT_DASH_SIZE),
+                            timeStepPosInPixels, r.y + ((nbDash - 1) * DEFAULT_DASH_SIZE));
                     nbDash -= 2;
                 }
-                correctCrop = FigureUtilities.getTextExtents(sTime,
-                        DEFAULT_TEXT_FONT).width;
+                correctCrop = FigureUtilities.getTextExtents(sTime, DEFAULT_TEXT_FONT).width;
                 graphics.setForegroundColor(ColorConstants.black);
-                graphics.drawString(sTime,
-                    (timeStepPosInPixels - (correctCrop / 2)),
-                    (r.y + r.height) - DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
+                graphics.drawString(sTime, (timeStepPosInPixels - (correctCrop / 2)), (r.y + r.height) -
+                    DEFAULT_TIME_TEXT_HEIGHT_MARGIN);
             }
         } while (timeStepPosInPixels < (r.width - referenceXSizeHalf));
     }

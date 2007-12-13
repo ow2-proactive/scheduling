@@ -66,13 +66,12 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
 
     @Override
-    public void compile(final List path, final ComponentContainer container,
-        final TaskMap tasks, final Map context) throws ADLException {
+    public void compile(final List path, final ComponentContainer container, final TaskMap tasks,
+            final Map context) throws ADLException {
         ObjectsContainer obj = init(path, container, tasks, context);
-        controllers(obj.getImplementation(), obj.getController(),
-            obj.getName(), obj);
-        end(tasks, container, context, obj.getName(), obj.getDefinition(),
-            obj.getControllerDesc(), obj.getContentDesc(), obj.getVn(), true);
+        controllers(obj.getImplementation(), obj.getController(), obj.getName(), obj);
+        end(tasks, container, context, obj.getName(), obj.getDefinition(), obj.getControllerDesc(), obj
+                .getContentDesc(), obj.getVn(), true);
     }
 
     protected static String getControllerPath(String controller, String name) {
@@ -80,15 +79,13 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         if (controllerURL != null) {
             return controllerURL.getPath();
         } else {
-            logger.warn("Can't retrieve controller description \"" +
-                controller + "\" for component " + name);
+            logger.warn("Can't retrieve controller description \"" + controller + "\" for component " + name);
             return null;
         }
     }
 
-    protected ObjectsContainer init(final List path,
-        final ComponentContainer container, final TaskMap tasks,
-        final Map context) {
+    protected ObjectsContainer init(final List path, final ComponentContainer container, final TaskMap tasks,
+            final Map context) {
         counter++;
 
         String implementation = null;
@@ -125,8 +122,7 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         if (container instanceof Definition) {
             definition = name;
         } else {
-            definition = (String) ((Node) container).astGetDecoration(
-                    "definition");
+            definition = (String) ((Node) container).astGetDecoration("definition");
         }
 
         //        Component[] comps = ((ComponentContainer) container).getComponents();
@@ -137,8 +133,8 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                 n = (VirtualNode) ((VirtualNodeContainer) container).getVirtualNode();
             } catch (ClassCastException e) {
                 throw new ProActiveRuntimeException(
-                    "DOCTYPE definition should be the following when using ProActive : \n" +
-                    "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">");
+                    "DOCTYPE definition should be the following when using ProActive : \n"
+                        + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">");
             }
 
             if (n == null) {
@@ -154,60 +150,53 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
                             }
                         } catch (ClassCastException e) {
                             throw new ProActiveRuntimeException(
-                                "DOCTYPE definition should be the following when using ProActive : \n" +
-                                "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">");
+                                "DOCTYPE definition should be the following when using ProActive : \n"
+                                    + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">");
                         }
                     }
                 }
             }
         }
 
-        return new ObjectsContainer(implementation, controller, name,
-            definition, n);
+        return new ObjectsContainer(implementation, controller, name, definition, n);
     }
 
-    protected void end(final TaskMap tasks, final ComponentContainer container,
-        final Map context, String name, String definition,
-        ControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode n, boolean isFunctional) {
+    protected void end(final TaskMap tasks, final ComponentContainer container, final Map context,
+            String name, String definition, ControllerDescription controllerDesc,
+            ContentDescription contentDesc, VirtualNode n, boolean isFunctional) {
         AbstractInstanceProviderTask createTask = null;
 
-        createTask = new CreateTask((ProActiveImplementationBuilder) builder,
-                container, name, definition, controllerDesc, contentDesc, n,
-                context);
+        createTask = new CreateTask((ProActiveImplementationBuilder) builder, container, name, definition,
+            controllerDesc, contentDesc, n, context);
 
-        FactoryProviderTask typeTask = (FactoryProviderTask) tasks.getTask("type",
-                container);
+        FactoryProviderTask typeTask = (FactoryProviderTask) tasks.getTask("type", container);
         createTask.setFactoryProviderTask(typeTask);
 
         tasks.addTask("create", container, createTask);
     }
 
-    private void controllers(String implementation, String controller,
-        String name, ObjectsContainer obj) {
+    private void controllers(String implementation, String controller, String name, ObjectsContainer obj) {
         ContentDescription contentDesc = null;
         ControllerDescription controllerDesc = null;
 
         if (implementation == null) {
             // a composite component 
             if ("composite".equals(controller) || (controller == null)) {
-                controllerDesc = new ControllerDescription(name,
-                        Constants.COMPOSITE);
+                controllerDesc = new ControllerDescription(name, Constants.COMPOSITE);
                 contentDesc = new ContentDescription(Composite.class.getName());
             } else {
-                controllerDesc = new ControllerDescription(name,
-                        Constants.COMPOSITE, getControllerPath(controller, name));
+                controllerDesc = new ControllerDescription(name, Constants.COMPOSITE, getControllerPath(
+                        controller, name));
             }
         } else {
             // a primitive component
             contentDesc = new ContentDescription(implementation);
 
             if ("primitive".equals(controller) || (controller == null)) {
-                controllerDesc = new ControllerDescription(name,
-                        Constants.PRIMITIVE);
+                controllerDesc = new ControllerDescription(name, Constants.PRIMITIVE);
             } else {
-                controllerDesc = new ControllerDescription(name,
-                        Constants.PRIMITIVE, getControllerPath(controller, name));
+                controllerDesc = new ControllerDescription(name, Constants.PRIMITIVE, getControllerPath(
+                        controller, name));
             }
         }
 
@@ -226,12 +215,9 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         Map context;
         ComponentContainer container;
 
-        public CreateTask(final ProActiveImplementationBuilder builder,
-            final ComponentContainer container, final String name,
-            final String definition,
-            final ControllerDescription controllerDesc,
-            final ContentDescription contentDesc, final VirtualNode vn,
-            final Map context) {
+        public CreateTask(final ProActiveImplementationBuilder builder, final ComponentContainer container,
+                final String name, final String definition, final ControllerDescription controllerDesc,
+                final ContentDescription contentDesc, final VirtualNode vn, final Map context) {
             this.builder = builder;
             this.container = container;
             this.name = name;
@@ -248,15 +234,15 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
             }
 
             Object type = getFactoryProviderTask().getFactory();
-            Object result = builder.createComponent(type, name, definition,
-                    controllerDesc, contentDesc, vn, (Map) context);
+            Object result = builder.createComponent(type, name, definition, controllerDesc, contentDesc, vn,
+                    (Map) context);
             setInstance(result);
         }
 
         @Override
         public String toString() {
-            return "T" + System.identityHashCode(this) + "[CreateTask(" + name +
-            "," + controllerDesc + "," + contentDesc + ")]";
+            return "T" + System.identityHashCode(this) + "[CreateTask(" + name + "," + controllerDesc + "," +
+                contentDesc + ")]";
         }
     }
 
@@ -269,8 +255,8 @@ public class ProActiveImplementationCompiler extends ImplementationCompiler {
         ContentDescription contentDesc = null;
         ControllerDescription controllerDesc = null;
 
-        public ObjectsContainer(String implementation, String controller,
-            String name, String definition, VirtualNode n) {
+        public ObjectsContainer(String implementation, String controller, String name, String definition,
+                VirtualNode n) {
             this.implementation = implementation;
             this.controller = controller;
             this.name = name;

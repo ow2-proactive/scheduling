@@ -63,46 +63,39 @@ public class SelectionScript extends Script<Boolean> {
     }
 
     /** Directly create a script with a string. */
-    public SelectionScript(String script, String engineName)
-        throws InvalidScriptException {
+    public SelectionScript(String script, String engineName) throws InvalidScriptException {
         super(script, engineName);
     }
 
     /** Directly create a script with a string. */
-    public SelectionScript(String script, String engineName, boolean dynamic)
-        throws InvalidScriptException {
+    public SelectionScript(String script, String engineName, boolean dynamic) throws InvalidScriptException {
         super(script, engineName);
         this.dynamic = dynamic;
     }
 
     /** Create a script from a file. */
-    public SelectionScript(File file, String[] parameters)
-        throws InvalidScriptException {
+    public SelectionScript(File file, String[] parameters) throws InvalidScriptException {
         super(file, parameters);
     }
 
     /** Create a script from a file. */
-    public SelectionScript(File file, String[] parameters, boolean dynamic)
-        throws InvalidScriptException {
+    public SelectionScript(File file, String[] parameters, boolean dynamic) throws InvalidScriptException {
         super(file, parameters);
         this.dynamic = dynamic;
     }
 
     /** Create a script from an URL. */
-    public SelectionScript(URL url, String[] parameters)
-        throws InvalidScriptException {
+    public SelectionScript(URL url, String[] parameters) throws InvalidScriptException {
         super(url, parameters);
     }
 
     /** Create a script from an URL. */
-    public SelectionScript(URL url, String[] parameters, boolean dynamic)
-        throws InvalidScriptException {
+    public SelectionScript(URL url, String[] parameters, boolean dynamic) throws InvalidScriptException {
         super(url, parameters);
         this.dynamic = dynamic;
     }
 
-    public SelectionScript(Script<?> script, boolean dynamic)
-        throws InvalidScriptException {
+    public SelectionScript(Script<?> script, boolean dynamic) throws InvalidScriptException {
         super(script);
         this.dynamic = dynamic;
     }
@@ -137,16 +130,15 @@ public class SelectionScript extends Script<Boolean> {
             } else if (result instanceof Integer) {
                 return new ScriptResult<Boolean>((Integer) result != 0);
             } else if (result instanceof String) {
-                return new ScriptResult<Boolean>(!(((String) result).equals(
-                        "false") || ((String) result).equals("False")));
+                return new ScriptResult<Boolean>(!(((String) result).equals("false") || ((String) result)
+                        .equals("False")));
             } else {
                 return new ScriptResult<Boolean>(new Exception(
-                        "Bad result format : awaited Boolean (or Integer when not existing), found " +
+                    "Bad result format : awaited Boolean (or Integer when not existing), found " +
                         result.getClass().getName()));
             }
         } else {
-            return new ScriptResult<Boolean>(new Exception(
-                    "No binding for key " + RESULT_VARIABLE));
+            return new ScriptResult<Boolean>(new Exception("No binding for key " + RESULT_VARIABLE));
         }
     }
 

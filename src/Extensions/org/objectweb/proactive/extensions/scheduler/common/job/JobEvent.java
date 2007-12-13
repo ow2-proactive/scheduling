@@ -213,8 +213,7 @@ public class JobEvent implements Serializable {
      *
      * @param taskFinishedTimeModify the taskStatusModify to set
      */
-    public void setTaskFinishedTimeModify(
-        HashMap<TaskId, Long> taskFinishedTimeModify) {
+    public void setTaskFinishedTimeModify(HashMap<TaskId, Long> taskFinishedTimeModify) {
         this.taskFinishedTimeModify = taskFinishedTimeModify;
     }
 

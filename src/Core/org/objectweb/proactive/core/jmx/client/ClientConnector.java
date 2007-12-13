@@ -75,22 +75,17 @@ public class ClientConnector implements Serializable {
 
             /*  build the jmx Url */
             if (this.serverName != null) {
-                this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(
-                            this.url),
-                        ProActiveJMXConstants.SERVER_REGISTERED_NAME + "_" +
-                        serverName, "service:jmx:proactive",
-                        URIBuilder.getPortNumber(this.url)).toString();
+                this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(this.url),
+                        ProActiveJMXConstants.SERVER_REGISTERED_NAME + "_" + serverName,
+                        "service:jmx:proactive", URIBuilder.getPortNumber(this.url)).toString();
             } else {
-                this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(
-                            this.url),
-                        ProActiveJMXConstants.SERVER_REGISTERED_NAME,
-                        "service:jmx:proactive",
+                this.url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(this.url),
+                        ProActiveJMXConstants.SERVER_REGISTERED_NAME, "service:jmx:proactive",
                         URIBuilder.getPortNumber(this.url)).toString();
             }
             JMXServiceURL jmxUrl = new JMXServiceURL(url);
             /* connect to the connector server  */
-            this.connector = JMXConnectorFactory.connect(jmxUrl,
-                    ProActiveJMXConstants.PROACTIVE_JMX_ENV);
+            this.connector = JMXConnectorFactory.connect(jmxUrl, ProActiveJMXConstants.PROACTIVE_JMX_ENV);
             /* retrieve the ProActive Connection that will enable the remote calls onto the remote MBean server */
             this.connection = (ProActiveConnection) this.connector.getMBeanServerConnection();
         } catch (MalformedURLException e) {

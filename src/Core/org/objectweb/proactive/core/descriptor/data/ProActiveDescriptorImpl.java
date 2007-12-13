@@ -78,8 +78,8 @@ import org.objectweb.proactive.core.xml.VariableContract;
 public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
 
     /**
-         *
-         */
+     *
+     */
 
     //
     //  ----- PRIVATE MEMBERS -----------------------------------------------------------------------------------
@@ -248,8 +248,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         return mainDefinitionMapping;
     }
 
-    public void setMainDefinitionMapping(
-        HashMap<String, MainDefinition> newMapping) {
+    public void setMainDefinitionMapping(HashMap<String, MainDefinition> newMapping) {
         mainDefinitionMapping = newMapping;
     }
 
@@ -261,8 +260,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         return virtualNodeMapping;
     }
 
-    public void setVirtualNodeMapping(
-        HashMap<String, VirtualNodeInternal> newMapping) {
+    public void setVirtualNodeMapping(HashMap<String, VirtualNodeInternal> newMapping) {
         virtualNodeMapping = newMapping;
     }
 
@@ -323,8 +321,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
      * @param fileTransferID
      * @return a new FileTransfer definition
      */
-    protected FileTransferDefinition createFileTransferDefinition(
-        String fileTransferID) {
+    protected FileTransferDefinition createFileTransferDefinition(String fileTransferID) {
         FileTransferDefinition ft = new FileTransferDefinition(fileTransferID);
         fileTransferMapping.put(fileTransferID, ft);
 
@@ -339,8 +336,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         return createVirtualNode(vnName, lookup, false);
     }
 
-    public VirtualNodeInternal createVirtualNode(String vnName, boolean lookup,
-        boolean isMainNode) {
+    public VirtualNodeInternal createVirtualNode(String vnName, boolean lookup, boolean isMainNode) {
         VirtualNodeInternal vn = getVirtualNode(vnName);
 
         if (jobID == null) {
@@ -361,8 +357,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
             if (lookup) {
                 vn = new VirtualNodeLookup(vnName);
             } else {
-                vn = new VirtualNodeImpl(vnName, proactiveSecurityManager,
-                        this.url, isMainNode, this);
+                vn = new VirtualNodeImpl(vnName, proactiveSecurityManager, this.url, isMainNode, this);
                 ((VirtualNodeImpl) vn).jobID = this.jobID;
 
                 //System.out.println("vn created with url: " + padURL + " and jobid : " + ((VirtualNodeImpl) vn).jobID);
@@ -394,8 +389,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         return vm;
     }
 
-    public ExternalProcess createProcess(String processID,
-        String processClassName) throws ProActiveException {
+    public ExternalProcess createProcess(String processID, String processClassName) throws ProActiveException {
         ExternalProcess process = getProcess(processID);
 
         if (process == null) {
@@ -406,8 +400,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         return process;
     }
 
-    public ExternalProcess createProcess(String processClassName)
-        throws ProActiveException {
+    public ExternalProcess createProcess(String processClassName) throws ProActiveException {
         try {
             Class<?> processClass = Class.forName(processClassName);
             ExternalProcess process = (ExternalProcess) processClass.newInstance();
@@ -432,8 +425,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    public synchronized FileTransferDefinition getFileTransfer(
-        String fileTransferID) {
+    public synchronized FileTransferDefinition getFileTransfer(String fileTransferID) {
         //TODO throw new ProActiveException 
         //if(fileTransferID.equalsIgnoreCase("implicit")) throw new ProActiveException();
         FileTransferDefinition ft = fileTransferMapping.get(fileTransferID);
@@ -450,8 +442,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         return ft;
     }
 
-    public void registerProcess(ExternalProcessDecorator compositeProcess,
-        String processID) {
+    public void registerProcess(ExternalProcessDecorator compositeProcess, String processID) {
         ExternalProcess process = getProcess(processID);
 
         if (process == null) {
@@ -461,9 +452,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    public void addProcessToSequenceList(
-        AbstractSequentialListProcessDecorator sequentialListProcess,
-        String processID) {
+    public void addProcessToSequenceList(AbstractSequentialListProcessDecorator sequentialListProcess,
+            String processID) {
         ExternalProcess process = getProcess(processID);
         if (process == null) {
             addSequentialPendingProcess(processID, sequentialListProcess);
@@ -472,9 +462,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    public void addServiceToSequenceList(
-        AbstractSequentialListProcessDecorator sequentialListProcess,
-        String processID) {
+    public void addServiceToSequenceList(AbstractSequentialListProcessDecorator sequentialListProcess,
+            String processID) {
         UniversalService service = (UniversalService) processMapping.get(processID);
         if (service == null) {
             addSequentialPendingService(processID, sequentialListProcess);
@@ -485,23 +474,22 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         }
     }
 
-    public void mapToExtendedJVM(JVMProcess jvmProcess, String processID)
-        throws ProActiveException {
+    public void mapToExtendedJVM(JVMProcess jvmProcess, String processID) throws ProActiveException {
         try {
             JVMProcessImpl process = (JVMProcessImpl) getProcess(processID);
 
             if (process == null) {
-                throw new ProActiveException("The jvmProcess with id " +
-                    processID +
-                    " is not yet defined in the descriptor. The extended jvmProcess must be defined before all jvmProcesses that extend it");
+                throw new ProActiveException(
+                    "The jvmProcess with id " +
+                        processID +
+                        " is not yet defined in the descriptor. The extended jvmProcess must be defined before all jvmProcesses that extend it");
 
                 //addPendingJVMProcess(processID, jvmProcess);
             } else {
                 jvmProcess.setExtendedJVM(process);
             }
         } catch (ClassCastException e) {
-            logger.fatal(
-                "ERROR: a jvmProcess can only extend another jvmProcess. Correct the Descriptor");
+            logger.fatal("ERROR: a jvmProcess can only extend another jvmProcess. Correct the Descriptor");
             e.printStackTrace();
         }
     }
@@ -530,8 +518,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
                 serviceUser.setService(service);
             } catch (ProActiveException e) {
                 e.printStackTrace();
-                logger.error("the given service " + service.getServiceName() +
-                    " cannot be set for class " + serviceUser.getUserClass());
+                logger.error("the given service " + service.getServiceName() + " cannot be set for class " +
+                    serviceUser.getUserClass());
             }
         }
     }
@@ -583,16 +571,14 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
 
         try {
             policyServer = ProActiveSecurityDescriptorHandler.createPolicyServer(file);
-            proactiveSecurityManager = new ProActiveSecurityManager(EntityType.APPLICATION,
-                    policyServer);
+            proactiveSecurityManager = new ProActiveSecurityManager(EntityType.APPLICATION, policyServer);
 
             // set the security policyserver to the default proactive meta object
             // by the way, the HalfBody will be associated to a security manager
             // derivated from this one.
-            ProActiveSecurityManager psm = proactiveSecurityManager.generateSiblingCertificate(EntityType.OBJECT,
-                    "HalfBody");
-            ProActiveMetaObjectFactory.newInstance()
-                                      .setProActiveSecurityManager(psm);
+            ProActiveSecurityManager psm = proactiveSecurityManager.generateSiblingCertificate(
+                    EntityType.OBJECT, "HalfBody");
+            ProActiveMetaObjectFactory.newInstance().setProActiveSecurityManager(psm);
         } catch (InvalidPolicyFile e) {
             e.printStackTrace();
         }
@@ -641,30 +627,26 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         processMapping.put(processID, process);
     }
 
-    private void addPendingProcess(String processID,
-        VirtualMachine virtualMachine) {
+    private void addPendingProcess(String processID, VirtualMachine virtualMachine) {
         ProcessUpdater updater = new VirtualMachineUpdater(virtualMachine);
 
         //pendingProcessMapping.put(processID, updater);
         addProcessUpdater(processID, updater);
     }
 
-    private void addPendingProcess(String processID,
-        ExternalProcessDecorator compositeProcess) {
+    private void addPendingProcess(String processID, ExternalProcessDecorator compositeProcess) {
         ProcessUpdater updater = new CompositeExternalProcessUpdater(compositeProcess);
 
         //pendingProcessMapping.put(processID, updater);
         addProcessUpdater(processID, updater);
     }
 
-    private void addSequentialPendingProcess(String processID,
-        AbstractSequentialListProcessDecorator sp) {
+    private void addSequentialPendingProcess(String processID, AbstractSequentialListProcessDecorator sp) {
         ProcessUpdater updater = new SequentialProcessUpdater(sp);
         addProcessUpdater(processID, updater);
     }
 
-    private void addSequentialPendingService(String processID,
-        AbstractSequentialListProcessDecorator sp) {
+    private void addSequentialPendingService(String processID, AbstractSequentialListProcessDecorator sp) {
         ServiceUpdater updater = new SequentialServiceUpdater(sp);
         addServiceUpdater(processID, updater);
     }
@@ -676,9 +658,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     //        //pendingProcessMapping.put(processID, updater);
     //        addProcessUpdater(processID, updater);
     //    }
-    private void addProcessUpdater(String processID,
-        ProcessUpdater processUpdater) {
-        CompositeProcessUpdater compositeProcessUpdater = (CompositeProcessUpdater) pendingProcessMapping.get(processID);
+    private void addProcessUpdater(String processID, ProcessUpdater processUpdater) {
+        CompositeProcessUpdater compositeProcessUpdater = (CompositeProcessUpdater) pendingProcessMapping
+                .get(processID);
 
         if (compositeProcessUpdater == null) {
             compositeProcessUpdater = new CompositeProcessUpdater();
@@ -702,9 +684,9 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         addServiceUpdater(serviceID, updater);
     }
 
-    private void addServiceUpdater(String serviceID,
-        ServiceUpdater serviceUpdater) {
-        CompositeServiceUpdater compositeServiceUpdater = (CompositeServiceUpdater) pendingServiceMapping.get(serviceID);
+    private void addServiceUpdater(String serviceID, ServiceUpdater serviceUpdater) {
+        CompositeServiceUpdater compositeServiceUpdater = (CompositeServiceUpdater) pendingServiceMapping
+                .get(serviceID);
 
         if (compositeServiceUpdater == null) {
             compositeServiceUpdater = new CompositeServiceUpdater();
@@ -779,8 +761,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     private class CompositeExternalProcessUpdater implements ProcessUpdater {
         private ExternalProcessDecorator compositeExternalProcess;
 
-        public CompositeExternalProcessUpdater(
-            ExternalProcessDecorator compositeExternalProcess) {
+        public CompositeExternalProcessUpdater(ExternalProcessDecorator compositeExternalProcess) {
             this.compositeExternalProcess = compositeExternalProcess;
         }
 
@@ -796,8 +777,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     private class SequentialProcessUpdater implements ProcessUpdater {
         private AbstractSequentialListProcessDecorator spd;
 
-        public SequentialProcessUpdater(
-            AbstractSequentialListProcessDecorator spd) {
+        public SequentialProcessUpdater(AbstractSequentialListProcessDecorator spd) {
             this.spd = spd;
         }
 
@@ -814,8 +794,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     private class SequentialServiceUpdater implements ServiceUpdater {
         private AbstractSequentialListProcessDecorator spd;
 
-        public SequentialServiceUpdater(
-            AbstractSequentialListProcessDecorator spd) {
+        public SequentialServiceUpdater(AbstractSequentialListProcessDecorator spd) {
             this.spd = spd;
         }
 
@@ -841,8 +820,7 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
     //            jvmProcess.setExtendedJVM((JVMProcessImpl) p);
     //        }
     //    }
-    private class VirtualMachineUpdater implements ProcessUpdater,
-        ServiceUpdater {
+    private class VirtualMachineUpdater implements ProcessUpdater, ServiceUpdater {
         private VirtualMachine virtualMachine;
 
         public VirtualMachineUpdater(VirtualMachine virtualMachine) {
@@ -882,8 +860,8 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
                 serviceUser.setService(s);
             } catch (ProActiveException e) {
                 e.printStackTrace();
-                logger.error("the given service " + s.getServiceName() +
-                    " cannot be set for class " + serviceUser.getUserClass());
+                logger.error("the given service " + s.getServiceName() + " cannot be set for class " +
+                    serviceUser.getUserClass());
             }
         }
     }
@@ -902,15 +880,13 @@ public class ProActiveDescriptorImpl implements ProActiveDescriptorInternal {
         return this.variableContract;
     }
 
-    public void addTechnicalService(TechnicalServiceXmlType tsParsed)
-        throws Exception {
+    public void addTechnicalService(TechnicalServiceXmlType tsParsed) throws Exception {
         TechnicalService ts = (TechnicalService) tsParsed.getType().newInstance();
         (ts).init(tsParsed.getArgs());
         if (technicalServiceMapping.containsKey(tsParsed.getId())) {
             ((TechnicalServiceWrapper) this.technicalServiceMapping.get(tsParsed.getId())).setTs(ts);
         } else {
-            logger.warn("Unregistered technical service id : " +
-                tsParsed.getId());
+            logger.warn("Unregistered technical service id : " + tsParsed.getId());
         }
     }
 

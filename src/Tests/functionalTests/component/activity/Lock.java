@@ -30,7 +30,6 @@
  */
 package functionalTests.component.activity;
 
-
 /**
  * A simple semaphore
  *

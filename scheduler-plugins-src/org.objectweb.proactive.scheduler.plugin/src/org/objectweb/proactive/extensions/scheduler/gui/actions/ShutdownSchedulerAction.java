@@ -48,17 +48,17 @@ public class ShutdownSchedulerAction extends Action {
     private ShutdownSchedulerAction(Shell shell) {
         this.shell = shell;
         this.setText("Shutdown scheduler");
-        this.setToolTipText(
-            "To shutdown the scheduler (This will finish all running and pending jobs before shutdown)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/scheduler_shutdown.png"));
+        this
+                .setToolTipText("To shutdown the scheduler (This will finish all running and pending jobs before shutdown)");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
+                "icons/scheduler_shutdown.png"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
     @Override
     public void run() {
         if (MessageDialog.openConfirm(shell, "Confirm please",
-                    "Are you sure you want to shutting down the scheduler ?")) {
+                "Are you sure you want to shutting down the scheduler ?")) {
             SchedulerProxy.getInstance().shutdown();
         }
     }

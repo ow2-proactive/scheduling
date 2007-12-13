@@ -61,10 +61,9 @@ public class RequestNodesMessage extends BreadthFirstMessage {
      * @param jobId
      * @param underloadedOnly determines if it replies with normal "askingNode" method or discard the call
      */
-    public RequestNodesMessage(int ttl, UniversalUniqueID uuid,
-        P2PService remoteService, int numberOfNodes, P2PNodeLookup lookup,
-        String vnName, String jobId, boolean underloadedOnly,
-        String nodeFamilyRegexp) {
+    public RequestNodesMessage(int ttl, UniversalUniqueID uuid, P2PService remoteService, int numberOfNodes,
+            P2PNodeLookup lookup, String vnName, String jobId, boolean underloadedOnly,
+            String nodeFamilyRegexp) {
         super(ttl, uuid, remoteService);
         this.numberOfNodes = numberOfNodes;
         this.lookup = lookup;
@@ -92,11 +91,9 @@ public class RequestNodesMessage extends BreadthFirstMessage {
                     Node current = nodes.get(i);
                     if (vnName != null) {
                         try {
-                            current.getProActiveRuntime()
-                                   .registerVirtualNode(vnName, true);
+                            current.getProActiveRuntime().registerVirtualNode(vnName, true);
                         } catch (Exception e) {
-                            logger.warn("Couldn't register " + vnName +
-                                " in the PAR", e);
+                            logger.warn("Couldn't register " + vnName + " in the PAR", e);
                         }
                     }
                     if (jobId != null) {
@@ -109,8 +106,8 @@ public class RequestNodesMessage extends BreadthFirstMessage {
                     if (numberOfNodes <= 0) {
                         this.active = false;
                     }
-                    target.acquaintanceManager_active.setMaxNOA(target.acquaintanceManager_active.getMaxNOA() -
-                        1);
+                    target.acquaintanceManager_active
+                            .setMaxNOA(target.acquaintanceManager_active.getMaxNOA() - 1);
                 }
             } else {
                 P2PNode askedNode = target.nodeManager.askingNode(nodeFamilyRegexp);
@@ -121,20 +118,16 @@ public class RequestNodesMessage extends BreadthFirstMessage {
                     P2PNodeAck nodeAck = null;
 
                     try {
-                        nodeAck = lookup.giveNode(nodeAvailable,
-                                askedNode.getNodeManager());
+                        nodeAck = lookup.giveNode(nodeAvailable, askedNode.getNodeManager());
                     } catch (Exception lookupExcption) {
-                        logger.info("Cannot contact the remote lookup",
-                            lookupExcption);
+                        logger.info("Cannot contact the remote lookup", lookupExcption);
                         target.nodeManager.noMoreNodeNeeded(nodeAvailable);
                         return;
                     }
                     if (nodeAck != null) {
                         // Waitng the ACK
-                        long endTime = System.currentTimeMillis() +
-                            P2PService.ACQ_TO;
-                        while ((System.currentTimeMillis() < endTime) &&
-                                PAFuture.isAwaited(nodeAck)) {
+                        long endTime = System.currentTimeMillis() + P2PService.ACQ_TO;
+                        while ((System.currentTimeMillis() < endTime) && PAFuture.isAwaited(nodeAck)) {
                             if (target.service.hasRequestToServe()) {
                                 target.service.serveAll(target.filter);
                             } else {
@@ -160,18 +153,16 @@ public class RequestNodesMessage extends BreadthFirstMessage {
                         // Setting vnInformation and JobId
                         if (vnName != null) {
                             try {
-                                nodeAvailable.getProActiveRuntime()
-                                             .registerVirtualNode(vnName, true);
+                                nodeAvailable.getProActiveRuntime().registerVirtualNode(vnName, true);
                             } catch (Exception e) {
-                                logger.warn("Couldn't register " + vnName +
-                                    " in the PAR", e);
+                                logger.warn("Couldn't register " + vnName + " in the PAR", e);
                             }
                         }
                         if (jobId != null) {
                             nodeAvailable.getNodeInformation().setJobID(jobId);
                         }
-                        numberOfNodes = (numberOfNodes == P2PConstants.MAX_NODE)
-                            ? P2PConstants.MAX_NODE : (numberOfNodes - 1);
+                        numberOfNodes = (numberOfNodes == P2PConstants.MAX_NODE) ? P2PConstants.MAX_NODE
+                                : (numberOfNodes - 1);
                         logger.info("Giving 1 node to vn: " + vnName);
                     } else {
                         // It's a NACK node

@@ -37,6 +37,8 @@ import java.util.Set;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.NodeProvider;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCM_NODEALLOC_LOGGER;
+
+
 public class VirtualNodeImpl implements VirtualNodeInternal {
 
     /** unique name (declared by GCMA) */
@@ -129,8 +131,8 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
                 nodeAttachmentSubscribers.add(new Subscriber(client, methodeName));
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName +
-                "(Node, VirtualNode) cannot be found on " + cl.getSimpleName());
+            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName + "(Node, VirtualNode) cannot be found on " +
+                cl.getSimpleName());
             return false;
         }
 
@@ -155,8 +157,8 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
                 isReadySubscribers.add(new Subscriber(client, methodeName));
             }
         } catch (NoSuchMethodException e) {
-            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName +
-                "(VirtualNode) cannot be found on " + cl.getSimpleName());
+            GCM_NODEALLOC_LOGGER.warn("Method " + methodeName + "(VirtualNode) cannot be found on " +
+                cl.getSimpleName());
             return false;
         }
 
@@ -190,8 +192,8 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
      */
     public void addNodeProviderContract(NodeProvider provider, long capacity) {
         if (findNodeProviderContract(provider) != null) {
-            throw new IllegalStateException("A contract with the provider " +
-                provider.getId() + " already exist for " + id);
+            throw new IllegalStateException("A contract with the provider " + provider.getId() +
+                " already exist for " + id);
         }
 
         nodeProvidersContracts.add(new NodeProviderContract(provider, capacity));
@@ -200,8 +202,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
     public boolean doesNodeProviderNeed(Node node, NodeProvider nodeProvider) {
         NodeProviderContract contract = findNodeProviderContract(nodeProvider);
 
-        if ((contract != null) && contract.doYouNeed(node, nodeProvider) &&
-                (needNode() || isGreedy())) {
+        if ((contract != null) && contract.doYouNeed(node, nodeProvider) && (needNode() || isGreedy())) {
             addNode(node);
             return true;
         }
@@ -268,8 +269,8 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
      * Private Helpers
      */
     private void addNode(Node node) {
-        GCM_NODEALLOC_LOGGER.debug("Node " +
-            node.getNodeInformation().getURL() + " attached to " + getName());
+        GCM_NODEALLOC_LOGGER
+                .debug("Node " + node.getNodeInformation().getURL() + " attached to " + getName());
         synchronized (nodes) {
             nodes.add(node);
         }
@@ -278,8 +279,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
             for (Subscriber subscriber : nodeAttachmentSubscribers) {
                 Class<?> cl = subscriber.getClient().getClass();
                 try {
-                    Method m = cl.getMethod(subscriber.getMethod(), Node.class,
-                            VirtualNode.class);
+                    Method m = cl.getMethod(subscriber.getMethod(), Node.class, VirtualNode.class);
                     m.invoke(subscriber.getClient(), node, this);
                 } catch (Exception e) {
                     GCM_NODEALLOC_LOGGER.warn(e);
@@ -292,8 +292,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
                 for (Subscriber subscriber : isReadySubscribers) {
                     Class<?> cl = subscriber.getClient().getClass();
                     try {
-                        Method m = cl.getMethod(subscriber.getMethod(),
-                                VirtualNode.class);
+                        Method m = cl.getMethod(subscriber.getMethod(), VirtualNode.class);
                         m.invoke(subscriber.getClient(), this);
                         isReadySubscribers.remove(subscriber);
                     } catch (Exception e) {
@@ -304,8 +303,7 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         }
     }
 
-    private NodeProviderContract findNodeProviderContract(
-        NodeProvider nodeProvider) {
+    private NodeProviderContract findNodeProviderContract(NodeProvider nodeProvider) {
         for (NodeProviderContract nodeProviderContract : nodeProvidersContracts) {
             if (nodeProvider == nodeProviderContract.getNodeProvider()) {
                 return nodeProviderContract;
@@ -399,10 +397,8 @@ public class VirtualNodeImpl implements VirtualNodeInternal {
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) +
-                ((client == null) ? 0 : client.hashCode());
-            result = (prime * result) +
-                ((method == null) ? 0 : method.hashCode());
+            result = (prime * result) + ((client == null) ? 0 : client.hashCode());
+            result = (prime * result) + ((method == null) ? 0 : method.hashCode());
             return result;
         }
 

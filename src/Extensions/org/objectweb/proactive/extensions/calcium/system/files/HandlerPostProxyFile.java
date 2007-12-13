@@ -45,8 +45,7 @@ class HandlerPostProxyFile implements Handler<ProxyFile> {
     IdentityHashMap<ProxyFile, ProxyFile> allFiles;
     FileServerClient fserver;
 
-    public HandlerPostProxyFile(FileServerClient fserver,
-        IdentityHashMap<ProxyFile, ProxyFile> allFiles) {
+    public HandlerPostProxyFile(FileServerClient fserver, IdentityHashMap<ProxyFile, ProxyFile> allFiles) {
         this.allFiles = allFiles;
         this.fserver = fserver;
     }

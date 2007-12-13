@@ -121,8 +121,8 @@ public class DinnerLayout {
         for (int n = 0; n < 5; n++) {
             params[0] = new Integer(n);
             try {
-                phils[n] = (Philosopher) org.objectweb.proactive.api.PAActiveObject.newActive(Philosopher.class.getName(),
-                        params);
+                phils[n] = (Philosopher) org.objectweb.proactive.api.PAActiveObject.newActive(
+                        Philosopher.class.getName(), params);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -171,7 +171,7 @@ public class DinnerLayout {
      * This is the <b>real</b> AWT Frame
      */
     protected class UserFrame extends javax.swing.JPanel implements java.awt.event.ActionListener,
-        java.awt.event.MouseListener {
+            java.awt.event.MouseListener {
         protected javax.swing.JButton bQuit;
         protected javax.swing.JButton bAuto;
 
@@ -319,17 +319,16 @@ public class DinnerLayout {
         }
 
         public void mousePressed(java.awt.event.MouseEvent e) {
-        }
-        ;
+        };
+
         public void mouseReleased(java.awt.event.MouseEvent e) {
-        }
-        ;
+        };
+
         public void mouseEntered(java.awt.event.MouseEvent e) {
-        }
-        ;
+        };
+
         public void mouseExited(java.awt.event.MouseEvent e) {
-        }
-        ;
+        };
 
         /**
          * mouseClicked
@@ -352,18 +351,18 @@ public class DinnerLayout {
 
             // checks if the philosopher is eating
             switch (philButtons[index].state) {
-            case 0:
-                // He's not eating
-                // (le philosophe fait un appel synchrone sur Table.getForks)
-                phils[index].getForks();
-                philButtons[index].changeState(1);
-                philButtons[index].setEnabled(false);
-                break;
-            case 2:
-                phils[index].putForks();
-                philButtons[index].changeState(0);
-                philButtons[index].setEnabled(true);
-                break;
+                case 0:
+                    // He's not eating
+                    // (le philosophe fait un appel synchrone sur Table.getForks)
+                    phils[index].getForks();
+                    philButtons[index].changeState(1);
+                    philButtons[index].setEnabled(false);
+                    break;
+                case 2:
+                    phils[index].putForks();
+                    philButtons[index].changeState(0);
+                    philButtons[index].setEnabled(true);
+                    break;
             }
         }
     }

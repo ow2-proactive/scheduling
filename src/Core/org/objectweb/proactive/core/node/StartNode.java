@@ -162,8 +162,7 @@ public class StartNode {
         }
     }
 
-    protected void createNode(String nodeURL, boolean noRebind)
-        throws NodeException, AlreadyBoundException {
+    protected void createNode(String nodeURL, boolean noRebind) throws NodeException, AlreadyBoundException {
         int exceptionCount = 0;
 
         while (true) {
@@ -173,13 +172,12 @@ public class StartNode {
                 if (nodeURL == null) {
                     node = NodeFactory.getDefaultNode();
                 } else {
-                    node = NodeFactory.createNode(nodeURL, !noRebind, null,
-                            null, null);
+                    node = NodeFactory.createNode(nodeURL, !noRebind, null, null, null);
                 }
 
-                logger.info("OK. Node " + node.getNodeInformation().getName() +
-                    " ( " + node.getNodeInformation().getURL() + " ) " +
-                    " is created in VM id=" + UniqueID.getCurrentVMID());
+                logger.info("OK. Node " + node.getNodeInformation().getName() + " ( " +
+                    node.getNodeInformation().getURL() + " ) " + " is created in VM id=" +
+                    UniqueID.getCurrentVMID());
 
                 break;
             } catch (NodeException e) {
@@ -210,8 +208,7 @@ public class StartNode {
      * Run the complete creation of the node step by step by invoking the other
      * helper methods
      */
-    protected void run()
-        throws java.io.IOException, NodeException, AlreadyBoundException {
+    protected void run() throws java.io.IOException, NodeException, AlreadyBoundException {
         // create node
         createNode(nodeURL, noRebind);
     }
@@ -241,31 +238,26 @@ public class StartNode {
         String localhost = "localhost";
 
         try {
-            localhost = URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                                .getInetAddress());
+            localhost = URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
         } catch (java.lang.SecurityException e) {
             logger.error("InetAddress failed: " + e.getMessage());
             e.printStackTrace();
         }
 
-        logger.info("usage: java " + this.getClass().getName() +
-            " <node URL> [options]");
+        logger.info("usage: java " + this.getClass().getName() + " <node URL> [options]");
         logger.info(" - options");
         logger.info("     " + NO_CLASS_SERVER_OPTION_NAME +
             " : indicates not to create a ClassServer for RMI.");
-        logger.info(
-            "                      By default a ClassServer is automatically created");
+        logger.info("                      By default a ClassServer is automatically created");
         logger.info("                      to serve class files on demand.");
         logger.info("     " + NO_REBIND_OPTION_NAME +
             "      : indicates not to use rebind when registering the");
-        logger.info(
-            "                      node to the RMIRegistry. If a node of the same name");
-        logger.info(
-            "                      already exists, the creation of the new node will fail.");
+        logger.info("                      node to the RMIRegistry. If a node of the same name");
+        logger.info("                      already exists, the creation of the new node will fail.");
         logger.info("  for instance: java " + StartNode.class.getName() + " " +
             Constants.RMI_PROTOCOL_IDENTIFIER + "://" + localhost + "/node1");
         logger.info("                java " + StartNode.class.getName() + " " +
-            Constants.RMI_PROTOCOL_IDENTIFIER + "://" + localhost + "/node2  " +
-            NO_CLASS_SERVER_OPTION_NAME + " " + NO_REBIND_OPTION_NAME);
+            Constants.RMI_PROTOCOL_IDENTIFIER + "://" + localhost + "/node2  " + NO_CLASS_SERVER_OPTION_NAME +
+            " " + NO_REBIND_OPTION_NAME);
     }
 }

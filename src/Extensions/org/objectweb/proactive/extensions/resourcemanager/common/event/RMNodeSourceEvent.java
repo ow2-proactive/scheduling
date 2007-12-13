@@ -92,7 +92,7 @@ public class RMNodeSourceEvent extends RMEvent {
     public boolean equals(Object obj) {
         if (obj instanceof RMNodeSourceEvent) {
             return ((RMNodeSourceEvent) obj).nodeSourceName.equals(this.nodeSourceName) &&
-            ((RMNodeSourceEvent) obj).nodeSourceType.equals(this.nodeSourceType);
+                ((RMNodeSourceEvent) obj).nodeSourceType.equals(this.nodeSourceType);
         }
         return false;
     }

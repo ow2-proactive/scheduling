@@ -61,16 +61,15 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskR
  * @author fviale
  *
  */
-public class AOTaskRepository implements TaskRepository<Task<?extends Serializable>>,
-    Serializable {
+public class AOTaskRepository implements TaskRepository<Task<? extends Serializable>>, Serializable {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * logger of the task repository
-    */
+     * logger of the task repository
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_REPOSITORY);
 
     /**
@@ -113,16 +112,15 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public long addTask(final Task<?extends Serializable> task,
-        final int hashCode) throws TaskAlreadySubmittedException {
+    public long addTask(final Task<? extends Serializable> task, final int hashCode)
+            throws TaskAlreadySubmittedException {
         if (hashCodes.contains(hashCode)) {
             throw new TaskAlreadySubmittedException();
         }
 
         hashCodes.add(hashCode);
         idTohashCode.put(taskCounter, hashCode);
-        TaskIntern<Serializable> ti = new TaskWrapperImpl(taskCounter,
-                (Task<Serializable>) task);
+        TaskIntern<Serializable> ti = new TaskWrapperImpl(taskCounter, (Task<Serializable>) task);
         idToTaskIntern.put(taskCounter, ti);
         taskCounter = (taskCounter + 1) % (Long.MAX_VALUE - 1);
         return ti.getId();
@@ -147,8 +145,7 @@ public class AOTaskRepository implements TaskRepository<Task<?extends Serializab
      * {@inheritDoc}
      */
     public void removeTask(final long id) {
-        if (!idToTaskIntern.containsKey(id) &&
-                !(idToZippedTask.containsKey(id))) {
+        if (!idToTaskIntern.containsKey(id) && !(idToZippedTask.containsKey(id))) {
             throw new NoSuchElementException("task unknown");
         }
 

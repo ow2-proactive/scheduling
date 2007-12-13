@@ -80,8 +80,7 @@ public class NumberSource implements java.io.Serializable, RunActive, Slowable {
                 } catch (InterruptedException ex) {
                 }
             } else if (first != null) {
-                logger.info("        Testing numbers from " + currentNumber +
-                    " to " + (currentNumber + 98));
+                logger.info("        Testing numbers from " + currentNumber + " to " + (currentNumber + 98));
                 for (int i = 0; i < 100; i++) { // start several requests at a time in order to increase speed
                     first.tryModulo(currentNumber);
                     currentNumber += 2;

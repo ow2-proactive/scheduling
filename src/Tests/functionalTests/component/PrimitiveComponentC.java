@@ -42,8 +42,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class PrimitiveComponentC implements I1, BindingController {
-    private final static Logger logger = ProActiveLogger.getLogger(
-            "functionalTestss.components");
+    private final static Logger logger = ProActiveLogger.getLogger("functionalTestss.components");
     public final static String MESSAGE = "-->c";
     public final static String I1_CLIENT_ITF_NAME = "i1-client";
     I1 i1Client;
@@ -62,8 +61,7 @@ public class PrimitiveComponentC implements I1, BindingController {
             i1Client = (I1) serverItf;
             //logger.debug("MotorImpl : added binding on a wheel");
         } else {
-            logger.error(
-                "no such binding is possible : client interface name does not match");
+            logger.error("no such binding is possible : client interface name does not match");
         }
     }
 
@@ -118,8 +116,7 @@ public class PrimitiveComponentC implements I1, BindingController {
             return i1Client;
         } else {
             if (logger.isDebugEnabled()) {
-                logger.debug("cannot find " + I1_CLIENT_ITF_NAME +
-                    " interface");
+                logger.debug("cannot find " + I1_CLIENT_ITF_NAME + " interface");
             }
             return null;
         }
@@ -128,8 +125,7 @@ public class PrimitiveComponentC implements I1, BindingController {
     /* (non-Javadoc)
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
-    public void unbindFc(String clientItf)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String clientItf) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if (clientItf.equals(I1_CLIENT_ITF_NAME)) {
             i1Client = null;

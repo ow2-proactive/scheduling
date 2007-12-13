@@ -74,8 +74,7 @@ public class HTTPProcess {
             //                           }
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
 
-            Thread.currentThread()
-                  .setContextClassLoader(this.getClass().getClassLoader());
+            Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
             HttpMessage message = (HttpMessage) HttpMarshaller.unmarshallObject(source);
 
             if (message != null) {

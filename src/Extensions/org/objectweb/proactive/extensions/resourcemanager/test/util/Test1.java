@@ -65,8 +65,8 @@ public class Test1 extends TestCase {
         monitor = RMFactory.getMonitoring();
         System.err.println("Deploying nodes...");
 
-        ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(
-                "descriptors/scheduler/deployment/Descriptor_SSH_List.xml");
+        ProActiveDescriptor pad = PADeployment
+                .getProactiveDescriptor("descriptors/scheduler/deployment/Descriptor_SSH_List.xml");
         ArrayList<ProActiveDescriptor> padList = new ArrayList<ProActiveDescriptor>();
         padList.add(pad);
         admin.createStaticNodesource("static source", padList);
@@ -77,8 +77,7 @@ public class Test1 extends TestCase {
     public void testPrincipal() {
         try {
             // selection script
-            SelectionScript verif = new SelectionScript(new File(
-                        "/user/jmartin/home/scripts/test.js"), null);
+            SelectionScript verif = new SelectionScript(new File("/user/jmartin/home/scripts/test.js"), null);
 
             // Displays total nodes
             int total = monitor.getNumberOfAllResources().intValue();
@@ -94,16 +93,14 @@ public class Test1 extends TestCase {
                 for (Node n : nodes)
                     System.err.println(n.getNodeInformation().getURL());
                 assertEquals("getExactlyNodes(2,null,null)", 2, nodes.size());
-                assertEquals("freeNodes",
-                    monitor.getNumberOfAllResources().intValue() - 2,
-                    monitor.getNumberOfFreeResource().intValue());
+                assertEquals("freeNodes", monitor.getNumberOfAllResources().intValue() - 2, monitor
+                        .getNumberOfFreeResource().intValue());
 
                 // Release thoose nodes
                 user.freeNodes(nodes);
                 Thread.sleep(5000);
-                assertEquals("freeNodes After",
-                    monitor.getNumberOfAllResources().intValue(),
-                    monitor.getNumberOfFreeResource().intValue());
+                assertEquals("freeNodes After", monitor.getNumberOfAllResources().intValue(), monitor
+                        .getNumberOfFreeResource().intValue());
             }
 
             //			URL url = new URL("http://localhost:10080/test.js");
@@ -117,16 +114,15 @@ public class Test1 extends TestCase {
                 for (Node n : nodes)
                     System.err.println(n.getNodeInformation().getURL());
                 PAFuture.waitFor(nodes);
-                assertEquals("getAtMostNodes(3, verif)", nodes.size(),
-                    monitor.getNumberOfAllResources().intValue() -
+                assertEquals("getAtMostNodes(3, verif)", nodes.size(), monitor.getNumberOfAllResources()
+                        .intValue() -
                     monitor.getNumberOfFreeResource().intValue());
                 System.err.println(monitor.getNumberOfFreeResource());
                 // Release those nodes
                 user.freeNodes(nodes);
                 Thread.sleep(5000);
-                assertEquals("freeNodes After",
-                    monitor.getNumberOfAllResources().intValue(),
-                    monitor.getNumberOfFreeResource().intValue());
+                assertEquals("freeNodes After", monitor.getNumberOfAllResources().intValue(), monitor
+                        .getNumberOfFreeResource().intValue());
             }
         } catch (Exception e) {
             e.printStackTrace();

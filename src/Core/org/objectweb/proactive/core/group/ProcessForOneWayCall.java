@@ -48,16 +48,14 @@ import org.objectweb.proactive.core.mop.StubObject;
  *
  * @author Laurent Baduel
  */
-public class ProcessForOneWayCall extends AbstractProcessForGroup
-    implements Runnable {
+public class ProcessForOneWayCall extends AbstractProcessForGroup implements Runnable {
     private int index;
     private MethodCall mc;
     private Body body;
     private ExceptionListException exceptionList;
 
-    public ProcessForOneWayCall(ProxyForGroup proxyGroup, Vector memberList,
-        int index, MethodCall mc, Body body,
-        ExceptionListException exceptionList) {
+    public ProcessForOneWayCall(ProxyForGroup proxyGroup, Vector memberList, int index, MethodCall mc,
+            Body body, ExceptionListException exceptionList) {
         this.proxyGroup = proxyGroup;
         this.memberList = memberList;
         this.index = index;
@@ -89,8 +87,8 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                         // a call on the Component interface
                         target = object;
                     } else {
-                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc.getComponentMetadata()
-                                                                                              .getComponentInterfaceName());
+                        target = ((ProActiveComponentRepresentative) object).getFcInterface(mc
+                                .getComponentMetadata().getComponentInterfaceName());
                     }
                     this.mc.execute(target);
                 } else if (object instanceof ProActiveInterface) {
@@ -105,8 +103,7 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                         this.mc.execute(object);
                     } else if (objectIsLocal) {
                         if (!(mc instanceof MethodCallControlForGroup)) {
-                            ((StubObject) object).getProxy()
-                             .reify(this.mc.getShallowCopy());
+                            ((StubObject) object).getProxy().reify(this.mc.getShallowCopy());
                         } else {
                             ((StubObject) object).getProxy().reify(this.mc);
                         }
@@ -115,8 +112,7 @@ public class ProcessForOneWayCall extends AbstractProcessForGroup
                     }
                 }
             } catch (Throwable e) {
-                this.exceptionList.add(new ExceptionInGroup(object, this.index,
-                        e.fillInStackTrace()));
+                this.exceptionList.add(new ExceptionInGroup(object, this.index, e.fillInStackTrace()));
             }
         }
     }

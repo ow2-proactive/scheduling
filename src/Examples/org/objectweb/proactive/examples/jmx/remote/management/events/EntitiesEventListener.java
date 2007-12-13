@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.jmx.remote.management.events;
 
-
 /**
  *
  * @author vlegrand

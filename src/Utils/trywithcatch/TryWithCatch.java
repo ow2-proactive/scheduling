@@ -102,8 +102,7 @@ public class TryWithCatch {
         Catcher ca;
 
         try {
-            tmp = File.createTempFile("trywithcatch_",
-                    "_" + new File(filename).getName());
+            tmp = File.createTempFile("trywithcatch_", "_" + new File(filename).getName());
             tmpOut = new BufferedOutputStream(new FileOutputStream(tmp));
             ca = new Catcher(filename, tmpOut, parsed);
         } catch (IOException ioe) {
@@ -138,8 +137,7 @@ public class TryWithCatch {
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            System.out.println(
-                "Usage: TryWithCatch [-fullname] [-nobackup] FILES");
+            System.out.println("Usage: TryWithCatch [-fullname] [-nobackup] FILES");
             System.out.println("With the -fullname option every added call");
             System.out.println("is prefixed with the full package:");
             System.out.println(TryCatch.PACKAGE);

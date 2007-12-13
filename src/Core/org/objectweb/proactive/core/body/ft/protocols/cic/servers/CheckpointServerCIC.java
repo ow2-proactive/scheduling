@@ -128,11 +128,10 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-    public synchronized int storeCheckpoint(Checkpoint c, int incarnation)
-        throws RemoteException {
+    public synchronized int storeCheckpoint(Checkpoint c, int incarnation) throws RemoteException {
         if (incarnation < this.globalIncarnation) {
-            logger.warn("** WARNING ** : Object with incarnation " +
-                incarnation + " is trying to store checkpoint");
+            logger.warn("** WARNING ** : Object with incarnation " + incarnation +
+                " is trying to store checkpoint");
             return 0;
         }
 
@@ -151,8 +150,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             // new history slot
             this.histories.put(c.getBodyID(), new ReceptionHistory());
             // new greatestHisto slot
-            this.greatestCommitedHistory.put(c.getBodyID(),
-                new MutableInteger(0));
+            this.greatestCommitedHistory.put(c.getBodyID(), new MutableInteger(0));
         } else {
             //add checkpoint
             ckptList.add(c);
@@ -163,24 +161,20 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
         if (index > this.lastRegisteredCkpt) {
             this.lastRegisteredCkpt = index;
         }
-        MutableInteger currentGlobalState = (this.stateMonitor.get(new MutableInteger(
-                    index)));
+        MutableInteger currentGlobalState = (this.stateMonitor.get(new MutableInteger(index)));
         if (currentGlobalState == null) {
             // this is the first checkpoint store for the global state index
-            this.stateMonitor.put(new MutableInteger(index),
-                new MutableInteger(1));
+            this.stateMonitor.put(new MutableInteger(index), new MutableInteger(1));
         } else {
             currentGlobalState.add(1);
         }
 
         //this.checkLastGlobalState();
-        logger.info("[CKPT] Receive checkpoint indexed " + index +
-            " from body " + c.getBodyID() + " (used memory = " +
-            this.getUsedMem() + " Kb)"); // + "[" + System.currentTimeMillis() + "]");
+        logger.info("[CKPT] Receive checkpoint indexed " + index + " from body " + c.getBodyID() +
+            " (used memory = " + this.getUsedMem() + " Kb)"); // + "[" + System.currentTimeMillis() + "]");
 
         if (displayCkptSize) {
-            logger.info("[CKPT] Size of ckpt " + index + " before addInfo : " +
-                this.getSize(c) + " bytes");
+            logger.info("[CKPT] Size of ckpt " + index + " before addInfo : " + this.getSize(c) + " bytes");
         }
 
         // broadcast history closure if a new globalState is built
@@ -189,8 +183,8 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             Enumeration<UniqueID> all = this.checkpointStorage.keys();
             while (all.hasMoreElements()) {
                 UniqueID callee = all.nextElement();
-                this.server.submitJob(new GSCESender(this.server, callee,
-                        new GlobalStateCompletion(this.lastGlobalState)));
+                this.server.submitJob(new GSCESender(this.server, callee, new GlobalStateCompletion(
+                    this.lastGlobalState)));
             }
         }
         return this.lastGlobalState;
@@ -199,8 +193,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber)
-        throws RemoteException {
+    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
         // TODO : checkpoints with multiple index ??
         return checkpointStorage.get(id).get(sequenceNumber);
     }
@@ -217,21 +210,17 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#addInfoToCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo, org.objectweb.proactive.core.UniqueID, int, int)
      */
-    public synchronized void addInfoToCheckpoint(CheckpointInfo ci,
-        UniqueID id, int sequenceNumber, int incarnation)
-        throws RemoteException {
+    public synchronized void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber,
+            int incarnation) throws RemoteException {
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#commitHistory(org.objectweb.proactive.core.body.ft.message.HistoryUpdater)
      **/
-    public synchronized void commitHistory(HistoryUpdater rh)
-        throws RemoteException {
+    public synchronized void commitHistory(HistoryUpdater rh) throws RemoteException {
         if (rh.incarnation < this.globalIncarnation) {
-            logger.warn("** WARNING ** : Object with incarnation " +
-                rh.incarnation +
-                " is trying to store checkpoint infos (Current inc = " +
-                this.globalIncarnation + ")");
+            logger.warn("** WARNING ** : Object with incarnation " + rh.incarnation +
+                " is trying to store checkpoint infos (Current inc = " + this.globalIncarnation + ")");
             return;
         }
 
@@ -250,8 +239,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             MutableInteger counter = (this.recoveryLineMonitor.get(greatestIndexSent));
             if (counter == null) {
                 // this is the first histo commit with index indexOfCkpt
-                this.recoveryLineMonitor.put(new MutableInteger(
-                        rh.checkpointIndex), new MutableInteger(1));
+                this.recoveryLineMonitor.put(new MutableInteger(rh.checkpointIndex), new MutableInteger(1));
             } else {
                 counter.add(1);
             }
@@ -265,8 +253,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getInfoFromCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber)
-        throws RemoteException {
+    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
         throw new NotImplementedException();
     }
 
@@ -274,8 +261,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
      * Not implemented for the CIC protocol
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeRequest(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.request.Request)
      */
-    public void storeRequest(UniqueID receiverId, Request request)
-        throws RemoteException {
+    public void storeRequest(UniqueID receiverId, Request request) throws RemoteException {
         throw new NotImplementedException();
     }
 
@@ -283,8 +269,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
      * Not implemented for the CIC protocol
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeReply(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.reply.Reply)
      */
-    public void storeReply(UniqueID receiverID, Reply reply)
-        throws RemoteException {
+    public void storeReply(UniqueID receiverID, Reply reply) throws RemoteException {
         throw new NotImplementedException();
     }
 
@@ -315,21 +300,19 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     private boolean checkRecoveryLine() {
         try {
             int systemSize = this.server.getSystemSize();
-            MutableInteger nextPossible = (this.recoveryLineMonitor.get(new MutableInteger(this.recoveryLine +
-                        1)));
+            MutableInteger nextPossible = (this.recoveryLineMonitor.get(new MutableInteger(
+                this.recoveryLine + 1)));
 
             // THIS PART MUST BE ATOMIC
-            if ((nextPossible != null) &&
-                    (nextPossible.getValue() == systemSize)) {
+            if ((nextPossible != null) && (nextPossible.getValue() == systemSize)) {
                 // a new recovery line has been created
                 // update histories
                 Enumeration<UniqueID> itKey = this.histories.keys();
                 while (itKey.hasMoreElements()) {
                     UniqueID key = itKey.nextElement();
                     ReceptionHistory cur = (this.histories.get(key));
-                    long nextBase = ((CheckpointInfoCIC) (this.getCheckpoint(key,
-                            this.recoveryLine + 1).getCheckpointInfo())).lastRcvdRequestIndex +
-                        1;
+                    long nextBase = ((CheckpointInfoCIC) (this.getCheckpoint(key, this.recoveryLine + 1)
+                            .getCheckpointInfo())).lastRcvdRequestIndex + 1;
                     cur.goToNextBase(nextBase);
                     cur.confirmLastUpdate();
                 }
@@ -354,8 +337,8 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             synchronized (this) {
                 globalState = this.recoveryLine;
                 this.globalIncarnation++;
-                logger.info("[RECOVERY] Recovering system from " + globalState +
-                    " with incarnation " + this.globalIncarnation);
+                logger.info("[RECOVERY] Recovering system from " + globalState + " with incarnation " +
+                    this.globalIncarnation);
 
                 itBodies = this.checkpointStorage.keys();
                 this.lastGlobalState = globalState;
@@ -365,8 +348,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                 this.recoveryLineMonitor = new Hashtable<MutableInteger, MutableInteger>();
 
                 // delete unusable checkpoints
-                Iterator<List<Checkpoint>> it = this.checkpointStorage.values()
-                                                                      .iterator();
+                Iterator<List<Checkpoint>> it = this.checkpointStorage.values().iterator();
                 while (it.hasNext()) {
                     List<Checkpoint> ckpts = it.next();
                     while (ckpts.size() > (globalState + 1)) {
@@ -412,8 +394,8 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                     Node node = this.server.getFreeNode();
 
                     //if (node==null)return;
-                    barriers.add(this.server.submitJobWithBarrier(
-                            new RecoveryJob(toSend, this.globalIncarnation, node)));
+                    barriers.add(this.server.submitJobWithBarrier(new RecoveryJob(toSend,
+                        this.globalIncarnation, node)));
                 } else {
                     UniversalBody toRecover = (this.server.getLocation(current));
 
@@ -427,15 +409,13 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                         Node node = this.server.getFreeNode();
 
                         //if (node==null)return;
-                        barriers.add(this.server.submitJobWithBarrier(
-                                new RecoveryJob(toSend, this.globalIncarnation,
-                                    node)));
+                        barriers.add(this.server.submitJobWithBarrier(new RecoveryJob(toSend,
+                            this.globalIncarnation, node)));
                     } else {
                         String nodeURL = toRecover.getNodeURL();
                         Node node = NodeFactory.getNode(nodeURL);
-                        barriers.add(this.server.submitJobWithBarrier(
-                                new RecoveryJob(toSend, this.globalIncarnation,
-                                    node)));
+                        barriers.add(this.server.submitJobWithBarrier(new RecoveryJob(toSend,
+                            this.globalIncarnation, node)));
                     }
                 }
             }
@@ -448,12 +428,10 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
                 (itBarriers.next()).waitForJobCompletion();
             }
         } catch (NodeException e) {
-            logger.error(
-                "[RECOVERY] **ERROR** Unable to send checkpoint for recovery");
+            logger.error("[RECOVERY] **ERROR** Unable to send checkpoint for recovery");
             e.printStackTrace();
         } catch (RemoteException e) {
-            logger.error(
-                "[RECOVERY] **ERROR** Cannot contact checkpoint server");
+            logger.error("[RECOVERY] **ERROR** Cannot contact checkpoint server");
             e.printStackTrace();
         }
     }
@@ -461,8 +439,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#outputCommit(org.objectweb.proactive.core.body.ft.message.MessageInfo)
      */
-    public synchronized void outputCommit(MessageInfo mi)
-        throws RemoteException {
+    public synchronized void outputCommit(MessageInfo mi) throws RemoteException {
         Hashtable<UniqueID, MutableLong> vectorClock = ((MessageInfoCIC) mi).vectorClock;
 
         // must store at least each histo up to vectorClock[id]
@@ -481,16 +458,14 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             if (lastCommited < index) {
                 try {
                     UniversalBody target = this.server.getLocation(id);
-                    HistoryUpdater rh = (HistoryUpdater) (target.receiveFTMessage(new OutputCommit(lastCommited +
-                                1, index)));
+                    HistoryUpdater rh = (HistoryUpdater) (target.receiveFTMessage(new OutputCommit(
+                        lastCommited + 1, index)));
                     ih.updateHistory(rh);
                 } catch (RemoteException e) {
-                    logger.error("**ERROR** Unable to retreive history of " +
-                        id);
+                    logger.error("**ERROR** Unable to retreive history of " + id);
                     e.printStackTrace();
                 } catch (IOException e) {
-                    logger.error("**ERROR** Unable to retreive history of " +
-                        id);
+                    logger.error("**ERROR** Unable to retreive history of " + id);
                     e.printStackTrace();
                 }
             }
@@ -552,11 +527,9 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             while (true) {
                 try {
                     Thread.sleep(period);
-                    CheckpointServerCIC.logger.info(
-                        "[CKPT] Performing Garbage Collection...");
+                    CheckpointServerCIC.logger.info("[CKPT] Performing Garbage Collection...");
                     this.garbageCollection();
-                    CheckpointServerCIC.logger.info(
-                        "[CKPT] Garbage Collection done.");
+                    CheckpointServerCIC.logger.info("[CKPT] Garbage Collection done.");
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -568,8 +541,7 @@ public class CheckpointServerCIC extends CheckpointServerImpl {
             boolean hasGarbaged = false;
             synchronized (server) {
                 int recLine = server.recoveryLine;
-                Iterator<List<Checkpoint>> it = server.checkpointStorage.values()
-                                                                        .iterator();
+                Iterator<List<Checkpoint>> it = server.checkpointStorage.values().iterator();
                 while (it.hasNext()) {
                     List<Checkpoint> ckpts = it.next();
                     for (int i = 0; i < recLine; i++) {

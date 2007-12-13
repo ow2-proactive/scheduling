@@ -56,8 +56,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Cedric Dalmasso
  *
  */
-public class ComponentActivityPriority extends ComponentActivity
-    implements RunActive, InitActive, EndActive, Serializable {
+public class ComponentActivityPriority extends ComponentActivity implements RunActive, InitActive, EndActive,
+        Serializable {
     //    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ACTIVITY);
     //    private transient InitActive componentInitActive; // used only once
     //    private RunActive componentRunActive;
@@ -109,12 +109,11 @@ public class ComponentActivityPriority extends ComponentActivity
                 NFRequestFilterImpl nfRequestFilter = new NFRequestFilterImpl();
                 while (body.isActive()) {
                     ComponentBody componentBody = (ComponentBody) body;
-                    while (LifeCycleController.STOPPED.equals(
-                                Fractal.getLifeCycleController(
-                                    componentBody.getProActiveComponentImpl())
-                                           .getFcState())) {
-                        PriorityController pc = (PriorityController) componentBody.getProActiveComponentImpl()
-                                                                                  .getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
+                    while (LifeCycleController.STOPPED.equals(Fractal.getLifeCycleController(
+                            componentBody.getProActiveComponentImpl()).getFcState())) {
+                        PriorityController pc = (PriorityController) componentBody
+                                .getProActiveComponentImpl().getFcInterface(
+                                        Constants.REQUEST_PRIORITY_CONTROLLER);
                         NF3RequestFilter nf3RequestFilter = new NF3RequestFilter(pc);
                         if (componentService.getOldest(nf3RequestFilter) != null) {
                             // NF3 bypass all other request 
@@ -152,15 +151,14 @@ public class ComponentActivityPriority extends ComponentActivity
                     }
                 }
             } catch (NoSuchInterfaceException e) {
-                logger.error(
-                    "could not retreive an interface, probably the life cycle controller of this component; terminating the component. Error message is : " +
-                    e.getMessage());
+                logger
+                        .error("could not retreive an interface, probably the life cycle controller of this component; terminating the component. Error message is : " +
+                            e.getMessage());
             }
         }
     }
 
-    private class ComponentPriotirizedRequestRunActive implements RunActive,
-        Serializable {
+    private class ComponentPriotirizedRequestRunActive implements RunActive, Serializable {
         public void runActivity(Body body) {
             Service componentService = new Service(body);
             ComponentBody componentBody = (ComponentBody) body;
@@ -170,8 +168,8 @@ public class ComponentActivityPriority extends ComponentActivity
             NF1NF2RequestFilter nf1nf2RequestFilter = null;
             PriorityController pc = null;
             try {
-                pc = (PriorityController) componentBody.getProActiveComponentImpl()
-                                                       .getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
+                pc = (PriorityController) componentBody.getProActiveComponentImpl().getFcInterface(
+                        Constants.REQUEST_PRIORITY_CONTROLLER);
                 nf3RequestFilter = new NF3RequestFilter(pc);
                 nf2RequestFilter = new NF2RequestFilter(pc);
                 nf1nf2RequestFilter = new NF1NF2RequestFilter(pc);
@@ -183,18 +181,15 @@ public class ComponentActivityPriority extends ComponentActivity
             }
 
             try {
-                while (LifeCycleController.STARTED.equals(
-                            Fractal.getLifeCycleController(
-                                componentBody.getProActiveComponentImpl())
-                                       .getFcState())) {
+                while (LifeCycleController.STARTED.equals(Fractal.getLifeCycleController(
+                        componentBody.getProActiveComponentImpl()).getFcState())) {
                     if (componentService.getOldest(nf3RequestFilter) != null) {
                         // NF3 bypass all other request 
                         //System.err.println("ComponentActivity : NF3");
                         componentService.blockingServeOldest(nf3RequestFilter);
                     } else if ((componentService.getOldest(nf1nf2RequestFilter) != null) &&
-                            componentService.getOldest(nf1nf2RequestFilter)
-                                                .equals(componentService.getOldest(
-                                    nf1RequestFilter))) {
+                        componentService.getOldest(nf1nf2RequestFilter).equals(
+                                componentService.getOldest(nf1RequestFilter))) {
                         // NF2 can't bypass NF1
                         //System.err.println("ComponentActivity : F/NF1 oldest");
                         componentService.blockingServeOldest();

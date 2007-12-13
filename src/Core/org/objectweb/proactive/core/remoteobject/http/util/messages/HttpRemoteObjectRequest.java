@@ -49,8 +49,7 @@ import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableExce
  * @author jbrocoll
  * @see java.io.Serializable
  */
-public class HttpRemoteObjectRequest extends ReflectRequest
-    implements Serializable {
+public class HttpRemoteObjectRequest extends ReflectRequest implements Serializable {
     private static HashMap hMapMethods;
 
     static {
@@ -68,8 +67,7 @@ public class HttpRemoteObjectRequest extends ReflectRequest
      * @param parameters The parameters associated with the method
      * @param oaid The unique ID of targeted active object
      */
-    public HttpRemoteObjectRequest(String methodName, List<Object> parameters,
-        String url) {
+    public HttpRemoteObjectRequest(String methodName, List<Object> parameters, String url) {
         super(url);
         this.methodName = methodName;
         this.parameters = parameters;

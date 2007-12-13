@@ -30,7 +30,6 @@
  */
 package functionalTests.component.collectiveitf.multicast;
 
-
 /**
  * @author Matthieu Morel
  */

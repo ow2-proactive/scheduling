@@ -79,20 +79,19 @@ public class UnicoreProActiveClient {
 
     // Unicore Site conf parameters
     private UnicoreParameters uParam;
-    static final String CLIENTUSAGE = "-jobName JobName -keypassword KeyPassWord -keyfilepath KeyFilePath " +
-        "-unicoredir UnicoreDir -submitJob [true|false] -saveJob [true|false] " +
-        "-usitename Name -usitetype [CLASSIC|REGISTRY] -usiteurl Url " +
-        "-vsitename Name -vsitenodes Nodes -vsiteprocessors Processors " +
-        "-vsitememory Memory -vsiteruntime Runtime " +
-        "-vsitepriority [high|low|normal|development|whenever]";
+    static final String CLIENTUSAGE = "-jobName JobName -keypassword KeyPassWord -keyfilepath KeyFilePath "
+        + "-unicoredir UnicoreDir -submitJob [true|false] -saveJob [true|false] "
+        + "-usitename Name -usitetype [CLASSIC|REGISTRY] -usiteurl Url "
+        + "-vsitename Name -vsitenodes Nodes -vsiteprocessors Processors "
+        + "-vsitememory Memory -vsiteruntime Runtime "
+        + "-vsitepriority [high|low|normal|development|whenever]";
 
     public UnicoreProActiveClient(UnicoreParameters uParam) {
         this.uParam = uParam;
 
         //Prompt the user for a keypassword if not
         //specified in the descriptor file
-        if ((uParam.getKeyPassword() == null) ||
-                (uParam.getKeyPassword().length() <= 0)) {
+        if ((uParam.getKeyPassword() == null) || (uParam.getKeyPassword().length() <= 0)) {
             UnicorePasswordGUI upGUI = new UnicorePasswordGUI();
             uParam.setKeyPassword(upGUI.getKeyPassword());
         }
@@ -111,8 +110,7 @@ public class UnicoreProActiveClient {
      * @param testGrid
      *            Indicates weather or not to use Testing site configurations.
      */
-    private void initStaticClientFields(Boolean noGui, String unicoreDir,
-        Boolean testGrid) {
+    private void initStaticClientFields(Boolean noGui, String unicoreDir, Boolean testGrid) {
         try {
             Class<?> clientClass = Client.class;
 
@@ -162,8 +160,7 @@ public class UnicoreProActiveClient {
             }
         }
 
-        System.err.println("Error Vsite (" + name + ") not found for: " +
-            us.toString());
+        System.err.println("Error Vsite (" + name + ") not found for: " + us.toString());
         return null;
     }
 
@@ -212,7 +209,7 @@ public class UnicoreProActiveClient {
         jc.setName(name); //Internal job name
         jc.setFilename(filename); //Filename when saved
         jc.setIgnoreFailure(false); //Set ignore failure flag
-                                    //jc.setDependencies(); //Set dependencies
+        //jc.setDependencies(); //Set dependencies
 
         return jc;
     }
@@ -262,12 +259,10 @@ public class UnicoreProActiveClient {
 
     private boolean checkCapacityResource(CapacityResource candidate) {
         if ((candidate.getRequest() > candidate.getMaxRequest()) ||
-                (candidate.getRequest() < candidate.getMinRequest())) {
+            (candidate.getRequest() < candidate.getMinRequest())) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Error with Capacity: max=" +
-                    candidate.getMaxRequest() + " min=" +
-                    candidate.getMinRequest() + " default=" +
-                    candidate.getDefaultRequest() + " request=" +
+                logger.debug("Error with Capacity: max=" + candidate.getMaxRequest() + " min=" +
+                    candidate.getMinRequest() + " default=" + candidate.getDefaultRequest() + " request=" +
                     candidate.getRequest());
             }
 
@@ -281,8 +276,8 @@ public class UnicoreProActiveClient {
         setCapResDefaultMaxMin(cr);
         cr.setRequest(request);
         if (!checkCapacityResource(cr)) {
-            System.err.println("Using default " + cr.getClass().getName() +
-                " request: " + cr.getDefaultRequest());
+            System.err.println("Using default " + cr.getClass().getName() + " request: " +
+                cr.getDefaultRequest());
             cr.setRequest(cr.getDefaultRequest());
         }
     }
@@ -321,8 +316,7 @@ public class UnicoreProActiveClient {
      * Initial configuration for unicore client lib. Also creats a job object.
      */
     private void buildJob() {
-        initStaticClientFields(new Boolean(true), uParam.getUnicoreDir(),
-            new Boolean(false));
+        initStaticClientFields(new Boolean(true), uParam.getUnicoreDir(), new Boolean(false));
         initResourceManager(uParam.getKeyFilePath(), uParam.getKeyPassword());
 
         jc = getNewJob(uParam.getJobName(), uParam.getJobName());
@@ -333,8 +327,7 @@ public class UnicoreProActiveClient {
      */
     private void buildUsite() {
         //************** USITE *********************
-        Usite us = getNewUsite(uParam.getUsiteUrl(), uParam.getUsiteName(),
-                uParam.getUsiteType());
+        Usite us = getNewUsite(uParam.getUsiteUrl(), uParam.getUsiteName(), uParam.getUsiteType());
 
         jc.setUsite(us);
     }
@@ -360,8 +353,7 @@ public class UnicoreProActiveClient {
         //*************** Requested Resources *********
         //Create a new ResourceTray if needed
         //Create a new resourceSet encapsulator
-        namedResourceSet = new NamedResourceSet(
-                "ProActive Descriptor Defined Resources");
+        namedResourceSet = new NamedResourceSet("ProActive Descriptor Defined Resources");
         namedResourceSet.removeAllElements();
 
         //Add the resource to the NamedResourceSet
@@ -384,8 +376,8 @@ public class UnicoreProActiveClient {
     private void buildScriptTask() {
         //*************** Set TASKS *****************
         //mv files + command
-        ScriptContainer sc = addScriptTask("ProActiveTask",
-                uParam.getDestMoveCommand() + uParam.getScriptContent());
+        ScriptContainer sc = addScriptTask("ProActiveTask", uParam.getDestMoveCommand() +
+            uParam.getScriptContent());
 
         // Add file imports
         buildImportFiles(sc);
@@ -404,15 +396,13 @@ public class UnicoreProActiveClient {
 
             //TODO improve the syntax checking
             if (fileInfo.length != 2) {
-                System.err.println(
-                    "UnicoreProActiveClient Syntax error Skipping: " +
-                    files[i]);
+                System.err.println("UnicoreProActiveClient Syntax error Skipping: " + files[i]);
                 continue;
             }
 
             //Storage, srcName, srcDest, overwrite, isAscii
-            FileImport fi = new FileImport("Local", fileInfo[0],
-                    UnicoreParameters.getFileName(fileInfo[1]), true, false);
+            FileImport fi = new FileImport("Local", fileInfo[0], UnicoreParameters.getFileName(fileInfo[1]),
+                true, false);
 
             sc.addFileImport(fi);
         }
@@ -431,8 +421,7 @@ public class UnicoreProActiveClient {
      */
     public void setScriptContent(String scriptContent) {
         if (jobIsBuilt) {
-            System.err.println("Error Job already built." +
-                "ScriptContent change will not affect job");
+            System.err.println("Error Job already built." + "ScriptContent change will not affect job");
         }
         uParam.setScriptContent(scriptContent);
     }
@@ -444,8 +433,7 @@ public class UnicoreProActiveClient {
      */
     public void build() {
         if (jobIsBuilt) {
-            System.err.println("Error. Job has already been built." +
-                "Can not build it again");
+            System.err.println("Error. Job has already been built." + "Can not build it again");
         }
 
         buildJob();
@@ -468,8 +456,8 @@ public class UnicoreProActiveClient {
         }
 
         if (!jobIsBuilt) {
-            System.err.println("Error in Unicore submitJob." +
-                " Must call buildJob() first. Job not submitted.");
+            System.err.println("Error in Unicore submitJob."
+                + " Must call buildJob() first. Job not submitted.");
             return;
         }
 
@@ -507,8 +495,8 @@ public class UnicoreProActiveClient {
         }
 
         if (!jobIsBuilt) {
-            System.err.println("Error in Unicore submitJob." +
-                " Must call buildJob() first. Job not submitted.");
+            System.err.println("Error in Unicore submitJob."
+                + " Must call buildJob() first. Job not submitted.");
             return;
         }
 
@@ -518,20 +506,18 @@ public class UnicoreProActiveClient {
             return;
         }
 
-        boolean succeeded = ResourceManager.writeObjectToFile(jc,
-                jc.getFilename() + ".ajo");
+        boolean succeeded = ResourceManager.writeObjectToFile(jc, jc.getFilename() + ".ajo");
 
         try {
             long timing = System.currentTimeMillis();
 
             //FileOutputStream f = new FileOutputStream(name);
-            XMLObjectWriter dout = new XMLObjectWriter(new File(jc.getFilename() +
-                        ".xml"));
+            XMLObjectWriter dout = new XMLObjectWriter(new File(jc.getFilename() + ".xml"));
             dout.writeObjectXML(jc);
 
             timing = System.currentTimeMillis() - timing;
-            System.out.println("Writing job in XML format to file " +
-                jc.getFilename() + " in " + timing + " milliseconds");
+            System.out.println("Writing job in XML format to file " + jc.getFilename() + " in " + timing +
+                " milliseconds");
         } catch (Exception e) {
             System.out.println("Exception during XML serialization...");
             e.printStackTrace();
@@ -562,7 +548,7 @@ public class UnicoreProActiveClient {
         uParam.setVsitePriority("high");
 
         uParam.setSubmitJob(false);
-        */
+         */
         UnicoreProActiveClient upc = new UnicoreProActiveClient(parseArgs(args));
 
         //DEBUG

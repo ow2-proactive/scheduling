@@ -58,11 +58,11 @@ public abstract class AbstractRectangleFigure extends AbstractFigure {
     //
     public ConnectionAnchor getAnchor() {
         return new ChopboxAnchor(this) {
-                protected Rectangle getBox() {
-                    Rectangle base = super.getBox();
-                    return base.getResized(-4, -4).getTranslated(4, 4);
-                }
-            };
+            protected Rectangle getBox() {
+                Rectangle base = super.getBox();
+                return base.getResized(-4, -4).getTranslated(4, 4);
+            }
+        };
     }
 
     //
@@ -79,7 +79,7 @@ public abstract class AbstractRectangleFigure extends AbstractFigure {
         if (showShadow) {
             graphics.setBackgroundColor(this.shadowColor);
             graphics.fillRoundRectangle(bounds.getTranslated(4, 4), round, /*s*/
-                round);
+            round);
         }
         // Drawings
         graphics.setForegroundColor(this.borderColor);
@@ -87,9 +87,8 @@ public abstract class AbstractRectangleFigure extends AbstractFigure {
         graphics.fillRoundRectangle(bounds, round, round);
         graphics.drawRoundRectangle(bounds, round, round);
         if (highlight != null) {
-            graphics.drawRoundRectangle(bounds.getCopy().resize(-2, -2)
-                                              .translate(1, 1), round - 3,
-                round - 3);
+            graphics
+                    .drawRoundRectangle(bounds.getCopy().resize(-2, -2).translate(1, 1), round - 3, round - 3);
         }
 
         // Cleanups

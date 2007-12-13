@@ -88,7 +88,7 @@ public class RSHJVMProcess extends RSHProcess implements JVMProcess {
      * @param errorMessageLogger The logger that handles error stream of the target JVMProcess
      */
     public RSHJVMProcess(RemoteProcessMessageLogger inputMessageLogger,
-        RemoteProcessMessageLogger errorMessageLogger) {
+            RemoteProcessMessageLogger errorMessageLogger) {
         super(new JVMProcessImpl(inputMessageLogger, errorMessageLogger));
         jvmProcess = (JVMProcessImpl) targetProcess;
     }

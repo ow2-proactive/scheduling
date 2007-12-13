@@ -83,8 +83,8 @@ public class JavaTask extends Task {
      */
     public void setTaskClass(Class<JavaExecutable> taskClass) {
         if (!TaskConstructorTools.hasEmptyConstructor(taskClass)) {
-            throw new RuntimeException("WARNING : The executable class '" +
-                taskClass + "' must have a public no parameter constructor !");
+            throw new RuntimeException("WARNING : The executable class '" + taskClass +
+                "' must have a public no parameter constructor !");
         }
         this.taskClass = taskClass;
         this.taskInstance = null;
@@ -107,8 +107,7 @@ public class JavaTask extends Task {
      */
     public void setTaskInstance(JavaExecutable taskInstance) {
         if (!TaskConstructorTools.hasEmptyConstructor(taskInstance.getClass())) {
-            throw new RuntimeException("WARNING : The executable class '" +
-                taskInstance.getClass() +
+            throw new RuntimeException("WARNING : The executable class '" + taskInstance.getClass() +
                 "' must have a public no parameter constructor !");
         }
         this.taskInstance = taskInstance;

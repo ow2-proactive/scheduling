@@ -94,8 +94,7 @@ public interface UserSchedulerInterface extends Serializable {
      * @return a job Result containing information about the result.
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
-    public TaskResult getTaskResult(JobId jobId, String taskName)
-        throws SchedulerException;
+    public TaskResult getTaskResult(JobId jobId, String taskName) throws SchedulerException;
 
     /**
      * Listen for the tasks user log.<br>
@@ -106,8 +105,7 @@ public interface UserSchedulerInterface extends Serializable {
      * @param port the port number on which the log will be sent.
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
-    public void listenLog(JobId jobId, String hostname, int port)
-        throws SchedulerException;
+    public void listenLog(JobId jobId, String hostname, int port) throws SchedulerException;
 
     /**
      * Add a scheduler event Listener. this listener provides method to notice of
@@ -120,9 +118,8 @@ public interface UserSchedulerInterface extends Serializable {
      * @return the scheduler current state containing the different lists of jobs.
      * @throws SchedulerException if an exception occurs in the scheduler (depends on your right).
      */
-    public SchedulerInitialState<?extends Job> addSchedulerEventListener(
-        SchedulerEventListener<?extends Job> sel, SchedulerEvent... events)
-        throws SchedulerException;
+    public SchedulerInitialState<? extends Job> addSchedulerEventListener(
+            SchedulerEventListener<? extends Job> sel, SchedulerEvent... events) throws SchedulerException;
 
     /**
      * Return the scheduler statistics.<br>
@@ -178,6 +175,5 @@ public interface UserSchedulerInterface extends Serializable {
      * @param jobId the job on which to change the priority.
      * @throws SchedulerException (can be due to insufficient permission)
      */
-    public void changePriority(JobId jobId, JobPriority priority)
-        throws SchedulerException;
+    public void changePriority(JobId jobId, JobPriority priority) throws SchedulerException;
 }

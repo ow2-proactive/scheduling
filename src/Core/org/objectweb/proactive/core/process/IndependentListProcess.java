@@ -42,8 +42,7 @@ import java.util.ArrayList;
  * @since ProActive 3.0
  *
  */
-public class IndependentListProcess
-    extends AbstractSequentialListProcessDecorator {
+public class IndependentListProcess extends AbstractSequentialListProcessDecorator {
     public IndependentListProcess() {
         super();
     }

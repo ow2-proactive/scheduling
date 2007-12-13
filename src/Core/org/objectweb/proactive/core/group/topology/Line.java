@@ -50,8 +50,7 @@ public class Line extends TopologyGroup { // implements Topology1D {
      * @param size - the dimension (max number of member in the topolody group)
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public Line(Group g, int size)
-        throws ConstructionOfReifiedObjectFailedException {
+    public Line(Group g, int size) throws ConstructionOfReifiedObjectFailedException {
         super(g, size);
         this.width = size;
     }

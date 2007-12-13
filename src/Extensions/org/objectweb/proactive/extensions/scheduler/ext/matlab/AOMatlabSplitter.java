@@ -45,8 +45,8 @@ import ptolemy.data.Token;
 public class AOMatlabSplitter extends AOSimpleMatlab {
 
     /**
-         *
-         */
+     *
+     */
     private int numberOfChildren;
 
     public AOMatlabSplitter() {
@@ -59,8 +59,8 @@ public class AOMatlabSplitter extends AOSimpleMatlab {
      * @param scriptLines a list of lines which represent the main script
      * @param numberOfChildren the number of children to which the input will be divided
      */
-    public AOMatlabSplitter(String matlabCommandName, String inputScript,
-        ArrayList<String> scriptLines, Integer numberOfChildren) {
+    public AOMatlabSplitter(String matlabCommandName, String inputScript, ArrayList<String> scriptLines,
+            Integer numberOfChildren) {
         super(matlabCommandName, inputScript, scriptLines);
         this.numberOfChildren = numberOfChildren;
     }

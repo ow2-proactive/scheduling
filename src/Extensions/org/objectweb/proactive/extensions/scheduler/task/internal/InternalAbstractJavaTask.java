@@ -47,7 +47,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.executable.Execu
 public abstract class InternalAbstractJavaTask extends InternalTask {
 
     /** Class instance of the class to instantiate. */
-    protected Class<?extends Executable> taskClass;
+    protected Class<? extends Executable> taskClass;
 
     /** Arguments of the task as a map */
     protected Map<String, Object> args = new HashMap<String, Object>();
@@ -63,7 +63,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @param taskClass the Class instance of the class to instantiate.
      */
-    public InternalAbstractJavaTask(Class<?extends Executable> taskClass) {
+    public InternalAbstractJavaTask(Class<? extends Executable> taskClass) {
         this.taskClass = taskClass;
     }
 
@@ -72,7 +72,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @return the task Class instance.
      */
-    public Class<?extends Executable> getTaskClass() {
+    public Class<? extends Executable> getTaskClass() {
         return taskClass;
     }
 
@@ -81,7 +81,7 @@ public abstract class InternalAbstractJavaTask extends InternalTask {
      *
      * @param taskClass the task Class instance.
      */
-    public void setTaskClass(Class<?extends Executable> taskClass) {
+    public void setTaskClass(Class<? extends Executable> taskClass) {
         this.taskClass = taskClass;
     }
 

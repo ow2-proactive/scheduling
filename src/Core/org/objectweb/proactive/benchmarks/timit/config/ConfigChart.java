@@ -71,8 +71,7 @@ public class ConfigChart extends Tag {
             return "";
         }
 
-        throw new RuntimeException("Variable chart.'" + name +
-            "' missing in configuration file");
+        throw new RuntimeException("Variable chart.'" + name + "' missing in configuration file");
     }
 
     public static Chart.Scale scaleValue(String scaleMode) {

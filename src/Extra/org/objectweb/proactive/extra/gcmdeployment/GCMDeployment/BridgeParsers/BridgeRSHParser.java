@@ -47,10 +47,8 @@ public class BridgeRSHParser extends AbstractBridgeParser {
     public AbstractBridge parseBridgeNode(Node bridgeNode, XPath xpath) {
         BridgeRSH bridge = (BridgeRSH) super.parseBridgeNode(bridgeNode, xpath);
 
-        String hostname = GCMParserHelper.getAttributeValue(bridgeNode,
-                ATTR_HOSTNAME);
-        String username = GCMParserHelper.getAttributeValue(bridgeNode,
-                ATTR_USERNAME);
+        String hostname = GCMParserHelper.getAttributeValue(bridgeNode, ATTR_HOSTNAME);
+        String username = GCMParserHelper.getAttributeValue(bridgeNode, ATTR_USERNAME);
 
         BridgeRSH bridgeRSH = (bridge);
         bridgeRSH.setHostname(hostname);

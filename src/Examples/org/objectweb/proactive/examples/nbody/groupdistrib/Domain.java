@@ -82,14 +82,12 @@ public class Domain implements Serializable {
      * @param i the unique identifier
      * @param planet the Planet controlled by this Domain
      */
-    public Domain(Integer i, Planet planet,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public Domain(Integer i, Planet planet, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.identification = i.intValue();
         this.prematureValues = new Vector();
         this.info = planet;
         this.killsupport = killsupport;
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /**
@@ -99,7 +97,7 @@ public class Domain implements Serializable {
      * @param maxIter The number of iterations to compute before stoppping
      */
     public void init(Domain domainGroup, Displayer dp, int maxIter,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.killsupport = killsupport;
         this.display = dp;
         this.maxIter = maxIter;
@@ -148,10 +146,9 @@ public class Domain implements Serializable {
                     logger.info("Compute movement." + this.iter);
                 }
             } else {
-                this.display.drawBody(this.info.x, this.info.y, this.info.z,
-                    this.info.vx, this.info.vy, this.info.vz,
-                    (int) this.info.mass, (int) this.info.diameter,
-                    this.identification, this.hostName);
+                this.display.drawBody(this.info.x, this.info.y, this.info.z, this.info.vx, this.info.vy,
+                        this.info.vz, (int) this.info.mass, (int) this.info.diameter, this.identification,
+                        this.hostName);
             }
             treatPremature();
         } else if (this.identification == 0) { // only need one quit signal man!
@@ -182,10 +179,8 @@ public class Domain implements Serializable {
     /**
      * Method called when the object is redeployed on a new Node (Fault recovery, or migration).
      */
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

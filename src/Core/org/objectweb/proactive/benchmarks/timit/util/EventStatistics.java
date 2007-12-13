@@ -59,8 +59,7 @@ public class EventStatistics implements Serializable {
         this.empty = true;
     }
 
-    public EventStatistics(String[] counterName, Object[] value, int nb,
-        EventDataBag statDataBag) {
+    public EventStatistics(String[] counterName, Object[] value, int nb, EventDataBag statDataBag) {
         this.counterName = counterName.clone();
         this.value = value.clone();
         this.statDataBag = statDataBag;
@@ -129,8 +128,7 @@ public class EventStatistics implements Serializable {
     }
 
     public final String format(double t) {
-        return this.paddingString(TimIt.df.format(t), this.padding, ' ', true) +
-        "    ";
+        return this.paddingString(TimIt.df.format(t), this.padding, ' ', true) + "    ";
     }
 
     /**

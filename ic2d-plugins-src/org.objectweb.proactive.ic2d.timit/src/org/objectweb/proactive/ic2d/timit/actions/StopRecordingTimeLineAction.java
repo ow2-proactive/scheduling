@@ -45,11 +45,9 @@ public class StopRecordingTimeLineAction extends Action {
     private TimeLineView timeLineView;
     StartRecordingTimeLineAction startRecordingTimeLineAction;
 
-    public StopRecordingTimeLineAction(
-        StartRecordingTimeLineAction startRecordingTimeLineAction) {
+    public StopRecordingTimeLineAction(StartRecordingTimeLineAction startRecordingTimeLineAction) {
         super.setId(STOP_RECORDING_TIMELINE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "duration.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "duration.gif"));
         super.setToolTipText(STOP_RECORDING_TIMELINE_ACTION);
         super.setEnabled(false);
         this.startRecordingTimeLineAction = startRecordingTimeLineAction;
@@ -62,8 +60,7 @@ public class StopRecordingTimeLineAction extends Action {
             IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
             IWorkbenchPage page = currentWindow.getActivePage();
             try {
-                IViewPart part = page.showView(
-                        "org.objectweb.proactive.ic2d.timit.views.TimeLineView");
+                IViewPart part = page.showView("org.objectweb.proactive.ic2d.timit.views.TimeLineView");
                 this.timeLineView = (TimeLineView) part;
             } catch (Exception e) {
                 e.printStackTrace();

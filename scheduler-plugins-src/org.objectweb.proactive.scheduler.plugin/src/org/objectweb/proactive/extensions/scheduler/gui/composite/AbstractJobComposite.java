@@ -147,10 +147,10 @@ public abstract class AbstractJobComposite extends Composite {
         if (!this.isDisposed()) {
             final int c = count;
             getDisplay().asyncExec(new Runnable() {
-                    public void run() {
-                        label.setText(title + " (" + c + ")");
-                    }
-                });
+                public void run() {
+                    label.setText(title + " (" + c + ")");
+                }
+            });
         }
     }
 
@@ -174,21 +174,19 @@ public abstract class AbstractJobComposite extends Composite {
 
     private void addJobInTable(JobId jobId, int anItemIndex) {
         if (!isDisposed()) {
-            final InternalJob job = JobsController.getLocalView()
-                                                  .getJobById(jobId);
+            final InternalJob job = JobsController.getLocalView().getJobById(jobId);
             final int itemIndex = anItemIndex;
             getDisplay().asyncExec(new Runnable() {
-                    public void run() {
-                        createItem(job, itemIndex);
-                    }
-                });
+                public void run() {
+                    createItem(job, itemIndex);
+                }
+            });
         }
     }
 
     private void sort(SelectionEvent event, int field) {
         if (lastSorting == field) {
-            order = (order == InternalJob.DESC_ORDER) ? InternalJob.ASC_ORDER
-                                                      : InternalJob.DESC_ORDER;
+            order = (order == InternalJob.DESC_ORDER) ? InternalJob.ASC_ORDER : InternalJob.DESC_ORDER;
             InternalJob.setSortingOrder(order);
         }
         InternalJob.setSortingBy(field);
@@ -198,33 +196,30 @@ public abstract class AbstractJobComposite extends Composite {
 
         refreshTable();
         table.setSortColumn((TableColumn) event.widget);
-        table.setSortDirection((order == InternalJob.DESC_ORDER) ? SWT.DOWN
-                                                                 : SWT.UP);
+        table.setSortDirection((order == InternalJob.DESC_ORDER) ? SWT.DOWN : SWT.UP);
     }
 
     private void fillBackgroundColor(TableItem item, JobState state, Color col) {
         boolean setFont = false;
         switch (state) {
-        case CANCELLED:
-            setFont = true;
-            item.setForeground(JOB_CANCELED_BACKGROUND_COLOR);
-            break;
-        case FAILED:
-            setFont = true;
-            item.setForeground(JOB_FAILED_BACKGROUND_COLOR);
-            break;
-        case FINISHED:
-        case PAUSED:
-        case PENDING:
-        case RUNNING:
-        case STALLED:
+            case CANCELLED:
+                setFont = true;
+                item.setForeground(JOB_CANCELED_BACKGROUND_COLOR);
+                break;
+            case FAILED:
+                setFont = true;
+                item.setForeground(JOB_FAILED_BACKGROUND_COLOR);
+                break;
+            case FINISHED:
+            case PAUSED:
+            case PENDING:
+            case RUNNING:
+            case STALLED:
         }
         if (setFont) {
             Font font = item.getFont();
-            item.setFont(new Font(font.getDevice(),
-                    font.getFontData()[0].getName(),
-                    font.getFontData()[0].getHeight(),
-                    font.getFontData()[0].getStyle() | SWT.BOLD));
+            item.setFont(new Font(font.getDevice(), font.getFontData()[0].getName(), font.getFontData()[0]
+                    .getHeight(), font.getFontData()[0].getStyle() | SWT.BOLD));
         }
     }
 
@@ -268,35 +263,35 @@ public abstract class AbstractJobComposite extends Composite {
         TableColumn tc3 = new TableColumn(table, SWT.CENTER);
         // addSelectionListener
         tc1.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalJob.SORT_BY_ID);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalJob.SORT_BY_ID);
+            }
+        });
         tc2.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalJob.SORT_BY_PRIORITY);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalJob.SORT_BY_PRIORITY);
+            }
+        });
         tc3.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalJob.SORT_BY_NAME);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalJob.SORT_BY_NAME);
+            }
+        });
         tc4.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalJob.SORT_BY_STATE);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalJob.SORT_BY_STATE);
+            }
+        });
         tc5.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    sort(event, InternalJob.SORT_BY_OWNER);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                sort(event, InternalJob.SORT_BY_OWNER);
+            }
+        });
         // setText
         tc1.setText(COLUMN_ID_TITLE);
         tc2.setText(COLUMN_PRIORITY_TITLE);
@@ -316,58 +311,54 @@ public abstract class AbstractJobComposite extends Composite {
         tc4.setMoveable(true);
         tc5.setMoveable(true);
 
-        table.addListener(SWT.Selection,
-            new Listener() {
-                public void handleEvent(Event event) {
-                    // get the jobId
-                    JobId jobId = (JobId) event.item.getData();
+        table.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                // get the jobId
+                JobId jobId = (JobId) event.item.getData();
 
-                    // get the job by jobId
-                    InternalJob job = JobsController.getLocalView()
-                                                    .getJobById(jobId);
+                // get the job by jobId
+                InternalJob job = JobsController.getLocalView().getJobById(jobId);
 
-                    if (job == null) {
-                        System.err.println(
-                            "LE JOB EST NULL .......... jobId ==> " + jobId);
-                        return;
-                    }
-
-                    // show its output
-                    // TODO est-ce que je laisse ou pas ???
-                    JobsOutputController.getInstance().showJobOutput(jobId);
-
-                    // update its informations
-                    JobInfo jobInfo = JobInfo.getInstance();
-                    if (jobInfo != null) {
-                        jobInfo.updateInfos(job);
-
-                        // set Focus on job info
-                        IWorkbench iworkbench = PlatformUI.getWorkbench();
-                        IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
-                        IWorkbenchPage page = currentWindow.getActivePage();
-                        try {
-                            IViewPart part = page.showView(JobInfo.ID);
-                            part.setFocus();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-
-                    // update its tasks informations
-                    TaskView taskView = TaskView.getInstance();
-                    if (taskView != null) {
-                        taskView.fullUpdate(job);
-                    }
-
-                    ResultPreview resultPreview = ResultPreview.getInstance();
-                    if (resultPreview != null) {
-                        resultPreview.update(new SimpleTextPanel(
-                                "No selected task"));
-                    }
-
-                    jobSelected(job);
+                if (job == null) {
+                    System.err.println("LE JOB EST NULL .......... jobId ==> " + jobId);
+                    return;
                 }
-            });
+
+                // show its output
+                // TODO est-ce que je laisse ou pas ???
+                JobsOutputController.getInstance().showJobOutput(jobId);
+
+                // update its informations
+                JobInfo jobInfo = JobInfo.getInstance();
+                if (jobInfo != null) {
+                    jobInfo.updateInfos(job);
+
+                    // set Focus on job info
+                    IWorkbench iworkbench = PlatformUI.getWorkbench();
+                    IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
+                    IWorkbenchPage page = currentWindow.getActivePage();
+                    try {
+                        IViewPart part = page.showView(JobInfo.ID);
+                        part.setFocus();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // update its tasks informations
+                TaskView taskView = TaskView.getInstance();
+                if (taskView != null) {
+                    taskView.fullUpdate(job);
+                }
+
+                ResultPreview resultPreview = ResultPreview.getInstance();
+                if (resultPreview != null) {
+                    resultPreview.update(new SimpleTextPanel("No selected task"));
+                }
+
+                jobSelected(job);
+            }
+        });
 
         // register to the table manager
         TableManager.getInstance().add(table);
@@ -388,8 +379,7 @@ public abstract class AbstractJobComposite extends Composite {
         if (itemIndex == 0) {
             fillBackgroundColor(item, job.getState(), null);
         } else {
-            fillBackgroundColor(item, job.getState(),
-                table.getItem(itemIndex - 1).getBackground());
+            fillBackgroundColor(item, job.getState(), table.getItem(itemIndex - 1).getBackground());
         }
 
         for (int i = 0; i < cols.length; i++) {
@@ -414,48 +404,44 @@ public abstract class AbstractJobComposite extends Composite {
             final JobId jobId = aJobId;
 
             getDisplay().asyncExec(new Runnable() {
-                    public void run() {
-                        Table table = getTable();
-                        TableItem[] items = table.getItems();
-                        TableItem item = null;
-                        int itemIndex = 0;
-                        for (TableItem it : items) {
-                            if (((JobId) (it.getData())).equals(jobId)) {
-                                item = it;
-                                break;
-                            }
-                            itemIndex++;
+                public void run() {
+                    Table table = getTable();
+                    TableItem[] items = table.getItems();
+                    TableItem item = null;
+                    int itemIndex = 0;
+                    for (TableItem it : items) {
+                        if (((JobId) (it.getData())).equals(jobId)) {
+                            item = it;
+                            break;
                         }
+                        itemIndex++;
+                    }
 
-                        if (item == null) {
-                            // TODO
-                            // throw new IllegalArgumentException("the item which represent the job : " +
-                            // jobId
-                            // + " is unknown !");
-                            //TODO System.err.println("the item which represent the job : " + jobId + " is unknown !");
-                            return;
-                        }
+                    if (item == null) {
+                        // TODO
+                        // throw new IllegalArgumentException("the item which represent the job : " +
+                        // jobId
+                        // + " is unknown !");
+                        //TODO System.err.println("the item which represent the job : " + jobId + " is unknown !");
+                        return;
+                    }
 
-                        TableColumn[] cols = table.getColumns();
-                        InternalJob job = JobsController.getLocalView()
-                                                        .getJobById(jobId);
-                        for (int i = 0; i < cols.length; i++) {
-                            String title = cols[i].getText();
-                            if ((title != null) &&
-                                    (title.equals(COLUMN_STATE_TITLE))) {
-                                if (itemIndex == 0) {
-                                    fillBackgroundColor(item, job.getState(),
-                                        null);
-                                } else {
-                                    fillBackgroundColor(item, job.getState(),
-                                        items[itemIndex].getBackground());
-                                }
-                                item.setText(i, job.getState().toString());
-                                break;
+                    TableColumn[] cols = table.getColumns();
+                    InternalJob job = JobsController.getLocalView().getJobById(jobId);
+                    for (int i = 0; i < cols.length; i++) {
+                        String title = cols[i].getText();
+                        if ((title != null) && (title.equals(COLUMN_STATE_TITLE))) {
+                            if (itemIndex == 0) {
+                                fillBackgroundColor(item, job.getState(), null);
+                            } else {
+                                fillBackgroundColor(item, job.getState(), items[itemIndex].getBackground());
                             }
+                            item.setText(i, job.getState().toString());
+                            break;
                         }
                     }
-                });
+                }
+            });
         }
     }
 
@@ -464,35 +450,33 @@ public abstract class AbstractJobComposite extends Composite {
             final JobId jobId = aJobId;
 
             getDisplay().asyncExec(new Runnable() {
-                    public void run() {
-                        Table table = getTable();
-                        TableItem[] items = table.getItems();
-                        TableItem item = null;
-                        for (TableItem it : items)
-                            if (((JobId) (it.getData())).equals(jobId)) {
-                                item = it;
-                                break;
-                            }
-
-                        if (item == null) {
-                            //						TODO throw new IllegalArgumentException("the item which represent the job : " + jobId
-                            //								+ " is unknown !");
-                            return;
+                public void run() {
+                    Table table = getTable();
+                    TableItem[] items = table.getItems();
+                    TableItem item = null;
+                    for (TableItem it : items)
+                        if (((JobId) (it.getData())).equals(jobId)) {
+                            item = it;
+                            break;
                         }
 
-                        TableColumn[] cols = table.getColumns();
-                        InternalJob job = JobsController.getLocalView()
-                                                        .getJobById(jobId);
-                        for (int i = 0; i < cols.length; i++) {
-                            String title = cols[i].getText();
-                            if ((title != null) &&
-                                    (title.equals(COLUMN_PRIORITY_TITLE))) {
-                                item.setText(i, job.getPriority().toString());
-                                break;
-                            }
+                    if (item == null) {
+                        //						TODO throw new IllegalArgumentException("the item which represent the job : " + jobId
+                        //								+ " is unknown !");
+                        return;
+                    }
+
+                    TableColumn[] cols = table.getColumns();
+                    InternalJob job = JobsController.getLocalView().getJobById(jobId);
+                    for (int i = 0; i < cols.length; i++) {
+                        String title = cols[i].getText();
+                        if ((title != null) && (title.equals(COLUMN_PRIORITY_TITLE))) {
+                            item.setText(i, job.getPriority().toString());
+                            break;
                         }
                     }
-                });
+                }
+            });
         }
     }
 
@@ -563,49 +547,45 @@ public abstract class AbstractJobComposite extends Composite {
             }
             final int i = tmp;
             getDisplay().asyncExec(new Runnable() {
-                    public void run() {
-                        int j = table.getSelectionIndex();
-                        if (i == j) {
-                            JobInfo jobInfo = JobInfo.getInstance();
-                            if (jobInfo != null) {
-                                jobInfo.clear();
-                            }
-
-                            ResultPreview resultPreview = ResultPreview.getInstance();
-                            if (resultPreview != null) {
-                                resultPreview.update(new SimpleTextPanel(
-                                        "No selected task"));
-                            }
-
-                            TaskView taskView = TaskView.getInstance();
-                            if (taskView != null) {
-                                taskView.clear();
-                            }
-
-                            // enabling/disabling button permitted with this job
-                            ObtainJobOutputAction.getInstance().setEnabled(false);
-                            PriorityJobAction.getInstance().setEnabled(false);
-                            PriorityIdleJobAction.getInstance().setEnabled(false);
-                            PriorityLowestJobAction.getInstance()
-                                                   .setEnabled(false);
-                            PriorityLowJobAction.getInstance().setEnabled(false);
-                            PriorityNormalJobAction.getInstance()
-                                                   .setEnabled(false);
-                            PriorityHighJobAction.getInstance().setEnabled(false);
-                            PriorityHighestJobAction.getInstance()
-                                                    .setEnabled(false);
-                            PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
-                            pauseResumeJobAction.setEnabled(false);
-                            pauseResumeJobAction.setPauseResumeMode();
-                            KillRemoveJobAction.getInstance().setEnabled(false);
+                public void run() {
+                    int j = table.getSelectionIndex();
+                    if (i == j) {
+                        JobInfo jobInfo = JobInfo.getInstance();
+                        if (jobInfo != null) {
+                            jobInfo.clear();
                         }
-                        table.remove(i);
-                        // TODO je pense qu'il ne servent à rien
-                        // table.redraw();
-                        // table.update();
-                        decreaseCount();
+
+                        ResultPreview resultPreview = ResultPreview.getInstance();
+                        if (resultPreview != null) {
+                            resultPreview.update(new SimpleTextPanel("No selected task"));
+                        }
+
+                        TaskView taskView = TaskView.getInstance();
+                        if (taskView != null) {
+                            taskView.clear();
+                        }
+
+                        // enabling/disabling button permitted with this job
+                        ObtainJobOutputAction.getInstance().setEnabled(false);
+                        PriorityJobAction.getInstance().setEnabled(false);
+                        PriorityIdleJobAction.getInstance().setEnabled(false);
+                        PriorityLowestJobAction.getInstance().setEnabled(false);
+                        PriorityLowJobAction.getInstance().setEnabled(false);
+                        PriorityNormalJobAction.getInstance().setEnabled(false);
+                        PriorityHighJobAction.getInstance().setEnabled(false);
+                        PriorityHighestJobAction.getInstance().setEnabled(false);
+                        PauseResumeJobAction pauseResumeJobAction = PauseResumeJobAction.getInstance();
+                        pauseResumeJobAction.setEnabled(false);
+                        pauseResumeJobAction.setPauseResumeMode();
+                        KillRemoveJobAction.getInstance().setEnabled(false);
                     }
-                });
+                    table.remove(i);
+                    // TODO je pense qu'il ne servent à rien
+                    // table.redraw();
+                    // table.update();
+                    decreaseCount();
+                }
+            });
         }
     }
 

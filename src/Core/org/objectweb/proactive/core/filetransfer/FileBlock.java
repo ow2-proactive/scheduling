@@ -83,11 +83,9 @@ public class FileBlock implements Serializable {
      * the block instance. Note that creating a new block requires performing a skip (seek) on the
      * stream, which is very slow. Therefore it is better to pass the buffered stream as parameter.
      */
-    public void loadNextBlock(BufferedInputStream bis)
-        throws IOException {
+    public void loadNextBlock(BufferedInputStream bis) throws IOException {
         if (bis == null) {
-            throw new IllegalArgumentException(
-                "Can not handle null BufferInputStream parameter.");
+            throw new IllegalArgumentException("Can not handle null BufferInputStream parameter.");
         }
 
         try {
@@ -104,11 +102,9 @@ public class FileBlock implements Serializable {
      * @param bos The BufferedOutputStream to save the file
      * @throws IOException If an error is encountered.
      */
-    public void saveCurrentBlock(BufferedOutputStream bos)
-        throws IOException {
+    public void saveCurrentBlock(BufferedOutputStream bos) throws IOException {
         if (bos == null) {
-            throw new IllegalArgumentException(
-                "Can not handle null BufferedOutputStream parameter.");
+            throw new IllegalArgumentException("Can not handle null BufferedOutputStream parameter.");
         }
 
         bos.write(buffer, 0, usage);

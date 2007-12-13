@@ -49,8 +49,7 @@ public class StartRecordingTimeLineAction extends Action {
 
     public StartRecordingTimeLineAction() {
         super.setId(START_RECORDING_TIMELINE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "start_rec.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "start_rec.gif"));
         super.setToolTipText(START_RECORDING_TIMELINE_ACTION);
         super.setEnabled(false);
     }
@@ -60,8 +59,7 @@ public class StartRecordingTimeLineAction extends Action {
         this.sourceContainer = container;
     }
 
-    public void setStopRecordingTimeLineAction(
-        StopRecordingTimeLineAction stopRecordingTimeLineAction) {
+    public void setStopRecordingTimeLineAction(StopRecordingTimeLineAction stopRecordingTimeLineAction) {
         this.stopRecordingTimeLineAction = stopRecordingTimeLineAction;
     }
 
@@ -72,15 +70,13 @@ public class StartRecordingTimeLineAction extends Action {
             IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
             IWorkbenchPage page = currentWindow.getActivePage();
             try {
-                IViewPart part = page.showView(
-                        "org.objectweb.proactive.ic2d.timit.views.TimeLineView");
+                IViewPart part = page.showView("org.objectweb.proactive.ic2d.timit.views.TimeLineView");
                 this.timeLineView = (TimeLineView) part;
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
-        this.timeLineView.getContainer()
-                         .provideSourceContainer(this.sourceContainer);
+        this.timeLineView.getContainer().provideSourceContainer(this.sourceContainer);
         this.setEnabled(false);
         this.stopRecordingTimeLineAction.setEnabled(true);
     }

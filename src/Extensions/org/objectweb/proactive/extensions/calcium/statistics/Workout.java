@@ -61,8 +61,7 @@ public class Workout implements Serializable {
         Collections.sort(keys, classSorterByName);
 
         for (Class<?> muscle : keys) {
-            workout += (muscle.getSimpleName() + "(" +
-            muscleWorkout.get(muscle) + ") ");
+            workout += (muscle.getSimpleName() + "(" + muscleWorkout.get(muscle) + ") ");
         }
 
         return workout;
@@ -79,8 +78,7 @@ public class Workout implements Serializable {
     }
 
     protected void track(Workout workout) {
-        java.util.Iterator<Class<?>> it = workout.muscleWorkout.keySet()
-                                                               .iterator();
+        java.util.Iterator<Class<?>> it = workout.muscleWorkout.keySet().iterator();
         while (it.hasNext()) {
             Class<?> muscle = it.next();
             if (!this.muscleWorkout.containsKey(muscle)) {

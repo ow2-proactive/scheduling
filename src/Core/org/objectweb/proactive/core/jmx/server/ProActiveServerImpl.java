@@ -47,8 +47,7 @@ import org.objectweb.proactive.core.node.NodeException;
  * The active object representing the connector. This object is responsible of creating ProActive JMX Connections
  * @author vlegrand
  */
-public class ProActiveServerImpl implements Serializable,
-    ProActiveInternalObject {
+public class ProActiveServerImpl implements Serializable, ProActiveInternalObject {
     private transient MBeanServer mbeanServer;
     private UniqueID id;
 

@@ -43,7 +43,7 @@ public class Activator extends GenericActivator {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         context.registerService(org.ungoverned.osgi.service.shell.Command.class.getName(),
-            new StartNodeCommand(), null);
+                new StartNodeCommand(), null);
     }
 
     public void bindProActiveService(ProActiveService proactiveService) {

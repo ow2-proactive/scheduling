@@ -59,8 +59,8 @@ public class EntityTableComposite extends Composite {
     protected Table rulesTable;
     private boolean isFrom;
 
-    public EntityTableComposite(Composite parent, FormToolkit toolkit,
-        List<SimplePolicyRule> data, final boolean isFrom) {
+    public EntityTableComposite(Composite parent, FormToolkit toolkit, List<SimplePolicyRule> data,
+            final boolean isFrom) {
         super(parent, SWT.NULL);
         toolkit.adapt(this);
         this.rules = data;
@@ -72,69 +72,66 @@ public class EntityTableComposite extends Composite {
         this.viewer = new TableViewer(this.entities);
 
         this.entities.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent e) {
-                    if ((e.character == SWT.DEL) || (e.character == SWT.BS)) {
-                        if (isFrom) {
-                            EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex())
-                                                           .removeFrom(EntityTableComposite.this.entities.getSelectionIndex());
-                        } else {
-                            EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex())
-                                                           .removeTo(EntityTableComposite.this.entities.getSelectionIndex());
-                        }
-                        updateTable();
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if ((e.character == SWT.DEL) || (e.character == SWT.BS)) {
+                    if (isFrom) {
+                        EntityTableComposite.this.rules.get(
+                                EntityTableComposite.this.rulesTable.getSelectionIndex()).removeFrom(
+                                EntityTableComposite.this.entities.getSelectionIndex());
+                    } else {
+                        EntityTableComposite.this.rules.get(
+                                EntityTableComposite.this.rulesTable.getSelectionIndex()).removeTo(
+                                EntityTableComposite.this.entities.getSelectionIndex());
                     }
-
-                    super.keyPressed(e);
+                    updateTable();
                 }
-            });
+
+                super.keyPressed(e);
+            }
+        });
 
         // drag n drop
-        DropTarget target = new DropTarget(this.entities,
-                DND.DROP_DEFAULT | DND.DROP_COPY);
+        DropTarget target = new DropTarget(this.entities, DND.DROP_DEFAULT | DND.DROP_COPY);
 
-        target.setTransfer(new Transfer[] {
-                CertificateTreeMapTransfer.getInstance()
-            });
+        target.setTransfer(new Transfer[] { CertificateTreeMapTransfer.getInstance() });
         target.addDropListener(new DropTargetAdapter() {
-                @Override
-                public void dragEnter(DropTargetEvent event) {
-                    if (event.detail == DND.DROP_DEFAULT) {
-                        event.detail = DND.DROP_COPY;
-                    }
+            @Override
+            public void dragEnter(DropTargetEvent event) {
+                if (event.detail == DND.DROP_DEFAULT) {
+                    event.detail = DND.DROP_COPY;
                 }
+            }
 
-                @Override
-                public void dragOperationChanged(DropTargetEvent event) {
-                    if (event.detail == DND.DROP_DEFAULT) {
-                        event.detail = DND.DROP_COPY;
-                    }
+            @Override
+            public void dragOperationChanged(DropTargetEvent event) {
+                if (event.detail == DND.DROP_DEFAULT) {
+                    event.detail = DND.DROP_COPY;
                 }
+            }
 
-                @Override
-                public void drop(DropTargetEvent event) {
-                    if (CertificateTreeMapTransfer.getInstance()
-                                                      .isSupportedType(event.currentDataType)) {
-                        CertificateTreeMap map = (CertificateTreeMap) event.data;
+            @Override
+            public void drop(DropTargetEvent event) {
+                if (CertificateTreeMapTransfer.getInstance().isSupportedType(event.currentDataType)) {
+                    CertificateTreeMap map = (CertificateTreeMap) event.data;
 
-                        for (CertificateTree tree : map.keySet()) {
-                            String display = tree.getCertificate().getType()
-                                                 .toString() + ":" +
-                                tree.getCertificate().getCert().getSubjectDN()
-                                    .getName();
-                            if (isFrom) {
-                                EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex())
-                                                               .addFrom(display);
-                            } else {
-                                EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex())
-                                                               .addTo(display);
-                            }
+                    for (CertificateTree tree : map.keySet()) {
+                        String display = tree.getCertificate().getType().toString() + ":" +
+                            tree.getCertificate().getCert().getSubjectDN().getName();
+                        if (isFrom) {
+                            EntityTableComposite.this.rules.get(
+                                    EntityTableComposite.this.rulesTable.getSelectionIndex())
+                                    .addFrom(display);
+                        } else {
+                            EntityTableComposite.this.rules.get(
+                                    EntityTableComposite.this.rulesTable.getSelectionIndex()).addTo(display);
                         }
-
-                        updateTable();
                     }
+
+                    updateTable();
                 }
-            });
+            }
+        });
     }
 
     public void updateTable() {
@@ -148,11 +145,9 @@ public class EntityTableComposite extends Composite {
         this.entities.removeAll();
         if (this.rulesTable.getSelectionIndex() != -1) {
             if (this.isFrom) {
-                this.viewer.add(this.rules.get(
-                        this.rulesTable.getSelectionIndex()).getFrom().toArray());
+                this.viewer.add(this.rules.get(this.rulesTable.getSelectionIndex()).getFrom().toArray());
             } else {
-                this.viewer.add(this.rules.get(
-                        this.rulesTable.getSelectionIndex()).getTo().toArray());
+                this.viewer.add(this.rules.get(this.rulesTable.getSelectionIndex()).getTo().toArray());
             }
         }
     }
@@ -160,10 +155,10 @@ public class EntityTableComposite extends Composite {
     public void add(String re) {
         if (isFrom) {
             EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex())
-                                           .addFrom(re);
+                    .addFrom(re);
         } else {
             EntityTableComposite.this.rules.get(EntityTableComposite.this.rulesTable.getSelectionIndex())
-                                           .addTo(re);
+                    .addTo(re);
         }
         this.updateTable();
     }

@@ -88,8 +88,7 @@ public class RMDeploy implements NodeCreationEventListener, Runnable {
      * @param pad ProActive descriptor to deploy.
      * @param vnNames virtual nodes to deploy
      */
-    public RMDeploy(PadDeployInterface nodeSource, ProActiveDescriptor pad,
-        String[] vnNames) {
+    public RMDeploy(PadDeployInterface nodeSource, ProActiveDescriptor pad, String[] vnNames) {
         this.nodeSource = nodeSource;
         this.padName = pad.getUrl();
         this.pad = pad;

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.cruisecontrol;
 
-
 /** Models the current road and incline of the road */
 public class RoadModel implements org.objectweb.proactive.RunActive {
     // Fields 

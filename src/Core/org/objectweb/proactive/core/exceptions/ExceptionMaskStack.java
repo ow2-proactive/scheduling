@@ -55,11 +55,11 @@ public class ExceptionMaskStack {
      * optimized way of doing this thread local thing
      */
     private static ThreadLocal threadLocalMask = new ThreadLocal() {
-            @Override
-            protected synchronized Object initialValue() {
-                return new ExceptionMaskStack();
-            }
-        };
+        @Override
+        protected synchronized Object initialValue() {
+            return new ExceptionMaskStack();
+        }
+    };
 
     /* The mask for the current thread */
     static ExceptionMaskStack get() {
@@ -126,8 +126,7 @@ public class ExceptionMaskStack {
         Iterator<ExceptionMaskLevel> iter = stack.iterator();
         while (iter.hasNext()) {
             ExceptionMaskLevel level = iter.next();
-            if (level.catchRuntimeException() ||
-                    level.areExceptionTypesCaught(c)) {
+            if (level.catchRuntimeException() || level.areExceptionTypesCaught(c)) {
                 return level;
             }
         }

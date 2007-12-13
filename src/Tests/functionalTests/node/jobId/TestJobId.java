@@ -55,23 +55,19 @@ public class TestJobId extends FunctionalTest {
     @Test
     public void testDefaultJobID() throws NodeException, AlreadyBoundException {
         Node node = NodeFactory.createNode("testDefaultJobID");
-        Assert.assertEquals(Job.DEFAULT_JOBID,
-            node.getNodeInformation().getJobID());
+        Assert.assertEquals(Job.DEFAULT_JOBID, node.getNodeInformation().getJobID());
     }
 
     @Test
-    public void testSpecifiedJobID()
-        throws NodeException, AlreadyBoundException {
-        Node node = NodeFactory.createNode("testSpecifiedJobID", false, null,
-                null, "myJobID");
+    public void testSpecifiedJobID() throws NodeException, AlreadyBoundException {
+        Node node = NodeFactory.createNode("testSpecifiedJobID", false, null, null, "myJobID");
         Assert.assertEquals("myJobID", node.getNodeInformation().getJobID());
     }
 
     @Test
     public void testSetJobID() throws NodeException, AlreadyBoundException {
         Node node = NodeFactory.createNode("testSetJobID");
-        Assert.assertEquals(Job.DEFAULT_JOBID,
-            node.getNodeInformation().getJobID());
+        Assert.assertEquals(Job.DEFAULT_JOBID, node.getNodeInformation().getJobID());
         node.getNodeInformation().setJobID("setJobID");
         Assert.assertEquals("setJobID", node.getNodeInformation().getJobID());
     }

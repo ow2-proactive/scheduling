@@ -67,8 +67,7 @@ public class HTTPRegistry {
      * @param body the body to be binded
      */
     public void bind(String name, InternalRemoteRemoteObject body) {
-        ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                       .debug("registering remote object at " + name);
+        ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).debug("registering remote object at " + name);
         rRemteObjectMap.put(name, body);
     }
 

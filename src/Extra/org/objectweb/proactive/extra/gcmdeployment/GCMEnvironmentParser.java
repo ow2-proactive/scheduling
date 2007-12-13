@@ -64,21 +64,17 @@ public class GCMEnvironmentParser implements GCMParserConstants {
     protected VariableContract variableContract;
     private static final String XPATH_ENVIRONMENT = "/*/pa:environment";
 
-    public GCMEnvironmentParser(File descriptor)
-        throws IOException, SAXException {
+    public GCMEnvironmentParser(File descriptor) throws IOException, SAXException {
         this(descriptor, null);
     }
 
-    public GCMEnvironmentParser(File descriptor, List<String> userSchemas)
-        throws IOException, SAXException {
+    public GCMEnvironmentParser(File descriptor, List<String> userSchemas) throws IOException, SAXException {
         variableContract = null;
-        schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas)
-                                        : new ArrayList<String>();
+        schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
 
         setup();
 
-        InputSource inputSource = new InputSource(new FileInputStream(
-                    descriptor));
+        InputSource inputSource = new InputSource(new FileInputStream(descriptor));
         try {
             document = documentBuilder.parse(inputSource);
         } catch (SAXException e) {
@@ -87,8 +83,7 @@ public class GCMEnvironmentParser implements GCMParserConstants {
         }
     }
 
-    public VariableContract getVariableContract()
-        throws XPathExpressionException, SAXException {
+    public VariableContract getVariableContract() throws XPathExpressionException, SAXException {
         if (variableContract == null) {
             variableContract = new VariableContract();
             parseEnvironment();
@@ -97,8 +92,7 @@ public class GCMEnvironmentParser implements GCMParserConstants {
         return variableContract;
     }
 
-    public Map<String, String> getVariableMap()
-        throws XPathExpressionException, SAXException {
+    public Map<String, String> getVariableMap() throws XPathExpressionException, SAXException {
         return getVariableContract().toMap();
     }
 
@@ -108,17 +102,14 @@ public class GCMEnvironmentParser implements GCMParserConstants {
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-        String deploymentSchema = GCMDeploymentParserImpl.class.getClass()
-                                                               .getResource(DEPLOYMENT_DESC_LOCATION)
-                                                               .getFile();
+        String deploymentSchema = GCMDeploymentParserImpl.class.getClass().getResource(
+                DEPLOYMENT_DESC_LOCATION).getFile();
 
         String commonTypesSchema = GCMDeploymentParserImpl.class.getClass()
-                                                                .getResource(COMMON_TYPES_LOCATION)
-                                                                .getFile();
+                .getResource(COMMON_TYPES_LOCATION).getFile();
 
-        String extensionSchemas = GCMDeploymentParserImpl.class.getClass()
-                                                               .getResource(EXTENSION_SCHEMAS_LOCATION)
-                                                               .getFile();
+        String extensionSchemas = GCMDeploymentParserImpl.class.getClass().getResource(
+                EXTENSION_SCHEMAS_LOCATION).getFile();
 
         schemas.add(0, extensionSchemas);
         schemas.add(0, deploymentSchema);
@@ -131,59 +122,47 @@ public class GCMEnvironmentParser implements GCMParserConstants {
 
             XPathFactory factory = XPathFactory.newInstance();
             xpath = factory.newXPath();
-            xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
-                    GCM_DESCRIPTOR_NAMESPACE));
+            xpath
+                    .setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
+                        GCM_DESCRIPTOR_NAMESPACE));
         } catch (ParserConfigurationException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
         }
     }
 
-    protected void parseEnvironment()
-        throws XPathExpressionException, SAXException {
-        NodeList environmentNodes = (NodeList) xpath.evaluate(XPATH_ENVIRONMENT,
-                document, XPathConstants.NODESET);
+    protected void parseEnvironment() throws XPathExpressionException, SAXException {
+        NodeList environmentNodes = (NodeList) xpath.evaluate(XPATH_ENVIRONMENT, document,
+                XPathConstants.NODESET);
 
         String[][] pairs = new String[][] {
-                {
-                    VARIABLES_JAVAPROPERTY_DESCRIPTOR,
-                    VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG
-                },
-                {
-                    VARIABLES_JAVAPROPERTY_PROGRAM,
-                    VARIABLES_JAVAPROPERTY_PROGRAM_TAG
-                },
+                { VARIABLES_JAVAPROPERTY_DESCRIPTOR, VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG },
+                { VARIABLES_JAVAPROPERTY_PROGRAM, VARIABLES_JAVAPROPERTY_PROGRAM_TAG },
                 { VARIABLES_JAVAPROPERTY, VARIABLES_JAVAPROPERTY_TAG },
                 { VARIABLES_DESCRIPTOR, VARIABLES_DESCRIPTOR_TAG },
                 { VARIABLES_PROGRAM, VARIABLES_PROGRAM_TAG },
                 { VARIABLES_PROGRAM_DEFAULT, VARIABLES_PROGRAM_DEFAULT_TAG },
-                { VARIABLES_DESCRIPTOR_DEFAULT, VARIABLES_DESCRIPTOR_DEFAULT_TAG },
-            };
+                { VARIABLES_DESCRIPTOR_DEFAULT, VARIABLES_DESCRIPTOR_DEFAULT_TAG }, };
 
         if (environmentNodes.getLength() == 1) {
             for (int i = 0; i < pairs.length; ++i) {
                 VariableContractType varContractType = VariableContractType.getType(pairs[i][1]);
-                processVariables(environmentNodes.item(0), pairs[i][0],
-                    varContractType);
+                processVariables(environmentNodes.item(0), pairs[i][0], varContractType);
             }
         }
     }
 
-    private void processVariables(Node environmentNode, String expr,
-        VariableContractType varContractType)
-        throws XPathExpressionException, SAXException {
-        Object result = xpath.evaluate(expr, environmentNode,
-                XPathConstants.NODESET);
+    private void processVariables(Node environmentNode, String expr, VariableContractType varContractType)
+            throws XPathExpressionException, SAXException {
+        Object result = xpath.evaluate(expr, environmentNode, XPathConstants.NODESET);
         NodeList nodes = (NodeList) result;
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
 
             String varName = GCMParserHelper.getAttributeValue(node, "name");
 
-            String varValue = variableContract.transform(GCMParserHelper.getAttributeValue(
-                        node, "value"));
+            String varValue = variableContract.transform(GCMParserHelper.getAttributeValue(node, "value"));
 
-            variableContract.setDescriptorVariable(varName, varValue,
-                varContractType);
+            variableContract.setDescriptorVariable(varName, varValue, varContractType);
         }
     }
 }

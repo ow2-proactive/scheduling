@@ -73,12 +73,12 @@ public class RegistrationForwarder implements NotificationListener {
         subscribeJMXRuntimeEvent();
     }
 
-    synchronized public void handleNotification(Notification notification,
-        Object handback) {
+    synchronized public void handleNotification(Notification notification, Object handback) {
         String type = notification.getType();
 
         if (NotificationType.GCMRuntimeRegistered.equals(type)) {
-            GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification.getUserData();
+            GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification
+                    .getUserData();
             addMessage(data);
         }
     }
@@ -132,10 +132,7 @@ public class RegistrationForwarder implements NotificationListener {
     }
 
     private void subscribeJMXRuntimeEvent() {
-        JMXNotificationManager.getInstance()
-                              .subscribe(ProActiveRuntimeImpl.getProActiveRuntime()
-                                                             .getMBean()
-                                                             .getObjectName(),
-            this);
+        JMXNotificationManager.getInstance().subscribe(
+                ProActiveRuntimeImpl.getProActiveRuntime().getMBean().getObjectName(), this);
     }
 }

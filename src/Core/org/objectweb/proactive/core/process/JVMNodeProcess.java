@@ -70,7 +70,7 @@ public class JVMNodeProcess extends JVMProcessImpl implements Serializable {
      * @param errorMessageLogger The logger that handles error stream of this process
      */
     public JVMNodeProcess(RemoteProcessMessageLogger inputMessageLogger,
-        RemoteProcessMessageLogger errorMessageLogger) {
+            RemoteProcessMessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
         setClassname("org.objectweb.proactive.core.runtime.StartRuntime");
     }

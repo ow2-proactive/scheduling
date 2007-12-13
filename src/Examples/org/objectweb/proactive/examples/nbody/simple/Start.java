@@ -61,21 +61,18 @@ public class Start {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
 
-    public static void main(int totalNbBodies, int maxIter,
-        Displayer displayer, Node[] nodes,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         logger.info("RUNNING simplest VERSION");
 
         Cube universe = new Cube(-100, -100, -100, 200, 200, 200);
         Domain[] domainArray = new Domain[totalNbBodies];
         for (int i = 0; i < totalNbBodies; i++) {
-            Object[] constructorParams = new Object[] {
-                    new Integer(i), new Planet(universe)
-                };
+            Object[] constructorParams = new Object[] { new Integer(i), new Planet(universe) };
             try {
                 // Create all the Domains used in the simulation 
-                domainArray[i] = (Domain) PAActiveObject.newActive(Domain.class.getName(),
-                        constructorParams, nodes[(i + 1) % nodes.length]);
+                domainArray[i] = (Domain) PAActiveObject.newActive(Domain.class.getName(), constructorParams,
+                        nodes[(i + 1) % nodes.length]);
             } catch (ActiveObjectCreationException e) {
                 killsupport.abort(e);
             } catch (NodeException e) {
@@ -88,9 +85,8 @@ public class Start {
         // Create a maestro, which will orchestrate the whole simulation, synchronizing the computations of the Domains
         Maestro maestro = null;
         try {
-            maestro = (Maestro) PAActiveObject.newActive(Maestro.class.getName(),
-                    new Object[] { domainArray, new Integer(maxIter), killsupport },
-                    nodes[0]);
+            maestro = (Maestro) PAActiveObject.newActive(Maestro.class.getName(), new Object[] { domainArray,
+                    new Integer(maxIter), killsupport }, nodes[0]);
         } catch (ActiveObjectCreationException e) {
             killsupport.abort(e);
         } catch (NodeException e) {

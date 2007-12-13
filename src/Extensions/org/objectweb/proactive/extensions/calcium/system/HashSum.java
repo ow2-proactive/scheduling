@@ -37,23 +37,19 @@ import java.security.*;
 public class HashSum {
     static String DEFAULT_HASH_ALGO = "MD5";
 
-    public static String md5sum(File file)
-        throws NoSuchAlgorithmException, IOException {
+    public static String md5sum(File file) throws NoSuchAlgorithmException, IOException {
         return hashsum(file, "MD5");
     }
 
-    public static String sha1sum(File file)
-        throws NoSuchAlgorithmException, IOException {
+    public static String sha1sum(File file) throws NoSuchAlgorithmException, IOException {
         return hashsum(file, "SHA-1");
     }
 
-    public static String hashsum(File file)
-        throws NoSuchAlgorithmException, IOException {
+    public static String hashsum(File file) throws NoSuchAlgorithmException, IOException {
         return hashsum(file, DEFAULT_HASH_ALGO);
     }
 
-    public static String hashsum(File file, String encoding)
-        throws IOException, NoSuchAlgorithmException {
+    public static String hashsum(File file, String encoding) throws IOException, NoSuchAlgorithmException {
         FileInputStream fis = new FileInputStream(file);
         MessageDigest md = MessageDigest.getInstance(encoding);
 
@@ -76,8 +72,7 @@ public class HashSum {
     }
 
     public static void main(String[] arg) throws Exception {
-        String a = sha1sum(new File(
-                    "/home/mleyton/Tutorial-ProActive-SkeletonForMarioToImprove.ppt"));
+        String a = sha1sum(new File("/home/mleyton/Tutorial-ProActive-SkeletonForMarioToImprove.ppt"));
         System.out.println(a);
     }
 }

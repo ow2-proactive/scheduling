@@ -65,8 +65,7 @@ public class AOStageOut {
         interpreter = new Interpreter();
     }
 
-    public void setStageInAndInterPool(AOStageIn stageIn,
-        AOInterpreterPool interpool) {
+    public void setStageInAndInterPool(AOStageIn stageIn, AOInterpreterPool interpool) {
         this.stageIn = stageIn;
         this.interpool = interpool;
     }

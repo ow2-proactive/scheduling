@@ -36,8 +36,8 @@ import java.io.Serializable;
 public class ReInt implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private int value;
 
     public ReInt() {

@@ -42,8 +42,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class MSEngineWorker implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private GeneralTask genTask;
     private GeneralResult genResult;
     private long dateStart;
@@ -87,12 +87,10 @@ public class MSEngineWorker implements Serializable {
             } else {
                 this.genResult.setState(GeneralResult.ABORT);
                 if (this.genTask instanceof MatlabTask) {
-                    this.genResult.setException(new MatlabException(
-                            "The MATLAB engine is closed"));
+                    this.genResult.setException(new MatlabException("The MATLAB engine is closed"));
                 } else {
                     this.genResult.setMessage("Error inside Scilab script." +
-                        System.getProperty("line.separator") +
-                        genTask.getLastMessage());
+                        System.getProperty("line.separator") + genTask.getLastMessage());
                 }
                 if (logger.isDebugEnabled()) {
                     logger.debug("->MSEngineWorker :execute : abort\n");
@@ -142,8 +140,7 @@ public class MSEngineWorker implements Serializable {
 
         for (AbstractData data : datas) {
             if (logger.isDebugEnabled()) {
-                logger.debug("->MSEngineWorker :ReceiveData : " +
-                    data.getName());
+                logger.debug("->MSEngineWorker :ReceiveData : " + data.getName());
             }
 
             this.genResult.add(data);

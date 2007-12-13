@@ -70,14 +70,12 @@ public class NoCallbackHandler implements CallbackHandler, Serializable {
      *                or more of the Callbacks specified in the
      *                <code>callbacks</code> parameter.
      */
-    public void handle(Callback[] callbacks)
-        throws UnsupportedCallbackException {
+    public void handle(Callback[] callbacks) throws UnsupportedCallbackException {
         if (callbacks[0] instanceof NoCallback) {
             NoCallback nc = (NoCallback) callbacks[0];
             nc.set(items);
         } else {
-            throw new UnsupportedCallbackException(callbacks[0],
-                "Unrecognized Callback");
+            throw new UnsupportedCallbackException(callbacks[0], "Unrecognized Callback");
         }
     }
 }

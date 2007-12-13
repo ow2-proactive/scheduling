@@ -100,14 +100,12 @@ public class HTTPInputStream extends DataInputStream {
 
         do {
             if ((line = getLine()) == null) {
-                throw new IOException(
-                    "Connection ended before reading all headers");
+                throw new IOException("Connection ended before reading all headers");
             }
 
             if ((line.length() > 0)) { // we don't care about headers in GET requests
                 if (line.startsWith(" ") || line.startsWith("\t")) {
-                    headers.put(prevFieldName, headers.get(prevFieldName) +
-                        line); // folding
+                    headers.put(prevFieldName, headers.get(prevFieldName) + line); // folding
                 }
 
                 String[] pair = pColon.split(line, 2);

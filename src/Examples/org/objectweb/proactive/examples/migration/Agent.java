@@ -46,8 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * This class represents a migratable Agent
  */
-public class Agent implements InitActive, RunActive, EndActive,
-    java.io.Serializable {
+public class Agent implements InitActive, RunActive, EndActive, java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private String name;
     private String nodename;
@@ -64,9 +63,7 @@ public class Agent implements InitActive, RunActive, EndActive,
         try {
             //System.out.println("getName called");
             //return the name of the Host
-            return URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                           .getInetAddress())
-                             .toUpperCase();
+            return URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress()).toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();
             return "getName failed";

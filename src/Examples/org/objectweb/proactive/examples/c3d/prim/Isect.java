@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d.prim;
 
-
 /**
  * Representation of the intersection between a Ray and a Primitive.
  * Would be set to null if Ray does not hit Primitive.

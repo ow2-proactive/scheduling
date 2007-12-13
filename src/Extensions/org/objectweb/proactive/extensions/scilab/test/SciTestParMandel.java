@@ -55,8 +55,7 @@ public class SciTestParMandel {
         Thread.sleep(nbEngine * 4000);
 
         BufferedReader reader = new BufferedReader(new FileReader(args[9]));
-        PrintWriter writer = new PrintWriter(new BufferedWriter(
-                    new FileWriter(args[10])));
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(args[10])));
 
         int xres = Integer.parseInt(args[3]);
         int yres = Integer.parseInt(args[4]);
@@ -90,22 +89,21 @@ public class SciTestParMandel {
             nbBloc = Integer.parseInt(arrayLine[0].trim());
 
             startTime = System.currentTimeMillis();
-            mandelResult = GridMatrix.calMandelbrot(service, "mandel" + i,
-                    xres, yres, xmin, xmax, ymin, ymax, precision, nbBloc);
+            mandelResult = GridMatrix.calMandelbrot(service, "mandel" + i, xres, yres, xmin, xmax, ymin,
+                    ymax, precision, nbBloc);
             result = mandelResult.get();
             service.removeAllEventListenerTask();
             endTime = System.currentTimeMillis();
 
-            System.out.println(nbEngine + " " + xres + " " + yres + " " +
-                precision + " " + nbBloc + " " + (endTime - startTime));
-            writer.println(nbEngine + " " + xres + " " + yres + " " +
-                precision + " " + nbBloc + " " + (endTime - startTime));
+            System.out.println(nbEngine + " " + xres + " " + yres + " " + precision + " " + nbBloc + " " +
+                (endTime - startTime));
+            writer.println(nbEngine + " " + xres + " " + yres + " " + precision + " " + nbBloc + " " +
+                (endTime - startTime));
 
             for (int k = 0; k < mandelResult.getNbRow(); k++) {
                 System.out.println("");
                 for (int j = 0; j < mandelResult.getNbCol(); j++) {
-                    System.out.print(result[(k * mandelResult.getNbCol()) + j] +
-                        " ");
+                    System.out.print(result[(k * mandelResult.getNbCol()) + j] + " ");
                 }
             }
         }

@@ -45,9 +45,8 @@ public class BlastParams implements java.io.Serializable {
     int divideDBInto; //Number of parts the database should be divided into
     long maxDBSize; //maximum database size to accept
 
-    public BlastParams(File queryFile, File dbFile, File formatProg,
-        File blastProg, boolean isNucleotide, long maxDBSize)
-        throws MalformedURLException {
+    public BlastParams(File queryFile, File dbFile, File formatProg, File blastProg, boolean isNucleotide,
+            long maxDBSize) throws MalformedURLException {
         this.formatProg = formatProg;
         this.blastProg = blastProg;
 
@@ -62,14 +61,14 @@ public class BlastParams implements java.io.Serializable {
     }
 
     public BlastParams(BlastParams param) throws MalformedURLException {
-        this(param.queryFile, param.dbFile, param.formatProg, param.blastProg,
-            param.isNucleotide, param.maxDBSize);
+        this(param.queryFile, param.dbFile, param.formatProg, param.blastProg, param.isNucleotide,
+                param.maxDBSize);
     }
 
     public String getBlastParemeterString(File outFile) {
         //-p blastn|blastp|blastx
-        return "-p blastn" + " -d " + dbFile.getAbsolutePath() + " -i " +
-        queryFile.getAbsoluteFile() + " -o " + outFile.getAbsolutePath();
+        return "-p blastn" + " -d " + dbFile.getAbsolutePath() + " -i " + queryFile.getAbsoluteFile() +
+            " -o " + outFile.getAbsolutePath();
     }
 
     public String getFormatQueryString() {
@@ -81,7 +80,6 @@ public class BlastParams implements java.io.Serializable {
     }
 
     private String getFormatParemeterString(File inputFile) {
-        return "-i " + inputFile.getAbsoluteFile() +
-        (isNucleotide ? " -p F " : " -o T");
+        return "-i " + inputFile.getAbsoluteFile() + (isNucleotide ? " -p F " : " -o T");
     }
 }

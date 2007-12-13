@@ -61,27 +61,22 @@ public class Test extends ComponentTest {
     private NF3Itf nonFunctionnal3_Itf = null;
 
     /**
-         *
-         */
+     *
+     */
     @Before
     public void createComponent() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
 
-        ControllerDescription myController = new ControllerDescription(P1_NAME,
-                Constants.PRIMITIVE,
-                "/functionalTests/component/requestpriority/my-component-config.xml",
-                false);
-        ComponentType pc_type = type_factory.createFcType(new InterfaceType[] {
-                    type_factory.createFcItfType(FItf.ITF_NAME,
-                        FItf.class.getName(), TypeFactory.SERVER,
-                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                });
+        ControllerDescription myController = new ControllerDescription(P1_NAME, Constants.PRIMITIVE,
+            "/functionalTests/component/requestpriority/my-component-config.xml", false);
+        ComponentType pc_type = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
+                FItf.ITF_NAME, FItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                TypeFactory.SINGLE), });
 
-        p1 = cf.newFcInstance(pc_type, myController,
-                new ContentDescription(PriotirizedComponent.class.getName(),
-                    new Object[] {  }));
+        p1 = cf.newFcInstance(pc_type, myController, new ContentDescription(PriotirizedComponent.class
+                .getName(), new Object[] {}));
 
         assertEquals(Fractal.getNameController(p1).getFcName(), P1_NAME);
 
@@ -96,42 +91,29 @@ public class Test extends ComponentTest {
 
         // set priorities functional 
         PriorityController pc = (PriorityController) p1.getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
-        assertEquals(RequestPriority.NF1,
-            pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
+        assertEquals(RequestPriority.NF1, pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
                 "setPriority", null));
-        assertEquals(RequestPriority.NF2,
-            pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
+        assertEquals(RequestPriority.NF2, pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
                 "setPriorityNF2", null));
-        assertEquals(RequestPriority.NF3,
-            pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
+        assertEquals(RequestPriority.NF3, pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
                 "setPriorityNF3", null));
-        assertEquals(RequestPriority.NF1,
-            pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
+        assertEquals(RequestPriority.NF1, pc.getPriority(Constants.REQUEST_PRIORITY_CONTROLLER,
                 "getPriority", null));
 
-        assertEquals(RequestPriority.F,
-            pc.getPriority(FItf.ITF_NAME, "addCall", null));
-        assertEquals(RequestPriority.F,
-            pc.getPriority(FItf.ITF_NAME, "getCallOrder", null));
-        assertEquals(RequestPriority.F,
-            pc.getPriority(FItf.ITF_NAME, "longFunctionalCall", null));
-        assertEquals(RequestPriority.F,
-            pc.getPriority(FItf.ITF_NAME, "functionalCall", null));
+        assertEquals(RequestPriority.F, pc.getPriority(FItf.ITF_NAME, "addCall", null));
+        assertEquals(RequestPriority.F, pc.getPriority(FItf.ITF_NAME, "getCallOrder", null));
+        assertEquals(RequestPriority.F, pc.getPriority(FItf.ITF_NAME, "longFunctionalCall", null));
+        assertEquals(RequestPriority.F, pc.getPriority(FItf.ITF_NAME, "functionalCall", null));
 
-        assertEquals(RequestPriority.NF1,
-            pc.getPriority(NF1Itf.CONTROLLER_NAME, "NF1Call", null));
-        assertEquals(RequestPriority.NF1,
-            pc.getPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", null));
-        assertEquals(RequestPriority.NF1,
-            pc.getPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
+        assertEquals(RequestPriority.NF1, pc.getPriority(NF1Itf.CONTROLLER_NAME, "NF1Call", null));
+        assertEquals(RequestPriority.NF1, pc.getPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", null));
+        assertEquals(RequestPriority.NF1, pc.getPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
 
         pc.setPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", RequestPriority.NF2);
-        assertEquals(RequestPriority.NF2,
-            pc.getPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", null));
+        assertEquals(RequestPriority.NF2, pc.getPriority(NF2Itf.CONTROLLER_NAME, "NF2Call", null));
 
         pc.setPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", RequestPriority.NF3);
-        assertEquals(RequestPriority.NF3,
-            pc.getPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
+        assertEquals(RequestPriority.NF3, pc.getPriority(NF3Itf.CONTROLLER_NAME, "NF3Call", null));
     }
 
     /**
@@ -139,8 +121,7 @@ public class Test extends ComponentTest {
      */
     @org.junit.Test
     public void test_F_F_NF3() throws Exception {
-        String expectedOrder = FItf.F_STR_CALL + NF3Itf.NF3_STR_CALL +
-            FItf.F_STR_CALL;
+        String expectedOrder = FItf.F_STR_CALL + NF3Itf.NF3_STR_CALL + FItf.F_STR_CALL;
         functionnal_Itf.longFunctionalCall();
         functionnal_Itf.functionalCall();
         Thread.sleep(500); //wait to be sure the first functionnalCall are processed
@@ -149,12 +130,11 @@ public class Test extends ComponentTest {
     }
 
     /**
-    *
-    */
+     *
+     */
     @org.junit.Test
     public void test_stopped_NF1_F_NF3() throws Exception {
-        String expectedOrder = NF1Itf.NF1_STR_CALL + NF3Itf.NF3_STR_CALL +
-            FItf.F_STR_CALL;
+        String expectedOrder = NF1Itf.NF1_STR_CALL + NF3Itf.NF3_STR_CALL + FItf.F_STR_CALL;
         Fractal.getLifeCycleController(p1).stopFc();
         nonFunctionnal1_Itf.longNF1Call();
         Thread.sleep(500); //wait to be sure the first functionnalCall are processing, allowing us to enqueue request in the order we want
@@ -168,12 +148,11 @@ public class Test extends ComponentTest {
     }
 
     /**
-    *
-    */
+     *
+     */
     @org.junit.Test
     public void test_F_F_NF1_NF2() throws Exception {
-        String expectedOrder = FItf.F_STR_CALL + FItf.F_STR_CALL +
-            NF1Itf.NF1_STR_CALL + NF2Itf.NF2_STR_CALL;
+        String expectedOrder = FItf.F_STR_CALL + FItf.F_STR_CALL + NF1Itf.NF1_STR_CALL + NF2Itf.NF2_STR_CALL;
         functionnal_Itf.longFunctionalCall();
         Thread.sleep(500);
         functionnal_Itf.functionalCall();
@@ -183,12 +162,12 @@ public class Test extends ComponentTest {
     }
 
     /**
-    *
-    */
+     *
+     */
     @org.junit.Test
     public void test_F_F_NF1_F_NF2() throws Exception {
-        String expectedOrder = FItf.F_STR_CALL + FItf.F_STR_CALL +
-            NF1Itf.NF1_STR_CALL + NF2Itf.NF2_STR_CALL + FItf.F_STR_CALL;
+        String expectedOrder = FItf.F_STR_CALL + FItf.F_STR_CALL + NF1Itf.NF1_STR_CALL + NF2Itf.NF2_STR_CALL +
+            FItf.F_STR_CALL;
         functionnal_Itf.longFunctionalCall();
         Thread.sleep(500);
         functionnal_Itf.functionalCall();
@@ -199,13 +178,12 @@ public class Test extends ComponentTest {
     }
 
     /**
-    *
+     *
      */
     @org.junit.Test
     public void test_F_F_NF1_F_NF2_NF3() throws Exception {
-        String expectedOrder = FItf.F_STR_CALL + NF3Itf.NF3_STR_CALL +
-            FItf.F_STR_CALL + NF1Itf.NF1_STR_CALL + NF2Itf.NF2_STR_CALL +
-            FItf.F_STR_CALL;
+        String expectedOrder = FItf.F_STR_CALL + NF3Itf.NF3_STR_CALL + FItf.F_STR_CALL + NF1Itf.NF1_STR_CALL +
+            NF2Itf.NF2_STR_CALL + FItf.F_STR_CALL;
         functionnal_Itf.longFunctionalCall();
         Thread.sleep(500);
         functionnal_Itf.functionalCall();
@@ -217,13 +195,12 @@ public class Test extends ComponentTest {
     }
 
     /**
-    *
+     *
      */
     @org.junit.Test
     public void test_stopped_NF1_F_NF1_F_NF2_NF3() throws Exception {
-        String expectedOrder = NF1Itf.NF1_STR_CALL + NF3Itf.NF3_STR_CALL +
-            NF1Itf.NF1_STR_CALL + NF2Itf.NF2_STR_CALL + FItf.F_STR_CALL +
-            FItf.F_STR_CALL;
+        String expectedOrder = NF1Itf.NF1_STR_CALL + NF3Itf.NF3_STR_CALL + NF1Itf.NF1_STR_CALL +
+            NF2Itf.NF2_STR_CALL + FItf.F_STR_CALL + FItf.F_STR_CALL;
 
         Fractal.getLifeCycleController(p1).stopFc();
         nonFunctionnal1_Itf.longNF1Call();
@@ -239,13 +216,12 @@ public class Test extends ComponentTest {
     }
 
     /**
-    *
+     *
      */
     @org.junit.Test
     public void test_F_F_NF2_F_NF2_NF1() throws Exception {
-        String expectedOrder = FItf.F_STR_CALL + NF2Itf.NF2_STR_CALL +
-            NF2Itf.NF2_STR_CALL + FItf.F_STR_CALL + FItf.F_STR_CALL +
-            NF1Itf.NF1_STR_CALL;
+        String expectedOrder = FItf.F_STR_CALL + NF2Itf.NF2_STR_CALL + NF2Itf.NF2_STR_CALL + FItf.F_STR_CALL +
+            FItf.F_STR_CALL + NF1Itf.NF1_STR_CALL;
         functionnal_Itf.longFunctionalCall();
         Thread.sleep(500);
         functionnal_Itf.functionalCall();
@@ -257,13 +233,12 @@ public class Test extends ComponentTest {
     }
 
     /**
-    *
+     *
      */
     @org.junit.Test
     public void test_stopped_NF1_F_NF2_F_NF2_NF1() throws Exception {
-        String expectedOrder = NF1Itf.NF1_STR_CALL + NF2Itf.NF2_STR_CALL +
-            NF2Itf.NF2_STR_CALL + NF1Itf.NF1_STR_CALL + FItf.F_STR_CALL +
-            FItf.F_STR_CALL;
+        String expectedOrder = NF1Itf.NF1_STR_CALL + NF2Itf.NF2_STR_CALL + NF2Itf.NF2_STR_CALL +
+            NF1Itf.NF1_STR_CALL + FItf.F_STR_CALL + FItf.F_STR_CALL;
         nonFunctionnal1_Itf.longNF1Call();
         Fractal.getLifeCycleController(p1).stopFc();
         Thread.sleep(500);

@@ -71,8 +71,8 @@ public class Election implements RunActive, Serializable {
             if (this.startTime == 0) { // election not yet started
                 service.blockingServeOldest(); // just wait for first vote to trigger timer.
             } else { // An election was started, let's use a timer.   
-                long time =  // time is in milliseconds 
-                    this.startTime - System.currentTimeMillis() + WAITMSECS;
+                long time = // time is in milliseconds 
+                this.startTime - System.currentTimeMillis() + WAITMSECS;
                 if (time < 0) {
                     voteOver("time's up");
                 } else {
@@ -90,8 +90,7 @@ public class Election implements RunActive, Serializable {
     public void vote(int i_user, String name, Vec wish) {
         // check no bad dude is voting twice
         if (voters.contains(new Integer(i_user))) {
-            this.c3ddispatcher.userLog(i_user,
-                "You have already voted in this round");
+            this.c3ddispatcher.userLog(i_user, "You have already voted in this round");
             return;
         }
 
@@ -102,14 +101,12 @@ public class Election implements RunActive, Serializable {
         //  We should be starting a new election, if startime=0 <==> ballots.size=0 <==> voters.size=0 
         if (this.startTime == 0) {
             this.startTime = System.currentTimeMillis();
-            this.c3ddispatcher.userLog(i_user,
-                "Request 'rotate " + wish.direction() + "' submitted, \nnew " +
+            this.c3ddispatcher.userLog(i_user, "Request 'rotate " + wish.direction() + "' submitted, \nnew " +
                 (WAITMSECS / 1000) + " second election started.");
-            this.c3ddispatcher.allLogExcept(i_user,
-                "New " + (WAITMSECS / 1000) + " second election started:");
+            this.c3ddispatcher
+                    .allLogExcept(i_user, "New " + (WAITMSECS / 1000) + " second election started:");
         }
-        this.c3ddispatcher.allLogExcept(i_user,
-            "   User " + name + " wants to rotate " + wish.direction());
+        this.c3ddispatcher.allLogExcept(i_user, "   User " + name + " wants to rotate " + wish.direction());
         // Has everybody voted ? 
         if (this.voters.size() == this.nbUsers) {
             voteOver("everybody voted");
@@ -121,11 +118,9 @@ public class Election implements RunActive, Serializable {
         this.c3ddispatcher.allLog("Election finished : " + reason);
         Vec winner = ballots.winner();
         if (winner == null) {
-            this.c3ddispatcher.allLog(
-                "   No consensus found, vote again please!");
+            this.c3ddispatcher.allLog("   No consensus found, vote again please!");
         } else {
-            this.c3ddispatcher.allLog("   The scene will be rotated by " +
-                winner.direction());
+            this.c3ddispatcher.allLog("   The scene will be rotated by " + winner.direction());
             this.c3ddispatcher.rotateScene(-1, winner); // i_user = -1 means this is called from Election!
         }
 

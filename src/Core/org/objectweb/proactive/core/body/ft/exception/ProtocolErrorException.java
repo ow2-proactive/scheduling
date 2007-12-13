@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.ft.exception;
 
-
 /**
  * For interbal use : This exceoption occurs if a inconsistency in the FT protocol occurs.
  * @author cdelbe
@@ -39,12 +38,12 @@ package org.objectweb.proactive.core.body.ft.exception;
 public class ProtocolErrorException extends RuntimeException {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    *
-    */
+     *
+     */
     public ProtocolErrorException() {
         super();
     }

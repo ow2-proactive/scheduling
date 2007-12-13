@@ -50,8 +50,7 @@ public class TimeLineChartObject {
         this.timeIntervalManager = new TimeIntervalManager();
     }
 
-    public void provideSourceContainer(
-        BasicChartContainerObject sourceContainer) {
+    public void provideSourceContainer(BasicChartContainerObject sourceContainer) {
         for (BasicChartObject c : sourceContainer.getChildrenList()) {
             ActiveObject a = c.getAoObject();
             if (a != null) {
@@ -74,8 +73,7 @@ public class TimeLineChartObject {
         // Get the longuest time
         long longuestTime = 0;
         for (SequenceObject s : this.childrenList) {
-            if ((s.lastTimeStampValue != 0) &&
-                    (s.lastTimeStampValue > longuestTime)) {
+            if ((s.lastTimeStampValue != 0) && (s.lastTimeStampValue > longuestTime)) {
                 longuestTime = s.lastTimeStampValue;
             }
         }
@@ -107,12 +105,10 @@ public class TimeLineChartObject {
     public SequenceObject createSequence(ActiveObject a) {
         SequenceObject sequenceObject = getSequence(a.getName());
         if (sequenceObject == null) {
-            sequenceObject = new SequenceObject(a.getName(), a.getObjectName(),
-                    this);
+            sequenceObject = new SequenceObject(a.getName(), a.getObjectName(), this);
             // Subscribe to notif manager
-            JMXNotificationManager.getInstance()
-                                  .subscribe(a.getObjectName(), sequenceObject,
-                a.getParent().getParent().getUrl());
+            JMXNotificationManager.getInstance().subscribe(a.getObjectName(), sequenceObject,
+                    a.getParent().getParent().getUrl());
         }
         return sequenceObject;
     }

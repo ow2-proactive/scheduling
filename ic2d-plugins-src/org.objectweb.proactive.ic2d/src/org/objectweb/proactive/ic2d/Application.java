@@ -62,27 +62,24 @@ public class Application implements IPlatformRunnable {
         // initialize the default log4j configuration
         if (System.getProperty("log4j.configuration") == null) {
             try {
-                InputStream in = PAProperties.class.getResourceAsStream(
-                        "proactive-log4j");
+                InputStream in = PAProperties.class.getResourceAsStream("proactive-log4j");
 
                 // testing the availability of the file
                 Properties p = new Properties();
                 p.load(in);
                 PropertyConfigurator.configure(p);
-                System.setProperty("log4j.configuration",
-                    PAProperties.class.getResource("proactive-log4j").toString());
+                System.setProperty("log4j.configuration", PAProperties.class.getResource("proactive-log4j")
+                        .toString());
             } catch (Exception e) {
                 URL u = PAProperties.class.getResource("proactive-log4j");
-                System.err.println(
-                    "IC2D:the default log4j configuration file (" + u +
+                System.err.println("IC2D:the default log4j configuration file (" + u +
                     ") is not accessible, logging is disabled");
             }
         }
 
         Display display = PlatformUI.createDisplay();
         try {
-            int returnCode = PlatformUI.createAndRunWorkbench(display,
-                    new ApplicationWorkbenchAdvisor());
+            int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
             if (returnCode == PlatformUI.RETURN_RESTART) {
                 return IPlatformRunnable.EXIT_RESTART;
             }

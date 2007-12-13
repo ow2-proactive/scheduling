@@ -64,6 +64,5 @@ public interface UnmarshallerHandler extends XMLHandler {
      * @param attributes the attributes of this element
      * @exception org.xml.sax.SAXException if an exception occur during processing
      */
-    public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException;
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException;
 }

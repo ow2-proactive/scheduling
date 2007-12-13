@@ -62,8 +62,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class HalfFTManagerPMLRB extends FTManager {
 
     /**
-         *
-         */
+     *
+     */
 
     //logger
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FAULT_TOLERANCE_PML);
@@ -95,19 +95,15 @@ public class HalfFTManagerPMLRB extends FTManager {
             this.storage = null;
             this.recovery = null;
         } catch (MalformedURLException e) {
-            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.",
-                e);
+            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.", e);
         } catch (RemoteException e) {
-            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.",
-                e);
+            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.", e);
         } catch (NotBoundException e) {
-            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.",
-                e);
+            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.", e);
         }
         this.sendNumber = 0;
         this.requestInfos = new MessageInfoPMLRB();
-        logger.info(" PML fault-tolerance is enabled for half body " +
-            this.ownerID);
+        logger.info(" PML fault-tolerance is enabled for half body " + this.ownerID);
         return 0;
     }
 
@@ -140,8 +136,7 @@ public class HalfFTManagerPMLRB extends FTManager {
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendReplyAfter(org.objectweb.proactive.core.body.reply.Reply, int, org.objectweb.proactive.core.body.UniversalBody)
      */
     @Override
-    public int onSendReplyAfter(Reply reply, int rdvValue,
-        UniversalBody destination) {
+    public int onSendReplyAfter(Reply reply, int rdvValue, UniversalBody destination) {
         return 0;
     }
 
@@ -159,8 +154,8 @@ public class HalfFTManagerPMLRB extends FTManager {
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onSendRequestAfter(org.objectweb.proactive.core.body.request.Request, int, org.objectweb.proactive.core.body.UniversalBody)
      */
     @Override
-    public int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination) throws RenegotiateSessionException {
+    public int onSendRequestAfter(Request request, int rdvValue, UniversalBody destination)
+            throws RenegotiateSessionException {
         return 0;
     }
 

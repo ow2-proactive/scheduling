@@ -44,14 +44,13 @@ public class PIExample {
     public static final long NUMBER_OF_EXPERIENCES = 1000000;
     public static final int NUMBER_OF_TASKS = 30;
 
-    public static void main(String[] args)
-        throws TaskAlreadySubmittedException, TaskException {
+    public static void main(String[] args) throws TaskAlreadySubmittedException, TaskException {
         // creation of the master
         ProActiveMaster<ComputePIMonteCarlo, Long> master = new ProActiveMaster<ComputePIMonteCarlo, Long>();
 
         // adding resources
-        master.addResources(PIExample.class.getResource(
-                "/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml"));
+        master.addResources(PIExample.class
+                .getResource("/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml"));
 
         // defining tasks
         Vector<ComputePIMonteCarlo> tasks = new Vector<ComputePIMonteCarlo>();
@@ -88,8 +87,8 @@ public class PIExample {
     public static class ComputePIMonteCarlo implements Task<Long> {
 
         /**
-                 *
-                 */
+         *
+         */
         public ComputePIMonteCarlo() {
         }
 

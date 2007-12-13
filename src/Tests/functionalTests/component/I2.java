@@ -30,7 +30,6 @@
  */
 package functionalTests.component;
 
-
 /**
  * @author Matthieu Morel
  */

@@ -45,8 +45,7 @@ public class Main {
 
     public static void main(String[] args) {
         if (args.length != 2) {
-            logger.error("Usage: java " + Main.class.getName() +
-                " <size> <deploiement file>");
+            logger.error("Usage: java " + Main.class.getName() + " <size> <deploiement file>");
             System.exit(0);
         }
 
@@ -58,8 +57,7 @@ public class Main {
         ProActiveDescriptor proActiveDescriptor = null;
         String[] nodesList = null;
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                    args[1]);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + args[1]);
             proActiveDescriptor.activateMappings();
             VirtualNode vn1 = proActiveDescriptor.getVirtualNode("matrixNode");
 
@@ -73,8 +71,7 @@ public class Main {
         Launcher l = null;
 
         try {
-            l = (Launcher) PAActiveObject.newActive(Launcher.class.getName(),
-                    new Object[] { nodesList }); //,targetNode);
+            l = (Launcher) PAActiveObject.newActive(Launcher.class.getName(), new Object[] { nodesList }); //,targetNode);
         } catch (Exception e) {
             logger.error("\nUnable to create the Launcher !!!!!\n");
             e.printStackTrace();
@@ -101,8 +98,7 @@ public class Main {
         }
 
         endTime = System.currentTimeMillis() - startTime;
-        logger.info("   Asynchronous Distribution : " + endTime +
-            " millisecondes\n\n");
+        logger.info("   Asynchronous Distribution : " + endTime + " millisecondes\n\n");
 
         // MULTIPLICATION
         int i = 1;
@@ -110,8 +106,7 @@ public class Main {
             m1 = new Matrix(matrixSize, matrixSize);
             m1.initializeWithRandomValues(); //l.createMatrix(matrixSize);
 
-            printMessageAndWait("Ready for distributed multiplication (" + i +
-                ")");
+            printMessageAndWait("Ready for distributed multiplication (" + i + ")");
             //startTime= System.currentTimeMillis();
             // System.out.println(m1);
             // System.out.println(m2);
@@ -126,8 +121,7 @@ public class Main {
     }
 
     private static void printMessageAndWait(String msg) {
-        java.io.BufferedReader d = new java.io.BufferedReader(new java.io.InputStreamReader(
-                    System.in));
+        java.io.BufferedReader d = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
         logger.info(msg);
         logger.info("   --> Press <return> to continue");
         try {
@@ -148,8 +142,7 @@ public class Main {
                 return null;
             }
             byte[] b = getBytesFromInputStream(new java.io.FileInputStream(f));
-            java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(new String(
-                        b));
+            java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(new String(b));
             int n = tokenizer.countTokens();
             if (n == 0) {
                 return null;
@@ -172,8 +165,7 @@ public class Main {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private static byte[] getBytesFromInputStream(java.io.InputStream in)
-        throws java.io.IOException {
+    private static byte[] getBytesFromInputStream(java.io.InputStream in) throws java.io.IOException {
         java.io.DataInputStream din = new java.io.DataInputStream(in);
         byte[] bytecodes = new byte[in.available()];
         try {

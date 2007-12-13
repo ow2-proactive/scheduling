@@ -76,8 +76,7 @@ public class Serie extends Tag {
             return "error.log";
         }
 
-        throw new RuntimeException("Variable benchmark.'" + name +
-            "' missing in configuration file");
+        throw new RuntimeException("Variable benchmark.'" + name + "' missing in configuration file");
     }
 
     public Benchmark[] getBenchmarks() {
@@ -93,8 +92,8 @@ public class Serie extends Tag {
 
     @Override
     public String toString() {
-        return super.toString() + Arrays.toString(this.charts) + "  -  " +
-        Arrays.toString(this.benchmarks) + "\n";
+        return super.toString() + Arrays.toString(this.charts) + "  -  " + Arrays.toString(this.benchmarks) +
+            "\n";
     }
 
     public static Serie[] oldtoArray(List serieList) {
@@ -115,8 +114,8 @@ public class Serie extends Tag {
         ArrayList<Serie> result = new ArrayList<Serie>();
 
         Pattern p = Pattern.compile("[^\\x23\\x7B\\x7D]*\\x23\\x7B" + // *#{
-                "([^\\x7D]*)" + // A,B,C
-                "\\x7D[^\\x7D\\x23\\x7B]*"); // }*
+            "([^\\x7D]*)" + // A,B,C
+            "\\x7D[^\\x7D\\x23\\x7B]*"); // }*
 
         for (int i = 0; i < quantity; i++) {
             Element eSerie = (Element) serieList.get(i);
@@ -146,22 +145,20 @@ public class Serie extends Tag {
         return result.toArray(new Serie[1]);
     }
 
-    private static void expand(Element eSerie, ArrayList<String> seqList,
-        int index, ArrayList<Serie> out) {
+    private static void expand(Element eSerie, ArrayList<String> seqList, int index, ArrayList<Serie> out) {
         String seq = seqList.get(index);
         String[] values = seq.split(",");
 
         for (String value : values) {
             Element eSerieClone = (Element) eSerie.clone();
             XMLHelper.replaceAll(eSerieClone, "\\x23\\x7B" + seq + "\\x7D", // #{*}
-                value);
+                    value);
             Iterator itDesc = eSerieClone.getDescendants();
             while (itDesc.hasNext()) {
                 Object eDesc = itDesc.next();
                 if (eDesc instanceof Element) {
-                    XMLHelper.replaceAll((Element) eDesc,
-                        "\\x23\\x7B" + seq + "\\x7D", // #{*},
-                        value);
+                    XMLHelper.replaceAll((Element) eDesc, "\\x23\\x7B" + seq + "\\x7D", // #{*},
+                            value);
                 }
             }
 

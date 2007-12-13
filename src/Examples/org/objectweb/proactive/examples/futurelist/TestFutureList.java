@@ -43,20 +43,18 @@ public class TestFutureList {
         FutureReceiver tf = null;
 
         if (args.length < 2) {
-            System.err.println(
-                "Usage: TestFutureList hostName1/nodeName1 hostName2/nodeName2");
+            System.err.println("Usage: TestFutureList hostName1/nodeName1 hostName2/nodeName2");
             System.exit(-1);
         }
         ProActiveConfiguration.load();
 
-        System.out.println(
-            "This is designed to test the use of the future list");
+        System.out.println("This is designed to test the use of the future list");
 
         try {
-            blockedO = (BlockedObject) org.objectweb.proactive.api.PAActiveObject.newActive(BlockedObject.class.getName(),
-                    null, args[0]);
-            tf = (FutureReceiver) org.objectweb.proactive.api.PAActiveObject.newActive(FutureReceiver.class.getName(),
-                    null, args[1]);
+            blockedO = (BlockedObject) org.objectweb.proactive.api.PAActiveObject.newActive(
+                    BlockedObject.class.getName(), null, args[0]);
+            tf = (FutureReceiver) org.objectweb.proactive.api.PAActiveObject.newActive(FutureReceiver.class
+                    .getName(), null, args[1]);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -48,8 +48,7 @@ public class StartStopSchedulerAction extends Action {
     private StartStopSchedulerAction() {
         this.setText("Start/Stop scheduler");
         this.setToolTipText("To start or stop the scheduler");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/scheduler_start.png"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_start.png"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
@@ -64,24 +63,20 @@ public class StartStopSchedulerAction extends Action {
 
     public void setStartMode() {
         started = false; // If I set the text to "start", so the scheduler is
-                         // stopped !
+        // stopped !
 
         this.setText("Start scheduler");
-        this.setToolTipText(
-            "To start the scheduler (this will finish start or restart the scheduler)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/scheduler_start.png"));
+        this.setToolTipText("To start the scheduler (this will finish start or restart the scheduler)");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_start.png"));
     }
 
     public void setStopMode() {
         started = true; // If I set the text to "stop", so the scheduler is
-                        // started/running !
+        // started/running !
 
         this.setText("Stop scheduler");
-        this.setToolTipText(
-            "To stop the scheduler (this will finish all pending and running jobs)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/scheduler_stop.png"));
+        this.setToolTipText("To stop the scheduler (this will finish all pending and running jobs)");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_stop.png"));
     }
 
     public static StartStopSchedulerAction newInstance() {

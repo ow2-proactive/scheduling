@@ -30,8 +30,7 @@
  */
 package org.objectweb.proactive.core.mop;
 
-public class InitializationOfStubClassFailedException
-    extends MOPRuntimeException {
+public class InitializationOfStubClassFailedException extends MOPRuntimeException {
     public InitializationOfStubClassFailedException() {
     }
 

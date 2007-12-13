@@ -37,6 +37,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.group.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * This class tests the access to named elements of a group.
  *

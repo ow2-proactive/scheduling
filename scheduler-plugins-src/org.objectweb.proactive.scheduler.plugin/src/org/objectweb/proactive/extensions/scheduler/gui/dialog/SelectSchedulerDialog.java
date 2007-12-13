@@ -120,8 +120,7 @@ public class SelectSchedulerDialog extends Dialog {
         Label loginLabel = new Label(shell, SWT.NONE);
         loginCombo = new Combo(shell, SWT.BORDER);
         Label pwdLabel = new Label(shell, SWT.NONE);
-        final Text pwdText = new Text(shell,
-                SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
+        final Text pwdText = new Text(shell, SWT.SINGLE | SWT.PASSWORD | SWT.BORDER);
         adminCheck = new Button(shell, SWT.CHECK);
         okButton = new Button(shell, SWT.NONE);
         cancelButton = new Button(shell, SWT.NONE);
@@ -178,17 +177,16 @@ public class SelectSchedulerDialog extends Dialog {
 
         // button "OK"
         okButton.setText("OK");
-        okButton.addListener(SWT.Selection,
-            new Listener() {
-                public void handleEvent(Event event) {
-                    validate = true;
-                    url = urlCombo.getText();
-                    login = loginCombo.getText();
-                    pwd = pwdText.getText();
-                    logAsAdmin = adminCheck.getSelection();
-                    shell.close();
-                }
-            });
+        okButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                validate = true;
+                url = urlCombo.getText();
+                login = loginCombo.getText();
+                pwd = pwdText.getText();
+                logAsAdmin = adminCheck.getSelection();
+                shell.close();
+            }
+        });
 
         FormData okFormData = new FormData();
         okFormData.top = new FormAttachment(adminCheck, 5);
@@ -199,13 +197,12 @@ public class SelectSchedulerDialog extends Dialog {
 
         // button "CANCEL"
         cancelButton.setText("Cancel");
-        cancelButton.addListener(SWT.Selection,
-            new Listener() {
-                public void handleEvent(Event event) {
-                    validate = false;
-                    shell.close();
-                }
-            });
+        cancelButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                validate = false;
+                shell.close();
+            }
+        });
 
         FormData cancelFormData = new FormData();
         cancelFormData.top = new FormAttachment(adminCheck, 5);
@@ -338,8 +335,7 @@ public class SelectSchedulerDialog extends Dialog {
      */
     private static void loadLogins() {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(
-                        LOGIN_FILE));
+            BufferedReader reader = new BufferedReader(new FileReader(LOGIN_FILE));
             try {
                 logins = new ArrayList<String>();
                 String login = null;
@@ -435,8 +431,7 @@ public class SelectSchedulerDialog extends Dialog {
                 return null;
             }
             if ((pwd == null) || pwd.trim().equals("")) {
-                MessageDialog.openError(parent, "Error",
-                    "The password is empty !");
+                MessageDialog.openError(parent, "Error", "The password is empty !");
                 return null;
             }
             return new SelectSchedulerDialogResult(url, login, pwd, logAsAdmin);

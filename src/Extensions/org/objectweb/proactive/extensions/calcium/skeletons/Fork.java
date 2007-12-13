@@ -61,8 +61,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
-public class Fork<P extends java.io.Serializable, R extends java.io.Serializable>
-    implements Skeleton<P, R> {
+public class Fork<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {
     Divide<P, ?> div;
     Conquer<?, R> conq;
     List<Skeleton> subSkelList;
@@ -80,8 +79,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
      *            The nested {@link Skeleton}s that will be executed, in parallel, on one of the parameter copies.
      */
     public Fork(Skeleton<P, R>... args) {
-        forkInit(new ForkDefaultDivide<P>(args.length), Arrays.asList(args),
-            new ForkDefaultConquer<R>());
+        forkInit(new ForkDefaultDivide<P>(args.length), Arrays.asList(args), new ForkDefaultConquer<R>());
     }
 
     /**
@@ -101,8 +99,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
             list.add(new Seq<P, R>(e));
         }
 
-        forkInit(new ForkDefaultDivide<P>(args.length), list,
-            new ForkDefaultConquer<R>());
+        forkInit(new ForkDefaultDivide<P>(args.length), list, new ForkDefaultConquer<R>());
     }
 
     /**
@@ -116,10 +113,8 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
      * @param args
      *            The nested {@link Skeleton}s that will be executed, in parallel, on one of the parameter copies.
      */
-    public <X extends Serializable>Fork(Conquer<X, R> conq,
-        Skeleton<P, X>... args) {
-        forkInit(new ForkDefaultDivide<P>(args.length), Arrays.asList(args),
-            conq);
+    public <X extends Serializable> Fork(Conquer<X, R> conq, Skeleton<P, X>... args) {
+        forkInit(new ForkDefaultDivide<P>(args.length), Arrays.asList(args), conq);
     }
 
     /**
@@ -135,16 +130,15 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
      * @param conq
      *            Reduces the computed results into a single one.
      */
-    public <X extends Serializable, Y extends Serializable>Fork(
-        Conquer<Y, R> conq, Divide<P, X> div, Skeleton<X, Y>... args) {
+    public <X extends Serializable, Y extends Serializable> Fork(Conquer<Y, R> conq, Divide<P, X> div,
+            Skeleton<X, Y>... args) {
         forkInit(div, Arrays.asList(args), conq);
     }
 
-    private <X extends Serializable, Y extends Serializable> void forkInit(
-        Divide<P, X> div, List<Skeleton<X, Y>> skelList, Conquer<Y, R> conq) {
+    private <X extends Serializable, Y extends Serializable> void forkInit(Divide<P, X> div,
+            List<Skeleton<X, Y>> skelList, Conquer<Y, R> conq) {
         if (skelList.size() <= 0) {
-            throw new IllegalArgumentException(
-                "Fork must have at least one instruction");
+            throw new IllegalArgumentException("Fork must have at least one instruction");
         }
 
         this.div = div;
@@ -196,8 +190,7 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
          *
          * @see Divide#divide(SkeletonSystem, Object)
          */
-        public List<T> divide(SkeletonSystem system, T param)
-            throws IOException, ClassNotFoundException {
+        public List<T> divide(SkeletonSystem system, T param) throws IOException, ClassNotFoundException {
             Vector<T> vector;
 
             vector = Stateness.deepCopy(param, number);
@@ -217,8 +210,8 @@ public class Fork<P extends java.io.Serializable, R extends java.io.Serializable
     static public class ForkDefaultConquer<T> implements Conquer<T, T> {
 
         /**
-             * @see Conquer#conquer(SkeletonSystem, Object[])
-             */
+         * @see Conquer#conquer(SkeletonSystem, Object[])
+         */
         public T conquer(SkeletonSystem system, T[] param) {
             return param[0];
         }

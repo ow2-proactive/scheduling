@@ -102,7 +102,8 @@ public class Service {
         this.requestQueue = body.getRequestQueue();
         if (((ComponentBody) body).isComponent()) {
             try {
-                lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body).getProActiveComponentImpl());
+                lifeCycleController = Fractal.getLifeCycleController(((ComponentBody) body)
+                        .getProActiveComponentImpl());
             } catch (NoSuchInterfaceException e) {
                 throw new ProActiveRuntimeException(
                     "could not find the life cycle controller for this component");
@@ -115,8 +116,7 @@ public class Service {
     //
     @Override
     public String toString() {
-        return "Service\n  Body=" + body.toString() + "\n  RequestQueue=" +
-        requestQueue.toString();
+        return "Service\n  Body=" + body.toString() + "\n  RequestQueue=" + requestQueue.toString();
     }
 
     /**
@@ -134,8 +134,7 @@ public class Service {
      */
     public void fifoServing() {
         if (((ComponentBody) body).isComponent()) {
-            while (LifeCycleController.STARTED.equals(
-                        lifeCycleController.getFcState())) {
+            while (LifeCycleController.STARTED.equals(lifeCycleController.getFcState())) {
                 blockingServeOldest();
             }
         } else {
@@ -363,8 +362,7 @@ public class Service {
      * @param requestFilter The request filter accepting the request
      */
     public void serveAll(RequestFilter requestFilter) {
-        requestQueue.processRequests(new ServingRequestProcessor(requestFilter),
-            body);
+        requestQueue.processRequests(new ServingRequestProcessor(requestFilter), body);
     }
 
     // -- Serve And Flush Youngest ---------------------------------------------------
@@ -407,8 +405,7 @@ public class Service {
      * @param requestFilter The request filter accepting requests
      */
     public void flushingServeYoungest(RequestFilter requestFilter) {
-        requestQueue.processRequests(new FlushingServeYoungestRequestProcessor(
-                requestFilter), body);
+        requestQueue.processRequests(new FlushingServeYoungestRequestProcessor(requestFilter), body);
     }
 
     // -- Serve And Flush Oldest ---------------------------------------------------
@@ -451,8 +448,7 @@ public class Service {
      * @param requestFilter The request filter accepting requests
      */
     public void flushingServeOldest(RequestFilter requestFilter) {
-        requestQueue.processRequests(new FlushingServeOldestRequestProcessor(
-                requestFilter), body);
+        requestQueue.processRequests(new FlushingServeOldestRequestProcessor(requestFilter), body);
     }
 
     // -- Other helpers methods ---------------------------------------------------
@@ -631,8 +627,7 @@ public class Service {
      * @param timeout : for how long the thread can be blocked.
      * @return the oldest request found in the queue that is accepted by the filter.
      */
-    public Request blockingRemoveOldest(RequestFilter requestFilter,
-        long timeout) {
+    public Request blockingRemoveOldest(RequestFilter requestFilter, long timeout) {
         return requestQueue.blockingRemoveOldest(requestFilter, timeout);
     }
 
@@ -700,8 +695,7 @@ public class Service {
      * @param timeout : for how long the thread can be blocked.
      * @return the youngest request found in the queue that is accepted by the filter.
      */
-    public Request blockingRemoveYoungest(RequestFilter requestFilter,
-        long timeout) {
+    public Request blockingRemoveYoungest(RequestFilter requestFilter, long timeout) {
         return requestQueue.blockingRemoveYoungest(requestFilter, timeout);
     }
 
@@ -718,8 +712,7 @@ public class Service {
             throw new NoSuchMethodError(methodName + " is not defined in " +
                 this.body.getReifiedObject().getClass().getName());
         }
-        return blockingRemoveYoungest(new RequestFilterOnMethodName(methodName),
-            0);
+        return blockingRemoveYoungest(new RequestFilterOnMethodName(methodName), 0);
     }
 
     /**
@@ -794,15 +787,13 @@ public class Service {
      * @see RequestProcessor
      *
      */
-    protected class FlushingServeYoungestRequestProcessor
-        implements RequestProcessor {
+    protected class FlushingServeYoungestRequestProcessor implements RequestProcessor {
         private RequestFilter selectorRequestFilter;
         private Request requestToServe;
         private int counter;
         private int numberOfRequests;
 
-        public FlushingServeYoungestRequestProcessor(
-            RequestFilter selectorRequestFilter) {
+        public FlushingServeYoungestRequestProcessor(RequestFilter selectorRequestFilter) {
             this.selectorRequestFilter = selectorRequestFilter;
         }
 
@@ -848,13 +839,11 @@ public class Service {
      * @see RequestProcessor
      *
      */
-    protected class FlushingServeOldestRequestProcessor
-        implements RequestProcessor {
+    protected class FlushingServeOldestRequestProcessor implements RequestProcessor {
         private RequestFilter selectorRequestFilter;
         private boolean hasServed;
 
-        public FlushingServeOldestRequestProcessor(
-            RequestFilter selectorRequestFilter) {
+        public FlushingServeOldestRequestProcessor(RequestFilter selectorRequestFilter) {
             this.selectorRequestFilter = selectorRequestFilter;
         }
 
@@ -888,8 +877,7 @@ public class Service {
      * @see RequestFilter
      *
      */
-    protected class RequestFilterOnMethodName implements RequestFilter,
-        java.io.Serializable {
+    protected class RequestFilterOnMethodName implements RequestFilter, java.io.Serializable {
         private String methodName;
 
         public RequestFilterOnMethodName(String methodName) {

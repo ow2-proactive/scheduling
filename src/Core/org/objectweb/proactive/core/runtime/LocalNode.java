@@ -93,8 +93,8 @@ public class LocalNode implements SecurityEntity {
     // JMX MBean
     private NodeWrapperMBean mbean;
 
-    public LocalNode(String nodeName, String jobId,
-        ProActiveSecurityManager securityManager, String virtualNodeName) {
+    public LocalNode(String nodeName, String jobId, ProActiveSecurityManager securityManager,
+            String virtualNodeName) {
         this.name = nodeName;
         this.jobId = ((jobId != null) ? jobId : Job.DEFAULT_JOBID);
         this.securityManager = securityManager;
@@ -103,20 +103,18 @@ public class LocalNode implements SecurityEntity {
         this.localProperties = new Properties();
 
         if (this.securityManager != null) {
-            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
-                           .debug("Local Node : " + this.name + " VN name : " +
-                this.virtualNodeName + " policyserver for app :" +
-                this.securityManager.getApplicationName());
+            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).debug(
+                    "Local Node : " + this.name + " VN name : " + this.virtualNodeName +
+                        " policyserver for app :" + this.securityManager.getApplicationName());
 
             // setting virtual node name
             //            this.securityManager.setVNName(this.virtualNodeName);
-            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
-                           .debug("registering node certificate for VN " +
-                this.virtualNodeName);
+            ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).debug(
+                    "registering node certificate for VN " + this.virtualNodeName);
         }
 
         this.roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
-                ProActiveRuntimeImpl.getProActiveRuntime());
+            ProActiveRuntimeImpl.getProActiveRuntime());
 
         // JMX registration
         //        if (PAProperties.PA_JMX_MBEAN.isTrue()) {
@@ -128,13 +126,11 @@ public class LocalNode implements SecurityEntity {
             try {
                 mbs.registerMBean(mbean, oname);
             } catch (InstanceAlreadyExistsException e) {
-                logger.error("A MBean with the object name " + oname +
-                    " already exists", e);
+                logger.error("A MBean with the object name " + oname + " already exists", e);
             } catch (MBeanRegistrationException e) {
                 logger.error("Can't register the MBean of the LocalNode", e);
             } catch (NotCompliantMBeanException e) {
-                logger.error("The MBean of the LocalNode is not JMX compliant",
-                    e);
+                logger.error("The MBean of the LocalNode is not JMX compliant", e);
             }
         }
 
@@ -294,9 +290,8 @@ public class LocalNode implements SecurityEntity {
             Body body = LocalBodyStore.getInstance().getLocalBody(bodyID);
 
             if (body != null) {
-                ProActiveLogger.getLogger(Loggers.NODE)
-                               .info("node " + this.name +
-                    " is being killed, terminating body " + bodyID);
+                ProActiveLogger.getLogger(Loggers.NODE).info(
+                        "node " + this.name + " is being killed, terminating body " + bodyID);
                 body.terminate();
             }
         }
@@ -304,11 +299,9 @@ public class LocalNode implements SecurityEntity {
         this.roe.unregisterAll();
 
         // JMX Notification
-        ProActiveRuntimeWrapperMBean runtimeMBean = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                        .getMBean();
+        ProActiveRuntimeWrapperMBean runtimeMBean = ProActiveRuntimeImpl.getProActiveRuntime().getMBean();
         if ((runtimeMBean != null) && (this.mbean != null)) {
-            runtimeMBean.sendNotification(NotificationType.nodeDestroyed,
-                this.mbean.getURL());
+            runtimeMBean.sendNotification(NotificationType.nodeDestroyed, this.mbean.getURL());
         }
 
         // END JMX Notification
@@ -321,8 +314,7 @@ public class LocalNode implements SecurityEntity {
                 try {
                     mbs.unregisterMBean(objectName);
                 } catch (InstanceNotFoundException e) {
-                    logger.error("The MBean with the objectName " + objectName +
-                        " was not found", e);
+                    logger.error("The MBean with the objectName " + objectName + " was not found", e);
                 } catch (MBeanRegistrationException e) {
                     logger.error("The MBean with the objectName " + objectName +
                         " can't be unregistered from the MBean server", e);
@@ -356,8 +348,7 @@ public class LocalNode implements SecurityEntity {
     }
 
     // Implements Security Entity
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException {
+    public TypedCertificate getCertificate() throws SecurityNotAvailableException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
@@ -377,8 +368,7 @@ public class LocalNode implements SecurityEntity {
         return this.securityManager.getEntities();
     }
 
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
@@ -386,7 +376,7 @@ public class LocalNode implements SecurityEntity {
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException {
+            throws SecurityNotAvailableException, AccessControlException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
@@ -400,38 +390,34 @@ public class LocalNode implements SecurityEntity {
         return this.securityManager.getPublicKey();
     }
 
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException, KeyExchangeException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
         return this.securityManager.publicKeyExchange(sessionID, signature);
     }
 
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
+            RenegotiateSessionException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
         return this.securityManager.randomValue(sessionID, clientRandomValue);
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException {
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
-        return this.securityManager.secretKeyExchange(sessionID, encodedAESKey,
-            encodedIVParameters, encodedClientMacKey, encodedLockData,
-            parametersSignature);
+        return this.securityManager.secretKeyExchange(sessionID, encodedAESKey, encodedIVParameters,
+                encodedClientMacKey, encodedLockData, parametersSignature);
     }
 
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
@@ -439,17 +425,14 @@ public class LocalNode implements SecurityEntity {
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SecurityNotAvailableException, SessionException {
+            TypedCertificate distantCertificate) throws SecurityNotAvailableException, SessionException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
-        return this.securityManager.startNewSession(distantSessionID, policy,
-            distantCertificate);
+        return this.securityManager.startNewSession(distantSessionID, policy, distantCertificate);
     }
 
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException {
+    public void terminateSession(long sessionID) throws SecurityNotAvailableException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }

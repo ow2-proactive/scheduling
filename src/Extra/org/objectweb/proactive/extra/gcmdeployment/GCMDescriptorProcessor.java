@@ -56,21 +56,19 @@ public class GCMDescriptorProcessor {
         this.document = document;
     }
 
-    public void transform(OutputStream output)
-        throws XPathExpressionException, SAXException, TransformerException {
+    public void transform(OutputStream output) throws XPathExpressionException, SAXException,
+            TransformerException {
         String[] nameList = vmap.keySet().toArray(new String[0]);
         String[] valueList = new String[nameList.length];
         for (int i = 0; i < nameList.length; i++) {
             valueList[i] = vmap.get(nameList[i]);
         }
 
-        System.setProperty("javax.xml.transform.TransformerFactory",
-            "net.sf.saxon.TransformerFactoryImpl");
+        System.setProperty("javax.xml.transform.TransformerFactory", "net.sf.saxon.TransformerFactoryImpl");
         DOMSource domSource = new DOMSource(document);
         TransformerFactory tfactory = TransformerFactory.newInstance();
 
-        Source stylesheetSource = new StreamSource(this.getClass()
-                                                       .getResourceAsStream("variables.xsl"));
+        Source stylesheetSource = new StreamSource(this.getClass().getResourceAsStream("variables.xsl"));
 
         Transformer transformer = null;
         try {

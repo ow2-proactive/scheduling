@@ -134,13 +134,11 @@ public class EncryptionEngine implements Serializable {
     }
 
     // implements Serializable
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
         // Add bouncycastle security provider

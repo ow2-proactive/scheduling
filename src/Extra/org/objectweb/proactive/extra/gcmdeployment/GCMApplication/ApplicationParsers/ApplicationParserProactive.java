@@ -69,9 +69,8 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
     }
 
     @Override
-    public void parseApplicationNode(Node paNode,
-        GCMApplicationParser applicationParser, XPath xpath)
-        throws XPathExpressionException, SAXException, IOException {
+    public void parseApplicationNode(Node paNode, GCMApplicationParser applicationParser, XPath xpath)
+            throws XPathExpressionException, SAXException, IOException {
         super.parseApplicationNode(paNode, applicationParser, xpath);
 
         CommandBuilderProActive commandBuilderProActive = (CommandBuilderProActive) commandBuilder;
@@ -80,12 +79,10 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         commandBuilderProActive.setProActivePath(relPath);
 
         try {
-            Node configNode = (Node) xpath.evaluate(XPATH_CONFIGURATION,
-                    paNode, XPathConstants.NODE);
+            Node configNode = (Node) xpath.evaluate(XPATH_CONFIGURATION, paNode, XPathConstants.NODE);
 
             if (configNode != null) {
-                parseProActiveConfiguration(xpath, commandBuilderProActive,
-                    configNode);
+                parseProActiveConfiguration(xpath, commandBuilderProActive, configNode);
             }
 
             commandBuilderProActive.setVirtualNodes(applicationParser.getVirtualNodes());
@@ -94,12 +91,10 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         }
     }
 
-    protected void parseProActiveConfiguration(XPath xpath,
-        CommandBuilderProActive commandBuilderProActive, Node configNode)
-        throws XPathExpressionException {
+    protected void parseProActiveConfiguration(XPath xpath, CommandBuilderProActive commandBuilderProActive,
+            Node configNode) throws XPathExpressionException {
         // Optional: java
-        Node javaNode = (Node) xpath.evaluate(XPATH_JAVA, configNode,
-                XPathConstants.NODE);
+        Node javaNode = (Node) xpath.evaluate(XPATH_JAVA, configNode, XPathConstants.NODE);
         if (javaNode != null) {
             PathElement pe = GCMParserHelper.parsePathElementNode(javaNode);
             commandBuilderProActive.setJavaPath(pe);
@@ -107,13 +102,10 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
 
         Node classPathNode;
         // Optional: proactiveClasspath
-        classPathNode = (Node) xpath.evaluate(XPATH_PROACTIVE_CLASSPATH,
-                configNode, XPathConstants.NODE);
+        classPathNode = (Node) xpath.evaluate(XPATH_PROACTIVE_CLASSPATH, configNode, XPathConstants.NODE);
         if (classPathNode != null) {
-            String type = GCMParserHelper.getAttributeValue(classPathNode,
-                    "type");
-            List<PathElement> proactiveClassPath = GCMParserHelper.parseClasspath(xpath,
-                    classPathNode);
+            String type = GCMParserHelper.getAttributeValue(classPathNode, "type");
+            List<PathElement> proactiveClassPath = GCMParserHelper.parseClasspath(xpath, classPathNode);
             commandBuilderProActive.setProActiveClasspath(proactiveClassPath);
             if ("overwrite".equals(type)) {
                 commandBuilderProActive.setOverwriteClasspath(true);
@@ -123,44 +115,40 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         }
 
         // Optional: applicationClasspath
-        classPathNode = (Node) xpath.evaluate(XPATH_APPLICATION_CLASSPATH,
-                configNode, XPathConstants.NODE);
+        classPathNode = (Node) xpath.evaluate(XPATH_APPLICATION_CLASSPATH, configNode, XPathConstants.NODE);
         if (classPathNode != null) {
-            List<PathElement> applicationClassPath = GCMParserHelper.parseClasspath(xpath,
-                    classPathNode);
+            List<PathElement> applicationClassPath = GCMParserHelper.parseClasspath(xpath, classPathNode);
             commandBuilderProActive.setApplicationClasspath(applicationClassPath);
         }
 
         // Optional: security policy
-        Node securityPolicyNode = (Node) xpath.evaluate(XPATH_SECURITY_POLICY,
-                configNode, XPathConstants.NODE);
+        Node securityPolicyNode = (Node) xpath.evaluate(XPATH_SECURITY_POLICY, configNode,
+                XPathConstants.NODE);
         if (securityPolicyNode != null) {
             PathElement pathElement = GCMParserHelper.parsePathElementNode(securityPolicyNode);
             commandBuilderProActive.setSecurityPolicy(pathElement);
         }
 
         // Optional: log4j properties
-        Node log4jPropertiesNode = (Node) xpath.evaluate(XPATH_LOG4J_PROPERTIES,
-                configNode, XPathConstants.NODE);
+        Node log4jPropertiesNode = (Node) xpath.evaluate(XPATH_LOG4J_PROPERTIES, configNode,
+                XPathConstants.NODE);
         if (log4jPropertiesNode != null) {
             PathElement pathElement = GCMParserHelper.parsePathElementNode(log4jPropertiesNode);
             commandBuilderProActive.setLog4jProperties(pathElement);
         }
 
         // Optional: user properties
-        Node userPropertiesNode = (Node) xpath.evaluate(XPATH_USER_PROPERTIES,
-                configNode, XPathConstants.NODE);
+        Node userPropertiesNode = (Node) xpath.evaluate(XPATH_USER_PROPERTIES, configNode,
+                XPathConstants.NODE);
         if (userPropertiesNode != null) {
             PathElement pathElement = GCMParserHelper.parsePathElementNode(userPropertiesNode);
             commandBuilderProActive.setUserProperties(pathElement);
         }
 
         // Optional: jvmarg
-        NodeList jvmargNodes = (NodeList) xpath.evaluate(XPATH_JVMARG,
-                configNode, XPathConstants.NODESET);
+        NodeList jvmargNodes = (NodeList) xpath.evaluate(XPATH_JVMARG, configNode, XPathConstants.NODESET);
         for (int i = 0; i < jvmargNodes.getLength(); i++) {
-            String jvmarg = GCMParserHelper.getAttributeValue(jvmargNodes.item(
-                        i), "value");
+            String jvmarg = GCMParserHelper.getAttributeValue(jvmargNodes.item(i), "value");
             commandBuilderProActive.addJVMArg(jvmarg);
         }
     }

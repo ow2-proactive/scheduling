@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.descriptor.legacyparser;
 
-
 /**
  * Defines many constants useful across ProActive
  *

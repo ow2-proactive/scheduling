@@ -39,8 +39,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
-    public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(
-        IWorkbenchWindowConfigurer configurer) {
+    public WorkbenchWindowAdvisor createWorkbenchWindowAdvisor(IWorkbenchWindowConfigurer configurer) {
         return new ApplicationWorkbenchWindowAdvisor(configurer);
     }
 
@@ -50,9 +49,8 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         configurer.setSaveAndRestore(true);
 
         // Sets the look of the tabs like Eclipse 3.x
-        PlatformUI.getPreferenceStore()
-                  .setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
-            false);
+        PlatformUI.getPreferenceStore().setValue(IWorkbenchPreferenceConstants.SHOW_TRADITIONAL_STYLE_TABS,
+                false);
     }
 
     public String getInitialWindowPerspectiveId() {

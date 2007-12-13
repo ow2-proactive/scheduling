@@ -51,8 +51,7 @@ public class Sum implements Serializable {
     public Sum() {
     }
 
-    public Ratio eval(Formula formula, int begin, int end)
-        throws OverflowException {
+    public Ratio eval(Formula formula, int begin, int end) throws OverflowException {
         Ratio[] ratios = new Ratio[sums.length];
         int d = (end - begin) / ratios.length;
 
@@ -61,8 +60,7 @@ public class Sum implements Serializable {
             begin += d;
         }
 
-        ratios[ratios.length - 1] = sums[ratios.length - 1].eval(formula,
-                begin, end);
+        ratios[ratios.length - 1] = sums[ratios.length - 1].eval(formula, begin, end);
 
         Ratio r = new Ratio(BigInteger.ZERO, BigInteger.ONE);
         for (int i = 0; i < ratios.length; i++) {
@@ -72,8 +70,7 @@ public class Sum implements Serializable {
         return r;
     }
 
-    public Sum(Node[] nodes)
-        throws ActiveObjectCreationException, NodeException {
+    public Sum(Node[] nodes) throws ActiveObjectCreationException, NodeException {
         sums = new SubSum[nodes.length];
         for (int i = 0; i < sums.length; i++) {
             sums[i] = (SubSum) PAActiveObject.newActive(SubSum.class.getName(),

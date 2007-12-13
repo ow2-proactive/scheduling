@@ -118,8 +118,8 @@ public class Timed implements Serializable {
      *            the array of events you want to use
      */
     public void activateDebug(TimerCounter[] counters, EventObserver[] events) {
-        System.out.println("\n\n\t !! BE CARREFUL : " +
-            "Counters are activated with debug mode (slower) !! \n\n");
+        System.out.println("\n\n\t !! BE CARREFUL : "
+            + "Counters are activated with debug mode (slower) !! \n\n");
 
         if (counters != null) {
             this.timer = new SecuredHierarchicalTimer();

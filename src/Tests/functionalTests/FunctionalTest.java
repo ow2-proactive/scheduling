@@ -57,12 +57,12 @@ public class FunctionalTest {
 
     /** A shutdown hook to kill all forked JVMs when exiting the main JVM */
     static final private Thread shutdownHook = new Thread() {
-            @Override
-            public void run() {
-                logger.trace("FunctionalTest Shutdown Hook");
-                killProActive();
-            }
-        };
+        @Override
+        public void run() {
+            logger.trace("FunctionalTest Shutdown Hook");
+            killProActive();
+        }
+    };
 
     @BeforeClass
     public static void beforeClass() {
@@ -86,49 +86,44 @@ public class FunctionalTest {
         if (timeout != 0) {
             logger.trace("Timer will be fired in " + timeout + " ms");
             TimerTask timerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        // 1- Advertise the failure
-                        logger.warn("FunctionalTest timeout reached !");
+                @Override
+                public void run() {
+                    // 1- Advertise the failure
+                    logger.warn("FunctionalTest timeout reached !");
 
-                        // 2- Display jstack output
-                        // It can be useful to debug (live|dead)lock
-                        Map<String, String> pids = getPids();
+                    // 2- Display jstack output
+                    // It can be useful to debug (live|dead)lock
+                    Map<String, String> pids = getPids();
 
-                        for (String pid : pids.keySet()) {
-                            System.err.println("PID: " + pid + " Command: " +
-                                pids.get(pid));
-                            System.err.println();
+                    for (String pid : pids.keySet()) {
+                        System.err.println("PID: " + pid + " Command: " + pids.get(pid));
+                        System.err.println();
 
-                            try {
-                                Process p = Runtime.getRuntime()
-                                                   .exec(getJSTACKCommand() +
-                                        " " + pid);
-                                BufferedReader br = new BufferedReader(new InputStreamReader(
-                                            p.getInputStream()));
+                        try {
+                            Process p = Runtime.getRuntime().exec(getJSTACKCommand() + " " + pid);
+                            BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-                                for (String line = br.readLine(); line != null;
-                                        line = br.readLine()) {
-                                    System.err.println("\t" + line);
-                                }
-
-                                System.err.println();
-                                System.err.println(
-                                    "---------------------------------------------------------------");
-                                System.err.println();
-                                System.err.println();
-                                System.err.flush();
-                            } catch (IOException e) {
-                                // Should not happen
-                                e.printStackTrace();
+                            for (String line = br.readLine(); line != null; line = br.readLine()) {
+                                System.err.println("\t" + line);
                             }
-                        }
 
-                        // 3- That's all
-                        // Shutdown hook will be triggered to kill all remaining ProActive Runtimes
-                        System.exit(0);
+                            System.err.println();
+                            System.err
+                                    .println("---------------------------------------------------------------");
+                            System.err.println();
+                            System.err.println();
+                            System.err.flush();
+                        } catch (IOException e) {
+                            // Should not happen
+                            e.printStackTrace();
+                        }
                     }
-                };
+
+                    // 3- That's all
+                    // Shutdown hook will be triggered to kill all remaining ProActive Runtimes
+                    System.exit(0);
+                }
+            };
 
             Timer timer = new Timer(true);
             timer.schedule(timerTask, timeout);
@@ -152,47 +147,41 @@ public class FunctionalTest {
         String javaHome = System.getProperty("java.home");
         File jpsBin = null;
         switch (OperatingSystem.getOperatingSystem()) {
-        case unix:
-            jpsBin = new File(javaHome + File.separator + ".." +
-                    File.separator + "bin" + File.separator + "jps");
-            break;
-        case windows:
-            jpsBin = new File(javaHome + File.separator + ".." +
-                    File.separator + "bin" + File.separator + "jps.exe");
-            break;
+            case unix:
+                jpsBin = new File(javaHome + File.separator + ".." + File.separator + "bin" + File.separator +
+                    "jps");
+                break;
+            case windows:
+                jpsBin = new File(javaHome + File.separator + ".." + File.separator + "bin" + File.separator +
+                    "jps.exe");
+                break;
         }
         if (!jpsBin.exists()) {
-            throw new FileNotFoundException("JPS not found: " +
-                jpsBin.toString());
+            throw new FileNotFoundException("JPS not found: " + jpsBin.toString());
         }
 
         Process jps;
-        jps = Runtime.getRuntime()
-                     .exec(new String[] { jpsBin.toString(), "-mlv" }, null,
-                null);
+        jps = Runtime.getRuntime().exec(new String[] { jpsBin.toString(), "-mlv" }, null, null);
         Reader reader = new InputStreamReader(jps.getInputStream());
         BufferedReader bReader = new BufferedReader(reader);
 
         String line = bReader.readLine();
         while (line != null) {
-            if (line.matches(".*proactive.test=true.*") ||
-                    line.matches(".*StartP2PService.*")) {
+            if (line.matches(".*proactive.test=true.*") || line.matches(".*StartP2PService.*")) {
                 logger.debug("MATCH " + line);
 
                 String pid = line.substring(0, line.indexOf(" "));
                 Process kill = null;
                 switch (OperatingSystem.getOperatingSystem()) {
-                case unix:
-                    kill = Runtime.getRuntime()
-                                  .exec(new String[] { "kill", "-9", pid });
-                    break;
-                case windows:
-                    kill = Runtime.getRuntime()
-                                  .exec(new String[] { "taskkill", "/PID", pid });
-                    break;
-                default:
-                    logger.info("Unsupported operating system");
-                    break;
+                    case unix:
+                        kill = Runtime.getRuntime().exec(new String[] { "kill", "-9", pid });
+                        break;
+                    case windows:
+                        kill = Runtime.getRuntime().exec(new String[] { "taskkill", "/PID", pid });
+                        break;
+                    default:
+                        logger.info("Unsupported operating system");
+                        break;
                 }
 
                 try {
@@ -211,21 +200,19 @@ public class FunctionalTest {
         File dir = new File(PAProperties.PA_HOME.getValue());
         File command = null;
         switch (OperatingSystem.getOperatingSystem()) {
-        case unix:
-            command = new File(dir + File.separator + "dev" + File.separator +
-                    "scripts" + File.separator + "killTests");
-            break;
-        default:
-            break;
+            case unix:
+                command = new File(dir + File.separator + "dev" + File.separator + "scripts" +
+                    File.separator + "killTests");
+                break;
+            default:
+                break;
         }
 
         if (command != null) {
             if (command.exists()) {
                 try {
-                    Process p = Runtime.getRuntime()
-                                       .exec(new String[] {
-                                command.getAbsolutePath()
-                            }, null, dir);
+                    Process p = Runtime.getRuntime().exec(new String[] { command.getAbsolutePath() }, null,
+                            dir);
                     p.waitFor();
                 } catch (Exception e) {
                     logger.warn(e);
@@ -265,11 +252,9 @@ public class FunctionalTest {
         try {
             // Run JPS to list all JVMs on this machine
             Process p = Runtime.getRuntime().exec(getJPSCommand() + " -ml");
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                        p.getInputStream()));
+            BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
 
-            for (String line = br.readLine(); line != null;
-                    line = br.readLine()) {
+            for (String line = br.readLine(); line != null; line = br.readLine()) {
                 // Discard all non ProActive JVM
                 if (line.contains("org.objectweb.proactive")) {
                     String[] fields = line.split(" ", 2);

@@ -39,8 +39,8 @@ import java.io.Serializable;
 public class Agent implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private Agent neighbour;
     private int counter;
     private int iter;

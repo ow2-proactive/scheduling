@@ -107,28 +107,22 @@ public class JobInfo extends ViewPart {
 
         // Time ******************************************************
         propertiesName.add("Submitted time");
-        propertiesValue.add(Tools.getFormattedDate(job.getJobInfo()
-                                                      .getSubmittedTime()));
+        propertiesValue.add(Tools.getFormattedDate(job.getJobInfo().getSubmittedTime()));
         propertiesName.add("Started time");
-        propertiesValue.add(Tools.getFormattedDate(job.getJobInfo()
-                                                      .getStartTime()));
+        propertiesValue.add(Tools.getFormattedDate(job.getJobInfo().getStartTime()));
         propertiesName.add("Finished time");
-        propertiesValue.add(Tools.getFormattedDate(job.getJobInfo()
-                                                      .getFinishedTime()));
+        propertiesValue.add(Tools.getFormattedDate(job.getJobInfo().getFinishedTime()));
 
         // Duration ******************************************************
         propertiesName.add("Pending duration");
-        propertiesValue.add(Tools.getFormattedDuration(
-                job.getJobInfo().getSubmittedTime(),
-                job.getJobInfo().getStartTime()));
+        propertiesValue.add(Tools.getFormattedDuration(job.getJobInfo().getSubmittedTime(), job.getJobInfo()
+                .getStartTime()));
         propertiesName.add("Execution duration");
-        propertiesValue.add(Tools.getFormattedDuration(
-                job.getJobInfo().getStartTime(),
-                job.getJobInfo().getFinishedTime()));
+        propertiesValue.add(Tools.getFormattedDuration(job.getJobInfo().getStartTime(), job.getJobInfo()
+                .getFinishedTime()));
         propertiesName.add("Total duration");
-        propertiesValue.add(Tools.getFormattedDuration(
-                job.getJobInfo().getSubmittedTime(),
-                job.getJobInfo().getFinishedTime()));
+        propertiesValue.add(Tools.getFormattedDuration(job.getJobInfo().getSubmittedTime(), job.getJobInfo()
+                .getFinishedTime()));
 
         // Others ******************************************************
         propertiesName.add("Description");
@@ -144,10 +138,9 @@ public class JobInfo extends ViewPart {
             TableItem item;
             for (int i = 0; i < propertiesName.size(); i++) {
                 item = new TableItem(table, SWT.NONE);
-                item.setText(new String[] {
-                        propertiesName.get(i),
-                        "  " + propertiesValue.get(i).toString()
-                    });
+                item
+                        .setText(new String[] { propertiesName.get(i),
+                                "  " + propertiesValue.get(i).toString() });
             }
             TableColumn[] cols = table.getColumns();
             for (TableColumn tc : cols) {

@@ -120,10 +120,8 @@ public class Chat implements java.io.Serializable, RunActive {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        this.addIntoDiffusionGroup((Chat) PAActiveObject.getStubOnThis(),
-            this.name);
-        this.writeMessage(new Message(" *** " + this.name +
-                " has joined the place"));
+        this.addIntoDiffusionGroup((Chat) PAActiveObject.getStubOnThis(), this.name);
+        this.writeMessage(new Message(" *** " + this.name + " has joined the place"));
     }
 
     /**
@@ -141,25 +139,20 @@ public class Chat implements java.io.Serializable, RunActive {
     public void connect(String hostName, String userName) {
         Chat neighbour = null;
         try {
-            neighbour = (Chat) PAActiveObject.lookupActive(Chat.class.getName(),
-                    "//" + hostName + "/" + userName); // 1
+            neighbour = (Chat) PAActiveObject.lookupActive(Chat.class.getName(), "//" + hostName + "/" +
+                userName); // 1
             this.diffusionGroup = neighbour.getDiffusionGroup(); // 2
             this.writeUsersInTheList();
-            this.diffusionGroup.addIntoDiffusionGroup((Chat) PAActiveObject.getStubOnThis(),
-                this.name); // 3
-            PAGroup.getGroup(this.diffusionGroup)
-                   .add(PAActiveObject.getStubOnThis()); //4
+            this.diffusionGroup.addIntoDiffusionGroup((Chat) PAActiveObject.getStubOnThis(), this.name); // 3
+            PAGroup.getGroup(this.diffusionGroup).add(PAActiveObject.getStubOnThis()); //4
             this.frame.list.append(this.name + "\n");
-            this.writeMessage(new Message(" *** " + this.name +
-                    " has joined the place"));
+            this.writeMessage(new Message(" *** " + this.name + " has joined the place"));
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            this.writePrivateMessage(new Message(
-                    " *** WARNING : Unable to contact " + userName + "@" +
-                    hostName + " !"));
-            this.writePrivateMessage(new Message(
-                    " *** WARNING : Starting alone !"));
+            this.writePrivateMessage(new Message(" *** WARNING : Unable to contact " + userName + "@" +
+                hostName + " !"));
+            this.writePrivateMessage(new Message(" *** WARNING : Starting alone !"));
             this.startAlone();
         }
     }
@@ -181,8 +174,7 @@ public class Chat implements java.io.Serializable, RunActive {
         this.writeMessage(new Message(" *** " + this.name + " has left"));
         this.diffusionGroup.removeUserFromTheList(this.name);
         this.diffusionGroup.removeFromDiffusionGroup((Chat) PAActiveObject.getStubOnThis());
-        PAGroup.getGroup(this.diffusionGroup)
-               .remove(PAActiveObject.getStubOnThis());
+        PAGroup.getGroup(this.diffusionGroup).remove(PAActiveObject.getStubOnThis());
     }
 
     /**
@@ -212,7 +204,8 @@ public class Chat implements java.io.Serializable, RunActive {
      */
     public void initializeMigrationStrategy() {
         if (this.migrationStrategy == null) {
-            this.migrationStrategy = new MigrationStrategyManagerImpl((Migratable) PAActiveObject.getBodyOnThis());
+            this.migrationStrategy = new MigrationStrategyManagerImpl((Migratable) PAActiveObject
+                    .getBodyOnThis());
             this.migrationStrategy.onDeparture("onDeparture");
         }
     }
@@ -230,8 +223,7 @@ public class Chat implements java.io.Serializable, RunActive {
      */
     public void register() {
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(),
-                "//localhost/" + this.name);
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//localhost/" + this.name);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -285,8 +277,7 @@ public class Chat implements java.io.Serializable, RunActive {
         try {
             PAMobileAgent.migrateTo(nodeURL);
         } catch (MigrationException e) {
-            this.writePrivateMessage(new Message(
-                    " *** WARNING : Unable to move to " + nodeURL + " !"));
+            this.writePrivateMessage(new Message(" *** WARNING : Unable to move to " + nodeURL + " !"));
         }
     }
 
@@ -321,8 +312,7 @@ public class Chat implements java.io.Serializable, RunActive {
      * @param userName - the name to remove
      */
     public void removeUserFromTheList(String userName) {
-        this.frame.list.setText(this.frame.list.getText()
-                                               .replaceAll(userName + "\n", ""));
+        this.frame.list.setText(this.frame.list.getText().replaceAll(userName + "\n", ""));
     }
 
     public static void main(String[] args) {
@@ -332,8 +322,7 @@ public class Chat implements java.io.Serializable, RunActive {
         ProActiveConfiguration.load();
 
         if ((args.length != 1) && (args.length != 3)) {
-            logger.info(
-                "usage : chat.[sh|bat] UserName [ServerHost ServerName]");
+            logger.info("usage : chat.[sh|bat] UserName [ServerHost ServerName]");
             System.exit(0);
         }
 
@@ -347,8 +336,7 @@ public class Chat implements java.io.Serializable, RunActive {
         try {
             Object[] param = new Object[1];
             param[0] = new String(userName);
-            chat = (Chat) PAActiveObject.newActive(Chat.class.getName(), param,
-                    (Node) null);
+            chat = (Chat) PAActiveObject.newActive(Chat.class.getName(), param, (Node) null);
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {

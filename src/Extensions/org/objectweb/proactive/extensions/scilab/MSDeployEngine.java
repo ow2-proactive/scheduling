@@ -61,16 +61,14 @@ public class MSDeployEngine {
      */
     public static String[] getListVirtualNode(String pathDescriptor) {
         if (logger.isDebugEnabled()) {
-            logger.debug("->MSDeployEngine In:getListVirtualNode:" +
-                pathDescriptor);
+            logger.debug("->MSDeployEngine In:getListVirtualNode:" + pathDescriptor);
         }
 
         ProActiveDescriptor desc;
         VirtualNode[] arrayVn;
         String[] arrayNameVn = null;
         try {
-            desc = PADeployment.getProactiveDescriptor("file:" +
-                    pathDescriptor);
+            desc = PADeployment.getProactiveDescriptor("file:" + pathDescriptor);
             arrayVn = desc.getVirtualNodes();
             arrayNameVn = new String[arrayVn.length];
 
@@ -84,13 +82,11 @@ public class MSDeployEngine {
         return arrayNameVn;
     }
 
-    public static synchronized int getNbMappedNodes(String nameVirtualNode,
-        String pathDescriptor) {
+    public static synchronized int getNbMappedNodes(String nameVirtualNode, String pathDescriptor) {
         ProActiveDescriptor desc;
         VirtualNode vn;
         try {
-            desc = PADeployment.getProactiveDescriptor("file:" +
-                    pathDescriptor);
+            desc = PADeployment.getProactiveDescriptor("file:" + pathDescriptor);
             vn = desc.getVirtualNode(nameVirtualNode);
             return vn.getNbMappedNodes();
         } catch (ProActiveException e) {
@@ -106,8 +102,8 @@ public class MSDeployEngine {
      * @param arrayIdEngine
      * @return HashMap of deployed Scilab Engines
      */
-    public synchronized static HashMap<String, MSEngine> deploy(
-        String nameVirtualNode, String pathDescriptor, String[] arrayIdEngine) {
+    public synchronized static HashMap<String, MSEngine> deploy(String nameVirtualNode,
+            String pathDescriptor, String[] arrayIdEngine) {
         if (logger.isDebugEnabled()) {
             logger.debug("->MSDeployEngine In:deploy:" + pathDescriptor);
         }
@@ -119,14 +115,12 @@ public class MSDeployEngine {
         HashMap<String, MSEngine> mapEngine = new HashMap<String, MSEngine>();
 
         try {
-            desc = PADeployment.getProactiveDescriptor("file:" +
-                    pathDescriptor);
+            desc = PADeployment.getProactiveDescriptor("file:" + pathDescriptor);
             vn = desc.getVirtualNode(nameVirtualNode);
             vn.activate();
             nodes = vn.getNodes();
 
-            int length = (nodes.length > arrayIdEngine.length)
-                ? arrayIdEngine.length : nodes.length;
+            int length = (nodes.length > arrayIdEngine.length) ? arrayIdEngine.length : nodes.length;
 
             for (int i = 0; i < length; i++) {
                 mSEngine = deploy(arrayIdEngine[i], nodes[i]);
@@ -147,11 +141,10 @@ public class MSDeployEngine {
      * @throws ActiveObjectCreationException
      * @throws NodeException
      */
-    private synchronized static MSEngine deploy(String idEngine,
-        Node currentNode) throws ActiveObjectCreationException, NodeException {
+    private synchronized static MSEngine deploy(String idEngine, Node currentNode)
+            throws ActiveObjectCreationException, NodeException {
         Object[] param = new Object[] { idEngine };
-        MSEngine mSEngine = (MSEngine) PAActiveObject.newActive(MSEngine.class.getName(),
-                param, currentNode);
+        MSEngine mSEngine = (MSEngine) PAActiveObject.newActive(MSEngine.class.getName(), param, currentNode);
         mapNode.put(idEngine, currentNode);
         mSEngine.setImmediateServices();
         return mSEngine;
@@ -164,15 +157,13 @@ public class MSDeployEngine {
      * @throws ActiveObjectCreationException
      * @throws NodeException
      */
-    public static MSEngine deploy(String idEngine)
-        throws ActiveObjectCreationException, NodeException {
+    public static MSEngine deploy(String idEngine) throws ActiveObjectCreationException, NodeException {
         if (logger.isDebugEnabled()) {
             logger.debug("->MSDeployEngine In:deploy");
         }
 
         Object[] param = new Object[] { idEngine };
-        MSEngine mSEngine = (MSEngine) PAActiveObject.newActive(MSEngine.class.getName(),
-                param);
+        MSEngine mSEngine = (MSEngine) PAActiveObject.newActive(MSEngine.class.getName(), param);
         mSEngine.setImmediateServices();
         return mSEngine;
     }

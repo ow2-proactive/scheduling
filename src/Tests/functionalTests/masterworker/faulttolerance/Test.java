@@ -47,12 +47,13 @@ import functionalTests.FunctionalTest;
 import functionalTests.masterworker.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test load balancing
  */
 public class Test extends FunctionalTest {
-    private URL descriptor = Test.class.getResource(
-            "/functionalTests/masterworker/faulttolerance/MasterWorkerFT.xml");
+    private URL descriptor = Test.class
+            .getResource("/functionalTests/masterworker/faulttolerance/MasterWorkerFT.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
     private ProActiveDescriptor pad;

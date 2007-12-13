@@ -73,8 +73,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author ProActive Team
  */
-public class BodyWrapper extends NotificationBroadcasterSupport
-    implements Serializable, BodyWrapperMBean {
+public class BodyWrapper extends NotificationBroadcasterSupport implements Serializable, BodyWrapperMBean {
 
     /** JMX Logger */
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
@@ -158,13 +157,11 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     public void sendNotification(String type, Object userData) {
         ObjectName source = getObjectName();
         if (notificationsLogger.isDebugEnabled()) {
-            notificationsLogger.debug("[" + type +
-                "]#[BodyWrapper.sendNotification] source=" + source +
+            notificationsLogger.debug("[" + type + "]#[BodyWrapper.sendNotification] source=" + source +
                 ", userData=" + userData);
         }
 
-        Notification notification = new Notification(type, source, counter++,
-                System.nanoTime() / 1000); // timeStamp in microseconds
+        Notification notification = new Notification(type, source, counter++, System.nanoTime() / 1000); // timeStamp in microseconds
         notification.setUserData(userData);
         // If the migration is finished, we need to inform the
         // JMXNotificationManager
@@ -187,8 +184,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         } catch (NodeException e) {
             throw new MigrationException("Cannot find node " + nodeUrl, e);
         }
-        PAMobileAgent.migrateTo(body, node, true,
-            Request.NFREQUEST_IMMEDIATE_PRIORITY);
+        PAMobileAgent.migrateTo(body, node, true, Request.NFREQUEST_IMMEDIATE_PRIORITY);
     }
 
     //
@@ -201,32 +197,29 @@ public class BodyWrapper extends NotificationBroadcasterSupport
      * 'updateFrequence' a list of notifications.
      */
     private void launchNotificationsThread() {
-        Thread t = new Thread("JMXNotificationThread for " +
-                BodyWrapper.this.objectName) {
-                @Override
-                public void run() {
-                    // first we wait for the creation of the body
-                    while (!BodyWrapper.this.body.isActive()) {
-                        try {
-                            Thread.sleep(updateFrequence);
-                        } catch (InterruptedException e) {
-                            logger.error("The JMX notifications sender thread was interrupted",
-                                e);
-                        }
-                    }
-
-                    // and once the body is activated, we can forward the notifications
-                    while (BodyWrapper.this.body.isActive()) {
-                        try {
-                            Thread.sleep(updateFrequence);
-                            sendNotifications();
-                        } catch (InterruptedException e) {
-                            logger.error("The JMX notifications sender thread was interrupted",
-                                e);
-                        }
+        Thread t = new Thread("JMXNotificationThread for " + BodyWrapper.this.objectName) {
+            @Override
+            public void run() {
+                // first we wait for the creation of the body
+                while (!BodyWrapper.this.body.isActive()) {
+                    try {
+                        Thread.sleep(updateFrequence);
+                    } catch (InterruptedException e) {
+                        logger.error("The JMX notifications sender thread was interrupted", e);
                     }
                 }
-            };
+
+                // and once the body is activated, we can forward the notifications
+                while (BodyWrapper.this.body.isActive()) {
+                    try {
+                        Thread.sleep(updateFrequence);
+                        sendNotifications();
+                    } catch (InterruptedException e) {
+                        logger.error("The JMX notifications sender thread was interrupted", e);
+                    }
+                }
+            }
+        };
         t.setDaemon(true);
         t.start();
     }
@@ -253,8 +246,8 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         //		synchronized (notifications) {
         if (!notifications.isEmpty()) {
             ObjectName source = getObjectName();
-            Notification n = new Notification(NotificationType.setOfNotifications,
-                    source, counter++, userMessage);
+            Notification n = new Notification(NotificationType.setOfNotifications, source, counter++,
+                userMessage);
             n.setUserData(notifications);
             super.sendNotification(n);
             notifications.clear();
@@ -265,12 +258,9 @@ public class BodyWrapper extends NotificationBroadcasterSupport
     //
     // -- SERIALIZATION METHODS -----------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         if (logger.isDebugEnabled()) {
-            logger.debug(
-                "[Serialisation.writeObject]#Serialization of the MBean :" +
-                objectName);
+            logger.debug("[Serialisation.writeObject]#Serialization of the MBean :" + objectName);
         }
 
         // Send the notifications before migrates.
@@ -288,8 +278,7 @@ public class BodyWrapper extends NotificationBroadcasterSupport
                     " was not found during the serialization of the MBean", e);
             } catch (MBeanRegistrationException e) {
                 logger.error("The MBean " + objectName +
-                    " can't be unregistered from the MBean server during the serialization of the MBean",
-                    e);
+                    " can't be unregistered from the MBean server during the serialization of the MBean", e);
             }
         }
 
@@ -297,15 +286,13 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         out.defaultWriteObject();
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         // Warning loggers is transient
         logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
         notificationsLogger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
 
         if ((logger != null) && logger.isDebugEnabled()) {
-            logger.debug(
-                "[Serialisation.readObject]#Deserialization of the MBean");
+            logger.debug("[Serialisation.readObject]#Deserialization of the MBean");
         }
 
         in.defaultReadObject();
@@ -328,15 +315,12 @@ public class BodyWrapper extends NotificationBroadcasterSupport
         try {
             mbs.registerMBean(this, objectName);
         } catch (InstanceAlreadyExistsException e) {
-            logger.error("A Mean is already registered with this objectName " +
-                objectName, e);
+            logger.error("A Mean is already registered with this objectName " + objectName, e);
         } catch (MBeanRegistrationException e) {
             logger.error("The MBean " + objectName +
-                " can't be registered on the MBean server during the deserialization of the MBean",
-                e);
+                " can't be registered on the MBean server during the deserialization of the MBean", e);
         } catch (NotCompliantMBeanException e) {
-            logger.error("Exception throws during the deserialization of the MBean",
-                e);
+            logger.error("Exception throws during the deserialization of the MBean", e);
         }
 
         launchNotificationsThread();
@@ -379,16 +363,14 @@ public class BodyWrapper extends NotificationBroadcasterSupport
      * @see org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean#getTimersSnapshotFromBody()
      */
     public Object[] getTimersSnapshotFromBody() throws Exception {
-        final org.objectweb.proactive.core.util.profiling.TimerProvidable container =
-            org.objectweb.proactive.core.util.profiling.TimerWarehouse.getTimerProvidable(this.id);
+        final org.objectweb.proactive.core.util.profiling.TimerProvidable container = org.objectweb.proactive.core.util.profiling.TimerWarehouse
+                .getTimerProvidable(this.id);
         if (container == null) {
-            throw new NullPointerException(
-                "The timers container is null, the body is not timed.");
+            throw new NullPointerException("The timers container is null, the body is not timed.");
         }
-        return new Object[] {
-            container.getSnapshot(), // The array of timers
-            System.nanoTime() // The nano timestamp on this machine used
-                              // to stop all timers at the caller side
+        return new Object[] { container.getSnapshot(), // The array of timers
+                System.nanoTime() // The nano timestamp on this machine used
+        // to stop all timers at the caller side
         };
     }
 }

@@ -67,9 +67,8 @@ import org.osgi.framework.FrameworkListener;
 import org.ungoverned.osgi.service.shell.ShellService;
 
 
-public class OSGiFramework extends NotificationBroadcasterSupport
-    implements OSGiFrameworkMBean, FrameworkListener, BundleListener, IJmx,
-        Serializable {
+public class OSGiFramework extends NotificationBroadcasterSupport implements OSGiFrameworkMBean,
+        FrameworkListener, BundleListener, IJmx, Serializable {
 
     /**
      *
@@ -92,22 +91,19 @@ public class OSGiFramework extends NotificationBroadcasterSupport
     private transient TransactionsManager transactionsManager;
     private int port;
 
-    public OSGiFramework(BundleContext context)
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
-            NotCompliantMBeanException {
+    public OSGiFramework(BundleContext context) throws InstanceAlreadyExistsException,
+            MBeanRegistrationException, NotCompliantMBeanException {
         try {
             this.context = context;
             OSGiStore.getInstance().setContext(this.context);
-            this.url = ProActiveInet.getInstance().getInetAddress()
-                                    .getCanonicalHostName();
+            this.url = ProActiveInet.getInstance().getInetAddress().getCanonicalHostName();
             this.port = ClassServer.getServerSocketPort();
             OSGiStore.getInstance().setUrl(url);
             UrlMBean urlMbean = new Url(this.url + '(' + this.port + ')');
             this.transactionsManager = TransactionsManager.getInstance(this.url);
 
             this.path = Constants.OSGI_JMX_PATH;
-            this.on = new ObjectName(this.path + Constants.ON_GATEWAYS +
-                    this.url + '(' + this.port + ')');
+            this.on = new ObjectName(this.path + Constants.ON_GATEWAYS + this.url + '(' + this.port + ')');
 
             this.context.addBundleListener(this);
             buildBundleList();
@@ -125,8 +121,8 @@ public class OSGiFramework extends NotificationBroadcasterSupport
     }
 
     /**
-    * @return the bundles
-    */
+     * @return the bundles
+     */
     public ArrayList<BundleInfo> getBundles() {
         return bundles;
     }
@@ -147,8 +143,8 @@ public class OSGiFramework extends NotificationBroadcasterSupport
     }
 
     /**
-    *
-    */
+     *
+     */
     public String getVendor() {
         return this.context.getProperty("org.osgi.framework.vendor");
     }
@@ -189,8 +185,7 @@ public class OSGiFramework extends NotificationBroadcasterSupport
         return this.context.getProperty("oscar.cache.profile");
     }
 
-    private void buildBundleList()
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
+    private void buildBundleList() throws InstanceAlreadyExistsException, MBeanRegistrationException,
             NotCompliantMBeanException, JMXException {
         this.bundles = new ArrayList<BundleInfo>();
         Bundle[] bundles = this.context.getBundles();
@@ -207,12 +202,11 @@ public class OSGiFramework extends NotificationBroadcasterSupport
         Transaction t;
         try {
             t = TransactionsManager.getInstance().getTransaction(transactionId);
-            return t.executeCommand(new InstallCommand(t, location,
-                    OSGiCommand.INSTALL));
+            return t.executeCommand(new InstallCommand(t, location, OSGiCommand.INSTALL));
         } catch (InvalidTransactionException e) {
             e.printStackTrace();
-            return new Status(Status.ERR, OSGiCommand.INSTALL + location,
-                e.getMessage(), OSGiStore.getInstance().getUrl());
+            return new Status(Status.ERR, OSGiCommand.INSTALL + location, e.getMessage(), OSGiStore
+                    .getInstance().getUrl());
         }
     }
 
@@ -230,8 +224,8 @@ public class OSGiFramework extends NotificationBroadcasterSupport
         this.bundles.add(b);
         OSGiStore.getInstance().registerBundle(b.getLocation(), b);
 
-        Notification notification = new BundleAddedNotification("osgi.added.notification",
-                b, seqNumber++, "A bundle has been added", this.url, this.on);
+        Notification notification = new BundleAddedNotification("osgi.added.notification", b, seqNumber++,
+            "A bundle has been added", this.url, this.on);
         sendNotification(notification);
     }
 
@@ -243,8 +237,8 @@ public class OSGiFramework extends NotificationBroadcasterSupport
                 break;
             }
         }
-        Notification notification = new BundleUninstalledNotification("osgi.uninstalled.notification",
-                bInfo, seqNumber++, "Bundle uninstalled", this.url, this.on);
+        Notification notification = new BundleUninstalledNotification("osgi.uninstalled.notification", bInfo,
+            seqNumber++, "Bundle uninstalled", this.url, this.on);
         sendNotification(notification);
     }
 
@@ -269,15 +263,12 @@ public class OSGiFramework extends NotificationBroadcasterSupport
     }
 
     /* JMX operations */
-    public void register()
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
+    public void register() throws InstanceAlreadyExistsException, MBeanRegistrationException,
             NotCompliantMBeanException {
         ManagementFactory.getPlatformMBeanServer().registerMBean(this, this.on);
     }
 
-    public void unregister()
-        throws InstanceNotFoundException, MBeanRegistrationException,
-            JMXException {
+    public void unregister() throws InstanceNotFoundException, MBeanRegistrationException, JMXException {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(this.on);
         Iterator<BundleInfo> i = this.bundles.iterator();
         while (i.hasNext()) {

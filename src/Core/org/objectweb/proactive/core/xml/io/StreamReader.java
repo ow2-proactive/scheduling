@@ -54,24 +54,21 @@ public class StreamReader implements XMLReader {
     private org.xml.sax.XMLReader parser;
     private org.xml.sax.InputSource inputSource;
 
-    public StreamReader(java.io.InputStream in, XMLHandler xmlHandler)
-        throws java.io.IOException {
+    public StreamReader(java.io.InputStream in, XMLHandler xmlHandler) throws java.io.IOException {
         this(new org.xml.sax.InputSource(in), xmlHandler);
     }
 
-    public StreamReader(java.io.Reader reader, XMLHandler xmlHandler)
-        throws java.io.IOException {
+    public StreamReader(java.io.Reader reader, XMLHandler xmlHandler) throws java.io.IOException {
         this(new org.xml.sax.InputSource(reader), xmlHandler);
     }
 
-    public StreamReader(org.xml.sax.InputSource inputSource,
-        XMLHandler xmlHandler) throws java.io.IOException {
+    public StreamReader(org.xml.sax.InputSource inputSource, XMLHandler xmlHandler)
+            throws java.io.IOException {
         this(inputSource, xmlHandler, null, null);
     }
 
-    public StreamReader(org.xml.sax.InputSource inputSource,
-        XMLHandler xmlHandler, String[] schemas,
-        org.xml.sax.ErrorHandler errorHandler) throws java.io.IOException {
+    public StreamReader(org.xml.sax.InputSource inputSource, XMLHandler xmlHandler, String[] schemas,
+            org.xml.sax.ErrorHandler errorHandler) throws java.io.IOException {
         this.inputSource = inputSource;
 
         DefaultHandlerAdapter adaptor = new DefaultHandlerAdapter(xmlHandler);
@@ -84,19 +81,16 @@ public class StreamReader implements XMLReader {
 
         if ((schemas != null) || (errorHandler != null)) {
             try {
-                parser.setErrorHandler((errorHandler == null)
-                    ? new SAXParserErrorHandler() : errorHandler);
+                parser.setErrorHandler((errorHandler == null) ? new SAXParserErrorHandler() : errorHandler);
 
                 if (schemas != null) {
-                    parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource",
-                        schemas);
+                    parser.setProperty("http://java.sun.com/xml/jaxp/properties/schemaSource", schemas);
 
                     ///    File f = new FileInputStream( ProActive.class.getResourceAsStream("/DescriptorSchema.xsd"));
                 }
 
                 parser.setFeature("http://xml.org/sax/features/validation", true);
-                parser.setFeature("http://apache.org/xml/features/validation/schema",
-                    true);
+                parser.setFeature("http://apache.org/xml/features/validation/schema", true);
 
                 //            parser.parse(inputSource);
             } catch (SAXNotRecognizedException e) {

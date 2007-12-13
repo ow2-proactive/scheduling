@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.xml;
 
-
 /**
  * This class implements a XML based preferences store. Constructor expect a URI pointing to an XML file containing
  * the values.
@@ -98,10 +97,10 @@ public class XMLPropertiesStore {
      * @param uri the URI of the XML data containing the data to read
      * @exception java.io.IOException if the XML data cannot be read or parsed
      */
-    public static org.w3c.dom.Document parseFromURI(String uri)
-        throws java.io.IOException {
+    public static org.w3c.dom.Document parseFromURI(String uri) throws java.io.IOException {
         try {
-            javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory.newInstance();
+            javax.xml.parsers.DocumentBuilderFactory factory = javax.xml.parsers.DocumentBuilderFactory
+                    .newInstance();
             javax.xml.parsers.DocumentBuilder documentBuilder = factory.newDocumentBuilder();
             return documentBuilder.parse(uri);
         } catch (org.xml.sax.SAXException e) {
@@ -197,8 +196,7 @@ public class XMLPropertiesStore {
      * @param defaultValue the defaultValue to return if the value cannot be found
      * @return the value identified by path or the defaultValue
      */
-    public int getValueAsInt(String path, org.w3c.dom.Node context,
-        int defaultValue) {
+    public int getValueAsInt(String path, org.w3c.dom.Node context, int defaultValue) {
         String s = getValueAsString(path, context);
         if (s == null) {
             return defaultValue;
@@ -286,7 +284,6 @@ public class XMLPropertiesStore {
     //
     //  ----- PRIVATE METHODS -----------------------------------------------------------------------------------
     //
-
     /**
      * Returns the node of the current DOM defined by the given xpath and starting from
      * the given context node. If the xpath expression does not lead to a node null is returned.
@@ -294,8 +291,7 @@ public class XMLPropertiesStore {
      * @param node is the context node from where to start processing the xpath
      * @return the node targeted by the xpath expression or null
      */
-    private org.w3c.dom.Node findNodeFromXPath(String path,
-        org.w3c.dom.Node node) {
+    private org.w3c.dom.Node findNodeFromXPath(String path, org.w3c.dom.Node node) {
         // deals with special cases if path is empty or point to the current node
         if ((path == null) || (path.length() == 0) || path.equals(".")) {
             return node;
@@ -345,8 +341,7 @@ public class XMLPropertiesStore {
      * @param node is the context node from where to start processing the xpath
      * @return the node targeted by the xpath expression or null
      */
-    private org.w3c.dom.Node[] findNodesFromXPath(String path,
-        org.w3c.dom.Node node) {
+    private org.w3c.dom.Node[] findNodesFromXPath(String path, org.w3c.dom.Node node) {
         // deals with special cases if path is empty or point to the current node
         if ((path == null) || (path.length() == 0) || path.equals(".")) {
             return null;
@@ -402,8 +397,7 @@ public class XMLPropertiesStore {
      * and in such a case null is returned)
      * @return the attribute node of name attributeName or null
      */
-    private org.w3c.dom.Node findNamedAttribute(String attributeName,
-        org.w3c.dom.Node node) {
+    private org.w3c.dom.Node findNamedAttribute(String attributeName, org.w3c.dom.Node node) {
         if ((attributeName == null) || (attributeName.length() == 0)) {
             return node;
         }
@@ -440,8 +434,7 @@ public class XMLPropertiesStore {
      * @param node the non null node where to look for the childs
      * @return the matching child nodes or null
      */
-    private org.w3c.dom.Node[] findNamedChilds(String name,
-        org.w3c.dom.Node node) {
+    private org.w3c.dom.Node[] findNamedChilds(String name, org.w3c.dom.Node node) {
         org.w3c.dom.Node child = node.getFirstChild();
         java.util.ArrayList result = new java.util.ArrayList();
         while (child != null) {

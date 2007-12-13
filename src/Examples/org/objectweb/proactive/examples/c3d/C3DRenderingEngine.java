@@ -43,8 +43,7 @@ import org.objectweb.proactive.examples.c3d.prim.View;
  * Rendering Engine used by C3D.
  * When fed a scene and an Interval, returns a 2D picture of the 3D scene.
  */
-public class C3DRenderingEngine implements java.io.Serializable,
-    RenderingEngine {
+public class C3DRenderingEngine implements java.io.Serializable, RenderingEngine {
     private static final double INFINITE = 1e6;
 
     // Alpha channel
@@ -84,8 +83,7 @@ public class C3DRenderingEngine implements java.io.Serializable,
     /** Trace and send back the result to the dispatcher. <i>Heavily optimized!!!</i>
      * @return the partial Image that was asked for */
     public Image2D render(int engineNb, Interval interval) {
-        int[] row = new int[interval.totalImageWidth * (interval.yto -
-            interval.yfrom)];
+        int[] row = new int[interval.totalImageWidth * (interval.yto - interval.yfrom)];
         int pixCounter = 0; //iterator
 
         // Rendering variables
@@ -148,8 +146,7 @@ public class C3DRenderingEngine implements java.io.Serializable,
                 }
 
                 // Sets the pixels
-                row[pixCounter++] = C3DRenderingEngine.alpha | (red << 16) |
-                    (green << 8) | (blue);
+                row[pixCounter++] = C3DRenderingEngine.alpha | (red << 16) | (green << 8) | (blue);
             } // end for (x)
         } // end for (y)
 

@@ -55,9 +55,8 @@ public class SecurityContext implements Serializable {
     //	public SecurityContext() {
     //		// serializable
     //	}
-    public SecurityContext(Entities local, Entities distant,
-        Communication sendRequest, Communication sendReply, boolean aoCreation,
-        boolean migration) {
+    public SecurityContext(Entities local, Entities distant, Communication sendRequest,
+            Communication sendReply, boolean aoCreation, boolean migration) {
         this.entitiesLocal = local;
         this.entitiesDistant = distant;
         this.sendReply = sendReply;
@@ -114,39 +113,27 @@ public class SecurityContext implements Serializable {
     }
 
     public boolean isEverythingForbidden() {
-        return !this.sendReply.getCommunication() &&
-        !this.sendRequest.getCommunication() && !this.aoCreation &&
-        !this.migration;
+        return !this.sendReply.getCommunication() && !this.sendRequest.getCommunication() &&
+            !this.aoCreation && !this.migration;
     }
 
     public SecurityContext otherSideContext() {
-        return new SecurityContext(this.getEntitiesDistant(),
-            this.getEntitiesLocal(), this.getSendReply(),
+        return new SecurityContext(this.getEntitiesDistant(), this.getEntitiesLocal(), this.getSendReply(),
             this.getSendRequest(), this.isAoCreation(), this.isMigration());
     }
 
-    public static SecurityContext computeContext(SecurityContext from,
-        SecurityContext to) {
-        return new SecurityContext(from.getEntitiesLocal(),
-            from.getEntitiesDistant(),
-            Communication.computeCommunication(from.getSendRequest(),
-                to.getReceiveRequest()),
-            Communication.computeCommunication(from.getSendReply(),
-                to.getReceiveReply()),
-            from.isAoCreation() && to.isAoCreation(),
-            from.isMigration() && to.isMigration());
+    public static SecurityContext computeContext(SecurityContext from, SecurityContext to) {
+        return new SecurityContext(from.getEntitiesLocal(), from.getEntitiesDistant(), Communication
+                .computeCommunication(from.getSendRequest(), to.getReceiveRequest()), Communication
+                .computeCommunication(from.getSendReply(), to.getReceiveReply()), from.isAoCreation() &&
+            to.isAoCreation(), from.isMigration() && to.isMigration());
     }
 
-    public static SecurityContext mergeContexts(SecurityContext thees,
-        SecurityContext that) {
-        return new SecurityContext(thees.getEntitiesLocal(),
-            thees.getEntitiesDistant(),
-            Communication.computeCommunication(thees.getSendRequest(),
-                that.getSendRequest()),
-            Communication.computeCommunication(thees.getSendReply(),
-                that.getSendReply()),
-            thees.isAoCreation() && that.isAoCreation(),
-            thees.isMigration() && that.isMigration());
+    public static SecurityContext mergeContexts(SecurityContext thees, SecurityContext that) {
+        return new SecurityContext(thees.getEntitiesLocal(), thees.getEntitiesDistant(), Communication
+                .computeCommunication(thees.getSendRequest(), that.getSendRequest()), Communication
+                .computeCommunication(thees.getSendReply(), that.getSendReply()), thees.isAoCreation() &&
+            that.isAoCreation(), thees.isMigration() && that.isMigration());
     }
 
     @Override

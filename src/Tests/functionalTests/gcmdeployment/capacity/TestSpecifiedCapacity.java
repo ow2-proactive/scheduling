@@ -44,13 +44,11 @@ public class TestSpecifiedCapacity extends FunctionalTest {
     @Test
     public void testSpecifiedCapacity() throws InterruptedException {
         new Thread() {
-                @Override
-                public void run() {
-                    StartRuntime.main(new String[] {
-                            "--capacity", new Long(askedCapacity).toString()
-                        });
-                }
-            }.start();
+            @Override
+            public void run() {
+                StartRuntime.main(new String[] { "--capacity", new Long(askedCapacity).toString() });
+            }
+        }.start();
 
         /* Be sure that the StartRuntime thread has been scheduled
          * Otherwise getCapacity will return -1 due to a race condition

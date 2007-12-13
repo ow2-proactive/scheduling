@@ -95,8 +95,8 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      */
     public void initActivity(Body body) {
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(),
-                "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//localhost/" +
+                RMConstants.NAME_ACTIVE_OBJECT_RMADMIN);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,8 +107,8 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @param sourceName name of the source to create.
      * @param pad ProActive deployment descriptor to deploy.
      */
-    public void createStaticNodesource(String sourceName,
-        List<ProActiveDescriptor> padList) throws RMException {
+    public void createStaticNodesource(String sourceName, List<ProActiveDescriptor> padList)
+            throws RMException {
         this.rmcore.createStaticNodesource(padList, sourceName);
     }
 
@@ -122,8 +122,8 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @param ttr Time to release in ms, time during the node will be kept by the nodes source and the Core.
      * @param peerUrls vector of ProActive P2P living peer and able to provide nodes.
      */
-    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr, Vector<String> peerUrls) throws RMException {
+    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
+            throws RMException {
         this.rmcore.createDynamicNodeSource(id, nbMaxNodes, nice, ttr, peerUrls);
     }
 
@@ -141,8 +141,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @param pad ProActive deployment descriptor to deploy.
      * @param sourceName name of the static node source that perform the deployment.
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName)
-        throws RMException {
+    public void addNodes(ProActiveDescriptor pad, String sourceName) throws RMException {
         this.rmcore.addNodes(pad, sourceName);
     }
 
@@ -160,8 +159,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @param pad ProActive deployment descriptor to deploy.
      * @param sourceName name of the static node source that perform the deployment.
      */
-    public void addNode(String nodeUrl, String sourceName)
-        throws RMException {
+    public void addNode(String nodeUrl, String sourceName) throws RMException {
         this.rmcore.addNode(nodeUrl, sourceName);
     }
 
@@ -184,8 +182,7 @@ public class RMAdminImpl implements RMAdmin, Serializable, InitActive {
      * @param preempt true the node must be removed immediately, without waiting job ending if the node is busy,
      * false the node is removed just after the job ending if the node is busy.
      */
-    public void removeSource(String sourceName, boolean preempt)
-        throws RMException {
+    public void removeSource(String sourceName, boolean preempt) throws RMException {
         this.rmcore.removeSource(sourceName, preempt);
     }
 

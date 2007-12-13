@@ -55,8 +55,7 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.pad.RMDeplo
  * @author ProActive team
  *
  */
-public class DummyNodeSource extends DynamicNodeSource
-    implements PadDeployInterface {
+public class DummyNodeSource extends DynamicNodeSource implements PadDeployInterface {
     // static nodes with their states (available=true - not available=false)
     private HashMap<Node, Boolean> StaticNodes;
 
@@ -66,8 +65,7 @@ public class DummyNodeSource extends DynamicNodeSource
     public DummyNodeSource() {
     }
 
-    public DummyNodeSource(String id, RMCoreSourceInt nodeManager,
-        int nbMaxNodes, int nice, int ttr) {
+    public DummyNodeSource(String id, RMCoreSourceInt nodeManager, int nbMaxNodes, int nice, int ttr) {
         super(id, nodeManager, nbMaxNodes, nice, ttr);
         StaticNodes = new HashMap<Node, Boolean>();
     }
@@ -79,10 +77,10 @@ public class DummyNodeSource extends DynamicNodeSource
     public void initActivity(Body body) {
         super.initActivity(body);
         try {
-            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(
-                    "/user/gsigety/home/pa_descriptors/nodes.xml");
+            ProActiveDescriptor pad = PADeployment
+                    .getProactiveDescriptor("/user/gsigety/home/pa_descriptors/nodes.xml");
             RMDeploymentFactory.deployAllVirtualNodes((PadDeployInterface) PAActiveObject.getStubOnThis(),
-                pad);
+                    pad);
         } catch (ProActiveException e) {
             e.printStackTrace();
         }
@@ -98,8 +96,7 @@ public class DummyNodeSource extends DynamicNodeSource
             try {
                 entry.getKey().killAllActiveObjects();
                 //TODO gisgety killing the node ?
-                entry.getKey().getProActiveRuntime()
-                     .killNode(entry.getKey().getNodeInformation().getName());
+                entry.getKey().getProActiveRuntime().killNode(entry.getKey().getNodeInformation().getName());
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -140,16 +137,14 @@ public class DummyNodeSource extends DynamicNodeSource
         }
         boolean found = false;
         for (Entry<Node, Boolean> entry : this.StaticNodes.entrySet()) {
-            if (entry.getKey().getNodeInformation().getURL() == node.getNodeInformation()
-                                                                        .getURL()) {
+            if (entry.getKey().getNodeInformation().getURL() == node.getNodeInformation().getURL()) {
                 //Node is available
                 entry.setValue(true);
                 found = true;
             }
         }
         if (!found) {
-            logger.error("[" + this.SourceId +
-                "] dummy node source : an unknown node has been rendered !!");
+            logger.error("[" + this.SourceId + "] dummy node source : an unknown node has been rendered !!");
         }
     }
 
@@ -165,8 +160,7 @@ public class DummyNodeSource extends DynamicNodeSource
     }
 
     public RMNodeSourceEvent getSourceEvent() {
-        return new RMNodeSourceEvent(this.getSourceId(),
-            RMConstants.DUMMY_NODE_SOURCE_TYPE);
+        return new RMNodeSourceEvent(this.getSourceId(), RMConstants.DUMMY_NODE_SOURCE_TYPE);
     }
 
     // ----------------------------------------------------------------------//

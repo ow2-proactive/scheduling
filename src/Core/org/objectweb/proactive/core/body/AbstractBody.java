@@ -125,8 +125,7 @@ import org.objectweb.proactive.core.util.profiling.TimerProvidable;
  * @see UniqueID
  *
  */
-public abstract class AbstractBody extends AbstractUniversalBody implements Body,
-    Serializable {
+public abstract class AbstractBody extends AbstractUniversalBody implements Body, Serializable {
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
@@ -195,16 +194,14 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @param factory the factory able to construct new factories for each type of meta objects
      *                needed by this body
      */
-    public AbstractBody(Object reifiedObject, String nodeURL,
-        MetaObjectFactory factory, String jobId)
-        throws ActiveObjectCreationException {
+    public AbstractBody(Object reifiedObject, String nodeURL, MetaObjectFactory factory, String jobId)
+            throws ActiveObjectCreationException {
         super(nodeURL, jobId);
 
         this.threadStore = factory.newThreadStoreFactory().newThreadStore();
 
         // GROUP
-        this.spmdManager = factory.newProActiveSPMDGroupManagerFactory()
-                                  .newProActiveSPMDGroupManager();
+        this.spmdManager = factory.newProActiveSPMDGroupManagerFactory().newProActiveSPMDGroupManager();
 
         ProActiveSecurity.loadProvider();
 
@@ -215,16 +212,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         if ((this.securityManager = factory.getProActiveSecurityManager()) == null) {
             this.isSecurityOn = false;
-            ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
-                           .debug("Active Object security Off");
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("Active Object security Off");
         } else {
             this.isSecurityOn = true;
-            ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
-                           .debug("Active Object security On application is " +
-                this.securityManager.getApplicationName());
-            ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
-                           .debug("current thread is " +
-                Thread.currentThread().getName());
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug(
+                    "Active Object security On application is " + this.securityManager.getApplicationName());
+            ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug(
+                    "current thread is " + Thread.currentThread().getName());
 
             this.isSecurityOn = this.securityManager.getCertificate() != null;
             //          this.securityManager.setBody(this);
@@ -245,13 +239,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     try {
                         mbs.registerMBean(mbean, oname);
                     } catch (InstanceAlreadyExistsException e) {
-                        logger.error("A MBean with the object name " + oname +
-                            " already exists", e);
+                        logger.error("A MBean with the object name " + oname + " already exists", e);
                     } catch (MBeanRegistrationException e) {
                         logger.error("Can't register the MBean of the body", e);
                     } catch (NotCompliantMBeanException e) {
-                        logger.error("The MBean of the body is not JMX compliant",
-                            e);
+                        logger.error("The MBean of the body is not JMX compliant", e);
                     }
                 }
             }
@@ -306,8 +298,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         String inc = (this.ftmanager != null) ? ("" + this.ftmanager) : ("");
 
         if (this.localBodyStrategy != null) {
-            return "Body for " + this.localBodyStrategy.getName() + " node=" +
-            this.nodeURL + " id=" + this.bodyID + inc;
+            return "Body for " + this.localBodyStrategy.getName() + " node=" + this.nodeURL + " id=" +
+                this.bodyID + inc;
         }
 
         return "Method call called during Body construction -- the body is not yet initialized ";
@@ -316,8 +308,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     //
     // -- implements UniversalBody -----------------------------------------------
     //
-    public int receiveRequest(Request request)
-        throws java.io.IOException, RenegotiateSessionException {
+    public int receiveRequest(Request request) throws java.io.IOException, RenegotiateSessionException {
         //  System.out.println("" + this + "  --> receiveRequest m="+request.getMethodName());
         // NON_FT is returned if this object is not fault tolerant
         int ftres = FTManager.NON_FT;
@@ -346,8 +337,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                  */
                 try {
                     this.renegociateSessionIfNeeded(request.getSessionId());
-                    if ((this.internalBodySecurity.isLocalBody()) &&
-                            request.isCiphered()) {
+                    if ((this.internalBodySecurity.isLocalBody()) && request.isCiphered()) {
                         request.decrypt(this.securityManager);
                     }
                 } catch (SecurityNotAvailableException e) {
@@ -392,8 +382,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             //System.out.println("Body receives Reply on NODE : " + this.nodeURL);
             if (this.isSecurityOn) {
                 try {
-                    if ((this.internalBodySecurity.isLocalBody()) &&
-                            reply.isCiphered()) {
+                    if ((this.internalBodySecurity.isLocalBody()) && reply.isCiphered()) {
                         reply.decrypt(this.securityManager);
                     }
                 } catch (Exception e) {
@@ -446,13 +435,11 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         this.localBodyStrategy.getFuturePool().disableAC();
     }
 
-    public void renegociateSessionIfNeeded(long sID)
-        throws RenegotiateSessionException, SecurityNotAvailableException,
-            IOException {
+    public void renegociateSessionIfNeeded(long sID) throws RenegotiateSessionException,
+            SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
-            if (!this.internalBodySecurity.isLocalBody() &&
-                    (this.openedSessions != null)) {
+            if (!this.internalBodySecurity.isLocalBody() && (this.openedSessions != null)) {
                 // inside a forwarder
                 Long sessionID;
 
@@ -472,8 +459,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException {
+    public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
             if (this.isSecurityOn) {
@@ -488,8 +474,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
+    public TypedCertificate getCertificate() throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
             if (this.isSecurityOn) {
@@ -522,18 +507,17 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SessionException, SecurityNotAvailableException, IOException {
+            TypedCertificate distantCertificate) throws SessionException, SecurityNotAvailableException,
+            IOException {
         try {
             enterInThreadStore();
             if (this.isSecurityOn) {
                 if (this.internalBodySecurity.isLocalBody()) {
-                    return this.securityManager.startNewSession(distantSessionID,
-                        policy, distantCertificate);
+                    return this.securityManager.startNewSession(distantSessionID, policy, distantCertificate);
                 }
 
-                return this.internalBodySecurity.startNewSession(distantSessionID,
-                    policy, distantCertificate);
+                return this.internalBodySecurity
+                        .startNewSession(distantSessionID, policy, distantCertificate);
             }
             throw new SecurityNotAvailableException();
         } finally {
@@ -541,8 +525,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException {
+    public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
             if (this.isSecurityOn) {
@@ -568,22 +551,19 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
+            RenegotiateSessionException, IOException {
         try {
             enterInThreadStore();
             if (this.isSecurityOn) {
                 byte[] plop;
 
                 if (this.internalBodySecurity.isLocalBody()) {
-                    plop = this.securityManager.randomValue(sessionID,
-                            clientRandomValue);
+                    plop = this.securityManager.randomValue(sessionID, clientRandomValue);
 
                     return plop;
                 } else {
-                    plop = this.internalBodySecurity.randomValue(sessionID,
-                            clientRandomValue);
+                    plop = this.internalBodySecurity.randomValue(sessionID, clientRandomValue);
 
                     return plop;
                 }
@@ -594,22 +574,19 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException, KeyExchangeException, IOException {
         try {
             enterInThreadStore();
             if (this.isSecurityOn) {
                 renegociateSessionIfNeeded(sessionID);
 
                 if (this.internalBodySecurity.isLocalBody()) {
-                    return this.securityManager.publicKeyExchange(sessionID,
-                        signature);
+                    return this.securityManager.publicKeyExchange(sessionID, signature);
                 }
 
                 // else
-                return this.internalBodySecurity.publicKeyExchange(sessionID,
-                    signature);
+                return this.internalBodySecurity.publicKeyExchange(sessionID, signature);
             }
             throw new SecurityNotAvailableException();
         } finally {
@@ -617,11 +594,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException, RenegotiateSessionException, IOException {
         try {
             enterInThreadStore();
             if (!this.isSecurityOn) {
@@ -634,17 +609,13 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
             if (this.internalBodySecurity.isLocalBody()) {
                 //	System.out.println("secretKeyExchange demande un security manager a " + ProActive.getBodyOnThis());
-                ske = this.securityManager.secretKeyExchange(sessionID,
-                        encodedAESKey, encodedIVParameters,
-                        encodedClientMacKey, encodedLockData,
-                        parametersSignature);
+                ske = this.securityManager.secretKeyExchange(sessionID, encodedAESKey, encodedIVParameters,
+                        encodedClientMacKey, encodedLockData, parametersSignature);
 
                 return ske;
             } else {
-                ske = this.internalBodySecurity.secretKeyExchange(sessionID,
-                        encodedAESKey, encodedIVParameters,
-                        encodedClientMacKey, encodedLockData,
-                        parametersSignature);
+                ske = this.internalBodySecurity.secretKeyExchange(sessionID, encodedAESKey,
+                        encodedIVParameters, encodedClientMacKey, encodedLockData, parametersSignature);
 
                 return ske;
             }
@@ -653,8 +624,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException, IOException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException,
+            IOException {
         try {
             enterInThreadStore();
             if (!this.isSecurityOn) {
@@ -709,8 +680,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException {
+    public Entities getEntities() throws SecurityNotAvailableException, IOException {
         try {
             enterInThreadStore();
             if (!this.isSecurityOn) {
@@ -744,8 +714,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 this.timersContainer.stopAll();
                 // We need to finalize statistics of the timers container
                 // for this body
-                this.timersContainer.sendResults(this.getName(),
-                    this.bodyID.shortString());
+                this.timersContainer.sendResults(this.getName(), this.bodyID.shortString());
                 this.timersContainer = null;
             }
         }
@@ -765,8 +734,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 try {
                     mbs.unregisterMBean(objectName);
                 } catch (InstanceNotFoundException e) {
-                    logger.error("The MBean with the objectName " + objectName +
-                        " was not found", e);
+                    logger.error("The MBean with the objectName " + objectName + " was not found", e);
                 } catch (MBeanRegistrationException e) {
                     logger.error("The MBean with the objectName " + objectName +
                         " can't be unregistered from the MBean server", e);
@@ -875,9 +843,8 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
         }
     }
 
-    public void sendRequest(MethodCall methodCall, Future future,
-        UniversalBody destinationBody)
-        throws IOException, RenegotiateSessionException {
+    public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
+            throws IOException, RenegotiateSessionException {
         long distantSessionID = 0;
 
         // Tag the outgoing request with the barrier tags
@@ -887,23 +854,20 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
 
         try {
             if (!this.isSecurityOn) {
-                ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
-                               .debug("security is off");
+                ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug("security is off");
             } else {
                 try {
                     if (this.internalBodySecurity.isLocalBody()) {
                         TypedCertificate cert = destinationBody.getCertificate();
-                        ProActiveLogger.getLogger(Loggers.SECURITY_BODY)
-                                       .debug("send Request AbstractBody " +
-                            this + ", method " + methodCall.getName() +
-                            " cert " + cert.getCert().getSubjectDN() + " " +
-                            cert.getCert().getPublicKey());
+                        ProActiveLogger.getLogger(Loggers.SECURITY_BODY).debug(
+                                "send Request AbstractBody " + this + ", method " + methodCall.getName() +
+                                    " cert " + cert.getCert().getSubjectDN() + " " +
+                                    cert.getCert().getPublicKey());
                         try {
-                            distantSessionID = this.securityManager.getSessionTo(cert)
-                                                                   .getDistantSessionID();
+                            distantSessionID = this.securityManager.getSessionTo(cert).getDistantSessionID();
                         } catch (SessionException e) {
                             distantSessionID = this.securityManager.initiateSession(destinationBody)
-                                                                   .getDistantSessionID();
+                                    .getDistantSessionID();
                         }
                     }
                 } catch (SecurityNotAvailableException e) {
@@ -913,14 +877,12 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 }
             }
 
-            this.localBodyStrategy.sendRequest(methodCall, future,
-                destinationBody);
+            this.localBodyStrategy.sendRequest(methodCall, future, destinationBody);
         } catch (RenegotiateSessionException e) {
             if (e.getUniversalBody() != null) {
                 e.printStackTrace();
-                ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO)
-                               .debug("renegotiate session " +
-                    distantSessionID);
+                ProActiveLogger.getLogger(Loggers.SECURITY_CRYPTO).debug(
+                        "renegotiate session " + distantSessionID);
                 updateLocation(destinationBody.getID(), e.getUniversalBody());
                 this.securityManager.terminateSession(distantSessionID);
                 sendRequest(methodCall, future, e.getUniversalBody());
@@ -932,8 +894,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             System.out.println("Communication forbidden.");
             bodyLogger.warn(e);
             // if the communication is not allowed, set the result as the exception
-            future.receiveReply(new MethodCallResult(null,
-                    new RuntimeSecurityException(e)));
+            future.receiveReply(new MethodCallResult(null, new RuntimeSecurityException(e)));
             //e.printStackTrace();
         }
     }
@@ -957,16 +918,15 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
      * @param request the request to process
      * @exception java.io.IOException if the request cannot be accepted
      */
-    protected abstract int internalReceiveRequest(Request request)
-        throws java.io.IOException, RenegotiateSessionException;
+    protected abstract int internalReceiveRequest(Request request) throws java.io.IOException,
+            RenegotiateSessionException;
 
     /**
      * Receives a reply in response to a former request.
      * @param reply the reply received
      * @exception java.io.IOException if the reply cannot be accepted
      */
-    protected abstract int internalReceiveReply(Reply reply)
-        throws java.io.IOException;
+    protected abstract int internalReceiveReply(Reply reply) throws java.io.IOException;
 
     protected void setLocalBodyImpl(LocalBodyStrategy localBody) {
         this.localBodyStrategy = localBody;
@@ -993,8 +953,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 try {
                     mbs.unregisterMBean(objectName);
                 } catch (InstanceNotFoundException e) {
-                    logger.error("The MBean with the objectName " + objectName +
-                        " was not found", e);
+                    logger.error("The MBean with the objectName " + objectName + " was not found", e);
                 } catch (MBeanRegistrationException e) {
                     logger.error("The MBean with the objectName " + objectName +
                         " can't be unregistered from the MBean server", e);
@@ -1073,23 +1032,20 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     //
     // -- SERIALIZATION METHODS -----------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         out.defaultWriteObject();
 
         mbean = null;
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         this.gc = new GarbageCollector(this);
         in.defaultReadObject();
         // FAULT TOLERANCE
         if (this.ftmanager != null) {
             if (this.ftmanager.isACheckpoint()) {
                 //re-use remote view of the old body if any
-                Body toKill = LocalBodyStore.getInstance()
-                                            .getLocalBody(this.bodyID);
+                Body toKill = LocalBodyStore.getInstance().getLocalBody(this.bodyID);
                 if (toKill != null) {
                     //this body is still alive
                     toKill.blockCommunication();
@@ -1105,16 +1061,15 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException {
+            throws SecurityNotAvailableException, AccessControlException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
         return this.securityManager.getProActiveSecurityManager(user);
     }
 
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException {
         if (this.securityManager == null) {
             throw new SecurityNotAvailableException();
         }
@@ -1128,16 +1083,14 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
     public static UniversalBody getRemoteBody(Object obj) {
         // Check if obj is really a reified object
         if (!(MOP.isReifiedObject(obj))) {
-            throw new ProActiveRuntimeException("The given object " + obj +
-                " is not a reified object");
+            throw new ProActiveRuntimeException("The given object " + obj + " is not a reified object");
         }
 
         // Find the appropriate remoteBody
         org.objectweb.proactive.core.mop.Proxy myProxy = ((StubObject) obj).getProxy();
 
         if (myProxy == null) {
-            throw new ProActiveRuntimeException(
-                "Cannot find a Proxy on the stub object: " + obj);
+            throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + obj);
         }
 
         BodyProxy myBodyProxy = (BodyProxy) myProxy;

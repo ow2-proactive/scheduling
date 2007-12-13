@@ -209,9 +209,7 @@ public class C implements CAttributes, BindingController, I, J {
             return (w == 0) ? v : i.n(v + 1, w - 1);
         } else if (j.size() > 0) {
             // for interceptors tests
-            return (w == 0) ? v
-                            : ((I) j.values().iterator().next()).n(v + 1, w -
-                1);
+            return (w == 0) ? v : ((I) j.values().iterator().next()).n(v + 1, w - 1);
         } else {
             return v;
         }

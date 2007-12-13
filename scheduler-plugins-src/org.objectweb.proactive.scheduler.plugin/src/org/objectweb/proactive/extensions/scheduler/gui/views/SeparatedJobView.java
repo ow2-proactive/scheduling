@@ -128,10 +128,10 @@ public class SeparatedJobView extends ViewPart {
         MenuManager menuMgr = new MenuManager("#PopupMenu");
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-                public void menuAboutToShow(IMenuManager manager) {
-                    fillContextMenu(manager);
-                }
-            });
+            public void menuAboutToShow(IMenuManager manager) {
+                fillContextMenu(manager);
+            }
+        });
 
         Menu menu = menuMgr.createContextMenu(parent);
         parent.setMenu(menu);
@@ -147,7 +147,7 @@ public class SeparatedJobView extends ViewPart {
         manager.add(submitJob);
         manager.add(pauseResumeJobAction);
         IMenuManager subMenu = new MenuManager("Change job priority") {
-            };
+        };
         manager.add(subMenu);
         if (SchedulerProxy.getInstance() != null) {
             if (SchedulerProxy.getInstance().isAnAdmin()) {
@@ -356,12 +356,10 @@ public class SeparatedJobView extends ViewPart {
 
         jobComposite = new JobComposite(parent);
 
-        pendingJobComposite = new PendingJobComposite(jobComposite, "Pending",
-                JobsController.getLocalView());
-        runningJobComposite = new RunningJobComposite(jobComposite, "Running",
-                JobsController.getLocalView());
-        finishedJobComposite = new FinishedJobComposite(jobComposite,
-                "Finished", JobsController.getLocalView());
+        pendingJobComposite = new PendingJobComposite(jobComposite, "Pending", JobsController.getLocalView());
+        runningJobComposite = new RunningJobComposite(jobComposite, "Running", JobsController.getLocalView());
+        finishedJobComposite = new FinishedJobComposite(jobComposite, "Finished", JobsController
+                .getLocalView());
 
         GridData gridData = new GridData();
         gridData.verticalAlignment = GridData.FILL;
@@ -373,8 +371,7 @@ public class SeparatedJobView extends ViewPart {
         gridData = new GridData();
         gridData.horizontalAlignment = GridData.FILL;
 
-        StatusLabel.newInstance(theParent, gridData,
-            JobsController.getLocalView());
+        StatusLabel.newInstance(theParent, gridData, JobsController.getLocalView());
 
         // I must turn active the jobsController after create
         // pendingJobComposite, runningJobComposite, finishedJobComposite
@@ -412,8 +409,7 @@ public class SeparatedJobView extends ViewPart {
         }
 
         JobsOutputController.clearInstance();
-        PAActiveObject.terminateActiveObject(JobsController.getActiveView(),
-            false);
+        PAActiveObject.terminateActiveObject(JobsController.getActiveView(), false);
         SchedulerProxy.getInstance().disconnect();
         PAActiveObject.terminateActiveObject(SchedulerProxy.getInstance(), false);
         JobsController.clearInstances();

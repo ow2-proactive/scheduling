@@ -42,8 +42,7 @@ public class SolveBT2 extends SolveBoard {
         n2 = n1 - 1;
         BoardBT2 boardBT2 = (BoardBT2) board;
         Result res = new Result(board.n);
-        backtrack2(res, (BoardBT2) board, boardBT2.row, boardBT2.left,
-            boardBT2.down, boardBT2.right);
+        backtrack2(res, (BoardBT2) board, boardBT2.row, boardBT2.left, boardBT2.down, boardBT2.right);
         return mixBoard(res, n1, n2);
     }
 
@@ -59,9 +58,7 @@ public class SolveBT2 extends SolveBoard {
         if (board.board[board.bound2] == 1) {
             for (ptn = 2, own = 1; own <= n1; own++, ptn <<= 1) {
                 bit = 1;
-                for (you = n1;
-                        (board.board[you] != ptn) && (board.board[own] >= bit);
-                        you--)
+                for (you = n1; (board.board[you] != ptn) && (board.board[own] >= bit); you--)
                     bit <<= 1;
                 if (board.board[own] > bit) {
                     return;
@@ -82,9 +79,7 @@ public class SolveBT2 extends SolveBoard {
         if (board.board[n1] == board.endbit) {
             for (you = n2, own = 1; own <= n1; own++, you--) {
                 bit = 1;
-                for (ptn = board.topbit;
-                        (ptn != board.board[you]) && (board.board[own] >= bit);
-                        ptn >>= 1)
+                for (ptn = board.topbit; (ptn != board.board[you]) && (board.board[own] >= bit); ptn >>= 1)
                     bit <<= 1;
                 if (board.board[own] > bit) {
                     return;
@@ -96,8 +91,7 @@ public class SolveBT2 extends SolveBoard {
             if (own > n1) {
                 //count4();
                 res.solutions[position(board.board[0])]++;
-                for (firstColumn = 1; (board.board[firstColumn] & 1) == 0;
-                        firstColumn++)
+                for (firstColumn = 1; (board.board[firstColumn] & 1) == 0; firstColumn++)
                     ;
                 res.solutions[firstColumn]++;
 
@@ -108,12 +102,9 @@ public class SolveBT2 extends SolveBoard {
 
         /* 270-degree rotation */
         if (board.board[board.bound1] == board.topbit) {
-            for (ptn = board.topbit >> 1, own = 1; own <= n1;
-                    own++, ptn >>= 1) {
+            for (ptn = board.topbit >> 1, own = 1; own <= n1; own++, ptn >>= 1) {
                 bit = 1;
-                for (you = 0;
-                        (board.board[you] != ptn) && (board.board[own] >= bit);
-                        you++)
+                for (you = 0; (board.board[you] != ptn) && (board.board[own] >= bit); you++)
                     bit <<= 1;
                 if (board.board[own] > bit) {
                     return;
@@ -127,19 +118,16 @@ public class SolveBT2 extends SolveBoard {
         //count8();
         res.solutions[position(board.board[0])]++;
         res.solutions[position(board.board[n1])]++;
-        for (firstColumn = 1; (board.board[firstColumn] & 1) == 0;
-                firstColumn++)
+        for (firstColumn = 1; (board.board[firstColumn] & 1) == 0; firstColumn++)
             ;
-        for (lastColumn = 1; (board.board[lastColumn] & board.topbit) == 0;
-                lastColumn++)
+        for (lastColumn = 1; (board.board[lastColumn] & board.topbit) == 0; lastColumn++)
             ;
         res.solutions[firstColumn]++;
         res.solutions[lastColumn]++;
         //display();
     }
 
-    private void backtrack2(Result res, BoardBT2 board, int y, int left,
-        int down, int right) {
+    private void backtrack2(Result res, BoardBT2 board, int y, int left, int down, int right) {
         int bitmap = board.mask & ~(left | down | right);
         int bit;
 
@@ -164,8 +152,7 @@ public class SolveBT2 extends SolveBoard {
             }
             while (bitmap != 0) {
                 bitmap ^= (board.board[y] = bit = -bitmap & bitmap);
-                backtrack2(res, board, y + 1, (left | bit) << 1, down | bit,
-                    (right | bit) >> 1);
+                backtrack2(res, board, y + 1, (left | bit) << 1, down | bit, (right | bit) >> 1);
             }
         }
     }

@@ -80,8 +80,7 @@ public class UnicorePasswordGUI extends JFrame implements ActionListener {
         Container panel = this.getContentPane();
         panel.setLayout(new BorderLayout());
 
-        panel.add(new JLabel("Input Unicore Keystore Password"),
-            BorderLayout.NORTH);
+        panel.add(new JLabel("Input Unicore Keystore Password"), BorderLayout.NORTH);
         panel.add(password, BorderLayout.CENTER);
         panel.add(ok, BorderLayout.SOUTH);
 

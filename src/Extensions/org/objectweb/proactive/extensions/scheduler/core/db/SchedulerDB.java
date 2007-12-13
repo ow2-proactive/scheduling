@@ -124,14 +124,12 @@ public class SchedulerDB extends AbstractSchedulerDB {
         }
     }
 
-    private boolean alreadyExistInTaskTable(int jobid_hashcode,
-        int taskid_hashcode) {
+    private boolean alreadyExistInTaskTable(int jobid_hashcode, int taskid_hashcode) {
         ResultSet rs = null;
 
         try {
-            rs = statement.executeQuery(
-                    "SELECT 1 FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
-                    jobid_hashcode + " AND taskid_hashcode=" + taskid_hashcode);
+            rs = statement.executeQuery("SELECT 1 FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
+                jobid_hashcode + " AND taskid_hashcode=" + taskid_hashcode);
 
             if (rs.next()) {
                 return true;
@@ -207,8 +205,8 @@ public class SchedulerDB extends AbstractSchedulerDB {
         System.out.println("[SCHEDULER-DATABASE] addjob");
 
         try {
-            preparedStatement = connection.prepareStatement(
-                    "INSERT INTO JOB_AND_JOB_EVENTS(jobid_hashcode, job) VALUES (?,?)");
+            preparedStatement = connection
+                    .prepareStatement("INSERT INTO JOB_AND_JOB_EVENTS(jobid_hashcode, job) VALUES (?,?)");
             preparedStatement.setInt(1, internalJob.getId().hashCode());
             preparedStatement.setBlob(2, serialize(internalJob));
 
@@ -231,12 +229,9 @@ public class SchedulerDB extends AbstractSchedulerDB {
         System.out.println("[SCHEDULER-DATABASE] remove");
 
         try {
-            statement.execute(
-                "DELETE FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
+            statement.execute("DELETE FROM TASK_EVENTS_AND_TASK_RESULTS WHERE jobid_hashcode=" +
                 jobId.hashCode());
-            statement.execute(
-                "DELETE FROM JOB_AND_JOB_EVENTS WHERE jobid_hashcode=" +
-                jobId.hashCode());
+            statement.execute("DELETE FROM JOB_AND_JOB_EVENTS WHERE jobid_hashcode=" + jobId.hashCode());
 
             return commit();
         } catch (SQLException e) {
@@ -259,11 +254,11 @@ public class SchedulerDB extends AbstractSchedulerDB {
             int taskid_hashcode = taskResult.getTaskId().hashCode();
 
             if (alreadyExistInTaskTable(jobid_hashcode, taskid_hashcode)) {
-                preparedStatement = connection.prepareStatement(
-                        "UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskresult=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
+                preparedStatement = connection
+                        .prepareStatement("UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskresult=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
             } else {
-                preparedStatement = connection.prepareStatement(
-                        "INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskresult,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
+                preparedStatement = connection
+                        .prepareStatement("INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskresult,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
             }
 
             preparedStatement.setBlob(1, serialize(taskResult));
@@ -309,18 +304,16 @@ public class SchedulerDB extends AbstractSchedulerDB {
             Map<JobId, JobEvent> jobEventMap = new HashMap<JobId, JobEvent>();
             Map<TaskId, TaskEvent> taskEventMap = new HashMap<TaskId, TaskEvent>();
 
-            rs = statement.executeQuery(
-                    "SELECT job, jobevent FROM JOB_AND_JOB_EVENTS");
+            rs = statement.executeQuery("SELECT job, jobevent FROM JOB_AND_JOB_EVENTS");
 
             while (rs.next()) {
                 //
-                InternalJob internalJob = (InternalJob) deserialize(rs.getBlob(
-                            1));
+                InternalJob internalJob = (InternalJob) deserialize(rs.getBlob(1));
                 internalHMJobList.put(internalJob.getId(), internalJob);
                 internalJobList.add(internalJob);
                 //
-                jobResultMap.put(internalJob.getId(),
-                    new JobResultImpl(internalJob.getId(), internalJob.getName()));
+                jobResultMap.put(internalJob.getId(), new JobResultImpl(internalJob.getId(), internalJob
+                        .getName()));
                 //
                 blob = rs.getBlob(2);
 
@@ -330,8 +323,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 }
             }
 
-            rs = statement.executeQuery(
-                    "SELECT taskevent,taskresult FROM TASK_EVENTS_AND_TASK_RESULTS");
+            rs = statement.executeQuery("SELECT taskevent,taskresult FROM TASK_EVENTS_AND_TASK_RESULTS");
 
             while (rs.next()) {
                 blob = rs.getBlob(1);
@@ -345,20 +337,16 @@ public class SchedulerDB extends AbstractSchedulerDB {
 
                 if (blob != null) {
                     TaskResult taskResult = ((TaskResult) deserialize(blob));
-                    jobResultMap.get(taskResult.getTaskId().getJobId())
-                                .addTaskResult(taskResult.getTaskId()
-                                                         .getReadableName(),
-                        taskResult,
-                        internalHMJobList.get(taskResult.getTaskId().getJobId())
-                                         .getHMTasks()
-                                         .get(taskResult.getTaskId())
-                                         .isPreciousResult());
+                    jobResultMap.get(taskResult.getTaskId().getJobId()).addTaskResult(
+                            taskResult.getTaskId().getReadableName(),
+                            taskResult,
+                            internalHMJobList.get(taskResult.getTaskId().getJobId()).getHMTasks().get(
+                                    taskResult.getTaskId()).isPreciousResult());
                 }
             }
 
-            if ((internalJobList.size() == 0) && (jobResultMap.size() == 0) &&
-                    (jobEventMap.size() == 0) && (taskEventMap.size() == 0) &&
-                    commit()) {
+            if ((internalJobList.size() == 0) && (jobResultMap.size() == 0) && (jobEventMap.size() == 0) &&
+                (taskEventMap.size() == 0) && commit()) {
                 return null;
             }
 
@@ -368,8 +356,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
                 jobResultList.add(jr);
 
             if (commit()) {
-                return new RecoverableState(internalJobList, jobResultList,
-                    jobEventMap, taskEventMap);
+                return new RecoverableState(internalJobList, jobResultList, jobEventMap, taskEventMap);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -414,8 +401,8 @@ public class SchedulerDB extends AbstractSchedulerDB {
         System.out.println("[SCHEDULER-DATABASE] setJobEvent");
 
         try {
-            preparedStatement = connection.prepareStatement(
-                    "UPDATE JOB_AND_JOB_EVENTS SET jobevent=? WHERE jobid_hashcode=?");
+            preparedStatement = connection
+                    .prepareStatement("UPDATE JOB_AND_JOB_EVENTS SET jobevent=? WHERE jobid_hashcode=?");
             preparedStatement.setBlob(1, serialize(jobEvent));
             preparedStatement.setInt(2, jobEvent.getJobId().hashCode());
 
@@ -442,11 +429,11 @@ public class SchedulerDB extends AbstractSchedulerDB {
             int taskid_hashcode = taskEvent.getTaskId().hashCode();
 
             if (alreadyExistInTaskTable(jobid_hashcode, taskid_hashcode)) {
-                preparedStatement = connection.prepareStatement(
-                        "UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskevent=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
+                preparedStatement = connection
+                        .prepareStatement("UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskevent=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
             } else {
-                preparedStatement = connection.prepareStatement(
-                        "INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskevent,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
+                preparedStatement = connection
+                        .prepareStatement("INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskevent,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
             }
 
             preparedStatement.setBlob(1, serialize(taskEvent));
@@ -469,8 +456,7 @@ public class SchedulerDB extends AbstractSchedulerDB {
      *      java.util.List)
      */
     @Override
-    public boolean setJobAndTasksEvents(JobEvent jobEvent,
-        List<TaskEvent> tasksEvents) {
+    public boolean setJobAndTasksEvents(JobEvent jobEvent, List<TaskEvent> tasksEvents) {
         System.out.println("[SCHEDULER-DATABASE] setJobAndTaskEvents");
 
         // TODO Factoriser le code....
@@ -479,19 +465,19 @@ public class SchedulerDB extends AbstractSchedulerDB {
         PreparedStatement tmpPreparedStatement = null;
 
         try {
-            preparedStatement = connection.prepareStatement(
-                    "UPDATE JOB_AND_JOB_EVENTS SET jobevent=? WHERE jobid_hashcode=?");
+            preparedStatement = connection
+                    .prepareStatement("UPDATE JOB_AND_JOB_EVENTS SET jobevent=? WHERE jobid_hashcode=?");
             preparedStatement.setBlob(1, serialize(jobEvent));
             preparedStatement.setInt(2, jobEvent.getJobId().hashCode());
 
             int nb = preparedStatement.executeUpdate();
             int count = 1;
 
-            updatePreparedStatement = connection.prepareStatement(
-                    "UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskevent=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
+            updatePreparedStatement = connection
+                    .prepareStatement("UPDATE TASK_EVENTS_AND_TASK_RESULTS SET taskevent=? WHERE jobid_hashcode=? AND taskid_hashcode=?");
 
-            insertPreparedStatement = connection.prepareStatement(
-                    "INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskevent,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
+            insertPreparedStatement = connection
+                    .prepareStatement("INSERT INTO TASK_EVENTS_AND_TASK_RESULTS(taskevent,jobid_hashcode,taskid_hashcode) VALUES(?,?,?)");
 
             int jobid_hashcode;
             int taskid_hashcode;

@@ -50,19 +50,16 @@ public class GatherItfAdapterProxy implements InvocationHandler, Serializable {
     /* (non-Javadoc)
      * @see java.lang.reflect.InvocationHandler#invoke(java.lang.Object, java.lang.reflect.Method, java.lang.Object[])
      */
-    public Object invoke(Object proxy, Method method, Object[] args)
-        throws Throwable {
+    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         try {
             if (logger.isDebugEnabled()) {
-                logger.debug("gather proxy trying to invoke method : " +
-                    method.toGenericString());
+                logger.debug("gather proxy trying to invoke method : " + method.toGenericString());
             }
 
             //                Method serverMethod = GatherBindingChecker.searchMatchingMethod(method, delegatee.getClass().getMethods());
             // need to change invocation parameters
-            Object result = delegatee.getClass()
-                                     .getMethod(method.getName(),
-                    method.getParameterTypes()).invoke(delegatee, args);
+            Object result = delegatee.getClass().getMethod(method.getName(), method.getParameterTypes())
+                    .invoke(delegatee, args);
             return result;
         } catch (Throwable t) {
             t.printStackTrace();

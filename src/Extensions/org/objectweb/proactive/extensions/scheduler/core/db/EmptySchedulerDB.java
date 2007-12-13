@@ -105,8 +105,7 @@ public class EmptySchedulerDB extends AbstractSchedulerDB {
      *      java.util.List)
      */
     @Override
-    public boolean setJobAndTasksEvents(JobEvent jobEvent,
-        List<TaskEvent> tasksEvents) {
+    public boolean setJobAndTasksEvents(JobEvent jobEvent, List<TaskEvent> tasksEvents) {
         return true;
     }
 

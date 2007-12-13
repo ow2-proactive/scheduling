@@ -57,10 +57,10 @@ public class AOStageCompute {
     }
 
     /**
-         * @param taskpool
-         * @param stageOut
-         * @param fserver
-         */
+     * @param taskpool
+     * @param stageOut
+     * @param fserver
+     */
     public AOStageCompute(TaskPool taskpool, AOStageOut stageOut) {
         super();
         this.taskpool = taskpool;

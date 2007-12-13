@@ -36,10 +36,10 @@ import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 
 public abstract class RuleEntity implements Serializable {
-    public enum Match {OK,
-        DEFAULT,
-        FAILED;
+    public enum Match {
+        OK, DEFAULT, FAILED;
     }
+
     public static final int UNDEFINED_LEVEL = 0;
 
     /**
@@ -76,15 +76,15 @@ public abstract class RuleEntity implements Serializable {
     // level
     private int levelIncrement() {
         switch (this.type) {
-        case RUNTIME:
-        case ENTITY:
-            return 1;
-        case NODE:
-            return 2;
-        case OBJECT:
-            return 3;
-        default:
-            return 0;
+            case RUNTIME:
+            case ENTITY:
+                return 1;
+            case NODE:
+                return 2;
+            case OBJECT:
+                return 3;
+            default:
+                return 0;
         }
     }
 

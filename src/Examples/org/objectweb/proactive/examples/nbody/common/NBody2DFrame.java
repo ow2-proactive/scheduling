@@ -56,8 +56,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
-public class NBody2DFrame extends JFrame implements Serializable,
-    ActionListener, MouseListener, WindowListener, NBodyFrame {
+public class NBody2DFrame extends JFrame implements Serializable, ActionListener, MouseListener,
+        WindowListener, NBodyFrame {
     // functional
     private String[] bodyname;
     private int[][] bodies; //[index]-> [x,y,w,d,vx,vy]
@@ -79,8 +79,7 @@ public class NBody2DFrame extends JFrame implements Serializable,
     private JButton zoomOut;
     private Start killsupport;
 
-    public NBody2DFrame(String title, int nb, boolean displayft,
-        Start killsupport) {
+    public NBody2DFrame(String title, int nb, boolean displayft, Start killsupport) {
         super(title);
         this.killsupport = killsupport;
         this.nbBodies = nb;
@@ -99,8 +98,7 @@ public class NBody2DFrame extends JFrame implements Serializable,
         }
 
         ClassLoader cl = this.getClass().getClassLoader();
-        java.net.URL u = cl.getResource(
-                "org/objectweb/proactive/examples/nbody/common/fondnbody.jpg");
+        java.net.URL u = cl.getResource("org/objectweb/proactive/examples/nbody/common/fondnbody.jpg");
         final Image backGround = getToolkit().getImage(u);
         this.addWindowListener(this);
 
@@ -132,8 +130,7 @@ public class NBody2DFrame extends JFrame implements Serializable,
             killingPanel.add(listVMs);
             killingPanel.add(cmd);
             killingPanel.add(kill);
-            killingPanel.setBorder(BorderFactory.createTitledBorder(
-                    "Execution control"));
+            killingPanel.setBorder(BorderFactory.createTitledBorder("Execution control"));
 
             controlPanel.add(killingPanel);
         }
@@ -152,8 +149,8 @@ public class NBody2DFrame extends JFrame implements Serializable,
         setVisible(true);
     }
 
-    public void drawBody(double x, double y, double z, double vx, double vy,
-        double vz, int weight, int d, int id, String name) {
+    public void drawBody(double x, double y, double z, double vx, double vy, double vz, int weight, int d,
+            int id, String name) {
         this.bodies[id][0] = (int) x;
         this.bodies[id][1] = (int) y;
         this.bodies[id][2] = weight;
@@ -200,10 +197,8 @@ public class NBody2DFrame extends JFrame implements Serializable,
     private class PlanetDisplayPanel extends JPanel {
         private final Image bkground;
         private int iter = 0;
-        private Color[] colors = {
-                Color.RED, Color.BLUE, Color.CYAN, Color.GREEN, Color.DARK_GRAY,
-                Color.MAGENTA, Color.ORANGE, Color.PINK, Color.BLACK
-            };
+        private Color[] colors = { Color.RED, Color.BLUE, Color.CYAN, Color.GREEN, Color.DARK_GRAY,
+                Color.MAGENTA, Color.ORANGE, Color.PINK, Color.BLACK };
 
         private PlanetDisplayPanel(Image bkground) {
             super();
@@ -221,11 +216,11 @@ public class NBody2DFrame extends JFrame implements Serializable,
                     for (int j = 0; j < histoSize; j++) {
                         int diameter = (bodies[i][3] > 10) ? (bodies[i][3]) : (6);
                         g.setColor(getColor(i));
-                        g.fillOval(historics[i].getX(j) + (diameter / 2),
-                            historics[i].getY(j) + (diameter / 2), 6, 6);
+                        g.fillOval(historics[i].getX(j) + (diameter / 2), historics[i].getY(j) +
+                            (diameter / 2), 6, 6);
                         g.setColor(Color.DARK_GRAY);
-                        g.drawOval(historics[i].getX(j) + (diameter / 2),
-                            historics[i].getY(j) + (diameter / 2), 6, 6);
+                        g.drawOval(historics[i].getX(j) + (diameter / 2), historics[i].getY(j) +
+                            (diameter / 2), 6, 6);
                     }
                 }
             }
@@ -308,9 +303,9 @@ public class NBody2DFrame extends JFrame implements Serializable,
             this.showTrace = !showTrace;
         } else if (e.getSource() == this.kill) {
             try {
-                Runtime.getRuntime()
-                       .exec("" + this.protocol.getSelectedItem() + " " +
-                    this.listVMs.getSelectedItem() + " killall -KILL java");
+                Runtime.getRuntime().exec(
+                        "" + this.protocol.getSelectedItem() + " " + this.listVMs.getSelectedItem() +
+                            " killall -KILL java");
             } catch (IOException e1) {
                 e1.printStackTrace();
             }

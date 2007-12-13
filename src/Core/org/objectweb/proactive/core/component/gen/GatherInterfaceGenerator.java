@@ -52,13 +52,12 @@ public class GatherInterfaceGenerator {
     private static Logger gatherLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GATHERCAST);
 
     public static Class<?> generateInterface(ProActiveInterfaceType itfType)
-        throws InterfaceGenerationFailedException {
+            throws InterfaceGenerationFailedException {
         Class<?> generated = null;
         String gatherProxyItfName = Utils.getGatherProxyItfClassName(itfType);
         try {
             //          try to fetch the class from the default class loader
-            generated = Thread.currentThread().getContextClassLoader()
-                              .loadClass(gatherProxyItfName);
+            generated = Thread.currentThread().getContextClassLoader().loadClass(gatherProxyItfName);
         } catch (ClassNotFoundException cnfe) {
             byte[] bytecode = generateInterfaceByteCode(gatherProxyItfName);
 
@@ -79,8 +78,8 @@ public class GatherInterfaceGenerator {
             return ClassDataCache.instance().getClassData(gatherProxyItfName);
         }
         try {
-            Class<?> serverItfClass = Class.forName(Utils.getInterfaceSignatureFromGathercastProxyClassName(
-                        gatherProxyItfName));
+            Class<?> serverItfClass = Class.forName(Utils
+                    .getInterfaceSignatureFromGathercastProxyClassName(gatherProxyItfName));
             CtClass repGatherItfClass = pool.makeInterface(gatherProxyItfName);
             Method[] serverItfMethods = serverItfClass.getMethods();
 
@@ -98,31 +97,26 @@ public class GatherInterfaceGenerator {
                     repReturnType = CtClass.voidType;
                 } else {
                     if (!(returnType instanceof ParameterizedType)) {
-                        throw new InterfaceGenerationFailedException(
-                            "gather method " +
-                            serverItfMethods[i].toGenericString() +
-                            " in gather interface of signature " +
-                            serverItfClass.getName() +
-                            " must return a parameterized list or void");
+                        throw new InterfaceGenerationFailedException("gather method " +
+                            serverItfMethods[i].toGenericString() + " in gather interface of signature " +
+                            serverItfClass.getName() + " must return a parameterized list or void");
                     }
 
-                    if (!(List.class.isAssignableFrom(
-                                (Class<?>) ((ParameterizedType) returnType).getRawType()))) {
-                        throw new InterfaceGenerationFailedException(
-                            "gather method " +
-                            serverItfMethods[i].toGenericString() +
-                            " in gather interface " + serverItfClass.getName() +
-                            " must return a parameterized list or void");
+                    if (!(List.class.isAssignableFrom((Class<?>) ((ParameterizedType) returnType)
+                            .getRawType()))) {
+                        throw new InterfaceGenerationFailedException("gather method " +
+                            serverItfMethods[i].toGenericString() + " in gather interface " +
+                            serverItfClass.getName() + " must return a parameterized list or void");
                     }
-                    java.lang.reflect.Type[] actualTypeArguments = ((ParameterizedType) returnType).getActualTypeArguments();
+                    java.lang.reflect.Type[] actualTypeArguments = ((ParameterizedType) returnType)
+                            .getActualTypeArguments();
                     if (actualTypeArguments.length != 1) {
-                        throw new InterfaceGenerationFailedException(
-                            "gather method " +
-                            serverItfMethods[i].toGenericString() +
-                            " in gather interface " + serverItfClass.getName() +
-                            " must return a parameterized type with one parameter");
+                        throw new InterfaceGenerationFailedException("gather method " +
+                            serverItfMethods[i].toGenericString() + " in gather interface " +
+                            serverItfClass.getName() + " must return a parameterized type with one parameter");
                     }
-                    repReturnType = pool.get(((Class<?>) (((ParameterizedType) returnType).getActualTypeArguments()[0])).getName());
+                    repReturnType = pool.get(((Class<?>) (((ParameterizedType) returnType)
+                            .getActualTypeArguments()[0])).getName());
                 }
 
                 // parameters types
@@ -130,18 +124,16 @@ public class GatherInterfaceGenerator {
                 for (int j = 0; j < paramTypes.length; j++) {
                     java.lang.reflect.Type paramType = paramTypes[j];
                     if (!(paramType instanceof ParameterizedType)) {
-                        throw new InterfaceGenerationFailedException(
-                            "gather method " +
-                            serverItfMethods[i].toGenericString() +
-                            " in gather interface " + serverItfClass.getName() +
-                            " must have type-parameterized parameter types");
+                        throw new InterfaceGenerationFailedException("gather method " +
+                            serverItfMethods[i].toGenericString() + " in gather interface " +
+                            serverItfClass.getName() + " must have type-parameterized parameter types");
                     }
-                    java.lang.reflect.Type[] actualTypeArguments = ((ParameterizedType) paramType).getActualTypeArguments();
+                    java.lang.reflect.Type[] actualTypeArguments = ((ParameterizedType) paramType)
+                            .getActualTypeArguments();
                     if (actualTypeArguments.length != 1) {
-                        throw new InterfaceGenerationFailedException(
-                            "gather method " +
-                            serverItfMethods[i].toGenericString() +
-                            " in gather interface " + serverItfClass.getName() +
+                        throw new InterfaceGenerationFailedException("gather method " +
+                            serverItfMethods[i].toGenericString() + " in gather interface " +
+                            serverItfClass.getName() +
                             " must have type-parameterized parameters with only one parameterizing element");
                     }
                     repParameterTypes[j] = pool.get(((Class<?>) actualTypeArguments[0]).getName());
@@ -154,9 +146,8 @@ public class GatherInterfaceGenerator {
                     repExceptions[j] = pool.get(exceptions[j].getName());
                 }
 
-                repServerItfMethods[i] = CtNewMethod.abstractMethod(repReturnType,
-                        serverItfMethods[i].getName(), repParameterTypes,
-                        repExceptions, repGatherItfClass);
+                repServerItfMethods[i] = CtNewMethod.abstractMethod(repReturnType, serverItfMethods[i]
+                        .getName(), repParameterTypes, repExceptions, repGatherItfClass);
 
                 repGatherItfClass.addMethod(repServerItfMethods[i]);
                 //            System.out.println("[GATHER_ITF_GEN] added method " + repServerItfMethods[i] + " matching method " + serverItfMethods[i]);
@@ -175,8 +166,7 @@ public class GatherInterfaceGenerator {
             return bytecode;
         } catch (Exception e) {
             e.printStackTrace();
-            gatherLogger.error("cannot generate gather proxy interface class " +
-                gatherProxyItfName);
+            gatherLogger.error("cannot generate gather proxy interface class " + gatherProxyItfName);
             return null;
         }
     }

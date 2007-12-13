@@ -77,8 +77,7 @@ public class NFControllerDescription extends ControllerDescription {
      * @param hierarchicalType String
      * @param synchronous boolean
      */
-    public NFControllerDescription(String name, String hierarchicalType,
-        boolean synchronous) {
+    public NFControllerDescription(String name, String hierarchicalType, boolean synchronous) {
         this(name, hierarchicalType, null, synchronous);
     }
 
@@ -88,8 +87,7 @@ public class NFControllerDescription extends ControllerDescription {
      * @param hierarchicalType String
      * @param controllersConfigFileLocation String
      */
-    public NFControllerDescription(String name, String hierarchicalType,
-        String controllersConfigFileLocation) {
+    public NFControllerDescription(String name, String hierarchicalType, String controllersConfigFileLocation) {
         this(name, hierarchicalType, controllersConfigFileLocation, false);
     }
 
@@ -101,8 +99,7 @@ public class NFControllerDescription extends ControllerDescription {
      * @param interceptorsConfigFileLocation String
      */
     public NFControllerDescription(String name, String hierarchicalType,
-        String controllersConfigFileLocation,
-        String interceptorsConfigFileLocation) {
+            String controllersConfigFileLocation, String interceptorsConfigFileLocation) {
         this(name, hierarchicalType, controllersConfigFileLocation, false);
     }
 
@@ -114,7 +111,7 @@ public class NFControllerDescription extends ControllerDescription {
      * @param synchronous boolean
      */
     public NFControllerDescription(String name, String hierarchicalType,
-        String controllersConfigFileLocation, boolean synchronous) {
+            String controllersConfigFileLocation, boolean synchronous) {
         this.hierarchicalType = hierarchicalType;
         this.name = name;
         if (!Constants.PRIMITIVE.equals(hierarchicalType)) {
@@ -125,8 +122,8 @@ public class NFControllerDescription extends ControllerDescription {
         } else {
             this.controllersConfigFileLocation = controllersConfigFileLocation;
         }
-        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(this.controllersConfigFileLocation)
-                                                      .getControllers();
+        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(
+                this.controllersConfigFileLocation).getControllers();
     }
 
     /**
@@ -135,7 +132,6 @@ public class NFControllerDescription extends ControllerDescription {
      */
     public NFControllerDescription(NFControllerDescription controllerDesc) {
         this(controllerDesc.name, controllerDesc.hierarchicalType,
-            controllerDesc.controllersConfigFileLocation,
-            controllerDesc.synchronous);
+                controllerDesc.controllersConfigFileLocation, controllerDesc.synchronous);
     }
 }

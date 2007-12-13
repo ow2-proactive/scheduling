@@ -65,8 +65,7 @@ public class RemoteBundle extends ManageableEntity implements Serializable {
     public RemoteBundle() {
     }
 
-    public RemoteBundle(BundleInfo bInfo, RemoteGateway gateway,
-        ManageableEntity parent) {
+    public RemoteBundle(BundleInfo bInfo, RemoteGateway gateway, ManageableEntity parent) {
         this.info = bInfo;
         this.gateway = gateway;
         this.parent = parent;
@@ -74,9 +73,8 @@ public class RemoteBundle extends ManageableEntity implements Serializable {
             this.connection = parent.getConnection();
         }
         try {
-            this.on = new ObjectName(Constants.OSGI_JMX_PATH +
-                    "type=bundles,url=" + gateway.getUrl() + ",name=" +
-                    this.info.getName());
+            this.on = new ObjectName(Constants.OSGI_JMX_PATH + "type=bundles,url=" + gateway.getUrl() +
+                ",name=" + this.info.getName());
             EntitiesEventManager.getInstance().listenTo(this);
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
@@ -109,30 +107,26 @@ public class RemoteBundle extends ManageableEntity implements Serializable {
     }
 
     public Status start() {
-        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on,
-                "start", new Object[] { this.gateway.getIdTransaction() },
-                new String[] { Long.class.getName() });
+        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on, "start",
+                new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class.getName() });
         return status.getObject();
     }
 
     public Status stop() {
-        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on,
-                "stop", new Object[] { this.gateway.getIdTransaction() },
-                new String[] { Long.class.getName() });
+        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on, "stop",
+                new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class.getName() });
         return status.getObject();
     }
 
     public Status update() {
-        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on,
-                "update", new Object[] { this.gateway.getIdTransaction() },
-                new String[] { Long.class.getName() });
+        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on, "update",
+                new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class.getName() });
         return status.getObject();
     }
 
     public Status uninstall() {
-        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on,
-                "uninstall", new Object[] { this.gateway.getIdTransaction() },
-                new String[] { Long.class.getName() });
+        GenericTypeWrapper<Status> status = this.connection.invokeAsynchronous(this.on, "uninstall",
+                new Object[] { this.gateway.getIdTransaction() }, new String[] { Long.class.getName() });
         return status.getObject();
     }
 
@@ -185,7 +179,6 @@ public class RemoteBundle extends ManageableEntity implements Serializable {
 
     public void setBundleInfo(BundleInfo info) {
         this.info = info;
-        EntitiesEventManager.getInstance()
-                            .newEvent(this, EntitiesEventManager.BUNDLE_UPDATED);
+        EntitiesEventManager.getInstance().newEvent(this, EntitiesEventManager.BUNDLE_UPDATED);
     }
 }

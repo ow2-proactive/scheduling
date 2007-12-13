@@ -67,7 +67,7 @@ public class SSHNodeProcess extends SSHJVMProcess {
      * @param errorMessageLogger The logger that handles error stream of the target JVMProcess
      */
     public SSHNodeProcess(RemoteProcessMessageLogger inputMessageLogger,
-        RemoteProcessMessageLogger errorMessageLogger) {
+            RemoteProcessMessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
         setClassname("org.objectweb.proactive.core.runtime.StartRuntime");
     }

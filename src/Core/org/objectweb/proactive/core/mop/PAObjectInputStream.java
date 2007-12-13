@@ -41,8 +41,7 @@ public class PAObjectInputStream extends SunMarshalInputStream {
     }
 
     @Override
-    protected Class<?> resolveClass(ObjectStreamClass desc)
-        throws IOException, ClassNotFoundException {
+    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
         try {
             return super.resolveClass(desc);
         } catch (ClassNotFoundException e) {

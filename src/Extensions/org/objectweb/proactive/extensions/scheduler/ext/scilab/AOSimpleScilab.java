@@ -51,8 +51,8 @@ import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.Invalid
 public class AOSimpleScilab implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     static String nl = System.getProperty("line.separator");
     private String inputScript = null;
     private String[] outputVars = null;
@@ -67,17 +67,16 @@ public class AOSimpleScilab implements Serializable {
      * @param inputScript  a pre-scilab script that will be launched before the main one (e.g. to set input params)
      * @param scriptLines a list of lines which represent the main script
      */
-    public AOSimpleScilab(String inputScript, ArrayList<String> scriptLines,
-        String[] outputVars) {
+    public AOSimpleScilab(String inputScript, ArrayList<String> scriptLines, String[] outputVars) {
         this.inputScript = inputScript;
         this.scriptLines = scriptLines;
         this.outputVars = outputVars;
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-                public void run() {
-                    Scilab.Finish();
-                }
-            }));
+            public void run() {
+                Scilab.Finish();
+            }
+        }));
     }
 
     public Object execute(TaskResult... results) throws Throwable {
@@ -88,12 +87,10 @@ public class AOSimpleScilab implements Serializable {
         } catch (UnsatisfiedLinkError e) {
             StringWriter error_message = new StringWriter();
             PrintWriter pw = new PrintWriter(error_message);
-            pw.println("Can't find the Scilab libraries in host " +
-                java.net.InetAddress.getLocalHost());
+            pw.println("Can't find the Scilab libraries in host " + java.net.InetAddress.getLocalHost());
             pw.println("PATH=" + System.getenv("PATH"));
             pw.println("LD_LIBRARY_PATH=" + System.getenv("LD_LIBRARY_PATH"));
-            pw.println("java.library.path=" +
-                System.getProperty("java.library.path"));
+            pw.println("java.library.path=" + System.getProperty("java.library.path"));
 
             UnsatisfiedLinkError ne = new UnsatisfiedLinkError(error_message.toString());
             ne.initCause(e);

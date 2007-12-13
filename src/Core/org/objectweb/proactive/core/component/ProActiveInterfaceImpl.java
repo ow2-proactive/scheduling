@@ -42,8 +42,7 @@ import org.objectweb.fractal.api.Type;
  *
  * @author Matthieu Morel
  */
-public abstract class ProActiveInterfaceImpl implements java.io.Serializable,
-    ProActiveInterface {
+public abstract class ProActiveInterfaceImpl implements java.io.Serializable, ProActiveInterface {
     private Component owner;
     private String name;
     private Type type;

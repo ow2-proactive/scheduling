@@ -44,15 +44,13 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.view.MonitoringView;
 
 
-public class NewViewAction extends Action
-    implements IWorkbenchWindowActionDelegate {
+public class NewViewAction extends Action implements IWorkbenchWindowActionDelegate {
     private static int index = 0;
     public static final String NEW_VIEW = "NewMonitoringView";
 
     public NewViewAction() {
         this.setId(NEW_VIEW);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "newview.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "newview.gif"));
         this.setText("New Monitoring View");
         this.setToolTipText("New Monitoring View");
     }
@@ -79,10 +77,8 @@ public class NewViewAction extends Action
     @Override
     public void run() {
         try {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-                      .showView(MonitoringView.ID,
-                MonitoringView.ID + "#" + (++index),
-                IWorkbenchPage.VIEW_ACTIVATE);
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(MonitoringView.ID,
+                    MonitoringView.ID + "#" + (++index), IWorkbenchPage.VIEW_ACTIVATE);
         } catch (PartInitException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

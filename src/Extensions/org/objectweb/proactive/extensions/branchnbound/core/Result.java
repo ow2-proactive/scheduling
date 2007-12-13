@@ -150,11 +150,9 @@ public class Result implements Serializable {
         }
     }
 
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         Object readObject = in.readObject();
-        if (readObject instanceof String &&
-                (((String) readObject).compareTo(NORESULT) == 0)) {
+        if (readObject instanceof String && (((String) readObject).compareTo(NORESULT) == 0)) {
             this.theSolution = new NoResultsException();
         } else {
             this.theSolution = readObject;

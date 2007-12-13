@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body;
 
-
 /**
  * This class is the default implementation of the Body interface.
  * An implementation of the Body interface, which lets the reified object
@@ -65,8 +64,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class ActiveBody extends ComponentBodyImpl implements Runnable,
-    java.io.Serializable {
+public class ActiveBody extends ComponentBodyImpl implements Runnable, java.io.Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
 
     //
@@ -95,11 +93,9 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
     /**
      * Builds the body object, then fires its service thread
      */
-    public ActiveBody(ConstructorCall c, String nodeURL, Active activity,
-        MetaObjectFactory factory, String jobID)
-        throws java.lang.reflect.InvocationTargetException,
-            ConstructorCallExecutionFailedException,
-            ActiveObjectCreationException {
+    public ActiveBody(ConstructorCall c, String nodeURL, Active activity, MetaObjectFactory factory,
+            String jobID) throws java.lang.reflect.InvocationTargetException,
+            ConstructorCallExecutionFailedException, ActiveObjectCreationException {
         // Creates the reified object
         super(c.execute(), nodeURL, activity, factory, jobID);
 
@@ -109,8 +105,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         // TODO_M read some flag before doing this?
         if (getProActiveComponentImpl() != null) {
             try {
-                getProActiveComponentImpl()
-                    .getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
+                getProActiveComponentImpl().getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
                 activity = new ComponentActivityPriority(activity, reifiedObject);
             } catch (NoSuchInterfaceException e) {
                 activity = new ComponentActivity(activity, reifiedObject);
@@ -197,8 +192,8 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
                 }
             }
         } catch (Exception e) {
-            logger.error("Exception occured in runActivity method of body " +
-                toString() + ". Now terminating the body");
+            logger.error("Exception occured in runActivity method of body " + toString() +
+                ". Now terminating the body");
 
             e.printStackTrace();
             terminate();
@@ -227,8 +222,7 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
 
         // get the incarnation number if ft is enable
         String inc = (this.ftmanager != null) ? ("" + this.ftmanager) : ("");
-        Thread t = new Thread(this,
-                shortClassName(getName()) + " on " + getNodeURL() + inc);
+        Thread t = new Thread(this, shortClassName(getName()) + " on " + getNodeURL() + inc);
 
         // Wait for the registration of this Body inside the LocalBodyStore
         // to avoid a race condition (t not yet scheduled and getActiveObjects() called)
@@ -264,16 +258,14 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable,
         return fqn.substring(n + 1);
     }
 
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("out = " + out);
         }
         out.defaultWriteObject();
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         if (logger.isDebugEnabled()) {
             logger.debug("in = " + in);
         }

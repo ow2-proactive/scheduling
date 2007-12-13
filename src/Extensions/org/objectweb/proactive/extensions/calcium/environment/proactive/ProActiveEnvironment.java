@@ -84,12 +84,9 @@ public class ProActiveEnvironment implements EnvironmentFactory {
      */
     public ProActiveEnvironment(String descriptor) throws ProActiveException {
         VariableContract vc = new VariableContract();
-        vc.setVariableFromProgram("SKELETON_FRAMEWORK_VN", "",
-            VariableContractType.DescriptorVariable);
-        vc.setVariableFromProgram("INTERPRETERS_VN", "",
-            VariableContractType.DescriptorVariable);
-        vc.setVariableFromProgram("MAX_CINTERPRETERS", "3",
-            VariableContractType.ProgramDefaultVariable);
+        vc.setVariableFromProgram("SKELETON_FRAMEWORK_VN", "", VariableContractType.DescriptorVariable);
+        vc.setVariableFromProgram("INTERPRETERS_VN", "", VariableContractType.DescriptorVariable);
+        vc.setVariableFromProgram("MAX_CINTERPRETERS", "3", VariableContractType.ProgramDefaultVariable);
 
         pad = PADeployment.getProactiveDescriptor(descriptor, vc);
         vc = pad.getVariableContract();
@@ -101,8 +98,7 @@ public class ProActiveEnvironment implements EnvironmentFactory {
 
         taskpool = Util.createActiveTaskPool(frameworkNode);
         fserver = Util.createFileServer(frameworkNode);
-        interpool = Util.createAOInterpreterPool(taskpool, fserver,
-                frameworkNode, nodes, maxCInterp);
+        interpool = Util.createAOInterpreterPool(taskpool, fserver, frameworkNode, nodes, maxCInterp);
 
         dispatcher = new TaskDispatcher(taskpool, interpool);
     }

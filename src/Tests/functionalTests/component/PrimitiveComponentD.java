@@ -47,16 +47,14 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  */
 public class PrimitiveComponentD implements I1, BindingController {
-    protected final static Logger logger = ProActiveLogger.getLogger(
-            "functionalTestss.components");
+    protected final static Logger logger = ProActiveLogger.getLogger("functionalTestss.components");
     public final static String MESSAGE = "-->d";
 
     //public final static Message MESSAGE = new Message("-->PrimitiveComponentD");
     public final static String I2_ITF_NAME = "i2";
 
     // typed collective interface
-    I2 i2 = (I2) Fractive.createMulticastClientInterface(I2_ITF_NAME,
-            I2.class.getName());
+    I2 i2 = (I2) Fractive.createMulticastClientInterface(I2_ITF_NAME, I2.class.getName());
 
     // ref on the Group
     Group i2Group = PAGroup.getGroup(i2);
@@ -110,8 +108,7 @@ public class PrimitiveComponentD implements I1, BindingController {
     /* (non-Javadoc)
      * @see org.objectweb.fractal.api.control.BindingController#lookupFc(java.lang.String)
      */
-    public Object lookupFc(String clientItfName)
-        throws NoSuchInterfaceException {
+    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
         if (clientItfName.equals(I2_ITF_NAME)) {
             return i2;
         } else if (i2Group.containsKey(clientItfName)) {
@@ -127,8 +124,7 @@ public class PrimitiveComponentD implements I1, BindingController {
     /* (non-Javadoc)
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
-    public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if (clientItfName.equals(I2_ITF_NAME)) {
             i2Group.clear();

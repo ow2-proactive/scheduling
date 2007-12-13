@@ -71,8 +71,7 @@ public class SimpleExternalProcess extends AbstractExternalProcess {
      * @param messageLogger The logger that handles input and error stream of this process
      * @param targetCommand The command to run
      */
-    public SimpleExternalProcess(RemoteProcessMessageLogger messageLogger,
-        String targetCommand) {
+    public SimpleExternalProcess(RemoteProcessMessageLogger messageLogger, String targetCommand) {
         this(messageLogger, messageLogger, targetCommand);
     }
 
@@ -82,9 +81,8 @@ public class SimpleExternalProcess extends AbstractExternalProcess {
      * @param errorMessageLogger The logger that handles error stream of this process
      * @param targetCommand The command to run
      */
-    public SimpleExternalProcess(
-        RemoteProcessMessageLogger inputMessageLogger,
-        RemoteProcessMessageLogger errorMessageLogger, String targetCommand) {
+    public SimpleExternalProcess(RemoteProcessMessageLogger inputMessageLogger,
+            RemoteProcessMessageLogger errorMessageLogger, String targetCommand) {
         super(inputMessageLogger, errorMessageLogger);
         this.targetCommand = targetCommand;
     }

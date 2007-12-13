@@ -100,7 +100,7 @@ public interface VirtualNodeInternal extends VirtualNode {
 
     /**
      * Indicates if the Virtual Node has a contract with this Node Provider
-          *
+     *
      * @param nodeProvider a Node Provider
      * @return true if a contract exists between the Virtual Node and the Node Provider, false
      * otherwise

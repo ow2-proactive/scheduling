@@ -53,8 +53,7 @@ import org.objectweb.proactive.p2p.service.util.P2PConstants;
  *
  * Created on Jan 4, 2005
  */
-public class P2PFirstContact implements Serializable, RunActive, P2PConstants,
-    ProActiveInternalObject {
+public class P2PFirstContact implements Serializable, RunActive, P2PConstants, ProActiveInternalObject {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.P2P_FIRST_CONTACT);
     private Vector peers;
     private P2PAcquaintanceManager acqGroup;
@@ -73,8 +72,7 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants,
      * @param acquaintances ProActive group of acquaintances.
      * @param local local P2P service.
      */
-    public P2PFirstContact(Vector peers, P2PAcquaintanceManager acquaintances,
-        P2PService local) {
+    public P2PFirstContact(Vector peers, P2PAcquaintanceManager acquaintances, P2PService local) {
         this.peers = peers;
         this.acqGroup = acquaintances;
         this.localP2pService = local;
@@ -111,16 +109,14 @@ public class P2PFirstContact implements Serializable, RunActive, P2PConstants,
                 Node distNode = NodeFactory.getNode(peerUrl);
                 P2PService peer = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
 
-                if (!peer.equals(this.localP2pService) &&
-                        !this.acqGroup.contains(peer).booleanValue()) {
+                if (!peer.equals(this.localP2pService) && !this.acqGroup.contains(peer).booleanValue()) {
                     // Send a message to the remote peer to record me
                     peer.register(this.localP2pService);
                     // Add the peer in my group of acquaintances
                     this.acqGroup.add(peer);
                 }
             } catch (Exception e) {
-                logger.debug("The peer at " + peerUrl +
-                    " couldn't be contacted", e);
+                logger.debug("The peer at " + peerUrl + " couldn't be contacted", e);
             }
         }
     }

@@ -30,7 +30,6 @@
  */
 package doc;
 
-
 /**
  * @author  ProActive Team
  * @version 1.0
@@ -43,8 +42,8 @@ public class ReplaceStringInHTML {
 
     public static void main(String[] args) throws java.io.IOException {
         if (args.length < 3) {
-            System.out.println(
-                "there should be 3 args: directory, string_to_replace, string_to_replace_with");
+            System.out
+                    .println("there should be 3 args: directory, string_to_replace, string_to_replace_with");
             System.exit(-1);
         }
         replace = args[1];
@@ -53,8 +52,7 @@ public class ReplaceStringInHTML {
         filter(sourceDir);
     }
 
-    private static void filterFile(java.io.File file)
-        throws java.io.IOException {
+    private static void filterFile(java.io.File file) throws java.io.IOException {
         String name = file.getName();
         if (!name.endsWith(".html")) {
             return;
@@ -63,14 +61,13 @@ public class ReplaceStringInHTML {
         byte[] b = getBytesFromInputStream(new java.io.FileInputStream(file));
         String html = new String(b);
         if (html.indexOf(replace) >= 0) {
-        	System.out.println("Replacing "+replace+" by "+replace_with);
+            System.out.println("Replacing " + replace + " by " + replace_with);
             html = html.replaceAll(replace, replace_with);
 
             b = html.getBytes();
             java.io.File newFile = new java.io.File(file.getParentFile(), name);
             newFile.delete();
-            java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(
-                        newFile));
+            java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(newFile));
             out.write(b, 0, b.length);
             out.flush();
             out.close();
@@ -100,8 +97,7 @@ public class ReplaceStringInHTML {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private static byte[] getBytesFromInputStream(java.io.InputStream in)
-        throws java.io.IOException {
+    private static byte[] getBytesFromInputStream(java.io.InputStream in) throws java.io.IOException {
         java.io.DataInputStream din = new java.io.DataInputStream(in);
         byte[] bytecodes = new byte[in.available()];
         try {

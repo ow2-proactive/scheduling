@@ -35,18 +35,17 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import static org.objectweb.proactive.core.ssh.SSH.logger;
 
+
 /**
  * A helper class to manager SSH Public keys
  *
  */
 public class SSHKeys {
-    static final public String[] IDENTITY_FILES = new String[] {
-            "identity", "id_rsa", "id_dsa"
-        };
+    static final public String[] IDENTITY_FILES = new String[] { "identity", "id_rsa", "id_dsa" };
 
     /** Default directory for public keys */
-    static final public String SSH_DIR = System.getProperty("user.home") +
-        File.separator + ".ssh" + File.separator;
+    static final public String SSH_DIR = System.getProperty("user.home") + File.separator + ".ssh" +
+        File.separator;
 
     /** Default suffix for public keys */
     private final static String KEY_SUFFIX = ".pub";
@@ -69,18 +68,15 @@ public class SSHKeys {
 
         File dir = new File(SshParameters.getSshKeyDirectory());
         if (!dir.exists()) {
-            logger.error("Cannot open SSH connection, " + dir +
-                "does not exist");
+            logger.error("Cannot open SSH connection, " + dir + "does not exist");
             throw new IOException(dir + "does not exist");
         }
         if (!dir.isDirectory()) {
-            logger.error("Cannot open SSH connection, " + dir +
-                "is not a directory");
+            logger.error("Cannot open SSH connection, " + dir + "is not a directory");
             throw new IOException(dir + "does not exist");
         }
         if (!dir.canRead()) {
-            logger.error("Cannot open SSH connection, " + dir +
-                "is not readable");
+            logger.error("Cannot open SSH connection, " + dir + "is not readable");
             throw new IOException(dir + "does not exist");
         }
 
@@ -99,8 +95,7 @@ public class SSHKeys {
         public boolean accept(File dir, String name) {
             if (name.endsWith(".pub")) {
                 // Look it this file without ".pub" exist
-                File tmp = new File(dir,
-                        name.substring(0, name.length() - KEY_SUFFIX_LEN));
+                File tmp = new File(dir, name.substring(0, name.length() - KEY_SUFFIX_LEN));
                 return tmp.exists() && tmp.canRead() && tmp.isFile();
             }
 

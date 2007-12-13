@@ -92,17 +92,16 @@ public abstract class StandardFrame extends javax.swing.JFrame {
         final String date = dateFormat.format(new java.util.Date());
         final String threadName = Thread.currentThread().getName();
         SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    Document doc = messageArea.getDocument();
-                    try {
-                        doc.insertString(doc.getLength(),
-                            date + " (" + threadName + ")\n      => " +
-                            message + "\n", regularStyle);
-                    } catch (Exception e) {
-                        logger.error("Couldn't insert initial text.");
-                    }
+            public void run() {
+                Document doc = messageArea.getDocument();
+                try {
+                    doc.insertString(doc.getLength(), date + " (" + threadName + ")\n      => " + message +
+                        "\n", regularStyle);
+                } catch (Exception e) {
+                    logger.error("Couldn't insert initial text.");
                 }
-            });
+            }
+        });
     }
 
     //Method with possibility of color text
@@ -112,18 +111,18 @@ public abstract class StandardFrame extends javax.swing.JFrame {
         final Style s = messageArea.addStyle("colored", regularStyle);
         StyleConstants.setForeground(s, color);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    Document doc = messageArea.getDocument();
-                    try {
-                        doc.insertString(doc.getLength(),
-                            date + " (" + threadName + ")\n      => ",
-                            regularStyle);
-                        doc.insertString(doc.getLength(), message + "\n", s);
-                    } catch (Exception e) {
-                        logger.error("Couldn't insert initial text.");
-                    }
+            public void run() {
+                Document doc = messageArea.getDocument();
+                try {
+                    doc
+                            .insertString(doc.getLength(), date + " (" + threadName + ")\n      => ",
+                                    regularStyle);
+                    doc.insertString(doc.getLength(), message + "\n", s);
+                } catch (Exception e) {
+                    logger.error("Couldn't insert initial text.");
                 }
-            });
+            }
+        });
     }
 
     //
@@ -139,27 +138,23 @@ public abstract class StandardFrame extends javax.swing.JFrame {
 
     protected abstract javax.swing.JPanel createRootPanel();
 
-    protected javax.swing.JPanel createMessageZonePanel(
-        final javax.swing.JTextPane area) {
-        Style styleDef = StyleContext.getDefaultStyleContext()
-                                     .getStyle(StyleContext.DEFAULT_STYLE);
+    protected javax.swing.JPanel createMessageZonePanel(final javax.swing.JTextPane area) {
+        Style styleDef = StyleContext.getDefaultStyleContext().getStyle(StyleContext.DEFAULT_STYLE);
         regularStyle = area.addStyle("regular", styleDef);
         area.setFont(new java.awt.Font("SansSerif", java.awt.Font.PLAIN, 10));
 
         JPanel panel = new javax.swing.JPanel(new java.awt.BorderLayout());
-        javax.swing.border.TitledBorder border = new javax.swing.border.TitledBorder(
-                "Messages");
+        javax.swing.border.TitledBorder border = new javax.swing.border.TitledBorder("Messages");
         panel.setBorder(border);
         javax.swing.JPanel topPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
 
         // clear log button
-        javax.swing.JButton clearLogButton = new javax.swing.JButton(
-                "clear messages");
+        javax.swing.JButton clearLogButton = new javax.swing.JButton("clear messages");
         clearLogButton.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    area.setText("");
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                area.setText("");
+            }
+        });
         topPanel.add(clearLogButton, java.awt.BorderLayout.WEST);
         panel.add(topPanel, java.awt.BorderLayout.NORTH);
         javax.swing.JScrollPane pane = new javax.swing.JScrollPane(area);
@@ -195,10 +190,10 @@ public abstract class StandardFrame extends javax.swing.JFrame {
         setSize(width, height + MESSAGE_ZONE_HEIGHT);
         setLocation(30, 30);
         addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosing(java.awt.event.WindowEvent e) {
-                    System.exit(0);
-                }
-            });
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                System.exit(0);
+            }
+        });
     }
 }

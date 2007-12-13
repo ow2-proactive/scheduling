@@ -69,12 +69,10 @@ public class RemoteFileImpl implements RemoteFile {
     }
 
     //@Override
-    public RemoteFile push(Node dstNode, File dstFile)
-        throws IOException {
+    public RemoteFile push(Node dstNode, File dstFile) throws IOException {
         waitFor();
 
-        return PAFileTransfer.transfer(getRemoteNode(), getRemoteFilePath(),
-            dstNode, dstFile);
+        return PAFileTransfer.transfer(getRemoteNode(), getRemoteFilePath(), dstNode, dstFile);
     }
 
     //@Override
@@ -129,15 +127,13 @@ public class RemoteFileImpl implements RemoteFile {
         return ftsDst.remove(file);
     }
 
-    protected FileTransferServiceReceive getRemoteFileTransferService()
-        throws IOException {
+    protected FileTransferServiceReceive getRemoteFileTransferService() throws IOException {
         try {
             return FileTransferEngine.getFileTransferEngine(node).getFTS();
         } catch (Exception e) {
             //TODO change when moving to Java 1.6
             //throw new IOException("Unable to connect or use ProActive Node: " + node, e);
-            throw new IOException("Unable to connect or use ProActive Node: " +
-                node + e.getMessage());
+            throw new IOException("Unable to connect or use ProActive Node: " + node + e.getMessage());
         }
     }
 }

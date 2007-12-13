@@ -66,8 +66,7 @@ public abstract class Executable implements Serializable {
      * @throws any exception thrown by the user's code
      * @return any object from the user.
      */
-    public abstract Object execute(TaskResult... results)
-        throws Throwable;
+    public abstract Object execute(TaskResult... results) throws Throwable;
 
     /**
      * Initialize the task with the arguments given in the constructor.<br>
@@ -91,8 +90,7 @@ public abstract class Executable implements Serializable {
      * @param args the arguments as a map.
      * @throws Exception an exception that the user can throw if something goes wrong.
      */
-    public abstract void init(Map<String, Object> args)
-        throws Exception;
+    public abstract void init(Map<String, Object> args) throws Exception;
 
     /**
      * Set the arguments map to this Executable task.

@@ -83,8 +83,7 @@ public abstract class MOPRuntimeException extends RuntimeException {
             if (super.getMessage() == null) {
                 return detail.getMessage();
             } else {
-                return super.getMessage() + "; nested exception is: \n" +
-                detail.toString();
+                return super.getMessage() + "; nested exception is: \n" + detail.toString();
             }
         }
     }

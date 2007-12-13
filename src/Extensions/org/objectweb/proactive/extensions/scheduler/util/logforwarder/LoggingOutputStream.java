@@ -94,8 +94,7 @@ public class LoggingOutputStream extends OutputStream {
      * @param level the Level to use when writing to the Logger
      * @throws IllegalArgumentException if cat == null or priority == null
      */
-    public LoggingOutputStream(Logger log, Level level)
-        throws IllegalArgumentException {
+    public LoggingOutputStream(Logger log, Level level) throws IllegalArgumentException {
         if (log == null) {
             throw new IllegalArgumentException("cat == null");
         }

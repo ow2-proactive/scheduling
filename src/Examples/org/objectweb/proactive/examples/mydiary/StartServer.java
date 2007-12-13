@@ -50,11 +50,11 @@ public class StartServer {
             pad.activateMappings();
 
             if (args.length == 2) {
-                diary = (Diary) PAActiveObject.newActive("org.objectweb.proactive.examples.mydiary.DiaryImpl",
-                        new Object[] {  });
+                diary = (Diary) PAActiveObject.newActive(
+                        "org.objectweb.proactive.examples.mydiary.DiaryImpl", new Object[] {});
             } else {
-                diary = (Diary) PAActiveObject.newActive("org.objectweb.proactive.examples.mydiary.DiaryImpl",
-                        new Object[] { args[1] });
+                diary = (Diary) PAActiveObject.newActive(
+                        "org.objectweb.proactive.examples.mydiary.DiaryImpl", new Object[] { args[1] });
             }
             PAActiveObject.register(diary, "//localhost/MyDiary");
         } catch (Exception e) {

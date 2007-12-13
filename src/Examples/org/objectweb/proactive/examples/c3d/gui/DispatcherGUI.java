@@ -95,12 +95,12 @@ public class DispatcherGUI implements ActionListener {
         this.mainFrame.setVisible(true);
         this.c3dDispatcher = c3dDispatcher;
         mainFrame.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    c3dDispatcher.exit();
-                    trash();
-                }
-            });
+            @Override
+            public void windowClosing(WindowEvent e) {
+                c3dDispatcher.exit();
+                trash();
+            }
+        });
     }
 
     /**
@@ -139,8 +139,7 @@ public class DispatcherGUI implements ActionListener {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
         mainPanel.add(createInfoText(), BorderLayout.NORTH);
-        mainPanel.add(createLogPanel("Application Log", new Dimension(200, 200)),
-            BorderLayout.CENTER);
+        mainPanel.add(createLogPanel("Application Log", new Dimension(200, 200)), BorderLayout.CENTER);
 
         JPanel extraPanel = new JPanel();
         extraPanel.setLayout(new GridLayout(2, 1));
@@ -157,18 +156,17 @@ public class DispatcherGUI implements ActionListener {
         JPanel infoPanel = new JPanel(); // the box should have been enough, but the label overwrites the menu!!!
         Box box = Box.createVerticalBox();
         String localhostName = "";
-        localhostName = URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                                .getInetAddress());
-        Label machine = new Label("on " + localhostName + " (" +
-                System.getProperty("os.name") + ")", Label.CENTER);
+        localhostName = URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
+        Label machine = new Label("on " + localhostName + " (" + System.getProperty("os.name") + ")",
+            Label.CENTER);
         Label header = new Label("C3D Dispatcher", Label.CENTER);
         header.setFont(new Font("SansSerif", Font.ITALIC + Font.BOLD, 18));
 
         box.add(header);
         box.add(machine);
         infoPanel.add(box);
-        infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-                header.getSize().height + machine.getSize().height));
+        infoPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, header.getSize().height +
+            machine.getSize().height));
         return infoPanel;
     }
 
@@ -282,8 +280,7 @@ public class DispatcherGUI implements ActionListener {
             addAvailableEngine(noMoreUsed);
         }
 
-        while ((this.usedEngineListModel.size() < nbEnginesToUse) &&
-                !this.availableEngineListModel.isEmpty()) {
+        while ((this.usedEngineListModel.size() < nbEnginesToUse) && !this.availableEngineListModel.isEmpty()) {
             String nowUsed = (String) this.availableEngineListModel.get(0);
             addUsedEngine(nowUsed);
         }
@@ -321,7 +318,7 @@ public class DispatcherGUI implements ActionListener {
             if (benchmarkMenuItem.getText().equals("Stop benchmark")) {
                 benchmarkMenuItem.setText("Benchmark");
                 c3dDispatcher.doBenchmarks(); // this call says "Stop the benchmark,
-                                              // it is read by the doBenchmark method which checks the request queue for this...
+                // it is read by the doBenchmark method which checks the request queue for this...
             } else {
                 benchmarkMenuItem.setText("Stop benchmark");
                 c3dDispatcher.doBenchmarks();

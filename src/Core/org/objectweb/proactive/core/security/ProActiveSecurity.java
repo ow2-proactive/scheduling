@@ -44,8 +44,7 @@ public class ProActiveSecurity {
         //
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
-            return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
-                    encodedCert));
+            return (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {

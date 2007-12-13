@@ -43,6 +43,7 @@ import functionalTests.ft.Collector;
 import functionalTests.ft.ReInt;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * AO fails during the computation, and is restarted.
  * Communications between passive object, non-ft active object and ft active object.
@@ -50,17 +51,17 @@ import static junit.framework.Assert.assertTrue;
 public class Test extends FunctionalTest {
     private int result = 0;
     private JVMProcessImpl server;
-    private static String FT_XML_LOCATION_UNIX = Test.class.getResource(
-            "/functionalTests/ft/testFT_PML.xml").getPath();
+    private static String FT_XML_LOCATION_UNIX = Test.class.getResource("/functionalTests/ft/testFT_PML.xml")
+            .getPath();
     private static int AWAITED_RESULT = 1771014405;
 
     @org.junit.Test
     public void action() throws Exception {
         // deployer le FTServer !
-        this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
+        this.server = new JVMProcessImpl(
+            new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
         // this.server = new JVMProcessImpl(new org.objectweb.proactive.core.process.AbstractExternalProcess.NullMessageLogger());
-        this.server.setClassname(
-            "org.objectweb.proactive.core.body.ft.servers.StartFTServer");
+        this.server.setClassname("org.objectweb.proactive.core.body.ft.servers.StartFTServer");
         this.server.setJvmOptions(FunctionalTest.JVM_PARAMETERS);
         this.server.setParameters("-proto pml");
         this.server.startProcess();
@@ -76,14 +77,11 @@ public class Test extends FunctionalTest {
         vnode = pad.getVirtualNode("Workers");
         Node[] nodes = vnode.getNodes();
 
-        Agent a = (Agent) PAActiveObject.newActive(Agent.class.getName(),
-                new Object[0], nodes[0]);
-        Agent b = (Agent) PAActiveObject.newActive(Agent.class.getName(),
-                new Object[0], nodes[1]);
+        Agent a = (Agent) PAActiveObject.newActive(Agent.class.getName(), new Object[0], nodes[0]);
+        Agent b = (Agent) PAActiveObject.newActive(Agent.class.getName(), new Object[0], nodes[1]);
 
         // not ft !
-        Collector c = (Collector) PAActiveObject.newActive(Collector.class.getName(),
-                new Object[0]);
+        Collector c = (Collector) PAActiveObject.newActive(Collector.class.getName(), new Object[0]);
 
         a.initCounter(1);
         b.initCounter(1);

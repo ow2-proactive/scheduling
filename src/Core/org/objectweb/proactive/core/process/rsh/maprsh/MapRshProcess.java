@@ -59,9 +59,8 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  * @since   ProActive 0.9.4
  */
 public class MapRshProcess extends AbstractExternalProcessDecorator {
-    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + File.separator + "ProActive" + File.separator +
-        "scripts" + File.separator + "unix" + File.separator +
+    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home") + File.separator +
+        "ProActive" + File.separator + "scripts" + File.separator + "unix" + File.separator +
         "gridexperiment" + File.separator + "oasis-exp";
     protected String scriptLocation = DEFAULT_SCRIPT_LOCATION;
     private String parallelize = null;
@@ -143,8 +142,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
         StringBuilder command = new StringBuilder();
         try {
             java.io.File script = new java.io.File(scriptLocation);
-            byte[] b = getBytesFromInputStream(new java.io.FileInputStream(
-                        script));
+            byte[] b = getBytesFromInputStream(new java.io.FileInputStream(script));
             String scriptText = new String(b);
             scriptText = removeJavaCommand(scriptText);
             //System.out.println(scriptText);
@@ -154,8 +152,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
             }
             b = scriptText.getBytes();
             // script.delete();
-            java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(
-                        script));
+            java.io.OutputStream out = new java.io.BufferedOutputStream(new java.io.FileOutputStream(script));
             out.write(b, 0, b.length);
             out.flush();
             out.close();
@@ -221,8 +218,7 @@ public class MapRshProcess extends AbstractExternalProcessDecorator {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private static byte[] getBytesFromInputStream(java.io.InputStream in)
-        throws java.io.IOException {
+    private static byte[] getBytesFromInputStream(java.io.InputStream in) throws java.io.IOException {
         java.io.DataInputStream din = new java.io.DataInputStream(in);
         byte[] bytecodes = new byte[in.available()];
         try {

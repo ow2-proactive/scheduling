@@ -37,6 +37,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertFalse;
 
+
 /**
  * Test AO loop migration
  */
@@ -54,8 +55,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         node1 = TestNodes.getSameVMNode().getNodeInformation().getURL();
         node2 = TestNodes.getLocalVMNode().getNodeInformation().getURL();
-        a = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { node1, node2 }, node1);
+        a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { node1, node2 }, node1);
 
         assertFalse(a.isException());
     }

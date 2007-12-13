@@ -40,12 +40,11 @@ import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
 
 
-public class A implements InitActive, RunActive, EndActive,
-    java.io.Serializable {
+public class A implements InitActive, RunActive, EndActive, java.io.Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private String name = "anonymous";
     private boolean onewayCallReceived = false;
 
@@ -82,9 +81,7 @@ public class A implements InitActive, RunActive, EndActive,
 
     public String getHostName() {
         try { //return the name of the Host
-            return URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                           .getInetAddress())
-                             .toUpperCase();
+            return URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress()).toUpperCase();
         } catch (Exception e) {
             e.printStackTrace();
             return "getName failed";

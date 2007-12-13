@@ -38,6 +38,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test newActive method on the local default node
  */
@@ -48,13 +49,11 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        a = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { "toto" });
+        a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
         name = a.getName();
         nodeUrl = a.getNodeUrl();
 
         assertTrue(name.equals("toto"));
-        assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(
-                    ProActiveInet.getInstance().getInetAddress())) != -1);
+        assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress())) != -1);
     }
 }

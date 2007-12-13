@@ -58,6 +58,6 @@ public interface ProActiveImplementationBuilder extends ImplementationBuilder {
      * @throws Exception if the creation of the component failed
      */
     public Object createComponent(Object type, String name, String definition,
-        ControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode adlVN, Map context) throws Exception;
+            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode adlVN,
+            Map context) throws Exception;
 }

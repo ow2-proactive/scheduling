@@ -88,12 +88,11 @@ public class Registry {
                 }
                 table.put(name, component);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("added component " + name +
-                        " to the local registry");
+                    logger.debug("added component " + name + " to the local registry");
                 }
             } catch (NoSuchInterfaceException e) {
-                throw new ADLException("It is not possible to register a component without a NameController controller",
-                    null);
+                throw new ADLException(
+                    "It is not possible to register a component without a NameController controller", null);
             }
         }
     }

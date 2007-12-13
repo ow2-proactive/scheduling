@@ -47,6 +47,5 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  */
 @PublicAPI
 public interface Divide<P, X> extends Muscle<P, List<X>> {
-    public List<X> divide(SkeletonSystem system, P param)
-        throws Exception;
+    public List<X> divide(SkeletonSystem system, P param) throws Exception;
 }

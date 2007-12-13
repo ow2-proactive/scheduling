@@ -59,13 +59,11 @@ public class SshTunnelFactory {
         return _factory;
     }
 
-    static public SshTunnel createTunnel(String host, int port)
-        throws java.io.IOException {
+    static public SshTunnel createTunnel(String host, int port) throws java.io.IOException {
         return getFactory().create(host, port);
     }
 
-    static public void reportUnusedTunnel(SshTunnel tunnel)
-        throws Exception {
+    static public void reportUnusedTunnel(SshTunnel tunnel) throws Exception {
         getFactory().reportUnused(tunnel);
     }
 
@@ -73,17 +71,17 @@ public class SshTunnelFactory {
         _unused = new java.util.Hashtable<String, UnusedTunnel>();
         if (PAProperties.PA_SSH_TUNNELING_USE_GC.isTrue()) {
             Thread gcThread = new Thread() {
-                    @Override
-                    public void run() {
-                        while (true) {
-                            try {
-                                sleep(1000);
-                            } catch (InterruptedException e) {
-                            }
-                            getFactory().GC();
+                @Override
+                public void run() {
+                    while (true) {
+                        try {
+                            sleep(1000);
+                        } catch (InterruptedException e) {
                         }
+                        getFactory().GC();
                     }
-                };
+                }
+            };
             gcThread.start();
         }
     }
@@ -92,8 +90,7 @@ public class SshTunnelFactory {
         return host + port;
     }
 
-    private synchronized SshTunnel create(String host, int port)
-        throws java.io.IOException {
+    private synchronized SshTunnel create(String host, int port) throws java.io.IOException {
         if (PAProperties.PA_SSH_TUNNELING_USE_GC.isTrue()) {
             UnusedTunnel unused = _unused.get(getKey(host, port));
             SshTunnel tunnel;
@@ -111,8 +108,7 @@ public class SshTunnelFactory {
         }
     }
 
-    private synchronized void reportUnused(SshTunnel tunnel)
-        throws Exception {
+    private synchronized void reportUnused(SshTunnel tunnel) throws Exception {
         if (tunnel != null) {
             String host = tunnel.getDistantHost();
             int port = tunnel.getDistantPort();
@@ -139,8 +135,7 @@ public class SshTunnelFactory {
             if (tunnel.isOldEnough()) {
                 try {
                     SshTunnel sshTunnel = tunnel.getTunnel();
-                    logger.debug("gc kill unused tunnel " +
-                        sshTunnel.getDistantHost() + ":" +
+                    logger.debug("gc kill unused tunnel " + sshTunnel.getDistantHost() + ":" +
                         sshTunnel.getDistantPort());
                     sshTunnel.realClose();
                 } catch (Exception e) {

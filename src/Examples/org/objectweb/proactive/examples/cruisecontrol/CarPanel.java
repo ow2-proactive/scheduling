@@ -66,8 +66,7 @@ public class CarPanel extends javax.swing.JPanel {
     javax.swing.JLabel distanceLabel;
 
     /** Constructors : displays the buttons, the labels, the distance  and the speedometer */
-    public CarPanel(final CruiseControlApplet parent,
-        final Interface activeObject) {
+    public CarPanel(final CruiseControlApplet parent, final Interface activeObject) {
         setLayout(null);
         setBorder(new javax.swing.border.LineBorder(java.awt.Color.black));
 
@@ -142,42 +141,42 @@ public class CarPanel extends javax.swing.JPanel {
         add(distanceLabel);
 
         EngineOn.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    activeObject.engineOn();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeObject.engineOn();
+            }
+        });
         EngineOff.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    activeObject.engineOff();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeObject.engineOff();
+            }
+        });
         Brake.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    activeObject.brake();
-                    brake();
-                    parent.controlPaneOff();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeObject.brake();
+                brake();
+                parent.controlPaneOff();
+            }
+        });
         Inc.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    activeObject.accelerate();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeObject.accelerate();
+            }
+        });
         Dec.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    activeObject.decelerate();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeObject.decelerate();
+            }
+        });
         UpAlpha.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    activeObject.incAlpha();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeObject.incAlpha();
+            }
+        });
         DownAlpha.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    activeObject.decAlpha();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeObject.decAlpha();
+            }
+        });
     }
 
     ///////////////////////////////////////////////////////////////

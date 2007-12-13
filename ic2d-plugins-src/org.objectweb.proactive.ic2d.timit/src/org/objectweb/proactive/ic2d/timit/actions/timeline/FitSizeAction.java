@@ -41,14 +41,12 @@ public class FitSizeAction extends Action {
 
     public FitSizeAction() {
         super.setId(FIT_SIZE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "fit_timeline.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "fit_timeline.gif"));
         super.setToolTipText(FIT_SIZE_ACTION);
         super.setEnabled(false);
     }
 
-    public final void setTarget(
-        final TimeLineChartEditPart durationChartEditPart) {
+    public final void setTarget(final TimeLineChartEditPart durationChartEditPart) {
         super.setEnabled(true);
         this.durationChartEditPart = durationChartEditPart;
     }

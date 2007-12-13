@@ -45,24 +45,22 @@ import org.xml.sax.SAXException;
  * TODO To change the template for this generated type comment go to Window -
  * Preferences - Java - Code Style - Code Templates
  */
-public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
-    implements ProActiveDescriptorConstants {
+public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller implements
+        ProActiveDescriptorConstants {
     protected ProActiveDescriptorInternal proActiveDescriptor;
 
-    public FileTransferDefinitionsHandler(
-        ProActiveDescriptorInternal proActiveDescriptor) {
+    public FileTransferDefinitionsHandler(ProActiveDescriptorInternal proActiveDescriptor) {
         super(false);
         this.proActiveDescriptor = proActiveDescriptor;
         addHandler(FILE_TRANSFER_TAG, new FileTransferHandler());
     }
 
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws SAXException {
     }
 
-    public class FileTransferHandler extends PassiveCompositeUnmarshaller
-        implements ProActiveDescriptorConstants {
+    public class FileTransferHandler extends PassiveCompositeUnmarshaller implements
+            ProActiveDescriptorConstants {
         protected FileTransferDefinition fileTransfer;
 
         public FileTransferHandler() {
@@ -75,19 +73,17 @@ public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
         }
 
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws SAXException {
+        public void startContextElement(String name, Attributes attributes) throws SAXException {
             String fileTransferId = attributes.getValue("id");
 
             if (!checkNonEmpty(fileTransferId)) {
-                throw new org.xml.sax.SAXException(
-                    "FileTransfer defined without id");
+                throw new org.xml.sax.SAXException("FileTransfer defined without id");
             }
 
             if (fileTransferId.equalsIgnoreCase(FILE_TRANSFER_IMPLICT_KEYWORD)) {
                 throw new org.xml.sax.SAXException(
                     "FileTransferDefinition id attribute is using illegal keyword: " +
-                    FILE_TRANSFER_IMPLICT_KEYWORD);
+                        FILE_TRANSFER_IMPLICT_KEYWORD);
             }
 
             /* We get a reference on the FileTransfer object with this ID.
@@ -103,17 +99,14 @@ public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
             return fileTransfer; //not really used for now
         }
 
-        public class FileHandler extends BasicUnmarshaller
-            implements ProActiveDescriptorConstants {
+        public class FileHandler extends BasicUnmarshaller implements ProActiveDescriptorConstants {
             @Override
-            public void startContextElement(String name, Attributes attributes)
-                throws SAXException {
+            public void startContextElement(String name, Attributes attributes) throws SAXException {
                 String source = attributes.getValue("src");
                 String dest = attributes.getValue("dest");
 
                 if (!checkNonEmpty(source)) {
-                    throw new org.xml.sax.SAXException(
-                        "Source filename not specified for file tag");
+                    throw new org.xml.sax.SAXException("Source filename not specified for file tag");
                 }
 
                 if (!checkNonEmpty(dest)) {
@@ -125,19 +118,16 @@ public class FileTransferDefinitionsHandler extends PassiveCompositeUnmarshaller
             }
         }
 
-        public class DirHandler extends BasicUnmarshaller
-            implements ProActiveDescriptorConstants {
+        public class DirHandler extends BasicUnmarshaller implements ProActiveDescriptorConstants {
             @Override
-            public void startContextElement(String name, Attributes attributes)
-                throws SAXException {
+            public void startContextElement(String name, Attributes attributes) throws SAXException {
                 String source = attributes.getValue("src");
                 String dest = attributes.getValue("dest");
                 String include = attributes.getValue("include");
                 String exclude = attributes.getValue("exclude");
 
                 if (!checkNonEmpty(source)) {
-                    throw new org.xml.sax.SAXException(
-                        "Source filename not specified for file tag");
+                    throw new org.xml.sax.SAXException("Source filename not specified for file tag");
                 }
 
                 if (!checkNonEmpty(dest)) {

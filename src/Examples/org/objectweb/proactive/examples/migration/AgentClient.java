@@ -52,8 +52,7 @@ public class AgentClient {
         ProActiveDescriptor proActiveDescriptor;
         ProActiveConfiguration.load();
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                    args[0]);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + args[0]);
             proActiveDescriptor.activateMappings();
 
             VirtualNode agent = proActiveDescriptor.getVirtualNode("Agent");
@@ -72,8 +71,7 @@ public class AgentClient {
                 myServer.moveTo(nodeList[i]);
                 nodeName = myServer.getNodeName();
                 hostName = myServer.getName();
-                logger.info("Agent is on: host " + hostName + " Node " +
-                    nodeName);
+                logger.info("Agent is on: host " + hostName + " Node " + nodeName);
             }
             myServer.endBodyActivity();
         } catch (Exception e) {

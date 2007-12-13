@@ -87,12 +87,10 @@ public class PolicyServer implements Serializable, Cloneable {
         this.keyStore = new SerializableKeyStore(null);
     }
 
-    public PolicyServer(KeyStore keyStore, Collection<PolicyRule> policyRules,
-        String applicationName, String descriptorLocation,
-        Collection<RuleEntity> accessAuthorizations) {
-        if ((keyStore == null) || (policyRules == null) ||
-                (applicationName == null) || (descriptorLocation == null) ||
-                (accessAuthorizations == null)) {
+    public PolicyServer(KeyStore keyStore, Collection<PolicyRule> policyRules, String applicationName,
+            String descriptorLocation, Collection<RuleEntity> accessAuthorizations) {
+        if ((keyStore == null) || (policyRules == null) || (applicationName == null) ||
+            (descriptorLocation == null) || (accessAuthorizations == null)) {
             throw new NullPointerException();
         }
 
@@ -127,22 +125,18 @@ public class PolicyServer implements Serializable, Cloneable {
     // this(policyRules);
     // this.keyStore = new SerializableKeyStore(keyStore);
     // }
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException {
         if (this.policyRules == null) {
-            ProActiveLogger.getLogger(Loggers.SECURITY_POLICY)
-                           .debug("trying to find a policy whereas none has been set" +
-                this + "    " + this.policyRules);
+            ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).debug(
+                    "trying to find a policy whereas none has been set" + this + "    " + this.policyRules);
             throw new SecurityNotAvailableException();
         }
 
-        if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
-                               .isDebugEnabled()) {
-            String s = "================================\nLocal : " +
-                local.toString();
+        if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER).isDebugEnabled()) {
+            String s = "================================\nLocal : " + local.toString();
             s += ("\nDistant : " + distant.toString());
-            ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
-                           .debug(s + "\n=================================\n");
+            ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER).debug(
+                    s + "\n=================================\n");
         }
 
         // getting all rules matching the context
@@ -158,10 +152,8 @@ public class PolicyServer implements Serializable, Cloneable {
 
             Match matchingTo = policyEntitiesTo.match(distant);
 
-            if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
-                                   .isDebugEnabled()) {
-                ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER)
-                               .debug("evaluating policy " + policy);
+            if (ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER).isDebugEnabled()) {
+                ProActiveLogger.getLogger(Loggers.SECURITY_POLICYSERVER).debug("evaluating policy " + policy);
             }
 
             //
@@ -172,13 +164,10 @@ public class PolicyServer implements Serializable, Cloneable {
                 matchingFrom = policyEntitiesFrom.match(distant);
                 matchingTo = policyEntitiesTo.match(local);
 
-                if ((matchingFrom != Match.FAILED) &&
-                        (matchingTo != Match.FAILED)) {
-                    matchingRules.add(new PolicyRule(policy.getEntitiesTo(),
-                            policy.getEntitiesFrom(),
-                            policy.getCommunicationReply(),
-                            policy.getCommunicationRequest(),
-                            policy.isAoCreation(), policy.isMigration()));
+                if ((matchingFrom != Match.FAILED) && (matchingTo != Match.FAILED)) {
+                    matchingRules.add(new PolicyRule(policy.getEntitiesTo(), policy.getEntitiesFrom(), policy
+                            .getCommunicationReply(), policy.getCommunicationRequest(),
+                        policy.isAoCreation(), policy.isMigration()));
                 }
             }
         }
@@ -195,22 +184,18 @@ public class PolicyServer implements Serializable, Cloneable {
                 // rule, higher level is more specific
                 int fromLevel = matchingPolicy.getEntitiesFrom().getLevel();
                 int toLevel = matchingPolicy.getEntitiesTo().getLevel();
-                for (Iterator<PolicyRule> applicableRulesIterator = applicableRules.iterator();
-                        applicableRulesIterator.hasNext();) {
+                for (Iterator<PolicyRule> applicableRulesIterator = applicableRules.iterator(); applicableRulesIterator
+                        .hasNext();) {
                     PolicyRule applicableRule = applicableRulesIterator.next();
-                    int applicableFromLevel = applicableRule.getEntitiesFrom()
-                                                            .getLevel();
-                    int applicableToLevel = applicableRule.getEntitiesTo()
-                                                          .getLevel();
+                    int applicableFromLevel = applicableRule.getEntitiesFrom().getLevel();
+                    int applicableToLevel = applicableRule.getEntitiesTo().getLevel();
 
-                    if ((fromLevel >= applicableFromLevel) &&
-                            (toLevel >= applicableToLevel)) {
+                    if ((fromLevel >= applicableFromLevel) && (toLevel >= applicableToLevel)) {
                         // current rule is more specific than the current
                         // applicableRule
                         applicableRulesIterator.remove();
                         add = true;
-                    } else if ((fromLevel > applicableFromLevel) ||
-                            (toLevel > applicableToLevel)) {
+                    } else if ((fromLevel > applicableFromLevel) || (toLevel > applicableToLevel)) {
                         // current rule and current applicableRule both have to
                         // be applied
                         add = true;
@@ -232,13 +217,10 @@ public class PolicyServer implements Serializable, Cloneable {
             matchingPolicy = PolicyRule.mergePolicies(applicableRules);
         }
 
-        ProActiveLogger.getLogger(Loggers.SECURITY_POLICY)
-                       .debug("Found Policy : " + matchingPolicy);
+        ProActiveLogger.getLogger(Loggers.SECURITY_POLICY).debug("Found Policy : " + matchingPolicy);
 
-        return new SecurityContext(local, distant,
-            matchingPolicy.getCommunicationRequest(),
-            matchingPolicy.getCommunicationReply(),
-            matchingPolicy.isAoCreation(), matchingPolicy.isMigration());
+        return new SecurityContext(local, distant, matchingPolicy.getCommunicationRequest(), matchingPolicy
+                .getCommunicationReply(), matchingPolicy.isAoCreation(), matchingPolicy.isMigration());
     }
 
     public List<PolicyRule> getPolicies() {
@@ -263,8 +245,7 @@ public class PolicyServer implements Serializable, Cloneable {
     @Override
     public String toString() {
         String s = null;
-        s = "ApplicationName : " + this.applicationName + "\nfile: " +
-            this.policyRulesFileLocation + "\n";
+        s = "ApplicationName : " + this.applicationName + "\nfile: " + this.policyRulesFileLocation + "\n";
         for (int i = 0; i < this.policyRules.size(); i++) {
             s += this.policyRules.get(i);
         }
@@ -299,8 +280,7 @@ public class PolicyServer implements Serializable, Cloneable {
                 return KeyStoreTools.getApplicationCertificate(this.keyStore.getKeyStore());
             } catch (KeyStoreException e) {
                 e.printStackTrace();
-                PolicyServer.log.error(
-                    "Application certificate cannot be found in keystore.");
+                PolicyServer.log.error("Application certificate cannot be found in keystore.");
             } catch (UnrecoverableKeyException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -321,8 +301,7 @@ public class PolicyServer implements Serializable, Cloneable {
                 return KeyStoreTools.getApplicationCertificateChain(this.keyStore.getKeyStore());
             } catch (KeyStoreException e) {
                 e.printStackTrace();
-                PolicyServer.log.error(
-                    "Application certificate chain not found in keystore.");
+                PolicyServer.log.error("Application certificate chain not found in keystore.");
             } catch (UnrecoverableKeyException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -340,12 +319,11 @@ public class PolicyServer implements Serializable, Cloneable {
     public TypedCertificate getApplicationCertificate(String appName) {
         if ((this.keyStore != null) && (appName != null)) {
             try {
-                return KeyStoreTools.getCertificate(this.keyStore.getKeyStore(),
-                    EntityType.APPLICATION, appName);
+                return KeyStoreTools.getCertificate(this.keyStore.getKeyStore(), EntityType.APPLICATION,
+                        appName);
             } catch (KeyStoreException e) {
                 e.printStackTrace();
-                PolicyServer.log.error("Application : " + appName +
-                    " certificate not found in keystore.");
+                PolicyServer.log.error("Application : " + appName + " certificate not found in keystore.");
             } catch (UnrecoverableKeyException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -384,8 +362,7 @@ public class PolicyServer implements Serializable, Cloneable {
 
             bout.close();
 
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(
-                        bout.toByteArray()));
+            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bout.toByteArray()));
 
             clone = (PolicyServer) ois.readObject();
         } catch (IOException e) {

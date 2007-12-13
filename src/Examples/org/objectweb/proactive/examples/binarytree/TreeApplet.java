@@ -88,11 +88,11 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
     public TreeApplet(String name, Integer width, Integer height) {
         super(name, width.intValue(), height.intValue());
         verticalSplitPane.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent e) {
-                    refresh();
-                }
-            });
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent e) {
+                refresh();
+            }
+        });
 
         // Create the DisplayManager
         try {
@@ -106,8 +106,8 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
 
     public static void main(String[] arg) {
         try {
-            org.objectweb.proactive.api.PAActiveObject.newActive(TreeApplet.class.getName(),
-                new Object[] { "Binary Tree", new Integer(900), new Integer(600) });
+            org.objectweb.proactive.api.PAActiveObject.newActive(TreeApplet.class.getName(), new Object[] {
+                    "Binary Tree", new Integer(900), new Integer(600) });
         } catch (ActiveObjectCreationException e) {
         } catch (NodeException e) {
         }
@@ -116,10 +116,10 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
     public void displayTree() {
         if (treePanel != null) {
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                    public void run() {
-                        treePanel.repaint();
-                    }
-                });
+                public void run() {
+                    treePanel.repaint();
+                }
+            });
         }
     }
 
@@ -137,24 +137,22 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         // Create Area
         javax.swing.JPanel panel = new javax.swing.JPanel();
         tNode = new javax.swing.JTextField("", 3);
-        javax.swing.JButton create = new javax.swing.JButton(
-                "Create Binary Tree");
+        javax.swing.JButton create = new javax.swing.JButton("Create Binary Tree");
         create.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    String nodeNb = tNode.getText();
-                    int nb = 0;
-                    try {
-                        // We re-initialize automatic continuations
-                        continuation.setSelected(true);
-                        AC = true;
-                        nb = (new Integer(nodeNb)).intValue();
-                        display.createTree(nb, AC);
-                    } catch (NumberFormatException ex) {
-                        receiveMessage("You must enter an integer size of the tree!",
-                            java.awt.Color.red);
-                    }
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                String nodeNb = tNode.getText();
+                int nb = 0;
+                try {
+                    // We re-initialize automatic continuations
+                    continuation.setSelected(true);
+                    AC = true;
+                    nb = (new Integer(nodeNb)).intValue();
+                    display.createTree(nb, AC);
+                } catch (NumberFormatException ex) {
+                    receiveMessage("You must enter an integer size of the tree!", java.awt.Color.red);
                 }
-            });
+            }
+        });
         panel.add(create);
         panel.add(new javax.swing.JLabel("Size:"));
         panel.add(tNode);
@@ -178,38 +176,37 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         javax.swing.JButton bAdd = new javax.swing.JButton("Add");
         bAdd.setToolTipText("Add a node to the tree");
         bAdd.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    String key = tKey.getText();
-                    String value = tValue.getText();
-                    if ((key == null) || (value == null)) {
-                        receiveMessage("You must specify a Key/Value couple!!!",
-                            java.awt.Color.red);
-                    } else {
-                        display.add(key, value, AC);
-                    }
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                String key = tKey.getText();
+                String value = tValue.getText();
+                if ((key == null) || (value == null)) {
+                    receiveMessage("You must specify a Key/Value couple!!!", java.awt.Color.red);
+                } else {
+                    display.add(key, value, AC);
                 }
-            });
+            }
+        });
         panel.add(bAdd);
 
         javax.swing.JButton bSearch = new javax.swing.JButton("Search");
         bSearch.setToolTipText("Research the value of the key");
         bSearch.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    String key = tKey.getText();
-                    if (key == null) {
-                        return;
-                    }
-                    tValue.setText((display.search(key)).toString());
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                String key = tKey.getText();
+                if (key == null) {
+                    return;
                 }
-            });
+                tValue.setText((display.search(key)).toString());
+            }
+        });
         panel.add(bSearch);
 
         javax.swing.JButton bDump = new javax.swing.JButton("Dump tree");
         bDump.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    displayTree();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                displayTree();
+            }
+        });
         panel.add(bDump);
 
         pCmd.add(panel);
@@ -222,27 +219,26 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         javax.swing.JButton generateK = new javax.swing.JButton("Generate Keys");
         generateK.setToolTipText("Generate keys to research values");
         generateK.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    String keyNb = tKeysNb.getText();
-                    try {
-                        int nb = (new Integer(keyNb)).intValue();
-                        keys = display.getRandomKeys(nb);
-                        searchPane.clear();
-                        java.util.Iterator it = keys.iterator();
-                        while (it.hasNext()) {
-                            java.util.Vector curLine = new java.util.Vector();
-                            String[] kv = new String[3];
-                            kv[0] = (String) it.next();
-                            kv[1] = "Unknown";
-                            kv[2] = "";
-                            searchPane.updateKeyValue(kv);
-                        }
-                    } catch (NumberFormatException ex) {
-                        receiveMessage("You must enter an integer number of keys!",
-                            java.awt.Color.red);
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                String keyNb = tKeysNb.getText();
+                try {
+                    int nb = (new Integer(keyNb)).intValue();
+                    keys = display.getRandomKeys(nb);
+                    searchPane.clear();
+                    java.util.Iterator it = keys.iterator();
+                    while (it.hasNext()) {
+                        java.util.Vector curLine = new java.util.Vector();
+                        String[] kv = new String[3];
+                        kv[0] = (String) it.next();
+                        kv[1] = "Unknown";
+                        kv[2] = "";
+                        searchPane.updateKeyValue(kv);
                     }
+                } catch (NumberFormatException ex) {
+                    receiveMessage("You must enter an integer number of keys!", java.awt.Color.red);
                 }
-            });
+            }
+        });
         panel.add(generateK);
         panel.add(new javax.swing.JLabel("Number:"));
         panel.add(tKeysNb);
@@ -257,28 +253,26 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         continuation = new javax.swing.JRadioButton("Automatic Continuations");
         continuation.setToolTipText("Enabled/Disabled Automatic Continuations");
         continuation.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    if (AC) {
-                        try {
-                            PAActiveObject.disableAC(display);
-                            display.disableAC();
-                            receiveMessage("Automatic continuation disabled...",
-                                new java.awt.Color(200, 100, 0));
-                            AC = false;
-                        } catch (IOException e1) {
-                        }
-                    } else {
-                        try {
-                            PAActiveObject.enableAC(display);
-                            display.enableAC();
-                            receiveMessage("Automatic continuation enabled...",
-                                new java.awt.Color(200, 100, 0));
-                            AC = true;
-                        } catch (IOException e1) {
-                        }
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                if (AC) {
+                    try {
+                        PAActiveObject.disableAC(display);
+                        display.disableAC();
+                        receiveMessage("Automatic continuation disabled...", new java.awt.Color(200, 100, 0));
+                        AC = false;
+                    } catch (IOException e1) {
+                    }
+                } else {
+                    try {
+                        PAActiveObject.enableAC(display);
+                        display.enableAC();
+                        receiveMessage("Automatic continuation enabled...", new java.awt.Color(200, 100, 0));
+                        AC = true;
+                    } catch (IOException e1) {
                     }
                 }
-            });
+            }
+        });
         panel.add(continuation);
         pCmd.add(panel);
 
@@ -286,44 +280,39 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
         javax.swing.JButton search = new javax.swing.JButton("Search Values");
         search.setToolTipText("Research values of the keys");
         search.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    try {
-                        java.util.Iterator it = keys.iterator();
-                        java.util.Vector<ObjectWrapper> tab1 = new java.util.Vector<ObjectWrapper>();
-                        while (it.hasNext()) {
-                            String key = (String) it.next();
-                            tab1.add(display.search(key));
-                        }
-
-                        int lng = keys.size();
-                        java.util.ArrayList<Integer> vKeys = new java.util.ArrayList<Integer>();
-                        java.util.ArrayList<String[]> res = new java.util.ArrayList<String[]>();
-                        for (int i = 0; i < lng; i++) {
-                            vKeys.add(new Integer(i));
-                        }
-
-                        for (int i = 0; i < lng; i++) {
-                            int key = 0;
-                            key = PAFuture.waitForAny(tab1);
-                            res.add(new String[] {
-                                    (String) (keys.get(
-                                        vKeys.remove(key).intValue())),
-                                    tab1.get(key).toString(), "" + i
-                                });
-                            tab1.remove(key);
-                        }
-
-                        Thread t = new RefreshThread(res);
-                        t.start();
-
-                        receiveMessage("Search in progress...",
-                            new java.awt.Color(200, 100, 100));
-                    } catch (NullPointerException ex) {
-                        receiveMessage("You must have keys to search!",
-                            java.awt.Color.red);
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                try {
+                    java.util.Iterator it = keys.iterator();
+                    java.util.Vector<ObjectWrapper> tab1 = new java.util.Vector<ObjectWrapper>();
+                    while (it.hasNext()) {
+                        String key = (String) it.next();
+                        tab1.add(display.search(key));
                     }
+
+                    int lng = keys.size();
+                    java.util.ArrayList<Integer> vKeys = new java.util.ArrayList<Integer>();
+                    java.util.ArrayList<String[]> res = new java.util.ArrayList<String[]>();
+                    for (int i = 0; i < lng; i++) {
+                        vKeys.add(new Integer(i));
+                    }
+
+                    for (int i = 0; i < lng; i++) {
+                        int key = 0;
+                        key = PAFuture.waitForAny(tab1);
+                        res.add(new String[] { (String) (keys.get(vKeys.remove(key).intValue())),
+                                tab1.get(key).toString(), "" + i });
+                        tab1.remove(key);
+                    }
+
+                    Thread t = new RefreshThread(res);
+                    t.start();
+
+                    receiveMessage("Search in progress...", new java.awt.Color(200, 100, 100));
+                } catch (NullPointerException ex) {
+                    receiveMessage("You must have keys to search!", java.awt.Color.red);
                 }
-            });
+            }
+        });
         panel.add(search);
         pCmd.add(panel);
 
@@ -351,11 +340,11 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
             setVisible(true);
             setBackground(java.awt.Color.white);
             addMouseListener(new java.awt.event.MouseAdapter() {
-                    @Override
-                    public void mouseEntered(java.awt.event.MouseEvent e) {
-                        refresh();
-                    }
-                });
+                @Override
+                public void mouseEntered(java.awt.event.MouseEvent e) {
+                    refresh();
+                }
+            });
         }
 
         @Override
@@ -382,36 +371,34 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                             // Dimension depending to the depth of tree
                             int height = 600;
                             switch (tree.depth()) {
-                            case 0:
-                            case 1:
-                            case 2:
-                            case 3:
-                            case 4:
-                                break;
-                            case 5:
-                                height = 1200;
-                                break;
-                            case 6:
-                                height = 2400;
-                                break;
-                            case 7:
-                            case 8:
-                            case 9:
-                                height = 5400;
-                                break;
-                            default:
-                                width = tree.depth() * 60;
-                                height = 5400;
-                                break;
+                                case 0:
+                                case 1:
+                                case 2:
+                                case 3:
+                                case 4:
+                                    break;
+                                case 5:
+                                    height = 1200;
+                                    break;
+                                case 6:
+                                    height = 2400;
+                                    break;
+                                case 7:
+                                case 8:
+                                case 9:
+                                    height = 5400;
+                                    break;
+                                default:
+                                    width = tree.depth() * 60;
+                                    height = 5400;
+                                    break;
                             }
-                            java.awt.Dimension newSize = new java.awt.Dimension(height,
-                                    width);
+                            java.awt.Dimension newSize = new java.awt.Dimension(height, width);
                             if (!newSize.equals(getPreferredSize())) {
                                 setPreferredSize(newSize);
                                 scrollTree.getViewport().doLayout();
                             }
-                            paintTree(g, tree, (int) height / 2, 30,
-                                tree.depth());
+                            paintTree(g, tree, (int) height / 2, 30, tree.depth());
                         } catch (NullPointerException e) {
                         }
                     }
@@ -420,8 +407,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
             }
         }
 
-        public void paintTree(java.awt.Graphics g, Tree tree, int x, int y,
-            int depth) {
+        public void paintTree(java.awt.Graphics g, Tree tree, int x, int y, int depth) {
             if ((tree != null) && (tree.getKey() != null)) {
                 // Analyse of the key size to paint the node
                 int keySize = 5;
@@ -467,8 +453,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
 
                 g.setColor(java.awt.Color.black);
                 g.drawRoundRect(x - (size / 2), y - 10, size, 40, 35, 35);
-                g.drawLine(x - (size / 2), y + 10, x - (size / 2) + size, y +
-                    10);
+                g.drawLine(x - (size / 2), y + 10, x - (size / 2) + size, y + 10);
                 g.drawString(tree.getKey(), x - (size / 2) + 5, y + 5);
 
                 g.setColor(java.awt.Color.blue);
@@ -478,35 +463,34 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                 int angle = 65;
                 if (depth > 0) {
                     switch (depth) {
-                    case 1:
-                        break;
-                    case 2:
-                        angle = 50;
-                        break;
-                    case 3:
-                        angle = 35;
-                        break;
-                    case 4:
-                        angle = 20;
-                        break;
-                    case 5:
-                        angle = 10;
-                        break;
-                    case 6:
-                        angle = 5;
-                        break;
-                    case 7:
-                        angle = 2;
-                        break;
-                    default:
-                        depth = 7;
-                        angle = 2;
+                        case 1:
+                            break;
+                        case 2:
+                            angle = 50;
+                            break;
+                        case 3:
+                            angle = 35;
+                            break;
+                        case 4:
+                            angle = 20;
+                            break;
+                        case 5:
+                            angle = 10;
+                            break;
+                        case 6:
+                            angle = 5;
+                            break;
+                        case 7:
+                            angle = 2;
+                            break;
+                        default:
+                            depth = 7;
+                            angle = 2;
                     }
                 }
 
                 try {
-                    int rightX = (int) (x +
-                        (50 / Math.tan(Math.toRadians(angle))));
+                    int rightX = (int) (x + (50 / Math.tan(Math.toRadians(angle))));
                     int rightY = y + 60;
 
                     paintTree(g, tree.getRight(), rightX, rightY, depth - 1);
@@ -523,8 +507,7 @@ public class TreeApplet extends org.objectweb.proactive.examples.StandardFrame {
                 }
 
                 try {
-                    int leftX = (int) (x +
-                        (50 / Math.tan(Math.toRadians(180 - angle))));
+                    int leftX = (int) (x + (50 / Math.tan(Math.toRadians(180 - angle))));
                     int leftY = y + 60;
 
                     paintTree(g, tree.getLeft(), leftX, leftY, depth - 1);

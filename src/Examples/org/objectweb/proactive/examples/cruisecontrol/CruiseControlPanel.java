@@ -71,8 +71,7 @@ public class CruiseControlPanel extends JPanel {
     int state = INACTIVE;
 
     /** Constructor which initializes the labels, the buttons, and places each components of the car */
-    public CruiseControlPanel(final CruiseControlApplet parent,
-        final Interface activeObject) {
+    public CruiseControlPanel(final CruiseControlApplet parent, final Interface activeObject) {
         setLayout(null);
         //setBorder(new LineBorder(Color.black));
         CruiseOff = new JButton("Control Off");
@@ -91,25 +90,25 @@ public class CruiseControlPanel extends JPanel {
         add(Dec1);
 
         CruiseOn.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    parent.controlOn();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                parent.controlOn();
+            }
+        });
         CruiseOff.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    parent.controlOff();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                parent.controlOff();
+            }
+        });
         Inc1.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    activeObject.accelerateCruise();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeObject.accelerateCruise();
+            }
+        });
         Dec1.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    activeObject.decelerateCruise();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                activeObject.decelerateCruise();
+            }
+        });
     }
 
     // Methods

@@ -50,42 +50,42 @@ import org.objectweb.proactive.core.node.Node;
  * <p>Manages the distribution and update of futures when gathercast methods return a result.</p>
  *
  * <p>If the invoked method on a gathercast interface
-* returns a result, the method returns a future, although the invocation has
-* not been processed yet (an invocation on a gathercast interface will not proceed until
-* all client interfaces invoked the same method). We faced a complex problem: how to
-* return and update futures of client invocations on gathercast interfaces? We considered
-* two strategies. The fist one was to customize the request queue so that a local data
-* structure (similar to the one described in figure 5.9) would handle the incoming requests
-* for gathercast interfaces. A second option was to use a dedicated tier active object for
-* handling futures.</p>
-*
-* <p>As we did not want to intervene in the core of the ProActive library by modifying the
-* request queue, we selected and implemented the second option, which also provides an example
-* of the management of futures and automatic continuations with active objects.</p>
-*
-* <p>One futures handler active object is
-* created for each gathercast request to be processed. It has a special activity, which only
-* serves distribute requests once it has received the <code>setFutureResult</code> request.
-* When a request from a client is served by the gathercast interface, it is enqueued in
-* the queue data structure, and the result which is return is the result of the invocation
-* of the distribute method (with an index) on the futures handler object. This result is
-* therefore a future itself.</p>
-*
-* <p>When all clients have invoked the same method on the gathercast interface, a new
-* request is built and served, which leads to an invocation which is performed either on
-* the base object if the component is primitive, or on another connected interface if the
-* component is composite. The result of this invocation is sent to the futures handler
-* object, by invoking the <code>setFutureResult</code> method. The futures handler will then block
-* until the result value is available. Then the distribute methods are served and the
-* values of the futures received by the clients are updated.</p>
-*
-* <p>Although this mechanism fulfills its role using the standard mechanism of the li-
-* brary, we observed that it does not scale very well: one active object for managing fu-
-* tures is created for each gathercast request, and even though we implemented a pool
-* of active objects, there are too many active objects created when stressing the gather-
-* cast interface. Therefore, the first approach envisaged above should be preferred in the
-* future (this approach is not currently implemented; it is quite complex and
-* deals with sensitive parts of the library). </p>
+ * returns a result, the method returns a future, although the invocation has
+ * not been processed yet (an invocation on a gathercast interface will not proceed until
+ * all client interfaces invoked the same method). We faced a complex problem: how to
+ * return and update futures of client invocations on gathercast interfaces? We considered
+ * two strategies. The fist one was to customize the request queue so that a local data
+ * structure (similar to the one described in figure 5.9) would handle the incoming requests
+ * for gathercast interfaces. A second option was to use a dedicated tier active object for
+ * handling futures.</p>
+ *
+ * <p>As we did not want to intervene in the core of the ProActive library by modifying the
+ * request queue, we selected and implemented the second option, which also provides an example
+ * of the management of futures and automatic continuations with active objects.</p>
+ *
+ * <p>One futures handler active object is
+ * created for each gathercast request to be processed. It has a special activity, which only
+ * serves distribute requests once it has received the <code>setFutureResult</code> request.
+ * When a request from a client is served by the gathercast interface, it is enqueued in
+ * the queue data structure, and the result which is return is the result of the invocation
+ * of the distribute method (with an index) on the futures handler object. This result is
+ * therefore a future itself.</p>
+ *
+ * <p>When all clients have invoked the same method on the gathercast interface, a new
+ * request is built and served, which leads to an invocation which is performed either on
+ * the base object if the component is primitive, or on another connected interface if the
+ * component is composite. The result of this invocation is sent to the futures handler
+ * object, by invoking the <code>setFutureResult</code> method. The futures handler will then block
+ * until the result value is available. Then the distribute methods are served and the
+ * values of the futures received by the clients are updated.</p>
+ *
+ * <p>Although this mechanism fulfills its role using the standard mechanism of the li-
+ * brary, we observed that it does not scale very well: one active object for managing fu-
+ * tures is created for each gathercast request, and even though we implemented a pool
+ * of active objects, there are too many active objects created when stressing the gather-
+ * cast interface. Therefore, the first approach envisaged above should be preferred in the
+ * future (this approach is not currently implemented; it is quite complex and
+ * deals with sensitive parts of the library). </p>
 
  * @author Matthieu Morel
  *

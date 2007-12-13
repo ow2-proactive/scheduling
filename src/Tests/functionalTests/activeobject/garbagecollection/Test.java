@@ -36,6 +36,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test DGC
  */
@@ -79,7 +80,7 @@ public class Test extends FunctionalTest {
              // to stubs are seemingly never cleared.
             return;
         }
-             */
+         */
         assertTrue(A.countCollected() == 0);
         buildGraph();
         while (A.countCollected() != 5) {

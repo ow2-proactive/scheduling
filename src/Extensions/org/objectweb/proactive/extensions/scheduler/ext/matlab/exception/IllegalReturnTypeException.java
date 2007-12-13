@@ -34,7 +34,7 @@ import ptolemy.data.Token;
 
 
 public class IllegalReturnTypeException extends Exception {
-    public IllegalReturnTypeException(Class<?extends Token> class1) {
+    public IllegalReturnTypeException(Class<? extends Token> class1) {
         super(class1.getCanonicalName());
     }
 }

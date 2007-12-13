@@ -43,8 +43,8 @@ public class RequestSingleNodeMessage extends RandomWalkMessage {
     protected P2PNodeLookup lookup;
     protected Boolean active;
 
-    public RequestSingleNodeMessage(int ttl, UniversalUniqueID uuid,
-        P2PService service, P2PNodeLookup lookup, String vnName, String jobId) {
+    public RequestSingleNodeMessage(int ttl, UniversalUniqueID uuid, P2PService service,
+            P2PNodeLookup lookup, String vnName, String jobId) {
         this.TTL = ttl;
         this.uuid = uuid;
         this.sender = service;
@@ -61,8 +61,7 @@ public class RequestSingleNodeMessage extends RandomWalkMessage {
         if (nodeAvailable != null) {
             if (vnName != null) {
                 try {
-                    nodeAvailable.getProActiveRuntime()
-                                 .registerVirtualNode(vnName, true);
+                    nodeAvailable.getProActiveRuntime().registerVirtualNode(vnName, true);
                 } catch (Exception e) {
                     logger.warn("Couldn't register " + vnName + " in the PAR", e);
                 }
@@ -73,8 +72,8 @@ public class RequestSingleNodeMessage extends RandomWalkMessage {
             try {
                 lookup.giveNode(nodeAvailable, askedNode.getNodeManager());
                 this.active = false;
-                target.acquaintanceManager_active.setMaxNOA(target.acquaintanceManager_active.getMaxNOA() -
-                    1);
+                target.acquaintanceManager_active
+                        .setMaxNOA(target.acquaintanceManager_active.getMaxNOA() - 1);
             } catch (Exception lookupExcption) {
                 logger.info("Cannot contact the remote lookup", lookupExcption);
                 target.nodeManager.noMoreNodeNeeded(nodeAvailable);

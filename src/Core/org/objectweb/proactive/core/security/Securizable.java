@@ -62,14 +62,13 @@ public interface Securizable {
      * corresponding to the sessionId is not found. The error must be returned to the sender
      * in order to renegociate a new session and re-send the message
      */
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException;
+    public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException;
 
     /**
      * @param psm the proactiveSecurityManager of the entity
      * @return true the message can be emitted.
      * @throws RenegotiateSessionException
      */
-    public boolean crypt(ProActiveSecurityManager psm,
-        SecurityEntity destinationBody) throws RenegotiateSessionException;
+    public boolean crypt(ProActiveSecurityManager psm, SecurityEntity destinationBody)
+            throws RenegotiateSessionException;
 }

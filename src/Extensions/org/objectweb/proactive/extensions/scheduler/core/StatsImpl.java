@@ -62,8 +62,7 @@ public class StatsImpl implements Stats {
         String key = "Start Time";
 
         if (!properties.containsKey(key)) {
-            properties.put(key,
-                Tools.getFormattedDate(System.currentTimeMillis()));
+            properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
         }
     }
 
@@ -74,8 +73,7 @@ public class StatsImpl implements Stats {
         String key = "Last Stop Time";
 
         if (!properties.containsKey(key)) {
-            properties.put(key,
-                Tools.getFormattedDate(System.currentTimeMillis()));
+            properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
         }
     }
 
@@ -86,8 +84,7 @@ public class StatsImpl implements Stats {
         String key = "Last Pause Time";
 
         if (!properties.containsKey(key)) {
-            properties.put(key,
-                Tools.getFormattedDate(System.currentTimeMillis()));
+            properties.put(key, Tools.getFormattedDate(System.currentTimeMillis()));
         }
     }
 
@@ -100,15 +97,15 @@ public class StatsImpl implements Stats {
         increaseProperty("Jobs Submitted", 1);
 
         switch (type) {
-        case PARAMETER_SWEEPING:
-            increasePSJobCount();
-            break;
-        case PROACTIVE:
-            increasePAJobCount();
-            break;
-        case TASKSFLOW:
-            increaseTFJobCount();
-            break;
+            case PARAMETER_SWEEPING:
+                increasePSJobCount();
+                break;
+            case PROACTIVE:
+                increasePAJobCount();
+                break;
+            case TASKSFLOW:
+                increaseTFJobCount();
+                break;
         }
     }
 
@@ -159,8 +156,7 @@ public class StatsImpl implements Stats {
         if (!properties.containsKey(propertyName)) {
             properties.put(propertyName, Integer.valueOf(inc));
         } else {
-            properties.put(propertyName,
-                ((Integer) properties.get(propertyName)) + inc);
+            properties.put(propertyName, ((Integer) properties.get(propertyName)) + inc);
         }
     }
 

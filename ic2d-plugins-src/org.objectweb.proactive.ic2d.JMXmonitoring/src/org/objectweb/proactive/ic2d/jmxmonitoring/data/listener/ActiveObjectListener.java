@@ -64,8 +64,9 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.util.IC2DThreadPool;
  */
 public class ActiveObjectListener implements NotificationListener {
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
-    private enum Type {SENDER,
-        RECEIVER;
+
+    private enum Type {
+        SENDER, RECEIVER;
     }
 
     ////////   Begin -- Task for handling notifications ///////
@@ -81,80 +82,57 @@ public class ActiveObjectListener implements NotificationListener {
                 String type = notification.getType();
 
                 if (type.equals(NotificationType.requestReceived)) {
-                    logger.debug(
-                        ".................................Request Received : " +
-                        ao.getName());
+                    logger.debug(".................................Request Received : " + ao.getName());
                     RequestNotificationData request = (RequestNotificationData) notification.getUserData();
                     addRequest(request, ao, Type.RECEIVER);
                 } else if (type.equals(NotificationType.waitForRequest)) {
-                    logger.debug(
-                        "...............................Wait for request");
+                    logger.debug("...............................Wait for request");
                     ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.WAITING_FOR_REQUEST);
                     ao.setRequestQueueLength(0);
                 }
                 // --- MessageEvent ---------------------
                 else if (type.equals(NotificationType.replyReceived)) {
-                    logger.debug(
-                        "...............................Reply received : " +
-                        ao.getName());
+                    logger.debug("...............................Reply received : " + ao.getName());
                 } else if (type.equals(NotificationType.replySent)) {
-                    logger.debug("...............................Reply sent : " +
-                        ao.getName());
+                    logger.debug("...............................Reply sent : " + ao.getName());
                     ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.ACTIVE);
                     Integer requestQueueLength = (Integer) notification.getUserData();
                     ao.setRequestQueueLength(requestQueueLength);
                 } else if (type.equals(NotificationType.requestSent)) {
-                    logger.debug(
-                        "...............................Request sent : " +
-                        ao.getName());
+                    logger.debug("...............................Request sent : " + ao.getName());
                     RequestNotificationData request = (RequestNotificationData) notification.getUserData();
                     addRequest(request, ao, Type.SENDER);
                 } else if (type.equals(NotificationType.servingStarted)) {
-                    logger.debug(
-                        "...............................Serving started : " +
-                        ao.getName());
+                    logger.debug("...............................Serving started : " + ao.getName());
                     ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.SERVING_REQUEST);
                     Integer requestQueueLength = (Integer) notification.getUserData();
                     ao.setRequestQueueLength(requestQueueLength);
                 } else if (type.equals(NotificationType.voidRequestServed)) {
-                    logger.debug(
-                        "...............................Void request served : " +
-                        ao.getName());
+                    logger.debug("...............................Void request served : " + ao.getName());
                     ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.ACTIVE);
                     Integer requestQueueLength = (Integer) notification.getUserData();
                     ao.setRequestQueueLength(requestQueueLength);
                 }
                 // --- MigrationEvent -------------------
                 else if (type.equals(NotificationType.migratedBodyRestarted)) {
-                    logger.debug(
-                        "...............................Migration body restarted : " +
-                        ao.getName());
+                    logger.debug("...............................Migration body restarted : " + ao.getName());
                 } else if (type.equals(NotificationType.migrationAboutToStart)) {
-                    logger.debug(
-                        "...............................Migration about to start " +
-                        ao + ", node=" + ao.getParent());
+                    logger.debug("...............................Migration about to start " + ao + ", node=" +
+                        ao.getParent());
                     ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.MIGRATING);
-                } else if (type.equals(
-                            NotificationType.migrationExceptionThrown)) {
-                    logger.debug(
-                        "...............................Migration Exception thrown : " +
+                } else if (type.equals(NotificationType.migrationExceptionThrown)) {
+                    logger.debug("...............................Migration Exception thrown : " +
                         ao.getName());
                     ao.migrationFailed((MigrationException) notification.getUserData());
                 } else if (type.equals(NotificationType.migrationFinished)) {
-                    logger.debug(
-                        "...............................Migration finished : " +
-                        ao.getName());
+                    logger.debug("...............................Migration finished : " + ao.getName());
                 }
                 // --- FuturEvent -------------------
                 else if (type.equals(NotificationType.waitByNecessity)) {
-                    logger.debug(
-                        "...............................Wait By Necessity : " +
-                        ao.getName());
+                    logger.debug("...............................Wait By Necessity : " + ao.getName());
                     ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.WAITING_BY_NECESSITY);
                 } else if (type.equals(NotificationType.receivedFutureResult)) {
-                    logger.debug(
-                        "...............................Received Future Result : " +
-                        ao.getName());
+                    logger.debug("...............................Received Future Result : " + ao.getName());
                     ao.setState(org.objectweb.proactive.ic2d.jmxmonitoring.util.State.RECEIVED_FUTURE_RESULT);
                 } else {
                     System.out.println(ao.getName() + " => " + type);
@@ -188,8 +166,7 @@ public class ActiveObjectListener implements NotificationListener {
      * @param ao
      * @param type
      */
-    private void addRequest(RequestNotificationData request, ActiveObject ao,
-        Type type) {
+    private void addRequest(RequestNotificationData request, ActiveObject ao, Type type) {
         UniqueID sourceID = request.getSource();
         UniqueID destinationID = request.getDestination();
         UniqueID aoID;
@@ -202,16 +179,14 @@ public class ActiveObjectListener implements NotificationListener {
         //String methodName = request.getMethodName();
         if (type == Type.SENDER) {
             if (!sourceID.equals(ao.getUniqueID())) {
-                System.err.println(
-                    "ActiveObjectListener.handleNotification() the source id != ao.id");
+                System.err.println("ActiveObjectListener.handleNotification() the source id != ao.id");
             }
             aoID = destinationID;
             nodeUrlToDiscovered = request.getDestinationNode();
             hostToDiscovered = destinationHost;
         } else {
             if (!destinationID.equals(ao.getUniqueID())) {
-                System.err.println(
-                    "ActiveObjectListener.handleNotification() the destination id != ao.id");
+                System.err.println("ActiveObjectListener.handleNotification() the destination id != ao.id");
             }
             aoID = sourceID;
             nodeUrlToDiscovered = request.getSourceNode();
@@ -222,26 +197,22 @@ public class ActiveObjectListener implements NotificationListener {
         String name = NamesFactory.getInstance().getName(aoID);
         if (name == null) {
             if ((sourceHost == null) || (destinationHost == null)) {
-                System.err.println(
-                    "ActiveObjectListener.handleNotification() source=" +
-                    request.getSourceNode() + ", destination=" +
-                    request.getDestinationNode());
+                System.err.println("ActiveObjectListener.handleNotification() source=" +
+                    request.getSourceNode() + ", destination=" + request.getDestinationNode());
                 return;
             }
 
             // We need to re-explore the host, because some new runtimes have been created.
             if (sourceHost.equals(destinationHost)) {
-                WorldObject wo = ao.getParent().getParent().getParent()
-                                   .getParent();
-                wo.getMonitorThread()
-                  .addObjectToExplore(ao.getParent().getParent().getParent());
+                WorldObject wo = ao.getParent().getParent().getParent().getParent();
+                wo.getMonitorThread().addObjectToExplore(ao.getParent().getParent().getParent());
             } else { // We have to monitore a new host.
                 String protocol = URIBuilder.getProtocol(nodeUrlToDiscovered);
                 int port = URIBuilder.getPortNumber(nodeUrlToDiscovered);
                 if ((ao.getDepth() - ao.getHostRank()) > 0) {
-                    ao.getWorldObject()
-                      .addHost(URIBuilder.buildURI(hostToDiscovered, "",
-                            protocol, port).toString(), ao.getHostRank() + 1);
+                    ao.getWorldObject().addHost(
+                            URIBuilder.buildURI(hostToDiscovered, "", protocol, port).toString(),
+                            ao.getHostRank() + 1);
                     if (type == Type.SENDER) {
                         ao.addCommunicationTo(destinationID);
                         return;

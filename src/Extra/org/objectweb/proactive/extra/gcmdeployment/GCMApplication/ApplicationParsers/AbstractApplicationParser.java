@@ -53,9 +53,8 @@ public abstract class AbstractApplicationParser implements ApplicationParser {
         return commandBuilder;
     }
 
-    public void parseApplicationNode(Node applicationNode,
-        GCMApplicationParser applicationParser, XPath xpath)
-        throws XPathExpressionException, SAXException, IOException {
+    public void parseApplicationNode(Node applicationNode, GCMApplicationParser applicationParser, XPath xpath)
+            throws XPathExpressionException, SAXException, IOException {
         this.xpath = xpath;
     }
 

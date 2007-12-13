@@ -59,21 +59,19 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferDefinition;
  * @version 1.0,  2006/11/10
  * @since ProActive 3.1
  */
-public class GLiteProcess extends AbstractExternalProcessDecorator
-    implements FileDependant {
+public class GLiteProcess extends AbstractExternalProcessDecorator implements FileDependant {
 
     /**
      * Firsts parameters
      */
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
     protected static final String DEFAULT_COMMAND_PATH = "glite-job-submit";
-    protected static final String DEFAULT_FILE_LOCATION = System.getProperty(
-            "user.home") + File.separator + "public" + File.separator + "JDL";
-    protected static final String DEFAULT_STDOUPUT = System.getProperty(
-            "user.home") + File.separator + "out.log";
-    protected static final String DEFAULT_CONFIG_FILE = System.getProperty(
-            "user.home") + File.separator + "public" + File.separator + "JDL" +
-        File.separator + "vo.conf";
+    protected static final String DEFAULT_FILE_LOCATION = System.getProperty("user.home") + File.separator +
+        "public" + File.separator + "JDL";
+    protected static final String DEFAULT_STDOUPUT = System.getProperty("user.home") + File.separator +
+        "out.log";
+    protected static final String DEFAULT_CONFIG_FILE = System.getProperty("user.home") + File.separator +
+        "public" + File.separator + "JDL" + File.separator + "vo.conf";
     protected int jobID;
     protected String hostList;
     protected String processor = DEFAULT_PROCESSOR_NUMBER;
@@ -162,13 +160,11 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
          */
         if (this.getJobType().equals("MPICH")) {
             args = this.getJobExecutable() +
-                initial_args.substring(initial_args.indexOf("/bin/java") +
-                    "/bin/java".length());
+                initial_args.substring(initial_args.indexOf("/bin/java") + "/bin/java".length());
             /*arguments will be parsed again at script level within gLite environment*/
             this.setJobExecutable("gLiteStartRuntime.sh");
         } else {
-            args = initial_args.substring(initial_args.indexOf("/bin/java") +
-                    "/bin/java".length());
+            args = initial_args.substring(initial_args.indexOf("/bin/java") + "/bin/java".length());
         }
 
         args = checkSyntax(args);
@@ -176,8 +172,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         try {
 
             /*multiple job*/
-            if (this.getJobType().equals("job") &&
-                    this.getJobJobType().equals("mpich")) {
+            if (this.getJobType().equals("job") && this.getJobJobType().equals("mpich")) {
                 this.jad.addAttribute(Jdl.TYPE, "job");
                 this.jad.addAttribute(Jdl.JOBTYPE, Jdl.JOBTYPE_MPICH);
                 this.jad.addAttribute(Jdl.NODENUMB, this.getJobNodeNumber());
@@ -212,8 +207,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
             }
 
             if (this.getJobRetryCount() != null) {
-                this.jad.addAttribute(Jdl.RETRYCOUNT,
-                    Integer.parseInt(getJobRetryCount()));
+                this.jad.addAttribute(Jdl.RETRYCOUNT, Integer.parseInt(getJobRetryCount()));
             }
 
             if (this.getJobMyProxyServer() != null) {
@@ -225,8 +219,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
             }
 
             if (this.getJobRequirements() != null) {
-                this.jad.setAttributeExpr(Jdl.REQUIREMENTS,
-                    this.getJobRequirements());
+                this.jad.setAttributeExpr(Jdl.REQUIREMENTS, this.getJobRequirements());
             }
 
             if (this.getJobRank() != null) {
@@ -234,13 +227,11 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
             }
 
             if (this.getJobDataAccessProtocol() != null) {
-                this.jad.addAttribute(Jdl.DATA_ACCESS,
-                    this.getJobDataAccessProtocol());
+                this.jad.addAttribute(Jdl.DATA_ACCESS, this.getJobDataAccessProtocol());
             }
 
             if (this.getJobStorageIndex() != null) {
-                this.jad.addAttribute(Jdl.OD_STORAGE_ELEMENT,
-                    this.getJobStorageIndex());
+                this.jad.addAttribute(Jdl.OD_STORAGE_ELEMENT, this.getJobStorageIndex());
             }
 
             if (this.getJobFuzzyRank() != null) {
@@ -299,12 +290,10 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
         }
 
         if (!confFileOption) {
-            return DEFAULT_COMMAND_PATH + " " + path + File.separator +
-            fileName;
+            return DEFAULT_COMMAND_PATH + " " + path + File.separator + fileName;
         }
 
-        return DEFAULT_COMMAND_PATH + " --config-vo " + configFile + " " +
-        path + File.separator + fileName;
+        return DEFAULT_COMMAND_PATH + " --config-vo " + configFile + " " + path + File.separator + fileName;
     }
 
     /**
@@ -422,8 +411,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
-    public void addAtt(String attrName, int attrValue)
-        throws Exception {
+    public void addAtt(String attrName, int attrValue) throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
@@ -433,8 +421,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
-    public void addAtt(String attrName, double attrValue)
-        throws Exception {
+    public void addAtt(String attrName, double attrValue) throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
@@ -444,8 +431,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
-    public void addAtt(String attrName, String attrValue)
-        throws Exception {
+    public void addAtt(String attrName, String attrValue) throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 
@@ -455,8 +441,7 @@ public class GLiteProcess extends AbstractExternalProcessDecorator
      * @throws InvalidAttributeValueException
      * @throws IllegalArgumentException
      */
-    public void addAtt(String attrName, boolean attrValue)
-        throws Exception {
+    public void addAtt(String attrName, boolean attrValue) throws Exception {
         jad.addAttribute(attrName, attrValue);
     }
 

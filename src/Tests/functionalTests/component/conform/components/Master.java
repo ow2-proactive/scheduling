@@ -41,8 +41,7 @@ public interface Master {
 
     List<StringWrapper> computeAsync(List<String> args, String other);
 
-    List<GenericTypeWrapper<String>> computeAsyncGenerics(List<String> args,
-        String other);
+    List<GenericTypeWrapper<String>> computeAsyncGenerics(List<String> args, String other);
 
     List<String> computeSync(List<String> args, String other);
 }

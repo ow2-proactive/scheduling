@@ -40,24 +40,16 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupPBSParser extends AbstractGroupParser {
-    private static final String NODE_NAME_MAIL_TO = NODE_EXT_NAMESPACE +
-        "mailTo";
-    private static final String NODE_NAME_MAIL_WHEN = NODE_EXT_NAMESPACE +
-        "mailWhen";
-    private static final String NODE_NAME_JOIN_OUTPUT = NODE_EXT_NAMESPACE +
-        "joinOutput";
-    private static final String NODE_NAME_WALL_TIME = NODE_EXT_NAMESPACE +
-        "wallTime";
-    private static final String NODE_NAME_PROCESSOR_PER_NODE = NODE_EXT_NAMESPACE +
-        "processorPerNode";
+    private static final String NODE_NAME_MAIL_TO = NODE_EXT_NAMESPACE + "mailTo";
+    private static final String NODE_NAME_MAIL_WHEN = NODE_EXT_NAMESPACE + "mailWhen";
+    private static final String NODE_NAME_JOIN_OUTPUT = NODE_EXT_NAMESPACE + "joinOutput";
+    private static final String NODE_NAME_WALL_TIME = NODE_EXT_NAMESPACE + "wallTime";
+    private static final String NODE_NAME_PROCESSOR_PER_NODE = NODE_EXT_NAMESPACE + "processorPerNode";
     private static final String NODE_NAME_NODES = NODE_EXT_NAMESPACE + "nodes";
-    private static final String NODE_NAME_HOSTLIST = NODE_EXT_NAMESPACE +
-        "hostlist";
+    private static final String NODE_NAME_HOSTLIST = NODE_EXT_NAMESPACE + "hostlist";
     private static final String NODE_NAME = "pbsGroup";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
-        "stdout";
-    private static final Object NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
-        "stderr";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
+    private static final Object NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
     private static final String ATTR_QUEUE_NAME = "queueName";
     private static final String ATTR_INTERACTIVE = "interactive";
 
@@ -75,14 +67,12 @@ public class GroupPBSParser extends AbstractGroupParser {
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         GroupPBS pbsGroup = (GroupPBS) super.parseGroupNode(groupNode, xpath);
 
-        String interactive = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_INTERACTIVE);
+        String interactive = GCMParserHelper.getAttributeValue(groupNode, ATTR_INTERACTIVE);
         if (interactive != null) {
             pbsGroup.setInteractive(interactive);
         }
 
-        String queueName = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_QUEUE_NAME);
+        String queueName = GCMParserHelper.getAttributeValue(groupNode, ATTR_QUEUE_NAME);
         if (queueName != null) {
             pbsGroup.setQueueName(queueName);
         }

@@ -82,11 +82,11 @@ public class TimItBasicReductor implements ProActiveInternalObject {
             return;
         }
         Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    generateAllStatistics();
-                }
-            });
+            @Override
+            public void run() {
+                generateAllStatistics();
+            }
+        });
     }
 
     /**
@@ -106,8 +106,7 @@ public class TimItBasicReductor implements ProActiveInternalObject {
         this.printOutput = Boolean.parseBoolean(TimItTechnicalService.getPrintOutput());
         File folder = new File(TimItBasicConfigurator.DEFAULT_OUTPUT_DIRECTORY);
         folder.mkdir();
-        BasicResultWriter finalWriter = new BasicResultWriter(folder.getAbsolutePath() +
-                "/" + filename);
+        BasicResultWriter finalWriter = new BasicResultWriter(folder.getAbsolutePath() + "/" + filename);
         finalWriter.addGlobalInformationElement(globalInformation);
         Iterator<ResultBag> resultsIterator = this.results.iterator();
         while (resultsIterator.hasNext()) {
@@ -137,10 +136,9 @@ public class TimItBasicReductor implements ProActiveInternalObject {
      *            Some information that could be the output of a toString method
      * @return Always return true to force synchronization
      */
-    public boolean receiveTimers(String className, String shortUniqueID,
-        List<BasicTimer> timersList, String otherInformation) {
-        results.add(new ResultBag(className, shortUniqueID, timersList,
-                otherInformation));
+    public boolean receiveTimers(String className, String shortUniqueID, List<BasicTimer> timersList,
+            String otherInformation) {
+        results.add(new ResultBag(className, shortUniqueID, timersList, otherInformation));
         // decrement the awaited results
         awaitedResults--;
         // If all result are received prepare to finish
@@ -174,16 +172,14 @@ public class TimItBasicReductor implements ProActiveInternalObject {
      * @param otherInformation
      *            Some information that could be the output of a toString method
      */
-    public void receiveTimersDirectMode(String className, String shortUniqueID,
-        List<BasicTimer> timersList, String otherInformation) {
-        ResultBag b = new ResultBag(className, shortUniqueID, timersList,
-                otherInformation);
+    public void receiveTimersDirectMode(String className, String shortUniqueID, List<BasicTimer> timersList,
+            String otherInformation) {
+        ResultBag b = new ResultBag(className, shortUniqueID, timersList, otherInformation);
         this.generateOutputFile = Boolean.parseBoolean(TimItTechnicalService.getGenerateOutputFile());
         this.printOutput = Boolean.parseBoolean(TimItTechnicalService.getPrintOutput());
         File folder = new File("output");
         folder.mkdir();
-        this.filename = folder.getAbsolutePath() + "/output" +
-            (Math.random() * 1000) + "" + this.hashCode();
+        this.filename = folder.getAbsolutePath() + "/output" + (Math.random() * 1000) + "" + this.hashCode();
         if (this.generateOutputFile) {
             b.printToFile();
         }
@@ -267,11 +263,12 @@ public class TimItBasicReductor implements ProActiveInternalObject {
         } else {
             result += "unknownPaVersion";
         }
-        return result + "_" +
-        ("".equals(TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_ID) ? ""
-                                                                      : TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_ID) +
-        "_" + PAActiveObject.getBodyOnThis().getID().shortString() +
-        TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_SUFFIX;
+        return result +
+            "_" +
+            ("".equals(TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_ID) ? ""
+                    : TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_ID) + "_" +
+            PAActiveObject.getBodyOnThis().getID().shortString() +
+            TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_SUFFIX;
     }
 
     /**

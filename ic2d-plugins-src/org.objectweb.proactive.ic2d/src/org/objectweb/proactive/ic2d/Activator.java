@@ -71,8 +71,7 @@ public class Activator extends AbstractUIPlugin {
 
         /* This code is used to the httpssh, fixes an Eclipse bug */
         Hashtable<String, String[]> properties = new Hashtable<String, String[]>(1);
-        properties.put(URLConstants.URL_HANDLER_PROTOCOL,
-            new String[] { "httpssh" });
+        properties.put(URLConstants.URL_HANDLER_PROTOCOL, new String[] { "httpssh" });
         String serviceClass = URLStreamHandlerService.class.getName();
         context.registerService(serviceClass, new IC2DHandler(), properties);
         /* --------------------------------------------------- */
@@ -142,8 +141,7 @@ public class Activator extends AbstractUIPlugin {
             return super.openConnection(u);
         }
 
-        public void parseURL(URLStreamHandlerSetter realHandler, URL u,
-            String spec, int start, int limit) {
+        public void parseURL(URLStreamHandlerSetter realHandler, URL u, String spec, int start, int limit) {
             this.realHandler = realHandler;
             super.parseURL(u, spec, start, limit);
         }
@@ -164,8 +162,7 @@ public class Activator extends AbstractUIPlugin {
          * @deprecated This method is only for compatibility with handlers written
          *             for JDK 1.1.
          */
-        protected void setURL(URL u, String proto, String host, int port,
-            String file, String ref) {
+        protected void setURL(URL u, String proto, String host, int port, String file, String ref) {
             realHandler.setURL(u, proto, host, port, file, ref);
         }
 
@@ -175,10 +172,9 @@ public class Activator extends AbstractUIPlugin {
          *
          * @see "java.net.URLStreamHandler.setURL(URL,String,String,int,String,String,String,String)"
          */
-        protected void setURL(URL u, String proto, String host, int port,
-            String auth, String user, String path, String query, String ref) {
-            realHandler.setURL(u, proto, host, port, auth, user, path, query,
-                ref);
+        protected void setURL(URL u, String proto, String host, int port, String auth, String user,
+                String path, String query, String ref) {
+            realHandler.setURL(u, proto, host, port, auth, user, path, query, ref);
         }
     }
 }

@@ -35,10 +35,8 @@ import java.io.FileFilter;
 
 
 class FormatDBOutputFilter implements FileFilter {
-    final String[] extensions = {
-            "nhr", "nin", "nin", "nnd", "nni", "nni", "nsi", "phr", "pin", "psq",
-            "pnd", "pnd", "psd", "psi"
-        };
+    final String[] extensions = { "nhr", "nin", "nin", "nnd", "nni", "nni", "nsi", "phr", "pin", "psq",
+            "pnd", "pnd", "psd", "psi" };
 
     public boolean accept(File file) {
         for (String ext : extensions) {

@@ -59,12 +59,9 @@ import org.xml.sax.SAXException;
  */
 public class TestDeploymentDescriptorParser {
     @Test
-    public void test()
-        throws IOException, XPathExpressionException, SAXException,
-            TransformerException, ParserConfigurationException {
-        File descriptor = new File(this.getClass()
-                                       .getResource("testfiles/deployment.xml")
-                                       .getFile());
+    public void test() throws IOException, XPathExpressionException, SAXException, TransformerException,
+            ParserConfigurationException {
+        File descriptor = new File(this.getClass().getResource("testfiles/deployment.xml").getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
         GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
@@ -75,12 +72,10 @@ public class TestDeploymentDescriptorParser {
     }
 
     @Test
-    public void allGroupsTest()
-        throws IOException, XPathExpressionException, SAXException,
+    public void allGroupsTest() throws IOException, XPathExpressionException, SAXException,
             TransformerException, ParserConfigurationException {
-        File descriptor = new File(this.getClass()
-                                       .getResource("testfiles/deployment/allGroupsExample.xml")
-                                       .getFile());
+        File descriptor = new File(this.getClass().getResource("testfiles/deployment/allGroupsExample.xml")
+                .getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
         GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
@@ -154,34 +149,28 @@ public class TestDeploymentDescriptorParser {
         public AbstractBridge parseBridgeNode(Node bridgeNode, XPath xpath) {
             AbstractBridge bridge = super.parseBridgeNode(bridgeNode, xpath);
             System.out.println("User Bridge Parser - someattr value = " +
-                bridgeNode.getAttributes().getNamedItem("someattr")
-                          .getNodeValue());
+                bridgeNode.getAttributes().getNamedItem("someattr").getNodeValue());
 
             return bridge;
         }
     }
 
     @Test
-    public void userSchemaTest()
-        throws IOException, XPathExpressionException, SAXException,
+    public void userSchemaTest() throws IOException, XPathExpressionException, SAXException,
             RuntimeException, TransformerException, ParserConfigurationException {
-        File descriptor = new File(getClass()
-                                       .getResource("testfiles/deployment/group_bridge_ext.xml")
-                                       .getFile());
+        File descriptor = new File(getClass().getResource("testfiles/deployment/group_bridge_ext.xml")
+                .getFile());
 
-        String userSchema = getClass()
-                                .getResource("testfiles/deployment/SampleDeploymentExtension.xsd")
-                                .getFile();
+        String userSchema = getClass().getResource("testfiles/deployment/SampleDeploymentExtension.xsd")
+                .getFile();
 
         userSchema = "/home/glaurent/workspace/proactive_trunk/classes/Tests/unitTests/deployment/descriptorParser/testfiles/deployment/SampleDeploymentExtension.xsd";
 
         ArrayList<String> schemas = new ArrayList<String>();
         schemas.add(userSchema);
 
-        System.out.println("Parsing " + descriptor.getAbsolutePath() +
-            " with custom schema " + userSchema);
-        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor,
-                schemas);
+        System.out.println("Parsing " + descriptor.getAbsolutePath() + " with custom schema " + userSchema);
+        GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, schemas);
 
         parser.registerGroupParser(new UserGroupParser());
         parser.registerBridgeParser(new UserBridgeParser());
@@ -191,11 +180,9 @@ public class TestDeploymentDescriptorParser {
         parser.parseResources();
     }
 
-    protected void idConstraintTest(String descriptorLocation)
-        throws XPathExpressionException, TransformerException,
-            ParserConfigurationException {
-        File descriptor = new File(this.getClass()
-                                       .getResource(descriptorLocation).getFile());
+    protected void idConstraintTest(String descriptorLocation) throws XPathExpressionException,
+            TransformerException, ParserConfigurationException {
+        File descriptor = new File(this.getClass().getResource(descriptorLocation).getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
         boolean gotException = false;
@@ -208,39 +195,33 @@ public class TestDeploymentDescriptorParser {
         } catch (SAXException e) {
             e.printStackTrace();
             final String errMsg = "Duplicate key value";
-            gotException = e.getMessage().contains(errMsg) ||
-                e.getException().getMessage().contains(errMsg);
+            gotException = e.getMessage().contains(errMsg) || e.getException().getMessage().contains(errMsg);
         }
 
         Assert.assertTrue(gotException);
     }
 
     @Test
-    public void hostIdConstraintTest()
-        throws XPathExpressionException, TransformerException,
+    public void hostIdConstraintTest() throws XPathExpressionException, TransformerException,
             ParserConfigurationException {
         idConstraintTest("testfiles/deployment/duplicateHostId.xml");
     }
 
     @Test
-    public void groupIdConstraintTest()
-        throws XPathExpressionException, TransformerException,
+    public void groupIdConstraintTest() throws XPathExpressionException, TransformerException,
             ParserConfigurationException {
         idConstraintTest("testfiles/deployment/duplicateGroupId.xml");
     }
 
     @Test
-    public void bridgeIdConstraintTest()
-        throws XPathExpressionException, TransformerException,
+    public void bridgeIdConstraintTest() throws XPathExpressionException, TransformerException,
             ParserConfigurationException {
         idConstraintTest("testfiles/deployment/duplicateBridgeId.xml");
     }
 
-    protected void refConstraintTest(String descriptorLocation)
-        throws XPathExpressionException, TransformerException,
-            ParserConfigurationException {
-        File descriptor = new File(this.getClass()
-                                       .getResource(descriptorLocation).getFile());
+    protected void refConstraintTest(String descriptorLocation) throws XPathExpressionException,
+            TransformerException, ParserConfigurationException {
+        File descriptor = new File(this.getClass().getResource(descriptorLocation).getFile());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath());
         boolean gotException = false;
@@ -253,37 +234,32 @@ public class TestDeploymentDescriptorParser {
         } catch (SAXException e) {
             e.printStackTrace();
             final String errMsg = "not found for identity constraint";
-            gotException = e.getMessage().contains(errMsg) ||
-                e.getException().getMessage().contains(errMsg);
+            gotException = e.getMessage().contains(errMsg) || e.getException().getMessage().contains(errMsg);
         }
 
         Assert.assertTrue(gotException);
     }
 
     @Test
-    public void hostRefIdConstraintTest()
-        throws XPathExpressionException, TransformerException,
+    public void hostRefIdConstraintTest() throws XPathExpressionException, TransformerException,
             ParserConfigurationException {
         refConstraintTest("testfiles/deployment/missingHostId.xml");
     }
 
     @Test
-    public void groupRefIdConstraintTest()
-        throws XPathExpressionException, TransformerException,
+    public void groupRefIdConstraintTest() throws XPathExpressionException, TransformerException,
             ParserConfigurationException {
         refConstraintTest("testfiles/deployment/missingGroupId.xml");
     }
 
     @Test
-    public void groupHostRefIdConstraintTest()
-        throws XPathExpressionException, TransformerException,
+    public void groupHostRefIdConstraintTest() throws XPathExpressionException, TransformerException,
             ParserConfigurationException {
         refConstraintTest("testfiles/deployment/missingGroupHostId.xml");
     }
 
     @Test
-    public void bridgeRefIdConstraintTest()
-        throws XPathExpressionException, TransformerException,
+    public void bridgeRefIdConstraintTest() throws XPathExpressionException, TransformerException,
             ParserConfigurationException {
         refConstraintTest("testfiles/deployment/missingBridgeId.xml");
     }

@@ -40,11 +40,11 @@ import org.objectweb.proactive.extra.gcmdeployment.process.hostinfo.Tools;
 
 public class PathElement implements Cloneable, Serializable {
     protected String relPath;
-    public enum PathBase {PROACTIVE,
-        HOME,
-        ROOT;
-    }
-    ;
+
+    public enum PathBase {
+        PROACTIVE, HOME, ROOT;
+    };
+
     protected PathBase base;
 
     public PathElement() {
@@ -100,30 +100,30 @@ public class PathElement implements Cloneable, Serializable {
 
     public String getFullPath(HostInfo hostInfo, CommandBuilder commandBuilder) {
         switch (base) {
-        case ROOT:
-            return relPath;
-        case HOME:
-            return appendPath(hostInfo.getHomeDirectory(), relPath, hostInfo);
-        case PROACTIVE:
-            Tool tool = hostInfo.getTool(Tools.PROACTIVE.id);
-            if (tool != null) {
-                String ret = appendPath(hostInfo.getHomeDirectory(),
-                        tool.getPath(), hostInfo);
-                return appendPath(ret, relPath, hostInfo);
-            } else {
-                String bp = commandBuilder.getPath(hostInfo);
-                if (bp != null) {
-                    return appendPath(bp, relPath, hostInfo);
+            case ROOT:
+                return relPath;
+            case HOME:
+                return appendPath(hostInfo.getHomeDirectory(), relPath, hostInfo);
+            case PROACTIVE:
+                Tool tool = hostInfo.getTool(Tools.PROACTIVE.id);
+                if (tool != null) {
+                    String ret = appendPath(hostInfo.getHomeDirectory(), tool.getPath(), hostInfo);
+                    return appendPath(ret, relPath, hostInfo);
                 } else {
-                    GCMD_LOGGER.warn("Full Path cannot be returned since nor the ProActive tool nor the CommandBuilder base path have been specified",
-                        new IllegalStateException());
-                    return null;
+                    String bp = commandBuilder.getPath(hostInfo);
+                    if (bp != null) {
+                        return appendPath(bp, relPath, hostInfo);
+                    } else {
+                        GCMD_LOGGER
+                                .warn(
+                                        "Full Path cannot be returned since nor the ProActive tool nor the CommandBuilder base path have been specified",
+                                        new IllegalStateException());
+                        return null;
+                    }
                 }
-            }
         }
 
-        GCMD_LOGGER.warn("Reached unreachable code",
-            new Exception("Unreachable"));
+        GCMD_LOGGER.warn("Reached unreachable code", new Exception("Unreachable"));
         return null;
     }
 
@@ -143,8 +143,7 @@ public class PathElement implements Cloneable, Serializable {
      * @param hostInfo Indicates which file separator to use
      * @return The concatenation of s1 and s2
      */
-    static public String appendPath(final String s1, final String s2,
-        final HostInfo hostInfo) {
+    static public String appendPath(final String s1, final String s2, final HostInfo hostInfo) {
         StringBuilder sb = new StringBuilder();
         sb.append(s1);
 
@@ -173,8 +172,7 @@ public class PathElement implements Cloneable, Serializable {
         final int prime = 31;
         int result = 1;
         result = (prime * result) + ((base == null) ? 0 : base.hashCode());
-        result = (prime * result) +
-            ((relPath == null) ? 0 : relPath.hashCode());
+        result = (prime * result) + ((relPath == null) ? 0 : relPath.hashCode());
         return result;
     }
 

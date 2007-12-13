@@ -56,8 +56,7 @@ public class UniversalUniqueID implements Serializable {
      */
     public static UniversalUniqueID randomUUID() {
         String uniqueId = Long.toHexString(System.currentTimeMillis()) + "-" +
-            Long.toHexString(_RandomForSpace.nextLong()) + "-" +
-            Long.toHexString(_RandomForTime.nextLong());
+            Long.toHexString(_RandomForSpace.nextLong()) + "-" + Long.toHexString(_RandomForTime.nextLong());
         return new UniversalUniqueID(uniqueId);
     }
 

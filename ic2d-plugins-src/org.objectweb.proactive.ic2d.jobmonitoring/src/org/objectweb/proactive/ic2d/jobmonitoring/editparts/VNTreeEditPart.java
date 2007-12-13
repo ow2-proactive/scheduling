@@ -46,8 +46,8 @@ import org.objectweb.proactive.ic2d.jobmonitoring.util.JobMonitoringTreeUtil;
  *
  */
 public class VNTreeEditPart extends JobMonitoringTreeEditPart<VirtualNodeObject> {
-    public static final Image VN_IMAGE = new Image(Display.getCurrent(),
-            VNTreeEditPart.class.getResourceAsStream("vn_icon.png"));
+    public static final Image VN_IMAGE = new Image(Display.getCurrent(), VNTreeEditPart.class
+            .getResourceAsStream("vn_icon.png"));
 
     //
     // -- CONSTRUCTOR ------------------------------------------------
@@ -94,7 +94,6 @@ public class VNTreeEditPart extends JobMonitoringTreeEditPart<VirtualNodeObject>
      */
     @Override
     protected final String getText() {
-        return getCastedModel().getName() + " (" + getCastedModel().getJobID() +
-        ")";
+        return getCastedModel().getName() + " (" + getCastedModel().getJobID() + ")";
     }
 }

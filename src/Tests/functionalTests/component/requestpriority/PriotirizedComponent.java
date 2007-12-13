@@ -30,7 +30,6 @@
  */
 package functionalTests.component.requestpriority;
 
-
 /**
  * @author cdalmass
  *

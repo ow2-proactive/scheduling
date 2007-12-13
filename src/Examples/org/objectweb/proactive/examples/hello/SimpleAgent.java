@@ -64,8 +64,7 @@ public class SimpleAgent implements java.io.Serializable {
     /** Returns the machine name on which the Active Object is currently */
     public String whereAreYou() {
         try {
-            return URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                           .getInetAddress());
+            return URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress());
         } catch (Exception e) {
             return "Localhost lookup failed";
         }
@@ -74,8 +73,7 @@ public class SimpleAgent implements java.io.Serializable {
     /** Creates a migratable SimpleAgaent, and migrates it */
     public static void main(String[] args) {
         if (args.length != 1) {
-            logger.info(
-                "Usage: java org.objectweb.proactive.examples.hello.SimpleAgent hostname/NodeName ");
+            logger.info("Usage: java org.objectweb.proactive.examples.hello.SimpleAgent hostname/NodeName ");
             System.exit(-1);
         }
 

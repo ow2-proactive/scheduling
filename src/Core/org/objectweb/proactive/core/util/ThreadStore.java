@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.util;
 
-
 /**
  * <p>
  * A class implementing this interface provides a sort of store where threads like

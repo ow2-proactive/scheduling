@@ -43,8 +43,7 @@ import org.eclipse.update.ui.UpdateManagerUI;
 /**
  * Action to invoke the Update install wizard.
  */
-public class InstallWizardAction extends Action
-    implements IWorkbenchWindowActionDelegate {
+public class InstallWizardAction extends Action implements IWorkbenchWindowActionDelegate {
     private IWorkbenchWindow window;
 
     public InstallWizardAction() {
@@ -60,12 +59,11 @@ public class InstallWizardAction extends Action
     }
 
     private void openInstaller(final IWorkbenchWindow window) {
-        BusyIndicator.showWhile(window.getShell().getDisplay(),
-            new Runnable() {
-                public void run() {
-                    UpdateManagerUI.openInstaller(window.getShell());
-                }
-            });
+        BusyIndicator.showWhile(window.getShell().getDisplay(), new Runnable() {
+            public void run() {
+                UpdateManagerUI.openInstaller(window.getShell());
+            }
+        });
     }
 
     public void selectionChanged(IAction action, ISelection selection) {

@@ -55,8 +55,7 @@ public class NativeExample extends AbstractExample {
      * @param args
      * @throws TaskAlreadySubmittedException
      */
-    public static void main(String[] args)
-        throws MalformedURLException, TaskAlreadySubmittedException {
+    public static void main(String[] args) throws MalformedURLException, TaskAlreadySubmittedException {
         //   Getting command line parameters and creating the master (see AbstractExample)
         init(args);
 
@@ -103,8 +102,8 @@ public class NativeExample extends AbstractExample {
     public static class SimpleNativeTask extends NativeTask {
 
         /**
-                 *
-                 */
+         *
+         */
         public SimpleNativeTask(String command) {
             super(command);
         }

@@ -61,9 +61,8 @@ public class Start {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
 
-    public static void main(int totalNbBodies, int maxIter,
-        Displayer displayer, Node[] nodes,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         logger.info("RUNNING group oo-spmd VERSION");
 
         Cube universe = new Cube(-100, -100, -100, 200, 200, 200);
@@ -74,8 +73,7 @@ public class Start {
         }
         Domain domainGroup = null;
         try {
-            domainGroup = (Domain) PASPMD.newSPMDGroup(Domain.class.getName(),
-                    constructorParams, nodes);
+            domainGroup = (Domain) PASPMD.newSPMDGroup(Domain.class.getName(), constructorParams, nodes);
         } catch (NodeException e) {
             killsupport.abort(e);
         } catch (ActiveObjectCreationException e) {

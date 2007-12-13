@@ -62,16 +62,16 @@ public class TryCatch extends Anything {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         return "" + tryTerminal + tryBlock + catchBlocks + finallyBlock;
     }
 
     @Override
-	protected void prettyPrint(int indent) {
+    protected void prettyPrint(int indent) {
         super.prettyPrint(indent);
         System.out.print("tryWithCatch (");
         for (Catch c : catchBlocks) {
-            System.out.print(c.getClassName() + ", ");	
+            System.out.print(c.getClassName() + ", ");
         }
         System.out.println(")");
 
@@ -114,7 +114,7 @@ public class TryCatch extends Anything {
     }
 
     @Override
-	public void work(Catcher c) throws IOException {
+    public void work(Catcher c) throws IOException {
         if (!catchBlocks.isEmpty()) {
             String call = getTryWithCatchCall();
             String indent = Catcher.getNewline(tryTerminal);
@@ -123,8 +123,8 @@ public class TryCatch extends Anything {
 
         tryBlock.work(c);
         String indent = Catcher.getNewline(tryBlock.getEnd());
-        c.addAtOffset(tryBlock.getEnd().getLeft(),
-            Catcher.INDENT + getPackageName() + END_TRY_WITH_CATCH + indent);
+        c.addAtOffset(tryBlock.getEnd().getLeft(), Catcher.INDENT + getPackageName() + END_TRY_WITH_CATCH +
+            indent);
 
         Iterator<Catch> iter = catchBlocks.iterator();
         Catch ca = null;
@@ -142,14 +142,12 @@ public class TryCatch extends Anything {
             }
 
             indent = Catcher.getNewline(lastBlock.getEnd());
-            c.addAtOffset(lastBlock.getEnd().getRight(),
-                " finally {" + indent + Catcher.INDENT + getPackageName() +
-                REMOVE_TRY_WITH_CATCH + indent + "}");
+            c.addAtOffset(lastBlock.getEnd().getRight(), " finally {" + indent + Catcher.INDENT +
+                getPackageName() + REMOVE_TRY_WITH_CATCH + indent + "}");
         } else {
-            indent = Catcher.getNewline(finallyBlock.getEnd()) +
-                Catcher.INDENT;
-            c.addAtOffset(finallyBlock.getStart().getRight(),
-                indent + getPackageName() + REMOVE_TRY_WITH_CATCH);
+            indent = Catcher.getNewline(finallyBlock.getEnd()) + Catcher.INDENT;
+            c.addAtOffset(finallyBlock.getStart().getRight(), indent + getPackageName() +
+                REMOVE_TRY_WITH_CATCH);
             finallyBlock.work(c);
         }
     }

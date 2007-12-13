@@ -87,8 +87,7 @@ public class PlanetDescription implements Serializable {
      * @param universe description of the englobbing universe
      * @param xmlAttributes XML parameters
      */
-    public PlanetDescription(UniverseDescription universe,
-        Attributes xmlAttributes) {
+    public PlanetDescription(UniverseDescription universe, Attributes xmlAttributes) {
         this.universe = universe;
         for (int i = 0; i < xmlAttributes.getLength(); i++) {
             String name = xmlAttributes.getQName(i).toLowerCase();

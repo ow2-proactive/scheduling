@@ -82,11 +82,9 @@ public class InternalJavaTask extends InternalAbstractJavaTask {
             try {
                 task = (JavaExecutable) taskClass.newInstance();
             } catch (InstantiationException e) {
-                throw new TaskCreationException("Cannot create javatask from task class ",
-                    e);
+                throw new TaskCreationException("Cannot create javatask from task class ", e);
             } catch (IllegalAccessException e) {
-                throw new TaskCreationException("Cannot create javatask from task class ",
-                    e);
+                throw new TaskCreationException("Cannot create javatask from task class ", e);
             }
         }
 

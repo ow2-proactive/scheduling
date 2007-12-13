@@ -102,8 +102,7 @@ public class Worker extends Timed {
     public void start() {
         this.rank = PASPMD.getMyRank();
         this.workers = (Worker) PASPMD.getSPMDGroup();
-        this.workersArray = (Worker[]) PAGroup.getGroup(this.workers)
-                                              .toArray(new Worker[0]);
+        this.workersArray = (Worker[]) PAGroup.getGroup(this.workers).toArray(new Worker[0]);
         this.groupSize = PASPMD.getMySPMDGroupSize();
 
         this.msg("Ready");
@@ -130,10 +129,10 @@ public class Worker extends Timed {
         this.E_RAND1 = ts.addEventObserver(new DefaultEventObserver("rand1"));
         this.E_RAND2 = ts.addEventObserver(new DefaultEventObserver("rand2"));
         this.E_COMM = ts.addEventObserver(new DefaultEventObserver("nbComms"));
-        this.E_PATTERN = (CommEventObserver) ts.addEventObserver(new CommEventObserver(
-                    "commPattern", this.groupSize, this.rank));
-        this.E_SIZE = (CommEventObserver) ts.addEventObserver(new CommEventObserver(
-                    "densityPattern", this.groupSize, this.rank));
+        this.E_PATTERN = (CommEventObserver) ts.addEventObserver(new CommEventObserver("commPattern",
+            this.groupSize, this.rank));
+        this.E_SIZE = (CommEventObserver) ts.addEventObserver(new CommEventObserver("densityPattern",
+            this.groupSize, this.rank));
 
         Root root = new Root();
 
@@ -157,12 +156,9 @@ public class Worker extends Timed {
 
             for (int i = 0; i < 10; i++) {
                 destRank = (this.rank + 1) % this.groupSize;
-                super.getEventObservable()
-                     .notifyObservers(new CommEvent(this.E_PATTERN, destRank, 1));
-                super.getEventObservable()
-                     .notifyObservers(new CommEvent(this.E_SIZE, destRank, 2));
-                super.getEventObservable()
-                     .notifyObservers(new Event(this.E_COMM, 1.0));
+                super.getEventObservable().notifyObservers(new CommEvent(this.E_PATTERN, destRank, 1));
+                super.getEventObservable().notifyObservers(new CommEvent(this.E_SIZE, destRank, 2));
+                super.getEventObservable().notifyObservers(new Event(this.E_COMM, 1.0));
                 this.workersArray[destRank].toto(i);
             }
 
@@ -172,18 +168,13 @@ public class Worker extends Timed {
                 } else {
                     destRank = this.rank - 1;
                 }
-                super.getEventObservable()
-                     .notifyObservers(new CommEvent(this.E_PATTERN, destRank, 1));
-                super.getEventObservable()
-                     .notifyObservers(new CommEvent(this.E_SIZE, destRank, 160));
-                super.getEventObservable()
-                     .notifyObservers(new Event(this.E_COMM, 1));
+                super.getEventObservable().notifyObservers(new CommEvent(this.E_PATTERN, destRank, 1));
+                super.getEventObservable().notifyObservers(new CommEvent(this.E_SIZE, destRank, 160));
+                super.getEventObservable().notifyObservers(new Event(this.E_COMM, 1));
                 this.workersArray[destRank].toto(i);
             }
-            super.getEventObservable()
-                 .notifyObservers(new Event(this.E_RAND1, Math.random()));
-            super.getEventObservable()
-                 .notifyObservers(new Event(this.E_RAND2, Math.random()));
+            super.getEventObservable().notifyObservers(new Event(this.E_RAND1, Math.random()));
+            super.getEventObservable().notifyObservers(new Event(this.E_RAND2, Math.random()));
 
             // ************** WORKING
             this.msg("Working");

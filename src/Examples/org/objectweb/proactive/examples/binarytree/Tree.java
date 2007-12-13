@@ -50,16 +50,14 @@ public class Tree {
         this.key = key;
         this.value = value;
         this.display = display;
-        display.displayMessage("[" + key + "] Created with value " + value,
-            java.awt.Color.blue);
+        display.displayMessage("[" + key + "] Created with value " + value, java.awt.Color.blue);
     }
 
     public void insert(String key, String value, boolean AC) {
         int res = key.compareTo(this.key);
         if (res == 0) {
             // Same key --> Modify the current value
-            display.displayMessage("[" + key + "] Replacing " + this.value +
-                " with " + value);
+            display.displayMessage("[" + key + "] Replacing " + this.value + " with " + value);
             this.value = value;
         } else if (res < 0) {
             display.displayMessage("[" + key + "] trying left");
@@ -71,8 +69,7 @@ public class Tree {
                 // Create the new node
                 try {
                     left = (Tree) org.objectweb.proactive.api.PAActiveObject.newActive(this.getClass()
-                                                                                           .getName(),
-                            new Object[] { key, value, display });
+                            .getName(), new Object[] { key, value, display });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -80,10 +77,10 @@ public class Tree {
                 // Enabled Automatic Continuations
                 if (AC) {
                     try {
-                        org.objectweb.proactive.api.PAActiveObject.enableAC(org.objectweb.proactive.api.PAActiveObject.getStubOnThis());
+                        org.objectweb.proactive.api.PAActiveObject
+                                .enableAC(org.objectweb.proactive.api.PAActiveObject.getStubOnThis());
                     } catch (java.io.IOException e) {
-                        display.displayMessage("Automatic Continuations error!!!",
-                            java.awt.Color.red);
+                        display.displayMessage("Automatic Continuations error!!!", java.awt.Color.red);
                     }
                 }
             }
@@ -95,8 +92,7 @@ public class Tree {
                 display.displayMessage("[" + key + "] Creating right");
                 try {
                     right = (Tree) org.objectweb.proactive.api.PAActiveObject.newActive(this.getClass()
-                                                                                            .getName(),
-                            new Object[] { key, value, display });
+                            .getName(), new Object[] { key, value, display });
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -104,10 +100,10 @@ public class Tree {
                 // Enabled Automatic Continuations
                 if (AC) {
                     try {
-                        org.objectweb.proactive.api.PAActiveObject.enableAC(org.objectweb.proactive.api.PAActiveObject.getStubOnThis());
+                        org.objectweb.proactive.api.PAActiveObject
+                                .enableAC(org.objectweb.proactive.api.PAActiveObject.getStubOnThis());
                     } catch (java.io.IOException e) {
-                        display.displayMessage("Automatic Continuations error!!!",
-                            java.awt.Color.red);
+                        display.displayMessage("Automatic Continuations error!!!", java.awt.Color.red);
                     }
                 }
             }
@@ -129,8 +125,7 @@ public class Tree {
         if (res < 0) {
             return (left != null) ? left.search(key) : new ObjectWrapper("null");
         } else {
-            return (right != null) ? right.search(key) : new ObjectWrapper(
-                "null");
+            return (right != null) ? right.search(key) : new ObjectWrapper("null");
         }
     }
 
@@ -192,7 +187,8 @@ public class Tree {
     // Change Automatic Continuations state
     public void enableAC() {
         try {
-            org.objectweb.proactive.api.PAActiveObject.enableAC(org.objectweb.proactive.api.PAActiveObject.getStubOnThis());
+            org.objectweb.proactive.api.PAActiveObject.enableAC(org.objectweb.proactive.api.PAActiveObject
+                    .getStubOnThis());
             if (right != null) {
                 right.enableAC();
             }
@@ -200,14 +196,14 @@ public class Tree {
                 left.enableAC();
             }
         } catch (java.io.IOException e) {
-            display.displayMessage("Automatic Continuations error!!!",
-                java.awt.Color.red);
+            display.displayMessage("Automatic Continuations error!!!", java.awt.Color.red);
         }
     }
 
     public void disableAC() {
         try {
-            org.objectweb.proactive.api.PAActiveObject.disableAC(org.objectweb.proactive.api.PAActiveObject.getStubOnThis());
+            org.objectweb.proactive.api.PAActiveObject.disableAC(org.objectweb.proactive.api.PAActiveObject
+                    .getStubOnThis());
             if (right != null) {
                 right.disableAC();
             }
@@ -215,8 +211,7 @@ public class Tree {
                 left.disableAC();
             }
         } catch (java.io.IOException e) {
-            display.displayMessage("Automatic Continuations error!!!",
-                java.awt.Color.red);
+            display.displayMessage("Automatic Continuations error!!!", java.awt.Color.red);
         }
     }
 }

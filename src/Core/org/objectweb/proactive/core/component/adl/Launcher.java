@@ -91,15 +91,14 @@ public class Launcher {
         }
     }
 
-    public static Object createComponent(String[] pargs)
-        throws Exception {
+    public static Object createComponent(String[] pargs) throws Exception {
         if (pargs[0].equals("-java")) {
             Factory f = FactoryFactory.getFactory(FactoryFactory.JAVA_BACKEND);
             return ((Map) f.newComponent(pargs[1], new HashMap())).get(pargs[2]);
         } else {
             Factory f;
-            if ("org.objectweb.proactive.core.component.Fractive".equals(
-                        PAProperties.FRACTAL_PROVIDER.getValue())) {
+            if ("org.objectweb.proactive.core.component.Fractive".equals(PAProperties.FRACTAL_PROVIDER
+                    .getValue())) {
                 // return the ProActive factory as defined in
                 // org.objectweb.proactive.core.component.adl.FactoryFactory
                 f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
@@ -117,10 +116,9 @@ public class Launcher {
                 try {
                     return f.newComponent(pargs[1], new HashMap());
                 } catch (ClassCastException e) {
-                    if (e.getMessage()
-                             .indexOf("attribute_controller_representative") != (-1)) {
-                        System.out.println(
-                            "Error while parsing the ADL. This could be due to the setting of attributes without implementing AttributeController. ");
+                    if (e.getMessage().indexOf("attribute_controller_representative") != (-1)) {
+                        System.out
+                                .println("Error while parsing the ADL. This could be due to the setting of attributes without implementing AttributeController. ");
                         throw e;
                     } else {
                         e.printStackTrace();
@@ -144,8 +142,7 @@ public class Launcher {
             }
             result[0] = args[0];
             result[1] = args[1];
-            result[2] = ((args.length == 3) || (args.length == 4)) ? args[2]
-                                                                   : "run";
+            result[2] = ((args.length == 3) || (args.length == 4)) ? args[2] : "run";
             result[3] = (args.length == 4) ? args[3] : null;
         } else {
             result[0] = "-java";
@@ -156,14 +153,12 @@ public class Launcher {
     }
 
     private static void parseError() {
-        System.out.println(
-            "Usage: Launcher [-java|-fractal] <definition> [ <itf> ] [deployment-descriptor]");
-        System.out.print(
-            "where <definition> is the name of the component to be ");
+        System.out.println("Usage: Launcher [-java|-fractal] <definition> [ <itf> ] [deployment-descriptor]");
+        System.out.print("where <definition> is the name of the component to be ");
         System.out.print("instantiated and started,\n <itf> is the name of ");
         System.out.println("its Runnable interface, if it has one,");
-        System.out.println(
-            "\nand [deployment-descriptor] is the deployment descriptor that should be used for ProActive");
+        System.out
+                .println("\nand [deployment-descriptor] is the deployment descriptor that should be used for ProActive");
         System.exit(1);
     }
 

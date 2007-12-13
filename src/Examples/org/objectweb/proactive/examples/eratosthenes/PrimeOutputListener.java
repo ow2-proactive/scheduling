@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.eratosthenes;
 
-
 /**
  * @author Jonathan Streit
  */

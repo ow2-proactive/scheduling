@@ -60,10 +60,10 @@ public class AppletEntrance extends org.objectweb.proactive.examples.StandardFra
     public void start() {
         receiveMessage("Please wait while initializing remote objects");
         try {
-            Office off = (Office) org.objectweb.proactive.api.PAActiveObject.newActive(Office.class.getName(),
-                    new Object[] { new Integer(0) });
-            Receptionnist recept = (Receptionnist) org.objectweb.proactive.api.PAActiveObject.newActive(Receptionnist.class.getName(),
-                    new Object[] { off });
+            Office off = (Office) org.objectweb.proactive.api.PAActiveObject.newActive(
+                    Office.class.getName(), new Object[] { new Integer(0) });
+            Receptionnist recept = (Receptionnist) org.objectweb.proactive.api.PAActiveObject.newActive(
+                    Receptionnist.class.getName(), new Object[] { off });
             receiveMessage("The doctors' office is open!");
             off.init(off, recept);
         } catch (Exception e) {
@@ -76,9 +76,8 @@ public class AppletEntrance extends org.objectweb.proactive.examples.StandardFra
         javax.swing.JPanel rootPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
         rootPanel.setBackground(java.awt.Color.white);
         rootPanel.setForeground(java.awt.Color.red);
-        rootPanel.add(new javax.swing.JLabel(
-                "The salishan problems : Problem 3 - The Doctor's Office"),
-            java.awt.BorderLayout.NORTH);
+        rootPanel.add(new javax.swing.JLabel("The salishan problems : Problem 3 - The Doctor's Office"),
+                java.awt.BorderLayout.NORTH);
         //javax.swing.JPanel officePanel=new javax.swing.JPanel(new java.awt.GridLayout(2,1));
         return rootPanel;
     }

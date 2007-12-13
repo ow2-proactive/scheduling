@@ -55,8 +55,8 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     Component componentA;
     String name;
     String nodeUrl;
@@ -64,7 +64,7 @@ public class Test extends ComponentTest {
 
     public Test() {
         super("Creation of a primitive component on a remote node",
-            "Test newActiveComponent method for a primitive component on a remote node");
+                "Test newActiveComponent method for a primitive component on a remote node");
     }
 
     /**
@@ -76,20 +76,15 @@ public class Test extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
 
-        componentA = cf.newFcInstance(type_factory.createFcType(
-                    new InterfaceType[] {
-                        type_factory.createFcItfType("componentInfo",
-                            ComponentInfo.class.getName(), TypeFactory.SERVER,
-                            TypeFactory.MANDATORY, TypeFactory.SINGLE)
-                    }),
-                new ControllerDescription("componentA", Constants.PRIMITIVE),
-                new ContentDescription(ComponentA.class.getName(),
-                    new Object[] { "toto" }), TestNodes.getRemoteACVMNode());
+        componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
+                .createFcItfType("componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE) }), new ControllerDescription(
+            "componentA", Constants.PRIMITIVE), new ContentDescription(ComponentA.class.getName(),
+            new Object[] { "toto" }), TestNodes.getRemoteACVMNode());
         //logger.debug("OK, instantiated the component");
         // start the component!
         Fractal.getLifeCycleController(componentA).startFc();
-        ComponentInfo ref = (ComponentInfo) componentA.getFcInterface(
-                "componentInfo");
+        ComponentInfo ref = (ComponentInfo) componentA.getFcInterface("componentInfo");
         name = ref.getName();
         nodeUrl = ((ComponentInfo) componentA.getFcInterface("componentInfo")).getNodeUrl();
 
@@ -100,8 +95,7 @@ public class Test extends ComponentTest {
     @Before
     public void preConditions() throws Exception {
         new TestNodes().action();
-        remoteHost = TestNodes.getRemoteACVMNode().getVMInformation()
-                              .getHostName();
+        remoteHost = TestNodes.getRemoteACVMNode().getVMInformation().getHostName();
         Assert.assertTrue(remoteHost != null);
     }
 }

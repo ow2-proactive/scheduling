@@ -39,8 +39,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.status.Status;
 import org.objectweb.proactive.examples.jmx.remote.management.transactions.Transaction;
 
 
-public class InstallCommand extends OSGiCommand implements InstallCommandMBean,
-    Serializable {
+public class InstallCommand extends OSGiCommand implements InstallCommandMBean, Serializable {
 
     /**
      *
@@ -55,12 +54,11 @@ public class InstallCommand extends OSGiCommand implements InstallCommandMBean,
     public Status undo_() {
         BundleInfo bInfo = OSGiStore.getInstance().getBundleInfo(this.location);
         if (bInfo != null) {
-            CommandMBean c = new UninstallCommand(this.transaction,
-                    bInfo.getId());
+            CommandMBean c = new UninstallCommand(this.transaction, bInfo.getId());
             return c.do_();
         }
-        return new Status(Status.ERR, OSGiCommand.UNINSTALL,
-            "Bundle does not exist", OSGiStore.getInstance().getUrl());
+        return new Status(Status.ERR, OSGiCommand.UNINSTALL, "Bundle does not exist", OSGiStore.getInstance()
+                .getUrl());
     }
 
     public boolean check() {

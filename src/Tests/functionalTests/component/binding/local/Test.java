@@ -52,8 +52,8 @@ import functionalTests.component.Setup;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     Component compA;
     Component compB1;
     Component compB2;
@@ -77,7 +77,7 @@ public class Test extends ComponentTest {
 
     public Test() {
         super("Components : Binding / rebinding / access to bound elements ",
-            "Components : Binding / rebinding / access to bound elements ");
+                "Components : Binding / rebinding / access to bound elements ");
     }
 
     /**
@@ -97,8 +97,7 @@ public class Test extends ComponentTest {
      */
     @Before
     public void initTest() throws Exception {
-        System.setProperty("fractal.provider",
-            "org.objectweb.proactive.core.component.Fractive");
+        System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");
         compA = Setup.createCompositeA();
         compB1 = Setup.createCompositeB1();
         compB2 = Setup.createPrimitiveB2();
@@ -113,10 +112,8 @@ public class Test extends ComponentTest {
         b1 = new Binding(compA_i2_client, "i2", compB1_i2_server);
         b2 = new Binding(compD_i2_client_collective, "i2", compB1_i2_server);
         b3 = new Binding(compD_i2_client_collective, "i2", compB2_i2_server);
-        b4 = new Binding((Interface) compDbis.getFcInterface("i2"), "i201",
-                compB2_i2_server);
-        b5 = new Binding((Interface) compDbis.getFcInterface("i2"), "i202",
-                compB2_i2_server);
+        b4 = new Binding((Interface) compDbis.getFcInterface("i2"), "i201", compB2_i2_server);
+        b5 = new Binding((Interface) compDbis.getFcInterface("i2"), "i202", compB2_i2_server);
         // TODO test whether multiple bindings on the same server interface is allowed?
         bindings1 = new Bindings();
         bindings2 = new Bindings();
@@ -174,14 +171,11 @@ public class Test extends ComponentTest {
     }
 
     private void testGetExternalClientBindings() {
-        Assert.assertTrue(Arrays.equals(bindings1.getExternalClientBindings(),
-                new String[] { "i2" }));
-        Assert.assertTrue(Arrays.equals(bindings2.getExternalClientBindings(),
-                new String[] { "i2" }));
+        Assert.assertTrue(Arrays.equals(bindings1.getExternalClientBindings(), new String[] { "i2" }));
+        Assert.assertTrue(Arrays.equals(bindings2.getExternalClientBindings(), new String[] { "i2" }));
         // cannot do equality between tables, as the ordering from getExternalsBindings is not predictable
         List l = Arrays.asList(bindings3.getExternalClientBindings());
         String[] t = new String[] { "i202", "i201" };
-        Assert.assertTrue((l.size() == t.length) &&
-            (l.containsAll(Arrays.asList(t))));
+        Assert.assertTrue((l.size() == t.length) && (l.containsAll(Arrays.asList(t))));
     }
 }

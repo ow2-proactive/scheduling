@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util;
 
-
 /**
  * Class used only for performances
  *

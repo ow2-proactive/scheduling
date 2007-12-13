@@ -47,8 +47,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
 /**
  * An implementation of a Location Server
  */
-public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
-    LocationServer {
+public class SimpleLocationServer implements org.objectweb.proactive.RunActive, LocationServer {
     static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     private BodyMap table;
     private String url;
@@ -115,8 +114,8 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
 
     public static void main(String[] args) {
         if (args.length < 1) {
-            logger.error(
-                "usage: java org.objectweb.proactive.ext.util.SimpleLocationServer <server url> [node]");
+            logger
+                    .error("usage: java org.objectweb.proactive.ext.util.SimpleLocationServer <server url> [node]");
             System.exit(-1);
         }
         Object[] arg = new Object[1];
@@ -124,11 +123,12 @@ public class SimpleLocationServer implements org.objectweb.proactive.RunActive,
         SimpleLocationServer server = null;
         try {
             if (args.length == 2) {
-                server = (SimpleLocationServer) PAActiveObject.newActive("org.objectweb.proactive.ext.util.SimpleLocationServer",
-                        arg, NodeFactory.getNode(args[1]));
+                server = (SimpleLocationServer) PAActiveObject.newActive(
+                        "org.objectweb.proactive.ext.util.SimpleLocationServer", arg, NodeFactory
+                                .getNode(args[1]));
             } else {
-                server = (SimpleLocationServer) PAActiveObject.newActive("org.objectweb.proactive.ext.util.SimpleLocationServer",
-                        arg);
+                server = (SimpleLocationServer) PAActiveObject.newActive(
+                        "org.objectweb.proactive.ext.util.SimpleLocationServer", arg);
             }
         } catch (Exception e) {
             e.printStackTrace();

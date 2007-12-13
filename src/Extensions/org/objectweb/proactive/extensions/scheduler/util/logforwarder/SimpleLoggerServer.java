@@ -64,8 +64,7 @@ public class SimpleLoggerServer implements Runnable {
      * if null, events are redirected into all appenders.
      * @throws IOException
      */
-    public SimpleLoggerServer(int port, String appenderName)
-        throws IOException {
+    public SimpleLoggerServer(int port, String appenderName) throws IOException {
         this.connections = new Vector<ConnectionHandler>();
         this.serverSocket = new ServerSocket(port);
         this.port = this.serverSocket.getLocalPort();
@@ -98,8 +97,7 @@ public class SimpleLoggerServer implements Runnable {
      * @return the created server.
      * @throws IOException
      */
-    public static SimpleLoggerServer createLoggerServer()
-        throws IOException {
+    public static SimpleLoggerServer createLoggerServer() throws IOException {
         SimpleLoggerServer simpleLoggerServer = new SimpleLoggerServer();
         Thread simpleLoggerServerThread = new Thread(simpleLoggerServer);
         simpleLoggerServerThread.start();
@@ -117,8 +115,7 @@ public class SimpleLoggerServer implements Runnable {
      */
 
     // TODO cdelbe : Unused ; see  ConnectionHandler.run()
-    public static SimpleLoggerServer createLoggerServer(String appenderName)
-        throws IOException {
+    public static SimpleLoggerServer createLoggerServer(String appenderName) throws IOException {
         SimpleLoggerServer simpleLoggerServer = new SimpleLoggerServer(appenderName);
         Thread simpleLoggerServerThread = new Thread(simpleLoggerServer);
         simpleLoggerServerThread.start();
@@ -188,8 +185,7 @@ public class SimpleLoggerServer implements Runnable {
         public ConnectionHandler(Socket input) {
             try {
                 this.input = input;
-                this.inputStream = new ObjectInputStream(new BufferedInputStream(
-                            input.getInputStream()));
+                this.inputStream = new ObjectInputStream(new BufferedInputStream(input.getInputStream()));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -209,8 +205,7 @@ public class SimpleLoggerServer implements Runnable {
                     localLogger = Logger.getLogger(currentEvent.getLoggerName());
 
                     // apply the logger-level filter
-                    if (currentEvent.getLevel()
-                                        .isGreaterOrEqual(localLogger.getEffectiveLevel())) {
+                    if (currentEvent.getLevel().isGreaterOrEqual(localLogger.getEffectiveLevel())) {
                         // finally log the event as if was generated locally
                         // TODO cdelbe : aName not used ; appender could be null
                         if (aName != null) {

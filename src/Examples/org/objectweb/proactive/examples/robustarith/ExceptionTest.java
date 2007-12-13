@@ -42,7 +42,6 @@ class DangerousException extends Exception {
     }
 }
 
-
 public class ExceptionTest implements Serializable {
 
     /* Empty constructor for ProActive */
@@ -61,8 +60,7 @@ public class ExceptionTest implements Serializable {
     public static void main(String[] args) {
         ExceptionTest test = null;
         try {
-            test = (ExceptionTest) PAActiveObject.newActive(ExceptionTest.class.getName(),
-                    null);
+            test = (ExceptionTest) PAActiveObject.newActive(ExceptionTest.class.getName(), null);
         } catch (Exception e) {
             e.printStackTrace();
             return;

@@ -30,7 +30,6 @@
  */
 package functionalTests.component;
 
-
 /**
  *
  * Sleeps a bit while processing the messages. This allows the filling of the queue while processing the request.

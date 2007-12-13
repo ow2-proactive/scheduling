@@ -45,6 +45,7 @@ import functionalTests.activeobject.locationserver.MigratableA;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test migration with location server and forwarder
  */
@@ -65,12 +66,11 @@ public class Test extends FunctionalTest {
         server = (SimpleLocationServer) PAActiveObject.newActive(SimpleLocationServer.class.getName(),
                 new Object[] { serverUrl });
         Thread.sleep(3000);
-        a = (A) PAActiveObject.newActive(A.class.getName(), null,
-                new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
-                MixedLocationMetaObjectFactory.newInstance());
-        migratableA = (MigratableA) PAActiveObject.newActive(MigratableA.class.getName(),
-                null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
-                MixedLocationMetaObjectFactory.newInstance());
+        a = (A) PAActiveObject.newActive(A.class.getName(), null, new Object[] { "toto" }, TestNodes
+                .getSameVMNode(), null, MixedLocationMetaObjectFactory.newInstance());
+        migratableA = (MigratableA) PAActiveObject.newActive(MigratableA.class.getName(), null,
+                new Object[] { "toto" }, TestNodes.getSameVMNode(), null, MixedLocationMetaObjectFactory
+                        .newInstance());
         idA = ((BodyProxy) ((StubObject) a).getProxy()).getBodyID();
         migratableA.moveTo(TestNodes.getLocalVMNode());
         Thread.sleep(3000);

@@ -70,7 +70,7 @@ public class RemoteLogListener {
                } catch (Exception e) {
                                e.printStackTrace();
                        }
-               */
+         */
 
         //        System.out.println("Starting listener");
         //        Appender a = new AppenderTest();

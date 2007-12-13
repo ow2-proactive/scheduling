@@ -52,8 +52,7 @@ public class SessionKeyFactory implements Serializable {
 
             // keyGen.init(128,rand);
         } catch (Exception e) {
-            System.out.println("Exception in the Session Key Generation : " +
-                e);
+            System.out.println("Exception in the Session Key Generation : " + e);
         }
     }
 

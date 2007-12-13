@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.util;
 
-
 /**
  * This Enum describes the types of notification messages
  * sent in the ic2d MVC Pattern.
@@ -110,10 +109,10 @@ public enum MVCNotificationTag {
      */
     RUNTIME_OBJECT_RUNTIME_KILLED,
     /**
-    * Notification message sent when a <code> RuntimeObject </code> is not responding.
-    * No data has to be sent in the MVCNotification object.
-    * TODO: notification not used. Send this type of notification
-    */
+     * Notification message sent when a <code> RuntimeObject </code> is not responding.
+     * No data has to be sent in the MVCNotification object.
+     * TODO: notification not used. Send this type of notification
+     */
     RUNTIME_OBJECT_RUNTIME_NOT_RESPONDING,
     /**
      * Notification message sent when a <code> RuntimeObject </code> is not monitored anymore.

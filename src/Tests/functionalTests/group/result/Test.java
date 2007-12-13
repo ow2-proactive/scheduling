@@ -42,6 +42,7 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * do a oneway call and an (a)synchronous call on a result group
  *
@@ -73,8 +74,8 @@ public class Test extends FunctionalTest {
         // is the result of the n-th group member at the n-th position in the result-result group ?
         boolean rightRankingOfResults = true;
         for (int i = 0; i < group.size(); i++) {
-            rightRankingOfResults &= ((A) groupResult.get(i)).getName()
-                                      .equals((((A) group.get(i)).asynchronousCall()).getName());
+            rightRankingOfResults &= ((A) groupResult.get(i)).getName().equals(
+                    (((A) group.get(i)).asynchronousCall()).getName());
         }
         assertTrue(rightRankingOfResults);
     }
@@ -83,15 +84,8 @@ public class Test extends FunctionalTest {
     public void preConditions() throws Exception {
         new TestNodes().action();
 
-        Object[][] params = {
-                { "Agent0" },
-                { "Agent1" },
-                { "Agent2" }
-            };
-        Node[] nodes = {
-                TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-                TestNodes.getRemoteVMNode()
-            };
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
         A typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
         this.resultTypedGroup = typedGroup.asynchronousCall();
 

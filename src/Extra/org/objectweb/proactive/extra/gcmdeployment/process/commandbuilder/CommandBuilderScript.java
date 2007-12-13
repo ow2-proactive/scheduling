@@ -55,10 +55,11 @@ public class CommandBuilderScript implements CommandBuilder {
 
     /** File transfers to perform before starting the command */
     private List<FileTransferBlock> fts;
-    public enum Instances {onePerHost,
-        onePerVM,
-        onePerCapacity;
+
+    public enum Instances {
+        onePerHost, onePerVM, onePerCapacity;
     }
+
     private Instances instances;
 
     public CommandBuilderScript() {
@@ -90,8 +91,7 @@ public class CommandBuilderScript implements CommandBuilder {
     public String buildCommand(HostInfo hostInfo, GCMApplicationDescriptor gcma) {
         StringBuilder sb = new StringBuilder();
         if (path != null) {
-            sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this),
-                    command, hostInfo));
+            sb.append(PathElement.appendPath(path.getFullPath(hostInfo, this), command, hostInfo));
         } else {
             sb.append(command);
         }

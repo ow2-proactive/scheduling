@@ -102,12 +102,12 @@ public class UserGUI implements ActionListener {
 
         this.c3dUser = c3dUser;
         mainFrame.addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent e) {
-                    c3dUser.terminate();
-                    trash();
-                }
-            });
+            @Override
+            public void windowClosing(WindowEvent e) {
+                c3dUser.terminate();
+                trash();
+            }
+        });
     }
 
     /** Generates the menu bar which contains list, clear, quit and about items*/
@@ -152,12 +152,12 @@ public class UserGUI implements ActionListener {
     /** The whole panel, which is made up of the 3 different panels : message, scene control & log
      * It is made up of two splitpanes, one for the upper vertical split of left/right, one to split top/bottom*/
     private JComponent createMainPanel() {
-        JSplitPane vertSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-                true, createMessagePanel(), createSceneControlPanel());
+        JSplitPane vertSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, createMessagePanel(),
+            createSceneControlPanel());
         vertSplitPane.setOneTouchExpandable(true);
 
-        JSplitPane horizSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                true, vertSplitPane, createLogPanel());
+        JSplitPane horizSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, vertSplitPane,
+            createLogPanel());
         horizSplitPane.setOneTouchExpandable(true);
 
         return horizSplitPane;
@@ -317,13 +317,11 @@ public class UserGUI implements ActionListener {
     public String[] getValues() {
         String users = "";
         int max = this.sendToComboBox.getItemCount();
-        for (int i = 1; i < max; i++) // Just don't save the BROADCAST value
+        for (int i = 1; i < max; i++)
+            // Just don't save the BROADCAST value
 
             users += (this.sendToComboBox.getItemAt(i) + "\n");
-        return new String[] {
-            this.logArea.getText(), this.messageLogArea.getText(),
-            this.userInfoText, users
-        };
+        return new String[] { this.logArea.getText(), this.messageLogArea.getText(), this.userInfoText, users };
         // no need to store the users, as the dispatcher informs of them again!
     }
 
@@ -350,8 +348,7 @@ public class UserGUI implements ActionListener {
     public void showUserInfo() {
         if (userInfoFrame == null) {
             userInfoFrame = new JFrame("Information");
-            userInfoFrame.getContentPane()
-                         .add(createUserInfoArea(this.userInfoText));
+            userInfoFrame.getContentPane().add(createUserInfoArea(this.userInfoText));
             userInfoFrame.pack();
         }
         userInfoFrame.setLocation(mainFrame.getLocation());
@@ -385,8 +382,7 @@ public class UserGUI implements ActionListener {
         } else if ((source == exitMenuItem)) {
             this.c3dUser.terminate();
             trash();
-        } else if ((source == this.localMessageField) ||
-                (source == this.sendMessageButton)) {
+        } else if ((source == this.localMessageField) || (source == this.sendMessageButton)) {
             String message = this.localMessageField.getText();
             if (message.length() > 0) {
                 String recipient = (String) sendToComboBox.getSelectedItem();
@@ -407,8 +403,7 @@ public class UserGUI implements ActionListener {
         } else if (source == clearMenuItem) {
             logArea.setText("");
         } else if (source == aboutMenuItem) {
-            new DialogBox(this.mainFrame, "About ProActive",
-                "The ProActive Grid Middleware",
+            new DialogBox(this.mainFrame, "About ProActive", "The ProActive Grid Middleware",
                 "http://ProActive.ObjectWeb.org/");
         } else {
             log("EVENT not handled : " + source);

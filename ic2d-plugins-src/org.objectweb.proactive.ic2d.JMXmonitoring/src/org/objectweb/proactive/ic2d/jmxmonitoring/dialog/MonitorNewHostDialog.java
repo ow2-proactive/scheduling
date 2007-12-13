@@ -148,28 +148,28 @@ public class MonitorNewHostDialog extends Dialog {
         hostFormData.right = new FormAttachment(50, -5);
         hostCombo.setLayoutData(hostFormData);
         hostCombo.addSelectionListener(new SelectionListener() {
-                public void widgetSelected(SelectionEvent e) {
-                    String hostName = hostCombo.getText();
-                    String url = urls.get(hostName);
-                    Integer port = URIBuilder.getPortNumber(url);
-                    String protocol = URIBuilder.getProtocol(url);
-                    portText.setText(port.toString());
-                    protocolCombo.setText(protocol);
-                }
+            public void widgetSelected(SelectionEvent e) {
+                String hostName = hostCombo.getText();
+                String url = urls.get(hostName);
+                Integer port = URIBuilder.getPortNumber(url);
+                String protocol = URIBuilder.getProtocol(url);
+                portText.setText(port.toString());
+                protocolCombo.setText(protocol);
+            }
 
-                public void widgetDefaultSelected(SelectionEvent e) {
-                    String text = hostCombo.getText();
-                    if (hostCombo.indexOf(text) < 0) { // Not in the list yet.
-                        hostCombo.add(text);
+            public void widgetDefaultSelected(SelectionEvent e) {
+                String text = hostCombo.getText();
+                if (hostCombo.indexOf(text) < 0) { // Not in the list yet.
+                    hostCombo.add(text);
 
-                        // Re-sort
-                        String[] items = hostCombo.getItems();
-                        Arrays.sort(items);
-                        hostCombo.setItems(items);
-                        hostCombo.setText(text);
-                    }
+                    // Re-sort
+                    String[] items = hostCombo.getItems();
+                    Arrays.sort(items);
+                    hostCombo.setItems(items);
+                    hostCombo.setText(text);
                 }
-            });
+            }
+        });
 
         // label "Port"
         Label portLabel = new Label(hostGroup, SWT.NONE);
@@ -213,8 +213,7 @@ public class MonitorNewHostDialog extends Dialog {
 
         // label depth
         Label depthLabel = new Label(shell, SWT.NONE);
-        depthLabel.setText(
-            "Hosts will be recursively searched up to a depth of :");
+        depthLabel.setText("Hosts will be recursively searched up to a depth of :");
         FormData depthFormData = new FormData();
         depthFormData.top = new FormAttachment(hostGroup, 20);
         depthFormData.left = new FormAttachment(15, 0);
@@ -244,7 +243,7 @@ public class MonitorNewHostDialog extends Dialog {
         okButton.addSelectionListener(new MonitorNewHostListener());
         FormData okFormData = new FormData();
         okFormData.top = new FormAttachment( /*depthLabel2*/
-                depthLabel, 20);
+        depthLabel, 20);
         okFormData.left = new FormAttachment(25, 20);
         okFormData.right = new FormAttachment(50, -10);
         okButton.setLayoutData(okFormData);
@@ -256,7 +255,7 @@ public class MonitorNewHostDialog extends Dialog {
         cancelButton.addSelectionListener(new MonitorNewHostListener());
         FormData cancelFormData = new FormData();
         cancelFormData.top = new FormAttachment( /*depthLabel2*/
-                depthLabel, 20);
+        depthLabel, 20);
         cancelFormData.left = new FormAttachment(50, 10);
         cancelFormData.right = new FormAttachment(75, -20);
         cancelButton.setLayoutData(cancelFormData);
@@ -294,7 +293,6 @@ public class MonitorNewHostDialog extends Dialog {
     //                }
     //            });
     //    }
-
     /**
      * Load Urls
      */
@@ -312,8 +310,7 @@ public class MonitorNewHostDialog extends Dialog {
 
                 while ((url = reader.readLine()) != null) {
                     if ((url == null) || url.equals("")) {
-                        url = URIBuilder.buildURIFromProperties(initialHostValue,
-                                "").toString();
+                        url = URIBuilder.buildURIFromProperties(initialHostValue, "").toString();
                     }
                     lastNameUsed = URIBuilder.getHostNameFromUrl(url);
                     lastPortUsed = URIBuilder.getPortNumber(url);
@@ -325,8 +322,7 @@ public class MonitorNewHostDialog extends Dialog {
                 String[] t = { "" };
                 String[] hosts = null;
                 if (hostNames.isEmpty()) {
-                    url = URIBuilder.buildURIFromProperties(initialHostValue, "")
-                                    .toString();
+                    url = URIBuilder.buildURIFromProperties(initialHostValue, "").toString();
                     lastNameUsed = URIBuilder.getHostNameFromUrl(url);
                     lastPortUsed = URIBuilder.getPortNumber(url);
                     lastProtocolUsed = URIBuilder.getProtocol(url);
@@ -351,8 +347,7 @@ public class MonitorNewHostDialog extends Dialog {
         } catch (FileNotFoundException e) {
             hostCombo.add(initialHostValue);
             hostCombo.setText(initialHostValue);
-            String defaultURL = URIBuilder.buildURIFromProperties(initialHostValue,
-                    "").toString();
+            String defaultURL = URIBuilder.buildURIFromProperties(initialHostValue, "").toString();
             urls.put(initialHostValue, defaultURL);
             recordUrl(defaultURL);
         }
@@ -406,8 +401,7 @@ public class MonitorNewHostDialog extends Dialog {
                 hostname = hostCombo.getText();
                 port = Integer.parseInt(portText.getText());
                 protocol = protocolCombo.getText();
-                final String url = URIBuilder.buildURI(hostname, "", protocol,
-                        port).toString();
+                final String url = URIBuilder.buildURI(hostname, "", protocol, port).toString();
                 recordUrl(url);
                 world.setDepth(Integer.parseInt(depthText.getText()));
                 //				new Thread() {

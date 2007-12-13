@@ -42,12 +42,12 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 public class Heartbeat implements FTMessage {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * Create a new heartbeat message.
-    */
+     * Create a new heartbeat message.
+     */
     public Heartbeat() {
     }
 

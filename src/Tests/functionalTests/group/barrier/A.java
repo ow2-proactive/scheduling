@@ -37,8 +37,8 @@ import org.objectweb.proactive.api.PASPMD;
 public class A implements Active, java.io.Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private String name;
     private int fooCounter = 0;
     private int barCounter = 0;

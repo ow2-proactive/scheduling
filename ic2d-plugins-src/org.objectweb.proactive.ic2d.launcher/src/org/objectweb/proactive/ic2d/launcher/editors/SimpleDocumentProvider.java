@@ -99,8 +99,7 @@ public class SimpleDocumentProvider extends AbstractDocumentProvider {
     /*
      * @see org.eclipse.ui.texteditor.AbstractDocumentProvider#createDocument(java.lang.Object)
      */
-    protected IDocument createDocument(Object element)
-        throws CoreException {
+    protected IDocument createDocument(Object element) throws CoreException {
         if (element instanceof IEditorInput) {
             IDocument document = new Document();
             if (setDocumentContent(document, (IEditorInput) element)) {
@@ -123,16 +122,15 @@ public class SimpleDocumentProvider extends AbstractDocumentProvider {
     /*
      * @see org.eclipse.ui.texteditor.AbstractDocumentProvider#createAnnotationModel(java.lang.Object)
      */
-    protected IAnnotationModel createAnnotationModel(Object element)
-        throws CoreException {
+    protected IAnnotationModel createAnnotationModel(Object element) throws CoreException {
         return null;
     }
 
     /*
      * @see org.eclipse.ui.texteditor.AbstractDocumentProvider#doSaveDocument(org.eclipse.core.runtime.IProgressMonitor, java.lang.Object, org.eclipse.jface.text.IDocument, boolean)
      */
-    protected void doSaveDocument(IProgressMonitor monitor, Object element,
-        IDocument document, boolean overwrite) throws CoreException {
+    protected void doSaveDocument(IProgressMonitor monitor, Object element, IDocument document,
+            boolean overwrite) throws CoreException {
         if (element instanceof IPathEditorInput) {
             IPathEditorInput pei = (IPathEditorInput) element;
             IPath path = pei.getPath();
@@ -147,18 +145,15 @@ public class SimpleDocumentProvider extends AbstractDocumentProvider {
                         writeDocumentContent(document, writer, monitor);
                     } else {
                         throw new CoreException(new Status(IStatus.ERROR,
-                                "org.eclipse.ui.examples.rcp.texteditor",
-                                IStatus.OK, "file is read-only", null)); //$NON-NLS-1$ //$NON-NLS-2$
+                            "org.eclipse.ui.examples.rcp.texteditor", IStatus.OK, "file is read-only", null)); //$NON-NLS-1$ //$NON-NLS-2$
                     }
                 } else {
                     throw new CoreException(new Status(IStatus.ERROR,
-                            "org.eclipse.ui.examples.rcp.texteditor",
-                            IStatus.OK, "error creating file", null)); //$NON-NLS-1$ //$NON-NLS-2$
+                        "org.eclipse.ui.examples.rcp.texteditor", IStatus.OK, "error creating file", null)); //$NON-NLS-1$ //$NON-NLS-2$
                 }
             } catch (IOException e) {
-                throw new CoreException(new Status(IStatus.ERROR,
-                        "org.eclipse.ui.examples.rcp.texteditor", IStatus.OK,
-                        "error when saving file", e)); //$NON-NLS-1$ //$NON-NLS-2$
+                throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ui.examples.rcp.texteditor",
+                    IStatus.OK, "error when saving file", e)); //$NON-NLS-1$ //$NON-NLS-2$
             }
         }
     }
@@ -184,13 +179,11 @@ public class SimpleDocumentProvider extends AbstractDocumentProvider {
      * @return <code>true</code> if setting the content was successful or no file exists, <code>false</code> otherwise
      * @throws CoreException if reading the file fails
      */
-    private boolean setDocumentContent(IDocument document, IEditorInput input)
-        throws CoreException {
+    private boolean setDocumentContent(IDocument document, IEditorInput input) throws CoreException {
         Reader reader;
         try {
             if (input instanceof IPathEditorInput) {
-                reader = new FileReader(((IPathEditorInput) input).getPath()
-                                         .toFile());
+                reader = new FileReader(((IPathEditorInput) input).getPath().toFile());
             } else {
                 return false;
             }
@@ -203,9 +196,8 @@ public class SimpleDocumentProvider extends AbstractDocumentProvider {
             setDocumentContent(document, reader);
             return true;
         } catch (IOException e) {
-            throw new CoreException(new Status(IStatus.ERROR,
-                    "org.eclipse.ui.examples.rcp.texteditor", IStatus.OK,
-                    "error reading file", e)); //$NON-NLS-1$ //$NON-NLS-2$
+            throw new CoreException(new Status(IStatus.ERROR, "org.eclipse.ui.examples.rcp.texteditor",
+                IStatus.OK, "error reading file", e)); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
@@ -216,8 +208,7 @@ public class SimpleDocumentProvider extends AbstractDocumentProvider {
      * @param reader the source
      * @throws IOException if reading fails
      */
-    private void setDocumentContent(IDocument document, Reader reader)
-        throws IOException {
+    private void setDocumentContent(IDocument document, Reader reader) throws IOException {
         Reader in = new BufferedReader(reader);
         try {
             StringBuffer buffer = new StringBuffer(512);
@@ -242,8 +233,8 @@ public class SimpleDocumentProvider extends AbstractDocumentProvider {
      * @param monitor a progress monitor to report progress
      * @throws IOException if writing fails
      */
-    private void writeDocumentContent(IDocument document, Writer writer,
-        IProgressMonitor monitor) throws IOException {
+    private void writeDocumentContent(IDocument document, Writer writer, IProgressMonitor monitor)
+            throws IOException {
         Writer out = new BufferedWriter(writer);
         try {
             out.write(document.get());

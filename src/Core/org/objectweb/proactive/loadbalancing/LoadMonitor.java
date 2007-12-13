@@ -80,7 +80,7 @@ public class LoadMonitor implements Runnable, ProActiveInternalObject {
                     if (load < 1) sl = sl * (1 - load);
                     sl = sl + LoadBalancingConstants.MIGRATION_TIME;
                 }
-                */
+                 */
                 Thread.sleep(Math.round(sl));
             } catch (InterruptedException interruptedexception) {
             }

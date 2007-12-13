@@ -71,15 +71,14 @@ public class DivideMIMD<P, X> implements Instruction<P, X> {
         this.stages = stages;
     }
 
-    public Task<X> compute(SkeletonSystemImpl system, Task<P> parent)
-        throws Exception {
+    public Task<X> compute(SkeletonSystemImpl system, Task<P> parent) throws Exception {
         Timer timer = new Timer();
         Collection<X> childObjects = div.divide(system, parent.getObject());
         timer.stop();
 
         if (childObjects.size() != stages.size()) {
-            String msg = "Divided Parameter(" + childObjects.size() +
-                ") and number stages(" + stages.size() + ") don't match.";
+            String msg = "Divided Parameter(" + childObjects.size() + ") and number stages(" + stages.size() +
+                ") don't match.";
             logger.error(msg);
             throw new MuscleException(msg);
         }

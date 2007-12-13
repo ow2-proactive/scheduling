@@ -56,8 +56,7 @@ public class SciTestParMult {
         int nbEngine = Integer.parseInt(args[2]);
         service.deployEngine(args[0], args[1], nbEngine);
         BufferedReader reader = new BufferedReader(new FileReader(args[3]));
-        PrintWriter writer = new PrintWriter(new BufferedWriter(
-                    new FileWriter(args[4])));
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(args[4])));
 
         int nbRow;
         int nbCol;
@@ -91,8 +90,7 @@ public class SciTestParMult {
             }
 
             startTime = System.currentTimeMillis();
-            result = GridMatrix.mult(service, "mult" + i, m1, nbRow, nbCol, m2,
-                    nbRow, nbCol);
+            result = GridMatrix.mult(service, "mult" + i, m1, nbRow, nbCol, m2, nbRow, nbCol);
             m3 = result.get();
 
             endTime = System.currentTimeMillis();

@@ -85,7 +85,6 @@ public class Force implements Serializable {
 
     @Override
     public String toString() {
-        return "<" + (int) this.x + " " + (int) this.y + " " + (int) this.z +
-        ">";
+        return "<" + (int) this.x + " " + (int) this.y + " " + (int) this.z + ">";
     }
 }

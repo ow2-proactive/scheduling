@@ -60,16 +60,14 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
      */
     public MPISpmdProxy(VirtualNode vn) throws RuntimeException {
         try {
-            target = (MPISpmdImpl) PAActiveObject.newActive(MPISpmdImpl.class.getName(),
-                    new Object[] { vn });
+            target = (MPISpmdImpl) PAActiveObject.newActive(MPISpmdImpl.class.getName(), new Object[] { vn });
         } catch (ActiveObjectCreationException e) {
             e.printStackTrace();
         } catch (NodeException e) {
             e.printStackTrace();
         }
         name = target.getName();
-        MPI_PROXY_LOGGER.debug("[MPI Proxy] creating MPI SPMD active object: " +
-            name);
+        MPI_PROXY_LOGGER.debug("[MPI Proxy] creating MPI SPMD active object: " + name);
         MPI_PROXY_LOGGER.debug("[MPI Proxy] status : " + status);
         target.setImmediateServices();
     }
@@ -79,8 +77,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
      * @return MPIResult
      */
     public MPIResult startMPI() throws IllegalMPIStateException {
-        MPI_PROXY_LOGGER.debug(
-            "[MPI Proxy] call start method on active object ");
+        MPI_PROXY_LOGGER.debug("[MPI Proxy] call start method on active object ");
         MPI_PROXY_LOGGER.debug("[MPI Proxy] status : " + status);
         // UNSTARTED/DEFAULT status
         if (status.equals(MPIConstants.MPI_UNSTARTED)) {
@@ -88,8 +85,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
             return target.startMPI();
         } else {
             PAActiveObject.terminateActiveObject(target, true);
-            throw new IllegalMPIStateException(
-                "!!! ERROR: cannot start MPI process " + this.name +
+            throw new IllegalMPIStateException("!!! ERROR: cannot start MPI process " + this.name +
                 " Caused by: MPI process has already been started once ");
         }
     }
@@ -100,8 +96,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
      * @return MPIResult
      */
     public MPIResult reStartMPI() throws IllegalMPIStateException {
-        MPI_PROXY_LOGGER.debug(
-            "[MPI Proxy] call reStart method on active object ");
+        MPI_PROXY_LOGGER.debug("[MPI Proxy] call reStart method on active object ");
         MPI_PROXY_LOGGER.debug("[MPI Proxy] status : " + status);
         // check if program is already finished and change status if yes
         checkTerminationStatus();
@@ -112,8 +107,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
             return target.startMPI();
         } else {
             PAActiveObject.terminateActiveObject(target, true);
-            throw new IllegalMPIStateException(
-                "!!! ERROR: cannot restart MPI process " + this.name +
+            throw new IllegalMPIStateException("!!! ERROR: cannot restart MPI process " + this.name +
                 " Caused by: no mpi process has been started once before");
         }
     }
@@ -131,15 +125,13 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
             setStatus(MPIConstants.MPI_KILLED);
             return target.killMPI();
         } // FINISHED/KILLED status
-        else if (status.equals(MPIConstants.MPI_FINISHED) ||
-                status.equals(MPIConstants.MPI_KILLED)) {
+        else if (status.equals(MPIConstants.MPI_FINISHED) || status.equals(MPIConstants.MPI_KILLED)) {
             return false;
         }
         // UNSTARTED status
         else {
             PAActiveObject.terminateActiveObject(target, true);
-            throw new IllegalMPIStateException(
-                "!!! ERROR: cannot kill MPI process " + this.name +
+            throw new IllegalMPIStateException("!!! ERROR: cannot kill MPI process " + this.name +
                 " Caused by: no mpi process has been started once before!");
         }
     }
@@ -192,7 +184,7 @@ public class MPISpmdProxy implements MPISpmd, java.io.Serializable {
 
     private void checkTerminationStatus() {
         if (target.isFinished() && (!status.equals(MPIConstants.MPI_FINISHED)) &&
-                (!status.equals(MPIConstants.MPI_KILLED))) {
+            (!status.equals(MPIConstants.MPI_KILLED))) {
             status = MPIConstants.MPI_FINISHED;
         }
     }

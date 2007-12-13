@@ -39,8 +39,7 @@ import org.objectweb.fractal.api.Component;
  * @author Paul Naoumenko
  *
  */
-public class ProActiveNFLifeCycleControllerImpl
-    extends ProActiveLifeCycleControllerImpl {
+public class ProActiveNFLifeCycleControllerImpl extends ProActiveLifeCycleControllerImpl {
 
     /**
      * Constructor for ProActiveNFLifeCycleController

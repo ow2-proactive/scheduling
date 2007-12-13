@@ -37,6 +37,7 @@ import java.lang.annotation.Target;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
+
 /**
  * Annotation for specifying the dispatch strategy of a given parameter. You
  * could use it directly in the method's parameter declaration or inside
@@ -70,6 +71,7 @@ public @interface ParamDispatchMetadata {
      * @return selected dispatch strategy
      */
     ParamDispatchMode mode();
+
     /**
      * Used for specifying a custom dispatch strategy. Custom dispatch strategies are defined in classes that
      * implement the {@link ParamDispatch} interface.

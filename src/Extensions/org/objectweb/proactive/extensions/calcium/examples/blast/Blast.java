@@ -52,37 +52,33 @@ public class Blast {
     public Blast() {
         /* Format the query and database files */
         Pipe<BlastParams, BlastParams> formatFork = new Pipe<BlastParams, BlastParams>(new ExecuteFormatDB(),
-                new ExecuteFormatQuery());
+            new ExecuteFormatQuery());
 
         /* Blast a database
          * 2.1 Format the database
          * 2.2 Blast the database */
         Pipe<BlastParams, File> blastPipe = new Pipe<BlastParams, File>(formatFork,
-                new Seq<BlastParams, File>(new ExecuteBlast()));
+            new Seq<BlastParams, File>(new ExecuteBlast()));
 
         /* 1 Divide the database
          * 2 Blast the database with the query
          * 3 Conquer the query results  */
-        root = new DaC<BlastParams, File>(new DivideDB(),
-                new DivideDBCondition(), blastPipe, new ConquerResults());
+        root = new DaC<BlastParams, File>(new DivideDB(), new DivideDBCondition(), blastPipe,
+            new ConquerResults());
     }
 
     public static void main(String[] args) throws Exception {
-        String descriptor = Blast.class.getResource("../SSHDescriptor.xml")
-                                       .getPath();
-        BlastParams param = new BlastParams(new File(
-                    "/home/mleyton/NOSAVE/blast/query.nt"),
-                new File("/home/mleyton/NOSAVE/blast/db.nt"),
-                new File("/home/mleyton/NOSAVE/blast/bin-linux/formatdb"),
-                new File("/home/mleyton/NOSAVE/blast/bin-linux/blastall"),
-                true, 2000 * 1024);
+        String descriptor = Blast.class.getResource("../SSHDescriptor.xml").getPath();
+        BlastParams param = new BlastParams(new File("/home/mleyton/NOSAVE/blast/query.nt"), new File(
+            "/home/mleyton/NOSAVE/blast/db.nt"), new File("/home/mleyton/NOSAVE/blast/bin-linux/formatdb"),
+            new File("/home/mleyton/NOSAVE/blast/bin-linux/blastall"), true, 2000 * 1024);
 
         Blast blast = new Blast();
         blast.solve(param, descriptor);
     }
 
-    private void solve(BlastParams parameters, String descriptor)
-        throws InterruptedException, PanicException, ProActiveException {
+    private void solve(BlastParams parameters, String descriptor) throws InterruptedException,
+            PanicException, ProActiveException {
         EnvironmentFactory envfactory = new ProActiveEnvironment(descriptor);
 
         //EnvironmentFactory envfactory = new MultiThreadedEnvironment(10);
@@ -93,8 +89,7 @@ public class Blast {
 
         try {
             File res = future.get();
-            System.out.println("Result in:" + res + " " + res.length() +
-                " [bytes]");
+            System.out.println("Result in:" + res + " " + res.length() + " [bytes]");
             System.out.println(future.getStats());
         } catch (Exception e) {
             e.printStackTrace();

@@ -38,8 +38,7 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
 
 
 public class DivideBT2 implements Divide<Board, Board> {
-    public Vector<Board> divide(SkeletonSystem system, Board board)
-        throws RuntimeException {
+    public Vector<Board> divide(SkeletonSystem system, Board board) throws RuntimeException {
         if (board.isRootBoard()) {
             return initDivideBT2(board);
         }
@@ -60,9 +59,8 @@ public class DivideBT2 implements Divide<Board, Board> {
             //bound1 = i; //bound2 = j;
             int bit = 1 << i;
 
-            v.add(new BoardBT2(board.n, board.solvableSize, 1, bit << 1, bit,
-                    bit >> 1, i, j, sidemask, lastmask, topbit, mask, endbit,
-                    null));
+            v.add(new BoardBT2(board.n, board.solvableSize, 1, bit << 1, bit, bit >> 1, i, j, sidemask,
+                lastmask, topbit, mask, endbit, null));
 
             lastmask |= ((lastmask >> 1) | (lastmask << 1));
             endbit >>= 1;
@@ -93,11 +91,9 @@ public class DivideBT2 implements Divide<Board, Board> {
         }
         while (bitmap != 0) {
             bitmap ^= (board.board[board.row] = bit = -bitmap & bitmap);
-            v.add(new BoardBT2(board.n, board.solvableSize, board.row + 1,
-                    (board.left | bit) << 1, board.down | bit,
-                    (board.right | bit) >> 1, board.bound1, board.bound2,
-                    board.sidemask, board.lastmask, board.topbit, board.mask,
-                    board.endbit, board.board));
+            v.add(new BoardBT2(board.n, board.solvableSize, board.row + 1, (board.left | bit) << 1,
+                board.down | bit, (board.right | bit) >> 1, board.bound1, board.bound2, board.sidemask,
+                board.lastmask, board.topbit, board.mask, board.endbit, board.board));
         } // while-generating
 
         return v;

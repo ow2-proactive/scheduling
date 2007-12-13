@@ -70,7 +70,7 @@ public abstract class Task implements Serializable {
     protected String description;
 
     /** Description of the result of the task */
-    protected Class<?extends ResultPreview> resultPreview;
+    protected Class<? extends ResultPreview> resultPreview;
 
     /**
      * selection script : can be launched before getting a node in order to
@@ -92,7 +92,6 @@ public abstract class Task implements Serializable {
 
     /** Maximum amount of time during which a task can be running. */
     //protected long runTimeLimit;
-
     /** Tell whether or not this task is re-runnable and how many times (0 if not, default 1) */
     protected int rerunnable = 1;
 
@@ -117,8 +116,7 @@ public abstract class Task implements Serializable {
             dependences = new ArrayList<Task>();
         }
         if (task instanceof ProActiveTask) {
-            throw new DependenceFailedException(
-                "Cannot add a ProActive task in a dependence context !");
+            throw new DependenceFailedException("Cannot add a ProActive task in a dependence context !");
         }
         dependences.add(task);
     }
@@ -162,7 +160,7 @@ public abstract class Task implements Serializable {
      *
      * @return the result preview of this task.
      */
-    public Class<?extends ResultPreview> getResultPreview() {
+    public Class<? extends ResultPreview> getResultPreview() {
         return resultPreview;
     }
 
@@ -172,7 +170,7 @@ public abstract class Task implements Serializable {
      * @param resultPreview
      *            the result preview  to set.
      */
-    public void setResultPreview(Class<?extends ResultPreview> resultPreview) {
+    public void setResultPreview(Class<? extends ResultPreview> resultPreview) {
         this.resultPreview = resultPreview;
     }
 
@@ -280,7 +278,6 @@ public abstract class Task implements Serializable {
     //    public long getRunTimeLimit() {
     //        return runTimeLimit;
     //    }
-
     /**
      * To set the maximum amount of time during witch the task will be running.
      *
@@ -291,7 +288,6 @@ public abstract class Task implements Serializable {
     //    public void setRunTimeLimit(long runTimeLimit) {
     //        this.runTimeLimit = runTimeLimit;
     //    }
-
     /**
      * To get the selection script. This is the script that will select a node.
      *

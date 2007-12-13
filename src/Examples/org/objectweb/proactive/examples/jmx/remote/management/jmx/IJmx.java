@@ -39,11 +39,8 @@ import org.objectweb.proactive.examples.jmx.remote.management.exceptions.JMXExce
 
 
 public interface IJmx {
-    public void register()
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
+    public void register() throws InstanceAlreadyExistsException, MBeanRegistrationException,
             NotCompliantMBeanException, JMXException;
 
-    public void unregister()
-        throws InstanceNotFoundException, MBeanRegistrationException,
-            JMXException;
+    public void unregister() throws InstanceNotFoundException, MBeanRegistrationException, JMXException;
 }

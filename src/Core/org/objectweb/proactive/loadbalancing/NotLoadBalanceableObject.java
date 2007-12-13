@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.loadbalancing;
 
-
 /**
  * <p>
  * This interface has to be implemented for ActiveObjects which don't have to

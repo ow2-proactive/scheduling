@@ -78,11 +78,8 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
     public final void run() {
         ProActiveSecurityManager psm = null;
         try {
-            psm = (ProActiveSecurityManager) this.object.invoke("getSecurityManager",
-                    new Object[] { null },
-                    new String[] {
-                        "org.objectweb.proactive.core.security.securityentity.Entity"
-                    });
+            psm = (ProActiveSecurityManager) this.object.invoke("getSecurityManager", new Object[] { null },
+                    new String[] { "org.objectweb.proactive.core.security.securityentity.Entity" });
         } catch (InstanceNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -103,8 +100,8 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 
         try {
             IWorkbench iworkbench = PlatformUI.getWorkbench();
-            IWorkbenchPage page = iworkbench.showPerspective(SecurityPerspective.ID,
-                    iworkbench.getActiveWorkbenchWindow());
+            IWorkbenchPage page = iworkbench.showPerspective(SecurityPerspective.ID, iworkbench
+                    .getActiveWorkbenchWindow());
             IViewPart part = page.showView(PolicyEditorView.ID);
 
             PolicyEditorView pev = (PolicyEditorView) part;
@@ -122,8 +119,8 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
             Hashtable<Long, Session> sessions = new Hashtable<Long, Session>();
             sessions.putAll(psm.getSessions());
 
-            pev.update(KeystoreUtils.listKeystore(psm.getKeyStore()), sprl,
-                psm.getApplicationName(), users, sessions);
+            pev.update(KeystoreUtils.listKeystore(psm.getKeyStore()), sprl, psm.getApplicationName(), users,
+                    sessions);
         } catch (WorkbenchException e2) {
             e2.printStackTrace();
         } catch (UnrecoverableKeyException e) {
@@ -162,8 +159,7 @@ public class GetSecurityManager extends Action implements IActionExtPoint {
 
     public void setAbstractDataObject(AbstractData ref) {
         this.object = ref;
-        super.setEnabled(this.object instanceof ActiveObject ||
-            this.object instanceof RuntimeObject ||
+        super.setEnabled(this.object instanceof ActiveObject || this.object instanceof RuntimeObject ||
             this.object instanceof NodeObject);
     }
 

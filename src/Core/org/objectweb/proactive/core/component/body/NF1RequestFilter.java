@@ -54,10 +54,8 @@ public class NF1RequestFilter implements RequestFilter {
     public boolean acceptRequest(Request request) {
         if (request instanceof ComponentRequest) {
             return ((ComponentRequest) request).isControllerRequest() &&
-            !pc.getPriority(null, request.getMethodName(), null)
-               .equals(RequestPriority.NF2) &&
-            !pc.getPriority(null, request.getMethodName(), null)
-               .equals(RequestPriority.NF3);
+                !pc.getPriority(null, request.getMethodName(), null).equals(RequestPriority.NF2) &&
+                !pc.getPriority(null, request.getMethodName(), null).equals(RequestPriority.NF3);
         } else {
             // standard requests cannot be component controller requests
             return false;

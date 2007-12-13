@@ -50,8 +50,7 @@ public class SecurityPerspective implements IPerspectiveFactory {
         layout.setEditorAreaVisible(false);
         layout.setFixed(false);
 
-        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP,
-                0.75f, editorAreaId);
+        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP, 0.75f, editorAreaId);
         topFolder.addView(PolicyEditorView.ID);
         topFolder.addPlaceholder("org.objectweb.proactive.ic2d.security.*");
     }

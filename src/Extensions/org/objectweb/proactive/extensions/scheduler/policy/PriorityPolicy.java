@@ -52,8 +52,7 @@ public class PriorityPolicy implements PolicyInterface {
      *
      * @see org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
      */
-    public Vector<EligibleTaskDescriptor> getOrderedTasks(
-        List<JobDescriptor> jobs) {
+    public Vector<EligibleTaskDescriptor> getOrderedTasks(List<JobDescriptor> jobs) {
         Vector<EligibleTaskDescriptor> toReturn = new Vector<EligibleTaskDescriptor>();
         //sort jobs by priority
         Collections.sort(jobs);

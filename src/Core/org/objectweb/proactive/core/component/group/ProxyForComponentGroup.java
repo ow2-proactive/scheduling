@@ -51,20 +51,18 @@ public class ProxyForComponentGroup extends ProxyForGroup {
     protected ComponentType componentType;
     protected ControllerDescription controllerDesc;
 
-    public ProxyForComponentGroup()
-        throws ConstructionOfReifiedObjectFailedException {
+    public ProxyForComponentGroup() throws ConstructionOfReifiedObjectFailedException {
         super();
         className = Component.class.getName();
     }
 
     public ProxyForComponentGroup(ConstructorCall c, Object[] p)
-        throws ConstructionOfReifiedObjectFailedException {
+            throws ConstructionOfReifiedObjectFailedException {
         super(c, p);
         className = Component.class.getName();
     }
 
-    public ProxyForComponentGroup(String nameOfClass)
-        throws ConstructionOfReifiedObjectFailedException {
+    public ProxyForComponentGroup(String nameOfClass) throws ConstructionOfReifiedObjectFailedException {
         super(nameOfClass);
         className = Component.class.getName();
     }

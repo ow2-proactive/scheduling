@@ -66,10 +66,10 @@ public interface ProActiveDescriptor extends Serializable {
     public ProActiveDescriptorInternal getProActiveDescriptorInternal();
 
     /**
-    * Returns the Url of the pad
-    * @return String in fact it is an identifire for the pad that is returned.
-    * This identifier is build from the pad url appended with the pad's jobId.
-    */
+     * Returns the Url of the pad
+     * @return String in fact it is an identifire for the pad that is returned.
+     * This identifier is build from the pad url appended with the pad's jobId.
+     */
     public String getUrl();
 
     /**
@@ -113,8 +113,8 @@ public interface ProActiveDescriptor extends Serializable {
     public void killall(boolean softly) throws ProActiveException;
 
     /**
-    *
-    * @return The current variable contract, or null.
-    */
+     *
+     * @return The current variable contract, or null.
+     */
     public VariableContract getVariableContract();
 }

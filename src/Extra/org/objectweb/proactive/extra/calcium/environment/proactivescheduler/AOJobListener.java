@@ -78,8 +78,8 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
     public AOJobListener() {
     }
 
-    public AOJobListener(AOTaskPool taskpool,
-        SchedulerAuthenticationInterface auth, String user, String password) {
+    public AOJobListener(AOTaskPool taskpool, SchedulerAuthenticationInterface auth, String user,
+            String password) {
         this.taskpool = taskpool;
         this.processing = new HashMap<JobId, Collection<Task>>();
         this.shutdown = false;
@@ -90,9 +90,9 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
         this.user = user;
     }
 
-    static protected AOJobListener createAOJobListener(Node frameworkNode,
-        TaskPool taskpool, SchedulerAuthenticationInterface auth, String user,
-        String password) throws ActiveObjectCreationException, NodeException {
+    static protected AOJobListener createAOJobListener(Node frameworkNode, TaskPool taskpool,
+            SchedulerAuthenticationInterface auth, String user, String password)
+            throws ActiveObjectCreationException, NodeException {
         if (logger.isDebugEnabled()) {
             logger.debug("Creating Job Listener");
         }
@@ -109,18 +109,17 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
 
             AOJobListener stubOnThis = (AOJobListener) PAActiveObject.getStubOnThis();
 
-            this.scheduler.addSchedulerEventListener(stubOnThis,
-                SchedulerEvent.JOB_KILLED,
-                SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED,
-                SchedulerEvent.SHUTDOWN, SchedulerEvent.SHUTTING_DOWN); //JOB_KILLED("jobKilledEvent"),
-                                                                        //            this.scheduler.addSchedulerEventListener(stubOnThis,
-                                                                        //                SchedulerEvent.JOB_RUNNING_TO_FINISHED); //RUNNING_TO_FINISHED_JOB("runningToFinishedJobEvent")
-                                                                        //            this.scheduler.addSchedulerEventListener(stubOnThis,
-                                                                        //                SchedulerEvent.KILLED); //KILLED("schedulerKilledEvent"),
-                                                                        //            this.scheduler.addSchedulerEventListener(stubOnThis,
-                                                                        //                SchedulerEvent.SHUTDOWN); //SHUTDOWN("schedulerShutDownEvent"),
-                                                                        //            this.scheduler.addSchedulerEventListener(stubOnThis,
-                                                                        //                SchedulerEvent.SHUTTING_DOWN); //SHUTTING_DOWN("schedulerShuttingDownEvent"),
+            this.scheduler.addSchedulerEventListener(stubOnThis, SchedulerEvent.JOB_KILLED,
+                    SchedulerEvent.JOB_RUNNING_TO_FINISHED, SchedulerEvent.KILLED, SchedulerEvent.SHUTDOWN,
+                    SchedulerEvent.SHUTTING_DOWN); //JOB_KILLED("jobKilledEvent"),
+            //            this.scheduler.addSchedulerEventListener(stubOnThis,
+            //                SchedulerEvent.JOB_RUNNING_TO_FINISHED); //RUNNING_TO_FINISHED_JOB("runningToFinishedJobEvent")
+            //            this.scheduler.addSchedulerEventListener(stubOnThis,
+            //                SchedulerEvent.KILLED); //KILLED("schedulerKilledEvent"),
+            //            this.scheduler.addSchedulerEventListener(stubOnThis,
+            //                SchedulerEvent.SHUTDOWN); //SHUTDOWN("schedulerShutDownEvent"),
+            //            this.scheduler.addSchedulerEventListener(stubOnThis,
+            //                SchedulerEvent.SHUTTING_DOWN); //SHUTTING_DOWN("schedulerShuttingDownEvent"),
         } catch (Exception e) {
             taskpool.panic(new PanicException(e));
             shutdown = true;
@@ -176,8 +175,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
         try {
             jResult = scheduler.getJobResult(event.getJobId());
         } catch (SchedulerException e) {
-            jobDidNotSucceed(event.getJobId(),
-                new TaskException("Failed to get result form scheduler: ", e));
+            jobDidNotSucceed(event.getJobId(), new TaskException("Failed to get result form scheduler: ", e));
         }
 
         if (logger.isDebugEnabled()) {
@@ -188,33 +186,26 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
 
         for (Task task : tasksOld) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Looking for result of task:" +
-                    task.taskId.toString());
+                logger.debug("Looking for result of task:" + task.taskId.toString());
             }
 
-            TaskResult result = jResult.getAllResults()
-                                       .get(task.taskId.toString());
+            TaskResult result = jResult.getAllResults().get(task.taskId.toString());
 
             if (result == null) {
                 task.setException(new TaskException("Task id=" + task.taskId +
-                        " was not returned by the scheduler"));
-                logger.error("Task result not found in job result: " +
-                    task.getException().getMessage());
+                    " was not returned by the scheduler"));
+                logger.error("Task result not found in job result: " + task.getException().getMessage());
             } else if (result.hadException()) { //Exception took place inside the framework
-                task.setException(new TaskException(
-                        "Throwable error took place in scheduler ",
-                        result.getException()));
-                logger.error("Task result contains exception: " +
-                    task.getException().getMessage());
+                task.setException(new TaskException("Throwable error took place in scheduler ", result
+                        .getException()));
+                logger.error("Task result contains exception: " + task.getException().getMessage());
             } else {
                 try {
                     Task computedTask = (Task) result.value();
 
                     if (!task.taskId.equals(computedTask.taskId)) {
-                        throw new TaskException(
-                            "Task changed id while being computed: " +
-                            task.taskId.value() + "=>" +
-                            computedTask.taskId.value());
+                        throw new TaskException("Task changed id while being computed: " +
+                            task.taskId.value() + "=>" + computedTask.taskId.value());
                     }
 
                     //Everything is OK
@@ -238,9 +229,8 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
             return;
         }
 
-        TaskException ex = new TaskException("Job id=" +
-                jobId.getCurrentValue() + "was killed by scheduler " +
-                scheduler);
+        TaskException ex = new TaskException("Job id=" + jobId.getCurrentValue() +
+            "was killed by scheduler " + scheduler);
 
         jobDidNotSucceed(jobId, ex);
     }
@@ -248,8 +238,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
     public void schedulerKilledEvent() {
         shutdown = true;
 
-        TaskException ex = new TaskException("Scheduler was killed: " +
-                scheduler);
+        TaskException ex = new TaskException("Scheduler was killed: " + scheduler);
 
         Collection<JobId> jList = processing.keySet();
 
@@ -261,8 +250,7 @@ public class AOJobListener implements SchedulerEventListener, InitActive {
     public void schedulerShutDownEvent() {
         shutdown = true;
 
-        TaskException ex = new TaskException("Scheduler was shut down: " +
-                scheduler);
+        TaskException ex = new TaskException("Scheduler was shut down: " + scheduler);
 
         Collection<JobId> jList = processing.keySet();
 

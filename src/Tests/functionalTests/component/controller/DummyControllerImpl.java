@@ -42,12 +42,11 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  * @author Matthieu Morel
  *
  */
-public class DummyControllerImpl extends AbstractProActiveController
-    implements DummyController {
+public class DummyControllerImpl extends AbstractProActiveController implements DummyController {
 
     /**
-         *
-         */
+     *
+     */
     private String dummyValue = null;
 
     /**
@@ -60,13 +59,11 @@ public class DummyControllerImpl extends AbstractProActiveController
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(DummyController.DUMMY_CONTROLLER_NAME,
-                    DummyController.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(
+                    DummyController.DUMMY_CONTROLLER_NAME, DummyController.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 

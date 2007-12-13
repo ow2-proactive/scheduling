@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.nbody.barneshut;
 
-
 /**
  * Class implementing physical gravitation force between bodies.
  * In this Barnes-Hut package, building a force may yield an exception
@@ -80,7 +79,6 @@ public class Force implements Serializable {
 
     @Override
     public String toString() {
-        return "<" + (int) this.x + " " + (int) this.y + " " + (int) this.z +
-        ">";
+        return "<" + (int) this.x + " " + (int) this.y + " " + (int) this.z + ">";
     }
 }

@@ -74,29 +74,23 @@ public class TesterImpl implements Tester, BindingController {
         }
     }
 
-    public void bindFc(String clientItfName, Object serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException,
-            IllegalLifeCycleException {
-        if ("oneToOneMulticastClientItf".equals(clientItfName) &&
-                (serverItf instanceof OneToOneMulticast)) {
+    public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
+            IllegalBindingException, IllegalLifeCycleException {
+        if ("oneToOneMulticastClientItf".equals(clientItfName) && (serverItf instanceof OneToOneMulticast)) {
             oneToOneMulticastClientItf = (OneToOneMulticast) serverItf;
         } else if ("broadcastMulticastClientItf".equals(clientItfName) &&
-                (serverItf instanceof BroadcastMulticast)) {
+            (serverItf instanceof BroadcastMulticast)) {
             broadcastMulticastClientItf = (BroadcastMulticast) serverItf;
         } else {
-            throw new ProActiveRuntimeException(
-                "cannot find multicast interface " + clientItfName);
+            throw new ProActiveRuntimeException("cannot find multicast interface " + clientItfName);
         }
     }
 
     public String[] listFc() {
-        return new String[] {
-            "oneToOneMulticastClientItf", "broadcastMulticastClientItf"
-        };
+        return new String[] { "oneToOneMulticastClientItf", "broadcastMulticastClientItf" };
     }
 
-    public Object lookupFc(String clientItfName)
-        throws NoSuchInterfaceException {
+    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
         if ("oneToOneMulticastClientItf".equals(clientItfName)) {
             return oneToOneMulticastClientItf;
         }
@@ -106,16 +100,14 @@ public class TesterImpl implements Tester, BindingController {
         throw new NoSuchInterfaceException(clientItfName);
     }
 
-    public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if ("oneToOneMulticastClientItf".equals(clientItfName)) {
             oneToOneMulticastClientItf = null;
         } else if ("broadcastMulticastClientItf".equals(clientItfName)) {
             broadcastMulticastClientItf = null;
         } else {
-            throw new ProActiveRuntimeException(
-                "cannot find multicast interface " + clientItfName);
+            throw new ProActiveRuntimeException("cannot find multicast interface " + clientItfName);
         }
     }
 }

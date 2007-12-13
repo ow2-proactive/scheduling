@@ -56,27 +56,22 @@ public class TimerTreeHolder extends AbstractObject {
         instance = this;
     }
 
-    public final void provideChartObject(final BasicChartObject source,
-        final boolean retrieveOnly) {
+    public final void provideChartObject(final BasicChartObject source, final boolean retrieveOnly) {
         int sourceIndex = this.chartObjectSources.indexOf(source);
         if (sourceIndex != -1) {
             if (sourceIndex < this.dummyRoots.size()) {
-                this.dummyRoots.get(sourceIndex)
-                               .firePropertyChange(TimerTreeNodeObject.P_SELECTION,
-                    null, null);
+                this.dummyRoots.get(sourceIndex).firePropertyChange(TimerTreeNodeObject.P_SELECTION, null,
+                        null);
             }
         } else if (!retrieveOnly) {
             this.chartObjectSources.add(source);
             // Add dummyRoot to current dummyRoots and attach the total
-            TimerTreeNodeObject dummyRoot = new TimerTreeNodeObject(source.getAoObject()
-                                                                          .getName());
+            TimerTreeNodeObject dummyRoot = new TimerTreeNodeObject(source.getAoObject().getName());
             dummyRoot.children.add(source.getRootTimer());
             dummyRoots.add(dummyRoot);
             firePropertyChange(P_ADD_SOURCE, null, null);
-            dummyRoot.firePropertyChange(TimerTreeNodeObject.P_SELECTION, null,
-                null);
-            dummyRoot.firePropertyChange(TimerTreeNodeObject.P_EXPAND_STATE,
-                null, true);
+            dummyRoot.firePropertyChange(TimerTreeNodeObject.P_SELECTION, null, null);
+            dummyRoot.firePropertyChange(TimerTreeNodeObject.P_EXPAND_STATE, null, true);
         }
     }
 

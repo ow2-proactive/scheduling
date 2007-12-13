@@ -50,8 +50,7 @@ public class SubSum implements Serializable {
         this.name = name;
     }
 
-    public Ratio eval(Formula formula, int begin, int end)
-        throws OverflowException {
+    public Ratio eval(Formula formula, int begin, int end) throws OverflowException {
         Ratio r = new Ratio(BigInteger.ZERO, BigInteger.ONE);
 
         while (begin <= end) {

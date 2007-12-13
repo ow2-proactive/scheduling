@@ -66,10 +66,8 @@ public class ByteToObjectConverter {
          * @throws IOException
          * @throws ClassNotFoundException
          */
-        public static Object convert(byte[] byteArray)
-            throws IOException, ClassNotFoundException {
-            return ByteToObjectConverter.convert(byteArray,
-                MakeDeepCopy.ConversionMode.MARSHALL);
+        public static Object convert(byte[] byteArray) throws IOException, ClassNotFoundException {
+            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.MARSHALL);
         }
     }
 
@@ -82,10 +80,8 @@ public class ByteToObjectConverter {
          * @throws IOException
          * @throws ClassNotFoundException
          */
-        public static Object convert(byte[] byteArray)
-            throws IOException, ClassNotFoundException {
-            return ByteToObjectConverter.convert(byteArray,
-                MakeDeepCopy.ConversionMode.OBJECT);
+        public static Object convert(byte[] byteArray) throws IOException, ClassNotFoundException {
+            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.OBJECT);
         }
     }
 
@@ -98,16 +94,13 @@ public class ByteToObjectConverter {
          * @throws IOException
          * @throws ClassNotFoundException
          */
-        public static Object convert(byte[] byteArray)
-            throws IOException, ClassNotFoundException {
-            return ByteToObjectConverter.convert(byteArray,
-                MakeDeepCopy.ConversionMode.PAOBJECT);
+        public static Object convert(byte[] byteArray) throws IOException, ClassNotFoundException {
+            return ByteToObjectConverter.convert(byteArray, MakeDeepCopy.ConversionMode.PAOBJECT);
         }
     }
 
-    private static Object convert(byte[] byteArray,
-        MakeDeepCopy.ConversionMode conversionMode)
-        throws IOException, ClassNotFoundException {
+    private static Object convert(byte[] byteArray, MakeDeepCopy.ConversionMode conversionMode)
+            throws IOException, ClassNotFoundException {
         final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
         //here we check wether or not we are running in ibis
@@ -118,14 +111,13 @@ public class ByteToObjectConverter {
         }
     }
 
-    private static Object readFromStream(ObjectInputStream objectInputStream)
-        throws IOException, ClassNotFoundException {
+    private static Object readFromStream(ObjectInputStream objectInputStream) throws IOException,
+            ClassNotFoundException {
         return objectInputStream.readObject();
     }
 
-    private static Object standardConvert(byte[] byteArray,
-        MakeDeepCopy.ConversionMode conversionMode)
-        throws IOException, ClassNotFoundException {
+    private static Object standardConvert(byte[] byteArray, MakeDeepCopy.ConversionMode conversionMode)
+            throws IOException, ClassNotFoundException {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
         ObjectInputStream objectInputStream = null;
 
@@ -136,7 +128,7 @@ public class ByteToObjectConverter {
             } else if (conversionMode == MakeDeepCopy.ConversionMode.PAOBJECT) {
                 objectInputStream = new PAObjectInputStream(byteArrayInputStream);
             } else /*(conversionMode == ObjectToByteConverter.ConversionMode.OBJECT)*/
-             {
+            {
                 objectInputStream = new ObjectInputStream(byteArrayInputStream);
             }
             return ByteToObjectConverter.readFromStream(objectInputStream);
@@ -150,21 +142,16 @@ public class ByteToObjectConverter {
     }
 
     @SuppressWarnings("unchecked")
-    private static Object ibisConvert(byte[] b)
-        throws IOException, ClassNotFoundException {
+    private static Object ibisConvert(byte[] b) throws IOException, ClassNotFoundException {
         try {
             final Class cl_bais = Class.forName(BYTE_ARRAY_INPUT_STREAM);
             final Class cl_buais = Class.forName(BUFFERED_ARRAY_INPUT_STREAM);
             final Class cl_isis = Class.forName(IBIS_SERIALIZATION_INPUT_STREAM);
-            final Constructor c_bais = cl_bais.getConstructor(Array.newInstance(
-                        byte.class, 0).getClass());
+            final Constructor c_bais = cl_bais.getConstructor(Array.newInstance(byte.class, 0).getClass());
 
-            final Constructor c_buais = cl_buais.getConstructor(new Class[] {
-                        java.io.InputStream.class
-                    });
-            final Constructor c_isis = cl_isis.getConstructor(new Class[] {
-                        Class.forName("ibis.io.DataInputStream")
-                    });
+            final Constructor c_buais = cl_buais.getConstructor(new Class[] { java.io.InputStream.class });
+            final Constructor c_isis = cl_isis.getConstructor(new Class[] { Class
+                    .forName("ibis.io.DataInputStream") });
 
             //      final ByteArrayInputStream bi = new ByteArrayInputStream(b);
             final ByteArrayInputStream i_bais = (ByteArrayInputStream) c_bais.newInstance(b);
@@ -179,10 +166,9 @@ public class ByteToObjectConverter {
             final Method closeMth = cl_isis.getMethod(CLOSE);
 
             //      final Object unserialized = si.readObject();
-            final Object unserialized = readObjectMth.invoke(i_isis,
-                    new Object[] {  });
+            final Object unserialized = readObjectMth.invoke(i_isis, new Object[] {});
 
-            closeMth.invoke(i_isis, new Object[] {  });
+            closeMth.invoke(i_isis, new Object[] {});
 
             return unserialized;
         } catch (ClassNotFoundException e) {

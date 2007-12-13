@@ -94,8 +94,8 @@ import org.objectweb.proactive.extensions.scilab.monitor.MSService;
 public class MSFrame extends javax.swing.JFrame {
 
     /**
-         *
-         */
+     *
+     */
     private JMenuBar menuBar;
     private JSplitPane splitMain2;
     private JScrollPane scrollTreeEngine;
@@ -190,49 +190,48 @@ public class MSFrame extends javax.swing.JFrame {
         service = new MSService();
 
         service.addEventListenerTask(new MSEventListener() {
-                public void actionPerformed(MSEvent evt) {
-                    GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
+            public void actionPerformed(MSEvent evt) {
+                GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
 
-                    if (sciTaskInfo.getState() == GenTaskInfo.PENDING) {
-                        updateTableTaskWait(sciTaskInfo);
-                        return;
-                    }
-
-                    if (sciTaskInfo.getState() == GenTaskInfo.CANCELLED) {
-                        updateTableTaskCancel(sciTaskInfo);
-                        return;
-                    }
-
-                    if (sciTaskInfo.getState() == GenTaskInfo.RUNNING) {
-                        updateTableTaskRun(sciTaskInfo);
-                        return;
-                    }
-
-                    if (sciTaskInfo.getState() == GenTaskInfo.KILLED) {
-                        updateTableTaskKill(sciTaskInfo);
-                        return;
-                    }
-
-                    if ((sciTaskInfo.getState() == GenTaskInfo.SUCCEEDED) ||
-                            (sciTaskInfo.getState() == GenTaskInfo.ABORTED)) {
-                        updateTableTaskEnd(sciTaskInfo);
-                        return;
-                    }
+                if (sciTaskInfo.getState() == GenTaskInfo.PENDING) {
+                    updateTableTaskWait(sciTaskInfo);
+                    return;
                 }
-            });
+
+                if (sciTaskInfo.getState() == GenTaskInfo.CANCELLED) {
+                    updateTableTaskCancel(sciTaskInfo);
+                    return;
+                }
+
+                if (sciTaskInfo.getState() == GenTaskInfo.RUNNING) {
+                    updateTableTaskRun(sciTaskInfo);
+                    return;
+                }
+
+                if (sciTaskInfo.getState() == GenTaskInfo.KILLED) {
+                    updateTableTaskKill(sciTaskInfo);
+                    return;
+                }
+
+                if ((sciTaskInfo.getState() == GenTaskInfo.SUCCEEDED) ||
+                    (sciTaskInfo.getState() == GenTaskInfo.ABORTED)) {
+                    updateTableTaskEnd(sciTaskInfo);
+                    return;
+                }
+            }
+        });
 
         service.addEventListenerEngine(new MSEventListener() {
-                public void actionPerformed(MSEvent evt) {
-                    refreshTreeEngine();
-                }
-            });
+            public void actionPerformed(MSEvent evt) {
+                refreshTreeEngine();
+            }
+        });
 
-        timerRefresh = new Timer(1000,
-                new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        timerRefreshActionPerformed(evt);
-                    }
-                });
+        timerRefresh = new Timer(1000, new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                timerRefreshActionPerformed(evt);
+            }
+        });
 
         timerRefresh.start();
     }
@@ -265,16 +264,16 @@ public class MSFrame extends javax.swing.JFrame {
             popupTreeEngine.add(itemRestartEngine);
             itemRestartEngine.setText("Restart Engine");
             itemRestartEngine.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        itemRestartEngineActionPerformed(evt);
-                    }
-                });
+                public void actionPerformed(ActionEvent evt) {
+                    itemRestartEngineActionPerformed(evt);
+                }
+            });
             treeEngine.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent evt) {
-                        treeEngineMouseClicked(evt);
-                    }
-                });
+                @Override
+                public void mouseClicked(MouseEvent evt) {
+                    treeEngineMouseClicked(evt);
+                }
+            });
             splitTask1 = new JSplitPane();
             splitTask1.setOrientation(JSplitPane.VERTICAL_SPLIT);
             splitTask1.setDividerSize(7);
@@ -310,38 +309,32 @@ public class MSFrame extends javax.swing.JFrame {
                 scrollTaskWait = new JScrollPane();
                 pnlTaskWait.add(scrollTaskWait, BorderLayout.CENTER);
                 scrollTaskWait.setPreferredSize(new java.awt.Dimension(690, 135));
-                tableTaskWaitModel = new DefaultTableModel(null,
-                        new String[] {
-                            "Id Task", "Script", "Priority", "Awaited Time(ms)",
-                            "State"
-                        });
+                tableTaskWaitModel = new DefaultTableModel(null, new String[] { "Id Task", "Script",
+                        "Priority", "Awaited Time(ms)", "State" });
 
                 tableTaskWait = new JTable() {
 
-                            /**
-                                         *
-                                         */
-                            @Override
-                            public boolean isCellEditable(int rowIndex,
-                                int vColIndex) {
-                                return false;
-                            }
-                        };
+                    /**
+                     *
+                     */
+                    @Override
+                    public boolean isCellEditable(int rowIndex, int vColIndex) {
+                        return false;
+                    }
+                };
 
                 scrollTaskWait.setViewportView(tableTaskWait);
                 scrollTaskWait.getViewport().setBackground(Color.WHITE);
                 tableTaskWait.setModel(tableTaskWaitModel);
-                tableTaskWait.getTableHeader()
-                             .setBackground(new java.awt.Color(250, 251, 253));
-                tableTaskWait.getColumnModel().getColumn(4)
-                             .setCellRenderer(new IconRenderer());
+                tableTaskWait.getTableHeader().setBackground(new java.awt.Color(250, 251, 253));
+                tableTaskWait.getColumnModel().getColumn(4).setCellRenderer(new IconRenderer());
                 tableTaskWait.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 tableTaskWait.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent evt) {
-                            tableTaskWaitMouseClicked(evt);
-                        }
-                    });
+                    @Override
+                    public void mouseClicked(MouseEvent evt) {
+                        tableTaskWaitMouseClicked(evt);
+                    }
+                });
                 {
                     pnlBtnTaskWait = new JPanel();
                     pnlTaskWait.add(pnlBtnTaskWait, BorderLayout.SOUTH);
@@ -353,20 +346,20 @@ public class MSFrame extends javax.swing.JFrame {
                     btnCancelTaskWait.setText("Cancel");
                     btnCancelTaskWait.setToolTipText("Cancel pending tasks ");
                     btnCancelTaskWait.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnCancelTaskWaitActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnCancelTaskWaitActionPerformed(evt);
+                        }
+                    });
                     btnClearTaskWait = new JButton();
                     pnlBtnTaskWait.add(btnClearTaskWait);
                     btnClearTaskWait.setText("Clear");
                     btnClearTaskWait.setSize(70, 22);
                     btnClearTaskWait.setToolTipText("Clear  cancelled tasks");
                     btnClearTaskWait.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnClearTaskWaitActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnClearTaskWaitActionPerformed(evt);
+                        }
+                    });
                 }
             }
 
@@ -381,40 +374,34 @@ public class MSFrame extends javax.swing.JFrame {
                 scrollTaskRun = new JScrollPane();
                 pnlTaskRun.add(scrollTaskRun, BorderLayout.CENTER);
                 scrollTaskRun.setPreferredSize(new java.awt.Dimension(690, 135));
-                tableTaskRunModel = new DefaultTableModel(null,
-                        new String[] {
-                            "Id Task", "Script", "Id Engine", "Global Time(ms)",
-                            "State"
-                        });
+                tableTaskRunModel = new DefaultTableModel(null, new String[] { "Id Task", "Script",
+                        "Id Engine", "Global Time(ms)", "State" });
 
                 tableTaskRun = new JTable() {
 
-                            /**
-                                         *
-                                         */
-                            @Override
-                            public boolean isCellEditable(int rowIndex,
-                                int vColIndex) {
-                                return false;
-                            }
-                        };
+                    /**
+                     *
+                     */
+                    @Override
+                    public boolean isCellEditable(int rowIndex, int vColIndex) {
+                        return false;
+                    }
+                };
 
                 scrollTaskRun.setViewportView(tableTaskRun);
                 scrollTaskRun.getViewport().setBackground(Color.WHITE);
 
                 tableTaskRun.setModel(tableTaskRunModel);
-                tableTaskRun.getTableHeader()
-                            .setBackground(new java.awt.Color(250, 251, 253));
+                tableTaskRun.getTableHeader().setBackground(new java.awt.Color(250, 251, 253));
 
-                tableTaskRun.getColumnModel().getColumn(4)
-                            .setCellRenderer(new IconRenderer());
+                tableTaskRun.getColumnModel().getColumn(4).setCellRenderer(new IconRenderer());
                 tableTaskRun.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 tableTaskRun.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent evt) {
-                            tableTaskRunMouseClicked(evt);
-                        }
-                    });
+                    @Override
+                    public void mouseClicked(MouseEvent evt) {
+                        tableTaskRunMouseClicked(evt);
+                    }
+                });
                 {
                     pnlBtnTaskRun = new JPanel();
                     pnlTaskRun.add(pnlBtnTaskRun, BorderLayout.SOUTH);
@@ -427,20 +414,20 @@ public class MSFrame extends javax.swing.JFrame {
                     btnKillTaskRun.setSize(70, 22);
                     btnKillTaskRun.setToolTipText("Kill executing tasks");
                     btnKillTaskRun.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnKillTaskRunActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnKillTaskRunActionPerformed(evt);
+                        }
+                    });
                     btnClearTaskRun = new JButton();
                     pnlBtnTaskRun.add(btnClearTaskRun);
                     btnClearTaskRun.setText("Clear");
                     btnClearTaskRun.setSize(70, 22);
                     btnClearTaskRun.setToolTipText("Clear killed tasks");
                     btnClearTaskRun.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnClearTaskRunActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnClearTaskRunActionPerformed(evt);
+                        }
+                    });
                 }
 
                 pnlLblTaskRun = new JPanel();
@@ -464,37 +451,31 @@ public class MSFrame extends javax.swing.JFrame {
                 scrollTaskEnd = new JScrollPane();
                 pnlTaskEnd.add(scrollTaskEnd, BorderLayout.CENTER);
                 scrollTaskEnd.setPreferredSize(new java.awt.Dimension(690, 135));
-                tableTaskEndModel = new DefaultTableModel(null,
-                        new String[] {
-                            "Id Task", "Script", "Execution Time(ms)",
-                            "Global Time(ms)", "State"
-                        });
+                tableTaskEndModel = new DefaultTableModel(null, new String[] { "Id Task", "Script",
+                        "Execution Time(ms)", "Global Time(ms)", "State" });
 
                 tableTaskEnd = new JTable() {
 
-                            /**
-                                         *
-                                         */
-                            @Override
-                            public boolean isCellEditable(int rowIndex,
-                                int vColIndex) {
-                                return false;
-                            }
-                        };
+                    /**
+                     *
+                     */
+                    @Override
+                    public boolean isCellEditable(int rowIndex, int vColIndex) {
+                        return false;
+                    }
+                };
                 scrollTaskEnd.setViewportView(tableTaskEnd);
                 scrollTaskEnd.getViewport().setBackground(Color.WHITE);
                 tableTaskEnd.setModel(tableTaskEndModel);
-                tableTaskEnd.getTableHeader()
-                            .setBackground(new java.awt.Color(250, 251, 253));
-                tableTaskEnd.getColumnModel().getColumn(4)
-                            .setCellRenderer(new IconRenderer());
+                tableTaskEnd.getTableHeader().setBackground(new java.awt.Color(250, 251, 253));
+                tableTaskEnd.getColumnModel().getColumn(4).setCellRenderer(new IconRenderer());
                 tableTaskEnd.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
                 tableTaskEnd.addMouseListener(new MouseAdapter() {
-                        @Override
-                        public void mouseClicked(MouseEvent evt) {
-                            tableTaskEndMouseClicked(evt);
-                        }
-                    });
+                    @Override
+                    public void mouseClicked(MouseEvent evt) {
+                        tableTaskEndMouseClicked(evt);
+                    }
+                });
                 {
                     pnlBtnTaskEnd = new JPanel();
                     pnlTaskEnd.add(pnlBtnTaskEnd, BorderLayout.SOUTH);
@@ -507,20 +488,20 @@ public class MSFrame extends javax.swing.JFrame {
                     btnSaveTaskEnd.setSize(70, 22);
                     btnSaveTaskEnd.setToolTipText("Save results");
                     btnSaveTaskEnd.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnSaveTaskEndActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnSaveTaskEndActionPerformed(evt);
+                        }
+                    });
                     btnDeleteTaskEnd = new JButton();
                     pnlBtnTaskEnd.add(btnDeleteTaskEnd);
                     btnDeleteTaskEnd.setText("Delete");
                     btnDeleteTaskEnd.setSize(70, 22);
                     btnDeleteTaskEnd.setToolTipText("Delete result");
                     btnDeleteTaskEnd.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnDeleteTaskEndActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnDeleteTaskEndActionPerformed(evt);
+                        }
+                    });
                 }
 
                 pnlLblTaskEnd = new JPanel();
@@ -540,8 +521,7 @@ public class MSFrame extends javax.swing.JFrame {
                 pnlMainLog.setLayout(pnlMainLogLayout);
                 pnlMainLog.setPreferredSize(new java.awt.Dimension(790, 348));
                 pnlMainLog.setSize(790, 200);
-                pnlMainLog.setBorder(BorderFactory.createTitledBorder(
-                        "Operations"));
+                pnlMainLog.setBorder(BorderFactory.createTitledBorder("Operations"));
                 scrollLog = new JScrollPane();
                 pnlMainLog.add(scrollLog, BorderLayout.CENTER);
                 txtLog = new JTextArea();
@@ -560,47 +540,39 @@ public class MSFrame extends javax.swing.JFrame {
                         pnlLogo.setPreferredSize(new java.awt.Dimension(802, 60));
                         pnlProActive = new JPanel() {
 
-                                    /**
-                                                         *
-                                                         */
-                                    @Override
-                                    public void paintComponent(Graphics g) {
-                                        super.paintComponent(g);
+                            /**
+                             *
+                             */
+                            @Override
+                            public void paintComponent(Graphics g) {
+                                super.paintComponent(g);
 
-                                        g.drawImage(Toolkit.getDefaultToolkit()
-                                                           .getImage(getClass()
-                                                                         .getResource("img/logo_proactive.png")),
-                                            0, 0, this);
-                                    }
-                                };
+                                g.drawImage(Toolkit.getDefaultToolkit().getImage(
+                                        getClass().getResource("img/logo_proactive.png")), 0, 0, this);
+                            }
+                        };
                         pnlLogo.add(pnlProActive);
 
-                        pnlProActive.setPreferredSize(new java.awt.Dimension(
-                                200, 30));
+                        pnlProActive.setPreferredSize(new java.awt.Dimension(200, 30));
                         pnlProActive.setSize(200, 70);
                         pnlScilab = new JPanel() {
 
-                                    /**
-                                                         *
-                                                         */
-                                    @Override
-                                    public void paintComponent(Graphics g) {
-                                        super.paintComponent(g);
+                            /**
+                             *
+                             */
+                            @Override
+                            public void paintComponent(Graphics g) {
+                                super.paintComponent(g);
 
-                                        g.drawImage(Toolkit.getDefaultToolkit()
-                                                           .getImage(getClass()
-                                                                         .getResource("img/MATLAB-logo.JPG")),
-                                            30, 0, this);
-                                        g.drawImage(Toolkit.getDefaultToolkit()
-                                                           .getImage(getClass()
-                                                                         .getResource("img/logo_scilab1.gif")),
-                                            190, 0, this);
-                                    }
-                                };
+                                g.drawImage(Toolkit.getDefaultToolkit().getImage(
+                                        getClass().getResource("img/MATLAB-logo.JPG")), 30, 0, this);
+                                g.drawImage(Toolkit.getDefaultToolkit().getImage(
+                                        getClass().getResource("img/logo_scilab1.gif")), 190, 0, this);
+                            }
+                        };
                         pnlLogo.add(pnlScilab);
 
-                        pnlScilab.setPreferredSize(new java.awt.Dimension(300,
-                                70));
+                        pnlScilab.setPreferredSize(new java.awt.Dimension(300, 70));
                         pnlScilab.setSize(300, 70);
                     }
 
@@ -614,10 +586,10 @@ public class MSFrame extends javax.swing.JFrame {
                         btnClearLog.setText("Clear");
                         btnClearLog.setToolTipText("Clear operation logs");
                         btnClearLog.addActionListener(new ActionListener() {
-                                public void actionPerformed(ActionEvent evt) {
-                                    btnClearLogActionPerformed(evt);
-                                }
-                            });
+                            public void actionPerformed(ActionEvent evt) {
+                                btnClearLogActionPerformed(evt);
+                            }
+                        });
                         pnlBtnClearCenter = new JPanel();
                         pnlBtnClear.add(pnlBtnClearCenter, BorderLayout.CENTER);
                     }
@@ -636,69 +608,69 @@ public class MSFrame extends javax.swing.JFrame {
             menuEngine.add(itemDescriptor);
             itemDescriptor.setText("From Descriptor");
             itemDescriptor.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        itemDescriptorActionPerformed(evt);
-                    }
-                });
+                public void actionPerformed(ActionEvent evt) {
+                    itemDescriptorActionPerformed(evt);
+                }
+            });
             itemDesktopGrid = new JMenuItem();
             menuEngine.add(itemDesktopGrid);
             itemDesktopGrid.setText("From Desktop Grid");
             //to modify
             itemDesktopGrid.setEnabled(false);
             itemDesktopGrid.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        itemDesktopGridActionPerformed(evt);
-                    }
-                });
+                public void actionPerformed(ActionEvent evt) {
+                    itemDesktopGridActionPerformed(evt);
+                }
+            });
             itemTask = new JMenuItem();
             menuCommand.add(itemTask);
             itemTask.setText("New Task");
             itemTask.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        itemTaskActionPerformed(evt);
-                    }
-                });
+                public void actionPerformed(ActionEvent evt) {
+                    itemTaskActionPerformed(evt);
+                }
+            });
             itemLegend = new JMenuItem();
             menuCommand.add(itemLegend);
             itemLegend.setText("Legend");
             itemLegend.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        itemLegendActionPerformed(evt);
-                    }
-                });
+                public void actionPerformed(ActionEvent evt) {
+                    itemLegendActionPerformed(evt);
+                }
+            });
             itemExit = new JMenuItem();
             menuCommand.add(itemExit);
             itemExit.setText("Exit");
             itemExit.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent evt) {
-                        if (service != null) {
-                            service.exit();
-                        }
-
-                        System.exit(0);
+                public void actionPerformed(ActionEvent evt) {
+                    if (service != null) {
+                        service.exit();
                     }
-                });
+
+                    System.exit(0);
+                }
+            });
             {
                 chooserDescriptor = new JFileChooser();
                 FileFilter filter = new FileFilter() {
-                        @Override
-                        public boolean accept(File f) {
-                            if (f == null) {
-                                return false;
-                            }
-
-                            if (f.isDirectory()) {
-                                return true;
-                            }
-
-                            return f.getName().endsWith(".xml");
+                    @Override
+                    public boolean accept(File f) {
+                        if (f == null) {
+                            return false;
                         }
 
-                        @Override
-                        public String getDescription() {
-                            return "XML Filter";
+                        if (f.isDirectory()) {
+                            return true;
                         }
-                    };
+
+                        return f.getName().endsWith(".xml");
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return "XML Filter";
+                    }
+                };
 
                 chooserDescriptor.setApproveButtonText("Deploy");
                 chooserDescriptor.setFileFilter(filter);
@@ -713,8 +685,7 @@ public class MSFrame extends javax.swing.JFrame {
                     pnlPreview.add(lblVn, BorderLayout.NORTH);
                     scrollPreview = new JScrollPane();
                     scrollPreview.setPreferredSize(new java.awt.Dimension(90, 80));
-                    scrollPreview.setBorder(BorderFactory.createLineBorder(
-                            Color.BLACK));
+                    scrollPreview.setBorder(BorderFactory.createLineBorder(Color.BLACK));
                     pnlPreview.add(scrollPreview, BorderLayout.CENTER);
                     listPreviewModel = new DefaultComboBoxModel();
                     listPreview = new JList();
@@ -724,52 +695,47 @@ public class MSFrame extends javax.swing.JFrame {
 
                 chooserDescriptor.setAccessory(pnlPreview);
                 chooserDescriptor.addPropertyChangeListener(new PropertyChangeListener() {
-                        public void propertyChange(PropertyChangeEvent evt) {
-                            if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(
-                                        evt.getPropertyName())) {
-                                File newFile = (File) evt.getNewValue();
-                                if (newFile != null) {
-                                    String path = newFile.getAbsolutePath();
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        if (JFileChooser.SELECTED_FILE_CHANGED_PROPERTY.equals(evt.getPropertyName())) {
+                            File newFile = (File) evt.getNewValue();
+                            if (newFile != null) {
+                                String path = newFile.getAbsolutePath();
 
-                                    String[] arrayNameVn = MSDeployEngine.getListVirtualNode(path);
+                                String[] arrayNameVn = MSDeployEngine.getListVirtualNode(path);
 
-                                    if (listPreviewModel == null) {
-                                        txtLog.append(
-                                            "Invalid deployment descriptor:" +
-                                            path);
-                                        return;
-                                    }
+                                if (listPreviewModel == null) {
+                                    txtLog.append("Invalid deployment descriptor:" + path);
+                                    return;
+                                }
 
-                                    listPreviewModel.removeAllElements();
-                                    for (int i = 0; i < arrayNameVn.length;
-                                            i++) {
-                                        listPreviewModel.addElement(arrayNameVn[i]);
-                                    }
+                                listPreviewModel.removeAllElements();
+                                for (int i = 0; i < arrayNameVn.length; i++) {
+                                    listPreviewModel.addElement(arrayNameVn[i]);
                                 }
                             }
                         }
-                    });
+                    }
+                });
             }
 
             setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             this.addWindowListener(new WindowAdapter() {
-                    @Override
-                    public void windowClosing(WindowEvent evt) {
-                        if (service != null) {
-                            service.exit();
-                        }
-
-                        System.exit(0);
+                @Override
+                public void windowClosing(WindowEvent evt) {
+                    if (service != null) {
+                        service.exit();
                     }
-                });
+
+                    System.exit(0);
+                }
+            });
             pack();
             Dimension d = Toolkit.getDefaultToolkit().getScreenSize();
             Dimension f = this.getSize();
             int x = (d.width - f.width) / 2;
             int y = (d.height - f.height) / 2;
             this.setBounds(x, y, f.width, f.height);
-            this.setIconImage(new ImageIcon(getClass()
-                                                .getResource("img/icone.png")).getImage());
+            this.setIconImage(new ImageIcon(getClass().getResource("img/icone.png")).getImage());
             this.setTitle("Grid Scilab/Matlab ToolBox");
             this.setSize(812, 780);
         } catch (Exception e) {
@@ -823,8 +789,7 @@ public class MSFrame extends javax.swing.JFrame {
 
     private void tableTaskRunMouseClicked(MouseEvent evt) {
         if (evt.getClickCount() == 2) {
-            String idTask = (String) this.tableTaskRunModel.getValueAt(this.tableTaskRun.getSelectedRow(),
-                    0);
+            String idTask = (String) this.tableTaskRunModel.getValueAt(this.tableTaskRun.getSelectedRow(), 0);
 
             GenTaskInfo sciTaskInfo = service.getMapTaskRun().get(idTask);
             this.dialogResult.setPathScript(sciTaskInfo.getPathScript());
@@ -839,8 +804,7 @@ public class MSFrame extends javax.swing.JFrame {
 
     private void tableTaskEndMouseClicked(MouseEvent evt) {
         if (evt.getClickCount() == 2) {
-            String idTask = (String) this.tableTaskEndModel.getValueAt(this.tableTaskEnd.getSelectedRow(),
-                    0);
+            String idTask = (String) this.tableTaskEndModel.getValueAt(this.tableTaskEnd.getSelectedRow(), 0);
 
             GenTaskInfo sciTaskInfo = service.getTaskEnd(idTask);
             this.dialogResult.setPathScript(sciTaskInfo.getPathScript());
@@ -850,8 +814,7 @@ public class MSFrame extends javax.swing.JFrame {
             GeneralResult res = sciTaskInfo.getResult();
             if (res.isException()) {
                 if (res.hasMessage()) {
-                    strResult = res.getMessage() +
-                        System.getProperty("line.separator");
+                    strResult = res.getMessage() + System.getProperty("line.separator");
                 }
 
                 StringWriter sw = new StringWriter();
@@ -860,8 +823,7 @@ public class MSFrame extends javax.swing.JFrame {
                 strResult += sw.toString();
             } else if (res.getState() == GeneralResult.ABORT) {
                 if (res.hasMessage()) {
-                    strResult = res.getMessage() +
-                        System.getProperty("line.separator");
+                    strResult = res.getMessage() + System.getProperty("line.separator");
                 }
             } else {
                 List<AbstractData> listResult = sciTaskInfo.getResult().getList();
@@ -989,27 +951,25 @@ public class MSFrame extends javax.swing.JFrame {
             return;
         }
 
-        pathDescriptor = this.chooserDescriptor.getSelectedFile()
-                                               .getAbsolutePath();
+        pathDescriptor = this.chooserDescriptor.getSelectedFile().getAbsolutePath();
         nameVn = (String) listPreview.getSelectedValue();
 
         if (nameVn == null) {
-            txtLog.append("->Please select a Virtual Node: " + pathDescriptor +
-                "\n");
+            txtLog.append("->Please select a Virtual Node: " + pathDescriptor + "\n");
             return;
         }
 
         txtLog.append("->Deployment is running: " + pathDescriptor + "\n");
 
         (new Thread() {
-                private String path = pathDescriptor;
+            private String path = pathDescriptor;
 
-                @Override
-                public void run() {
-                    service.deployEngine(nameVn, path);
-                    txtLog.append("->Deployment is successfull:" + path + "\n");
-                }
-            }).start();
+            @Override
+            public void run() {
+                service.deployEngine(nameVn, path);
+                txtLog.append("->Deployment is successfull:" + path + "\n");
+            }
+        }).start();
     }
 
     private void addTask() {
@@ -1043,8 +1003,9 @@ public class MSFrame extends javax.swing.JFrame {
         }
 
         try {
-            service.sendTask(dialogTask.getFile(), dialogTask.getJobInit(),
-                dialogTask.getDataOut(), priority);
+            service
+                    .sendTask(dialogTask.getFile(), dialogTask.getJobInit(), dialogTask.getDataOut(),
+                            priority);
         } catch (IOException e) {
             txtLog.append("->Path Error :" + dialogTask.getFile() + "\n");
         }
@@ -1065,8 +1026,7 @@ public class MSFrame extends javax.swing.JFrame {
                 count--;
             } else {
                 nodeEngine.removeAllChildren();
-                nodeEngine.add(new TreeEngineNode(
-                        mSEngineInfo.getSciEngineUrl()));
+                nodeEngine.add(new TreeEngineNode(mSEngineInfo.getSciEngineUrl()));
                 i++;
             }
         }
@@ -1086,10 +1046,10 @@ public class MSFrame extends javax.swing.JFrame {
 
     private void updateTreeNodes() {
         EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    treeEngine.updateUI();
-                }
-            });
+            public void run() {
+                treeEngine.updateUI();
+            }
+        });
     }
 
     private void setStateTreeNode(String idEngine, int state) {
@@ -1140,12 +1100,9 @@ public class MSFrame extends javax.swing.JFrame {
             strPriority = "Low";
         }
 
-        Object[] row = new Object[] {
-                sciTaskInfo.getIdTask(), sciTaskInfo.getNameScript(),
-                strPriority,
+        Object[] row = new Object[] { sciTaskInfo.getIdTask(), sciTaskInfo.getNameScript(), strPriority,
                 (new Date()).getTime() - sciTaskInfo.getDateStart() + "",
-                new ImageIcon(getClass().getResource("img/runTask.gif"))
-            };
+                new ImageIcon(getClass().getResource("img/runTask.gif")) };
         this.tableTaskWaitModel.addRow(row);
         txtLog.append("->Add new Task :" + sciTaskInfo.getIdTask() + "\n");
     }
@@ -1157,8 +1114,8 @@ public class MSFrame extends javax.swing.JFrame {
             if (idTask.equals(sciTaskInfo.getIdTask())) {
                 this.tableTaskWaitModel.setValueAt("-", i, 2);
                 this.tableTaskWaitModel.setValueAt("-", i, 3);
-                this.tableTaskWaitModel.setValueAt(new ImageIcon(
-                        getClass().getResource("img/stopTask.gif")), i, 4);
+                this.tableTaskWaitModel.setValueAt(new ImageIcon(getClass().getResource("img/stopTask.gif")),
+                        i, 4);
                 break;
             }
         }
@@ -1177,12 +1134,9 @@ public class MSFrame extends javax.swing.JFrame {
             }
         }
 
-        Object[] row = new Object[] {
-                sciTaskInfo.getIdTask(), sciTaskInfo.getNameScript(),
-                sciTaskInfo.getIdEngine(),
-                (new Date()).getTime() - sciTaskInfo.getDateStart() + "",
-                new ImageIcon(getClass().getResource("img/runTask.gif"))
-            };
+        Object[] row = new Object[] { sciTaskInfo.getIdTask(), sciTaskInfo.getNameScript(),
+                sciTaskInfo.getIdEngine(), (new Date()).getTime() - sciTaskInfo.getDateStart() + "",
+                new ImageIcon(getClass().getResource("img/runTask.gif")) };
 
         this.tableTaskRunModel.addRow(row);
         txtLog.append("->Execute Task :" + sciTaskInfo.getIdTask() + "\n");
@@ -1195,10 +1149,9 @@ public class MSFrame extends javax.swing.JFrame {
             if (idTask.equals(sciTaskInfo.getIdTask())) {
                 this.tableTaskRunModel.setValueAt("-", i, 2);
                 this.tableTaskRunModel.setValueAt("-", i, 3);
-                this.tableTaskRunModel.setValueAt(new ImageIcon(
-                        getClass().getResource("img/stopTask.gif")), i, 4);
-                txtLog.append("->Execute Task :" + sciTaskInfo.getIdTask() +
-                    "\n");
+                this.tableTaskRunModel.setValueAt(new ImageIcon(getClass().getResource("img/stopTask.gif")),
+                        i, 4);
+                txtLog.append("->Execute Task :" + sciTaskInfo.getIdTask() + "\n");
                 break;
             }
         }
@@ -1224,12 +1177,9 @@ public class MSFrame extends javax.swing.JFrame {
             setStateTreeNode(sciTaskInfo.getIdEngine(), TreeEngineNode.SUSPECT);
         }
 
-        Object[] row = new Object[] {
-                sciTaskInfo.getIdTask(), sciTaskInfo.getNameScript(),
-                sciTaskInfo.getTimeExecution() + "",
-                sciTaskInfo.getTimeGlobal() + "",
-                new ImageIcon(getClass().getResource(strTmp))
-            };
+        Object[] row = new Object[] { sciTaskInfo.getIdTask(), sciTaskInfo.getNameScript(),
+                sciTaskInfo.getTimeExecution() + "", sciTaskInfo.getTimeGlobal() + "",
+                new ImageIcon(getClass().getResource(strTmp)) };
         this.tableTaskEndModel.addRow(row);
 
         updateTreeNodes();
@@ -1238,37 +1188,36 @@ public class MSFrame extends javax.swing.JFrame {
     }
 
     /**
-    * Auto-generated method for setting the popup menu for a component
-    */
-    private void setComponentPopupMenu(final java.awt.Component parent,
-        final javax.swing.JPopupMenu menu) {
+     * Auto-generated method for setting the popup menu for a component
+     */
+    private void setComponentPopupMenu(final java.awt.Component parent, final javax.swing.JPopupMenu menu) {
         parent.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mousePressed(java.awt.event.MouseEvent e) {
-                    if (e.isPopupTrigger()) {
-                        menu.show(parent, e.getX(), e.getY());
-                    }
-
-                    TreeEngineNode nodeEngine = (TreeEngineNode) treeEngine.getLastSelectedPathComponent();
-
-                    if (nodeEngine == null) {
-                        return;
-                    }
-
-                    if (!nodeEngine.isRoot() && !nodeEngine.isLeaf()) {
-                        itemRestartEngine.setEnabled(true);
-                    } else {
-                        itemRestartEngine.setEnabled(false);
-                    }
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    menu.show(parent, e.getX(), e.getY());
                 }
 
-                @Override
-                public void mouseReleased(java.awt.event.MouseEvent e) {
-                    if (e.isPopupTrigger()) {
-                        menu.show(parent, e.getX(), e.getY());
-                    }
+                TreeEngineNode nodeEngine = (TreeEngineNode) treeEngine.getLastSelectedPathComponent();
+
+                if (nodeEngine == null) {
+                    return;
                 }
-            });
+
+                if (!nodeEngine.isRoot() && !nodeEngine.isLeaf()) {
+                    itemRestartEngine.setEnabled(true);
+                } else {
+                    itemRestartEngine.setEnabled(false);
+                }
+            }
+
+            @Override
+            public void mouseReleased(java.awt.event.MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    menu.show(parent, e.getX(), e.getY());
+                }
+            }
+        });
     }
 
     private void itemRestartEngineActionPerformed(ActionEvent evt) {

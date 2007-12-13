@@ -34,8 +34,7 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
 import org.objectweb.proactive.core.node.Node;
 
 
-public class NodeCreationEventProducerImpl extends AbstractEventProducer
-    implements NodeCreationEventProducer {
+public class NodeCreationEventProducerImpl extends AbstractEventProducer implements NodeCreationEventProducer {
     public NodeCreationEventProducerImpl() {
         super(false, false);
     }
@@ -48,8 +47,7 @@ public class NodeCreationEventProducerImpl extends AbstractEventProducer
      * @see org.objectweb.proactive.core.event.AbstractEventProducer#notifyOneListener(ProActiveListener, ProActiveEvent)
      */
     @Override
-    protected void notifyOneListener(ProActiveListener proActiveListener,
-        ProActiveEvent event) {
+    protected void notifyOneListener(ProActiveListener proActiveListener, ProActiveEvent event) {
         NodeCreationEvent creationEvent = (NodeCreationEvent) event;
         NodeCreationEventListener creationEventListener = (NodeCreationEventListener) proActiveListener;
 
@@ -60,8 +58,7 @@ public class NodeCreationEventProducerImpl extends AbstractEventProducer
     //
     //-------------------PROTECTED METHODS------------------
     //
-    protected void notifyListeners(VirtualNodeInternal vn, int type, Node node,
-        int nodeCreated) {
+    protected void notifyListeners(VirtualNodeInternal vn, int type, Node node, int nodeCreated) {
         if (hasListeners()) {
             notifyAllListeners(new NodeCreationEvent(vn, type, node, nodeCreated));
         } else {
@@ -85,7 +82,6 @@ public class NodeCreationEventProducerImpl extends AbstractEventProducer
     /**
      * @see org.objectweb.proactive.core.event.NodeCreationEventProducer#removeNodeCreationEventListener(org.objectweb.proactive.core.event.NodeCreationEventListener)
      */
-    public void removeNodeCreationEventListener(
-        NodeCreationEventListener listener) {
+    public void removeNodeCreationEventListener(NodeCreationEventListener listener) {
     }
 }

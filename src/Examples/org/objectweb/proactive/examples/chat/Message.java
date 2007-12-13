@@ -60,8 +60,8 @@ public class Message implements Serializable {
      * @param source
      */
     public Message(String author, String source) {
-        s = "<" + (new java.util.Date(System.currentTimeMillis())).toString() +
-            "> <" + author + "> " + source;
+        s = "<" + (new java.util.Date(System.currentTimeMillis())).toString() + "> <" + author + "> " +
+            source;
         if (!(s.endsWith("\n"))) {
             s += "\n";
         }

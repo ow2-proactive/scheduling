@@ -53,9 +53,8 @@ import org.objectweb.proactive.extensions.scilab.SciTask;
 public class SciTestLibrary {
     private HashMap<String, MSEngine> mapEngine;
 
-    public SciTestLibrary(String nameVN, String pathDescriptor,
-        String[] arrayEngine, String localSource, String remoteDest)
-        throws ProActiveException {
+    public SciTestLibrary(String nameVN, String pathDescriptor, String[] arrayEngine, String localSource,
+            String remoteDest) throws ProActiveException {
         //Deployment
         mapEngine = MSDeployEngine.deploy(nameVN, pathDescriptor, arrayEngine);
 
@@ -71,10 +70,8 @@ public class SciTestLibrary {
         try {
             for (int i = 0; i < arrayKey.length; i++) {
                 Node node = MSDeployEngine.getEngineNode((String) arrayKey[i]);
-                System.out.println("Sending file to:" +
-                    node.getNodeInformation().getURL());
-                RemoteFile rfile = PAFileTransfer.push(new File(localSource),
-                        node, new File(remoteDest));
+                System.out.println("Sending file to:" + node.getNodeInformation().getURL());
+                RemoteFile rfile = PAFileTransfer.push(new File(localSource), node, new File(remoteDest));
                 rfile.waitFor();
             }
         } catch (Exception e) {
@@ -101,8 +98,7 @@ public class SciTestLibrary {
             dataIn = new SciDoubleMatrix("x", 1, 1, new double[] { i });
             sciTaskCallFun.addDataIn(dataIn);
             sciTaskCallFun.addDataOut("z");
-            sciTaskCallFun.setJob("z" + "= mult(" + dataIn.getName() + "," +
-                dataIn.getName() + ");");
+            sciTaskCallFun.setJob("z" + "= mult(" + dataIn.getName() + "," + dataIn.getName() + ");");
             sciEngine = this.mapEngine.get(arrayKey[i]);
             sciResult = sciEngine.execute(sciTaskCallFun);
             System.out.println(sciResult.get("z"));

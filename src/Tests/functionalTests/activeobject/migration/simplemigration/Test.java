@@ -38,6 +38,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test AO simple migration
  */
@@ -60,12 +61,10 @@ public class Test extends FunctionalTest {
         }
 
         localVmNode = TestNodes.getLocalVMNode();
-        a = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { "toto" }, sameVmNode);
+        a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" }, sameVmNode);
         a.moveTo(localVmNode);
 
         assertTrue(a.getName().equals("toto"));
-        assertTrue(a.getNodeUrl()
-                    .equals(localVmNode.getNodeInformation().getURL()));
+        assertTrue(a.getNodeUrl().equals(localVmNode.getNodeInformation().getURL()));
     }
 }

@@ -41,8 +41,8 @@ import org.objectweb.proactive.core.node.Node;
 public class A implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     String name;
 
     public A() {

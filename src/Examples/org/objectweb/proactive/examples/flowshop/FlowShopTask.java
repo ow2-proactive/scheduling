@@ -66,7 +66,6 @@ public class FlowShopTask extends Task {
 
     // private int[] bestPerm;
     // private long bestMakespan;
-
     /**
      * The last permutation we must explore.
      */
@@ -102,8 +101,7 @@ public class FlowShopTask extends Task {
      * @param com for bench
      * @param randomInit for bench
      */
-    public FlowShopTask(FlowShop fs, long lowerBound, long upperBound,
-        boolean com, boolean randomInit) {
+    public FlowShopTask(FlowShop fs, long lowerBound, long upperBound, boolean com, boolean randomInit) {
         this(fs, lowerBound, upperBound, null, null, 0, com, randomInit);
         currentPerm = new int[fs.jobs.length];
         for (int i = 0; i < currentPerm.length; i++) {
@@ -121,15 +119,13 @@ public class FlowShopTask extends Task {
      * @param com
      * @param randomInit
      */
-    public FlowShopTask(FlowShop fs, long lowerBound, long upperBound,
-        int[] currentPerm, int[] lastPerm, int depth, boolean com,
-        boolean randomInit) {
+    public FlowShopTask(FlowShop fs, long lowerBound, long upperBound, int[] currentPerm, int[] lastPerm,
+            int depth, boolean com, boolean randomInit) {
         this.fs = fs;
         this.fsr = new FlowShopResult();
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
-        this.currentPerm = (currentPerm == null) ? null
-                                                 : (int[]) currentPerm.clone();
+        this.currentPerm = (currentPerm == null) ? null : (int[]) currentPerm.clone();
         this.lastPerm = (lastPerm == null) ? null : (int[]) lastPerm.clone();
         this.depth = depth;
         this.com = com;
@@ -138,11 +134,11 @@ public class FlowShopTask extends Task {
     }
 
     /**
-    * Return the next permutation. Warning, the parmeter are modified.
-    *
-    * @param perm the permutation we modifie to get the next
-    * @return the next permutation if exist, null otherwise
-    */
+     * Return the next permutation. Warning, the parmeter are modified.
+     *
+     * @param perm the permutation we modifie to get the next
+     * @return the next permutation if exist, null otherwise
+     */
     private static int[] nextPerm(int[] perm) {
         int i = perm.length - 1;
         while ((i > 0) && (perm[i - 1] >= perm[i]))
@@ -181,8 +177,8 @@ public class FlowShopTask extends Task {
      * @return the makespan if it not exceed bound else the negative index
      * where the makespan exeed the bound
      */
-    private static int computeConditionalMakespan(FlowShop fs,
-        int[] permutation, long bound, int[] timeMachine) {
+    private static int computeConditionalMakespan(FlowShop fs, int[] permutation, long bound,
+            int[] timeMachine) {
         //contains cumulated time by machine
         for (int i = 0; i < timeMachine.length; i++) {
             timeMachine[i] = 0;
@@ -202,8 +198,7 @@ public class FlowShopTask extends Task {
                 }
             }
             cumulateTimeOnLastMachine -= currentJob[timeMachine.length - 1];
-            if ((timeMachine[timeMachine.length - 1] +
-                    cumulateTimeOnLastMachine) >= bound) {
+            if ((timeMachine[timeMachine.length - 1] + cumulateTimeOnLastMachine) >= bound) {
                 return -(i + 1);
             }
         }
@@ -267,8 +262,7 @@ public class FlowShopTask extends Task {
             }
             while ((FlowShopTask.nextPerm(currentPerm)) != null) {
                 nbLoop++;
-                if ((lastPerm != null) &&
-                        (currentPerm[depth - 1] != theLastJobFixed)) {
+                if ((lastPerm != null) && (currentPerm[depth - 1] != theLastJobFixed)) {
                     //					(Permutation.compareTo(currentPerm, lastPerm) >= 0)) {
                     //					Main.logger.info("depth " + depth + "  cmp  " + Permutation.string(currentPerm) + " >= " + Permutation.string(lastPerm));
                     break;
@@ -280,17 +274,15 @@ public class FlowShopTask extends Task {
                     fsr.permutation = ((FlowShopResult) this.bestKnownSolution).permutation;
                 }
 
-                if ((currentMakespan = FlowShopTask.computeConditionalMakespan(
-                                fs, currentPerm,
-                                ((FlowShopResult) this.bestKnownSolution).makespan,
-                                timeMachine)) < 0) {
+                if ((currentMakespan = FlowShopTask.computeConditionalMakespan(fs, currentPerm,
+                        ((FlowShopResult) this.bestKnownSolution).makespan, timeMachine)) < 0) {
                     //bad branch
                     int n = currentPerm.length + currentMakespan;
                     FlowShopTask.jumpPerm(currentPerm, n, tmpPerm[n]);
                     //					cutbacks[-currentMakespan - 1]++;
                     if (nbLoop > 100000000) { // TODO verify
                         if (((System.currentTimeMillis() - time) > MAX_TIME_TO_SPLIT) &&
-                                worker.isHungry().booleanValue()) { // avoid too tasks
+                            worker.isHungry().booleanValue()) { // avoid too tasks
                             mustSplit = true;
                             nbPerm++;
                             break;
@@ -302,15 +294,13 @@ public class FlowShopTask extends Task {
                     // better branch than previous best
                     if (com) {
                         fsr.makespan = currentMakespan;
-                        System.arraycopy(currentPerm, 0, fsr.permutation, 0,
-                            currentPerm.length);
+                        System.arraycopy(currentPerm, 0, fsr.permutation, 0, currentPerm.length);
                         r.setSolution(fsr);
                         this.worker.setBestCurrentResult(r);
                     } else {
                         ((FlowShopResult) this.bestKnownSolution).makespan = currentMakespan;
                         System.arraycopy(currentPerm, 0,
-                            ((FlowShopResult) this.bestKnownSolution).permutation,
-                            0, currentPerm.length);
+                                ((FlowShopResult) this.bestKnownSolution).permutation, 0, currentPerm.length);
                     }
                 }
 
@@ -323,12 +313,9 @@ public class FlowShopTask extends Task {
             this.worker.sendSubTasksToTheManager(((FlowShopTask) PAActiveObject.getStubOnThis()).split());
         }
 
-        Main.logger.info(" -- Explore " + nbPerm + " permutations in " + time +
-            " ms\nBest makespan :" +
-            ((FlowShopResult) this.bestKnownSolution).makespan +
-            " with this permutation " +
-            Permutation.string(
-                ((FlowShopResult) this.bestKnownSolution).permutation));
+        Main.logger.info(" -- Explore " + nbPerm + " permutations in " + time + " ms\nBest makespan :" +
+            ((FlowShopResult) this.bestKnownSolution).makespan + " with this permutation " +
+            Permutation.string(((FlowShopResult) this.bestKnownSolution).permutation));
         //            + ". We have cut " + Permutation.string(cutbacks));
         ((FlowShopResult) this.bestKnownSolution).nbPermutationTested = nbPerm;
         ((FlowShopResult) this.bestKnownSolution).time = time;
@@ -353,23 +340,21 @@ public class FlowShopTask extends Task {
         int[] beginPerm = new int[perm.length];
 
         do {
-            if ((lastPerm != null) &&
-                    (Permutation.compareTo(perm, lastPerm) > 0)) {
+            if ((lastPerm != null) && (Permutation.compareTo(perm, lastPerm) > 0)) {
                 break;
             }
             System.arraycopy(perm, 0, beginPerm, 0, perm.length);
 
             Permutation.jumpPerm(perm, perm.length - (depth + 1));
 
-            tasks.add(new FlowShopTask(fs, this.lowerBound, this.upperBound,
-                    beginPerm, perm, depth + 1, com, randomInit));
+            tasks.add(new FlowShopTask(fs, this.lowerBound, this.upperBound, beginPerm, perm, depth + 1, com,
+                randomInit));
         } while (Permutation.nextPerm(perm) != null);
         if (tasks.size() != 0) {
             ((FlowShopTask) tasks.lastElement()).lastPerm = lastPerm;
         }
-        Main.logger.info("We split in " + tasks.size() + " subtask at depth " +
-            depth + " : " + Permutation.string(currentPerm) + ", " +
-            Permutation.string(lastPerm));
+        Main.logger.info("We split in " + tasks.size() + " subtask at depth " + depth + " : " +
+            Permutation.string(currentPerm) + ", " + Permutation.string(lastPerm));
 
         /*Iterator i = tasks.iterator();
            while (i.hasNext()) {
@@ -406,8 +391,8 @@ public class FlowShopTask extends Task {
             fact *= i;
         }
         double percent = (((double) nbPerm) / fact) * 100;
-        Main.logger.info("We test " + nbPerm + " permutation on " + fact +
-            " (" + percent + "%) in " + time + " ms.");
+        Main.logger.info("We test " + nbPerm + " permutation on " + fact + " (" + percent + "%) in " + time +
+            " ms.");
         //+ ". We have cut " + Permutation.string(cuts));
         return r;
     }
@@ -424,20 +409,17 @@ public class FlowShopTask extends Task {
     public void initUpperBound() {
         int[] randomPerm = currentPerm.clone();
         for (int i = depth + 1; i < randomPerm.length; i++) {
-            int randomI = (int) (i +
-                (Math.random() * (randomPerm.length - (i + 1))));
+            int randomI = (int) (i + (Math.random() * (randomPerm.length - (i + 1))));
             int tmp = randomPerm[i];
             randomPerm[i] = randomPerm[randomI];
             randomPerm[randomI] = tmp;
         }
         Main.logger.info("initUpperBound => " +
-            (randomInit
-            ? ("random Perm : " + Permutation.string(randomPerm) +
-            " her makespan " + FlowShop.computeMakespan(fs, randomPerm))
-            : (" non random Perm " + Permutation.string(currentPerm) +
-            FlowShop.computeMakespan(fs, currentPerm))));
-        fsr.makespan = randomInit ? FlowShop.computeMakespan(fs, randomPerm)
-                                  : FlowShop.computeMakespan(fs, currentPerm);
+            (randomInit ? ("random Perm : " + Permutation.string(randomPerm) + " her makespan " + FlowShop
+                    .computeMakespan(fs, randomPerm)) : (" non random Perm " +
+                Permutation.string(currentPerm) + FlowShop.computeMakespan(fs, currentPerm))));
+        fsr.makespan = randomInit ? FlowShop.computeMakespan(fs, randomPerm) : FlowShop.computeMakespan(fs,
+                currentPerm);
         fsr.permutation = randomInit ? randomPerm : (int[]) currentPerm.clone();
     }
 
@@ -448,16 +430,13 @@ public class FlowShopTask extends Task {
     @Override
     public String toString() {
         return "FSTask: makespan " +
-        ((fsr.permutation == null) ? ""
-                                   : ("" +
-        FlowShop.computeMakespan(fs,
-            ((FlowShopResult) this.bestKnownSolution).permutation))) +
-        ",\nbest perm : " +
-        (((FlowShopResult) this.bestKnownSolution == null) ? ""
-                                                           : ((((FlowShopResult) this.bestKnownSolution).permutation == null)
-        ? ""
-        : Permutation.string(((FlowShopResult) this.bestKnownSolution).permutation))) +
-        ",\ncurrent perm : " + Permutation.string(currentPerm) +
-        " and\nlast Perm : " + Permutation.string(lastPerm);
+            ((fsr.permutation == null) ? "" : ("" + FlowShop.computeMakespan(fs,
+                    ((FlowShopResult) this.bestKnownSolution).permutation))) +
+            ",\nbest perm : " +
+            (((FlowShopResult) this.bestKnownSolution == null) ? ""
+                    : ((((FlowShopResult) this.bestKnownSolution).permutation == null) ? "" : Permutation
+                            .string(((FlowShopResult) this.bestKnownSolution).permutation))) +
+            ",\ncurrent perm : " + Permutation.string(currentPerm) + " and\nlast Perm : " +
+            Permutation.string(lastPerm);
     }
 }

@@ -40,8 +40,8 @@ import org.objectweb.proactive.core.node.NodeException;
 public class A implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     String name;
 
     public A() {

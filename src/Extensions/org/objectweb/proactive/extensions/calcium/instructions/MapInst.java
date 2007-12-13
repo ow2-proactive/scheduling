@@ -43,14 +43,12 @@ public class MapInst<P, R> implements Instruction<P, P> {
     ConquerInst<?, R> conquerInst;
     DivideSIMD<P, ?> divideInst;
 
-    public MapInst(Divide<P, ?> div, Conquer<?, R> conq,
-        Stack<Instruction> childStack) {
+    public MapInst(Divide<P, ?> div, Conquer<?, R> conq, Stack<Instruction> childStack) {
         conquerInst = new ConquerInst(conq);
         divideInst = new DivideSIMD(div, childStack);
     }
 
-    public Task<P> compute(SkeletonSystemImpl system, Task<P> t)
-        throws Exception {
+    public Task<P> compute(SkeletonSystemImpl system, Task<P> t) throws Exception {
         t.pushInstruction(conquerInst);
         t.pushInstruction(divideInst);
         return t;

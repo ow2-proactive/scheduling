@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.p2p.service.util;
 
-
 /**
  * Java system properties name and P2P constants.
  *

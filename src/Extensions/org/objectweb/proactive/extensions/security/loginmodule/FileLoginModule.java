@@ -55,8 +55,8 @@ public class FileLoginModule implements LoginModule {
     // the authentication status
     private boolean succeeded = false;
 
-    public void initialize(Subject subject, CallbackHandler callbackHandler,
-        Map<String, ?> sharedState, Map<String, ?> options) {
+    public void initialize(Subject subject, CallbackHandler callbackHandler, Map<String, ?> sharedState,
+            Map<String, ?> options) {
         this.callbackHandler = callbackHandler;
 
         // initialize any configured options
@@ -66,8 +66,8 @@ public class FileLoginModule implements LoginModule {
     public boolean login() throws LoginException {
         // prompt for a user name and password
         if (callbackHandler == null) {
-            throw new LoginException("Error: no CallbackHandler available " +
-                "to garner authentication information from the user");
+            throw new LoginException("Error: no CallbackHandler available "
+                + "to garner authentication information from the user");
         }
 
         Callback[] callbacks = new Callback[] { new NoCallback() };
@@ -90,8 +90,7 @@ public class FileLoginModule implements LoginModule {
             filePath = (String) params.get("path");
             reqGroup = (String) params.get("group");
             groupsFilePath = (String) params.get("groupsFilePath");
-            groupsHierarchy = new GroupHierarchy((String[]) params.get(
-                        "groupsHierarchy"));
+            groupsHierarchy = new GroupHierarchy((String[]) params.get("groupsHierarchy"));
 
             params.clear();
             ((NoCallback) callbacks[0]).clear();
@@ -99,16 +98,13 @@ public class FileLoginModule implements LoginModule {
             throw new LoginException(ioe.toString());
         } catch (UnsupportedCallbackException uce) {
             throw new LoginException("Error: " + uce.getCallback().toString() +
-                " not available to garner authentication information " +
-                "from the user");
+                " not available to garner authentication information " + "from the user");
         }
 
         // print debugging information
         if (debug) {
-            System.out.println("\t\t[LDAPLoginModule] " +
-                "user entered user name: " + username);
-            System.out.println("\t\t[LDAPLoginModule] " +
-                "user entered password: " + password);
+            System.out.println("\t\t[LDAPLoginModule] " + "user entered user name: " + username);
+            System.out.println("\t\t[LDAPLoginModule] " + "user entered password: " + password);
         }
 
         Properties props = new Properties();
@@ -122,8 +118,7 @@ public class FileLoginModule implements LoginModule {
         }
 
         // verify the username and password
-        if (!props.containsKey(username) ||
-                !props.get(username).equals(password)) {
+        if (!props.containsKey(username) || !props.get(username).equals(password)) {
             throw new FailedLoginException("Incorrect Username/Password");
         }
 
@@ -154,8 +149,7 @@ public class FileLoginModule implements LoginModule {
         }
 
         if (debug) {
-            System.out.println("\t\t[FileLoginModule] " +
-                "authentication succeeded");
+            System.out.println("\t\t[FileLoginModule] " + "authentication succeeded");
         }
 
         succeeded = true;
@@ -187,20 +181,17 @@ public class FileLoginModule implements LoginModule {
             this.hierarchy = hierarchy;
         }
 
-        public boolean isAbove(String trueGroup, String reqGroup)
-            throws FailedLoginException {
+        public boolean isAbove(String trueGroup, String reqGroup) throws FailedLoginException {
             int trueGroupLevel = groupLevel(trueGroup);
 
             if (trueGroupLevel == -1) {
-                throw new FailedLoginException(
-                    "User group is not in groups hierarchy");
+                throw new FailedLoginException("User group is not in groups hierarchy");
             }
 
             int reqGroupLevel = groupLevel(reqGroup);
 
             if (reqGroupLevel == -1) {
-                throw new FailedLoginException(
-                    "Required group is not in groups hierarchy");
+                throw new FailedLoginException("Required group is not in groups hierarchy");
             }
 
             return trueGroupLevel >= reqGroupLevel;

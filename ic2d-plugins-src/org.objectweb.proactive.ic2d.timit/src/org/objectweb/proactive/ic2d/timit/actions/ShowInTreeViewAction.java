@@ -47,8 +47,7 @@ public class ShowInTreeViewAction extends Action {
 
     public ShowInTreeViewAction() {
         super.setId(SHOW_IN_TREE_VIEW_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "treeview.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "treeview.gif"));
         super.setToolTipText(SHOW_IN_TREE_VIEW_ACTION);
         super.setEnabled(false);
     }
@@ -64,8 +63,7 @@ public class ShowInTreeViewAction extends Action {
         IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
         IWorkbenchPage page = currentWindow.getActivePage();
         try {
-            IViewPart part = page.showView(
-                    "org.objectweb.proactive.ic2d.timit.views.TimerTreeView");
+            IViewPart part = page.showView("org.objectweb.proactive.ic2d.timit.views.TimerTreeView");
 
             if (target != null) {
                 TimerTreeHolder.getInstance().provideChartObject(target, false);

@@ -51,8 +51,7 @@ class HandlerFile2ProxyFile implements Handler<File> {
     FileServerClient fserver;
     IdentityHashMap<ProxyFile, ProxyFile> files;
 
-    HandlerFile2ProxyFile(FileServerClient fserver,
-        IdentityHashMap<ProxyFile, ProxyFile> files) {
+    HandlerFile2ProxyFile(FileServerClient fserver, IdentityHashMap<ProxyFile, ProxyFile> files) {
         this.fserver = fserver;
         this.files = files;
     }
@@ -68,7 +67,6 @@ class HandlerFile2ProxyFile implements Handler<File> {
     }
 
     public boolean matches(Object o) {
-        return File.class.isAssignableFrom(o.getClass()) &&
-        !ProxyFile.class.isAssignableFrom(o.getClass());
+        return File.class.isAssignableFrom(o.getClass()) && !ProxyFile.class.isAssignableFrom(o.getClass());
     }
 }

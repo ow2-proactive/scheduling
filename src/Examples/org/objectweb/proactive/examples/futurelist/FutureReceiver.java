@@ -62,8 +62,7 @@ public class FutureReceiver implements java.io.Serializable {
     public void displayAllFutures() {
         EmptyFuture temp;
 
-        for (java.util.Enumeration<EmptyFuture> e = waitingFutures.elements();
-                e.hasMoreElements();) {
+        for (java.util.Enumeration<EmptyFuture> e = waitingFutures.elements(); e.hasMoreElements();) {
             temp = e.nextElement();
             logger.info("Result: " + temp.getName());
         }
@@ -82,7 +81,8 @@ public class FutureReceiver implements java.io.Serializable {
      * Request its body futurePool and create an empty future list
      */
     public void createFutureList() {
-        org.objectweb.proactive.core.body.ActiveBody b = (org.objectweb.proactive.core.body.ActiveBody) org.objectweb.proactive.api.PAActiveObject.getBodyOnThis();
+        org.objectweb.proactive.core.body.ActiveBody b = (org.objectweb.proactive.core.body.ActiveBody) org.objectweb.proactive.api.PAActiveObject
+                .getBodyOnThis();
         this.futureList = new FutureList();
     }
 
@@ -92,22 +92,19 @@ public class FutureReceiver implements java.io.Serializable {
 
     public void displayAwaited() {
         if (futureList != null) {
-            logger.info("FutureReceiver: I am still waiting " +
-                futureList.countAwaited() + " futures");
+            logger.info("FutureReceiver: I am still waiting " + futureList.countAwaited() + " futures");
         }
     }
 
     public void displayAllAwaited() {
         if (futureList != null) {
-            logger.info("FutureReceiver: I am waiting for all my futures:  " +
-                futureList.allAwaited());
+            logger.info("FutureReceiver: I am waiting for all my futures:  " + futureList.allAwaited());
         }
     }
 
     public void displayNoneAwaited() {
         if (futureList != null) {
-            logger.info("FutureReceiver: I don't have any pending future:  " +
-                futureList.noneAwaited());
+            logger.info("FutureReceiver: I don't have any pending future:  " + futureList.noneAwaited());
         }
     }
 

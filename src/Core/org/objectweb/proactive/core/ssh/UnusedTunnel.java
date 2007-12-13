@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.ssh;
 
-
 /**
  * @author mlacage
  * A trivial placeholder for SshTunnels and their "unused" time.

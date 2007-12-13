@@ -44,12 +44,12 @@ import functionalTests.FunctionalTest;
 import functionalTests.masterworker.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test load balancing
  */
 public class Test extends FunctionalTest {
-    private URL descriptor = Test.class.getResource(
-            "/functionalTests/masterworker/MasterWorker.xml");
+    private URL descriptor = Test.class.getResource("/functionalTests/masterworker/MasterWorker.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
     public static final int NB_TASKS = 4;
@@ -64,8 +64,7 @@ public class Test extends FunctionalTest {
             // we don't care of the results
             ids.clear();
         } catch (TaskException e) {
-            assertTrue("Expected exception is the cause",
-                e.getCause() instanceof ArithmeticException);
+            assertTrue("Expected exception is the cause", e.getCause() instanceof ArithmeticException);
             catched = true;
         }
         assertTrue("Exception caught as excepted", catched);

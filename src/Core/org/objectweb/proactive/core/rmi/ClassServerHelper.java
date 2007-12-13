@@ -54,8 +54,7 @@ public class ClassServerHelper {
     // -- Constructors -----------------------------------------------
     //
     public ClassServerHelper() {
-        if ((System.getSecurityManager() == null) &&
-                PAProperties.PA_SECURITYMANAGER.isTrue()) {
+        if ((System.getSecurityManager() == null) && PAProperties.PA_SECURITYMANAGER.isTrue()) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
         if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
@@ -89,8 +88,7 @@ public class ClassServerHelper {
         shouldCreateClassServer = v;
     }
 
-    public synchronized String initializeClassServer()
-        throws java.io.IOException {
+    public synchronized String initializeClassServer() throws java.io.IOException {
         if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
             return this.getCodebase();
         }
@@ -119,14 +117,14 @@ public class ClassServerHelper {
         String codebase;
 
         if (SshParameters.getSshTunneling()) {
-            URI uri = URIBuilder.buildURI(currentClassServer.getHostname(),
-                    "/", "httpssh", ClassServer.getServerSocketPort());
+            URI uri = URIBuilder.buildURI(currentClassServer.getHostname(), "/", "httpssh", ClassServer
+                    .getServerSocketPort());
             codebase = uri.toString();
         } else if (PAProperties.PA_HTTP_SERVLET.isTrue()) {
             codebase = ClassServerServlet.getURI().toString() + "doc";
         } else {
-            URI uri = URIBuilder.buildURI(currentClassServer.getHostname(),
-                    "/", "http", ClassServer.getServerSocketPort());
+            URI uri = URIBuilder.buildURI(currentClassServer.getHostname(), "/", "http", ClassServer
+                    .getServerSocketPort());
             codebase = uri.toString();
         }
 

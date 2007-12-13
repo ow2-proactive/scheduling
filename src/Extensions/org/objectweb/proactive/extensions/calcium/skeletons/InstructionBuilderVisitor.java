@@ -58,26 +58,22 @@ public class InstructionBuilderVisitor implements SkeletonVisitor {
         this.stack = new Stack<Instruction>();
     }
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        Farm<P, R> farm) {
+    public <P extends Serializable, R extends Serializable> void visit(Farm<P, R> farm) {
         farm.child.accept(this);
     }
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        Pipe<P, R> pipe) {
+    public <P extends Serializable, R extends Serializable> void visit(Pipe<P, R> pipe) {
         //the last instructions go into the stack first
         for (int i = pipe.stages.size() - 1; i >= 0; i--) {
             pipe.stages.get(i).accept(this);
         }
     }
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        Seq<P, R> seq) {
+    public <P extends Serializable, R extends Serializable> void visit(Seq<P, R> seq) {
         stack.add(new SeqInst<P, R>(seq.secCode));
     }
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        If<P, R> ifskel) {
+    public <P extends Serializable, R extends Serializable> void visit(If<P, R> ifskel) {
         //build substacks for both cases
         InstructionBuilderVisitor ifChildVisitor = new InstructionBuilderVisitor();
         InstructionBuilderVisitor elseChildVisitor = new InstructionBuilderVisitor();
@@ -86,8 +82,7 @@ public class InstructionBuilderVisitor implements SkeletonVisitor {
         ifskel.elseChild.accept(elseChildVisitor);
 
         //stack a the new instruction holding both possible cases
-        IfInst<P> ifinst = new IfInst<P>(ifskel.cond, ifChildVisitor.stack,
-                elseChildVisitor.stack);
+        IfInst<P> ifinst = new IfInst<P>(ifskel.cond, ifChildVisitor.stack, elseChildVisitor.stack);
         stack.add(ifinst);
     }
 
@@ -105,16 +100,14 @@ public class InstructionBuilderVisitor implements SkeletonVisitor {
         stack.add(new WhileInst<P>(whileSkel.cond, childVisitor.stack));
     }
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        Map<P, R> map) {
+    public <P extends Serializable, R extends Serializable> void visit(Map<P, R> map) {
         InstructionBuilderVisitor childVisitor = new InstructionBuilderVisitor();
         map.child.accept(childVisitor);
 
         stack.add(new MapInst<P, R>(map.div, map.conq, childVisitor.stack));
     }
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        Fork<P, R> fork) {
+    public <P extends Serializable, R extends Serializable> void visit(Fork<P, R> fork) {
         Vector<Stack<Instruction>> v = new Vector<Stack<Instruction>>();
 
         for (Skeleton s : fork.subSkelList) {
@@ -126,12 +119,10 @@ public class InstructionBuilderVisitor implements SkeletonVisitor {
         stack.add(new ForkInst<P, R>(fork.div, fork.conq, v));
     }
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        DaC<P, R> dac) {
+    public <P extends Serializable, R extends Serializable> void visit(DaC<P, R> dac) {
         InstructionBuilderVisitor childVisitor = new InstructionBuilderVisitor();
         dac.child.accept(childVisitor);
 
-        stack.add(new DaCInst<P, R>(dac.div, dac.conq, dac.cond,
-                childVisitor.stack));
+        stack.add(new DaCInst<P, R>(dac.div, dac.conq, dac.cond, childVisitor.stack));
     }
 }

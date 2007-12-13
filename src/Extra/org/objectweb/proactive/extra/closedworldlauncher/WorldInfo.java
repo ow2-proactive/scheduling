@@ -54,8 +54,7 @@ public class WorldInfo {
         currentHostNumber = (tmp == null) ? 0 : Integer.parseInt(tmp);
         tmp = System.getProperty(HOST_LIST_PROPERTY);
         hostList = (tmp == null) ? new String() : tmp;
-        hostListAsArray = (tmp == null) ? new String[] { "" }
-                                        : this.stringToArray(tmp);
+        hostListAsArray = (tmp == null) ? new String[] { "" } : this.stringToArray(tmp);
     }
 
     public int getTotalHostNumber() {
@@ -91,10 +90,8 @@ public class WorldInfo {
     @Override
     public String toString() {
         StringBuffer tmp = new StringBuffer();
-        tmp.append(TOTAL_HOSTS_NUMBER_PROPERTY).append(" = ")
-           .append(totalHostsNumber).append("\n");
-        tmp.append(HOST_NUMBER_PROPERTY).append(" = ").append(currentHostNumber)
-           .append("\n");
+        tmp.append(TOTAL_HOSTS_NUMBER_PROPERTY).append(" = ").append(totalHostsNumber).append("\n");
+        tmp.append(HOST_NUMBER_PROPERTY).append(" = ").append(currentHostNumber).append("\n");
         tmp.append(HOST_LIST_PROPERTY).append(" = ");
 
         for (int i = 0; i < hostListAsArray.length; i++) {

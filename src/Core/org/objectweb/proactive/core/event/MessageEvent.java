@@ -48,8 +48,7 @@ import org.objectweb.proactive.core.body.message.Message;
  * @since   ProActive 0.9
  *
  */
-public class MessageEvent extends ProActiveEvent implements Message,
-    java.io.Serializable {
+public class MessageEvent extends ProActiveEvent implements Message, java.io.Serializable {
 
     /** constant indicating the encapsulated message has been sent */
     public static final int REQUEST_SENT = 10;
@@ -84,8 +83,7 @@ public class MessageEvent extends ProActiveEvent implements Message,
      * @param requestQueueLength the length of the request queue of the
      * body that sends this event or -1 if this event did not affect the queue length.
      */
-    public MessageEvent(Message message, int messageActionType,
-        UniqueID destinationID, int requestQueueLength) {
+    public MessageEvent(Message message, int messageActionType, UniqueID destinationID, int requestQueueLength) {
         super(message, messageActionType);
         this.destinationID = destinationID;
         this.requestQueueLength = requestQueueLength;
@@ -119,9 +117,8 @@ public class MessageEvent extends ProActiveEvent implements Message,
      */
     @Override
     public String toString() {
-        return "methodName=" + getMethodName() + " sourceID=" +
-        getSourceBodyID() + " destinationID=" + getDestinationBodyID() +
-        " sequenceNumber=" + getSequenceNumber();
+        return "methodName=" + getMethodName() + " sourceID=" + getSourceBodyID() + " destinationID=" +
+            getDestinationBodyID() + " sequenceNumber=" + getSequenceNumber();
     }
 
     public boolean wasSent() {

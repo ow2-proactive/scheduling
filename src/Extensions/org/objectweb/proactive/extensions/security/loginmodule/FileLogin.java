@@ -65,8 +65,7 @@ public abstract class FileLogin {
      *             If the authentication fails (incorrect credentials) or if
      *             there is an error during the attempt to verify them.
      */
-    public static Boolean login(Map<String, Object> params)
-        throws LoginException {
+    public static Boolean login(Map<String, Object> params) throws LoginException {
         return Login.login(params, "FileLoginMethod");
     }
 }

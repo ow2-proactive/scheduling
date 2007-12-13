@@ -132,8 +132,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      * More precisely, this permits proxy instanciation via the Meta.newMeta
      * method.
      */
-    public FutureProxy(ConstructorCall c, Object[] p)
-        throws ConstructionOfReifiedObjectFailedException {
+    public FutureProxy(ConstructorCall c, Object[] p) throws ConstructionOfReifiedObjectFailedException {
         // we don't care what the arguments are
         this();
     }
@@ -190,8 +189,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
      */
     public synchronized void receiveReply(MethodCallResult obj) {
         if (isAvailable()) {
-            throw new IllegalStateException(
-                "FutureProxy receives a reply and this target field is not null");
+            throw new IllegalStateException("FutureProxy receives a reply and this target field is not null");
         }
         target = obj;
         ExceptionHandler.addResult(this);
@@ -272,7 +270,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         if (Profiling.TIMERS_COMPILED) {
             TimerWarehouse.startTimer(PAActiveObject.getBodyOnThis().getID(),
-                TimerWarehouse.WAIT_BY_NECESSITY);
+                    TimerWarehouse.WAIT_BY_NECESSITY);
         }
 
         FutureMonitoring.monitorFutureProxy(this);
@@ -286,8 +284,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         if (body != null) {
             mbean = body.getMBean();
             if (mbean != null) {
-                mbean.sendNotification(NotificationType.waitByNecessity,
-                    new FutureNotificationData(bodyId, getCreatorID()));
+                mbean.sendNotification(NotificationType.waitByNecessity, new FutureNotificationData(bodyId,
+                    getCreatorID()));
             }
         }
 
@@ -295,8 +293,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!isAvailable()) {
             if (time.isTimeoutElapsed()) {
-                throw new ProActiveException(
-                    "Timeout expired while waiting for the future update");
+                throw new ProActiveException("Timeout expired while waiting for the future update");
             }
             try {
                 this.wait(time.getRemainingTimeout());
@@ -307,14 +304,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
         // JMX Notification
         if (mbean != null) {
-            mbean.sendNotification(NotificationType.receivedFutureResult,
-                new FutureNotificationData(bodyId, getCreatorID()));
+            mbean.sendNotification(NotificationType.receivedFutureResult, new FutureNotificationData(bodyId,
+                getCreatorID()));
         }
 
         // END JMX Notification
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.stopTimer(PAActiveObject.getBodyOnThis().getID(),
-                TimerWarehouse.WAIT_BY_NECESSITY);
+            TimerWarehouse
+                    .stopTimer(PAActiveObject.getBodyOnThis().getID(), TimerWarehouse.WAIT_BY_NECESSITY);
         }
     }
 
@@ -346,8 +343,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     public void setUpdater(UniversalBody updater) {
         if (this.updater != null) {
-            new IllegalStateException("Updater already set to: " +
-                this.updater).printStackTrace();
+            new IllegalStateException("Updater already set to: " + this.updater).printStackTrace();
         }
         this.updater = updater;
     }
@@ -387,8 +383,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         try {
             result = c.execute(resultObject);
         } catch (MethodCallExecutionFailedException e) {
-            throw new ProActiveRuntimeException(
-                "FutureProxy: Illegal arguments in call " + c.getName());
+            throw new ProActiveRuntimeException("FutureProxy: Illegal arguments in call " + c.getName());
         }
 
         // If target of this future is another future, make a shortcut !
@@ -411,8 +406,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //
     // -- PRIVATE METHODS FOR SERIALIZATION -----------------------------------------------
     //
-    private synchronized void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private synchronized void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         UniversalBody writtenUpdater = this.updater;
 
         if (!FuturePool.isInsideABodyForwarder()) {
@@ -429,16 +423,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
                 // it's a halfbody...
                 if (sender == null) {
-                    sender = LocalBodyStore.getInstance()
-                                           .getLocalHalfBody(senderID);
+                    sender = LocalBodyStore.getInstance().getLocalHalfBody(senderID);
                 }
                 if (sender != null) { // else we are in a migration forwarder
                     if (continuation) {
                         /* The written future will be updated by the writing body */
                         writtenUpdater = PAActiveObject.getBodyOnThis();
                         for (UniversalBody dest : FuturePool.getBodiesDestination()) {
-                            sender.getFuturePool()
-                                  .addAutomaticContinuation(id, dest);
+                            sender.getFuturePool().addAutomaticContinuation(id, dest);
                         }
                     } else {
                         // its not a copy and not a continuation: wait for the result
@@ -470,8 +462,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         out.writeObject(writtenUpdater.getRemoteAdapter());
     }
 
-    private synchronized void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private synchronized void readObject(java.io.ObjectInputStream in) throws java.io.IOException,
+            ClassNotFoundException {
         senderID = (UniqueID) in.readObject();
         target = (MethodCallResult) in.readObject();
         id = (FutureID) in.readObject();
@@ -544,13 +536,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     //////////////////////////
     public synchronized static int futureLength(Object future) {
         int res = 0;
-        if ((MOP.isReifiedObject(future)) &&
-                ((((StubObject) future).getProxy()) instanceof Future)) {
+        if ((MOP.isReifiedObject(future)) && ((((StubObject) future).getProxy()) instanceof Future)) {
             res++;
             Future f = (Future) (((StubObject) future).getProxy());
             Object gna = f.getResult();
-            while ((MOP.isReifiedObject(gna)) &&
-                    ((((StubObject) gna).getProxy()) instanceof Future)) {
+            while ((MOP.isReifiedObject(gna)) && ((((StubObject) gna).getProxy()) instanceof Future)) {
                 f = (Future) (((StubObject) gna).getProxy());
                 gna = f.getResult();
                 res++;

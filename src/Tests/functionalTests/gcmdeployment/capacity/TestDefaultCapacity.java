@@ -42,11 +42,11 @@ public class TestDefaultCapacity extends FunctionalTest {
     @Test
     public void testCapacityAutoDetection() {
         new Thread() {
-                @Override
-                public void run() {
-                    StartRuntime.main(new String[] {  });
-                }
-            }.start();
+            @Override
+            public void run() {
+                StartRuntime.main(new String[] {});
+            }
+        }.start();
 
         /* Be sure that the StartRuntime thread has been scheduled
          * Otherwise getCapacity will return -1 due to a race condition

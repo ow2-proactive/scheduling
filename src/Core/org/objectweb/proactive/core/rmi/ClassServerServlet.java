@@ -95,8 +95,7 @@ public class ClassServerServlet extends HttpServlet {
             OutputStream out = response.getOutputStream();
             RequestInfo reqInfo = new RequestInfo();
             reqInfo.read(this.request);
-            HTTPRequestHandler service = new HTTPRequestHandler(in, out,
-                    reqInfo, response);
+            HTTPRequestHandler service = new HTTPRequestHandler(in, out, reqInfo, response);
             service.run();
         } catch (IOException e) {
             e.printStackTrace();
@@ -104,8 +103,7 @@ public class ClassServerServlet extends HttpServlet {
     }
 
     public static URI getURI() {
-        return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
-                ProActiveInet.getInstance().getInetAddress()), SERVLET_NAME,
-            Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port);
+        return URIBuilder.buildURI(URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress()),
+                SERVLET_NAME, Constants.XMLHTTP_PROTOCOL_IDENTIFIER, port);
     }
 }

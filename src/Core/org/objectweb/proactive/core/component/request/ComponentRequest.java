@@ -66,8 +66,7 @@ public interface ComponentRequest extends Request {
      * @param sender the sender of the functional component request
      * @param intermediate the component that the functional request has reached so far
      */
-    public void shortcutNotification(UniversalBody sender,
-        UniversalBody intermediate);
+    public void shortcutNotification(UniversalBody sender, UniversalBody intermediate);
 
     /**
      *

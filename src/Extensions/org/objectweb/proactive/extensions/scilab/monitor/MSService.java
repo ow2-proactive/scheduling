@@ -63,8 +63,8 @@ import org.objectweb.proactive.extensions.scilab.SciTask;
 public class MSService implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private HashMap<String, MSEngineInfo> mapEngine;
     private ArrayList<String> listIdEngineFree;
     private ArrayList<GenTaskInfo> listTaskWait;
@@ -91,18 +91,18 @@ public class MSService implements Serializable {
         this.engineObservable = new MSEventSource();
 
         (new Thread() {
-                @Override
-                public void run() {
-                    executeTasks();
-                }
-            }).start();
+            @Override
+            public void run() {
+                executeTasks();
+            }
+        }).start();
 
         (new Thread() {
-                @Override
-                public void run() {
-                    retrieveResults();
-                }
-            }).start();
+            @Override
+            public void run() {
+                retrieveResults();
+            }
+        }).start();
     }
 
     /**
@@ -112,14 +112,13 @@ public class MSService implements Serializable {
      * @param arrayIdEngine
      * @return the number of deployed engine
      */
-    public synchronized int deployEngine(String nameVirtualNode,
-        String pathDescriptor, String[] arrayIdEngine) {
+    public synchronized int deployEngine(String nameVirtualNode, String pathDescriptor, String[] arrayIdEngine) {
         if (logger.isDebugEnabled()) {
             logger.debug("->MSService In:deployEngine:" + nameVirtualNode);
         }
 
-        HashMap<String, MSEngine> mapNewEngine = MSDeployEngine.deploy(nameVirtualNode,
-                pathDescriptor, arrayIdEngine);
+        HashMap<String, MSEngine> mapNewEngine = MSDeployEngine.deploy(nameVirtualNode, pathDescriptor,
+                arrayIdEngine);
         MSEngine mSEngine;
         String idEngine;
         BooleanWrapper isActivate;
@@ -133,8 +132,7 @@ public class MSService implements Serializable {
             }
 
             isActivate = mSEngine.activate();
-            mapEngine.put(idEngine,
-                new MSEngineInfo(idEngine, mSEngine, isActivate));
+            mapEngine.put(idEngine, new MSEngineInfo(idEngine, mSEngine, isActivate));
         }
 
         this.listIdEngineFree.addAll(mapNewEngine.keySet());
@@ -149,18 +147,15 @@ public class MSService implements Serializable {
      * @param pathDescriptor
      * @return the number of deployed engine
      */
-    public synchronized int deployEngine(String nameVirtualNode,
-        String pathDescriptor) {
+    public synchronized int deployEngine(String nameVirtualNode, String pathDescriptor) {
         long countTmp = this.countIdEngine;
-        int nbEngine = MSDeployEngine.getNbMappedNodes(nameVirtualNode,
-                pathDescriptor);
+        int nbEngine = MSDeployEngine.getNbMappedNodes(nameVirtualNode, pathDescriptor);
         String[] arrayIdEngine = new String[nbEngine];
         for (int i = 0; i < arrayIdEngine.length; i++) {
             arrayIdEngine[i] = "Engine" + countTmp++;
         }
 
-        nbEngine = this.deployEngine(nameVirtualNode, pathDescriptor,
-                arrayIdEngine);
+        nbEngine = this.deployEngine(nameVirtualNode, pathDescriptor, arrayIdEngine);
         this.countIdEngine += nbEngine;
         return nbEngine;
     }
@@ -172,16 +167,14 @@ public class MSService implements Serializable {
      * @param number of engines to deploy
      * @return the number of deployed engine
      */
-    public synchronized int deployEngine(String nameVirtualNode,
-        String pathDescriptor, int nbEngine) {
+    public synchronized int deployEngine(String nameVirtualNode, String pathDescriptor, int nbEngine) {
         long countTmp = this.countIdEngine;
         String[] arrayIdEngine = new String[nbEngine];
         for (int i = 0; i < arrayIdEngine.length; i++) {
             arrayIdEngine[i] = "Engine" + countTmp++;
         }
 
-        nbEngine = this.deployEngine(nameVirtualNode, pathDescriptor,
-                arrayIdEngine);
+        nbEngine = this.deployEngine(nameVirtualNode, pathDescriptor, arrayIdEngine);
         this.countIdEngine += nbEngine;
         return nbEngine;
     }
@@ -210,8 +203,7 @@ public class MSService implements Serializable {
      * @param jobInit initialization script
      * @param dataOut array of output variables
      */
-    public synchronized void sendTask(File scriptFile, String jobInit,
-        String[] dataOut) throws IOException {
+    public synchronized void sendTask(File scriptFile, String jobInit, String[] dataOut) throws IOException {
         this.sendTask(scriptFile, jobInit, dataOut, GenTaskInfo.NORMAL);
     }
 
@@ -223,8 +215,8 @@ public class MSService implements Serializable {
      * @param dataOut array of output variables
      * @param Priority priority of the job
      */
-    public synchronized void sendTask(File scriptFile, String jobInit,
-        String[] dataOut, int Priority) throws IOException {
+    public synchronized void sendTask(File scriptFile, String jobInit, String[] dataOut, int Priority)
+            throws IOException {
         if (logger.isDebugEnabled()) {
             logger.debug("->MSService In:sendTask");
         }
@@ -247,8 +239,7 @@ public class MSService implements Serializable {
 
         for (int i = 0; i < dataOut.length; i++) {
             if (logger.isDebugEnabled()) {
-                logger.debug("->MSService :sendTask DataOut:" +
-                    dataOut[i].trim());
+                logger.debug("->MSService :sendTask DataOut:" + dataOut[i].trim());
             }
 
             if (dataOut[i].trim().equals("")) {
@@ -392,8 +383,7 @@ public class MSService implements Serializable {
                 sciResult = sciTaskInfo.getResult();
                 if (!PAFuture.isAwaited(sciResult)) {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("->MSService loop:retrieveResult:" +
-                            keys[i]);
+                        logger.debug("->MSService loop:retrieveResult:" + keys[i]);
                     }
 
                     this.mapTaskRun.remove(keys[i]);
@@ -565,8 +555,7 @@ public class MSService implements Serializable {
      * @param mSEngineInfo engine information
      * @param sciTaskInfo task information
      */
-    private synchronized void executeTask(MSEngineInfo mSEngineInfo,
-        GenTaskInfo sciTaskInfo) {
+    private synchronized void executeTask(MSEngineInfo mSEngineInfo, GenTaskInfo sciTaskInfo) {
         if (logger.isDebugEnabled()) {
             logger.debug("->MSService In:executeTask");
         }
@@ -607,8 +596,7 @@ public class MSService implements Serializable {
      * Unregister a listener to task events
      * @param evtListener listener
      */
-    public synchronized void removeEventListenerTask(
-        MSEventListener evtListener) {
+    public synchronized void removeEventListenerTask(MSEventListener evtListener) {
         taskObservable.removeMSEventListener(evtListener);
     }
 
@@ -632,8 +620,7 @@ public class MSService implements Serializable {
      * Unregister a listener to engine events
      * @param evtListener listener
      */
-    public synchronized void removeEventListenerEngine(
-        MSEventListener evtListener) {
+    public synchronized void removeEventListenerEngine(MSEventListener evtListener) {
         engineObservable.removeMSEventListener(evtListener);
     }
 

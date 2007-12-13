@@ -55,7 +55,7 @@ public class Maestro implements Serializable {
      * @param max the total number of iterations that should be simulated
      */
     public Maestro(Domain[] domainArray, Integer max,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.killsupport = killsupport;
         this.maxIter = max.intValue();
         this.domainArray = domainArray;

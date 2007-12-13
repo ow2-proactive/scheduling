@@ -59,10 +59,8 @@ public class VariableContract implements Serializable {
     public static VariableContract xmlproperties = null;
     public static final Lock lock = new Lock();
     private boolean closed;
-    private static final Pattern variablePattern = Pattern.compile(
-            "(\\$\\{(.*?)\\})");
-    private static final Pattern legalPattern = Pattern.compile(
-            "^\\$\\{[\\w\\.]+\\}$");
+    private static final Pattern variablePattern = Pattern.compile("(\\$\\{(.*?)\\})");
+    private static final Pattern legalPattern = Pattern.compile("^\\$\\{[\\w\\.]+\\}$");
 
     private class PropertiesDatas implements Serializable {
         public String value;
@@ -73,8 +71,7 @@ public class VariableContract implements Serializable {
         public String toString() {
             StringBuilder sb = new StringBuilder();
 
-            sb.append(value).append(" type=").append(type).append(" setFrom=")
-              .append(setFrom);
+            sb.append(value).append(" type=").append(type).append(" setFrom=").append(setFrom);
             return sb.toString();
         }
     }
@@ -98,28 +95,27 @@ public class VariableContract implements Serializable {
     }
 
     /**
-         * Tells if this contract is closed or not.
-         *
-         * @return True if it is closed, false otherwise.
-         */
+     * Tells if this contract is closed or not.
+     *
+     * @return True if it is closed, false otherwise.
+     */
     public boolean isClosed() {
         return closed;
     }
 
     /**
-         * Method for setting variables value from the deploying application.
-         *
-         * @param name
-         *            The name of the variable.
-         * @param value
-         *            Value of the variable
-         * @throws NullPointerException
-         *             if the arguments are null.
-         * @throws IllegalArgumentException
-         *             if setting the value breaches the variable (contract) type
-         */
-    public void setVariableFromProgram(String name, String value,
-        VariableContractType type) {
+     * Method for setting variables value from the deploying application.
+     *
+     * @param name
+     *            The name of the variable.
+     * @param value
+     *            Value of the variable
+     * @throws NullPointerException
+     *             if the arguments are null.
+     * @throws IllegalArgumentException
+     *             if setting the value breaches the variable (contract) type
+     */
+    public void setVariableFromProgram(String name, String value, VariableContractType type) {
         setVariableFrom(name, value, type, "Program");
         setFromJavaProperty(name, type);
     }
@@ -174,28 +170,25 @@ public class VariableContract implements Serializable {
      * @throws NullPointerException if the arguments are null.
      * @throws IllegalArgumentException if setting the value breaches the variable (contract) type
      */
-    private void setVariableFrom(String name, String value,
-        VariableContractType type, String from) {
+    private void setVariableFrom(String name, String value, VariableContractType type, String from) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Setting from " + from + ": " + type + " " + name +
-                "=" + value);
+            logger.debug("Setting from " + from + ": " + type + " " + name + "=" + value);
         }
 
         if (closed) {
-            throw new IllegalArgumentException(
-                "Variable Contract is Closed. Variables can no longer be set");
+            throw new IllegalArgumentException("Variable Contract is Closed. Variables can no longer be set");
         }
 
         checkGenericLogic(name, value, type);
 
         if ((value.length() > 0) && !type.hasSetAbility(from)) {
-            throw new IllegalArgumentException("Variable " + name +
-                " can not be set from " + from + " for type: " + type);
+            throw new IllegalArgumentException("Variable " + name + " can not be set from " + from +
+                " for type: " + type);
         }
 
         if ((value.length() <= 0) && !type.hasSetEmptyAbility(from)) {
-            throw new IllegalArgumentException("Variable " + name +
-                " can not be set empty from " + from + " for type: " + type);
+            throw new IllegalArgumentException("Variable " + name + " can not be set empty from " + from +
+                " for type: " + type);
         }
 
         if (variablesMap.containsKey(name)) {
@@ -203,8 +196,8 @@ public class VariableContract implements Serializable {
 
             if (!type.hasPriority(var.setFrom, from)) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Skipping, lower priority (" + from + " < " +
-                        var.setFrom + ") for type: " + type);
+                    logger.debug("Skipping, lower priority (" + from + " < " + var.setFrom + ") for type: " +
+                        type);
                 }
                 return;
             }
@@ -219,8 +212,7 @@ public class VariableContract implements Serializable {
      * @throws NullPointerException if the arguments are null.
      * @throws IllegalArgumentException if setting the value breaches the variable (contract) type
      */
-    public void setVariableFromProgram(HashMap map, VariableContractType type)
-        throws NullPointerException {
+    public void setVariableFromProgram(HashMap map, VariableContractType type) throws NullPointerException {
         if ((map == null) || (type == null)) {
             throw new NullPointerException("Null arguments");
         }
@@ -240,8 +232,7 @@ public class VariableContract implements Serializable {
      * @throws NullPointerException if the arguments are null.
      * @throws IllegalArgumentException if setting the value breaches the variable (contract) type
      */
-    public void setDescriptorVariable(String name, String value,
-        VariableContractType type) {
+    public void setDescriptorVariable(String name, String value, VariableContractType type) {
         setVariableFrom(name, value, type, "Descriptor");
         setFromJavaProperty(name, type);
     }
@@ -263,12 +254,10 @@ public class VariableContract implements Serializable {
             properties.load(stream);
         } catch (Exception ex) {
             if (logger.isDebugEnabled()) {
-                logger.debug("Curret Working Directory: " +
-                    System.getProperty("user.dir"));
+                logger.debug("Curret Working Directory: " + System.getProperty("user.dir"));
             }
 
-            throw new org.xml.sax.SAXException(
-                "Tag property cannot open file : [" + file + "]");
+            throw new org.xml.sax.SAXException("Tag property cannot open file : [" + file + "]");
         }
 
         String name;
@@ -277,8 +266,7 @@ public class VariableContract implements Serializable {
         while (it.hasNext()) {
             name = (String) it.next();
             value = properties.getProperty(name);
-            setDescriptorVariable(name, value,
-                VariableContractType.DescriptorVariable);
+            setDescriptorVariable(name, value, VariableContractType.DescriptorVariable);
         }
     }
 
@@ -323,16 +311,14 @@ public class VariableContract implements Serializable {
         StringBuffer sb = new StringBuffer();
         while (m.find()) {
             if (!isLegalName(m.group(1))) {
-                throw new SAXException("Error, malformed variable:" +
-                    m.group(1));
+                throw new SAXException("Error, malformed variable:" + m.group(1));
             }
 
             String name = m.group(2);
             String value = getValue(name);
 
             if ((value == null) || (value.length() <= 0)) {
-                throw new SAXException("Error, variable value not found: " +
-                    name + "=?");
+                throw new SAXException("Error, variable value not found: " + name + "=?");
             }
 
             if (logger.isDebugEnabled()) {
@@ -352,8 +338,7 @@ public class VariableContract implements Serializable {
      * @param value Must be not null
      * @param type Checks if variable is already defined with different type
      */
-    private void checkGenericLogic(String name, String value,
-        VariableContractType type) {
+    private void checkGenericLogic(String name, String value, VariableContractType type) {
 
         /*
          * Generic Logical checks
@@ -378,10 +363,8 @@ public class VariableContract implements Serializable {
             throw new NullPointerException("Variable Type is null.");
         }
 
-        if (variablesMap.containsKey(name) &&
-                !variablesMap.get(name).type.equals(type)) {
-            throw new IllegalArgumentException("Variable " + name +
-                " is already defined with type: " +
+        if (variablesMap.containsKey(name) && !variablesMap.get(name).type.equals(type)) {
+            throw new IllegalArgumentException("Variable " + name + " is already defined with type: " +
                 variablesMap.get(name).type);
         }
     }
@@ -394,9 +377,8 @@ public class VariableContract implements Serializable {
      * @throws NullPointerException
      * @throws IllegalArgumentException
      */
-    private void unsafeAdd(String name, String value,
-        VariableContractType type, String setFrom)
-        throws NullPointerException, IllegalArgumentException {
+    private void unsafeAdd(String name, String value, VariableContractType type, String setFrom)
+            throws NullPointerException, IllegalArgumentException {
         if (name == null) {
             throw new NullPointerException("XML Variable Name is null.");
         }
@@ -411,14 +393,12 @@ public class VariableContract implements Serializable {
         if (variablesMap.containsKey(name)) {
             data = variablesMap.get(name);
             if (logger.isDebugEnabled()) {
-                logger.debug("...Modifying variable registry: " + name + "=" +
-                    value);
+                logger.debug("...Modifying variable registry: " + name + "=" + value);
             }
         } else {
             data = new PropertiesDatas();
             if (logger.isDebugEnabled()) {
-                logger.debug("...Creating new registry for variable: " + name +
-                    "=" + value);
+                logger.debug("...Creating new registry for variable: " + name + "=" + value);
             }
         }
 

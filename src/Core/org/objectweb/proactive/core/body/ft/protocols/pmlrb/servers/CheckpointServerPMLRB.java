@@ -70,10 +70,9 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint, int)
      */
-    public int storeCheckpoint(Checkpoint c, int incarnation)
-        throws RemoteException {
-        logger.info("[STORAGE] " + c.getBodyID() + " is checkpointing..." +
-            " (used memory = " + this.getUsedMem() + " Kb)");
+    public int storeCheckpoint(Checkpoint c, int incarnation) throws RemoteException {
+        logger.info("[STORAGE] " + c.getBodyID() + " is checkpointing..." + " (used memory = " +
+            this.getUsedMem() + " Kb)");
         UniqueID caller = c.getBodyID();
         List<Checkpoint> already = this.checkpointStorage.get(caller);
 
@@ -95,8 +94,7 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      * Not implemented for this procotol.
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber)
-        throws RemoteException {
+    public Checkpoint getCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
         throw new NotImplementedException();
     }
 
@@ -115,8 +113,8 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      * Not implemented for this protocol.
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#addInfoToCheckpoint(org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo, org.objectweb.proactive.core.UniqueID, int, int)
      */
-    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id,
-        int sequenceNumber, int incarnation) throws RemoteException {
+    public void addInfoToCheckpoint(CheckpointInfo ci, UniqueID id, int sequenceNumber, int incarnation)
+            throws RemoteException {
         throw new NotImplementedException();
     }
 
@@ -124,16 +122,14 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
      * Not implemented for this protocol.
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#getInfoFromCheckpoint(org.objectweb.proactive.core.UniqueID, int)
      */
-    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber)
-        throws RemoteException {
+    public CheckpointInfo getInfoFromCheckpoint(UniqueID id, int sequenceNumber) throws RemoteException {
         throw new NotImplementedException();
     }
 
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeRequest(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.request.Request)
      */
-    public void storeRequest(UniqueID receiverId, Request request)
-        throws RemoteException {
+    public void storeRequest(UniqueID receiverId, Request request) throws RemoteException {
         List<Checkpoint> lck = this.checkpointStorage.get(receiverId);
         if (lck != null) {
             Checkpoint c = this.checkpointStorage.get(receiverId).get(0);
@@ -151,12 +147,11 @@ public class CheckpointServerPMLRB extends CheckpointServerImpl {
     /**
      * @see org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServer#storeReply(org.objectweb.proactive.core.UniqueID, org.objectweb.proactive.core.body.reply.Reply)
      */
-    public void storeReply(UniqueID receiverID, Reply reply)
-        throws RemoteException {
+    public void storeReply(UniqueID receiverID, Reply reply) throws RemoteException {
         // checkpoint could not be null : if this oa receive a repy, it thus has already
         // served a request, and has checkpointed before.
-        CheckpointInfoPMLRB ci = (CheckpointInfoPMLRB) (this.checkpointStorage.get(receiverID)
-                                                                              .get(0)).getCheckpointInfo();
+        CheckpointInfoPMLRB ci = (CheckpointInfoPMLRB) (this.checkpointStorage.get(receiverID).get(0))
+                .getCheckpointInfo();
         ci.addReply(reply);
     }
 

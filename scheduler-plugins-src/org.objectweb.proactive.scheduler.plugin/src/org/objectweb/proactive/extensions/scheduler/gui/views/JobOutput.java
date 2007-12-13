@@ -79,8 +79,7 @@ public class JobOutput extends MessageConsole {
      */
     public JobOutput(String name) {
         super(name, null);
-        ConsolePlugin.getDefault().getConsoleManager()
-                     .addConsoles(new IConsole[] { this });
+        ConsolePlugin.getDefault().getConsoleManager().addConsoles(new IConsole[] { this });
     }
 
     // -------------------------------------------------------------------- //
@@ -97,12 +96,12 @@ public class JobOutput extends MessageConsole {
         final Color col = color;
         // Print the message in the UI Thread in async mode
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    MessageConsoleStream stream = newMessageStream();
-                    stream.setColor(col);
-                    stream.print(mess);
-                }
-            });
+            public void run() {
+                MessageConsoleStream stream = newMessageStream();
+                stream.setColor(col);
+                stream.print(mess);
+            }
+        });
     }
 
     // -------------------------------------------------------------------- //

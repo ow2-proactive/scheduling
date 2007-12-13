@@ -66,14 +66,12 @@ public class StoredFile implements java.io.Serializable {
     }
 
     public boolean equals(StoredFile rf) {
-        return (this.fileId == rf.fileId) &&
-        this.location.getPath().equals(rf.location.getPath()) &&
-        (this.length == rf.length);
+        return (this.fileId == rf.fileId) && this.location.getPath().equals(rf.location.getPath()) &&
+            (this.length == rf.length);
     }
 
     @Override
     public String toString() {
-        return "id=" + fileId + " path=" + location + " length=" + length +
-        " md5sum=" + md5sum;
+        return "id=" + fileId + " path=" + location + " length=" + length + " md5sum=" + md5sum;
     }
 }

@@ -143,14 +143,12 @@ public abstract class FTManager implements java.io.Serializable {
                 String urlCheckpoint = PAProperties.PA_FT_SERVER_CHECKPOINT.getValue();
                 String urlRecovery = PAProperties.PA_FT_SERVER_RECOVERY.getValue();
                 String urlLocation = PAProperties.PA_LOCATION_SERVER.getValue();
-                if ((urlCheckpoint != null) && (urlRecovery != null) &&
-                        (urlLocation != null)) {
+                if ((urlCheckpoint != null) && (urlRecovery != null) && (urlLocation != null)) {
                     this.storage = (CheckpointServer) (Naming.lookup(urlCheckpoint));
                     this.location = (LocationServer) (Naming.lookup(urlLocation));
                     this.recovery = (RecoveryProcess) (Naming.lookup(urlRecovery));
                 } else {
-                    throw new ProActiveException(
-                        "Unable to init FTManager : servers are not correctly set");
+                    throw new ProActiveException("Unable to init FTManager : servers are not correctly set");
                 }
             }
 
@@ -164,18 +162,14 @@ public abstract class FTManager implements java.io.Serializable {
                 this.location.updateLocation(ownerID, owner.getRemoteAdapter());
             } catch (RemoteException e) {
                 logger.error("**ERROR** Unable to register in location server");
-                throw new ProActiveException("Unable to register in location server",
-                    e);
+                throw new ProActiveException("Unable to register in location server", e);
             }
         } catch (MalformedURLException e) {
-            throw new ProActiveException("Unable to init FTManager : FT is disable.",
-                e);
+            throw new ProActiveException("Unable to init FTManager : FT is disable.", e);
         } catch (RemoteException e) {
-            throw new ProActiveException("Unable to init FTManager : FT is disable.",
-                e);
+            throw new ProActiveException("Unable to init FTManager : FT is disable.", e);
         } catch (NotBoundException e) {
-            throw new ProActiveException("Unable to init FTManager : FT is disable.",
-                e);
+            throw new ProActiveException("Unable to init FTManager : FT is disable.", e);
         }
         return 0;
     }
@@ -189,8 +183,7 @@ public abstract class FTManager implements java.io.Serializable {
             this.recovery.unregister(this.ownerID);
         } catch (RemoteException e) {
             logger.error("**ERROR** Unable to register in location server");
-            throw new ProActiveException("Unable to unregister in location server",
-                e);
+            throw new ProActiveException("Unable to unregister in location server", e);
         }
     }
 
@@ -220,32 +213,29 @@ public abstract class FTManager implements java.io.Serializable {
      * @param e the exception raised during the communication
      * @return the actual location of the callee
      */
-    public UniversalBody communicationFailed(UniqueID suspect,
-        UniversalBody suspectLocation, Exception e) {
+    public UniversalBody communicationFailed(UniqueID suspect, UniversalBody suspectLocation, Exception e) {
         try {
             // send an adapter to suspectLocation: the suspected body could be local
-            UniversalBody newLocation = this.location.searchObject(suspect,
-                    suspectLocation.getRemoteAdapter(), this.ownerID);
+            UniversalBody newLocation = this.location.searchObject(suspect, suspectLocation
+                    .getRemoteAdapter(), this.ownerID);
 
             if (newLocation == null) {
                 while (newLocation == null) {
                     try {
                         // suspected is failed or is recovering
                         if (logger.isDebugEnabled()) {
-                            logger.debug("[CIC] Waiting for recovery of " +
-                                suspect);
+                            logger.debug("[CIC] Waiting for recovery of " + suspect);
                         }
                         Thread.sleep(TIME_TO_RESEND);
                     } catch (InterruptedException e2) {
                         e2.printStackTrace();
                     }
-                    newLocation = this.location.searchObject(suspect,
-                            suspectLocation.getRemoteAdapter(), this.ownerID);
+                    newLocation = this.location.searchObject(suspect, suspectLocation.getRemoteAdapter(),
+                            this.ownerID);
                 }
                 return newLocation;
             } else {
-                System.out.println(
-                    "FTManager.communicationFailed() : new location is not null ");
+                System.out.println("FTManager.communicationFailed() : new location is not null ");
 
                 // newLocation is the new location of suspect
                 return newLocation;
@@ -271,18 +261,14 @@ public abstract class FTManager implements java.io.Serializable {
             this.onSendReplyAfter(r, res, destination);
             return res;
         } catch (BodyTerminatedException e) {
-            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
-                destination.getID() + " SUSPECTED ON REPLY SENDING : " +
-                e.getMessage());
-            UniversalBody newDestination = this.communicationFailed(destination.getID(),
-                    destination, e);
+            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " + destination.getID() +
+                " SUSPECTED ON REPLY SENDING : " + e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(), destination, e);
             return this.sendReply(r, newDestination);
         } catch (IOException e) {
-            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
-                destination.getID() + " SUSPECTED ON REPLY SENDING : " +
-                e.getMessage());
-            UniversalBody newDestination = this.communicationFailed(destination.getID(),
-                    destination, e);
+            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " + destination.getID() +
+                " SUSPECTED ON REPLY SENDING : " + e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(), destination, e);
             return this.sendReply(r, newDestination);
         }
     }
@@ -296,26 +282,22 @@ public abstract class FTManager implements java.io.Serializable {
      * @throws RenegotiateSessionException
      * @throws CommunicationForbiddenException
      */
-    public int sendRequest(Request r, UniversalBody destination)
-        throws RenegotiateSessionException, CommunicationForbiddenException {
+    public int sendRequest(Request r, UniversalBody destination) throws RenegotiateSessionException,
+            CommunicationForbiddenException {
         try {
             this.onSendRequestBefore(r);
             int res = r.send(destination);
             this.onSendRequestAfter(r, res, destination);
             return res;
         } catch (BodyTerminatedException e) {
-            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
-                destination.getID() + " SUSPECTED ON REQUEST SENDING : " +
-                e.getMessage());
-            UniversalBody newDestination = this.communicationFailed(destination.getID(),
-                    destination, e);
+            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " + destination.getID() +
+                " SUSPECTED ON REQUEST SENDING : " + e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(), destination, e);
             return this.sendRequest(r, newDestination);
         } catch (IOException e) {
-            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " +
-                destination.getID() + " SUSPECTED ON REQUEST SENDING : " +
-                e.getMessage());
-            UniversalBody newDestination = this.communicationFailed(destination.getID(),
-                    destination, e);
+            logger.info("[FAULT] " + this.ownerID + " : FAILURE OF " + destination.getID() +
+                " SUSPECTED ON REQUEST SENDING : " + e.getMessage());
+            UniversalBody newDestination = this.communicationFailed(destination.getID(), destination, e);
             return this.sendRequest(r, newDestination);
         } catch (RenegotiateSessionException e1) {
             throw e1;
@@ -376,8 +358,7 @@ public abstract class FTManager implements java.io.Serializable {
      * @param destination the destination body of reply
      * @return depends on fault-tolerance protocol
      */
-    public abstract int onSendReplyAfter(Reply reply, int rdvValue,
-        UniversalBody destination);
+    public abstract int onSendReplyAfter(Reply reply, int rdvValue, UniversalBody destination);
 
     /**
      * This method is called before the sending of a request
@@ -395,9 +376,8 @@ public abstract class FTManager implements java.io.Serializable {
      * @throws RenegotiateSessionException
      * @throws CommunicationForbiddenException
      */
-    public abstract int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination)
-        throws RenegotiateSessionException, CommunicationForbiddenException;
+    public abstract int onSendRequestAfter(Request request, int rdvValue, UniversalBody destination)
+            throws RenegotiateSessionException, CommunicationForbiddenException;
 
     /**
      * This method is called before the service of a request
@@ -434,7 +414,6 @@ public abstract class FTManager implements java.io.Serializable {
      * @param ownerID the UniversalID of the caller
      * @param remoteBodyAdapter the remotBodyAdapter of the caller
      */
-    public void updateLocationAtServer(UniqueID ownerID,
-        UniversalBody remoteBodyAdapter) {
+    public void updateLocationAtServer(UniqueID ownerID, UniversalBody remoteBodyAdapter) {
     }
 }

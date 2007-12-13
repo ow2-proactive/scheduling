@@ -83,11 +83,9 @@ public class ProActiveMPIComm {
 
     public ProActiveMPIComm(String libName, int uniqueID) {
         hostname = ProActiveInet.getInstance().getInetAddress().getHostName();
-        logger.info("[REMOTE PROXY] [" + this.hostname +
-            "] Constructor> : Loading library.");
+        logger.info("[REMOTE PROXY] [" + this.hostname + "] Constructor> : Loading library.");
         System.loadLibrary(libName);
-        logger.info("[REMOTE PROXY] [" + this.hostname +
-            "] Constructor> : Library loaded.");
+        logger.info("[REMOTE PROXY] [" + this.hostname + "] Constructor> : Library loaded.");
         // initialize semaphores & log files
         this.init(uniqueID);
     }
@@ -96,21 +94,20 @@ public class ProActiveMPIComm {
     //// INTERNAL METHODS ////
     ////////////////////////////////
     public void initQueues() {
-        logger.info("[REMOTE PROXY] [" + this.hostname +
-            "] initQueues> : init receiving queue: " + initRecvQueue());
+        logger.info("[REMOTE PROXY] [" + this.hostname + "] initQueues> : init receiving queue: " +
+            initRecvQueue());
 
-        logger.info("[REMOTE PROXY] [" + this.hostname +
-            "] initQueues> : init sending queue: " + initSendQueue());
+        logger.info("[REMOTE PROXY] [" + this.hostname + "] initQueues> : init sending queue: " +
+            initSendQueue());
     }
 
     public void closeQueues() {
-        logger.info("[REMOTE PROXY] [" + this.hostname +
-            "] closeQueues> : closeQueue: " + closeQueue());
+        logger.info("[REMOTE PROXY] [" + this.hostname + "] closeQueues> : closeQueue: " + closeQueue());
     }
 
     public void closeAllSRQueues() {
-        logger.info("[REMOTE PROXY] [" + this.hostname +
-            "] closeAllSRQueues> : closeAllQueues: " + closeAllQueues());
+        logger.info("[REMOTE PROXY] [" + this.hostname + "] closeAllSRQueues> : closeAllQueues: " +
+            closeAllQueues());
     }
 
     public void createRecvThread() {
@@ -129,8 +126,7 @@ public class ProActiveMPIComm {
     }
 
     public void wakeUpThread() {
-        logger.info("[REMOTE PROXY] [" + this.hostname +
-            "] activeThread> : activate thread");
+        logger.info("[REMOTE PROXY] [" + this.hostname + "] activeThread> : activate thread");
         this.notify = true;
     }
 
@@ -141,8 +137,7 @@ public class ProActiveMPIComm {
     ////////////////////////////////
     //// INITIALIZATION METHODS ////
     ////////////////////////////////
-    public void setMyProxy(ProActiveMPICoupling myProxy,
-        ProActiveMPIManager jobManager, int idJob) {
+    public void setMyProxy(ProActiveMPICoupling myProxy, ProActiveMPIManager jobManager, int idJob) {
         this.myProxy = myProxy;
         this.jobID = idJob;
         this.manager = jobManager;
@@ -162,8 +157,8 @@ public class ProActiveMPIComm {
     }
 
     public void sendJobNumber(int jobNumber) {
-        logger.info("[REMOTE PROXY] [" + this.hostname +
-            "] sendJobNumber> send job number " + sendJobNb(jobNumber));
+        logger.info("[REMOTE PROXY] [" + this.hostname + "] sendJobNumber> send job number " +
+            sendJobNb(jobNumber));
     }
 
     public void receiveFromMpi(ProActiveMPIData m_r) {

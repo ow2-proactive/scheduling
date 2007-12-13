@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.gc;
 
-
 /**
  * This is probably the smallest class in ProActive. So, let's compensate with
  * comments. The DGC has to keep track of every Proxy pointing to a given

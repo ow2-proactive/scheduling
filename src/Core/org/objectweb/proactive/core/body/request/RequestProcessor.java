@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.request;
 
-
 /**
  * <p>
  * A class implementing this interface can process requests.

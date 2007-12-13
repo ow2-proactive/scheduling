@@ -44,8 +44,7 @@ public class BridgeOARSHParser extends BridgeSSHParser {
 
     @Override
     public AbstractBridge parseBridgeNode(Node bridgeNode, XPath xpath) {
-        BridgeOARSH bridge = (BridgeOARSH) super.parseBridgeNode(bridgeNode,
-                xpath);
+        BridgeOARSH bridge = (BridgeOARSH) super.parseBridgeNode(bridgeNode, xpath);
 
         String jobId = GCMParserHelper.getAttributeValue(bridgeNode, ATTR_JOB_ID);
 

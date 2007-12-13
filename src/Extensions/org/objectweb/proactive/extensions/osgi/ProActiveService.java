@@ -52,7 +52,7 @@ public interface ProActiveService {
      * @throws NodeException
      */
     public Object newActive(String classname, Object[] constructorParameters)
-        throws ActiveObjectCreationException, NodeException;
+            throws ActiveObjectCreationException, NodeException;
 
     /**
      *

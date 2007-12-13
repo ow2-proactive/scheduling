@@ -75,8 +75,7 @@ public interface RMUser {
      * @param selectionScript : script to be verified by the returned nodes.
      * @return an array list of nodes.
      */
-    public NodeSet getAtMostNodes(IntWrapper nbNodes,
-        SelectionScript selectionScript);
+    public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript);
 
     /**
      * Provides exactly nbNodes nodes verifying the selection script.
@@ -86,8 +85,7 @@ public interface RMUser {
      * @param selectionScript : script to be verified by the returned nodes.
      * @return an array list of nodes.
      */
-    public NodeSet getExactlyNodes(IntWrapper nbNodes,
-        SelectionScript selectionScript);
+    public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript);
 
     /**
      * Release the node got by an user previously.

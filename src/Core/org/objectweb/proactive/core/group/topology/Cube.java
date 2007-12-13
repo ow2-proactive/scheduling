@@ -53,8 +53,7 @@ public class Cube extends Plan { // implements Topology3D {
      * @param depth - the depth of the three-dimensional topology group
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public Cube(Group g, int height, int width, int depth)
-        throws ConstructionOfReifiedObjectFailedException {
+    public Cube(Group g, int height, int width, int depth) throws ConstructionOfReifiedObjectFailedException {
         super(g, height * width * depth);
         this.height = height;
         this.width = width;
@@ -225,8 +224,7 @@ public class Cube extends Plan { // implements Topology3D {
             e.printStackTrace();
         }
 
-        int begining = (posZ * (this.getHeight() * this.getWidth())) +
-            (posY * this.getWidth());
+        int begining = (posZ * (this.getHeight() * this.getWidth())) + (posY * this.getWidth());
         for (int i = begining; i < (begining + this.getWidth()); i++) {
             tmp.add(this.get(i));
         }
@@ -288,8 +286,7 @@ public class Cube extends Plan { // implements Topology3D {
 
         int begining = (posY * this.getWidth()) + posY;
         for (int i = 0; i < this.getDepth(); i++) {
-            tmp.add(this.get(begining +
-                    (i * (this.getWidth() * this.getHeight()))));
+            tmp.add(this.get(begining + (i * (this.getWidth() * this.getHeight()))));
         }
         Line result = null;
         try {
@@ -317,7 +314,7 @@ public class Cube extends Plan { // implements Topology3D {
         for (int i = 0; i < this.getHeight(); i++) {
             for (int j = 0; j < this.getDepth(); j++) {
                 tmp.add(this.get((begining + (i * this.getWidth())) +
-                        (j * (this.getWidth() * this.getHeight()))));
+                    (j * (this.getWidth() * this.getHeight()))));
             }
         }
         Plan result = null;
@@ -346,7 +343,7 @@ public class Cube extends Plan { // implements Topology3D {
         for (int i = 0; i < this.getWidth(); i++) {
             for (int j = 0; j < this.getDepth(); j++) {
                 tmp.add(this.get((begining + (i * this.getWidth())) +
-                        (j * (this.getWidth() * this.getHeight()))));
+                    (j * (this.getWidth() * this.getHeight()))));
             }
         }
         Plan result = null;

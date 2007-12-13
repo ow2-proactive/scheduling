@@ -56,12 +56,12 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Resul
 public class ResultQueue<R extends Serializable> implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * log4j logger of the master
-    */
+     * log4j logger of the master
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
 
     /**
@@ -279,7 +279,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
      */
     public void setMode(final Master.OrderingMode mode) {
         if ((mode == Master.OrderingMode.CompletionOrder) &&
-                (this.mode == Master.OrderingMode.SubmitionOrder)) {
+            (this.mode == Master.OrderingMode.SubmitionOrder)) {
             Iterator<ResultIntern<R>> it = orderedResults.iterator();
             while (it.hasNext()) {
                 ResultIntern<R> res = it.next();
@@ -287,7 +287,7 @@ public class ResultQueue<R extends Serializable> implements Serializable {
                 it.remove();
             }
         } else if ((mode == Master.OrderingMode.SubmitionOrder) &&
-                (this.mode == Master.OrderingMode.CompletionOrder)) {
+            (this.mode == Master.OrderingMode.CompletionOrder)) {
             Iterator<ResultIntern<R>> it = unorderedResults.iterator();
             while (it.hasNext()) {
                 ResultIntern<R> res = it.next();

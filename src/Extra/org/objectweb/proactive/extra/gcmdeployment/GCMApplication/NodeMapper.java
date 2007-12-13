@@ -76,8 +76,7 @@ public class NodeMapper implements NotificationListener {
      */
     final private Object dispatchMutex;
 
-    public NodeMapper(GCMApplicationDescriptorImpl gcma,
-        Collection<VirtualNodeInternal> virtualNodes) {
+    public NodeMapper(GCMApplicationDescriptorImpl gcma, Collection<VirtualNodeInternal> virtualNodes) {
         this.gcma = gcma;
 
         this.virtualNodes = new LinkedList<VirtualNodeInternal>();
@@ -98,8 +97,7 @@ public class NodeMapper implements NotificationListener {
     private void subscribeJMXRuntimeEvent() {
         ProActiveRuntimeImpl part = ProActiveRuntimeImpl.getProActiveRuntime();
         part.addDeployment(gcma.getDeploymentId());
-        JMXNotificationManager.getInstance()
-                              .subscribe(part.getMBean().getObjectName(), this);
+        JMXNotificationManager.getInstance().subscribe(part.getMBean().getObjectName(), this);
     }
 
     public void handleNotification(Notification notification, Object handback) {
@@ -107,7 +105,8 @@ public class NodeMapper implements NotificationListener {
             String type = notification.getType();
 
             if (NotificationType.GCMRuntimeRegistered.equals(type)) {
-                GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification.getUserData();
+                GCMRuntimeRegistrationNotificationData data = (GCMRuntimeRegistrationNotificationData) notification
+                        .getUserData();
                 if (data.getDeploymentId() != gcma.getDeploymentId()) {
                     return;
                 }
@@ -140,8 +139,7 @@ public class NodeMapper implements NotificationListener {
      * @return returns true if a VirtualNode took the Node, false otherwise
      */
     private boolean dispatchS1(Node node, NodeProvider nodeProvider) {
-        GCM_NODEALLOC_LOGGER.trace("Stage1: " +
-            node.getNodeInformation().getURL() + " from " +
+        GCM_NODEALLOC_LOGGER.trace("Stage1: " + node.getNodeInformation().getURL() + " from " +
             nodeProvider.getId());
 
         for (VirtualNodeInternal virtualNode : virtualNodes) {
@@ -161,14 +159,12 @@ public class NodeMapper implements NotificationListener {
      * @return returns true if a VirtualNode took the Node, false otherwise
      */
     private boolean dispatchS2(Node node, NodeProvider nodeProvider) {
-        GCM_NODEALLOC_LOGGER.trace("Stage2: " +
-            node.getNodeInformation().getURL() + " from " +
+        GCM_NODEALLOC_LOGGER.trace("Stage2: " + node.getNodeInformation().getURL() + " from " +
             nodeProvider.getId());
 
         // Check this Node can be dispatched 
         for (VirtualNodeInternal virtualNode : virtualNodes) {
-            if (virtualNode.hasContractWith(nodeProvider) &&
-                    virtualNode.hasUnsatisfiedContract()) {
+            if (virtualNode.hasContractWith(nodeProvider) && virtualNode.hasUnsatisfiedContract()) {
                 return false;
             }
         }
@@ -192,8 +188,7 @@ public class NodeMapper implements NotificationListener {
      * @return
      */
     private boolean dispatchS3(Node node, NodeProvider nodeProvider) {
-        GCM_NODEALLOC_LOGGER.trace("Stage3: " +
-            node.getNodeInformation().getURL() + " from " +
+        GCM_NODEALLOC_LOGGER.trace("Stage3: " + node.getNodeInformation().getURL() + " from " +
             nodeProvider.getId());
 
         for (VirtualNodeInternal virtualNode : virtualNodes) {

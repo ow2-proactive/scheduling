@@ -47,8 +47,8 @@ class HandlerPreEagerProxyFile implements Handler<ProxyFile> {
     WSpaceImpl wspace;
     IdentityHashMap<ProxyFile, ProxyFile> allFiles;
 
-    public HandlerPreEagerProxyFile(FileServerClient fserver,
-        WSpaceImpl wspace, IdentityHashMap<ProxyFile, ProxyFile> allFiles) {
+    public HandlerPreEagerProxyFile(FileServerClient fserver, WSpaceImpl wspace,
+            IdentityHashMap<ProxyFile, ProxyFile> allFiles) {
         this.fserver = fserver;
         this.wspace = wspace;
         this.allFiles = allFiles;

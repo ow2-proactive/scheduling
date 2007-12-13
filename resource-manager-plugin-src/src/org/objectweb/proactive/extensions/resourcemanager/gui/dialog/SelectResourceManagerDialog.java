@@ -176,17 +176,16 @@ public class SelectResourceManagerDialog extends Dialog {
 
         // button "OK"
         okButton.setText("OK");
-        okButton.addListener(SWT.Selection,
-            new Listener() {
-                public void handleEvent(Event event) {
-                    validate = true;
-                    url = urlCombo.getText();
-                    //                    login = loginCombo.getText();
-                    //                    pwd = pwdText.getText();
-                    //                    logAsAdmin = adminCheck.getSelection();
-                    shell.close();
-                }
-            });
+        okButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                validate = true;
+                url = urlCombo.getText();
+                //                    login = loginCombo.getText();
+                //                    pwd = pwdText.getText();
+                //                    logAsAdmin = adminCheck.getSelection();
+                shell.close();
+            }
+        });
 
         FormData okFormData = new FormData();
         okFormData.top = new FormAttachment(urlCombo, 5);
@@ -197,13 +196,12 @@ public class SelectResourceManagerDialog extends Dialog {
 
         // button "CANCEL"
         cancelButton.setText("Cancel");
-        cancelButton.addListener(SWT.Selection,
-            new Listener() {
-                public void handleEvent(Event event) {
-                    validate = false;
-                    shell.close();
-                }
-            });
+        cancelButton.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+                validate = false;
+                shell.close();
+            }
+        });
 
         FormData cancelFormData = new FormData();
         cancelFormData.top = new FormAttachment(urlCombo, 5);

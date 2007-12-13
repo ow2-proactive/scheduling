@@ -71,17 +71,15 @@ public class SchedulerPerspective implements IPerspectiveFactory {
         String editorArea = layout.getEditorArea();
         layout.setEditorAreaVisible(false);
 
-        IFolderLayout topFolder = layout.createFolder(ID_TOP_FOLDER,
-                IPageLayout.TOP, 0.62f, editorArea);
+        IFolderLayout topFolder = layout.createFolder(ID_TOP_FOLDER, IPageLayout.TOP, 0.62f, editorArea);
         topFolder.addView(SeparatedJobView.ID);
 
-        IFolderLayout leftFolder = layout.createFolder(ID_LEFT_FOLDER,
-                IPageLayout.LEFT, 0.72f, editorArea);
+        IFolderLayout leftFolder = layout.createFolder(ID_LEFT_FOLDER, IPageLayout.LEFT, 0.72f, editorArea);
         leftFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
         leftFolder.addView(TaskView.ID);
 
-        IFolderLayout bottomFolder = layout.createFolder(ID_BOTTOM_FOLDER,
-                IPageLayout.BOTTOM, 0.28f, editorArea);
+        IFolderLayout bottomFolder = layout.createFolder(ID_BOTTOM_FOLDER, IPageLayout.BOTTOM, 0.28f,
+                editorArea);
         bottomFolder.addView(JobInfo.ID);
         bottomFolder.addView(ResultPreview.ID);
     }

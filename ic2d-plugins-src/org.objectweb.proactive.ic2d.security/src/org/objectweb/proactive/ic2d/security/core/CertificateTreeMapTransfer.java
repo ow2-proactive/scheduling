@@ -66,7 +66,7 @@ public class CertificateTreeMapTransfer extends ByteArrayTransfer {
     @Override
     protected boolean validate(Object object) {
         if ((object == null) || !(object instanceof CertificateTreeMap) ||
-                (((CertificateTreeMap) object).size() == 0)) {
+            (((CertificateTreeMap) object).size() == 0)) {
             return false;
         }
         return true;

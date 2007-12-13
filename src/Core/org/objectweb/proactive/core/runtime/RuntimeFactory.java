@@ -81,8 +81,7 @@ public abstract class RuntimeFactory {
 
     /** the table where associations Protocol - Factory are kept */
     private static java.util.HashMap<String, String> protocolFactoryMapping = new java.util.HashMap<String, String>();
-    private static java.util.HashMap<String, RuntimeFactory> instanceFactoryMapping =
-        new java.util.HashMap<String, RuntimeFactory>();
+    private static java.util.HashMap<String, RuntimeFactory> instanceFactoryMapping = new java.util.HashMap<String, RuntimeFactory>();
 
     static {
         ProActiveConfiguration.load();
@@ -102,11 +101,9 @@ public abstract class RuntimeFactory {
      * @param factoryClassName the fully qualified name of the class of the factory
      * responsible of creating the proActiveRuntime for that protocol
      */
-    protected static synchronized void setFactory(String protocol,
-        String factoryClassName) {
+    protected static synchronized void setFactory(String protocol, String factoryClassName) {
         if (runtimeLogger.isDebugEnabled()) {
-            runtimeLogger.debug("protocol2 =  " + protocol + " " +
-                factoryClassName);
+            runtimeLogger.debug("protocol2 =  " + protocol + " " + factoryClassName);
         }
         protocolFactoryMapping.put(protocol, factoryClassName);
     }
@@ -118,8 +115,7 @@ public abstract class RuntimeFactory {
      * @param factoryObject the class of the factory
      * responsible of creating the proactiveRuntime for that protocol
      */
-    protected static synchronized void setFactory(String protocol,
-        RuntimeFactory factoryObject) {
+    protected static synchronized void setFactory(String protocol, RuntimeFactory factoryObject) {
         protocolFactoryMapping.put(protocol, factoryObject.getClass().getName());
         instanceFactoryMapping.put(protocol, factoryObject);
     }
@@ -129,8 +125,7 @@ public abstract class RuntimeFactory {
      * @return true if the given proActiveRuntime belongs to this JVM false else
      */
     public static boolean isRuntimeLocal(ProActiveRuntime proActiveRuntime) {
-        return proActiveRuntime.getVMInformation().getVMID()
-                               .equals(UniqueID.getCurrentVMID());
+        return proActiveRuntime.getVMInformation().getVMID().equals(UniqueID.getCurrentVMID());
     }
 
     /**
@@ -139,8 +134,7 @@ public abstract class RuntimeFactory {
      * @return The only one ProActiveRuntime associated with the local JVM
      * @throws ProActiveException if the default runtime cannot be created
      */
-    public static synchronized ProActiveRuntime getDefaultRuntime()
-        throws ProActiveException {
+    public static synchronized ProActiveRuntime getDefaultRuntime() throws ProActiveException {
         ProActiveRuntime defaultRuntime = null;
         try {
             //defaultRuntime = getProtocolSpecificRuntime(Constants.DEFAULT_PROTOCOL_IDENTIFIER);
@@ -148,16 +142,14 @@ public abstract class RuntimeFactory {
             //                                                                              .getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL));
             defaultRuntime = getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
             if (runtimeLogger.isDebugEnabled()) {
-                runtimeLogger.debug("default runtime = " +
-                    defaultRuntime.getURL());
+                runtimeLogger.debug("default runtime = " + defaultRuntime.getURL());
             }
         } catch (ProActiveException e) {
             //e.printStackTrace();
             if (runtimeLogger.isDebugEnabled()) {
                 runtimeLogger.debug("Error with the default ProActiveRuntime");
             }
-            throw new ProActiveException("Error when getting the default ProActiveRuntime",
-                e);
+            throw new ProActiveException("Error when getting the default ProActiveRuntime", e);
         }
         return defaultRuntime;
     }
@@ -170,26 +162,21 @@ public abstract class RuntimeFactory {
      * @return ProActiveRuntime
      * @throws ProActiveException if this ProActiveRuntime cannot be created
      */
-    public static ProActiveRuntime getProtocolSpecificRuntime(String protocol)
-        throws ProActiveException {
+    public static ProActiveRuntime getProtocolSpecificRuntime(String protocol) throws ProActiveException {
         ProActiveRuntimeImpl proActiveRuntime = ProActiveRuntimeImpl.getProActiveRuntime();
 
-        RemoteRemoteObject rro = proActiveRuntime.getRemoteObjectExposer()
-                                                 .getRemoteObject(protocol);
+        RemoteRemoteObject rro = proActiveRuntime.getRemoteObjectExposer().getRemoteObject(protocol);
 
         if (rro == null) {
-            URI url = RemoteObjectHelper.generateUrl(protocol,
-                    URIBuilder.getNameFromURI(URI.create(
-                            proActiveRuntime.getURL())));
+            URI url = RemoteObjectHelper.generateUrl(protocol, URIBuilder.getNameFromURI(URI
+                    .create(proActiveRuntime.getURL())));
             proActiveRuntime.getRemoteObjectExposer().activateProtocol(url);
-            rro = proActiveRuntime.getRemoteObjectExposer()
-                                  .getRemoteObject(protocol);
+            rro = proActiveRuntime.getRemoteObjectExposer().getRemoteObject(protocol);
 
             //            throw new ProActiveException("Cannot create a ProActiveRuntime based on " + protocol);
         }
 
-        return (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(new RemoteObjectAdapter(
-                rro));
+        return (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(new RemoteObjectAdapter(rro));
     }
 
     /**
@@ -199,15 +186,13 @@ public abstract class RuntimeFactory {
      * @return ProActiveRuntime
      * @throws ProActiveException if the runtime cannot be found
      */
-    public static ProActiveRuntime getRuntime(String proActiveRuntimeURL)
-        throws ProActiveException {
+    public static ProActiveRuntime getRuntime(String proActiveRuntimeURL) throws ProActiveException {
         runtimeLogger.debug("proActiveRunTimeURL " + proActiveRuntimeURL);
 
         //do we have any association for this node?
         //String protocol = getProtocol(proActiveRuntimeURL);
         //        RuntimeFactory factory = getFactory(protocol);
-        RemoteObject ro = RemoteObjectHelper.lookup(URI.create(
-                    proActiveRuntimeURL));
+        RemoteObject ro = RemoteObjectHelper.lookup(URI.create(proActiveRuntimeURL));
 
         //proActiveRuntimeURL = removeProtocol(proActiveRuntimeURL, protocol);
         return (ProActiveRuntime) RemoteObjectHelper.generatedObjectStub(ro);
@@ -224,12 +209,10 @@ public abstract class RuntimeFactory {
      * @return ProActiveRuntime
      * @throws ProActiveException if this ProActiveRuntime cannot be created
      */
-    protected abstract ProActiveRuntime getProtocolSpecificRuntimeImpl()
-        throws ProActiveException;
+    protected abstract ProActiveRuntime getProtocolSpecificRuntimeImpl() throws ProActiveException;
 
     /**
      * Returns the reference to the proActiveRuntime located at s
      */
-    protected abstract ProActiveRuntime getRemoteRuntimeImpl(String s)
-        throws ProActiveException;
+    protected abstract ProActiveRuntime getRemoteRuntimeImpl(String s) throws ProActiveException;
 }

@@ -74,8 +74,7 @@ public class ProActiveExample extends ProActiveExecutable {
 
         for (Node node : nodes) {
             try {
-                Worker w = (Worker) PAActiveObject.newActive(Worker.class.getName(),
-                        new Object[] {  }, node);
+                Worker w = (Worker) PAActiveObject.newActive(Worker.class.getName(), new Object[] {}, node);
                 workers.add(w);
             } catch (ActiveObjectCreationException e) {
                 e.printStackTrace();

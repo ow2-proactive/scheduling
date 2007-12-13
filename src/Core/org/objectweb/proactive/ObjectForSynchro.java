@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive;
 
-
 /**
  * <P>
  * An object instance of this class is to be returned when a method of an active

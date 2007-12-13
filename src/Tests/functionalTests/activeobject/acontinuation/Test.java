@@ -39,6 +39,7 @@ import org.objectweb.proactive.core.config.PAProperties;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test automatic continuations by results and parameters
  */
@@ -74,8 +75,7 @@ public class Test extends FunctionalTest {
         @Override
         public void run() {
             try {
-                a = (A) PAActiveObject.newActive(A.class.getName(),
-                        new Object[] { "principal" });
+                a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "principal" });
                 //test future by result
                 a.initFirstDeleguate();
                 idDeleguate = a.getId("deleguate2");
@@ -90,25 +90,20 @@ public class Test extends FunctionalTest {
                 }
 
                 //test future passed as parameter
-                b = (A) PAActiveObject.newActive(A.class.getName(),
-                        new Object[] { "dummy" });
+                b = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "dummy" });
                 idPrincipal = b.getIdforFuture();
                 a.forwardID(idPrincipal);
                 //Test non-blocking when future passed as parameter
-                A c = (A) PAActiveObject.newActive(A.class.getName(),
-                        new Object[] { "c" });
-                A d = (A) PAActiveObject.newActive(A.class.getName(),
-                        new Object[] { "d" });
-                A e = (A) PAActiveObject.newActive(A.class.getName(),
-                        new Object[] { "e" });
+                A c = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "c" });
+                A d = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "d" });
+                A e = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "e" });
 
                 A de = d.getA(e);
                 A cde = c.getA(de);
                 lastA = e.getA(cde);
 
                 //test multiple wrapped futures with multiples AC destinations
-                A f = (A) PAActiveObject.newActive(A.class.getName(),
-                        new Object[] { "f" });
+                A f = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "f" });
                 c.initSecondDeleguate();
                 A t = c.delegatedGetA(d);
                 t1 = e.getA(t);

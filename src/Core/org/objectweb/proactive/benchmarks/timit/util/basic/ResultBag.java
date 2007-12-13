@@ -46,8 +46,8 @@ public class ResultBag {
     protected String otherInformation;
     protected List<BasicTimer> timersList;
 
-    public ResultBag(final String className, final String uniqueID,
-        final List<BasicTimer> timersList, final String otherInformation) {
+    public ResultBag(final String className, final String uniqueID, final List<BasicTimer> timersList,
+            final String otherInformation) {
         this.className = className;
         this.uniqueID = uniqueID;
         this.timersList = timersList;
@@ -72,8 +72,7 @@ public class ResultBag {
 
     @Override
     public String toString() {
-        String result = className + " : " + " shortUniqueID : " +
-            this.uniqueID + "\n";
+        String result = className + " : " + " shortUniqueID : " + this.uniqueID + "\n";
         Iterator<BasicTimer> it = this.timersList.iterator();
         while (it.hasNext()) {
             result += ("" + it.next() + "\n");

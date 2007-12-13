@@ -45,10 +45,8 @@ public interface PriorityController {
      * All the possible kind of priority for a request on a component.
      *
      */
-    public enum RequestPriority {F,
-        NF1,
-        NF2,
-        NF3;
+    public enum RequestPriority {
+        F, NF1, NF2, NF3;
     }
 
     /**
@@ -61,8 +59,7 @@ public interface PriorityController {
      * @param priority The priority
      * @return true if success, else false
      */
-    public void setPriority(String interfaceName, String methodName,
-        RequestPriority priority);
+    public void setPriority(String interfaceName, String methodName, RequestPriority priority);
 
     /**
      * Set priority of the method named 'methodName' with the signature
@@ -76,8 +73,8 @@ public interface PriorityController {
      * @param priority The priority
      * @return true if success, else false
      */
-    public void setPriority(String interfaceName, String methodName,
-        Class<?>[] parametersTypes, RequestPriority priority);
+    public void setPriority(String interfaceName, String methodName, Class<?>[] parametersTypes,
+            RequestPriority priority);
 
     /**
      * Get the priority for a given method.
@@ -87,6 +84,5 @@ public interface PriorityController {
      * @param parametersTypes The type of the method's parameters signature
      * @return
      */
-    public RequestPriority getPriority(String interfaceName, String methodName,
-        Class<?>[] parametersTypes);
+    public RequestPriority getPriority(String interfaceName, String methodName, Class<?>[] parametersTypes);
 }

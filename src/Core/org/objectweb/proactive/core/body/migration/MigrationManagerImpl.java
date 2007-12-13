@@ -57,8 +57,8 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
 
-public class MigrationManagerImpl extends AbstractEventProducer
-    implements MigrationManager, java.io.Serializable {
+public class MigrationManagerImpl extends AbstractEventProducer implements MigrationManager,
+        java.io.Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     transient protected LocationServer locationServer;
     protected int nbOfMigrationWithoutUpdate; // used to compare with maxMigrationNb
@@ -83,8 +83,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
         super(true);
 
         if (PAProperties.PA_MIXEDLOCATION_TTL.isSet()) {
-            this.ttl = Integer.valueOf(PAProperties.PA_MIXEDLOCATION_TTL.getValue())
-                              .intValue();
+            this.ttl = Integer.valueOf(PAProperties.PA_MIXEDLOCATION_TTL.getValue()).intValue();
         } else {
             this.ttl = INFINITE_TTL;
         }
@@ -92,14 +91,14 @@ public class MigrationManagerImpl extends AbstractEventProducer
         this.updatingForwarder = PAProperties.PA_MIXEDLOCATION_UPDATINGFORWARDER.isTrue();
         if (PAProperties.PA_MIXEDLOCATION_MAXMIGRATIONNB.isSet()) {
             this.maxMigrationNb = Integer.valueOf(PAProperties.PA_MIXEDLOCATION_MAXMIGRATIONNB.getValue())
-                                         .intValue();
+                    .intValue();
         } else {
             this.maxMigrationNb = INFINITE_MAX_MIGRATION_NB;
         }
 
         if (PAProperties.PA_MIXEDLOCATION_MAXTIMEONSITE.isSet()) {
             this.maxTimeOnSite = Integer.valueOf(PAProperties.PA_MIXEDLOCATION_MAXTIMEONSITE.getValue())
-                                        .intValue();
+                    .intValue();
         } else {
             this.maxTimeOnSite = INFINITE_MAX_TIME_ON_SITE;
         }
@@ -115,8 +114,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
             this.locationServer = LocationServerFactory.getLocationServer();
         }
         if (this.locationServer != null) {
-            this.locationServer.updateLocation(body.getID(),
-                body.getRemoteAdapter(), this.migrationCounter);
+            this.locationServer.updateLocation(body.getID(), body.getRemoteAdapter(), this.migrationCounter);
         }
         resetNbOfMigrationWithoutUpdate();
     }
@@ -128,8 +126,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
     public void launchTimeToLive(MigratableBody body, UniversalBody migratedBody) {
         if (this.ttl != INFINITE_TTL) {
             this.ttlTimer = new Timer();
-            this.ttlTimer.schedule(new TimeToLiveTimerTask(this, body,
-                    migratedBody), this.ttl);
+            this.ttlTimer.schedule(new TimeToLiveTimerTask(this, body, migratedBody), this.ttl);
         }
     }
 
@@ -139,15 +136,13 @@ public class MigrationManagerImpl extends AbstractEventProducer
     //
     public Node checkNode(Node node) throws MigrationException {
         if (node == null) {
-            throw new MigrationException(
-                "The RemoteNodeImpl could not be found");
+            throw new MigrationException("The RemoteNodeImpl could not be found");
         }
 
         // check if the node is remote
         if (NodeFactory.isNodeLocal(node)) {
             MigrationException me = new MigrationException("The given node " +
-                    node.getNodeInformation().getURL() +
-                    " is in the same virtual machine");
+                node.getNodeInformation().getURL() + " is in the same virtual machine");
             if (hasListeners()) {
                 notifyAllListeners(new MigrationEvent(me));
             }
@@ -156,12 +151,10 @@ public class MigrationManagerImpl extends AbstractEventProducer
         return node;
     }
 
-    public UniversalBody migrateTo(Node node, Body body)
-        throws MigrationException {
+    public UniversalBody migrateTo(Node node, Body body) throws MigrationException {
         // ProActiveEvent
         if (hasListeners()) {
-            notifyAllListeners(new MigrationEvent(body,
-                    MigrationEvent.BEFORE_MIGRATION));
+            notifyAllListeners(new MigrationEvent(body, MigrationEvent.BEFORE_MIGRATION));
         }
 
         // END ProActiveEvent
@@ -169,8 +162,8 @@ public class MigrationManagerImpl extends AbstractEventProducer
         // JMX Notification
         BodyWrapperMBean mbean = body.getMBean();
         if (mbean != null) {
-            mbean.sendNotification(NotificationType.migrationAboutToStart,
-                node.getProActiveRuntime().getURL());
+            mbean.sendNotification(NotificationType.migrationAboutToStart, node.getProActiveRuntime()
+                    .getURL());
         }
 
         // End JMX Notification
@@ -184,8 +177,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
             // UniversalBody remoteBody = node.receiveBody(body);
             // --------------------added lines---------------------------
             ProActiveRuntime part = node.getProActiveRuntime();
-            UniversalBody remoteBody = part.receiveBody(node.getNodeInformation()
-                                                            .getName(), body);
+            UniversalBody remoteBody = part.receiveBody(node.getNodeInformation().getName(), body);
 
             if (logger.isDebugEnabled()) {
                 logger.debug("runtime = " + part);
@@ -203,16 +195,15 @@ public class MigrationManagerImpl extends AbstractEventProducer
 
             // ProActiveEvent
             if (hasListeners()) {
-                notifyAllListeners(new MigrationEvent(body,
-                        MigrationEvent.AFTER_MIGRATION));
+                notifyAllListeners(new MigrationEvent(body, MigrationEvent.AFTER_MIGRATION));
             }
 
             // END ProActiveEvent
 
             // JMX Notification
             if (mbean != null) {
-                mbean.sendNotification(NotificationType.migrationFinished,
-                    node.getProActiveRuntime().getURL());
+                mbean.sendNotification(NotificationType.migrationFinished, node.getProActiveRuntime()
+                        .getURL());
             }
 
             // End JMX Notification
@@ -228,8 +219,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
             //} catch (ProActiveException e) {
         } catch (Exception e) {
             e.printStackTrace();
-            MigrationException me = new MigrationException("Exception while sending the Object",
-                    e.getCause());
+            MigrationException me = new MigrationException("Exception while sending the Object", e.getCause());
 
             // ProActiveEvent
             if (hasListeners()) {
@@ -240,8 +230,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
 
             // JMX Notification
             if (mbean != null) {
-                mbean.sendNotification(NotificationType.migrationExceptionThrown,
-                    me);
+                mbean.sendNotification(NotificationType.migrationExceptionThrown, me);
             }
 
             // END JMX Notification
@@ -254,17 +243,14 @@ public class MigrationManagerImpl extends AbstractEventProducer
      * it changes the body into a forwarder or terminate it
      * if we don't forwarders
      */
-    public void changeBodyAfterMigration(MigratableBody body,
-        UniversalBody migratedBody) {
+    public void changeBodyAfterMigration(MigratableBody body, UniversalBody migratedBody) {
         if (this.ttl == 0) {
             // we don't need forwarders so we don't create them
             // the body is dead now
             body.terminate();
         } else {
-            body.setRequestReceiver(createRequestReceiver(migratedBody,
-                    body.getRequestReceiver()));
-            body.setReplyReceiver(createReplyReceiver(migratedBody,
-                    body.getReplyReceiver()));
+            body.setRequestReceiver(createRequestReceiver(migratedBody, body.getRequestReceiver()));
+            body.setReplyReceiver(createReplyReceiver(migratedBody, body.getReplyReceiver()));
 
             body.setHasMigrated();
 
@@ -280,8 +266,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
     public void startingAfterMigration(Body body) {
         // ProActiveEvent
         if (hasListeners()) {
-            notifyAllListeners(new MigrationEvent(body,
-                    MigrationEvent.RESTARTING_AFTER_MIGRATING));
+            notifyAllListeners(new MigrationEvent(body, MigrationEvent.RESTARTING_AFTER_MIGRATING));
         }
 
         // END ProActiveEvent
@@ -300,24 +285,22 @@ public class MigrationManagerImpl extends AbstractEventProducer
 
         // TTU : maxMigrationNb
         if ((this.maxMigrationNb != INFINITE_MAX_MIGRATION_NB) &&
-                (this.nbOfMigrationWithoutUpdate >= this.maxMigrationNb)) {
+            (this.nbOfMigrationWithoutUpdate >= this.maxMigrationNb)) {
             updateLocation(body);
         }
         // TTU : maxTimeOnSite
         else if (this.maxTimeOnSite != INFINITE_MAX_TIME_ON_SITE) {
             this.maxTimeOnSiteTimer = new Timer();
-            this.maxTimeOnSiteTimer.schedule(new MaxTimeOnSiteTimerTask(this,
-                    body), this.maxTimeOnSite);
+            this.maxTimeOnSiteTimer.schedule(new MaxTimeOnSiteTimerTask(this, body), this.maxTimeOnSite);
         }
     }
 
     public RequestReceiver createRequestReceiver(UniversalBody remoteBody,
-        RequestReceiver currentRequestReceiver) {
+            RequestReceiver currentRequestReceiver) {
         return new RequestReceiverForwarder(remoteBody);
     }
 
-    public ReplyReceiver createReplyReceiver(UniversalBody remoteBody,
-        ReplyReceiver currentReplyReceiver) {
+    public ReplyReceiver createReplyReceiver(UniversalBody remoteBody, ReplyReceiver currentReplyReceiver) {
         return new ReplyReceiverForwarder(remoteBody);
     }
 
@@ -329,8 +312,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
         removeListener(listener);
     }
 
-    public void setMigrationStrategy(int ttl, boolean updatingForwarder,
-        int maxMigrationNb, int maxTimeOnSite) {
+    public void setMigrationStrategy(int ttl, boolean updatingForwarder, int maxMigrationNb, int maxTimeOnSite) {
         this.ttl = ttl;
         this.updatingForwarder = updatingForwarder;
         this.maxMigrationNb = maxMigrationNb;
@@ -341,23 +323,22 @@ public class MigrationManagerImpl extends AbstractEventProducer
     // -- PROTECTED METHODS -----------------------------------------------
     //
     @Override
-    protected void notifyOneListener(ProActiveListener listener,
-        ProActiveEvent event) {
+    protected void notifyOneListener(ProActiveListener listener, ProActiveEvent event) {
         MigrationEvent migrationEvent = (MigrationEvent) event;
         MigrationEventListener migrationEventListener = (MigrationEventListener) listener;
         switch (event.getType()) {
-        case MigrationEvent.BEFORE_MIGRATION:
-            migrationEventListener.migrationAboutToStart(migrationEvent);
-            break;
-        case MigrationEvent.AFTER_MIGRATION:
-            migrationEventListener.migrationFinished(migrationEvent);
-            break;
-        case MigrationEvent.MIGRATION_EXCEPTION:
-            migrationEventListener.migrationExceptionThrown(migrationEvent);
-            break;
-        case MigrationEvent.RESTARTING_AFTER_MIGRATING:
-            migrationEventListener.migratedBodyRestarted(migrationEvent);
-            break;
+            case MigrationEvent.BEFORE_MIGRATION:
+                migrationEventListener.migrationAboutToStart(migrationEvent);
+                break;
+            case MigrationEvent.AFTER_MIGRATION:
+                migrationEventListener.migrationFinished(migrationEvent);
+                break;
+            case MigrationEvent.MIGRATION_EXCEPTION:
+                migrationEventListener.migrationExceptionThrown(migrationEvent);
+                break;
+            case MigrationEvent.RESTARTING_AFTER_MIGRATING:
+                migrationEventListener.migratedBodyRestarted(migrationEvent);
+                break;
         }
     }
 
@@ -367,8 +348,7 @@ public class MigrationManagerImpl extends AbstractEventProducer
         protected MigrationManagerImpl migrationManager;
         protected Body body;
 
-        public MaxTimeOnSiteTimerTask(MigrationManagerImpl migrationManager,
-            Body body) {
+        public MaxTimeOnSiteTimerTask(MigrationManagerImpl migrationManager, Body body) {
             this.migrationManager = migrationManager;
             this.body = body;
         }
@@ -376,10 +356,9 @@ public class MigrationManagerImpl extends AbstractEventProducer
         @Override
         public void run() {
             this.body.enterInThreadStore(); // make sure that the body isn't
-                                            // trying to migrate
+            // trying to migrate
 
-            if ((this.body instanceof Migratable) &&
-                    !((Migratable) this.body).hasJustMigrated()) {
+            if ((this.body instanceof Migratable) && !((Migratable) this.body).hasJustMigrated()) {
                 this.migrationManager.updateLocation(this.body);
             }
             this.body.exitFromThreadStore();
@@ -392,8 +371,8 @@ public class MigrationManagerImpl extends AbstractEventProducer
         protected UniversalBody migratedBody;
         private long creationTime;
 
-        public TimeToLiveTimerTask(MigrationManagerImpl migrationManager,
-            MigratableBody body, UniversalBody migratedBody) {
+        public TimeToLiveTimerTask(MigrationManagerImpl migrationManager, MigratableBody body,
+                UniversalBody migratedBody) {
             this.migrationManager = migrationManager;
             this.body = body;
             this.migratedBody = migratedBody;

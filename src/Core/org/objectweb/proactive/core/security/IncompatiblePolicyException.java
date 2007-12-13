@@ -33,8 +33,8 @@ package org.objectweb.proactive.core.security;
 public class IncompatiblePolicyException extends RuntimeException {
 
     /**
-         *
-         */
+     *
+     */
     public IncompatiblePolicyException() {
         super();
     }

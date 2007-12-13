@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.event;
 
-
 /**
  * A class implementing this interface can produce NodeCreationEvent. It has also the ability to register
  * or remove NodeCreationEvent listener
@@ -48,6 +47,5 @@ public interface NodeCreationEventProducer {
      * Removes the NodeCreationEventListener.
      * @param listener the listener to remove
      */
-    public void removeNodeCreationEventListener(
-        NodeCreationEventListener listener);
+    public void removeNodeCreationEventListener(NodeCreationEventListener listener);
 }

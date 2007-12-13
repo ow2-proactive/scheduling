@@ -49,19 +49,16 @@ public class TestNodes extends FunctionalTest {
     private static String XML_LOCATION;
 
     static {
-        String value = System.getProperty(
-                "functionalTests.descriptor.defaultnodes.file");
+        String value = System.getProperty("functionalTests.descriptor.defaultnodes.file");
         if (value != null) {
             XML_LOCATION = TestNodes.class.getResource(value).getPath();
         } else {
             if ("ibis".equals(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue())) {
                 XML_LOCATION = TestNodes.class.getResource(
-                        "/functionalTests/descriptor/defaultnodes/NodesIbis.xml")
-                                              .getPath();
+                        "/functionalTests/descriptor/defaultnodes/NodesIbis.xml").getPath();
             } else {
                 XML_LOCATION = TestNodes.class.getResource(
-                        "/functionalTests/descriptor/defaultnodes/Nodes.xml")
-                                              .getPath();
+                        "/functionalTests/descriptor/defaultnodes/Nodes.xml").getPath();
             }
         }
     }
@@ -76,8 +73,7 @@ public class TestNodes extends FunctionalTest {
 
     @Test
     public void action() throws Exception {
-        proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                XML_LOCATION);
+        proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + XML_LOCATION);
         proActiveDescriptor.activateMappings();
         TestNodes.virtualNodes = proActiveDescriptor.getVirtualNodes();
         for (int i = 0; i < virtualNodes.length; i++) {

@@ -39,6 +39,7 @@ import java.util.List;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 
+
 /**
  * <p>This enumeration defines the various dispatch modes available for
  * parameters. The available dispatch mode are:
@@ -63,66 +64,66 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
 @PublicAPI
 public enum ParamDispatchMode implements ParamDispatch, Serializable {
     /**
-    * The default dispatch mode. All parameters are send to all
-    * bounded server interfaces.
-    */
+     * The default dispatch mode. All parameters are send to all
+     * bounded server interfaces.
+     */
     BROADCAST,
     /**
-    * Sends the i<sup>th</sup> member of a List arguments
-    * to i<sup>th</sup>connected server interface. The length of the List argument
-    * and the number of bounded server interface must be the same.
-    */
+     * Sends the i<sup>th</sup> member of a List arguments
+     * to i<sup>th</sup>connected server interface. The length of the List argument
+     * and the number of bounded server interface must be the same.
+     */
     ONE_TO_ONE,
     /**
-    * Sends the i/n<sup>th</sup> member of a List arguments
-    * to n<sup>th</sup>connected server interface.
-    */
+     * Sends the i/n<sup>th</sup> member of a List arguments
+     * to n<sup>th</sup>connected server interface.
+     */
     ROUND_ROBIN,
     /**
-    * The dispatch mode is given as a
-    * parameter, as a class signature.
-    */
+     * The dispatch mode is given as a
+     * parameter, as a class signature.
+     */
     CUSTOM;
     /*
      *
      * @see org.objectweb.proactive.core.component.type.annotations.multicast.ParametersDispatch#dispatch(java.lang.Object, int)
      */
     private List<Object> dispatch(List<?> inputParameter, int nbOutputReceivers)
-        throws ParameterDispatchException {
+            throws ParameterDispatchException {
         List<Object> result = new ArrayList<Object>();
 
         switch (this) {
-        case BROADCAST:
-            for (int i = 0; i < nbOutputReceivers; i++) {
-                result.add(inputParameter);
-            }
-            break;
-        case ONE_TO_ONE:
-            if (inputParameter.size() != nbOutputReceivers) {
-                throw new ParameterDispatchException(
-                    "in a one-to-one distribution, the list of parameters on the client side" +
-                    "must have a size equal to the number of connected receivers");
-            }
-            for (int i = 0; i < nbOutputReceivers; i++) {
-                result.add(inputParameter.get(i));
-            }
+            case BROADCAST:
+                for (int i = 0; i < nbOutputReceivers; i++) {
+                    result.add(inputParameter);
+                }
+                break;
+            case ONE_TO_ONE:
+                if (inputParameter.size() != nbOutputReceivers) {
+                    throw new ParameterDispatchException(
+                        "in a one-to-one distribution, the list of parameters on the client side"
+                            + "must have a size equal to the number of connected receivers");
+                }
+                for (int i = 0; i < nbOutputReceivers; i++) {
+                    result.add(inputParameter.get(i));
+                }
 
-            break;
-        case ROUND_ROBIN:
-            for (int i = 0; i < inputParameter.size(); i++) {
-                result.add(inputParameter.get(i));
-            }
-            break;
-        default:
-            result = BROADCAST.dispatch(inputParameter, nbOutputReceivers);
-            break;
+                break;
+            case ROUND_ROBIN:
+                for (int i = 0; i < inputParameter.size(); i++) {
+                    result.add(inputParameter.get(i));
+                }
+                break;
+            default:
+                result = BROADCAST.dispatch(inputParameter, nbOutputReceivers);
+                break;
         }
 
         return result;
     }
 
     public List<Object> dispatch(Object inputParameter, int nbOutputReceivers)
-        throws ParameterDispatchException {
+            throws ParameterDispatchException {
         if (inputParameter instanceof List) {
             return dispatch((List) inputParameter, nbOutputReceivers);
         }
@@ -140,28 +141,27 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
     /*
      * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#getDispatchSize(java.util.List, int)
      */
-    private int expectedDispatchSize(List<?> inputParameter,
-        int nbOutputReceivers) throws ParameterDispatchException {
+    private int expectedDispatchSize(List<?> inputParameter, int nbOutputReceivers)
+            throws ParameterDispatchException {
         int result = 0;
 
         switch (this) {
-        case BROADCAST:
-            result = nbOutputReceivers;
-            break;
-        case ONE_TO_ONE:
-            if (inputParameter.size() != nbOutputReceivers) {
-                throw new ParameterDispatchException(
-                    "in a one-to-one distribution, the list of parameters on the client side" +
-                    "must have a size equal to the number of connected receivers");
-            }
-            result = nbOutputReceivers;
-            break;
-        case ROUND_ROBIN:
-            result = inputParameter.size();
-            break;
-        default:
-            result = BROADCAST.expectedDispatchSize(inputParameter,
-                    nbOutputReceivers);
+            case BROADCAST:
+                result = nbOutputReceivers;
+                break;
+            case ONE_TO_ONE:
+                if (inputParameter.size() != nbOutputReceivers) {
+                    throw new ParameterDispatchException(
+                        "in a one-to-one distribution, the list of parameters on the client side"
+                            + "must have a size equal to the number of connected receivers");
+                }
+                result = nbOutputReceivers;
+                break;
+            case ROUND_ROBIN:
+                result = inputParameter.size();
+                break;
+            default:
+                result = BROADCAST.expectedDispatchSize(inputParameter, nbOutputReceivers);
         }
 
         return result;
@@ -171,7 +171,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
      * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#getDispatchSize(java.lang.Object, int)
      */
     public int expectedDispatchSize(Object inputParameter, int nbOutputReceivers)
-        throws ParameterDispatchException {
+            throws ParameterDispatchException {
         if (inputParameter instanceof List) {
             return expectedDispatchSize((List) inputParameter, nbOutputReceivers);
         }
@@ -182,8 +182,8 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
     /*
      * @see org.objectweb.proactive.core.component.type.annotations.collective.ParamDispatch#matchesClientSideParameterType(java.lang.reflect.Type)
      */
-    public boolean match(Type clientSideInputParameterType,
-        Type serverSideInputParameterType) throws ParameterDispatchException {
+    public boolean match(Type clientSideInputParameterType, Type serverSideInputParameterType)
+            throws ParameterDispatchException {
         boolean result = false;
         boolean clientSideParamTypeIsParameterizedType = (clientSideInputParameterType instanceof ParameterizedType);
         boolean serverSideParamTypeIsParameterizedType = (serverSideInputParameterType instanceof ParameterizedType);
@@ -198,10 +198,8 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
         if (clientSideParamTypeIsParameterizedType) {
             clientSideRawType = (Class<?>) ((ParameterizedType) clientSideInputParameterType).getRawType();
             if (!(((ParameterizedType) clientSideInputParameterType).getActualTypeArguments().length == 1)) {
-                throw new ParameterDispatchException(
-                    "client side input parameter type " +
-                    clientSideInputParameterType +
-                    " can only be parameterized with one type");
+                throw new ParameterDispatchException("client side input parameter type " +
+                    clientSideInputParameterType + " can only be parameterized with one type");
             }
             Type cType = ((ParameterizedType) clientSideInputParameterType).getActualTypeArguments()[0];
             if (cType instanceof ParameterizedType) {
@@ -213,20 +211,16 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
             if (clientSideInputParameterType instanceof Class<?>) {
                 clientSideClass = (Class<?>) clientSideInputParameterType;
             } else {
-                throw new ParameterDispatchException(
-                    "client side input parameter type " +
-                    clientSideInputParameterType +
-                    " can only be either a parameterized type or a class");
+                throw new ParameterDispatchException("client side input parameter type " +
+                    clientSideInputParameterType + " can only be either a parameterized type or a class");
             }
         }
 
         if (serverSideParamTypeIsParameterizedType) {
             serverSideRawType = ((Class<?>) ((ParameterizedType) serverSideInputParameterType).getRawType());
             if (!(((ParameterizedType) serverSideInputParameterType).getActualTypeArguments().length == 1)) {
-                throw new ParameterDispatchException(
-                    "server side input parameter type " +
-                    serverSideInputParameterType +
-                    " can only be parameterized with one type");
+                throw new ParameterDispatchException("server side input parameter type " +
+                    serverSideInputParameterType + " can only be parameterized with one type");
             }
             Type sType = ((ParameterizedType) serverSideInputParameterType).getActualTypeArguments()[0];
             if (sType instanceof ParameterizedType) {
@@ -240,45 +234,41 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
             if (serverSideInputParameterType instanceof Class<?>) {
                 serverSideClass = (Class<?>) serverSideInputParameterType;
             } else {
-                throw new ParameterDispatchException(
-                    "server side input parameter type " +
+                throw new ParameterDispatchException("server side input parameter type " +
                     serverSideInputParameterType + " is incompatible with " +
-                    "client side input parameter type " +
-                    clientSideInputParameterType);
+                    "client side input parameter type " + clientSideInputParameterType);
             }
         }
 
         switch (this) {
-        case BROADCAST:
-            if (clientSideParamTypeIsParameterizedType) {
-                if (serverSideParamTypeIsParameterizedType) {
-                    result = clientSideRawType.isAssignableFrom(serverSideRawType) &&
-                        clientSideElementsType.isAssignableFrom(clientSideElementsType);
+            case BROADCAST:
+                if (clientSideParamTypeIsParameterizedType) {
+                    if (serverSideParamTypeIsParameterizedType) {
+                        result = clientSideRawType.isAssignableFrom(serverSideRawType) &&
+                            clientSideElementsType.isAssignableFrom(clientSideElementsType);
+                    } else {
+                        result = true; // maybe this constraint should be softened
+                    }
                 } else {
-                    result = true; // maybe this constraint should be softened
+                    result = clientSideClass.isAssignableFrom(serverSideClass);
                 }
-            } else {
-                result = clientSideClass.isAssignableFrom(serverSideClass);
-            }
-            break;
-        case ONE_TO_ONE:
-            if (clientSideParamTypeIsParameterizedType) {
-                if (serverSideParamTypeIsParameterizedType) {
-                    result = clientSideElementsType.isAssignableFrom(serverSideRawType);
+                break;
+            case ONE_TO_ONE:
+                if (clientSideParamTypeIsParameterizedType) {
+                    if (serverSideParamTypeIsParameterizedType) {
+                        result = clientSideElementsType.isAssignableFrom(serverSideRawType);
+                    } else {
+                        result = clientSideElementsType.isAssignableFrom(serverSideClass);
+                    }
                 } else {
-                    result = clientSideElementsType.isAssignableFrom(serverSideClass);
+                    result = false; // maybe this constraint should be softened
                 }
-            } else {
-                result = false; // maybe this constraint should be softened
-            }
-            break;
-        case ROUND_ROBIN:
-            result = ONE_TO_ONE.match(clientSideInputParameterType,
-                    serverSideInputParameterType);
-            break;
-        default:
-            result = BROADCAST.match(clientSideInputParameterType,
-                    serverSideInputParameterType);
+                break;
+            case ROUND_ROBIN:
+                result = ONE_TO_ONE.match(clientSideInputParameterType, serverSideInputParameterType);
+                break;
+            default:
+                result = BROADCAST.match(clientSideInputParameterType, serverSideInputParameterType);
         }
 
         return result;

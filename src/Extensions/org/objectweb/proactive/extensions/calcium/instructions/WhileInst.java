@@ -50,8 +50,7 @@ public class WhileInst<P> implements Instruction<P, P> {
         this.childStack = childStack;
     }
 
-    public Task<P> compute(SkeletonSystemImpl system, Task<P> task)
-        throws Exception {
+    public Task<P> compute(SkeletonSystemImpl system, Task<P> task) throws Exception {
         Timer timer = new Timer();
 
         boolean evalCondition = cond.evalCondition(system, task.getObject());

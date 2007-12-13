@@ -52,8 +52,7 @@ public class PeerPopupMenuPlugin extends AbstractPopupGraphMousePlugin {
     SettableVertexLocationFunction vertexLocations;
     protected Display display;
 
-    public PeerPopupMenuPlugin(Display d,
-        SettableVertexLocationFunction vertexLocations) {
+    public PeerPopupMenuPlugin(Display d, SettableVertexLocationFunction vertexLocations) {
         this.vertexLocations = vertexLocations;
         this.display = d;
     }
@@ -64,55 +63,51 @@ public class PeerPopupMenuPlugin extends AbstractPopupGraphMousePlugin {
         final Point2D ivp = vv.inverseViewTransform(e.getPoint());
         PickSupport pickSupport = vv.getPickSupport();
         if (pickSupport != null) {
-            final P2PUndirectedSparseVertex vertex = (P2PUndirectedSparseVertex) pickSupport.getVertex(ivp.getX(),
-                    ivp.getY());
+            final P2PUndirectedSparseVertex vertex = (P2PUndirectedSparseVertex) pickSupport.getVertex(ivp
+                    .getX(), ivp.getY());
             JPopupMenu popup = new JPopupMenu();
             if (vertex != null) {
                 JMenu submenu = new JMenu(vertex.getName());
                 JMenu noaSubmenu = new JMenu("Noa : " + vertex.getNoa());
-                JMenu maxNoaSubmenu = new JMenu("Max Noa : " +
-                        vertex.getMaxNoa());
+                JMenu maxNoaSubmenu = new JMenu("Max Noa : " + vertex.getMaxNoa());
 
                 submenu.add(noaSubmenu);
                 submenu.add(maxNoaSubmenu);
                 popup.add(submenu);
 
                 noaSubmenu.add(new AbstractAction("Set Noa") {
-                        public void actionPerformed(ActionEvent e) {
-                            System.out.println(
-                                ".handlePopup()xxxxxxxxxxxxxxxxxxxxxxxxxxxxx display is " +
-                                display);
+                    public void actionPerformed(ActionEvent e) {
+                        System.out.println(".handlePopup()xxxxxxxxxxxxxxxxxxxxxxxxxxxxx display is " +
+                            display);
 
-                            display.asyncExec(new Runnable() {
-                                    public void run() {
-                                        new ChangeNOADialog("NOA",
-                                            vertex.getName(), vertex.getNoa(),
-                                            display.getActiveShell());
-                                        //                    	    	        	   System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ " + display.getActiveShell());
-                                    }
-                                });
+                        display.asyncExec(new Runnable() {
+                            public void run() {
+                                new ChangeNOADialog("NOA", vertex.getName(), vertex.getNoa(), display
+                                        .getActiveShell());
+                                //                    	    	        	   System.out.println("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ " + display.getActiveShell());
+                            }
+                        });
 
-                            //SetValueDialog v = new SetValueDialog("Set Value", "Noa",vertex.getNoa());
-                            //v.setVisible(true);
-                            //  System.out.println(v.getValue());
-                        }
-                    });
+                        //SetValueDialog v = new SetValueDialog("Set Value", "Noa",vertex.getNoa());
+                        //v.setVisible(true);
+                        //  System.out.println(v.getValue());
+                    }
+                });
 
                 maxNoaSubmenu.add(new AbstractAction("Set Max Noa") {
-                        public void actionPerformed(ActionEvent e) {
-                            SetValueDialog v = new SetValueDialog("Set Value",
-                                    "Max Noa", vertex.getMaxNoa());
-                            v.setVisible(true);
-                            System.out.println(v.getValue());
-                        }
-                    });
+                    public void actionPerformed(ActionEvent e) {
+                        SetValueDialog v = new SetValueDialog("Set Value", "Max Noa", vertex.getMaxNoa());
+                        v.setVisible(true);
+                        System.out.println(v.getValue());
+                    }
+                });
                 popup.add(new AbstractAction("Update") {
-                        public void actionPerformed(ActionEvent e) {
-                            //SetValueDialog v = new SetValueDialog("Set Value", "Max Noa",vertex.getMaxNoa());
-                            //	v.setVisible(true);
-                            System.out.println("Update!");
-                        }
-                    });
+                    public void actionPerformed(ActionEvent e) {
+                        //SetValueDialog v = new SetValueDialog("Set Value", "Max Noa",vertex.getMaxNoa());
+                        //	v.setVisible(true);
+                        System.out.println("Update!");
+                    }
+                });
             }
             popup.show(vv, e.getX(), e.getY());
         }

@@ -97,8 +97,7 @@ public class DomainImpl implements SecurityDomain {
         return null;
     }
 
-    public void terminateSession(long sessionID)
-        throws IOException, SecurityNotAvailableException {
+    public void terminateSession(long sessionID) throws IOException, SecurityNotAvailableException {
     }
 
     public TypedCertificate getCertificate() {
@@ -110,7 +109,7 @@ public class DomainImpl implements SecurityDomain {
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate) {
+            TypedCertificate distantCertificate) {
         return 0;
     }
 
@@ -118,21 +117,19 @@ public class DomainImpl implements SecurityDomain {
         return null;
     }
 
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
+            RenegotiateSessionException {
         return null;
     }
 
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException, KeyExchangeException {
         return null;
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException, RenegotiateSessionException {
         return null;
     }
 
@@ -141,14 +138,13 @@ public class DomainImpl implements SecurityDomain {
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException {
+            throws SecurityNotAvailableException, AccessControlException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException {
         // TODO Auto-generated method stub
     }
 }

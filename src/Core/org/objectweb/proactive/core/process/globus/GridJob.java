@@ -95,15 +95,13 @@ public class GridJob implements GramJobListener {
                 // if non-batch, then get some output back
                 if (!m_batch) {
                     newRSL = "&" + RSL.substring(0, RSL.indexOf('&')) +
-                        "(rsl_substitution=(GLOBUSRUN_GASS_URL " + m_gassURL +
-                        "))" +
+                        "(rsl_substitution=(GLOBUSRUN_GASS_URL " + m_gassURL + "))" +
                         RSL.substring(RSL.indexOf('&') + 1, RSL.length()) +
                         "(stdout=$(GLOBUSRUN_GASS_URL)/dev/stdout-5)(stderr=$(GLOBUSRUN_GASS_URL)/dev/sterr-5)";
                     //newRSL = RSL;
                 } else {
                     //	   format batching RSL so output can be retrieved later on using any GTK commands
-                    newRSL = RSL +
-                        "(stdout=x-gass-cache://$(GLOBUS_GRAM_JOB_CONTACT)stdout anExtraTag)" +
+                    newRSL = RSL + "(stdout=x-gass-cache://$(GLOBUS_GRAM_JOB_CONTACT)stdout anExtraTag)" +
                         "(stderr=x-gass-cache://$(GLOBUS_GRAM_JOB_CONTACT)stderr anExtraTag)";
                 }
             } else {
@@ -146,8 +144,7 @@ public class GridJob implements GramJobListener {
                 m_gassServer.unregisterJobOutputStream("out-5");
             }
 
-            m_jobOutput = "Error submitting job: " + ex.getClass() + ":" +
-                ex.getMessage();
+            m_jobOutput = "Error submitting job: " + ex.getClass() + ":" + ex.getMessage();
             ex.printStackTrace();
         }
 

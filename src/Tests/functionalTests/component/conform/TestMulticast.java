@@ -65,12 +65,10 @@ public class TestMulticast extends Conformtest {
     protected ComponentType tMaster;
     protected ComponentType tBadMaster;
     protected ComponentType tSlave;
-    protected final static String serverMaster = "server/" +
-        Master.class.getName() + "/false,false,false";
-    protected final static String serverSlave = "server-multicast/" + PKG +
-        ".Slave/false,false,false";
-    protected final static String clientSlaveMulticast = MasterImpl.ITF_CLIENTE_MULTICAST +
-        "/" + PKG + ".SlaveMulticast/true,false,false";
+    protected final static String serverMaster = "server/" + Master.class.getName() + "/false,false,false";
+    protected final static String serverSlave = "server-multicast/" + PKG + ".Slave/false,false,false";
+    protected final static String clientSlaveMulticast = MasterImpl.ITF_CLIENTE_MULTICAST + "/" + PKG +
+        ".SlaveMulticast/true,false,false";
 
     // -------------------------------------------------------------------------
     // Constructor ans setup
@@ -82,19 +80,14 @@ public class TestMulticast extends Conformtest {
         ptf = (ProActiveTypeFactory) tf;
         gf = Fractal.getGenericFactory(boot);
         tMaster = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("server", Master.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE),
-                    ptf.createFcItfType(MasterImpl.ITF_CLIENTE_MULTICAST,
-                        SlaveMulticast.class.getName(), TypeFactory.CLIENT,
-                        TypeFactory.MANDATORY,
-                        ProActiveTypeFactory.MULTICAST_CARDINALITY)
-                });
-        tSlave = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("server-multicast",
-                        Slave.class.getName(), TypeFactory.SERVER,
+                tf.createFcItfType("server", Master.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                });
+                ptf
+                        .createFcItfType(MasterImpl.ITF_CLIENTE_MULTICAST, SlaveMulticast.class.getName(),
+                                TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                                ProActiveTypeFactory.MULTICAST_CARDINALITY) });
+        tSlave = tf.createFcType(new InterfaceType[] { tf.createFcItfType("server-multicast", Slave.class
+                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), });
     }
 
     // -------------------------------------------------------------------------
@@ -102,49 +95,33 @@ public class TestMulticast extends Conformtest {
     // -------------------------------------------------------------------------
     @Test
     public void testPrimitiveWithMulticast() throws Exception {
-        Component master = gf.newFcInstance(tMaster, "primitive",
-                MasterImpl.class.getName());
-        checkComponent(master,
-            new HashSet<Object>(Arrays.asList(
-                    new Object[] {
-                        COMP, BC, LC, SC, NC, CP, MCC, GC, MC, serverMaster,
-                        clientSlaveMulticast
-                    })));
-        Component slave = gf.newFcInstance(tSlave, "primitive",
-                SlaveImpl.class.getName());
-        checkComponent(slave,
-            new HashSet<Object>(Arrays.asList(
-                    new Object[] { COMP, LC, SC, NC, CP, MCC, GC, MC, serverSlave })));
+        Component master = gf.newFcInstance(tMaster, "primitive", MasterImpl.class.getName());
+        checkComponent(master, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, CP,
+                MCC, GC, MC, serverMaster, clientSlaveMulticast })));
+        Component slave = gf.newFcInstance(tSlave, "primitive", SlaveImpl.class.getName());
+        checkComponent(slave, new HashSet<Object>(Arrays.asList(new Object[] { COMP, LC, SC, NC, CP, MCC, GC,
+                MC, serverSlave })));
     }
 
     @Test
     public void testCompositeWithMulticast() throws Exception {
         Component master = gf.newFcInstance(tMaster, "composite", null);
-        checkComponent(master,
-            new HashSet<Object>(Arrays.asList(
-                    new Object[] {
-                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, serverMaster,
-                        clientSlaveMulticast
-                    })));
+        checkComponent(master, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, CP,
+                MCC, GC, MC, serverMaster, clientSlaveMulticast })));
         Component slave = gf.newFcInstance(tSlave, "composite", null);
-        checkComponent(slave,
-            new HashSet<Object>(Arrays.asList(
-                    new Object[] {
-                        COMP, BC, CC, LC, SC, NC, CP, MCC, GC, MC, serverSlave
-                    })));
+        checkComponent(slave, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, CP,
+                MCC, GC, MC, serverSlave })));
     }
 
     @Test(expected = InstantiationException.class)
     public void testItfTypeWithBadMulticastItf() throws Exception {
         tBadMaster = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("server", Master.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE),
-                    ptf.createFcItfType("client-multicast",
-                        BadSlaveMulticast.class.getName(), TypeFactory.CLIENT,
-                        TypeFactory.MANDATORY,
-                        ProActiveTypeFactory.MULTICAST_CARDINALITY)
-                });
+                tf.createFcItfType("server", Master.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                ptf
+                        .createFcItfType("client-multicast", BadSlaveMulticast.class.getName(),
+                                TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                                ProActiveTypeFactory.MULTICAST_CARDINALITY) });
     }
 
     // -------------------------------------------------------------------------
@@ -152,19 +129,14 @@ public class TestMulticast extends Conformtest {
     // -------------------------------------------------------------------------
     @Test
     public void testRoundRobinParameterDispatch() throws Exception {
-        Component master = gf.newFcInstance(tMaster, "primitive",
-                MasterImpl.class.getName());
-        Component slave1 = gf.newFcInstance(tSlave, "primitive",
-                SlaveImpl.class.getName());
-        Component slave2 = gf.newFcInstance(tSlave, "primitive",
-                SlaveImpl.class.getName());
+        Component master = gf.newFcInstance(tMaster, "primitive", MasterImpl.class.getName());
+        Component slave1 = gf.newFcInstance(tSlave, "primitive", SlaveImpl.class.getName());
+        Component slave2 = gf.newFcInstance(tSlave, "primitive", SlaveImpl.class.getName());
 
-        Fractal.getBindingController(master)
-               .bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
-            slave1.getFcInterface("server-multicast"));
-        Fractal.getBindingController(master)
-               .bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
-            slave2.getFcInterface("server-multicast"));
+        Fractal.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
+                slave1.getFcInterface("server-multicast"));
+        Fractal.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
+                slave2.getFcInterface("server-multicast"));
 
         Fractal.getLifeCycleController(master).startFc();
         Fractal.getLifeCycleController(slave1).startFc();
@@ -177,8 +149,7 @@ public class TestMulticast extends Conformtest {
             masterItf.computeOneWay(stringList, "OneWay call");
         }
         for (List<String> stringList : listOfParameters) {
-            List<StringWrapper> results = masterItf.computeAsync(stringList,
-                    "Asynchronous call");
+            List<StringWrapper> results = masterItf.computeAsync(stringList, "Asynchronous call");
             ArrayList<String> resultsAL = new ArrayList<String>();
             for (StringWrapper sw : results) {
                 Assert.assertNotNull("One result is null", sw);
@@ -213,8 +184,7 @@ public class TestMulticast extends Conformtest {
         return multicastArgsList;
     }
 
-    private static void checkResult(List<String> args, String other,
-        ArrayList<String> results) {
+    private static void checkResult(List<String> args, String other, ArrayList<String> results) {
         Slave mySlave = new SlaveImpl();
         ArrayList<String> expectedResults = new ArrayList<String>(args.size());
 

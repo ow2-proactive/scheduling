@@ -97,8 +97,7 @@ public class PiBBP implements Serializable {
      * @return The value of PI
      */
     public String runSimple() {
-        System.out.println(
-            "No deployment : computation will take place on the current node.");
+        System.out.println("No deployment : computation will take place on the current node.");
         System.out.println("Starting computation ...");
         long timeAtBeginningOfComputation = System.currentTimeMillis();
 
@@ -114,8 +113,7 @@ public class PiBBP implements Serializable {
 
         // display results
         System.out.println("Computation finished ...");
-        System.out.println("Computed PI value is : " +
-            result.getNumericalResult().toString());
+        System.out.println("Computed PI value is : " + result.getNumericalResult().toString());
 
         System.out.println("Time waiting for result : " +
             (timeAtEndOfComputation - timeAtBeginningOfComputation) + " ms");
@@ -129,11 +127,8 @@ public class PiBBP implements Serializable {
     public String runParallel() {
         try {
             // create a group of computers on the current host
-            piComputer = (PiComputer) PAGroup.newGroup(PiComputer.class.getName(),
-                    new Object[][] {
-                        new Object[] { new Integer(nbDecimals_) },
-                        new Object[] { new Integer(nbDecimals_) }
-                    });
+            piComputer = (PiComputer) PAGroup.newGroup(PiComputer.class.getName(), new Object[][] {
+                    new Object[] { new Integer(nbDecimals_) }, new Object[] { new Integer(nbDecimals_) } });
 
             return computeOnGroup(piComputer);
         } catch (Exception e) {
@@ -153,24 +148,21 @@ public class PiBBP implements Serializable {
             // *************************************************************/
             System.out.println("\nStarting deployment of virtual nodes");
             // parse the descriptor file
-            deploymentDescriptor_ = PADeployment.getProactiveDescriptor(
-                    "../descriptors/" + deploymentDescriptorLocation_);
+            deploymentDescriptor_ = PADeployment.getProactiveDescriptor("../descriptors/" +
+                deploymentDescriptorLocation_);
             deploymentDescriptor_.activateMappings();
-            VirtualNode computersVN = deploymentDescriptor_.getVirtualNode(
-                    "computers-vn");
+            VirtualNode computersVN = deploymentDescriptor_.getVirtualNode("computers-vn");
 
             //            // create the remote nodes for the virtual node computersVN
             //           computersVN.activate();
             //*************************************************************
             // * creation of active objects on the remote nodes
             // *************************************************************/
-            System.out.println(
-                "\nCreating a group of computers on the given virtual node ...");
+            System.out.println("\nCreating a group of computers on the given virtual node ...");
 
             // create a group of computers on the virtual node computersVN
             piComputer = (PiComputer) PAGroup.newGroupInParallel(PiComputer.class.getName(),
-                    new Object[] { new Integer(nbDecimals_) },
-                    computersVN.getNodes());
+                    new Object[] { new Integer(nbDecimals_) }, computersVN.getNodes());
 
             return computeOnGroup(piComputer);
         } catch (Exception e) {
@@ -205,14 +197,14 @@ public class PiBBP implements Serializable {
             context.put("deployment-descriptor", deploymentDescriptor);
             deploymentDescriptor.activateMappings();
             int nbNodes = deploymentDescriptor.getVirtualNode("computers-vn")
-                                              .getNumberOfCreatedNodesAfterDeployment();
+                    .getNumberOfCreatedNodesAfterDeployment();
 
             /*Determing intervals to send for computation*/
             List<Interval> intervals = PiUtil.dividePIList(nbNodes, nbDecimals_);
 
             /*Master component creation*/
-            Component master = (Component) f.newComponent("org.objectweb.proactive.examples.pi.fractal.PiBBPWrapper",
-                    null);
+            Component master = (Component) f.newComponent(
+                    "org.objectweb.proactive.examples.pi.fractal.PiBBPWrapper", null);
 
             /*Creation of worker components, depending on the number of deployed nodes*/
             Component worker;
@@ -220,9 +212,8 @@ public class PiBBP implements Serializable {
             for (int i = 0; i < nbNodes; i++) {
                 worker = (Component) f.newComponent("org.objectweb.proactive.examples.pi.fractal.PiComputer",
                         context);
-                Fractal.getBindingController(master)
-                       .bindFc("multicastDispatcher",
-                    worker.getFcInterface("computation")); /*Master component is bound to each worker, with its client multicast interface*/
+                Fractal.getBindingController(master).bindFc("multicastDispatcher",
+                        worker.getFcInterface("computation")); /*Master component is bound to each worker, with its client multicast interface*/
                 workers.add(worker);
             }
 
@@ -264,8 +255,7 @@ public class PiBBP implements Serializable {
      */
     public String computeOnGroup(PiComp piComputers) {
         int nbNodes = PAGroup.getGroup(piComputers).size();
-        System.out.println("\nUsing " + nbNodes +
-            " PiComputers for the computation\n");
+        System.out.println("\nUsing " + nbNodes + " PiComputers for the computation\n");
 
         // distribution of the intervals to the computers is handled in
         // a private method
@@ -304,16 +294,16 @@ public class PiBBP implements Serializable {
         // * results
         // *************************************************************/
         System.out.println("\nComputation finished ...");
-        System.out.println("Computed PI value is : " +
-            total.getNumericalResult().toString());
+        System.out.println("Computed PI value is : " + total.getNumericalResult().toString());
         System.out.println("Time waiting for result : " +
             (timeAtEndOfComputation - timeAtBeginningOfComputation) + " ms");
-        System.out.println("Cumulated time from all computers is : " +
-            total.getComputationTime() + " ms");
-        System.out.println("Ratio for " + resultsGroup.size() +
-            " processors is : " +
-            (((double) total.getComputationTime() / ((double) (timeAtEndOfComputation -
-            timeAtBeginningOfComputation))) * 100) + " %");
+        System.out.println("Cumulated time from all computers is : " + total.getComputationTime() + " ms");
+        System.out
+                .println("Ratio for " +
+                    resultsGroup.size() +
+                    " processors is : " +
+                    (((double) total.getComputationTime() / ((double) (timeAtEndOfComputation - timeAtBeginningOfComputation))) * 100) +
+                    " %");
         return total.getNumericalResult().toString();
     }
 
@@ -322,29 +312,28 @@ public class PiBBP implements Serializable {
      *
      */
     public void start() {
-        System.out.println("Evaluation of Pi will be performed with " +
-            nbDecimals_ + " decimals");
+        System.out.println("Evaluation of Pi will be performed with " + nbDecimals_ + " decimals");
 
         switch (run_) {
-        case (SIMPLE):
-            runSimple();
-            break;
-        case (PARALLEL):
-            runParallel();
-            break;
-        case (PARALLEL_DISTRIBUTED):
-            runParallelDistributed();
-            try {
-                deploymentDescriptor_.killall(false);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            break;
-        case (COMPONENT):
-            runComponent();
-            break;
-        default:
-            runSimple();
+            case (SIMPLE):
+                runSimple();
+                break;
+            case (PARALLEL):
+                runParallel();
+                break;
+            case (PARALLEL_DISTRIBUTED):
+                runParallelDistributed();
+                try {
+                    deploymentDescriptor_.killall(false);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            case (COMPONENT):
+                runComponent();
+                break;
+            default:
+                runSimple();
         }
     }
 
@@ -356,12 +345,10 @@ public class PiBBP implements Serializable {
                     new Object[] { args });
 
             if (piApplication.isWebService()) {
-                WebServices.exposeAsWebService(piApplication,
-                    "http://localhost:8080/", "piComputation",
-                    new String[] {
-                        "runSimple", "runParallel", "runParallelDistributed",
-                        "setNbDecimals"
-                    });
+                WebServices
+                        .exposeAsWebService(piApplication, "http://localhost:8080/", "piComputation",
+                                new String[] { "runSimple", "runParallel", "runParallelDistributed",
+                                        "setNbDecimals" });
             } else {
                 piApplication.start();
             }
@@ -391,23 +378,23 @@ public class PiBBP implements Serializable {
             run_ = new Integer(args[1]).intValue();
             int deployment = new Integer(args[2]).intValue();
             switch (deployment) {
-            case 1:
-                deploymentDescriptorLocation_ = "localhost.xml";
-                break;
-            case 2:
-                deploymentDescriptorLocation_ = "LAN.xml";
-                break;
-            case 3:
-                deploymentDescriptorLocation_ = "sophia-infra-p2p.xml";
-                break;
-            case 4:
-                deploymentDescriptorLocation_ = "sophia-cluster.xml";
-                break;
-            case 5:
-                deploymentDescriptorLocation_ = "custom-descriptor.xml";
-                break;
-            default:
-                deploymentDescriptorLocation_ = "localhost.xml";
+                case 1:
+                    deploymentDescriptorLocation_ = "localhost.xml";
+                    break;
+                case 2:
+                    deploymentDescriptorLocation_ = "LAN.xml";
+                    break;
+                case 3:
+                    deploymentDescriptorLocation_ = "sophia-infra-p2p.xml";
+                    break;
+                case 4:
+                    deploymentDescriptorLocation_ = "sophia-cluster.xml";
+                    break;
+                case 5:
+                    deploymentDescriptorLocation_ = "custom-descriptor.xml";
+                    break;
+                default:
+                    deploymentDescriptorLocation_ = "localhost.xml";
             }
         }
     }

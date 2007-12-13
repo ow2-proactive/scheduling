@@ -79,18 +79,15 @@ public abstract class AbstractCopyProtocol implements CopyProtocol {
         this.isDefaultProtocol = isDefaultProtocol;
     }
 
-    public void setFileTransferDefinitions(
-        FileTransferDefinition[] fileTransfer) {
+    public void setFileTransferDefinitions(FileTransferDefinition[] fileTransfer) {
         this.fileTransfer = fileTransfer;
     }
 
-    public void setSrcInfo(
-        FileTransferWorkShop.StructureInformation srcInfoParams) {
+    public void setSrcInfo(FileTransferWorkShop.StructureInformation srcInfoParams) {
         this.srcInfoParams = srcInfoParams;
     }
 
-    public void setDstInfo(
-        FileTransferWorkShop.StructureInformation dstInfoParams) {
+    public void setDstInfo(FileTransferWorkShop.StructureInformation dstInfoParams) {
         this.dstInfoParams = dstInfoParams;
     }
 

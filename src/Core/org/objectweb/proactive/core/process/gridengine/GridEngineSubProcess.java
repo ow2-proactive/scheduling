@@ -62,9 +62,8 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  */
 public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
     public final static String DEFAULT_QSUBPATH = "/opt/gridengine/bin/glinux/qsub";
-    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + File.separator + "ProActive" + File.separator +
-        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home") + File.separator +
+        "ProActive" + File.separator + "scripts" + File.separator + "unix" + File.separator + "cluster" +
         File.separator + "gridEngineStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected static final String DEFAULT_PARALLEL_ENVIRONMENT = null;
@@ -280,8 +279,7 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
             qsubCommand.append("-e ").append(errorFile).append(" ");
         }
 
-        if ((this.parallelEnvironment != null) &&
-                (this.parallelEnvironment.length() > 0)) {
+        if ((this.parallelEnvironment != null) && (this.parallelEnvironment.length() > 0)) {
             qsubCommand.append("-pe ").append(parallelEnvironment).append(" ");
 
             if ((this.hostNumber != null) && (this.hostNumber.length() > 0)) {
@@ -291,8 +289,8 @@ public class GridEngineSubProcess extends AbstractExternalProcessDecorator {
             }
         } else {
             if ((this.hostNumber != null) && (this.hostNumber.length() > 0)) {
-                logger.warn(
-                    "You specified hostNumber without a parallelEnvironment. Your job will fail. Please update your schema");
+                logger
+                        .warn("You specified hostNumber without a parallelEnvironment. Your job will fail. Please update your schema");
             }
         }
 

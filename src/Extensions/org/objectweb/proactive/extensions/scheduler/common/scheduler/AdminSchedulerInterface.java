@@ -48,16 +48,15 @@ import org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface;
 public interface AdminSchedulerInterface extends UserSchedulerInterface {
 
     /**
-    * Change the policy of the scheduler.<br>
-    * This method will immediately change the policy and so the whole scheduling process.
-    *
-    * @param newPolicyFile the new policy file as a string.
-    * @return true if the policy has been correctly change, false if not.
-    * @throws SchedulerException (can be due to insufficient permission)
-    */
-    public BooleanWrapper changePolicy(
-        Class<?extends PolicyInterface> newPolicyFile)
-        throws SchedulerException;
+     * Change the policy of the scheduler.<br>
+     * This method will immediately change the policy and so the whole scheduling process.
+     *
+     * @param newPolicyFile the new policy file as a string.
+     * @return true if the policy has been correctly change, false if not.
+     * @throws SchedulerException (can be due to insufficient permission)
+     */
+    public BooleanWrapper changePolicy(Class<? extends PolicyInterface> newPolicyFile)
+            throws SchedulerException;
 
     /**
      * Start the scheduler.

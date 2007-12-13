@@ -43,8 +43,7 @@ import org.objectweb.proactive.core.jmx.ProActiveConnection;
 import org.objectweb.proactive.examples.jmx.remote.management.client.entities.ManageableEntity;
 
 
-public class ActiveNotificationListener implements Serializable,
-    NotificationListener {
+public class ActiveNotificationListener implements Serializable, NotificationListener {
 
     /**
      *
@@ -64,9 +63,8 @@ public class ActiveNotificationListener implements Serializable,
         ObjectName name = entity.getObjectName();
         ProActiveConnection connection = entity.getConnection();
         try {
-            connection.addNotificationListener(name,
-                (NotificationListener) PAActiveObject.getStubOnThis(), null,
-                null);
+            connection.addNotificationListener(name, (NotificationListener) PAActiveObject.getStubOnThis(),
+                    null, null);
         } catch (InstanceNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

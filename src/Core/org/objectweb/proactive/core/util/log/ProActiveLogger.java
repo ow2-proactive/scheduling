@@ -52,8 +52,7 @@ public class ProActiveLogger extends Logger {
     static {
         if (System.getProperty("log4j.configuration") == null) {
             try {
-                InputStream in = PAProperties.class.getResourceAsStream(
-                        "proactive-log4j");
+                InputStream in = PAProperties.class.getResourceAsStream("proactive-log4j");
 
                 // testing the availability of the file
                 Properties p = new Properties();
@@ -61,8 +60,8 @@ public class ProActiveLogger extends Logger {
                 PropertyConfigurator.configure(p);
             } catch (Exception e) {
                 URL u = PAProperties.class.getResource("proactive-log4j");
-                System.err.println("the default log4j configuration file (" +
-                    u + ") is not accessible, logging is disabled");
+                System.err.println("the default log4j configuration file (" + u +
+                    ") is not accessible, logging is disabled");
             }
         }
     }

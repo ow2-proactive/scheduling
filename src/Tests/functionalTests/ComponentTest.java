@@ -65,7 +65,6 @@ public abstract class ComponentTest extends FunctionalTest {
         }
 
         //-Dfractal.provider=org.objectweb.proactive.core.component.Fractive
-        PAProperties.FRACTAL_PROVIDER.setValue(
-            "org.objectweb.proactive.core.component.Fractive");
+        PAProperties.FRACTAL_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
     }
 }

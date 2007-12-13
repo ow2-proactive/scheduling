@@ -63,30 +63,26 @@ public class MultEventListener implements MSEventListener {
         GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
         if (sciTaskInfo.getState() != GenTaskInfo.SUCCEEDED) {
             if (sciTaskInfo.getState() == GenTaskInfo.ABORTED) {
-                System.out.println("---------------- Task:" +
-                    sciTaskInfo.getIdTask() + " ABORT -----------------");
+                System.out.println("---------------- Task:" + sciTaskInfo.getIdTask() +
+                    " ABORT -----------------");
             }
 
             return;
         }
 
-        System.out.println("IDTASK: " + sciTaskInfo.getIdTask() + " IDRES: " +
-            res.getName());
+        System.out.println("IDTASK: " + sciTaskInfo.getIdTask() + " IDRES: " + res.getName());
         if (!sciTaskInfo.getIdTask().startsWith(res.getName())) {
             return;
         }
 
         service.removeTask(sciTaskInfo.getIdTask());
 
-        System.out.println("---------------- Task:" + sciTaskInfo.getIdTask() +
-            " SUCCESS -----------------");
+        System.out.println("---------------- Task:" + sciTaskInfo.getIdTask() + " SUCCESS -----------------");
 
         GeneralResult sciResult = sciTaskInfo.getResult();
 
         //System.out.println(sciTaskInfo.getTimeGlobal() +" " + sciResult.getTimeExecution());
-        SciDoubleMatrix sciSubMatrix = (SciDoubleMatrix) sciResult.getList()
-                                                                  .get(0)
-                                                                  .getData();
+        SciDoubleMatrix sciSubMatrix = (SciDoubleMatrix) sciResult.getList().get(0).getData();
         int iTask = Integer.parseInt(sciSubMatrix.getName().substring(1));
         double[] subMatrix = sciSubMatrix.getData();
 

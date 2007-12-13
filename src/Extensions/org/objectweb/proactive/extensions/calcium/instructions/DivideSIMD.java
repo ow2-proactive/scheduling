@@ -64,8 +64,7 @@ public class DivideSIMD<P, X> implements Instruction<P, X> {
         this.instruction = instruction;
     }
 
-    public Task<X> compute(SkeletonSystemImpl system, Task<P> parent)
-        throws Exception {
+    public Task<X> compute(SkeletonSystemImpl system, Task<P> parent) throws Exception {
         Timer timer = new Timer();
 
         Collection<X> childObjects = div.divide(system, parent.getObject());

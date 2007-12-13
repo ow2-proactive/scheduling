@@ -58,8 +58,7 @@ import org.objectweb.proactive.examples.c3d.Dispatcher;
 /** A dialog with two text fields, which handles incorrect entries.
  * It is used to select a dispatcher host and a user name.
  * Inspired from the java Swing Dialog tutorial */
-public class NameAndHostDialog extends JDialog implements ActionListener,
-    PropertyChangeListener {
+public class NameAndHostDialog extends JDialog implements ActionListener, PropertyChangeListener {
     private String userName = "Bob";
     private JTextField userTextField;
     protected JTextField hostNameTextField;
@@ -83,38 +82,35 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         this.hostNameTextField.addActionListener(this);
 
         //Create an array of the text and components to be displayed.
-        Object[] array = {
-                "Please enter your name,", this.userTextField,
-                "and the C3DDispatcher host", this.hostNameTextField
-            };
+        Object[] array = { "Please enter your name,", this.userTextField, "and the C3DDispatcher host",
+                this.hostNameTextField };
 
         //Create an array specifying the number of dialog buttons and their text.
         Object[] options = { this.enterButtonString, this.cancelButtonString };
 
         //Create the JOptionPane.
-        this.optionPane = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE,
-                JOptionPane.YES_NO_OPTION, null, options, options[0]);
+        this.optionPane = new JOptionPane(array, JOptionPane.PLAIN_MESSAGE, JOptionPane.YES_NO_OPTION, null,
+            options, options[0]);
 
         //Make this dialog display it.
         setContentPane(this.optionPane);
 
         //Handle window closing correctly.
         addWindowListener(new WindowAdapter() {
-                @Override
-                public void windowClosing(WindowEvent we) {
-                    // handle closing behavior in propertyChange ()
-                    NameAndHostDialog.this.optionPane.setValue(new Integer(
-                            JOptionPane.CLOSED_OPTION));
-                }
-            });
+            @Override
+            public void windowClosing(WindowEvent we) {
+                // handle closing behavior in propertyChange ()
+                NameAndHostDialog.this.optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
+            }
+        });
 
         //Ensure the text field always gets the first focus.
         addComponentListener(new ComponentAdapter() {
-                @Override
-                public void componentShown(ComponentEvent ce) {
-                    NameAndHostDialog.this.userTextField.requestFocusInWindow();
-                }
-            });
+            @Override
+            public void componentShown(ComponentEvent ce) {
+                NameAndHostDialog.this.userTextField.requestFocusInWindow();
+            }
+        });
 
         //Register an event handler that reacts to option pane state changes.
         this.optionPane.addPropertyChangeListener(this);
@@ -133,8 +129,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         String prop = event.getPropertyName();
 
         if (isVisible() && (event.getSource() == this.optionPane) &&
-                (JOptionPane.VALUE_PROPERTY.equals(prop) ||
-                JOptionPane.INPUT_VALUE_PROPERTY.equals(prop))) {
+            (JOptionPane.VALUE_PROPERTY.equals(prop) || JOptionPane.INPUT_VALUE_PROPERTY.equals(prop))) {
             Object value = this.optionPane.getValue();
 
             if (value == JOptionPane.UNINITIALIZED_VALUE) {
@@ -171,8 +166,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         this.c3dDispatcher = null;
         // First try with the provided url, if the user entered the exact url for the dispatcher
         try {
-            this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class.getName(),
-                    url);
+            this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class.getName(), url);
             setVisible(false);
             return;
         } catch (Exception e) {
@@ -185,9 +179,8 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
             hostName = URIBuilder.getHostNameFromUrl(url);
             registeredObjects = PAActiveObject.listActive(url);
         } catch (IOException e) {
-            treatException(e,
-                "Sorry, could not find a registered C3DDispatcher on host \"" +
-                hostName + "\".");
+            treatException(e, "Sorry, could not find a registered C3DDispatcher on host \"" + hostName +
+                "\".");
             return;
         }
 
@@ -197,31 +190,27 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
 
             if (name.equals("Dispatcher") && (name.indexOf("_VN") == -1)) { // replace by (java 1.5 String.contains)
                 try {
-                    this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class.getName(),
-                            registeredObjects[i]);
+                    this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class
+                            .getName(), registeredObjects[i]);
                     setVisible(false);
                     return;
                 } catch (ActiveObjectCreationException e) {
-                    treatException(e,
-                        "Sorry, could not create stub for C3DDispatcher on host \"" +
-                        hostName + "\".");
+                    treatException(e, "Sorry, could not create stub for C3DDispatcher on host \"" + hostName +
+                        "\".");
                 } catch (IOException e) {
                 }
             }
         }
 
-        treatException(new IOException(
-                "No such Active Object in registered Active Objects."),
-            "Sorry, could not find a registered Dispatcher on host \"" +
-            hostName + "\".");
+        treatException(new IOException("No such Active Object in registered Active Objects."),
+                "Sorry, could not find a registered Dispatcher on host \"" + hostName + "\".");
     }
 
     /** Take action against failed connections to Dispatcher. */
     protected void treatException(Exception exception, String message) {
         this.hostNameTextField.selectAll();
-        JOptionPane.showMessageDialog(NameAndHostDialog.this,
-            message + "\nError is \n " + exception.getMessage(), "Try again",
-            JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(NameAndHostDialog.this, message + "\nError is \n " +
+            exception.getMessage(), "Try again", JOptionPane.ERROR_MESSAGE);
         this.hostNameTextField.requestFocusInWindow();
     }
 
@@ -246,14 +235,13 @@ public class NameAndHostDialog extends JDialog implements ActionListener,
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
         if (!protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            port = Integer.parseInt(ProActiveConfiguration.getInstance()
-                                                          .getProperty("proactive." +
-                        protocol + ".port"));
+            port = Integer.parseInt(ProActiveConfiguration.getInstance().getProperty(
+                    "proactive." + protocol + ".port"));
         }
 
-        localhost = URIBuilder.buildURI(URIBuilder.getHostNameorIP(
-                    ProActiveInet.getInstance().getInetAddress()), null, null,
-                port).toString();
+        localhost = URIBuilder.buildURI(
+                URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress()), null, null, port)
+                .toString();
 
         return localhost;
     }

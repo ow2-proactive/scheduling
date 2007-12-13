@@ -68,8 +68,7 @@ import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
 @PublicAPI
-public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
-    java.io.Serializable {
+public class ProxyForGroup extends AbstractProxy implements Proxy, Group, java.io.Serializable {
 
     /** The logger for the Class */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.GROUPS);
@@ -107,8 +106,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     private boolean autoPurge = false;
 
     /* ----------------------- CONSTRUCTORS ----------------------- */
-    public ProxyForGroup(String nameOfClass)
-        throws ConstructionOfReifiedObjectFailedException {
+    public ProxyForGroup(String nameOfClass) throws ConstructionOfReifiedObjectFailedException {
         this();
         this.className = nameOfClass;
     }
@@ -120,8 +118,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         this.elementNames = new HashMap();
     }
 
-    public ProxyForGroup(ConstructorCall c, Object[] p)
-        throws ConstructionOfReifiedObjectFailedException {
+    public ProxyForGroup(ConstructorCall c, Object[] p) throws ConstructionOfReifiedObjectFailedException {
         this();
     }
 
@@ -204,29 +201,25 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * typed group</b>.
      * @throws InvocationTargetException if a problem occurs when invoking the method on the members of the Group
      */
-    public synchronized Object reify(MethodCall mc)
-        throws InvocationTargetException {
+    public synchronized Object reify(MethodCall mc) throws InvocationTargetException {
         //System.out.println("A method is called : \"" + mc.getName() + "\" on " + this.memberList.size() + " membres.");
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.startXAndDisable(PAActiveObject.getBodyOnThis()
-                                                          .getID(),
-                ((mc.isOneWayCall() ||
-                (mc.getReifiedMethod().getReturnType() == Void.TYPE))
-                ? TimerWarehouse.GROUP_ONE_WAY_CALL
-                : TimerWarehouse.GROUP_ASYNC_CALL));
+            TimerWarehouse
+                    .startXAndDisable(
+                            PAActiveObject.getBodyOnThis().getID(),
+                            ((mc.isOneWayCall() || (mc.getReifiedMethod().getReturnType() == Void.TYPE)) ? TimerWarehouse.GROUP_ONE_WAY_CALL
+                                    : TimerWarehouse.GROUP_ASYNC_CALL));
         }
 
         ExceptionListException exceptionList = null;
 
         /* if the method called is toString, apply it to the proxy, not to the members */
-        if (("toString".equals(mc.getName())) &&
-                (mc.getNumberOfParameter() == 0)) {
+        if (("toString".equals(mc.getName())) && (mc.getNumberOfParameter() == 0)) {
             return this.toString();
         }
 
         /* if the method called is hashCode, apply it to the proxy, not to the members */
-        if (("hashCode".equals(mc.getName())) &&
-                (mc.getNumberOfParameter() == 0)) {
+        if (("hashCode".equals(mc.getName())) && (mc.getNumberOfParameter() == 0)) {
             return new Integer(this.hashCode());
         }
 
@@ -262,11 +255,9 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         this.threadpool.complete();
 
         if (Profiling.TIMERS_COMPILED) {
-            TimerWarehouse.enableAndStopX(PAActiveObject.getBodyOnThis().getID(),
-                ((mc.isOneWayCall() ||
-                (mc.getReifiedMethod().getReturnType() == Void.TYPE))
-                ? TimerWarehouse.GROUP_ONE_WAY_CALL
-                : TimerWarehouse.GROUP_ASYNC_CALL));
+            TimerWarehouse.enableAndStopX(PAActiveObject.getBodyOnThis().getID(), ((mc.isOneWayCall() || (mc
+                    .getReifiedMethod().getReturnType() == Void.TYPE)) ? TimerWarehouse.GROUP_ONE_WAY_CALL
+                    : TimerWarehouse.GROUP_ASYNC_CALL));
         }
 
         /*
@@ -304,8 +295,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param mc the MethodCall to be applied on each member of the Group.
      * @return the result of the call.
      */
-    protected Object asynchronousCallOnGroup(MethodCall mc)
-        throws InvocationTargetException {
+    protected Object asynchronousCallOnGroup(MethodCall mc) throws InvocationTargetException {
         Object result;
         Body body = PAActiveObject.getBodyOnThis();
 
@@ -315,25 +305,20 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
             Object[] paramProxy = new Object[0];
             Type t = mc.getReifiedMethod().getGenericReturnType();
             if (t instanceof TypeVariable) {
-                returnTypeClassName = mc.getGenericTypesMapping().get(t)
-                                        .getName();
+                returnTypeClassName = mc.getGenericTypesMapping().get(t).getName();
             } else {
-                returnTypeClassName = mc.getReifiedMethod().getReturnType()
-                                        .getName();
+                returnTypeClassName = mc.getReifiedMethod().getReturnType().getName();
             }
 
-            result = MOP.newInstance(returnTypeClassName, null, null,
-                    ProxyForGroup.class.getName(), paramProxy);
+            result = MOP.newInstance(returnTypeClassName, null, null, ProxyForGroup.class.getName(),
+                    paramProxy);
 
             ((ProxyForGroup) ((StubObject) result).getProxy()).className = returnTypeClassName;
         } catch (ClassNotReifiableException e1) {
-            throw new InvocationTargetException(e1,
-                "Method " + mc.getReifiedMethod().toGenericString() +
-                " : cannot return a group of results for the non reifiable type " +
-                returnTypeClassName);
+            throw new InvocationTargetException(e1, "Method " + mc.getReifiedMethod().toGenericString() +
+                " : cannot return a group of results for the non reifiable type " + returnTypeClassName);
         } catch (Exception e2) {
-            throw new InvocationTargetException(e2,
-                "Method " + mc.getReifiedMethod().toGenericString() +
+            throw new InvocationTargetException(e2, "Method " + mc.getReifiedMethod().toGenericString() +
                 " : cannot create group of results");
         }
 
@@ -351,26 +336,23 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
                 mc.transformEffectiveArgumentsIntoByteArray();
             }
             for (int index = 0; index < this.memberList.size(); index++)
-                this.threadpool.addAJob(new ProcessForAsyncCall(this,
-                        this.memberList, memberListOfResultGroup, index, mc,
-                        body));
+                this.threadpool.addAJob(new ProcessForAsyncCall(this, this.memberList,
+                    memberListOfResultGroup, index, mc, body));
         } else { // isDispatchingCall == true
-                 //Object[] individualEffectiveArguments = distributeParameters(mc);
+            //Object[] individualEffectiveArguments = distributeParameters(mc);
             for (int index = 0; index < memberList.size(); index++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
                 for (int i = 0; i < mc.getNumberOfParameter(); i++)
                     if (PAGroup.isScatterGroupOn(mc.getParameter(i))) {
-                        individualEffectiveArguments[i] = PAGroup.get(mc.getParameter(
-                                    i), index % PAGroup.size(mc.getParameter(i)));
+                        individualEffectiveArguments[i] = PAGroup.get(mc.getParameter(i), index %
+                            PAGroup.size(mc.getParameter(i)));
                     } else {
                         individualEffectiveArguments[i] = mc.getParameter(i);
                     }
-                this.threadpool.addAJob(new ProcessForAsyncCall(this,
-                        this.memberList, memberListOfResultGroup, index,
-                        new MethodCall(mc.getReifiedMethod(),
-                            mc.getGenericTypesMapping(),
-                            individualEffectiveArguments,
-                            mc.getExceptionContext()), body));
+                this.threadpool.addAJob(new ProcessForAsyncCall(this, this.memberList,
+                    memberListOfResultGroup, index,
+                    new MethodCall(mc.getReifiedMethod(), mc.getGenericTypesMapping(),
+                        individualEffectiveArguments, mc.getExceptionContext()), body));
             }
         }
 
@@ -399,15 +381,13 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     //        }
     //        return individualEffectiveArguments;
     //    }
-
     /**
      * Add the results (Future) into the typed group result at the correct poisition.
      * @param memberListOfResultGroup the list of the typed group result.
      * @param result the result of a call on member of a Group.
      * @param index the rank of the result.
      */
-    protected void addToListOfResult(Vector memberListOfResultGroup,
-        Object result, int index) {
+    protected void addToListOfResult(Vector memberListOfResultGroup, Object result, int index) {
         memberListOfResultGroup.set(index, result);
     }
 
@@ -417,8 +397,8 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * Launchs the threads for OneWay call of each member of the Group.
      * @param mc the MethodCall to be applied on each member of the Group.
      */
-    protected void oneWayCallOnGroup(MethodCall mc,
-        ExceptionListException exceptionList) throws InvocationTargetException {
+    protected void oneWayCallOnGroup(MethodCall mc, ExceptionListException exceptionList)
+            throws InvocationTargetException {
         Body body = PAActiveObject.getBodyOnThis();
 
         // Creating Threads
@@ -427,26 +407,23 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
                 mc.transformEffectiveArgumentsIntoByteArray();
             }
             for (int index = 0; index < this.memberList.size(); index++) {
-                this.threadpool.addAJob(new ProcessForOneWayCall(this,
-                        this.memberList, index, mc, body, exceptionList));
+                this.threadpool.addAJob(new ProcessForOneWayCall(this, this.memberList, index, mc, body,
+                    exceptionList));
             }
         } else { // isDispatchingCall == true
-                 //            Object[] individualEffectiveArguments = distributeParameters(mc);
+            //            Object[] individualEffectiveArguments = distributeParameters(mc);
             for (int index = 0; index < memberList.size(); index++) {
                 Object[] individualEffectiveArguments = new Object[mc.getNumberOfParameter()];
                 for (int i = 0; i < mc.getNumberOfParameter(); i++)
                     if (PAGroup.isScatterGroupOn(mc.getParameter(i))) {
-                        individualEffectiveArguments[i] = PAGroup.get(mc.getParameter(
-                                    i), index % PAGroup.size(mc.getParameter(i)));
+                        individualEffectiveArguments[i] = PAGroup.get(mc.getParameter(i), index %
+                            PAGroup.size(mc.getParameter(i)));
                     } else {
                         individualEffectiveArguments[i] = mc.getParameter(i);
                     }
-                this.threadpool.addAJob(new ProcessForOneWayCall(this,
-                        this.memberList, index,
-                        new MethodCall(mc.getReifiedMethod(),
-                            mc.getGenericTypesMapping(),
-                            individualEffectiveArguments,
-                            mc.getExceptionContext()), body, exceptionList));
+                this.threadpool.addAJob(new ProcessForOneWayCall(this, this.memberList, index,
+                    new MethodCall(mc.getReifiedMethod(), mc.getGenericTypesMapping(),
+                        individualEffectiveArguments, mc.getExceptionContext()), body, exceptionList));
             }
         }
 
@@ -475,11 +452,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
                 /* if o is a reference on a component interface*/
                 else if (o instanceof ProActiveInterface) {
                     return this.memberList.add(o);
-                } /* if o is a Group */ else if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
+                } /* if o is a Group */else if (o instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
 
                     /* like an addMerge call */
-                    return this.memberList.addAll(((org.objectweb.proactive.core.group.ProxyForGroup) o).memberList);
-                } /* o is a standard Java object */ else {
+                    return this.memberList
+                            .addAll(((org.objectweb.proactive.core.group.ProxyForGroup) o).memberList);
+                } /* o is a standard Java object */else {
                     return this.memberList.add(o);
                 }
             } else {
@@ -675,16 +653,15 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
 
             /* check oGroup is an Reified Object and if it is "assignableFrom" the class of the group */
             if ((MOP.isReifiedObject(oGroup)) &&
-                    ((MOP.forName(this.className)).isAssignableFrom(
-                        oGroup.getClass()))) {
+                ((MOP.forName(this.className)).isAssignableFrom(oGroup.getClass()))) {
 
                 /* check oGroup is an object representing a group */
                 if (((StubObject) oGroup).getProxy() instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
                     memberList.addAll(((ProxyForGroup) ((StubObject) oGroup).getProxy()).memberList);
-                } /* if oGroup is a Standard Active Object (but not a group), just add it */ else {
+                } /* if oGroup is a Standard Active Object (but not a group), just add it */else {
                     this.add(oGroup);
                 }
-            } /* if oGroup is a Group */ else if (oGroup instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
+            } /* if oGroup is a Group */else if (oGroup instanceof org.objectweb.proactive.core.group.ProxyForGroup) {
                 memberList.addAll(((org.objectweb.proactive.core.group.ProxyForGroup) oGroup).memberList);
             }
         } catch (java.lang.ClassNotFoundException e) {
@@ -763,8 +740,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     public Object getGroupByType() {
         Object result;
         try { // a new proxy is generated
-            result = MOP.newInstance(this.className, null, null,
-                    ProxyForGroup.class.getName(), null);
+            result = MOP.newInstance(this.className, null, null, ProxyForGroup.class.getName(), null);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -793,8 +769,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public Group union(Group g) {
         try {
-            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(
-                            g.getTypeName()))) {
+            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
                 ProxyForGroup result = new ProxyForGroup(this.getTypeName());
 
                 // add the members of this
@@ -827,8 +802,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public Group intersection(Group g) {
         try {
-            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(
-                            g.getTypeName()))) {
+            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
                 ProxyForGroup result = new ProxyForGroup(this.getTypeName());
                 Object member;
                 Iterator it = this.iterator();
@@ -859,8 +833,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public Group exclude(Group g) {
         try {
-            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(
-                            g.getTypeName()))) {
+            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
                 ProxyForGroup result = new ProxyForGroup(this.getTypeName());
                 Object member;
                 Iterator it = this.iterator();
@@ -889,8 +862,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      */
     public Group difference(Group g) {
         try {
-            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(
-                            g.getTypeName()))) {
+            if ((MOP.forName(this.getTypeName())).isAssignableFrom(MOP.forName(g.getTypeName()))) {
                 ProxyForGroup result = new ProxyForGroup(this.getTypeName());
                 Object member;
                 Iterator it = this.iterator();
@@ -970,8 +942,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     public void display() {
         logger.info("Number of member : " + memberList.size());
         for (int i = 0; i < memberList.size(); i++)
-            logger.info("  " + i + " : " +
-                memberList.get(i).getClass().getName());
+            logger.info("  " + i + " : " + memberList.get(i).getClass().getName());
     }
 
     /* ------------------- SYNCHRONIZATION -------------------- */
@@ -1080,8 +1051,7 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
         ExceptionListException exceptionList = new ExceptionListException();
         for (int i = 0; i < this.memberList.size(); i++) {
             if (this.memberList.get(i) instanceof Throwable) {
-                exceptionList.add(new ExceptionInGroup(null, i,
-                        (Throwable) this.memberList.get(i)));
+                exceptionList.add(new ExceptionInGroup(null, i, (Throwable) this.memberList.get(i)));
             }
         }
         return exceptionList;
@@ -1127,16 +1097,15 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param params - an array that contains the parameters for the constructor of member.
      * @param nodeList - the nodes where the member will be created.
      */
-    public void createMemberWithMultithread(String className,
-        Class<?>[] genericParameters, Object[][] params, Node[] nodeList) {
+    public void createMemberWithMultithread(String className, Class<?>[] genericParameters,
+            Object[][] params, Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < params.length; i++) {
             this.memberList.add(null);
         }
         for (int i = 0; i < params.length; i++) {
-            this.threadpool.addAJob(new ProcessForGroupCreation(this,
-                    className, genericParameters, params[i],
-                    nodeList[i % nodeList.length], i));
+            this.threadpool.addAJob(new ProcessForGroupCreation(this, className, genericParameters,
+                params[i], nodeList[i % nodeList.length], i));
         }
         this.threadpool.complete();
     }
@@ -1147,15 +1116,15 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
      * @param params - the parameters for the constructor of members.
      * @param nodeList - the nodes where the member will be created.
      */
-    public void createMemberWithMultithread(String className,
-        Class<?>[] genericParameters, Object[] params, Node[] nodeList) {
+    public void createMemberWithMultithread(String className, Class<?>[] genericParameters, Object[] params,
+            Node[] nodeList) {
         // Initializes the Group to the correct size
         for (int i = 0; i < nodeList.length; i++) {
             this.memberList.add(null);
         }
         for (int i = 0; i < nodeList.length; i++) {
-            this.threadpool.addAJob(new ProcessForGroupCreation(this,
-                    className, genericParameters, params, nodeList[i], i));
+            this.threadpool.addAJob(new ProcessForGroupCreation(this, className, genericParameters, params,
+                nodeList[i], i));
         }
         this.threadpool.complete();
     }
@@ -1203,14 +1172,12 @@ public class ProxyForGroup extends AbstractProxy implements Proxy, Group,
     }
 
     /* ------------------------ PRIVATE METHODS FOR SERIALIZATION --------------------- */
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         // this.threadpool.finalize();
         out.defaultWriteObject();
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.proxyForGroupID = new UniqueID();
         this.threadpool = new ThreadPool();

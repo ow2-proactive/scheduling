@@ -65,7 +65,8 @@ public class ConnectDeconnectResourceManagerAction extends Action {
     }
 
     private void connection() {
-        SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(parent.getShell());
+        SelectResourceManagerDialogResult dialogResult = SelectResourceManagerDialog.showDialog(parent
+                .getShell());
         if (dialogResult != null) {
             try {
                 RMMonitoring imMonitoring = RMConnection.connectAsMonitor(dialogResult.getUrl());
@@ -78,20 +79,18 @@ public class ConnectDeconnectResourceManagerAction extends Action {
 
                 this.setText("Disconnect");
                 this.setToolTipText("Disconnect from the ProActive Scheduler");
-                this.setImageDescriptor(ImageDescriptor.createFromFile(
-                        this.getClass(), "icons/disconnect.gif"));
+                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
+                        "icons/disconnect.gif"));
 
                 ResourceExplorerView.init();
             } catch (RMException e) {
                 MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                    "Couldn't Connect to the resource manager based on : \n" +
-                    dialogResult.getUrl());
+                        "Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
                 e.printStackTrace();
             }
         } else {
             MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                "Couldn't Connect to the resource manager based on : \n" +
-                dialogResult.getUrl());
+                    "Couldn't Connect to the resource manager based on : \n" + dialogResult.getUrl());
         }
     }
 
@@ -103,14 +102,11 @@ public class ConnectDeconnectResourceManagerAction extends Action {
     public void setDisconnectionMode() {
         isConnected = false;
         this.setText("Connect the ProActive Scheduler");
-        this.setToolTipText(
-            "Connect the started ProActive Scheduler by its url");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/connect.gif"));
+        this.setToolTipText("Connect the started ProActive Scheduler by its url");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/connect.gif"));
     }
 
-    public static ConnectDeconnectResourceManagerAction newInstance(
-        Composite parent) {
+    public static ConnectDeconnectResourceManagerAction newInstance(Composite parent) {
         instance = new ConnectDeconnectResourceManagerAction(parent);
         return instance;
     }

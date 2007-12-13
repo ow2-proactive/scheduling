@@ -54,20 +54,19 @@ import org.objectweb.proactive.extensions.resourcemanager.nodesource.frontend.No
 public interface RMCoreSourceInt {
 
     /** Add a new node to the node Manager.
-    *  The new node is available for tasks execution.
-    * @param node {@link Node} object to add.
-    * @param VNodeName Virtual node name of the node.
-    * @param PADName ProActive descriptor name of the node.
-    * @param nodeSource Stub of the {@link NodeSource} object that handle the node.
-    */
-    public void internalAddNode(Node node, String VNodeName, String PADName,
-        NodeSource nodeSource);
+     *  The new node is available for tasks execution.
+     * @param node {@link Node} object to add.
+     * @param VNodeName Virtual node name of the node.
+     * @param PADName ProActive descriptor name of the node.
+     * @param nodeSource Stub of the {@link NodeSource} object that handle the node.
+     */
+    public void internalAddNode(Node node, String VNodeName, String PADName, NodeSource nodeSource);
 
     /**
-    * Add a NodeSource to the core with its Id.
-    * @param source Stub of the {@link NodeSource} object to add.
-    * @param sourceId name of the {@link NodeSource} object to add.
-    */
+     * Add a NodeSource to the core with its Id.
+     * @param source Stub of the {@link NodeSource} object to add.
+     * @param sourceId name of the {@link NodeSource} object to add.
+     */
     public void internalAddSource(NodeSource source, String sourceId);
 
     /**
@@ -81,17 +80,17 @@ public interface RMCoreSourceInt {
     public void internalRemoveSource(String sourceId, RMNodeSourceEvent evt);
 
     /**
-    * Removes a node from the Core.
-    * RMCore confirm after to the NodeSource the removing.
-    * @param nodeUrl URL of the node to remove.
-    * @param preempt true the node must removed immediately, without waiting job ending if the node is busy,
-    * false the node is removed just after the job ending if the node is busy.
-    */
+     * Removes a node from the Core.
+     * RMCore confirm after to the NodeSource the removing.
+     * @param nodeUrl URL of the node to remove.
+     * @param preempt true the node must removed immediately, without waiting job ending if the node is busy,
+     * false the node is removed just after the job ending if the node is busy.
+     */
     public void internalRemoveNode(String nodeUrl, boolean preempt);
 
     /**
-    * Informs the nodeManager that a node is down.
-    * @param nodeUrl URL of the down node.
-    */
+     * Informs the nodeManager that a node is down.
+     * @param nodeUrl URL of the down node.
+     */
     public void setDownNode(String nodeUrl);
 }

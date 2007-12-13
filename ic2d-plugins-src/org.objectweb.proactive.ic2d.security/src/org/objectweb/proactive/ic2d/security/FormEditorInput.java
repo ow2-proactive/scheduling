@@ -59,8 +59,7 @@ public class FormEditorInput implements IEditorInput {
      * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
      */
     public ImageDescriptor getImageDescriptor() {
-        return PlatformUI.getWorkbench().getSharedImages()
-                         .getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT);
+        return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_ELEMENT);
     }
 
     /*

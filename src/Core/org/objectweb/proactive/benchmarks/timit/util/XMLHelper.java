@@ -94,8 +94,7 @@ public class XMLHelper {
         try {
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
 
-            FileOutputStream fos = new FileOutputStream(XMLHelper.createFileWithDirs(
-                        filename));
+            FileOutputStream fos = new FileOutputStream(XMLHelper.createFileWithDirs(filename));
             out.output(document, fos);
             fos.flush();
             fos.close();
@@ -158,8 +157,7 @@ public class XMLHelper {
                 new File(path).mkdirs();
             }
             FileOutputStream fos = new FileOutputStream(file, true); // true->append
-            String time = "" +
-                (new java.sql.Timestamp(System.currentTimeMillis()));
+            String time = "" + (new java.sql.Timestamp(System.currentTimeMillis()));
             message = time + "  " + message + "\n";
             fos.write(message.getBytes());
             fos.close();
@@ -183,16 +181,14 @@ public class XMLHelper {
      * @param outFilename
      *            the generated pad file name
      */
-    public static void generateDescriptor(String inFilename,
-        HashMap<String, String> gvars, HashMap<String, String> lvars,
-        String outFilename) {
+    public static void generateDescriptor(String inFilename, HashMap<String, String> gvars,
+            HashMap<String, String> lvars, String outFilename) {
         // Read and modify ProActive descriptor base
         Document doc = XMLHelper.readFile(inFilename);
 
         // Get the root namespace in order to provide it when performing a getChild
         Namespace descriptorNamespace = doc.getRootElement().getNamespace();
-        Element eVariables = doc.getRootElement()
-                                .getChild("variables", descriptorNamespace);
+        Element eVariables = doc.getRootElement().getChild("variables", descriptorNamespace);
         Iterator it = eVariables.getChildren().iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();
@@ -234,12 +230,11 @@ public class XMLHelper {
      * @param vars
      *            the variables to set
      */
-    public static void replaceVariables(List serieList,
-        HashMap<String, String> vars) {
+    public static void replaceVariables(List serieList, HashMap<String, String> vars) {
         // Replace variables
         Pattern p = Pattern.compile("[^\\x24\\x7B\\x7D]*\\x24\\x7B" + // *${
-                "([^\\x7D]*)" + // A,B,C
-                "\\x7D[^\\x7D\\x24\\x7B]*"); // }*
+            "([^\\x7D]*)" + // A,B,C
+            "\\x7D[^\\x7D\\x24\\x7B]*"); // }*
         Iterator it = serieList.iterator();
         while (it.hasNext()) {
             Element serie = (Element) it.next();
@@ -268,8 +263,7 @@ public class XMLHelper {
      * @param vars
      *            the variables values
      */
-    private static void replaceVariablesAttributes(Element elt, Pattern p,
-        HashMap<String, String> vars) {
+    private static void replaceVariablesAttributes(Element elt, Pattern p, HashMap<String, String> vars) {
         Iterator itAttr = elt.getAttributes().iterator();
         while (itAttr.hasNext()) {
             Attribute attr = (Attribute) itAttr.next();
@@ -279,9 +273,7 @@ public class XMLHelper {
                 String var = m.group(1);
                 String resolve = vars.get(var);
                 values = values.replaceAll("\\x24\\x7B" + var + "\\x7D", // ${*}
-                        (resolve.split(",").length == 1) ? resolve
-                                                         : ("#{" + resolve +
-                        "}"));
+                        (resolve.split(",").length == 1) ? resolve : ("#{" + resolve + "}"));
                 attr.setValue(values);
             }
         }

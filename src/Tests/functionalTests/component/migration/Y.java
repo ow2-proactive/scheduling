@@ -62,9 +62,8 @@ public class Y implements B, BindingController, Serializable {
         return l;
     }
 
-    public void bindFc(String clientItfName, Object serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException,
-            IllegalLifeCycleException {
+    public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
+            IllegalBindingException, IllegalLifeCycleException {
         if ("c".equals(clientItfName)) {
             c = (C) serverItf;
         } else {
@@ -76,8 +75,7 @@ public class Y implements B, BindingController, Serializable {
         return new String[] { "c" };
     }
 
-    public Object lookupFc(String clientItfName)
-        throws NoSuchInterfaceException {
+    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
         if ("c".equals(clientItfName)) {
             return c;
         } else {
@@ -85,8 +83,7 @@ public class Y implements B, BindingController, Serializable {
         }
     }
 
-    public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if ("c".equals(clientItfName)) {
             c = null;

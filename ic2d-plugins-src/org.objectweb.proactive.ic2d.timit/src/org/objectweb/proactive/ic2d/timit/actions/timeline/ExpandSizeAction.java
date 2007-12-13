@@ -41,14 +41,12 @@ public class ExpandSizeAction extends Action {
 
     public ExpandSizeAction() {
         super.setId(EXPAND_TIMELINE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "expand_timeline.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "expand_timeline.gif"));
         super.setToolTipText(EXPAND_TIMELINE_ACTION);
         super.setEnabled(false);
     }
 
-    public final void setTarget(
-        final TimeLineChartEditPart durationChartEditPart) {
+    public final void setTarget(final TimeLineChartEditPart durationChartEditPart) {
         super.setEnabled(true);
         this.durationChartEditPart = durationChartEditPart;
     }

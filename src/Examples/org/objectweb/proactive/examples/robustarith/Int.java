@@ -48,15 +48,13 @@ public class Int {
     public static BigInteger pow2(int e) throws OverflowException {
         BigInteger val = BigInteger.ONE.shiftLeft(e);
         if (val.compareTo(MAX) > 0) {
-            throw new OverflowException("pow", new BigInteger("2"),
-                new BigInteger("" + e));
+            throw new OverflowException("pow", new BigInteger("2"), new BigInteger("" + e));
         }
 
         return val;
     }
 
-    public static BigInteger add(BigInteger a, BigInteger b)
-        throws OverflowException {
+    public static BigInteger add(BigInteger a, BigInteger b) throws OverflowException {
         if ((a.signum() > 0) && (b.signum() > 0)) {
             if (MAX.subtract(a).compareTo(b) < 0) {
                 throw new OverflowException("add", a, b);
@@ -70,8 +68,7 @@ public class Int {
         return a.add(b);
     }
 
-    public static BigInteger sub(BigInteger a, BigInteger b)
-        throws OverflowException {
+    public static BigInteger sub(BigInteger a, BigInteger b) throws OverflowException {
         try {
             return add(a, b.negate());
         } catch (OverflowException oe) {
@@ -79,8 +76,7 @@ public class Int {
         }
     }
 
-    public static BigInteger mul(BigInteger a, BigInteger b)
-        throws OverflowException {
+    public static BigInteger mul(BigInteger a, BigInteger b) throws OverflowException {
         BigInteger m = a.multiply(b);
         if (m.compareTo(MAX) > 0) {
             throw new OverflowException("mul", a, b);
@@ -89,8 +85,7 @@ public class Int {
         return m;
     }
 
-    public static BigInteger div(BigInteger a, BigInteger b)
-        throws OverflowException {
+    public static BigInteger div(BigInteger a, BigInteger b) throws OverflowException {
         if (b.signum() == 0) {
             throw new OverflowException("div", a, b);
         }

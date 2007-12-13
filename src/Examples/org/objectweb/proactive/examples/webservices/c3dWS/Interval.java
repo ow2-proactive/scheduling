@@ -38,8 +38,7 @@ public class Interval implements java.io.Serializable {
     public int yto;
     public int total;
 
-    public Interval(int number, int width, int height, int yfrom, int yto,
-        int total) {
+    public Interval(int number, int width, int height, int yfrom, int yto, int total) {
         this.number = number;
         this.width = width;
         this.height = height;

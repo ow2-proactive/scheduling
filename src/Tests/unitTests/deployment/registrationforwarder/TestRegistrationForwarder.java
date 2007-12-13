@@ -36,6 +36,8 @@ import org.objectweb.proactive.core.runtime.RegistrationForwarder;
 
 import junit.framework.Assert;
 import static unitTests.UnitTests.logger;
+
+
 public class TestRegistrationForwarder {
     final static long timeout = 500;
 
@@ -52,8 +54,7 @@ public class TestRegistrationForwarder {
     public void test2() throws InterruptedException {
         // Check the message is flushed only after the timeout
         RegistrationForwarderExt to = new RegistrationForwarderExt(3, timeout);
-        GCMRuntimeRegistrationNotificationData m = new GCMRuntimeRegistrationNotificationData("1",
-                1, 1, null);
+        GCMRuntimeRegistrationNotificationData m = new GCMRuntimeRegistrationNotificationData("1", 1, 1, null);
         to.addMessage(m);
         Assert.assertEquals(0, to.flushed);
         Thread.sleep(timeout * 2);
@@ -101,8 +102,7 @@ public class TestRegistrationForwarder {
         RegistrationForwarderExt to = new RegistrationForwarderExt(3, 500);
         GCMRuntimeRegistrationNotificationData m;
         for (int i = 1; i < 101; i++) {
-            m = new GCMRuntimeRegistrationNotificationData(Integer.toString(i),
-                    i, i, null);
+            m = new GCMRuntimeRegistrationNotificationData(Integer.toString(i), i, i, null);
             to.addMessage(m);
             Assert.assertEquals(i / 3, to.flushed);
         }

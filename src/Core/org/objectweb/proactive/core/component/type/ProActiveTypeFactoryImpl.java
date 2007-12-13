@@ -70,20 +70,17 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
     /*
      * @see org.objectweb.fractal.api.type.TypeFactory#createFcItfType(String, String, boolean, boolean, boolean)
      */
-    public InterfaceType createFcItfType(String name, String signature,
-        boolean isClient, boolean isOptional, boolean isCollection)
-        throws InstantiationException {
-        return new ProActiveInterfaceTypeImpl(name, signature, isClient,
-            isOptional,
+    public InterfaceType createFcItfType(String name, String signature, boolean isClient, boolean isOptional,
+            boolean isCollection) throws InstantiationException {
+        return new ProActiveInterfaceTypeImpl(name, signature, isClient, isOptional,
             (isCollection ? ProActiveTypeFactory.COLLECTION_CARDINALITY
-                          : ProActiveTypeFactory.SINGLETON_CARDINALITY));
+                    : ProActiveTypeFactory.SINGLETON_CARDINALITY));
     }
 
     /*
      * @see org.objectweb.fractal.api.type.TypeFactory#createFcType(InterfaceType[])
      */
-    public ComponentType createFcType(InterfaceType[] interfaceTypes)
-        throws InstantiationException {
+    public ComponentType createFcType(InterfaceType[] interfaceTypes) throws InstantiationException {
 
         /*
          * Workaround for null component types.
@@ -93,7 +90,7 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
          * interface types.
          */
         if (interfaceTypes == null) {
-            interfaceTypes = new InterfaceType[] {  };
+            interfaceTypes = new InterfaceType[] {};
         }
         return new ProActiveComponentTypeImpl(interfaceTypes);
     }
@@ -101,10 +98,8 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
     /*
      * @see org.objectweb.proactive.core.component.type.ProActiveTypeFactory#createFcItfType(java.lang.String, java.lang.String, boolean, boolean, java.lang.String)
      */
-    public InterfaceType createFcItfType(String name, String signature,
-        boolean isClient, boolean isOptional, String cardinality)
-        throws InstantiationException {
-        return new ProActiveInterfaceTypeImpl(name, signature, isClient,
-            isOptional, cardinality);
+    public InterfaceType createFcItfType(String name, String signature, boolean isClient, boolean isOptional,
+            String cardinality) throws InstantiationException {
+        return new ProActiveInterfaceTypeImpl(name, signature, isClient, isOptional, cardinality);
     }
 }

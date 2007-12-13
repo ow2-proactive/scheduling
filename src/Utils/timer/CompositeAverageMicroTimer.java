@@ -48,8 +48,7 @@ import org.objectweb.proactive.core.util.profiling.Timer;
  * @author Fabrice Huet
  *
  */
-public class CompositeAverageMicroTimer extends AverageMicroTimer
-    implements Timer, Serializable {
+public class CompositeAverageMicroTimer extends AverageMicroTimer implements Timer, Serializable {
     private HashMap<String, Timer> timerMap = new HashMap<String, Timer>();
     private Timer activeTimer = null;
 
@@ -138,12 +137,9 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         while (it.hasNext()) {
             Timer t = it.next();
             tmp.append("    ").append(t.getName()).append("\n");
-            tmp.append("        ").append("Number of measures: ")
-               .append(t.getNumberOfValues());
-            tmp.append("\n        ").append("Total time measured: ")
-               .append(t.getCumulatedTime());
-            tmp.append("\n        ").append("Average time: ")
-               .append(t.getAverage()).append("\n");
+            tmp.append("        ").append("Number of measures: ").append(t.getNumberOfValues());
+            tmp.append("\n        ").append("Total time measured: ").append(t.getCumulatedTime());
+            tmp.append("\n        ").append("Average time: ").append(t.getAverage()).append("\n");
         }
 
         return tmp.toString();
@@ -181,8 +177,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
         out.defaultWriteObject();
     }
 
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         System.out.println("CompositeAverageMicroTimer.readObject()");
 
@@ -190,8 +185,7 @@ public class CompositeAverageMicroTimer extends AverageMicroTimer
     }
 
     public static void main(String[] args) {
-        CompositeAverageMicroTimer timer = new CompositeAverageMicroTimer(
-                "Test");
+        CompositeAverageMicroTimer timer = new CompositeAverageMicroTimer("Test");
         PAProfilerEngine.registerTimer(timer);
         System.out.println("Using sub-timer 1");
         timer.setTimer("1");

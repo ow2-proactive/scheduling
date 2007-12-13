@@ -46,12 +46,12 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskI
 public class ResultInternImpl implements ResultIntern<Serializable> {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * The id of the task
-    */
+     * The id of the task
+     */
     protected long id = -1;
 
     /**

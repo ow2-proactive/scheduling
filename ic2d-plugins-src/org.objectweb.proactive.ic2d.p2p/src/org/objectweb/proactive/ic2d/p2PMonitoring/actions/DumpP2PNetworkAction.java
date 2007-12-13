@@ -51,8 +51,7 @@ public class DumpP2PNetworkAction implements IWorkbenchWindowActionDelegate {
 
     public void run(IAction action) {
         DumpP2PNetworkDialog d = new DumpP2PNetworkDialog(display.getActiveShell());
-        System.out.println("DumpP2PNetworkAction.run() I should monitor " +
-            d.getUrl());
+        System.out.println("DumpP2PNetworkAction.run() I should monitor " + d.getUrl());
         System.out.println("DumpP2PNetworkAction.run() display is " + display);
         P2PView.dumpP2PNetwork(d.getUrl());
     }

@@ -35,6 +35,7 @@ import org.objectweb.proactive.core.mop.MOP;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test stub generation for interface
  */
@@ -44,14 +45,14 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        StringInterface i1 = (StringInterface) MOP.newInstance("functionalTests.stub.stubinterface.StringInterface",
-                "functionalTests.stub.stubinterface.StringInterfaceImpl", null,
-                new Object[] { "toto" },
+        StringInterface i1 = (StringInterface) MOP.newInstance(
+                "functionalTests.stub.stubinterface.StringInterface",
+                "functionalTests.stub.stubinterface.StringInterfaceImpl", null, new Object[] { "toto" },
                 "functionalTests.stub.stubinterface.ProxyOne", new Object[0]);
         result1 = i1.getMyString();
 
-        StringInterfaceImpl i2 = (StringInterfaceImpl) MOP.newInstance("functionalTests.stub.stubinterface.StringInterfaceImpl",
-                null, new Object[] { "titi" },
+        StringInterfaceImpl i2 = (StringInterfaceImpl) MOP.newInstance(
+                "functionalTests.stub.stubinterface.StringInterfaceImpl", null, new Object[] { "titi" },
                 "functionalTests.stub.stubinterface.ProxyOne", new Object[0]);
         result2 = i2.getMyString();
 

@@ -44,12 +44,12 @@ public class SearchModel extends javax.swing.table.AbstractTableModel {
     @Override
     public String getColumnName(int column) {
         switch (column) {
-        case 0:
-            return "Key";
-        case 1:
-            return "Value";
-        case 2:
-            return "Order";
+            case 0:
+                return "Key";
+            case 1:
+                return "Value";
+            case 2:
+                return "Order";
         }
         return "";
     }
@@ -70,12 +70,12 @@ public class SearchModel extends javax.swing.table.AbstractTableModel {
         try {
             String[] t = (String[]) data.elementAt(row);
             switch (column) {
-            case 0:
-                return t[0];
-            case 1:
-                return t[1];
-            case 2:
-                return t[2];
+                case 0:
+                    return t[0];
+                case 1:
+                    return t[1];
+                case 2:
+                    return t[2];
             }
         } catch (Exception e) {
         }

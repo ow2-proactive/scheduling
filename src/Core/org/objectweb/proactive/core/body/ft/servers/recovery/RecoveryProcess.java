@@ -94,8 +94,7 @@ public interface RecoveryProcess extends Remote {
      * @return the barrier on which waiting for the completion of the job
      * @throws RemoteException
      */
-    public JobBarrier submitJobWithBarrier(ActiveQueueJob job)
-        throws RemoteException;
+    public JobBarrier submitJobWithBarrier(ActiveQueueJob job) throws RemoteException;
 
     /**
      * Return the size of the system, i.e. the number of registred bodies.

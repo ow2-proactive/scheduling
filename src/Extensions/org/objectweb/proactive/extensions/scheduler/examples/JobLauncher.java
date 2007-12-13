@@ -110,19 +110,14 @@ public class JobLauncher {
 
                 if (logIt) {
                     // next, this method will forward task output on the previous loggerServer
-                    scheduler.listenLog(id,
-                        ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName(),
-                        simpleLoggerServer.getPort());
+                    scheduler.listenLog(id, ProActiveInet.getInstance().getInetAddress().getHostName(),
+                            simpleLoggerServer.getPort());
 
-                    Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
-                            id);
+                    Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + id);
 
-                    DateFormat dateFormat = new SimpleDateFormat(
-                            "hh'h'mm'm'_dd-MM-yy");
-                    FileAppender fa = new FileAppender(Log4JTaskLogs.DEFAULT_LOG_LAYOUT,
-                            "./logs/job[" + j.getName() + "," + id + "]_" +
-                            dateFormat.format(new Date()) + ".log", true);
+                    DateFormat dateFormat = new SimpleDateFormat("hh'h'mm'm'_dd-MM-yy");
+                    FileAppender fa = new FileAppender(Log4JTaskLogs.DEFAULT_LOG_LAYOUT, "./logs/job[" +
+                        j.getName() + "," + id + "]_" + dateFormat.format(new Date()) + ".log", true);
                     l.addAppender(fa);
                 }
 

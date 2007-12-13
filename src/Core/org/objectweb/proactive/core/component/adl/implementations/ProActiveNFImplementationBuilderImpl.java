@@ -47,35 +47,31 @@ import org.objectweb.proactive.core.group.Group;
 /**
  * @author Paul Naoumenko
  */
-public class ProActiveNFImplementationBuilderImpl
-    extends ProActiveImplementationBuilderImpl {
+public class ProActiveNFImplementationBuilderImpl extends ProActiveImplementationBuilderImpl {
     @Override
     public Object createComponent(Object type, String name, String definition,
-        ControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode adlVN, Map context) throws Exception {
-        ObjectsContainer obj = commonCreation(type, name, definition,
-                contentDesc, adlVN, context);
+            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode adlVN,
+            Map context) throws Exception {
+        ObjectsContainer obj = commonCreation(type, name, definition, contentDesc, adlVN, context);
 
-        return createNFComponent(type, obj.getDvn(), controllerDesc,
-            contentDesc, adlVN, obj.getBootstrapComponent());
+        return createNFComponent(type, obj.getDvn(), controllerDesc, contentDesc, adlVN, obj
+                .getBootstrapComponent());
     }
 
     private Component createNFComponent(Object type,
-        org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN,
-        ControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode adlVN, Component bootstrap) throws Exception {
+            org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN,
+            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode adlVN,
+            Component bootstrap) throws Exception {
         Component result;
 
         // FIXME : exhaustively specify the behaviour
-        if ((deploymentVN != null) &&
-                VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
-                controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
-                !contentDesc.uniqueInstance()) {
-            result = (Component) ((Group) (Fractive.getGenericFactory(bootstrap)).newNFcInstanceAsList((ComponentType) type,
-                    controllerDesc, contentDesc, deploymentVN)).getGroupByType();
+        if ((deploymentVN != null) && VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
+            controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) && !contentDesc.uniqueInstance()) {
+            result = (Component) ((Group) (Fractive.getGenericFactory(bootstrap)).newNFcInstanceAsList(
+                    (ComponentType) type, controllerDesc, contentDesc, deploymentVN)).getGroupByType();
         } else {
-            result = ((ProActiveGenericFactory) Fractal.getGenericFactory(bootstrap)).newNFcInstance((ComponentType) type,
-                    controllerDesc, contentDesc, deploymentVN);
+            result = ((ProActiveGenericFactory) Fractal.getGenericFactory(bootstrap)).newNFcInstance(
+                    (ComponentType) type, controllerDesc, contentDesc, deploymentVN);
         }
 
         //        registry.addComponent(result); // the registry can handle groups

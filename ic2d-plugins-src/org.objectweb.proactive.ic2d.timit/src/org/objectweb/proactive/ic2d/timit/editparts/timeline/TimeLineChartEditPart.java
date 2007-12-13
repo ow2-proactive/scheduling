@@ -56,8 +56,7 @@ import org.objectweb.proactive.ic2d.timit.figures.timeline.SequenceFigure;
 import org.objectweb.proactive.ic2d.timit.figures.timeline.TimeAxisFigure;
 
 
-public class TimeLineChartEditPart extends AbstractGraphicalEditPart
-    implements Runnable {
+public class TimeLineChartEditPart extends AbstractGraphicalEditPart implements Runnable {
     private CustomLayer panel;
     private Panel namesPanel;
     private TimeAxisFigure timeAxisFigure;
@@ -88,9 +87,8 @@ public class TimeLineChartEditPart extends AbstractGraphicalEditPart
     @Override
     protected IFigure createFigure() {
         // Attach a horizontal range model listener
-        ((FigureCanvas) this.getViewer().getControl()).getViewport()
-         .getHorizontalRangeModel()
-         .addPropertyChangeListener(new CustomHorizontalRangeModelPropertyChangeListener());
+        ((FigureCanvas) this.getViewer().getControl()).getViewport().getHorizontalRangeModel()
+                .addPropertyChangeListener(new CustomHorizontalRangeModelPropertyChangeListener());
         // Create the whole layer
         this.panel = new CustomLayer();
         return panel;
@@ -109,8 +107,7 @@ public class TimeLineChartEditPart extends AbstractGraphicalEditPart
 
         // Clear editparts		
         // In order to avoid concurrent exception create a temporary list to be filled with parts to delete
-        final List<EditPart> toDelete = new ArrayList<EditPart>(this.getChildren()
-                                                                    .size());
+        final List<EditPart> toDelete = new ArrayList<EditPart>(this.getChildren().size());
 
         // Deactivate selected parts
         for (final Object o : this.getChildren()) {
@@ -177,7 +174,9 @@ public class TimeLineChartEditPart extends AbstractGraphicalEditPart
     }
 
     public final void expandWidth() {
-        int widthToMatch = Math.round((this.timeIntervalManager.getTimeInterval() / TimeIntervalManager.MINIMAL_TIMESTAMP_VALUE_IN_MICROSECONDS) * TimeAxisFigure.referenceXSize);
+        int widthToMatch = Math
+                .round((this.timeIntervalManager.getTimeInterval() / TimeIntervalManager.MINIMAL_TIMESTAMP_VALUE_IN_MICROSECONDS) *
+                    TimeAxisFigure.referenceXSize);
         Rectangle r = this.panel.getBounds();
         setDirtyMode();
         r.width = widthToMatch;
@@ -213,8 +212,7 @@ public class TimeLineChartEditPart extends AbstractGraphicalEditPart
 
             // CONTAINER PANEL
             Panel containerPanel = new Panel();
-            containerPanel.setBorder(new LineBorder(
-                    new Color(Display.getCurrent(), 225, 225, 225)));
+            containerPanel.setBorder(new LineBorder(new Color(Display.getCurrent(), 225, 225, 225)));
             this.add(containerPanel);
             BorderLayout containerPanelLayout = new BorderLayout();
             containerPanelLayout.setHorizontalSpacing(10);
@@ -279,8 +277,7 @@ public class TimeLineChartEditPart extends AbstractGraphicalEditPart
         }
     }
 
-    public class CustomHorizontalRangeModelPropertyChangeListener
-        implements PropertyChangeListener {
+    public class CustomHorizontalRangeModelPropertyChangeListener implements PropertyChangeListener {
         public void propertyChange(PropertyChangeEvent evt) {
             TimeLineChartEditPart.this.timeAxisFigure.setBDirty(true);
             TimeLineChartEditPart.this.setDirtyMode();

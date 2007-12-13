@@ -54,23 +54,18 @@ public class MatlabSplitter extends SimpleMatlab {
         Object nb = args.get("number_of_children");
 
         if (nb == null) {
-            throw new IllegalArgumentException(
-                "\"number_of_children\" must be specified.");
+            throw new IllegalArgumentException("\"number_of_children\" must be specified.");
         }
 
         numberOfChildren = Integer.parseInt((String) nb);
     }
 
     @Override
-    protected Object executeInternal(String uri, TaskResult... results)
-        throws Throwable {
-        System.out.println("[" + host +
-            " MATLAB TASK] Deploying Worker (MatlabSplitter)");
-        splitterWorker = (AOMatlabSplitter) deploy(uri,
-                AOMatlabSplitter.class.getName(), matlabCommandName,
+    protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
+        System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabSplitter)");
+        splitterWorker = (AOMatlabSplitter) deploy(uri, AOMatlabSplitter.class.getName(), matlabCommandName,
                 inputScript, scriptLines, numberOfChildren);
-        System.out.println("[" + host +
-            " MATLAB TASK] Executing (MatlabSplitter)");
+        System.out.println("[" + host + " MATLAB TASK] Executing (MatlabSplitter)");
 
         Object res = splitterWorker.execute(results);
         res = PAFuture.getFutureValue(res);

@@ -45,8 +45,7 @@ import org.objectweb.proactive.api.PAActiveObject;
  * it demands creation of a new container.
  * The container is migratable.
  */
-public class ActivePrimeContainer implements PrimeNumber, java.io.Serializable,
-    Slowable, RunActive {
+public class ActivePrimeContainer implements PrimeNumber, java.io.Serializable, Slowable, RunActive {
     private PrimeNumber first;
     private int size;
     private int maxSize;
@@ -68,8 +67,8 @@ public class ActivePrimeContainer implements PrimeNumber, java.io.Serializable,
      *  @param n the first number to store in this container
      *  @param previous the container or source that sends requests to this container
      * */
-    public ActivePrimeContainer(ActivePrimeContainerCreator creator,
-        PrimeOutputListener listener, Integer maxSize, Long n, Slowable previous) {
+    public ActivePrimeContainer(ActivePrimeContainerCreator creator, PrimeOutputListener listener,
+            Integer maxSize, Long n, Slowable previous) {
         super();
         this.maxSize = maxSize.intValue();
         this.activePrimeContainerCreator = creator;
@@ -129,7 +128,7 @@ public class ActivePrimeContainer implements PrimeNumber, java.io.Serializable,
             return new PrimeNumberImpl(this, n);
         } else {
             return activePrimeContainerCreator.newActivePrimeContainer(n,
-                (ActivePrimeContainer) PAActiveObject.getStubOnThis());
+                    (ActivePrimeContainer) PAActiveObject.getStubOnThis());
         }
     }
 }

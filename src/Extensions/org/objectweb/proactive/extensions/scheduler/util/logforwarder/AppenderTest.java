@@ -39,14 +39,14 @@ public class AppenderTest extends AppenderSkeleton {
     @Override
     protected void append(LoggingEvent arg0) {
         if (arg0.getLevel().equals(Level.INFO)) {
-            System.out.println("======INFO======> " + arg0.getLoggerName() +
-                " : " + arg0.getRenderedMessage());
+            System.out.println("======INFO======> " + arg0.getLoggerName() + " : " +
+                arg0.getRenderedMessage());
         } else if (arg0.getLevel().equals(Level.ERROR)) {
-            System.out.println("======ERROR=====> " + arg0.getLoggerName() +
-                " : " + arg0.getRenderedMessage());
+            System.out.println("======ERROR=====> " + arg0.getLoggerName() + " : " +
+                arg0.getRenderedMessage());
         } else {
-            System.out.println("======OTHER=====> " + arg0.getLoggerName() +
-                " : " + arg0.getRenderedMessage());
+            System.out.println("======OTHER=====> " + arg0.getLoggerName() + " : " +
+                arg0.getRenderedMessage());
         }
     }
 

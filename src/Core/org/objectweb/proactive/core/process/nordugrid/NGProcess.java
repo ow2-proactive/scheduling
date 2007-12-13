@@ -56,9 +56,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 2.3
  */
 public class NGProcess extends AbstractExternalProcessDecorator {
-    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + File.separator + "ProActive" + File.separator +
-        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home") + File.separator +
+        "ProActive" + File.separator + "scripts" + File.separator + "unix" + File.separator + "cluster" +
         File.separator + "ngStartRuntime.sh ";
     public final static String DEFAULT_NGPATH = "ngsub";
     protected String count = "1";
@@ -115,9 +114,8 @@ public class NGProcess extends AbstractExternalProcessDecorator {
     }
 
     @Override
-    protected void internalStartProcess(String xRslCommand)
-        throws java.io.IOException {
-        String[] ng_command = command_buffer.toArray(new String[] {  });
+    protected void internalStartProcess(String xRslCommand) throws java.io.IOException {
+        String[] ng_command = command_buffer.toArray(new String[] {});
         int j = new Integer(count).intValue();
 
         for (int i = 0; i < j; i++) {
@@ -127,11 +125,11 @@ public class NGProcess extends AbstractExternalProcessDecorator {
             try {
                 externalProcess = Runtime.getRuntime().exec(ng_command);
                 java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
-                            externalProcess.getInputStream()));
+                    externalProcess.getInputStream()));
                 java.io.BufferedReader err = new java.io.BufferedReader(new java.io.InputStreamReader(
-                            externalProcess.getErrorStream()));
+                    externalProcess.getErrorStream()));
                 java.io.BufferedWriter out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(
-                            externalProcess.getOutputStream()));
+                    externalProcess.getOutputStream()));
                 handleProcess(in, out, err);
             } catch (java.io.IOException e) {
                 isFinished = true;
@@ -155,18 +153,15 @@ public class NGProcess extends AbstractExternalProcessDecorator {
 
                 //Skipping non existant local filenames, keep remote files
                 if (!FileTransferWorkShop.isLocalReadable(fullfilename) &&
-                        !FileTransferWorkShop.isRemote(fullfilename)) {
+                    !FileTransferWorkShop.isRemote(fullfilename)) {
                     logger.info(fullfilename);
                     if (fileTransferLogger.isDebugEnabled()) {
-                        fileTransferLogger.debug(
-                            "Skiping. Unreadable for FileTransfer:" +
-                            fullfilename);
+                        fileTransferLogger.debug("Skiping. Unreadable for FileTransfer:" + fullfilename);
                     }
                     continue;
                 }
 
-                sb.append("(\"" + files[j].getDestName() + "\" \"" +
-                    fullfilename + "\")");
+                sb.append("(\"" + files[j].getDestName() + "\" \"" + fullfilename + "\")");
             }
         }
         if (fileTransferLogger.isDebugEnabled()) {
@@ -224,8 +219,7 @@ public class NGProcess extends AbstractExternalProcessDecorator {
             xRSL_command = xRSL_command + "(queue=" + queue + ")";
         }
         if (inputFiles != null) {
-            xRSL_command = xRSL_command + DEFAULT_INPUT_FILE + inputFiles +
-                ")";
+            xRSL_command = xRSL_command + DEFAULT_INPUT_FILE + inputFiles + ")";
         }
 
         //following line should be uncommented in case parallel environment
@@ -243,10 +237,8 @@ public class NGProcess extends AbstractExternalProcessDecorator {
         File tmp_executableFile;
         int index = executable_path.lastIndexOf("/");
         String executable = executable_path.substring(index + 1);
-        this.tmp_executable = "tmp_" + executable +
-            ProActiveRandom.nextPosInt();
-        String tmp_executable_path = executable_path.replace(executable,
-                tmp_executable);
+        this.tmp_executable = "tmp_" + executable + ProActiveRandom.nextPosInt();
+        String tmp_executable_path = executable_path.replace(executable, tmp_executable);
 
         //first we build the temporary execuable, that will be sent
         try {
@@ -255,11 +247,9 @@ public class NGProcess extends AbstractExternalProcessDecorator {
                 tmp_executableFile.delete();
             }
             tmp_executableFile.deleteOnExit();
-            BufferedReader reader = new BufferedReader(new FileReader(
-                        executable_path));
+            BufferedReader reader = new BufferedReader(new FileReader(executable_path));
 
-            BufferedWriter writer = new BufferedWriter(new FileWriter(
-                        tmp_executableFile));
+            BufferedWriter writer = new BufferedWriter(new FileWriter(tmp_executableFile));
             while (true) {
                 String line = reader.readLine();
                 if (line == null) {
@@ -284,11 +274,9 @@ public class NGProcess extends AbstractExternalProcessDecorator {
 
         //then we append the executable in the inputfiles, to be transfered on the server
         if (inputFiles != null) {
-            inputFiles = inputFiles + "(\"" + tmp_executable + "\" \"" +
-                tmp_executable_path + "\")";
+            inputFiles = inputFiles + "(\"" + tmp_executable + "\" \"" + tmp_executable_path + "\")";
         } else {
-            inputFiles = "(\"" + tmp_executable + "\" \"" +
-                tmp_executable_path + "\")";
+            inputFiles = "(\"" + tmp_executable + "\" \"" + tmp_executable_path + "\")";
         }
     }
 }

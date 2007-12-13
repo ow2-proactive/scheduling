@@ -46,7 +46,7 @@ public class GroupOAR extends AbstractGroup {
     protected boolean interactive = false;
     protected String queueName;
     private PathElement scriptLocation = new PathElement("scripts/gcmdeployment/oar2.sh",
-            PathElement.PathBase.PROACTIVE);
+        PathElement.PathBase.PROACTIVE);
     private String directory;
     private String stdout;
     private String stderr;
@@ -57,8 +57,7 @@ public class GroupOAR extends AbstractGroup {
     private int core = 0;
 
     @Override
-    public List<String> buildCommands(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma) {
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma) {
         StringBuilder command = new StringBuilder();
 
         // OARSUB parameters

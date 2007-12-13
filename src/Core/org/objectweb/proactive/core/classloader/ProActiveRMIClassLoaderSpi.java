@@ -55,9 +55,8 @@ import java.rmi.server.RMIClassLoaderSpi;
 public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
     private ClassLoader proActiveClassLoader = null;
     RMIClassLoaderSpi rmiClassLoaderSpi = RMIClassLoader.getDefaultProviderInstance();
-    private boolean useProActiveClassLoader = ClassLoader.getSystemClassLoader()
-                                                         .toString()
-                                                         .startsWith("org.objectweb.proactive.core.classloader.ProActiveClassLoader");
+    private boolean useProActiveClassLoader = ClassLoader.getSystemClassLoader().toString().startsWith(
+            "org.objectweb.proactive.core.classloader.ProActiveClassLoader");
 
     public ProActiveRMIClassLoaderSpi() {
         if (useProActiveClassLoader) {
@@ -72,11 +71,10 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
      * @see RMIClassLoaderSpi#loadClass(java.lang.String, java.lang.String, java.lang.ClassLoader)
      */
     @Override
-    public Class<?> loadClass(String codebase, String name,
-        ClassLoader defaultLoader)
-        throws MalformedURLException, ClassNotFoundException {
+    public Class<?> loadClass(String codebase, String name, ClassLoader defaultLoader)
+            throws MalformedURLException, ClassNotFoundException {
         return rmiClassLoaderSpi.loadClass(codebase, name,
-            ((proActiveClassLoader != null) ? proActiveClassLoader : defaultLoader));
+                ((proActiveClassLoader != null) ? proActiveClassLoader : defaultLoader));
     }
 
     /**
@@ -85,19 +83,17 @@ public class ProActiveRMIClassLoaderSpi extends RMIClassLoaderSpi {
      * @see RMIClassLoaderSpi#loadProxyClass(java.lang.String, java.lang.String[], java.lang.ClassLoader)
      */
     @Override
-    public Class<?> loadProxyClass(String codebase, String[] interfaces,
-        ClassLoader defaultLoader)
-        throws MalformedURLException, ClassNotFoundException {
+    public Class<?> loadProxyClass(String codebase, String[] interfaces, ClassLoader defaultLoader)
+            throws MalformedURLException, ClassNotFoundException {
         return rmiClassLoaderSpi.loadProxyClass(codebase, interfaces,
-            ((proActiveClassLoader != null) ? proActiveClassLoader : defaultLoader));
+                ((proActiveClassLoader != null) ? proActiveClassLoader : defaultLoader));
     }
 
     /*
      * @see RMIClassLoaderSpi#getClassLoader(java.lang.String)
      */
     @Override
-    public ClassLoader getClassLoader(String codebase)
-        throws MalformedURLException {
+    public ClassLoader getClassLoader(String codebase) throws MalformedURLException {
         if (proActiveClassLoader != null) {
             return proActiveClassLoader;
         } else {

@@ -94,8 +94,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
     }
 
     @Override
-    protected void internalStartProcess(String rslCommand)
-        throws java.io.IOException {
+    protected void internalStartProcess(String rslCommand) throws java.io.IOException {
         GridJob Job1 = new GridJob(hostname, false);
         String jobOut = Job1.GlobusRun(getCommand());
         logger.info(jobOut);
@@ -109,16 +108,16 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
         //here we guess that the process behind globus is a java process. Indeed it makes no sense to
         //run a globus process foloowed by something else, since we target direclty the globus frontend
         String java_command = ((JVMProcess) getTargetProcess()).getJavaPath();
-        String initial_args = ((JVMProcess) getTargetProcess()).getCommand()
-                               .substring(java_command.length() + 1);
+        String initial_args = ((JVMProcess) getTargetProcess()).getCommand().substring(
+                java_command.length() + 1);
 
         //This is because the GT2 provider doesn't support the = in the RSL command,
         //we surround the whole arg with \. This has to be removed for GT4 if one day 
         // we include the notion of provider, since GT4 supports =.
         String args = checkSyntax(initial_args);
 
-        String RSLCommand = "& (executable = " + java_command + ")(arguments=" +
-            args + ")(count=" + count + ")";
+        String RSLCommand = "& (executable = " + java_command + ")(arguments=" + args + ")(count=" + count +
+            ")";
 
         if (stdout != null) {
             RSLCommand = RSLCommand + "(stdout=" + stdout + ")";
@@ -133,8 +132,7 @@ public class GlobusProcess extends AbstractExternalProcessDecorator {
         }
 
         if (environment != null) {
-            RSLCommand = RSLCommand + "(environment=" +
-                buildEnvironmentCommand() + ")";
+            RSLCommand = RSLCommand + "(environment=" + buildEnvironmentCommand() + ")";
         }
         if (maxTime != null) {
             RSLCommand = RSLCommand + "(maxTime=" + maxTime + ")";

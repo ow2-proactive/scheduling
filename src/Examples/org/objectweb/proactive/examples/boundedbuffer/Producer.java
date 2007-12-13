@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.boundedbuffer;
 
-
 /**
  * This class implements a simple producer
  */

@@ -111,9 +111,9 @@ public class TaskLauncher implements InitActive {
     }
 
     /**
-    * Initializes the activity of the active object.
-    * @param body the body of the active object being initialized
-    */
+     * Initializes the activity of the active object.
+     * @param body the body of the active object being initialized
+     */
     public void initActivity(Body body) {
         PAActiveObject.setImmediateService("getNodes");
         PAActiveObject.setImmediateService("activateLogs");
@@ -131,8 +131,7 @@ public class TaskLauncher implements InitActive {
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core, Executable executableTask,
-        TaskResult... results) {
+    public TaskResult doTask(SchedulerCore core, Executable executableTask, TaskResult... results) {
         try {
             //launch pre script
             if (pre != null) {
@@ -153,8 +152,7 @@ public class TaskLauncher implements InitActive {
             return result;
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex,
-                new Log4JTaskLogs(this.logBuffer.getBuffer()));
+            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
             // reset stdout/err
             try {
@@ -179,19 +177,15 @@ public class TaskLauncher implements InitActive {
         // error about log should not be logged
         LogLog.setQuietMode(true);
         // create logger
-        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX +
-                this.taskId.getJobId());
+        Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + this.taskId.getJobId());
         l.setAdditivity(false);
         MDC.getContext().put(Log4JTaskLogs.MDC_TASK_ID, this.taskId);
         l.removeAllAppenders();
-        this.logBuffer = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME,
-                true);
+        this.logBuffer = new BufferedAppender(Log4JTaskLogs.JOB_APPENDER_NAME, true);
         l.addAppender(this.logBuffer);
         // redirect stdout and err
-        this.redirectedStdout = new PrintStream(new LoggingOutputStream(l,
-                    Level.INFO), true);
-        this.redirectedStderr = new PrintStream(new LoggingOutputStream(l,
-                    Level.ERROR), true);
+        this.redirectedStdout = new PrintStream(new LoggingOutputStream(l, Level.INFO), true);
+        this.redirectedStderr = new PrintStream(new LoggingOutputStream(l, Level.ERROR), true);
         System.setOut(redirectedStdout);
         System.setErr(redirectedStderr);
     }
@@ -229,16 +223,15 @@ public class TaskLauncher implements InitActive {
      * @throws UserException if an error occurred during the execution of the script
      * @return the value of the variable GenerationScript.COMMAND_NAME after the script evaluation.
      */
-    protected void executePreScript(Node n)
-        throws ActiveObjectCreationException, NodeException, UserException {
+    protected void executePreScript(Node n) throws ActiveObjectCreationException, NodeException,
+            UserException {
         ScriptHandler handler = ScriptLoader.createHandler(n);
         ScriptResult<String> res = handler.handle(pre);
 
         if (res.errorOccured()) {
             System.err.println("Error on pre-script occured : ");
             res.getException().printStackTrace();
-            throw new UserException(
-                "PreTask script has failed on the current node");
+            throw new UserException("PreTask script has failed on the current node");
         }
 
         //return res.getResult();

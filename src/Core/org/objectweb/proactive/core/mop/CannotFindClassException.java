@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.mop;
 
-
 /**
  * Thrown when a static initializer tries to load in a class through its string
  * name but no definition for the class with the specifed name could be found.

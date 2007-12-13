@@ -111,8 +111,7 @@ public abstract class TaskQueue implements Serializable {
      * @param pendingTasks the pending tasks.
      * @param backupOutputStream the stream for backuping.
      */
-    public abstract void backupTasks(Task rootTask, Vector<Task> pendingTasks,
-        OutputStream backupOutputStream);
+    public abstract void backupTasks(Task rootTask, Vector<Task> pendingTasks, OutputStream backupOutputStream);
 
     /**
      * Restoring all tasks from a previous backup.
@@ -168,12 +167,10 @@ public abstract class TaskQueue implements Serializable {
      * @param newBest the best current solution.
      */
     public void informNewBestResult(Result newBest) {
-        if ((this.bestCurrentResult == null) ||
-                newBest.isBetterThan(this.bestCurrentResult)) {
+        if ((this.bestCurrentResult == null) || newBest.isBetterThan(this.bestCurrentResult)) {
             this.bestCurrentResult = newBest;
             if (logger.isInfoEnabled()) {
-                logger.info("A new best result was found: " +
-                    this.bestCurrentResult);
+                logger.info("A new best result was found: " + this.bestCurrentResult);
             }
         }
     }

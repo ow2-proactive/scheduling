@@ -98,8 +98,7 @@ public class ResourceServerImpl implements ResourceServer {
      * @see org.objectweb.proactive.core.body.ft.servers.resource.ResourceServer#addFreeNode(org.objectweb.proactive.core.node.Node)
      */
     public void addFreeNode(Node n) throws RemoteException {
-        logger.info("[RESSOURCE] A node is added : " +
-            n.getNodeInformation().getURL());
+        logger.info("[RESSOURCE] A node is added : " + n.getNodeInformation().getURL());
         this.freeNodes.add(n);
     }
 
@@ -112,12 +111,10 @@ public class ResourceServerImpl implements ResourceServer {
         if (this.freeNodes.isEmpty()) {
             // use p2p service if any
             if (this.serviceP2P != null) {
-                P2PNodeLookup p2pNodeLookup = this.serviceP2P.getNodes(1, "FT",
-                        "1"); // SET JOB-ID
+                P2PNodeLookup p2pNodeLookup = this.serviceP2P.getNodes(1, "FT", "1"); // SET JOB-ID
                 n = (Node) ((p2pNodeLookup.getNodes(30000)).firstElement());
             } else {
-                logger.error(
-                    "[RESSOURCE] **ERROR** There is no resource nodes !");
+                logger.error("[RESSOURCE] **ERROR** There is no resource nodes !");
                 return null;
             }
         } else {
@@ -133,8 +130,7 @@ public class ResourceServerImpl implements ResourceServer {
             this.nodeCounter = 0;
             n = getFreeNode();
         }
-        logger.info("[RESSOURCE] Return a node : " +
-            n.getNodeInformation().getURL());
+        logger.info("[RESSOURCE] Return a node : " + n.getNodeInformation().getURL());
         return n;
     }
 

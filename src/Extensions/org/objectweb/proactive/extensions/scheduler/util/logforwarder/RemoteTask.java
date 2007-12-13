@@ -56,8 +56,7 @@ public class RemoteTask {
         //logger.removeAllAppenders();
 
         // redirect stdout
-        System.setOut(new PrintStream(
-                new LoggingOutputStream(logger, Level.INFO), true));
+        System.setOut(new PrintStream(new LoggingOutputStream(logger, Level.INFO), true));
 
         //        System.setErr(new PrintStream(new LoggingOutputStream(logger, Level.ERROR), true));
     }

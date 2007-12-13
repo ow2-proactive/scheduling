@@ -42,8 +42,8 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 public class A implements Serializable, RunActive {
 
     /**
-         *
-         */
+     *
+     */
     public static final int MAX_MIG = 20;
     String node1;
     String node2;

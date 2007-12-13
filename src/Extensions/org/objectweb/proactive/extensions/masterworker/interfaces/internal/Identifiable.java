@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
-
 /**
  * A simple interface for objects which are identifiable by a numeric id
  * @author fviale

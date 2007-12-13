@@ -58,17 +58,14 @@ public class PAMobileAgent {
         try {
             return NodeFactory.getNode(url);
         } catch (NodeException e) {
-            throw new MigrationException("The node of given URL " + url +
-                " cannot be localized", e);
+            throw new MigrationException("The node of given URL " + url + " cannot be localized", e);
         }
     }
 
-    private static String getNodeURLFromActiveObject(Object o)
-        throws MigrationException {
+    private static String getNodeURLFromActiveObject(Object o) throws MigrationException {
         //first we check if the parameter is an active object,
         if (!org.objectweb.proactive.core.mop.MOP.isReifiedObject(o)) {
-            throw new MigrationException(
-                "The parameter is not an active object");
+            throw new MigrationException("The parameter is not an active object");
         }
 
         //now we get a reference on the remoteBody of this guy
@@ -110,8 +107,7 @@ public class PAMobileAgent {
      * @see PAActiveObject#getBodyOnThis
      */
     public static void migrateTo(Object activeObject) throws MigrationException {
-        migrateTo(PAMobileAgent.getNodeFromURL(
-                PAMobileAgent.getNodeURLFromActiveObject(activeObject)));
+        migrateTo(PAMobileAgent.getNodeFromURL(PAMobileAgent.getNodeURLFromActiveObject(activeObject)));
     }
 
     /**
@@ -141,12 +137,12 @@ public class PAMobileAgent {
      * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @exception MigrationException if the migration fails
      */
-    public static void migrateTo(Body bodyToMigrate, Node node,
-        boolean isNFRequest) throws MigrationException {
+    public static void migrateTo(Body bodyToMigrate, Node node, boolean isNFRequest)
+            throws MigrationException {
         //In the context of ProActive, migration of an active object is considered as a non functional request.
         //That's why "true" is set by default for the "isNFRequest" parameter.
         PAMobileAgent.migrateTo(bodyToMigrate, node, true,
-            org.objectweb.proactive.core.body.request.Request.NFREQUEST_IMMEDIATE_PRIORITY);
+                org.objectweb.proactive.core.body.request.Request.NFREQUEST_IMMEDIATE_PRIORITY);
     }
 
     /**
@@ -160,8 +156,8 @@ public class PAMobileAgent {
      * @param priority  the level of priority of the non functional request. Levels are defined in Request interface of ProActive.
      * @exception MigrationException if the migration fails
      */
-    public static void migrateTo(Body bodyToMigrate, Node node,
-        boolean isNFRequest, int priority) throws MigrationException {
+    public static void migrateTo(Body bodyToMigrate, Node node, boolean isNFRequest, int priority)
+            throws MigrationException {
         if (!(bodyToMigrate instanceof Migratable)) {
             throw new MigrationException(
                 "This body cannot migrate. It doesn't implement Migratable interface");
@@ -170,11 +166,12 @@ public class PAMobileAgent {
         Object[] arguments = { node };
 
         try {
-            BodyRequest request = new BodyRequest(bodyToMigrate, "migrateTo",
-                    new Class[] { Node.class }, arguments, isNFRequest, priority);
+            BodyRequest request = new BodyRequest(bodyToMigrate, "migrateTo", new Class[] { Node.class },
+                arguments, isNFRequest, priority);
             request.send(bodyToMigrate);
         } catch (NoSuchMethodException e) {
-            throw new MigrationException("Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",
+            throw new MigrationException(
+                "Cannot find method migrateTo this body. Non sense since the body is instance of Migratable",
                 e);
         } catch (java.io.IOException e) {
             throw new MigrationException("Cannot send the request to migrate", e);
@@ -191,12 +188,10 @@ public class PAMobileAgent {
      * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @exception MigrationException if the migration fails
      */
-    public static void migrateTo(Body bodyToMigrate, Object activeObject,
-        boolean isNFRequest) throws MigrationException {
-        PAMobileAgent.migrateTo(bodyToMigrate,
-            PAMobileAgent.getNodeFromURL(
-                PAMobileAgent.getNodeURLFromActiveObject(activeObject)),
-            isNFRequest);
+    public static void migrateTo(Body bodyToMigrate, Object activeObject, boolean isNFRequest)
+            throws MigrationException {
+        PAMobileAgent.migrateTo(bodyToMigrate, PAMobileAgent.getNodeFromURL(PAMobileAgent
+                .getNodeURLFromActiveObject(activeObject)), isNFRequest);
     }
 
     /**
@@ -209,9 +204,8 @@ public class PAMobileAgent {
      * @param isNFRequest a boolean indicating that the request is not functional i.e it does not modify the application's computation
      * @exception MigrationException if the migration fails
      */
-    public static void migrateTo(Body bodyToMigrate, String nodeURL,
-        boolean isNFRequest) throws MigrationException {
-        PAMobileAgent.migrateTo(bodyToMigrate,
-            PAMobileAgent.getNodeFromURL(nodeURL), isNFRequest);
+    public static void migrateTo(Body bodyToMigrate, String nodeURL, boolean isNFRequest)
+            throws MigrationException {
+        PAMobileAgent.migrateTo(bodyToMigrate, PAMobileAgent.getNodeFromURL(nodeURL), isNFRequest);
     }
 }

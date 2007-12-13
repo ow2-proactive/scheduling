@@ -90,12 +90,10 @@ public class Context implements Serializable {
                 UniversalBody caller = currentRequest.getSender();
                 return MOP.createStubObject(caller.getReifiedClassName(), caller);
             } catch (MOPException e) {
-                throw new ProActiveRuntimeException(
-                    "Cannot create stub on caller : " + e);
+                throw new ProActiveRuntimeException("Cannot create stub on caller : " + e);
             }
         } else {
-            throw new ProActiveRuntimeException(
-                "No request is currently served by " + this.body);
+            throw new ProActiveRuntimeException("No request is currently served by " + this.body);
         }
     }
 
@@ -104,13 +102,12 @@ public class Context implements Serializable {
      */
     @Override
     public String toString() {
-        StringBuffer res = new StringBuffer("Execution context for body " +
-                this.body.getID() + " : ");
+        StringBuffer res = new StringBuffer("Execution context for body " + this.body.getID() + " : ");
         if (this.currentRequest == null) {
             res.append("no current service.");
         } else {
-            res.append("service of " + this.currentRequest.getMethodName() +
-                " from " + this.currentRequest.getSourceBodyID());
+            res.append("service of " + this.currentRequest.getMethodName() + " from " +
+                this.currentRequest.getSourceBodyID());
         }
         return res.toString();
     }

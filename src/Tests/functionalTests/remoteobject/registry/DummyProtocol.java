@@ -49,20 +49,19 @@ public class DummyProtocol implements RemoteObjectFactory {
     }
 
     public URI[] list(URI url) throws ProActiveException {
-        return new URI[] {  };
+        return new URI[] {};
     }
 
     public RemoteObject lookup(URI url) throws ProActiveException {
         return null;
     }
 
-    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target)
-        throws ProActiveException {
+    public RemoteRemoteObject newRemoteObject(InternalRemoteRemoteObject target) throws ProActiveException {
         return null;
     }
 
-    public RemoteRemoteObject register(InternalRemoteRemoteObject target,
-        URI url, boolean replacePreviousBinding) throws ProActiveException {
+    public RemoteRemoteObject register(InternalRemoteRemoteObject target, URI url,
+            boolean replacePreviousBinding) throws ProActiveException {
         return null;
     }
 

@@ -85,8 +85,8 @@ public class BenchmarkResultWriter {
         Element benchResult = new Element("BenchmarkStatistics");
         this.eTimit.addContent(benchResult);
         benchResult.setAttribute(new Attribute("name", name));
-        benchResult.setAttribute(new Attribute("date",
-                "" + (new java.sql.Timestamp(System.currentTimeMillis()))));
+        benchResult.setAttribute(new Attribute("date", "" +
+            (new java.sql.Timestamp(System.currentTimeMillis()))));
 
         // Timer statistics
         Element eTimers = new Element("timers");
@@ -164,8 +164,7 @@ public class BenchmarkResultWriter {
     /**
      * Fill in pure timing values from 'timer' in the sub tag 'eTimers'
      */
-    private void fillTimersResults(Element eTimers,
-        HierarchicalTimerStatistics timer) {
+    private void fillTimersResults(Element eTimers, HierarchicalTimerStatistics timer) {
         if (timer == null) {
             return;
         }
@@ -198,20 +197,17 @@ public class BenchmarkResultWriter {
                                 if (nameArray[j] != null) {
                                     if (nameArray[k].equals(nameArray[j])) {
                                         currentElement = new Element("timer");
-                                        nameAttr = new Attribute("name",
-                                                nameArray[j]);
+                                        nameAttr = new Attribute("name", nameArray[j]);
                                         // If there is a root error
                                         if (rootElement == null) {
-                                            throw new IllegalStateException(
-                                                "-- Timer " + nameArray[j] +
+                                            throw new IllegalStateException("-- Timer " + nameArray[j] +
                                                 " has a null root. Please check your start-stop pairs for this timer.");
                                         }
                                         rootElement.addContent(currentElement);
                                         parentElement = currentElement;
                                     } else {
                                         currentElement = new Element("timer");
-                                        nameAttr = new Attribute("name",
-                                                nameArray[k]);
+                                        nameAttr = new Attribute("name", nameArray[k]);
                                         parentElement.addContent(currentElement);
                                     }
                                 }
@@ -219,8 +215,7 @@ public class BenchmarkResultWriter {
                             if (nameAttr != null) {
                                 currentElement.setAttribute(nameAttr);
                             }
-                            minAttr = new Attribute("min",
-                                    timer.getFormMin(i, j, k));
+                            minAttr = new Attribute("min", timer.getFormMin(i, j, k));
                             if (currentElement != null) {
                                 currentElement.setAttribute(minAttr);
                             }
@@ -228,8 +223,7 @@ public class BenchmarkResultWriter {
                     }
 
                     if (timer.getAverage(i, j, k) != -1) {
-                        avgAttr = new Attribute("avg",
-                                timer.getFormAverage(i, j, k));
+                        avgAttr = new Attribute("avg", timer.getFormAverage(i, j, k));
                         if (currentElement != null) {
                             currentElement.setAttribute(avgAttr);
                         }
@@ -243,8 +237,7 @@ public class BenchmarkResultWriter {
                     }
 
                     if (timer.getDeviation(i, j, k) != -1) {
-                        devAttr = new Attribute("dev",
-                                timer.getFormDeviation(i, j, k));
+                        devAttr = new Attribute("dev", timer.getFormDeviation(i, j, k));
                         if (currentElement != null) {
                             currentElement.setAttribute(devAttr);
                         }

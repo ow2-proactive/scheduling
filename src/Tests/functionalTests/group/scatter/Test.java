@@ -40,6 +40,7 @@ import functionalTests.group.A;
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * distributes the parameters of a method call to member
  *
@@ -54,27 +55,13 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
         new TestNodes().action();
 
-        Object[][] params = {
-                { "Agent0" },
-                { "Agent1" },
-                { "Agent2" }
-            };
-        Node[] nodes = {
-                TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-                TestNodes.getRemoteVMNode()
-            };
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
-        Object[][] paramsParameter = {
-                { "AgentA" },
-                { "AgentB" },
-                { "AgentC" }
-            };
-        Node[] nodesParameter = {
-                TestNodes.getRemoteVMNode(), TestNodes.getSameVMNode(),
-                TestNodes.getLocalVMNode()
-            };
-        this.parameterGroup = (A) PAGroup.newGroup(A.class.getName(),
-                paramsParameter, nodesParameter);
+        Object[][] paramsParameter = { { "AgentA" }, { "AgentB" }, { "AgentC" } };
+        Node[] nodesParameter = { TestNodes.getRemoteVMNode(), TestNodes.getSameVMNode(),
+                TestNodes.getLocalVMNode() };
+        this.parameterGroup = (A) PAGroup.newGroup(A.class.getName(), paramsParameter, nodesParameter);
 
         PAGroup.setScatterGroup(this.parameterGroup);
         this.resultTypedGroup = this.typedGroup.asynchronousCall(this.parameterGroup);
@@ -93,8 +80,8 @@ public class Test extends FunctionalTest {
         boolean rightRankingAndCorrectnessOfResults = true;
         for (int i = 0; i < group.size(); i++) {
             // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
-            assertEquals(((A) groupResult.get(i)).getName(),
-                (((A) group.get(i)).asynchronousCall((A) groupParameter.get(i))).getName());
+            assertEquals(((A) groupResult.get(i)).getName(), (((A) group.get(i))
+                    .asynchronousCall((A) groupParameter.get(i))).getName());
         }
 
         // is the result of the n-th group member called with the n-th parameter at the n-th position in the result group ?
@@ -102,18 +89,15 @@ public class Test extends FunctionalTest {
 
     public static void main(String[] args) {
         try {
-            System.setProperty("fractal.provider",
-                "org.objectweb.proactive.core.component.Fractive");
-            System.setProperty("java.security.policy",
-                System.getProperty("user.dir") +
+            System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");
+            System.setProperty("java.security.policy", System.getProperty("user.dir") +
                 "/compile/proactive.java.policy");
-            System.setProperty("log4j.configuration",
-                System.getProperty("user.dir") + "/compile/proactive-log4j");
-            System.setProperty("log4j.configuration",
-                "file:" + System.getProperty("user.dir") +
+            System.setProperty("log4j.configuration", System.getProperty("user.dir") +
+                "/compile/proactive-log4j");
+            System.setProperty("log4j.configuration", "file:" + System.getProperty("user.dir") +
                 "/compile/proactive-log4j");
             System.setProperty("functionalTests.descriptor.defaultnodes.file",
-                "/functionalTests/descriptor/defaultnodes/NodesLocal.xml");
+                    "/functionalTests/descriptor/defaultnodes/NodesLocal.xml");
             Test test = new Test();
             test.action();
             System.exit(0);

@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive;
 
-
 /**
  * This is a marker which must be implemented by all non functional active objects,
  * e.g. load balancing objects, p2p objects, IC2D spy.

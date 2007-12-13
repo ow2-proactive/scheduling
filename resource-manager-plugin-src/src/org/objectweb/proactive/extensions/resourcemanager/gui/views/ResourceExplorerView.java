@@ -47,8 +47,7 @@ public class ResourceExplorerView extends ViewPart {
     }
 
     public static void init() {
-        RMInitialState initialState = ResourceManagerController.getLocalView()
-                                                               .getInitialState();
+        RMInitialState initialState = ResourceManagerController.getLocalView().getInitialState();
         viewer.initTree(initialState);
     }
 
@@ -81,24 +80,24 @@ public class ResourceExplorerView extends ViewPart {
 
     private void makeActions() {
         doubleClickAction = new Action() {
-                    @Override
-                    public void run() {
-                        if (drillDownAdapter.canGoInto()) {
-                            drillDownAdapter.goInto();
-                        }
-                    }
-                };
+            @Override
+            public void run() {
+                if (drillDownAdapter.canGoInto()) {
+                    drillDownAdapter.goInto();
+                }
+            }
+        };
         simpleClickAction = new Action() {
-                    @Override
-                    public void run() {
-                        //				ISelection selection = viewer.getSelection();
-                        //				if (selection != null) {
-                        //					Object obj = ((IStructuredSelection) selection).getFirstElement();
-                        //					if (obj != null)
-                        //						System.out.println("simple-click detected on " + obj.toString());
-                        //				}
-                    }
-                };
+            @Override
+            public void run() {
+                //				ISelection selection = viewer.getSelection();
+                //				if (selection != null) {
+                //					Object obj = ((IStructuredSelection) selection).getFirstElement();
+                //					if (obj != null)
+                //						System.out.println("simple-click detected on " + obj.toString());
+                //				}
+            }
+        };
         collapseAllAction = CollapseAllAction.newInstance(viewer);
         expandAllAction = ExpandAllAction.newInstance(viewer);
         connectDeconnectAction = ConnectDeconnectResourceManagerAction.newInstance(parent);
@@ -108,10 +107,10 @@ public class ResourceExplorerView extends ViewPart {
         MenuManager menuMgr = new MenuManager("#PopupMenu");
         menuMgr.setRemoveAllWhenShown(true);
         menuMgr.addMenuListener(new IMenuListener() {
-                public void menuAboutToShow(IMenuManager manager) {
-                    fillContextMenu(manager);
-                }
-            });
+            public void menuAboutToShow(IMenuManager manager) {
+                fillContextMenu(manager);
+            }
+        });
 
         Menu menu = menuMgr.createContextMenu(viewer.getControl());
         viewer.getControl().setMenu(menu);
@@ -140,15 +139,15 @@ public class ResourceExplorerView extends ViewPart {
 
     private void hookClickAction() {
         viewer.addDoubleClickListener(new IDoubleClickListener() {
-                public void doubleClick(DoubleClickEvent event) {
-                    doubleClickAction.run();
-                }
-            });
+            public void doubleClick(DoubleClickEvent event) {
+                doubleClickAction.run();
+            }
+        });
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-                public void selectionChanged(SelectionChangedEvent event) {
-                    simpleClickAction.run();
-                }
-            });
+            public void selectionChanged(SelectionChangedEvent event) {
+                simpleClickAction.run();
+            }
+        });
     }
 
     /**

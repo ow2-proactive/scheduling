@@ -33,8 +33,8 @@ package functionalTests.descriptor.launcher;
 public class A implements java.io.Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private String name;
 
     public A() {

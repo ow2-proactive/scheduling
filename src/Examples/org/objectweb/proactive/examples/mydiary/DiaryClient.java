@@ -49,8 +49,8 @@ public class DiaryClient {
             pad.activateMappings();
 
             System.out.println("looking for server");
-            Diary remoteDiary = (Diary) PAActiveObject.lookupActive("org.objectweb.proactive.examples.mydiary.Diary",
-                    "localhost/MyDiray");
+            Diary remoteDiary = (Diary) PAActiveObject.lookupActive(
+                    "org.objectweb.proactive.examples.mydiary.Diary", "localhost/MyDiray");
             System.out.println("server found");
         } catch (Exception e) {
             e.printStackTrace();

@@ -57,8 +57,7 @@ import org.objectweb.proactive.extensions.scheduler.job.InternalJob;
  * @version 1.0, Jul 12, 2007
  * @since ProActive 3.2
  */
-public class FinishedJobComposite extends AbstractJobComposite
-    implements FinishedJobsListener {
+public class FinishedJobComposite extends AbstractJobComposite implements FinishedJobsListener {
     // -------------------------------------------------------------------- //
     // --------------------------- constructor ---------------------------- //
     // -------------------------------------------------------------------- //
@@ -69,8 +68,7 @@ public class FinishedJobComposite extends AbstractJobComposite
      * @param title
      * @param jobsController
      */
-    public FinishedJobComposite(Composite parent, String title,
-        JobsController jobsController) {
+    public FinishedJobComposite(Composite parent, String title, JobsController jobsController) {
         super(parent, title, FINISHED_TABLE_ID);
         jobsController.addFinishedJobsListener(this);
     }

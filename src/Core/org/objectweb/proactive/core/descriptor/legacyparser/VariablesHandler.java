@@ -44,38 +44,31 @@ import org.xml.sax.InputSource;
  * @author The ProActive Team
  *
  */
-public class VariablesHandler extends PassiveCompositeUnmarshaller
-    implements ProActiveDescriptorConstants {
+public class VariablesHandler extends PassiveCompositeUnmarshaller implements ProActiveDescriptorConstants {
     protected VariableContract variableContract;
 
     public VariablesHandler(VariableContract variableContract) {
         super(false);
         this.variableContract = variableContract;
 
-        this.addHandler(VARIABLES_DESCRIPTOR_TAG,
-            new VariableHandler(VARIABLES_DESCRIPTOR_TAG));
-        this.addHandler(VARIABLES_PROGRAM_TAG,
-            new VariableHandler(VARIABLES_PROGRAM_TAG));
-        this.addHandler(VARIABLES_JAVAPROPERTY_TAG,
-            new VariableHandler(VARIABLES_JAVAPROPERTY_TAG));
-        this.addHandler(VARIABLES_PROGRAM_DEFAULT_TAG,
-            new VariableHandler(VARIABLES_PROGRAM_DEFAULT_TAG));
-        this.addHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG,
-            new VariableHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG));
-        this.addHandler(VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG,
-            new VariableHandler(VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
-        this.addHandler(VARIABLES_JAVAPROPERTY_PROGRAM_TAG,
-            new VariableHandler(VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
+        this.addHandler(VARIABLES_DESCRIPTOR_TAG, new VariableHandler(VARIABLES_DESCRIPTOR_TAG));
+        this.addHandler(VARIABLES_PROGRAM_TAG, new VariableHandler(VARIABLES_PROGRAM_TAG));
+        this.addHandler(VARIABLES_JAVAPROPERTY_TAG, new VariableHandler(VARIABLES_JAVAPROPERTY_TAG));
+        this.addHandler(VARIABLES_PROGRAM_DEFAULT_TAG, new VariableHandler(VARIABLES_PROGRAM_DEFAULT_TAG));
+        this.addHandler(VARIABLES_DESCRIPTOR_DEFAULT_TAG, new VariableHandler(
+            VARIABLES_DESCRIPTOR_DEFAULT_TAG));
+        this.addHandler(VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG, new VariableHandler(
+            VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG));
+        this.addHandler(VARIABLES_JAVAPROPERTY_PROGRAM_TAG, new VariableHandler(
+            VARIABLES_JAVAPROPERTY_PROGRAM_TAG));
 
-        this.addHandler(VARIABLES_INCLUDE_XML_FILE_TAG,
-            new IncludeXMLFileHandler());
-        this.addHandler(VARIABLES_INCLUDE_PROPERTY_FILE_TAG,
-            new IncludePropertiesFileHandler());
+        this.addHandler(VARIABLES_INCLUDE_XML_FILE_TAG, new IncludeXMLFileHandler());
+        this.addHandler(VARIABLES_INCLUDE_PROPERTY_FILE_TAG, new IncludePropertiesFileHandler());
     }
 
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+            throws org.xml.sax.SAXException {
         //Once the variables have been defined, we load pending values from the javaproperties
         variableContract.setJavaPropertiesValues();
     }
@@ -85,8 +78,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
      * when including a variable contract defined on a different file.
      * @param filename the full path to the file
      */
-    public static void createVariablesHandler(String filename,
-        VariableContract variableContract) {
+    public static void createVariablesHandler(String filename, VariableContract variableContract) {
         VariablesFileHandler vfh = new VariablesFileHandler(variableContract);
 
         org.objectweb.proactive.core.xml.io.StreamReader sr;
@@ -94,8 +86,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         //String file = VariablesHandler.class.getResource(filename).getPath();
         InputSource source = new org.xml.sax.InputSource(filename);
         try {
-            sr = new org.objectweb.proactive.core.xml.io.StreamReader(source,
-                    vfh);
+            sr = new org.objectweb.proactive.core.xml.io.StreamReader(source, vfh);
             sr.read();
             //return (cast) vh.getResultObject();
         } catch (Exception e) {
@@ -104,12 +95,10 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         }
     }
 
-    public static class VariablesFileHandler
-        extends PassiveCompositeUnmarshaller {
+    public static class VariablesFileHandler extends PassiveCompositeUnmarshaller {
         VariablesFileHandler(VariableContract variableContract) {
             super(false);
-            this.addHandler(VARIABLES_TAG,
-                new VariablesHandler(variableContract));
+            this.addHandler(VARIABLES_TAG, new VariablesHandler(variableContract));
         }
     }
 
@@ -123,11 +112,9 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         }
 
         @Override
-        public void startContextElement(String tag, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String tag, Attributes attributes) throws org.xml.sax.SAXException {
             if (this.varType == null) {
-                throw new org.xml.sax.SAXException(
-                    "Ilegal Descriptor Variable Type: " + varStringType);
+                throw new org.xml.sax.SAXException("Ilegal Descriptor Variable Type: " + varStringType);
             }
 
             // Variable Name
@@ -150,8 +137,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         }
 
         @Override
-        public void startContextElement(String tag, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String tag, Attributes attributes) throws org.xml.sax.SAXException {
             String file = attributes.getValue("location");
             if (checkNonEmpty(file)) {
                 // Specific processing for loading an xml file
@@ -166,8 +152,7 @@ public class VariablesHandler extends PassiveCompositeUnmarshaller
         }
 
         @Override
-        public void startContextElement(String tag, Attributes attributes)
-            throws org.xml.sax.SAXException {
+        public void startContextElement(String tag, Attributes attributes) throws org.xml.sax.SAXException {
             String file = attributes.getValue("location");
             if (checkNonEmpty(file)) {
                 // Specific processing for loading a file

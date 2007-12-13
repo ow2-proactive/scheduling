@@ -38,19 +38,17 @@ import org.objectweb.proactive.core.event.ProActiveEvent;
 import org.objectweb.proactive.core.event.ProActiveListener;
 
 
-public class MessageEventProducerImpl extends AbstractEventProducer
-    implements MessageEventProducer, java.io.Serializable {
+public class MessageEventProducerImpl extends AbstractEventProducer implements MessageEventProducer,
+        java.io.Serializable {
     public MessageEventProducerImpl() {
     }
 
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-    public void notifyListeners(Message message, int type, UniqueID bodyID,
-        int requestQueueLength) {
+    public void notifyListeners(Message message, int type, UniqueID bodyID, int requestQueueLength) {
         if (hasListeners()) {
-            notifyAllListeners(new MessageEvent(message, type, bodyID,
-                    requestQueueLength));
+            notifyAllListeners(new MessageEvent(message, type, bodyID, requestQueueLength));
         }
     }
 
@@ -75,40 +73,40 @@ public class MessageEventProducerImpl extends AbstractEventProducer
     // -- PROTECTED METHODS -----------------------------------------------
     //
     @Override
-    protected void notifyOneListener(ProActiveListener listener,
-        ProActiveEvent event) {
+    protected void notifyOneListener(ProActiveListener listener, ProActiveEvent event) {
         MessageEvent messageEvent = (MessageEvent) event;
         MessageEventListener messageEventListener = (MessageEventListener) listener;
         switch (messageEvent.getType()) {
-        case MessageEvent.REQUEST_SENT:
-            // WARNING: we don't generate an event in the following case:
-            //   - The listener is an active object  AND
-            //   - The destination of the request is the listener
-            // This is done to avoid recursive generation of events
-            if (listener instanceof org.objectweb.proactive.core.mop.StubObject) {
-                org.objectweb.proactive.core.mop.StubObject so = (org.objectweb.proactive.core.mop.StubObject) listener;
-                UniqueID id = ((org.objectweb.proactive.core.body.proxy.BodyProxy) so.getProxy()).getBodyID();
-                if (id.equals(messageEvent.getDestinationBodyID())) {
-                    break;
+            case MessageEvent.REQUEST_SENT:
+                // WARNING: we don't generate an event in the following case:
+                //   - The listener is an active object  AND
+                //   - The destination of the request is the listener
+                // This is done to avoid recursive generation of events
+                if (listener instanceof org.objectweb.proactive.core.mop.StubObject) {
+                    org.objectweb.proactive.core.mop.StubObject so = (org.objectweb.proactive.core.mop.StubObject) listener;
+                    UniqueID id = ((org.objectweb.proactive.core.body.proxy.BodyProxy) so.getProxy())
+                            .getBodyID();
+                    if (id.equals(messageEvent.getDestinationBodyID())) {
+                        break;
+                    }
                 }
-            }
-            messageEventListener.requestSent(messageEvent);
-            break;
-        case MessageEvent.REQUEST_RECEIVED:
-            messageEventListener.requestReceived(messageEvent);
-            break;
-        case MessageEvent.REPLY_SENT:
-            messageEventListener.replySent(messageEvent);
-            break;
-        case MessageEvent.REPLY_RECEIVED:
-            messageEventListener.replyReceived(messageEvent);
-            break;
-        case MessageEvent.VOID_REQUEST_SERVED:
-            messageEventListener.voidRequestServed(messageEvent);
-            break;
-        case MessageEvent.SERVING_STARTED:
-            messageEventListener.servingStarted(messageEvent);
-            break;
+                messageEventListener.requestSent(messageEvent);
+                break;
+            case MessageEvent.REQUEST_RECEIVED:
+                messageEventListener.requestReceived(messageEvent);
+                break;
+            case MessageEvent.REPLY_SENT:
+                messageEventListener.replySent(messageEvent);
+                break;
+            case MessageEvent.REPLY_RECEIVED:
+                messageEventListener.replyReceived(messageEvent);
+                break;
+            case MessageEvent.VOID_REQUEST_SERVED:
+                messageEventListener.voidRequestServed(messageEvent);
+                break;
+            case MessageEvent.SERVING_STARTED:
+                messageEventListener.servingStarted(messageEvent);
+                break;
         }
     }
 } // end inner class MessageEventProducer

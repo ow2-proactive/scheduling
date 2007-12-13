@@ -86,17 +86,14 @@ public class PiComputer implements PiComp {
     }
 
     public Result compute(Interval interval) {
-        System.out.println("Starting computation for interval [" +
-            interval.getBeginning() + " , " + interval.getEnd() +
-            "] on host : " +
-            ProActiveInet.getInstance().getInetAddress().getHostName());
+        System.out.println("Starting computation for interval [" + interval.getBeginning() + " , " +
+            interval.getEnd() + "] on host : " + ProActiveInet.getInstance().getInetAddress().getHostName());
         long startChrono = System.currentTimeMillis();
 
         BigDecimal bd = ZERO;
 
         // BBP formula for the given interval
-        for (int k = interval.getBeginning().intValue();
-                k <= interval.getEnd().intValue(); k++) {
+        for (int k = interval.getBeginning().intValue(); k <= interval.getEnd().intValue(); k++) {
             bd = bd.add(f(k));
         }
 

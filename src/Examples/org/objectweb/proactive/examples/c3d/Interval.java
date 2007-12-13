@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-
 /**
  * Used to represent an interval of pixels to draw (or that were drawn) as part of an Image2D.
  * these are integer values, acting as counters on arrays, to says which values in a pixel
@@ -43,8 +42,7 @@ public class Interval implements java.io.Serializable {
     public int yfrom; // which line does this interval start from
     public int yto; // line of end of this interval
 
-    public Interval(int number, int totalWidth, int totalHeight, int yfrom,
-        int yto) {
+    public Interval(int number, int totalWidth, int totalHeight, int yfrom, int yto) {
         this.number = number;
         this.totalImageWidth = totalWidth;
         this.totalImageHeight = totalHeight;

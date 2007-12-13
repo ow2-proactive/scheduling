@@ -44,10 +44,8 @@ public class GatherServer implements GatherDummyItf {
      */
     public void foo(List<IntMutableWrapper> l) {
         // verify values are transmitted correctly
-        Assert.assertTrue(l.contains(
-                new IntMutableWrapper(new Integer(Test.VALUE_1))));
-        Assert.assertTrue(l.contains(
-                new IntMutableWrapper(new Integer(Test.VALUE_2))));
+        Assert.assertTrue(l.contains(new IntMutableWrapper(new Integer(Test.VALUE_1))));
+        Assert.assertTrue(l.contains(new IntMutableWrapper(new Integer(Test.VALUE_2))));
     }
 
     /*

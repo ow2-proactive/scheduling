@@ -47,8 +47,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This factory creates server socket with randomly choosen port number
  * it tries 5 different ports before reporting a failure
  */
-public class RandomPortSocketFactory implements RMIServerSocketFactory,
-    RMIClientSocketFactory, Serializable {
+public class RandomPortSocketFactory implements RMIServerSocketFactory, RMIClientSocketFactory, Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.RMI);
     static protected final int MAX = 5;
     static protected Random random = new Random();
@@ -60,22 +59,19 @@ public class RandomPortSocketFactory implements RMIServerSocketFactory,
     }
 
     public RandomPortSocketFactory(int basePort, int range) {
-        logger.debug("RandomPortSocketFactory constructor(2) basePort = " +
-            basePort + " range " + range);
+        logger.debug("RandomPortSocketFactory constructor(2) basePort = " + basePort + " range " + range);
         this.basePort = basePort;
         this.range = range;
     }
 
     public ServerSocket createServerSocket(int port) throws IOException {
         int tries = 0;
-        logger.debug("RandomPortSocketFactory: createServerSocket " + port +
-            " requested");
+        logger.debug("RandomPortSocketFactory: createServerSocket " + port + " requested");
         while (true) {
             try {
                 int offset = random.nextInt(range);
                 ServerSocket socket = new ServerSocket(basePort + offset);
-                logger.debug("RandomPortSocketFactory: success for port " +
-                    (basePort + offset));
+                logger.debug("RandomPortSocketFactory: success for port " + (basePort + offset));
                 return socket;
             } catch (IOException e) {
                 tries++;
@@ -87,8 +83,7 @@ public class RandomPortSocketFactory implements RMIServerSocketFactory,
     }
 
     public Socket createSocket(String host, int port) throws IOException {
-        logger.debug("RandomPortServerSocketFactory: createSocket to host " +
-            host + " on port " + port);
+        logger.debug("RandomPortServerSocketFactory: createSocket to host " + host + " on port " + port);
         return new Socket(host, port);
     }
 }

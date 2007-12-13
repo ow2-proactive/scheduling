@@ -74,14 +74,14 @@ public class TimItBasicManager {
             return this.timItBasicReductor;
         }
         try {
-            this.timItBasicReductor = (TimItBasicReductor) PAActiveObject.newActive(TimItBasicReductor.class.getName(),
-                    new Object[] {  });
+            this.timItBasicReductor = (TimItBasicReductor) PAActiveObject.newActive(TimItBasicReductor.class
+                    .getName(), new Object[] {});
             this.timItBasicReductor.registerShutdownHook();
             this.timItBasicReductor.incrementAwaitedResult();
             return this.timItBasicReductor;
         } catch (Exception e) {
-            System.err.println(
-                "*** TimIt [TimItCommonManager] : Cannot create the active object TimItCommonReductor");
+            System.err
+                    .println("*** TimIt [TimItCommonManager] : Cannot create the active object TimItCommonReductor");
             e.printStackTrace();
         }
         return null;
@@ -111,15 +111,13 @@ public class TimItBasicManager {
      * @return True if timers are activated false otherwise
      * @throws ProActiveException If there is a problem with the node
      */
-    public static boolean checkNodeProperties(Node node)
-        throws ProActiveException {
+    public static boolean checkNodeProperties(Node node) throws ProActiveException {
         if (node == null) {
             return false;
         }
         String s = node.getProperty("timitActivation");
 
-        return (s != null) && !"".equals(s) &&
-        !"false".equalsIgnoreCase(node.getProperty("reduceResults"));
+        return (s != null) && !"".equals(s) && !"false".equalsIgnoreCase(node.getProperty("reduceResults"));
     }
 
     /**

@@ -51,8 +51,7 @@ public class ExpandAllAction extends Action {
     public ExpandAllAction(TreeViewer treeViewer) {
         super("Expand All");
         this.treeViewer = treeViewer;
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "expand.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "expand.gif"));
         this.setToolTipText("Expand All");
     }
 

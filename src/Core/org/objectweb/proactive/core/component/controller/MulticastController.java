@@ -62,22 +62,20 @@ public interface MulticastController extends CollectiveInterfaceController {
      *
      * @throws ParameterDispatchException if there is an error in the dispatch of the parameters
      */
-    public Map<MethodCall, Integer> generateMethodCallsForMulticastDelegatee(
-        MethodCall mc, ProxyForComponentInterfaceGroup delegatee)
-        throws ParameterDispatchException;
+    public Map<MethodCall, Integer> generateMethodCallsForMulticastDelegatee(MethodCall mc,
+            ProxyForComponentInterfaceGroup delegatee) throws ParameterDispatchException;
 
     /**
-         * Performs a binding between a multicast client interface and a server
-         * interface
-         *
-         * @param clientItfName
-         *            name of a multicast client interface
-         *
-         * @param serverItf
-         *            reference on a server interface
-         */
-    public void bindFcMulticast(String clientItfName,
-        ProActiveInterface serverItf);
+     * Performs a binding between a multicast client interface and a server
+     * interface
+     *
+     * @param clientItfName
+     *            name of a multicast client interface
+     *
+     * @param serverItf
+     *            reference on a server interface
+     */
+    public void bindFcMulticast(String clientItfName, ProActiveInterface serverItf);
 
     /**
      * Removes a binding between a multicast client interface and a server interface
@@ -91,6 +89,5 @@ public interface MulticastController extends CollectiveInterfaceController {
      * @param multicastItfName name of a multicast interface
      * @return a reference on this multicast interface
      */
-    public ProxyForComponentInterfaceGroup lookupFcMulticast(
-        String multicastItfName);
+    public ProxyForComponentInterfaceGroup lookupFcMulticast(String multicastItfName);
 }

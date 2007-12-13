@@ -67,7 +67,6 @@ public interface ProActiveTypeFactory extends TypeFactory {
      * @return an interface type initialized with the given values.
      * @throws InstantiationException if the interface type cannot be created.
      */
-    public InterfaceType createFcItfType(String name, String signature,
-        boolean isClient, boolean isOptional, String cardinality)
-        throws InstantiationException;
+    public InterfaceType createFcItfType(String name, String signature, boolean isClient, boolean isOptional,
+            String cardinality) throws InstantiationException;
 }

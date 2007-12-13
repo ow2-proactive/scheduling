@@ -62,9 +62,8 @@ public class RuntimeRegistrationEvent extends ProActiveEvent {
      * @param creatorID The name of the creator of the registered ProActiveRuntime
      * @param protocol The protocol used to register the registered ProActiveRuntime when created
      */
-    public RuntimeRegistrationEvent(ProActiveRuntime proActiveRuntime,
-        int messageType, ProActiveRuntime registeredRuntimeName,
-        String creatorID, String protocol, String vmName) {
+    public RuntimeRegistrationEvent(ProActiveRuntime proActiveRuntime, int messageType,
+            ProActiveRuntime registeredRuntimeName, String creatorID, String protocol, String vmName) {
         super(proActiveRuntime, messageType);
         this.creatorID = creatorID;
         this.registeredRuntimeName = registeredRuntimeName;

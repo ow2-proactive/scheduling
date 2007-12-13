@@ -56,6 +56,6 @@ public interface RemoteRemoteObject {
      * @throws RenegotiateSessionException if the security infrastructure needs to (re)initiate the session
      * @throws IOException if the message transfer has failed
      */
-    public Reply receiveMessage(Request message)
-        throws ProActiveException, IOException, RenegotiateSessionException;
+    public Reply receiveMessage(Request message) throws ProActiveException, IOException,
+            RenegotiateSessionException;
 }

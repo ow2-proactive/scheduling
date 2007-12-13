@@ -43,6 +43,8 @@ import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveCounter;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMA_LOGGER;
+
+
 public class TopologyImpl implements Topology, Serializable {
     protected long id;
     protected String applicationDescriptorPath;
@@ -149,8 +151,7 @@ public class TopologyImpl implements Topology, Serializable {
         return ret;
     }
 
-    static public Topology createTopology(TopologyRootImpl emptyTopology,
-        Set<Node> nodes) {
+    static public Topology createTopology(TopologyRootImpl emptyTopology, Set<Node> nodes) {
         TopologyRootImpl topology;
         try {
             topology = (TopologyRootImpl) Utils.makeDeepCopy(emptyTopology);

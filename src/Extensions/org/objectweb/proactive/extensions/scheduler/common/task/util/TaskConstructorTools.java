@@ -3,7 +3,6 @@
  */
 package org.objectweb.proactive.extensions.scheduler.common.task.util;
 
-
 /**
  * TaskConstructorTools is used to know if a user executable task (java or ProActive)
  * contains a no parameter constructor. If it is not the case, the executable cannot be launched.
@@ -23,7 +22,7 @@ public class TaskConstructorTools {
      */
     public static boolean hasEmptyConstructor(Class<?> cla) {
         try {
-            cla.getDeclaredConstructor(new Class<?>[] {  });
+            cla.getDeclaredConstructor(new Class<?>[] {});
             return true;
         } catch (Exception e) {
             return false;

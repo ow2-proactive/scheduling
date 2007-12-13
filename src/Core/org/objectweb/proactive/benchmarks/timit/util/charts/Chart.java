@@ -54,12 +54,9 @@ public interface Chart extends java.io.Serializable {
      * become 977K
      * </ul>
      */
-    public static enum LegendFormat {DEFAULT,
-        NONE,
-        POW10,
-        POW2;
-    }
-    ;
+    public static enum LegendFormat {
+        DEFAULT, NONE, POW10, POW2;
+    };
 
     /**
      * The chart can have a specific scale:
@@ -69,11 +66,9 @@ public interface Chart extends java.io.Serializable {
      * <li>LOGARITHMIC create a chart with a logarithmic scale
      * </ul>
      */
-    public static enum Scale {DEFAULT,
-        LINEAR,
-        LOGARITHMIC;
-    }
-    ;
+    public static enum Scale {
+        DEFAULT, LINEAR, LOGARITHMIC;
+    };
 
     /**
      * Generate a chart from the root Element of finalized benchmark serie, or a
@@ -87,6 +82,5 @@ public interface Chart extends java.io.Serializable {
      * @param cChart
      *            the parameters of the chart
      */
-    public void generateChart(Element eTimit, BenchmarkStatistics bstats,
-        ConfigChart cChart);
+    public void generateChart(Element eTimit, BenchmarkStatistics bstats, ConfigChart cChart);
 }

@@ -56,8 +56,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This listener is used by the JMXNotificationManager.
  * @author ProActive Team
  */
-public class JMXNotificationListener implements NotificationListener,
-    ProActiveInternalObject, Serializable {
+public class JMXNotificationListener implements NotificationListener, ProActiveInternalObject, Serializable {
     private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
 
     public JMXNotificationListener() {
@@ -74,24 +73,19 @@ public class JMXNotificationListener implements NotificationListener,
             NotificationFilter filter, Object handback) instead
      */
     @Deprecated
-    public void subscribe(ProActiveConnection connection, ObjectName oname,
-        NotificationFilter filter, Object handback) {
+    public void subscribe(ProActiveConnection connection, ObjectName oname, NotificationFilter filter,
+            Object handback) {
         try {
             if (!connection.isRegistered(oname)) {
-                System.err.println(
-                    "JMXNotificationListener.subscribe() Oooops oname not known:" +
-                    oname);
+                System.err.println("JMXNotificationListener.subscribe() Oooops oname not known:" + oname);
                 return;
             }
-            connection.addNotificationListener(oname,
-                (NotificationListener) PAActiveObject.getStubOnThis(), filter,
-                handback);
+            connection.addNotificationListener(oname, (NotificationListener) PAActiveObject.getStubOnThis(),
+                    filter, handback);
         } catch (InstanceNotFoundException e) {
-            logger.error("Doesn't find the object name " + oname +
-                " during the registration", e);
+            logger.error("Doesn't find the object name " + oname + " during the registration", e);
         } catch (IOException e) {
-            logger.error("Doesn't subscribe the JMX Notification listener to the Notifications",
-                e);
+            logger.error("Doesn't subscribe the JMX Notification listener to the Notifications", e);
         }
     }
 
@@ -104,40 +98,35 @@ public class JMXNotificationListener implements NotificationListener,
      * @deprecated Use JMXNotificationManager.unsubscribeObjectFromRemoteMBean(..) instead
      */
     @Deprecated
-    public void unsubscribe(ProActiveConnection connection, ObjectName oname,
-        NotificationFilter filter, Object handback) {
+    public void unsubscribe(ProActiveConnection connection, ObjectName oname, NotificationFilter filter,
+            Object handback) {
         if (!PAActiveObject.pingActiveObject(connection)) {
             if (logger.isDebugEnabled()) {
-                logger.debug(
-                    "Trying to unregister listener on a connection with terminated body. Ping faild on the connection object: " +
-                    connection.toString());
+                logger
+                        .debug("Trying to unregister listener on a connection with terminated body. Ping faild on the connection object: " +
+                            connection.toString());
             }
             return;
         }
         try {
             if (connection.isRegistered(oname)) {
-                connection.removeNotificationListener(oname,
-                    (NotificationListener) PAActiveObject.getStubOnThis(),
-                    filter, handback);
+                connection.removeNotificationListener(oname, (NotificationListener) PAActiveObject
+                        .getStubOnThis(), filter, handback);
             }
         } catch (InstanceNotFoundException e) {
-            logger.error("Doesn't find the object name " + oname +
-                " during the registration", e);
+            logger.error("Doesn't find the object name " + oname + " during the registration", e);
         } catch (ListenerNotFoundException e) {
             logger.error("Doesn't find the Notification Listener", e);
         } catch (IOException e) {
-            logger.error("Can't unsubscribe the JMX Notification listener to the Notifications",
-                e);
+            logger.error("Can't unsubscribe the JMX Notification listener to the Notifications", e);
         }
     }
 
     public void handleNotification(Notification notification, Object handback) {
-        JMXNotificationManager.getInstance()
-                              .handleNotification(notification, handback);
+        JMXNotificationManager.getInstance().handleNotification(notification, handback);
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
         // Warning loggers is transient
@@ -152,8 +141,7 @@ public class JMXNotificationListener implements NotificationListener,
                 RemoteObjectExposer roe = ((AbstractBody) myBody).getRemoteObjectExposer();
                 //  PAActiveObject.terminateActiveObject(PAActiveObject.getStubOnThis(), false);
                 roe.unregisterAll();
-                System.out.println(
-                    "Unregistered JMXNotificationListener from the registry (body:" +
+                System.out.println("Unregistered JMXNotificationListener from the registry (body:" +
                     myBody.toString() + " )");
             }
             return true;

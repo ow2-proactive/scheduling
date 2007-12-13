@@ -53,8 +53,7 @@ import org.objectweb.proactive.ic2d.timit.data.timeline.TimeIntervalManager;
 public class SequenceFigure extends Figure {
     public static final int DEFAULT_SEQUENCE_WIDTH = 19;
     public static final int DEFAULT_SEQUENCE_HEIGHT = 19;
-    private static final Font DEFAULT_TEXT_FONT = new Font(Display.getCurrent(),
-            "Courrier New", 10, SWT.BOLD);
+    private static final Font DEFAULT_TEXT_FONT = new Font(Display.getCurrent(), "Courrier New", 10, SWT.BOLD);
     private Display display;
     private GC gc;
     private Image imgChart;
@@ -69,8 +68,8 @@ public class SequenceFigure extends Figure {
         this.setPreferredSize(DEFAULT_SEQUENCE_WIDTH, DEFAULT_SEQUENCE_HEIGHT);
     }
 
-    public SequenceFigure(TimeIntervalManager timeIntervalManager,
-        SequenceObject model, ScrollingGraphicalViewer viewer) {
+    public SequenceFigure(TimeIntervalManager timeIntervalManager, SequenceObject model,
+            ScrollingGraphicalViewer viewer) {
         this.timeIntervalManager = timeIntervalManager;
         this.model = model;
         this.viewer = viewer;
@@ -102,9 +101,8 @@ public class SequenceFigure extends Figure {
     protected final void paintFigure(final Graphics graphics) {
         // Get the visible area
         final Rectangle visibleR = graphics.getClip(Rectangle.SINGLETON);
-        if ((this.timeIntervalManager == null) ||
-                !this.timeIntervalManager.isInited() || (visibleR.width <= 0) ||
-                (visibleR.height <= 0)) {
+        if ((this.timeIntervalManager == null) || !this.timeIntervalManager.isInited() ||
+            (visibleR.width <= 0) || (visibleR.height <= 0)) {
             return;
         }
 
@@ -125,16 +123,14 @@ public class SequenceFigure extends Figure {
         if (this.bDirty) {
             this.bDirty = false;
             // OFFSCREEN IMAGE CREATION STRATEGY
-            if ((this.imgChart == null) ||
-                    (this.imgChart.getImageData().width != visibleR.width)) {
+            if ((this.imgChart == null) || (this.imgChart.getImageData().width != visibleR.width)) {
                 if (this.gc != null) {
                     this.gc.dispose();
                 }
                 if (this.imgChart != null) {
                     this.imgChart.dispose();
                 }
-                this.imgChart = new Image(this.display, visibleR.width,
-                        visibleR.height);
+                this.imgChart = new Image(this.display, visibleR.width, visibleR.height);
                 this.gc = new GC(this.imgChart);
             }
 
@@ -153,8 +149,7 @@ public class SequenceFigure extends Figure {
 
             boolean done = false;
             while ((stamp != null) && !done) {
-                x1 = this.timeIntervalManager.getXPosition(stamp.startTime,
-                        r.width);
+                x1 = this.timeIntervalManager.getXPosition(stamp.startTime, r.width);
                 // If the current stamp start is not visible continue to the next
                 if (x1 > rxStopVisible) {
                     stamp = this.model.getNextLoggedStampReversed();
@@ -162,8 +157,7 @@ public class SequenceFigure extends Figure {
                 }
                 done = x1 < rxStartVisible;
 
-                x2 = this.timeIntervalManager.getXPosition(stamp.endTime,
-                        r.width);
+                x2 = this.timeIntervalManager.getXPosition(stamp.endTime, r.width);
 
                 if (stamp.state == State.SERVING_REQUEST) {
                     color = AOFigure.COLOR_WHEN_SERVING_REQUEST;
@@ -183,7 +177,7 @@ public class SequenceFigure extends Figure {
                         this.gc.drawLine(rX1, 0, rX1, visibleR.height);
                     }
                 } else { // assert x1 < x2
-                         // Draw only the visible part of the state
+                    // Draw only the visible part of the state
                     if (rX1 < 0) {
                         rX1 = 0;
                     }

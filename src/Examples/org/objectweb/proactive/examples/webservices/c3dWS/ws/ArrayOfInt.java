@@ -32,19 +32,16 @@ package org.objectweb.proactive.examples.webservices.c3dWS.ws;
 
 public class ArrayOfInt implements java.io.Serializable {
     // Type metadata
-    private static org.apache.axis.description.TypeDesc typeDesc = new org.apache.axis.description.TypeDesc(ArrayOfInt.class,
-            true);
+    private static org.apache.axis.description.TypeDesc typeDesc = new org.apache.axis.description.TypeDesc(
+        ArrayOfInt.class, true);
 
     static {
-        typeDesc.setXmlType(new javax.xml.namespace.QName(
-                "http://tempuri.org/", "ArrayOfInt"));
+        typeDesc.setXmlType(new javax.xml.namespace.QName("http://tempuri.org/", "ArrayOfInt"));
 
         org.apache.axis.description.ElementDesc elemField = new org.apache.axis.description.ElementDesc();
         elemField.setFieldName("_int");
-        elemField.setXmlName(new javax.xml.namespace.QName(
-                "http://tempuri.org/", "int"));
-        elemField.setXmlType(new javax.xml.namespace.QName(
-                "http://www.w3.org/2001/XMLSchema", "int"));
+        elemField.setXmlName(new javax.xml.namespace.QName("http://tempuri.org/", "int"));
+        elemField.setXmlType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"));
         elemField.setMinOccurs(0);
         typeDesc.addFieldDesc(elemField);
     }
@@ -105,10 +102,8 @@ public class ArrayOfInt implements java.io.Serializable {
         __equalsCalc = obj;
 
         boolean _equals;
-        _equals = true &&
-            (((this._int == null) && (other.get_int() == null)) ||
-            ((this._int != null) &&
-            java.util.Arrays.equals(this._int, other.get_int())));
+        _equals = true && (((this._int == null) && (other.get_int() == null)) || ((this._int != null) && java.util.Arrays
+                .equals(this._int, other.get_int())));
         __equalsCalc = null;
 
         return _equals;
@@ -125,8 +120,7 @@ public class ArrayOfInt implements java.io.Serializable {
         int _hashCode = 1;
 
         if (get_int() != null) {
-            for (int i = 0; i < java.lang.reflect.Array.getLength(get_int());
-                    i++) {
+            for (int i = 0; i < java.lang.reflect.Array.getLength(get_int()); i++) {
                 java.lang.Object obj = java.lang.reflect.Array.get(get_int(), i);
 
                 if ((obj != null) && !obj.getClass().isArray()) {
@@ -150,20 +144,16 @@ public class ArrayOfInt implements java.io.Serializable {
     /**
      * Get Custom Serializer
      */
-    public static org.apache.axis.encoding.Serializer getSerializer(
-        java.lang.String mechType, java.lang.Class<?> _javaType,
-        javax.xml.namespace.QName _xmlType) {
-        return new org.apache.axis.encoding.ser.BeanSerializer(_javaType,
-            _xmlType, typeDesc);
+    public static org.apache.axis.encoding.Serializer getSerializer(java.lang.String mechType,
+            java.lang.Class<?> _javaType, javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanSerializer(_javaType, _xmlType, typeDesc);
     }
 
     /**
      * Get Custom Deserializer
      */
-    public static org.apache.axis.encoding.Deserializer getDeserializer(
-        java.lang.String mechType, java.lang.Class<?> _javaType,
-        javax.xml.namespace.QName _xmlType) {
-        return new org.apache.axis.encoding.ser.BeanDeserializer(_javaType,
-            _xmlType, typeDesc);
+    public static org.apache.axis.encoding.Deserializer getDeserializer(java.lang.String mechType,
+            java.lang.Class<?> _javaType, javax.xml.namespace.QName _xmlType) {
+        return new org.apache.axis.encoding.ser.BeanDeserializer(_javaType, _xmlType, typeDesc);
     }
 }

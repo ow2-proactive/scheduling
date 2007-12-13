@@ -72,15 +72,12 @@ public class Url implements UrlMBean, IJmx {
         return this.url;
     }
 
-    public void register()
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
+    public void register() throws InstanceAlreadyExistsException, MBeanRegistrationException,
             NotCompliantMBeanException, JMXException {
         ManagementFactory.getPlatformMBeanServer().registerMBean(this, this.on);
     }
 
-    public void unregister()
-        throws InstanceNotFoundException, MBeanRegistrationException,
-            JMXException {
+    public void unregister() throws InstanceNotFoundException, MBeanRegistrationException, JMXException {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(this.on);
     }
 }

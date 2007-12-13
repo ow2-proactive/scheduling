@@ -43,7 +43,7 @@ public interface NBodyFrame {
      * Example of Complexities :
      * <li> Creation of java3d scene tree is at <B>O(MAX_HISTO_SIZE*nbBodies)</B><li>
      * <li> Drawing of trace is at <B>O(MAX_HISTO_SIZE*nbBodies)</B>
-    */
+     */
     public final static int MAX_HISTO_SIZE = 100;
 
     /**
@@ -59,7 +59,6 @@ public interface NBodyFrame {
      * @param identification id of the body who call the method
      * @param hostName where the body is hosted
      */
-    public abstract void drawBody(double x, double y, double z, double vx,
-        double vy, double vz, int mass, int diameter, int identification,
-        String hostName);
+    public abstract void drawBody(double x, double y, double z, double vx, double vy, double vz, int mass,
+            int diameter, int identification, String hostName);
 }

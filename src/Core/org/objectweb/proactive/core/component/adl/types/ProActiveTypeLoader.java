@@ -48,8 +48,8 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
  */
 public class ProActiveTypeLoader extends TypeLoader {
     @Override
-    protected void checkInterfaceContainer(final InterfaceContainer container,
-        final boolean extend, final Map context) throws ADLException {
+    protected void checkInterfaceContainer(final InterfaceContainer container, final boolean extend,
+            final Map context) throws ADLException {
         Interface[] itfs = container.getInterfaces();
         for (int i = 0; i < itfs.length; i++) {
             Interface itf = itfs[i];
@@ -63,8 +63,7 @@ public class ProActiveTypeLoader extends TypeLoader {
                     try {
                         getClassLoader(context).loadClass(signature);
                     } catch (ClassNotFoundException e) {
-                        throw new ADLException("Invalid signature '" +
-                            signature + "'", (Node) itf, e);
+                        throw new ADLException("Invalid signature '" + signature + "'", (Node) itf, e);
                     }
                 }
                 String role = ((TypeInterface) itf).getRole();
@@ -74,29 +73,22 @@ public class ProActiveTypeLoader extends TypeLoader {
                     }
                 } else {
                     if (!role.equals("client") && !role.equals("server")) {
-                        throw new ADLException("Invalid role '" + role + "'",
-                            (Node) itf);
+                        throw new ADLException("Invalid role '" + role + "'", (Node) itf);
                     }
                 }
                 String contingency = ((TypeInterface) itf).getContingency();
                 if (contingency != null) {
-                    if (!contingency.equals("mandatory") &&
-                            !contingency.equals("optional")) {
-                        throw new ADLException("Invalid contingency '" +
-                            contingency + "'", (Node) itf);
+                    if (!contingency.equals("mandatory") && !contingency.equals("optional")) {
+                        throw new ADLException("Invalid contingency '" + contingency + "'", (Node) itf);
                     }
                 }
 
                 String cardinality = ((TypeInterface) itf).getCardinality();
                 if (cardinality != null) {
-                    if (!cardinality.equals("singleton") &&
-                            !cardinality.equals("collection") &&
-                            !cardinality.equals(
-                                ProActiveTypeFactory.MULTICAST_CARDINALITY) &&
-                            !cardinality.equals(
-                                ProActiveTypeFactory.GATHER_CARDINALITY)) {
-                        throw new ADLException("Invalid cardinality '" +
-                            cardinality + "'", (Node) itf);
+                    if (!cardinality.equals("singleton") && !cardinality.equals("collection") &&
+                        !cardinality.equals(ProActiveTypeFactory.MULTICAST_CARDINALITY) &&
+                        !cardinality.equals(ProActiveTypeFactory.GATHER_CARDINALITY)) {
+                        throw new ADLException("Invalid cardinality '" + cardinality + "'", (Node) itf);
                     }
                 }
             }

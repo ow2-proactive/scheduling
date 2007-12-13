@@ -54,7 +54,7 @@ public interface ParamDispatch {
      * @throws ParameterDispatchException if parameter dispatch fails
      */
     public List<Object> dispatch(Object inputParameter, int nbOutputReceivers)
-        throws ParameterDispatchException;
+            throws ParameterDispatchException;
 
     /**
      * Computes the number of method invocations that will be generated with the selection distribution algorithm.
@@ -64,7 +64,7 @@ public interface ParamDispatch {
      * @throws ParameterDispatchException if parameter dispatch computation fails
      */
     public int expectedDispatchSize(Object inputParameter, int nbOutputReceivers)
-        throws ParameterDispatchException;
+            throws ParameterDispatchException;
 
     /**
      * Verifies that, for the specified distribution mode, the types of parameters are compatible between client side and server side.
@@ -73,6 +73,6 @@ public interface ParamDispatch {
      * @return true if the types are compatible, false otherwise
      * @throws ParameterDispatchException if verification fails
      */
-    public boolean match(Type clientSideInputParameter,
-        Type serverSideInputParameter) throws ParameterDispatchException;
+    public boolean match(Type clientSideInputParameter, Type serverSideInputParameter)
+            throws ParameterDispatchException;
 }

@@ -50,8 +50,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
  */
 public class ProActiveTypeBindingLoader extends TypeBindingLoader {
     @Override
-    protected void checkNode(final Object node, final Map context)
-        throws ADLException {
+    protected void checkNode(final Object node, final Map context) throws ADLException {
         try {
             super.checkNode(node, context);
         } catch (ADLException e) {
@@ -66,8 +65,8 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
     }
 
     @Override
-    protected void checkBinding(final Binding binding, final Interface fromItf,
-        final Interface toItf, final Map context) throws ADLException {
+    protected void checkBinding(final Binding binding, final Interface fromItf, final Interface toItf,
+            final Map context) throws ADLException {
         try {
             super.checkBinding(binding, fromItf, toItf, context);
         } catch (ADLException e) {
@@ -84,19 +83,22 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
                 //            	Class<?> serverSideItfClass = Class<?>.forName(sItf.getSignature());
                 if (!clientSideItfClass.isAssignableFrom(serverSideItfClass)) {
                     // check if multicast interface
-                    if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(
-                                cItf.getCardinality())) {
+                    if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cItf.getCardinality())) {
                         Method[] clientSideItfMethods = clientSideItfClass.getMethods();
                         Method[] serverSideItfMethods = serverSideItfClass.getMethods();
 
                         if (clientSideItfMethods.length != serverSideItfMethods.length) {
                             throw new ADLException(
                                 "incompatible binding between multicast client interface " +
-                                cItf.getName() + " (" + cItf.getSignature() +
-                                ")  and server interface " + sItf.getName() +
-                                " (" + sItf.getSignature() +
-                                ") : there is not the same number of methods (including those inherited) " +
-                                "in both interfaces !", (Node) binding);
+                                    cItf.getName() +
+                                    " (" +
+                                    cItf.getSignature() +
+                                    ")  and server interface " +
+                                    sItf.getName() +
+                                    " (" +
+                                    sItf.getSignature() +
+                                    ") : there is not the same number of methods (including those inherited) " +
+                                    "in both interfaces !", (Node) binding);
                         }
 
                         //                        Map<Method, Method> matchingMethodsForThisItf = new HashMap<Method, Method>(clientSideItfMethods.length);
@@ -124,11 +126,9 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
                     }
                 }
             } catch (ClassNotFoundException e1) {
-                throw new ADLException(
-                    "incompatible binding between multicast client interface " +
-                    cItf.getName() + " (" + cItf.getSignature() +
-                    ")  and server interface " + sItf.getName() + " (" +
-                    sItf.getSignature() + ") : cannot find interface " +
+                throw new ADLException("incompatible binding between multicast client interface " +
+                    cItf.getName() + " (" + cItf.getSignature() + ")  and server interface " +
+                    sItf.getName() + " (" + sItf.getSignature() + ") : cannot find interface " +
                     e1.getMessage(), (Node) binding);
             }
         }

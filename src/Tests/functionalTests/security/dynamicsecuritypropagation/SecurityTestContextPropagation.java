@@ -43,6 +43,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.security.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test the dynamic propagation of an application context
  *
@@ -52,22 +53,22 @@ import static junit.framework.Assert.assertTrue;
 public class SecurityTestContextPropagation extends FunctionalTest {
 
     /**
-         *
-         */
+     *
+     */
     private ProActiveSecurityManager psm = null;
 
     @Test
     public void action() throws Exception {
-        A a = (A) PAActiveObject.newActive("functionalTests.security.A",
-                new Object[] {  });
+        A a = (A) PAActiveObject.newActive("functionalTests.security.A", new Object[] {});
 
         assertTrue("hello".equals(a.hello("hello")));
     }
 
     @Before
     public void initTest() throws Exception {
-        PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestContextPropagation.class.getResource(
-                    "/functionalTests/security/applicationPolicy.xml").getPath());
+        PolicyServer ps = ProActiveSecurityDescriptorHandler
+                .createPolicyServer(SecurityTestContextPropagation.class.getResource(
+                        "/functionalTests/security/applicationPolicy.xml").getPath());
         psm = new ProActiveSecurityManager(EntityType.OBJECT, ps);
 
         // set the default security manager

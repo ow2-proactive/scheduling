@@ -47,8 +47,7 @@ public class TimerTreeHolderEditPart extends AbstractTimerTreeEditPart {
     public final void propertyChange(final PropertyChangeEvent evt) {
         if (evt.getPropertyName().equals(TimerTreeHolder.P_ADD_SOURCE)) {
             refreshChildren();
-        } else if (evt.getPropertyName()
-                          .equals(TimerTreeHolder.P_REMOVE_SELECTED)) {
+        } else if (evt.getPropertyName().equals(TimerTreeHolder.P_REMOVE_SELECTED)) {
             ((TimerTreeHolder) this.getModel()).removeDummyRoot((TimerTreeNodeObject) evt.getNewValue());
             List<EditPart> l = this.getViewer().getSelectedEditParts();
 

@@ -131,13 +131,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since ProActive 0.91
  *
  */
-public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
-    implements ProActiveRuntime, LocalProActiveRuntime,
-        ProActiveRuntimeImplMBean {
+public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl implements ProActiveRuntime,
+        LocalProActiveRuntime, ProActiveRuntimeImplMBean {
 
     /**
-         *
-         */
+     *
+     */
 
     //
     // -- STATIC MEMBERS
@@ -202,7 +201,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         try {
             this.vmInformation = new VMInformationImpl();
             this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
-            this.runtimeAcquaintancesURL = java.util.Collections.synchronizedSortedSet(new java.util.TreeSet<String>());
+            this.runtimeAcquaintancesURL = java.util.Collections
+                    .synchronizedSortedSet(new java.util.TreeSet<String>());
             this.virtualNodesMap = new java.util.Hashtable<String, VirtualNodeInternal>();
             this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptorInternal>();
             this.nodeMap = new java.util.Hashtable<String, LocalNode>();
@@ -213,26 +213,27 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
                 if ((file != null) && new File(file).exists()) {
                     // loading security from a file
-                    ProActiveRuntimeImpl.runtimeSecurityManager = new ProActiveSecurityManager(EntityType.RUNTIME,
-                            file);
-                    ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
-                                   .info("ProActive Security Policy (proactive.runtime.security) using " +
-                        file);
+                    ProActiveRuntimeImpl.runtimeSecurityManager = new ProActiveSecurityManager(
+                        EntityType.RUNTIME, file);
+                    ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME).info(
+                            "ProActive Security Policy (proactive.runtime.security) using " + file);
 
-                    runtimeSecurityManager = runtimeSecurityManager.generateSiblingCertificate(EntityType.RUNTIME,
-                            this.getVMInformation().getName());
+                    runtimeSecurityManager = runtimeSecurityManager.generateSiblingCertificate(
+                            EntityType.RUNTIME, this.getVMInformation().getName());
 
                     // Is the runtime included within a Domain ?
                     String domainURL = PAProperties.PA_RUNTIME_DOMAIN_URL.getValue();
 
                     if (domainURL != null) {
-                        SecurityEntity domain = (SecurityDomain) PAActiveObject.lookupActive("org.objectweb.proactive.ext.security.domain.SecurityDomain",
-                                domainURL);
+                        SecurityEntity domain = (SecurityDomain) PAActiveObject.lookupActive(
+                                "org.objectweb.proactive.ext.security.domain.SecurityDomain", domainURL);
                         ProActiveRuntimeImpl.runtimeSecurityManager.setParent(domain);
                     }
                 } else {
-                    ProActiveLogger.getLogger(Loggers.SECURITY_RUNTIME)
-                                   .debug("ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled ");
+                    ProActiveLogger
+                            .getLogger(Loggers.SECURITY_RUNTIME)
+                            .debug(
+                                    "ProActive Security Policy (proactive.runtime.security) not set. Runtime Security disabled ");
                 }
             } catch (InvalidPolicyFile e) {
                 e.printStackTrace();
@@ -253,11 +254,10 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         // Remote Object exporter
-        this.roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime",
-                this, new ProActiveRuntimeRemoteObjectAdapter());
+        this.roe = new RemoteObjectExposer("org.objectweb.proactive.core.runtime.ProActiveRuntime", this,
+            new ProActiveRuntimeRemoteObjectAdapter());
 
-        String url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(
-                    getInternalURL()),
+        String url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(getInternalURL()),
                 URIBuilder.getNameFromURI(getInternalURL())).toString();
 
         this.roe.activateProtocol(URI.create(url));
@@ -342,8 +342,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         this.descriptorMap.put(url, pad);
     }
 
-    public ProActiveDescriptorInternal getDescriptor(String url,
-        boolean isHierarchicalSearch) throws IOException, ProActiveException {
+    public ProActiveDescriptorInternal getDescriptor(String url, boolean isHierarchicalSearch)
+            throws IOException, ProActiveException {
         ProActiveDescriptorInternal pad = this.descriptorMap.get(url);
 
         // hierarchical search or not, look if we know the pad
@@ -377,13 +377,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     private void createServerConnector() {
         // One the Serverconnector is launched any ProActive JMX Connector
         // client can connect to it remotely and manage the MBeans.
-        serverConnector = new ServerConnector(URIBuilder.getNameFromURI(
-                    proActiveRuntime.getURL()));
+        serverConnector = new ServerConnector(URIBuilder.getNameFromURI(proActiveRuntime.getURL()));
         try {
             serverConnector.start();
         } catch (IOException e) {
-            jmxLogger.error("Can't start the JMX Connector in the ProActive Runtime",
-                e);
+            jmxLogger.error("Can't start the JMX Connector in the ProActive Runtime", e);
         }
     }
 
@@ -397,25 +395,20 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         ObjectName objectName = null;
         try {
-            objectName = new ObjectName(
-                    "org.objectweb.proactive:type=JMXClassLoader");
+            objectName = new ObjectName("org.objectweb.proactive:type=JMXClassLoader");
         } catch (MalformedObjectNameException e) {
-            jmxLogger.error("Can't create the objectName of the JMX ClassLoader MBean",
-                e);
+            jmxLogger.error("Can't create the objectName of the JMX ClassLoader MBean", e);
         } catch (NullPointerException e) {
-            jmxLogger.error("Can't create the objectName of the JMX ClassLoader MBean",
-                e);
+            jmxLogger.error("Can't create the objectName of the JMX ClassLoader MBean", e);
         }
         try {
             mbs.registerMBean(jmxClassLoader, objectName);
         } catch (InstanceAlreadyExistsException e) {
-            jmxLogger.error("A MBean with the object name " + objectName +
-                " already exists", e);
+            jmxLogger.error("A MBean with the object name " + objectName + " already exists", e);
         } catch (MBeanRegistrationException e) {
             jmxLogger.error("Can't register the MBean of the JMX ClassLoader", e);
         } catch (NotCompliantMBeanException e) {
-            jmxLogger.error("The MBean of the JMX ClassLoader is not JMX compliant",
-                e);
+            jmxLogger.error("The MBean of the JMX ClassLoader is not JMX compliant", e);
         }
 
         String runtimeUrl = proActiveRuntime.getURL();
@@ -425,14 +418,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             try {
                 mbs.registerMBean(mbean, objectName);
             } catch (InstanceAlreadyExistsException e) {
-                jmxLogger.error("A MBean with the object name " + objectName +
-                    " already exists", e);
+                jmxLogger.error("A MBean with the object name " + objectName + " already exists", e);
             } catch (MBeanRegistrationException e) {
-                jmxLogger.error("Can't register the MBean of the ProActive Runtime",
-                    e);
+                jmxLogger.error("Can't register the MBean of the ProActive Runtime", e);
             } catch (NotCompliantMBeanException e) {
-                jmxLogger.error("The MBean of the ProActive Runtime is not JMX compliant",
-                    e);
+                jmxLogger.error("The MBean of the ProActive Runtime is not JMX compliant", e);
             }
         }
     }
@@ -446,10 +436,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createLocalNode(String,
      *      boolean, ProActiveSecurityManager, String, String)
      */
-    public String createLocalNode(String nodeURL,
-        boolean replacePreviousBinding,
-        ProActiveSecurityManager nodeSecurityManager, String vnName,
-        String jobId) throws NodeException, AlreadyBoundException {
+    public String createLocalNode(String nodeURL, boolean replacePreviousBinding,
+            ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId) throws NodeException,
+            AlreadyBoundException {
         // check if nodeName is an URI or not
         String nodeName = URIBuilder.getNameFromURI(nodeURL);
 
@@ -463,14 +452,13 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
             nodeSecurityManager.setParent(this);
         }
 
-        LocalNode newNode = new LocalNode(nodeName, jobId, nodeSecurityManager,
-                vnName);
+        LocalNode newNode = new LocalNode(nodeName, jobId, nodeSecurityManager, vnName);
 
         URI realnodeURL = URI.create(nodeURL);
         if (!realnodeURL.isAbsolute()) {
             try {
-                realnodeURL = RemoteObjectHelper.generateUrl(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue(),
-                        nodeName);
+                realnodeURL = RemoteObjectHelper.generateUrl(PAProperties.PA_COMMUNICATION_PROTOCOL
+                        .getValue(), nodeName);
             } catch (UnknownProtocolException e) {
                 throw new NodeException(e);
             }
@@ -482,8 +470,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         }
 
         if (replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
-            newNode.setActiveObjects(this.nodeMap.get(nodeName)
-                                                 .getActiveObjectsId());
+            newNode.setActiveObjects(this.nodeMap.get(nodeName).getActiveObjectsId());
             this.nodeMap.remove(nodeName);
         }
 
@@ -516,8 +503,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createVM(UniversalProcess)
      */
-    public void createVM(UniversalProcess remoteProcess)
-        throws java.io.IOException {
+    public void createVM(UniversalProcess remoteProcess) throws java.io.IOException {
         remoteProcess.startProcess();
     }
 
@@ -531,8 +517,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         synchronized (this.nodeMap) {
             nodeNames = new String[this.nodeMap.size()];
 
-            for (java.util.Enumeration<String> e = this.nodeMap.keys();
-                    e.hasMoreElements();) {
+            for (java.util.Enumeration<String> e = this.nodeMap.keys(); e.hasMoreElements();) {
                 nodeNames[i] = e.nextElement();
                 i++;
             }
@@ -556,26 +541,23 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#register(ProActiveRuntime,
      *      String, String, String, String)
      */
-    public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeName, String creatorID, String creationProtocol,
-        String vmName) {
+    public void register(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeName,
+            String creatorID, String creationProtocol, String vmName) {
         // System.out.println("register in Impl");
         // System.out.println("thread"+Thread.currentThread().getName());
         // System.out.println(vmInformation.getVMID().toString());
         this.proActiveRuntimeMap.put(proActiveRuntimeName, proActiveRuntimeDist);
 
         // ProActiveEvent
-        notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED,
-            proActiveRuntimeDist, creatorID, creationProtocol, vmName);
+        notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_REGISTERED, proActiveRuntimeDist, creatorID,
+                creationProtocol, vmName);
         // END ProActiveEvent
 
         // JMX Notification
         if (getMBean() != null) {
             RuntimeNotificationData notificationData = new RuntimeNotificationData(creatorID,
-                    proActiveRuntimeDist.getURL(), creationProtocol, vmName);
-            getMBean()
-                .sendNotification(NotificationType.runtimeRegistered,
-                notificationData);
+                proActiveRuntimeDist.getURL(), creationProtocol, vmName);
+            getMBean().sendNotification(NotificationType.runtimeRegistered, notificationData);
         }
 
         // END JMX Notification
@@ -586,23 +568,20 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *      java.lang.String, java.lang.String, java.lang.String,
      *      java.lang.String)
      */
-    public void unregister(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
-        String vmName) {
+    public void unregister(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeUrl,
+            String creatorID, String creationProtocol, String vmName) {
         this.proActiveRuntimeMap.remove(proActiveRuntimeUrl);
 
         // ProActiveEvent
-        notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_UNREGISTERED,
-            proActiveRuntimeDist, creatorID, creationProtocol, vmName);
+        notifyListeners(this, RuntimeRegistrationEvent.RUNTIME_UNREGISTERED, proActiveRuntimeDist, creatorID,
+                creationProtocol, vmName);
         // END ProActiveEvent
 
         // JMX Notification
         if (getMBean() != null) {
             RuntimeNotificationData notificationData = new RuntimeNotificationData(creatorID,
-                    proActiveRuntimeDist.getURL(), creationProtocol, vmName);
-            getMBean()
-                .sendNotification(NotificationType.runtimeUnregistered,
-                notificationData);
+                proActiveRuntimeDist.getURL(), creationProtocol, vmName);
+            getMBean().sendNotification(NotificationType.runtimeUnregistered, notificationData);
         }
 
         // END JMX Notification
@@ -618,8 +597,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         synchronized (this.proActiveRuntimeMap) {
             runtimeArray = new ProActiveRuntime[this.proActiveRuntimeMap.size()];
 
-            for (java.util.Enumeration<ProActiveRuntime> e = this.proActiveRuntimeMap.elements();
-                    e.hasMoreElements();) {
+            for (java.util.Enumeration<ProActiveRuntime> e = this.proActiveRuntimeMap.elements(); e
+                    .hasMoreElements();) {
                 runtimeArray[i] = e.nextElement();
                 i++;
             }
@@ -689,11 +668,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 try {
                     mbs.unregisterMBean(objectName);
                 } catch (InstanceNotFoundException e) {
-                    jmxLogger.error("The MBean with the objectName " +
-                        objectName + " was not found", e);
+                    jmxLogger.error("The MBean with the objectName " + objectName + " was not found", e);
                 } catch (MBeanRegistrationException e) {
-                    jmxLogger.error("The MBean with the objectName " +
-                        objectName +
+                    jmxLogger.error("The MBean with the objectName " + objectName +
                         " can't be unregistered from the MBean server", e);
                 }
             }
@@ -707,9 +684,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getURL()
      */
     protected String getInternalURL() {
-        return URIBuilder.buildURI(URIBuilder.getHostNameorIP(
-                this.vmInformation.getInetAddress()),
-            this.vmInformation.getName()).toString();
+        return URIBuilder.buildURI(URIBuilder.getHostNameorIP(this.vmInformation.getInetAddress()),
+                this.vmInformation.getName()).toString();
     }
 
     /**
@@ -760,19 +736,18 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return this.virtualNodesMap.get(virtualNodeName);
     }
 
-    public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding) throws UnknownProtocolException {
+    public void registerVirtualNode(String virtualNodeName, boolean replacePreviousBinding)
+            throws UnknownProtocolException {
         String url;
-        url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(
-                    getInternalURL()), virtualNodeName).toString();
+        url = URIBuilder.buildURIFromProperties(URIBuilder.getHostNameFromUrl(getInternalURL()),
+                virtualNodeName).toString();
         this.roe.activateProtocol(URI.create(url));
     }
 
     public void unregisterVirtualNode(String virtualNodeName) {
         VirtualNodeInternal vn = virtualNodesMap.get(virtualNodeName);
         if (vn != null) {
-            JMXNotificationManager.getInstance()
-                                  .unsubscribe(getMBean().getObjectName(), vn);
+            JMXNotificationManager.getInstance().unsubscribe(getMBean().getObjectName(), vn);
         }
         virtualNodesMap.remove(virtualNodeName);
     }
@@ -790,8 +765,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return localNode.getJobId();
     }
 
-    public List<UniversalBody> getActiveObjects(String nodeName,
-        String className) {
+    public List<UniversalBody> getActiveObjects(String nodeName, String className) {
         // the array to return
         ArrayList<UniversalBody> localBodies = new ArrayList<UniversalBody>();
         LocalBodyStore localBodystore = LocalBodyStore.getInstance();
@@ -816,8 +790,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                     // unregister it from this ProActiveRuntime
                     unregisterBody(nodeName, bodyID);
                 } else {
-                    String objectClass = body.getReifiedObject().getClass()
-                                             .getName();
+                    String objectClass = body.getReifiedObject().getClass().getName();
 
                     // if the reified object is of the specified type
                     // return the body adapter
@@ -835,21 +808,19 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#createBody(String,
      *      ConstructorCall, boolean)
      */
-    public UniversalBody createBody(String nodeName,
-        ConstructorCall bodyConstructorCall, boolean isLocal)
-        throws ConstructorCallExecutionFailedException,
-            java.lang.reflect.InvocationTargetException {
+    public UniversalBody createBody(String nodeName, ConstructorCall bodyConstructorCall, boolean isLocal)
+            throws ConstructorCallExecutionFailedException, java.lang.reflect.InvocationTargetException {
         Body localBody = (Body) bodyConstructorCall.execute();
 
         // SECURITY
-        ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody).getProActiveSecurityManager();
+        ProActiveSecurityManager objectSecurityManager = ((AbstractBody) localBody)
+                .getProActiveSecurityManager();
 
         if (objectSecurityManager != null) {
             objectSecurityManager.setParent(this.nodeMap.get(nodeName));
         }
 
-        ProActiveLogger.getLogger(Loggers.RUNTIME).debug("nodeName " +
-            nodeName);
+        ProActiveLogger.getLogger(Loggers.RUNTIME).debug("nodeName " + nodeName);
         registerBody(nodeName, localBody);
 
         if (GarbageCollector.dgcIsEnabled()) {
@@ -895,8 +866,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#receiveCheckpoint(String,
      *      Checkpoint, int)
      */
-    public UniversalBody receiveCheckpoint(String nodeURL, Checkpoint ckpt,
-        int inc) throws ProActiveException {
+    public UniversalBody receiveCheckpoint(String nodeURL, Checkpoint ckpt, int inc)
+            throws ProActiveException {
         runtimeLogger.debug("Receive a checkpoint for recovery");
 
         // the recovered body
@@ -913,8 +884,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         // may send looged requests or logged replies
         LocalBodyStore.getInstance().pushContext(new Context(ret, null));
         try {
-            ((AbstractBody) ret).getFTManager()
-             .beforeRestartAfterRecovery(ckpt.getCheckpointInfo(), inc);
+            ((AbstractBody) ret).getFTManager().beforeRestartAfterRecovery(ckpt.getCheckpointInfo(), inc);
         } finally {
             // remove context for the current thread
             LocalBodyStore.getInstance().popContext();
@@ -989,8 +959,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * set the runtime security manager
      */
-    public static void setProActiveSecurityManager(
-        ProActiveSecurityManager server) {
+    public static void setProActiveSecurityManager(ProActiveSecurityManager server) {
         if (runtimeSecurityManager != null) {
             return;
         }
@@ -1004,8 +973,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getEntities(java.lang.String)
      */
     public Entities getEntities(String nodeName) {
-        ProActiveSecurityManager nodeSecurityManager = this.nodeMap.get(nodeName)
-                                                                   .getSecurityManager();
+        ProActiveSecurityManager nodeSecurityManager = this.nodeMap.get(nodeName).getSecurityManager();
 
         Entities entities = this.getEntities();
 
@@ -1083,8 +1051,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         Entities entities = new Entities();
 
         if (runtimeSecurityManager != null) {
-            entities.add(new Entity(
-                    runtimeSecurityManager.getMyCertificateChain()));
+            entities.add(new Entity(runtimeSecurityManager.getMyCertificateChain()));
             return entities;
         }
 
@@ -1094,8 +1061,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     /**
      * @param sc
      */
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException {
         if (runtimeSecurityManager == null) {
             throw new SecurityNotAvailableException();
         }
@@ -1104,8 +1070,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return runtimeSecurityManager.getPolicy(local, distant);
     }
 
-    public byte[] getClassDataFromParentRuntime(String className)
-        throws ProActiveException {
+    public byte[] getClassDataFromParentRuntime(String className) throws ProActiveException {
         byte[] classData = null;
 
         if (this.parentRuntime != null) {
@@ -1121,8 +1086,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 ClassDataCache.instance().addClassData(className, classData);
 
                 if (runtimeLogger.isDebugEnabled()) {
-                    runtimeLogger.debug(getURL() + " -- > Returning class " +
-                        className + " found in " + this.parentRuntime.getURL());
+                    runtimeLogger.debug(getURL() + " -- > Returning class " + className + " found in " +
+                        this.parentRuntime.getURL());
                 }
 
                 return classData;
@@ -1132,8 +1097,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return null;
     }
 
-    public synchronized byte[] getClassDataFromThisRuntime(String className)
-        throws ProActiveException {
+    public synchronized byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
         byte[] classData = null;
 
         // 1. look in class cache
@@ -1170,19 +1134,16 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         return null;
     }
 
-    public void launchMain(String className, String[] parameters)
-        throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
-        System.out.println("ProActiveRuntimeImpl.launchMain() -" + className +
-            "-");
+    public void launchMain(String className, String[] parameters) throws ClassNotFoundException,
+            NoSuchMethodException, ProActiveException {
+        System.out.println("ProActiveRuntimeImpl.launchMain() -" + className + "-");
 
         Class<?> mainClass = Class.forName(className);
-        Method mainMethod = mainClass.getMethod("main",
-                new Class[] { String[].class });
+        Method mainMethod = mainClass.getMethod("main", new Class[] { String[].class });
         new LauncherThread(mainMethod, parameters).start();
     }
 
-    public void newRemote(String className)
-        throws ClassNotFoundException, ProActiveException {
+    public void newRemote(String className) throws ClassNotFoundException, ProActiveException {
         Class<?> remoteClass = Class.forName(className);
         new LauncherThread(remoteClass).start();
     }
@@ -1228,8 +1189,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#terminateSession(long)
      */
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException {
+    public void terminateSession(long sessionID) throws SecurityNotAvailableException {
         if (runtimeSecurityManager == null) {
             throw new SecurityNotAvailableException();
         }
@@ -1241,8 +1201,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getCertificate()
      */
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException {
+    public TypedCertificate getCertificate() throws SecurityNotAvailableException {
         if (runtimeSecurityManager == null) {
             throw new SecurityNotAvailableException();
         }
@@ -1264,13 +1223,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#startNewSession(org.objectweb.proactive.ext.security.Communication)
      */
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SecurityNotAvailableException, SessionException {
+            TypedCertificate distantCertificate) throws SecurityNotAvailableException, SessionException {
         if (runtimeSecurityManager == null) {
             throw new SecurityNotAvailableException();
         }
-        return runtimeSecurityManager.startNewSession(distantSessionID, policy,
-            distantCertificate);
+        return runtimeSecurityManager.startNewSession(distantSessionID, policy, distantCertificate);
     }
 
     /*
@@ -1291,14 +1248,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#randomValue(long,
      *      byte[])
      */
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException {
         if (runtimeSecurityManager == null) {
             throw new SecurityNotAvailableException();
         }
         try {
-            return runtimeSecurityManager.randomValue(sessionID,
-                clientRandomValue);
+            return runtimeSecurityManager.randomValue(sessionID, clientRandomValue);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -1313,12 +1268,11 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      *      org.objectweb.proactive.core.body.UniversalBody, byte[], byte[],
      *      byte[])
      */
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException {
         if (runtimeSecurityManager != null) {
             try {
-                return runtimeSecurityManager.publicKeyExchange(sessionID,
-                    signature);
+                return runtimeSecurityManager.publicKeyExchange(sessionID, signature);
             } catch (KeyExchangeException e) {
                 e.printStackTrace();
             }
@@ -1335,16 +1289,14 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#secretKeyExchange(long,
      *      byte[], byte[], byte[], byte[], byte[])
      */
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException {
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException, RenegotiateSessionException {
         if (runtimeSecurityManager == null) {
             throw new SecurityNotAvailableException();
         }
-        return runtimeSecurityManager.secretKeyExchange(sessionID,
-            encodedAESKey, encodedIVParameters, encodedClientMacKey,
-            encodedLockData, parametersSignature);
+        return runtimeSecurityManager.secretKeyExchange(sessionID, encodedAESKey, encodedIVParameters,
+                encodedClientMacKey, encodedLockData, parametersSignature);
     }
 
     //    /*
@@ -1365,8 +1317,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     //
     // -- INNER CLASSES -----------------------------------------------
     //
-    protected static class VMInformationImpl implements VMInformation,
-        java.io.Serializable {
+    protected static class VMInformationImpl implements VMInformation, java.io.Serializable {
         private final java.net.InetAddress hostInetAddress;
 
         // the Unique ID of the JVM
@@ -1388,9 +1339,9 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 this.name = PAProperties.PA_RUNTIME_NAME.getValue();
 
                 if (this.name.indexOf("PA_JVM") < 0) {
-                    runtimeLogger.warn(
-                        "WARNING !!! The name of a ProActiveRuntime MUST contain PA_JVM string \n" +
-                        "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
+                    runtimeLogger
+                            .warn("WARNING !!! The name of a ProActiveRuntime MUST contain PA_JVM string \n"
+                                + "WARNING !!! Property proactive.runtime.name does not contain PA_JVM. This name is not adapted to IC2D tool");
                 }
             } else {
                 this.name = "PA_JVM" + random; //+ "_" + this.hostName;
@@ -1463,8 +1414,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         public int hashCode() {
             final int prime = 31;
             int result = 1;
-            result = (prime * result) +
-                ((uniqueVMID == null) ? 0 : uniqueVMID.hashCode());
+            result = (prime * result) + ((uniqueVMID == null) ? 0 : uniqueVMID.hashCode());
             return result;
         }
 
@@ -1519,8 +1469,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         public void run() {
             if (this.launchMain) {
                 try {
-                    this.mainMethod.invoke(null,
-                        new Object[] { this.parameters });
+                    this.mainMethod.invoke(null, new Object[] { this.parameters });
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {
@@ -1563,16 +1512,15 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException {
+            throws SecurityNotAvailableException, AccessControlException {
         if (runtimeSecurityManager == null) {
             throw new SecurityNotAvailableException();
         }
         return runtimeSecurityManager.getProActiveSecurityManager(user);
     }
 
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException {
         if (runtimeSecurityManager == null) {
             throw new SecurityNotAvailableException();
         }
@@ -1581,8 +1529,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     public Set<String> setCapacity(long capacity) {
         if (vmInformation.getCapacity() > 0) {
-            throw new IllegalStateException("setCapacity already set to " +
-                vmInformation.getCapacity());
+            throw new IllegalStateException("setCapacity already set to " + vmInformation.getCapacity());
         }
 
         if (capacity < 1) {
@@ -1597,15 +1544,12 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         String hostname = vmInformation.getHostName();
         for (long i = 0; i < capacity; i++) {
-            String nodeName = this.vmInformation.getName() + "_" +
-                Constants.GCM_NODE_NAME + i;
-            String url = URIBuilder.buildURI(hostname, nodeName, protocol)
-                                   .toString();
+            String nodeName = this.vmInformation.getName() + "_" + Constants.GCM_NODE_NAME + i;
+            String url = URIBuilder.buildURI(hostname, nodeName, protocol).toString();
 
             try {
                 // FIXME acontes PSM ?
-                nodeUrls.add(createLocalNode(url, false, null,
-                        VirtualNode.DEFAULT_VN, "Undefined"));
+                nodeUrls.add(createLocalNode(url, false, null, VirtualNode.DEFAULT_VN, "Undefined"));
             } catch (NodeException e) {
                 // Cannot do something here. This node will node be created
                 logger.warn("Failed to create a capacity node", e);
@@ -1614,8 +1558,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
                 // Should not happen, log it and delete the old node
                 logger.warn(url + "is already registered... replacing it !");
                 try {
-                    nodeUrls.add(createLocalNode(url, true, null,
-                            VirtualNode.DEFAULT_VN, null));
+                    nodeUrls.add(createLocalNode(url, true, null, VirtualNode.DEFAULT_VN, null));
                 } catch (NodeException e1) {
                     logger.warn("Failed to create a capacity node", e1);
                 } catch (AlreadyBoundException e1) {
@@ -1629,9 +1572,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl
 
     public void register(GCMRuntimeRegistrationNotificationData notification) {
         createRegistrationForwarder();
-        getMBean()
-            .sendNotification(NotificationType.GCMRuntimeRegistered,
-            notification);
+        getMBean().sendNotification(NotificationType.GCMRuntimeRegistered, notification);
     }
 
     public FileTransferEngine getFileTransferEngine() {

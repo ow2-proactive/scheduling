@@ -60,8 +60,8 @@ public class HierarchicalTimerStatistics implements Serializable {
      * activated)
      */
     public HierarchicalTimerStatistics() {
-        this(new String[1], new double[1][1][1], new double[1][1][1],
-            new double[1][1][1], new double[1][1][1], new int[1], 0);
+        this(new String[1], new double[1][1][1], new double[1][1][1], new double[1][1][1],
+                new double[1][1][1], new int[1], 0);
         this.empty = true;
     }
 
@@ -77,9 +77,8 @@ public class HierarchicalTimerStatistics implements Serializable {
      * @param hierarchy
      * @param nb
      */
-    public HierarchicalTimerStatistics(String[] timerName,
-        double[][][] deviation, double[][][] average, double[][][] min,
-        double[][][] max, int[] hierarchy, int nb) {
+    public HierarchicalTimerStatistics(String[] timerName, double[][][] deviation, double[][][] average,
+            double[][][] min, double[][][] max, int[] hierarchy, int nb) {
         this.timerName = timerName.clone();
         this.deviation = deviation.clone();
         this.average = average.clone();
@@ -172,25 +171,17 @@ public class HierarchicalTimerStatistics implements Serializable {
                             if (this.timerName[k].equals(rootName)) {
                                 tName = rootName + " :";
                                 tName = this.paddingString(tName, 30, ' ', false);
-                                result += (tName + "min " +
-                                this.format(this.min[i][j][k]));
+                                result += (tName + "min " + this.format(this.min[i][j][k]));
                             } else {
                                 if (this.timerName[j] != null) {
-                                    if (this.timerName[k].equals(
-                                                this.timerName[j])) {
-                                        tName = "-----> " + this.timerName[j] +
-                                            " :";
-                                        tName = this.paddingString(tName, 30,
-                                                ' ', false);
-                                        result += (tName + "min " +
-                                        this.format(this.min[i][j][k]));
+                                    if (this.timerName[k].equals(this.timerName[j])) {
+                                        tName = "-----> " + this.timerName[j] + " :";
+                                        tName = this.paddingString(tName, 30, ' ', false);
+                                        result += (tName + "min " + this.format(this.min[i][j][k]));
                                     } else {
-                                        tName = "        -----> " +
-                                            this.timerName[k] + " :";
-                                        tName = this.paddingString(tName, 30,
-                                                ' ', false);
-                                        result += (tName + "min " +
-                                        this.format(this.min[i][j][k]));
+                                        tName = "        -----> " + this.timerName[k] + " :";
+                                        tName = this.paddingString(tName, 30, ' ', false);
+                                        result += (tName + "min " + this.format(this.min[i][j][k]));
                                     }
                                 }
                             }
@@ -204,8 +195,7 @@ public class HierarchicalTimerStatistics implements Serializable {
                         result += ("max " + this.format(this.max[i][j][k]));
                     }
                     if (this.deviation[i][j][k] != -1) {
-                        result += ("dev " +
-                        this.format(this.deviation[i][j][k]) + "\n" + first);
+                        result += ("dev " + this.format(this.deviation[i][j][k]) + "\n" + first);
                     }
                     first = "";
                 }
@@ -223,8 +213,7 @@ public class HierarchicalTimerStatistics implements Serializable {
      * @return formatted String (padded)
      */
     private final String format(double t) {
-        return this.paddingString(TimIt.df.format(t), this.padding, ' ', true) +
-        "s    ";
+        return this.paddingString(TimIt.df.format(t), this.padding, ' ', true) + "s    ";
     }
 
     /**

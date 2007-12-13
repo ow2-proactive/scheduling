@@ -56,8 +56,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Implementation of a ProActiveRuntimeWrapper MBean
  * @author ProActive Team
  */
-public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
-    implements ProActiveRuntimeWrapperMBean, Serializable {
+public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport implements
+        ProActiveRuntimeWrapperMBean, Serializable {
 
     /** JMX Logger */
     // private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_MBEAN);
@@ -110,8 +110,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
         List<ObjectName> onames = new ArrayList<ObjectName>();
         for (int i = 0; i < nodeNames.length; i++) {
             String nodeName = nodeNames[i];
-            ObjectName oname = FactoryName.createNodeObjectName(getURL(),
-                    nodeName);
+            ObjectName oname = FactoryName.createNodeObjectName(getURL(), nodeName);
 
             onames.add(oname);
         }
@@ -125,8 +124,7 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport
     public void sendNotification(String type, Object userData) {
         ObjectName source = getObjectName();
         if (notificationsLogger.isDebugEnabled()) {
-            notificationsLogger.debug("[" + type +
-                "]#[ProActiveRuntimeWrapper.sendNotification] source=" +
+            notificationsLogger.debug("[" + type + "]#[ProActiveRuntimeWrapper.sendNotification] source=" +
                 source + ", userData=" + userData);
         }
 

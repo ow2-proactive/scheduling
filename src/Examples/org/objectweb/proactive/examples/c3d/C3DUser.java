@@ -58,8 +58,7 @@ import org.objectweb.proactive.examples.c3d.prim.Surface;
  * This class does not do gui related work, which is cast back to UserGUI.
  * It only handles the logic parts, ie specifies the behavior.
  */
-public class C3DUser implements InitActive, java.io.Serializable, User,
-    UserLogic {
+public class C3DUser implements InitActive, java.io.Serializable, User, UserLogic {
 
     /** useful for showing information, if no GUI is available, or for error messages*/
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
@@ -140,14 +139,15 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
      */
     public void initActivity(Body body) {
         if (body != null) { // FIXME: this is a component bug: sometimes body is null!    
-            MigrationStrategyManagerImpl myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) body);
+            MigrationStrategyManagerImpl myStrategyManager = new MigrationStrategyManagerImpl(
+                (org.objectweb.proactive.core.body.migration.Migratable) body);
             myStrategyManager.onArrival("rebuild");
             myStrategyManager.onDeparture("leaveHost");
         }
 
         // register user to dispatcher, while asking user to be patient
         WaitFrame wait = new WaitFrame("C3D : please wait!", "Please wait...",
-                "Waiting for information from Dispatcher");
+            "Waiting for information from Dispatcher");
         // get the stub, which is a long operation, while the wait window is displayed 
         this.me = (User) org.objectweb.proactive.api.PAActiveObject.getStubOnThis();
 
@@ -228,8 +228,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         ProActiveConfiguration.load();
 
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                    argv[0]);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + argv[0]);
         } catch (Exception e) {
             logger.error("Trouble loading descriptor file");
             e.printStackTrace();
@@ -242,8 +241,8 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
         try {
             //C3DUser c3duser = (C3DUser) 
-            org.objectweb.proactive.api.PAActiveObject.newActive(C3DUser.class.getName(),
-                params, user.getNode());
+            org.objectweb.proactive.api.PAActiveObject.newActive(C3DUser.class.getName(), params, user
+                    .getNode());
         } catch (Exception e) {
             logger.error("Problemn with C3DUser Active Object creation:");
             e.printStackTrace();
@@ -276,13 +275,12 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         if (talkId == null) {
             // BroadCast
             gui.writeMessage("<to all> " + message + '\n');
-            this.c3ddispatcher.userWriteMessageExcept(this.i_user,
-                "[from " + this.userName + "] " + message);
+            this.c3ddispatcher.userWriteMessageExcept(this.i_user, "[from " + this.userName + "] " + message);
         } else {
             // Private message
             gui.writeMessage("<to " + recipientName + "> " + message + '\n');
-            this.c3ddispatcher.userWriteMessage(talkId.intValue(),
-                "[Private from " + this.userName + "] " + message);
+            this.c3ddispatcher.userWriteMessage(talkId.intValue(), "[Private from " + this.userName + "] " +
+                message);
         }
     }
 
@@ -314,8 +312,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
         }
 
         if (index != -1) {
-            guiInfoText = guiInfoText.substring(0, index + 1) +
-                this.dispMachineAndOS;
+            guiInfoText = guiInfoText.substring(0, index + 1) + this.dispMachineAndOS;
         } else {
             guiInfoText += this.dispMachineAndOS;
         }
@@ -329,8 +326,7 @@ public class C3DUser implements InitActive, java.io.Serializable, User,
 
         hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
 
-        return "User\n   " + this.userName + " (" + hostName + ")" +
-        "\nDispatcher\n" + this.dispMachineAndOS;
+        return "User\n   " + this.userName + " (" + hostName + ")" + "\nDispatcher\n" + this.dispMachineAndOS;
     }
 
     private void createGUI() {

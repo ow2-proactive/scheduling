@@ -113,11 +113,10 @@ public class LinkedVirtualNode {
         while (iter.hasNext()) {
             LinkedVirtualNode element = (LinkedVirtualNode) iter.next();
             if (element.getDefiningComponentName().equals(EMPTY_COMPONENT_NAME) ||
-                    element.getVirtualNodeName().equals(EMPTY_VIRTUAL_NODE_NAME)) {
+                element.getVirtualNodeName().equals(EMPTY_VIRTUAL_NODE_NAME)) {
                 continue;
             }
-            buff.append(element.getDefiningComponentName() + "." +
-                element.getVirtualNodeName());
+            buff.append(element.getDefiningComponentName() + "." + element.getVirtualNodeName());
             buff.append(";");
         }
         return buff.toString();
@@ -144,8 +143,7 @@ public class LinkedVirtualNode {
      * virtual node in the hierarchy of composed virtual nodes
      */
     public String getExportedVirtualNodeNameAfterComposition() {
-        return ((composer == null) ? virtualNodeName
-                                   : composer.getExportedVirtualNodeNameAfterComposition());
+        return ((composer == null) ? virtualNodeName : composer.getExportedVirtualNodeNameAfterComposition());
     }
 
     /**
@@ -153,8 +151,7 @@ public class LinkedVirtualNode {
      * @return the name
      */
     public String getExportedVirtualNodeNameBeforeComposition() {
-        return ((composer == null) ? virtualNodeName
-                                   : composer.getVirtualNodeName());
+        return ((composer == null) ? virtualNodeName : composer.getVirtualNodeName());
     }
 
     /**
@@ -199,7 +196,6 @@ public class LinkedVirtualNode {
     //    public void setSelfExported() {
     //        selfExported=true;
     //    }
-
     /**
      * @return true if the composing virtual node and the exported virtual node are defined in the same component.
      */
@@ -209,8 +205,7 @@ public class LinkedVirtualNode {
         }
 
         // FIXME find a better way
-        return (isLeaf ||
-        composer.getDefiningComponentName().equals(getDefiningComponentName()));
+        return (isLeaf || composer.getDefiningComponentName().equals(getDefiningComponentName()));
     }
 
     /**
@@ -252,13 +247,11 @@ public class LinkedVirtualNode {
     public String toString() {
         StringBuffer buffer = new StringBuffer();
         if (composer == this) {
-            buffer.append(getDefiningComponentName() + "." +
-                getVirtualNodeName() + "<--" + componentName + "." +
-                virtualNodeName + "-->{");
+            buffer.append(getDefiningComponentName() + "." + getVirtualNodeName() + "<--" + componentName +
+                "." + virtualNodeName + "-->{");
         } else if (composer != null) {
-            buffer.append(composer.getDefiningComponentName() + "." +
-                composer.getVirtualNodeName() + "<--" + componentName + "." +
-                virtualNodeName + "-->{");
+            buffer.append(composer.getDefiningComponentName() + "." + composer.getVirtualNodeName() + "<--" +
+                componentName + "." + virtualNodeName + "-->{");
         }
         Iterator it = composingVirtualNodes.iterator();
         while (it.hasNext()) {

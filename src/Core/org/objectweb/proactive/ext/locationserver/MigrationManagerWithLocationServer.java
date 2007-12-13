@@ -74,20 +74,15 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
 
         //  if (locationServer != null) {
         if (logger.isDebugEnabled()) {
-            logger.debug("Updating location with this stub " +
-                body.getRemoteAdapter());
+            logger.debug("Updating location with this stub " + body.getRemoteAdapter());
         }
 
-        System.out.println(
-            "MigrationManagerWithLocationServer.updateLocation() location server" +
+        System.out.println("MigrationManagerWithLocationServer.updateLocation() location server" +
             this.locationServer);
 
-        System.out.println(
-            "MigrationManagerWithLocationServer.updateLocation() body.getID()" +
-            body.getID());
+        System.out.println("MigrationManagerWithLocationServer.updateLocation() body.getID()" + body.getID());
 
-        System.out.println(
-            "MigrationManagerWithLocationServer.updateLocation() body.getremoteadapter() " +
+        System.out.println("MigrationManagerWithLocationServer.updateLocation() body.getremoteadapter() " +
             body.getRemoteAdapter());
 
         this.locationServer.updateLocation(body.getID(), body.getRemoteAdapter());
@@ -98,8 +93,7 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
     // -- Implements MigrationManager -----------------------------------------------
     //
     @Override
-    public UniversalBody migrateTo(Node node, Body body)
-        throws MigrationException {
+    public UniversalBody migrateTo(Node node, Body body) throws MigrationException {
         this.locationServer = null;
         if (this.myBody == null) {
             this.myBody = body;
@@ -119,18 +113,16 @@ public class MigrationManagerWithLocationServer extends MigrationManagerImpl {
     //    }
     @Override
     public RequestReceiver createRequestReceiver(UniversalBody remoteBody,
-        RequestReceiver currentRequestReceiver) {
+            RequestReceiver currentRequestReceiver) {
         return new BouncingRequestReceiver();
     }
 
     @Override
-    public ReplyReceiver createReplyReceiver(UniversalBody remoteBody,
-        ReplyReceiver currentReplyReceiver) {
+    public ReplyReceiver createReplyReceiver(UniversalBody remoteBody, ReplyReceiver currentReplyReceiver) {
         return currentReplyReceiver;
     }
 
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.updateLocation(this.myBody);
         //	this.updateLocation();

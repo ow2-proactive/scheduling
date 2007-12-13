@@ -52,8 +52,7 @@ public class RemoteObjectHelper {
      * @return the default port number associated to the protocol or -1 if none
      * @throws UnknownProtocolException
      */
-    public static int getDefaultPortForProtocol(String protocol)
-        throws UnknownProtocolException {
+    public static int getDefaultPortForProtocol(String protocol) throws UnknownProtocolException {
         if (Constants.XMLHTTP_PROTOCOL_IDENTIFIER.equals(protocol)) {
             // http port could change according the availability of the default port when activated
             // so we first instantiante the factory which will set the new port if necessary
@@ -63,8 +62,8 @@ public class RemoteObjectHelper {
                 return Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue());
             }
         } else if ((Constants.RMI_PROTOCOL_IDENTIFIER.equals(protocol)) ||
-                Constants.IBIS_PROTOCOL_IDENTIFIER.equals(protocol) ||
-                Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(protocol)) {
+            Constants.IBIS_PROTOCOL_IDENTIFIER.equals(protocol) ||
+            Constants.RMISSH_PROTOCOL_IDENTIFIER.equals(protocol)) {
             return Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
         }
 
@@ -80,10 +79,8 @@ public class RemoteObjectHelper {
      * @return the default port number associated to the protocol
      * @throws UnknownProtocolException
      */
-    public static URI generateUrl(String protocol, String name)
-        throws UnknownProtocolException {
-        return URIBuilder.buildURI(null, name, protocol,
-            getDefaultPortForProtocol(protocol), true);
+    public static URI generateUrl(String protocol, String name) throws UnknownProtocolException {
+        return URIBuilder.buildURI(null, name, protocol, getDefaultPortForProtocol(protocol), true);
     }
 
     /**
@@ -96,8 +93,7 @@ public class RemoteObjectHelper {
     public static URI generateUrl(String name) {
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
         try {
-            return URIBuilder.buildURI(null, name, protocol,
-                getDefaultPortForProtocol(protocol), true);
+            return URIBuilder.buildURI(null, name, protocol, getDefaultPortForProtocol(protocol), true);
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         }
@@ -109,8 +105,7 @@ public class RemoteObjectHelper {
      * @return return the remote object factory for a given protocol
      * @throws UnknownProtocolException
      */
-    public static RemoteObjectFactory getRemoteObjectFactory(String protocol)
-        throws UnknownProtocolException {
+    public static RemoteObjectFactory getRemoteObjectFactory(String protocol) throws UnknownProtocolException {
         return AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
     }
 
@@ -119,8 +114,7 @@ public class RemoteObjectHelper {
      * @return eturn the remote object factory for the protocol contained within the url
      * @throws UnknownProtocolException
      */
-    public static RemoteObjectFactory getFactoryFromURL(URI url)
-        throws UnknownProtocolException {
+    public static RemoteObjectFactory getFactoryFromURL(URI url) throws UnknownProtocolException {
         url = expandURI(url);
         return getRemoteObjectFactory(url.getScheme());
     }
@@ -143,11 +137,9 @@ public class RemoteObjectHelper {
         if (uri.getScheme() == null) {
             int port = uri.getPort();
             if (port == -1) {
-                uri = URIBuilder.buildURIFromProperties(uri.getHost(),
-                        uri.getPath());
+                uri = URIBuilder.buildURIFromProperties(uri.getHost(), uri.getPath());
             } else {
-                uri = URIBuilder.setProtocol(uri,
-                        PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+                uri = URIBuilder.setProtocol(uri, PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
             }
         }
         return uri;
@@ -161,11 +153,10 @@ public class RemoteObjectHelper {
      * @return return a remote reference on the remote object (aka a RemoteRemoteObject)
      * @throws ProActiveException
      */
-    public static RemoteRemoteObject register(RemoteObject target, URI url,
-        boolean replacePreviousBinding) throws ProActiveException {
-        return getFactoryFromURL(url)
-                   .register(new InternalRemoteRemoteObjectImpl(target),
-            expandURI(url), replacePreviousBinding);
+    public static RemoteRemoteObject register(RemoteObject target, URI url, boolean replacePreviousBinding)
+            throws ProActiveException {
+        return getFactoryFromURL(url).register(new InternalRemoteRemoteObjectImpl(target), expandURI(url),
+                replacePreviousBinding);
     }
 
     /**
@@ -193,14 +184,12 @@ public class RemoteObjectHelper {
      * @return the couple stub + proxy on the given remote object
      * @throws ProActiveException if the stub generation has failed or if the remote object is no longer available
      */
-    public static Object generatedObjectStub(RemoteObject ro)
-        throws ProActiveException {
+    public static Object generatedObjectStub(RemoteObject ro) throws ProActiveException {
         try {
-            Object reifiedObjectStub = MOP.createStubObject(ro.getClassName(),
-                    ro.getTargetClass(), new Class[] {  });
+            Object reifiedObjectStub = MOP.createStubObject(ro.getClassName(), ro.getTargetClass(),
+                    new Class[] {});
 
-            ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(
-                    null, new Object[] { ro }));
+            ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(null, new Object[] { ro }));
 
             Class<?> adapter = ro.getAdapterClass();
 

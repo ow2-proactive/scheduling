@@ -40,12 +40,9 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupCGSPParser extends AbstractGroupParser {
-    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
-        "stderr";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
-        "stdout";
-    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE +
-        "directory";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
+    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE + "directory";
     private static final String NODE_NAME_COUNT = NODE_EXT_NAMESPACE + "count";
     private static final String ATTR_QUEUE = "queue";
     private static final String ATTR_HOSTNAME = "hostname";
@@ -65,8 +62,7 @@ public class GroupCGSPParser extends AbstractGroupParser {
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         GroupCGSP cgspGroup = (GroupCGSP) super.parseGroupNode(groupNode, xpath);
 
-        String hostname = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_HOSTNAME);
+        String hostname = GCMParserHelper.getAttributeValue(groupNode, ATTR_HOSTNAME);
         cgspGroup.setHostName(hostname);
 
         String queue = GCMParserHelper.getAttributeValue(groupNode, ATTR_QUEUE);

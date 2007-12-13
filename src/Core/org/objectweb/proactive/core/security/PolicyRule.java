@@ -39,8 +39,8 @@ import org.objectweb.proactive.core.security.securityentity.RuleEntities;
 public class PolicyRule implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private final RuleEntities from;
     private final RuleEntities to;
     private final Communication communicationReply;
@@ -62,11 +62,9 @@ public class PolicyRule implements Serializable {
         this.aocreation = false;
     }
 
-    public PolicyRule(RuleEntities from, RuleEntities to,
-        Communication request, Communication reply, boolean aoCreation,
-        boolean migration) {
-        if ((from == null) || (to == null) || (request == null) ||
-                (reply == null)) {
+    public PolicyRule(RuleEntities from, RuleEntities to, Communication request, Communication reply,
+            boolean aoCreation, boolean migration) {
+        if ((from == null) || (to == null) || (request == null) || (reply == null)) {
             throw new NullPointerException();
         }
         this.from = from;
@@ -81,9 +79,8 @@ public class PolicyRule implements Serializable {
      * Copy constructor.
      */
     public PolicyRule(PolicyRule policy) {
-        this(policy.getEntitiesFrom(), policy.getEntitiesTo(),
-            policy.getCommunicationRequest(), policy.getCommunicationReply(),
-            policy.isAoCreation(), policy.isMigration());
+        this(policy.getEntitiesFrom(), policy.getEntitiesTo(), policy.getCommunicationRequest(), policy
+                .getCommunicationReply(), policy.isAoCreation(), policy.isMigration());
     }
 
     //    /**
@@ -129,9 +126,8 @@ public class PolicyRule implements Serializable {
             vnTo = this.to.toString();
         }
 
-        return vnFrom + "-->\n" + vnTo + "\nRequest : " +
-        this.communicationRequest + "\nReply : " + this.communicationReply +
-        "\nMigration :" + this.migration + "\nAOCreation:" + this.aocreation;
+        return vnFrom + "-->\n" + vnTo + "\nRequest : " + this.communicationRequest + "\nReply : " +
+            this.communicationReply + "\nMigration :" + this.migration + "\nAOCreation:" + this.aocreation;
     }
 
     //    /**
@@ -216,13 +212,10 @@ public class PolicyRule implements Serializable {
                 Communication reply = Communication.computeCommunication(policy.getCommunicationReply(),
                         resultPolicy.getCommunicationReply());
 
-                boolean aoCreation = policy.isAoCreation() &&
-                    resultPolicy.isAoCreation();
-                boolean migration = policy.isMigration() &&
-                    resultPolicy.isMigration();
+                boolean aoCreation = policy.isAoCreation() && resultPolicy.isAoCreation();
+                boolean migration = policy.isMigration() && resultPolicy.isMigration();
 
-                resultPolicy = new PolicyRule(from, to, request, reply,
-                        aoCreation, migration);
+                resultPolicy = new PolicyRule(from, to, request, reply, aoCreation, migration);
             }
         }
         return resultPolicy;

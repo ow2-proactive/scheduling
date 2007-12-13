@@ -54,8 +54,7 @@ public class ProActiveLoggerFactory implements LoggerFactory {
         if (System.getProperty("log4j.configuration") == null) {
             Properties p = new Properties();
             try {
-                InputStream in = PAProperties.class.getResourceAsStream(
-                        "proactive-log4j");
+                InputStream in = PAProperties.class.getResourceAsStream("proactive-log4j");
                 if (in != null) {
                     p.load(in);
                     PropertyConfigurator.configure(p);

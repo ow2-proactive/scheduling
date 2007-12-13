@@ -54,13 +54,11 @@ public class NonFunctionalServices {
 
     static {
         try {
-            nonFunctionalServicesClass = java.lang.Class.forName(
-                    "org.objectweb.proactive.core.util.NonFunctionalServices");
+            nonFunctionalServicesClass = java.lang.Class
+                    .forName("org.objectweb.proactive.core.util.NonFunctionalServices");
             paramTypes = new Class<?>[1];
-            paramTypes[0] = java.lang.Class.forName(
-                    "org.objectweb.proactive.core.mop.Proxy");
-            terminateAOMethod = nonFunctionalServicesClass.getMethod("_terminateAO",
-                    paramTypes);
+            paramTypes[0] = java.lang.Class.forName("org.objectweb.proactive.core.mop.Proxy");
+            terminateAOMethod = nonFunctionalServicesClass.getMethod("_terminateAO", paramTypes);
             terminateAOImmediatelyMethod = nonFunctionalServicesClass.getMethod("_terminateAOImmediately",
                     paramTypes);
         } catch (ClassNotFoundException e) {
@@ -88,10 +86,9 @@ public class NonFunctionalServices {
      * @param proxy
      * @throws Throwable
      */
-    public static void terminateAOImmediately(Proxy proxy)
-        throws Throwable {
-        proxy.reify(MethodCall.getMethodCall(terminateAOImmediatelyMethod,
-                paramTypes, (Map<TypeVariable, Class<?>>) null));
+    public static void terminateAOImmediately(Proxy proxy) throws Throwable {
+        proxy.reify(MethodCall.getMethodCall(terminateAOImmediatelyMethod, paramTypes,
+                (Map<TypeVariable, Class<?>>) null));
     }
 
     /**

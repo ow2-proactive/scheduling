@@ -48,8 +48,7 @@ public class ExpandAllAction extends Action {
         this.viewer = viewer;
         this.setText("Expand All");
         this.setToolTipText("To expand all items");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/expandall.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/expandall.gif"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 

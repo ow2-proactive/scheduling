@@ -72,8 +72,7 @@ public class TestTypeFactory extends Conformtest {
     public void testNotAnInterface() {
         try {
             // not an interface
-            Type t = tf.createFcItfType("i", TestTypeFactory.class.getName(),
-                    false, false, false);
+            Type t = tf.createFcItfType("i", TestTypeFactory.class.getName(), false, false, false);
             gf.newFcInstance(t, "composite", null);
             fail();
         } catch (InstantiationException e) {
@@ -85,12 +84,9 @@ public class TestTypeFactory extends Conformtest {
     // -------------------------------------------------------------------------
     @Test
     public void testComponentType() throws Exception {
-        InterfaceType sType = tf.createFcItfType("s", I.class.getName(), false,
-                false, false);
-        InterfaceType i1Type = tf.createFcItfType("i1", I.class.getName(),
-                true, false, false);
-        InterfaceType i2Type = tf.createFcItfType("i2", I.class.getName(),
-                true, false, false);
+        InterfaceType sType = tf.createFcItfType("s", I.class.getName(), false, false, false);
+        InterfaceType i1Type = tf.createFcItfType("i1", I.class.getName(), true, false, false);
+        InterfaceType i2Type = tf.createFcItfType("i2", I.class.getName(), true, false, false);
         tf.createFcType(null);
         tf.createFcType(new InterfaceType[] { sType });
         tf.createFcType(new InterfaceType[] { i1Type, i2Type });
@@ -102,11 +98,8 @@ public class TestTypeFactory extends Conformtest {
         try {
             // bad prefixes
             tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("i", I.class.getName(), false, false,
-                        false),
-                    tf.createFcItfType("i", I.class.getName(), true, false,
-                        false)
-                });
+                    tf.createFcItfType("i", I.class.getName(), false, false, false),
+                    tf.createFcItfType("i", I.class.getName(), true, false, false) });
             fail();
         } catch (InstantiationException e) {
         }
@@ -114,8 +107,7 @@ public class TestTypeFactory extends Conformtest {
             // bad prefixes
             tf.createFcType(new InterfaceType[] {
                     tf.createFcItfType("i", I.class.getName(), true, true, true),
-                    tf.createFcItfType("ij", I.class.getName(), true, true, true)
-                });
+                    tf.createFcItfType("ij", I.class.getName(), true, true, true) });
             fail();
         } catch (InstantiationException e) {
         }

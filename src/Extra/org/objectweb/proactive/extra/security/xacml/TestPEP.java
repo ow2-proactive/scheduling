@@ -68,13 +68,12 @@ public class TestPEP {
      * @throws URISyntaxException
      *             if there is a problem with a URI
      */
-    private static Set<Subject> setupSubjects(List<String> from)
-        throws URISyntaxException {
+    private static Set<Subject> setupSubjects(List<String> from) throws URISyntaxException {
         // bundle the attributes in a Subject with the default category
         Set<Attribute> attributes = new HashSet<Attribute>();
         for (String entity : from) {
-            attributes.add(new Attribute(new URI(StringAttribute.identifier),
-                    null, null, new StringAttribute(entity)));
+            attributes.add(new Attribute(new URI(StringAttribute.identifier), null, null,
+                new StringAttribute(entity)));
         }
         Set<Subject> subjects = new HashSet<Subject>();
         subjects.add(new Subject(attributes));
@@ -90,12 +89,11 @@ public class TestPEP {
      * @throws URISyntaxException
      *             if there is a problem with a URI
      */
-    private static Set<Attribute> setupResource(List<String> to)
-        throws URISyntaxException {
+    private static Set<Attribute> setupResource(List<String> to) throws URISyntaxException {
         Set<Attribute> resource = new HashSet<Attribute>();
         for (String entity : to) {
-            resource.add(new Attribute(new URI(EvaluationCtx.RESOURCE_ID),
-                    null, null, new StringAttribute(entity)));
+            resource.add(new Attribute(new URI(EvaluationCtx.RESOURCE_ID), null, null, new StringAttribute(
+                entity)));
         }
         return resource;
     }
@@ -108,8 +106,7 @@ public class TestPEP {
      * @throws URISyntaxException
      *             if there is a problem with a URI
      */
-    private static Set<Attribute> setupAction(String actionName)
-        throws URISyntaxException {
+    private static Set<Attribute> setupAction(String actionName) throws URISyntaxException {
         Set<Attribute> action = new HashSet<Attribute>();
 
         // this is a standard URI that can optionally be used to specify
@@ -117,16 +114,15 @@ public class TestPEP {
         URI actionId = new URI("urn:oasis:names:tc:xacml:1.0:action:action-id");
 
         // create the action
-        action.add(new Attribute(actionId, null, null,
-                new StringAttribute(actionName)));
+        action.add(new Attribute(actionId, null, null, new StringAttribute(actionName)));
 
         return action;
     }
 
-    public boolean evaluate(List<String> from, List<String> to, String action)
-        throws ParsingException, URISyntaxException {
-        RequestCtx request = new RequestCtx(setupSubjects(from),
-                setupResource(to), setupAction(action), new HashSet<Attribute>());
+    public boolean evaluate(List<String> from, List<String> to, String action) throws ParsingException,
+            URISyntaxException {
+        RequestCtx request = new RequestCtx(setupSubjects(from), setupResource(to), setupAction(action),
+            new HashSet<Attribute>());
 
         // request.encode(System.out);
         // System.out.println("===");
@@ -150,7 +146,7 @@ public class TestPEP {
             Logger logger = Logger.getLogger(PDP.class.getName());
             logger.addHandler(handler);
             TestPEP pep = new TestPEP(
-                    "/user/nhouillo/home/ws/ProActive/src/Extra/org.objectweb.proactive.extensions.security.loginmodule/xacml/generated.xml");
+                "/user/nhouillo/home/ws/ProActive/src/Extra/org.objectweb.proactive.extensions.security.loginmodule/xacml/generated.xml");
             List<String> from = new ArrayList<String>();
             from.add("TATA");
             List<String> to = new ArrayList<String>();

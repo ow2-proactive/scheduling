@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.masterworker.interfaces.internal;
 
-
 /**
  * <i><font size="-1" color="#FF0000">**For internal use only** </font></i><br>
  * An object implementing this interface expects to be notified when a Worker is missing<br/>

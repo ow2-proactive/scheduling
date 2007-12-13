@@ -50,22 +50,22 @@ import javax.swing.JTextField;
 
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo
+ * SWT/Swing GUI Builder, which is free for non-commercial
+ * use. If Jigloo is being used commercially (ie, by a corporation,
+ * company or business for any purpose whatever) then you
+ * should purchase a license for each developer using Jigloo.
+ * Please visit www.cloudgarden.com for details.
+ * Use of Jigloo implies acceptance of these licensing terms.
+ * A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+ * THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+ * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class DialogResult extends javax.swing.JDialog {
 
     /**
-         *
-         */
+     *
+     */
     private JPanel pnlMain;
     private JLabel lblPath;
     private JPanel pnlPath;
@@ -111,12 +111,10 @@ public class DialogResult extends javax.swing.JDialog {
 
                         pnlInit.setLayout(pnlInitLayout);
                         pnlInit.setSize(570, 235);
-                        pnlInit.setBorder(BorderFactory.createTitledBorder(
-                                "Initialize Script"));
+                        pnlInit.setBorder(BorderFactory.createTitledBorder("Initialize Script"));
                         scrollInit = new JScrollPane();
                         pnlInit.add(scrollInit, BorderLayout.CENTER);
-                        scrollInit.setPreferredSize(new java.awt.Dimension(
-                                500, 210));
+                        scrollInit.setPreferredSize(new java.awt.Dimension(500, 210));
                         scrollInit.setSize(500, 210);
                         txtInit = new JTextArea();
                         scrollInit.setViewportView(txtInit);
@@ -129,12 +127,10 @@ public class DialogResult extends javax.swing.JDialog {
                         BorderLayout pnlOutParamLayout = new BorderLayout();
                         pnlTask.add(pnlOutParam, BorderLayout.CENTER);
                         pnlOutParam.setLayout(pnlOutParamLayout);
-                        pnlOutParam.setBorder(BorderFactory.createTitledBorder(
-                                "Out Parameters"));
+                        pnlOutParam.setBorder(BorderFactory.createTitledBorder("Out Parameters"));
                         scrollOutParam = new JScrollPane();
                         pnlOutParam.add(scrollOutParam, BorderLayout.CENTER);
-                        scrollOutParam.setPreferredSize(new java.awt.Dimension(
-                                553, 256));
+                        scrollOutParam.setPreferredSize(new java.awt.Dimension(553, 256));
                         scrollOutParam.setSize(500, 210);
                         txtOutParam = new JTextArea();
                         scrollOutParam.setViewportView(txtOutParam);
@@ -153,18 +149,18 @@ public class DialogResult extends javax.swing.JDialog {
                     pnlQuit.add(btnSave);
                     btnSave.setText("Save");
                     btnSave.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnSaveActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnSaveActionPerformed(evt);
+                        }
+                    });
                     btnQuit = new JButton();
                     pnlQuit.add(btnQuit);
                     btnQuit.setText("Quit");
                     btnQuit.addActionListener(new ActionListener() {
-                            public void actionPerformed(ActionEvent evt) {
-                                btnQuitActionPerformed(evt);
-                            }
-                        });
+                        public void actionPerformed(ActionEvent evt) {
+                            btnQuitActionPerformed(evt);
+                        }
+                    });
                 }
 
                 {

@@ -192,8 +192,8 @@ public class TimItReductor implements ProActiveInternalObject, Serializable {
      * its vector of EventDatas. Important note : The order of each
      * eventDataVector is preserved between workers.
      */
-    public void receiveAll(EventDataBag eventDataBag,
-        HierarchicalTimer receivedTimer, String receivedInformation) {
+    public void receiveAll(EventDataBag eventDataBag, HierarchicalTimer receivedTimer,
+            String receivedInformation) {
         if (eventDataBag != null) {
             this.bagList.add(eventDataBag);
         }
@@ -229,8 +229,7 @@ public class TimItReductor implements ProActiveInternalObject, Serializable {
         EventDataBag firstBag = this.bagList.get(0);
 
         if (firstBag == null) {
-            System.out.println("The first bag is null inside method " +
-                "TimItReductor.collapseStatData !");
+            System.out.println("The first bag is null inside method " + "TimItReductor.collapseStatData !");
             return null;
         }
 
@@ -254,8 +253,7 @@ public class TimItReductor implements ProActiveInternalObject, Serializable {
             // Iterate through other bags
             for (j = 1; j < this.bagList.size(); j++) {
                 anotherBag = this.bagList.get(j);
-                data.collapseWith(anotherBag.getEventData(i),
-                    anotherBag.getSubjectRank());
+                data.collapseWith(anotherBag.getEventData(i), anotherBag.getSubjectRank());
             }
         }
         return firstBag;

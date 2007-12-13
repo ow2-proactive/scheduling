@@ -41,8 +41,7 @@ public class TagMissingException extends Exception {
     // -- CONSTRUCTORS ---------------------------------------------
     //
     public TagMissingException(XMLDescriptor desc) {
-        super("The file (" + desc.getPath() +
-            ") must contain a mainDefinition tag!");
+        super("The file (" + desc.getPath() + ") must contain a mainDefinition tag!");
         this.descriptor = desc;
     }
 

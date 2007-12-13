@@ -96,8 +96,7 @@ public class Jacobi implements Serializable {
             Object[] params = new Object[1];
             params[0] = descriptor;
             try {
-                singleton = (Jacobi) PAActiveObject.newActive(Jacobi.class.getName(),
-                        params);
+                singleton = (Jacobi) PAActiveObject.newActive(Jacobi.class.getName(), params);
             } catch (ActiveObjectCreationException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -120,13 +119,11 @@ public class Jacobi implements Serializable {
 
     public static void main(String[] args) {
         if (args.length != 1) {
-            logger.error("Usage: java " + Jacobi.class.getName() +
-                " <deployment file>");
+            logger.error("Usage: java " + Jacobi.class.getName() + " <deployment file>");
             System.exit(1);
         }
 
-        File resultFile = new File(System.getProperty("user.dir") +
-                File.separator + resultsFileName);
+        File resultFile = new File(System.getProperty("user.dir") + File.separator + resultsFileName);
 
         if (resultFile.exists()) {
             resultFile.delete();
@@ -134,8 +131,7 @@ public class Jacobi implements Serializable {
 
         try {
             if (!resultFile.createNewFile()) {
-                logger.error("Error creating : " +
-                    resultFile.getAbsolutePath());
+                logger.error("Error creating : " + resultFile.getAbsolutePath());
                 System.exit(1);
             }
         } catch (IOException e2) {
@@ -146,8 +142,7 @@ public class Jacobi implements Serializable {
         ProActiveDescriptor proActiveDescriptor = null;
         String[] nodes = null;
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                    args[0]);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + args[0]);
         } catch (ProActiveException e) {
             System.err.println("** ProActiveException **");
         }
@@ -171,8 +166,7 @@ public class Jacobi implements Serializable {
 
         SubMatrix matrix = null;
         try {
-            matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(),
-                    params, nodes);
+            matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(), params, nodes);
         } catch (ClassNotFoundException e) {
             System.err.println("** ClassNotFoundException **");
         } catch (ClassNotReifiableException e) {

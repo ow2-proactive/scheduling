@@ -94,8 +94,7 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
     }
 
     /** Creates a new ActivePrimeContainer starting with number n */
-    public ActivePrimeContainer newActivePrimeContainer(long n,
-        Slowable previous) {
+    public ActivePrimeContainer newActivePrimeContainer(long n, Slowable previous) {
         try {
             int containerSize;
 
@@ -126,13 +125,10 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
                 node = NodeFactory.getDefaultNode();
             }
 
-            logger.info("    Creating container with size " + containerSize +
-                " starting with number " + n);
-            ActivePrimeContainer result = (ActivePrimeContainer) PAActiveObject.newActive(ActivePrimeContainer.class.getName(),
-                    new Object[] {
-                        PAActiveObject.getStubOnThis(), outputListener,
-                        new Integer(containerSize), new Long(n), previous
-                    }, node);
+            logger.info("    Creating container with size " + containerSize + " starting with number " + n);
+            ActivePrimeContainer result = (ActivePrimeContainer) PAActiveObject.newActive(
+                    ActivePrimeContainer.class.getName(), new Object[] { PAActiveObject.getStubOnThis(),
+                            outputListener, new Integer(containerSize), new Long(n), previous }, node);
 
             // Workaround for a little bug in ProActive (Exception in receiveRequest)
             // may be removed as the bug is fixed
@@ -159,14 +155,14 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             }
 
             // create output listener
-            outputListener = (PrimeOutputListener) PAActiveObject.newActive(ConsolePrimeOutputListener.class.getName(),
-                    new Object[] {  }, listenerNode);
+            outputListener = (PrimeOutputListener) PAActiveObject.newActive(ConsolePrimeOutputListener.class
+                    .getName(), new Object[] {}, listenerNode);
 
             outputListener.newPrimeNumberFound(2);
 
             // create number source  
-            source = (NumberSource) PAActiveObject.newActive(NumberSource.class.getName(),
-                    new Object[] {  }, sourceNode);
+            source = (NumberSource) PAActiveObject.newActive(NumberSource.class.getName(), new Object[] {},
+                    sourceNode);
 
             // create first container  			
             ActivePrimeContainer first = newActivePrimeContainer(3, source);
@@ -213,8 +209,8 @@ public class Main implements ActivePrimeContainerCreator, InitActive {
             }
         }
         ProActiveConfiguration.load();
-        Main main = (Main) PAActiveObject.newActive(Main.class.getName(),
-                new Object[] { xmlDescriptor, new Boolean(gui) });
+        Main main = (Main) PAActiveObject.newActive(Main.class.getName(), new Object[] { xmlDescriptor,
+                new Boolean(gui) });
     }
 
     /** class for control window. */

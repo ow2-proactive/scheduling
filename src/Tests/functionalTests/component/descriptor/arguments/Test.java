@@ -51,13 +51,13 @@ import functionalTests.ComponentTest;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     Component dummy;
 
     public Test() {
         super("Configuration with ADL arguments and AttributeController",
-            "Configuration with ADL arguments and AttributeController");
+                "Configuration with ADL arguments and AttributeController");
     }
 
     /* (non-Javadoc)
@@ -68,11 +68,10 @@ public class Test extends ComponentTest {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
         context.put("message", "hello world");
-        dummy = (Component) f.newComponent("functionalTests.component.descriptor.arguments.dummy",
-                context);
+        dummy = (Component) f.newComponent("functionalTests.component.descriptor.arguments.dummy", context);
         Fractal.getLifeCycleController(dummy).startFc();
 
-        Assert.assertEquals("This component is storing the info : hello world",
-            ((Action) dummy.getFcInterface("action")).doSomething());
+        Assert.assertEquals("This component is storing the info : hello world", ((Action) dummy
+                .getFcInterface("action")).doSomething());
     }
 }

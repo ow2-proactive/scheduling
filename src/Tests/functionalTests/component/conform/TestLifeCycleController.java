@@ -58,15 +58,10 @@ public class TestLifeCycleController extends Conformtest {
         tf = Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("server", I.class.getName(), false,
-                        false, false),
-                    tf.createFcItfType("servers", I.class.getName(), false,
-                        false, true),
-                    tf.createFcItfType("client", I.class.getName(), true,
-                        false, false),
-                    tf.createFcItfType("clients", I.class.getName(), true,
-                        false, true)
-                });
+                tf.createFcItfType("server", I.class.getName(), false, false, false),
+                tf.createFcItfType("servers", I.class.getName(), false, false, true),
+                tf.createFcItfType("client", I.class.getName(), true, false, false),
+                tf.createFcItfType("clients", I.class.getName(), true, false, true) });
         setUpComponents();
     }
 
@@ -80,17 +75,16 @@ public class TestLifeCycleController extends Conformtest {
     // -------------------------------------------------------------------------
     @Test
     public void testStarted() throws Exception {
-        Fractal.getBindingController(c)
-               .bindFc("client", d.getFcInterface("server"));
+        Fractal.getBindingController(c).bindFc("client", d.getFcInterface("server"));
         assertEquals("STOPPED", Fractal.getLifeCycleController(c).getFcState());
         Fractal.getLifeCycleController(c).startFc();
         assertEquals("STARTED", Fractal.getLifeCycleController(c).getFcState());
         final I i = (I) c.getFcInterface("server");
         Thread t = new Thread(new Runnable() {
-                    public void run() {
-                        i.m(true);
-                    }
-                });
+            public void run() {
+                i.m(true);
+            }
+        });
         t.start();
         t.join(50);
         assertTrue(!t.isAlive());
@@ -112,7 +106,6 @@ public class TestLifeCycleController extends Conformtest {
     //    t.join(50);
     //    assertTrue(t.isAlive());
     //  }
-
     // -------------------------------------------------------------------------
     // Test errors in start
     // -------------------------------------------------------------------------
@@ -123,8 +116,7 @@ public class TestLifeCycleController extends Conformtest {
             Fractal.getLifeCycleController(c).startFc();
             fail();
         } catch (IllegalLifeCycleException e) {
-            assertEquals("STOPPED",
-                Fractal.getLifeCycleController(c).getFcState());
+            assertEquals("STOPPED", Fractal.getLifeCycleController(c).getFcState());
         }
     }
 
@@ -134,10 +126,8 @@ public class TestLifeCycleController extends Conformtest {
     @Test
     @Ignore
     public void testUnbindNotStopped() throws Exception {
-        Fractal.getBindingController(c)
-               .bindFc("client", d.getFcInterface("server"));
-        Fractal.getBindingController(c)
-               .bindFc("clients0", d.getFcInterface("server"));
+        Fractal.getBindingController(c).bindFc("client", d.getFcInterface("server"));
+        Fractal.getBindingController(c).bindFc("clients0", d.getFcInterface("server"));
         Fractal.getLifeCycleController(c).startFc();
         try {
             Fractal.getBindingController(c).unbindFc("client");
@@ -169,39 +159,29 @@ public class TestLifeCycleController extends Conformtest {
         @Test
         public void testRecursiveStartStop() throws Exception {
             ContentController cc = Fractal.getContentController(r);
-            Fractal.getBindingController(r)
-                   .bindFc("server", c.getFcInterface("server"));
-            Fractal.getBindingController(c)
-                   .bindFc("client", d.getFcInterface("server"));
-            Fractal.getBindingController(d)
-                   .bindFc("client", cc.getFcInternalInterface("client"));
-            Fractal.getBindingController(r)
-                   .bindFc("client", r.getFcInterface("server"));
+            Fractal.getBindingController(r).bindFc("server", c.getFcInterface("server"));
+            Fractal.getBindingController(c).bindFc("client", d.getFcInterface("server"));
+            Fractal.getBindingController(d).bindFc("client", cc.getFcInternalInterface("client"));
+            Fractal.getBindingController(r).bindFc("client", r.getFcInterface("server"));
 
             Fractal.getLifeCycleController(r).startFc();
-            assertEquals("STARTED",
-                Fractal.getLifeCycleController(r).getFcState());
-            assertEquals("STARTED",
-                Fractal.getLifeCycleController(c).getFcState());
-            assertEquals("STARTED",
-                Fractal.getLifeCycleController(d).getFcState());
+            assertEquals("STARTED", Fractal.getLifeCycleController(r).getFcState());
+            assertEquals("STARTED", Fractal.getLifeCycleController(c).getFcState());
+            assertEquals("STARTED", Fractal.getLifeCycleController(d).getFcState());
             final I i = (I) r.getFcInterface("server");
             Thread t = new Thread(new Runnable() {
-                        public void run() {
-                            i.m(true);
-                        }
-                    });
+                public void run() {
+                    i.m(true);
+                }
+            });
             t.start();
             t.join(50);
             assertTrue(!t.isAlive());
 
             Fractal.getLifeCycleController(r).stopFc();
-            assertEquals("STOPPED",
-                Fractal.getLifeCycleController(r).getFcState());
-            assertEquals("STOPPED",
-                Fractal.getLifeCycleController(c).getFcState());
-            assertEquals("STOPPED",
-                Fractal.getLifeCycleController(d).getFcState());
+            assertEquals("STOPPED", Fractal.getLifeCycleController(r).getFcState());
+            assertEquals("STOPPED", Fractal.getLifeCycleController(c).getFcState());
+            assertEquals("STOPPED", Fractal.getLifeCycleController(d).getFcState());
 
             // TODO test issue: this test assumes a call on a stopped interface hangs
             //      t = new Thread(new Runnable() {
@@ -220,8 +200,7 @@ public class TestLifeCycleController extends Conformtest {
             ContentController cc = Fractal.getContentController(r);
             cc.removeFcSubComponent(c);
             cc.removeFcSubComponent(d);
-            Fractal.getBindingController(r)
-                   .bindFc("client", r.getFcInterface("server"));
+            Fractal.getBindingController(r).bindFc("client", r.getFcInterface("server"));
             try {
                 Fractal.getLifeCycleController(c).startFc();
                 fail();
@@ -233,12 +212,9 @@ public class TestLifeCycleController extends Conformtest {
         @Ignore
         public void testRemoveNotStopped() throws Exception {
             ContentController cc = Fractal.getContentController(r);
-            Fractal.getBindingController(r)
-                   .bindFc("server", c.getFcInterface("server"));
-            Fractal.getBindingController(c)
-                   .bindFc("client", cc.getFcInternalInterface("client"));
-            Fractal.getBindingController(r)
-                   .bindFc("client", r.getFcInterface("server"));
+            Fractal.getBindingController(r).bindFc("server", c.getFcInterface("server"));
+            Fractal.getBindingController(c).bindFc("client", cc.getFcInternalInterface("client"));
+            Fractal.getBindingController(r).bindFc("client", r.getFcInterface("server"));
             cc.removeFcSubComponent(d);
             Fractal.getLifeCycleController(r).startFc();
 

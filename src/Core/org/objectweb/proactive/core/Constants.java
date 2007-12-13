@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core;
 
-
 /**
  * Defines many constants useful across ProActive
  *

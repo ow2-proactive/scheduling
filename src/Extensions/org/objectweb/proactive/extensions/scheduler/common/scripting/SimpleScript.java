@@ -48,20 +48,17 @@ public class SimpleScript extends Script {
     private String id = null;
 
     /** Directly create a script with a string. */
-    public SimpleScript(String script, String engineName)
-        throws InvalidScriptException {
+    public SimpleScript(String script, String engineName) throws InvalidScriptException {
         super(script, engineName);
     }
 
     /** Create a script from a file. */
-    public SimpleScript(File file, String[] parameters)
-        throws InvalidScriptException {
+    public SimpleScript(File file, String[] parameters) throws InvalidScriptException {
         super(file, parameters);
     }
 
     /** Create a script from an URL. */
-    public SimpleScript(URL url, String[] parameters)
-        throws InvalidScriptException {
+    public SimpleScript(URL url, String[] parameters) throws InvalidScriptException {
         super(url, parameters);
     }
 

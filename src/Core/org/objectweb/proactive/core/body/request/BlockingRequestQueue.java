@@ -91,8 +91,7 @@ public interface BlockingRequestQueue extends RequestQueue {
      * null if a request has been found during the given time.
      * @return the oldest request found in the queue or null.
      */
-    public Request blockingRemoveOldest(RequestFilter requestFilter,
-        long timeout);
+    public Request blockingRemoveOldest(RequestFilter requestFilter, long timeout);
 
     /**
      * Blocks the calling thread until there is a request that can be accepted
@@ -113,8 +112,7 @@ public interface BlockingRequestQueue extends RequestQueue {
      * @param requestFilter the request filter that select the request to be returned
      * @return the youngest request found in the queue that is accepted by the filter.
      */
-    public Request blockingRemoveYoungest(RequestFilter requestFilter,
-        long timeout);
+    public Request blockingRemoveYoungest(RequestFilter requestFilter, long timeout);
 
     /**
      * Blocks the calling thread until there is a request of name methodName

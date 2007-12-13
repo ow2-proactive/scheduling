@@ -68,11 +68,9 @@ public class RemoteObjectExposer implements Serializable {
      * @param target the object to turn into a remote object
      * @param targetRemoteObjectAdapter the adapter object that allows to implement specific behaviour like cache mechanism
      */
-    public RemoteObjectExposer(String className, Object target,
-        Adapter<?> targetRemoteObjectAdapter) {
+    public RemoteObjectExposer(String className, Object target, Adapter<?> targetRemoteObjectAdapter) {
         this.className = className;
-        this.remoteObject = new RemoteObjectImpl(className, target,
-                targetRemoteObjectAdapter);
+        this.remoteObject = new RemoteObjectImpl(className, target, targetRemoteObjectAdapter);
         this.activatedProtocols = new Hashtable<URI, RemoteRemoteObject>();
     }
 
@@ -82,8 +80,7 @@ public class RemoteObjectExposer implements Serializable {
      * @return a remote reference to the remote object ie a RemoteRemoteObject
      * @throws UnknownProtocolException thrown if the protocol specified within the url is unknow
      */
-    public synchronized InternalRemoteRemoteObject activateProtocol(URI url)
-        throws UnknownProtocolException {
+    public synchronized InternalRemoteRemoteObject activateProtocol(URI url) throws UnknownProtocolException {
         String protocol = null;
 
         // check if the url contains a scheme (protocol)
@@ -101,19 +98,16 @@ public class RemoteObjectExposer implements Serializable {
             int port = url.getPort();
             if (port == -1) {
                 try {
-                    url = new URI(url.getScheme(), url.getUserInfo(),
-                            url.getHost(),
-                            RemoteObjectHelper.getDefaultPortForProtocol(
-                                protocol), url.getPath(), url.getQuery(),
-                            url.getFragment());
+                    url = new URI(url.getScheme(), url.getUserInfo(), url.getHost(), RemoteObjectHelper
+                            .getDefaultPortForProtocol(protocol), url.getPath(), url.getQuery(), url
+                            .getFragment());
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
             }
 
             // register the object on the register
-            InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(this.remoteObject,
-                    url);
+            InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(this.remoteObject, url);
             RemoteRemoteObject rmo = rof.register(irro, url, true);
             irro.setRemoteRemoteObject(rmo);
 
@@ -122,9 +116,8 @@ public class RemoteObjectExposer implements Serializable {
 
             return irro;
         } catch (ProActiveException e) {
-            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                           .warn("unable to activate a remote object at endpoint " +
-                url.toString(), e);
+            ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).warn(
+                    "unable to activate a remote object at endpoint " + url.toString(), e);
 
             e.printStackTrace();
             return null;
@@ -192,13 +185,11 @@ public class RemoteObjectExposer implements Serializable {
             uri = uris.nextElement();
             //RemoteRemoteObject rro = this.activatedProtocols.get(uri);
             try {
-                RemoteObjectHelper.getRemoteObjectFactory(uri.getScheme())
-                                  .unregister(uri);
+                RemoteObjectHelper.getRemoteObjectFactory(uri.getScheme()).unregister(uri);
             } catch (ProActiveException e) {
                 //  e.printStackTrace();
-                ProActiveLogger.getLogger(Loggers.REMOTEOBJECT)
-                               .info("Could not unregister " + uri +
-                    ". Error message: " + e.getMessage());
+                ProActiveLogger.getLogger(Loggers.REMOTEOBJECT).info(
+                        "Could not unregister " + uri + ". Error message: " + e.getMessage());
             }
         }
     }

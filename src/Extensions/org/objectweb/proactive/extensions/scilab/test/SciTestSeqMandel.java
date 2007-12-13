@@ -50,8 +50,7 @@ public class SciTestSeqMandel {
         }
 
         BufferedReader reader = new BufferedReader(new FileReader(args[6]));
-        PrintWriter writer = new PrintWriter(new BufferedWriter(
-                    new FileWriter(args[7])));
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(args[7])));
 
         int xres = Integer.parseInt(args[0]);
         int yres = Integer.parseInt(args[1]);
@@ -77,16 +76,13 @@ public class SciTestSeqMandel {
             precision = Integer.parseInt(line.trim());
 
             startTime = System.currentTimeMillis();
-            Scilab.Exec(SciMath.formulaMandelbrot("Fract", xres, yres, xmin,
-                    xmax, ymin, ymax, precision));
+            Scilab.Exec(SciMath.formulaMandelbrot("Fract", xres, yres, xmin, xmax, ymin, ymax, precision));
             SciData sciFract = Scilab.receiveDataByName("Fract");
             System.out.println(sciFract);
             endTime = System.currentTimeMillis();
 
-            System.out.println(xres + " " + yres + " " + precision + " " +
-                (endTime - startTime));
-            writer.println(xres + " " + yres + " " + precision + " " +
-                (endTime - startTime));
+            System.out.println(xres + " " + yres + " " + precision + " " + (endTime - startTime));
+            writer.println(xres + " " + yres + " " + precision + " " + (endTime - startTime));
         }
 
         reader.close();

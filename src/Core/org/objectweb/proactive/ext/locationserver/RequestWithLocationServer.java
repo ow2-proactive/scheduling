@@ -56,9 +56,8 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
     private int tries;
     private transient LocationServer server;
 
-    public RequestWithLocationServer(MethodCall methodCall,
-        UniversalBody sender, boolean isOneWay, long nextSequenceID,
-        LocationServer server) {
+    public RequestWithLocationServer(MethodCall methodCall, UniversalBody sender, boolean isOneWay,
+            long nextSequenceID, LocationServer server) {
         super(methodCall, sender, isOneWay, nextSequenceID);
         this.server = server;
     }
@@ -70,8 +69,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
     }
 
     @Override
-    protected int sendRequest(UniversalBody destinationBody)
-        throws java.io.IOException {
+    protected int sendRequest(UniversalBody destinationBody) throws java.io.IOException {
         int ftres = FTManager.NON_FT;
         try {
             //   startTime = System.currentTimeMillis();
@@ -87,8 +85,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
     /**
      * Implements the backup solution
      */
-    protected void backupSolution(UniversalBody destinationBody)
-        throws java.io.IOException {
+    protected void backupSolution(UniversalBody destinationBody) throws java.io.IOException {
         boolean ok = false;
         tries = 0;
         //get the new location from the server
@@ -107,14 +104,13 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
                 if (sender != null) {
                     sender.updateLocation(bodyID, remoteBody);
                 } else {
-                    LocalBodyStore.getInstance().getLocalBody(getSourceBodyID())
-                                  .updateLocation(bodyID, remoteBody);
+                    LocalBodyStore.getInstance().getLocalBody(getSourceBodyID()).updateLocation(bodyID,
+                            remoteBody);
                 }
                 ok = true;
             } catch (Exception e) {
-                logger.debug(
-                    "RequestWithLocationServer:  .............. FAILED = " +
-                    " for method " + methodName);
+                logger.debug("RequestWithLocationServer:  .............. FAILED = " + " for method " +
+                    methodName);
                 tries++;
             }
         }
@@ -126,8 +122,7 @@ public class RequestWithLocationServer extends RequestImpl implements java.io.Se
         }
         UniversalBody mobile = server.searchObject(bodyID);
 
-        logger.debug(
-            "RequestWithLocationServer: backupSolution() server has sent an answer");
+        logger.debug("RequestWithLocationServer: backupSolution() server has sent an answer");
 
         PAFuture.waitFor(mobile);
         return mobile;

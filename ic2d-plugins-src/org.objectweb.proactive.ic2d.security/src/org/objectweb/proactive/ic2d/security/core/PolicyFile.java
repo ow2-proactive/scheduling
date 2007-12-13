@@ -39,8 +39,8 @@ public class PolicyFile {
     private List<SimplePolicyRule> rules;
     private List<String> authorizedUsers;
 
-    public PolicyFile(String applicationName, String keystorePath,
-        List<SimplePolicyRule> rules, List<String> authorizedUsers) {
+    public PolicyFile(String applicationName, String keystorePath, List<SimplePolicyRule> rules,
+            List<String> authorizedUsers) {
         this.applicationName = applicationName;
         this.keystorePath = keystorePath;
         this.rules = rules;

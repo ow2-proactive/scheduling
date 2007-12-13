@@ -55,8 +55,8 @@ public class Log4JTaskLogs implements TaskLogs {
     public static final String MDC_TASK_ID = "taskid";
 
     /** Default layout for logs */
-    public static final Layout DEFAULT_LOG_LAYOUT = new PatternLayout("[%X{" +
-            Log4JTaskLogs.MDC_TASK_ID + "}@%d{HH:mm:ss}]" + " %m %n");
+    public static final Layout DEFAULT_LOG_LAYOUT = new PatternLayout("[%X{" + Log4JTaskLogs.MDC_TASK_ID +
+        "}@%d{HH:mm:ss}]" + " %m %n");
 
     /** Logger level in which stdout must be redirected */
     public static final Level STDOUT_LEVEL = Level.INFO;
@@ -82,8 +82,7 @@ public class Log4JTaskLogs implements TaskLogs {
         StringBuffer logs = new StringBuffer(this.allEvents.size());
 
         for (LoggingEvent e : this.allEvents) {
-            logs.append(timeStamp ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e)
-                                  : e.getMessage());
+            logs.append(timeStamp ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
         }
 
         return logs.toString();
@@ -97,8 +96,7 @@ public class Log4JTaskLogs implements TaskLogs {
 
         for (LoggingEvent e : this.allEvents) {
             if (Log4JTaskLogs.STDERR_LEVEL.equals(e.getLevel())) {
-                logs.append(timeStamp
-                    ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
+                logs.append(timeStamp ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
             }
         }
 
@@ -113,8 +111,7 @@ public class Log4JTaskLogs implements TaskLogs {
 
         for (LoggingEvent e : this.allEvents) {
             if (Log4JTaskLogs.STDOUT_LEVEL.equals(e.getLevel())) {
-                logs.append(timeStamp
-                    ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
+                logs.append(timeStamp ? Log4JTaskLogs.DEFAULT_LOG_LAYOUT.format(e) : e.getMessage());
             }
         }
 

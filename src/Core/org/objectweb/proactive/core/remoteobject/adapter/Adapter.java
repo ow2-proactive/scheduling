@@ -86,8 +86,8 @@ public abstract class Adapter<T> implements Serializable, StubObject {
     protected abstract void construct();
 
     /**
-    * set the proxy to the active object
-    */
+     * set the proxy to the active object
+     */
     public void setProxy(Proxy p) {
         ((StubObject) target).setProxy(p);
     }

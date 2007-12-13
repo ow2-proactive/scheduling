@@ -71,8 +71,8 @@ public class RMLauncher {
                 admin.addNodes(pad);
             }
         } else {
-            ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(
-                    "../../../descriptors/scheduler/deployment/Local4JVM.xml");
+            ProActiveDescriptor pad = PADeployment
+                    .getProactiveDescriptor("../../../descriptors/scheduler/deployment/Local4JVM.xml");
             admin.addNodes(pad);
         }
 

@@ -71,13 +71,11 @@ public class Domain implements Serializable {
      * @param i the unique identifier
      * @param planet the Planet which is inside this Domain
      */
-    public Domain(Integer i, Planet planet,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public Domain(Integer i, Planet planet, org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.killsupport = killsupport;
         identification = i.intValue();
         info = planet;
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /**
@@ -126,8 +124,8 @@ public class Domain implements Serializable {
         this.values[id] = inf;
         this.nbReceived++;
         if (this.nbReceived > this.nbvalues) { // This is a bad sign!
-            this.killsupport.abort(new RuntimeException("Domain " +
-                    identification + " received too many answers"));
+            this.killsupport.abort(new RuntimeException("Domain " + identification +
+                " received too many answers"));
         }
         if (this.nbReceived == this.nbvalues) {
             this.maestro.notifyFinished();
@@ -145,19 +143,17 @@ public class Domain implements Serializable {
                 logger.info("Compute movement.");
             }
         } else {
-            this.display.drawBody(this.info.x, this.info.y, this.info.z,
-                this.info.vx, this.info.vy, this.info.vz, (int) this.info.mass,
-                (int) this.info.diameter, this.identification, this.hostName);
+            this.display.drawBody(this.info.x, this.info.y, this.info.z, this.info.vx, this.info.vy,
+                    this.info.vz, (int) this.info.mass, (int) this.info.diameter, this.identification,
+                    this.hostName);
         }
     }
 
     /**
      * Method called when the object is redeployed on a new Node (Fault recovery, or migration).
      */
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

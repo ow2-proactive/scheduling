@@ -119,9 +119,8 @@ public class Permutation implements Serializable {
     public static void main(String[] args) {
         int[] perm1 = new int[] { 3, 2, 1, 0 };
         int[] perm2 = new int[] { 0, 3, 2, 1 };
-        System.out.println("inf ~ sup " + Permutation.compareTo(perm1, perm2) +
-            "eq " + Permutation.compareTo(perm1, perm1) + "sup ~ inf" +
-            Permutation.compareTo(perm2, perm1));
+        System.out.println("inf ~ sup " + Permutation.compareTo(perm1, perm2) + "eq " +
+            Permutation.compareTo(perm1, perm1) + "sup ~ inf" + Permutation.compareTo(perm2, perm1));
         if (true) {
             return;
         }
@@ -156,8 +155,7 @@ public class Permutation implements Serializable {
                 System.out.print(currentPerm[i]);
             System.out.println();
         } while ((nextPerm(currentPerm)) != null);
-        System.out.println("We computed " + nbPerm + " permutations of the " +
-            factNbJob + " expected!");
+        System.out.println("We computed " + nbPerm + " permutations of the " + factNbJob + " expected!");
     }
 
     public static void print(int[] perm) {

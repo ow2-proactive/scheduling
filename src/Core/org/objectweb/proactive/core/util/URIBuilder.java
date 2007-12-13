@@ -48,9 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class is a utility class to perform modifications and operations on urls.
  */
 public class URIBuilder {
-    private static String[] LOCAL_URLS = {
-            "", "localhost.localdomain", "localhost", "127.0.0.1"
-        };
+    private static String[] LOCAL_URLS = { "", "localhost.localdomain", "localhost", "127.0.0.1" };
     static Logger logger = ProActiveLogger.getLogger(Loggers.UTIL);
 
     //
@@ -87,8 +85,7 @@ public class URIBuilder {
      */
     public static URI buildURI(String host, String name, String protocol) {
         try {
-            return buildURI(host, name, protocol,
-                RemoteObjectHelper.getDefaultPortForProtocol(protocol));
+            return buildURI(host, name, protocol, RemoteObjectHelper.getDefaultPortForProtocol(protocol));
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         }
@@ -116,8 +113,7 @@ public class URIBuilder {
      * @param port Url's port
      * @returnan url under the form [protocol:][//host[:port]][[/]name]
      */
-    public static URI buildURI(String host, String name, String protocol,
-        int port) {
+    public static URI buildURI(String host, String name, String protocol, int port) {
         return buildURI(host, name, protocol, port, true);
     }
 
@@ -132,8 +128,7 @@ public class URIBuilder {
      * @see #getHostNameorIP(InetAddress address)
      * @returnan url under the form [protocol:][//host[:port]][[/]name]
      */
-    public static URI buildURI(String host, String name, String protocol,
-        int port, boolean replaceHost) {
+    public static URI buildURI(String host, String name, String protocol, int port, boolean replaceHost) {
         //        if (protocol == null) {
         //            protocol = System.getProperty(Constants.PROPERTY_PA_COMMUNICATION_PROTOCOL);
         //        }
@@ -163,8 +158,8 @@ public class URIBuilder {
 
     public static URI setProtocol(URI uri, String protocol) {
         try {
-            return new URI(protocol, uri.getUserInfo(), uri.getHost(),
-                uri.getPort(), uri.getPath(), uri.getQuery(), uri.getFragment());
+            return new URI(protocol, uri.getUserInfo(), uri.getHost(), uri.getPort(), uri.getPath(), uri
+                    .getQuery(), uri.getFragment());
         } catch (URISyntaxException e) {
             e.printStackTrace();
         }
@@ -273,8 +268,7 @@ public class URIBuilder {
      * Returns the url without protocol
      */
     public static URI removeProtocol(URI uri) {
-        return buildURI(getHostNameFromUrl(uri), uri.getPath(), null,
-            uri.getPort(), false);
+        return buildURI(getHostNameFromUrl(uri), uri.getPath(), null, uri.getPort(), false);
     }
 
     public static URI removeProtocol(String url) {
@@ -333,14 +327,12 @@ public class URIBuilder {
      * @throws UnknownHostException if no network interface was found
      * @see getHostNameorIP(InetAddress address)
      */
-    public static String fromLocalhostToHostname(String localName)
-        throws UnknownHostException {
+    public static String fromLocalhostToHostname(String localName) throws UnknownHostException {
         if (localName == null) {
             localName = "localhost";
         }
 
-        java.net.InetAddress hostInetAddress = ProActiveInet.getInstance()
-                                                            .getInetAddress();
+        java.net.InetAddress hostInetAddress = ProActiveInet.getInstance().getInetAddress();
         for (int i = 0; i < LOCAL_URLS.length; i++) {
             if (LOCAL_URLS[i].startsWith(localName.toLowerCase())) {
                 return URIBuilder.getHostNameorIP(hostInetAddress);
@@ -376,8 +368,8 @@ public class URIBuilder {
     public static URI setPort(URI u, int port) {
         URI u2;
         try {
-            u2 = new URI(u.getScheme(), u.getUserInfo(), u.getHost(), port,
-                    u.getPath(), u.getQuery(), u.getFragment());
+            u2 = new URI(u.getScheme(), u.getUserInfo(), u.getHost(), port, u.getPath(), u.getQuery(), u
+                    .getFragment());
             return u2;
         } catch (URISyntaxException e) {
             e.printStackTrace();

@@ -44,6 +44,5 @@ import org.objectweb.proactive.extensions.calcium.system.SkeletonSystem;
  */
 @PublicAPI
 public interface Condition<P> extends Muscle<P, Boolean> {
-    public boolean evalCondition(SkeletonSystem system, P param)
-        throws Exception;
+    public boolean evalCondition(SkeletonSystem system, P param) throws Exception;
 }

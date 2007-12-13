@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.mop;
 
-
 /**
  */
 public class MOPException extends Exception {
@@ -90,8 +89,7 @@ public class MOPException extends Exception {
             if (super.getMessage() == null) {
                 return detail.getMessage();
             } else {
-                return super.getMessage() + "; nested exception is: \n" +
-                detail.toString();
+                return super.getMessage() + "; nested exception is: \n" + detail.toString();
             }
         }
     }

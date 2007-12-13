@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scheduler.common.task;
 
-
 /**
  * A simple String based implementation of TaskLogs.
  * @author cdelbe

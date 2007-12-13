@@ -44,8 +44,7 @@ public class RefreshAction extends Action {
     public RefreshAction(MonitorThread monitorThread) {
         this.monitorThread = monitorThread;
         this.setId(REFRESH);
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "refresh.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "refresh.gif"));
         this.setText("Refresh");
         this.setToolTipText("Refresh");
     }

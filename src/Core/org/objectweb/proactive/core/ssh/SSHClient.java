@@ -85,10 +85,8 @@ public class SSHClient {
         System.out.println("Options:");
         System.out.println("\t-" + OPT_USERNAME + "\tusername");
         System.out.println("\t-" + OPT_IDENTITY + "\tprivate key");
-        System.out.println("\t-" + OPT_IDENTITY_PASSWORD +
-            "\tpassword to decrypt the private key");
-        System.out.println("\t-" + OPT_PASSWORD +
-            "\tpassword to perform password authentication");
+        System.out.println("\t-" + OPT_IDENTITY_PASSWORD + "\tpassword to decrypt the private key");
+        System.out.println("\t-" + OPT_PASSWORD + "\tpassword to perform password authentication");
         System.out.println("\t-" + OPT_VERBOSE + "\tverbose mode");
 
         if (exit) {
@@ -98,12 +96,10 @@ public class SSHClient {
 
     public static void main(String[] args) throws ParseException {
         Options options = new Options();
-        options.addOption(OPT_PASSWORD, true,
-            "Password for password authentication");
+        options.addOption(OPT_PASSWORD, true, "Password for password authentication");
         options.addOption(OPT_USERNAME, true, "Username");
         options.addOption(OPT_IDENTITY, true, "Identity file");
-        options.addOption(OPT_IDENTITY_PASSWORD, true,
-            "Password for identity file");
+        options.addOption(OPT_IDENTITY_PASSWORD, true, "Password for identity file");
         options.addOption(OPT_HELP, false, "Help");
         options.addOption(OPT_VERBOSE, false, "Verbose");
 
@@ -131,18 +127,15 @@ public class SSHClient {
         if (cmd.hasOption(OPT_IDENTITY)) {
             identity = new File(cmd.getOptionValue(OPT_IDENTITY));
             if (!identity.exists()) {
-                System.err.println("[E] specified identity file," + identity +
-                    ", does not exist");
+                System.err.println("[E] specified identity file," + identity + ", does not exist");
                 System.exit(3);
             }
             if (!identity.isFile()) {
-                System.err.println("[E] specified identity file" + identity +
-                    " is not a file");
+                System.err.println("[E] specified identity file" + identity + " is not a file");
                 System.exit(3);
             }
             if (!identity.canRead()) {
-                System.err.println("[E] specified identity file" + identity +
-                    " is not readable");
+                System.err.println("[E] specified identity file" + identity + " is not readable");
                 System.exit(3);
             }
         }
@@ -171,8 +164,7 @@ public class SSHClient {
 
             // 1. Password authentication requested
             if (password != null) {
-                isAuthenticated = conn.authenticateWithPassword(username,
-                        password);
+                isAuthenticated = conn.authenticateWithPassword(username, password);
                 if (isAuthenticated) {
                     info("Password authentication succeeded");
                 } else {
@@ -183,11 +175,9 @@ public class SSHClient {
 
                 // 2.1 An identity file is specified use it 
                 if (identity != null) {
-                    isAuthenticated = conn.authenticateWithPublicKey(username,
-                            identity, identityPassword);
+                    isAuthenticated = conn.authenticateWithPublicKey(username, identity, identityPassword);
                     if (isAuthenticated) {
-                        info("Pubkey authentication succeeded with " +
-                            identity);
+                        info("Pubkey authentication succeeded with " + identity);
                     } else {
                         info("Pubkey authentication failed with " + identity);
                     }
@@ -199,8 +189,7 @@ public class SSHClient {
                             continue;
                         }
 
-                        isAuthenticated = conn.authenticateWithPublicKey(username,
-                                f, identityPassword);
+                        isAuthenticated = conn.authenticateWithPublicKey(username, f, identityPassword);
                         info("Pubkey authentication succeeded with " + f);
                         if (isAuthenticated) {
                             break;
@@ -233,24 +222,20 @@ public class SSHClient {
                      * be set together.
                      */
                     int conditions = sess.waitForCondition(ChannelCondition.STDOUT_DATA |
-                            ChannelCondition.STDERR_DATA |
-                            ChannelCondition.EOF, 0);
+                        ChannelCondition.STDERR_DATA | ChannelCondition.EOF, 0);
 
                     /* Wait no longer than 2 seconds (= 2000 milliseconds) */
                     if ((conditions & ChannelCondition.TIMEOUT) != 0) {
 
                         /* A timeout occured. */
-                        throw new IOException(
-                            "Timeout while waiting for data from peer.");
+                        throw new IOException("Timeout while waiting for data from peer.");
                     }
 
                     /* Here we do not need to check separately for CLOSED, since CLOSED implies EOF */
                     if ((conditions & ChannelCondition.EOF) != 0) {
 
                         /* The remote side won't send us further data... */
-                        if ((conditions &
-                                (ChannelCondition.STDOUT_DATA |
-                                ChannelCondition.STDERR_DATA)) == 0) {
+                        if ((conditions & (ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA)) == 0) {
 
                             /* ... and we have consumed all data in the local arrival window. */
                             break;

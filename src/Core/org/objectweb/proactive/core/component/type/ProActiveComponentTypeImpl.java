@@ -49,8 +49,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author Matthieu Morel
  *
  */
-public class ProActiveComponentTypeImpl implements ComponentType,
-    ProActiveInterfaceType, Serializable {
+public class ProActiveComponentTypeImpl implements ComponentType, ProActiveInterfaceType, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
@@ -61,8 +60,7 @@ public class ProActiveComponentTypeImpl implements ComponentType,
     /**
      * Constructor for ProActiveComponentTypeImpl.
      */
-    public ProActiveComponentTypeImpl(final InterfaceType[] interfaceTypes)
-        throws InstantiationException {
+    public ProActiveComponentTypeImpl(final InterfaceType[] interfaceTypes) throws InstantiationException {
         this.interfaceTypes = clone(interfaceTypes);
         // verifications
         for (int i = 0; i < interfaceTypes.length; ++i) {
@@ -71,17 +69,14 @@ public class ProActiveComponentTypeImpl implements ComponentType,
             for (int j = i + 1; j < interfaceTypes.length; ++j) {
                 String q = interfaceTypes[j].getFcItfName();
                 if (p.equals(q)) {
-                    throw new InstantiationException(
-                        "Two interfaces have the same name '" + q + "'");
+                    throw new InstantiationException("Two interfaces have the same name '" + q + "'");
                 }
                 if (collection && q.startsWith(p)) {
-                    throw new InstantiationException(
-                        "The name of the interface '" + q + "' starts with '" +
+                    throw new InstantiationException("The name of the interface '" + q + "' starts with '" +
                         p + "', which is the name of a collection interface");
                 }
                 if (interfaceTypes[j].isFcCollectionItf() && p.startsWith(q)) {
-                    throw new InstantiationException(
-                        "The name of the interface '" + p + "' starts with '" +
+                    throw new InstantiationException("The name of the interface '" + p + "' starts with '" +
                         q + "', which is the name of a collection interface");
                 }
             }
@@ -110,8 +105,7 @@ public class ProActiveComponentTypeImpl implements ComponentType,
     /**
      * @see org.objectweb.fractal.api.type.ComponentType#getFcInterfaceType(String)
      */
-    public InterfaceType getFcInterfaceType(String name)
-        throws NoSuchInterfaceException {
+    public InterfaceType getFcInterfaceType(String name) throws NoSuchInterfaceException {
         for (int i = 0; i < interfaceTypes.length; i++) {
             InterfaceType type = interfaceTypes[i];
             if (type.getFcItfName().equals(name)) {

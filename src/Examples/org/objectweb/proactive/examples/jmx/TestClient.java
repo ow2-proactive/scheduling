@@ -122,22 +122,19 @@ public class TestClient implements NotificationListener, Serializable {
     private void domains() {
         System.out.println();
         System.out.println("Registered Domains :");
-        String[] domains = (String[]) connection.getDomainsAsynchronous()
-                                                .getObject();
+        String[] domains = (String[]) connection.getDomainsAsynchronous().getObject();
         for (int i = 0; i < domains.length; i++) {
             System.out.println("\t [ " + i + " ] " + domains[i]);
         }
         System.out.println();
-        System.out.println(
-            "Type the domain number to see all registered MBeans in this domain :");
+        System.out.println("Type the domain number to see all registered MBeans in this domain :");
         String read = read();
         try {
             int index = Integer.parseInt(read);
             mbeans(domains[index]);
         } catch (Exception e) {
             System.out.println();
-            System.out.println(
-                "Type the domain number to see all registered MBeans in this domain :");
+            System.out.println("Type the domain number to see all registered MBeans in this domain :");
             domains();
         }
     }
@@ -169,8 +166,7 @@ public class TestClient implements NotificationListener, Serializable {
                 beanProperties(beans[index].getObjectName());
             } catch (Exception e) {
                 System.out.println();
-                System.out.println(
-                    "Type the mbean number to see its properties :");
+                System.out.println("Type the mbean number to see its properties :");
                 mbeans(domain);
             }
             mbeans(domain);
@@ -185,11 +181,9 @@ public class TestClient implements NotificationListener, Serializable {
 
     private void beanProperties(ObjectName on) {
         System.out.println();
-        System.out.println("-------------------- " + on +
-            " ---------------------------- ");
+        System.out.println("-------------------- " + on + " ---------------------------- ");
 
-        MBeanInfo beanInfo = (MBeanInfo) connection.getMBeanInfoAsynchronous(on)
-                                                   .getObject();
+        MBeanInfo beanInfo = (MBeanInfo) connection.getMBeanInfoAsynchronous(on).getObject();
         System.out.println("\tConstructors : ");
         System.out.println();
         MBeanConstructorInfo[] constructorInfos = beanInfo.getConstructors();
@@ -201,11 +195,9 @@ public class TestClient implements NotificationListener, Serializable {
             } else {
                 for (int j = 0; j < params.length; j++) {
                     if (j == (params.length - 1)) {
-                        System.out.println(params[j].getType() + "  " +
-                            params[j].getName() + "  ); ");
+                        System.out.println(params[j].getType() + "  " + params[j].getName() + "  ); ");
                     } else {
-                        System.out.println(params[j].getType() + "  " +
-                            params[j].getName() + "  , ");
+                        System.out.println(params[j].getType() + "  " + params[j].getName() + "  , ");
                     }
                 }
             }
@@ -217,10 +209,8 @@ public class TestClient implements NotificationListener, Serializable {
         System.out.println("\tAttributes :");
         MBeanAttributeInfo[] attribs = beanInfo.getAttributes();
         for (int i = 0; i < attribs.length; i++) {
-            Object obj = connection.getAttributeAsynchronous(on,
-                    attribs[i].getName()).getObject();
-            System.out.println("\t\t" + attribs[i].getDescription() + " =\t " +
-                obj);
+            Object obj = connection.getAttributeAsynchronous(on, attribs[i].getName()).getObject();
+            System.out.println("\t\t" + attribs[i].getDescription() + " =\t " + obj);
         }
 
         System.out.println();
@@ -230,8 +220,7 @@ public class TestClient implements NotificationListener, Serializable {
             System.out.println("\tOperations :");
 
             for (int i = 0; i < infos.length; i++) {
-                System.out.println("Description = " +
-                    infos[i].getDescription());
+                System.out.println("Description = " + infos[i].getDescription());
                 System.out.print("\t" + infos[i].getReturnType() + "  ");
                 System.out.print(infos[i].getName() + "  ( ");
 
@@ -241,11 +230,9 @@ public class TestClient implements NotificationListener, Serializable {
                 } else {
                     for (int j = 0; j < params.length; j++) {
                         if (j == (params.length - 1)) {
-                            System.out.print(params[j].getType() + "  " +
-                                params[j].getName() + " ) ");
+                            System.out.print(params[j].getType() + "  " + params[j].getName() + " ) ");
                         } else {
-                            System.out.print(params[j].getType() + "  " +
-                                params[j].getName() + " , ");
+                            System.out.print(params[j].getType() + "  " + params[j].getName() + " , ");
                         }
                     }
                     System.out.println();
@@ -265,8 +252,7 @@ public class TestClient implements NotificationListener, Serializable {
                 e.printStackTrace();
             }
             for (int i = 0; i < notifs.length; i++) {
-                System.out.println("\t\t" + notifs[i].getDescription() +
-                    " : \t\t" + notifs[i].getName());
+                System.out.println("\t\t" + notifs[i].getDescription() + " : \t\t" + notifs[i].getName());
             }
         }
     }

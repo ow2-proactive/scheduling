@@ -40,12 +40,11 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public abstract class AbstractExternalProcess extends AbstractUniversalProcess
-    implements ExternalProcess {
+public abstract class AbstractExternalProcess extends AbstractUniversalProcess implements ExternalProcess {
     protected static Logger clogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_PROCESS);
     protected static Logger fileTransferLogger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT_FILETRANSFER);
-    protected static final boolean IS_WINDOWS_SYSTEM = System.getProperty(
-            "os.name").toLowerCase().startsWith("win");
+    protected static final boolean IS_WINDOWS_SYSTEM = System.getProperty("os.name").toLowerCase()
+            .startsWith("win");
     protected Process externalProcess;
     private volatile boolean shouldRun = true;
     public static final int NO_COMPOSITION = 0;
@@ -73,16 +72,13 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         this(messageLogger, messageLogger, null);
     }
 
-    public AbstractExternalProcess(
-        RemoteProcessMessageLogger inputMessageLogger,
-        RemoteProcessMessageLogger errorMessageLogger) {
+    public AbstractExternalProcess(RemoteProcessMessageLogger inputMessageLogger,
+            RemoteProcessMessageLogger errorMessageLogger) {
         this(inputMessageLogger, errorMessageLogger, null);
     }
 
-    public AbstractExternalProcess(
-        RemoteProcessMessageLogger inputMessageLogger,
-        RemoteProcessMessageLogger errorMessageLogger,
-        MessageSink outputMessageSink) {
+    public AbstractExternalProcess(RemoteProcessMessageLogger inputMessageLogger,
+            RemoteProcessMessageLogger errorMessageLogger, MessageSink outputMessageSink) {
         this.inputMessageLogger = inputMessageLogger;
         this.errorMessageLogger = errorMessageLogger;
         this.outputMessageSink = outputMessageSink;
@@ -110,14 +106,12 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         return outputMessageSink;
     }
 
-    public void setInputMessageLogger(
-        RemoteProcessMessageLogger inputMessageLogger) {
+    public void setInputMessageLogger(RemoteProcessMessageLogger inputMessageLogger) {
         checkStarted();
         this.inputMessageLogger = inputMessageLogger;
     }
 
-    public void setErrorMessageLogger(
-        RemoteProcessMessageLogger errorMessageLogger) {
+    public void setErrorMessageLogger(RemoteProcessMessageLogger errorMessageLogger) {
         checkStarted();
         this.errorMessageLogger = errorMessageLogger;
     }
@@ -173,8 +167,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     protected String buildWindowsEnvironmentCommand() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < environment.length; i++) {
-            inputMessageLogger.log("      exporting variable " +
-                environment[i]);
+            inputMessageLogger.log("      exporting variable " + environment[i]);
             sb.append("set ");
             sb.append(environment[i]);
             sb.append(" ; ");
@@ -185,8 +178,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     protected String buildUnixEnvironmentCommand() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < environment.length; i++) {
-            inputMessageLogger.log("      exporting variable " +
-                environment[i]);
+            inputMessageLogger.log("      exporting variable " + environment[i]);
             sb.append("export ");
             sb.append(environment[i]);
             sb.append(" ; ");
@@ -195,17 +187,16 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     }
 
     @Override
-    protected void internalStartProcess(String commandToExecute)
-        throws java.io.IOException {
+    protected void internalStartProcess(String commandToExecute) throws java.io.IOException {
         try {
             shouldRun = true;
             externalProcess = Runtime.getRuntime().exec(commandToExecute);
             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getInputStream()));
+                externalProcess.getInputStream()));
             java.io.BufferedReader err = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getErrorStream()));
+                externalProcess.getErrorStream()));
             java.io.BufferedWriter out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(
-                        externalProcess.getOutputStream()));
+                externalProcess.getOutputStream()));
             handleProcess(in, out, err);
         } catch (java.io.IOException e) {
             isFinished = true;
@@ -259,8 +250,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         /* Try all the protocols for this FileTransferStructure
          * until one of them is successful */
         for (int i = 0; (i < copyProtocol.length) && !success; i++) {
-            fileTransferLogger.info("Trying copyprotocol: " +
-                copyProtocol[i].getProtocolName());
+            fileTransferLogger.info("Trying copyprotocol: " + copyProtocol[i].getProtocolName());
             if (!copyProtocol[i].checkProtocol()) {
                 logger.error("Protocol check failed");
                 continue;
@@ -271,8 +261,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             //the nodes register back to this runtime, in the VirtualNodeImpl class.
             if (copyProtocol[i].getProtocolName().equalsIgnoreCase("pftp")) {
                 if (fileTransferLogger.isDebugEnabled()) {
-                    fileTransferLogger.debug(
-                        "ProActive File Transfer will be used later on.");
+                    fileTransferLogger.debug("ProActive File Transfer will be used later on.");
                 }
 
                 //TODO transfer this info to the virtual node level
@@ -280,11 +269,9 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
                 requiresFileTransferDeployOnNodeCreation = true;
             }
             //it's an internal protocol
-            else if (copyProtocol[i].isDefaultProtocol() &&
-                    copyProtocol[i].isDummyProtocol()) {
+            else if (copyProtocol[i].isDefaultProtocol() && copyProtocol[i].isDummyProtocol()) {
                 if (fileTransferLogger.isDebugEnabled()) {
-                    fileTransferLogger.debug(
-                        "Trying protocol internal filetransfer");
+                    fileTransferLogger.debug("Trying protocol internal filetransfer");
                 }
 
                 success = internalFileTransferDefaultProtocol();
@@ -298,8 +285,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         end = System.currentTimeMillis();
 
         if (fileTransferLogger.isDebugEnabled()) {
-            fileTransferLogger.debug("FileTransfer spent:" + (end - beginning) +
-                "[ms]");
+            fileTransferLogger.debug("FileTransfer spent:" + (end - beginning) + "[ms]");
         }
 
         if (!success) {
@@ -324,8 +310,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         return requiresFileTransferDeployOnNodeCreation;
     }
 
-    protected void handleProcess(java.io.BufferedReader in,
-        java.io.BufferedWriter out, java.io.BufferedReader err) {
+    protected void handleProcess(java.io.BufferedReader in, java.io.BufferedWriter out,
+            java.io.BufferedReader err) {
         if (closeStream) {
             try {
                 //the sleep might be needed for processes that fail if
@@ -353,8 +339,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             return;
         }
         inThreadMonitor = new ThreadActivityMonitor();
-        Runnable r = new ProcessInputHandler(in, inputMessageLogger,
-                inThreadMonitor);
+        Runnable r = new ProcessInputHandler(in, inputMessageLogger, inThreadMonitor);
         Thread t = new Thread(r, "IN -> " + getShortName(getCommand(), 20));
         t.start();
     }
@@ -364,8 +349,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
             return;
         }
         errThreadMonitor = new ThreadActivityMonitor();
-        Runnable r = new ProcessInputHandler(err, errorMessageLogger,
-                errThreadMonitor);
+        Runnable r = new ProcessInputHandler(err, errorMessageLogger, errThreadMonitor);
         Thread t = new Thread(r, "ERR -> " + getShortName(getCommand(), 20));
         t.start();
     }
@@ -397,8 +381,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         } while (errThreadMonitor.isActive() || inThreadMonitor.isActive());
     }
 
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         if (isStarted) {
             //if the process is started, we have to remove the external process
             // which is now not Serializable:UnixProcess or WindowsProcess
@@ -425,8 +408,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     /**
      * Implementation of a RemoteProcessMessageLogger that output all messages to the standard output
      */
-    public static class StandardOutputMessageLogger
-        implements RemoteProcessMessageLogger, java.io.Serializable {
+    public static class StandardOutputMessageLogger implements RemoteProcessMessageLogger,
+            java.io.Serializable {
         public StandardOutputMessageLogger() {
             //messageLogger.addAppender(new ConsoleAppender(new PatternLayout("%-5p %m %n")));
         }
@@ -450,8 +433,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     /**
      * Implementation of a RemoteProcessMessageLogger that discard all output
      */
-    public static class NullMessageLogger implements RemoteProcessMessageLogger,
-        java.io.Serializable {
+    public static class NullMessageLogger implements RemoteProcessMessageLogger, java.io.Serializable {
         public NullMessageLogger() {
         }
 
@@ -470,8 +452,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
     /**
      * Implementation of a MessageSink that can receive one message at a time
      */
-    public static class SimpleMessageSink implements MessageSink,
-        java.io.Serializable {
+    public static class SimpleMessageSink implements MessageSink, java.io.Serializable {
         private String message;
         private boolean isActive = true;
 
@@ -528,9 +509,8 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         private RemoteProcessMessageLogger logger;
         private ThreadActivityMonitor threadMonitor;
 
-        public ProcessInputHandler(java.io.BufferedReader in,
-            RemoteProcessMessageLogger logger,
-            ThreadActivityMonitor threadMonitor) {
+        public ProcessInputHandler(java.io.BufferedReader in, RemoteProcessMessageLogger logger,
+                ThreadActivityMonitor threadMonitor) {
             this.in = in;
             this.logger = logger;
             this.threadMonitor = threadMonitor;
@@ -575,8 +555,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
                 } catch (java.io.IOException e) {
                     e.printStackTrace();
                 }
-                logger.log("Process finished Thread=" +
-                    Thread.currentThread().getName());
+                logger.log("Process finished Thread=" + Thread.currentThread().getName());
             }
         }
     }
@@ -591,8 +570,7 @@ public abstract class AbstractExternalProcess extends AbstractUniversalProcess
         private java.io.BufferedWriter out;
         private MessageSink messageSink;
 
-        public ProcessOutputHandler(java.io.BufferedWriter out,
-            MessageSink messageSink) {
+        public ProcessOutputHandler(java.io.BufferedWriter out, MessageSink messageSink) {
             this.out = out;
             this.messageSink = messageSink;
         }

@@ -72,10 +72,9 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
         cells[0].setIn(true);
         cells[0].setOut(true);
         try {
-            display = (ActiveDisplay) org.objectweb.proactive.api.PAActiveObject.turnActive(new ActiveDisplay(
-                        max, this));
-            receiveMessage("ActiveDisplay created : " +
-                display.getClass().getName());
+            display = (ActiveDisplay) org.objectweb.proactive.api.PAActiveObject
+                    .turnActive(new ActiveDisplay(max, this));
+            receiveMessage("ActiveDisplay created : " + display.getClass().getName());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -141,10 +140,10 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
         bProd = new javax.swing.JButton("Start");
         bProd.setBackground(java.awt.Color.lightGray);
         bProd.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    display.toggleProd();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                display.toggleProd();
+            }
+        });
         panel.add(bProd);
 
         rootPanel.add(panel);
@@ -166,10 +165,10 @@ public class AppletBuffer extends org.objectweb.proactive.examples.StandardFrame
         bCons = new javax.swing.JButton("Start");
         bCons.setBackground(java.awt.Color.lightGray);
         bCons.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    display.toggleCons();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                display.toggleCons();
+            }
+        });
         panel.add(bCons);
         rootPanel.add(panel);
         return rootPanel;

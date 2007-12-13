@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.jmx.notification;
 
-
 /**
  * @author ProActive Team
  */

@@ -46,11 +46,9 @@ public class ProActiveComponentBuilder implements ComponentBuilder {
     // --------------------------------------------------------------------------
     // Implementation of the ComponentBuilder interface
     // --------------------------------------------------------------------------
-    public void addComponent(final Object superComponent,
-        final Object subComponent, final String name, final Object context)
-        throws Exception {
-        Fractal.getContentController((Component) superComponent)
-               .addFcSubComponent((Component) subComponent);
+    public void addComponent(final Object superComponent, final Object subComponent, final String name,
+            final Object context) throws Exception {
+        Fractal.getContentController((Component) superComponent).addFcSubComponent((Component) subComponent);
         // as opposed  to the standard fractal implementation, we do not set
         // the name of the component here because :
         // 1. it is already name at instantiation time
@@ -62,7 +60,6 @@ public class ProActiveComponentBuilder implements ComponentBuilder {
         //    }
     }
 
-    public void startComponent(final Object component, final Object context)
-        throws Exception {
+    public void startComponent(final Object component, final Object context) throws Exception {
     }
 }

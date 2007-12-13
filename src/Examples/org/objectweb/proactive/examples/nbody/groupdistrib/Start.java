@@ -63,9 +63,8 @@ public class Start {
         org.objectweb.proactive.examples.nbody.common.Start.main(args);
     }
 
-    public static void main(int totalNbBodies, int maxIter,
-        Displayer displayer, Node[] nodes,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         logger.info("RUNNING groupdistrib VERSION");
 
         Object[][] constructorParams = new Object[totalNbBodies][3];
@@ -81,8 +80,7 @@ public class Start {
         Domain domainGroup = null;
         try {
             // Create a group containing all the Domain in the simulation 
-            domainGroup = (Domain) PAGroup.newGroup(Domain.class.getName(),
-                    constructorParams, nodes);
+            domainGroup = (Domain) PAGroup.newGroup(Domain.class.getName(), constructorParams, nodes);
         } catch (ClassNotReifiableException e) {
             killsupport.abort(e);
         } catch (ClassNotFoundException e) {

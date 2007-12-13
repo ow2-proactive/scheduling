@@ -80,15 +80,14 @@ import org.objectweb.proactive.extensions.webservices.WebServices;
 /**
  * This class decouples the set of user frames from the set of rendering
  */
-public class C3DDispatcher implements org.objectweb.proactive.RunActive,
-    Serializable {
+public class C3DDispatcher implements org.objectweb.proactive.RunActive, Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
 
     /**
      * The array of random colors
      */
     private static Vec[] color = {
-            //    new Vec(0,0,0), // Black 
+    //    new Vec(0,0,0), // Black 
             new Vec(1, 1, 1), // White
             new Vec(0, 0, 0.5), // Navy
             new Vec(0, 0.5, 0), // darkgreen
@@ -96,7 +95,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             new Vec(1, 0.6, 0), // Orange
             new Vec(1, 0.7, 0.8), // Pink
             new Vec(0.8, 0.8, 1) // Lavender
-        };
+    };
     protected VirtualNode vn;
 
     /*
@@ -233,8 +232,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
     /**
      * Constructor to call when using XML Descriptor
      */
-    public C3DDispatcher(String[] rendererNodes, VirtualNode vn,
-        ProActiveDescriptor pad) {
+    public C3DDispatcher(String[] rendererNodes, VirtualNode vn, ProActiveDescriptor pad) {
         new C3DDispatcherFrame();
         this.rendererNodes = rendererNodes;
         this.vn = vn;
@@ -272,7 +270,6 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             //engines = hosts.getMachines();
             //engines = proActiveDescriptor.getVirtualNodeMappingSize()-1;
             //System.out.println("taille du tableau d'engines "+engines);
-
             /* Initializes the array to hold the rendering engines */
 
             //engine = new C3DRenderingEngine[engines];
@@ -293,12 +290,12 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             engine = new C3DRenderingEngine[engines];
 
             for (int i = 0; i < rendererNodes.length; i++) {
-                C3DRenderingEngine tmp = (C3DRenderingEngine) PAActiveObject.newActive("org.objectweb.proactive.examples.webservices.c3dWS.C3DRenderingEngine",
-                        param, rendererNodes[i]);
+                C3DRenderingEngine tmp = (C3DRenderingEngine) PAActiveObject.newActive(
+                        "org.objectweb.proactive.examples.webservices.c3dWS.C3DRenderingEngine", param,
+                        rendererNodes[i]);
 
                 //String nodeURL = nodeTab[i].getNodeInformation().getURL();
-                log("New rendering engine " + i + " created at " +
-                    rendererNodes[i]);
+                log("New rendering engine " + i + " created at " + rendererNodes[i]);
 
                 // always have a renderer used when launching the program
                 if (i == 1) {
@@ -378,8 +375,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
 
         for (int i = 0; i < intervals; i++) {
             //      log("Creating inter : "+i);
-            Interval newint = new Interval(i, width, height, i * intheight,
-                    (i + 1) * intheight, intervals);
+            Interval newint = new Interval(i, width, height, i * intheight, (i + 1) * intheight, intervals);
             int_stack.push(newint);
         }
 
@@ -405,11 +401,9 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                         /* Triggers the calculation of this interval on engine e */
                         tmp.render(e, interval);
 
-                        log("Interval " + interval.number +
-                            " assigned to engine " + keys[e] + "[" + e + "]");
+                        log("Interval " + interval.number + " assigned to engine " + keys[e] + "[" + e + "]");
                     } else {
-                        log("Failed to assign an interval to engine " +
-                            keys[e]);
+                        log("Failed to assign an interval to engine " + keys[e]);
                         h_engines.get(keys[e]);
                     }
                 }
@@ -483,8 +477,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
 
         /* Stores the newly rendered interval in <code>pixels</code>; this
          * is later used to initialize the images of newcoming consumers */
-        System.arraycopy(newpix, 0, pixels, interval.width * interval.yfrom,
-            newpix.length);
+        System.arraycopy(newpix, 0, pixels, interval.width * interval.yfrom, newpix.length);
 
         /* Decreases the counter of not yet rendered intervals */
         i_left--;
@@ -494,8 +487,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
 
         if (!int_stack.empty()) {
             nextinterval = (Interval) int_stack.pop();
-            log("Next interval [" + nextinterval.number +
-                "] assigned to engine " + engine_number);
+            log("Next interval [" + nextinterval.number + "] assigned to engine " + engine_number);
 
             // new NextInterval(engine_number, engine[engine_number], nextinterval);
             engine[engine_number].render(engine_number, nextinterval);
@@ -512,9 +504,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
 
             if (previousTime != -1) {
                 showMessageAll("Speed Up : " +
-                    (java.lang.Math.rint(
-                        ((double) previousTime / elapsed) * 1000) / 1000) +
-                    "\n");
+                    (java.lang.Math.rint(((double) previousTime / elapsed) * 1000) / 1000) + "\n");
             } else {
                 showMessageAll("");
             }
@@ -700,8 +690,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         /* Creates the rendering engines */
         init();
 
-        org.objectweb.proactive.core.body.request.BlockingRequestQueue requestQueue =
-            body.getRequestQueue();
+        org.objectweb.proactive.core.body.request.BlockingRequestQueue requestQueue = body.getRequestQueue();
 
         /* Loops over lifetime */
         while (body.isActive()) {
@@ -710,8 +699,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             Request r = requestQueue.blockingRemoveOldest();
             String methodName = r.getMethodName();
 
-            if (methodName.startsWith("rotate") ||
-                    methodName.startsWith("spin")) {
+            if (methodName.startsWith("rotate") || methodName.startsWith("spin")) {
                 processRotate(body, methodName, r);
             } else {
                 if (!Election.isRunning()) {
@@ -720,8 +708,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                 } else if (methodName.equals("addSphere")) {
                     // There is an election and addsphere comes..
                     // nothing happens...
-                    showMessageAll(
-                        "Cannot add spheres while an election is running");
+                    showMessageAll("Cannot add spheres while an election is running");
                 } else {
                     // THERE IS a running election and the method name is not left or right..
                     body.serve(r);
@@ -738,8 +725,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      * @param methodName The methodname <font size="-1">Not reconputed in order to gain time</font>
      * @param r The request object
      */
-    public void processRotate(org.objectweb.proactive.Body body,
-        String methodName, Request r) {
+    public void processRotate(org.objectweb.proactive.Body body, String methodName, Request r) {
         int i_user = 0;
 
         try {
@@ -765,8 +751,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                     showMessage(i_user, "Scene is being rotated left");
                     body.serve(r);
                 } else {
-                    election = new Election(i_user, new Integer(Election.LEFT),
-                            this);
+                    election = new Election(i_user, new Integer(Election.LEFT), this);
                 }
             }
         } else if (methodName.equals("rotateRight")) {
@@ -786,8 +771,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                     showMessage(i_user, "Scene is being rotated right");
                     body.serve(r);
                 } else {
-                    election = new Election(i_user,
-                            new Integer(Election.RIGHT), this);
+                    election = new Election(i_user, new Integer(Election.RIGHT), this);
                 }
             }
         } else if (methodName.equals("rotateUp")) {
@@ -807,8 +791,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                     showMessage(i_user, "Scene is being rotated up");
                     body.serve(r);
                 } else {
-                    election = new Election(i_user, new Integer(Election.UP),
-                            this);
+                    election = new Election(i_user, new Integer(Election.UP), this);
                 }
             }
         } else if (methodName.equals("rotateDown")) {
@@ -828,16 +811,14 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                     showMessage(i_user, "Scene is being rotated down");
                     body.serve(r);
                 } else {
-                    election = new Election(i_user, new Integer(Election.DOWN),
-                            this);
+                    election = new Election(i_user, new Integer(Election.DOWN), this);
                 }
             }
         } else if (methodName.equals("spinClock")) {
             // A user wants to spin clockwise
             if (Election.isRunning()) {
                 // There is an election
-                int i_votes = Election.vote(i_user,
-                        new Integer(Election.CLOCKWISE));
+                int i_votes = Election.vote(i_user, new Integer(Election.CLOCKWISE));
 
                 if (i_votes == h_users.size()) {
                     election.finish();
@@ -850,16 +831,14 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                     showMessage(i_user, "Scene is being spinned right");
                     body.serve(r);
                 } else {
-                    election = new Election(i_user,
-                            new Integer(Election.CLOCKWISE), this);
+                    election = new Election(i_user, new Integer(Election.CLOCKWISE), this);
                 }
             }
         } else if (methodName.equals("spinUnclock")) {
             // An user wants to spin unclock
             if (Election.isRunning()) {
                 // there is an election
-                int i_votes = Election.vote(i_user,
-                        new Integer(Election.UNCLOCKWISE));
+                int i_votes = Election.vote(i_user, new Integer(Election.UNCLOCKWISE));
 
                 if (i_votes == h_users.size()) {
                     election.finish();
@@ -872,8 +851,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
                     showMessage(i_user, "Scene is being spinned left");
                     body.serve(r);
                 } else {
-                    election = new Election(i_user,
-                            new Integer(Election.UNCLOCKWISE), this);
+                    election = new Election(i_user, new Integer(Election.UNCLOCKWISE), this);
                 }
             }
         }
@@ -900,8 +878,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      * @param message the message to display
      */
     public void showDialog(int i_user, String subject, String s_message) {
-        ((User) h_users.get(new Integer(i_user))).dialogMessage(subject,
-            s_message);
+        ((User) h_users.get(new Integer(i_user))).dialogMessage(subject, s_message);
     }
 
     /**
@@ -1052,8 +1029,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         Node node = null;
 
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                    argv[0]);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + argv[0]);
             proActiveDescriptor.activateMappings();
 
             //Thread.sleep(20000);		
@@ -1063,28 +1039,22 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         }
 
         //Object param[] = new Object[]{ proActiveDescriptor };
-        VirtualNode dispatcher = proActiveDescriptor.getVirtualNode(
-                "Dispatcher");
+        VirtualNode dispatcher = proActiveDescriptor.getVirtualNode("Dispatcher");
 
         VirtualNode renderer = proActiveDescriptor.getVirtualNode("Renderer");
         String[] rendererNodes = renderer.getNodesURL();
-        Object[] param = new Object[] {
-                rendererNodes, dispatcher, proActiveDescriptor
-            };
+        Object[] param = new Object[] { rendererNodes, dispatcher, proActiveDescriptor };
 
         node = dispatcher.getNode();
 
         try {
-            C3DDispatcher c3dd = (C3DDispatcher) PAActiveObject.newActive("org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher",
-                    param, node);
+            C3DDispatcher c3dd = (C3DDispatcher) PAActiveObject.newActive(
+                    "org.objectweb.proactive.examples.webservices.c3dWS.C3DDispatcher", param, node);
 
             //Expose the dispatcher as a web service
-            String[] methods = {
-                    "rotateRight", "getPicture", "rotateLeft", "rotateUp",
-                    "rotateDown", "getPixels", "getPixelMax", "waitForImage",
-                    "spinClock", "spinUnclock", "addRandomSphere",
-                    "resetSceneWS", "registerWSUser", "unregisterWSUser"
-                };
+            String[] methods = { "rotateRight", "getPicture", "rotateLeft", "rotateUp", "rotateDown",
+                    "getPixels", "getPixelMax", "waitForImage", "spinClock", "spinUnclock",
+                    "addRandomSphere", "resetSceneWS", "registerWSUser", "unregisterWSUser" };
 
             String urn = "C3DDispatcher";
             String url = "http://" + hostWS;
@@ -1115,8 +1085,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
         // sets the color to a specific color chosen arbitrary in the color[] array (which btw is a Vec array..)
         // Hm.. well, I'm really sorry for the person who'll maintain this code...
         // I _DO_ apologize for the following line.
-        sphere.surf.color = (color[Math.round((float) (Math.random() * (color.length -
-                1)))]);
+        sphere.surf.color = (color[Math.round((float) (Math.random() * (color.length - 1)))]);
 
         // Voodoo stuff...
         sphere.surf.kd = Math.random();
@@ -1191,8 +1160,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             // avg = avg + ((new-avg)/times)
             elapsed = System.currentTimeMillis() - start;
             userPing += ((elapsed - userPing) / userTotal);
-            log("Pinging user " + s_name + " in " + elapsed + " ms. Average: " +
-                userPing);
+            log("Pinging user " + s_name + " in " + elapsed + " ms. Average: " + userPing);
         }
 
         /**
@@ -1393,8 +1361,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             User user = ((User) h_users.get(new Integer(number)));
 
             if (user.getName().equals(name)) {
-                if (user instanceof WSUser &&
-                        ((WSUser) user).getUrl().equals(urlUser)) {
+                if (user instanceof WSUser && ((WSUser) user).getUrl().equals(urlUser)) {
                     removedUser = user;
                 }
 
@@ -1414,8 +1381,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
      * @return name and version of the OS
      */
     public String getOSString() {
-        return System.getProperty("os.name") + " " +
-        System.getProperty("os.version");
+        return System.getProperty("os.name") + " " + System.getProperty("os.version");
     }
 
     public int getIntervals() {
@@ -1448,10 +1414,8 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             return;
         } else {
             scene.addObject(s);
-            showMessageAll("A Sphere has been added\nX:" +
-                Math.floor(s.getCenter().x) + " Y:" +
-                Math.floor(s.getCenter().y) + " Z:" +
-                Math.floor(s.getCenter().y));
+            showMessageAll("A Sphere has been added\nX:" + Math.floor(s.getCenter().x) + " Y:" +
+                Math.floor(s.getCenter().y) + " Z:" + Math.floor(s.getCenter().y));
             render();
             log("Scene now contains " + scene.getObjects() + " spheres");
         }
@@ -1474,8 +1438,7 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
             if (engine[n].ping() == 0) {
                 elapsed = System.currentTimeMillis() - start;
                 enginePing += ((elapsed - enginePing) / (n + 1));
-                log("Pinging engine " + n + "in " + elapsed + " ms. Average: " +
-                    enginePing);
+                log("Pinging engine " + n + "in " + elapsed + " ms. Average: " + enginePing);
             }
         }
 
@@ -1569,12 +1532,10 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
 
             String s_localhost = "";
 
-            s_localhost = ProActiveInet.getInstance().getInetAddress()
-                                       .getCanonicalHostName();
+            s_localhost = ProActiveInet.getInstance().getInetAddress().getCanonicalHostName();
 
-            Label l_machine = new Label("on machine: " + s_localhost + " (" +
-                    System.getProperty("os.name") + " " +
-                    System.getProperty("os.version") + ")");
+            Label l_machine = new Label("on machine: " + s_localhost + " (" + System.getProperty("os.name") +
+                " " + System.getProperty("os.version") + ")");
             c.insets = new Insets(0, 10, 5, 10);
             c.gridy = 1;
             gridbag.setConstraints(l_machine, c);
@@ -1760,7 +1721,6 @@ public class C3DDispatcher implements org.objectweb.proactive.RunActive,
     }
 }
 
-
 class Election extends Thread {
     public static final int UP = 0;
     public static final int DOWN = 1;
@@ -1782,13 +1742,10 @@ class Election extends Thread {
         Election.running = true;
         wishes = new Hashtable();
         vote(i_user, wish);
-        c3ddispatcher.showMessage(i_user,
-            "Request 'rotate " + voteString(wish) + "' submitted, \nnew " +
+        c3ddispatcher.showMessage(i_user, "Request 'rotate " + voteString(wish) + "' submitted, \nnew " +
             WAITSECS + " second election started ...");
-        c3ddispatcher.showMessageExcept(i_user,
-            "New " + WAITSECS + " second election started:");
-        c3ddispatcher.showMessageExcept(i_user,
-            "   User " + c3ddispatcher.nameOfUser(i_user) +
+        c3ddispatcher.showMessageExcept(i_user, "New " + WAITSECS + " second election started:");
+        c3ddispatcher.showMessageExcept(i_user, "   User " + c3ddispatcher.nameOfUser(i_user) +
             " wants to rotate " + voteString(wish));
 
         //c3ddispatcher.showDialogExcept(i_user,"Election","An election has been started !");
@@ -1814,17 +1771,15 @@ class Election extends Thread {
             i_user = ((Integer) e.nextElement()).intValue();
 
             Integer wish = (Integer) wishes.get(new Integer(i_user));
-            c3ddispatcher.showMessageAll("   User " +
-                c3ddispatcher.nameOfUser(i_user) + " voted '" +
+            c3ddispatcher.showMessageAll("   User " + c3ddispatcher.nameOfUser(i_user) + " voted '" +
                 voteString(wish) + "'");
 
             // update the scores
             score[wish.intValue()]++;
         }
 
-        c3ddispatcher.showMessageAll("   Result:\n       " + score[RIGHT] +
-            " right, " + score[LEFT] + " left [rotate]\n      " + score[UP] +
-            " up ," + score[DOWN] + " down [vertical]\n      " +
+        c3ddispatcher.showMessageAll("   Result:\n       " + score[RIGHT] + " right, " + score[LEFT] +
+            " left [rotate]\n      " + score[UP] + " up ," + score[DOWN] + " down [vertical]\n      " +
             score[CLOCKWISE] + " right," + score[UNCLOCKWISE] + " left [spin]");
 
         // Computes the winner
@@ -1838,51 +1793,50 @@ class Election extends Thread {
         }
 
         switch (winner) {
-        case UP:
-            c3ddispatcher.showMessageAll("   The scene will be rotated up.");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.rotateUp(0);
+            case UP:
+                c3ddispatcher.showMessageAll("   The scene will be rotated up.");
+                Election.running = false;
+                Election.wishes.clear();
+                c3ddispatcher.rotateUp(0);
 
-            break;
-        case DOWN:
-            c3ddispatcher.showMessageAll("   The scene will be rotated down.");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.rotateDown(0);
+                break;
+            case DOWN:
+                c3ddispatcher.showMessageAll("   The scene will be rotated down.");
+                Election.running = false;
+                Election.wishes.clear();
+                c3ddispatcher.rotateDown(0);
 
-            break;
-        case LEFT:
-            c3ddispatcher.showMessageAll("   The scene will be rotated left.");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.rotateLeft(0);
+                break;
+            case LEFT:
+                c3ddispatcher.showMessageAll("   The scene will be rotated left.");
+                Election.running = false;
+                Election.wishes.clear();
+                c3ddispatcher.rotateLeft(0);
 
-            break;
-        case RIGHT:
-            c3ddispatcher.showMessageAll("   The scene will be rotated right.");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.rotateRight(0);
+                break;
+            case RIGHT:
+                c3ddispatcher.showMessageAll("   The scene will be rotated right.");
+                Election.running = false;
+                Election.wishes.clear();
+                c3ddispatcher.rotateRight(0);
 
-            break;
-        case CLOCKWISE:
-            c3ddispatcher.showMessageAll("  The scene will be spinned right");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.spinClock(0);
+                break;
+            case CLOCKWISE:
+                c3ddispatcher.showMessageAll("  The scene will be spinned right");
+                Election.running = false;
+                Election.wishes.clear();
+                c3ddispatcher.spinClock(0);
 
-            break;
-        case UNCLOCKWISE:
-            c3ddispatcher.showMessageAll("  The scene will be spinned left");
-            Election.running = false;
-            Election.wishes.clear();
-            c3ddispatcher.spinUnclock(0);
+                break;
+            case UNCLOCKWISE:
+                c3ddispatcher.showMessageAll("  The scene will be spinned left");
+                Election.running = false;
+                Election.wishes.clear();
+                c3ddispatcher.spinUnclock(0);
 
-            break;
-        default:
-            c3ddispatcher.showMessageAll(
-                "   No consensus found, vote again please!");
+                break;
+            default:
+                c3ddispatcher.showMessageAll("   No consensus found, vote again please!");
         }
 
         Election.running = false;
@@ -1891,8 +1845,7 @@ class Election extends Thread {
 
     public synchronized static int vote(int i_user, Integer wish) {
         if (wishes.containsKey(new Integer(i_user))) {
-            c3ddispatcher.showMessage(i_user,
-                "You have already voted in this round");
+            c3ddispatcher.showMessage(i_user, "You have already voted in this round");
         } else {
             wishes.put(new Integer(i_user), wish);
         }
@@ -1908,27 +1861,27 @@ class Election extends Thread {
         String ret;
 
         switch (wish.intValue()) {
-        case UP:
-            ret = "up";
-            break;
-        case DOWN:
-            ret = "down";
-            break;
-        case LEFT:
-            ret = "left";
-            break;
-        case RIGHT:
-            ret = "right";
-            break;
-        case CLOCKWISE:
-            ret = "clockwise";
-            break;
-        case UNCLOCKWISE:
-            ret = "unclockwise";
-            break;
-        default:
-            ret = "error";
-            break;
+            case UP:
+                ret = "up";
+                break;
+            case DOWN:
+                ret = "down";
+                break;
+            case LEFT:
+                ret = "left";
+                break;
+            case RIGHT:
+                ret = "right";
+                break;
+            case CLOCKWISE:
+                ret = "clockwise";
+                break;
+            case UNCLOCKWISE:
+                ret = "unclockwise";
+                break;
+            default:
+                ret = "error";
+                break;
         }
 
         return ret;

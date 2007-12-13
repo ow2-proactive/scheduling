@@ -33,7 +33,8 @@ package org.objectweb.proactive.examples.webservices.c3dWS.ws;
 import javax.xml.namespace.QName;
 
 
-public class Service1SoapStub extends org.apache.axis.client.Stub implements org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap {
+public class Service1SoapStub extends org.apache.axis.client.Stub implements
+        org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap {
     static org.apache.axis.description.OperationDesc[] _operations;
 
     static {
@@ -50,14 +51,13 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         this(null);
     }
 
-    public Service1SoapStub(java.net.URL endpointURL,
-        javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
+    public Service1SoapStub(java.net.URL endpointURL, javax.xml.rpc.Service service)
+            throws org.apache.axis.AxisFault {
         this(service);
         super.cachedEndpoint = endpointURL;
     }
 
-    public Service1SoapStub(javax.xml.rpc.Service service)
-        throws org.apache.axis.AxisFault {
+    public Service1SoapStub(javax.xml.rpc.Service service) throws org.apache.axis.AxisFault {
         if (service == null) {
             super.service = new org.apache.axis.client.Service();
         } else {
@@ -74,8 +74,7 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         java.lang.Class<?> arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
         java.lang.Class<?> simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
         java.lang.Class<?> simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
-        qName = new javax.xml.namespace.QName("http://tempuri.org/",
-                "ArrayOfInt");
+        qName = new javax.xml.namespace.QName("http://tempuri.org/", "ArrayOfInt");
         cachedSerQNames.add(qName);
         cls = org.objectweb.proactive.examples.webservices.c3dWS.ws.ArrayOfInt.class;
         cachedSerClasses.add(cls);
@@ -87,11 +86,9 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         org.apache.axis.description.OperationDesc oper;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("HelloWorld");
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "name"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "name"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         //        oper.setStyle(Style.WRAPPED);
         //        oper.setUse(Use.LITERAL);
@@ -99,26 +96,19 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("setPixels");
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "userName"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "pix"),
-            new javax.xml.namespace.QName("http://tempuri.org/", "ArrayOfInt"),
-            org.objectweb.proactive.examples.webservices.c3dWS.ws.ArrayOfInt.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "number"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "int"), int.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "nbInt"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "int"), int.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "userName"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "pix"),
+                new javax.xml.namespace.QName("http://tempuri.org/", "ArrayOfInt"),
+                org.objectweb.proactive.examples.webservices.c3dWS.ws.ArrayOfInt.class,
+                org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "number"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"), int.class,
+                org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "nbInt"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"), int.class,
+                org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         //        oper.setStyle(Style.WRAPPED);
         //        oper.setUse(Use.LITERAL);
@@ -126,16 +116,12 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("ShowDialog");
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "userName"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "message"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "userName"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "message"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         //        oper.setStyle(Style.WRAPPED);
         //        oper.setUse(Use.LITERAL);
@@ -143,16 +129,12 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("showUserMessage");
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "userName"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "message"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "userName"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "message"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         //        oper.setStyle(Style.WRAPPED);
         //        oper.setUse(Use.LITERAL);
@@ -160,21 +142,15 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("showUserMessageFrom");
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "userName"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "from"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "message"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "userName"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "from"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "message"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         //        oper.setStyle(Style.WRAPPED);
         //        oper.setUse(Use.LITERAL);
@@ -182,21 +158,15 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("informNewUser");
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "myUserName"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "usernameNew"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "id"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "int"), int.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "myUserName"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "usernameNew"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "id"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "int"), int.class,
+                org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         //        oper.setStyle(Style.WRAPPED);
         //        oper.setUse(Use.LITERAL);
@@ -204,24 +174,19 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
 
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("informUserLeft");
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "myUserName"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
-        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/",
-                "userNameLeft"),
-            new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema",
-                "string"), java.lang.String.class,
-            org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "myUserName"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
+        oper.addParameter(new javax.xml.namespace.QName("http://tempuri.org/", "userNameLeft"),
+                new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"),
+                java.lang.String.class, org.apache.axis.description.ParameterDesc.IN, false, false);
         oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
         //        oper.setStyle(Style.WRAPPED);
         //        oper.setUse(Use.LITERAL);
         _operations[6] = oper;
     }
 
-    private org.apache.axis.client.Call createCall()
-        throws java.rmi.RemoteException {
+    private org.apache.axis.client.Call createCall() throws java.rmi.RemoteException {
         try {
             org.apache.axis.client.Call _call = (org.apache.axis.client.Call) super.service.createCall();
 
@@ -278,13 +243,11 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
 
             return _call;
         } catch (java.lang.Throwable t) {
-            throw new org.apache.axis.AxisFault("Failure trying to get the Call object",
-                t);
+            throw new org.apache.axis.AxisFault("Failure trying to get the Call object", t);
         }
     }
 
-    public void helloWorld(java.lang.String helloWorldName)
-        throws java.rmi.RemoteException {
+    public void helloWorld(java.lang.String helloWorldName) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -294,20 +257,15 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://tempuri.org/HelloWorld");
         _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR,
-            Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS,
-            Boolean.FALSE);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName(
-                "http://tempuri.org/", "HelloWorld"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://tempuri.org/", "HelloWorld"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
 
-        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {
-                    helloWorldName
-                });
+        java.lang.Object _resp = _call.invoke(new java.lang.Object[] { helloWorldName });
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException) _resp;
@@ -317,9 +275,8 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
     }
 
     public void setPixels(java.lang.String setPixelsUserName,
-        org.objectweb.proactive.examples.webservices.c3dWS.ws.ArrayOfInt setPixelsPix,
-        int setPixelsNumber, int setPixelsNbInt)
-        throws java.rmi.RemoteException {
+            org.objectweb.proactive.examples.webservices.c3dWS.ws.ArrayOfInt setPixelsPix,
+            int setPixelsNumber, int setPixelsNbInt) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -329,22 +286,16 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://tempuri.org/setPixels");
         _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR,
-            Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS,
-            Boolean.FALSE);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName(
-                "http://tempuri.org/", "setPixels"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://tempuri.org/", "setPixels"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
 
-        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {
-                    setPixelsUserName, setPixelsPix,
-                    new java.lang.Integer(setPixelsNumber),
-                    new java.lang.Integer(setPixelsNbInt)
-                });
+        java.lang.Object _resp = _call.invoke(new java.lang.Object[] { setPixelsUserName, setPixelsPix,
+                new java.lang.Integer(setPixelsNumber), new java.lang.Integer(setPixelsNbInt) });
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException) _resp;
@@ -353,8 +304,8 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         extractAttachments(_call);
     }
 
-    public void showDialog(java.lang.String showDialogUserName,
-        java.lang.String showDialogMessage) throws java.rmi.RemoteException {
+    public void showDialog(java.lang.String showDialogUserName, java.lang.String showDialogMessage)
+            throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -364,20 +315,16 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://tempuri.org/ShowDialog");
         _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR,
-            Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS,
-            Boolean.FALSE);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName(
-                "http://tempuri.org/", "ShowDialog"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://tempuri.org/", "ShowDialog"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
 
-        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {
-                    showDialogUserName, showDialogMessage
-                });
+        java.lang.Object _resp = _call
+                .invoke(new java.lang.Object[] { showDialogUserName, showDialogMessage });
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException) _resp;
@@ -387,8 +334,7 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
     }
 
     public void showUserMessage(java.lang.String showUserMessageUserName,
-        java.lang.String showUserMessageMessage)
-        throws java.rmi.RemoteException {
+            java.lang.String showUserMessageMessage) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -398,20 +344,16 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://tempuri.org/showUserMessage");
         _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR,
-            Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS,
-            Boolean.FALSE);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName(
-                "http://tempuri.org/", "showUserMessage"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://tempuri.org/", "showUserMessage"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
 
-        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {
-                    showUserMessageUserName, showUserMessageMessage
-                });
+        java.lang.Object _resp = _call.invoke(new java.lang.Object[] { showUserMessageUserName,
+                showUserMessageMessage });
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException) _resp;
@@ -420,11 +362,9 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         extractAttachments(_call);
     }
 
-    public void showUserMessageFrom(
-        java.lang.String showUserMessageFromUserName,
-        java.lang.String showUserMessageFromFrom,
-        java.lang.String showUserMessageFromMessage)
-        throws java.rmi.RemoteException {
+    public void showUserMessageFrom(java.lang.String showUserMessageFromUserName,
+            java.lang.String showUserMessageFromFrom, java.lang.String showUserMessageFromMessage)
+            throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -434,21 +374,16 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://tempuri.org/showUserMessageFrom");
         _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR,
-            Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS,
-            Boolean.FALSE);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName(
-                "http://tempuri.org/", "showUserMessageFrom"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://tempuri.org/", "showUserMessageFrom"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
 
-        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {
-                    showUserMessageFromUserName, showUserMessageFromFrom,
-                    showUserMessageFromMessage
-                });
+        java.lang.Object _resp = _call.invoke(new java.lang.Object[] { showUserMessageFromUserName,
+                showUserMessageFromFrom, showUserMessageFromMessage });
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException) _resp;
@@ -458,8 +393,7 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
     }
 
     public void informNewUser(java.lang.String informNewUserMyUserName,
-        java.lang.String informNewUserUsernameNew, int informNewUserId)
-        throws java.rmi.RemoteException {
+            java.lang.String informNewUserUsernameNew, int informNewUserId) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -469,21 +403,16 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://tempuri.org/informNewUser");
         _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR,
-            Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS,
-            Boolean.FALSE);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName(
-                "http://tempuri.org/", "informNewUser"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://tempuri.org/", "informNewUser"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
 
-        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {
-                    informNewUserMyUserName, informNewUserUsernameNew,
-                    new java.lang.Integer(informNewUserId)
-                });
+        java.lang.Object _resp = _call.invoke(new java.lang.Object[] { informNewUserMyUserName,
+                informNewUserUsernameNew, new java.lang.Integer(informNewUserId) });
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException) _resp;
@@ -493,8 +422,7 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
     }
 
     public void informUserLeft(java.lang.String informUserLeftMyUserName,
-        java.lang.String informUserLeftUserNameLeft)
-        throws java.rmi.RemoteException {
+            java.lang.String informUserLeftUserNameLeft) throws java.rmi.RemoteException {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }
@@ -504,20 +432,16 @@ public class Service1SoapStub extends org.apache.axis.client.Stub implements org
         _call.setUseSOAPAction(true);
         _call.setSOAPActionURI("http://tempuri.org/informUserLeft");
         _call.setEncodingStyle(null);
-        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR,
-            Boolean.FALSE);
-        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS,
-            Boolean.FALSE);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
         _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
-        _call.setOperationName(new javax.xml.namespace.QName(
-                "http://tempuri.org/", "informUserLeft"));
+        _call.setOperationName(new javax.xml.namespace.QName("http://tempuri.org/", "informUserLeft"));
 
         setRequestHeaders(_call);
         setAttachments(_call);
 
-        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {
-                    informUserLeftMyUserName, informUserLeftUserNameLeft
-                });
+        java.lang.Object _resp = _call.invoke(new java.lang.Object[] { informUserLeftMyUserName,
+                informUserLeftUserNameLeft });
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException) _resp;

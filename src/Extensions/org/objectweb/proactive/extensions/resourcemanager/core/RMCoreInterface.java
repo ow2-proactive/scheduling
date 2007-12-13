@@ -77,8 +77,8 @@ public interface RMCoreInterface {
      * @param pad a ProActiveDescriptor object to deploy at the node source creation.
      * @param sourceName name given to the static node source.
      */
-    public void createStaticNodesource(List<ProActiveDescriptor> padList,
-        String sourceName) throws RMException;
+    public void createStaticNodesource(List<ProActiveDescriptor> padList, String sourceName)
+            throws RMException;
 
     /**
      * Creates a Dynamic Node source Active Object.
@@ -90,8 +90,8 @@ public interface RMCoreInterface {
      * @param ttr Time to release in ms, time during the node will be kept by the nodes source and the Core.
      * @param peerUrls vector of ProActive P2P living peer and able to provide nodes.
      */
-    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice,
-        int ttr, Vector<String> peerUrls) throws RMException;
+    public void createDynamicNodeSource(String id, int nbMaxNodes, int nice, int ttr, Vector<String> peerUrls)
+            throws RMException;
 
     /**
      * Add nodes to a static Node Source.
@@ -101,8 +101,7 @@ public interface RMCoreInterface {
      * @param sourceName name of an existing PADNodesource
      * @throws AddingNodesException if the NodeSource
      */
-    public void addNodes(ProActiveDescriptor pad, String sourceName)
-        throws RMException;
+    public void addNodes(ProActiveDescriptor pad, String sourceName) throws RMException;
 
     /**
      * Add nodes to the default static Node Source.
@@ -116,8 +115,7 @@ public interface RMCoreInterface {
      * Add a deployed node to the default static nodes source of the RM
      * @param nodeUrl URL of the node.
      */
-    public void addNode(String nodeUrl) throws RMException;
-    ;
+    public void addNode(String nodeUrl) throws RMException;;
 
     /**
      * Add nodes to a StaticNodeSource represented by sourceName.
@@ -125,8 +123,7 @@ public interface RMCoreInterface {
      * @param pad ProActive deployment descriptor to deploy.
      * @param sourceName name of the static node source that perform the deployment.
      */
-    public void addNode(String nodeUrl, String sourceName)
-        throws RMException;
+    public void addNode(String nodeUrl, String sourceName) throws RMException;
 
     /**
      * Remove a node from the Core and from its node source.
@@ -157,23 +154,22 @@ public interface RMCoreInterface {
      * @param preempt true all the nodes must be removed immediately, without waiting job ending if nodes are busy,
      * false nodes are removed just after the job ending if busy.
      */
-    public void removeSource(String sourceName, boolean preempt)
-        throws RMException;
+    public void removeSource(String sourceName, boolean preempt) throws RMException;
 
     /**
-    * Get a set of nodes that verify a selection script.
-    * This method has three way to handle the request :<BR>
-    *  - if there is no script, it returns at most the
-    * first nb free nodes asked.<BR>
-    * - If the script is a dynamic script, the method will
-    * test the resources, until nb nodes verify the script or if there is no
-    * node left.<BR>
-    * - If the script is a static script, it will return in priority the
-    * nodes on which the given script has already been verified.<BR>
-    *
-    * @param nb number of node to provide
-    * @param selectionScript that nodes must verify
-    */
+     * Get a set of nodes that verify a selection script.
+     * This method has three way to handle the request :<BR>
+     *  - if there is no script, it returns at most the
+     * first nb free nodes asked.<BR>
+     * - If the script is a dynamic script, the method will
+     * test the resources, until nb nodes verify the script or if there is no
+     * node left.<BR>
+     * - If the script is a static script, it will return in priority the
+     * nodes on which the given script has already been verified.<BR>
+     *
+     * @param nb number of node to provide
+     * @param selectionScript that nodes must verify
+     */
     public NodeSet getAtMostNodes(IntWrapper nb, SelectionScript selectionScript);
 
     /**
@@ -182,8 +178,7 @@ public interface RMCoreInterface {
      * @param nb exactly number of nodes to provide.
      * @param selectionScript  that nodes must verify.
      */
-    public NodeSet getExactlyNodes(IntWrapper nb,
-        SelectionScript selectionScript);
+    public NodeSet getExactlyNodes(IntWrapper nb, SelectionScript selectionScript);
 
     /**
      * Free a node after a work.
@@ -266,7 +261,7 @@ public interface RMCoreInterface {
      * Initial state must be understood as a new Monitor point of view.
      * A new monitor start to receive RMCore events, so must be informed of the current
      * state of the Core at the beginning of monitoring.
-            * @return RMInitialState containing nodes and nodeSources of the RMCore.
+     * @return RMInitialState containing nodes and nodeSources of the RMCore.
      */
     public RMInitialState getRMInitialState();
 

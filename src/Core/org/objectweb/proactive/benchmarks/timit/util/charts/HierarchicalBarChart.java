@@ -63,17 +63,14 @@ public class HierarchicalBarChart implements Chart {
     private Element[] timers;
     private Comparable[] categories;
 
-    public void generateChart(Element eTimit, BenchmarkStatistics bstats,
-        ConfigChart cChart) {
+    public void generateChart(Element eTimit, BenchmarkStatistics bstats, ConfigChart cChart) {
         Element eTimitClone = (Element) eTimit.clone();
 
         // Apply filter on elements
-        Iterator<Element> itTimers = eTimitClone.getDescendants(new ElementFilter(
-                    "timers"));
+        Iterator<Element> itTimers = eTimitClone.getDescendants(new ElementFilter("timers"));
 
         while (itTimers.hasNext()) {
-            XMLHelper.tagFiltering(itTimers.next(),
-                cChart.get("filter").split(","));
+            XMLHelper.tagFiltering(itTimers.next(), cChart.get("filter").split(","));
         }
 
         // Get values from XML tree (Element)
@@ -93,8 +90,7 @@ public class HierarchicalBarChart implements Chart {
 
     private void buildFinalChart(ConfigChart cChart) {
         Chart.Scale scaleMode = ConfigChart.scaleValue(cChart.get("scaleMode"));
-        Chart.LegendFormat legendFormatMode = ConfigChart.legendValue(cChart.get(
-                    "legendFormatMode"));
+        Chart.LegendFormat legendFormatMode = ConfigChart.legendValue(cChart.get("legendFormatMode"));
         int alpha = Integer.valueOf(cChart.get("alpha"));
 
         if (scaleMode == Chart.Scale.DEFAULT) {
@@ -103,17 +99,14 @@ public class HierarchicalBarChart implements Chart {
         if (legendFormatMode == Chart.LegendFormat.DEFAULT) {
             legendFormatMode = Chart.LegendFormat.NONE;
         }
-        this.buildFinalChart(cChart.get("title"), cChart.get("subTitle"),
-            cChart.get("xAxisLabel"), cChart.get("yAxisLabel"),
-            Integer.valueOf(cChart.get("height")),
-            Integer.valueOf(cChart.get("width")), cChart.get("filename"),
-            scaleMode, legendFormatMode, alpha);
+        this.buildFinalChart(cChart.get("title"), cChart.get("subTitle"), cChart.get("xAxisLabel"), cChart
+                .get("yAxisLabel"), Integer.valueOf(cChart.get("height")), Integer.valueOf(cChart
+                .get("width")), cChart.get("filename"), scaleMode, legendFormatMode, alpha);
     }
 
-    private void buildFinalChart(String title, String subTitle,
-        String xAxisLabel, String yAxisLabel, int height, int width,
-        String filename, Chart.Scale scaleMode,
-        Chart.LegendFormat legendFormatMode, int alpha) {
+    private void buildFinalChart(String title, String subTitle, String xAxisLabel, String yAxisLabel,
+            int height, int width, String filename, Chart.Scale scaleMode,
+            Chart.LegendFormat legendFormatMode, int alpha) {
         Vector[] vec = new Vector[this.timers.length];
         boolean exist;
 
@@ -145,8 +138,8 @@ public class HierarchicalBarChart implements Chart {
 
         CategoryDataset dataset = null;
         try {
-            dataset = DatasetUtilities.createCategoryDataset(toSeries(vec[0]),
-                    this.categories, toDataset(vec));
+            dataset = DatasetUtilities.createCategoryDataset(toSeries(vec[0]), this.categories,
+                    toDataset(vec));
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             throw new IllegalArgumentException(
@@ -157,12 +150,11 @@ public class HierarchicalBarChart implements Chart {
         final CategoryAxis categoryAxis = new CategoryAxis(xAxisLabel);
         final ValueAxis valueAxis = new NumberAxis(yAxisLabel);
 
-        final CategoryPlot plot = new CategoryPlot(dataset, categoryAxis,
-                valueAxis, new HierarchicalBarRenderer());
+        final CategoryPlot plot = new CategoryPlot(dataset, categoryAxis, valueAxis,
+            new HierarchicalBarRenderer());
 
         plot.setOrientation(PlotOrientation.VERTICAL);
-        final JFreeChart chart = new JFreeChart(title,
-                JFreeChart.DEFAULT_TITLE_FONT, plot, true);
+        final JFreeChart chart = new JFreeChart(title, JFreeChart.DEFAULT_TITLE_FONT, plot, true);
         chart.addSubtitle(new TextTitle(subTitle));
 
         // set the background color for the chart...
@@ -186,11 +178,11 @@ public class HierarchicalBarChart implements Chart {
                     "The output filename for the HierarchicalBarChart cannot be null or empty !");
             }
 
-            ChartUtilities.saveChartAsPNG(XMLHelper.createFileWithDirs(filename +
-                    ".png"), chart, width, height);
+            ChartUtilities.saveChartAsPNG(XMLHelper.createFileWithDirs(filename + ".png"), chart, width,
+                    height);
 
-            Utilities.saveChartAsSVG(chart, new Rectangle(width, height),
-                XMLHelper.createFileWithDirs(filename + ".svg"));
+            Utilities.saveChartAsSVG(chart, new Rectangle(width, height), XMLHelper
+                    .createFileWithDirs(filename + ".svg"));
         } catch (java.io.IOException e) {
             System.err.println("Error writing chart image to file");
             e.printStackTrace();
@@ -208,8 +200,7 @@ public class HierarchicalBarChart implements Chart {
             }
             return result;
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new IllegalArgumentException(
-                "Can't generate chart with irregular type of values");
+            throw new IllegalArgumentException("Can't generate chart with irregular type of values");
         }
     }
 

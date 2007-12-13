@@ -36,6 +36,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import static unitTests.UnitTests.logger;
+
+
 public class TestCommandEscape {
     final static String sshLocalhost = "ssh localhost";
     final static String cTrue = "true *";
@@ -82,8 +84,7 @@ public class TestCommandEscape {
         return prefixCmd + " " + Helpers.escapeCommand(cmd);
     }
 
-    static private int exec(String cmd)
-        throws IOException, InterruptedException {
+    static private int exec(String cmd) throws IOException, InterruptedException {
         Process p = Runtime.getRuntime().exec(cmd);
         p.waitFor();
         return p.exitValue();

@@ -41,6 +41,7 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
 import functionalTests.group.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * do an (a)synchronous call that rise exception
  *
@@ -57,15 +58,8 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        Object[][] params = {
-                { "Agent0" },
-                { "Agent1" },
-                { "Agent2" }
-            };
-        Node[] nodes = {
-                TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-                TestNodes.getRemoteVMNode()
-            };
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
         this.typedGroup = (A) PAGroup.newGroup(A.class.getName(), params, nodes);
 
         this.resultTypedGroup = this.typedGroup.asynchronousCallException();

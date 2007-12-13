@@ -34,8 +34,7 @@ import org.objectweb.proactive.core.util.CircularArrayList;
 import org.objectweb.proactive.examples.StandardFrame;
 
 
-public class PenguinApplet extends StandardFrame
-    implements PenguinMessageReceiver {
+public class PenguinApplet extends StandardFrame implements PenguinMessageReceiver {
     private PenguinControler controler;
     private Action startAction;
     private Action suspendAction;
@@ -68,94 +67,88 @@ public class PenguinApplet extends StandardFrame
         javax.swing.JPanel rootPanel = new javax.swing.JPanel(new java.awt.BorderLayout());
 
         // WEST PANEL
-        javax.swing.JPanel p1 = new javax.swing.JPanel(new java.awt.GridLayout(
-                    0, 1));
+        javax.swing.JPanel p1 = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
         javax.swing.JButton bStart = new javax.swing.JButton("Start");
         bStart.setToolTipText("Start itinerary");
         bStart.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    executeAction(agentList.getSelectedIndices(), startAction);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                executeAction(agentList.getSelectedIndices(), startAction);
+            }
+        });
         p1.add(bStart);
 
         javax.swing.JButton bSuspend = new javax.swing.JButton("Suspend");
         bSuspend.setToolTipText("Suspend itinerary");
         bSuspend.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    executeAction(agentList.getSelectedIndices(), suspendAction);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                executeAction(agentList.getSelectedIndices(), suspendAction);
+            }
+        });
         p1.add(bSuspend);
 
         javax.swing.JButton bResume = new javax.swing.JButton("Resume");
         bResume.setToolTipText("Resume itinerary");
         bResume.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    executeAction(agentList.getSelectedIndices(), resumeAction);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                executeAction(agentList.getSelectedIndices(), resumeAction);
+            }
+        });
         p1.add(bResume);
 
         javax.swing.JButton bSet = new javax.swing.JButton("Set itinerary");
         bSet.setToolTipText("Set new itinerary");
         bSet.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    setItinerary(agentList.getSelectedIndices());
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                setItinerary(agentList.getSelectedIndices());
+            }
+        });
         p1.add(bSet);
 
         rootPanel.add(p1, java.awt.BorderLayout.WEST);
 
         // EAST PANEL
-        javax.swing.JPanel p2 = new javax.swing.JPanel(new java.awt.GridLayout(
-                    0, 1));
+        javax.swing.JPanel p2 = new javax.swing.JPanel(new java.awt.GridLayout(0, 1));
         javax.swing.JButton bAddAgent = new javax.swing.JButton("Add agent");
         bAddAgent.setToolTipText("Add one new agent");
         bAddAgent.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    //receiveMessage("Add new agent pressed");
-                    addAgent();
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                //receiveMessage("Add new agent pressed");
+                addAgent();
+            }
+        });
         p2.add(bAddAgent);
 
         javax.swing.JButton bCall = new javax.swing.JButton("Call");
         bCall.setToolTipText("Call");
         bCall.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    executeAction(agentList.getSelectedIndices(), callAction);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                executeAction(agentList.getSelectedIndices(), callAction);
+            }
+        });
         p2.add(bCall);
 
-        javax.swing.JButton bCallOther = new javax.swing.JButton(
-                "Chained calls");
+        javax.swing.JButton bCallOther = new javax.swing.JButton("Chained calls");
         bCallOther.setToolTipText("Chained calls from selected agent");
         bCallOther.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    executeAction(agentList.getSelectedIndices(),
-                        chainedCallAction);
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                executeAction(agentList.getSelectedIndices(), chainedCallAction);
+            }
+        });
         p2.add(bCallOther);
 
         javax.swing.JButton bGet = new javax.swing.JButton("Get itinerary");
         bGet.setToolTipText("Get current itinerary");
         bGet.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    itineraryField.setText(getItinerary(
-                            agentList.getSelectedIndices()));
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                itineraryField.setText(getItinerary(agentList.getSelectedIndices()));
+            }
+        });
         p2.add(bGet);
 
         rootPanel.add(p2, java.awt.BorderLayout.EAST);
 
         // CENTER PANEL
-        javax.swing.JPanel p3 = new javax.swing.JPanel(new java.awt.GridLayout(
-                    1, 0));
+        javax.swing.JPanel p3 = new javax.swing.JPanel(new java.awt.GridLayout(1, 0));
 
         agentList = new javax.swing.JList(penguinListModel);
         agentList.setToolTipText("Agent list");
@@ -179,8 +172,7 @@ public class PenguinApplet extends StandardFrame
             e.printStackTrace();
         }
         if (n > 0) {
-            PenguinWrapper p1 = (PenguinWrapper) penguinListModel.getElementAt(n -
-                    1);
+            PenguinWrapper p1 = (PenguinWrapper) penguinListModel.getElementAt(n - 1);
             PenguinWrapper p2 = (PenguinWrapper) penguinListModel.getElementAt(n);
             (p1.penguin).setOther(p2.penguin);
         } else {
@@ -190,8 +182,7 @@ public class PenguinApplet extends StandardFrame
 
     private void executeAction(int[] selection, Action action) {
         if (selection.length == 0) {
-            receiveMessage(
-                "You must select an agent in the list first or add one if none is already present");
+            receiveMessage("You must select an agent in the list first or add one if none is already present");
         } else {
             for (int i = 0; i < selection.length; i++) {
                 int value = selection[i];
@@ -203,8 +194,7 @@ public class PenguinApplet extends StandardFrame
 
     private String getItinerary(int[] selection) {
         if (selection.length == 0) {
-            receiveMessage(
-                "You must select an agent in the list first or add one if none is already present");
+            receiveMessage("You must select an agent in the list first or add one if none is already present");
         } else if (selection.length > 1) {
             receiveMessage("You must select one agent");
         } else {
@@ -227,8 +217,7 @@ public class PenguinApplet extends StandardFrame
 
     private void setItinerary(int[] selection) {
         if (selection.length == 0) {
-            receiveMessage(
-                "You must select an agent in the list first or add one if none is already present");
+            receiveMessage("You must select an agent in the list first or add one if none is already present");
         } else {
             for (int i = 0; i < selection.length; i++) {
                 int value = selection[i];
@@ -330,8 +319,7 @@ public class PenguinApplet extends StandardFrame
 
         public void setItinerary(String itinerary) {
             java.util.ArrayList<String> itineraryList = new java.util.ArrayList<String>();
-            java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(itinerary,
-                    "\n");
+            java.util.StringTokenizer tokenizer = new java.util.StringTokenizer(itinerary, "\n");
             while (tokenizer.hasMoreTokens())
                 itineraryList.add(tokenizer.nextToken());
             String[] intineraryArray = itineraryList.toArray(new String[0]);

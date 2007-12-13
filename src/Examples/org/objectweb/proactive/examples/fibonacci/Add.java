@@ -93,10 +93,8 @@ public class Add implements Serializable, InitActive, RunActive {
     public static void main(String[] args) {
         try {
             Add add = (Add) PAActiveObject.newActive(Add.class.getName(), null);
-            Cons1 cons1 = (Cons1) PAActiveObject.newActive(Cons1.class.getName(),
-                    null);
-            Cons2 cons2 = (Cons2) PAActiveObject.newActive(Cons2.class.getName(),
-                    null);
+            Cons1 cons1 = (Cons1) PAActiveObject.newActive(Cons1.class.getName(), null);
+            Cons2 cons2 = (Cons2) PAActiveObject.newActive(Cons2.class.getName(), null);
             add.setCons1(cons1);
             cons1.setAdd(add);
             cons1.setCons2(cons2);

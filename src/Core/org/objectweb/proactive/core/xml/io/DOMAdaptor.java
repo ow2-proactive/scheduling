@@ -86,16 +86,16 @@ public class DOMAdaptor {
         Node child = node.getFirstChild();
         while (child != null) {
             switch (child.getNodeType()) {
-            case Node.TEXT_NODE:
-            case Node.CDATA_SECTION_NODE:
-                if (sb == null) {
-                    sb = new StringBuilder();
-                }
-                sb.append(((org.w3c.dom.CharacterData) child).getData());
-                break;
-            default:
-                domWalker(child);
-                break;
+                case Node.TEXT_NODE:
+                case Node.CDATA_SECTION_NODE:
+                    if (sb == null) {
+                        sb = new StringBuilder();
+                    }
+                    sb.append(((org.w3c.dom.CharacterData) child).getData());
+                    break;
+                default:
+                    domWalker(child);
+                    break;
             }
             child = child.getNextSibling();
         }
@@ -104,8 +104,7 @@ public class DOMAdaptor {
         }
     }
 
-    private java.util.Vector notifyStartPrefixMapping(NamedNodeMap nodeMap)
-        throws org.xml.sax.SAXException {
+    private java.util.Vector notifyStartPrefixMapping(NamedNodeMap nodeMap) throws org.xml.sax.SAXException {
         java.util.Vector prefixes = null;
         int n = nodeMap.getLength();
         for (int i = 0; i < n; i++) {
@@ -125,8 +124,7 @@ public class DOMAdaptor {
         return prefixes;
     }
 
-    private void notifyEndPrefixMapping(java.util.Vector prefixes)
-        throws org.xml.sax.SAXException {
+    private void notifyEndPrefixMapping(java.util.Vector prefixes) throws org.xml.sax.SAXException {
         int n = prefixes.size();
         for (int i = 0; i < n; i++) {
             targetHandler.endPrefixMapping((String) prefixes.elementAt(i));

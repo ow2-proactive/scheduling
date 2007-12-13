@@ -46,8 +46,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * @author Matthieu Morel
  */
-public class PrimitiveComponentA implements I1, BindingController, InitActive,
-    RunActive, EndActive {
+public class PrimitiveComponentA implements I1, BindingController, InitActive, RunActive, EndActive {
     public final static String MESSAGE = "-->a";
     public final static String I2_ITF_NAME = "i2";
     private static Logger logger = ProActiveLogger.getLogger("functionalTests");
@@ -67,8 +66,7 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive,
             i2 = (I2) serverItf;
             //logger.debug("MotorImpl : added binding on a wheel");
         } else {
-            logger.error(
-                "no such binding is possible : client interface name does not match");
+            logger.error("no such binding is possible : client interface name does not match");
         }
     }
 
@@ -133,8 +131,7 @@ public class PrimitiveComponentA implements I1, BindingController, InitActive,
     /* (non-Javadoc)
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(java.lang.String)
      */
-    public void unbindFc(String clientItf)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String clientItf) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         if (clientItf.equals(I2_ITF_NAME)) {
             i2 = null;

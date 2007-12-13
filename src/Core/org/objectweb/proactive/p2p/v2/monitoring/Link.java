@@ -54,7 +54,6 @@ public class Link {
     public boolean equals(Object o) {
         System.out.println("Link.equals()");
         Link l = (Link) o;
-        return this.getSource().equals(l.getSource()) &&
-        this.getDestination().equals(l.getDestination());
+        return this.getSource().equals(l.getSource()) && this.getDestination().equals(l.getDestination());
     }
 }

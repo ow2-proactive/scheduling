@@ -40,12 +40,11 @@ import javax.swing.tree.DefaultTreeCellRenderer;
 public class TreeEngineRenderer extends DefaultTreeCellRenderer {
 
     /**
-         *
-         */
+     *
+     */
     @Override
-    public Component getTreeCellRendererComponent(JTree tree, Object value,
-        boolean selected, boolean expanded, boolean leaf, int row,
-        boolean hasFocus) {
+    public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
+            boolean expanded, boolean leaf, int row, boolean hasFocus) {
         DefaultTreeCellRenderer renderer = (DefaultTreeCellRenderer) super.getTreeCellRendererComponent(tree,
                 value, selected, expanded, leaf, row, hasFocus);
 
@@ -53,7 +52,7 @@ public class TreeEngineRenderer extends DefaultTreeCellRenderer {
             TreeEngineNode nodeEngine = ((TreeEngineNode) value);
             renderer.setText(nodeEngine.toString());
             if (!nodeEngine.isLeaf() && !nodeEngine.isRoot() &&
-                    (nodeEngine.getState() == TreeEngineNode.SUSPECT)) {
+                (nodeEngine.getState() == TreeEngineNode.SUSPECT)) {
                 renderer.setForeground(Color.RED);
             } else {
                 renderer.setForeground(Color.BLACK);

@@ -43,8 +43,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Condition;
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
-public class If<P extends java.io.Serializable, R extends java.io.Serializable>
-    implements Skeleton<P, R> {
+public class If<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {
     Condition<P> cond;
     Skeleton<P, ?> ifChild;
     Skeleton<P, ?> elseChild;
@@ -56,8 +55,7 @@ public class If<P extends java.io.Serializable, R extends java.io.Serializable>
      * @param ifChild The <code>true</code> case {@link Skeleton}.
      * @param elseChild The <code>false</code> case {@link Skeleton}.
      */
-    public If(Condition<P> cond, Skeleton<P, R> ifChild,
-        Skeleton<P, R> elseChild) {
+    public If(Condition<P> cond, Skeleton<P, R> ifChild, Skeleton<P, R> elseChild) {
         this.cond = cond;
         this.ifChild = ifChild;
         this.elseChild = elseChild;

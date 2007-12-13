@@ -60,8 +60,7 @@ import org.objectweb.proactive.core.util.URIBuilder;
  * @version 1.0,  2003/04/01
  * @since   ProActive 1.0.2
  */
-public class VirtualNodeLookup extends RuntimeDeploymentProperties
-    implements VirtualNodeInternal {
+public class VirtualNodeLookup extends RuntimeDeploymentProperties implements VirtualNodeInternal {
     private VirtualNodeInternal virtualNode;
     private String name;
     private String urlForLookup;
@@ -139,13 +138,11 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
                 return;
             }
             try {
-                this.urlForLookup = URIBuilder.buildURI(this.lookupHost,
-                        this.name, this.lookupProtocol, this.portForLookup)
-                                              .toString();
+                this.urlForLookup = URIBuilder.buildURI(this.lookupHost, this.name, this.lookupProtocol,
+                        this.portForLookup).toString();
                 //		this.remoteProActiveRuntime = RuntimeFactory.getRuntime(urlForLookup,lookupProtocol);
                 //		this.virtualNode = remoteProActiveRuntime.getVirtualNode(this.name);
-                this.virtualNode = PADeployment.lookupVirtualNode(urlForLookup)
-                                               .getVirtualNodeInternal();
+                this.virtualNode = PADeployment.lookupVirtualNode(urlForLookup).getVirtualNodeInternal();
                 isActivated = true;
             } catch (ProActiveException e) {
                 e.printStackTrace();
@@ -320,13 +317,11 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal#setRuntimeInformations(String,String)
      * At the moment the only property that can be set at runtime is LOOKUP_HOST.
      */
-    public void setRuntimeInformations(String information, String value)
-        throws ProActiveException {
+    public void setRuntimeInformations(String information, String value) throws ProActiveException {
         try {
             checkProperty(information);
         } catch (ProActiveException e) {
-            throw new ProActiveException("only " + runtimeHostForLookup +
-                " and" + runtimePortForLookup +
+            throw new ProActiveException("only " + runtimeHostForLookup + " and" + runtimePortForLookup +
                 " property can be set at runtime", e);
         }
         performTask(information, value);
@@ -389,8 +384,8 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         }
         runtimeProperties.remove(information);
         if (!isWaitingForProperties()) {
-            this.urlForLookup = URIBuilder.buildURI(this.lookupHost, this.name,
-                    this.lookupProtocol, this.portForLookup).toString();
+            this.urlForLookup = URIBuilder.buildURI(this.lookupHost, this.name, this.lookupProtocol,
+                    this.portForLookup).toString();
             activate();
         }
     }
@@ -399,24 +394,21 @@ public class VirtualNodeLookup extends RuntimeDeploymentProperties
         if (isWaitingForProperties()) {
             String exceptionMessage = "This VirtualNode has not yet been activated since, it is waiting for runtime properties ";
             for (int i = 0; i < runtimeProperties.size(); i++) {
-                exceptionMessage = exceptionMessage.concat(runtimeProperties.get(
-                            i) + " ");
+                exceptionMessage = exceptionMessage.concat(runtimeProperties.get(i) + " ");
             }
             throw new ProActiveException(exceptionMessage);
         }
     }
 
     public int startMPI() {
-        throw new RuntimeException(
-            " ERROR: No MPI process attached with the virtual node !");
+        throw new RuntimeException(" ERROR: No MPI process attached with the virtual node !");
     }
 
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.descriptor.data.VirtualNode#fileTransferRetrieve()
      */
     public List<RemoteFile> fileTransferRetrieve() throws ProActiveException {
-        throw new ProActiveException(
-            "No File Transfer Retrieve support from VirtualNodeLookup");
+        throw new ProActiveException("No File Transfer Retrieve support from VirtualNodeLookup");
     }
 
     public ExternalProcess getMPIProcess() {

@@ -80,19 +80,15 @@ public class PAComponent {
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Component newActiveComponent(String classname,
-        Class<?>[] genericParameters, Object[] constructorParameters,
-        Node node, Active activity, MetaObjectFactory factory,
-        ComponentParameters componentParameters)
-        throws ActiveObjectCreationException, NodeException {
+    public static Component newActiveComponent(String classname, Class<?>[] genericParameters,
+            Object[] constructorParameters, Node node, Active activity, MetaObjectFactory factory,
+            ComponentParameters componentParameters) throws ActiveObjectCreationException, NodeException {
         try {
             Component boot = Fractal.getBootstrapComponent();
             GenericFactory cf = Fractal.getGenericFactory(boot);
-            return cf.newFcInstance(componentParameters.getComponentType(),
-                new ControllerDescription(componentParameters.getName(),
-                    componentParameters.getHierarchicalType()),
-                new ContentDescription(classname, constructorParameters,
-                    activity, factory));
+            return cf.newFcInstance(componentParameters.getComponentType(), new ControllerDescription(
+                componentParameters.getName(), componentParameters.getHierarchicalType()),
+                    new ContentDescription(classname, constructorParameters, activity, factory));
         } catch (NoSuchInterfaceException e) {
             throw new ActiveObjectCreationException(e);
         } catch (InstantiationException e) {
@@ -130,17 +126,15 @@ public class PAComponent {
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Component newActiveComponent(String className,
-        Class<?>[] genericParameters, Object[] constructorParameters,
-        VirtualNode vn, ComponentParameters componentParameters)
-        throws ActiveObjectCreationException, NodeException {
+    public static Component newActiveComponent(String className, Class<?>[] genericParameters,
+            Object[] constructorParameters, VirtualNode vn, ComponentParameters componentParameters)
+            throws ActiveObjectCreationException, NodeException {
         try {
             Component boot = Fractal.getBootstrapComponent();
             ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
-            return cf.newFcInstance(componentParameters.getComponentType(),
-                new ControllerDescription(componentParameters.getName(),
-                    componentParameters.getHierarchicalType()),
-                new ContentDescription(className, constructorParameters));
+            return cf.newFcInstance(componentParameters.getComponentType(), new ControllerDescription(
+                componentParameters.getName(), componentParameters.getHierarchicalType()),
+                    new ContentDescription(className, constructorParameters));
         } catch (NoSuchInterfaceException e) {
             throw new ActiveObjectCreationException(e);
         } catch (InstantiationException e) {
@@ -174,12 +168,11 @@ public class PAComponent {
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Component newActiveComponent(String className,
-        Object[] constructorParameters, Node node, Active activity,
-        MetaObjectFactory factory, ComponentParameters componentParameters)
-        throws ActiveObjectCreationException, NodeException {
-        return newActiveComponent(className, null, constructorParameters, node,
-            activity, factory, componentParameters);
+    public static Component newActiveComponent(String className, Object[] constructorParameters, Node node,
+            Active activity, MetaObjectFactory factory, ComponentParameters componentParameters)
+            throws ActiveObjectCreationException, NodeException {
+        return newActiveComponent(className, null, constructorParameters, node, activity, factory,
+                componentParameters);
     }
 
     /**
@@ -207,11 +200,9 @@ public class PAComponent {
      * @exception ActiveObjectCreationException if a problem occurs while creating the stub or the body
      * @exception NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Component newActiveComponent(String className,
-        Object[] constructorParameters, VirtualNode vn,
-        ComponentParameters componentParameters)
-        throws ActiveObjectCreationException, NodeException {
-        return newActiveComponent(className, null, constructorParameters, vn,
-            componentParameters);
+    public static Component newActiveComponent(String className, Object[] constructorParameters,
+            VirtualNode vn, ComponentParameters componentParameters) throws ActiveObjectCreationException,
+            NodeException {
+        return newActiveComponent(className, null, constructorParameters, vn, componentParameters);
     }
 }

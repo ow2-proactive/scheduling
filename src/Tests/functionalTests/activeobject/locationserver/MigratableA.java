@@ -41,8 +41,8 @@ import org.objectweb.proactive.core.node.Node;
 public class MigratableA implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     String name;
 
     public MigratableA() {

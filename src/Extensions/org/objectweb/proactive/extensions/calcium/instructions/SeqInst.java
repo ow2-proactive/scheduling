@@ -47,8 +47,7 @@ public class SeqInst<P, R> implements Instruction<P, R> {
         this.secCode = secCode;
     }
 
-    public Task<R> compute(SkeletonSystemImpl system, Task<P> t)
-        throws Exception {
+    public Task<R> compute(SkeletonSystemImpl system, Task<P> t) throws Exception {
         Timer timer = new Timer();
         R resultObject = secCode.execute(system, t.getObject());
         timer.stop();

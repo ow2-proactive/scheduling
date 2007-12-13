@@ -83,8 +83,7 @@ public class StartRuntime {
 
     public static void main(String[] args) {
         // PAProperties cannot be used since we do not want to use log4j
-        String defaultInitOverride = System.getProperty(
-                "log4j.defaultInitOverride");
+        String defaultInitOverride = System.getProperty("log4j.defaultInitOverride");
         String log4jFile = System.getProperty("log4j.configuration");
 
         if ("true".equals(defaultInitOverride) && (log4jFile != null)) {
@@ -93,9 +92,7 @@ public class StartRuntime {
                 URI log4jConfigurationURI = URI.create(log4jFile);
                 PropertyConfigurator.configure(log4jConfigurationURI.toURL());
             } catch (IOException e) {
-                System.out.println(
-                    "Error : incorrect path for log4j configuration : " +
-                    log4jFile);
+                System.out.println("Error : incorrect path for log4j configuration : " + log4jFile);
             }
         }
         //        System.out.println("log4j is ready");
@@ -104,14 +101,11 @@ public class StartRuntime {
         ProActiveConfiguration.load();
 
         logger.info("**** Starting jvm on " +
-            URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                    .getInetAddress()));
+            URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress()));
 
         if (logger.isDebugEnabled()) {
-            logger.debug("**** Starting jvm with classpath " +
-                System.getProperty("java.class.path"));
-            logger.debug("****              with bootclasspath " +
-                System.getProperty("sun.boot.class.path"));
+            logger.debug("**** Starting jvm with classpath " + System.getProperty("java.class.path"));
+            logger.debug("****              with bootclasspath " + System.getProperty("sun.boot.class.path"));
         }
 
         new StartRuntime(args).run();
@@ -168,11 +162,11 @@ public class StartRuntime {
      */
     private void register(ProActiveRuntime PART) {
         try {
-            ProActiveRuntime proActiveRuntime = RuntimeFactory.getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+            ProActiveRuntime proActiveRuntime = RuntimeFactory
+                    .getProtocolSpecificRuntime(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
 
-            PART.register(proActiveRuntime, proActiveRuntime.getURL(),
-                this.creatorID,
-                PAProperties.PA_COMMUNICATION_PROTOCOL.getValue(), this.vmName);
+            PART.register(proActiveRuntime, proActiveRuntime.getURL(), this.creatorID,
+                    PAProperties.PA_COMMUNICATION_PROTOCOL.getValue(), this.vmName);
         } catch (ProActiveException e) {
             e.printStackTrace();
 

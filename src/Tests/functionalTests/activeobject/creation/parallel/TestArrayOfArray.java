@@ -42,6 +42,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test newActiveInParallel method with an array for constructor parameters
  *
@@ -51,8 +52,7 @@ import static junit.framework.Assert.assertTrue;
  */
 public class TestArrayOfArray extends FunctionalTest {
     private static final String XML_PATH = TestVnNotActivated.class.getResource(
-            "/functionalTests/activeobject/creation/parallel/4_local.xml")
-                                                                   .getPath();
+            "/functionalTests/activeobject/creation/parallel/4_local.xml").getPath();
     private VirtualNode vn;
     private ProActiveDescriptor padForActiving;
 
@@ -61,22 +61,14 @@ public class TestArrayOfArray extends FunctionalTest {
      */
     @Test(expected = Exception.class)
     public void testNbConstructorsEqualsNbNodes() throws Exception {
-        PAActiveObject.newActiveInParallel(A.class.getName(),
-            new Object[][] {
-                { "toto" },
-                { "tata" }
-            }, vn.getNodes());
+        PAActiveObject.newActiveInParallel(A.class.getName(), new Object[][] { { "toto" }, { "tata" } }, vn
+                .getNodes());
     }
 
     @Test
     public void testNewActiveInParallel() throws Exception {
-        A[] aos = (A[]) PAActiveObject.newActiveInParallel(A.class.getName(),
-                new Object[][] {
-                    { "toto" },
-                    { "tata" },
-                    { "titi" },
-                    { "tutu" }
-                }, vn.getNodes());
+        A[] aos = (A[]) PAActiveObject.newActiveInParallel(A.class.getName(), new Object[][] { { "toto" },
+                { "tata" }, { "titi" }, { "tutu" } }, vn.getNodes());
         assertTrue(aos != null);
         assertTrue(aos.length == 4);
     }

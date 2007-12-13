@@ -59,10 +59,8 @@ public class FileStaging implements Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.SKELETONS_SYSTEM);
     ArrayList<ProxyFile> beforeProxyFiles;
 
-    public <T>FileStaging(Task<T> task, FileServerClient fserver,
-        WSpaceImpl wspace) throws Exception {
-        String policy = System.getProperty(
-                "proactive.skeletons.filetransfer.policy");
+    public <T> FileStaging(Task<T> task, FileServerClient fserver, WSpaceImpl wspace) throws Exception {
+        String policy = System.getProperty("proactive.skeletons.filetransfer.policy");
         if (logger.isDebugEnabled()) {
             logger.debug("Using File Transfer policy: " + policy);
         }
@@ -72,23 +70,20 @@ public class FileStaging implements Serializable {
         Handler<ProxyFile> before = null;
 
         if ((policy == null) || policy.equalsIgnoreCase("hybrid")) {
-            before = new HandlerPreHybridProxyFile(task, fserver, wspace,
-                    allFiles);
+            before = new HandlerPreHybridProxyFile(task, fserver, wspace, allFiles);
         } else if (policy.equalsIgnoreCase("eager")) {
             before = new HandlerPreEagerProxyFile(fserver, wspace, allFiles);
         } else if (policy.equalsIgnoreCase("lazy")) {
             before = new HandlerPreLazyProxyFile(fserver, wspace, allFiles);
         }
 
-        navigateObjectGraph(task.family.hasFinishedChild(),
-            task.family.childrenFinished, task, before);
+        navigateObjectGraph(task.family.hasFinishedChild(), task.family.childrenFinished, task, before);
 
         beforeProxyFiles = new ArrayList<ProxyFile>(allFiles.size());
         beforeProxyFiles.addAll(allFiles.values());
     }
 
-    public void stageOut(FileServerClient fserver, Task<?> task)
-        throws Exception {
+    public void stageOut(FileServerClient fserver, Task<?> task) throws Exception {
         if (logger.isDebugEnabled()) {
             logger.debug("Staging out for data parallelism");
         }
@@ -101,8 +96,7 @@ public class FileStaging implements Serializable {
         Handler<ProxyFile> handler = new HandlerPostProxyFile(fserver, allFiles);
 
         //mark the after reference count
-        navigateObjectGraph(task.family.hasReadyChildTask(),
-            task.family.childrenReady, task, handler);
+        navigateObjectGraph(task.family.hasReadyChildTask(), task.family.childrenReady, task, handler);
 
         //now process the files: new, modified, updated, etc..
         Collection<ProxyFile> list = allFiles.values();
@@ -114,11 +108,9 @@ public class FileStaging implements Serializable {
         updateProxyFileStats(task, allFiles.values());
     }
 
-    private static void updateProxyFileStats(Task task,
-        Collection<ProxyFile> list) {
+    private static void updateProxyFileStats(Task task, Collection<ProxyFile> list) {
         for (ProxyFile pfile : list) {
-            task.getStats()
-                .addComputationBlockedFetchingData(pfile.blockedFetchingTime);
+            task.getStats().addComputationBlockedFetchingData(pfile.blockedFetchingTime);
             task.getStats().addUploadedBytes(pfile.uploadedBytes);
             task.getStats().addDownloadedBytes(pfile.downloadedBytes);
 
@@ -126,9 +118,8 @@ public class FileStaging implements Serializable {
         }
     }
 
-    private static <T, U> void navigateObjectGraph(boolean condition,
-        Vector<Task<T>> list, Task task, Handler<U> handler)
-        throws Exception {
+    private static <T, U> void navigateObjectGraph(boolean condition, Vector<Task<T>> list, Task task,
+            Handler<U> handler) throws Exception {
         if (condition) {
             for (Task t : list) {
                 t.setObject(ObjectGraph.searchForClass(t.getObject(), handler));
@@ -138,14 +129,12 @@ public class FileStaging implements Serializable {
         }
     }
 
-    public static <T> Task<T> stageInput(FileServerClient fserver, Task<T> task)
-        throws PanicException {
+    public static <T> Task<T> stageInput(FileServerClient fserver, Task<T> task) throws PanicException {
         // TODO change the exception type
         IdentityHashMap<ProxyFile, ProxyFile> files = new IdentityHashMap<ProxyFile, ProxyFile>();
 
         try {
-            T o = (T) ObjectGraph.searchForClass(task.getObject(),
-                    new HandlerFile2ProxyFile(fserver, files));
+            T o = (T) ObjectGraph.searchForClass(task.getObject(), new HandlerFile2ProxyFile(fserver, files));
             task.setObject(o);
 
             updateProxyFileStats(task, files.values());
@@ -156,12 +145,11 @@ public class FileStaging implements Serializable {
         return task;
     }
 
-    public static <R> Task<R> stageOutput(FileServerClient fserver,
-        Task<R> task, File outDir) throws Exception {
+    public static <R> Task<R> stageOutput(FileServerClient fserver, Task<R> task, File outDir)
+            throws Exception {
         IdentityHashMap<ProxyFile, ProxyFile> files = new IdentityHashMap<ProxyFile, ProxyFile>();
 
-        R o = (R) ObjectGraph.searchForClass(task.getObject(),
-                new HandlerProxy2File(fserver, files, outDir));
+        R o = (R) ObjectGraph.searchForClass(task.getObject(), new HandlerProxy2File(fserver, files, outDir));
         task.setObject(o);
 
         updateProxyFileStats(task, files.values());

@@ -68,20 +68,17 @@ public class CertificateTree implements Serializable {
         this.parent = null;
     }
 
-    public CertificateTree(String name, int keySize, int validity,
-        EntityType type) {
+    public CertificateTree(String name, int keySize, int validity, EntityType type) {
         this(genCert(name, keySize, validity, type));
     }
 
-    private static TypedCertificate genCert(String name, int keySize,
-        int validity, EntityType type) {
+    private static TypedCertificate genCert(String name, int keySize, int validity, EntityType type) {
         if (keygen == null) {
             if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
                 Security.addProvider(new BouncyCastleProvider());
             }
             try {
-                keygen = KeyPairGenerator.getInstance("RSA",
-                        BouncyCastleProvider.PROVIDER_NAME);
+                keygen = KeyPairGenerator.getInstance("RSA", BouncyCastleProvider.PROVIDER_NAME);
             } catch (NoSuchAlgorithmException e1) {
                 e1.printStackTrace();
             } catch (NoSuchProviderException e1) {
@@ -94,8 +91,8 @@ public class CertificateTree implements Serializable {
         KeyPair kp = keygen.genKeyPair();
 
         try {
-            X509Certificate cert = CertTools.genSelfCert(name, validity, null,
-                    kp.getPrivate(), kp.getPublic(), true);
+            X509Certificate cert = CertTools.genSelfCert(name, validity, null, kp.getPrivate(), kp
+                    .getPublic(), true);
             return new TypedCertificate(cert, type, kp.getPrivate());
         } catch (InvalidKeyException e) {
             e.printStackTrace();
@@ -158,13 +155,11 @@ public class CertificateTree implements Serializable {
     }
 
     public boolean merge(CertificateTree tree) {
-        if ((tree == null) ||
-                !tree.getCertificate().equals(this.getCertificate())) {
+        if ((tree == null) || !tree.getCertificate().equals(this.getCertificate())) {
             return false;
         }
 
-        if ((this.certificate.getPrivateKey() == null) &&
-                (tree.getCertificate().getPrivateKey() != null)) {
+        if ((this.certificate.getPrivateKey() == null) && (tree.getCertificate().getPrivateKey() != null)) {
             this.certificate = tree.getCertificate();
         }
         for (CertificateTree newChild : tree.getChildren()) {
@@ -183,11 +178,10 @@ public class CertificateTree implements Serializable {
         String parentName = parentCert.getSubjectX500Principal().getName();
 
         try {
-            X509Certificate cert = CertTools.genCert(name, validity, null,
-                    childKP.getPublic(), true, parentName, parentPrivateKey,
-                    parentPublicKey);
-            CertificateTree newChild = new CertificateTree(new TypedCertificate(
-                        cert, type, childKP.getPrivate()));
+            X509Certificate cert = CertTools.genCert(name, validity, null, childKP.getPublic(), true,
+                    parentName, parentPrivateKey, parentPublicKey);
+            CertificateTree newChild = new CertificateTree(new TypedCertificate(cert, type, childKP
+                    .getPrivate()));
             newChild.setParent(this);
             add(newChild);
         } catch (InvalidKeyException e) {
@@ -203,11 +197,9 @@ public class CertificateTree implements Serializable {
         }
     }
 
-    public TypedCertificate search(String name, EntityType type)
-        throws NotFoundException {
+    public TypedCertificate search(String name, EntityType type) throws NotFoundException {
         if ((type == this.certificate.getType()) &&
-                this.certificate.getCert().getSubjectX500Principal().getName()
-                                    .equals(name)) {
+            this.certificate.getCert().getSubjectX500Principal().getName().equals(name)) {
             return this.certificate;
         }
 
@@ -219,8 +211,7 @@ public class CertificateTree implements Serializable {
             }
         }
 
-        throw new NotFoundException("Certificate " + name + " : " + type +
-            " not found.");
+        throw new NotFoundException("Certificate " + name + " : " + type + " not found.");
     }
 
     public boolean remove() {
@@ -249,8 +240,7 @@ public class CertificateTree implements Serializable {
         return this.parent.getRoot();
     }
 
-    public static CertificateTree newTree(
-        List<TypedCertificate> certificateChain) {
+    public static CertificateTree newTree(List<TypedCertificate> certificateChain) {
         CertificateTree parentNode = null;
         CertificateTree childNode = null;
         for (TypedCertificate certificate : certificateChain) {

@@ -48,18 +48,12 @@ public class SimpleTestRMUser {
             NodeInformation nodeInfo = node.getNodeInformation();
             String mes = "#[SimpleTestIMUser] NodeInformation : \n";
             mes += "+--------------------------------------------------------------------\n";
-            mes += ("+--> getCreationProtocolID : " + nodeInfo.getProtocol() +
-            "\n");
-            mes += ("+--> getDescriptorVMName   : " +
-            nodeInfo.getVMInformation().getDescriptorVMName() + "\n");
-            mes += ("+--> getHostName           : " +
-            nodeInfo.getVMInformation().getHostName() + "\n");
-            mes += ("+--> getJobID              : " + nodeInfo.getJobID() +
-            "\n");
-            mes += ("+--> getName               : " + nodeInfo.getName() +
-            "\n");
-            mes += ("+--> getProtocol           : " + nodeInfo.getProtocol() +
-            "\n");
+            mes += ("+--> getCreationProtocolID : " + nodeInfo.getProtocol() + "\n");
+            mes += ("+--> getDescriptorVMName   : " + nodeInfo.getVMInformation().getDescriptorVMName() + "\n");
+            mes += ("+--> getHostName           : " + nodeInfo.getVMInformation().getHostName() + "\n");
+            mes += ("+--> getJobID              : " + nodeInfo.getJobID() + "\n");
+            mes += ("+--> getName               : " + nodeInfo.getName() + "\n");
+            mes += ("+--> getProtocol           : " + nodeInfo.getProtocol() + "\n");
             mes += ("+--> getURL                : " + nodeInfo.getURL() + "\n");
             mes += "+--------------------------------------------------------------------\n";
             System.out.println(mes);
@@ -68,8 +62,7 @@ public class SimpleTestRMUser {
         }
     }
 
-    public static void main(String[] args)
-        throws ActiveObjectCreationException, IOException {
+    public static void main(String[] args) throws ActiveObjectCreationException, IOException {
         System.out.println("# --oOo-- Simple Test User --oOo-- ");
 
         try {
@@ -77,20 +70,16 @@ public class SimpleTestRMUser {
             if (args.length > 0) {
                 url = args[0];
             } else {
-                url = "rmi://localhost:1099/" +
-                    RMConstants.NAME_ACTIVE_OBJECT_RMUSER;
+                url = "rmi://localhost:1099/" + RMConstants.NAME_ACTIVE_OBJECT_RMUSER;
             }
 
             RMUser user = RMConnection.connectAsUser(url);
-            System.out.println("#[SimpleTestIMUser] Echo user : " +
-                user.echo());
+            System.out.println("#[SimpleTestIMUser] Echo user : " + user.echo());
 
             int nbAskedNodes = 2;
-            System.out.println("#[SimpleTestIMUser] User ask to the RM " +
-                nbAskedNodes + " Nodes");
+            System.out.println("#[SimpleTestIMUser] User ask to the RM " + nbAskedNodes + " Nodes");
 
-            NodeSet nodes = user.getAtMostNodes(new IntWrapper(nbAskedNodes),
-                    null);
+            NodeSet nodes = user.getAtMostNodes(new IntWrapper(nbAskedNodes), null);
 
             for (Node aNode : nodes) {
                 afficheNodeInfo(aNode);

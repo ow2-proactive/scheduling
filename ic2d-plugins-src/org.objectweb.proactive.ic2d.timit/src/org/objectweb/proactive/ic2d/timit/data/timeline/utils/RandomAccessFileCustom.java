@@ -126,8 +126,7 @@ public class RandomAccessFileCustom extends Reader {
      * @revised 1.4
      * @spec JSR-51
      */
-    public RandomAccessFileCustom(File file, String mode)
-        throws FileNotFoundException {
+    public RandomAccessFileCustom(File file, String mode) throws FileNotFoundException {
         this.file = new java.io.RandomAccessFile(file, mode);
         setBufferSize(80);
     }
@@ -176,8 +175,7 @@ public class RandomAccessFileCustom extends Reader {
      * @revised 1.4
      * @spec JSR-51
      */
-    public RandomAccessFileCustom(File file, String mode, int bufferSize)
-        throws IOException {
+    public RandomAccessFileCustom(File file, String mode, int bufferSize) throws IOException {
         this.file = new java.io.RandomAccessFile(file, mode);
         setBufferSize(bufferSize);
     }
@@ -262,15 +260,13 @@ public class RandomAccessFileCustom extends Reader {
                     // Convert at most one character
                     charBuffer.limit(charBuffer.position() + 1);
                     int oldPos = charBuffer.position();
-                    CoderResult result = decoder.decode(byteBuffer, charBuffer,
-                            true);
+                    CoderResult result = decoder.decode(byteBuffer, charBuffer, true);
                     assert (!result.isError()) : result;
                     n = charBuffer.position() - oldPos;
                     if (n > 0) {
                         characterToBytes.add(n);
                     }
-                } while ((n > 0) &&
-                        (charBuffer.limit() < charBuffer.capacity()));
+                } while ((n > 0) && (charBuffer.limit() < charBuffer.capacity()));
                 prepareReadChars();
                 if (charBuffer.remaining() <= 0) {
                     // Continue until we get at least a single character or EOF
@@ -337,8 +333,7 @@ public class RandomAccessFileCustom extends Reader {
         int charactersInBytes = 0;
         for (int i = charBuffer.position(); i < charBuffer.limit(); ++i)
             charactersInBytes += characterToBytes.get(i);
-        return file.getFilePointer() - byteBuffer.remaining() -
-        charactersInBytes;
+        return file.getFilePointer() - byteBuffer.remaining() - charactersInBytes;
     }
 
     /**
@@ -361,7 +356,7 @@ public class RandomAccessFileCustom extends Reader {
             return;
         }
         if (((offset > 0) && (offset <= charBuffer.remaining())) ||
-                ((offset < 0) && (-offset <= charBuffer.position()))) {
+            ((offset < 0) && (-offset <= charBuffer.position()))) {
             charBuffer.position(charBuffer.position() + offset);
         } else {
             byteBuffer.clear();

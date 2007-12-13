@@ -78,8 +78,7 @@ public class ProActiveDeployer extends WSConstants {
      * @param url  The web server url  where to deploy the service - typically "http://localhost:8080"
      * @param component The component owning the interfaces that will be deployed as web services.
      */
-    public static void deployComponent(String componentName, String url,
-        Component component) {
+    public static void deployComponent(String componentName, String url, Component component) {
         Object[] interfaces = component.getFcInterfaces();
 
         for (int i = 0; i < interfaces.length; i++) {
@@ -104,8 +103,7 @@ public class ProActiveDeployer extends WSConstants {
 
                     String[] methsArray = new String[meths.size()];
                     meths.toArray(methsArray);
-                    deploy(componentName + "_" + name, url, interface_,
-                        component, methsArray, true);
+                    deploy(componentName + "_" + name, url, interface_, component, methsArray, true);
                 }
             }
         }
@@ -120,8 +118,7 @@ public class ProActiveDeployer extends WSConstants {
         ServiceManagerClient serviceManagerClient = null;
 
         try {
-            serviceManagerClient = new ServiceManagerClient(new URL(url +
-                        ROUTER));
+            serviceManagerClient = new ServiceManagerClient(new URL(url + ROUTER));
             serviceManagerClient.undeploy(urn);
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -136,8 +133,7 @@ public class ProActiveDeployer extends WSConstants {
      * @param url The url of the web server
      * @param component The component owning the services interfaces
      */
-    public static void undeployComponent(String componentName, String url,
-        Component component) {
+    public static void undeployComponent(String componentName, String url, Component component) {
         Object[] interfaces = component.getFcInterfaces();
 
         for (int i = 0; i < interfaces.length; i++) {
@@ -145,8 +141,7 @@ public class ProActiveDeployer extends WSConstants {
 
             if (!(inter instanceof LifeCycleController)) {
                 if (!((ProActiveInterfaceType) inter.getFcItfType()).isFcClientItf()) {
-                    String serviceName = componentName + "_" +
-                        inter.getFcItfName();
+                    String serviceName = componentName + "_" + inter.getFcItfName();
                     undeploy(serviceName, url);
                 }
             }
@@ -156,25 +151,23 @@ public class ProActiveDeployer extends WSConstants {
     /*
      * deploy services.
      */
-    private static void deploy(String urn, String url, Object o, Component c,
-        String[] methods, boolean componentInterface) {
+    private static void deploy(String urn, String url, Object o, Component c, String[] methods,
+            boolean componentInterface) {
         String wsdl;
 
         /* first we need to generate a WSDL description of the object we want to deploy */
         if (componentInterface) {
-            wsdl = WSDLGenerator.getWSDL(o.getClass(), urn, url + ROUTER,
-                    DOCUMENTATION, methods);
+            wsdl = WSDLGenerator.getWSDL(o.getClass(), urn, url + ROUTER, DOCUMENTATION, methods);
         } else {
-            wsdl = WSDLGenerator.getWSDL(o.getClass().getSuperclass(), urn,
-                    url + ROUTER, DOCUMENTATION, methods);
+            wsdl = WSDLGenerator.getWSDL(o.getClass().getSuperclass(), urn, url + ROUTER, DOCUMENTATION,
+                    methods);
         }
 
         /*For deploying an active object we need a ServiceManagerClient that will contact the Serlvet */
         ServiceManagerClient serviceManagerClient = null;
 
         try {
-            serviceManagerClient = new ServiceManagerClient(new URL(url +
-                        ROUTER));
+            serviceManagerClient = new ServiceManagerClient(new URL(url + ROUTER));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
@@ -274,11 +267,9 @@ public class ProActiveDeployer extends WSConstants {
                             String pname = extractName(parameters[j]);
 
                             TypeMapping tm = new TypeMapping("http://schemas.xmlsoap.org/soap/encoding/",
-                                    new QName("http://" + pname,
-                                        getSimpleName(parameters[j])),
-                                    parameters[j].getName(),
-                                    "org.apache.soap.encoding.soapenc.BeanSerializer",
-                                    "org.apache.soap.encoding.soapenc.BeanSerializer");
+                                new QName("http://" + pname, getSimpleName(parameters[j])), parameters[j]
+                                        .getName(), "org.apache.soap.encoding.soapenc.BeanSerializer",
+                                "org.apache.soap.encoding.soapenc.BeanSerializer");
 
                             tms.addElement(tm);
                         }
@@ -296,11 +287,9 @@ public class ProActiveDeployer extends WSConstants {
                             String pname = extractName(parameters[j]);
 
                             TypeMapping tm = new TypeMapping("http://schemas.xmlsoap.org/soap/encoding/",
-                                    new QName("http://" + pname,
-                                        getSimpleName(parameters[j])),
-                                    parameters[j].getName(),
-                                    "org.apache.soap.encoding.soapenc.BeanSerializer",
-                                    "org.apache.soap.encoding.soapenc.BeanSerializer");
+                                new QName("http://" + pname, getSimpleName(parameters[j])), parameters[j]
+                                        .getName(), "org.apache.soap.encoding.soapenc.BeanSerializer",
+                                "org.apache.soap.encoding.soapenc.BeanSerializer");
 
                             tms.addElement(tm);
                         }

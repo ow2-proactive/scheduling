@@ -83,10 +83,10 @@ public class TaskView extends ViewPart {
         if (!taskComposite.isDisposed()) {
             final InternalJob aJob = job;
             Display.getDefault().asyncExec(new Runnable() {
-                    public void run() {
-                        taskComposite.setTasks(aJob.getId(), aJob.getTasks());
-                    }
-                });
+                public void run() {
+                    taskComposite.setTasks(aJob.getId(), aJob.getTasks());
+                }
+            });
         }
     }
 
@@ -101,11 +101,10 @@ public class TaskView extends ViewPart {
         final TaskEvent aTaskEvent = taskEvent;
         final InternalTask aTaskDescriptor = taskDescriptor;
         Display.getDefault().asyncExec(new Runnable() {
-                public void run() {
-                    taskComposite.changeLine(aTaskEvent.getTaskId(),
-                        aTaskDescriptor);
-                }
-            });
+            public void run() {
+                taskComposite.changeLine(aTaskEvent.getTaskId(), aTaskDescriptor);
+            }
+        });
     }
 
     /**

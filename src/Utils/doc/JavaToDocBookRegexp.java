@@ -47,22 +47,18 @@ public class JavaToDocBookRegexp extends RegexpHighLighter {
 
     public JavaToDocBookRegexp() {
         pattern = new Pattern[] { //   \b in a regexp means a word boundary
-                Pattern.compile("(\\b)(" + signatureKeywords + ")(\\b)"),
+        Pattern.compile("(\\b)(" + signatureKeywords + ")(\\b)"),
                 Pattern.compile("(\\b)(" + codeKeywords + ")(\\b)"),
-                Pattern.compile("(\\b)(" + typeKeywords + ")(\\b)")
-            };
-        replacement = new String[] {
-                "$1" + OPENKEYWORD + "$2" + CLOSEKEY + "$3",
-                "$1" + OPENCODE + "$2" + CLOSECODE + "$3",
-                "$1" + OPENTYPE + "$2" + CLOSETYPE + "$3"
-            };
+                Pattern.compile("(\\b)(" + typeKeywords + ")(\\b)") };
+        replacement = new String[] { "$1" + OPENKEYWORD + "$2" + CLOSEKEY + "$3",
+                "$1" + OPENCODE + "$2" + CLOSECODE + "$3", "$1" + OPENTYPE + "$2" + CLOSETYPE + "$3" };
         reset();
     }
 
     /** Add tags around java keywords.
      * @param string some java code to highlight, cannot contain \n */
     @Override
-	protected String decorate(String string) {
+    protected String decorate(String string) {
         assert string.indexOf('\n') == -1 : "Hey, decorate can't work with newlines in the input String!";
 
         String result = string;
@@ -86,8 +82,7 @@ public class JavaToDocBookRegexp extends RegexpHighLighter {
 
             if (index >= 0) {
                 if ((index == 0) || (string.charAt(index - 1) != '\\')) {
-                    result = (string.substring(0, index + "\"".length()) +
-                        CLOSESTRING);
+                    result = (string.substring(0, index + "\"".length()) + CLOSESTRING);
                     this.inString = false;
                     result += decorate(string.substring(index + "\"".length()));
                 } else {
@@ -104,8 +99,7 @@ public class JavaToDocBookRegexp extends RegexpHighLighter {
             int index = string.indexOf("*/");
 
             if (index >= 0) {
-                result = (string.substring(0, index + "*/".length()) +
-                    CLOSECOMMENT);
+                result = (string.substring(0, index + "*/".length()) + CLOSECOMMENT);
                 this.inComment = false;
                 result += decorate(string.substring(index + "*/".length()));
             } //else  echo(string); already done
@@ -115,14 +109,13 @@ public class JavaToDocBookRegexp extends RegexpHighLighter {
 
         // OK, not already in tag, comment or string, so look for either of those 
         Matcher m = Pattern.compile("(.*?)(<|//|/\\*|\").*").matcher(string); //  this regexp describes the start of tag, comment or string
-                                                                              //Matcher m = Pattern.compile("(<|//|/\\*|\")").matcher(string); //  this regexp describes the start of tag, comment or string
+        //Matcher m = Pattern.compile("(<|//|/\\*|\")").matcher(string); //  this regexp describes the start of tag, comment or string
 
         if (!m.matches()) { // found no tag, string or comment, so just highlight the following java
-                            // for all the patterns defined, do regexp replacement 
+            // for all the patterns defined, do regexp replacement 
 
             for (int i = 0; i < this.pattern.length; i++)
-                result = this.pattern[i].matcher(result)
-                                        .replaceAll(this.replacement[i]);
+                result = this.pattern[i].matcher(result).replaceAll(this.replacement[i]);
 
             // pattern reuse is faster than String.replaceAll(regexp, replacement)
             return result;
@@ -132,50 +125,48 @@ public class JavaToDocBookRegexp extends RegexpHighLighter {
         char ch = m.group().charAt(matchStart); // get this group's first character.
 
         switch (ch) {
-        case '<': { // This is the start of an xmlTag
-            result = decorate(string.substring(0, matchStart));
-            result += ("<");
-            this.inXmlTag = true;
-            result += decorate(string.substring(matchStart + "<".length()));
-
-            return result;
-        }
-
-        case '"': { // This is the start of a String
-            result = decorate(string.substring(0, matchStart));
-            result += (OPENSTRING + "\"");
-            this.inString = true;
-            result += decorate(string.substring(matchStart + "\"".length()));
-
-            return result;
-        }
-
-        case '/': { // this is the start of a comment
-
-            if (string.charAt(matchStart + 1) == '/') { // This is the start of a comment like //
+            case '<': { // This is the start of an xmlTag
                 result = decorate(string.substring(0, matchStart));
-                result += (OPENCOMMENT + string.substring(matchStart) +
-                CLOSECOMMENT);
-            } else { // This is the start of a comment like /*
-                result = decorate(string.substring(0, matchStart));
-                result += (OPENCOMMENT + "/*");
-                this.inComment = true;
-                result += decorate(string.substring(matchStart + "/*".length()));
+                result += ("<");
+                this.inXmlTag = true;
+                result += decorate(string.substring(matchStart + "<".length()));
+
+                return result;
             }
 
-            return result;
-        }
+            case '"': { // This is the start of a String
+                result = decorate(string.substring(0, matchStart));
+                result += (OPENSTRING + "\"");
+                this.inString = true;
+                result += decorate(string.substring(matchStart + "\"".length()));
 
-        default:
-            throw new IllegalStateException(
-                "Matcher said match was found, but char " +
-                Character.toString(ch) + " is not in compile regexp " + string);
+                return result;
+            }
+
+            case '/': { // this is the start of a comment
+
+                if (string.charAt(matchStart + 1) == '/') { // This is the start of a comment like //
+                    result = decorate(string.substring(0, matchStart));
+                    result += (OPENCOMMENT + string.substring(matchStart) + CLOSECOMMENT);
+                } else { // This is the start of a comment like /*
+                    result = decorate(string.substring(0, matchStart));
+                    result += (OPENCOMMENT + "/*");
+                    this.inComment = true;
+                    result += decorate(string.substring(matchStart + "/*".length()));
+                }
+
+                return result;
+            }
+
+            default:
+                throw new IllegalStateException("Matcher said match was found, but char " +
+                    Character.toString(ch) + " is not in compile regexp " + string);
         }
     }
 
     /** Puts all variables back to their original state */
     @Override
-	protected void reset() {
+    protected void reset() {
         this.inComment = false;
         this.inString = false;
         this.inXmlTag = false;

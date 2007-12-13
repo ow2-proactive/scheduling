@@ -87,9 +87,7 @@ public class SaveFile extends Action implements IWorkbenchWindowActionDelegate {
         IWorkbenchPage page = window.getActivePage();
         IWorkbench workbench = window.getWorkbench();
         IPerspectiveRegistry reg = workbench.getPerspectiveRegistry();
-        goodPerspective = page.getPerspective()
-                              .equals(reg.findPerspectiveWithId(
-                    LauncherPerspective.ID));
+        goodPerspective = page.getPerspective().equals(reg.findPerspectiveWithId(LauncherPerspective.ID));
 
         return (goodPerspective && (page.getEditorReferences().length > 0));
     }

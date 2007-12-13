@@ -48,9 +48,8 @@ public class PALauncher {
      * @throws NoSuchMethodException
      * @throws ProActiveException
      */
-    public static void newMain(String classname, String[] mainParameters,
-        Node node)
-        throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
+    public static void newMain(String classname, String[] mainParameters, Node node)
+            throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
         ProActiveRuntime part = node.getProActiveRuntime();
         part.launchMain(classname, mainParameters);
     }
@@ -63,8 +62,8 @@ public class PALauncher {
      * @throws ClassNotFoundException
      * @throws ProActiveException
      */
-    public static void newRemote(String classname, Node node)
-        throws ClassNotFoundException, ProActiveException {
+    public static void newRemote(String classname, Node node) throws ClassNotFoundException,
+            ProActiveException {
         ProActiveRuntime part = node.getProActiveRuntime();
         part.newRemote(classname);
     }

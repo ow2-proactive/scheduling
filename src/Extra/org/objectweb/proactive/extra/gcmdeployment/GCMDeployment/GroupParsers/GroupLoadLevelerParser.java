@@ -44,24 +44,15 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupLoadLevelerParser extends AbstractGroupParser {
-    private static final String NODE_NAME_TASKS_PER_HOST = NODE_EXT_NAMESPACE +
-        "tasksPerHost";
-    private static final String NODE_NAME_CPUS_PER_TASK = NODE_EXT_NAMESPACE +
-        "cpusPerTask";
-    private static final String NODE_NAME_NB_TASKS = NODE_EXT_NAMESPACE +
-        "nbTasks";
-    private static final String NODE_NAME_ARGUMENTS = NODE_EXT_NAMESPACE +
-        "arguments";
-    private static final String NODE_NAME_MAX_TIME = NODE_EXT_NAMESPACE +
-        "maxTime";
-    private static final String NODE_NAME_RESOURCES = NODE_EXT_NAMESPACE +
-        "resources";
-    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE +
-        "directory";
-    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
-        "stderr";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
-        "stdout";
+    private static final String NODE_NAME_TASKS_PER_HOST = NODE_EXT_NAMESPACE + "tasksPerHost";
+    private static final String NODE_NAME_CPUS_PER_TASK = NODE_EXT_NAMESPACE + "cpusPerTask";
+    private static final String NODE_NAME_NB_TASKS = NODE_EXT_NAMESPACE + "nbTasks";
+    private static final String NODE_NAME_ARGUMENTS = NODE_EXT_NAMESPACE + "arguments";
+    private static final String NODE_NAME_MAX_TIME = NODE_EXT_NAMESPACE + "maxTime";
+    private static final String NODE_NAME_RESOURCES = NODE_EXT_NAMESPACE + "resources";
+    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE + "directory";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
     private static final String ATTR_JOB_NAME = "jobName";
     private static final String NODE_NAME = "loadLevelerGroup";
 
@@ -77,11 +68,9 @@ public class GroupLoadLevelerParser extends AbstractGroupParser {
 
     @Override
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
-        GroupLoadLeveler loadLevelerGroup = (GroupLoadLeveler) super.parseGroupNode(groupNode,
-                xpath);
+        GroupLoadLeveler loadLevelerGroup = (GroupLoadLeveler) super.parseGroupNode(groupNode, xpath);
 
-        String jobname = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_JOB_NAME);
+        String jobname = GCMParserHelper.getAttributeValue(groupNode, ATTR_JOB_NAME);
 
         loadLevelerGroup.setJobName(jobname);
 
@@ -107,8 +96,7 @@ public class GroupLoadLevelerParser extends AbstractGroupParser {
                 loadLevelerGroup.setMaxTime(nodeValue);
             } else if (nodeName.equals(NODE_NAME_ARGUMENTS)) {
                 try {
-                    List<String> argList = GCMParserHelper.parseArgumentListNode(xpath,
-                            childNode);
+                    List<String> argList = GCMParserHelper.parseArgumentListNode(xpath, childNode);
                     loadLevelerGroup.setArgumentList(argList);
                 } catch (XPathExpressionException e) {
                     GCMDeploymentLoggers.GCMD_LOGGER.error(e.getMessage(), e);

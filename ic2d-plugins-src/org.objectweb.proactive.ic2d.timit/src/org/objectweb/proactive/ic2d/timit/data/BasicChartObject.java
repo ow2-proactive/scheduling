@@ -57,32 +57,22 @@ public class BasicChartObject {
     /**
      * The basic timer level
      */
-    public static final String[] BASIC_LEVEL = new String[] {
-            CoreTimersContainer.TOTAL_TIMER_NAME,
-            CoreTimersContainer.SERVE_TIMER_NAME,
-            CoreTimersContainer.SEND_REQUEST_TIMER_NAME,
-            CoreTimersContainer.SEND_REPLY_TIMER_NAME,
-            CoreTimersContainer.WAIT_BY_NECESSITY_TIMER_NAME,
-            CoreTimersContainer.WAIT_FOR_REQUEST_TIMER_NAME
-        };
+    public static final String[] BASIC_LEVEL = new String[] { CoreTimersContainer.TOTAL_TIMER_NAME,
+            CoreTimersContainer.SERVE_TIMER_NAME, CoreTimersContainer.SEND_REQUEST_TIMER_NAME,
+            CoreTimersContainer.SEND_REPLY_TIMER_NAME, CoreTimersContainer.WAIT_BY_NECESSITY_TIMER_NAME,
+            CoreTimersContainer.WAIT_FOR_REQUEST_TIMER_NAME };
 
     /**
      * The detailed timer level
      */
-    public static final String[] DETAILED_LEVEL = new String[] {
-            CoreTimersContainer.TOTAL_TIMER_NAME,
-            CoreTimersContainer.SERVE_TIMER_NAME,
-            CoreTimersContainer.SEND_REQUEST_TIMER_NAME,
-            CoreTimersContainer.SEND_REPLY_TIMER_NAME,
-            CoreTimersContainer.WAIT_BY_NECESSITY_TIMER_NAME,
-            CoreTimersContainer.WAIT_FOR_REQUEST_TIMER_NAME,
-            CoreTimersContainer.LOCAL_COPY_TIMER_NAME,
+    public static final String[] DETAILED_LEVEL = new String[] { CoreTimersContainer.TOTAL_TIMER_NAME,
+            CoreTimersContainer.SERVE_TIMER_NAME, CoreTimersContainer.SEND_REQUEST_TIMER_NAME,
+            CoreTimersContainer.SEND_REPLY_TIMER_NAME, CoreTimersContainer.WAIT_BY_NECESSITY_TIMER_NAME,
+            CoreTimersContainer.WAIT_FOR_REQUEST_TIMER_NAME, CoreTimersContainer.LOCAL_COPY_TIMER_NAME,
             CoreTimersContainer.BEFORE_SERIALIZATION_TIMER_NAME,
-            CoreTimersContainer.SERIALIZATION_TIMER_NAME,
-            CoreTimersContainer.AFTER_SERIALIZATION_TIMER_NAME,
+            CoreTimersContainer.SERIALIZATION_TIMER_NAME, CoreTimersContainer.AFTER_SERIALIZATION_TIMER_NAME,
             CoreTimersContainer.GROUP_ONE_WAY_CALL_TIMER_NAME,
-            CoreTimersContainer.GROUP_ASYNC_CALL_TIMER_NAME
-        };
+            CoreTimersContainer.GROUP_ASYNC_CALL_TIMER_NAME };
 
     /**
      * The associated chart builder
@@ -136,8 +126,8 @@ public class BasicChartObject {
      * @param basicTimersArray The array of incoming timers
      * @param aoObject The reference on the active object representation
      */
-    public BasicChartObject(final BasicChartContainerObject parent,
-        final BasicTimer[] basicTimersArray, final ActiveObject aoObject) {
+    public BasicChartObject(final BasicChartContainerObject parent, final BasicTimer[] basicTimersArray,
+            final ActiveObject aoObject) {
         this.parent = parent;
         this.timersMap = new java.util.HashMap<Integer, TimerTreeNodeObject>();
         this.timersList = new ArrayList<TimerTreeNodeObject>();
@@ -146,8 +136,8 @@ public class BasicChartObject {
         this.updateCurrentTimersList(basicTimersArray);
         this.hasChanged = true;
         this.aoObject = aoObject;
-        this.barChartBuilder = new BarChartBuilder((this.aoObject == null)
-                ? "Unknown name" : this.aoObject.getName());
+        this.barChartBuilder = new BarChartBuilder((this.aoObject == null) ? "Unknown name" : this.aoObject
+                .getName());
 
         this.parent.addChild(this);
     }
@@ -161,8 +151,7 @@ public class BasicChartObject {
     public final Chart provideChart() {
         if (this.hasChanged) {
             this.hasChanged = false;
-            return this.barChartBuilder.createChart(this.timersList,
-                this.currentTimerLevel);
+            return this.barChartBuilder.createChart(this.timersList, this.currentTimerLevel);
         }
         return this.barChartBuilder.chart;
     }
@@ -173,8 +162,7 @@ public class BasicChartObject {
      * @return The inversed current timer level
      */
     public final String getInversedTimerLevel() {
-        return (this.currentTimerLevel.equals(BASIC_LEVEL) ? "Detailed"
-                                                           : "Basic   ");
+        return (this.currentTimerLevel.equals(BASIC_LEVEL) ? "Detailed" : "Basic   ");
     }
 
     /**
@@ -207,8 +195,7 @@ public class BasicChartObject {
         if (availableTimers != null) {
             // Update the current timers object collection
             this.updateCurrentTimersList(availableTimers);
-            this.rootTimer.firePropertyChange(TimerTreeNodeObject.P_CHILDREN,
-                null, null);
+            this.rootTimer.firePropertyChange(TimerTreeNodeObject.P_CHILDREN, null, null);
             this.hasChanged = true;
             this.ep.asyncRefresh();
         }
@@ -219,8 +206,7 @@ public class BasicChartObject {
      *
      * @param incomingTimersArray The array of incoming timers
      */
-    public final void updateCurrentTimersList(
-        final BasicTimer[] incomingTimersArray) {
+    public final void updateCurrentTimersList(final BasicTimer[] incomingTimersArray) {
         for (final BasicTimer basicTimer : incomingTimersArray) {
             TimerTreeNodeObject timerTreeNodeObject = this.timersMap.get(basicTimer.getId());
 
@@ -231,24 +217,20 @@ public class BasicChartObject {
                 // If is not root
                 if (basicTimer.getParent() != null) {
                     // Retreive parent object
-                    TimerTreeNodeObject parent = this.timersMap.get(basicTimer.getParent()
-                                                                              .getId());
+                    TimerTreeNodeObject parent = this.timersMap.get(basicTimer.getParent().getId());
                     if (parent != null) {
                         // Create the timer object
-                        timerTreeNodeObject = new TimerTreeNodeObject(basicTimer,
-                                parent);
+                        timerTreeNodeObject = new TimerTreeNodeObject(basicTimer, parent);
                         // Set the total timer reference
                         timerTreeNodeObject.setTotalTimerAndCompute(this.rootTimer);
                         // Add to map
-                        this.timersMap.put(basicTimer.getId(),
-                            timerTreeNodeObject);
+                        this.timersMap.put(basicTimer.getId(), timerTreeNodeObject);
                         // Add to list
                         this.timersList.add(timerTreeNodeObject);
                     }
                 } else { // If root then add to map and to list
                     if (this.rootTimer == null) {
-                        this.rootTimer = new TimerTreeNodeObject(basicTimer,
-                                null);
+                        this.rootTimer = new TimerTreeNodeObject(basicTimer, null);
                         this.rootTimer.setTotalTimerAndCompute(this.rootTimer);
                         this.timersMap.put(basicTimer.getId(), this.rootTimer);
                         this.timersList.add(this.rootTimer);
@@ -337,11 +319,10 @@ public class BasicChartObject {
      *            The reference on the remote active object
      * @return A list of BasicTimer
      */
-    protected static final BasicTimer[] performSnapshotInternal(
-        final ActiveObject aoObject, final String[] timerLevel) {
+    protected static final BasicTimer[] performSnapshotInternal(final ActiveObject aoObject,
+            final String[] timerLevel) {
         try {
-            final Object[] result = (Object[]) aoObject.getAttribute(
-                    "TimersSnapshotFromBody");
+            final Object[] result = (Object[]) aoObject.getAttribute("TimersSnapshotFromBody");
             final BasicTimer[] availableTimers = (BasicTimer[]) result[0];
             final long remoteTimeStamp = (Long) result[1];
 
@@ -357,19 +338,17 @@ public class BasicChartObject {
             CoreTimersContainer.updateAllUserComputationTimers(availableTimers);
 
             if ((availableTimers == null) || (availableTimers.length == 0)) {
-                Console.getInstance(Activator.CONSOLE_NAME)
-                       .log("There is no available timers for " +
-                    aoObject.getName());
+                Console.getInstance(Activator.CONSOLE_NAME).log(
+                        "There is no available timers for " + aoObject.getName());
                 return null;
             }
             return availableTimers;
         } catch (Exception e) {
             Console console = Console.getInstance(Activator.CONSOLE_NAME);
-            String message = "Cannot perform timers snapshot on " +
-                aoObject.getName() + ". ";
+            String message = "Cannot perform timers snapshot on " + aoObject.getName() + ". ";
             if (e.getCause() instanceof javax.management.RuntimeMBeanException) {
-                message += ("No available TimItTechnicalService for the virtual node : " +
-                aoObject.getParent().getVirtualNodeName());
+                message += ("No available TimItTechnicalService for the virtual node : " + aoObject
+                        .getParent().getVirtualNodeName());
             }
             console.log(message);
         }

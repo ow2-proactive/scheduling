@@ -42,13 +42,13 @@ import javax.swing.table.DefaultTableCellRenderer;
 public class IconRenderer extends DefaultTableCellRenderer {
 
     /**
-         *
-         */
+     *
+     */
     JLabel res = new JLabel();
 
     @Override
-    public Component getTableCellRendererComponent(JTable table, Object value,
-        boolean isSelected, boolean hasFocus, int row, int column) {
+    public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+            boolean hasFocus, int row, int column) {
         res.setHorizontalAlignment(SwingConstants.CENTER);
         if (value instanceof ImageIcon) {
             ImageIcon icon = (ImageIcon) value;

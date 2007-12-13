@@ -80,6 +80,5 @@ public interface Group extends Serializable {
      * @param commandBuilder The final command builder
      * @return The command to be used to start this group
      */
-    public List<String> buildCommands(CommandBuilder commandBuilder,
-        GCMApplicationDescriptor gcma);
+    public List<String> buildCommands(CommandBuilder commandBuilder, GCMApplicationDescriptor gcma);
 }

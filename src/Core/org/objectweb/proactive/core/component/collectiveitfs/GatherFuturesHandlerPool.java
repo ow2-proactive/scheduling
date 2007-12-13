@@ -71,11 +71,10 @@ public class GatherFuturesHandlerPool {
     private Hashtable<GatherFuturesHandler, Long> locked;
     private Hashtable<GatherFuturesHandler, Long> unlocked;
 
-    GatherFuturesHandler create()
-        throws ActiveObjectCreationException, NodeException {
+    GatherFuturesHandler create() throws ActiveObjectCreationException, NodeException {
         //			System.out.println("CREATED " + ++created );
         return (GatherFuturesHandler) PAActiveObject.newActive(GatherFuturesHandler.class.getName(),
-            new Object[] {  });
+                new Object[] {});
     }
 
     boolean validate(GatherFuturesHandler handler) {
@@ -86,8 +85,8 @@ public class GatherFuturesHandlerPool {
         PAActiveObject.terminateActiveObject(handler, false);
     }
 
-    public synchronized GatherFuturesHandler borrowFuturesHandler()
-        throws ActiveObjectCreationException, NodeException {
+    public synchronized GatherFuturesHandler borrowFuturesHandler() throws ActiveObjectCreationException,
+            NodeException {
         long now = System.currentTimeMillis();
         GatherFuturesHandler handler;
         if (unlocked.size() > 0) {

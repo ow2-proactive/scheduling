@@ -39,28 +39,21 @@ import java.io.Serializable;
  * @author The ProActive Team (mleyton)
  */
 public interface SkeletonVisitor {
-    public <P extends Serializable, R extends Serializable> void visit(
-        Farm<P, R> skeleton);
+    public <P extends Serializable, R extends Serializable> void visit(Farm<P, R> skeleton);
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        Pipe<P, R> skeleton);
+    public <P extends Serializable, R extends Serializable> void visit(Pipe<P, R> skeleton);
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        Seq<P, R> skeleton);
+    public <P extends Serializable, R extends Serializable> void visit(Seq<P, R> skeleton);
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        If<P, R> skeleton);
+    public <P extends Serializable, R extends Serializable> void visit(If<P, R> skeleton);
 
     public <P extends Serializable> void visit(For<P> skeleton);
 
     public <P extends Serializable> void visit(While<P> skeleton);
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        Map<P, R> skeleton);
+    public <P extends Serializable, R extends Serializable> void visit(Map<P, R> skeleton);
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        Fork<P, R> skeleton);
+    public <P extends Serializable, R extends Serializable> void visit(Fork<P, R> skeleton);
 
-    public <P extends Serializable, R extends Serializable> void visit(
-        DaC<P, R> skeleton);
+    public <P extends Serializable, R extends Serializable> void visit(DaC<P, R> skeleton);
 }

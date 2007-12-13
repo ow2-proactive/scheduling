@@ -86,13 +86,11 @@ public class ProActiveConfiguration {
             checkSystemProperties();
 
             // loading default values
-            String filename = ProActiveConfiguration.class.getResource(PROACTIVE_CONFIG_FILENAME)
-                                                          .toString();
+            String filename = ProActiveConfiguration.class.getResource(PROACTIVE_CONFIG_FILENAME).toString();
 
             logger.debug("default configuration file " + filename);
 
-            properties = ProActiveConfigurationParser.parse(filename,
-                    new Properties());
+            properties = ProActiveConfigurationParser.parse(filename, new Properties());
 
             filename = null;
 
@@ -102,8 +100,8 @@ public class ProActiveConfiguration {
                 filename = System.getProperty(PAProperties.PA_CONFIGURATION_FILE.getKey());
             } else {
                 // or if the file exists in the user home dir
-                File f = new File(System.getProperty("user.home") +
-                        File.separator + PROACTIVE_USER_CONFIG_FILENAME);
+                File f = new File(System.getProperty("user.home") + File.separator +
+                    PROACTIVE_USER_CONFIG_FILENAME);
                 if (f.exists()) {
                     filename = f.getAbsolutePath();
                 }
@@ -112,8 +110,7 @@ public class ProActiveConfiguration {
             if (filename != null) {
                 // override default properties by the ones defined by the user
                 logger.debug("using user configuration file : " + filename);
-                properties = ProActiveConfigurationParser.parse(filename,
-                        properties);
+                properties = ProActiveConfigurationParser.parse(filename, properties);
             } else {
                 logger.debug("no user configuration file");
             }
@@ -142,16 +139,15 @@ public class ProActiveConfiguration {
             if (prop != null) {
                 String value = System.getProperty(key);
                 if (!prop.isValid(value)) {
-                    logger.warn("Invalid value, " + value + " for key " + key +
-                        ". Must be a " + prop.getType().toString());
+                    logger.warn("Invalid value, " + value + " for key " + key + ". Must be a " +
+                        prop.getType().toString());
                 }
             } else {
                 if (key.startsWith("proactive.")) {
                     logger.warn("Property " + key + " is not declared inside " +
                         PAProperties.class.getSimpleName() + " , ignoring");
                 } else {
-                    logger.debug("System property " + key +
-                        " is not a ProAtive property");
+                    logger.debug("System property " + key + " is not a ProAtive property");
                 }
             }
         }
@@ -175,8 +171,8 @@ public class ProActiveConfiguration {
                 logger.debug("key:" + key + " --> value:" + value);
                 System.setProperty(key, value);
             } else {
-                logger.debug("do not override " + key + ":" +
-                    System.getProperty(key) + " with value:" + value);
+                logger.debug("do not override " + key + ":" + System.getProperty(key) + " with value:" +
+                    value);
             }
         }
     }

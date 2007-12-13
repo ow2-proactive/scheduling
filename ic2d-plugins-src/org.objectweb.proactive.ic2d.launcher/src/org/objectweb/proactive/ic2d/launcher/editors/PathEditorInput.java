@@ -94,8 +94,7 @@ public class PathEditorInput implements IPathEditorInput {
      * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
      */
     public ImageDescriptor getImageDescriptor() {
-        return PlatformUI.getWorkbench().getEditorRegistry()
-                         .getImageDescriptor(fPath.toString());
+        return PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor(fPath.toString());
     }
 
     /*

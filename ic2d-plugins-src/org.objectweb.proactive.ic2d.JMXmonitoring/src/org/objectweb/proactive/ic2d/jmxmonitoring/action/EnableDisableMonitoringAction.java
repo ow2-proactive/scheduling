@@ -41,8 +41,7 @@ import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
 
 
-public class EnableDisableMonitoringAction extends Action
-    implements IWorkbenchWindowActionDelegate {
+public class EnableDisableMonitoringAction extends Action implements IWorkbenchWindowActionDelegate {
     public static final String ENABLE_DISABLE_MONITORING = "EnableDisbaleMonitoring";
     public static final boolean DEFAULT_IS_MONITORING = true;
 
@@ -87,13 +86,11 @@ public class EnableDisableMonitoringAction extends Action
     //
     private void updateMonitoringState() {
         if (monitoring) {
-            this.setImageDescriptor(ImageDescriptor.createFromFile(
-                    this.getClass(), "openedEye.gif"));
+            this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "openedEye.gif"));
             this.setToolTipText(enableMessage);
             Console.getInstance(Activator.CONSOLE_NAME).debug(enableMessage);
         } else {
-            this.setImageDescriptor(ImageDescriptor.createFromFile(
-                    this.getClass(), "closedEye.gif"));
+            this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "closedEye.gif"));
             this.setToolTipText(disableMessage);
             Console.getInstance(Activator.CONSOLE_NAME).debug(disableMessage);
         }

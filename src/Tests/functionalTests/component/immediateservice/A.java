@@ -44,8 +44,7 @@ public class A implements Itf, ComponentInitActive {
      * Initialize the immediate service method in the initComponentActivity
      */
     public void initComponentActivity(Body body) {
-        PAActiveObject.setImmediateService("immediateMethod",
-            new Class[] { String.class });
+        PAActiveObject.setImmediateService("immediateMethod", new Class[] { String.class });
         //        ProActive.setImmediateService("startFc",
         //                new Class[] { });
         PAActiveObject.setImmediateService("immediateStopLoopMethod");

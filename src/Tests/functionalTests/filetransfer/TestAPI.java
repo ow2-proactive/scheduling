@@ -67,8 +67,7 @@ public class TestAPI extends FunctionalTest {
     ProActiveDescriptor pad;
     Node testnode;
     Node testnodePush;
-    File dirTest = new File(System.getProperty("java.io.tmpdir"),
-            "ProActive-TestAPI");
+    File dirTest = new File(System.getProperty("java.io.tmpdir"), "ProActive-TestAPI");
 
     @Before
     public void initTest() throws Exception {
@@ -115,12 +114,10 @@ public class TestAPI extends FunctionalTest {
         File fileTest = new File(dirTest, "ProActiveTestFile.dat");
         File filePushed = new File(dirTest, "b/ProActiveTestPushed.dat");
         File filePulled = new File(dirTest, "c/ProActiveTestPulled.dat");
-        File fileFuturePushed = new File(dirTest,
-                "d/ProActiveTestFuturePushed.dat");
+        File fileFuturePushed = new File(dirTest, "d/ProActiveTestFuturePushed.dat");
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Creating " + FILE_SIZE + "MB random test file: " +
-                fileTest);
+            logger.debug("Creating " + FILE_SIZE + "MB random test file: " + fileTest);
         }
 
         //creates a new test file
@@ -128,20 +125,16 @@ public class TestAPI extends FunctionalTest {
         Assert.assertTrue(dirTest.exists());
         createRandomContentFile(fileTest, FILE_SIZE);
 
-        RemoteFile rfilePushed = PAFileTransfer.push(fileTest, testnode,
-                filePushed);
+        RemoteFile rfilePushed = PAFileTransfer.push(fileTest, testnode, filePushed);
         rfilePushed.waitFor();
         Assert.assertTrue(rfilePushed.getRemoteFilePath().equals(filePushed)); //wait-by-necessity
 
-        RemoteFile rfilePulled = PAFileTransfer.pull(testnode, filePushed,
-                filePulled);
+        RemoteFile rfilePulled = PAFileTransfer.pull(testnode, filePushed, filePulled);
 
-        RemoteFile pushedWhilePulling = rfilePulled.push(testnodePush,
-                fileFuturePushed);
+        RemoteFile pushedWhilePulling = rfilePulled.push(testnodePush, fileFuturePushed);
 
         Assert.assertTrue(rfilePulled.getRemoteFilePath().equals(filePulled)); //wait-by-necessity
-        Assert.assertTrue(pushedWhilePulling.getRemoteFilePath()
-                                            .equals(fileFuturePushed)); //wait-by-necessity
+        Assert.assertTrue(pushedWhilePulling.getRemoteFilePath().equals(fileFuturePushed)); //wait-by-necessity
 
         rfilePulled.waitFor();
         pushedWhilePulling.waitFor();
@@ -155,8 +148,7 @@ public class TestAPI extends FunctionalTest {
             logger.debug("CheckSum TestFile              =" + fileTestSum);
             logger.debug("CheckSum PushedFile            =" + filePushedSum);
             logger.debug("CheckSum PulledFile            =" + filePulledSum);
-            logger.debug("CheckSum PushedFileWhilePulling=" +
-                fileFuturePushedSum);
+            logger.debug("CheckSum PushedFileWhilePulling=" + fileFuturePushedSum);
         }
 
         Assert.assertTrue(fileTestSum == filePushedSum);
@@ -199,10 +191,8 @@ public class TestAPI extends FunctionalTest {
 
         createRandomContentFile(dirTestSrcFile, FILE_SIZE);
 
-        RemoteFile rdirPushed = PAFileTransfer.push(dirTestSrc, testnode,
-                dirTestPushed);
-        RemoteFile rdirPulled = PAFileTransfer.push(dirTestSrc, testnode,
-                dirTestPulled);
+        RemoteFile rdirPushed = PAFileTransfer.push(dirTestSrc, testnode, dirTestPushed);
+        RemoteFile rdirPulled = PAFileTransfer.push(dirTestSrc, testnode, dirTestPulled);
 
         rdirPushed.waitFor();
         rdirPulled.waitFor();
@@ -245,8 +235,8 @@ public class TestAPI extends FunctionalTest {
      */
     static long checkSum(File file) throws IOException {
         // Compute Adler-32 checksum
-        CheckedInputStream cis = new CheckedInputStream(new FileInputStream(
-                    file.getAbsoluteFile()), new Adler32());
+        CheckedInputStream cis = new CheckedInputStream(new FileInputStream(file.getAbsoluteFile()),
+            new Adler32());
         byte[] tempBuf = new byte[1024 * 1024]; //1MB loops
         while (cis.read(tempBuf) >= 0)
             ;
@@ -261,8 +251,7 @@ public class TestAPI extends FunctionalTest {
      * @return
      * @throws IOException
      */
-    static void createRandomContentFile(File file, int size)
-        throws IOException {
+    static void createRandomContentFile(File file, int size) throws IOException {
         SecureRandom psrg = new SecureRandom();
         byte[] b = new byte[1024 * 1024]; //1 * MB
         psrg.nextBytes(b);

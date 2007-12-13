@@ -48,21 +48,18 @@ import org.objectweb.proactive.extensions.calcium.statistics.StatsGlobal;
 public class FindPrimes implements Serializable {
     public Skeleton<Interval, Primes> root;
 
-    public static void main(String[] args)
-        throws InterruptedException, PanicException {
+    public static void main(String[] args) throws InterruptedException, PanicException {
         FindPrimes st = new FindPrimes();
         st.solve();
     }
 
     public FindPrimes() {
-        root = new DaC<Interval, Primes>(new IntervalDivide(),
-                new IntervalDivideCondition(), new SearchInterval(),
-                new JoinPrimes());
+        root = new DaC<Interval, Primes>(new IntervalDivide(), new IntervalDivideCondition(),
+            new SearchInterval(), new JoinPrimes());
     }
 
     public void solve() throws InterruptedException, PanicException {
-        String descriptor = FindPrimes.class.getResource("LocalDescriptor.xml")
-                                            .getPath();
+        String descriptor = FindPrimes.class.getResource("LocalDescriptor.xml").getPath();
 
         EnvironmentFactory enviroment = new MultiThreadedEnvironment(1);
 

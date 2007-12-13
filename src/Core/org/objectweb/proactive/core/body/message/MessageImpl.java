@@ -83,8 +83,7 @@ public class MessageImpl implements Message, java.io.Serializable {
      * @param isOneWay <code>true</code> if oneWay
      * @param methodName the method name of the method call
      */
-    public MessageImpl(UniqueID sourceID, long sequenceNumber,
-        boolean isOneWay, String methodName) {
+    public MessageImpl(UniqueID sourceID, long sequenceNumber, boolean isOneWay, String methodName) {
         this.sourceID = sourceID;
         this.sequenceNumber = sequenceNumber;
         this.timeStamp = System.currentTimeMillis();
@@ -127,8 +126,7 @@ public class MessageImpl implements Message, java.io.Serializable {
         return timeStamp;
     }
 
-    private void readObject(java.io.ObjectInputStream s)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream s) throws java.io.IOException, ClassNotFoundException {
         s.defaultReadObject();
         this.timeStamp = System.currentTimeMillis();
     }

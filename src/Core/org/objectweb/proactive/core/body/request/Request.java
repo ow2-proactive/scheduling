@@ -104,8 +104,7 @@ public interface Request extends Message, Securizable {
      * @exception java.io.IOException if the request fails to be sent
      * @return value for fault-tolerance protocol
      */
-    public int send(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException,
+    public int send(UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException,
             CommunicationForbiddenException;
 
     /**
@@ -125,8 +124,7 @@ public interface Request extends Message, Securizable {
      * @exception java.io.IOException if the request failed to perform a possible
      * operation upon that notification
      */
-    public void notifyReception(UniversalBody bodyReceiver)
-        throws java.io.IOException;
+    public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException;
 
     /**
      * Returns true if the request is a non fuctional request.

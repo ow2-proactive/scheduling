@@ -73,12 +73,9 @@ public class WorldListener implements MouseListener, MouseMotionListener {
             while (it.hasNext()) {
                 final IAction act = (IAction) it.next();
                 final Class<?> actionClass = act.getClass();
-                if ((actionClass == NewHostAction.class) ||
-                        (actionClass == SetDepthAction.class) ||
-                        (actionClass == RefreshAction.class) ||
-                        (actionClass == SetTTRAction.class) ||
-                        (actionClass == ZoomInAction.class) ||
-                        (actionClass == ZoomOutAction.class)) {
+                if ((actionClass == NewHostAction.class) || (actionClass == SetDepthAction.class) ||
+                    (actionClass == RefreshAction.class) || (actionClass == SetTTRAction.class) ||
+                    (actionClass == ZoomInAction.class) || (actionClass == ZoomOutAction.class)) {
                     act.setEnabled(true);
                 } else if (act instanceof IActionExtPoint) {
                     ((IActionExtPoint) act).setAbstractDataObject(this.world);

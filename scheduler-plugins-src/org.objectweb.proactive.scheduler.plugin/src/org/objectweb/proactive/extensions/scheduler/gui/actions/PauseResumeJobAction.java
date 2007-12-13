@@ -57,14 +57,12 @@ public class PauseResumeJobAction extends Action {
         TableItem item = TableManager.getInstance().getLastSelectedItem();
         if (item != null) {
             JobId jobId = (JobId) item.getData();
-            JobState jobState = JobsController.getLocalView().getJobById(jobId)
-                                              .getState();
+            JobState jobState = JobsController.getLocalView().getJobById(jobId).getState();
             if (jobState.equals(JobState.PAUSED)) {
                 SchedulerProxy.getInstance().resume(jobId);
                 setPauseMode();
-            } else if (jobState.equals(JobState.RUNNING) ||
-                    jobState.equals(JobState.PENDING) ||
-                    jobState.equals(JobState.STALLED)) {
+            } else if (jobState.equals(JobState.RUNNING) || jobState.equals(JobState.PENDING) ||
+                jobState.equals(JobState.STALLED)) {
                 SchedulerProxy.getInstance().pause(jobId);
                 setResumeMode();
             } else {
@@ -75,22 +73,21 @@ public class PauseResumeJobAction extends Action {
 
     public void setPauseMode() {
         this.setText("Pause job");
-        this.setToolTipText(
-            "To pause this job (this will finish all running tasks)");
+        this.setToolTipText("To pause this job (this will finish all running tasks)");
     }
 
     public void setResumeMode() {
         this.setText("Resume job");
-        this.setToolTipText(
-            "To resume this job (this will restart all paused tasks)");
+        this.setToolTipText("To resume this job (this will restart all paused tasks)");
     }
 
     public void setPauseResumeMode() {
         this.setEnabled(false);
         this.setText("Pause/Resume job");
         this.setToolTipText("To pause or resume a job");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/job_pause_resume.gif"));
+        this
+                .setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
+                        "icons/job_pause_resume.gif"));
     }
 
     public static PauseResumeJobAction newInstance() {

@@ -53,8 +53,7 @@ import org.eclipse.swt.graphics.Color;
 /**
  * An implementation of {@link Connection} based on RoundedLine.
  */
-public class RoundedLineConnection extends RoundedLine implements Connection,
-    AnchorListener {
+public class RoundedLineConnection extends RoundedLine implements Connection, AnchorListener {
     // Use to display the topology
     private boolean oldState;
     private ConnectionAnchor endAnchorSave;
@@ -163,8 +162,7 @@ public class RoundedLineConnection extends RoundedLine implements Connection,
         if (bounds == null) {
             super.getBounds();
             for (int i = 0; i < getChildren().size(); i++) {
-                IFigure child = (IFigure) getChildren()
-                                              .get(i);
+                IFigure child = (IFigure) getChildren().get(i);
                 bounds.union(child.getBounds());
             }
         }

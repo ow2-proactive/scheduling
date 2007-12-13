@@ -72,8 +72,7 @@ public class ProActiveTask extends Task {
      */
     @Override
     public void addDependence(Task task) {
-        throw new RuntimeException(
-            "ProActiveTask.addDependence(Task) Should be never used in this context !");
+        throw new RuntimeException("ProActiveTask.addDependence(Task) Should be never used in this context !");
     }
 
     /**
@@ -119,8 +118,8 @@ public class ProActiveTask extends Task {
      */
     public void setTaskClass(Class<ProActiveExecutable> taskClass) {
         if (!TaskConstructorTools.hasEmptyConstructor(taskClass)) {
-            throw new RuntimeException("WARNING : The executable class '" +
-                taskClass + "' must have a public no parameter constructor !");
+            throw new RuntimeException("WARNING : The executable class '" + taskClass +
+                "' must have a public no parameter constructor !");
         }
         this.taskClass = taskClass;
         this.taskInstance = null;
@@ -143,8 +142,7 @@ public class ProActiveTask extends Task {
      */
     public void setTaskInstance(ProActiveExecutable taskInstance) {
         if (!TaskConstructorTools.hasEmptyConstructor(taskInstance.getClass())) {
-            throw new RuntimeException("WARNING : The executable class '" +
-                taskInstance.getClass() +
+            throw new RuntimeException("WARNING : The executable class '" + taskInstance.getClass() +
                 "' must have a public no parameter constructor !");
         }
         this.taskInstance = taskInstance;

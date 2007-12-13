@@ -30,24 +30,12 @@
  */
 package org.objectweb.proactive.ic2d.jmxmonitoring.util;
 
-
 /**
  * This Enum describes the states a
  * </code> org.objectweb.proactive.ic2d.jmxmonitoring.data.Abstractdata </code> object can have.
  * @author ProActiveTeam
  *
  */
-public enum State {UNKNOWN,
-    MIGRATING,
-    NOT_RESPONDING,
-    HIGHLIGHTED,
-    NOT_HIGHLIGHTED,
-    NOT_MONITORED,
-    SERVING_REQUEST,
-    WAITING_BY_NECESSITY,
-    WAITING_BY_NECESSITY_WHILE_ACTIVE,
-    WAITING_BY_NECESSITY_WHILE_SERVING,
-    RECEIVED_FUTURE_RESULT,
-    ACTIVE,
-    WAITING_FOR_REQUEST;
+public enum State {
+    UNKNOWN, MIGRATING, NOT_RESPONDING, HIGHLIGHTED, NOT_HIGHLIGHTED, NOT_MONITORED, SERVING_REQUEST, WAITING_BY_NECESSITY, WAITING_BY_NECESSITY_WHILE_ACTIVE, WAITING_BY_NECESSITY_WHILE_SERVING, RECEIVED_FUTURE_RESULT, ACTIVE, WAITING_FOR_REQUEST;
 }

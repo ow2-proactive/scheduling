@@ -48,8 +48,7 @@ public class InterStageParam implements java.io.Serializable {
     FileStaging fstaging;
     SkeletonSystemImpl system;
 
-    public InterStageParam(Task<?> task, FileStaging fstaging,
-        SkeletonSystemImpl system) {
+    public InterStageParam(Task<?> task, FileStaging fstaging, SkeletonSystemImpl system) {
         super();
         this.task = task;
         this.fstaging = fstaging;

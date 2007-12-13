@@ -55,8 +55,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 /**
  * @author Matthieu Morel
  */
-public class ProActiveImplementationBuilderImpl
-    implements ProActiveImplementationBuilder, BindingController {
+public class ProActiveImplementationBuilderImpl implements ProActiveImplementationBuilder, BindingController {
     public final static String REGISTRY_BINDING = "registry";
     public RegistryManager registry;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
@@ -90,25 +89,22 @@ public class ProActiveImplementationBuilderImpl
     //  --------------------------------------------------------------------------
     // Implementation of the Implementation Builder and ProActiveImplementationBuilder interfaces
     // --------------------------------------------------------------------------
-    public Object createComponent(Object arg0, String arg1, String arg2,
-        Object arg3, Object arg4, Object arg5) throws Exception {
+    public Object createComponent(Object arg0, String arg1, String arg2, Object arg3, Object arg4, Object arg5)
+            throws Exception {
         return null;
     }
 
     public Object createComponent(Object type, String name, String definition,
-        ControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode adlVN, Map context) throws Exception {
-        ObjectsContainer obj = commonCreation(type, name, definition,
-                contentDesc, adlVN, context);
-        return createFComponent(type, obj.getDvn(), controllerDesc,
-            contentDesc, adlVN, obj.getBootstrapComponent());
+            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode adlVN,
+            Map context) throws Exception {
+        ObjectsContainer obj = commonCreation(type, name, definition, contentDesc, adlVN, context);
+        return createFComponent(type, obj.getDvn(), controllerDesc, contentDesc, adlVN, obj
+                .getBootstrapComponent());
     }
 
-    protected ObjectsContainer commonCreation(Object type, String name,
-        String definition, ContentDescription contentDesc, VirtualNode adlVN,
-        Map context) throws Exception {
-        org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal deploymentVN =
-            null;
+    protected ObjectsContainer commonCreation(Object type, String name, String definition,
+            ContentDescription contentDesc, VirtualNode adlVN, Map context) throws Exception {
+        org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal deploymentVN = null;
         Component bootstrap = null;
         if (context != null) {
             bootstrap = (Component) context.get("bootstrap");
@@ -119,46 +115,41 @@ public class ProActiveImplementationBuilderImpl
 
         if (adlVN != null) {
             // consider exported virtual nodes
-            LinkedVirtualNode exported = ExportedVirtualNodesList.instance()
-                                                                 .getNode(name,
-                    adlVN.getName(), false);
+            LinkedVirtualNode exported = ExportedVirtualNodesList.instance().getNode(name, adlVN.getName(),
+                    false);
             if (exported != null) {
                 adlVN.setName(exported.getExportedVirtualNodeNameAfterComposition());
-                adlVN.setCardinality(exported.isMultiple()
-                    ? VirtualNode.MULTIPLE : VirtualNode.SINGLE);
+                adlVN.setCardinality(exported.isMultiple() ? VirtualNode.MULTIPLE : VirtualNode.SINGLE);
             } else {
                 // 	TODO add self exported virtual node ?
                 // for the moment, just add a leaf to the linked vns
-                ExportedVirtualNodesList.instance()
-                                        .addLeafVirtualNode(name,
-                    adlVN.getName(), adlVN.getCardinality()); // TODO_M check this
+                ExportedVirtualNodesList.instance().addLeafVirtualNode(name, adlVN.getName(),
+                        adlVN.getCardinality()); // TODO_M check this
             }
             if (context.get("deployment-descriptor") != null) {
-                org.objectweb.proactive.core.descriptor.data.VirtualNode vn = ((ProActiveDescriptor) context.get(
-                        "deployment-descriptor")).getVirtualNode(adlVN.getName());
+                org.objectweb.proactive.core.descriptor.data.VirtualNode vn = ((ProActiveDescriptor) context
+                        .get("deployment-descriptor")).getVirtualNode(adlVN.getName());
                 if (vn != null) {
                     deploymentVN = vn.getVirtualNodeInternal();
                 }
                 if (deploymentVN == null) {
                     if (adlVN.getName().equals("null")) {
-                        logger.info(name +
-                            " will be instantiated in the current virtual machine (\"null\" was specified as the virtual node name)");
+                        logger
+                                .info(name +
+                                    " will be instantiated in the current virtual machine (\"null\" was specified as the virtual node name)");
                     } else {
-                        throw new ADLException("Could not find virtual node  " +
-                            adlVN.getName() + " in the deployment descriptor",
-                            null);
+                        throw new ADLException("Could not find virtual node  " + adlVN.getName() +
+                            " in the deployment descriptor", null);
                     }
                 } else {
-                    if (deploymentVN.isMultiple() &&
-                            (adlVN.getCardinality().equals(VirtualNode.SINGLE))) {
+                    if (deploymentVN.isMultiple() && (adlVN.getCardinality().equals(VirtualNode.SINGLE))) {
                         // there will be only one instance of the component, on one node of the virtual node 
                         contentDesc.forceSingleInstance();
                     } else if (!(deploymentVN.isMultiple()) &&
-                            (adlVN.getCardinality().equals(VirtualNode.MULTIPLE))) {
+                        (adlVN.getCardinality().equals(VirtualNode.MULTIPLE))) {
                         throw new ADLException(
                             "Cannot deploy on a single virtual node when the cardinality of this virtual node named " +
-                            adlVN.getName() + " in the ADL is set to multiple",
-                            null);
+                                adlVN.getName() + " in the ADL is set to multiple", null);
                     }
                 }
             }
@@ -167,21 +158,20 @@ public class ProActiveImplementationBuilderImpl
     }
 
     private Component createFComponent(Object type,
-        org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN,
-        ControllerDescription controllerDesc, ContentDescription contentDesc,
-        VirtualNode adlVN, Component bootstrap) throws Exception {
+            org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN,
+            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode adlVN,
+            Component bootstrap) throws Exception {
         Component result;
 
         // FIXME : exhaustively specify the behaviour
-        if ((deploymentVN != null) &&
-                VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
-                controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
-                !contentDesc.uniqueInstance()) {
-            result = (Component) ((Group) ((ProActiveGenericFactory) Fractal.getGenericFactory(bootstrap)).newFcInstanceAsList((ComponentType) type,
-                    controllerDesc, contentDesc, deploymentVN)).getGroupByType();
+        if ((deploymentVN != null) && VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
+            controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) && !contentDesc.uniqueInstance()) {
+            result = (Component) ((Group) ((ProActiveGenericFactory) Fractal.getGenericFactory(bootstrap))
+                    .newFcInstanceAsList((ComponentType) type, controllerDesc, contentDesc, deploymentVN))
+                    .getGroupByType();
         } else {
-            result = ((ProActiveGenericFactory) Fractal.getGenericFactory(bootstrap)).newFcInstance((ComponentType) type,
-                    controllerDesc, contentDesc, deploymentVN);
+            result = ((ProActiveGenericFactory) Fractal.getGenericFactory(bootstrap)).newFcInstance(
+                    (ComponentType) type, controllerDesc, contentDesc, deploymentVN);
         }
 
         //        registry.addComponent(result); // the registry can handle groups
@@ -192,9 +182,7 @@ public class ProActiveImplementationBuilderImpl
         private org.objectweb.proactive.core.descriptor.data.VirtualNode deploymentVN;
         private Component bootstrap;
 
-        public ObjectsContainer(
-            org.objectweb.proactive.core.descriptor.data.VirtualNode dVn,
-            Component bstrp) {
+        public ObjectsContainer(org.objectweb.proactive.core.descriptor.data.VirtualNode dVn, Component bstrp) {
             deploymentVN = dVn;
             bootstrap = bstrp;
         }

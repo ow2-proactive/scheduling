@@ -138,8 +138,7 @@ public class TimItView extends ViewPart {
         this.configureButtons();
 
         // ---------------------		
-        IToolBarManager toolBarManager = getViewSite().getActionBars()
-                                             .getToolBarManager();
+        IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
         this.showInTreeViewAction = new ShowInTreeViewAction();
         toolBarManager.add(showInTreeViewAction);
@@ -148,7 +147,8 @@ public class TimItView extends ViewPart {
         startRecordingTimeLineAction.setTarget(this.chartContainer);
         toolBarManager.add(startRecordingTimeLineAction);
 
-        StopRecordingTimeLineAction stopRecordingTimeLineAction = new StopRecordingTimeLineAction(startRecordingTimeLineAction);
+        StopRecordingTimeLineAction stopRecordingTimeLineAction = new StopRecordingTimeLineAction(
+            startRecordingTimeLineAction);
         startRecordingTimeLineAction.setStopRecordingTimeLineAction(stopRecordingTimeLineAction);
         toolBarManager.add(stopRecordingTimeLineAction);
     }
@@ -163,15 +163,15 @@ public class TimItView extends ViewPart {
         refreshSelectedButton.setSelection(false);
         refreshSelectedButton.setEnabled(false);
         refreshSelectedButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    if (timItViewer.getSelectedEditParts().size() != 0) {
-                        BasicChartObject c = (BasicChartObject) ((BasicChartEditPart) timItViewer.getSelectedEditParts()
-                                                                                                 .get(0)).getModel();
-                        c.performSnapshot();
-                    }
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (timItViewer.getSelectedEditParts().size() != 0) {
+                    BasicChartObject c = (BasicChartObject) ((BasicChartEditPart) timItViewer
+                            .getSelectedEditParts().get(0)).getModel();
+                    c.performSnapshot();
                 }
-            });
+            }
+        });
 
         // Configuration of the refresh all button
         refreshAllButton.setText("Refresh All");
@@ -179,17 +179,17 @@ public class TimItView extends ViewPart {
         refreshAllButton.setSelection(false);
         refreshAllButton.setEnabled(false);
         refreshAllButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    Display.getDefault().asyncExec(new Runnable() {
-                            public void run() {
-                                for (BasicChartObject o : chartContainer.getChildrenList()) {
-                                    o.performSnapshot();
-                                }
-                            }
-                        });
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                Display.getDefault().asyncExec(new Runnable() {
+                    public void run() {
+                        for (BasicChartObject o : chartContainer.getChildrenList()) {
+                            o.performSnapshot();
+                        }
+                    }
+                });
+            }
+        });
 
         // Configuration of the switch button
         timerLevelButton.setText("Switch to Detailed");
@@ -197,16 +197,15 @@ public class TimItView extends ViewPart {
         timerLevelButton.setSelection(false);
         timerLevelButton.setEnabled(false);
         timerLevelButton.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    if (timItViewer.getSelectedEditParts().size() != 0) {
-                        BasicChartObject c = (BasicChartObject) ((BasicChartEditPart) timItViewer.getSelectedEditParts()
-                                                                                                 .get(0)).getModel();
-                        timerLevelButton.setText("Switch To " +
-                            c.switchTimerLevel());
-                    }
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (timItViewer.getSelectedEditParts().size() != 0) {
+                    BasicChartObject c = (BasicChartObject) ((BasicChartEditPart) timItViewer
+                            .getSelectedEditParts().get(0)).getModel();
+                    timerLevelButton.setText("Switch To " + c.switchTimerLevel());
                 }
-            });
+            }
+        });
     }
 
     /**
@@ -238,10 +237,10 @@ public class TimItView extends ViewPart {
 
         // ADD for resize event
         parent.addControlListener(new ControlAdapter() { /* resize listener */
-                public void controlResized(ControlEvent event) {
-                    chartContainer.update(true); // timItViewer.getContents().refresh();
-                }
-            });
+            public void controlResized(ControlEvent event) {
+                chartContainer.update(true); // timItViewer.getContents().refresh();
+            }
+        });
     }
 
     /**
@@ -289,8 +288,7 @@ public class TimItView extends ViewPart {
         return showInTreeViewAction;
     }
 
-    public void setShowInTreeViewAction(
-        ShowInTreeViewAction showInTreeViewAction) {
+    public void setShowInTreeViewAction(ShowInTreeViewAction showInTreeViewAction) {
         this.showInTreeViewAction = showInTreeViewAction;
     }
 

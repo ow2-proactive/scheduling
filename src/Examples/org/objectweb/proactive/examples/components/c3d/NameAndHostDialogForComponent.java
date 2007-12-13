@@ -62,25 +62,20 @@ public class NameAndHostDialogForComponent extends NameAndHostDialog {
             String protocol = URIBuilder.getProtocol(hostNameTextField.getText());
 
             ProActiveComponentRepresentative a;
-            a = Fractive.lookup(URIBuilder.buildURI(hostName, COMPONENT_ALIAS,
-                        protocol, portNumber).toString());
-            this.c3dDispatcher = (Dispatcher) a.getFcInterface(
-                    "user2dispatcher");
+            a = Fractive.lookup(URIBuilder.buildURI(hostName, COMPONENT_ALIAS, protocol, portNumber)
+                    .toString());
+            this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");
             setVisible(false);
         } catch (UnknownHostException e) {
             treatException(e, "Sorry, host name '" + hostName + "' not found.");
         } catch (IOException e) {
             treatException(e, "Sorry, lookup failed on '" + hostName + "'.");
         } catch (NamingException e) {
-            treatException(e,
-                "Sorry, lookup failed on '" + hostName +
-                "', no Component registered with name " + COMPONENT_ALIAS +
-                ".");
+            treatException(e, "Sorry, lookup failed on '" + hostName +
+                "', no Component registered with name " + COMPONENT_ALIAS + ".");
         } catch (NoSuchInterfaceException e) {
-            treatException(e,
-                "Sorry, lookup failed on '" + hostName +
-                "', component registered with name " + COMPONENT_ALIAS +
-                " does not have the correct interface.");
+            treatException(e, "Sorry, lookup failed on '" + hostName + "', component registered with name " +
+                COMPONENT_ALIAS + " does not have the correct interface.");
         }
     }
 }

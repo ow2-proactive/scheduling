@@ -80,8 +80,7 @@ public class LargerQueueImpl extends TaskQueue {
             this.queue.add(tasks);
             this.size += tasks.size();
             if (logger.isDebugEnabled()) {
-                logger.debug("Task provider just received and added " +
-                    tasks.size());
+                logger.debug("Task provider just received and added " + tasks.size());
             }
         }
     }
@@ -143,8 +142,7 @@ public class LargerQueueImpl extends TaskQueue {
     @Override
     public BooleanWrapper isHungry() {
         if (logger.isDebugEnabled()) {
-            logger.debug("Queue size is " + this.size + " - Hungry level is " +
-                hungryLevel);
+            logger.debug("Queue size is " + this.size + " - Hungry level is " + hungryLevel);
         }
         return new BooleanWrapper(this.size <= hungryLevel);
     }
@@ -161,8 +159,7 @@ public class LargerQueueImpl extends TaskQueue {
      * @see org.objectweb.proactive.branchnbound.core.queue.TaskQueue#backupTasks(org.objectweb.proactive.branchnbound.core.Task, java.util.Vector, java.io.OutputStream)
      */
     @Override
-    public void backupTasks(Task rootTask, Vector pendingTasks,
-        java.io.OutputStream backupOutputStream) {
+    public void backupTasks(Task rootTask, Vector pendingTasks, java.io.OutputStream backupOutputStream) {
         try {
             ObjectOutputStream oos = new ObjectOutputStream(backupOutputStream);
             oos.writeObject(rootTask);
@@ -192,7 +189,7 @@ public class LargerQueueImpl extends TaskQueue {
             while (!separationReached) {
                 Object read = ois.readObject();
                 if (!separationReached && read instanceof String &&
-                        (((String) read).compareTo(BCK_SEPARTOR) == 0)) {
+                    (((String) read).compareTo(BCK_SEPARTOR) == 0)) {
                     separationReached = true;
                     continue;
                 }

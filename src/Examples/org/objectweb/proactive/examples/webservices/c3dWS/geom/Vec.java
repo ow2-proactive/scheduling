@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.webservices.c3dWS.geom;
 
-
 /**
  * This class reflects the 3d vectors used in 3d computations
  */
@@ -135,8 +134,7 @@ public class Vec implements java.io.Serializable {
     }
 
     public static Vec cross(Vec a, Vec b) {
-        return new Vec((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z),
-            (a.x * b.y) - (a.y * b.x));
+        return new Vec((a.y * b.z) - (a.z * b.y), (a.z * b.x) - (a.x * b.z), (a.x * b.y) - (a.y * b.x));
     }
 
     public static double dot(Vec a, Vec b) {
@@ -144,8 +142,7 @@ public class Vec implements java.io.Serializable {
     }
 
     public static Vec comb(double a, Vec A, double b, Vec B) {
-        return new Vec((a * A.x) + (b * B.x), (a * A.y) + (b * B.y),
-            (a * A.z) + (b * B.z));
+        return new Vec((a * A.x) + (b * B.x), (a * A.y) + (b * B.y), (a * A.z) + (b * B.z));
     }
 
     public final void comb2(double a, Vec A, double b, Vec B) {

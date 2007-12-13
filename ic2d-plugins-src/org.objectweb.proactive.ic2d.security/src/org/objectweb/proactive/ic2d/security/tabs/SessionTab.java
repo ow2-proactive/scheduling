@@ -72,21 +72,17 @@ public class SessionTab extends UpdatableTab {
 
         body.setLayout(new GridLayout(3, true));
 
-        createSectionSessionList(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        createSectionSessionList(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createSectionDistantCertificate(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        createSectionDistantCertificate(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        createSectionContext(body)
-            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        createSectionContext(body).setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         setControl(body);
     }
 
     private Section createSectionSessionList(Composite parent) {
-        Section section = this.toolkit.createSection(parent,
-                ExpandableComposite.TITLE_BAR);
+        Section section = this.toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
         section.setText("Sessions List");
 
         Composite client = this.toolkit.createComposite(section);
@@ -101,46 +97,39 @@ public class SessionTab extends UpdatableTab {
 
     private Table createListSessions(Composite parent) {
         this.sessionTable = this.toolkit.createTable(parent, SWT.NULL);
-        this.sessionTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-                true));
+        this.sessionTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         this.sessionTableViewer = new TableViewer(this.sessionTable);
 
         this.sessionTable.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    updateViewers();
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                updateViewers();
 
-                    super.widgetSelected(e);
-                }
-            });
+                super.widgetSelected(e);
+            }
+        });
 
         return this.sessionTable;
     }
 
     private Section createSectionDistantCertificate(Composite parent) {
-        this.certDetailsSection = new CertificateDetailsSection(parent,
-                this.toolkit);
+        this.certDetailsSection = new CertificateDetailsSection(parent, this.toolkit);
 
         return this.certDetailsSection.get();
     }
 
     private Section createSectionContext(Composite parent) {
-        Section section = this.toolkit.createSection(parent,
-                ExpandableComposite.TITLE_BAR);
+        Section section = this.toolkit.createSection(parent, ExpandableComposite.TITLE_BAR);
         section.setText("Communication");
 
         Composite client = this.toolkit.createComposite(section);
         client.setLayout(new GridLayout());
 
-        this.requestComposite = new CommunicationDetailsComposite(client,
-                this.toolkit, "Request");
-        this.requestComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-                true, true));
+        this.requestComposite = new CommunicationDetailsComposite(client, this.toolkit, "Request");
+        this.requestComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        this.replyComposite = new CommunicationDetailsComposite(client,
-                this.toolkit, "Reply");
-        this.replyComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
-                true, true));
+        this.replyComposite = new CommunicationDetailsComposite(client, this.toolkit, "Reply");
+        this.replyComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         section.setClient(client);
 
@@ -157,8 +146,7 @@ public class SessionTab extends UpdatableTab {
     }
 
     protected void updateViewers() {
-        Session session = this.sessionList.get(this.sessionTable.getSelectionIndex())
-                                          .getSession();
+        Session session = this.sessionList.get(this.sessionTable.getSelectionIndex()).getSession();
 
         this.certDetailsSection.update(session.getDistantCertificate());
 
@@ -172,8 +160,7 @@ public class SessionTab extends UpdatableTab {
     public void setSessions(Hashtable<Long, Session> sessions) {
         this.sessionList.clear();
         for (Long id : sessions.keySet()) {
-            this.sessionList.add(new SessionWithID(sessions.get(id),
-                    id.longValue()));
+            this.sessionList.add(new SessionWithID(sessions.get(id), id.longValue()));
         }
     }
 

@@ -75,8 +75,7 @@ public class Launcher implements java.io.Serializable {
         }
 
         endTime = System.currentTimeMillis() - startTime;
-        logger.info("\n       Result (" + i + ") : Total time spent = " +
-            endTime + " millisecondes");
+        logger.info("\n       Result (" + i + ") : Total time spent = " + endTime + " millisecondes");
 
         //System.out.println(result);
     }

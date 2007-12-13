@@ -55,33 +55,31 @@ import org.objectweb.proactive.core.jmx.server.ProActiveConnector;
 public class ClientProvider implements JMXConnectorProvider {
 
     /**
-       * <p>Creates a new connector client that is ready to connect
-       * to the connector server at the given address.  Each successful
-       * call to this method produces a different
-       * <code>JMXConnector</code> object.</p>
-       *
-       * @param serviceURL the address of the connector server to connect to.
-       *
-       * @param environment a read-only Map containing named attributes
-       * to determine how the connection is made.  Keys in this map must
-       * be Strings.  The appropriate type of each associated value
-       * depends on the attribute.</p>
-       *
-       * @return a <code>JMXConnector</code> representing the new
-       * connector client.  Each successful call to this method produces
-       * a different object.
-       *
-       * @exception NullPointerException if <code>serviceURL</code> or
-       * <code>environment</code> is null.
-       *
-       * @exception IOException if the connection cannot be made because
-       * of a communication problem.
-       */
-    public JMXConnector newJMXConnector(JMXServiceURL serviceURL, Map env)
-        throws IOException {
+     * <p>Creates a new connector client that is ready to connect
+     * to the connector server at the given address.  Each successful
+     * call to this method produces a different
+     * <code>JMXConnector</code> object.</p>
+     *
+     * @param serviceURL the address of the connector server to connect to.
+     *
+     * @param environment a read-only Map containing named attributes
+     * to determine how the connection is made.  Keys in this map must
+     * be Strings.  The appropriate type of each associated value
+     * depends on the attribute.</p>
+     *
+     * @return a <code>JMXConnector</code> representing the new
+     * connector client.  Each successful call to this method produces
+     * a different object.
+     *
+     * @exception NullPointerException if <code>serviceURL</code> or
+     * <code>environment</code> is null.
+     *
+     * @exception IOException if the connection cannot be made because
+     * of a communication problem.
+     */
+    public JMXConnector newJMXConnector(JMXServiceURL serviceURL, Map env) throws IOException {
         if (!serviceURL.getProtocol().equals(ProActiveJMXConstants.PROTOCOL)) {
-            throw new MalformedURLException("Protocol not proactive: " +
-                serviceURL.getProtocol());
+            throw new MalformedURLException("Protocol not proactive: " + serviceURL.getProtocol());
         }
 
         return new ProActiveConnector(serviceURL, env);

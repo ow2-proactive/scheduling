@@ -55,8 +55,7 @@ public class Utils {
      * @return null if clientItfName does not begin with the name of a collection interface,
      *         the name of the collection interface otherwise
      */
-    public static String pertainsToACollectionInterface(String clientItfName,
-        Component owner) {
+    public static String pertainsToACollectionInterface(String clientItfName, Component owner) {
         InterfaceType[] itfTypes = (((ComponentType) owner.getFcType()).getFcInterfaceTypes());
         for (int i = 0; i < itfTypes.length; i++) {
             if (itfTypes[i].isFcCollectionItf()) {
@@ -68,13 +67,12 @@ public class Utils {
         return null;
     }
 
-    public static InterfaceType getItfType(String itfName, Component owner)
-        throws NoSuchInterfaceException {
+    public static InterfaceType getItfType(String itfName, Component owner) throws NoSuchInterfaceException {
         InterfaceType[] itfTypes = (((ComponentType) owner.getFcType()).getFcInterfaceTypes());
         for (int i = 0; i < itfTypes.length; i++) {
             if (itfTypes[i].isFcCollectionItf()) {
                 if (itfName.startsWith(itfTypes[i].getFcItfName()) &&
-                        !itfName.equals(itfTypes[i].getFcItfName())) {
+                    !itfName.equals(itfTypes[i].getFcItfName())) {
                     return itfTypes[i];
                 }
             } else {
@@ -87,13 +85,10 @@ public class Utils {
     }
 
     public static boolean hasSingleCardinality(String itfName, Component owner) {
-        Iterator<Interface> it = Arrays.<Interface>asList((Interface[]) owner.getFcInterfaces())
-                                       .iterator();
+        Iterator<Interface> it = Arrays.<Interface> asList((Interface[]) owner.getFcInterfaces()).iterator();
         while (it.hasNext()) {
-            ProActiveInterfaceType itfType = (ProActiveInterfaceType) it.next()
-                                                                        .getFcItfType();
-            if (itfType.getFcItfName().equals(itfName) &&
-                    itfType.isFcSingletonItf()) {
+            ProActiveInterfaceType itfType = (ProActiveInterfaceType) it.next().getFcItfType();
+            if (itfType.getFcItfName().equals(itfName) && itfType.isFcSingletonItf()) {
                 return true;
             }
         }
@@ -102,8 +97,7 @@ public class Utils {
 
     public static boolean isMulticastItf(String itfName, Component owner) {
         try {
-            return ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(getCardinality(
-                    itfName, owner));
+            return ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(getCardinality(itfName, owner));
         } catch (NoSuchInterfaceException e) {
             return false;
         }
@@ -118,15 +112,13 @@ public class Utils {
 
     public static boolean isSingletonItf(String itfName, Component owner) {
         try {
-            return ProActiveTypeFactory.SINGLETON_CARDINALITY.equals(getCardinality(
-                    itfName, owner));
+            return ProActiveTypeFactory.SINGLETON_CARDINALITY.equals(getCardinality(itfName, owner));
         } catch (NoSuchInterfaceException e) {
             return false;
         }
     }
 
-    public static String getCardinality(String itfName, Component owner)
-        throws NoSuchInterfaceException {
+    public static String getCardinality(String itfName, Component owner) throws NoSuchInterfaceException {
         InterfaceType[] itfTypes = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
 
         for (InterfaceType type : itfTypes) {
@@ -137,8 +129,7 @@ public class Utils {
         throw new NoSuchInterfaceException(itfName);
     }
 
-    public static String getMethodSignatureWithoutReturnTypeAndModifiers(
-        Method m) {
+    public static String getMethodSignatureWithoutReturnTypeAndModifiers(Method m) {
         String result = m.toString();
         result = result.substring(result.indexOf(m.getName()));
         return result;
@@ -146,7 +137,6 @@ public class Utils {
 
     public static boolean isControllerInterfaceName(String itfName) {
         // according to Fractal spec v2.0 , section 4.1
-        return ((itfName != null) &&
-        (itfName.endsWith("-controller") || itfName.equals("component")));
+        return ((itfName != null) && (itfName.endsWith("-controller") || itfName.equals("component")));
     }
 }

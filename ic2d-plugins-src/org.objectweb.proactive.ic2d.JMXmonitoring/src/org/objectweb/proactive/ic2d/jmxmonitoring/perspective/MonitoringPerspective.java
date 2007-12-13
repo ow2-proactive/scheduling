@@ -58,21 +58,18 @@ public class MonitoringPerspective implements IPerspectiveFactory {
         layout.setEditorAreaVisible(false);
         layout.setFixed(false);
 
-        IFolderLayout rightFolder = layout.createFolder(FI_RIGHT,
-                IPageLayout.RIGHT, 0.80f, editorAreaId);
+        IFolderLayout rightFolder = layout.createFolder(FI_RIGHT, IPageLayout.RIGHT, 0.80f, editorAreaId);
         //rightFolder.addPlaceholder(Legend.ID);
         rightFolder.addView(Legend.ID);
 
-        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP,
-                0.75f, editorAreaId);
+        IFolderLayout topFolder = layout.createFolder(FI_TOP, IPageLayout.TOP, 0.75f, editorAreaId);
         //topFolder.addPlaceholder(MonitoringView.ID);
         topFolder.addView(MonitoringView.ID);
-        topFolder.addPlaceholder(
-            "org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView:org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView*");
+        topFolder
+                .addPlaceholder("org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView:org.objectweb.proactive.ic2d.jmxmonitoring.views.MonitoringView*");
         topFolder.addPlaceholder("org.objectweb.proactive.ic2d.dgc.*");
 
-        IFolderLayout bottomFolder = layout.createFolder(FI_BOTTOM,
-                IPageLayout.BOTTOM, 0.20f, editorAreaId);
+        IFolderLayout bottomFolder = layout.createFolder(FI_BOTTOM, IPageLayout.BOTTOM, 0.20f, editorAreaId);
         //bottomFolder.addPlaceholder(IConsoleConstants.ID_CONSOLE_VIEW);
         bottomFolder.addView(IConsoleConstants.ID_CONSOLE_VIEW);
     }

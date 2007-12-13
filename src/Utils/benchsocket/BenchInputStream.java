@@ -54,8 +54,7 @@ public class BenchInputStream extends InputStream implements BenchStream {
         }
     }
 
-    public BenchInputStream(InputStream stream, int number,
-        BenchClientSocket parent) {
+    public BenchInputStream(InputStream stream, int number, BenchClientSocket parent) {
         this(stream, number);
         this.parent = parent;
     }
@@ -71,8 +70,7 @@ public class BenchInputStream extends InputStream implements BenchStream {
 
     protected void display(String s) {
         if (parent != null) {
-            System.out.println(s + "" + number + " = " + total + " real " +
-                parent);
+            System.out.println(s + "" + number + " = " + total + " real " + parent);
         } else {
             System.out.println(s + "" + number + " = " + total);
         }

@@ -42,8 +42,7 @@ public class DeleteTreeAction extends Action {
 
     public DeleteTreeAction() {
         super.setId(DELETE_TREE_ACTION);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "delete_obj.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "delete_obj.gif"));
         super.setToolTipText(DELETE_TREE_ACTION);
         super.setEnabled(false);
     }

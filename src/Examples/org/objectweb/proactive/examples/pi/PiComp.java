@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.pi;
 
-
 /**
  * This interface has to be implemented by all workers who will perform pi computation
  * @author ProActive team

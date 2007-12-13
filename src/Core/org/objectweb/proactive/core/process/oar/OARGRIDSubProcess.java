@@ -53,9 +53,8 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  */
 public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
     public final static String DEFAULT_OARGRIDSUBPATH = "/usr/local/bin/oargridsub";
-    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + File.separator + "ProActive" + File.separator +
-        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home") + File.separator +
+        "ProActive" + File.separator + "scripts" + File.separator + "unix" + File.separator + "cluster" +
         File.separator + "oarGRIDStartRuntime.sh ";
     protected static final int DEFAULT_HOSTS_NUMBER = 1;
     protected static final int DEFAULT_WEIGHT = 1;
@@ -154,7 +153,7 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
             for (int i = 0; i < resTab.length; i++)
                 al.add(new OarSite(resTab[i]));
 
-            this.oarsite = al.toArray((new OarSite[] {  }));
+            this.oarsite = al.toArray((new OarSite[] {}));
         }
     }
 
@@ -181,8 +180,7 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
     }
 
     @Override
-    protected void internalStartProcess(String commandToExecute)
-        throws java.io.IOException {
+    protected void internalStartProcess(String commandToExecute) throws java.io.IOException {
         ArrayList<String> al = new ArrayList<String>();
 
         //we divide the command into tokens
@@ -197,16 +195,16 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
             //            System.out.println(m.group(i));
             al.add(m.group(i));
         }
-        String[] command = al.toArray(new String[] {  });
+        String[] command = al.toArray(new String[] {});
 
         try {
             externalProcess = Runtime.getRuntime().exec(command);
             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getInputStream()));
+                externalProcess.getInputStream()));
             java.io.BufferedReader err = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getErrorStream()));
+                externalProcess.getErrorStream()));
             java.io.BufferedWriter out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(
-                        externalProcess.getOutputStream()));
+                externalProcess.getOutputStream()));
             handleProcess(in, out, err);
         } catch (java.io.IOException e) {
             isFinished = true;
@@ -223,9 +221,8 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
     @Override
     protected String internalBuildCommand() {
         StringBuilder oarsubCommand = new StringBuilder();
-        oarsubCommand.append(
-            "/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do " +
-            accessProtocol + " \\$i  ");
+        oarsubCommand.append("/bin/sh -c  'echo for i in \\`cat \\$OAR_NODEFILE\\` \\; do " + accessProtocol +
+            " \\$i  ");
 
         oarsubCommand.append(targetProcess.getCommand());
         oarsubCommand.append(" \\&  done  \\; wait > ");
@@ -268,8 +265,7 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
         if (oarsite == null) {
             return "";
         }
-        if ((oarsite.getClusterFrontEndName() == null) ||
-                (oarsite.getClusterFrontEndName() == "")) {
+        if ((oarsite.getClusterFrontEndName() == null) || (oarsite.getClusterFrontEndName() == "")) {
             return "";
         }
 
@@ -324,12 +320,9 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
             }
             //ToDo, handle Error case
             else {
-                System.out.println(
-                    "clusterFrontEndName not found for cluster: " +
-                    clusterName);
+                System.out.println("clusterFrontEndName not found for cluster: " + clusterName);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("clusterFrontEndName not found for cluster: " +
-                        clusterName);
+                    logger.debug("clusterFrontEndName not found for cluster: " + clusterName);
                 }
             }
         }
@@ -365,23 +358,20 @@ public class OARGRIDSubProcess extends AbstractExternalProcessDecorator {
                 if (resTab[i].indexOf("=") < 0) { //Clustername has no "="
                     clusterName = resTab[i];
                 } else if (resTab[i].indexOf("nodes=") >= 0) {
-                    String count = resTab[i].substring(resTab[i].indexOf("=") +
-                            1);
+                    String count = resTab[i].substring(resTab[i].indexOf("=") + 1);
                     if (count.equals("all")) {
                         nodes = UniversalProcess.UNKNOWN_NODE_NUMBER;
                     } else {
                         nodes = Integer.parseInt(count);
                     }
                 } else if (resTab[i].indexOf("weight=") >= 0) {
-                    weight = Integer.parseInt(resTab[i].substring(resTab[i].indexOf(
-                                    "=") + 1));
+                    weight = Integer.parseInt(resTab[i].substring(resTab[i].indexOf("=") + 1));
                 }
             }
         }
 
         public String getResource() {
-            return this.clusterName + ":nodes=" + this.nodes + ":weight=" +
-            this.weight;
+            return this.clusterName + ":nodes=" + this.nodes + ":weight=" + this.weight;
         }
 
         public String getClusterFrontEndName() {

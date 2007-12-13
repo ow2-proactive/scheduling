@@ -41,6 +41,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import static org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers.GCMD_LOGGER;
+
+
 public class Executor {
     final static private Executor singleton = new Executor();
     private List<Thread> threads;
@@ -57,21 +59,19 @@ public class Executor {
     }
 
     public void submit(String command) {
-        Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT + ".job." +
-                jobId);
+        Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT + ".job." + jobId);
         jobId++;
 
         logger.debug("Command submited: " + command);
         try {
             System.out.println("executing command=" + command);
 
-            Process p = Runtime.getRuntime()
-                               .exec(new String[] { "sh", "-c", command });
+            Process p = Runtime.getRuntime().exec(new String[] { "sh", "-c", command });
 
-            InputStreamMonitor stdoutM = new InputStreamMonitor(MonitorType.STDOUT,
-                    p.getInputStream(), command, logger);
-            InputStreamMonitor stderrM = new InputStreamMonitor(MonitorType.STDERR,
-                    p.getErrorStream(), command, logger);
+            InputStreamMonitor stdoutM = new InputStreamMonitor(MonitorType.STDOUT, p.getInputStream(),
+                command, logger);
+            InputStreamMonitor stderrM = new InputStreamMonitor(MonitorType.STDERR, p.getErrorStream(),
+                command, logger);
             stderrM.start();
             stdoutM.start();
             threads.add(stdoutM);
@@ -86,17 +86,18 @@ public class Executor {
             t.join();
         }
     }
-    private enum MonitorType {STDOUT,
-        STDERR;
+
+    private enum MonitorType {
+        STDOUT, STDERR;
     }
+
     static private class InputStreamMonitor extends Thread {
         MonitorType type;
         InputStream stream;
         String cmd;
         Logger logger;
 
-        public InputStreamMonitor(MonitorType type, InputStream stream,
-            String cmd, Logger logger) {
+        public InputStreamMonitor(MonitorType type, InputStream stream, String cmd, Logger logger) {
             this.logger = logger;
             logger.trace("Monitor started: " + type.name() + " " + cmd);
             this.type = type;

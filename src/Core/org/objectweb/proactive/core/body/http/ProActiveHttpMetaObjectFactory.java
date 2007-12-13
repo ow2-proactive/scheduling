@@ -36,8 +36,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class ProActiveHttpMetaObjectFactory extends ProActiveMetaObjectFactory
-    implements java.io.Serializable {
+public class ProActiveHttpMetaObjectFactory extends ProActiveMetaObjectFactory implements
+        java.io.Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MOP);
 
     //

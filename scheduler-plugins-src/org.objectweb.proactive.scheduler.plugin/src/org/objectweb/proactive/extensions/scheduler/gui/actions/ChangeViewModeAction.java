@@ -49,8 +49,7 @@ public class ChangeViewModeAction extends Action {
         this.jobComposite = jobComposite;
         this.setText("Switch view mode");
         this.setToolTipText("Switch view to horizontal mode");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/horizontal.png"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/horizontal.png"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
@@ -61,12 +60,10 @@ public class ChangeViewModeAction extends Action {
         layout.type = isVertical ? SWT.HORIZONTAL : SWT.VERTICAL;
         if (isVertical) {
             this.setToolTipText("Switch view to horizontal mode");
-            this.setImageDescriptor(ImageDescriptor.createFromFile(
-                    this.getClass(), "icons/horizontal.png"));
+            this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/horizontal.png"));
         } else {
             this.setToolTipText("Switch view to vertical mode");
-            this.setImageDescriptor(ImageDescriptor.createFromFile(
-                    this.getClass(), "icons/vertical.png"));
+            this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/vertical.png"));
         }
         jobComposite.layout();
     }

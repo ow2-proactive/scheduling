@@ -94,11 +94,8 @@ public abstract class CertTools {
         oids.put("email", X509Name.EmailAddress);
     }
 
-    private static final String[] dNObjectsForward = {
-            "emailaddress", "e", "email", "uid", "cn", "sn", "serialnumber",
-            "gn", "givenname", "initials", "surname", "t", "ou", "o", "l", "st",
-            "dc", "c"
-        };
+    private static final String[] dNObjectsForward = { "emailaddress", "e", "email", "uid", "cn", "sn",
+            "serialnumber", "gn", "givenname", "initials", "surname", "t", "ou", "o", "l", "st", "dc", "c" };
 
     /** Change this if you want reverse order */
     private static final String[] dNObjects = dNObjectsForward;
@@ -180,10 +177,9 @@ public abstract class CertTools {
         return new X509Name(ordering, values);
     } // stringToBcX509Name
 
-    public static X509Certificate genSelfCert(String dn, long validity,
-        String policyId, PrivateKey privKey, PublicKey pubKey, boolean isCA)
-        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException,
-            CertificateEncodingException, IllegalStateException {
+    public static X509Certificate genSelfCert(String dn, long validity, String policyId, PrivateKey privKey,
+            PublicKey pubKey, boolean isCA) throws NoSuchAlgorithmException, SignatureException,
+            InvalidKeyException, CertificateEncodingException, IllegalStateException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
         Date firstDate = new Date();
@@ -231,17 +227,15 @@ public abstract class CertTools {
         try {
             if (isCA == true) {
                 SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
-                            new ByteArrayInputStream(pubKey.getEncoded())).readObject());
+                    new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 SubjectKeyIdentifier ski = new SubjectKeyIdentifier(spki);
 
                 SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
-                            new ByteArrayInputStream(pubKey.getEncoded())).readObject());
+                    new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(apki);
 
-                certgen.addExtension(X509Extensions.SubjectKeyIdentifier.getId(),
-                    false, ski);
-                certgen.addExtension(X509Extensions.AuthorityKeyIdentifier.getId(),
-                    false, aki);
+                certgen.addExtension(X509Extensions.SubjectKeyIdentifier.getId(), false, ski);
+                certgen.addExtension(X509Extensions.AuthorityKeyIdentifier.getId(), false, aki);
             }
         } catch (IOException e) { // do nothing
         }
@@ -249,11 +243,9 @@ public abstract class CertTools {
         // CertificatePolicies extension if supplied policy ID, always
         // non-critical
         if (policyId != null) {
-            PolicyInformation pi = new PolicyInformation(new DERObjectIdentifier(
-                        policyId));
+            PolicyInformation pi = new PolicyInformation(new DERObjectIdentifier(policyId));
             DERSequence seq = new DERSequence(pi);
-            certgen.addExtension(X509Extensions.CertificatePolicies.getId(),
-                false, seq);
+            certgen.addExtension(X509Extensions.CertificatePolicies.getId(), false, seq);
         }
 
         X509Certificate selfcert = certgen.generate(privKey);
@@ -261,10 +253,9 @@ public abstract class CertTools {
         return selfcert;
     } // genselfCert
 
-    public static X509Certificate genCert(String dn, long validity,
-        String policyId, PublicKey pubKey, boolean isCA, String caDn,
-        PrivateKey caPrivateKey, PublicKey acPubKey)
-        throws NoSuchAlgorithmException, SignatureException, InvalidKeyException,
+    public static X509Certificate genCert(String dn, long validity, String policyId, PublicKey pubKey,
+            boolean isCA, String caDn, PrivateKey caPrivateKey, PublicKey acPubKey)
+            throws NoSuchAlgorithmException, SignatureException, InvalidKeyException,
             CertificateEncodingException, IllegalStateException {
         // Create self signed certificate
         String sigAlg = "SHA1WithRSA";
@@ -315,17 +306,15 @@ public abstract class CertTools {
             if (false) {
                 // if (isCA == true) {
                 SubjectPublicKeyInfo spki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
-                            new ByteArrayInputStream(pubKey.getEncoded())).readObject());
+                    new ByteArrayInputStream(pubKey.getEncoded())).readObject());
                 SubjectKeyIdentifier ski = new SubjectKeyIdentifier(spki);
 
                 SubjectPublicKeyInfo apki = new SubjectPublicKeyInfo((ASN1Sequence) new ASN1InputStream(
-                            new ByteArrayInputStream(acPubKey.getEncoded())).readObject());
+                    new ByteArrayInputStream(acPubKey.getEncoded())).readObject());
                 AuthorityKeyIdentifier aki = new AuthorityKeyIdentifier(apki);
 
-                certgen.addExtension(X509Extensions.SubjectKeyIdentifier.getId(),
-                    false, ski);
-                certgen.addExtension(X509Extensions.AuthorityKeyIdentifier.getId(),
-                    false, aki);
+                certgen.addExtension(X509Extensions.SubjectKeyIdentifier.getId(), false, ski);
+                certgen.addExtension(X509Extensions.AuthorityKeyIdentifier.getId(), false, aki);
             }
         } catch (IOException e) { // do nothing
         }
@@ -333,11 +322,9 @@ public abstract class CertTools {
         // CertificatePolicies extension if supplied policy ID, always
         // non-critical
         if (policyId != null) {
-            PolicyInformation pi = new PolicyInformation(new DERObjectIdentifier(
-                        policyId));
+            PolicyInformation pi = new PolicyInformation(new DERObjectIdentifier(policyId));
             DERSequence seq = new DERSequence(pi);
-            certgen.addExtension(X509Extensions.CertificatePolicies.getId(),
-                false, seq);
+            certgen.addExtension(X509Extensions.CertificatePolicies.getId(), false, seq);
         }
 
         X509Certificate cert = certgen.generate(caPrivateKey);
@@ -349,8 +336,7 @@ public abstract class CertTools {
         CertificateFactory cf = CertTools.getCertificateFactory();
         X509Certificate x509cert = null;
         try {
-            x509cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
-                        cert));
+            x509cert = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(cert));
         } catch (CertificateException e) {
             e.printStackTrace();
         }
@@ -377,8 +363,7 @@ public abstract class CertTools {
         //
         try {
             CertificateFactory cf = CertificateFactory.getInstance("X.509", "BC");
-            certificate = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(
-                        encodedCert));
+            certificate = (X509Certificate) cf.generateCertificate(new ByteArrayInputStream(encodedCert));
         } catch (CertificateException e) {
             e.printStackTrace();
         } catch (NoSuchProviderException e) {

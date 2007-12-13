@@ -58,9 +58,8 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
     private int tries;
     private transient LocationServer server;
 
-    public TimedRequestWithLocationServer(MethodCall methodCall,
-        UniversalBody sender, boolean isOneWay, long nextSequenceID,
-        LocationServer server) {
+    public TimedRequestWithLocationServer(MethodCall methodCall, UniversalBody sender, boolean isOneWay,
+            long nextSequenceID, LocationServer server) {
         super(methodCall, sender, isOneWay, nextSequenceID);
         this.server = server;
     }
@@ -72,35 +71,29 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
 
         Reply r = super.serve(targetBody);
         timer.stop();
-        System.out.println("TimedRequestWithLocationServer: " +
-            timer.getCumulatedTime() + " for method " + methodName);
+        System.out.println("TimedRequestWithLocationServer: " + timer.getCumulatedTime() + " for method " +
+            methodName);
         return r;
     }
 
     @Override
-    protected int sendRequest(UniversalBody destinationBody)
-        throws java.io.IOException {
-        System.out.println("TimedRequestWithLocationServer: sending to remote " +
-            methodName);
+    protected int sendRequest(UniversalBody destinationBody) throws java.io.IOException {
+        System.out.println("TimedRequestWithLocationServer: sending to remote " + methodName);
         int ftres = FTManager.NON_FT;
         try {
             startTime = System.currentTimeMillis();
             ftres = destinationBody.receiveRequest(this);
 
             long endTime = System.currentTimeMillis();
-            System.out.println(
-                "TimedRequestWithLocationServer:  .............. 1/gamma = " +
+            System.out.println("TimedRequestWithLocationServer:  .............. 1/gamma = " +
                 (endTime - startTime) + " for method " + methodName);
-            System.out.println(
-                "TimedRequestWithLocationServer:  .............. done  = " +
+            System.out.println("TimedRequestWithLocationServer:  .............. done  = " +
                 (endTime - startTime) + " for method " + methodName);
         } catch (Exception e) {
             // endTime = System.currentTimeMillis();
             //There can only be a problem when trying to contact the Agent
-            System.out.println(
-                "TimedRequestWithLocationServer:  .............. FAILED = " +
-                (System.currentTimeMillis() - startTime) + " for method " +
-                methodName);
+            System.out.println("TimedRequestWithLocationServer:  .............. FAILED = " +
+                (System.currentTimeMillis() - startTime) + " for method " + methodName);
             //e.printStackTrace();
             System.out.println(">>>>>>>>>>>> Exception " + e);
             this.backupSolution(destinationBody);
@@ -111,8 +104,7 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
     /**
      * Implements the backup solution
      */
-    protected void backupSolution(UniversalBody destinationBody)
-        throws java.io.IOException {
+    protected void backupSolution(UniversalBody destinationBody) throws java.io.IOException {
         //   long startTimeGamma1=0;
         //   long endTimeGamma1=0;
         boolean ok = false;
@@ -123,12 +115,10 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
         UniqueID bodyID = destinationBody.getID();
         while (!ok && (tries < MAX_TRIES)) {
             UniversalBody remoteBody = null;
-            System.out.println(" ==== Query server ==== time " +
-                System.currentTimeMillis());
+            System.out.println(" ==== Query server ==== time " + System.currentTimeMillis());
 
             UniversalBody mobile = queryServer(bodyID);
-            System.out.println("=========================== time " +
-                System.currentTimeMillis());
+            System.out.println("=========================== time " + System.currentTimeMillis());
             //we want to bypass the stub/proxy
             remoteBody = (UniversalBody) ((FutureProxy) ((StubObject) mobile).getProxy()).getResult();
 
@@ -137,26 +127,22 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
                 remoteBody.receiveRequest(this);
 
                 long endTime = System.currentTimeMillis();
-                System.out.println(
-                    "TimedRequestWithLocationServer:  .............. 1/gamma = " +
+                System.out.println("TimedRequestWithLocationServer:  .............. 1/gamma = " +
                     (endTime - startTimeGamma) + " for method " + methodName);
-                System.out.println(
-                    "TimedRequestWithLocationServer:  .............. done = " +
+                System.out.println("TimedRequestWithLocationServer:  .............. done = " +
                     (endTime - startTime) + " for method " + methodName);
                 //everything went fine, we have to update the current location of the object
                 //so that next requests don't go through the server
                 if (sender != null) {
                     sender.updateLocation(bodyID, remoteBody);
                 } else {
-                    LocalBodyStore.getInstance().getLocalBody(getSourceBodyID())
-                                  .updateLocation(bodyID, remoteBody);
+                    LocalBodyStore.getInstance().getLocalBody(getSourceBodyID()).updateLocation(bodyID,
+                            remoteBody);
                 }
                 ok = true;
             } catch (Exception e) {
-                System.out.println(
-                    "TimedRequestWithLocationServer:  .............. FAILED = " +
-                    (System.currentTimeMillis() - startTimeGamma) +
-                    " for method " + methodName);
+                System.out.println("TimedRequestWithLocationServer:  .............. FAILED = " +
+                    (System.currentTimeMillis() - startTimeGamma) + " for method " + methodName);
                 tries++;
             }
         }
@@ -170,9 +156,9 @@ public class TimedRequestWithLocationServer extends RequestImpl implements java.
 
         UniversalBody mobile = server.searchObject(bodyID);
         long endTimeBackupSolution = System.currentTimeMillis();
-        System.out.println(
-            "TimedRequestWithLocationServer: backupSolution() server has sent an answer after " +
-            (endTimeBackupSolution - startTimeBackupSolution));
+        System.out
+                .println("TimedRequestWithLocationServer: backupSolution() server has sent an answer after " +
+                    (endTimeBackupSolution - startTimeBackupSolution));
         PAFuture.waitFor(mobile);
         return mobile;
     }

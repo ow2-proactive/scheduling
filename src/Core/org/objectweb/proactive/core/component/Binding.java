@@ -56,8 +56,7 @@ public class Binding implements Serializable {
      * @param clientItfName String name of the binding
      * @param serverInterface a reference on a server interface
      */
-    public Binding(final Interface clientInterface, String clientItfName,
-        final Interface serverInterface) {
+    public Binding(final Interface clientInterface, String clientItfName, final Interface serverInterface) {
         this.clientInterface = (ProActiveInterface) clientInterface;
         this.clientInterfaceName = clientItfName;
         this.serverInterface = (ProActiveInterface) serverInterface;

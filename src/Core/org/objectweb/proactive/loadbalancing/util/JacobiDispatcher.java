@@ -53,8 +53,7 @@ public class JacobiDispatcher {
     protected int nodesBooked;
     protected P2PNodeLookup p2pNodeLookup;
 
-    static public void createVirtualGrid(JacobiWorker[] workers,
-        int workerGridSize) {
+    static public void createVirtualGrid(JacobiWorker[] workers, int workerGridSize) {
         System.out.println("[JACOBI] Creating workers virtual grid...");
         int nbWorker = workers.length;
         for (int i = 0; i < nbWorker; i++) {
@@ -94,7 +93,7 @@ public class JacobiDispatcher {
                     down = workers[i + workerGridSize];
                 }
             } else if ((i > (workerGridSize * (workerGridSize - 1))) &&
-                    (i < ((workerGridSize * workerGridSize) - 1))) { // down
+                (i < ((workerGridSize * workerGridSize) - 1))) { // down
                 up = workers[i - workerGridSize];
                 right = workers[i + 1];
                 left = workers[i - 1];
@@ -128,8 +127,8 @@ public class JacobiDispatcher {
         System.out.println("[JACOBI] Virtual grid is created.");
     }
 
-    static public void createAndSplitMatrix(JacobiWorker[] workers,
-        int workerGridSize, int subMatrixSize, int globalMatrixSize) {
+    static public void createAndSplitMatrix(JacobiWorker[] workers, int workerGridSize, int subMatrixSize,
+            int globalMatrixSize) {
         System.out.println("[JACOBI] Creating and spliting global matrix");
         for (int currentW = 0; currentW < workers.length; currentW++) {
             //create submatrix
@@ -147,8 +146,8 @@ public class JacobiDispatcher {
             int upperLeftY = (currentW / workerGridSize) * subMatrixSize;
 
             //send submatrix to worker
-            workers[currentW].setSubMatrix(globalMatrixSize, subMatrixSize,
-                upperLeftX, upperLeftY, currentSubMatrix);
+            workers[currentW].setSubMatrix(globalMatrixSize, subMatrixSize, upperLeftX, upperLeftY,
+                    currentSubMatrix);
         }
         System.out.println("[JACOBI]Global Matrix created and splitted");
     }
@@ -167,8 +166,7 @@ public class JacobiDispatcher {
     public JacobiDispatcher() {
     }
 
-    public JacobiDispatcher(String s1, String s2, String s3,
-        P2PService serviceP2P) throws ProActiveException {
+    public JacobiDispatcher(String s1, String s2, String s3, P2PService serviceP2P) throws ProActiveException {
         int globalSize = Integer.parseInt(s1);
         int nbWorker = Integer.parseInt(s2);
         int maxIter = Integer.parseInt(s3);
@@ -184,35 +182,28 @@ public class JacobiDispatcher {
         System.out.println("         * # of workers       = " + nbWorker);
         System.out.println("         * worker grid size   = " + workerGridSize);
         System.out.println("         * # of iterations    = " + maxIter);
-        System.out.println("         * boundary value     = " +
-            JacobiDispatcher.boudaryValue);
+        System.out.println("         * boundary value     = " + JacobiDispatcher.boudaryValue);
 
         try {
             ProActiveConfiguration.load();
 
             int n = 8;
-            P2PNodeLookup p2pNodeLookup = serviceP2P.getNodes(n, "JacobiNode",
-                    "Jacobi");
+            P2PNodeLookup p2pNodeLookup = serviceP2P.getNodes(n, "JacobiNode", "Jacobi");
 
             Vector nodes = p2pNodeLookup.getNodes();
 
-            System.out.println("[JACOBI] Deploying Workers in " + nodes.size() +
-                " nodes");
+            System.out.println("[JACOBI] Deploying Workers in " + nodes.size() + " nodes");
             for (int i = 0; i < nbWorker; i++) {
                 int fix = (int) (Math.random() * n);
                 workers[i] = (JacobiWorker) (PAActiveObject.newActive(JacobiWorker.class.getName(),
-                        new Object[] {
-                            new Integer(i),
-                            new Double(JacobiDispatcher.boudaryValue),
-                            new Integer(maxIter)
-                        }, (Node) nodes.get(fix)));
+                        new Object[] { new Integer(i), new Double(JacobiDispatcher.boudaryValue),
+                                new Integer(maxIter) }, (Node) nodes.get(fix)));
             }
             System.out.println("[JACOBI] Workers are deployed");
 
             //initializing workers
             JacobiDispatcher.createVirtualGrid(workers, workerGridSize);
-            JacobiDispatcher.createAndSplitMatrix(workers, workerGridSize,
-                submatrixSize, globalSize);
+            JacobiDispatcher.createAndSplitMatrix(workers, workerGridSize, submatrixSize, globalSize);
 
             for (int i = 0; i < nbWorker; i++) {
                 workers[i].computeNewSubMatrix();

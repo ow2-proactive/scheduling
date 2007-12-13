@@ -48,12 +48,10 @@ public class GroupSSHParser extends AbstractGroupParser {
         GroupSSH groupSSH = (GroupSSH) super.parseGroupNode(groupNode, xpath);
 
         // Mandatory attributes
-        String hostList = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_HOST_LIST);
+        String hostList = GCMParserHelper.getAttributeValue(groupNode, ATTR_HOST_LIST);
         groupSSH.setHostList(hostList);
 
-        String commandOptions = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_COMMAND_OPTIONS);
+        String commandOptions = GCMParserHelper.getAttributeValue(groupNode, ATTR_COMMAND_OPTIONS);
         if (commandOptions != null) {
             groupSSH.setCommandOption(commandOptions);
         }

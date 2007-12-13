@@ -81,9 +81,8 @@ public class ProActiveProvider extends WSConstants implements Provider {
      * First, we make a lookup active in order to retrieve the active object and then store it in the private field targetObject
      * @see org.apache.soap.util.Provider
      */
-    public void locate(DeploymentDescriptor dd, Envelope env, Call call,
-        String methodName, String targetObjectURI, SOAPContext reqContext)
-        throws SOAPException {
+    public void locate(DeploymentDescriptor dd, Envelope env, Call call, String methodName,
+            String targetObjectURI, SOAPContext reqContext) throws SOAPException {
         //Set some properties to the context
         HttpServlet servlet = (HttpServlet) reqContext.getProperty(Constants.BAG_HTTPSERVLET);
         HttpSession session = (HttpSession) reqContext.getProperty(Constants.BAG_HTTPSESSION);
@@ -111,23 +110,20 @@ public class ProActiveProvider extends WSConstants implements Provider {
         if (!RPCRouter.validCall(dd, call)) {
             System.err.println("It's not a valid call");
 
-            SOAPException e = new SOAPException(Constants.FAULT_CODE_CLIENT,
-                    "It's not a  valid call");
+            SOAPException e = new SOAPException(Constants.FAULT_CODE_CLIENT, "It's not a  valid call");
             throw e;
         }
 
         byte[] serObj = (byte[]) props.get("Stub");
 
-        boolean isInterfaceComponent = ((String) props.get(WSConstants.COMPONENT_INTERFACE)).equals(
-                "true");
+        boolean isInterfaceComponent = ((String) props.get(WSConstants.COMPONENT_INTERFACE)).equals("true");
 
         try {
             if (!isInterfaceComponent) {
                 targetObject = HttpMarshaller.unmarshallObject(serObj);
             } else {
                 Object o = HttpMarshaller.unmarshallObject(serObj);
-                String actualName = targetObjectURI.substring(targetObjectURI.lastIndexOf(
-                            '_') + 1);
+                String actualName = targetObjectURI.substring(targetObjectURI.lastIndexOf('_') + 1);
                 Component c = (Component) o;
                 targetObject = c.getFcInterface(actualName);
             }
@@ -142,8 +138,7 @@ public class ProActiveProvider extends WSConstants implements Provider {
      * First We invoke the method thanks to RPCRouter.invoke() method then we build an enveloppe that contains the response.
      * @see org.apache.soap.util.Provider
      **/
-    public void invoke(SOAPContext reqContext, SOAPContext resContext)
-        throws SOAPException {
+    public void invoke(SOAPContext reqContext, SOAPContext resContext) throws SOAPException {
         System.out.println("=============================================");
         System.out.println("In ProActiveProvider.invoke()");
 
@@ -152,25 +147,20 @@ public class ProActiveProvider extends WSConstants implements Provider {
         //dd.setProviderClass(targetObject.getClass().getName());
         // Add logic to invoke the service and get back the result here
         try {
-            Response resp = RPCRouter.invoke(dd, call, targetObject,
-                    reqContext, resContext);
+            Response resp = RPCRouter.invoke(dd, call, targetObject, reqContext, resContext);
 
             //build the enveloppe that contains the response
             Envelope env = resp.buildEnvelope();
             System.out.println(env);
             StringWriter sw = new StringWriter();
             env.marshall(sw, call.getSOAPMappingRegistry(), resContext);
-            resContext.setRootPart(sw.toString(),
-                Constants.HEADERVAL_CONTENT_TYPE_UTF8);
+            resContext.setRootPart(sw.toString(), Constants.HEADERVAL_CONTENT_TYPE_UTF8);
         } catch (Exception e) {
-            System.out.println("--- >exception ! " + e.getMessage() + " -- " +
-                e.getClass().getName());
+            System.out.println("--- >exception ! " + e.getMessage() + " -- " + e.getClass().getName());
             e.printStackTrace(System.out);
 
-            SOAPException ex = new SOAPException(Constants.FAULT_CODE_SERVER,
-                    e.getMessage());
-            System.out.println(
-                "An error has occured when trying to invoke the method on the object");
+            SOAPException ex = new SOAPException(Constants.FAULT_CODE_SERVER, e.getMessage());
+            System.out.println("An error has occured when trying to invoke the method on the object");
             throw ex;
         }
     }

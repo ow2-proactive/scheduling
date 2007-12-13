@@ -46,13 +46,11 @@ public class SolveBT1 extends SolveBoard {
         n2 = n1 - 1;
         BoardBT1 boardBT1 = (BoardBT1) board;
         Result res = new Result(board.n);
-        backtrack1(res, boardBT1, boardBT1.row, boardBT1.left, boardBT1.down,
-            boardBT1.right);
+        backtrack1(res, boardBT1, boardBT1.row, boardBT1.left, boardBT1.down, boardBT1.right);
         return mixBoard(res, n1, n2);
     }
 
-    private void backtrack1(Result res, BoardBT1 board, int y, int left,
-        int down, int right) {
+    private void backtrack1(Result res, BoardBT1 board, int y, int left, int down, int right) {
         int bitmap = board.mask & ~(left | down | right);
         int bit;
         int firstColumn;
@@ -64,12 +62,9 @@ public class SolveBT1 extends SolveBoard {
                 //count8();
                 res.solutions[position(board.board[0])]++;
                 res.solutions[position(board.board[n1])]++;
-                for (firstColumn = 0; (board.board[firstColumn] & 1) == 0;
-                        firstColumn++)
+                for (firstColumn = 0; (board.board[firstColumn] & 1) == 0; firstColumn++)
                     ;
-                for (lastColumn = 1;
-                        (board.board[lastColumn] & board.topbit) == 0;
-                        lastColumn++)
+                for (lastColumn = 1; (board.board[lastColumn] & board.topbit) == 0; lastColumn++)
                     ;
                 res.solutions[firstColumn]++;
                 res.solutions[lastColumn]++;
@@ -80,8 +75,7 @@ public class SolveBT1 extends SolveBoard {
             }
             while (bitmap != 0) {
                 bitmap ^= (board.board[y] = bit = -bitmap & bitmap);
-                backtrack1(res, board, y + 1, (left | bit) << 1, down | bit,
-                    (right | bit) >> 1);
+                backtrack1(res, board, y + 1, (left | bit) << 1, down | bit, (right | bit) >> 1);
             }
         }
     }

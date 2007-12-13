@@ -51,8 +51,7 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
  */
 public class WsdlServlet extends HttpServlet {
     @Override
-    public void doGet(HttpServletRequest req, HttpServletResponse res)
-        throws IOException {
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
         DefaultConfigManager cm = new DefaultConfigManager();
         PrintWriter out = res.getWriter();
         res.setHeader("content-type", "text/xml");
@@ -68,8 +67,7 @@ public class WsdlServlet extends HttpServlet {
 
             Hashtable<String, String> options = new Hashtable<String, String>();
             String catalinaBase = PAProperties.CATALINA_BASE.getValue();
-            options.put("filename",
-                catalinaBase + "/webapps/" + WSConstants.WEBAPP_NAME +
+            options.put("filename", catalinaBase + "/webapps/" + WSConstants.WEBAPP_NAME +
                 "/DeployedServices.ds");
             cm.setOptions(options);
             cm.loadRegistry();

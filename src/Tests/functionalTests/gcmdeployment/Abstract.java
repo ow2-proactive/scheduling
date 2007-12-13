@@ -37,8 +37,7 @@ import functionalTests.FunctionalTest;
 
 
 public abstract class Abstract extends FunctionalTest {
-    static protected File getDescriptor(Class<?> cl)
-        throws FileNotFoundException {
+    static protected File getDescriptor(Class<?> cl) throws FileNotFoundException {
         String classname = cl.getSimpleName();
         String resource = cl.getResource(classname + ".xml").getFile();
         File desc = new File(resource);

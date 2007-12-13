@@ -36,8 +36,7 @@ import functionalTests.component.collectiveitf.multicast.Identifiable;
 import functionalTests.component.collectiveitf.multicast.WrappedInteger;
 
 
-public class ServerImpl implements BroadcastServerItf, OneToOneServerItf,
-    Identifiable {
+public class ServerImpl implements BroadcastServerItf, OneToOneServerItf, Identifiable {
     int id = 0;
 
     /*

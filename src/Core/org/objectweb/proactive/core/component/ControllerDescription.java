@@ -87,8 +87,7 @@ public class ControllerDescription implements Serializable {
      * @param hierarchicalType String
      * @param synchronous boolean
      */
-    public ControllerDescription(String name, String hierarchicalType,
-        boolean synchronous) {
+    public ControllerDescription(String name, String hierarchicalType, boolean synchronous) {
         this(name, hierarchicalType, null, synchronous);
     }
 
@@ -98,8 +97,7 @@ public class ControllerDescription implements Serializable {
      * @param hierarchicalType String
      * @param controllersConfigFileLocation String
      */
-    public ControllerDescription(String name, String hierarchicalType,
-        String controllersConfigFileLocation) {
+    public ControllerDescription(String name, String hierarchicalType, String controllersConfigFileLocation) {
         this(name, hierarchicalType, controllersConfigFileLocation, false);
     }
 
@@ -110,9 +108,8 @@ public class ControllerDescription implements Serializable {
      * @param controllersConfigFileLocation String
      * @param interceptorsConfigFileLocation String
      */
-    public ControllerDescription(String name, String hierarchicalType,
-        String controllersConfigFileLocation,
-        String interceptorsConfigFileLocation) {
+    public ControllerDescription(String name, String hierarchicalType, String controllersConfigFileLocation,
+            String interceptorsConfigFileLocation) {
         this(name, hierarchicalType, controllersConfigFileLocation, false);
     }
 
@@ -123,8 +120,8 @@ public class ControllerDescription implements Serializable {
      * @param controllersConfigFileLocation String
      * @param synchronous boolean
      */
-    public ControllerDescription(String name, String hierarchicalType,
-        String controllersConfigFileLocation, boolean synchronous) {
+    public ControllerDescription(String name, String hierarchicalType, String controllersConfigFileLocation,
+            boolean synchronous) {
         //FIXME use an enum to avoid unknow hierarchicalType
         this.hierarchicalType = hierarchicalType;
         this.name = name;
@@ -136,8 +133,8 @@ public class ControllerDescription implements Serializable {
         } else {
             this.controllersConfigFileLocation = controllersConfigFileLocation;
         }
-        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(this.controllersConfigFileLocation)
-                                                      .getControllers();
+        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(
+                this.controllersConfigFileLocation).getControllers();
     }
 
     /**
@@ -146,8 +143,7 @@ public class ControllerDescription implements Serializable {
      */
     public ControllerDescription(ControllerDescription controllerDesc) {
         this(controllerDesc.name, controllerDesc.hierarchicalType,
-            controllerDesc.controllersConfigFileLocation,
-            controllerDesc.synchronous);
+                controllerDesc.controllersConfigFileLocation, controllerDesc.synchronous);
     }
 
     /**

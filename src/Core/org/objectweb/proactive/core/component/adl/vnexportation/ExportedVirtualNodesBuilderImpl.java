@@ -43,36 +43,26 @@ import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
  * @author Matthieu Morel
  *
  */
-public class ExportedVirtualNodesBuilderImpl
-    implements ExportedVirtualNodesBuilder {
+public class ExportedVirtualNodesBuilderImpl implements ExportedVirtualNodesBuilder {
     // implementation of ExportedVirtualNodesBuilder
-    public void compose(String componentName,
-        ExportedVirtualNode[] exportedVirtualNodes,
-        VirtualNode currentComponentVN) throws ADLException {
+    public void compose(String componentName, ExportedVirtualNode[] exportedVirtualNodes,
+            VirtualNode currentComponentVN) throws ADLException {
         for (int i = 0; i < exportedVirtualNodes.length; i++) {
             ComposingVirtualNode[] composing_vns = exportedVirtualNodes[i].getComposedFrom()
-                                                                          .getComposingVirtualNodes();
+                    .getComposingVirtualNodes();
 
             for (int j = 0; j < composing_vns.length; j++) {
                 boolean composing_vn_is_multiple = false;
                 if ("this".equals(composing_vns[j].getComponent())) {
                     if (currentComponentVN == null) {
-                        throw new ADLException(
-                            "Trying to compose a virtual node from " +
-                            composing_vns[j].getName() +
-                            ", which is declared to be in the component " +
-                            componentName +
-                            " , but there is no virtual node defined in this component",
-                            null);
+                        throw new ADLException("Trying to compose a virtual node from " +
+                            composing_vns[j].getName() + ", which is declared to be in the component " +
+                            componentName + " , but there is no virtual node defined in this component", null);
                     }
-                    if (!currentComponentVN.getName()
-                                               .equals(composing_vns[j].getName())) {
-                        throw new ADLException(
-                            "Trying to compose a virtual node from " +
-                            composing_vns[i].getName() +
-                            ", which is declared to be in the component " +
-                            componentName + ", but " +
-                            currentComponentVN.getName() + " is not defined " +
+                    if (!currentComponentVN.getName().equals(composing_vns[j].getName())) {
+                        throw new ADLException("Trying to compose a virtual node from " +
+                            composing_vns[i].getName() + ", which is declared to be in the component " +
+                            componentName + ", but " + currentComponentVN.getName() + " is not defined " +
                             "in this component", null);
                     }
 
@@ -80,16 +70,13 @@ public class ExportedVirtualNodesBuilderImpl
                     composing_vns[j].setComponent(componentName);
                 }
                 if ((currentComponentVN != null) &&
-                        currentComponentVN.getCardinality()
-                                              .equals(VirtualNode.MULTIPLE)) {
+                    currentComponentVN.getCardinality().equals(VirtualNode.MULTIPLE)) {
                     composing_vn_is_multiple = true;
                 }
 
                 //                /System.out.println("COMPOSING : " + componentName + "." + exportedVirtualNodes[i].getName() + "--> " + composing_vns[j].getComponent() + "." + composing_vns[j].getName());
-                ExportedVirtualNodesList.instance()
-                                        .compose(componentName,
-                    exportedVirtualNodes[i], composing_vns[j],
-                    composing_vn_is_multiple);
+                ExportedVirtualNodesList.instance().compose(componentName, exportedVirtualNodes[i],
+                        composing_vns[j], composing_vn_is_multiple);
                 //System.out.println("COMPOSED VN LIST : " +ExportedVirtualNodesList.instance().toString());
             }
         }

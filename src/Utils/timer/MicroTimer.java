@@ -39,8 +39,7 @@ public class MicroTimer implements Timeable {
             nativeMode = true;
         } catch (Throwable e) {
             e.printStackTrace();
-            System.err.println(
-                "WARNING: couldn't load native lib, falling back to milliseconds");
+            System.err.println("WARNING: couldn't load native lib, falling back to milliseconds");
             nativeMode = false;
         }
     }
@@ -124,7 +123,6 @@ public class MicroTimer implements Timeable {
             e.printStackTrace();
         }
         micro.stop();
-        System.out.println("After 1000ms : " + micro.getCumulatedTime() +
-            micro.getUnit());
+        System.out.println("After 1000ms : " + micro.getCumulatedTime() + micro.getUnit());
     }
 }

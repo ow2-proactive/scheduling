@@ -69,8 +69,7 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
     private Skeleton<T, R> skeleton;
     private int streamPriority;
     private FileServerClient fserver;
-    private static File DEFAULT_OUTPUT_ROOT_DIR = SkeletonSystemImpl.newDirInTmp(
-            "calcium-output");
+    private static File DEFAULT_OUTPUT_ROOT_DIR = SkeletonSystemImpl.newDirInTmp("calcium-output");
     BlockingQueue<CalFuture<R>> list;
 
     Stream(Facade facade, FileServerClient fserver, Skeleton<T, R> skeleton) {
@@ -93,8 +92,7 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @throws PanicException
      */
     @SuppressWarnings("unchecked")
-    public CalFuture<R> input(T param, File outputRootDir)
-        throws PanicException {
+    public CalFuture<R> input(T param, File outputRootDir) throws PanicException {
         //Put the parameters in a Task container
         Task<T> task = new Task<T>(param);
 
@@ -109,15 +107,13 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
         task.setStack(builder.stack);
         task.setPriority(new TaskPriority(streamPriority));
 
-        CalFutureImpl<R> future = new CalFutureImpl<R>(task.taskId, fserver,
-                outputRootDir);
+        CalFutureImpl<R> future = new CalFutureImpl<R>(task.taskId, fserver, outputRootDir);
         facade.putTask(task, future);
 
         return future;
     }
 
-    public List<CalFuture<R>> input(List<T> paramV)
-        throws InterruptedException, PanicException {
+    public List<CalFuture<R>> input(List<T> paramV) throws InterruptedException, PanicException {
         return input(paramV, DEFAULT_OUTPUT_ROOT_DIR);
     }
 
@@ -130,8 +126,8 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @throws PanicException
      * @throws InterruptedException
      */
-    public List<CalFuture<R>> input(List<T> paramV, File outputRootDir)
-        throws InterruptedException, PanicException {
+    public List<CalFuture<R>> input(List<T> paramV, File outputRootDir) throws InterruptedException,
+            PanicException {
         Vector<CalFuture<R>> vector = new Vector<CalFuture<R>>(paramV.size());
         for (T param : paramV)
             vector.add(input(param, outputRootDir));
@@ -151,15 +147,12 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @throws PanicException
      */
     @SuppressWarnings("unchecked")
-    public void input(T param, BlockingQueue<CalFuture<R>> queue,
-        File outputRootDir) throws PanicException {
-        CalFutureImpl<R> future = (CalFutureImpl) this.input(param,
-                outputRootDir);
+    public void input(T param, BlockingQueue<CalFuture<R>> queue, File outputRootDir) throws PanicException {
+        CalFutureImpl<R> future = (CalFutureImpl) this.input(param, outputRootDir);
         future.setCallBackQueue(queue);
     }
 
-    public void input(T param, BlockingQueue<CalFuture<R>> queue)
-        throws PanicException {
+    public void input(T param, BlockingQueue<CalFuture<R>> queue) throws PanicException {
         input(param, queue, DEFAULT_OUTPUT_ROOT_DIR);
     }
 
@@ -172,8 +165,7 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @throws PanicException
      */
     public void submit(T param, File outputRootDir) throws PanicException {
-        CalFutureImpl<R> future = (CalFutureImpl) this.input(param,
-                outputRootDir);
+        CalFutureImpl<R> future = (CalFutureImpl) this.input(param, outputRootDir);
         future.setCallBackQueue(list);
     }
 
@@ -196,8 +188,7 @@ public class Stream<T extends java.io.Serializable, R extends java.io.Serializab
      * @return The first available result.
      * @throws InterruptedException
      */
-    public CalFuture<R> retrieve(long timeout, TimeUnit unit)
-        throws InterruptedException {
+    public CalFuture<R> retrieve(long timeout, TimeUnit unit) throws InterruptedException {
         return list.poll(timeout, unit);
     }
 

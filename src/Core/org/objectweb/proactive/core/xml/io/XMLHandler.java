@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.xml.io;
 
-
 /**
  *
  * Receives SAX event and pass them on
@@ -48,8 +47,7 @@ public interface XMLHandler {
      * @param attributes the attributes of this element
      * @exception org.xml.sax.SAXException if an exception occur during processing
      */
-    public void startElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException;
+    public void startElement(String name, Attributes attributes) throws org.xml.sax.SAXException;
 
     /**
      * Receives notification that an XML value has been read in the XML being deserialized
@@ -72,8 +70,7 @@ public interface XMLHandler {
      * @param uri the uri qualifying the prefix
      * @exception org.xml.sax.SAXException if an exception occur during processing
      */
-    public void startPrefixMapping(String prefix, String uri)
-        throws org.xml.sax.SAXException;
+    public void startPrefixMapping(String prefix, String uri) throws org.xml.sax.SAXException;
 
     /**
      * Receives notification that the scope of an XML prefix has just ended

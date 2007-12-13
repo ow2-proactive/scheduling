@@ -71,8 +71,7 @@ import org.objectweb.proactive.core.util.wrapper.GenericTypeWrapper;
  * @author ProActive Team
  *
  */
-public class ProActiveConnection implements Serializable, MBeanServerConnection,
-    ProActiveInternalObject {
+public class ProActiveConnection implements Serializable, MBeanServerConnection, ProActiveInternalObject {
 
     /**
 
@@ -100,41 +99,35 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     /* *
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, javax.management.ObjectName)
      */
-    public ObjectInstance createMBean(String arg0, ObjectName arg1,
-        ObjectName arg2)
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
-            NotCompliantMBeanException, InstanceNotFoundException,
-            ReflectionException, MBeanException {
+    public ObjectInstance createMBean(String arg0, ObjectName arg1, ObjectName arg2)
+            throws InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException,
+            InstanceNotFoundException, ReflectionException, MBeanException {
         return this.mbs.createMBean(arg0, arg1, arg2);
     }
 
     /* *
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, java.lang.Object[], java.lang.String[])
      */
-    public ObjectInstance createMBean(String className, ObjectName name,
-        Object[] params, String[] signature)
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
-            NotCompliantMBeanException, ReflectionException, MBeanException {
+    public ObjectInstance createMBean(String className, ObjectName name, Object[] params, String[] signature)
+            throws InstanceAlreadyExistsException, MBeanRegistrationException, NotCompliantMBeanException,
+            ReflectionException, MBeanException {
         return this.mbs.createMBean(className, name, params, signature);
     }
 
     /**
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, javax.management.ObjectName, java.lang.Object[], java.lang.String[])
      */
-    public ObjectInstance createMBean(String className, ObjectName name,
-        ObjectName loaderName, Object[] params, String[] signature)
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
-            NotCompliantMBeanException, InstanceNotFoundException,
+    public ObjectInstance createMBean(String className, ObjectName name, ObjectName loaderName,
+            Object[] params, String[] signature) throws InstanceAlreadyExistsException,
+            MBeanRegistrationException, NotCompliantMBeanException, InstanceNotFoundException,
             ReflectionException, MBeanException {
-        return this.mbs.createMBean(className, name, loaderName, params,
-            signature);
+        return this.mbs.createMBean(className, name, loaderName, params, signature);
     }
 
     /* *
      * @see javax.management.MBeanServerConnection#unregisterMBean(javax.management.ObjectName)
      */
-    public void unregisterMBean(ObjectName name)
-        throws InstanceNotFoundException, MBeanRegistrationException {
+    public void unregisterMBean(ObjectName name) throws InstanceNotFoundException, MBeanRegistrationException {
         this.mbs.unregisterMBean(name);
     }
 
@@ -142,16 +135,14 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#getObjectInstance(javax.management.ObjectName)
      */
     @SuppressWarnings("unused")
-    public ObjectInstance getObjectInstance(ObjectName name)
-        throws InstanceNotFoundException, IOException {
+    public ObjectInstance getObjectInstance(ObjectName name) throws InstanceNotFoundException, IOException {
         return this.mbs.getObjectInstance(name);
     }
 
     /**
      * @see javax.management.MBeanServerConnection#queryMBeans(javax.management.ObjectName, javax.management.QueryExp)
      */
-    public Set<ObjectInstance> queryMBeans(ObjectName name, QueryExp query)
-        throws IOException {
+    public Set<ObjectInstance> queryMBeans(ObjectName name, QueryExp query) throws IOException {
         return this.mbs.queryMBeans(name, query);
     }
 
@@ -159,8 +150,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#queryNames(javax.management.ObjectName, javax.management.QueryExp)
      */
     @SuppressWarnings("unused")
-    public Set queryNames(ObjectName name, QueryExp query)
-        throws IOException {
+    public Set queryNames(ObjectName name, QueryExp query) throws IOException {
         return this.mbs.queryNames(name, query);
     }
 
@@ -184,9 +174,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#getAttribute(javax.management.ObjectName, java.lang.String)
      */
     @SuppressWarnings("unused")
-    public Object getAttribute(ObjectName name, String attribute)
-        throws MBeanException, AttributeNotFoundException,
-            InstanceNotFoundException, ReflectionException, IOException {
+    public Object getAttribute(ObjectName name, String attribute) throws MBeanException,
+            AttributeNotFoundException, InstanceNotFoundException, ReflectionException, IOException {
         //      System.out.println("Get Attribute " + attribute + " --  " + name);
         return this.mbs.getAttribute(name, attribute);
     }
@@ -196,7 +185,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      */
     @SuppressWarnings("unused")
     public AttributeList getAttributes(ObjectName name, String[] attributes)
-        throws InstanceNotFoundException, ReflectionException, IOException {
+            throws InstanceNotFoundException, ReflectionException, IOException {
         return mbs.getAttributes(name, attributes);
     }
 
@@ -204,9 +193,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#setAttribute(javax.management.ObjectName, javax.management.Attribute)
      */
     @SuppressWarnings("unused")
-    public void setAttribute(ObjectName name, Attribute attribute)
-        throws InstanceNotFoundException, AttributeNotFoundException,
-            InvalidAttributeValueException, MBeanException, ReflectionException,
+    public void setAttribute(ObjectName name, Attribute attribute) throws InstanceNotFoundException,
+            AttributeNotFoundException, InvalidAttributeValueException, MBeanException, ReflectionException,
             IOException {
         this.mbs.setAttribute(name, attribute);
     }
@@ -216,7 +204,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      */
     @SuppressWarnings("unused")
     public AttributeList setAttributes(ObjectName name, AttributeList attributes)
-        throws InstanceNotFoundException, ReflectionException, IOException {
+            throws InstanceNotFoundException, ReflectionException, IOException {
         return this.mbs.setAttributes(name, attributes);
     }
 
@@ -224,10 +212,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#invoke(javax.management.ObjectName, java.lang.String, java.lang.Object[], java.lang.String[])
      */
     @SuppressWarnings("unused")
-    public Object invoke(ObjectName name, String operationName,
-        Object[] params, String[] signature)
-        throws InstanceNotFoundException, MBeanException, ReflectionException,
-            IOException {
+    public Object invoke(ObjectName name, String operationName, Object[] params, String[] signature)
+            throws InstanceNotFoundException, MBeanException, ReflectionException, IOException {
         return this.mbs.invoke(name, operationName, params, signature);
     }
 
@@ -251,9 +237,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#addNotificationListener(javax.management.ObjectName, javax.management.ObjectName, javax.management.NotificationFilter, java.lang.Object)
      */
     @SuppressWarnings("unused")
-    public void addNotificationListener(ObjectName name, ObjectName listener,
-        NotificationFilter filter, Object handback)
-        throws InstanceNotFoundException, IOException {
+    public void addNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter,
+            Object handback) throws InstanceNotFoundException, IOException {
         // System.out.println("ProActiveConnection: add Notification Listener " +
         //    listener.toString() + " for object " + name);
         this.mbs.addNotificationListener(name, listener, filter, handback);
@@ -263,9 +248,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#addNotificationListener(javax.management.ObjectName, javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @SuppressWarnings("unused")
-    public void addNotificationListener(ObjectName name,
-        NotificationListener listener, NotificationFilter filter,
-        Object handback) throws InstanceNotFoundException, IOException {
+    public void addNotificationListener(ObjectName name, NotificationListener listener,
+            NotificationFilter filter, Object handback) throws InstanceNotFoundException, IOException {
         try {
             ListenerAdapter tl = new ListenerAdapter(listener, mbs, name);
             //    System.out.println("ProActiveConnection: add ListenerAdapter " +
@@ -283,7 +267,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      */
     @SuppressWarnings("unused")
     public void removeNotificationListener(ObjectName name, ObjectName listener)
-        throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+            throws InstanceNotFoundException, ListenerNotFoundException, IOException {
         // ListenerAdapter tl = this.listenerMap.get(listener);
         ListenerAdapter tl = this.objectNameToListenerMap.get(name);
         this.mbs.removeNotificationListener(name, tl);
@@ -293,9 +277,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#removeNotificationListener(javax.management.ObjectName, javax.management.ObjectName, javax.management.NotificationFilter, java.lang.Object)
      */
     @SuppressWarnings("unused")
-    public void removeNotificationListener(ObjectName name,
-        ObjectName listener, NotificationFilter filter, Object handback)
-        throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+    public void removeNotificationListener(ObjectName name, ObjectName listener, NotificationFilter filter,
+            Object handback) throws InstanceNotFoundException, ListenerNotFoundException, IOException {
         ListenerAdapter tl = this.objectNameToListenerMap.get(name);
         this.mbs.removeNotificationListener(name, tl, filter, handback);
     }
@@ -304,9 +287,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#removeNotificationListener(javax.management.ObjectName, javax.management.NotificationListener)
      */
     @SuppressWarnings("unused")
-    public void removeNotificationListener(ObjectName name,
-        NotificationListener listener)
-        throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+    public void removeNotificationListener(ObjectName name, NotificationListener listener)
+            throws InstanceNotFoundException, ListenerNotFoundException, IOException {
         ListenerAdapter tl = this.objectNameToListenerMap.get(name);
         this.mbs.removeNotificationListener(name, tl);
     }
@@ -315,10 +297,9 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#removeNotificationListener(javax.management.ObjectName, javax.management.NotificationListener, javax.management.NotificationFilter, java.lang.Object)
      */
     @SuppressWarnings("unused")
-    public void removeNotificationListener(ObjectName name,
-        NotificationListener listener, NotificationFilter filter,
-        Object handback)
-        throws InstanceNotFoundException, ListenerNotFoundException, IOException {
+    public void removeNotificationListener(ObjectName name, NotificationListener listener,
+            NotificationFilter filter, Object handback) throws InstanceNotFoundException,
+            ListenerNotFoundException, IOException {
         // ListenerAdapter tl = this.listenerMap.get(listener);
         ListenerAdapter tl = this.objectNameToListenerMap.get(name);
         //     System.out.println("ProActiveConnection: removing ListenerAdapter " +
@@ -330,8 +311,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#getMBeanInfo(javax.management.ObjectName)
      */
     @SuppressWarnings("unused")
-    public MBeanInfo getMBeanInfo(ObjectName name)
-        throws InstanceNotFoundException, IntrospectionException,
+    public MBeanInfo getMBeanInfo(ObjectName name) throws InstanceNotFoundException, IntrospectionException,
             ReflectionException, IOException {
         return this.mbs.getMBeanInfo(name);
     }
@@ -340,8 +320,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#isInstanceOf(javax.management.ObjectName, java.lang.String)
      */
     @SuppressWarnings("unused")
-    public boolean isInstanceOf(ObjectName name, String className)
-        throws InstanceNotFoundException, IOException {
+    public boolean isInstanceOf(ObjectName name, String className) throws InstanceNotFoundException,
+            IOException {
         return this.mbs.isInstanceOf(name, className);
     }
 
@@ -349,9 +329,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName)
      */
     @SuppressWarnings("unused")
-    public ObjectInstance createMBean(String className, ObjectName name)
-        throws ReflectionException, InstanceAlreadyExistsException,
-            MBeanRegistrationException, MBeanException,
+    public ObjectInstance createMBean(String className, ObjectName name) throws ReflectionException,
+            InstanceAlreadyExistsException, MBeanRegistrationException, MBeanException,
             NotCompliantMBeanException, IOException {
         return this.mbs.createMBean(className, name);
     }
@@ -360,25 +339,21 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * This method is the same as createMBean but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName)
      */
-    public GenericTypeWrapper createMBeanAsynchronous(String className,
-        ObjectName name) {
+    public GenericTypeWrapper createMBeanAsynchronous(String className, ObjectName name) {
         try {
-            return new GenericTypeWrapper<ObjectInstance>(this.createMBean(
-                    className, name));
+            return new GenericTypeWrapper<ObjectInstance>(this.createMBean(className, name));
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
     }
 
     /**
-      * This method is the same as createMBean but returns a reifiable type in order to perform ProActive asynchronous call
-      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, javax.management.ObjectName)
-      */
-    public GenericTypeWrapper createMBeanAsynchronous(String className,
-        ObjectName name, ObjectName loaderName) {
+     * This method is the same as createMBean but returns a reifiable type in order to perform ProActive asynchronous call
+     * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, javax.management.ObjectName)
+     */
+    public GenericTypeWrapper createMBeanAsynchronous(String className, ObjectName name, ObjectName loaderName) {
         try {
-            return new GenericTypeWrapper<ObjectInstance>(this.createMBean(
-                    className, name, loaderName));
+            return new GenericTypeWrapper<ObjectInstance>(this.createMBean(className, name, loaderName));
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
@@ -388,11 +363,11 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * This method is the same as createMBean but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, java.lang.Object[], java.lang.String[])
      */
-    public GenericTypeWrapper createMBeanAsynchronous(String className,
-        ObjectName name, Object[] params, String[] signature) {
+    public GenericTypeWrapper createMBeanAsynchronous(String className, ObjectName name, Object[] params,
+            String[] signature) {
         try {
-            return new GenericTypeWrapper<ObjectInstance>(this.createMBean(
-                    className, name, params, signature));
+            return new GenericTypeWrapper<ObjectInstance>(this
+                    .createMBean(className, name, params, signature));
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
@@ -402,12 +377,11 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * This method is the same as createMBean but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#createMBean(java.lang.String, javax.management.ObjectName, javax.management.ObjectName, java.lang.Object[], java.lang.String[])
      */
-    public GenericTypeWrapper createMBeanAsynchronous(String className,
-        ObjectName name, ObjectName loaderName, Object[] params,
-        String[] signature) {
+    public GenericTypeWrapper createMBeanAsynchronous(String className, ObjectName name,
+            ObjectName loaderName, Object[] params, String[] signature) {
         try {
-            return new GenericTypeWrapper<ObjectInstance>(this.createMBean(
-                    className, name, loaderName, params, signature));
+            return new GenericTypeWrapper<ObjectInstance>(this.createMBean(className, name, loaderName,
+                    params, signature));
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
@@ -419,8 +393,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      */
     public GenericTypeWrapper getObjectInstanceAsynchronous(ObjectName name) {
         try {
-            return new GenericTypeWrapper<ObjectInstance>(this.getObjectInstance(
-                    name));
+            return new GenericTypeWrapper<ObjectInstance>(this.getObjectInstance(name));
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
@@ -430,8 +403,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      *   This method is the same as queryMBeans but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#queryMBeans(javax.management.ObjectName, javax.management.QueryExp)
      */
-    public GenericTypeWrapper queryMBeansAsynchronous(ObjectName name,
-        QueryExp query) {
+    public GenericTypeWrapper queryMBeansAsynchronous(ObjectName name, QueryExp query) {
         try {
             return new GenericTypeWrapper<Set>(this.queryMBeans(name, query));
         } catch (IOException e) {
@@ -441,10 +413,9 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
 
     /**
      * This method  is the same as queryNames but returns a reifiable type in order to perform ProActive asynchronous call
-    * @see javax.management.MBeanServerConnection#queryNames(javax.management.ObjectName, javax.management.QueryExp)
-    */
-    public GenericTypeWrapper queryNamesAsynchronous(ObjectName name,
-        QueryExp query) {
+     * @see javax.management.MBeanServerConnection#queryNames(javax.management.ObjectName, javax.management.QueryExp)
+     */
+    public GenericTypeWrapper queryNamesAsynchronous(ObjectName name, QueryExp query) {
         try {
             return new GenericTypeWrapper<Set>(this.queryNames(name, query));
         } catch (IOException e) {
@@ -455,7 +426,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     /**
      * This method  is the same as getMBeanCount but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#getMBeanInfo(javax.management.ObjectName)
-    */
+     */
     public GenericTypeWrapper getMBeanCountAsynchronous() {
         try {
             return new GenericTypeWrapper<Integer>(this.getMBeanCount());
@@ -468,11 +439,9 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * This method  is the same as getAttribute  but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#getAttribute(javax.management.ObjectName, java.lang.String)
      */
-    public GenericTypeWrapper getAttributeAsynchronous(ObjectName name,
-        String attribute) {
+    public GenericTypeWrapper getAttributeAsynchronous(ObjectName name, String attribute) {
         try {
-            return new GenericTypeWrapper<Object>(this.getAttribute(name,
-                    attribute));
+            return new GenericTypeWrapper<Object>(this.getAttribute(name, attribute));
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
@@ -482,11 +451,9 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
      * This method  is the same as getAttributes  but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#getAttributes(javax.management.ObjectName, java.lang.String[])
      */
-    public GenericTypeWrapper getAttributesAsynchronous(ObjectName name,
-        String[] attributes) {
+    public GenericTypeWrapper getAttributesAsynchronous(ObjectName name, String[] attributes) {
         try {
-            return new GenericTypeWrapper<AttributeList>(this.getAttributes(
-                    name, attributes));
+            return new GenericTypeWrapper<AttributeList>(this.getAttributes(name, attributes));
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
@@ -494,13 +461,11 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
 
     /**
      * This method  is the same as setAttributes  but returns a reifiable type in order to perform ProActive asynchronous call
-           * @see javax.management.MBeanServerConnection#setAttributes(javax.management.ObjectName, javax.management.AttributeList)
-           */
-    public GenericTypeWrapper setAttributesAsynchronous(ObjectName name,
-        AttributeList attributes) {
+     * @see javax.management.MBeanServerConnection#setAttributes(javax.management.ObjectName, javax.management.AttributeList)
+     */
+    public GenericTypeWrapper setAttributesAsynchronous(ObjectName name, AttributeList attributes) {
         try {
-            return new GenericTypeWrapper<AttributeList>(this.setAttributes(
-                    name, attributes));
+            return new GenericTypeWrapper<AttributeList>(this.setAttributes(name, attributes));
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
@@ -509,12 +474,11 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     /**
      * This method  is the same as invoke  but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#invoke(javax.management.ObjectName, java.lang.String, java.lang.Object[], java.lang.String[])
-           */
-    public GenericTypeWrapper invokeAsynchronous(ObjectName name,
-        String operationName, Object[] params, String[] signature) {
+     */
+    public GenericTypeWrapper invokeAsynchronous(ObjectName name, String operationName, Object[] params,
+            String[] signature) {
         try {
-            return new GenericTypeWrapper<Object>(this.invoke(name,
-                    operationName, params, signature));
+            return new GenericTypeWrapper<Object>(this.invoke(name, operationName, params, signature));
         } catch (Exception e) {
             return new GenericTypeWrapper<Exception>(e);
         }
@@ -523,7 +487,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     /**
      * This method  is the same as getDefaultDomain  but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#getDefaultDomain()
-           */
+     */
     public GenericTypeWrapper getDefaultDomainAsynchronous() {
         try {
             return new GenericTypeWrapper<String>(this.getDefaultDomain());
@@ -535,7 +499,7 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
     /**
      * This method  is the same as getDomain  but returns a reifiable type in order to perform ProActive asynchronous call
      * @see javax.management.MBeanServerConnection#getDomains()
-           */
+     */
     public GenericTypeWrapper getDomainsAsynchronous() {
         try {
             return new GenericTypeWrapper<String[]>(this.getDomains());
@@ -546,8 +510,8 @@ public class ProActiveConnection implements Serializable, MBeanServerConnection,
 
     /**
      * This method  is the same as getMBeanInfo  but returns a reifiable type in order to perform ProActive asynchronous call
-           * @see javax.management.MBeanServerConnection#getMBeanInfo(javax.management.ObjectName)
-            *    */
+     * @see javax.management.MBeanServerConnection#getMBeanInfo(javax.management.ObjectName)
+     *    */
     public GenericTypeWrapper getMBeanInfoAsynchronous(ObjectName name) {
         try {
             return new GenericTypeWrapper<MBeanInfo>(this.getMBeanInfo(name));

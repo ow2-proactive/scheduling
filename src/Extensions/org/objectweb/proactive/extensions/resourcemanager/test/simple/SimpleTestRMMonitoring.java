@@ -50,8 +50,7 @@ import org.objectweb.proactive.extensions.resourcemanager.frontend.RMEventListen
 import org.objectweb.proactive.extensions.resourcemanager.frontend.RMMonitoring;
 
 
-public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
-    Serializable {
+public class SimpleTestRMMonitoring implements RMEventListener, InitActive, Serializable {
     private RMMonitoring imMonitoring;
 
     /**
@@ -70,13 +69,11 @@ public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
      */
     public void initActivity(Body body) {
         System.out.println("SimpleTestIMMonitoring.initActivity()");
-        RMInitialState initState = this.imMonitoring.addRMEventListener((RMEventListener) PAActiveObject.getStubOnThis(),
-                RMEventType.KILLED, RMEventType.NODE_ADDED,
-                RMEventType.NODE_BUSY, RMEventType.NODE_DOWN,
-                RMEventType.NODE_FREE, RMEventType.NODE_REMOVED,
-                RMEventType.NODE_TO_RELEASE, RMEventType.NODESOURCE_CREATED,
-                RMEventType.NODESOURCE_REMOVED, RMEventType.SHUTDOWN,
-                RMEventType.SHUTTING_DOWN, RMEventType.STARTED);
+        RMInitialState initState = this.imMonitoring.addRMEventListener((RMEventListener) PAActiveObject
+                .getStubOnThis(), RMEventType.KILLED, RMEventType.NODE_ADDED, RMEventType.NODE_BUSY,
+                RMEventType.NODE_DOWN, RMEventType.NODE_FREE, RMEventType.NODE_REMOVED,
+                RMEventType.NODE_TO_RELEASE, RMEventType.NODESOURCE_CREATED, RMEventType.NODESOURCE_REMOVED,
+                RMEventType.SHUTDOWN, RMEventType.SHUTTING_DOWN, RMEventType.STARTED);
 
         printInitialState(initState);
     }
@@ -89,14 +86,13 @@ public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
             if (args.length > 0) {
                 url = args[0];
             } else {
-                url = "rmi://localhost:1099/" +
-                    RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING;
+                url = "rmi://localhost:1099/" + RMConstants.NAME_ACTIVE_OBJECT_RMMONITORING;
             }
 
             RMMonitoring imMonitoring = RMConnection.connectAsMonitor(url);
 
-            SimpleTestRMMonitoring test = (SimpleTestRMMonitoring) PAActiveObject.newActive(SimpleTestRMMonitoring.class.getName(),
-                    new Object[] { imMonitoring });
+            SimpleTestRMMonitoring test = (SimpleTestRMMonitoring) PAActiveObject.newActive(
+                    SimpleTestRMMonitoring.class.getName(), new Object[] { imMonitoring });
         } catch (NodeException e) {
             e.printStackTrace();
         } catch (ActiveObjectCreationException e) {
@@ -112,8 +108,7 @@ public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
 
         System.out.println("\n" + nsList.size() + " node sources :");
         for (RMNodeSourceEvent ns : nsList) {
-            System.out.println("\ttype : " + ns.getSourceType() + " name : " +
-                ns.getSourceName());
+            System.out.println("\ttype : " + ns.getSourceType() + " name : " + ns.getSourceName());
         }
 
         ArrayList<RMNodeEvent> freeNodes = state.getFreeNodes();
@@ -121,27 +116,27 @@ public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
         ArrayList<RMNodeEvent> toReleaseNodes = state.getToReleaseNodes();
         ArrayList<RMNodeEvent> downNodes = state.getDownNodes();
 
-        System.out.println(freeNodes.size() + busyNodes.size() +
-            toReleaseNodes.size() + downNodes.size() + " nodes :");
+        System.out.println(freeNodes.size() + busyNodes.size() + toReleaseNodes.size() + downNodes.size() +
+            " nodes :");
 
         for (RMNodeEvent ne : freeNodes) {
-            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " +
-                ne.getNodeSource() + ", Status : " + ne.getState());
+            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " + ne.getNodeSource() +
+                ", Status : " + ne.getState());
         }
 
         for (RMNodeEvent ne : busyNodes) {
-            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " +
-                ne.getNodeSource() + ", Status : " + ne.getState());
+            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " + ne.getNodeSource() +
+                ", Status : " + ne.getState());
         }
 
         for (RMNodeEvent ne : toReleaseNodes) {
-            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " +
-                ne.getNodeSource() + ", Status : " + ne.getState());
+            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " + ne.getNodeSource() +
+                ", Status : " + ne.getState());
         }
 
         for (RMNodeEvent ne : downNodes) {
-            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " +
-                ne.getNodeSource() + ", Status : " + ne.getState());
+            System.out.println("\t" + ne.getNodeUrl() + ", Node Source : " + ne.getNodeSource() +
+                ", Status : " + ne.getState());
         }
     }
 
@@ -163,42 +158,40 @@ public class SimpleTestRMMonitoring implements RMEventListener, InitActive,
     }
 
     public void nodeAddedEvent(RMNodeEvent n) {
-        System.out.println("nodeAddedEvent " + n.getNodeUrl() + " status : " +
-            n.getState() + " VMname : " + n.getVMName());
+        System.out.println("nodeAddedEvent " + n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeBusyEvent(RMNodeEvent n) {
-        System.out.println("nodeBusyEvent " + n.getNodeUrl() + " status : " +
-            n.getState() + " VMname : " + n.getVMName());
+        System.out.println("nodeBusyEvent " + n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeDownEvent(RMNodeEvent n) {
-        System.out.println("nodeDownEvent " + n.getNodeUrl() + " status : " +
-            n.getState() + " VMname : " + n.getVMName());
+        System.out.println("nodeDownEvent " + n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeFreeEvent(RMNodeEvent n) {
-        System.out.println("nodeFreeEvent " + n.getNodeUrl() + " status : " +
-            n.getState() + " VMname : " + n.getVMName());
+        System.out.println("nodeFreeEvent " + n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeToReleaseEvent(RMNodeEvent n) {
-        System.out.println("nodeToReleaseEvent " + n.getNodeUrl() +
-            " status : " + n.getState() + " VMname : " + n.getVMName());
+        System.out.println("nodeToReleaseEvent " + n.getNodeUrl() + " status : " + n.getState() +
+            " VMname : " + n.getVMName());
     }
 
     public void nodeRemovedEvent(RMNodeEvent n) {
-        System.out.println("nodeRemovedEvent " + n.getNodeUrl() + " status : " +
-            n.getState() + " VMname : " + n.getVMName());
+        System.out.println("nodeRemovedEvent " + n.getNodeUrl() + " status : " + n.getState() + " VMname : " +
+            n.getVMName());
     }
 
     public void nodeSourceAddedEvent(RMNodeSourceEvent ns) {
-        System.out.println("nodeSourceAddedEvent " + ns.getSourceName() +
-            "RM : " + ns.getRMUrl());
+        System.out.println("nodeSourceAddedEvent " + ns.getSourceName() + "RM : " + ns.getRMUrl());
     }
 
     public void nodeSourceRemovedEvent(RMNodeSourceEvent ns) {
-        System.out.println("nodeSourceRemovedEvent " + ns.getSourceName() +
-            "RM : " + ns.getRMUrl());
+        System.out.println("nodeSourceRemovedEvent " + ns.getSourceName() + "RM : " + ns.getRMUrl());
     }
 }

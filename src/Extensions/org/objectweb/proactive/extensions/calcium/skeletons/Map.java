@@ -48,8 +48,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  *  @author The ProActive Team (mleyton)
  */
 @PublicAPI
-public class Map<P extends java.io.Serializable, R extends java.io.Serializable>
-    implements Skeleton<P, R> {
+public class Map<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {
     Divide<P, ?> div;
     Skeleton<?, ?> child;
     Conquer<?, R> conq;
@@ -61,8 +60,8 @@ public class Map<P extends java.io.Serializable, R extends java.io.Serializable>
      * @param nested The nested {@ link Skeleton} to execute on each class.
      * @param conq The custom {@link Conquer} behavior.
      */
-    public <X extends Serializable, Y extends Serializable>Map(
-        Divide<P, X> div, Skeleton<X, Y> nested, Conquer<Y, R> conq) {
+    public <X extends Serializable, Y extends Serializable> Map(Divide<P, X> div, Skeleton<X, Y> nested,
+            Conquer<Y, R> conq) {
         this.div = div;
         this.child = nested;
         this.conq = conq;
@@ -75,8 +74,8 @@ public class Map<P extends java.io.Serializable, R extends java.io.Serializable>
      * @param msucle The muscle function that will be nested in a {@link Seq} {@link Skeleton}.
      * @param conq The custom {@link Conquer} behavior.
      */
-    public <X extends Serializable, Y extends Serializable>Map(
-        Divide<P, X> div, Execute<X, Y> muscle, Conquer<Y, R> conq) {
+    public <X extends Serializable, Y extends Serializable> Map(Divide<P, X> div, Execute<X, Y> muscle,
+            Conquer<Y, R> conq) {
         this.div = div;
         this.child = new Seq<X, Y>(muscle);
         this.conq = conq;

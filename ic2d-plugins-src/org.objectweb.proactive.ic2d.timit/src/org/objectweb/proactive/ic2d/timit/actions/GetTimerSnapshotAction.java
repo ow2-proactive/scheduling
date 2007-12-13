@@ -62,8 +62,7 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
 
     public GetTimerSnapshotAction() {
         super.setId(GET_TIMER_SNAPSHOT);
-        super.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "timer.gif"));
+        super.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "timer.gif"));
         super.setToolTipText("Get timers snapshot from this object");
         super.setEnabled(false);
     }
@@ -75,12 +74,10 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
         IWorkbenchWindow currentWindow = iworkbench.getActiveWorkbenchWindow();
         IWorkbenchPage page = currentWindow.getActivePage();
         try {
-            IViewPart part = page.showView(
-                    "org.objectweb.proactive.ic2d.timit.views.TimItView");
+            IViewPart part = page.showView("org.objectweb.proactive.ic2d.timit.views.TimItView");
 
             if (BasicChartObject.DEBUG) {
-                new BasicChartObject(((TimItView) part).getChartContainer(),
-                    null, null);
+                new BasicChartObject(((TimItView) part).getChartContainer(), null, null);
                 return;
             }
 
@@ -114,7 +111,8 @@ public class GetTimerSnapshotAction extends Action implements IActionExtPoint {
 
     public void setActiveSelect(AbstractData ref) {
         if ((this.container != null) && (ref instanceof ActiveObject)) {
-            BasicChartObject basicChartObject = this.container.getChartObjectById(((ActiveObject) ref).getUniqueID());
+            BasicChartObject basicChartObject = this.container.getChartObjectById(((ActiveObject) ref)
+                    .getUniqueID());
             if (basicChartObject != null) {
                 basicChartObject.getEp().handleSelection(true);
             }

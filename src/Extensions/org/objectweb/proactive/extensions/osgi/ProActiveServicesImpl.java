@@ -62,8 +62,7 @@ public class ProActiveServicesImpl implements ProActiveService {
     private Node node;
     private Servlet servlet;
     private BundleContext bc;
-    private static final String aliasServlet = "/" +
-        ClassServerServlet.SERVLET_NAME;
+    private static final String aliasServlet = "/" + ClassServerServlet.SERVLET_NAME;
     private static final String OSGI_NODE_NAME = "OSGiNode";
     private HttpService http;
     private int port;
@@ -77,8 +76,7 @@ public class ProActiveServicesImpl implements ProActiveService {
 
     public ProActiveServicesImpl(ServiceBinderContext context) {
         this.bc = context.getBundleContext();
-        this.port = Integer.parseInt(this.bc.getProperty(
-                    "org.osgi.service.http.port"));
+        this.port = Integer.parseInt(this.bc.getProperty("org.osgi.service.http.port"));
     }
 
     public void setNode(Node node) {
@@ -88,8 +86,8 @@ public class ProActiveServicesImpl implements ProActiveService {
     /**
      * @see org.objectweb.proactive.osgi.ProActiveService#newActive(java.lang.String, java.lang.Object[])
      */
-    public Object newActive(String className, Object[] params)
-        throws ActiveObjectCreationException, NodeException {
+    public Object newActive(String className, Object[] params) throws ActiveObjectCreationException,
+            NodeException {
         return PAActiveObject.newActive(className, params, this.node);
     }
 
@@ -121,8 +119,7 @@ public class ProActiveServicesImpl implements ProActiveService {
      * @param ref
      */
     public void unbind(HttpService ref) {
-        System.out.println(
-            "Node is no more accessible by Http, temination of ProActiveService");
+        System.out.println("Node is no more accessible by Http, temination of ProActiveService");
         terminate();
     }
 
@@ -143,8 +140,7 @@ public class ProActiveServicesImpl implements ProActiveService {
     private void createNode() {
         //    	System.out.println("url du class server = ");
         try {
-            Thread.currentThread()
-                  .setContextClassLoader(ProActiveServicesImpl.class.getClassLoader());
+            Thread.currentThread().setContextClassLoader(ProActiveServicesImpl.class.getClassLoader());
             this.node = NodeFactory.createNode(OSGI_NODE_NAME);
         } catch (NodeException e) {
             e.printStackTrace();
@@ -160,24 +156,24 @@ public class ProActiveServicesImpl implements ProActiveService {
     private boolean registerServlet() {
         try {
             HttpContext myContext = new HttpContext() {
-                    public boolean handleSecurity(HttpServletRequest arg0,
-                        HttpServletResponse arg1) throws IOException {
-                        return false;
-                    }
+                public boolean handleSecurity(HttpServletRequest arg0, HttpServletResponse arg1)
+                        throws IOException {
+                    return false;
+                }
 
-                    public URL getResource(String arg0) {
-                        try {
-                            return new URL(aliasServlet + "?" + arg0);
-                        } catch (MalformedURLException e) {
-                            e.printStackTrace();
-                        }
-                        return null;
+                public URL getResource(String arg0) {
+                    try {
+                        return new URL(aliasServlet + "?" + arg0);
+                    } catch (MalformedURLException e) {
+                        e.printStackTrace();
                     }
+                    return null;
+                }
 
-                    public String getMimeType(String arg0) {
-                        return null;
-                    }
-                };
+                public String getMimeType(String arg0) {
+                    return null;
+                }
+            };
 
             this.http.registerServlet(aliasServlet, this.servlet, null, null);
             //            this.http.registerResources("/", aliasServlet + "doc", myContext);

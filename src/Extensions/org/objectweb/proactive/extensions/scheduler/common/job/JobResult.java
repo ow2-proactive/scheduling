@@ -77,8 +77,7 @@ public interface JobResult extends Serializable {
      * @param taskResult the corresponding result of the task.
      * @param isFinal, true if this taskResult is a final one.
      */
-    public void addTaskResult(String taskName, TaskResult taskResult,
-        boolean isFinal);
+    public void addTaskResult(String taskName, TaskResult taskResult, boolean isFinal);
 
     /**
      * Return every task results of this job as a mapping between

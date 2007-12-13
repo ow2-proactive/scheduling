@@ -68,27 +68,19 @@ public class TestBindingController extends Conformtest {
         tf = Fractal.getTypeFactory(boot);
         gf = Fractal.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("server", I.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
+                tf.createFcItfType("server", I.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                         TypeFactory.SINGLE),
-                    tf.createFcItfType("servers", I.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
+                tf.createFcItfType("servers", I.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                         TypeFactory.COLLECTION),
-                    tf.createFcItfType("client", I.class.getName(),
-                        TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                tf.createFcItfType("client", I.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY,
                         TypeFactory.SINGLE),
-                    tf.createFcItfType("clients", I.class.getName(),
-                        TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                        TypeFactory.COLLECTION)
-                });
+                tf.createFcItfType("clients", I.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                        TypeFactory.COLLECTION) });
         u = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("serverI", I.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.OPTIONAL,
+                tf.createFcItfType("serverI", I.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL,
                         TypeFactory.SINGLE),
-                    tf.createFcItfType("serverJ", J.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE),
-                });
+                tf.createFcItfType("serverJ", J.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                        TypeFactory.SINGLE), });
         setUpComponents();
     }
 
@@ -162,8 +154,7 @@ public class TestBindingController extends Conformtest {
     @Ignore
     public void testNoSuchInterfaceBind() throws Exception {
         try {
-            Fractal.getBindingController(c)
-                   .bindFc("c", d.getFcInterface("server"));
+            Fractal.getBindingController(c).bindFc("c", d.getFcInterface("server"));
             fail();
         } catch (NoSuchInterfaceException e) {
         }
@@ -173,8 +164,7 @@ public class TestBindingController extends Conformtest {
     @Ignore
     public void testNotAServerInterface() throws Exception {
         try {
-            Fractal.getBindingController(c)
-                   .bindFc("client", c.getFcInterface("client"));
+            Fractal.getBindingController(c).bindFc("client", c.getFcInterface("client"));
             fail();
         } catch (IllegalBindingException e) {
         }
@@ -183,8 +173,7 @@ public class TestBindingController extends Conformtest {
     @Test
     public void testWrongType() throws Exception {
         try {
-            Fractal.getBindingController(c)
-                   .bindFc("client", e.getFcInterface("serverJ"));
+            Fractal.getBindingController(c).bindFc("client", e.getFcInterface("serverJ"));
             fail();
         } catch (IllegalBindingException e) {
         }
@@ -194,8 +183,7 @@ public class TestBindingController extends Conformtest {
     @Ignore
     public void testMandatoryToOptional() throws Exception {
         try {
-            Fractal.getBindingController(c)
-                   .bindFc("client", e.getFcInterface("serverI"));
+            Fractal.getBindingController(c).bindFc("client", e.getFcInterface("serverI"));
             fail();
         } catch (IllegalBindingException e) {
         }

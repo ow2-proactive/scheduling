@@ -50,8 +50,7 @@ public class UnderusedResources extends AbstractInference {
     boolean hasSymptom(Stats stats) {
         double value = ((double) stats.getMaxAvailableResources()) / stats.getTreeSize();
         if (logger.isDebugEnabled() && (threshold < value)) {
-            logger.debug(this.getClass().getSimpleName() + ": " + threshold +
-                " !> " + value);
+            logger.debug(this.getClass().getSimpleName() + ": " + threshold + " !> " + value);
         }
 
         if (threshold < value) {

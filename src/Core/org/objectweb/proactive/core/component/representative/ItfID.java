@@ -68,8 +68,8 @@ public class ItfID implements Serializable {
     public boolean equals(Object o) {
         //System.out.println("Now checking for equality");
         if (o instanceof ItfID) {
-            return (itfName.equals(((ItfID) o).itfName) &&
-            (componentBodyID.equals(((ItfID) o).componentBodyID)));
+            return (itfName.equals(((ItfID) o).itfName) && (componentBodyID
+                    .equals(((ItfID) o).componentBodyID)));
         } else {
             return false;
         }

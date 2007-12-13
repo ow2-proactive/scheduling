@@ -48,17 +48,14 @@ public class ComponentMethodCallMetadata implements Serializable {
     protected short priority;
     private ItfID senderItfID = null;
 
-    public void shortcutNotification(UniversalBody sender,
-        UniversalBody intermediate) {
+    public void shortcutNotification(UniversalBody sender, UniversalBody intermediate) {
         if (shortcut == null) {
             // store only first sender?
-            shortcut = new Shortcut(getComponentInterfaceName(), sender,
-                    intermediate);
+            shortcut = new Shortcut(getComponentInterfaceName(), sender, intermediate);
         } else {
             shortcut.updateDestination(intermediate);
             if (logger.isDebugEnabled()) {
-                logger.debug("added shortcut : shortcutCounter is now " +
-                    shortcut.length());
+                logger.debug("added shortcut : shortcutCounter is now " + shortcut.length());
             }
         }
     }

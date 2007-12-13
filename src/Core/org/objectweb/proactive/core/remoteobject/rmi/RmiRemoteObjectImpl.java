@@ -48,28 +48,24 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  *
  *
  */
-public class RmiRemoteObjectImpl extends UnicastRemoteObject
-    implements RmiRemoteObject {
+public class RmiRemoteObjectImpl extends UnicastRemoteObject implements RmiRemoteObject {
     protected InternalRemoteRemoteObject internalrrObject;
 
     public RmiRemoteObjectImpl() throws java.rmi.RemoteException {
     }
 
-    public RmiRemoteObjectImpl(InternalRemoteRemoteObject target)
-        throws java.rmi.RemoteException {
+    public RmiRemoteObjectImpl(InternalRemoteRemoteObject target) throws java.rmi.RemoteException {
         this.internalrrObject = target;
     }
 
-    public RmiRemoteObjectImpl(InternalRemoteRemoteObject target,
-        RMIServerSocketFactory sf, RMIClientSocketFactory cf)
-        throws java.rmi.RemoteException {
+    public RmiRemoteObjectImpl(InternalRemoteRemoteObject target, RMIServerSocketFactory sf,
+            RMIClientSocketFactory cf) throws java.rmi.RemoteException {
         super(0, cf, sf);
         this.internalrrObject = target;
     }
 
-    public Reply receiveMessage(Request message)
-        throws RemoteException, RenegotiateSessionException, ProActiveException,
-            IOException {
+    public Reply receiveMessage(Request message) throws RemoteException, RenegotiateSessionException,
+            ProActiveException, IOException {
         if (message.isOneWay()) {
             this.internalrrObject.receiveMessage(message);
             return null;

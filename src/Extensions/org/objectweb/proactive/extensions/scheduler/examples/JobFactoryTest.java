@@ -37,7 +37,6 @@ import org.objectweb.proactive.extensions.scheduler.common.job.JobFactory;
 public class JobFactoryTest {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) throws Exception {
-        Job j = JobFactory.getFactory()
-                          .createJob("descriptors/scheduler/jobs/Job_2_tasks.xml");
+        Job j = JobFactory.getFactory().createJob("descriptors/scheduler/jobs/Job_2_tasks.xml");
     }
 }

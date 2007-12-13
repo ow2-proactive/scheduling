@@ -162,10 +162,10 @@ public class TestGUI extends JFrame implements ActionListener, ChangeListener {
             exitMenuItem = new JMenuItem();
             exitMenuItem.setText("Exit");
             exitMenuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        System.exit(0);
-                    }
-                });
+                public void actionPerformed(ActionEvent e) {
+                    System.exit(0);
+                }
+            });
         }
         return exitMenuItem;
     }
@@ -180,10 +180,10 @@ public class TestGUI extends JFrame implements ActionListener, ChangeListener {
             aboutMenuItem = new JMenuItem();
             aboutMenuItem.setText("About");
             aboutMenuItem.addActionListener(new ActionListener() {
-                    public void actionPerformed(ActionEvent e) {
-                        new JDialog(TestGUI.this, "About", true).show();
-                    }
-                });
+                public void actionPerformed(ActionEvent e) {
+                    new JDialog(TestGUI.this, "About", true).show();
+                }
+            });
         }
         return aboutMenuItem;
     }
@@ -197,8 +197,7 @@ public class TestGUI extends JFrame implements ActionListener, ChangeListener {
         if (cutMenuItem == null) {
             cutMenuItem = new JMenuItem();
             cutMenuItem.setText("Cut");
-            cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X,
-                    Event.CTRL_MASK, true));
+            cutMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_X, Event.CTRL_MASK, true));
         }
         return cutMenuItem;
     }
@@ -212,8 +211,7 @@ public class TestGUI extends JFrame implements ActionListener, ChangeListener {
         if (copyMenuItem == null) {
             copyMenuItem = new JMenuItem();
             copyMenuItem.setText("Copy");
-            copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C,
-                    Event.CTRL_MASK, true));
+            copyMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_C, Event.CTRL_MASK, true));
         }
         return copyMenuItem;
     }
@@ -227,8 +225,7 @@ public class TestGUI extends JFrame implements ActionListener, ChangeListener {
         if (pasteMenuItem == null) {
             pasteMenuItem = new JMenuItem();
             pasteMenuItem.setText("Paste");
-            pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V,
-                    Event.CTRL_MASK, true));
+            pasteMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_V, Event.CTRL_MASK, true));
         }
         return pasteMenuItem;
     }
@@ -242,8 +239,7 @@ public class TestGUI extends JFrame implements ActionListener, ChangeListener {
         if (saveMenuItem == null) {
             saveMenuItem = new JMenuItem();
             saveMenuItem.setText("Save");
-            saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,
-                    Event.CTRL_MASK, true));
+            saveMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, Event.CTRL_MASK, true));
         }
         return saveMenuItem;
     }

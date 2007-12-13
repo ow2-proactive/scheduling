@@ -30,22 +30,20 @@
  */
 package org.objectweb.proactive.core.security;
 
-public enum Authorization {DENIED(-1),
-    OPTIONAL(0),
-    REQUIRED(1);
+public enum Authorization {
+    DENIED(-1), OPTIONAL(0), REQUIRED(1);
     private final int value;
 
     private Authorization(int value) {
         this.value = value;
     }
 
-    public static Authorization compute(Authorization local,
-        Authorization distant) throws IncompatiblePolicyException {
+    public static Authorization compute(Authorization local, Authorization distant)
+            throws IncompatiblePolicyException {
         return local.compute(distant);
     }
 
-    public Authorization compute(Authorization that)
-        throws IncompatiblePolicyException {
+    public Authorization compute(Authorization that) throws IncompatiblePolicyException {
         if ((this.value * that.value) == -1) {
             throw new IncompatiblePolicyException("incompatible policies");
         }

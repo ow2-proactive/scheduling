@@ -114,9 +114,9 @@ public class GroupGLite extends AbstractGroup {
     }
 
     /**
-    *
-    * @return number of desired CPUs (just useful if jobType = mpich)
-    */
+     *
+     * @return number of desired CPUs (just useful if jobType = mpich)
+     */
     public String getJobNodeNumber() {
         return jobNodeNumber;
     }

@@ -47,8 +47,7 @@ class HandlerProxy2File implements Handler<File> {
     File outDir;
     IdentityHashMap<ProxyFile, ProxyFile> files;
 
-    HandlerProxy2File(FileServerClient fserver,
-        IdentityHashMap<ProxyFile, ProxyFile> files, File outDir) {
+    HandlerProxy2File(FileServerClient fserver, IdentityHashMap<ProxyFile, ProxyFile> files, File outDir) {
         this.fserver = fserver;
         this.outDir = outDir;
         this.files = files;
@@ -56,8 +55,7 @@ class HandlerProxy2File implements Handler<File> {
 
     public File transform(File file) throws Exception {
         if (!ProxyFile.class.isAssignableFrom(file.getClass())) {
-            throw new Exception("Transforming wrong type class:" +
-                file.getClass());
+            throw new Exception("Transforming wrong type class:" + file.getClass());
         }
 
         ProxyFile pfile = (ProxyFile) file;

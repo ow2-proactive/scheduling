@@ -45,6 +45,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * A stripped-down Active Object example. The object has only one public method,
  * sayHello() The object does nothing but reflect the host its on.
@@ -63,26 +64,19 @@ public class Test extends FunctionalTest {
         // FIXME if ever the classes are compiled to a location other than a direct child of the PROACTIVE_DIR, the descriptor folder won't be found
         URI descriptorsuri = baseuri.resolve("../../../descriptors");
         File descriptorsfolder = new File(descriptorsuri);
-        assertTrue("\"" + descriptorsuri + "\" directory could not be found",
-            descriptorsfolder.exists());
-        assertTrue("\"" + descriptorsuri + "\" is not a directory",
-            descriptorsfolder.isDirectory());
-        assertTrue("\"" + descriptorsuri + "\" is read-protected",
-            descriptorsfolder.canRead());
+        assertTrue("\"" + descriptorsuri + "\" directory could not be found", descriptorsfolder.exists());
+        assertTrue("\"" + descriptorsuri + "\" is not a directory", descriptorsfolder.isDirectory());
+        assertTrue("\"" + descriptorsuri + "\" is read-protected", descriptorsfolder.canRead());
 
         // recurse into directory tree to locate xml files
         checkValidationRecursive(descriptorsfolder);
 
         // locates the examples directory
-        URI examplesuri = baseuri.resolve(
-                "../../../src/Examples/org/objectweb/proactive/examples");
+        URI examplesuri = baseuri.resolve("../../../src/Examples/org/objectweb/proactive/examples");
         File examplesfolder = new File(examplesuri);
-        assertTrue("\"" + examplesuri + "\" directory could not be found",
-            examplesfolder.exists());
-        assertTrue("\"" + examplesuri + "\" is not a directory",
-            examplesfolder.isDirectory());
-        assertTrue("\"" + examplesuri + "\" is read-protected",
-            examplesfolder.canRead());
+        assertTrue("\"" + examplesuri + "\" directory could not be found", examplesfolder.exists());
+        assertTrue("\"" + examplesuri + "\" is not a directory", examplesfolder.isDirectory());
+        assertTrue("\"" + examplesuri + "\" is read-protected", examplesfolder.canRead());
 
         // recurse into directory tree to locate xml files
         checkValidationRecursive(examplesfolder);
@@ -90,8 +84,7 @@ public class Test extends FunctionalTest {
         assertTrue(!handler.validationError);
     }
 
-    private void checkValidationRecursive(File basedirectory)
-        throws SAXException, IOException {
+    private void checkValidationRecursive(File basedirectory) throws SAXException, IOException {
         for (File file : basedirectory.listFiles()) {
             if (file.isDirectory() && file.canRead()) {
                 checkValidationRecursive(file);
@@ -100,8 +93,7 @@ public class Test extends FunctionalTest {
                 int index = filename.lastIndexOf('.');
 
                 if (index > 0) {
-                    String extension = filename.substring(index + 1,
-                            filename.length());
+                    String extension = filename.substring(index + 1, filename.length());
 
                     if (extension.equals("xml")) {
                         checkValidation(file);
@@ -111,8 +103,7 @@ public class Test extends FunctionalTest {
         }
     }
 
-    private void checkValidation(File xmlDescriptor)
-        throws SAXException, IOException {
+    private void checkValidation(File xmlDescriptor) throws SAXException, IOException {
         //Since Validator implements ErrorHandler, you can use it to parse the example XML document. 
         // The parse methods parse(java.lang.String systemId) and parse(org.xml.sax.InputSource inputSource) 
         // may be used for parsing an XML document.
@@ -122,8 +113,7 @@ public class Test extends FunctionalTest {
             exp.printStackTrace();
         } finally {
             if (handler.validationError) {
-                System.out.println("Error occured when parsing \"" +
-                    xmlDescriptor.getAbsolutePath() + "\".");
+                System.out.println("Error occured when parsing \"" + xmlDescriptor.getAbsolutePath() + "\".");
                 throw new SAXException(handler.saxParseException);
             }
         }
@@ -137,16 +127,13 @@ public class Test extends FunctionalTest {
         parser = new SAXParser();
 
         //Set the validation feature to true to report validation errors. If the validation feature is set to true, the XML document should specify a XML schema or a DTD.
-        parser.setFeature("http://apache.org/xml/features/validation/dynamic",
-            true);
+        parser.setFeature("http://apache.org/xml/features/validation/dynamic", true);
 
         //Set the validation/schema feature to true to report validation errors against a schema.
-        parser.setFeature("http://apache.org/xml/features/validation/schema",
-            true);
+        parser.setFeature("http://apache.org/xml/features/validation/schema", true);
 
         //Set the validation/schema-full-checking feature to true to enable full schema, grammar-constraint checking.
-        parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking",
-            true);
+        parser.setFeature("http://apache.org/xml/features/validation/schema-full-checking", true);
 
         handler = new Validator();
         parser.setErrorHandler(handler);
@@ -174,22 +161,19 @@ public class Test extends FunctionalTest {
         public SAXParseException saxParseException = null;
 
         @Override
-        public void error(SAXParseException exception)
-            throws SAXException {
+        public void error(SAXParseException exception) throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
         @Override
-        public void fatalError(SAXParseException exception)
-            throws SAXException {
+        public void fatalError(SAXParseException exception) throws SAXException {
             validationError = true;
             saxParseException = exception;
         }
 
         @Override
-        public void warning(SAXParseException exception)
-            throws SAXException {
+        public void warning(SAXParseException exception) throws SAXException {
         }
     }
 }

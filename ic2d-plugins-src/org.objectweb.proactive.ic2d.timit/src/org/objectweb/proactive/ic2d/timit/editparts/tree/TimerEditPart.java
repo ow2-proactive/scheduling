@@ -43,8 +43,7 @@ import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
 
 
 public class TimerEditPart extends AbstractTimerTreeEditPart {
-    public static final Color HEADER_COLOR = new Color(Display.getCurrent(),
-            225, 225, 255);
+    public static final Color HEADER_COLOR = new Color(Display.getCurrent(), 225, 225, 255);
     protected TimerTreeView timerTreeView;
     private TreeItem widgetTreeItem;
 
@@ -61,8 +60,7 @@ public class TimerEditPart extends AbstractTimerTreeEditPart {
             TimerTreeNodeObject model = (TimerTreeNodeObject) getModel();
 
             // If is header choose different color
-            if ((model.getParent() == null) &&
-                    (model.getCurrentTimer() == null)) {
+            if ((model.getParent() == null) && (model.getCurrentTimer() == null)) {
                 this.widgetTreeItem.setBackground(HEADER_COLOR);
             }
         }
@@ -71,21 +69,19 @@ public class TimerEditPart extends AbstractTimerTreeEditPart {
     protected final void refreshVisuals() {
         TimerTreeNodeObject model = (TimerTreeNodeObject) getModel();
         if ((this.widgetTreeItem != null) && !this.widgetTreeItem.isDisposed()) {
-            if ((model.getParent() == null) &&
-                    (model.getCurrentTimer() == null)) {
+            if ((model.getParent() == null) && (model.getCurrentTimer() == null)) {
                 this.setWidgetText(model.getLabelName());
             } else {
                 // 5 columns available
-                this.widgetTreeItem.setText(TimerTreeView.NAME_COLUMN,
-                    model.getLabelName()); // Name
-                this.widgetTreeItem.setText(TimerTreeView.TIME_COLUMN,
-                    model.getFormatedCurrentTotalTimeInDouble()); // Time
-                this.widgetTreeItem.setText(TimerTreeView.TOTAL_PERCENT_COLUMN,
-                    model.getFormatedPercentageFromTotal()); // Total %
-                this.widgetTreeItem.setText(TimerTreeView.INVOCATIONS_COLUMN,
-                    "" + model.getCurrentTimer().getStartStopCoupleCount()); // Invocations
-                this.widgetTreeItem.setText(TimerTreeView.PARENT_PERCENT_COLUMN,
-                    model.getFormatedPercentageFromParent()); // Parent %
+                this.widgetTreeItem.setText(TimerTreeView.NAME_COLUMN, model.getLabelName()); // Name
+                this.widgetTreeItem.setText(TimerTreeView.TIME_COLUMN, model
+                        .getFormatedCurrentTotalTimeInDouble()); // Time
+                this.widgetTreeItem.setText(TimerTreeView.TOTAL_PERCENT_COLUMN, model
+                        .getFormatedPercentageFromTotal()); // Total %
+                this.widgetTreeItem.setText(TimerTreeView.INVOCATIONS_COLUMN, "" +
+                    model.getCurrentTimer().getStartStopCoupleCount()); // Invocations
+                this.widgetTreeItem.setText(TimerTreeView.PARENT_PERCENT_COLUMN, model
+                        .getFormatedPercentageFromParent()); // Parent %
             }
         }
     }
@@ -122,8 +118,7 @@ public class TimerEditPart extends AbstractTimerTreeEditPart {
         if (evt.getPropertyName().equals(TimerTreeNodeObject.P_CHILDREN)) {
             super.refresh();
             for (final TimerTreeNodeObject child : getModelChildren()) {
-                child.firePropertyChange(TimerTreeNodeObject.P_CHILDREN, null,
-                    null);
+                child.firePropertyChange(TimerTreeNodeObject.P_CHILDREN, null, null);
             }
 
             // Incoming event to update the name of the current TimerObject
@@ -136,8 +131,7 @@ public class TimerEditPart extends AbstractTimerTreeEditPart {
             this.getViewer().reveal(this);
             // Select this edit part visually
             this.getViewer().select(this);
-        } else if (evt.getPropertyName()
-                          .equals(TimerTreeNodeObject.P_EXPAND_STATE)) {
+        } else if (evt.getPropertyName().equals(TimerTreeNodeObject.P_EXPAND_STATE)) {
             boolean newState = (Boolean) evt.getNewValue();
             // A full refresh is needed
             this.removeAllAndRefreshChildren();
@@ -147,24 +141,23 @@ public class TimerEditPart extends AbstractTimerTreeEditPart {
             final boolean up = (Boolean) evt.getNewValue();
             final int sortBy = (Integer) evt.getOldValue(); // don't bother        	
             switch (sortBy) {
-            case TimerTreeView.TIME_COLUMN:
-                ((TimerTreeNodeObject) getModel()).sortChildrenByTime(up);
-                break;
-            case TimerTreeView.TOTAL_PERCENT_COLUMN:
-                ((TimerTreeNodeObject) getModel()).sortChildrenByTotalPercent(up);
-                break;
-            case TimerTreeView.INVOCATIONS_COLUMN:
-                ((TimerTreeNodeObject) getModel()).sortChildrenByInvocations(up);
-                break;
-            case TimerTreeView.PARENT_PERCENT_COLUMN:
-                ((TimerTreeNodeObject) getModel()).sortChildrenByParentPercent(up);
-                break;
-            default:
-                return;
+                case TimerTreeView.TIME_COLUMN:
+                    ((TimerTreeNodeObject) getModel()).sortChildrenByTime(up);
+                    break;
+                case TimerTreeView.TOTAL_PERCENT_COLUMN:
+                    ((TimerTreeNodeObject) getModel()).sortChildrenByTotalPercent(up);
+                    break;
+                case TimerTreeView.INVOCATIONS_COLUMN:
+                    ((TimerTreeNodeObject) getModel()).sortChildrenByInvocations(up);
+                    break;
+                case TimerTreeView.PARENT_PERCENT_COLUMN:
+                    ((TimerTreeNodeObject) getModel()).sortChildrenByParentPercent(up);
+                    break;
+                default:
+                    return;
             }
             for (TimerTreeNodeObject child : getModelChildren()) {
-                child.firePropertyChange(TimerTreeNodeObject.P_SORT,
-                    evt.getOldValue(), evt.getNewValue());
+                child.firePropertyChange(TimerTreeNodeObject.P_SORT, evt.getOldValue(), evt.getNewValue());
             }
             // A full refresh is needed
             this.removeAllAndRefreshChildren();
@@ -173,8 +166,7 @@ public class TimerEditPart extends AbstractTimerTreeEditPart {
 
     private final void removeAllAndRefreshChildren() {
         // In order to avoid concurrent exception create a temporary list to be filled with parts to delete
-        List<EditPart> toDelete = new ArrayList<EditPart>(super.getChildren()
-                                                               .size());
+        List<EditPart> toDelete = new ArrayList<EditPart>(super.getChildren().size());
 
         // Deactivate selected parts
         for (final EditPart e : (List<EditPart>) super.getChildren()) {

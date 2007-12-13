@@ -78,16 +78,15 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
  * @author fviale
  *
  */
-public class AOWorkerManager implements WorkerManager,
-    NodeCreationEventListener, InitActive, Serializable {
+public class AOWorkerManager implements WorkerManager, NodeCreationEventListener, InitActive, Serializable {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * log4j logger for the worker manager
-    */
+     * log4j logger for the worker manager
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_WORKERMANAGER);
 
     /**
@@ -141,8 +140,7 @@ public class AOWorkerManager implements WorkerManager,
      * @param provider the entity that will give tasks to the workers created
      * @param initialMemory the initial memory of the workers
      */
-    public AOWorkerManager(final TaskProvider<Serializable> provider,
-        final Map<String, Object> initialMemory) {
+    public AOWorkerManager(final TaskProvider<Serializable> provider, final Map<String, Object> initialMemory) {
         this.provider = provider;
         this.initialMemory = initialMemory;
     }
@@ -178,8 +176,7 @@ public class AOWorkerManager implements WorkerManager,
     /**
      * {@inheritDoc}
      */
-    public void addResources(final URL descriptorURL,
-        final String virtualNodeName) {
+    public void addResources(final URL descriptorURL, final String virtualNodeName) {
         if (!isTerminated) {
             try {
                 ProActiveDescriptor pad = PADeployment.getProactiveDescriptor(descriptorURL.toExternalForm());
@@ -212,8 +209,7 @@ public class AOWorkerManager implements WorkerManager,
 
             vnlist.add(virtualnode);
             if (logger.isDebugEnabled()) {
-                logger.debug("Virtual Node " + virtualnode.getName() +
-                    " added to worker manager");
+                logger.debug("Virtual Node " + virtualnode.getName() + " added to worker manager");
             }
         }
     }
@@ -226,19 +222,14 @@ public class AOWorkerManager implements WorkerManager,
         if (!isTerminated) {
             try {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Creating worker on " +
-                        node.getNodeInformation().getName());
+                    logger.debug("Creating worker on " + node.getNodeInformation().getName());
                 }
 
-                String workername = node.getVMInformation().getHostName() +
-                    "_" + workerNameCounter++;
+                String workername = node.getVMInformation().getHostName() + "_" + workerNameCounter++;
 
                 // Creates the worker which will automatically connect to the master
-                workers.put(workername,
-                    (Worker) PAActiveObject.newActive(
-                        AOWorker.class.getName(),
-                        new Object[] { workername, provider, initialMemory },
-                        node));
+                workers.put(workername, (Worker) PAActiveObject.newActive(AOWorker.class.getName(),
+                        new Object[] { workername, provider, initialMemory }, node));
                 if (logger.isDebugEnabled()) {
                     logger.debug("Worker " + workername + " created on " +
                         node.getNodeInformation().getName());
@@ -297,8 +288,7 @@ public class AOWorkerManager implements WorkerManager,
             for (int i = 0; i < vnlist.size(); i++) {
                 // we wait for every node creation, in case some nodes were not already deployed
                 try {
-                    if (vnlist.get(i).getNbMappedNodes() > vnlist.get(i)
-                                                                     .getNumberOfCurrentlyCreatedNodes()) {
+                    if (vnlist.get(i).getNbMappedNodes() > vnlist.get(i).getNumberOfCurrentlyCreatedNodes()) {
                         // implicit wait of created nodes
                         vnlist.get(i).getNodes();
                     }

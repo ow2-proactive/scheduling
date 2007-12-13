@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.util.converter.MakeDeepCopy;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertNotNull;
 
+
 /**
  * Test if the security manager is operational :  to be serialized and unserialized, ...
  *
@@ -59,8 +60,9 @@ public class SecurityTestSecurityManager extends FunctionalTest {
 
     @Before
     public void initTest() throws Exception {
-        PolicyServer ps = ProActiveSecurityDescriptorHandler.createPolicyServer(SecurityTestSecurityManager.class.getResource(
-                    "/functionalTests/security/applicationPolicy.xml").getPath());
+        PolicyServer ps = ProActiveSecurityDescriptorHandler
+                .createPolicyServer(SecurityTestSecurityManager.class.getResource(
+                        "/functionalTests/security/applicationPolicy.xml").getPath());
         psm = new ProActiveSecurityManager(EntityType.UNKNOWN, ps);
     }
 }

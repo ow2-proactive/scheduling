@@ -82,12 +82,9 @@ public class TestTopology extends Abstract {
 
     static private void printNode(Topology topology) {
         System.out.println();
-        System.out.println("Deployment Path: " +
-            topology.getDeploymentPathStr());
-        System.out.println("App Desc Path: " +
-            topology.getApplicationDescriptorPath());
-        System.out.println("Dep Desc Path" +
-            topology.getApplicationDescriptorPath());
+        System.out.println("Deployment Path: " + topology.getDeploymentPathStr());
+        System.out.println("App Desc Path: " + topology.getApplicationDescriptorPath());
+        System.out.println("Dep Desc Path" + topology.getApplicationDescriptorPath());
         System.out.println("Node Provider:" + topology.getNodeProvider());
         System.out.println("Children:" + topology.getChildren().size());
 
@@ -96,8 +93,7 @@ public class TestTopology extends Abstract {
             for (GCMRuntime runtime : host.getRuntimes()) {
                 System.out.println("\t\t" + runtime.getName());
                 for (Node node : runtime.getNodes()) {
-                    System.out.println("\t\t\t" +
-                        node.getNodeInformation().getName());
+                    System.out.println("\t\t\t" + node.getNodeInformation().getName());
                 }
             }
         }

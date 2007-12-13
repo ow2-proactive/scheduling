@@ -57,9 +57,8 @@ public class PerformanceTest {
 
     private final void initTest() throws Exception {
         // Access the nodes of the descriptor file
-        this.descriptorPad = PADeployment.getProactiveDescriptor(this.getClass()
-                                                                     .getResource("/performanceTests/simple/descriptor.xml")
-                                                                     .getPath());
+        this.descriptorPad = PADeployment.getProactiveDescriptor(this.getClass().getResource(
+                "/performanceTests/simple/descriptor.xml").getPath());
         descriptorPad.activateMappings();
         VirtualNode vnode = descriptorPad.getVirtualNodes()[0];
         this.nodes = vnode.getNodes();
@@ -67,12 +66,11 @@ public class PerformanceTest {
 
     private final void performLocal() throws Exception {
         // First create the callee that will be local to the caller
-        Callee callee = (Callee) PAActiveObject.newActive(Callee.class.getName(),
-                null, nodes[0]);
+        Callee callee = (Callee) PAActiveObject.newActive(Callee.class.getName(), null, nodes[0]);
 
         // Then create the caller and provide it a stub on the callee
-        Caller caller = (Caller) PAActiveObject.newActive(Caller.class.getName(),
-                new Object[] { callee }, nodes[0]);
+        Caller caller = (Caller) PAActiveObject.newActive(Caller.class.getName(), new Object[] { callee },
+                nodes[0]);
         caller.performTest();
         // Kill these active objects
         callee.kill();
@@ -81,12 +79,11 @@ public class PerformanceTest {
 
     private final void performRemote() throws Exception {
         // First create the callee that will be remote to the caller
-        Callee callee = (Callee) PAActiveObject.newActive(Callee.class.getName(),
-                null, nodes[0]);
+        Callee callee = (Callee) PAActiveObject.newActive(Callee.class.getName(), null, nodes[0]);
 
         // Then create the caller and provide it a stub on the callee
-        Caller caller = (Caller) PAActiveObject.newActive(Caller.class.getName(),
-                new Object[] { callee }, nodes[1]);
+        Caller caller = (Caller) PAActiveObject.newActive(Caller.class.getName(), new Object[] { callee },
+                nodes[1]);
         caller.performTest();
         // Kill these active objects
         callee.kill();
@@ -138,15 +135,21 @@ public class PerformanceTest {
 
         // Options handling 
         Options opt = new Options();
-        opt.addOption("n", "nbRuns", true,
-            "Specify the number of runs. Default is 5.");
+        opt.addOption("n", "nbRuns", true, "Specify the number of runs. Default is 5.");
         opt.addOption("o", "outputDir", true, "Specify the output directory.");
-        opt.addOption("p", "printCurrentVersion", true,
-            "Prints the current ProActive version.");
-        opt.addOption("c", "compareCurrentWith", true,
-            "Specify the version to compare with. By default the latest precedent version is used. This option invalidates the x option.");
-        opt.addOption("x", "compareAmount", true,
-            "Specify the number of precedent consecutive versions to compare with the current. Default is 1 (the latest precedent version).");
+        opt.addOption("p", "printCurrentVersion", true, "Prints the current ProActive version.");
+        opt
+                .addOption(
+                        "c",
+                        "compareCurrentWith",
+                        true,
+                        "Specify the version to compare with. By default the latest precedent version is used. This option invalidates the x option.");
+        opt
+                .addOption(
+                        "x",
+                        "compareAmount",
+                        true,
+                        "Specify the number of precedent consecutive versions to compare with the current. Default is 1 (the latest precedent version).");
         try {
             BasicParser parser = new BasicParser();
             CommandLine cl = parser.parse(opt, args);
@@ -155,12 +158,10 @@ public class PerformanceTest {
                 nbRuns = Integer.valueOf(cl.getOptionValue("n"));
             }
             if (cl.hasOption("o") && !"".equals(cl.getOptionValue("o"))) {
-                TimItBasicConfigurator.DEFAULT_OUTPUT_DIRECTORY = cl.getOptionValue(
-                        "o");
+                TimItBasicConfigurator.DEFAULT_OUTPUT_DIRECTORY = cl.getOptionValue("o");
             }
             if (cl.hasOption("p") && !"".equals(cl.getOptionValue("p"))) {
-                System.out.println("*** The current ProActive version is : " +
-                    currentPaVersion);
+                System.out.println("*** The current ProActive version is : " + currentPaVersion);
             }
             if (cl.hasOption("c") && !"".equals(cl.getOptionValue("c"))) {
                 otherPaVersion = cl.getOptionValue("c");
@@ -185,20 +186,17 @@ public class PerformanceTest {
         File folder = new File(TimItBasicConfigurator.DEFAULT_OUTPUT_DIRECTORY);
 
         if (!folder.isDirectory()) {
-            throw new RuntimeException("The ressource : " +
-                TimItBasicConfigurator.DEFAULT_OUTPUT_DIRECTORY +
+            throw new RuntimeException("The ressource : " + TimItBasicConfigurator.DEFAULT_OUTPUT_DIRECTORY +
                 " is not a directory.");
         }
 
         // Compute the average from generated files for the current version of ProActive
-        File[] averageCurrentVerFiles = generateVersionAverageLocalAndRemote(folder,
-                currentPaVersion,
+        File[] averageCurrentVerFiles = generateVersionAverageLocalAndRemote(folder, currentPaVersion,
                 TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX, true);
 
-        System.out.println("*** For the version : " + currentPaVersion +
-            " the latest files are :\n" + "\t\t - remote :" +
-            averageCurrentVerFiles[0].getAbsolutePath() + "\n" +
-            "\t\t - local  :" + averageCurrentVerFiles[1].getAbsolutePath());
+        System.out.println("*** For the version : " + currentPaVersion + " the latest files are :\n" +
+            "\t\t - remote :" + averageCurrentVerFiles[0].getAbsolutePath() + "\n" + "\t\t - local  :" +
+            averageCurrentVerFiles[1].getAbsolutePath());
 
         // Precedent version handling        
         File[] otherVerFiles = null;
@@ -206,47 +204,37 @@ public class PerformanceTest {
         // If nbCompare == 1 compare with the latest precedent or specified
         if (nbCompare == 1) {
             if ((otherPaVersion == null) || "".equals(otherPaVersion)) {
-                System.out.println("*** Looking for the precedent version of " +
-                    currentPaVersion);
+                System.out.println("*** Looking for the precedent version of " + currentPaVersion);
                 // Try to find the latest precedent version from the current version			
-                otherPaVersion = getLatestPrecedentVersion(folder,
-                        currentPaVersion,
-                        TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX,
-                        "_remote");
+                otherPaVersion = getLatestPrecedentVersion(folder, currentPaVersion,
+                        TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX, "_remote");
             }
 
             // If no precedent version was found the comparison is impossible
             if (otherPaVersion == null) {
-                System.out.println(
-                    "*** No precedent version was found for the current version : " +
+                System.out.println("*** No precedent version was found for the current version : " +
                     currentPaVersion + " exiting.");
                 System.exit(0);
             }
 
-            otherVerFiles = getLatestFilesForAGivenVersion(folder,
-                    otherPaVersion);
+            otherVerFiles = getLatestFilesForAGivenVersion(folder, otherPaVersion);
 
-            System.out.println("*** The latest precedent version found is " +
-                otherPaVersion + ". The latest files are :\n" +
-                "\t\t - remote :" + otherVerFiles[0].getAbsolutePath() + "\n" +
+            System.out.println("*** The latest precedent version found is " + otherPaVersion +
+                ". The latest files are :\n" + "\t\t - remote :" + otherVerFiles[0].getAbsolutePath() + "\n" +
                 "\t\t - local  :" + otherVerFiles[1].getAbsolutePath());
 
             // Once we are sure that stats are available
             // generate the comparative chart for remote and local			
             BasicComparativeChartBuilder chart = new BasicComparativeChartBuilder(new File[] {
-                        otherVerFiles[0], averageCurrentVerFiles[0]
-                    },
-                    "Comparison between version " + currentPaVersion + " and " +
-                    otherPaVersion + ".",
-                    "Caller performs several calls on a remote callee.");
+                    otherVerFiles[0], averageCurrentVerFiles[0] }, "Comparison between version " +
+                currentPaVersion + " and " + otherPaVersion + ".",
+                "Caller performs several calls on a remote callee.");
             chart.buildComparativeChart(folder);
 
-            chart = new BasicComparativeChartBuilder(new File[] {
-                        otherVerFiles[1], averageCurrentVerFiles[1]
-                    },
-                    "Comparison between version " + currentPaVersion + " and " +
-                    otherPaVersion + ".",
-                    "Caller performs several calls on a local callee.");
+            chart = new BasicComparativeChartBuilder(
+                new File[] { otherVerFiles[1], averageCurrentVerFiles[1] }, "Comparison between version " +
+                    currentPaVersion + " and " + otherPaVersion + ".",
+                "Caller performs several calls on a local callee.");
             chart.buildComparativeChart(folder);
         } else {
             java.util.List<String> precedentVersionList = new java.util.ArrayList<String>();
@@ -258,26 +246,20 @@ public class PerformanceTest {
 
             // Find precedent versions
             for (int i = 0; i < (nbCompare + 1); i++) {
-                System.out.println("*** Looking for the precedent version of " +
-                    tempVersion);
+                System.out.println("*** Looking for the precedent version of " + tempVersion);
                 // Try to find the latest precedent version from the tempVersion			
-                otherTempVersion = getLatestPrecedentVersion(folder,
-                        tempVersion,
-                        TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX,
-                        "_remote");
+                otherTempVersion = getLatestPrecedentVersion(folder, tempVersion,
+                        TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX, "_remote");
                 // If no precedent version was found exit from the loop
                 if (otherTempVersion == null) {
-                    System.out.println(
-                        "*** No precedent version was found for the version : " +
-                        tempVersion + ".");
+                    System.out.println("*** No precedent version was found for the version : " + tempVersion +
+                        ".");
                     break;
                 }
                 precedentVersionList.add(otherTempVersion);
-                File[] tempFiles = getLatestFilesForAGivenVersion(folder,
-                        otherTempVersion);
-                System.out.println("*** The latest precedent version found is " +
-                    otherTempVersion + ". The latest files are :\n" +
-                    "\t\t - remote :" + tempFiles[0].getAbsolutePath() + "\n" +
+                File[] tempFiles = getLatestFilesForAGivenVersion(folder, otherTempVersion);
+                System.out.println("*** The latest precedent version found is " + otherTempVersion +
+                    ". The latest files are :\n" + "\t\t - remote :" + tempFiles[0].getAbsolutePath() + "\n" +
                     "\t\t - local  :" + tempFiles[1].getAbsolutePath());
                 precedentVersionFilesList.add(tempFiles);
                 tempVersion = otherTempVersion;
@@ -306,20 +288,17 @@ public class PerformanceTest {
             // Once we are sure that stats are available
             // generate the comparative chart for remote and local			
             BasicComparativeChartBuilder chart = new BasicComparativeChartBuilder(remoteStatsFiles,
-                    "Comparison between version " + currentPaVersion + " and " +
-                    precedentVersionList + ".",
-                    "Caller performs several calls on a remote callee.");
+                "Comparison between version " + currentPaVersion + " and " + precedentVersionList + ".",
+                "Caller performs several calls on a remote callee.");
             chart.buildComparativeChart(folder);
 
-            chart = new BasicComparativeChartBuilder(localStatsFiles,
-                    "Comparison between version " + currentPaVersion + " and " +
-                    precedentVersionList + ".",
-                    "Caller performs several calls on a local callee.");
+            chart = new BasicComparativeChartBuilder(localStatsFiles, "Comparison between version " +
+                currentPaVersion + " and " + precedentVersionList + ".",
+                "Caller performs several calls on a local callee.");
             chart.buildComparativeChart(folder);
         }
 
-        System.out.println(
-            "*** The comparative charts has been generated in the folowing directory : " +
+        System.out.println("*** The comparative charts has been generated in the folowing directory : " +
             folder);
 
         // Exit
@@ -333,36 +312,27 @@ public class PerformanceTest {
      * @param version The version of files to be found
      * @return An array of 2 files
      */
-    public final static File[] getLatestFilesForAGivenVersion(File folder,
-        String version) {
+    public final static File[] getLatestFilesForAGivenVersion(File folder, String version) {
         File[] res = new File[2];
 
         // Get the latest modified file with _remote suffix for the current Pa version 			
-        File latestRemoteOutputCurrentVersion = getLastModified(folder,
-                version,
-                TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX, "",
-                "_remote");
+        File latestRemoteOutputCurrentVersion = getLastModified(folder, version,
+                TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX, "", "_remote");
 
-        if ((latestRemoteOutputCurrentVersion == null) ||
-                !latestRemoteOutputCurrentVersion.exists()) {
-            throw new RuntimeException(
-                "Cannot find the latest xxx_remote output file for the version : " +
+        if ((latestRemoteOutputCurrentVersion == null) || !latestRemoteOutputCurrentVersion.exists()) {
+            throw new RuntimeException("Cannot find the latest xxx_remote output file for the version : " +
                 version + " in the directory : " + folder.getAbsolutePath());
         }
         res[0] = latestRemoteOutputCurrentVersion;
 
         // Get the latest modified file with _local suffix from the _remote one
-        String[] splittedName = latestRemoteOutputCurrentVersion.getName()
-                                                                .split("_");
+        String[] splittedName = latestRemoteOutputCurrentVersion.getName().split("_");
 
         File latestLocalOutputCurrentVersion = getLastModified(folder, version,
-                TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX,
-                splittedName[2], "_local");
+                TimItBasicConfigurator.DEFAULT_OUTPUT_FILENAME_PREFFIX, splittedName[2], "_local");
 
-        if ((latestLocalOutputCurrentVersion == null) ||
-                !latestLocalOutputCurrentVersion.exists()) {
-            throw new RuntimeException(
-                "Cannot find the latest xxx_local output file for the version : " +
+        if ((latestLocalOutputCurrentVersion == null) || !latestLocalOutputCurrentVersion.exists()) {
+            throw new RuntimeException("Cannot find the latest xxx_local output file for the version : " +
                 version + " in the directory : " + folder.getAbsolutePath());
         }
         res[1] = latestLocalOutputCurrentVersion;
@@ -378,8 +348,8 @@ public class PerformanceTest {
      * @param filenameSufix The sufix of the filename
      * @return The latest modified file for a given version
      */
-    public final static File getLastModified(File folder, String version,
-        String versionPrefix, String optionalId, String filenameSufix) {
+    public final static File getLastModified(File folder, String version, String versionPrefix,
+            String optionalId, String filenameSufix) {
         File[] files = folder.listFiles();
         File res = null;
         if ((files == null) || (files.length <= 1)) {
@@ -393,8 +363,7 @@ public class PerformanceTest {
         String currentId;
         for (int i = 0; i < files.length; i++) {
             filename = files[i].getName();
-            if (!filename.startsWith(versionPrefix) ||
-                    !filename.endsWith(filenameSufix)) {
+            if (!filename.startsWith(versionPrefix) || !filename.endsWith(filenameSufix)) {
                 continue;
             }
 
@@ -405,8 +374,7 @@ public class PerformanceTest {
                 }
             }
             currentVersion = filename.split("_")[1];
-            if (version.equals(currentVersion) &&
-                    (files[i].lastModified() > min)) {
+            if (version.equals(currentVersion) && (files[i].lastModified() > min)) {
                 min = files[i].lastModified();
                 res = files[i];
             }
@@ -422,8 +390,8 @@ public class PerformanceTest {
      * @param filenameSufix The version sufix
      * @return The latest precedent version vailable in the specified folder
      */
-    public final static String getLatestPrecedentVersion(File folder,
-        String version, String versionPrefix, String filenameSufix) {
+    public final static String getLatestPrecedentVersion(File folder, String version, String versionPrefix,
+            String filenameSufix) {
         File[] files = folder.listFiles();
         String res = null;
         if ((files == null) || (files.length <= 1)) {
@@ -436,13 +404,11 @@ public class PerformanceTest {
         int currentVersionValue;
         for (int i = 0; i < files.length; i++) {
             filename = files[i].getName();
-            if (!filename.startsWith(versionPrefix) ||
-                    !filename.endsWith(filenameSufix)) {
+            if (!filename.startsWith(versionPrefix) || !filename.endsWith(filenameSufix)) {
                 continue;
             }
             currentVersionValue = Integer.valueOf(filename.split("_")[1]);
-            if ((currentVersionValue < versionValue) &&
-                    (currentVersionValue > tempVersion)) {
+            if ((currentVersionValue < versionValue) && (currentVersionValue > tempVersion)) {
                 tempVersion = currentVersionValue;
             }
         }
@@ -464,8 +430,8 @@ public class PerformanceTest {
      * @param deleteUnused Delete unused files when average is computed
      * @return An array of 2 files
      */
-    public final static File[] generateVersionAverageLocalAndRemote(
-        File folder, String version, String versionPrefix, boolean deleteUnused) {
+    public final static File[] generateVersionAverageLocalAndRemote(File folder, String version,
+            String versionPrefix, boolean deleteUnused) {
         File[] files = folder.listFiles();
 
         // First get all files for a given version and create documents		
@@ -479,8 +445,7 @@ public class PerformanceTest {
         // Get all files
         for (int i = 0; i < files.length; i++) {
             filename = files[i].getName();
-            if (!filename.startsWith(versionPrefix) ||
-                    (filename.indexOf("AVG") >= 0)) {
+            if (!filename.startsWith(versionPrefix) || (filename.indexOf("AVG") >= 0)) {
                 continue;
             }
             currentVersion = filename.split("_")[1];
@@ -501,13 +466,11 @@ public class PerformanceTest {
         }
 
         Document remoteAverageDoc = BasicResultWriter.getAverage(listOfRemote);
-        File remoteAverageFile = new File(folder,
-                versionPrefix + version + "_AVG" + "_remote");
+        File remoteAverageFile = new File(folder, versionPrefix + version + "_AVG" + "_remote");
         XMLHelper.writeFile(remoteAverageDoc, remoteAverageFile);
 
         Document localAverageDoc = BasicResultWriter.getAverage(listOfLocal);
-        File localAverageFile = new File(folder,
-                versionPrefix + version + "_AVG" + "_local");
+        File localAverageFile = new File(folder, versionPrefix + version + "_AVG" + "_local");
         XMLHelper.writeFile(localAverageDoc, localAverageFile);
 
         return new File[] { remoteAverageFile, localAverageFile };

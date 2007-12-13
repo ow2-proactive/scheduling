@@ -46,8 +46,7 @@ public class ForInst<P> implements Instruction<P, P> {
         this.childStack = childStack;
     }
 
-    public Task<P> compute(SkeletonSystemImpl system, Task<P> task)
-        throws Exception {
+    public Task<P> compute(SkeletonSystemImpl system, Task<P> task) throws Exception {
         if (times > 0) {
             //Add the For with one less time to execute
             childStack.add(0, new ForInst<P>(times - 1, childStack));

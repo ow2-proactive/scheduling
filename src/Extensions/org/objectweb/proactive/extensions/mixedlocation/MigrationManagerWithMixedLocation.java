@@ -48,8 +48,7 @@ import org.objectweb.proactive.ext.locationserver.LocationServer;
 import org.objectweb.proactive.ext.locationserver.LocationServerFactory;
 
 
-public class MigrationManagerWithMixedLocation extends MigrationManagerImpl
-    implements java.io.Serializable {
+public class MigrationManagerWithMixedLocation extends MigrationManagerImpl implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.MIGRATION);
     protected UniversalBodyWrapper wrapper;
     transient protected LocationServer locationServer;
@@ -75,14 +74,13 @@ public class MigrationManagerWithMixedLocation extends MigrationManagerImpl
 
     @Override
     public RequestReceiver createRequestReceiver(UniversalBody remoteBody,
-        RequestReceiver currentRequestReceiver) {
+            RequestReceiver currentRequestReceiver) {
         this.createWrapper(remoteBody);
         return new RequestReceiverForwarder(wrapper);
     }
 
     @Override
-    public ReplyReceiver createReplyReceiver(UniversalBody remoteBody,
-        ReplyReceiver currentReplyReceiver) {
+    public ReplyReceiver createReplyReceiver(UniversalBody remoteBody, ReplyReceiver currentReplyReceiver) {
         this.createWrapper(wrapper);
         return new ReplyReceiverForwarder(wrapper);
     }
@@ -109,8 +107,7 @@ public class MigrationManagerWithMixedLocation extends MigrationManagerImpl
         updateLocation(body);
     }
 
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         if (logger.isDebugEnabled()) {
             logger.debug("MigrationManagerWithMixedLocation readObject XXXXXXX");
         }

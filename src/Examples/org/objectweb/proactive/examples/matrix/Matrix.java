@@ -264,8 +264,7 @@ public class Matrix implements java.io.Serializable {
         return new Matrix(d);
     }
 
-    public Matrix getActiveVerticalSubMatrix(int widthStart, int widthStop,
-        Node node) {
+    public Matrix getActiveVerticalSubMatrix(int widthStart, int widthStop, Node node) {
         Matrix vsm = null;
 
         double[][] d = new double[widthStop - widthStart][];
@@ -276,14 +275,12 @@ public class Matrix implements java.io.Serializable {
         params[0] = d;
 
         try {
-            vsm = (Matrix) PAActiveObject.newActive("org.objectweb.proactive.examples.matrix.Matrix",
-                    params, node);
+            vsm = (Matrix) PAActiveObject.newActive("org.objectweb.proactive.examples.matrix.Matrix", params,
+                    node);
         } catch (ActiveObjectCreationException e) {
-            logger.error(
-                "Error create Active Vertical Sub Matrix : ActiveObjectCreationException\n");
+            logger.error("Error create Active Vertical Sub Matrix : ActiveObjectCreationException\n");
         } catch (NodeException e) {
-            logger.error(
-                "Error create Active Vertical Sub Matrix : NodeException\n");
+            logger.error("Error create Active Vertical Sub Matrix : NodeException\n");
         }
         return vsm;
     }
@@ -338,8 +335,8 @@ public class Matrix implements java.io.Serializable {
         }
 
         try {
-            result = (Matrix) PAGroup.newGroup("org.objectweb.proactive.examples.matrix.Matrix",
-                    params, nodeList);
+            result = (Matrix) PAGroup.newGroup("org.objectweb.proactive.examples.matrix.Matrix", params,
+                    nodeList);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -427,8 +424,8 @@ public class Matrix implements java.io.Serializable {
             po[0] = d;
 
             try {
-                result[i] = (Matrix) PAActiveObject.newActive("org.objectweb.proactive.examples.matrix.Matrix",
-                        po, nodeList[i]);
+                result[i] = (Matrix) PAActiveObject.newActive(
+                        "org.objectweb.proactive.examples.matrix.Matrix", po, nodeList[i]);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -456,8 +453,7 @@ public class Matrix implements java.io.Serializable {
     }
 
     // -- PRIVATE METHODS FOR SERIALIZATION -----------------------------------------------
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         //long startTime;
         //long endTime;
         //startTime = System.currentTimeMillis();

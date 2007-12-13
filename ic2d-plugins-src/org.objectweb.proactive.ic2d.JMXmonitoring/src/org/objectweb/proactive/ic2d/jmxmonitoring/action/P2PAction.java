@@ -47,8 +47,7 @@ public class P2PAction extends Action {
         this.setId(ENABLE_DISABLE_P2P_MONITORING);
         setChecked(!WorldObject.HIDE_P2PNODE_MONITORING);
         setToolTipText("Show P2P Objects");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "p2p.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "p2p.gif"));
     }
 
     @Override

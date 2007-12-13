@@ -48,15 +48,16 @@ import ptolemy.data.Token;
 public class AbstractData implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private SciData sciData;
     private String matName;
     private Token matData;
-    private enum data_type {SCILAB_DATA,
-        MATLAB_DATA;
-    }
-    ;
+
+    private enum data_type {
+        SCILAB_DATA, MATLAB_DATA;
+    };
+
     private data_type type;
 
     /**
@@ -85,10 +86,10 @@ public class AbstractData implements Serializable {
      */
     public String getName() {
         switch (type) {
-        case SCILAB_DATA:
-            return sciData.getName();
-        case MATLAB_DATA:
-            return matName;
+            case SCILAB_DATA:
+                return sciData.getName();
+            case MATLAB_DATA:
+                return matName;
         }
 
         return null;
@@ -100,10 +101,10 @@ public class AbstractData implements Serializable {
      */
     public Object getData() {
         switch (type) {
-        case SCILAB_DATA:
-            return sciData;
-        case MATLAB_DATA:
-            return matData;
+            case SCILAB_DATA:
+                return sciData;
+            case MATLAB_DATA:
+                return matData;
         }
 
         return null;
@@ -112,10 +113,10 @@ public class AbstractData implements Serializable {
     @Override
     public String toString() {
         switch (type) {
-        case SCILAB_DATA:
-            return sciData.toString();
-        case MATLAB_DATA:
-            return matData.toString();
+            case SCILAB_DATA:
+                return sciData.toString();
+            case MATLAB_DATA:
+                return matData.toString();
         }
 
         return null;

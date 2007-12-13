@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.component.exceptions;
 
-
 /**
  * This exception occurs when the generation of component interfaces fails.
  *

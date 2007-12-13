@@ -36,8 +36,8 @@ import org.objectweb.proactive.core.process.filetransfer.FileTransferWorkShop;
 import org.objectweb.proactive.core.util.RemoteProcessMessageLogger;
 
 
-public abstract class AbstractExternalProcessDecorator
-    extends AbstractExternalProcess implements ExternalProcessDecorator {
+public abstract class AbstractExternalProcessDecorator extends AbstractExternalProcess implements
+        ExternalProcessDecorator {
     protected ExternalProcess targetProcess;
     private int compositionType = APPEND_TO_COMMAND_COMPOSITION;
 
@@ -52,8 +52,7 @@ public abstract class AbstractExternalProcessDecorator
         this(targetProcess, APPEND_TO_COMMAND_COMPOSITION);
     }
 
-    public AbstractExternalProcessDecorator(ExternalProcess targetProcess,
-        int compositionType) {
+    public AbstractExternalProcessDecorator(ExternalProcess targetProcess, int compositionType) {
         super();
         setTargetProcess(targetProcess);
         this.compositionType = compositionType;
@@ -102,8 +101,8 @@ public abstract class AbstractExternalProcessDecorator
     @Override
     protected String buildCommand() {
         if ((compositionType == SEND_TO_OUTPUT_STREAM_COMPOSITION) ||
-                (compositionType == GIVE_COMMAND_AS_PARAMETER) ||
-                (compositionType == COPY_FILE_AND_APPEND_COMMAND)) {
+            (compositionType == GIVE_COMMAND_AS_PARAMETER) ||
+            (compositionType == COPY_FILE_AND_APPEND_COMMAND)) {
             return internalBuildCommand();
         } else {
             if (targetProcess != null) {
@@ -124,8 +123,7 @@ public abstract class AbstractExternalProcessDecorator
     protected abstract String internalBuildCommand();
 
     @Override
-    protected void internalStartProcess(String commandToExecute)
-        throws java.io.IOException {
+    protected void internalStartProcess(String commandToExecute) throws java.io.IOException {
         super.internalStartProcess(commandToExecute);
         if (compositionType == SEND_TO_OUTPUT_STREAM_COMPOSITION) {
             try {
@@ -155,8 +153,7 @@ public abstract class AbstractExternalProcessDecorator
         try {
             ftw.addFileTransfer(((FileDependant) targetProcess).getFileTransfertDefinition());
         } catch (ClassCastException e) {
-            logger.error(
-                "Unable to handle the file transfert dependant process");
+            logger.error("Unable to handle the file transfert dependant process");
             return;
         }
 
@@ -171,14 +168,12 @@ public abstract class AbstractExternalProcessDecorator
     /**
      * Implementation of a RemoteProcessMessageLogger that feeds two MessageLoggers
      */
-    public static class CompositeMessageLogger
-        implements RemoteProcessMessageLogger, java.io.Serializable {
+    public static class CompositeMessageLogger implements RemoteProcessMessageLogger, java.io.Serializable {
         private RemoteProcessMessageLogger messageLogger1;
         private RemoteProcessMessageLogger messageLogger2;
 
-        public CompositeMessageLogger(
-            RemoteProcessMessageLogger messageLogger1,
-            RemoteProcessMessageLogger messageLogger2) {
+        public CompositeMessageLogger(RemoteProcessMessageLogger messageLogger1,
+                RemoteProcessMessageLogger messageLogger2) {
             this.messageLogger1 = messageLogger1;
             this.messageLogger2 = messageLogger2;
         }
@@ -206,8 +201,7 @@ public abstract class AbstractExternalProcessDecorator
         private MessageSink messageSink1;
         private MessageSink messageSink2;
 
-        public CompositeMessageSink(MessageSink messageSink1,
-            MessageSink messageSink2) {
+        public CompositeMessageSink(MessageSink messageSink1, MessageSink messageSink2) {
             this.messageSink1 = messageSink1;
             this.messageSink2 = messageSink2;
         }

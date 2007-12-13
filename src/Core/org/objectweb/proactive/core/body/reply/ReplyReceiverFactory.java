@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.body.reply;
 
-
 /**
  * <p>
  * A class implementing this interface is a factory of ReplyReceiver objects.

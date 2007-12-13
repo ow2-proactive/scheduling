@@ -96,10 +96,8 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * This method should have NEVER been called in an ProActive task launcher.
      */
     @Override
-    public TaskResult doTask(SchedulerCore core, Executable executable,
-        TaskResult... results) {
-        throw new RuntimeException(
-            "This method should have NEVER been called in this context !!");
+    public TaskResult doTask(SchedulerCore core, Executable executable, TaskResult... results) {
+        throw new RuntimeException("This method should have NEVER been called in this context !!");
     }
 
     /**
@@ -112,8 +110,7 @@ public class ProActiveTaskLauncher extends TaskLauncher {
      * @return a task result representing the result of this task execution.
      */
     @SuppressWarnings("unchecked")
-    public TaskResult doTask(SchedulerCore core,
-        ProActiveExecutable executableTask, NodeSet nodes) {
+    public TaskResult doTask(SchedulerCore core, ProActiveExecutable executableTask, NodeSet nodes) {
         nodesList = nodes;
 
         try {
@@ -133,16 +130,14 @@ public class ProActiveTaskLauncher extends TaskLauncher {
             executableTask.init();
 
             //launch task
-            TaskResult result = new TaskResultImpl(taskId,
-                    executableTask.execute(nodes),
-                    new Log4JTaskLogs(this.logBuffer.getBuffer()));
+            TaskResult result = new TaskResultImpl(taskId, executableTask.execute(nodes), new Log4JTaskLogs(
+                this.logBuffer.getBuffer()));
 
             //return result
             return result;
         } catch (Throwable ex) {
             // exceptions are always handled at scheduler core level
-            return new TaskResultImpl(taskId, ex,
-                new Log4JTaskLogs(this.logBuffer.getBuffer()));
+            return new TaskResultImpl(taskId, ex, new Log4JTaskLogs(this.logBuffer.getBuffer()));
         } finally {
             // reset stdout/err
             try {

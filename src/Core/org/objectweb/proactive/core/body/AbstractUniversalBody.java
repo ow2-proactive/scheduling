@@ -62,8 +62,7 @@ import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolExcept
  * @since   ProActive 0.9.3
  *
  */
-public abstract class AbstractUniversalBody implements UniversalBody,
-    Serializable {
+public abstract class AbstractUniversalBody implements UniversalBody, Serializable {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
@@ -106,15 +105,14 @@ public abstract class AbstractUniversalBody implements UniversalBody,
      * @param remoteBodyFactory the factory able to construct new factories for each type of meta objects
      *                needed by this body
      */
-    public AbstractUniversalBody(String nodeURL, String jobID)
-        throws ActiveObjectCreationException {
+    public AbstractUniversalBody(String nodeURL, String jobID) throws ActiveObjectCreationException {
         this.nodeURL = nodeURL;
         this.bodyID = new UniqueID();
         this.location = new BodyMap();
         this.jobID = jobID;
 
         this.roe = new RemoteObjectExposer(UniversalBody.class.getName(), this,
-                new UniversalBodyRemoteObjectAdapter());
+            new UniversalBodyRemoteObjectAdapter());
 
         URI uri = RemoteObjectHelper.generateUrl(this.bodyID.toString());
 
@@ -127,8 +125,7 @@ public abstract class AbstractUniversalBody implements UniversalBody,
         }
     }
 
-    protected RemoteRemoteObject register(URI uri)
-        throws UnknownProtocolException {
+    protected RemoteRemoteObject register(URI uri) throws UnknownProtocolException {
         return this.roe.activateProtocol(uri);
     }
 
@@ -164,13 +161,11 @@ public abstract class AbstractUniversalBody implements UniversalBody,
     //
     // -- PRIVATE METHODS -----------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         out.defaultWriteObject();
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         if (this.bodyID == null) {
             // it may happen that the bodyID is set to null before serialization if we want to
@@ -180,7 +175,7 @@ public abstract class AbstractUniversalBody implements UniversalBody,
 
         // remoteBody is transient so we recreate it here
         this.roe = new RemoteObjectExposer(UniversalBody.class.getName(), this,
-                new UniversalBodyRemoteObjectAdapter());
+            new UniversalBodyRemoteObjectAdapter());
 
         URI uri = RemoteObjectHelper.generateUrl(this.bodyID.toString());
 
@@ -207,8 +202,7 @@ public abstract class AbstractUniversalBody implements UniversalBody,
         this.shortcuts.put(shortcut.getLinkedInterfaceID(), shortcut);
     }
 
-    public void register(String url)
-        throws IOException, UnknownProtocolException {
+    public void register(String url) throws IOException, UnknownProtocolException {
         this.roe.activateProtocol(URI.create(url));
     }
 

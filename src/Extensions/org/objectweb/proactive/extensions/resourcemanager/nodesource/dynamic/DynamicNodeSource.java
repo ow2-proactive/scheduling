@@ -76,8 +76,8 @@ import org.objectweb.proactive.extensions.resourcemanager.utils.Heap;
  * @since ProActive 3.9
  *
  */
-public abstract class DynamicNodeSource extends NodeSource
-    implements DynamicNSInterface, Serializable, RunActive {
+public abstract class DynamicNodeSource extends NodeSource implements DynamicNSInterface, Serializable,
+        RunActive {
 
     /** nodes URL and when they must be released */
     private HashMap<String, Long> nodes_ttr;
@@ -122,8 +122,7 @@ public abstract class DynamicNodeSource extends NodeSource
      * @param nice Time to wait before acquire a new node just after a node release.
      * @param ttr Node keeping duration before releasing it.
      */
-    public DynamicNodeSource(String id, RMCoreSourceInt imcore, int nbMaxNodes,
-        int nice, int ttr) {
+    public DynamicNodeSource(String id, RMCoreSourceInt imcore, int nbMaxNodes, int nice, int ttr) {
         super(id, imcore);
         this.nbMax = nbMaxNodes;
         this.nice = nice;
@@ -189,8 +188,7 @@ public abstract class DynamicNodeSource extends NodeSource
             }
         } else {
             //no nodes to remove, shutdown directly the NodeSource
-            this.imCore.internalRemoveSource(this.SourceId,
-                this.getSourceEvent());
+            this.imCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
             //terminates runActivty's infinite loop.
             running = false;
         }
@@ -288,8 +286,7 @@ public abstract class DynamicNodeSource extends NodeSource
         }
 
         // Getting part
-        while ((nodes.size() < nbMax) && (niceTimes.peek() != null) &&
-                (niceTimes.peek() < currentTime)) {
+        while ((nodes.size() < nbMax) && (niceTimes.peek() != null) && (niceTimes.peek() < currentTime)) {
             Node node = getNode();
             if (node == null) {
                 niceTimes.extract();
@@ -297,8 +294,7 @@ public abstract class DynamicNodeSource extends NodeSource
                 break;
             } else {
                 currentTime = System.currentTimeMillis();
-                nodes_ttr.put(node.getNodeInformation().getURL(),
-                    currentTime + ttr);
+                nodes_ttr.put(node.getNodeInformation().getURL(), currentTime + ttr);
                 this.addNewAvailableNode(node, this.SourceId, this.SourceId);
                 niceTimes.extract();
             }
@@ -377,8 +373,7 @@ public abstract class DynamicNodeSource extends NodeSource
                 if (this.nodes.size() == 0) {
                     //Node source is to shutdown and all nodes have been removed :
                     //finish the shutdown
-                    this.imCore.internalRemoveSource(this.SourceId,
-                        this.getSourceEvent());
+                    this.imCore.internalRemoveSource(this.SourceId, this.getSourceEvent());
                     //terminates runActivty's infinite loop.
                     running = false;
                 }

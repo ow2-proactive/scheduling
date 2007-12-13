@@ -72,8 +72,7 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
      * @exception java.io.IOException if the request cannot be accepted
      * @return value for fault-tolerance protocol
      */
-    public int receiveRequest(Request request)
-        throws java.io.IOException, RenegotiateSessionException;
+    public int receiveRequest(Request request) throws java.io.IOException, RenegotiateSessionException;
 
     /**
      * Receives a reply in response to a former request.
@@ -106,8 +105,7 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
      * @param body the stub to the new location
      * @exception java.io.IOException if a pb occurs during this method call
      */
-    public void updateLocation(UniqueID id, UniversalBody body)
-        throws java.io.IOException;
+    public void updateLocation(UniqueID id, UniversalBody body) throws java.io.IOException;
 
     /**
      * similar to the {@link UniversalBody#updateLocation(org.objectweb.proactive.core.UniqueID, UniversalBody)} method,
@@ -160,8 +158,7 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
      * @return its associated response
      * @throws IOException if a pb occurs during this method call
      */
-    public GCResponse receiveGCMessage(GCMessage toSend)
-        throws IOException;
+    public GCResponse receiveGCMessage(GCMessage toSend) throws IOException;
 
     /**
      * Inform the DGC that an active object is pinned somewhere so cannot
@@ -171,6 +168,5 @@ public interface UniversalBody extends Job, Serializable, SecurityEntity {
      */
     public void setRegistered(boolean registered) throws IOException;
 
-    public void register(String url)
-        throws IOException, UnknownProtocolException;
+    public void register(String url) throws IOException, UnknownProtocolException;
 }

@@ -148,8 +148,7 @@ public class MonitoringView extends ViewPart {
         FormData graphicalViewerData = new FormData();
         graphicalViewerData.left = new FormAttachment(0, 0);
         graphicalViewerData.right = new FormAttachment(100, 0);
-        graphicalViewerData.top = new FormAttachment(virtualNodesGroup.getGroup(),
-                0);
+        graphicalViewerData.top = new FormAttachment(virtualNodesGroup.getGroup(), 0);
         graphicalViewerData.bottom = new FormAttachment(100, -limit);
         graphicalViewer.getControl().setLayoutData(graphicalViewerData);
 
@@ -183,12 +182,12 @@ public class MonitoringView extends ViewPart {
         autoResetEnable.setToolTipText("Enable or Disable the Auto Reset");
         autoResetEnable.setSelection(WorldObject.DEFAULT_ENABLE_AUTO_RESET);
         autoResetEnable.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    boolean selected = autoResetEnable.getSelection();
-                    world.setEnableAutoResetTime(selected);
-                }
-            });
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean selected = autoResetEnable.getSelection();
+                world.setEnableAutoResetTime(selected);
+            }
+        });
 
         final Spinner autoReset = new Spinner(autoResetGroup, SWT.NONE);
         // Allow 0 decimal places
@@ -203,27 +202,24 @@ public class MonitoringView extends ViewPart {
         autoReset.setSelection(WorldObject.DEFAULT_AUTO_RESET_TIME);
         autoReset.setToolTipText("Auto reset time of the arrows");
         autoReset.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseUp(MouseEvent e) {
+            @Override
+            public void mouseUp(MouseEvent e) {
+                int selection = autoReset.getSelection();
+                world.setAutoResetTime(selection);
+            }
+        });
+
+        autoReset.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if ((e.keyCode == SWT.KEYPAD_CR) || (e.keyCode == SWT.CR) || (e.keyCode == SWT.UP) ||
+                    (e.keyCode == SWT.DOWN) || (e.keyCode == SWT.ARROW_UP) || (e.keyCode == SWT.ARROW_DOWN) ||
+                    (e.keyCode == SWT.PAGE_UP) || (e.keyCode == SWT.PAGE_DOWN)) {
                     int selection = autoReset.getSelection();
                     world.setAutoResetTime(selection);
                 }
-            });
-
-        autoReset.addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyReleased(KeyEvent e) {
-                    if ((e.keyCode == SWT.KEYPAD_CR) || (e.keyCode == SWT.CR) ||
-                            (e.keyCode == SWT.UP) || (e.keyCode == SWT.DOWN) ||
-                            (e.keyCode == SWT.ARROW_UP) ||
-                            (e.keyCode == SWT.ARROW_DOWN) ||
-                            (e.keyCode == SWT.PAGE_UP) ||
-                            (e.keyCode == SWT.PAGE_DOWN)) {
-                        int selection = autoReset.getSelection();
-                        world.setAutoResetTime(selection);
-                    }
-                }
-            });
+            }
+        });
 
         Label titleLabel = new Label(autoResetGroup, SWT.NONE);
         titleLabel.setText("seconds");
@@ -235,8 +231,7 @@ public class MonitoringView extends ViewPart {
 
         bProportional = new Button(drawingStyleGroup, SWT.RADIO);
         bProportional.setText("Proportional");
-        bProportional.addSelectionListener(new DrawingStyleButtonListener(
-                parent));
+        bProportional.addSelectionListener(new DrawingStyleButtonListener(parent));
 
         bRatio = new Button(drawingStyleGroup, SWT.RADIO);
         bRatio.setText("Ratio");
@@ -266,24 +261,20 @@ public class MonitoringView extends ViewPart {
         resetTopology.addSelectionListener(new ResetTopologyListener());
 
         // --------------------
-        IToolBarManager toolBarManager = getViewSite().getActionBars()
-                                             .getToolBarManager();
+        IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
 
         // Adds "Monitor a new Host" action to the view's toolbar
-        NewHostAction toolBarNewHost = new NewHostAction(parent.getDisplay(),
-                world);
+        NewHostAction toolBarNewHost = new NewHostAction(parent.getDisplay(), world);
         toolBarManager.add(toolBarNewHost);
 
         // Adds "Set depth" action to the view's toolbar
-        SetDepthAction toolBarSetDepth = new SetDepthAction(parent.getDisplay(),
-                world);
+        SetDepthAction toolBarSetDepth = new SetDepthAction(parent.getDisplay(), world);
         toolBarManager.add(toolBarSetDepth);
 
         toolBarManager.add(new Separator());
 
         // Adds "Set Time to refresh" action to the view's toolbar
-        SetTTRAction toolBarTTR = new SetTTRAction(parent.getDisplay(),
-                world.getMonitorThread());
+        SetTTRAction toolBarTTR = new SetTTRAction(parent.getDisplay(), world.getMonitorThread());
         toolBarManager.add(toolBarTTR);
 
         // Adds refresh action to the view's toolbar
@@ -291,7 +282,8 @@ public class MonitoringView extends ViewPart {
         toolBarManager.add(toolBarRefresh);
 
         // Adds enable/disable monitoring action to the view's toolbar
-        EnableDisableMonitoringAction toolBarEnableDisableMonitoring = new EnableDisableMonitoringAction(world);
+        EnableDisableMonitoringAction toolBarEnableDisableMonitoring = new EnableDisableMonitoringAction(
+            world);
         toolBarManager.add(toolBarEnableDisableMonitoring);
 
         // Adds enable/disable monitoring action to the view's toolbar
@@ -301,18 +293,17 @@ public class MonitoringView extends ViewPart {
         toolBarManager.add(new Separator());
 
         // Adds Zoom-in and Zoom-out actions to the view's toolbar
-        ZoomManager zoomManager = ((ScalableFreeformRootEditPart) graphicalViewer.getRootEditPart()).getZoomManager();
+        ZoomManager zoomManager = ((ScalableFreeformRootEditPart) graphicalViewer.getRootEditPart())
+                .getZoomManager();
         zoomManager.setZoomLevels(new double[] { 0.25, 0.5, 0.75, 1.0, 1.5 });
 
         ZoomInAction zoomIn = new ZoomInAction(zoomManager);
-        zoomIn.setImageDescriptor(ImageDescriptor.createFromFile(
-                MonitoringView.class, "zoom-in-2.gif"));
+        zoomIn.setImageDescriptor(ImageDescriptor.createFromFile(MonitoringView.class, "zoom-in-2.gif"));
         graphicalViewer.getActionRegistry().registerAction(zoomIn);
         toolBarManager.add(zoomIn);
 
         ZoomOutAction zoomOut = new ZoomOutAction(zoomManager);
-        zoomOut.setImageDescriptor(ImageDescriptor.createFromFile(
-                MonitoringView.class, "zoom-out-2.gif"));
+        zoomOut.setImageDescriptor(ImageDescriptor.createFromFile(MonitoringView.class, "zoom-out-2.gif"));
         graphicalViewer.getActionRegistry().registerAction(zoomOut);
         toolBarManager.add(zoomOut);
 
@@ -371,7 +362,6 @@ public class MonitoringView extends ViewPart {
     //
     // -- PROTECTED METHODS -------------------------------------------
     //
-
     /**
      * Returns the <code>EditPartFactory</code> that the
      * <code>GraphicalViewer</code> will use.
@@ -434,8 +424,7 @@ public class MonitoringView extends ViewPart {
         registry.registerAction(new NewHostAction(display, world));
         registry.registerAction(new SetDepthAction(display, world));
         registry.registerAction(new RefreshAction(world.getMonitorThread()));
-        registry.registerAction(new SetTTRAction(display,
-                world.getMonitorThread()));
+        registry.registerAction(new SetTTRAction(display, world.getMonitorThread()));
         registry.registerAction(new RefreshHostAction());
         registry.registerAction(new RefreshJVMAction());
         registry.registerAction(new RefreshNodeAction());
@@ -448,17 +437,16 @@ public class MonitoringView extends ViewPart {
         // Get all available actions defined by possibly provided 
         // extensions for the extension point monitoring_action	
         try {
-            IExtensionPoint extensionPoint = Platform.getExtensionRegistry()
-                                                     .getExtensionPoint(Activator.PLUGIN_ID +
-                    ".actions_extension");
+            IExtensionPoint extensionPoint = Platform.getExtensionRegistry().getExtensionPoint(
+                    Activator.PLUGIN_ID + ".actions_extension");
             if (extensionPoint == null) {
                 return;
             }
             IConfigurationElement[] configs = extensionPoint.getConfigurationElements();
 
             for (int x = 0; x < configs.length; x++) {
-                IActionExtPoint providedAction = (IActionExtPoint) configs[x].createExecutableExtension(
-                        "class");
+                IActionExtPoint providedAction = (IActionExtPoint) configs[x]
+                        .createExecutableExtension("class");
                 registry.registerAction(providedAction);
             }
         } catch (Exception ex) {
@@ -468,15 +456,15 @@ public class MonitoringView extends ViewPart {
 
     private void initStateRadioButtons() {
         switch (RoundedLine.DEFAULT_STYLE) {
-        case FIXED:
-            bFixed.setSelection(true);
-            break;
-        case PROPORTIONAL:
-            bProportional.setSelection(true);
-            break;
-        case RATIO:
-            bRatio.setSelection(true);
-            break;
+            case FIXED:
+                bFixed.setSelection(true);
+                break;
+            case PROPORTIONAL:
+                bProportional.setSelection(true);
+                break;
+            case RATIO:
+                bRatio.setSelection(true);
+                break;
         }
     }
 

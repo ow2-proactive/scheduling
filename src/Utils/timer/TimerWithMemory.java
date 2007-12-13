@@ -38,8 +38,7 @@ import org.objectweb.proactive.core.util.profiling.Timer;
 /**
  * A timer which retains the values measured in addition to calculating the average
  */
-public class TimerWithMemory extends AverageMicroTimer implements Timer,
-    Serializable {
+public class TimerWithMemory extends AverageMicroTimer implements Timer, Serializable {
     protected long[] memory;
     protected int position;
 
@@ -145,7 +144,6 @@ public class TimerWithMemory extends AverageMicroTimer implements Timer,
         System.out.println("Average is " + mt.getAverage());
         System.out.println("Variance is " + mt.getVariance());
 
-        System.out.println("Standard deviation is " +
-            mt.getStandardDeviation());
+        System.out.println("Standard deviation is " + mt.getStandardDeviation());
     }
 }

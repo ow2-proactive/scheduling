@@ -66,12 +66,10 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param creatorID UniqueID of the creator body of the future
      * @param bodyDest body which receives the future (id, bodyID)
      */
-    public synchronized void addAutomaticContinuation(long id,
-        UniqueID creatorID, UniversalBody bodyDest) {
+    public synchronized void addAutomaticContinuation(long id, UniqueID creatorID, UniversalBody bodyDest) {
         java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID == null) {
-            throw new ProActiveRuntimeException(
-                "There is no map for creatorID " + creatorID);
+            throw new ProActiveRuntimeException("There is no map for creatorID " + creatorID);
         }
         FuturesAndACs listes = indexedByID.get(new Long(id));
 
@@ -79,8 +77,7 @@ public class FutureMap extends Object implements java.io.Serializable {
         if (listes != null) {
             listes.addDestinationsAC(bodyDest);
         } else {
-            throw new ProActiveRuntimeException("There is no list for future " +
-                id);
+            throw new ProActiveRuntimeException("There is no list for future " + id);
         }
     }
 
@@ -122,8 +119,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param id sequence id of the future
      * @param creatorID UniqueID of the creator body of the future
      */
-    public synchronized ArrayList<Future> getFuturesToUpdate(long id,
-        UniqueID creatorID) {
+    public synchronized ArrayList<Future> getFuturesToUpdate(long id, UniqueID creatorID) {
         java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
         ArrayList<Future> result = null;
 
@@ -141,8 +137,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param id sequence id of the future
      * @param bodyID UniqueID of the creator body of the future
      */
-    public synchronized ArrayList<UniversalBody> getAutomaticContinuation(
-        long id, UniqueID bodyID) {
+    public synchronized ArrayList<UniversalBody> getAutomaticContinuation(long id, UniqueID bodyID) {
         java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(bodyID));
         ArrayList<UniversalBody> result = null;
         if (indexedByID != null) {

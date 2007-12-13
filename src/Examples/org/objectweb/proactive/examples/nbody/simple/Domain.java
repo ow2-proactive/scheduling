@@ -67,8 +67,7 @@ public class Domain implements Serializable {
     public Domain(Integer i, Planet planet) {
         this.identification = i.intValue();
         this.info = planet;
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /**
@@ -115,8 +114,7 @@ public class Domain implements Serializable {
         this.values[id] = inf;
         this.nbReceived++;
         if (this.nbReceived > this.nbvalues) { // This is a bad sign!
-            System.err.println("Domain " + identification +
-                " received too many answers");
+            System.err.println("Domain " + identification + " received too many answers");
         }
         if (this.nbReceived == this.nbvalues) {
             this.maestro.notifyFinished();
@@ -137,19 +135,17 @@ public class Domain implements Serializable {
                 logger.info("Compute movement.");
             }
         } else {
-            this.display.drawBody(this.info.x, this.info.y, this.info.z,
-                this.info.vx, this.info.vy, this.info.vz, (int) this.info.mass,
-                (int) this.info.diameter, this.identification, this.hostName);
+            this.display.drawBody(this.info.x, this.info.y, this.info.z, this.info.vx, this.info.vy,
+                    this.info.vz, (int) this.info.mass, (int) this.info.diameter, this.identification,
+                    this.hostName);
         }
     }
 
     /**
      * Method called when the object is redeployed on a new Node (Fault recovery, or migration).
      */
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

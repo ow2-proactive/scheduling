@@ -40,8 +40,8 @@ import org.objectweb.proactive.core.migration.MigrationStrategyManagerImpl;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
 
-public class PenguinControler implements org.objectweb.proactive.RunActive,
-    PenguinMessageReceiver, java.io.Serializable {
+public class PenguinControler implements org.objectweb.proactive.RunActive, PenguinMessageReceiver,
+        java.io.Serializable {
     //The image panel
     private transient PenguinApplet display;
     protected CircularArrayList penguinList;
@@ -62,8 +62,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive,
     }
 
     public void rebuild() {
-        this.display = new PenguinApplet((PenguinControler) PAActiveObject.getStubOnThis(),
-                penguinList);
+        this.display = new PenguinApplet((PenguinControler) PAActiveObject.getStubOnThis(), penguinList);
     }
 
     public void clean() {
@@ -83,8 +82,8 @@ public class PenguinControler implements org.objectweb.proactive.RunActive,
 
     public Penguin createPenguin(int n) {
         try {
-            Penguin newPenguin = (Penguin) org.objectweb.proactive.api.PAActiveObject.newActive(Penguin.class.getName(),
-                    new Object[] { new Integer(n) });
+            Penguin newPenguin = (Penguin) org.objectweb.proactive.api.PAActiveObject.newActive(Penguin.class
+                    .getName(), new Object[] { new Integer(n) });
             newPenguin.initialize(args);
             newPenguin.setControler((PenguinControler) PAActiveObject.getStubOnThis());
             return newPenguin;
@@ -96,7 +95,8 @@ public class PenguinControler implements org.objectweb.proactive.RunActive,
 
     public void runActivity(Body b) {
         org.objectweb.proactive.Service service = new org.objectweb.proactive.Service(b);
-        myStrategyManager = new MigrationStrategyManagerImpl((org.objectweb.proactive.core.body.migration.Migratable) b);
+        myStrategyManager = new MigrationStrategyManagerImpl(
+            (org.objectweb.proactive.core.body.migration.Migratable) b);
         myStrategyManager.onDeparture("clean");
         rebuild();
         service.fifoServing();
@@ -116,8 +116,7 @@ public class PenguinControler implements org.objectweb.proactive.RunActive,
         // Version with descriptor
         ProActiveDescriptor proActiveDescriptor = null;
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                    args[0]);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + args[0]);
             proActiveDescriptor.activateMappings();
             VirtualNode vn1 = proActiveDescriptor.getVirtualNode("penguinNode");
 

@@ -48,8 +48,7 @@ public abstract class TopologyGroup extends ProxyForGroup {
      * @param size - the number of member of g used to build the topology
      * @throws ConstructionOfReifiedObjectFailedException
      */
-    public TopologyGroup(Group g, int size)
-        throws ConstructionOfReifiedObjectFailedException {
+    public TopologyGroup(Group g, int size) throws ConstructionOfReifiedObjectFailedException {
         super(g.getTypeName());
         for (int i = 0; i < size; i++) {
             this.add(g.get(i));

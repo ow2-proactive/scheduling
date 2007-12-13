@@ -124,10 +124,10 @@ public final class TaskId implements Comparable<TaskId>, Serializable {
     }
 
     /**
-    * Return the human readable name associated to this id.
-    *
-    * @return the human readable name associated to this id.
-    */
+     * Return the human readable name associated to this id.
+     *
+     * @return the human readable name associated to this id.
+     */
     public String getReadableName() {
         return this.readableName;
     }

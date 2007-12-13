@@ -49,8 +49,7 @@ class ConquerInst<Y, R> implements Instruction<Y, R> {
         this.conq = conq;
     }
 
-    public Task<R> compute(SkeletonSystemImpl system, Task<Y> parent)
-        throws Exception {
+    public Task<R> compute(SkeletonSystemImpl system, Task<Y> parent) throws Exception {
 
         /*
          * We get the result objects from the child and then we execute the
@@ -58,8 +57,7 @@ class ConquerInst<Y, R> implements Instruction<Y, R> {
          * result of the conquer.
          */
         Timer timer = new Timer();
-        R resultObject = conq.conquer(system,
-                parent.family.getFinishedChildParams());
+        R resultObject = conq.conquer(system, parent.family.getFinishedChildParams());
         timer.stop();
         Task<R> resultTask = parent.reBirth(resultObject);
 

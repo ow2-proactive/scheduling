@@ -49,8 +49,8 @@ public class DiaryImpl implements Diary, Serializable {
     protected ArrayList<String> entries;
 
     public DiaryImpl() {
-    }
-    ;
+    };
+
     public DiaryImpl(String name) {
         diaryName = name;
     }

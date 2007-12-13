@@ -105,15 +105,13 @@ public class Exercise implements Serializable {
 
     static class CompareByComputationTime implements Comparator<Exercise> {
         public int compare(Exercise o1, Exercise o2) {
-            return (new Long(o1.computationTime)).compareTo(new Long(
-                    o2.computationTime));
+            return (new Long(o1.computationTime)).compareTo(new Long(o2.computationTime));
         }
     }
 
     static class CompareByInvokedTimes implements Comparator<Exercise> {
         public int compare(Exercise o1, Exercise o2) {
-            return (new Long(o1.numberExecutedTimes)).compareTo(new Long(
-                    o2.numberExecutedTimes));
+            return (new Long(o1.numberExecutedTimes)).compareTo(new Long(o2.numberExecutedTimes));
         }
     }
 }

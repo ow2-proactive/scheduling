@@ -60,8 +60,8 @@ public class ContentDescription implements Serializable {
      * @param activity the activity as defined in the ProActive model
      * @param factory overriden meta-object factory for the component. Can be null.
      */
-    public ContentDescription(String className, Object[] constructorParameters,
-        Active activity, MetaObjectFactory factory) {
+    public ContentDescription(String className, Object[] constructorParameters, Active activity,
+            MetaObjectFactory factory) {
         this.className = className;
         this.constructorParameters = constructorParameters;
         this.activity = activity;

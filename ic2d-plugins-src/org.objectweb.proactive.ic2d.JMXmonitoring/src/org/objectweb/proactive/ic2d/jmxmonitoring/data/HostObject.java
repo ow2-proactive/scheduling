@@ -74,8 +74,8 @@ public class HostObject extends AbstractData {
      * @throws NullPointerException
      * @throws MalformedObjectNameException
      */
-    protected HostObject(WorldObject parent, String url, int rank)
-        throws MalformedObjectNameException, NullPointerException {
+    protected HostObject(WorldObject parent, String url, int rank) throws MalformedObjectNameException,
+            NullPointerException {
         super(new ObjectName(FactoryName.HOST));
 
         this.hostName = URIBuilder.getHostNameFromUrl(url);
@@ -222,8 +222,7 @@ public class HostObject extends AbstractData {
         }
 
         // Some child have to be removed
-        for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator();
-                iter.hasNext();) {
+        for (Iterator<AbstractData> iter = childrenToRemoved.values().iterator(); iter.hasNext();) {
             RuntimeObject child = (RuntimeObject) iter.next();
             child.destroy();
         }
@@ -242,15 +241,14 @@ public class HostObject extends AbstractData {
                 e.printStackTrace();
             }
 
-            OperatingSystemMXBean proxyMXBean = (OperatingSystemMXBean) MBeanServerInvocationHandler.newProxyInstance(connection,
-                    OSoname, OperatingSystemMXBean.class, false);
+            OperatingSystemMXBean proxyMXBean = (OperatingSystemMXBean) MBeanServerInvocationHandler
+                    .newProxyInstance(connection, OSoname, OperatingSystemMXBean.class, false);
             this.osName = proxyMXBean.getName();
             this.osVersion = proxyMXBean.getVersion();
 
             setChanged();
-            notifyObservers(new MVCNotification(
-                    MVCNotificationTag.HOST_OBJECT_UPDATED_OSNAME_AND_VERSON,
-                    this.toString()));
+            notifyObservers(new MVCNotification(MVCNotificationTag.HOST_OBJECT_UPDATED_OSNAME_AND_VERSON,
+                this.toString()));
         }
     }
 
@@ -265,9 +263,8 @@ public class HostObject extends AbstractData {
         if (child instanceof RuntimeObject) {
             RuntimeObject runtimeObject = (RuntimeObject) child;
             ObjectName oname = runtimeObject.getObjectName();
-            JMXNotificationManager.getInstance()
-                                  .subscribe(oname,
-                runtimeObject.getListener(), runtimeObject.getUrl());
+            JMXNotificationManager.getInstance().subscribe(oname, runtimeObject.getListener(),
+                    runtimeObject.getUrl());
         }
 
         super.addChild(child);

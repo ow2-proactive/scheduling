@@ -388,8 +388,7 @@ public class C3DRenderingEngine implements java.io.Serializable {
                 }
 
                 // Sets the pixels
-                row[pixCounter++] = alpha | (red << 16) | (green << 8) |
-                    (blue);
+                row[pixCounter++] = alpha | (red << 16) | (green << 8) | (blue);
             } // end for (x)
         } // end for (y)
 

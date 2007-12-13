@@ -42,8 +42,7 @@ import org.objectweb.proactive.core.event.RequestQueueEventListener;
 import org.objectweb.proactive.core.util.CircularArrayList;
 
 
-public class RequestQueueImpl extends AbstractEventProducer implements java.io.Serializable,
-    RequestQueue {
+public class RequestQueueImpl extends AbstractEventProducer implements java.io.Serializable, RequestQueue {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
     //
@@ -122,8 +121,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
 
         // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-            notifyAllListeners(new RequestQueueEvent(ownerID,
-                    RequestQueueEvent.REMOVE_REQUEST));
+            notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
         }
 
         // END ProActiveEvent
@@ -169,8 +167,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
 
         // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-            notifyAllListeners(new RequestQueueEvent(ownerID,
-                    RequestQueueEvent.REMOVE_REQUEST));
+            notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
         }
 
         // END ProActiveEvent
@@ -201,8 +198,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
 
         //if the request is non functional and priority, a reference on it is added in a nonFunctionalRequestsQueue.
         int priority = request.getNFRequestPriority();
-        if ((priority == Request.NFREQUEST_IMMEDIATE_PRIORITY) ||
-                (priority == Request.NFREQUEST_PRIORITY)) {
+        if ((priority == Request.NFREQUEST_IMMEDIATE_PRIORITY) || (priority == Request.NFREQUEST_PRIORITY)) {
             nfRequestsProcessor.addToNFRequestsQueue(request);
         }
 
@@ -210,8 +206,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
 
         // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-            notifyAllListeners(new RequestQueueEvent(ownerID,
-                    RequestQueueEvent.ADD_REQUEST));
+            notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.ADD_REQUEST));
         }
 
         // END ProActiveEvent
@@ -223,8 +218,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
 
         //if the request is non functional and priority, a reference on it is added in a nonFunctionalRequestsQueue.
         int priority = request.getNFRequestPriority();
-        if ((priority == Request.NFREQUEST_IMMEDIATE_PRIORITY) ||
-                (priority == Request.NFREQUEST_PRIORITY)) {
+        if ((priority == Request.NFREQUEST_IMMEDIATE_PRIORITY) || (priority == Request.NFREQUEST_PRIORITY)) {
             nfRequestsProcessor.addToNFRequestsQueue(request);
         }
 
@@ -232,16 +226,14 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
 
         // ProActiveEvent
         if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-            notifyAllListeners(new RequestQueueEvent(ownerID,
-                    RequestQueueEvent.ADD_REQUEST));
+            notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.ADD_REQUEST));
         }
 
         // END ProActiveEvent
         return ftres;
     }
 
-    public synchronized void processRequests(RequestProcessor processor,
-        Body body) {
+    public synchronized void processRequests(RequestProcessor processor, Body body) {
         for (int i = 0; i < requestQueue.size(); i++) {
             Request r;
 
@@ -258,28 +250,26 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
             r = (Request) requestQueue.get(i);
             int result = processor.processRequest(r);
             switch (result) {
-            case RequestProcessor.REMOVE_AND_SERVE:
-                requestQueue.remove(i);
-                i--;
+                case RequestProcessor.REMOVE_AND_SERVE:
+                    requestQueue.remove(i);
+                    i--;
 
-                // ProActiveEvent
-                if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-                    notifyAllListeners(new RequestQueueEvent(ownerID,
-                            RequestQueueEvent.REMOVE_REQUEST));
-                }
-                // END ProActiveEvent
-                body.serve(r);
-                break;
-            case RequestProcessor.REMOVE:
-                requestQueue.remove(i);
-                i--;
-                if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-                    notifyAllListeners(new RequestQueueEvent(ownerID,
-                            RequestQueueEvent.REMOVE_REQUEST));
-                }
-                break;
-            case RequestProcessor.KEEP:
-                break;
+                    // ProActiveEvent
+                    if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
+                        notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
+                    }
+                    // END ProActiveEvent
+                    body.serve(r);
+                    break;
+                case RequestProcessor.REMOVE:
+                    requestQueue.remove(i);
+                    i--;
+                    if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
+                        notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
+                    }
+                    break;
+                case RequestProcessor.KEEP:
+                    break;
             }
         }
     }
@@ -287,14 +277,12 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     @Override
     public synchronized String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append("--- RequestQueueImpl n=").append(requestQueue.size())
-          .append("   requests --- ->\n");
+        sb.append("--- RequestQueueImpl n=").append(requestQueue.size()).append("   requests --- ->\n");
         int count = 0;
         java.util.Iterator iterator = requestQueue.iterator();
         while (iterator.hasNext()) {
             Request currentrequest = (Request) iterator.next();
-            sb.append(count).append("--> ")
-              .append(currentrequest.getMethodName()).append("\n");
+            sb.append(count).append("--> ").append(currentrequest.getMethodName()).append("\n");
             count++;
         }
         sb.append("--- End RequestQueueImpl ---");
@@ -306,8 +294,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
         addListener(listener);
     }
 
-    public void removeRequestQueueEventListener(
-        RequestQueueEventListener listener) {
+    public void removeRequestQueueEventListener(RequestQueueEventListener listener) {
         removeListener(listener);
     }
 
@@ -315,8 +302,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     // -- PROTECTED METHODS -----------------------------------------------
     //
     @Override
-    protected void notifyOneListener(ProActiveListener listener,
-        ProActiveEvent event) {
+    protected void notifyOneListener(ProActiveListener listener, ProActiveEvent event) {
         ((RequestQueueEventListener) listener).requestQueueModified((RequestQueueEvent) event);
     }
 
@@ -355,8 +341,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
 
                     // ProActiveEvent
                     if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-                        notifyAllListeners(new RequestQueueEvent(ownerID,
-                                RequestQueueEvent.REMOVE_REQUEST));
+                        notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
                     }
 
                     // END ProActiveEvent
@@ -375,8 +360,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
      * @param shouldRemove whether to remove the request found or not
      * @return the youngest matching request or null
      */
-    private Request findYoungest(RequestFilter requestFilter,
-        boolean shouldRemove) {
+    private Request findYoungest(RequestFilter requestFilter, boolean shouldRemove) {
         Request r;
 
         //First, we deal with priotity non functional requests
@@ -395,8 +379,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
 
                     // ProActiveEvent
                     if (SEND_ADD_REMOVE_EVENT && hasListeners()) {
-                        notifyAllListeners(new RequestQueueEvent(ownerID,
-                                RequestQueueEvent.REMOVE_REQUEST));
+                        notifyAllListeners(new RequestQueueEvent(ownerID, RequestQueueEvent.REMOVE_REQUEST));
                     }
 
                     // END ProActiveEvent
@@ -410,8 +393,7 @@ public class RequestQueueImpl extends AbstractEventProducer implements java.io.S
     //
     // -- INNER CLASSES -----------------------------------------------
     //
-    protected class RequestFilterOnMethodName implements RequestFilter,
-        java.io.Serializable {
+    protected class RequestFilterOnMethodName implements RequestFilter, java.io.Serializable {
         private String methodName;
 
         public RequestFilterOnMethodName() {

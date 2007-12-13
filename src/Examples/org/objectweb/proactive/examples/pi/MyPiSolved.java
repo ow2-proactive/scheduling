@@ -52,8 +52,7 @@ public class MyPiSolved {
 
         int numberOfWorkers = PAGroup.getGroup(piComputer).size();
 
-        Interval intervals = PiUtil.dividePI(numberOfWorkers,
-                numberOfDecimals.intValue());
+        Interval intervals = PiUtil.dividePI(numberOfWorkers, numberOfDecimals.intValue());
         PAGroup.setScatterGroup(intervals);
 
         Result results = piComputer.compute(intervals);

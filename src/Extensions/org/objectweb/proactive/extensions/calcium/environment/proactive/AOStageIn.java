@@ -55,8 +55,7 @@ public class AOStageIn {
      * @param next
      * @param taskpool
      */
-    public AOStageIn(AOTaskPool taskpool, FileServerClientImpl fserver,
-        AOStageCompute stageCompute) {
+    public AOStageIn(AOTaskPool taskpool, FileServerClientImpl fserver, AOStageCompute stageCompute) {
         super();
         this.fserver = fserver;
         this.stageCompute = stageCompute;

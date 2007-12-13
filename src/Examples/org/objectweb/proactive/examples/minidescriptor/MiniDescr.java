@@ -73,8 +73,8 @@ public class MiniDescr {
             Object[] param = null;
 
             for (int i = 0; i < nodes.length; i++) {
-                MiniDescrActive desc = (MiniDescrActive) PAActiveObject.newActive(MiniDescrActive.class.getName(),
-                        param, nodes[i]);
+                MiniDescrActive desc = (MiniDescrActive) PAActiveObject.newActive(MiniDescrActive.class
+                        .getName(), param, nodes[i]);
                 Message msg = desc.getComputerInfo();
                 logger.info("-+-+-+-+-+-+-+- " + msg + " -+-+-+-+-+-+-+-");
             }

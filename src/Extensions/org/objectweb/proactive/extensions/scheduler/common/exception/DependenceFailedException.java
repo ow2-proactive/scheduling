@@ -19,10 +19,10 @@ public class DependenceFailedException extends RuntimeException {
     /**  */
 
     /**
-    * Create a new instance of JobCreationException with the given messag
-    *
-    * @param msg the message to attach.
-    */
+     * Create a new instance of JobCreationException with the given messag
+     *
+     * @param msg the message to attach.
+     */
     public DependenceFailedException(String string) {
         super(string);
     }

@@ -61,8 +61,8 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
         String[] heterocommand = buildHeteronymousTransfer();
 
         //Put homonymous and heteronymous on the same array
-        String[] allCommands = new String[(homocommand.length() > 0)
-            ? (heterocommand.length + 1) : heterocommand.length];
+        String[] allCommands = new String[(homocommand.length() > 0) ? (heterocommand.length + 1)
+                : heterocommand.length];
 
         if (homocommand.length() > 0) {
             allCommands[allCommands.length - 1] = homocommand;
@@ -120,8 +120,8 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
         //files
         for (int i = 0; i < files.length; i++) {
             // prefix/filename
-            String fullfilename = FileTransferWorkShop.buildFilePathString(srcInfoParams,
-                    files[i].getSrcName());
+            String fullfilename = FileTransferWorkShop.buildFilePathString(srcInfoParams, files[i]
+                    .getSrcName());
 
             //Skip unreadable file
             if (!FileTransferWorkShop.isLocalReadable(fullfilename)) {
@@ -152,8 +152,8 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
 
         //Files & Dirs are the same
         for (int i = 0; i < files.length; i++) {
-            String fullfilename = FileTransferWorkShop.buildFilePathString(srcInfoParams,
-                    files[i].getSrcName());
+            String fullfilename = FileTransferWorkShop.buildFilePathString(srcInfoParams, files[i]
+                    .getSrcName());
 
             //Skip unreadable file
             if (!FileTransferWorkShop.isLocalReadable(fullfilename)) {
@@ -178,8 +178,7 @@ public class SecureCopyProtocol extends AbstractCopyProtocol {
             }
             sb.append(dstInfoParams.hostname).append(":");
 
-            sb.append(FileTransferWorkShop.buildFilePathString(dstInfoParams,
-                    files[i].getDestName()));
+            sb.append(FileTransferWorkShop.buildFilePathString(dstInfoParams, files[i].getDestName()));
 
             command.add(sb.toString());
         }

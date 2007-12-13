@@ -36,8 +36,8 @@ import java.io.Serializable;
 public class SerializableString implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private String v;
 
     public SerializableString() {

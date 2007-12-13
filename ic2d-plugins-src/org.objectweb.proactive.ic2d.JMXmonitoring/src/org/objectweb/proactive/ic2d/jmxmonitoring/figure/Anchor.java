@@ -77,15 +77,13 @@ public class Anchor extends EllipseAnchor {
         k = k * k;
 
         if ((orientation == Position.EAST) || (orientation == Position.WEST) ||
-                (orientation == Position.SAME)) {
+            (orientation == Position.SAME)) {
             return r.getCenter().translate((int) (r.width * dx), 0);
-        } else if ((orientation == Position.SOUTH) ||
-                (orientation == Position.NORTH)) {
+        } else if ((orientation == Position.SOUTH) || (orientation == Position.NORTH)) {
             return r.getCenter().translate(0, (int) (r.height * dy));
         } else {
-            return r.getCenter()
-                    .translate((int) ((r.width * dx) / Math.sqrt(1 + k)),
-                (int) ((r.height * dy) / Math.sqrt(1 + (1 / k))));
+            return r.getCenter().translate((int) ((r.width * dx) / Math.sqrt(1 + k)),
+                    (int) ((r.height * dy) / Math.sqrt(1 + (1 / k))));
         }
     }
 
@@ -101,24 +99,24 @@ public class Anchor extends EllipseAnchor {
      */
     public void useRelativePosition(Position positionOfTheTarget) {
         switch (positionOfTheTarget) {
-        case NORTH:
-            this.orientation = Position.EAST;
-            break;
-        case SOUTH:
-            this.orientation = Position.WEST;
-            break;
-        case EAST:
-            this.orientation = Position.NORTH;
-            break;
-        case WEST:
-            this.orientation = Position.SOUTH;
-            break;
-        case SAME:
-            this.orientation = Position.SAME;
-            break;
-        default: //Position.UNKNOWN
-            this.orientation = Position.UNKNOWN;
-            break;
+            case NORTH:
+                this.orientation = Position.EAST;
+                break;
+            case SOUTH:
+                this.orientation = Position.WEST;
+                break;
+            case EAST:
+                this.orientation = Position.NORTH;
+                break;
+            case WEST:
+                this.orientation = Position.SOUTH;
+                break;
+            case SAME:
+                this.orientation = Position.SAME;
+                break;
+            default: //Position.UNKNOWN
+                this.orientation = Position.UNKNOWN;
+                break;
         }
     }
 
@@ -133,22 +131,22 @@ public class Anchor extends EllipseAnchor {
             Rectangle rect = getOwner().getBounds();
             Point ref = rect.getCenter();
             switch (orientation) {
-            case EAST:
-                ref = ref.translate(rect.width / 2, 0);
-                break;
-            case SAME:
-            case WEST:
-                ref = ref.translate(-rect.width / 2, 0);
-                break;
-            case NORTH:
-                ref = ref.translate(0, -rect.height / 2);
-                break;
-            case SOUTH:
-                ref = ref.translate(0, rect.height / 2);
-                break;
-            default:
-                ref = super.getReferencePoint();
-                break;
+                case EAST:
+                    ref = ref.translate(rect.width / 2, 0);
+                    break;
+                case SAME:
+                case WEST:
+                    ref = ref.translate(-rect.width / 2, 0);
+                    break;
+                case NORTH:
+                    ref = ref.translate(0, -rect.height / 2);
+                    break;
+                case SOUTH:
+                    ref = ref.translate(0, rect.height / 2);
+                    break;
+                default:
+                    ref = super.getReferencePoint();
+                    break;
             }
             getOwner().translateToAbsolute(ref);
             return ref;

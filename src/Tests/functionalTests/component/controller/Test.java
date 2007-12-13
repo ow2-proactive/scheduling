@@ -53,16 +53,15 @@ import functionalTests.component.creation.ComponentInfo;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     Component componentA;
     String name;
     String nodeUrl;
     String result = null;
 
     public Test() {
-        super("Components : Addition of a custom controller",
-            "Components : Addition of a custom controller");
+        super("Components : Addition of a custom controller", "Components : Addition of a custom controller");
     }
 
     /**
@@ -74,22 +73,17 @@ public class Test extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
 
-        componentA = cf.newFcInstance(type_factory.createFcType(
-                    new InterfaceType[] {
-                        type_factory.createFcItfType("componentInfo",
-                            ComponentInfo.class.getName(), TypeFactory.SERVER,
-                            TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                    }),
-                new ControllerDescription("componentA", Constants.PRIMITIVE,
-                    getClass()
-                        .getResource("/functionalTests/component/controller/config.xml")
-                        .getPath()),
-                new ContentDescription(ComponentA.class.getName(),
-                    new Object[] { "toto" }));
+        componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
+                .createFcItfType("componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE), }), new ControllerDescription(
+            "componentA", Constants.PRIMITIVE, getClass().getResource(
+                    "/functionalTests/component/controller/config.xml").getPath()), new ContentDescription(
+            ComponentA.class.getName(), new Object[] { "toto" }));
         //logger.debug("OK, instantiated the component");
-        ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).setDummyValue(
-            "DUMMY");
-        result = ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME)).getDummyValue();
+        ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
+                .setDummyValue("DUMMY");
+        result = ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
+                .getDummyValue();
 
         Assert.assertEquals("DUMMY", result);
     }

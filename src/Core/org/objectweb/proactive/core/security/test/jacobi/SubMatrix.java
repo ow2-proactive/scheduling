@@ -163,8 +163,7 @@ public class SubMatrix {
         a = this.old[index + 1];
         for (int y = 1; y < (this.height - 1); y++) {
             for (int x = 1; x < (this.width - 1); x++) {
-                current = (b + a + this.old[index - this.width] +
-                    this.old[index + this.width]) / 4;
+                current = (b + a + this.old[index - this.width] + this.old[index + this.width]) / 4;
                 this.current[index] = current;
                 diff = Math.abs(current - n);
                 if (diff < this.minDiff) {
@@ -193,8 +192,7 @@ public class SubMatrix {
 
         // north-west corner
         index = 0;
-        current = (this.northNeighborBorder[0] + this.old[index + this.width] +
-            this.westNeighborBorder[0] + this.old[index + 1]) / 4;
+        current = (this.northNeighborBorder[0] + this.old[index + this.width] + this.westNeighborBorder[0] + this.old[index + 1]) / 4;
         this.current[index] = current;
         diff = Math.abs(current - this.old[index]);
         if (diff < this.minDiff) {
@@ -203,9 +201,8 @@ public class SubMatrix {
 
         // north-east corner
         index = this.width - 1;
-        current = (this.northNeighborBorder[this.width - 1] +
-            this.old[index + this.width] + this.old[index - 1] +
-            this.eastNeighborBorder[0]) / 4;
+        current = (this.northNeighborBorder[this.width - 1] + this.old[index + this.width] +
+            this.old[index - 1] + this.eastNeighborBorder[0]) / 4;
         this.current[index] = current;
         diff = Math.abs(current - this.old[index]);
         if (diff < this.minDiff) {
@@ -214,9 +211,7 @@ public class SubMatrix {
 
         // north border
         for (index = 1; index < (this.width - 1); index++) {
-            current = (this.northNeighborBorder[index] +
-                this.old[this.width + index] + this.old[index - 1] +
-                this.old[index + 1]) / 4;
+            current = (this.northNeighborBorder[index] + this.old[this.width + index] + this.old[index - 1] + this.old[index + 1]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -237,9 +232,8 @@ public class SubMatrix {
         // west border
         index = this.width;
         for (int i = 1; i < (this.height - 1); i++) {
-            current = (this.old[index - this.width] +
-                this.old[index + this.width] + this.westNeighborBorder[i] +
-                this.old[index + 1]) / 4;
+            current = (this.old[index - this.width] + this.old[index + this.width] +
+                this.westNeighborBorder[i] + this.old[index + 1]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -250,9 +244,8 @@ public class SubMatrix {
 
         // south-east corner
         index = (this.width * this.height) - 1;
-        current = (this.old[index - this.width] +
-            this.southNeighborBorder[this.width - 1] + this.old[index - 1] +
-            this.eastNeighborBorder[this.height - 1]) / 4;
+        current = (this.old[index - this.width] + this.southNeighborBorder[this.width - 1] +
+            this.old[index - 1] + this.eastNeighborBorder[this.height - 1]) / 4;
         this.current[index] = current;
         diff = Math.abs(current - this.old[index]);
         if (diff < this.minDiff) {
@@ -262,9 +255,7 @@ public class SubMatrix {
         // south border
         index = (this.width * (this.height - 1)) + 1;
         for (int i = 1; i < (this.width - 1); i++) {
-            current = (this.old[index - this.width] +
-                this.southNeighborBorder[i] + this.old[index - 1] +
-                this.old[index + 1]) / 4;
+            current = (this.old[index - this.width] + this.southNeighborBorder[i] + this.old[index - 1] + this.old[index + 1]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -276,9 +267,7 @@ public class SubMatrix {
         // east border
         index = (this.width * 2) - 1;
         for (int i = 1; i < (this.height - 1); i++) {
-            current = (this.old[index - this.width] +
-                this.old[index + this.width] + this.old[index - 1] +
-                this.eastNeighborBorder[i]) / 4;
+            current = (this.old[index - this.width] + this.old[index + this.width] + this.old[index - 1] + this.eastNeighborBorder[i]) / 4;
             this.current[index] = current;
             diff = Math.abs(current - this.old[index]);
             if (diff < this.minDiff) {
@@ -308,8 +297,8 @@ public class SubMatrix {
         try {
             topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
         } catch (ConstructionOfReifiedObjectFailedException e) {
-            System.err.println(
-                "** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
+            System.err
+                    .println("** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
             e.printStackTrace();
         }
 
@@ -367,8 +356,8 @@ public class SubMatrix {
         try {
             topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
         } catch (ConstructionOfReifiedObjectFailedException e) {
-            System.err.println(
-                "** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
+            System.err
+                    .println("** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
             e.printStackTrace();
         }
 
@@ -381,12 +370,10 @@ public class SubMatrix {
         try {
             this.neighbors = (SubMatrix) PAGroup.newGroup(SubMatrix.class.getName());
         } catch (ClassNotReifiableException e) {
-            System.err.println(
-                "** ClassNotReifiableException ** - Unable to build the neighbors group");
+            System.err.println("** ClassNotReifiableException ** - Unable to build the neighbors group");
             e.printStackTrace();
         } catch (ClassNotFoundException e) {
-            System.err.println(
-                "** ClassNotFoundException ** - Unable to build the neighbors group");
+            System.err.println("** ClassNotFoundException ** - Unable to build the neighbors group");
             e.printStackTrace();
         }
         Group neighborsGroup = PAGroup.getGroup(this.neighbors);
@@ -428,8 +415,8 @@ public class SubMatrix {
         try {
             topology = new Plan(allSubMatrix, Jacobi.WIDTH, Jacobi.HEIGHT);
         } catch (ConstructionOfReifiedObjectFailedException e) {
-            System.err.println(
-                "** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
+            System.err
+                    .println("** ConstructionOfReifiedObjectFailedException ** - Unable to build the plan topology");
             e.printStackTrace();
         }
 
@@ -627,14 +614,11 @@ public class SubMatrix {
         } else {
             this.endTime = System.currentTimeMillis() - this.startTime;
 
-            System.out.println("\n\n[" + this.name +
-                "] Computation over (MethodBarrier) : " + "\n  WIDTH = " +
-                Jacobi.WIDTH + "\n  HEIGHT = " + Jacobi.HEIGHT +
-                "\n  ITERATIONS = " + Jacobi.ITERATIONS +
-                "\n  SUBMATRIX_WIDTH = " + SubMatrix.DEFAULT_WIDTH +
-                "\n  SUBMATRIX_HEIGHT = " + SubMatrix.DEFAULT_HEIGHT +
-                "\n  ELAPSED TIME = " + this.endTime + "\n  COMPUTE TIME = " +
-                this.totalComp + "\n  COMPUTE = " + this.nbComp + "\n\n");
+            System.out.println("\n\n[" + this.name + "] Computation over (MethodBarrier) : " +
+                "\n  WIDTH = " + Jacobi.WIDTH + "\n  HEIGHT = " + Jacobi.HEIGHT + "\n  ITERATIONS = " +
+                Jacobi.ITERATIONS + "\n  SUBMATRIX_WIDTH = " + SubMatrix.DEFAULT_WIDTH +
+                "\n  SUBMATRIX_HEIGHT = " + SubMatrix.DEFAULT_HEIGHT + "\n  ELAPSED TIME = " + this.endTime +
+                "\n  COMPUTE TIME = " + this.totalComp + "\n  COMPUTE = " + this.nbComp + "\n\n");
 
             System.exit(0);
 
@@ -657,8 +641,7 @@ public class SubMatrix {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        PASPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop,
-            this.neighbors);
+        PASPMD.barrier("SynchronizationWithNeighbors" + this.iterationsToStop, this.neighbors);
         // compute the border values
         this.me.borderCompute();
         // decrement the iteration counter
@@ -672,14 +655,11 @@ public class SubMatrix {
         } else {
             this.endTime = System.currentTimeMillis() - this.startTime;
 
-            System.out.println("\n\n[" + this.name +
-                "] Computation over (NeighborBarrier) : " + "\n  WIDTH = " +
-                Jacobi.WIDTH + "\n  HEIGHT = " + Jacobi.HEIGHT +
-                "\n  ITERATIONS = " + Jacobi.ITERATIONS +
-                "\n  SUBMATRIX_WIDTH = " + SubMatrix.DEFAULT_WIDTH +
-                "\n  SUBMATRIX_HEIGHT = " + SubMatrix.DEFAULT_HEIGHT +
-                "\n  ELAPSED TIME = " + this.endTime + "\n  COMPUTE TIME = " +
-                this.totalComp + "\n  COMPUTE = " + this.nbComp + "\n\n");
+            System.out.println("\n\n[" + this.name + "] Computation over (NeighborBarrier) : " +
+                "\n  WIDTH = " + Jacobi.WIDTH + "\n  HEIGHT = " + Jacobi.HEIGHT + "\n  ITERATIONS = " +
+                Jacobi.ITERATIONS + "\n  SUBMATRIX_WIDTH = " + SubMatrix.DEFAULT_WIDTH +
+                "\n  SUBMATRIX_HEIGHT = " + SubMatrix.DEFAULT_HEIGHT + "\n  ELAPSED TIME = " + this.endTime +
+                "\n  COMPUTE TIME = " + this.totalComp + "\n  COMPUTE = " + this.nbComp + "\n\n");
 
             //System.exit(0);
             //			if (this.minDiff < Jacobi.MINDIFF) {
@@ -700,9 +680,7 @@ public class SubMatrix {
         // compute the internal values
         this.internalCompute();
         // synchronization to be sure that all submatrix have exchanged borders
-        PASPMD.barrier(
-            "SynchronizationToBeSureThatAllSubmatrixHaveExchangedBorders" +
-            this.iterationsToStop);
+        PASPMD.barrier("SynchronizationToBeSureThatAllSubmatrixHaveExchangedBorders" + this.iterationsToStop);
         // compute the border values
         this.me.borderCompute();
         // decrement the iteration counter
@@ -716,13 +694,10 @@ public class SubMatrix {
         } else {
             this.endTime = System.currentTimeMillis() - this.startTime;
 
-            System.out.println("\n\n[" + this.name +
-                "] Computation over (BigBarrier) : " + "\n  WIDTH = " +
-                Jacobi.WIDTH + "\n  HEIGHT = " + Jacobi.HEIGHT +
-                "\n  ITERATIONS = " + Jacobi.ITERATIONS +
-                "\n  SUBMATRIX_WIDTH = " + SubMatrix.DEFAULT_WIDTH +
-                "\n  SUBMATRIX_HEIGHT = " + SubMatrix.DEFAULT_HEIGHT +
-                "\n  ELAPSED TIME = " + this.endTime + "\n  COMPUTE TIME = " +
+            System.out.println("\n\n[" + this.name + "] Computation over (BigBarrier) : " + "\n  WIDTH = " +
+                Jacobi.WIDTH + "\n  HEIGHT = " + Jacobi.HEIGHT + "\n  ITERATIONS = " + Jacobi.ITERATIONS +
+                "\n  SUBMATRIX_WIDTH = " + SubMatrix.DEFAULT_WIDTH + "\n  SUBMATRIX_HEIGHT = " +
+                SubMatrix.DEFAULT_HEIGHT + "\n  ELAPSED TIME = " + this.endTime + "\n  COMPUTE TIME = " +
                 this.totalComp + "\n  COMPUTE = " + this.nbComp + "\n\n");
 
             //	System.exit(0);

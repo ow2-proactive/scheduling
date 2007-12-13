@@ -50,13 +50,13 @@ public class HelloClient {
             // checks for the server's URL
             if (args.length == 0) {
                 // There is no url to the server, so create an active server within this VM
-                myServer = (Hello) org.objectweb.proactive.api.PAActiveObject.newActive(Hello.class.getName(),
-                        new Object[] { "local" });
+                myServer = (Hello) org.objectweb.proactive.api.PAActiveObject.newActive(
+                        Hello.class.getName(), new Object[] { "local" });
             } else {
                 // Lookups the server object
                 logger.info("Using server located on " + args[0]);
-                myServer = (Hello) org.objectweb.proactive.api.PAActiveObject.lookupActive(Hello.class.getName(),
-                        args[0]);
+                myServer = (Hello) org.objectweb.proactive.api.PAActiveObject.lookupActive(Hello.class
+                        .getName(), args[0]);
             }
 
             // Invokes a remote method on this object to get the message

@@ -45,8 +45,8 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  *
  * @author Matthieu Morel
  */
-public class ProActiveSuperControllerImpl extends AbstractProActiveController
-    implements Serializable, ProActiveSuperController {
+public class ProActiveSuperControllerImpl extends AbstractProActiveController implements Serializable,
+        ProActiveSuperController {
     public ProActiveSuperControllerImpl(Component owner) {
         super(owner);
     }
@@ -54,14 +54,11 @@ public class ProActiveSuperControllerImpl extends AbstractProActiveController
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(Constants.SUPER_CONTROLLER,
-                    ProActiveSuperController.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY,
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.SUPER_CONTROLLER,
+                    ProActiveSuperController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 

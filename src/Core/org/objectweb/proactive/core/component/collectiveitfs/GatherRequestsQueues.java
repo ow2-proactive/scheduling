@@ -97,15 +97,12 @@ public class GatherRequestsQueues implements Serializable {
         Set<String> itfNames = queues.keySet();
         for (Iterator iter = itfNames.iterator(); iter.hasNext();) {
             String itfName = (String) iter.next();
-            Map<SerializableMethod, List<GatherRequestsQueue>> queuesPerNamedItf =
-                queues.get(itfName);
+            Map<SerializableMethod, List<GatherRequestsQueue>> queuesPerNamedItf = queues.get(itfName);
             Set<SerializableMethod> invokedMethods = queuesPerNamedItf.keySet();
-            for (Iterator iterator = invokedMethods.iterator();
-                    iterator.hasNext();) {
+            for (Iterator iterator = invokedMethods.iterator(); iterator.hasNext();) {
                 SerializableMethod method = (SerializableMethod) iterator.next();
                 List<GatherRequestsQueue> listOfQueues = queuesPerNamedItf.get(method);
-                for (Iterator iterator2 = listOfQueues.iterator();
-                        iterator.hasNext();) {
+                for (Iterator iterator2 = listOfQueues.iterator(); iterator.hasNext();) {
                     GatherRequestsQueue queue = (GatherRequestsQueue) iterator.next();
                     queue.migrateFuturesHandlerTo(node);
                 }
@@ -122,13 +119,11 @@ public class GatherRequestsQueues implements Serializable {
         }
 
         for (int i = 0; i < itfTypes.length; i++) {
-            if (ProActiveTypeFactory.GATHER_CARDINALITY.equals(
-                        itfTypes[i].getFcCardinality())) {
+            if (ProActiveTypeFactory.GATHER_CARDINALITY.equals(itfTypes[i].getFcCardinality())) {
                 // add a queue for each gather itf
                 Map<SerializableMethod, List<GatherRequestsQueue>> map = new HashMap<SerializableMethod, List<GatherRequestsQueue>>();
                 queues.put(itfTypes[i].getFcItfName(), map);
-                gatherItfs.add(new ItfID(itfTypes[i].getFcItfName(),
-                        owner.getID()));
+                gatherItfs.add(new ItfID(itfTypes[i].getFcItfName(), owner.getID()));
             }
         }
     }
@@ -138,17 +133,14 @@ public class GatherRequestsQueues implements Serializable {
      */
     public Object addRequest(ComponentRequest r) throws ServeException {
         Object result = null;
-        String serverItfName = r.getMethodCall().getComponentMetadata()
-                                .getComponentInterfaceName();
-        ItfID senderItfID = r.getMethodCall().getComponentMetadata()
-                             .getSenderItfID();
+        String serverItfName = r.getMethodCall().getComponentMetadata().getComponentInterfaceName();
+        ItfID senderItfID = r.getMethodCall().getComponentMetadata().getSenderItfID();
 
         Method reifiedMethod = r.getMethodCall().getReifiedMethod();
         Method itfTypeMethod;
         try {
-            itfTypeMethod = GatherBindingChecker.searchMatchingMethod(reifiedMethod,
-                    Class.forName(getItfType(serverItfName).getFcItfSignature())
-                         .getMethods(), false);
+            itfTypeMethod = GatherBindingChecker.searchMatchingMethod(reifiedMethod, Class.forName(
+                    getItfType(serverItfName).getFcItfSignature()).getMethods(), false);
         } catch (Exception e1) {
             e1.printStackTrace();
             throw new ServeException("problem when analysing gather request", e1);
@@ -156,8 +148,8 @@ public class GatherRequestsQueues implements Serializable {
 
         List<ItfID> connectedClientItfs;
         try {
-            connectedClientItfs = Fractive.getGathercastController(owner)
-                                          .getConnectedClientItfs(serverItfName);
+            connectedClientItfs = Fractive.getGathercastController(owner).getConnectedClientItfs(
+                    serverItfName);
         } catch (NoSuchInterfaceException e) {
             throw new ServeException("this component has no binding controller");
         }
@@ -167,30 +159,26 @@ public class GatherRequestsQueues implements Serializable {
         }
 
         if (!queues.containsKey(serverItfName)) {
-            throw new ProActiveRuntimeException(
-                "there is no gathercast interface named " + serverItfName);
+            throw new ProActiveRuntimeException("there is no gathercast interface named " + serverItfName);
         }
 
         Map<SerializableMethod, List<GatherRequestsQueue>> map = queues.get(serverItfName);
 
         // SerializableMethod objects are used as keys
-        List<GatherRequestsQueue> list = map.get(new SerializableMethod(
-                    itfTypeMethod));
+        List<GatherRequestsQueue> list = map.get(new SerializableMethod(itfTypeMethod));
 
         if (list == null) {
             list = new ArrayList<GatherRequestsQueue>();
             // new queue, and add current request
-            GatherRequestsQueue queue = new GatherRequestsQueue(owner,
-                    serverItfName, itfTypeMethod, connectedClientItfs,
-                    gatherFuturesHandlerPool);
+            GatherRequestsQueue queue = new GatherRequestsQueue(owner, serverItfName, itfTypeMethod,
+                connectedClientItfs, gatherFuturesHandlerPool);
             list.add(queue);
             map.put(new SerializableMethod(itfTypeMethod), list);
         }
 
         if (list.isEmpty()) {
-            GatherRequestsQueue queue = new GatherRequestsQueue(owner,
-                    serverItfName, itfTypeMethod, connectedClientItfs,
-                    gatherFuturesHandlerPool);
+            GatherRequestsQueue queue = new GatherRequestsQueue(owner, serverItfName, itfTypeMethod,
+                connectedClientItfs, gatherFuturesHandlerPool);
             map.get(new SerializableMethod(itfTypeMethod)).add(queue);
         }
 
@@ -201,9 +189,8 @@ public class GatherRequestsQueues implements Serializable {
                 if (!iter.hasNext()) {
                     // no other queue to receive this request. create one
                     // concurrent access exception?
-                    queue = new GatherRequestsQueue(owner, serverItfName,
-                            itfTypeMethod, connectedClientItfs,
-                            gatherFuturesHandlerPool);
+                    queue = new GatherRequestsQueue(owner, serverItfName, itfTypeMethod, connectedClientItfs,
+                        gatherFuturesHandlerPool);
                     // add the request
                     result = queue.put(senderItfID, r);
                     list.add(queue);
@@ -218,8 +205,7 @@ public class GatherRequestsQueues implements Serializable {
             break;
         }
         if (logger.isDebugEnabled()) {
-            logger.debug("added request [" + r.getMethodName() +
-                "] in gather queue");
+            logger.debug("added request [" + r.getMethodName() + "] in gather queue");
         }
         // check if needs to do something!
         notifyUpdate(serverItfName, list);
@@ -227,12 +213,12 @@ public class GatherRequestsQueues implements Serializable {
         return result;
     }
 
-    private void notifyUpdate(String serverItfName,
-        List<GatherRequestsQueue> requestQueues) throws ServeException {
+    private void notifyUpdate(String serverItfName, List<GatherRequestsQueue> requestQueues)
+            throws ServeException {
         // default: if all connected itfs have sent a request, then process it
         try {
-            List<ItfID> connectedClientItfs = Fractive.getGathercastController(owner)
-                                                      .getConnectedClientItfs(serverItfName);
+            List<ItfID> connectedClientItfs = Fractive.getGathercastController(owner).getConnectedClientItfs(
+                    serverItfName);
             GatherRequestsQueue firstRequestsInLine = requestQueues.get(0); // need to ensure this
             if (firstRequestsInLine.isFull()) {
                 // ok, condition met, proceed with request
@@ -241,9 +227,7 @@ public class GatherRequestsQueues implements Serializable {
                 Method clientMethod = firstRequestsInLine.getInvokedMethod();
                 String methodName = clientMethod.getName();
                 if (logger.isDebugEnabled()) {
-                    logger.debug(
-                        "conditions reached, processing gather request [" +
-                        methodName + "]");
+                    logger.debug("conditions reached, processing gather request [" + methodName + "]");
                 }
 
                 Class<?>[] clientMethodParamTypes = clientMethod.getParameterTypes();
@@ -253,22 +237,20 @@ public class GatherRequestsQueues implements Serializable {
                     gatherMethodParamTypes[i] = List.class;
                 }
 
-                Class<?> gatherItfClass = Class.forName(((ProActiveInterfaceType) ((ProActiveInterface) owner.getFcInterface(
-                            serverItfName)).getFcItfType()).getFcItfSignature());
+                Class<?> gatherItfClass = Class.forName(((ProActiveInterfaceType) ((ProActiveInterface) owner
+                        .getFcInterface(serverItfName)).getFcItfType()).getFcItfSignature());
 
-                Method gatherMethod = gatherItfClass.getMethod(clientMethod.getName(),
-                        gatherMethodParamTypes);
+                Method gatherMethod = gatherItfClass
+                        .getMethod(clientMethod.getName(), gatherMethodParamTypes);
                 Object[] gatherEffectiveArguments = new Object[gatherMethodParamTypes.length];
 
                 // build the list of parameters
                 for (int i = 0; i < gatherEffectiveArguments.length; i++) {
                     List<Object> l = new ArrayList<Object>(connectedClientItfs.size());
-                    for (Iterator iter = connectedClientItfs.iterator();
-                            iter.hasNext();) {
+                    for (Iterator iter = connectedClientItfs.iterator(); iter.hasNext();) {
                         ItfID id = (ItfID) iter.next();
                         // keep same ordering as connected client itfs
-                        l.add(firstRequestsInLine.get(id).getMethodCall()
-                                                 .getEffectiveArguments()[i]);
+                        l.add(firstRequestsInLine.get(id).getMethodCall().getEffectiveArguments()[i]);
                     }
                     // parameters from a given client have the same order than this client in the list of connected clients 
                     gatherEffectiveArguments[i] = l;
@@ -280,14 +262,13 @@ public class GatherRequestsQueues implements Serializable {
                         new ItfID(serverItfName, owner.getID()));
                 long sequenceID = ((ComponentBodyImpl) PAActiveObject.getBodyOnThis()).getNextSequenceID();
 
-                ComponentRequest gatherRequest = new ComponentRequestImpl(gatherMC,
-                        PAActiveObject.getBodyOnThis(),
-                        firstRequestsInLine.oneWayMethods(), sequenceID);
+                ComponentRequest gatherRequest = new ComponentRequestImpl(gatherMC, PAActiveObject
+                        .getBodyOnThis(), firstRequestsInLine.oneWayMethods(), sequenceID);
 
                 // serve the request (do not reenqueue it)
                 if (logger.isDebugEnabled()) {
-                    logger.debug("gather request queues .serving request [" +
-                        gatherRequest.getMethodName() + "]");
+                    logger.debug("gather request queues .serving request [" + gatherRequest.getMethodName() +
+                        "]");
                 }
                 Reply reply = gatherRequest.serve(PAActiveObject.getBodyOnThis());
 

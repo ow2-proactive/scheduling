@@ -99,29 +99,22 @@ public class FaultToleranceService implements UniversalService {
     public String buildParamsLine() {
         StringBuffer line = new StringBuffer("-Dproactive.ft=true");
         if (this.getGlobalServerURL() != null) {
-            if ((this.getCheckpointServerURL() != null) ||
-                    (this.getLocationServerURL() != null) ||
-                    (this.getRecoveryProcessURL() != null)) {
-                logger.warn(
-                    "A global server is set : other servers are ignored !!");
+            if ((this.getCheckpointServerURL() != null) || (this.getLocationServerURL() != null) ||
+                (this.getRecoveryProcessURL() != null)) {
+                logger.warn("A global server is set : other servers are ignored !!");
             }
-            line.append(" -Dproactive.ft.server.global=" +
-                this.getGlobalServerURL());
+            line.append(" -Dproactive.ft.server.global=" + this.getGlobalServerURL());
         } else {
-            line.append(" -Dproactive.ft.server.checkpoint=" +
-                this.getCheckpointServerURL());
-            line.append(" -Dproactive.ft.server.recovery=" +
-                this.getRecoveryProcessURL());
-            line.append(" -Dproactive.ft.server.location=" +
-                this.getLocationServerURL());
+            line.append(" -Dproactive.ft.server.checkpoint=" + this.getCheckpointServerURL());
+            line.append(" -Dproactive.ft.server.recovery=" + this.getRecoveryProcessURL());
+            line.append(" -Dproactive.ft.server.location=" + this.getLocationServerURL());
         }
 
         if (this.getTtcValue() != null) {
             line.append(" -Dproactive.ft.ttc=" + this.getTtcValue());
         }
         if (this.getAttachedResourceServer() != null) {
-            line.append(" -Dproactive.ft.server.resource=" +
-                this.getAttachedResourceServer());
+            line.append(" -Dproactive.ft.server.resource=" + this.getAttachedResourceServer());
         }
         if (this.getProtocolType() != null) {
             line.append(" -Dproactive.ft.protocol=" + this.getProtocolType());
@@ -146,17 +139,11 @@ public class FaultToleranceService implements UniversalService {
                 }
                 return true;
             } catch (MalformedURLException e) {
-                logger.error(
-                    "**ERROR** RessourceServer unreachable : ressource is not registred." +
-                    e);
+                logger.error("**ERROR** RessourceServer unreachable : ressource is not registred." + e);
             } catch (RemoteException e) {
-                logger.error(
-                    "**ERROR** RessourceServer unreachable : ressource is not registred" +
-                    e);
+                logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
             } catch (NotBoundException e) {
-                logger.error(
-                    "**ERROR** RessourceServer unreachable : ressource is not registred" +
-                    e);
+                logger.error("**ERROR** RessourceServer unreachable : ressource is not registred" + e);
             }
             return false;
         } else {

@@ -40,8 +40,7 @@ import org.objectweb.proactive.extensions.calcium.muscle.Execute;
  * @author The ProActive Team (mleyton)
  */
 @PublicAPI
-public class Farm<P extends java.io.Serializable, R extends java.io.Serializable>
-    implements Skeleton<P, R> {
+public class Farm<P extends java.io.Serializable, R extends java.io.Serializable> implements Skeleton<P, R> {
     Skeleton<P, R> child;
 
     /**

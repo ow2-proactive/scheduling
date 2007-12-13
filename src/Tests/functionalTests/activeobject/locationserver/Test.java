@@ -43,6 +43,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test migration with location server
  */
@@ -66,13 +67,12 @@ public class Test extends FunctionalTest {
 
         Thread.sleep(3000);
 
-        this.a = (A) PAActiveObject.newActive(A.class.getName(), null,
-                new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
-                LocationServerMetaObjectFactory.newInstance());
+        this.a = (A) PAActiveObject.newActive(A.class.getName(), null, new Object[] { "toto" }, TestNodes
+                .getSameVMNode(), null, LocationServerMetaObjectFactory.newInstance());
 
-        this.migratableA = (MigratableA) PAActiveObject.newActive(MigratableA.class.getName(),
-                null, new Object[] { "toto" }, TestNodes.getSameVMNode(), null,
-                LocationServerMetaObjectFactory.newInstance());
+        this.migratableA = (MigratableA) PAActiveObject.newActive(MigratableA.class.getName(), null,
+                new Object[] { "toto" }, TestNodes.getSameVMNode(), null, LocationServerMetaObjectFactory
+                        .newInstance());
 
         this.idA = ((BodyProxy) ((StubObject) this.a).getProxy()).getBodyID();
 

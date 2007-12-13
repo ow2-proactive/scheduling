@@ -45,8 +45,7 @@ public class NewHostAction extends Action {
     public static final String NEW_HOST = "New host";
 
     public NewHostAction(Display display, WorldObject world) {
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "host.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "host.gif"));
         this.display = display;
         this.world = world;
         this.setId(NEW_HOST);

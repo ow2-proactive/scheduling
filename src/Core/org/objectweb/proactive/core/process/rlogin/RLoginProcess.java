@@ -140,8 +140,7 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
 
     public static void main(String[] args) {
         try {
-            LSFBSubProcess lsf = new LSFBSubProcess(new SimpleExternalProcess(
-                        "ls -lsa"));
+            LSFBSubProcess lsf = new LSFBSubProcess(new SimpleExternalProcess("ls -lsa"));
             RLoginProcess p = new RLoginProcess(lsf, false);
             p.setHostname("galere1");
             p.startProcess();
@@ -163,15 +162,13 @@ public class RLoginProcess extends AbstractExternalProcessDecorator {
         if (this.username == null) {
             command = DEFAULT_RLOGINPATH + hostname + " ";
         } else {
-            command = DEFAULT_RLOGINPATH + "-l " + username + " " + hostname +
-                " ";
+            command = DEFAULT_RLOGINPATH + "-l " + username + " " + hostname + " ";
         }
         return command;
     }
 
     @Override
-    protected void internalStartProcess(String command)
-        throws java.io.IOException {
+    protected void internalStartProcess(String command) throws java.io.IOException {
         super.internalStartProcess(command);
         if (exitAfterCommand) {
             outputMessageSink.setMessage(null);

@@ -40,15 +40,11 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupFuraParser extends AbstractGroupParser {
-    private static final String NODE_NAME_MAXTIME = NODE_EXT_NAMESPACE +
-        "maxtime";
+    private static final String NODE_NAME_MAXTIME = NODE_EXT_NAMESPACE + "maxtime";
     private static final String NODE_NAME_STDIN = NODE_EXT_NAMESPACE + "stdin";
-    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE +
-        "stderr";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE +
-        "stdout";
-    private static final String NODE_NAME_DESCRIPTION = NODE_EXT_NAMESPACE +
-        "description";
+    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
+    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
+    private static final String NODE_NAME_DESCRIPTION = NODE_EXT_NAMESPACE + "description";
     private static final String ATTR_JOB_NAME = "jobName";
     private static final String NODE_NAME = "furaGroup";
 
@@ -66,8 +62,7 @@ public class GroupFuraParser extends AbstractGroupParser {
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         GroupFura furaGroup = (GroupFura) super.parseGroupNode(groupNode, xpath);
 
-        String jobName = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_JOB_NAME);
+        String jobName = GCMParserHelper.getAttributeValue(groupNode, ATTR_JOB_NAME);
         furaGroup.setJobName(jobName);
 
         groupNode.getChildNodes();

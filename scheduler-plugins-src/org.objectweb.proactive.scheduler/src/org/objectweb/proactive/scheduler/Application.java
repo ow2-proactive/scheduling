@@ -56,8 +56,7 @@ public class Application implements IPlatformRunnable {
 
         Display display = PlatformUI.createDisplay();
         try {
-            int returnCode = PlatformUI.createAndRunWorkbench(display,
-                    new ApplicationWorkbenchAdvisor());
+            int returnCode = PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor());
             if (returnCode == PlatformUI.RETURN_RESTART) {
                 return IPlatformRunnable.EXIT_RESTART;
             }

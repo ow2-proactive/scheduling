@@ -59,8 +59,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.transactions.Trans
 import org.objectweb.proactive.examples.jmx.remote.management.transactions.TransactionsManager;
 
 
-public class OSGiTransaction extends Transaction implements OSGiTransactionMBean,
-    IJmx, Serializable {
+public class OSGiTransaction extends Transaction implements OSGiTransactionMBean, IJmx, Serializable {
 
     /**
      *
@@ -91,11 +90,9 @@ public class OSGiTransaction extends Transaction implements OSGiTransactionMBean
         if (!c.check()) {
             try {
                 ((OSGiCommand) c).register();
-                Notification notification = new TransactionCommandNotification(this.getClass()
-                                                                                   .getName(),
-                        c.getOperation(), seqNumber++,
-                        "New command in transaction", this.idTransaction,
-                        c.getDate());
+                Notification notification = new TransactionCommandNotification(this.getClass().getName(), c
+                        .getOperation(), seqNumber++, "New command in transaction", this.idTransaction, c
+                        .getDate());
                 sendNotification(notification);
             } catch (InstanceAlreadyExistsException e) {
                 // TODO Auto-generated catch block
@@ -116,8 +113,7 @@ public class OSGiTransaction extends Transaction implements OSGiTransactionMBean
         } else {
             this.compensation.add(c);
             return new Status(Status.OK, c.getOperation(),
-                "CommandMBean already done, put in compensation list",
-                OSGiStore.getInstance().getUrl());
+                "CommandMBean already done, put in compensation list", OSGiStore.getInstance().getUrl());
         }
     }
 
@@ -142,11 +138,10 @@ public class OSGiTransaction extends Transaction implements OSGiTransactionMBean
         this.state = Transaction.COMMITED;
         TransactionsManager.getInstance().update(this);
         Notification notification = new TransactionCommitedNotification(OSGiTransaction.class.getName(),
-                this, seqNumber++, "Transaction Commited", this.idTransaction,
-                null);
+            this, seqNumber++, "Transaction Commited", this.idTransaction, null);
         sendNotification(notification);
-        return new Status(Status.OK, "commit " + this.idTransaction,
-            "Transaction commited", OSGiStore.getInstance().getUrl());
+        return new Status(Status.OK, "commit " + this.idTransaction, "Transaction commited", OSGiStore
+                .getInstance().getUrl());
     }
 
     @Override
@@ -159,11 +154,10 @@ public class OSGiTransaction extends Transaction implements OSGiTransactionMBean
 
         TransactionsManager.getInstance().update(this);
         Notification notification = new TransactionCancelledNotification(OSGiTransaction.class.getName(),
-                this, seqNumber++, "Transaction cancelled", this.idTransaction,
-                null);
+            this, seqNumber++, "Transaction cancelled", this.idTransaction, null);
         sendNotification(notification);
-        return new Status(Status.OK, "rollback " + this.idTransaction,
-            "Transaction cancelled", OSGiStore.getInstance().getUrl());
+        return new Status(Status.OK, "rollback " + this.idTransaction, "Transaction cancelled", OSGiStore
+                .getInstance().getUrl());
     }
 
     public Status rollback(int step) throws TransactionNotActiveException {
@@ -175,8 +169,7 @@ public class OSGiTransaction extends Transaction implements OSGiTransactionMBean
      * IJmx implementation
      * @throws JMXException
      */
-    public void register()
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
+    public void register() throws InstanceAlreadyExistsException, MBeanRegistrationException,
             NotCompliantMBeanException, JMXException {
         ObjectName on;
         try {
@@ -189,9 +182,7 @@ public class OSGiTransaction extends Transaction implements OSGiTransactionMBean
         }
     }
 
-    public void unregister()
-        throws InstanceNotFoundException, MBeanRegistrationException,
-            JMXException {
+    public void unregister() throws InstanceNotFoundException, MBeanRegistrationException, JMXException {
         ObjectName on;
 
         try {

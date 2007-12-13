@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scheduler.gui.data;
 
-
 /**
  * @author FRADJ Johann
  *

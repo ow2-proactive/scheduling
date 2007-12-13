@@ -46,9 +46,8 @@ public class A implements FooItf, BindingController {
         b.foo();
     }
 
-    public void bindFc(String clientItfName, Object serverItf)
-        throws NoSuchInterfaceException, IllegalBindingException,
-            IllegalLifeCycleException {
+    public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
+            IllegalBindingException, IllegalLifeCycleException {
         if (clientItfName.equals(FooItf.CLIENT_ITF_NAME)) {
             b = (FooItf) serverItf;
             //logger.debug("MotorImpl : added binding on a wheel");
@@ -62,16 +61,14 @@ public class A implements FooItf, BindingController {
         return null;
     }
 
-    public Object lookupFc(String clientItfName)
-        throws NoSuchInterfaceException {
+    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
         if ("foo-client".equals(clientItfName)) {
             return b;
         }
         throw new NoSuchInterfaceException(clientItfName);
     }
 
-    public void unbindFc(String clientItfName)
-        throws NoSuchInterfaceException, IllegalBindingException,
+    public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
     }
 }

@@ -57,13 +57,11 @@ public class GridMatrix {
      * @param nbBloc number of blocks
      * @return future of the matrix result
      */
-    public static FutureDoubleMatrix calMandelbrot(MSService service,
-        String name, int xres, int yres, double xmin, double xmax, double ymin,
-        double ymax, int precision, int nbBloc) {
+    public static FutureDoubleMatrix calMandelbrot(MSService service, String name, int xres, int yres,
+            double xmin, double xmax, double ymin, double ymax, int precision, int nbBloc) {
         FutureDoubleMatrix res = new FutureDoubleMatrix(name, xres, yres);
 
-        service.addEventListenerTask(new MandelbrotEventListener(service,
-                nbBloc, res));
+        service.addEventListenerTask(new MandelbrotEventListener(service, nbBloc, res));
 
         AbstractGeneralTask sciTask;
         int nbRow = yres / nbBloc;
@@ -74,8 +72,7 @@ public class GridMatrix {
         for (int i = 0; i < nbBloc; i++) {
             sciTask = new SciTask(name + i);
             sciTask.addDataOut(name + i);
-            sciTask.setJob(SciMath.formulaMandelbrot(name + i, nbRow, xres,
-                    xmin, xmax, y1, y2, precision));
+            sciTask.setJob(SciMath.formulaMandelbrot(name + i, nbRow, xres, xmin, xmax, y1, y2, precision));
             service.sendTask(sciTask);
             y1 = y2;
             y2 += sizeBloc;
@@ -92,8 +89,7 @@ public class GridMatrix {
      * @param nbBloc number of blocks
      * @return future of the matrix result
      */
-    public static FutureDoubleMatrix calPi(MSService service, String name,
-        int precision, int nbBloc) {
+    public static FutureDoubleMatrix calPi(MSService service, String name, int precision, int nbBloc) {
         FutureDoubleMatrix res = new FutureDoubleMatrix(name, 1, 1);
         int sizeBloc = precision / nbBloc;
         service.addEventListenerTask(new PiEventListener(service, nbBloc, res));
@@ -121,24 +117,21 @@ public class GridMatrix {
      * @param nbCol2
      * @return future of the matrix result
      */
-    public static FutureDoubleMatrix mult(MSService service, String name,
-        double[] matrix1, int nbRow1, int nbCol1, double[] matrix2, int nbRow2,
-        int nbCol2) {
+    public static FutureDoubleMatrix mult(MSService service, String name, double[] matrix1, int nbRow1,
+            int nbCol1, double[] matrix2, int nbRow2, int nbCol2) {
         FutureDoubleMatrix res = new FutureDoubleMatrix(name, nbRow2, nbCol2);
 
         MSEventListener eventListener = new MultEventListener(service, res);
         service.addEventListenerTask(eventListener);
         int nbTask = service.getNbEngine();
 
-        if ((matrix1.length != (nbRow1 * nbCol1)) ||
-                (matrix2.length != (nbRow2 * nbCol2)) || (nbCol1 != nbRow2)) {
-            System.out.println(
-                "---------------INVALID MATRIX FOR MULTIPLICATION-----------------");
+        if ((matrix1.length != (nbRow1 * nbCol1)) || (matrix2.length != (nbRow2 * nbCol2)) ||
+            (nbCol1 != nbRow2)) {
+            System.out.println("---------------INVALID MATRIX FOR MULTIPLICATION-----------------");
             return null;
         }
 
-        SciDoubleMatrix sciMatrix = new SciDoubleMatrix("M", nbRow1, nbCol1,
-                matrix1);
+        SciDoubleMatrix sciMatrix = new SciDoubleMatrix("M", nbRow1, nbCol1, matrix1);
 
         int nbRow = nbRow2;
         int nbCol = nbCol2 / nbTask;
@@ -151,14 +144,13 @@ public class GridMatrix {
                 subMatrix[j] = matrix2[j + (i * sizeSubMatrix)];
             }
 
-            SciDoubleMatrix sciSubMatrix = new SciDoubleMatrix("M" + i, nbRow,
-                    nbCol, subMatrix);
+            SciDoubleMatrix sciSubMatrix = new SciDoubleMatrix("M" + i, nbRow, nbCol, subMatrix);
             SciTask sciTask = new SciTask(name + i);
             sciTask.addDataIn(sciMatrix);
             sciTask.addDataIn(sciSubMatrix);
             sciTask.addDataOut("M" + i);
-            sciTask.setJob(sciSubMatrix.getName() + "=" + sciMatrix.getName() +
-                "*" + sciSubMatrix.getName() + ";");
+            sciTask.setJob(sciSubMatrix.getName() + "=" + sciMatrix.getName() + "*" + sciSubMatrix.getName() +
+                ";");
             service.sendTask(sciTask);
         }
 

@@ -50,8 +50,7 @@ public class LastTaskPenalty extends AbstractInference {
 
         double value = average / stats.getTreeSize();
         if (logger.isDebugEnabled() && (threshold < value)) {
-            logger.debug(this.getClass().getSimpleName() + ": " + threshold +
-                " !> " + value);
+            logger.debug(this.getClass().getSimpleName() + ": " + threshold + " !> " + value);
         }
 
         if (threshold < value) {

@@ -41,22 +41,22 @@ import javax.swing.JPanel;
 
 
 /**
-* This code was edited or generated using CloudGarden's Jigloo
-* SWT/Swing GUI Builder, which is free for non-commercial
-* use. If Jigloo is being used commercially (ie, by a corporation,
-* company or business for any purpose whatever) then you
-* should purchase a license for each developer using Jigloo.
-* Please visit www.cloudgarden.com for details.
-* Use of Jigloo implies acceptance of these licensing terms.
-* A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
-* THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
-* LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
-*/
+ * This code was edited or generated using CloudGarden's Jigloo
+ * SWT/Swing GUI Builder, which is free for non-commercial
+ * use. If Jigloo is being used commercially (ie, by a corporation,
+ * company or business for any purpose whatever) then you
+ * should purchase a license for each developer using Jigloo.
+ * Please visit www.cloudgarden.com for details.
+ * Use of Jigloo implies acceptance of these licensing terms.
+ * A COMMERCIAL LICENSE HAS NOT BEEN PURCHASED FOR
+ * THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
+ * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
+ */
 public class DialogLegend extends javax.swing.JDialog {
 
     /**
-         *
-         */
+     *
+     */
     private JPanel pnlTaskWait;
     private JPanel pnlTaskRun;
     private JPanel pnlTaskEnd;
@@ -91,8 +91,7 @@ public class DialogLegend extends javax.swing.JDialog {
             getContentPane().setLayout(thisLayout);
             pnlTaskWait = new JPanel();
             getContentPane().add(pnlTaskWait);
-            pnlTaskWait.setBorder(BorderFactory.createTitledBorder(
-                    "Pending Tasks"));
+            pnlTaskWait.setBorder(BorderFactory.createTitledBorder("Pending Tasks"));
             {
                 pnlLegendWait = new JPanel();
                 GridLayout pnlLegendWaitLayout = new GridLayout(2, 2);
@@ -104,19 +103,17 @@ public class DialogLegend extends javax.swing.JDialog {
                 pnlTaskWait.add(pnlLegendWait);
                 pnlIconWait = new JPanel() {
 
-                            /**
-                                         *
-                                         */
-                            @Override
-                            public void paintComponent(Graphics g) {
-                                super.paintComponent(g);
+                    /**
+                     *
+                     */
+                    @Override
+                    public void paintComponent(Graphics g) {
+                        super.paintComponent(g);
 
-                                g.drawImage(Toolkit.getDefaultToolkit()
-                                                   .getImage(getClass()
-                                                                 .getResource("img/runTask.gif")),
-                                    0, 0, this);
-                            }
-                        };
+                        g.drawImage(Toolkit.getDefaultToolkit().getImage(
+                                getClass().getResource("img/runTask.gif")), 0, 0, this);
+                    }
+                };
                 pnlLegendWait.add(pnlIconWait);
                 pnlIconWait.setPreferredSize(new java.awt.Dimension(100, 28));
                 pnlIconWait.setSize(100, 28);
@@ -127,19 +124,17 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendWait.setSize(100, 28);
                 pnlIconCancel = new JPanel() {
 
-                            /**
-                                         *
-                                         */
-                            @Override
-                            public void paintComponent(Graphics g) {
-                                super.paintComponent(g);
+                    /**
+                     *
+                     */
+                    @Override
+                    public void paintComponent(Graphics g) {
+                        super.paintComponent(g);
 
-                                g.drawImage(Toolkit.getDefaultToolkit()
-                                                   .getImage(getClass()
-                                                                 .getResource("img/stopTask.gif")),
-                                    0, 0, this);
-                            }
-                        };
+                        g.drawImage(Toolkit.getDefaultToolkit().getImage(
+                                getClass().getResource("img/stopTask.gif")), 0, 0, this);
+                    }
+                };
                 pnlLegendWait.add(pnlIconCancel);
                 pnlIconCancel.setPreferredSize(new java.awt.Dimension(100, 28));
                 pnlIconCancel.setSize(100, 28);
@@ -153,8 +148,7 @@ public class DialogLegend extends javax.swing.JDialog {
 
             pnlTaskRun = new JPanel();
             getContentPane().add(pnlTaskRun);
-            pnlTaskRun.setBorder(BorderFactory.createTitledBorder(
-                    "Executing Tasks"));
+            pnlTaskRun.setBorder(BorderFactory.createTitledBorder("Executing Tasks"));
             pnlTaskRun.setPreferredSize(new java.awt.Dimension(100, 28));
             pnlTaskRun.setSize(100, 28);
             {
@@ -168,19 +162,17 @@ public class DialogLegend extends javax.swing.JDialog {
                 pnlTaskRun.add(pnlLegendRun);
                 pnlIconRun = new JPanel() {
 
-                            /**
-                                         *
-                                         */
-                            @Override
-                            public void paintComponent(Graphics g) {
-                                super.paintComponent(g);
+                    /**
+                     *
+                     */
+                    @Override
+                    public void paintComponent(Graphics g) {
+                        super.paintComponent(g);
 
-                                g.drawImage(Toolkit.getDefaultToolkit()
-                                                   .getImage(getClass()
-                                                                 .getResource("img/runTask.gif")),
-                                    0, 0, this);
-                            }
-                        };
+                        g.drawImage(Toolkit.getDefaultToolkit().getImage(
+                                getClass().getResource("img/runTask.gif")), 0, 0, this);
+                    }
+                };
                 pnlLegendRun.add(pnlIconRun);
                 pnlIconRun.setPreferredSize(new java.awt.Dimension(100, 28));
                 pnlIconRun.setSize(100, 28);
@@ -191,19 +183,17 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendRun.setSize(100, 28);
                 pnlIconKill = new JPanel() {
 
-                            /**
-                                         *
-                                         */
-                            @Override
-                            public void paintComponent(Graphics g) {
-                                super.paintComponent(g);
+                    /**
+                     *
+                     */
+                    @Override
+                    public void paintComponent(Graphics g) {
+                        super.paintComponent(g);
 
-                                g.drawImage(Toolkit.getDefaultToolkit()
-                                                   .getImage(getClass()
-                                                                 .getResource("img/stopTask.gif")),
-                                    0, 0, this);
-                            }
-                        };
+                        g.drawImage(Toolkit.getDefaultToolkit().getImage(
+                                getClass().getResource("img/stopTask.gif")), 0, 0, this);
+                    }
+                };
                 pnlLegendRun.add(pnlIconKill);
                 pnlIconKill.setPreferredSize(new java.awt.Dimension(100, 28));
                 pnlIconKill.setSize(100, 28);
@@ -217,8 +207,7 @@ public class DialogLegend extends javax.swing.JDialog {
 
             pnlTaskEnd = new JPanel();
             getContentPane().add(pnlTaskEnd);
-            pnlTaskEnd.setBorder(BorderFactory.createTitledBorder(
-                    "Terminated Tasks"));
+            pnlTaskEnd.setBorder(BorderFactory.createTitledBorder("Terminated Tasks"));
             {
                 pnlLegendEnd = new JPanel();
                 GridLayout pnlLegendEndLayout = new GridLayout(2, 2);
@@ -230,19 +219,17 @@ public class DialogLegend extends javax.swing.JDialog {
                 pnlTaskEnd.add(pnlLegendEnd);
                 pnlIconSuccess = new JPanel() {
 
-                            /**
-                                         *
-                                         */
-                            @Override
-                            public void paintComponent(Graphics g) {
-                                super.paintComponent(g);
+                    /**
+                     *
+                     */
+                    @Override
+                    public void paintComponent(Graphics g) {
+                        super.paintComponent(g);
 
-                                g.drawImage(Toolkit.getDefaultToolkit()
-                                                   .getImage(getClass()
-                                                                 .getResource("img/successTask.gif")),
-                                    0, 0, this);
-                            }
-                        };
+                        g.drawImage(Toolkit.getDefaultToolkit().getImage(
+                                getClass().getResource("img/successTask.gif")), 0, 0, this);
+                    }
+                };
                 pnlLegendEnd.add(pnlIconSuccess);
                 pnlIconSuccess.setPreferredSize(new java.awt.Dimension(100, 28));
                 pnlIconSuccess.setSize(100, 28);
@@ -253,19 +240,17 @@ public class DialogLegend extends javax.swing.JDialog {
                 lblLegendSuccess.setSize(100, 28);
                 pnlIconAbort = new JPanel() {
 
-                            /**
-                                         *
-                                         */
-                            @Override
-                            public void paintComponent(Graphics g) {
-                                super.paintComponent(g);
+                    /**
+                     *
+                     */
+                    @Override
+                    public void paintComponent(Graphics g) {
+                        super.paintComponent(g);
 
-                                g.drawImage(Toolkit.getDefaultToolkit()
-                                                   .getImage(getClass()
-                                                                 .getResource("img/abortTask.gif")),
-                                    0, 0, this);
-                            }
-                        };
+                        g.drawImage(Toolkit.getDefaultToolkit().getImage(
+                                getClass().getResource("img/abortTask.gif")), 0, 0, this);
+                    }
+                };
                 pnlLegendEnd.add(pnlIconAbort);
                 pnlIconAbort.setPreferredSize(new java.awt.Dimension(100, 28));
                 pnlIconAbort.setSize(100, 28);

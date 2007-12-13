@@ -113,7 +113,7 @@ public class AcquaintancesWrapper implements Serializable {
     //        logger.info("***********************");
     //    }
     public String[] getAcquaintancesURLs() {
-        return urlList.toArray(new String[] {  });
+        return urlList.toArray(new String[] {});
     }
 
     /*

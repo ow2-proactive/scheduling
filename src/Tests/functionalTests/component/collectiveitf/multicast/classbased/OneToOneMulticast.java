@@ -40,8 +40,7 @@ import functionalTests.component.collectiveitf.multicast.WrappedInteger;
 
 
 // only testing one mode
-@ClassDispatchMetadata(mode = @ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE)
-)
+@ClassDispatchMetadata(mode = @ParamDispatchMetadata(mode = ParamDispatchMode.ONE_TO_ONE))
 public interface OneToOneMulticast {
     public List<WrappedInteger> dispatch(List<WrappedInteger> l);
 }

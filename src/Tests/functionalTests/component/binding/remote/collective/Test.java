@@ -58,8 +58,8 @@ import functionalTests.descriptor.defaultnodes.TestNodes;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
     public static String MESSAGE = "-->Main";
     Component pD1;
     Component pB1;
@@ -68,7 +68,7 @@ public class Test extends ComponentTest {
 
     public Test() {
         super("Communication between remote primitive components through client collective interface",
-            "Communication between remote primitive components through client collective interface ");
+                "Communication between remote primitive components through client collective interface ");
     }
 
     /**
@@ -81,32 +81,22 @@ public class Test extends ComponentTest {
         ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
 
         ComponentType D_Type = type_factory.createFcType(new InterfaceType[] {
-                    type_factory.createFcItfType("i1", I1.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE),
-                    type_factory.createFcItfType("i2", I2.class.getName(),
-                        TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                        TypeFactory.COLLECTION)
-                });
-        ComponentType B_Type = type_factory.createFcType(new InterfaceType[] {
-                    type_factory.createFcItfType("i2", I2.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY,
-                        TypeFactory.SINGLE)
-                });
+                type_factory.createFcItfType("i1", I1.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                type_factory.createFcItfType("i2", I2.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.MANDATORY, TypeFactory.COLLECTION) });
+        ComponentType B_Type = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
+                "i2", I2.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) });
 
         // instantiate the components
-        pD1 = cf.newFcInstance(D_Type,
-                new ControllerDescription("pD1", Constants.PRIMITIVE),
-                new ContentDescription(PrimitiveComponentD.class.getName(),
-                    new Object[] {  }), TestNodes.getRemoteACVMNode());
-        pB1 = cf.newFcInstance(B_Type,
-                new ControllerDescription("pB1", Constants.PRIMITIVE),
-                new ContentDescription(PrimitiveComponentB.class.getName(),
-                    new Object[] {  }));
-        pB2 = cf.newFcInstance(B_Type,
-                new ControllerDescription("pB2", Constants.PRIMITIVE),
-                new ContentDescription(PrimitiveComponentB.class.getName(),
-                    new Object[] {  }), TestNodes.getRemoteACVMNode());
+        pD1 = cf.newFcInstance(D_Type, new ControllerDescription("pD1", Constants.PRIMITIVE),
+                new ContentDescription(PrimitiveComponentD.class.getName(), new Object[] {}), TestNodes
+                        .getRemoteACVMNode());
+        pB1 = cf.newFcInstance(B_Type, new ControllerDescription("pB1", Constants.PRIMITIVE),
+                new ContentDescription(PrimitiveComponentB.class.getName(), new Object[] {}));
+        pB2 = cf.newFcInstance(B_Type, new ControllerDescription("pB2", Constants.PRIMITIVE),
+                new ContentDescription(PrimitiveComponentB.class.getName(), new Object[] {}), TestNodes
+                        .getRemoteACVMNode());
 
         // bind the components
         Fractal.getBindingController(pD1).bindFc("i2", pB1.getFcInterface("i2"));
@@ -129,11 +119,9 @@ public class Test extends ComponentTest {
         }
 
         // this --> primitiveA --> primitiveB --> primitiveA --> this  (message goes through composite components)
-        String single_message = Test.MESSAGE + PrimitiveComponentD.MESSAGE +
-            PrimitiveComponentB.MESSAGE + PrimitiveComponentD.MESSAGE +
-            Test.MESSAGE;
+        String single_message = Test.MESSAGE + PrimitiveComponentD.MESSAGE + PrimitiveComponentB.MESSAGE +
+            PrimitiveComponentD.MESSAGE + Test.MESSAGE;
 
-        Assert.assertEquals(resulting_msg.toString(),
-            single_message + single_message);
+        Assert.assertEquals(resulting_msg.toString(), single_message + single_message);
     }
 }

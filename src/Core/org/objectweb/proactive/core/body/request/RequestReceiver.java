@@ -36,9 +36,8 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
 
 
 public interface RequestReceiver {
-    public int receiveRequest(Request r, Body bodyReceiver)
-        throws java.io.IOException, RenegotiateSessionException,
-            CommunicationForbiddenException;
+    public int receiveRequest(Request r, Body bodyReceiver) throws java.io.IOException,
+            RenegotiateSessionException, CommunicationForbiddenException;
 
     public boolean isInImmediateService() throws java.io.IOException;
 }

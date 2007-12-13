@@ -41,6 +41,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.descriptor.defaultnodes.TestNodes;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * perform a barrier call on an SPMD group
  *
@@ -53,17 +54,9 @@ public class Test extends FunctionalTest {
     public void preConditions() throws Exception {
         new TestNodes().action();
 
-        Object[][] params = {
-                { "Agent0" },
-                { "Agent1" },
-                { "Agent2" }
-            };
-        Node[] nodes = {
-                TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(),
-                TestNodes.getRemoteVMNode()
-            };
-        this.spmdgroup = (A) PASPMD.newSPMDGroup(A.class.getName(), params,
-                nodes);
+        Object[][] params = { { "Agent0" }, { "Agent1" }, { "Agent2" } };
+        Node[] nodes = { TestNodes.getSameVMNode(), TestNodes.getLocalVMNode(), TestNodes.getRemoteVMNode() };
+        this.spmdgroup = (A) PASPMD.newSPMDGroup(A.class.getName(), params, nodes);
 
         assertTrue(spmdgroup != null);
         assertTrue(PAGroup.size(spmdgroup) == 3);

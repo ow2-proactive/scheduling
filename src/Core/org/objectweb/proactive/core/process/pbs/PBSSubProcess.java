@@ -64,9 +64,8 @@ import org.objectweb.proactive.core.process.UniversalProcess;
  */
 public class PBSSubProcess extends AbstractExternalProcessDecorator {
     public final static String DEFAULT_QSUBPATH = "/usr/local/bin/qsub";
-    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty(
-            "user.home") + File.separator + "ProActive" + File.separator +
-        "scripts" + File.separator + "unix" + File.separator + "cluster" +
+    private static final String DEFAULT_SCRIPT_LOCATION = System.getProperty("user.home") + File.separator +
+        "ProActive" + File.separator + "scripts" + File.separator + "unix" + File.separator + "cluster" +
         File.separator + "pbsStartRuntime.sh ";
     protected static final String DEFAULT_HOSTS_NUMBER = "1";
     protected static final String DEFAULT_PROCESSOR_NUMBER = "1";
@@ -138,7 +137,8 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
      * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
      */
     public int getNodeNumber() {
-        return (new Integer(getProcessorPerNodeNumber()).intValue()) * (new Integer(getHostsNumber()).intValue());
+        return (new Integer(getProcessorPerNodeNumber()).intValue()) *
+            (new Integer(getHostsNumber()).intValue());
     }
 
     /**
@@ -302,16 +302,16 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
                 }
             }
         }
-        String[] command = al.toArray(new String[] {  });
+        String[] command = al.toArray(new String[] {});
 
         try {
             externalProcess = Runtime.getRuntime().exec(command);
             java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getInputStream()));
+                externalProcess.getInputStream()));
             java.io.BufferedReader err = new java.io.BufferedReader(new java.io.InputStreamReader(
-                        externalProcess.getErrorStream()));
+                externalProcess.getErrorStream()));
             java.io.BufferedWriter out = new java.io.BufferedWriter(new java.io.OutputStreamWriter(
-                        externalProcess.getOutputStream()));
+                externalProcess.getOutputStream()));
             handleProcess(in, out, err);
         } catch (java.io.IOException e) {
             isFinished = true;
@@ -335,8 +335,8 @@ public class PBSSubProcess extends AbstractExternalProcessDecorator {
 
         //the parameters for the script are given as an 
         //environment variable
-        qsubCommand.append(" -v ").append("PROACTIVE_COMMAND=\" ")
-                   .append(targetProcess.getCommand()).append("\" ");
+        qsubCommand.append(" -v ").append("PROACTIVE_COMMAND=\" ").append(targetProcess.getCommand()).append(
+                "\" ");
         qsubCommand.append(scriptLocation);
 
         if (queueName != null) {

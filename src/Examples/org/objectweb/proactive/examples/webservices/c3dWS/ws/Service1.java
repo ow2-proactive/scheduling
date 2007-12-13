@@ -34,8 +34,8 @@ public interface Service1 extends javax.xml.rpc.Service {
     public java.lang.String getService1SoapAddress();
 
     public org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap getService1Soap()
-        throws javax.xml.rpc.ServiceException;
+            throws javax.xml.rpc.ServiceException;
 
     public org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap getService1Soap(
-        java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
+            java.net.URL portAddress) throws javax.xml.rpc.ServiceException;
 }

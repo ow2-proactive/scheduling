@@ -48,17 +48,15 @@ public class KillSchedulerAction extends Action {
     private KillSchedulerAction(Shell shell) {
         this.shell = shell;
         this.setText("Kill scheduler");
-        this.setToolTipText(
-            "To kill the scheduler (this kill immediately the scheduler)");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(
-                this.getClass(), "icons/scheduler_kill.png"));
+        this.setToolTipText("To kill the scheduler (this kill immediately the scheduler)");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/scheduler_kill.png"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 
     @Override
     public void run() {
         if (MessageDialog.openConfirm(shell, "Confirm please",
-                    "Are you sure you want to Kill the scheduler ?")) {
+                "Are you sure you want to Kill the scheduler ?")) {
             SchedulerProxy.getInstance().kill();
         }
     }

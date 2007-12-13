@@ -63,8 +63,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class HalfFTManagerCIC extends FTManager {
 
     /**
-         *
-         */
+     *
+     */
 
     // message infos
     private MessageInfoCIC forSentMessage;
@@ -95,19 +95,15 @@ public class HalfFTManagerCIC extends FTManager {
             this.storage = null;
             this.recovery = null;
         } catch (MalformedURLException e) {
-            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.",
-                e);
+            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.", e);
         } catch (RemoteException e) {
-            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.",
-                e);
+            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.", e);
         } catch (NotBoundException e) {
-            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.",
-                e);
+            throw new ProActiveException("Unable to init HalfFTManager : FT is disable.", e);
         }
         this.forSentMessage = new MessageInfoCIC();
         this.forSentMessage.fromHalfBody = true;
-        logger.info(" CIC fault-tolerance is enabled for half body " +
-            this.ownerID);
+        logger.info(" CIC fault-tolerance is enabled for half body " + this.ownerID);
         return 0;
     }
 
@@ -135,9 +131,8 @@ public class HalfFTManagerCIC extends FTManager {
     }
 
     @Override
-    public int onSendRequestAfter(Request request, int rdvValue,
-        UniversalBody destination)
-        throws RenegotiateSessionException, CommunicationForbiddenException {
+    public int onSendRequestAfter(Request request, int rdvValue, UniversalBody destination)
+            throws RenegotiateSessionException, CommunicationForbiddenException {
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
                 request.resetSendCounter();
@@ -155,8 +150,7 @@ public class HalfFTManagerCIC extends FTManager {
     }
 
     @Override
-    public synchronized int onSendReplyAfter(Reply reply, int rdvValue,
-        UniversalBody destination) {
+    public synchronized int onSendReplyAfter(Reply reply, int rdvValue, UniversalBody destination) {
         if (rdvValue == FTManagerCIC.RESEND_MESSAGE) {
             try {
                 reply.setIgnoreIt(false);

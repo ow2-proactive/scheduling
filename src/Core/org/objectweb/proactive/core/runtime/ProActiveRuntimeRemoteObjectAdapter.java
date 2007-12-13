@@ -70,16 +70,16 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
  * runtime.
  *  - cache the vmInformation field
  */
-public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntime>
-    implements ProActiveRuntime {
+public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntime> implements
+        ProActiveRuntime {
 
     /**
-         * generated serial uid
-         */
+     * generated serial uid
+     */
 
     /**
-    * Cache the vmInformation field
-    */
+     * Cache the vmInformation field
+     */
     protected VMInformation vmInformation;
 
     public ProActiveRuntimeRemoteObjectAdapter() {
@@ -99,28 +99,22 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
     }
 
     // =========   Implements ProActiveRuntime ==================
-    public void addAcquaintance(String proActiveRuntimeName)
-        throws ProActiveException {
+    public void addAcquaintance(String proActiveRuntimeName) throws ProActiveException {
         target.addAcquaintance(proActiveRuntimeName);
     }
 
-    public UniversalBody createBody(String nodeName,
-        ConstructorCall bodyConstructorCall, boolean isNodeLocal)
-        throws ProActiveException, ConstructorCallExecutionFailedException,
-            InvocationTargetException {
+    public UniversalBody createBody(String nodeName, ConstructorCall bodyConstructorCall, boolean isNodeLocal)
+            throws ProActiveException, ConstructorCallExecutionFailedException, InvocationTargetException {
         return target.createBody(nodeName, bodyConstructorCall, isNodeLocal);
     }
 
-    public String createLocalNode(String nodeName,
-        boolean replacePreviousBinding,
-        ProActiveSecurityManager nodeSecurityManager, String vnName,
-        String jobId) throws NodeException, AlreadyBoundException {
-        return target.createLocalNode(nodeName, replacePreviousBinding,
-            nodeSecurityManager, vnName, jobId);
+    public String createLocalNode(String nodeName, boolean replacePreviousBinding,
+            ProActiveSecurityManager nodeSecurityManager, String vnName, String jobId) throws NodeException,
+            AlreadyBoundException {
+        return target.createLocalNode(nodeName, replacePreviousBinding, nodeSecurityManager, vnName, jobId);
     }
 
-    public void createVM(UniversalProcess remoteProcess)
-        throws IOException, ProActiveException {
+    public void createVM(UniversalProcess remoteProcess) throws IOException, ProActiveException {
         target.createVM(remoteProcess);
     }
 
@@ -128,28 +122,24 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         return target.getAcquaintances();
     }
 
-    public List<UniversalBody> getActiveObjects(String nodeName)
-        throws ProActiveException {
+    public List<UniversalBody> getActiveObjects(String nodeName) throws ProActiveException {
         return target.getActiveObjects(nodeName);
     }
 
-    public List<UniversalBody> getActiveObjects(String nodeName,
-        String className) throws ProActiveException {
+    public List<UniversalBody> getActiveObjects(String nodeName, String className) throws ProActiveException {
         return target.getActiveObjects(nodeName, className);
     }
 
-    public byte[] getClassDataFromParentRuntime(String className)
-        throws ProActiveException {
+    public byte[] getClassDataFromParentRuntime(String className) throws ProActiveException {
         return target.getClassDataFromParentRuntime(className);
     }
 
-    public byte[] getClassDataFromThisRuntime(String className)
-        throws ProActiveException {
+    public byte[] getClassDataFromThisRuntime(String className) throws ProActiveException {
         return target.getClassDataFromThisRuntime(className);
     }
 
-    public ProActiveDescriptorInternal getDescriptor(String url,
-        boolean isHierarchicalSearch) throws IOException, ProActiveException {
+    public ProActiveDescriptorInternal getDescriptor(String url, boolean isHierarchicalSearch)
+            throws IOException, ProActiveException {
         return target.getDescriptor(url, isHierarchicalSearch);
     }
 
@@ -169,8 +159,7 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         return target.getLocalNodeNames();
     }
 
-    public String getLocalNodeProperty(String nodeName, String key)
-        throws ProActiveException {
+    public String getLocalNodeProperty(String nodeName, String key) throws ProActiveException {
         return target.getLocalNodeProperty(nodeName, key);
     }
 
@@ -182,8 +171,7 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         return target.getMBeanServerName();
     }
 
-    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName)
-        throws ProActiveException {
+    public ProActiveRuntime getProActiveRuntime(String proActiveRuntimeName) throws ProActiveException {
         return target.getProActiveRuntime(proActiveRuntimeName);
     }
 
@@ -203,8 +191,7 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         return target.getVNName(Nodename);
     }
 
-    public VirtualNodeInternal getVirtualNode(String virtualNodeName)
-        throws ProActiveException {
+    public VirtualNodeInternal getVirtualNode(String virtualNodeName) throws ProActiveException {
         return target.getVirtualNode(virtualNodeName);
     }
 
@@ -220,50 +207,43 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         target.killRT(softly);
     }
 
-    public void launchMain(String className, String[] parameters)
-        throws ClassNotFoundException, NoSuchMethodException, ProActiveException {
+    public void launchMain(String className, String[] parameters) throws ClassNotFoundException,
+            NoSuchMethodException, ProActiveException {
         target.launchMain(className, parameters);
     }
 
-    public void newRemote(String className)
-        throws ClassNotFoundException, ProActiveException {
+    public void newRemote(String className) throws ClassNotFoundException, ProActiveException {
         target.newRemote(className);
     }
 
-    public UniversalBody receiveBody(String nodeName, Body body)
-        throws ProActiveException {
+    public UniversalBody receiveBody(String nodeName, Body body) throws ProActiveException {
         return target.receiveBody(nodeName, body);
     }
 
-    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt,
-        int inc) throws ProActiveException {
+    public UniversalBody receiveCheckpoint(String nodeName, Checkpoint ckpt, int inc)
+            throws ProActiveException {
         return target.receiveCheckpoint(nodeName, ckpt, inc);
     }
 
-    public void register(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
-        String vmName) throws ProActiveException {
-        target.register(proActiveRuntimeDist, proActiveRuntimeUrl, creatorID,
-            creationProtocol, vmName);
+    public void register(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeUrl, String creatorID,
+            String creationProtocol, String vmName) throws ProActiveException {
+        target.register(proActiveRuntimeDist, proActiveRuntimeUrl, creatorID, creationProtocol, vmName);
     }
 
     public void register(GCMRuntimeRegistrationNotificationData event) {
         target.register(event);
     }
 
-    public void registerVirtualNode(String virtualNodeName,
-        boolean replacePreviousBinding)
-        throws ProActiveException, AlreadyBoundException {
+    public void registerVirtualNode(String virtualNodeName, boolean replacePreviousBinding)
+            throws ProActiveException, AlreadyBoundException {
         target.registerVirtualNode(virtualNodeName, replacePreviousBinding);
     }
 
-    public void rmAcquaintance(String proActiveRuntimeName)
-        throws ProActiveException {
+    public void rmAcquaintance(String proActiveRuntimeName) throws ProActiveException {
         target.rmAcquaintance(proActiveRuntimeName);
     }
 
-    public Object setLocalNodeProperty(String nodeName, String key, String value)
-        throws ProActiveException {
+    public Object setLocalNodeProperty(String nodeName, String key, String value) throws ProActiveException {
         return target.setLocalNodeProperty(nodeName, key, value);
     }
 
@@ -271,86 +251,70 @@ public class ProActiveRuntimeRemoteObjectAdapter extends Adapter<ProActiveRuntim
         target.startJMXServerConnector();
     }
 
-    public void unregister(ProActiveRuntime proActiveRuntimeDist,
-        String proActiveRuntimeUrl, String creatorID, String creationProtocol,
-        String vmName) throws ProActiveException {
-        target.unregister(proActiveRuntimeDist, proActiveRuntimeUrl, creatorID,
-            creationProtocol, vmName);
+    public void unregister(ProActiveRuntime proActiveRuntimeDist, String proActiveRuntimeUrl,
+            String creatorID, String creationProtocol, String vmName) throws ProActiveException {
+        target.unregister(proActiveRuntimeDist, proActiveRuntimeUrl, creatorID, creationProtocol, vmName);
     }
 
     public void unregisterAllVirtualNodes() throws ProActiveException {
         target.unregisterAllVirtualNodes();
     }
 
-    public void unregisterVirtualNode(String virtualNodeName)
-        throws ProActiveException {
+    public void unregisterVirtualNode(String virtualNodeName) throws ProActiveException {
         target.unregisterVirtualNode(virtualNodeName);
     }
 
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
+    public TypedCertificate getCertificate() throws SecurityNotAvailableException, IOException {
         return target.getCertificate();
     }
 
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException {
+    public Entities getEntities() throws SecurityNotAvailableException, IOException {
         return target.getEntities();
     }
 
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException, IOException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException,
+            IOException {
         return target.getPolicy(local, distant);
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         return target.getProActiveSecurityManager(user);
     }
 
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException {
+    public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
         return target.getPublicKey();
     }
 
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException, KeyExchangeException, IOException {
         return target.publicKeyExchange(sessionID, signature);
     }
 
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
+            RenegotiateSessionException, IOException {
         return target.randomValue(sessionID, clientRandomValue);
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return target.secretKeyExchange(sessionID, encodedAESKey,
-            encodedIVParameters, encodedClientMacKey, encodedLockData,
-            parametersSignature);
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException, RenegotiateSessionException, IOException {
+        return target.secretKeyExchange(sessionID, encodedAESKey, encodedIVParameters, encodedClientMacKey,
+                encodedLockData, parametersSignature);
     }
 
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         target.setProActiveSecurityManager(user, policyServer);
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SessionException, SecurityNotAvailableException, IOException {
-        return target.startNewSession(distantSessionID, policy,
-            distantCertificate);
+            TypedCertificate distantCertificate) throws SessionException, SecurityNotAvailableException,
+            IOException {
+        return target.startNewSession(distantSessionID, policy, distantCertificate);
     }
 
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException {
+    public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         target.terminateSession(sessionID);
     }
 }

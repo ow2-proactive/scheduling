@@ -48,8 +48,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  * @author Matthieu Morel
  *
  */
-public class ComponentParametersControllerImpl
-    extends AbstractProActiveController implements Serializable,
+public class ComponentParametersControllerImpl extends AbstractProActiveController implements Serializable,
         ComponentParametersController {
     private ComponentParameters componentParameters;
 
@@ -64,20 +63,18 @@ public class ComponentParametersControllerImpl
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(Constants.COMPONENT_PARAMETERS_CONTROLLER,
-                    ComponentParametersController.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY,
-                    TypeFactory.SINGLE));
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(
+                    Constants.COMPONENT_PARAMETERS_CONTROLLER, ComponentParametersController.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException(
-                "cannot create controller type : " + this.getClass().getName());
+            throw new ProActiveRuntimeException("cannot create controller type : " +
+                this.getClass().getName());
         }
     }
 
     /*
-    * see {@link ComponentParametersController#getComponentParameters()}
-    */
+     * see {@link ComponentParametersController#getComponentParameters()}
+     */
     public ComponentParameters getComponentParameters() {
         return componentParameters;
     }

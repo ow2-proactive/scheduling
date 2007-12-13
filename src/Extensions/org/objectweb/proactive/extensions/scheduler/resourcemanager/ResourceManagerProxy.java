@@ -106,27 +106,25 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
      * @throws IOException
      * @throws NodeException
      */
-    public static ResourceManagerProxy getProxy(URI uriIM)
-        throws ActiveObjectCreationException, IOException, NodeException {
+    public static ResourceManagerProxy getProxy(URI uriIM) throws ActiveObjectCreationException, IOException,
+            NodeException {
         try {
             String url = uriIM.toString();
             if (!url.endsWith("/")) {
                 url += "/";
             }
-            RMUser user = RMConnection.connectAsUser(url +
-                    NAME_ACTIVE_OBJECT_RMUSER);
-            RMMonitoring monitor = RMConnection.connectAsMonitor(url +
-                    NAME_ACTIVE_OBJECT_RMMONITORING);
-            return (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class.getCanonicalName(),
-                new Object[] { monitor, user });
+            RMUser user = RMConnection.connectAsUser(url + NAME_ACTIVE_OBJECT_RMUSER);
+            RMMonitoring monitor = RMConnection.connectAsMonitor(url + NAME_ACTIVE_OBJECT_RMMONITORING);
+            return (ResourceManagerProxy) PAActiveObject.newActive(ResourceManagerProxy.class
+                    .getCanonicalName(), new Object[] { monitor, user });
         } catch (RMException e) {
             throw new ActiveObjectCreationException(e);
         }
     }
 
     public StringWrapper echo() {
-        return new StringWrapper("User Interface says " + user.echo() +
-            " and Monitoring Interface says " + monitoring.echo());
+        return new StringWrapper("User Interface says " + user.echo() + " and Monitoring Interface says " +
+            monitoring.echo());
     }
 
     // FREE NODES *********************************************
@@ -161,8 +159,7 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
                     nodes.put(node, handler.handle(postScript));
 
                     if (logger.isInfoEnabled()) {
-                        logger.info("Post Script handled on node" +
-                            node.getNodeInformation().getURL());
+                        logger.info("Post Script handled on node" + node.getNodeInformation().getURL());
                     }
                 } catch (ActiveObjectCreationException e) {
                     // TODO Que faire si noeud mort ?
@@ -211,8 +208,7 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
                     this.nodes.put(node, res);
 
                     if (logger.isInfoEnabled()) {
-                        logger.info("Post Script handled on node" +
-                            node.getNodeInformation().getURL());
+                        logger.info("Post Script handled on node" + node.getNodeInformation().getURL());
                     }
                 } catch (ActiveObjectCreationException e) {
                     // TODO Que faire si noeud mort ?
@@ -285,8 +281,7 @@ public class ResourceManagerProxy implements InitActive, RunActive, RMConstants 
     }
 
     private void verify() {
-        Iterator<Entry<Node, ScriptResult<?>>> iterator = nodes.entrySet()
-                                                               .iterator();
+        Iterator<Entry<Node, ScriptResult<?>>> iterator = nodes.entrySet().iterator();
         NodeSet ns = new NodeSet();
 
         while (iterator.hasNext()) {

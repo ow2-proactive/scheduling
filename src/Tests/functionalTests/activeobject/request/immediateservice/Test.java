@@ -37,6 +37,7 @@ import org.objectweb.proactive.api.PAFuture;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test immediateService method on an AO
  */
@@ -47,8 +48,7 @@ public class Test extends FunctionalTest {
 
     @Before
     public void action() throws Exception {
-        a = (A) PAActiveObject.newActive(A.class.getName(),
-                new Object[] { "toto" });
+        a = (A) PAActiveObject.newActive(A.class.getName(), new Object[] { "toto" });
         // getObject is set as an IS in the runActivity of A
         dum = a.getObject();
         PAActiveObject.terminateActiveObject(a, true);

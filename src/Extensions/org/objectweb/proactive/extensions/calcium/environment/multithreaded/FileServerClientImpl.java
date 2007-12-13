@@ -51,8 +51,7 @@ public class FileServerClientImpl implements FileServerClient {
         fserver.commit(fileId, refCountDelta);
     }
 
-    public void fetch(StoredFile rfile, File localDst)
-        throws IOException {
+    public void fetch(StoredFile rfile, File localDst) throws IOException {
         fserver.canFetch(rfile);
 
         SkeletonSystemImpl.copyFile(rfile.location, localDst);
@@ -62,8 +61,7 @@ public class FileServerClientImpl implements FileServerClient {
         fserver.shutdown();
     }
 
-    public StoredFile store(File current, int refCount)
-        throws IOException {
+    public StoredFile store(File current, int refCount) throws IOException {
         StoredFile rfile = fserver.register();
 
         SkeletonSystemImpl.copyFile(current, rfile.location);

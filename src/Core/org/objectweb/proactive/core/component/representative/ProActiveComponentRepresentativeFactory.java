@@ -73,11 +73,10 @@ public class ProActiveComponentRepresentativeFactory {
      * @param controllerConfigFileLocation location of a file that contains the description of the controllers for this component. null will load the default configuration
      * @return a corresponding component representative
      */
-    public ProActiveComponentRepresentative createComponentRepresentative(
-        ComponentType componentType, String hierarchicalType, Proxy proxy,
-        String controllerConfigFileLocation) {
-        ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(componentType,
-                hierarchicalType, controllerConfigFileLocation);
+    public ProActiveComponentRepresentative createComponentRepresentative(ComponentType componentType,
+            String hierarchicalType, Proxy proxy, String controllerConfigFileLocation) {
+        ProActiveComponentRepresentative representative = new ProActiveComponentRepresentativeImpl(
+            componentType, hierarchicalType, controllerConfigFileLocation);
         representative.setProxy(proxy);
         return representative;
     }
@@ -92,11 +91,10 @@ public class ProActiveComponentRepresentativeFactory {
      * @param controllerConfigFileLocation location of a file that contains the description of the controllers for this component. null will load the default configuration
      * @return a corresponding component representative
      */
-    public ProActiveComponentRepresentative createNFComponentRepresentative(
-        ComponentType componentType, String hierarchicalType, Proxy proxy,
-        String controllerConfigFileLocation) {
-        ProActiveComponentRepresentative representative = new ProActiveNFComponentRepresentativeImpl(componentType,
-                hierarchicalType, controllerConfigFileLocation);
+    public ProActiveComponentRepresentative createNFComponentRepresentative(ComponentType componentType,
+            String hierarchicalType, Proxy proxy, String controllerConfigFileLocation) {
+        ProActiveComponentRepresentative representative = new ProActiveNFComponentRepresentativeImpl(
+            componentType, hierarchicalType, controllerConfigFileLocation);
         representative.setProxy(proxy);
         return representative;
     }
@@ -108,36 +106,26 @@ public class ProActiveComponentRepresentativeFactory {
      * @return a component representative for the pointed component
      * @throws Throwable an exception
      */
-    public ProActiveComponentRepresentative createComponentRepresentative(
-        Proxy proxy) throws Throwable {
+    public ProActiveComponentRepresentative createComponentRepresentative(Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
-        proxy.reify(MethodCall.getComponentMethodCall(
-                ComponentParametersControllerImpl.class.getDeclaredMethod(
-                    "setImmediateServices", new Class[] {  }),
-                new Object[] {  }, null,
-                Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
-                ComponentRequest.STRICT_FIFO_PRIORITY));
+        proxy.reify(MethodCall.getComponentMethodCall(ComponentParametersControllerImpl.class
+                .getDeclaredMethod("setImmediateServices", new Class[] {}), new Object[] {}, null,
+                Constants.COMPONENT_PARAMETERS_CONTROLLER, null, ComponentRequest.STRICT_FIFO_PRIORITY));
 
-        ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall.getComponentMethodCall(
-                    ComponentParametersControllerImpl.class.getDeclaredMethod(
-                        "getComponentParameters", new Class[] {  }),
-                    new Object[] {  }, null,
-                    Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
-                    ComponentRequest.STRICT_FIFO_PRIORITY));
+        ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall
+                .getComponentMethodCall(ComponentParametersControllerImpl.class.getDeclaredMethod(
+                        "getComponentParameters", new Class[] {}), new Object[] {}, null,
+                        Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
+                        ComponentRequest.STRICT_FIFO_PRIORITY));
 
         //remove immediate service for getComponentParameters
-        proxy.reify(MethodCall.getComponentMethodCall(
-                ComponentParametersControllerImpl.class.getDeclaredMethod(
-                    "removeImmediateServices", new Class[] {  }),
-                new Object[] {  }, null,
-                Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
-                ComponentRequest.STRICT_FIFO_PRIORITY));
+        proxy.reify(MethodCall.getComponentMethodCall(ComponentParametersControllerImpl.class
+                .getDeclaredMethod("removeImmediateServices", new Class[] {}), new Object[] {}, null,
+                Constants.COMPONENT_PARAMETERS_CONTROLLER, null, ComponentRequest.STRICT_FIFO_PRIORITY));
 
-        return ProActiveComponentRepresentativeFactory.instance()
-                                                      .createComponentRepresentative(componentParameters.getComponentType(),
-            componentParameters.getHierarchicalType(), proxy,
-            componentParameters.getControllerDescription()
-                               .getControllersConfigFileLocation());
+        return ProActiveComponentRepresentativeFactory.instance().createComponentRepresentative(
+                componentParameters.getComponentType(), componentParameters.getHierarchicalType(), proxy,
+                componentParameters.getControllerDescription().getControllersConfigFileLocation());
     }
 
     /**
@@ -147,33 +135,23 @@ public class ProActiveComponentRepresentativeFactory {
      * @return a component representative for the pointed component
      * @throws Throwable an exception
      */
-    public ProActiveComponentRepresentative createNFComponentRepresentative(
-        Proxy proxy) throws Throwable {
+    public ProActiveComponentRepresentative createNFComponentRepresentative(Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
-        proxy.reify(MethodCall.getComponentMethodCall(
-                ComponentParametersControllerImpl.class.getDeclaredMethod(
-                    "setImmediateServices", new Class[] {  }),
-                new Object[] {  }, null,
-                Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
-                ComponentRequest.STRICT_FIFO_PRIORITY));
-        ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall.getComponentMethodCall(
-                    ComponentParametersControllerImpl.class.getDeclaredMethod(
-                        "getComponentParameters", new Class[] {  }),
-                    new Object[] {  }, null,
-                    Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
-                    ComponentRequest.STRICT_FIFO_PRIORITY));
+        proxy.reify(MethodCall.getComponentMethodCall(ComponentParametersControllerImpl.class
+                .getDeclaredMethod("setImmediateServices", new Class[] {}), new Object[] {}, null,
+                Constants.COMPONENT_PARAMETERS_CONTROLLER, null, ComponentRequest.STRICT_FIFO_PRIORITY));
+        ComponentParameters componentParameters = (ComponentParameters) proxy.reify(MethodCall
+                .getComponentMethodCall(ComponentParametersControllerImpl.class.getDeclaredMethod(
+                        "getComponentParameters", new Class[] {}), new Object[] {}, null,
+                        Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
+                        ComponentRequest.STRICT_FIFO_PRIORITY));
 
         //remove immediate service for getComponentParameters
-        proxy.reify(MethodCall.getComponentMethodCall(
-                ComponentParametersControllerImpl.class.getDeclaredMethod(
-                    "removeImmediateServices", new Class[] {  }),
-                new Object[] {  }, null,
-                Constants.COMPONENT_PARAMETERS_CONTROLLER, null,
-                ComponentRequest.STRICT_FIFO_PRIORITY));
-        return ProActiveComponentRepresentativeFactory.instance()
-                                                      .createNFComponentRepresentative(componentParameters.getComponentType(),
-            componentParameters.getHierarchicalType(), proxy,
-            componentParameters.getControllerDescription()
-                               .getControllersConfigFileLocation());
+        proxy.reify(MethodCall.getComponentMethodCall(ComponentParametersControllerImpl.class
+                .getDeclaredMethod("removeImmediateServices", new Class[] {}), new Object[] {}, null,
+                Constants.COMPONENT_PARAMETERS_CONTROLLER, null, ComponentRequest.STRICT_FIFO_PRIORITY));
+        return ProActiveComponentRepresentativeFactory.instance().createNFComponentRepresentative(
+                componentParameters.getComponentType(), componentParameters.getHierarchicalType(), proxy,
+                componentParameters.getControllerDescription().getControllersConfigFileLocation());
     }
 }

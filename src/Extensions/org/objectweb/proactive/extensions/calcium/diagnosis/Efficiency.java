@@ -54,8 +54,7 @@ public class Efficiency {
     Efficiency() {
         inference = new Vector<Inference>();
 
-        inference.add(new CoarseGranularity(10, new UnderusedResources(0.8),
-                new LastTaskPenalty(0.1)));
+        inference.add(new CoarseGranularity(10, new UnderusedResources(0.8), new LastTaskPenalty(0.1)));
 
         inference.add(new FineGranularity(1, new DeepTree(3), new WideTree(20)));
     }
@@ -157,6 +156,6 @@ public class Efficiency {
 
         }
         System.out.println("done");
-        */
+         */
     }
 }

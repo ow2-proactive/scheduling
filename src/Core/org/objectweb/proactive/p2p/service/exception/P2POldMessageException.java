@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.p2p.service.exception;
 
-
 /**
  * @author Alexandre di Costanzo
  *

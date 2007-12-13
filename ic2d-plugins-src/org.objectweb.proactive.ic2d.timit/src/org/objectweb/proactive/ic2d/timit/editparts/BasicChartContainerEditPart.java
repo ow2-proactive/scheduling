@@ -47,16 +47,14 @@ import org.objectweb.proactive.ic2d.timit.views.TimItView;
  * @author vbodnart
  *
  */
-public class BasicChartContainerEditPart extends AbstractGraphicalEditPart
-    implements Runnable {
+public class BasicChartContainerEditPart extends AbstractGraphicalEditPart implements Runnable {
     protected TimItView timItView;
 
     /**
      * The constructor of this edit part
      * @param model
      */
-    public BasicChartContainerEditPart(BasicChartContainerObject model,
-        TimItView timItView) {
+    public BasicChartContainerEditPart(BasicChartContainerObject model, TimItView timItView) {
         model.setEp(this);
         setModel(model);
         this.timItView = timItView;

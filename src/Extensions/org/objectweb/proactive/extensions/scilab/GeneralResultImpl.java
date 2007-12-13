@@ -37,8 +37,8 @@ import java.util.List;
 public class GeneralResultImpl implements GeneralResult {
 
     /**
-         *
-         */
+     *
+     */
     private String id;
     private int state;
     private long timeExecution;
@@ -103,10 +103,10 @@ public class GeneralResultImpl implements GeneralResult {
     }
 
     /**
-    *
-    * @param name data id
-    * @return the data
-    */
+     *
+     * @param name data id
+     * @return the data
+     */
     public AbstractData get(String name) {
         for (AbstractData data : listResults) {
             if (data.getName().equals(name)) {
@@ -118,9 +118,9 @@ public class GeneralResultImpl implements GeneralResult {
     }
 
     /**
-    *
-    * @return list of all out data
-    */
+     *
+     * @return list of all out data
+     */
     public List<AbstractData> getList() {
         return listResults;
     }

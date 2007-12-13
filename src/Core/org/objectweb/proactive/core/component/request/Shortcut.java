@@ -74,8 +74,7 @@ public class Shortcut implements Serializable {
     public Shortcut() {
     }
 
-    public Shortcut(String functionalInterfaceName, UniversalBody sender,
-        UniversalBody intermediate) {
+    public Shortcut(String functionalInterfaceName, UniversalBody sender, UniversalBody intermediate) {
         fcFunctionalInterfaceName = functionalInterfaceName;
         steps = new Vector<UniversalBody>();
         this.sender = sender;
@@ -127,8 +126,7 @@ public class Shortcut implements Serializable {
      */
     public ItfID getShortcutInterfaceID() {
         // it is the last encountered interface while creating the shortcut
-        return new ItfID(fcFunctionalInterfaceName,
-            steps.get(steps.size() - 1).getID());
+        return new ItfID(fcFunctionalInterfaceName, steps.get(steps.size() - 1).getID());
     }
 
     /**
@@ -142,14 +140,12 @@ public class Shortcut implements Serializable {
     //
     // -- PRIVATE METHODS FOR SERIALIZATION -----------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         out.defaultWriteObject();
         out.writeObject(sender.getRemoteAdapter());
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
     }

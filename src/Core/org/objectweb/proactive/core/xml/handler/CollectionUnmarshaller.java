@@ -81,8 +81,7 @@ public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {
         if (targetClass == null) {
             resultArray = new Object[size];
         } else {
-            resultArray = (Object[]) java.lang.reflect.Array.newInstance(targetClass,
-                    size);
+            resultArray = (Object[]) java.lang.reflect.Array.newInstance(targetClass, size);
         }
         if (size > 0) {
             resultList.toArray(resultArray);
@@ -94,8 +93,7 @@ public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {
         return resultArray;
     }
 
-    public void startContextElement(String name, Attributes attributes)
-        throws org.xml.sax.SAXException {
+    public void startContextElement(String name, Attributes attributes) throws org.xml.sax.SAXException {
         resultList = new java.util.ArrayList();
     }
 
@@ -103,8 +101,8 @@ public class CollectionUnmarshaller extends AbstractUnmarshallerDecorator {
     // -- PROTECTED METHODS ------------------------------------------------------
     //
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws org.xml.sax.SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+            throws org.xml.sax.SAXException {
         Object o = activeHandler.getResultObject();
         if (o != null) {
             resultList.add(o);

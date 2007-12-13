@@ -57,8 +57,7 @@ public interface GCMApplicationParser extends GCMParserConstants {
      * @throws IOException
      * @throws SAXException
      */
-    public Map<String, NodeProvider> getNodeProviders()
-        throws SAXException, IOException;
+    public Map<String, NodeProvider> getNodeProviders() throws SAXException, IOException;
 
     /**
      * Returns all the Virtual Node
@@ -67,8 +66,7 @@ public interface GCMApplicationParser extends GCMParserConstants {
      * @throws IOException
      * @throws SAXException
      */
-    public Map<String, VirtualNodeInternal> getVirtualNodes()
-        throws SAXException, IOException;
+    public Map<String, VirtualNodeInternal> getVirtualNodes() throws SAXException, IOException;
 
     /**
      * Returns the Command Builder
@@ -78,6 +76,5 @@ public interface GCMApplicationParser extends GCMParserConstants {
      * @throws SAXException
      * @throws XPathExpressionException
      */
-    public CommandBuilder getCommandBuilder()
-        throws XPathExpressionException, SAXException, IOException;
+    public CommandBuilder getCommandBuilder() throws XPathExpressionException, SAXException, IOException;
 }

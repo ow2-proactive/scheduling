@@ -55,8 +55,7 @@ import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
  * @author Matthieu Morel
  *
  */
-public class ExportedVirtualNodesCompiler implements PrimitiveCompiler,
-    BindingController {
+public class ExportedVirtualNodesCompiler implements PrimitiveCompiler, BindingController {
     private ExportedVirtualNodesBuilder builder;
     public final static String BUILDER_BINDING = "builder";
 
@@ -83,10 +82,11 @@ public class ExportedVirtualNodesCompiler implements PrimitiveCompiler,
         }
     }
 
-    public void compile(List path, ComponentContainer container, TaskMap tasks,
-        Map context) throws ADLException {
+    public void compile(List path, ComponentContainer container, TaskMap tasks, Map context)
+            throws ADLException {
         if (container instanceof ExportedVirtualNodesContainer) {
-            ExportedVirtualNodes exported_vns = ((ExportedVirtualNodesContainer) container).getExportedVirtualNodes();
+            ExportedVirtualNodes exported_vns = ((ExportedVirtualNodesContainer) container)
+                    .getExportedVirtualNodes();
             if (exported_vns != null) {
                 //                InstanceProviderTask c = (InstanceProviderTask) tasks.getTask("create",
                 //                        container);
@@ -100,13 +100,12 @@ public class ExportedVirtualNodesCompiler implements PrimitiveCompiler,
                 //                else {
                 //                    component_name = ((Definition) container).getName();
                 //                }
-                VirtualNode current_component_vn = (VirtualNode) ((VirtualNodeContainer) container).getVirtualNode();
-                SetExportedVirtualNodesTask t = new SetExportedVirtualNodesTask(component_name,
-                        builder, exported_vns.getExportedVirtualNodes(),
-                        current_component_vn);
+                VirtualNode current_component_vn = (VirtualNode) ((VirtualNodeContainer) container)
+                        .getVirtualNode();
+                SetExportedVirtualNodesTask t = new SetExportedVirtualNodesTask(component_name, builder,
+                    exported_vns.getExportedVirtualNodes(), current_component_vn);
 
-                InstanceProviderTask createTask = (InstanceProviderTask) tasks.getTask("create",
-                        container);
+                InstanceProviderTask createTask = (InstanceProviderTask) tasks.getTask("create", container);
 
                 // exportations to be known *before* the creation of components.
                 createTask.addPreviousTask(t);
@@ -122,9 +121,8 @@ public class ExportedVirtualNodesCompiler implements PrimitiveCompiler,
         private ExportedVirtualNode[] exported_vns;
         private VirtualNode currentComponentVN;
 
-        public SetExportedVirtualNodesTask(String componentName,
-            ExportedVirtualNodesBuilder builder,
-            ExportedVirtualNode[] exported_vns, VirtualNode currentComponentVN) {
+        public SetExportedVirtualNodesTask(String componentName, ExportedVirtualNodesBuilder builder,
+                ExportedVirtualNode[] exported_vns, VirtualNode currentComponentVN) {
             this.componentName = componentName;
             this.builder = builder;
             this.exported_vns = exported_vns;

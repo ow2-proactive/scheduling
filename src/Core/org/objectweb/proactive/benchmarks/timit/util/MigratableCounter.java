@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util;
 
-
 /**
  * A MigratableCounter is a TimerCounter which can be migrated using ProActive
  * migration.<br>
@@ -86,11 +85,11 @@ public class MigratableCounter extends TimerCounter {
     public void start() {
         this.latency = System.currentTimeMillis();
         this.elapsed = this.netclock.getCurrentTimeMillis(); // ask time to
-                                                             // network clock
+        // network clock
 
         this.latency = System.currentTimeMillis() - this.latency;
         this.elapsed -= (this.latency / 2); // adjust and consider an symetrical
-                                            // connection
+        // connection
     }
 
     /**
@@ -102,7 +101,7 @@ public class MigratableCounter extends TimerCounter {
         this.elapsed = this.netclock.getCurrentTimeMillis() - this.elapsed;
         this.latency = System.currentTimeMillis() - this.latency;
         this.elapsed -= (this.latency / 2); // adjust and consider an symetrical
-                                            // connection
+        // connection
 
         super.setValue((int) this.elapsed);
     }

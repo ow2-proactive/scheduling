@@ -35,6 +35,7 @@ import org.objectweb.proactive.api.PAException;
 import functionalTests.FunctionalTest;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test exceptions
  * @author ProActiveTeam
@@ -167,8 +168,7 @@ public class Test extends FunctionalTest {
     public void action() throws Exception {
 
         /* Server */
-        Exc r = (Exc) org.objectweb.proactive.api.PAActiveObject.newActive(Exc.class.getName(),
-                null);
+        Exc r = (Exc) org.objectweb.proactive.api.PAActiveObject.newActive(Exc.class.getName(), null);
 
         /* Client */
 

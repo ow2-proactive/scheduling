@@ -52,8 +52,8 @@ public class A {
 
     public int register() {
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(),
-                URIBuilder.buildURIFromProperties("localhost", "A").toString());
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), URIBuilder.buildURIFromProperties(
+                    "localhost", "A").toString());
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -59,8 +59,8 @@ import org.objectweb.proactive.core.security.securityentity.Entity;
 public class UniversalBodyWrapper implements UniversalBody, Runnable {
 
     /**
-         *
-         */
+     *
+     */
     protected UniversalBody wrappedBody;
     protected long time;
     protected UniqueID id;
@@ -85,8 +85,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         //   t.start();
     }
 
-    public int receiveRequest(Request request)
-        throws IOException, RenegotiateSessionException {
+    public int receiveRequest(Request request) throws IOException, RenegotiateSessionException {
         //       System.out.println("UniversalBodyWrapper.receiveRequest");
         if (this.wrappedBody == null) {
             throw new IOException();
@@ -131,8 +130,7 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.jobID;
     }
 
-    public void updateLocation(UniqueID id, UniversalBody body)
-        throws IOException {
+    public void updateLocation(UniqueID id, UniversalBody body) throws IOException {
         this.wrappedBody.updateLocation(id, body);
     }
 
@@ -194,46 +192,37 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     }
 
     // SECURITY
-    public void terminateSession(long sessionID)
-        throws java.io.IOException, SecurityNotAvailableException {
+    public void terminateSession(long sessionID) throws java.io.IOException, SecurityNotAvailableException {
         this.wrappedBody.terminateSession(sessionID);
     }
 
-    public TypedCertificate getCertificate()
-        throws java.io.IOException, SecurityNotAvailableException {
+    public TypedCertificate getCertificate() throws java.io.IOException, SecurityNotAvailableException {
         return this.wrappedBody.getCertificate();
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws IOException, SecurityNotAvailableException, SessionException {
-        return this.wrappedBody.startNewSession(distantSessionID, policy,
-            distantCertificate);
+            TypedCertificate distantCertificate) throws IOException, SecurityNotAvailableException,
+            SessionException {
+        return this.wrappedBody.startNewSession(distantSessionID, policy, distantCertificate);
     }
 
-    public PublicKey getPublicKey()
-        throws java.io.IOException, SecurityNotAvailableException {
+    public PublicKey getPublicKey() throws java.io.IOException, SecurityNotAvailableException {
         return this.wrappedBody.getPublicKey();
     }
 
-    public byte[] randomValue(long sessionID, byte[] cl_rand)
-        throws IOException, SecurityNotAvailableException,
-            RenegotiateSessionException {
+    public byte[] randomValue(long sessionID, byte[] cl_rand) throws IOException,
+            SecurityNotAvailableException, RenegotiateSessionException {
         return this.wrappedBody.randomValue(sessionID, cl_rand);
     }
 
-    public byte[] publicKeyExchange(long sessionID, byte[] sig_code)
-        throws IOException, SecurityNotAvailableException,
-            RenegotiateSessionException, KeyExchangeException {
+    public byte[] publicKeyExchange(long sessionID, byte[] sig_code) throws IOException,
+            SecurityNotAvailableException, RenegotiateSessionException, KeyExchangeException {
         return this.wrappedBody.publicKeyExchange(sessionID, sig_code);
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1,
-        byte[] tmp2, byte[] tmp3, byte[] tmp4)
-        throws IOException, SecurityNotAvailableException,
-            RenegotiateSessionException {
-        return this.wrappedBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2,
-            tmp3, tmp4);
+    public byte[][] secretKeyExchange(long sessionID, byte[] tmp, byte[] tmp1, byte[] tmp2, byte[] tmp3,
+            byte[] tmp4) throws IOException, SecurityNotAvailableException, RenegotiateSessionException {
+        return this.wrappedBody.secretKeyExchange(sessionID, tmp, tmp1, tmp2, tmp3, tmp4);
     }
 
     //    /* (non-Javadoc)
@@ -247,13 +236,12 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
     /* (non-Javadoc)
      * @see org.objectweb.proactive.core.body.UniversalBody#getPolicy(org.objectweb.proactive.ext.security.SecurityContext)
      */
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException, IOException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException,
+            IOException {
         return this.wrappedBody.getPolicy(local, distant);
     }
 
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException {
+    public Entities getEntities() throws SecurityNotAvailableException, IOException {
         return this.wrappedBody.getEntities();
     }
 
@@ -274,25 +262,20 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
 
     public void createShortcut(Shortcut shortcut) throws IOException {
         // TODO implement
-        throw new ProActiveRuntimeException(
-            "create shortcut method not implemented yet");
+        throw new ProActiveRuntimeException("create shortcut method not implemented yet");
     }
 
-    public void register(String url)
-        throws IOException, UnknownProtocolException {
+    public void register(String url) throws IOException, UnknownProtocolException {
         this.wrappedBody.register(url);
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         return this.wrappedBody.getProActiveSecurityManager(user);
     }
 
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         this.wrappedBody.setProActiveSecurityManager(user, policyServer);
     }
 }

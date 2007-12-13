@@ -46,8 +46,7 @@ public class StartCommand extends OSGiCommand implements StartCommandMBean {
     }
 
     public Status undo_() {
-        StopCommand stopCommand = new StopCommand(this.transaction,
-                this.idBundle);
+        StopCommand stopCommand = new StopCommand(this.transaction, this.idBundle);
         return stopCommand.do_();
     }
 
@@ -55,8 +54,7 @@ public class StartCommand extends OSGiCommand implements StartCommandMBean {
         BundleInfo[] bundles = OSGiStore.getInstance().getBundles();
         for (int i = 0; i < bundles.length; i++) {
             if ((bundles[i].getId() == this.idBundle) &&
-                    ((bundles[i].getState() == Bundle.ACTIVE) ||
-                    (bundles[i].getState() == Bundle.STARTING))) {
+                ((bundles[i].getState() == Bundle.ACTIVE) || (bundles[i].getState() == Bundle.STARTING))) {
                 this.done = true;
             }
         }

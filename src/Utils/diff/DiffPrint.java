@@ -45,25 +45,24 @@ interface UnaryPredicate {
     boolean execute(Object obj);
 }
 
-
 /** A simple framework for printing change lists produced by <code>Diff</code>.
-    @see bmsi.util.Diff
-    @author Stuart D. Gathman
-    Copyright (C) 2000 Business Management Systems, Inc.
-<p>
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 1, or (at your option)
-    any later version.
-<p>
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-<p>
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ @see bmsi.util.Diff
+ @author Stuart D. Gathman
+ Copyright (C) 2000 Business Management Systems, Inc.
+ <p>
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 1, or (at your option)
+ any later version.
+ <p>
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ <p>
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 public class DiffPrint {
 
@@ -259,7 +258,7 @@ public class DiffPrint {
            This is a contiguous portion of a complete edit script,
            describing changes in consecutive lines.  */
         @Override
-		protected void print_hunk(Diff.change hunk) {
+        protected void print_hunk(Diff.change hunk) {
             /* Determine range of line numbers involved in each file.  */
             analyze_hunk(hunk);
             if ((deletes == 0) && (inserts == 0)) {
@@ -301,7 +300,7 @@ public class DiffPrint {
 
         /** Print a hunk of an ed diff */
         @Override
-		protected void print_hunk(Diff.change hunk) {
+        protected void print_hunk(Diff.change hunk) {
             /* Determine range of line numbers involved in each file.  */
             analyze_hunk(hunk);
             if ((deletes == 0) && (inserts == 0)) {
@@ -363,8 +362,7 @@ public class DiffPrint {
                 outfile.println(mark + ' ' + label);
             } else if (inf.lastModified() > 0) {
                 // FIXME: use DateFormat to get precise format needed.
-                outfile.println(mark + ' ' + inf.getPath() + '\t' +
-                    new Date(inf.lastModified()));
+                outfile.println(mark + ' ' + inf.getPath() + '\t' + new Date(inf.lastModified()));
             } else {
                 /* Don't pretend that standard input is ancient.  */
                 outfile.println(mark + ' ' + inf.getPath());
@@ -372,7 +370,7 @@ public class DiffPrint {
         }
 
         @Override
-		public void print_header(String filea, String fileb) {
+        public void print_header(String filea, String fileb) {
             print_context_label("***", new File(filea), filea);
             print_context_label("---", new File(fileb), fileb);
         }
@@ -386,13 +384,12 @@ public class DiffPrint {
             String function = find_function(file0, first0);
             if (function != null) {
                 outfile.print(" ");
-                outfile.print((function.length() < 40) ? function
-                                                       : function.substring(0, 40));
+                outfile.print((function.length() < 40) ? function : function.substring(0, 40));
             }
         }
 
         @Override
-		protected void print_hunk(Diff.change hunk) {
+        protected void print_hunk(Diff.change hunk) {
             /* Determine range of line numbers involved in each file.  */
             analyze_hunk(hunk);
 
@@ -478,7 +475,7 @@ public class DiffPrint {
         }
 
         @Override
-		public void print_header(String filea, String fileb) {
+        public void print_header(String filea, String fileb) {
             print_context_label("---", new File(filea), filea);
             print_context_label("+++", new File(fileb), fileb);
         }
@@ -497,7 +494,7 @@ public class DiffPrint {
         }
 
         @Override
-		protected void print_hunk(Diff.change hunk) {
+        protected void print_hunk(Diff.change hunk) {
             /* Determine range of line numbers involved in each file.  */
             analyze_hunk(hunk);
 
@@ -587,8 +584,7 @@ public class DiffPrint {
      * @return true is returned if filea and fileb are different.
      * @throws IOException
      */
-    public static boolean printUnifiedDiff(String filea, String fileb)
-        throws IOException {
+    public static boolean printUnifiedDiff(String filea, String fileb) throws IOException {
         String[] a = slurp(filea);
         String[] b = slurp(fileb);
         Diff d = new Diff(a, b);

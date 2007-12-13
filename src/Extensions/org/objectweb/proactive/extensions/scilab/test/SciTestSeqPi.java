@@ -50,8 +50,7 @@ class SciTestSeqPi {
         }
 
         BufferedReader reader = new BufferedReader(new FileReader(args[0]));
-        PrintWriter writer = new PrintWriter(new BufferedWriter(
-                    new FileWriter(args[1])));
+        PrintWriter writer = new PrintWriter(new BufferedWriter(new FileWriter(args[1])));
 
         int precision;
         String line;

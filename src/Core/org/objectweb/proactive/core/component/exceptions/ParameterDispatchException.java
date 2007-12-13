@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.component.exceptions;
 
-
 /**
  * Exception thrown if parameters cannot be dispatched from or to a collective interface.
  *

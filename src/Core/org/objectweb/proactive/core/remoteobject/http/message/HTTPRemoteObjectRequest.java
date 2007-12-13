@@ -47,9 +47,9 @@ public class HTTPRemoteObjectRequest extends HttpMessage implements Serializable
     }
 
     public Object getReturnedObject() { //throws Exception {
-                                        //        if (this.returnedObject instanceof Exception) {
-                                        //            throw (Exception) this.returnedObject;
-                                        //        }
+        //        if (this.returnedObject instanceof Exception) {
+        //            throw (Exception) this.returnedObject;
+        //        }
         return this.returnedObject;
     }
 
@@ -64,8 +64,7 @@ public class HTTPRemoteObjectRequest extends HttpMessage implements Serializable
     @Override
     public Object processMessage() {
         try {
-            InternalRemoteRemoteObject ro = HTTPRegistry.getInstance()
-                                                        .lookup(url);
+            InternalRemoteRemoteObject ro = HTTPRegistry.getInstance().lookup(url);
             int max_retry = 10;
             while ((ro == null) && (max_retry > 0)) {
                 try {

@@ -36,8 +36,7 @@ import org.objectweb.proactive.examples.jmx.remote.management.status.Status;
 import org.objectweb.proactive.examples.jmx.remote.management.transactions.Transaction;
 
 
-public class UninstallCommand extends OSGiCommand
-    implements UninstallCommandMBean {
+public class UninstallCommand extends OSGiCommand implements UninstallCommandMBean {
     private long idBundle;
 
     public UninstallCommand(Transaction t, long id) {
@@ -47,8 +46,7 @@ public class UninstallCommand extends OSGiCommand
 
     public Status undo_() {
         String location = OSGiStore.getInstance().getBundleInfo(this.idBundle);
-        InstallCommand c = new InstallCommand(this.transaction, location,
-                OSGiCommand.INSTALL);
+        InstallCommand c = new InstallCommand(this.transaction, location, OSGiCommand.INSTALL);
         return c.do_();
     }
 

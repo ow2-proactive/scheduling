@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.cruisecontrol;
 
-
 /**
  * The class representing the current road
  */
@@ -123,8 +122,7 @@ public class CarModel implements org.objectweb.proactive.RunActive {
         if (this.state == ACTIVE) {
             //		this.acc = father.getAcceleration().doubleValue();
             if ((m_newAcc <= 50) && (m_newAcc >= 0)) {
-                speed = (speed + (m_newAcc * deltaT)) -
-                    (coeff * speed * deltaT) -
+                speed = (speed + (m_newAcc * deltaT)) - (coeff * speed * deltaT) -
                     (Math.sin(alpha) * 4 * g * deltaT);
                 if (this.speed < 0.005) {
                     this.speed = 0;
@@ -146,8 +144,7 @@ public class CarModel implements org.objectweb.proactive.RunActive {
     /** Increase the acceleration of the car */
     public void incAcceleration(double m_acc) {
         if (this.state == ACTIVE) {
-            if (((this.acc < 50) && (m_acc > 0)) ||
-                    ((this.acc > 0) && (m_acc < 0))) {
+            if (((this.acc < 50) && (m_acc > 0)) || ((this.acc > 0) && (m_acc < 0))) {
                 this.acc += m_acc;
             }
 

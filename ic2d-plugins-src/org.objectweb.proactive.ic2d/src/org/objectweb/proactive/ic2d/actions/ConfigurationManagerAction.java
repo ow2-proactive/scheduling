@@ -41,8 +41,7 @@ import org.eclipse.update.ui.UpdateManagerUI;
 /**
  * Action to invoke the Update configuration manager.
  */
-public class ConfigurationManagerAction
-    implements IWorkbenchWindowActionDelegate {
+public class ConfigurationManagerAction implements IWorkbenchWindowActionDelegate {
     private IWorkbenchWindow window;
 
     /**
@@ -56,12 +55,11 @@ public class ConfigurationManagerAction
      * Runs the action when selected
      */
     public void run(IAction action) {
-        BusyIndicator.showWhile(window.getShell().getDisplay(),
-            new Runnable() {
-                public void run() {
-                    UpdateManagerUI.openConfigurationManager(window.getShell());
-                }
-            });
+        BusyIndicator.showWhile(window.getShell().getDisplay(), new Runnable() {
+            public void run() {
+                UpdateManagerUI.openConfigurationManager(window.getShell());
+            }
+        });
     }
 
     /**

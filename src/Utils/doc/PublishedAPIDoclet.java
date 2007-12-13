@@ -42,7 +42,7 @@ import com.sun.javadoc.RootDoc;
 
 public class PublishedAPIDoclet {
     static final private String OPT_FILE = "-file";
-    
+
     public static boolean start(RootDoc root) {
         String fileName = readOptions(root.options());
         try {
@@ -62,7 +62,7 @@ public class PublishedAPIDoclet {
             e.printStackTrace();
             return false;
         }
-       
+
         return true;
     }
 
@@ -90,7 +90,7 @@ public class PublishedAPIDoclet {
             String[] opt = options[i];
             if (opt[0].equals(OPT_FILE)) {
                 if (foundTagOption) {
-                    reporter.printError("Only one " +  OPT_FILE + " option allowed.");
+                    reporter.printError("Only one " + OPT_FILE + " option allowed.");
                     return false;
                 } else {
                     foundTagOption = true;

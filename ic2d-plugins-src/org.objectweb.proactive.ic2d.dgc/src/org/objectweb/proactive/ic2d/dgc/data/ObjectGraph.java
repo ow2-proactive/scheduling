@@ -54,8 +54,7 @@ public class ObjectGraph {
         ActiveObjectByID.put(ao.getUniqueID(), ao);
     }
 
-    private static Collection<AbstractData> getAllChildren(
-        Collection<AbstractData> parents) {
+    private static Collection<AbstractData> getAllChildren(Collection<AbstractData> parents) {
         Collection<AbstractData> res = new Vector<AbstractData>();
         for (AbstractData o : parents) {
             res.addAll(o.getMonitoredChildrenAsList());
@@ -63,8 +62,7 @@ public class ObjectGraph {
         return res;
     }
 
-    private static Collection<ActiveObject> bodyIDToActiveObject(
-        Collection<UniqueID> ids) {
+    private static Collection<ActiveObject> bodyIDToActiveObject(Collection<UniqueID> ids) {
         Collection<ActiveObject> aos = new Vector<ActiveObject>();
         for (UniqueID id : ids) {
             ActiveObject ao = ActiveObjectByID.get(id);
@@ -77,8 +75,7 @@ public class ObjectGraph {
         return aos;
     }
 
-    public static Map<ActiveObject, Collection<ActiveObject>> getObjectGraph(
-        WorldObject world) {
+    public static Map<ActiveObject, Collection<ActiveObject>> getObjectGraph(WorldObject world) {
         Collection<AbstractData> hosts = world.getMonitoredChildrenAsList();
         Collection<AbstractData> runtimes = getAllChildren(hosts);
         Collection<AbstractData> nodes = getAllChildren(runtimes);
@@ -91,8 +88,7 @@ public class ObjectGraph {
                 UniqueID bodyID = ((ActiveObject) oo).getUniqueID();
                 Collection<UniqueID> referencesID = null;
                 try {
-                    referencesID = (Collection<UniqueID>) ao.getAttribute(
-                            "ReferenceList");
+                    referencesID = (Collection<UniqueID>) ao.getAttribute("ReferenceList");
                     Collection<ActiveObject> referencesAO = bodyIDToActiveObject(referencesID);
                     res.put(ao, referencesAO);
                 } catch (InstanceNotFoundException e) {

@@ -56,8 +56,7 @@ public abstract class AbstractSchedulerDB {
 
     public abstract boolean setTaskEvent(TaskEvent taskEvent);
 
-    public abstract boolean setJobAndTasksEvents(JobEvent jobEvent,
-        List<TaskEvent> tasksEvents);
+    public abstract boolean setJobAndTasksEvents(JobEvent jobEvent, List<TaskEvent> tasksEvents);
 
     public abstract boolean addTaskResult(TaskResult taskResult);
 

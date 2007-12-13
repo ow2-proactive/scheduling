@@ -61,8 +61,7 @@ public class HalfBodies extends GarbageCollector {
     /**
      * Keep track of who knows what
      */
-    private final WeakHashMap<HalfBody, ConcurrentLinkedQueue<Referenced>> references =
-        new WeakHashMap<HalfBody, ConcurrentLinkedQueue<Referenced>>();
+    private final WeakHashMap<HalfBody, ConcurrentLinkedQueue<Referenced>> references = new WeakHashMap<HalfBody, ConcurrentLinkedQueue<Referenced>>();
 
     /**
      * The singleton
@@ -84,8 +83,7 @@ public class HalfBodies extends GarbageCollector {
         HalfBody hb = null;
 
         if (GarbageCollector.dgcIsEnabled()) {
-            hb = HalfBody.getHalfBody(LocalBodyStore.getInstance()
-                                                    .getHalfBodyMetaObjectFactory());
+            hb = HalfBody.getHalfBody(LocalBodyStore.getInstance().getHalfBodyMetaObjectFactory());
         }
 
         return hb;
@@ -129,8 +127,7 @@ public class HalfBodies extends GarbageCollector {
         this.log(Level.DEBUG, "Sending GC Message to: " + refs);
         Vector<GCSimpleMessage> messages = new Vector<GCSimpleMessage>(refs.size());
         for (Referenced r : refs) {
-            messages.add(new GCSimpleMessage(r, this.body.getID(), false,
-                    this.dummyActivity));
+            messages.add(new GCSimpleMessage(r, this.body.getID(), false, this.dummyActivity));
         }
 
         return messages;
@@ -148,8 +145,7 @@ public class HalfBodies extends GarbageCollector {
      * Find the actual half body, and attach the referenced
      */
     @Override
-    public synchronized void addProxy(AbstractBody body,
-        UniversalBodyProxy proxy) {
+    public synchronized void addProxy(AbstractBody body, UniversalBodyProxy proxy) {
         if (this.isFinished()) {
             return;
         }
@@ -166,8 +162,7 @@ public class HalfBodies extends GarbageCollector {
         if (!refs.contains(ref)) {
             refs.add(ref);
         }
-        this.log(Level.DEBUG,
-            "New referenced: " + proxy.getBodyID().shortString());
+        this.log(Level.DEBUG, "New referenced: " + proxy.getBodyID().shortString());
     }
 
     /**

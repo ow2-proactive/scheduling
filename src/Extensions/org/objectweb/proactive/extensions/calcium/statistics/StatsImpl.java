@@ -117,13 +117,11 @@ public class StatsImpl implements Stats {
     public String toString() {
         String ls = System.getProperty("line.separator");
 
-        return "Time: " + processingTime + "P " + readyTime + "R " +
-        waitingTime + "W " + resultsTime + "F " + getWallClockTime() + "L " +
-        getComputationTime() + "C[ms] " + unusedCPUTime + "UC[ms] " +
-        computationBlockedFetchingData + "B[ms] " + uploadedBytes +
-        "Up [bytes] " + downloadedBytes + "Down [bytes] " + "TreeSize:" +
-        getTreeSize() + " " + "TreeSpan:" + getTreeSpan() + " " + "TreeDepth:" +
-        getTreeDepth() + ls + workout;
+        return "Time: " + processingTime + "P " + readyTime + "R " + waitingTime + "W " + resultsTime + "F " +
+            getWallClockTime() + "L " + getComputationTime() + "C[ms] " + unusedCPUTime + "UC[ms] " +
+            computationBlockedFetchingData + "B[ms] " + uploadedBytes + "Up [bytes] " + downloadedBytes +
+            "Down [bytes] " + "TreeSize:" + getTreeSize() + " " + "TreeSpan:" + getTreeSpan() + " " +
+            "TreeDepth:" + getTreeDepth() + ls + workout;
     }
 
     public void markFinishTime() {
@@ -140,10 +138,8 @@ public class StatsImpl implements Stats {
         this.readyTime += stats.getReadyTime();
 
         this.subTreeSize += stats.getTreeSize();
-        this.numberLeafs += ((stats.getNumberLeafs() == 0) ? 1
-                                                           : stats.getNumberLeafs());
-        this.maxResources = Math.max(maxResources,
-                stats.getMaxAvailableResources());
+        this.numberLeafs += ((stats.getNumberLeafs() == 0) ? 1 : stats.getNumberLeafs());
+        this.maxResources = Math.max(maxResources, stats.getMaxAvailableResources());
         this.workout.track(stats.workout);
 
         this.computationBlockedFetchingData += stats.computationBlockedFetchingData;

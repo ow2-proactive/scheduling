@@ -46,14 +46,14 @@ public class Block extends Anything {
     }
 
     @Override
-	public String toString() {
+    public String toString() {
         return "{@" + start.getLeft() + "-" + end.getRight() + "}";
     }
 
     @Override
-	public boolean isEmpty() {
+    public boolean isEmpty() {
         for (Anything a : things) {
-        	if (!a.isEmpty()) {
+            if (!a.isEmpty()) {
                 return false;
             }
         }
@@ -62,21 +62,21 @@ public class Block extends Anything {
     }
 
     @Override
-	protected void prettyPrint(int indent) {
+    protected void prettyPrint(int indent) {
         start.prettyPrint(indent);
         indent++;
         for (Anything a : things) {
-        	a.prettyPrint(indent);
+            a.prettyPrint(indent);
         }
         indent--;
         end.prettyPrint(indent);
     }
 
     @Override
-	public void work(Catcher c) throws IOException {
-    	for (Anything a : things) {
-    		 a.work(c);
-    	}
+    public void work(Catcher c) throws IOException {
+        for (Anything a : things) {
+            a.work(c);
+        }
     }
 
     public Terminal getStart() {

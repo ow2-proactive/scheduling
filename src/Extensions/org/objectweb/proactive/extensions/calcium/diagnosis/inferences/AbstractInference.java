@@ -55,8 +55,7 @@ public abstract class AbstractInference implements Inference {
         this(threshold, new Inference[0], cause);
     }
 
-    public AbstractInference(double threshold, Inference[] inferences,
-        Cause[] causes) {
+    public AbstractInference(double threshold, Inference[] inferences, Cause[] causes) {
         this.threshold = threshold;
         this.inferences = Arrays.asList(inferences);
         this.causes = Arrays.asList(causes);

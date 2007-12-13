@@ -45,8 +45,8 @@ import org.objectweb.proactive.core.util.MutableLong;
 public class MessageInfoCIC implements MessageInfo {
 
     /**
-         *
-         */
+     *
+     */
 
     // checkpointing protocol
     public char checkpointIndex;

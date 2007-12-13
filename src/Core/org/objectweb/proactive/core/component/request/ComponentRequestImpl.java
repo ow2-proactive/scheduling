@@ -72,8 +72,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author Matthieu Morel
  */
-public class ComponentRequestImpl extends RequestImpl
-    implements ComponentRequest, Serializable {
+public class ComponentRequestImpl extends RequestImpl implements ComponentRequest, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
 
     //private int shortcutCounter = 0;
@@ -83,16 +82,15 @@ public class ComponentRequestImpl extends RequestImpl
 
     // priorities for NF requests (notably when using filters on functional requests) : 
     //private short priority=ComponentRequest.STRICT_FIFO_PRIORITY;
-    public ComponentRequestImpl(MethodCall methodCall, UniversalBody sender,
-        boolean isOneWay, long nextSequenceID) {
+    public ComponentRequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay,
+            long nextSequenceID) {
         super(methodCall, sender, isOneWay, nextSequenceID);
         declaringClass = methodCall.getReifiedMethod().getDeclaringClass();
         targetClass = methodCall.getReifiedMethod().getDeclaringClass();
     }
 
     public ComponentRequestImpl(Request request) {
-        super(request.getMethodCall(), request.getSender(), request.isOneWay(),
-            request.getSequenceNumber());
+        super(request.getMethodCall(), request.getSender(), request.isOneWay(), request.getSequenceNumber());
         declaringClass = methodCall.getReifiedMethod().getDeclaringClass();
         targetClass = methodCall.getReifiedMethod().getDeclaringClass();
     }
@@ -103,21 +101,21 @@ public class ComponentRequestImpl extends RequestImpl
      * on the base object if this component is a primitive component and the invocation is a functional invocation.
      */
     @Override
-    protected MethodCallResult serveInternal(Body targetBody)
-        throws ServeException {
+    protected MethodCallResult serveInternal(Body targetBody) throws ServeException {
         Object result = null;
         Throwable exception = null;
 
         if (logger.isDebugEnabled()) {
             try {
-                logger.debug("invocation on method [" + methodCall.getName() +
+                logger.debug("invocation on method [" +
+                    methodCall.getName() +
                     "] of interface [" +
                     methodCall.getComponentMetadata().getComponentInterfaceName() +
                     "] on component : [" +
                     ((ComponentParametersController) ((ComponentBodyImpl) targetBody)
-                     .getProActiveComponentImpl()
-                     .getFcInterface(Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
-                     .getName() + "]");
+                            .getProActiveComponentImpl().getFcInterface(
+                                    Constants.COMPONENT_PARAMETERS_CONTROLLER)).getComponentParameters()
+                            .getName() + "]");
             } catch (NoSuchInterfaceException e) {
                 e.printStackTrace();
             }
@@ -126,28 +124,27 @@ public class ComponentRequestImpl extends RequestImpl
         try {
             if (isControllerRequest()) {
                 result = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
-                          .getControllerRequestHandler().handleRequest(this);
+                        .getControllerRequestHandler().handleRequest(this);
             } else {
                 if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
                     interceptBeforeInvocation(targetBody);
 
-                    String hierarchical_type = Fractive.getComponentParametersController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                                                       .getComponentParameters()
-                                                       .getHierarchicalType();
+                    String hierarchical_type = Fractive.getComponentParametersController(
+                            ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                            .getComponentParameters().getHierarchicalType();
 
                     // gather: interception managed with non-transformed incoming requests
-                    ProActiveInterface itf = (ProActiveInterface) ((ComponentBody) targetBody).getProActiveComponentImpl()
-                                                                   .getFcInterface(methodCall.getComponentMetadata()
-                                                                                             .getComponentInterfaceName());
+                    ProActiveInterface itf = (ProActiveInterface) ((ComponentBody) targetBody)
+                            .getProActiveComponentImpl().getFcInterface(
+                                    methodCall.getComponentMetadata().getComponentInterfaceName());
                     ProActiveInterfaceType itfType = (ProActiveInterfaceType) itf.getFcItfType();
                     if (itfType.isFcGathercastItf() &&
-                            (!getMethodCall().getComponentMetadata()
-                                      .getSenderItfID()
-                                      .equals(new ItfID(
-                                    itfType.getFcItfName(), targetBody.getID())))) {
+                        (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
+                                new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
                         // delegate to gather controller, except for self requests
-                        result = Fractive.getGathercastController(((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
-                                         .handleRequestOnGatherItf(this);
+                        result = Fractive.getGathercastController(
+                                ((ComponentBodyImpl) targetBody).getProActiveComponentImpl())
+                                .handleRequestOnGatherItf(this);
                     }
                     // if the component is a composite , forward to functional interface 
                     else if (hierarchical_type.equals(Constants.COMPOSITE)) {
@@ -157,24 +154,21 @@ public class ComponentRequestImpl extends RequestImpl
                                 // TODO_M allow stopping shortcut here
                             }
                             // executing on connected server interface
-                            result = methodCall.execute((((ComponentBodyImpl) targetBody).getProActiveComponentImpl()).getFcInterface(
-                                        methodCall.getComponentMetadata()
-                                                  .getComponentInterfaceName()));
+                            result = methodCall.execute((((ComponentBodyImpl) targetBody)
+                                    .getProActiveComponentImpl()).getFcInterface(methodCall
+                                    .getComponentMetadata().getComponentInterfaceName()));
                         } catch (IllegalArgumentException e) {
-                            throw new ServeException("could not reify method call : ",
-                                e);
+                            throw new ServeException("could not reify method call : ", e);
                         } catch (Throwable e) {
                             e.printStackTrace();
-                            throw new ServeException("could not reify method call : ",
-                                e);
+                            throw new ServeException("could not reify method call : ", e);
                         }
                     } else {
                         // the component is a primitive
                         // directly execute the method on the active object
                         if (logger.isDebugEnabled()) {
                             if (getShortcutLength() > 0) {
-                                logger.debug("request has crossed " +
-                                    (getShortcutLength() - 1) +
+                                logger.debug("request has crossed " + (getShortcutLength() - 1) +
                                     " membranes before reaching a primitive component");
                             }
                         }
@@ -187,28 +181,23 @@ public class ComponentRequestImpl extends RequestImpl
                 }
             }
         } catch (NoSuchInterfaceException nsie) {
-            throw new ServeException("cannot serve request : problem accessing a component controller",
-                nsie);
+            throw new ServeException("cannot serve request : problem accessing a component controller", nsie);
         } catch (MethodCallExecutionFailedException e) {
-            throw new ServeException("serve method " +
-                methodCall.getReifiedMethod().toString() + " failed", e);
+            throw new ServeException("serve method " + methodCall.getReifiedMethod().toString() + " failed",
+                e);
         } catch (java.lang.reflect.InvocationTargetException e) {
             exception = e.getTargetException();
             if (logger.isDebugEnabled()) {
-                logger.debug("Serve method " +
-                    methodCall.getReifiedMethod().getName() + " failed: ", e);
+                logger.debug("Serve method " + methodCall.getReifiedMethod().getName() + " failed: ", e);
             } else {
-                logger.info("Serve method " +
-                    methodCall.getReifiedMethod().getName() +
-                    " failed; throws exception with the following message:" +
-                    e.getMessage() +
+                logger.info("Serve method " + methodCall.getReifiedMethod().getName() +
+                    " failed; throws exception with the following message:" + e.getMessage() +
                     " Activate debug logger level for more information.");
             }
 
             if (isOneWay) {
-                throw new ServeException("serve method " +
-                    methodCall.getReifiedMethod().toString() + " failed",
-                    exception);
+                throw new ServeException("serve method " + methodCall.getReifiedMethod().toString() +
+                    " failed", exception);
             }
         }
 
@@ -219,15 +208,14 @@ public class ComponentRequestImpl extends RequestImpl
     private void interceptBeforeInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
             List inputInterceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
-                                      .getInputInterceptors();
+                    .getInputInterceptors();
             Iterator it = inputInterceptors.iterator();
             while (it.hasNext()) {
                 try {
                     InputInterceptor interceptor = (InputInterceptor) it.next();
                     interceptor.beforeInputMethodInvocation(methodCall);
                 } catch (NullPointerException e) {
-                    logger.error("could not intercept invocation : " +
-                        e.getMessage());
+                    logger.error("could not intercept invocation : " + e.getMessage());
                 }
             }
         }
@@ -238,7 +226,7 @@ public class ComponentRequestImpl extends RequestImpl
         if (methodCall.getReifiedMethod() != null) {
             if (((ComponentBodyImpl) targetBody).getProActiveComponentImpl() != null) {
                 List interceptors = ((ComponentBodyImpl) targetBody).getProActiveComponentImpl()
-                                     .getInputInterceptors();
+                        .getInputInterceptors();
 
                 // use inputInterceptors in reverse order after invocation
                 ListIterator it = interceptors.listIterator();
@@ -259,33 +247,28 @@ public class ComponentRequestImpl extends RequestImpl
      */
     public boolean isControllerRequest() {
         // according to the Fractal spec v2.0 , section 4.1
-        return Utils.isControllerInterfaceName(methodCall.getComponentMetadata()
-                                                         .getComponentInterfaceName());
+        return Utils.isControllerInterfaceName(methodCall.getComponentMetadata().getComponentInterfaceName());
     }
 
     /*
      * @see org.objectweb.proactive.core.component.request.ComponentRequest#isStopFcRequest()
      */
     public boolean isStopFcRequest() {
-        return (declaringClass.equals(LifeCycleController.class) &&
-        "stopFc".equals(getMethodName()));
+        return (declaringClass.equals(LifeCycleController.class) && "stopFc".equals(getMethodName()));
     }
 
     /*
      * @see org.objectweb.proactive.core.component.request.ComponentRequest#isStartFcRequest()
      */
     public boolean isStartFcRequest() {
-        return (declaringClass.equals(LifeCycleController.class) &&
-        "startFc".equals(getMethodName()));
+        return (declaringClass.equals(LifeCycleController.class) && "startFc".equals(getMethodName()));
     }
 
     @Override
-    public void notifyReception(UniversalBody bodyReceiver)
-        throws IOException {
+    public void notifyReception(UniversalBody bodyReceiver) throws IOException {
         if (getShortcut() != null) {
             if (logger.isDebugEnabled()) {
-                logger.debug("notifying reception of method " +
-                    methodCall.getName());
+                logger.debug("notifying reception of method " + methodCall.getName());
             }
             Shortcut shortcut = getShortcut();
             shortcut.updateDestination(bodyReceiver.getRemoteAdapter());
@@ -296,10 +279,8 @@ public class ComponentRequestImpl extends RequestImpl
         super.notifyReception(bodyReceiver);
     }
 
-    public void shortcutNotification(UniversalBody sender,
-        UniversalBody intermediate) {
-        methodCall.getComponentMetadata()
-                  .shortcutNotification(sender, intermediate);
+    public void shortcutNotification(UniversalBody sender, UniversalBody intermediate) {
+        methodCall.getComponentMetadata().shortcutNotification(sender, intermediate);
     }
 
     public Shortcut getShortcut() {

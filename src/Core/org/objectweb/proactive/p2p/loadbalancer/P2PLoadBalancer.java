@@ -55,8 +55,7 @@ import org.objectweb.proactive.p2p.service.P2PService;
 import org.objectweb.proactive.p2p.service.util.P2PConstants;
 
 
-public class P2PLoadBalancer extends LoadBalancer implements RunActive,
-    ProActiveInternalObject {
+public class P2PLoadBalancer extends LoadBalancer implements RunActive, ProActiveInternalObject {
     static int MAX_KNOWN_PEERS = 10;
     static long MAX_DISTANCE = 100;
     protected String balancerName;
@@ -79,10 +78,9 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             try {
                 P2PService oService = (P2PService) it.next();
                 itAddress = oService.getAddress().stringValue();
-                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
-                    "/" + this.balancerName;
-                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
-                        itAddress);
+                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) + "/" + this.balancerName;
+                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class
+                        .getName(), itAddress);
 
                 if (forBalancing.indexOf(oLB) < 0) {
                     long distance = ping(itAddress);
@@ -96,8 +94,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             } catch (IOException e) {
                 logger.error("[P2PLB] IOException");
             } catch (ProActiveRuntimeException e) {
-                logger.error(
-                    "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
+                logger.error("[P2PLoadBalancing] Trying to reach a non-existing peer from " +
                     myNode.getVMInformation().getHostName());
             }
         }
@@ -111,10 +108,9 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             try {
                 P2PService oService = (P2PService) it.next();
                 String itAddress = oService.getAddress().stringValue();
-                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
-                    "/" + this.balancerName;
-                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
-                        itAddress);
+                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) + "/" + this.balancerName;
+                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class
+                        .getName(), itAddress);
 
                 if (!forBalancing.contains(oLB)) {
                     forBalancing.add(oLB);
@@ -125,8 +121,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             } catch (IOException e) {
                 logger.error("[P2PLB] IOException");
             } catch (ProActiveRuntimeException e) {
-                logger.error(
-                    "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
+                logger.error("[P2PLoadBalancing] Trying to reach a non-existing peer from " +
                     myNode.getVMInformation().getHostName());
             }
         }
@@ -140,10 +135,9 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             try {
                 P2PService oService = (P2PService) it.next();
                 itAddress = oService.getAddress().stringValue();
-                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
-                    "/robinhood";
-                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
-                        itAddress);
+                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) + "/robinhood";
+                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class
+                        .getName(), itAddress);
 
                 if (!forStealing.contains(oLB)) {
                     long distance = ping(itAddress);
@@ -157,8 +151,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             } catch (IOException e) {
                 logger.error("[P2PLB] IOException");
             } catch (ProActiveRuntimeException e) {
-                logger.error(
-                    "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
+                logger.error("[P2PLoadBalancing] Trying to reach a non-existing peer from " +
                     myNode.getVMInformation().getHostName());
             }
         }
@@ -173,10 +166,9 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             try {
                 P2PService oService = (P2PService) it.next();
                 itAddress = oService.getAddress().stringValue();
-                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
-                    "/" + this.balancerName;
-                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class.getName(),
-                        itAddress);
+                itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) + "/" + this.balancerName;
+                P2PLoadBalancer oLB = (P2PLoadBalancer) PAActiveObject.lookupActive(P2PLoadBalancer.class
+                        .getName(), itAddress);
 
                 if (!forStealing.contains(oLB)) {
                     forBalancing.add(oLB);
@@ -187,8 +179,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             } catch (IOException e) {
                 logger.error("[P2PLB] IOException");
             } catch (ProActiveRuntimeException e) {
-                logger.error(
-                    "[P2PLoadBalancing] Trying to reach a non-existing peer from " +
+                logger.error("[P2PLoadBalancing] Trying to reach a non-existing peer from " +
                     myNode.getVMInformation().getHostName());
             }
         }
@@ -201,8 +192,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
     protected long ping(String nodeAddress) {
         // nodeAddress come in format "protocol://host:port/nodename"
         long timeResp = Long.MAX_VALUE;
-        String itAddress = new String(nodeAddress.substring(0,
-                    nodeAddress.lastIndexOf("/")));
+        String itAddress = new String(nodeAddress.substring(0, nodeAddress.lastIndexOf("/")));
         if (itAddress.lastIndexOf(':') >= (itAddress.length() - 6)) {
             itAddress = itAddress.substring(0, itAddress.lastIndexOf(':'));
         }
@@ -219,12 +209,10 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
             String line;
             while ((line = in.readLine()) != null) {
                 if (line.indexOf('=') > 0) {
-                    line = line.substring(line.indexOf('=') + 2,
-                            line.indexOf("ms") - 1);
+                    line = line.substring(line.indexOf('=') + 2, line.indexOf("ms") - 1);
                     // rtt min/avg/max/mdev = 0.246/0.339/0.413/0.069 ms, pipe 3
                     String[] pingStats = line.split("/");
-                    timeResp = 1 +
-                        Math.round(Double.parseDouble(pingStats[1]));
+                    timeResp = 1 + Math.round(Double.parseDouble(pingStats[1]));
                 }
             }
             in.close();
@@ -248,10 +236,8 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
         int badRemote = 0;
 
         int first = randomizer.nextInt(size);
-        for (int i = 0; (i < LoadBalancingConstants.SUBSET_SIZE) && (size > 0);
-                i++) {
-            P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forBalancing.get((first +
-                    i) % size));
+        for (int i = 0; (i < LoadBalancingConstants.SUBSET_SIZE) && (size > 0); i++) {
+            P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forBalancing.get((first + i) % size));
             try {
                 remoteP2Plb.getActiveObjectsFrom(myThis, ranking);
             } catch (ProActiveRuntimeException e) {
@@ -265,17 +251,16 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
         }
     }
 
-    protected void getActiveObjectsFrom(P2PLoadBalancer remoteBalancer,
-        double remoteRanking) {
+    protected void getActiveObjectsFrom(P2PLoadBalancer remoteBalancer, double remoteRanking) {
         if (remoteRanking < (ranking * LoadBalancingConstants.BALANCE_FACTOR)) { // I'm better than him!
             remoteBalancer.sendActiveObjectsTo(myNode);
         }
     }
 
     /**
-    * This method use the P2P infrastructure to search nodes which I
-    * can steal work.  Method extended from LoadBalancer class.
-    */
+     * This method use the P2P infrastructure to search nodes which I
+     * can steal work.  Method extended from LoadBalancer class.
+     */
     @Override
     public void stealWork() {
         int size = forStealing.size();
@@ -285,11 +270,8 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
 
         int badRemote = 0;
         int first = randomizer.nextInt(size);
-        for (int i = 0;
-                (i < LoadBalancingConstants.NEIGHBORS_TO_STEAL) && (size > 0);
-                i++) {
-            P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forStealing.get((first +
-                    i) % size));
+        for (int i = 0; (i < LoadBalancingConstants.NEIGHBORS_TO_STEAL) && (size > 0); i++) {
+            P2PLoadBalancer remoteP2Plb = ((P2PLoadBalancer) forStealing.get((first + i) % size));
             try {
                 remoteP2Plb.sendActiveObjectsTo(myNode, ranking);
             } catch (ProActiveRuntimeException e) {
@@ -317,8 +299,8 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
         /* Updating the node reference */
         try {
             String itAddress = body.getNodeURL();
-            itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
-                "/" + P2PConstants.SHARED_NODE_NAME + "_0";
+            itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) + "/" +
+                P2PConstants.SHARED_NODE_NAME + "_0";
             this.myNode = NodeFactory.getNode(itAddress);
         } catch (NodeException e) {
             e.printStackTrace();
@@ -327,8 +309,7 @@ public class P2PLoadBalancer extends LoadBalancer implements RunActive,
         // registering myself
         try {
             String itAddress = body.getNodeURL();
-            itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) +
-                "/" + this.balancerName;
+            itAddress = itAddress.substring(0, itAddress.lastIndexOf("/")) + "/" + this.balancerName;
             PAActiveObject.register(myThis, itAddress);
         } catch (IOException e) {
             e.printStackTrace();

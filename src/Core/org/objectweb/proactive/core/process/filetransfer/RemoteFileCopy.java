@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.process.filetransfer;
 
-
 /**
  * Remote File Copy (RCP) module.
  *

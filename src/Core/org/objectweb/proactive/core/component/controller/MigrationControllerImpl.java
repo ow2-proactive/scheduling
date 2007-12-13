@@ -46,8 +46,7 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 
 
-public class MigrationControllerImpl extends AbstractProActiveController
-    implements MigrationController {
+public class MigrationControllerImpl extends AbstractProActiveController implements MigrationController {
     public MigrationControllerImpl(Component owner) {
         super(owner);
     }
@@ -55,13 +54,11 @@ public class MigrationControllerImpl extends AbstractProActiveController
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(Constants.MIGRATION_CONTROLLER,
-                    MigrationController.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.MIGRATION_CONTROLLER,
+                    MigrationController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException(
-                "cannot create controller type for controller " +
+            throw new ProActiveRuntimeException("cannot create controller type for controller " +
                 this.getClass().getName());
         }
     }
@@ -84,8 +81,7 @@ public class MigrationControllerImpl extends AbstractProActiveController
         try {
             migrateTo(NodeFactory.getNode(stringUrl));
         } catch (NodeException e) {
-            throw new MigrationException("Cannot find node with URL " +
-                stringUrl);
+            throw new MigrationException("Cannot find node with URL " + stringUrl);
         }
     }
 }

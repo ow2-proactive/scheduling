@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment.process.bridge;
 
-
 /**
  * A dummy bridge to be used in unit tests
  */

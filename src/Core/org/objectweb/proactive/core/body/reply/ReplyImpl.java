@@ -73,17 +73,16 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     protected long sessionID;
     protected transient ProActiveSecurityManager psm = null;
 
-    public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
-        MethodCallResult result, ProActiveSecurityManager psm) {
+    public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, MethodCallResult result,
+            ProActiveSecurityManager psm) {
         super(senderID, sequenceNumber, true, methodName);
         this.result = result;
         this.psm = psm;
         this.isAC = false;
     }
 
-    public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName,
-        MethodCallResult result, ProActiveSecurityManager psm,
-        boolean isAutomaticContinuation) {
+    public ReplyImpl(UniqueID senderID, long sequenceNumber, String methodName, MethodCallResult result,
+            ProActiveSecurityManager psm, boolean isAutomaticContinuation) {
         this(senderID, sequenceNumber, methodName, result, psm);
         this.isAC = isAutomaticContinuation;
     }
@@ -97,9 +96,8 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
         // perform
         // a deep copy of result in order to preserve ProActive model.
         UniqueID destinationID = destinationBody.getID();
-        boolean isLocal = ((LocalBodyStore.getInstance()
-                                          .getLocalBody(destinationID) != null) ||
-            (LocalBodyStore.getInstance().getLocalHalfBody(destinationID) != null));
+        boolean isLocal = ((LocalBodyStore.getInstance().getLocalBody(destinationID) != null) || (LocalBodyStore
+                .getInstance().getLocalHalfBody(destinationID) != null));
 
         if (isLocal) {
             result = (MethodCallResult) Utils.makeDeepCopy(result);
@@ -109,8 +107,7 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
         if (!ciphered && (psm != null)) {
             try {
                 Session session = this.psm.getSessionTo(destinationBody.getCertificate());
-                if (!session.getSecurityContext().getSendReply()
-                                .getCommunication()) {
+                if (!session.getSecurityContext().getSendReply().getCommunication()) {
                     throw new CommunicationForbiddenException();
                 }
                 this.sessionID = session.getDistantSessionID();
@@ -145,11 +142,9 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
         return ciphered;
     }
 
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException {
+    public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException {
         if ((sessionID != 0) && ciphered) {
-            byte[] decryptedMethodCall = psm.decrypt(sessionID,
-                    encryptedResult, ActAs.CLIENT);
+            byte[] decryptedMethodCall = psm.decrypt(sessionID, encryptedResult, ActAs.CLIENT);
             try {
                 result = (MethodCallResult) ByteToObjectConverter.ObjectStream.convert(decryptedMethodCall);
                 return true;

@@ -44,17 +44,15 @@ import org.objectweb.proactive.core.event.NodeCreationEventListener;
  *
  * Created on Nov 8, 2005
  */
-public class NodeCreationListenerForAoCreation
-    implements NodeCreationEventListener {
+public class NodeCreationListenerForAoCreation implements NodeCreationEventListener {
     private Vector result;
     private String className;
     private Class<?>[] genericParameters;
     private Object[] constructorParameters;
     private ExecutorService threadpool;
 
-    public NodeCreationListenerForAoCreation(Vector result, String className,
-        Class<?>[] genericParameters, Object[] constructorParameters,
-        ExecutorService threadpool) {
+    public NodeCreationListenerForAoCreation(Vector result, String className, Class<?>[] genericParameters,
+            Object[] constructorParameters, ExecutorService threadpool) {
         this.result = result;
         this.className = className;
         this.genericParameters = genericParameters;
@@ -63,8 +61,7 @@ public class NodeCreationListenerForAoCreation
     }
 
     public void nodeCreated(NodeCreationEvent event) {
-        threadpool.execute(new ProcessForAoCreation(this.result,
-                this.className, this.genericParameters,
-                this.constructorParameters, event.getNode()));
+        threadpool.execute(new ProcessForAoCreation(this.result, this.className, this.genericParameters,
+            this.constructorParameters, event.getNode()));
     }
 }

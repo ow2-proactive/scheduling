@@ -40,17 +40,17 @@ import org.objectweb.proactive.extra.gcmdeployment.process.ListGenerator;
 
 
 public class TestListGenerator {
-    final static private String validResource = TestListGenerator.class.getResource(
-            "data.valid.txt").getFile();
-    final static private String invalidResource = TestListGenerator.class.getResource(
-            "data.invalid.txt").getFile();
+    final static private String validResource = TestListGenerator.class.getResource("data.valid.txt")
+            .getFile();
+    final static private String invalidResource = TestListGenerator.class.getResource("data.invalid.txt")
+            .getFile();
 
     /*
     @Test
     public void singleTest() {
         ListGenerator.generateNames("");
     }
-        */
+     */
     @Test
     public void testValid() throws Exception {
         BufferedReader br = new BufferedReader(new FileReader(validResource));
@@ -65,12 +65,11 @@ public class TestListGenerator {
             }
 
             if (response == null) {
-                throw new IllegalArgumentException(
-                    "Illegal format for a data file: " + question);
+                throw new IllegalArgumentException("Illegal format for a data file: " + question);
             }
 
-            Assert.assertEquals("question=\"" + question + "\"", response,
-                concat(ListGenerator.generateNames(question)));
+            Assert.assertEquals("question=\"" + question + "\"", response, concat(ListGenerator
+                    .generateNames(question)));
         }
     }
 
@@ -88,8 +87,7 @@ public class TestListGenerator {
 
             try {
                 List<String> ret = ListGenerator.generateNames(question);
-                Assert.fail("Question=" + question + "\" response=\"" +
-                    concat(ret) + "\"");
+                Assert.fail("Question=" + question + "\" response=\"" + concat(ret) + "\"");
             } catch (IllegalArgumentException e) {
                 // An IllegalArguementException is expected
             }

@@ -50,16 +50,13 @@ public class WSpaceImpl implements WSpace, java.io.Serializable {
         this.wspace = wspace;
 
         if (wspace.exists()) {
-            throw new IOException("Working space already exists: " +
-                wspace.getPath());
+            throw new IOException("Working space already exists: " + wspace.getPath());
         } else if (!wspace.mkdirs()) {
-            throw new IOException("Unable to create working space: " +
-                wspace.getPath());
+            throw new IOException("Unable to create working space: " + wspace.getPath());
         }
 
         if (!wspace.canWrite()) {
-            throw new IOException("Cannot write to working space: " +
-                wspace.getPath());
+            throw new IOException("Cannot write to working space: " + wspace.getPath());
         }
     }
 

@@ -105,34 +105,28 @@ public class StubGenerator {
             logAndExit("srcDir attribute is not set");
         }
         if (!srcDir.exists()) {
-            logAndExit("Invalid srcDir attribute: " + srcDir.toString() +
-                " does not exist");
+            logAndExit("Invalid srcDir attribute: " + srcDir.toString() + " does not exist");
         }
         if (!srcDir.isDirectory()) {
-            logAndExit("Invalid srcDir attribute: " + srcDir.toString() +
-                " is not a directory");
+            logAndExit("Invalid srcDir attribute: " + srcDir.toString() + " is not a directory");
         }
 
         if (pkg == null) {
             logAndExit("pkg attribute is not set");
         }
-        File pkgDir = new File(srcDir.toString() + File.separator +
-                pkg.replace('.', File.separatorChar));
+        File pkgDir = new File(srcDir.toString() + File.separator + pkg.replace('.', File.separatorChar));
         if (!pkgDir.exists()) {
-            logAndExit("Invalid pkg attribute: " + pkgDir.toString() +
-                " does not exist");
+            logAndExit("Invalid pkg attribute: " + pkgDir.toString() + " does not exist");
         }
 
         if (destDir == null) {
             destDir = srcDir;
         }
         if (!destDir.isDirectory()) {
-            logAndExit("Invalid dest attribute: " + destDir.toString() +
-                " is not a directory");
+            logAndExit("Invalid dest attribute: " + destDir.toString() + " is not a directory");
         }
         if (!destDir.isDirectory()) {
-            logAndExit("Invalid src attribute: " + destDir.toString() +
-                " is not a directory");
+            logAndExit("Invalid src attribute: " + destDir.toString() + " is not a directory");
         }
 
         List<File> files = new ArrayList<File>();
@@ -143,8 +137,7 @@ public class StubGenerator {
         } else {
             File file = new File(pkgDir + File.separator + cl + ".class");
             if (!file.exists() || !file.isFile()) {
-                logAndExit("Invalid pkg or class attribute: " +
-                    file.toString() + " does not exist");
+                logAndExit("Invalid pkg or class attribute: " + file.toString() + " does not exist");
             }
 
             files.add(file);
@@ -165,8 +158,7 @@ public class StubGenerator {
                     System.setErr(mute);
                 }
 
-                StubGenerator.generateClass(str,
-                    destDir.toString() + File.separator);
+                StubGenerator.generateClass(str, destDir.toString() + File.separator);
             } catch (Throwable e) {
                 System.out.println("Stub generation failed: " + str);
             }
@@ -210,12 +202,10 @@ public class StubGenerator {
             byte[] data;
 
             data = JavassistByteCodeStubBuilder.create(className, null);
-            stubClassName = Utils.convertClassNameToStubClassName(className,
-                    null);
+            stubClassName = Utils.convertClassNameToStubClassName(className, null);
 
             char sep = File.separatorChar;
-            fileName = directoryName + stubClassName.replace('.', sep) +
-                ".class";
+            fileName = directoryName + stubClassName.replace('.', sep) + ".class";
 
             // And writes it to a file
             new File(fileName.substring(0, fileName.lastIndexOf(sep))).mkdirs();

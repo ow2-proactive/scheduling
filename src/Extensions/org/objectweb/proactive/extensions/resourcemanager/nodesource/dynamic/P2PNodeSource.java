@@ -79,15 +79,15 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     /**
      * Active object constructor.
      * @param id Name of node source.
-          * @param imCore Stub of Active object {@link RMCore}.
+     * @param imCore Stub of Active object {@link RMCore}.
      * @param nbMaxNodes Max number of nodes that the source has to provide.
      * @param nice Time to wait before acquire a new node just after a node release.
      * @param ttr Node keeping duration before releasing it.
      * @param peerUrls Vector containing known peers .
      *
      */
-    public P2PNodeSource(String id, RMCoreSourceInt imCore, int nbMaxNodes,
-        int nice, int ttr, Vector<String> peerUrls) {
+    public P2PNodeSource(String id, RMCoreSourceInt imCore, int nbMaxNodes, int nice, int ttr,
+            Vector<String> peerUrls) {
         super(id, imCore, nbMaxNodes, nice, ttr);
         lookups = new HashMap<String, P2PNodeLookup>();
         this.peerUrls = peerUrls;
@@ -150,8 +150,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     @Override
     protected void releaseNode(Node node) {
         String nodeUrl = node.getNodeInformation().getURL();
-        System.out.println("[DYNAMIC P2P SOURCE] P2PNodeSource.releaseNode(" +
-            nodeUrl + ")");
+        System.out.println("[DYNAMIC P2P SOURCE] P2PNodeSource.releaseNode(" + nodeUrl + ")");
         P2PNodeLookup p2pNodeLookup = this.lookups.get(nodeUrl);
         p2pNodeLookup.killNode(nodeUrl);
         //terminate AOs, remove node and its lookup form lookup HM
@@ -169,8 +168,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
     @Override
     protected Node getNode() {
         // TODO Auto-generated method stub
-        P2PNodeLookup p2pNodeLookup = this.p2pService.getNodes(1,
-                this.SourceId, "Resource Manager");
+        P2PNodeLookup p2pNodeLookup = this.p2pService.getNodes(1, this.SourceId, "Resource Manager");
         Node n = (Node) ((p2pNodeLookup.getNodes()).firstElement());
         this.lookups.put(n.getNodeInformation().getURL(), p2pNodeLookup);
         return n;
@@ -194,8 +192,7 @@ public class P2PNodeSource extends DynamicNodeSource implements InitActive {
      */
     @Override
     public RMNodeSourceEvent getSourceEvent() {
-        return new RMNodeSourceEvent(this.getSourceId(),
-            RMConstants.P2P_NODE_SOURCE_TYPE);
+        return new RMNodeSourceEvent(this.getSourceId(), RMConstants.P2P_NODE_SOURCE_TYPE);
     }
 
     // ----------------------------------------------------------------------//

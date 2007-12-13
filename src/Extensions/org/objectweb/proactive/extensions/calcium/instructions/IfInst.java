@@ -46,15 +46,13 @@ public class IfInst<P> implements Instruction<P, P> {
     Stack<Instruction> trueChildStack;
     Stack<Instruction> falseChildStack;
 
-    public IfInst(Condition<P> cond, Stack<Instruction> trueChildStack,
-        Stack<Instruction> falseChildStack) {
+    public IfInst(Condition<P> cond, Stack<Instruction> trueChildStack, Stack<Instruction> falseChildStack) {
         this.cond = cond;
         this.trueChildStack = trueChildStack;
         this.falseChildStack = falseChildStack;
     }
 
-    public Task<P> compute(SkeletonSystemImpl system, Task<P> t)
-        throws Exception {
+    public Task<P> compute(SkeletonSystemImpl system, Task<P> t) throws Exception {
         Stack<Instruction> childStack;
         Timer timer = new Timer();
         boolean evalCondition = cond.evalCondition(system, t.getObject());

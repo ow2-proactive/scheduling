@@ -51,14 +51,13 @@ import functionalTests.ComponentTest;
 public class Test extends ComponentTest {
 
     /**
-         *
-         */
+     *
+     */
 
     //    public Test() {
     //        super("Encapsulation of functional activity within component activity",
     //            "Encapsulation of functional activity within component activity");
     //    }
-
     /**
      * @see testsuite.test.FunctionalTest#action()
      */
@@ -68,17 +67,15 @@ public class Test extends ComponentTest {
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
         GenericFactory cf = Fractal.getGenericFactory(boot);
 
-        Component comp = cf.newFcInstance(type_factory.createFcType(
-                    new InterfaceType[] {  }),
-                new ControllerDescription("component", Constants.PRIMITIVE),
-                new ContentDescription(A.class.getName(), new Object[] {  }));
+        Component comp = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {}),
+                new ControllerDescription("component", Constants.PRIMITIVE), new ContentDescription(A.class
+                        .getName(), new Object[] {}));
 
         Fractal.getLifeCycleController(comp).startFc();
         Fractal.getLifeCycleController(comp).stopFc();
 
-        String expectedResult = A.INIT_COMPONENT_ACTIVITY +
-            A.RUN_COMPONENT_ACTIVITY + A.INIT_FUNCTIONAL_ACTIVITY +
-            A.RUN_FUNCTIONAL_ACTIVITY + A.END_FUNCTIONAL_ACTIVITY +
+        String expectedResult = A.INIT_COMPONENT_ACTIVITY + A.RUN_COMPONENT_ACTIVITY +
+            A.INIT_FUNCTIONAL_ACTIVITY + A.RUN_FUNCTIONAL_ACTIVITY + A.END_FUNCTIONAL_ACTIVITY +
             A.END_COMPONENT_ACTIVITY;
         A.getLock().waitForRelease(); // wait until component activity is finished
         Assert.assertEquals(expectedResult, A.message);

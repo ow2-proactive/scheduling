@@ -94,40 +94,40 @@ public class VirtualNodesGroup implements Observer {
         MVCNotification notif = (MVCNotification) arg;
         Object data = notif.getData();
         if ((notif.getMVCNotification() == MVCNotificationTag.WORLD_OBJECT_ADD_VIRTUAL_NODE) &&
-                (data instanceof Hashtable)) { //<"Add a virtual node",VNObject>
+            (data instanceof Hashtable)) { //<"Add a virtual node",VNObject>
             Hashtable table = (Hashtable) data;
             final VirtualNodeObject vnAdded = (VirtualNodeObject) table.get(WorldObject.ADD_VN_MESSAGE);
             if (vnAdded != null) {
                 Display.getDefault().asyncExec(new Runnable() {
-                        public void run() {
-                            Button b = new Button(group, SWT.CHECK);
-                            b.setForeground(vnColors.getColor(vnAdded.getKey())); //DOESN'T WORK !!!
-                            b.setText(vnAdded.getName());
-                            b.addSelectionListener(new VirtualNodeButtonListener());
-                            buttons.put(b, vnAdded);
-                            virtualNodes.put(vnAdded, b);
-                            group.pack(true);
-                        }
-                    });
+                    public void run() {
+                        Button b = new Button(group, SWT.CHECK);
+                        b.setForeground(vnColors.getColor(vnAdded.getKey())); //DOESN'T WORK !!!
+                        b.setText(vnAdded.getName());
+                        b.addSelectionListener(new VirtualNodeButtonListener());
+                        buttons.put(b, vnAdded);
+                        virtualNodes.put(vnAdded, b);
+                        group.pack(true);
+                    }
+                });
             }
         } else if ((notif.getMVCNotification() == MVCNotificationTag.WORLD_OBJECT_REMOVE_VIRTUAL_NODE) &&
-                (data instanceof Hashtable)) { //<"Remove a virtual node",VNObject>
+            (data instanceof Hashtable)) { //<"Remove a virtual node",VNObject>
             Hashtable table = (Hashtable) data;
             final VirtualNodeObject vnRemoved = (VirtualNodeObject) table.get(WorldObject.REMOVE_VN_MESSAGE);
             if (vnRemoved != null) {
                 Display.getDefault().asyncExec(new Runnable() {
-                        public void run() {
-                            Button b = virtualNodes.get(vnRemoved);
-                            virtualNodes.remove(vnRemoved);
-                            buttons.remove(b);
-                            if (!b.isDisposed()) {
-                                b.dispose();
-                            }
-                            if (!group.isDisposed()) {
-                                group.pack();
-                            }
+                    public void run() {
+                        Button b = virtualNodes.get(vnRemoved);
+                        virtualNodes.remove(vnRemoved);
+                        buttons.remove(b);
+                        if (!b.isDisposed()) {
+                            b.dispose();
                         }
-                    });
+                        if (!group.isDisposed()) {
+                            group.pack();
+                        }
+                    }
+                });
             }
         }
     }

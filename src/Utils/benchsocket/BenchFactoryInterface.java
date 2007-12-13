@@ -30,7 +30,6 @@
  */
 package benchsocket;
 
-
 /**
  * @author fabrice
  *

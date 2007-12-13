@@ -81,16 +81,16 @@ import org.objectweb.proactive.extensions.masterworker.util.HashSetQueue;
  * Literally : the entity to which an user can submit tasks to be solved<br>
  * @author fviale
  */
-public class AOMaster implements Serializable, TaskProvider<Serializable>,
-    InitActive, RunActive, MasterIntern, WorkerDeadListener {
+public class AOMaster implements Serializable, TaskProvider<Serializable>, InitActive, RunActive,
+        MasterIntern, WorkerDeadListener {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * log4j logger for the master
-    */
+     * log4j logger for the master
+     */
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER);
 
     /**
@@ -208,7 +208,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * @param initialMemory initial memory of the workers
      */
     public AOMaster(final TaskRepository<Task<Serializable>> repository,
-        final Map<String, Object> initialMemory) {
+            final Map<String, Object> initialMemory) {
         this.initialMemory = initialMemory;
         this.repository = repository;
         this.pendingRequest = null;
@@ -231,8 +231,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
      * {@inheritDoc}
      */
-    public void addResources(final URL descriptorURL,
-        final String virtualNodeName) {
+    public void addResources(final URL descriptorURL, final String virtualNodeName) {
         (smanager).addResources(descriptorURL, virtualNodeName);
     }
 
@@ -259,8 +258,8 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     }
 
     @SuppressWarnings("unchecked")
-    private Queue<TaskIntern<Serializable>> getTasksInternal(
-        final Worker worker, final String workerName, boolean flooding) {
+    private Queue<TaskIntern<Serializable>> getTasksInternal(final Worker worker, final String workerName,
+            boolean flooding) {
         // if we don't know him, we record the worker in our system
         if (!workersByName.containsKey(workerName)) {
             recordWorker(worker, workerName);
@@ -305,8 +304,10 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
                         wact.add(taskId);
                         workersActivity.put(workerName, wact);
                     }
-                    TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository.getTask(taskId);
-                    TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) PAFuture.getFutureValue(taskfuture);
+                    TaskIntern<Serializable> taskfuture = (TaskIntern<Serializable>) repository
+                            .getTask(taskId);
+                    TaskIntern<Serializable> realTask = (TaskIntern<Serializable>) PAFuture
+                            .getFutureValue(taskfuture);
                     repository.saveTask(taskId);
                     tasksToDo.offer(realTask);
                 }
@@ -320,8 +321,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * {@inheritDoc}
      */
     @SuppressWarnings("unchecked")
-    public Queue<TaskIntern<Serializable>> getTasks(final Worker worker,
-        final String workerName) {
+    public Queue<TaskIntern<Serializable>> getTasks(final Worker worker, final String workerName) {
         return getTasksInternal(worker, workerName, true);
     }
 
@@ -478,9 +478,8 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
      * {@inheritDoc}
      */
-    public Queue<TaskIntern<Serializable>> sendResultAndGetTasks(
-        final ResultIntern<Serializable> result, final String originatorName,
-        boolean reflooding) {
+    public Queue<TaskIntern<Serializable>> sendResultAndGetTasks(final ResultIntern<Serializable> result,
+            final String originatorName, boolean reflooding) {
         long taskId = result.getId();
         if (launchedTasks.contains(taskId)) {
             if (logger.isDebugEnabled()) {
@@ -499,8 +498,8 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
         }
 
         // We assign a new task to the worker
-        Queue<TaskIntern<Serializable>> newTasks = getTasksInternal(workersByName.get(
-                    originatorName), originatorName, reflooding);
+        Queue<TaskIntern<Serializable>> newTasks = getTasksInternal(workersByName.get(originatorName),
+                originatorName, reflooding);
         return newTasks;
     }
 
@@ -509,16 +508,15 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      */
     protected void maybeServePending() {
         if (pendingRequest != null) {
-            if (pendingRequest.getMethodName().equals("waitOneResult") &&
-                    resultQueue.isOneResultAvailable()) {
+            if (pendingRequest.getMethodName().equals("waitOneResult") && resultQueue.isOneResultAvailable()) {
                 servePending();
             } else if (pendingRequest.getMethodName().equals("waitAllResults") &&
-                    resultQueue.areAllResultsAvailable()) {
+                resultQueue.areAllResultsAvailable()) {
                 servePending();
             } else if (pendingRequest.getMethodName().equals("waitKResults")) {
                 int k = (Integer) pendingRequest.getParameter(0);
-                if (((resultQueue.countPendingResults() +
-                        resultQueue.countAvailableResults()) < k) || (k <= 0)) {
+                if (((resultQueue.countPendingResults() + resultQueue.countAvailableResults()) < k) ||
+                    (k <= 0)) {
                     servePending();
                 } else if (resultQueue.countAvailableResults() >= k) {
                     servePending();
@@ -569,8 +567,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      * {@inheritDoc}
      */
     public void solveIds(final List<Long> taskIds) {
-        logger.debug("Adding " + taskIds.size() + " tasks by " +
-            Thread.currentThread() + " and body is " +
+        logger.debug("Adding " + taskIds.size() + " tasks by " + Thread.currentThread() + " and body is " +
             PAActiveObject.getContext().getBody());
 
         for (Long taskId : taskIds) {
@@ -642,11 +639,9 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
      * {@inheritDoc}
      */
-    public List<ResultIntern<Serializable>> waitAllResults()
-        throws TaskException {
+    public List<ResultIntern<Serializable>> waitAllResults() throws TaskException {
         if (pendingRequest != null) {
-            throw new IllegalStateException(
-                "Already waiting for a wait request");
+            throw new IllegalStateException("Already waiting for a wait request");
         }
 
         if (logger.isDebugEnabled()) {
@@ -659,15 +654,12 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     /**
      * {@inheritDoc}
      */
-    public List<ResultIntern<Serializable>> waitKResults(final int k)
-        throws TaskException {
+    public List<ResultIntern<Serializable>> waitKResults(final int k) throws TaskException {
         if (pendingRequest != null) {
-            throw new IllegalStateException(
-                "Already waiting for a wait request");
+            throw new IllegalStateException("Already waiting for a wait request");
         }
 
-        if ((resultQueue.countPendingResults() +
-                resultQueue.countAvailableResults()) < k) {
+        if ((resultQueue.countPendingResults() + resultQueue.countAvailableResults()) < k) {
             throw new IllegalArgumentException("" + k + " is too big");
         } else if (k <= 0) {
             throw new IllegalArgumentException("Wrong value : " + k);
@@ -685,15 +677,13 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
      */
     public ResultIntern<Serializable> waitOneResult() throws TaskException {
         if (pendingRequest != null) {
-            throw new IllegalStateException(
-                "Already waiting for a wait request");
+            throw new IllegalStateException("Already waiting for a wait request");
         }
 
         ResultIntern<Serializable> res = resultQueue.getNext();
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Result of task " + res.getId() +
-                " received by the user.");
+            logger.debug("Result of task " + res.getId() + " received by the user.");
         }
 
         return res;
@@ -706,12 +696,12 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     protected class FindWaitFilter implements RequestFilter {
 
         /**
-                 *
-                 */
+         *
+         */
 
         /**
-        * Creates a filter
-        */
+         * Creates a filter
+         */
         public FindWaitFilter() {
         }
 
@@ -738,12 +728,12 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     protected class FindNotWaitFilter implements RequestFilter {
 
         /**
-                 *
-                 */
+         *
+         */
 
         /**
-        * Creates the filter
-        */
+         * Creates the filter
+         */
         public FindNotWaitFilter() {
         }
 
@@ -764,7 +754,7 @@ public class AOMaster implements Serializable, TaskProvider<Serializable>,
     }
 
     public void solve(List<TaskIntern<ResultIntern<Serializable>>> tasks)
-        throws TaskAlreadySubmittedException {
+            throws TaskAlreadySubmittedException {
         throw new UnsupportedOperationException("Illegal call");
     }
 }

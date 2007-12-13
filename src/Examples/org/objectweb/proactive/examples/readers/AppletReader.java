@@ -73,16 +73,14 @@ public class AppletReader extends org.objectweb.proactive.examples.StandardFrame
         javax.swing.JPanel pControls = new javax.swing.JPanel(new java.awt.BorderLayout());
         javax.swing.JPanel pPolicy = new javax.swing.JPanel(new java.awt.BorderLayout());
 
-        pPolicy.add(new javax.swing.JLabel("Synchronization Policy"),
-            java.awt.BorderLayout.WEST);
-        policy = new javax.swing.JComboBox(new String[] {
-                    "Even Policy", "Priority to Writers", "Priority to Readers"
-                });
+        pPolicy.add(new javax.swing.JLabel("Synchronization Policy"), java.awt.BorderLayout.WEST);
+        policy = new javax.swing.JComboBox(new String[] { "Even Policy", "Priority to Writers",
+                "Priority to Readers" });
         policy.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent e) {
-                    display.setPolicy(policy.getSelectedIndex());
-                }
-            });
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                display.setPolicy(policy.getSelectedIndex());
+            }
+        });
         pPolicy.add(policy, java.awt.BorderLayout.CENTER);
 
         pControls.add(pPolicy, java.awt.BorderLayout.CENTER);

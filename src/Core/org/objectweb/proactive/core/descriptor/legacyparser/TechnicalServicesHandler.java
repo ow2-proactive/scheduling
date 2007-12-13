@@ -45,27 +45,25 @@ import org.objectweb.proactive.core.xml.io.Attributes;
 import org.xml.sax.SAXException;
 
 
-public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
-    implements ProActiveDescriptorConstants {
+public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller implements
+        ProActiveDescriptorConstants {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.DEPLOYMENT);
     protected ProActiveDescriptorInternal proActiveDescriptor;
 
-    public TechnicalServicesHandler(
-        ProActiveDescriptorInternal proActiveDescriptor) {
+    public TechnicalServicesHandler(ProActiveDescriptorInternal proActiveDescriptor) {
         super(false);
         this.proActiveDescriptor = proActiveDescriptor;
-        addHandler(TECHNICAL_SERVICES_DEF_TAG,
-            new TechnicalServiceDefinitionHandler());
+        addHandler(TECHNICAL_SERVICES_DEF_TAG, new TechnicalServiceDefinitionHandler());
     }
 
     /**
      * @see org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
      */
     @Override
-    protected void notifyEndActiveHandler(String name,
-        UnmarshallerHandler activeHandler) throws SAXException {
+    protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler) throws SAXException {
         try {
-            proActiveDescriptor.addTechnicalService((TechnicalServiceXmlType) activeHandler.getResultObject());
+            proActiveDescriptor
+                    .addTechnicalService((TechnicalServiceXmlType) activeHandler.getResultObject());
         } catch (NullPointerException e) {
             // Technical service not used by any virtual node
             logger.warn("Technical service  not attached to virtual node");
@@ -75,26 +73,22 @@ public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
     }
 
     // INNER
-    public class TechnicalServiceDefinitionHandler
-        extends PassiveCompositeUnmarshaller {
+    public class TechnicalServiceDefinitionHandler extends PassiveCompositeUnmarshaller {
         private Map<String, String> argsMap = new Hashtable<String, String>();
         private TechnicalServiceXmlType technicalService = new TechnicalServiceXmlType();
 
         public TechnicalServiceDefinitionHandler() {
-            addHandler(TECHNICAL_SERVICE_ARG_TAG,
-                new TechnicalServiceArgHandler());
+            addHandler(TECHNICAL_SERVICE_ARG_TAG, new TechnicalServiceArgHandler());
         }
 
         /**
          * @see org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller#startContextElement(java.lang.String, org.objectweb.proactive.core.xml.io.Attributes)
          */
         @Override
-        public void startContextElement(String name, Attributes attributes)
-            throws SAXException {
+        public void startContextElement(String name, Attributes attributes) throws SAXException {
             this.technicalService.setId(attributes.getValue("id"));
             try {
-                this.technicalService.setType(Class.forName(attributes.getValue(
-                            "class")));
+                this.technicalService.setType(Class.forName(attributes.getValue("class")));
             } catch (ClassNotFoundException e) {
                 throw new SAXException("Technical Service not found", e);
             }
@@ -104,8 +98,8 @@ public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
          * @see org.objectweb.proactive.core.xml.handler.PassiveCompositeUnmarshaller#notifyEndActiveHandler(java.lang.String, org.objectweb.proactive.core.xml.handler.UnmarshallerHandler)
          */
         @Override
-        protected void notifyEndActiveHandler(String name,
-            UnmarshallerHandler activeHandler) throws SAXException {
+        protected void notifyEndActiveHandler(String name, UnmarshallerHandler activeHandler)
+                throws SAXException {
             this.technicalService.setArgs(this.argsMap);
         }
 
@@ -120,8 +114,7 @@ public class TechnicalServicesHandler extends PassiveCompositeUnmarshaller
         // INNNER INNER
         public class TechnicalServiceArgHandler extends BasicUnmarshaller {
             @Override
-            public void startContextElement(String name, Attributes attributes)
-                throws SAXException {
+            public void startContextElement(String name, Attributes attributes) throws SAXException {
                 String argName = attributes.getValue("name");
                 String argValue = attributes.getValue("value");
                 argsMap.put(argName, argValue);

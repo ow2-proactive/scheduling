@@ -70,8 +70,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      * @param environment the connector environnement, i.e., the package location of the ServerProvider
      * @throws IOException
      */
-    public ProActiveConnectorServer(JMXServiceURL url,
-        Map<String, ?> environment) throws IOException {
+    public ProActiveConnectorServer(JMXServiceURL url, Map<String, ?> environment) throws IOException {
         this(url, environment, (MBeanServer) null);
     }
 
@@ -82,9 +81,8 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      * @param mbeanServer the MBean server bound with the connector
      * @throws IOException
      */
-    public ProActiveConnectorServer(JMXServiceURL url,
-        Map<String, ?> environment, MBeanServer mbeanServer)
-        throws IOException {
+    public ProActiveConnectorServer(JMXServiceURL url, Map<String, ?> environment, MBeanServer mbeanServer)
+            throws IOException {
         this(url, environment, (ProActiveServerImpl) null, mbeanServer);
     }
 
@@ -96,9 +94,8 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
      * @param mbeanServer the MBean server bound with the connector
      * @throws IOException
      */
-    public ProActiveConnectorServer(JMXServiceURL url,
-        Map<String, ?> environment, ProActiveServerImpl paServer,
-        MBeanServer mbeanServer) throws IOException {
+    public ProActiveConnectorServer(JMXServiceURL url, Map<String, ?> environment,
+            ProActiveServerImpl paServer, MBeanServer mbeanServer) throws IOException {
         super(mbeanServer);
         if (url == null) {
             throw new IllegalArgumentException("Null JMXService URL");
@@ -140,8 +137,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
         MBeanServer mbs = getMBeanServer();
 
         if (mbs == null) {
-            throw new IllegalStateException(
-                "This connector is not attached with a mbean server");
+            throw new IllegalStateException("This connector is not attached with a mbean server");
         }
 
         try {
@@ -185,8 +181,7 @@ public class ProActiveConnectorServer extends JMXConnectorServer {
             String url = path.substring(index);
             PAActiveObject.unregister(url);
         } catch (IOException e) {
-            System.out.println(
-                "Could not unregister ProActiveServerImpl from the registry. " +
+            System.out.println("Could not unregister ProActiveServerImpl from the registry. " +
                 e.getMessage());
         }
 

@@ -77,13 +77,11 @@ public class SafeSaveDialog {
                 File file = new File(fileName);
                 if (file.exists()) {
                     // The file already exists; asks for confirmation
-                    MessageBox mb = new MessageBox(dlg.getParent(),
-                            SWT.ICON_WARNING | SWT.YES | SWT.NO);
+                    MessageBox mb = new MessageBox(dlg.getParent(), SWT.ICON_WARNING | SWT.YES | SWT.NO);
 
                     // We really should read this string from a
                     // resource bundle
-                    mb.setMessage(fileName +
-                        " already exists. Do you want to replace it?");
+                    mb.setMessage(fileName + " already exists. Do you want to replace it?");
 
                     // If they click Yes, we're done and we drop out. If
                     // they click No, we redisplay the File Dialog

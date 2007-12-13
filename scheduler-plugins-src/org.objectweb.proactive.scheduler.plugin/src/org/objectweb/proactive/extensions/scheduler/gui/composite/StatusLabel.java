@@ -71,8 +71,7 @@ public class StatusLabel implements EventSchedulerListener {
     private static StatusLabel instance = null;
     private Label label = null;
 
-    private StatusLabel(Composite parent, GridData gridData,
-        JobsController jobsController) {
+    private StatusLabel(Composite parent, GridData gridData, JobsController jobsController) {
         label = new Label(parent, SWT.CENTER | SWT.BORDER);
         label.setText(INITIAL_TEXT);
         label.setForeground(INITIAL_COLOR);
@@ -81,8 +80,7 @@ public class StatusLabel implements EventSchedulerListener {
         jobsController.addEventSchedulerListener(this);
     }
 
-    public static void newInstance(Composite parent, GridData gridData,
-        JobsController jobsController) {
+    public static void newInstance(Composite parent, GridData gridData, JobsController jobsController) {
         instance = new StatusLabel(parent, gridData, jobsController);
     }
 
@@ -131,11 +129,11 @@ public class StatusLabel implements EventSchedulerListener {
         final Color color = aColor;
         if (!label.isDisposed()) {
             Display.getDefault().asyncExec(new Runnable() {
-                    public void run() {
-                        label.setForeground(color);
-                        label.setText(text);
-                    }
-                });
+                public void run() {
+                    label.setForeground(color);
+                    label.setText(text);
+                }
+            });
         }
     }
 }

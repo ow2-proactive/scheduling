@@ -82,9 +82,8 @@ public abstract class PolicyTools {
             try {
                 th.startDocument();
 
-                policyTag(th, policy.getApplicationName(),
-                    policy.getKeystorePath(), policy.getRules(),
-                    policy.getAuthorizedUsers());
+                policyTag(th, policy.getApplicationName(), policy.getKeystorePath(), policy.getRules(),
+                        policy.getAuthorizedUsers());
 
                 th.endDocument();
             } catch (SAXException e) {
@@ -95,17 +94,15 @@ public abstract class PolicyTools {
         }
     }
 
-    private static void policyTag(TransformerHandler th,
-        String applicationName, String keystorePath,
-        List<SimplePolicyRule> rules, List<String> authorizedUsers)
-        throws SAXException {
+    private static void policyTag(TransformerHandler th, String applicationName, String keystorePath,
+            List<SimplePolicyRule> rules, List<String> authorizedUsers) throws SAXException {
         AttributesImpl atts = new AttributesImpl();
         atts.addAttribute("", "", "xmlns", "CDATA", "urn:proactive:security:1.1");
         atts.addAttribute("", "", "schemaVersion", "CDATA", "1.0");
-        atts.addAttribute("", "", "xmlns:xsi", "CDATA",
-            "http://www.w3.org/2001/XMLSchema-instance");
-        atts.addAttribute("", "", "xsi:schemaLocation", "CDATA",
-            "urn:proactive:security:1.1 http://www-sop.inria.fr/oasis/ProActive/schemas/security/1.1/security.xsd");
+        atts.addAttribute("", "", "xmlns:xsi", "CDATA", "http://www.w3.org/2001/XMLSchema-instance");
+        atts
+                .addAttribute("", "", "xsi:schemaLocation", "CDATA",
+                        "urn:proactive:security:1.1 http://www-sop.inria.fr/oasis/ProActive/schemas/security/1.1/security.xsd");
 
         th.startElement("", "", "Policy", atts);
 
@@ -117,8 +114,7 @@ public abstract class PolicyTools {
         th.endElement("", "", "Policy");
     }
 
-    private static void applicationNameTag(TransformerHandler th, String name)
-        throws SAXException {
+    private static void applicationNameTag(TransformerHandler th, String name) throws SAXException {
         th.startElement("", "", "ApplicationName", new AttributesImpl());
 
         th.characters(name.toCharArray(), 0, name.length());
@@ -126,8 +122,7 @@ public abstract class PolicyTools {
         th.endElement("", "", "ApplicationName");
     }
 
-    private static void keystoreTag(TransformerHandler th, String path)
-        throws SAXException {
+    private static void keystoreTag(TransformerHandler th, String path) throws SAXException {
         th.startElement("", "", "PKCS12KeyStore", new AttributesImpl());
 
         th.characters(path.toCharArray(), 0, path.length());
@@ -135,8 +130,7 @@ public abstract class PolicyTools {
         th.endElement("", "", "PKCS12KeyStore");
     }
 
-    private static void rulesTag(TransformerHandler th,
-        List<SimplePolicyRule> rules) throws SAXException {
+    private static void rulesTag(TransformerHandler th, List<SimplePolicyRule> rules) throws SAXException {
         th.startElement("", "", "Rules", new AttributesImpl());
 
         for (SimplePolicyRule rule : rules) {
@@ -146,8 +140,7 @@ public abstract class PolicyTools {
         th.endElement("", "", "Rules");
     }
 
-    private static void ruleTag(TransformerHandler th, SimplePolicyRule rule)
-        throws SAXException {
+    private static void ruleTag(TransformerHandler th, SimplePolicyRule rule) throws SAXException {
         th.startElement("", "", "Rule", new AttributesImpl());
 
         entityListTag("From", th, rule.getFrom());
@@ -159,8 +152,8 @@ public abstract class PolicyTools {
         th.endElement("", "", "Rule");
     }
 
-    private static void entityListTag(String tag, TransformerHandler th,
-        List<String> names) throws SAXException {
+    private static void entityListTag(String tag, TransformerHandler th, List<String> names)
+            throws SAXException {
         th.startElement("", "", tag, new AttributesImpl());
 
         for (String name : names) {
@@ -170,36 +163,29 @@ public abstract class PolicyTools {
         th.endElement("", "", tag);
     }
 
-    private static void entityTag(TransformerHandler th, String name)
-        throws SAXException {
+    private static void entityTag(TransformerHandler th, String name) throws SAXException {
         AttributesImpl atts = new AttributesImpl();
-        atts.addAttribute("", "", "type", "CDATA",
-            name.substring(0, name.indexOf(':')));
-        atts.addAttribute("", "", "name", "CDATA",
-            name.substring(name.indexOf(':') + 1));
+        atts.addAttribute("", "", "type", "CDATA", name.substring(0, name.indexOf(':')));
+        atts.addAttribute("", "", "name", "CDATA", name.substring(name.indexOf(':') + 1));
 
         th.startElement("", "", "Entity", atts);
         th.endElement("", "", "Entity");
     }
 
-    private static void communicationTag(TransformerHandler th,
-        SimplePolicyRule rule) throws SAXException {
+    private static void communicationTag(TransformerHandler th, SimplePolicyRule rule) throws SAXException {
         th.startElement("", "", "Communication", new AttributesImpl());
 
-        authorizationTag("Request", th, rule.isRequest(), rule.getReqAuth(),
-            rule.getReqConf(), rule.getReqInt());
-        authorizationTag("Reply", th, rule.isReply(), rule.getRepAuth(),
-            rule.getRepConf(), rule.getRepInt());
+        authorizationTag("Request", th, rule.isRequest(), rule.getReqAuth(), rule.getReqConf(), rule
+                .getReqInt());
+        authorizationTag("Reply", th, rule.isReply(), rule.getRepAuth(), rule.getRepConf(), rule.getRepInt());
 
         th.endElement("", "", "Communication");
     }
 
-    private static void authorizationTag(String tag, TransformerHandler th,
-        boolean permission, Authorization auth, Authorization conf,
-        Authorization integ) throws SAXException {
+    private static void authorizationTag(String tag, TransformerHandler th, boolean permission,
+            Authorization auth, Authorization conf, Authorization integ) throws SAXException {
         AttributesImpl atts = new AttributesImpl();
-        atts.addAttribute("", "", "value", "CDATA",
-            permission ? "authorized" : "denied");
+        atts.addAttribute("", "", "value", "CDATA", permission ? "authorized" : "denied");
 
         th.startElement("", "", tag, atts);
 
@@ -208,9 +194,8 @@ public abstract class PolicyTools {
         th.endElement("", "", tag);
     }
 
-    private static void attributesTag(TransformerHandler th,
-        Authorization auth, Authorization conf, Authorization integ)
-        throws SAXException {
+    private static void attributesTag(TransformerHandler th, Authorization auth, Authorization conf,
+            Authorization integ) throws SAXException {
         AttributesImpl atts = new AttributesImpl();
         atts.addAttribute("", "", "authentication", "CDATA", auth.toString());
         atts.addAttribute("", "", "confidentiality", "CDATA", conf.toString());
@@ -220,8 +205,7 @@ public abstract class PolicyTools {
         th.endElement("", "", "Attributes");
     }
 
-    private static void rightsTag(String tag, TransformerHandler th,
-        boolean permission) throws SAXException {
+    private static void rightsTag(String tag, TransformerHandler th, boolean permission) throws SAXException {
         String value = permission ? "authorized" : "denied";
 
         th.startElement("", "", tag, new AttributesImpl());
@@ -231,8 +215,7 @@ public abstract class PolicyTools {
         th.endElement("", "", tag);
     }
 
-    private static void usersTag(TransformerHandler th,
-        List<String> authorizedUsers) throws SAXException {
+    private static void usersTag(TransformerHandler th, List<String> authorizedUsers) throws SAXException {
         th.startElement("", "", "AccessRights", new AttributesImpl());
 
         for (String name : authorizedUsers) {
@@ -249,8 +232,7 @@ public abstract class PolicyTools {
      * @return
      * @throws ParserConfigurationException
      */
-    public static PolicyFile readPolicyFile(String path)
-        throws ParserConfigurationException {
+    public static PolicyFile readPolicyFile(String path) throws ParserConfigurationException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -286,10 +268,8 @@ public abstract class PolicyTools {
             }
             for (Node usersNode : getChildrenNamed(policy, "AccessRights")) {
                 for (Node entity : getChildrenNamed(usersNode, "Entity")) {
-                    String type = entity.getAttributes().getNamedItem("type")
-                                        .getNodeValue();
-                    String name = entity.getAttributes().getNamedItem("name")
-                                        .getNodeValue();
+                    String type = entity.getAttributes().getNamedItem("type").getNodeValue();
+                    String name = entity.getAttributes().getNamedItem("name").getNodeValue();
                     users.add(type + ":" + name);
                 }
             }
@@ -321,20 +301,16 @@ public abstract class PolicyTools {
 
     private static void setFrom(SimplePolicyRule rule, Node fromNode) {
         for (Node node : getChildrenNamed(fromNode, "Entity")) {
-            String type = node.getAttributes().getNamedItem("type")
-                              .getNodeValue();
-            String name = node.getAttributes().getNamedItem("name")
-                              .getNodeValue();
+            String type = node.getAttributes().getNamedItem("type").getNodeValue();
+            String name = node.getAttributes().getNamedItem("name").getNodeValue();
             rule.addFrom(type + ":" + name);
         }
     }
 
     private static void setTo(SimplePolicyRule rule, Node toNode) {
         for (Node node : getChildrenNamed(toNode, "Entity")) {
-            String type = node.getAttributes().getNamedItem("type")
-                              .getNodeValue();
-            String name = node.getAttributes().getNamedItem("name")
-                              .getNodeValue();
+            String type = node.getAttributes().getNamedItem("type").getNodeValue();
+            String name = node.getAttributes().getNamedItem("name").getNodeValue();
             rule.addTo(type + ":" + name);
         }
     }
@@ -349,39 +325,31 @@ public abstract class PolicyTools {
     }
 
     private static void setRequest(SimplePolicyRule rule, Node reqNode) {
-        String permission = reqNode.getAttributes().getNamedItem("value")
-                                   .getNodeValue();
+        String permission = reqNode.getAttributes().getNamedItem("value").getNodeValue();
         rule.setRequest(permission.equals("authorized"));
         for (Node node : getChildrenNamed(reqNode, "Attributes")) {
-            String auth = node.getAttributes().getNamedItem("authentication")
-                              .getNodeValue();
+            String auth = node.getAttributes().getNamedItem("authentication").getNodeValue();
             rule.setReqAuth(Authorization.fromString(auth));
 
-            String conf = node.getAttributes().getNamedItem("confidentiality")
-                              .getNodeValue();
+            String conf = node.getAttributes().getNamedItem("confidentiality").getNodeValue();
             rule.setReqConf(Authorization.fromString(conf));
 
-            String integ = node.getAttributes().getNamedItem("integrity")
-                               .getNodeValue();
+            String integ = node.getAttributes().getNamedItem("integrity").getNodeValue();
             rule.setReqInt(Authorization.fromString(integ));
         }
     }
 
     private static void setReply(SimplePolicyRule rule, Node repNode) {
-        String permission = repNode.getAttributes().getNamedItem("value")
-                                   .getNodeValue();
+        String permission = repNode.getAttributes().getNamedItem("value").getNodeValue();
         rule.setReply(permission.equals("authorized"));
         for (Node node : getChildrenNamed(repNode, "Attributes")) {
-            String auth = node.getAttributes().getNamedItem("authentication")
-                              .getNodeValue();
+            String auth = node.getAttributes().getNamedItem("authentication").getNodeValue();
             rule.setRepAuth(Authorization.fromString(auth));
 
-            String conf = node.getAttributes().getNamedItem("confidentiality")
-                              .getNodeValue();
+            String conf = node.getAttributes().getNamedItem("confidentiality").getNodeValue();
             rule.setRepConf(Authorization.fromString(conf));
 
-            String integ = node.getAttributes().getNamedItem("integrity")
-                               .getNodeValue();
+            String integ = node.getAttributes().getNamedItem("integrity").getNodeValue();
             rule.setRepInt(Authorization.fromString(integ));
         }
     }

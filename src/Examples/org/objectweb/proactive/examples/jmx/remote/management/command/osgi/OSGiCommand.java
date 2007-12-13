@@ -54,8 +54,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.BundleException;
 
 
-public abstract class OSGiCommand extends NotificationBroadcasterSupport
-    implements IJmx, CommandMBean {
+public abstract class OSGiCommand extends NotificationBroadcasterSupport implements IJmx, CommandMBean {
     public static final String INSTALL = "install ";
     public static final String UNINSTALL = "uninstall ";
     public static final String START = "start ";
@@ -93,8 +92,7 @@ public abstract class OSGiCommand extends NotificationBroadcasterSupport
      * @throws BundleException
      */
     public Status undo() {
-        return new Status(Status.ERR, OSGiStore.getInstance().getUrl(),
-            this.operation, "unavailable");
+        return new Status(Status.ERR, OSGiStore.getInstance().getUrl(), this.operation, "unavailable");
     }
 
     public boolean hasBeenDone() {
@@ -118,24 +116,20 @@ public abstract class OSGiCommand extends NotificationBroadcasterSupport
         ByteArrayOutputStream baosErr = new ByteArrayOutputStream();
         PrintStream psErr = new PrintStream(baosErr);
         try {
-            OSGiStore.getInstance().getShell()
-                     .executeCommand(this.operation, ps, psErr);
+            OSGiStore.getInstance().getShell().executeCommand(this.operation, ps, psErr);
 
             outString = baos.toString();
             errString = baosErr.toString();
 
             if (!errString.equals("")) {
-                return new Status(Status.ERR, this.operation, errString,
-                    OSGiStore.getInstance().getUrl());
+                return new Status(Status.ERR, this.operation, errString, OSGiStore.getInstance().getUrl());
             } else {
-                Status s = new Status(Status.OK, this.operation, outString,
-                        OSGiStore.getInstance().getUrl());
+                Status s = new Status(Status.OK, this.operation, outString, OSGiStore.getInstance().getUrl());
                 return s;
             }
         } catch (Exception e) {
             //                e.printStackTrace();
-            return new Status(Status.ERR, this.operation, e.getMessage(),
-                OSGiStore.getInstance().getUrl());
+            return new Status(Status.ERR, this.operation, e.getMessage(), OSGiStore.getInstance().getUrl());
         }
     }
 
@@ -151,15 +145,13 @@ public abstract class OSGiCommand extends NotificationBroadcasterSupport
      * IJmx implementation
      * @throws JMXException
      */
-    public void register()
-        throws InstanceAlreadyExistsException, MBeanRegistrationException,
+    public void register() throws InstanceAlreadyExistsException, MBeanRegistrationException,
             NotCompliantMBeanException, JMXException {
         ObjectName on;
         try {
-            String s = "Transactions:id=" + this.transaction.getId() +
-                ",date=" + this.date.getTime() + ",command=" + this.type +
-                this.operation.substring(this.operation.lastIndexOf(
-                        File.separatorChar) + 1);
+            String s = "Transactions:id=" + this.transaction.getId() + ",date=" + this.date.getTime() +
+                ",command=" + this.type +
+                this.operation.substring(this.operation.lastIndexOf(File.separatorChar) + 1);
             on = new ObjectName(s);
             ManagementFactory.getPlatformMBeanServer().registerMBean(this, on);
         } catch (MalformedObjectNameException e) {
@@ -169,14 +161,11 @@ public abstract class OSGiCommand extends NotificationBroadcasterSupport
         }
     }
 
-    public void unregister()
-        throws InstanceNotFoundException, MBeanRegistrationException,
-            JMXException {
+    public void unregister() throws InstanceNotFoundException, MBeanRegistrationException, JMXException {
         ObjectName on;
 
         try {
-            on = new ObjectName("Transactions:id" + this.transaction.getId() +
-                    ",command=" + this.operation);
+            on = new ObjectName("Transactions:id" + this.transaction.getId() + ",command=" + this.operation);
         } catch (MalformedObjectNameException e) {
             throw new JMXException(e);
         } catch (NullPointerException e) {

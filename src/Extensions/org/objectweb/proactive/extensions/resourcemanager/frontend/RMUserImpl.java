@@ -102,8 +102,8 @@ public class RMUserImpl implements RMUser, InitActive {
      */
     public void initActivity(Body body) {
         try {
-            PAActiveObject.register(PAActiveObject.getStubOnThis(),
-                "//localhost/" + RMConstants.NAME_ACTIVE_OBJECT_RMUSER);
+            PAActiveObject.register(PAActiveObject.getStubOnThis(), "//localhost/" +
+                RMConstants.NAME_ACTIVE_OBJECT_RMUSER);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -122,8 +122,7 @@ public class RMUserImpl implements RMUser, InitActive {
      * @param selectionScript : script to be verified by the returned nodes.
      * @return an array list of nodes.
      */
-    public NodeSet getAtMostNodes(IntWrapper nbNodes,
-        SelectionScript selectionScript) {
+    public NodeSet getAtMostNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
         return rmcore.getAtMostNodes(nbNodes, selectionScript);
     }
 
@@ -135,8 +134,7 @@ public class RMUserImpl implements RMUser, InitActive {
      * @param selectionScript : script to be verified by the returned nodes.
      * @return an array list of nodes.
      */
-    public NodeSet getExactlyNodes(IntWrapper nbNodes,
-        SelectionScript selectionScript) {
+    public NodeSet getExactlyNodes(IntWrapper nbNodes, SelectionScript selectionScript) {
         if (logger.isInfoEnabled()) {
             logger.info("getExactlyNodes, nb nodes : " + nbNodes);
         }

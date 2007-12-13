@@ -72,18 +72,15 @@ public class FileProcess {
                 // reading from resources in the classpath
                 b = getBytesFromResource(info.getClassFileName());
             } catch (IOException e) {
-                throw new ClassNotFoundException("Cannot find class " +
-                    info.getClassFileName(), e);
+                throw new ClassNotFoundException("Cannot find class " + info.getClassFileName(), e);
             }
         } else {
             for (int i = 0; i < codebases.length; i++) {
                 try {
                     if (codebases[i].isDirectory()) {
-                        b = getBytesFromDirectory(info.getClassFileName(),
-                                codebases[i]);
+                        b = getBytesFromDirectory(info.getClassFileName(), codebases[i]);
                     } else {
-                        b = getBytesFromArchive(info.getClassFileName(),
-                                codebases[i]);
+                        b = getBytesFromArchive(info.getClassFileName(), codebases[i]);
                     }
                 } catch (java.io.IOException e) {
                 }
@@ -95,8 +92,8 @@ public class FileProcess {
 
         // try to get the class as a generated stub
         // generate it if necessary
-        b = org.objectweb.proactive.core.mop.MOPClassLoader.getMOPClassLoader()
-                                                           .getClassData(info.getClassFileName());
+        b = org.objectweb.proactive.core.mop.MOPClassLoader.getMOPClassLoader().getClassData(
+                info.getClassFileName());
         if (b != null) {
             return b;
         }
@@ -112,8 +109,7 @@ public class FileProcess {
         //    System.out.println("ClassServer sent class " + info.path +
         //        " successfully");
         //}
-        throw new ClassNotFoundException("Cannot find class " +
-            info.getClassFileName());
+        throw new ClassNotFoundException("Cannot find class " + info.getClassFileName());
     }
 
     //
@@ -129,11 +125,9 @@ public class FileProcess {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    public static byte[] getBytesFromResource(String path)
-        throws java.io.IOException {
+    public static byte[] getBytesFromResource(String path) throws java.io.IOException {
         String filename = path.replace('.', '/') + ".class";
-        java.io.InputStream in = FileProcess.class.getClassLoader()
-                                                  .getResourceAsStream(filename);
+        java.io.InputStream in = FileProcess.class.getClassLoader().getResourceAsStream(filename);
         if (in == null) {
             return null;
         }
@@ -143,8 +137,7 @@ public class FileProcess {
         //      //logger.debug("ClassFileServer reading: " + filename+"  length="+length+" from classpath");
         //}
         if (length == -1) {
-            throw new java.io.IOException("File length is unknown: " +
-                filename);
+            throw new java.io.IOException("File length is unknown: " + filename);
         } else {
             return getBytesFromInputStream(in, length);
         }
@@ -160,8 +153,7 @@ public class FileProcess {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private byte[] getBytesFromArchive(String path, java.io.File archive)
-        throws java.io.IOException {
+    private byte[] getBytesFromArchive(String path, java.io.File archive) throws java.io.IOException {
         String filename = path.replace('.', '/') + ".class";
         java.util.zip.ZipFile jarFile = new java.util.zip.ZipFile(archive);
         java.util.zip.ZipEntry zipEntry = jarFile.getEntry(filename);
@@ -174,11 +166,9 @@ public class FileProcess {
         //      //logger.debug("ClassFileServer reading: " + filename+"  length="+length+" from jar/xip file "+archive.getAbsolutePath());
         //}
         if (length == -1) {
-            throw new java.io.IOException("File length is unknown: " +
-                filename);
+            throw new java.io.IOException("File length is unknown: " + filename);
         } else {
-            return getBytesFromInputStream(jarFile.getInputStream(zipEntry),
-                length);
+            return getBytesFromInputStream(jarFile.getInputStream(zipEntry), length);
         }
     }
 
@@ -192,10 +182,8 @@ public class FileProcess {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private byte[] getBytesFromDirectory(String path, java.io.File directory)
-        throws java.io.IOException {
-        java.io.File f = new java.io.File(directory,
-                path.replace('.', java.io.File.separatorChar) + ".class");
+    private byte[] getBytesFromDirectory(String path, java.io.File directory) throws java.io.IOException {
+        java.io.File f = new java.io.File(directory, path.replace('.', java.io.File.separatorChar) + ".class");
         if (!f.exists()) {
             return null;
         }
@@ -207,8 +195,7 @@ public class FileProcess {
         if (length == 0) {
             throw new java.io.IOException("File length is zero: " + path);
         } else {
-            return getBytesFromInputStream(new java.io.FileInputStream(f),
-                length);
+            return getBytesFromInputStream(new java.io.FileInputStream(f), length);
         }
     }
 
@@ -219,8 +206,8 @@ public class FileProcess {
      * @return the bytecodes for the class
      * @exception java.io.IOException if the class cannot be read
      */
-    private static byte[] getBytesFromInputStream(java.io.InputStream in,
-        int length) throws java.io.IOException {
+    private static byte[] getBytesFromInputStream(java.io.InputStream in, int length)
+            throws java.io.IOException {
         java.io.DataInputStream din = new java.io.DataInputStream(in);
         byte[] bytecodes = new byte[length];
         try {
@@ -235,8 +222,7 @@ public class FileProcess {
 
     private java.io.File[] findClasspathRoots(String classpath) {
         String pathSeparator = File.pathSeparator;
-        java.util.StringTokenizer st = new java.util.StringTokenizer(classpath,
-                pathSeparator);
+        java.util.StringTokenizer st = new java.util.StringTokenizer(classpath, pathSeparator);
         int n = st.countTokens();
         java.io.File[] roots = new java.io.File[n];
         for (int i = 0; i < n; i++) {

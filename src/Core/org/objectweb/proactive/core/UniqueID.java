@@ -120,8 +120,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
 
     public String shortString() {
         if (this.cachedShortString == null) {
-            this.cachedShortString = "" +
-                Math.abs(this.getCanonString().hashCode() % 100000);
+            this.cachedShortString = "" + Math.abs(this.getCanonString().hashCode() % 100000);
         }
 
         return this.cachedShortString;
@@ -157,8 +156,7 @@ public class UniqueID implements java.io.Serializable, Comparable {
     public boolean equals(Object o) {
         //System.out.println("Now checking for equality");
         if (o instanceof UniqueID) {
-            return ((this.id.equals(((UniqueID) o).id)) &&
-            (this.vmID.equals(((UniqueID) o).vmID)));
+            return ((this.id.equals(((UniqueID) o).id)) && (this.vmID.equals(((UniqueID) o).vmID)));
         } else {
             return false;
         }
@@ -168,7 +166,6 @@ public class UniqueID implements java.io.Serializable, Comparable {
      * for debug purpose
      */
     public void echo() {
-        logger.info("UniqueID The Id is " + this.id + " and the address is " +
-            this.vmID);
+        logger.info("UniqueID The Id is " + this.id + " and the address is " + this.vmID);
     }
 }

@@ -54,13 +54,13 @@ import org.objectweb.proactive.core.runtime.LocalNode;
 public interface VirtualNode extends Job, Serializable {
 
     /**
-    * Name of the default Virtual Node.
-    *
-    * A Node belongs to the default Virtual Node until
-    * setVirtualNodeName is called on it.
-    *
-    * @See {@link LocalNode}
-    */
+     * Name of the default Virtual Node.
+     *
+     * A Node belongs to the default Virtual Node until
+     * setVirtualNodeName is called on it.
+     *
+     * @See {@link LocalNode}
+     */
     static final public String DEFAULT_VN = "DEFAULT_VN";
 
     /**

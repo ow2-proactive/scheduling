@@ -33,7 +33,8 @@ package org.objectweb.proactive.examples.webservices.c3dWS.ws;
 import javax.xml.namespace.QName;
 
 
-public class Service1Locator extends org.apache.axis.client.Service implements org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1 {
+public class Service1Locator extends org.apache.axis.client.Service implements
+        org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1 {
     // Use to get a proxy class for Service1Soap
     private java.lang.String Service1Soap_address = "http://atacama/TestWS/Service1.asmx";
 
@@ -58,7 +59,7 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
     }
 
     public org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap getService1Soap()
-        throws javax.xml.rpc.ServiceException {
+            throws javax.xml.rpc.ServiceException {
         java.net.URL endpoint;
 
         try {
@@ -71,11 +72,10 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
     }
 
     public org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap getService1Soap(
-        java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
+            java.net.URL portAddress) throws javax.xml.rpc.ServiceException {
         try {
-            org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1SoapStub _stub =
-                new org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1SoapStub(portAddress,
-                    this);
+            org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1SoapStub _stub = new org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1SoapStub(
+                portAddress, this);
             _stub.setPortName(getService1SoapWSDDServiceName());
 
             return _stub;
@@ -94,14 +94,12 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
      * then ServiceException is thrown.
      */
     @Override
-    public java.rmi.Remote getPort(Class serviceEndpointInterface)
-        throws javax.xml.rpc.ServiceException {
+    public java.rmi.Remote getPort(Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
         try {
-            if (org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap.class.isAssignableFrom(
-                        serviceEndpointInterface)) {
-                org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1SoapStub _stub =
-                    new org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1SoapStub(new java.net.URL(
-                            Service1Soap_address), this);
+            if (org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1Soap.class
+                    .isAssignableFrom(serviceEndpointInterface)) {
+                org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1SoapStub _stub = new org.objectweb.proactive.examples.webservices.c3dWS.ws.Service1SoapStub(
+                    new java.net.URL(Service1Soap_address), this);
                 _stub.setPortName(getService1SoapWSDDServiceName());
 
                 return _stub;
@@ -110,10 +108,8 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
             throw new javax.xml.rpc.ServiceException(t);
         }
 
-        throw new javax.xml.rpc.ServiceException(
-            "There is no stub implementation for the interface:  " +
-            ((serviceEndpointInterface == null) ? "null"
-                                                : serviceEndpointInterface.getName()));
+        throw new javax.xml.rpc.ServiceException("There is no stub implementation for the interface:  " +
+            ((serviceEndpointInterface == null) ? "null" : serviceEndpointInterface.getName()));
     }
 
     /**
@@ -123,8 +119,8 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
      */
     @SuppressWarnings("unchecked")
     @Override
-    public java.rmi.Remote getPort(javax.xml.namespace.QName portName,
-        Class serviceEndpointInterface) throws javax.xml.rpc.ServiceException {
+    public java.rmi.Remote getPort(javax.xml.namespace.QName portName, Class serviceEndpointInterface)
+            throws javax.xml.rpc.ServiceException {
         if (portName == null) {
             return getPort(serviceEndpointInterface);
         }
@@ -159,21 +155,21 @@ public class Service1Locator extends org.apache.axis.client.Service implements o
     /**
      * Set the endpoint address for the specified port name.
      */
-    public void setEndpointAddress(java.lang.String portName,
-        java.lang.String address) throws javax.xml.rpc.ServiceException {
+    public void setEndpointAddress(java.lang.String portName, java.lang.String address)
+            throws javax.xml.rpc.ServiceException {
         if ("Service1Soap".equals(portName)) {
             setService1SoapEndpointAddress(address);
         } else { // Unknown Port Name
-            throw new javax.xml.rpc.ServiceException(
-                " Cannot set Endpoint Address for Unknown Port" + portName);
+            throw new javax.xml.rpc.ServiceException(" Cannot set Endpoint Address for Unknown Port" +
+                portName);
         }
     }
 
     /**
      * Set the endpoint address for the specified port name.
      */
-    public void setEndpointAddress(javax.xml.namespace.QName portName,
-        java.lang.String address) throws javax.xml.rpc.ServiceException {
+    public void setEndpointAddress(javax.xml.namespace.QName portName, java.lang.String address)
+            throws javax.xml.rpc.ServiceException {
         setEndpointAddress(portName.getLocalPart(), address);
     }
 }

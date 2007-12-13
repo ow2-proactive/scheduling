@@ -160,53 +160,45 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         private String errMessage = "";
 
         /* With a handler class, just override the methods you need to use
-        */
+         */
 
         // Start Error Handler code here
         @Override
         public void warning(SAXParseException e) {
-            logger.warn("Warning Line " + e.getLineNumber() + ": " +
-                e.getMessage() + "\n");
+            logger.warn("Warning Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
         }
 
         @Override
         public void error(SAXParseException e) throws SAXParseException {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
-                    e.getMessage() + "\n");
+            errMessage = new String("Error Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
             logger.error(errMessage);
             throw e;
         }
 
         @Override
         public void fatalError(SAXParseException e) throws SAXParseException {
-            errMessage = new String("Error Line " + e.getLineNumber() + ": " +
-                    e.getMessage() + "\n");
+            errMessage = new String("Error Line " + e.getLineNumber() + ": " + e.getMessage() + "\n");
             logger.fatal(errMessage);
             throw e;
         }
     }
 
-    public JaxpDescriptorParser(String xmlDescriptorUrl,
-        VariableContract variableContract)
-        throws MalformedURLException, SAXException {
+    public JaxpDescriptorParser(String xmlDescriptorUrl, VariableContract variableContract)
+            throws MalformedURLException, SAXException {
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-        String deploymentSchema = getClass()
-                                      .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/deployment/3.3/deployment.xsd")
-                                      .toString();
-        String securitySchemav1_0 = getClass()
-                                        .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd")
-                                        .toString();
-        String securitySchemav1_1 = getClass()
-                                        .getResource("/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.1/security.xsd")
-                                        .toString();
-        domFactory.setAttribute(JAXP_SCHEMA_SOURCE,
-            new Object[] {
-                deploymentSchema, securitySchemav1_0, securitySchemav1_1
-            });
+        String deploymentSchema = getClass().getResource(
+                "/org/objectweb/proactive/core/descriptor/xml/schemas/deployment/3.3/deployment.xsd")
+                .toString();
+        String securitySchemav1_0 = getClass().getResource(
+                "/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.0/security.xsd").toString();
+        String securitySchemav1_1 = getClass().getResource(
+                "/org/objectweb/proactive/core/descriptor/xml/schemas/security/1.1/security.xsd").toString();
+        domFactory.setAttribute(JAXP_SCHEMA_SOURCE, new Object[] { deploymentSchema, securitySchemav1_0,
+                securitySchemav1_1 });
         this.xmlDescriptorUrl = xmlDescriptorUrl;
         this.variableContract = variableContract;
     }
@@ -250,16 +242,14 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     private void handleSecurity() throws SAXException, XPathExpressionException {
-        NodeList nodes = (NodeList) xpath.evaluate(SECURITY_TAG, document,
-                XPathConstants.NODESET);
+        NodeList nodes = (NodeList) xpath.evaluate(SECURITY_TAG, document, XPathConstants.NODESET);
         Node securityNode = nodes.item(0);
         if (securityNode != null) {
-            NodeList fileSubNodes = (NodeList) xpath.evaluate(SECURITY_FILE,
-                    securityNode, XPathConstants.NODESET);
+            NodeList fileSubNodes = (NodeList) xpath.evaluate(SECURITY_FILE, securityNode,
+                    XPathConstants.NODESET);
             if (fileSubNodes.getLength() == 1) {
-                String securityFile = getNodeExpandedValue(fileSubNodes.item(0)
-                                                                       .getAttributes()
-                                                                       .getNamedItem(SECURITY_FILE_URI));
+                String securityFile = getNodeExpandedValue(fileSubNodes.item(0).getAttributes().getNamedItem(
+                        SECURITY_FILE_URI));
                 if ((securityFile == null) || (securityFile.length() <= 0)) {
                     throw new SAXException("Empty security file");
                 }
@@ -269,33 +259,26 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     File descriptorPath = new File(this.proActiveDescriptor.getUrl());
                     String descriptorDir = descriptorPath.getParent();
                     if (descriptorDir != null) {
-                        securityFile = descriptorDir + File.separator +
-                            securityFile;
+                        securityFile = descriptorDir + File.separator + securityFile;
                     }
                 }
 
-                logger.debug("creating ProActiveSecurityManager : " +
-                    securityFile);
+                logger.debug("creating ProActiveSecurityManager : " + securityFile);
                 proActiveDescriptor.createProActiveSecurityManager(securityFile);
             } else { // TODO : Policy node
             }
         }
     }
 
-    private void handleMainDefinitions()
-        throws XPathExpressionException, SAXException {
-        NodeList nodes = (NodeList) xpath.evaluate(MAIN_DEFINITIONS, document,
-                XPathConstants.NODESET);
+    private void handleMainDefinitions() throws XPathExpressionException, SAXException {
+        NodeList nodes = (NodeList) xpath.evaluate(MAIN_DEFINITIONS, document, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
-            String id = getNodeExpandedValue(node.getAttributes()
-                                                 .getNamedItem("id"));
-            String className = getNodeExpandedValue(node.getAttributes()
-                                                        .getNamedItem("class"));
+            String id = getNodeExpandedValue(node.getAttributes().getNamedItem("id"));
+            String className = getNodeExpandedValue(node.getAttributes().getNamedItem("class"));
 
             if (className == null) {
-                throw new org.xml.sax.SAXException(
-                    "class Tag without any mainDefinition defined");
+                throw new org.xml.sax.SAXException("class Tag without any mainDefinition defined");
             }
             proActiveDescriptor.createMainDefinition(id);
 
@@ -303,48 +286,40 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             proActiveDescriptor.mainDefinitionSetMainClass(className);
 
             // process args
-            NodeList argNodes = (NodeList) xpath.evaluate(XMLNS_PREFIX +
-                    ARG_TAG + "/@value", node, XPathConstants.NODESET);
+            NodeList argNodes = (NodeList) xpath.evaluate(XMLNS_PREFIX + ARG_TAG + "/@value", node,
+                    XPathConstants.NODESET);
             for (int j = 0; j < argNodes.getLength(); ++j) {
                 Node argNode = argNodes.item(j);
                 String argVal = getNodeExpandedValue(argNode);
                 if (argVal == null) {
-                    throw new org.xml.sax.SAXException(
-                        "value Tag without any arg defined");
+                    throw new org.xml.sax.SAXException("value Tag without any arg defined");
                 }
                 proActiveDescriptor.mainDefinitionAddParameter(argVal);
             }
 
             // process mapToVirtualNodes
-            NodeList mapNodes = (NodeList) xpath.evaluate(XMLNS_PREFIX +
-                    MAP_TO_VIRTUAL_NODE_TAG + "/@value", node,
-                    XPathConstants.NODESET);
+            NodeList mapNodes = (NodeList) xpath.evaluate(XMLNS_PREFIX + MAP_TO_VIRTUAL_NODE_TAG + "/@value",
+                    node, XPathConstants.NODESET);
             for (int j = 0; j < mapNodes.getLength(); ++j) {
                 Node mapNode = mapNodes.item(j);
                 String virtualNode = getNodeExpandedValue(mapNode);
                 if (virtualNode == null) {
-                    throw new org.xml.sax.SAXException(
-                        "value Tag without any mapToVirtualNode defined");
+                    throw new org.xml.sax.SAXException("value Tag without any mapToVirtualNode defined");
                 }
 
-                VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(virtualNode,
-                        false, true);
+                VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(virtualNode, false, true);
 
                 proActiveDescriptor.mainDefinitionAddVirtualNode(vn);
             }
         }
     }
 
-    private void handleTechnicalServices()
-        throws XPathExpressionException, SAXException {
-        NodeList nodes = (NodeList) xpath.evaluate(TECHNICAL_SERVICES,
-                document, XPathConstants.NODESET);
+    private void handleTechnicalServices() throws XPathExpressionException, SAXException {
+        NodeList nodes = (NodeList) xpath.evaluate(TECHNICAL_SERVICES, document, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
-            String serviceId = getNodeExpandedValue(node.getAttributes()
-                                                        .getNamedItem("id"));
-            String serviceClass = getNodeExpandedValue(node.getAttributes()
-                                                           .getNamedItem("class"));
+            String serviceId = getNodeExpandedValue(node.getAttributes().getNamedItem("id"));
+            String serviceClass = getNodeExpandedValue(node.getAttributes().getNamedItem("class"));
             TechnicalServiceXmlType technicalService = new TechnicalServiceXmlType();
             technicalService.setId(serviceId);
             try {
@@ -355,14 +330,11 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             // process args
             Map<String, String> argsMap = new Hashtable<String, String>();
-            NodeList args = (NodeList) xpath.evaluate(XMLNS_PREFIX + ARG_TAG,
-                    node, XPathConstants.NODESET);
+            NodeList args = (NodeList) xpath.evaluate(XMLNS_PREFIX + ARG_TAG, node, XPathConstants.NODESET);
             for (int j = 0; j < args.getLength(); ++j) {
                 Node argNode = args.item(j);
-                String argName = getNodeExpandedValue(argNode.getAttributes()
-                                                             .getNamedItem("name"));
-                String argValue = getNodeExpandedValue(argNode.getAttributes()
-                                                              .getNamedItem("value"));
+                String argName = getNodeExpandedValue(argNode.getAttributes().getNamedItem("name"));
+                String argValue = getNodeExpandedValue(argNode.getAttributes().getNamedItem("value"));
                 argsMap.put(argName, argValue);
             }
             technicalService.setArgs(argsMap);
@@ -370,39 +342,30 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             try {
                 proActiveDescriptor.addTechnicalService(technicalService);
             } catch (Exception e) {
-                throw new SAXException("Technical service class not instanciable",
-                    e);
+                throw new SAXException("Technical service class not instanciable", e);
             }
         }
     }
 
-    private void handleVariables()
-        throws XPathExpressionException, SAXException {
+    private void handleVariables() throws XPathExpressionException, SAXException {
         // Variables
         //
         String[][] pairs = new String[][] {
-                {
-                    VARIABLES_JAVAPROPERTY_DESCRIPTOR,
-                    VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG
-                },
-                {
-                    VARIABLES_JAVAPROPERTY_PROGRAM,
-                    VARIABLES_JAVAPROPERTY_PROGRAM_TAG
-                },
+                { VARIABLES_JAVAPROPERTY_DESCRIPTOR, VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG },
+                { VARIABLES_JAVAPROPERTY_PROGRAM, VARIABLES_JAVAPROPERTY_PROGRAM_TAG },
                 { VARIABLES_JAVAPROPERTY, VARIABLES_JAVAPROPERTY_TAG },
                 { VARIABLES_DESCRIPTOR, VARIABLES_DESCRIPTOR_TAG },
                 { VARIABLES_PROGRAM, VARIABLES_PROGRAM_TAG },
                 { VARIABLES_PROGRAM_DEFAULT, VARIABLES_PROGRAM_DEFAULT_TAG },
-                { VARIABLES_DESCRIPTOR_DEFAULT, VARIABLES_DESCRIPTOR_DEFAULT_TAG },
-            };
+                { VARIABLES_DESCRIPTOR_DEFAULT, VARIABLES_DESCRIPTOR_DEFAULT_TAG }, };
 
         for (int i = 0; i < pairs.length; ++i) {
             VariableContractType varContractType = VariableContractType.getType(pairs[i][1]);
             processVariables(pairs[i][0], varContractType);
         }
 
-        NodeList nodes = (NodeList) xpath.evaluate(VARIABLES_INCLUDE_XML_FILE,
-                document, XPathConstants.NODESET);
+        NodeList nodes = (NodeList) xpath.evaluate(VARIABLES_INCLUDE_XML_FILE, document,
+                XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
             Node attr = node.getAttributes().getNamedItem("location");
@@ -412,8 +375,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             }
         }
 
-        nodes = (NodeList) xpath.evaluate(VARIABLES_INCLUDE_PROPERTY_FILE,
-                document, XPathConstants.NODESET);
+        nodes = (NodeList) xpath.evaluate(VARIABLES_INCLUDE_PROPERTY_FILE, document, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
             Node attr = node.getAttributes().getNamedItem("location");
@@ -424,9 +386,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
-    private void processVariables(String expr,
-        VariableContractType varContractType)
-        throws XPathExpressionException, SAXException {
+    private void processVariables(String expr, VariableContractType varContractType)
+            throws XPathExpressionException, SAXException {
         Object result = xpath.evaluate(expr, document, XPathConstants.NODESET);
         NodeList nodes = (NodeList) result;
         for (int i = 0; i < nodes.getLength(); ++i) {
@@ -439,28 +400,24 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             String varName = varNameItem.getNodeValue();
 
-            String varValue = getNodeExpandedValue(node.getAttributes()
-                                                       .getNamedItem("value"));
+            String varValue = getNodeExpandedValue(node.getAttributes().getNamedItem("value"));
 
             if (varValue == null) {
                 varValue = "";
             }
 
-            variableContract.setDescriptorVariable(varName, varValue,
-                varContractType);
+            variableContract.setDescriptorVariable(varName, varValue, varContractType);
         }
     }
 
-    private void handleFileTransfer()
-        throws XPathExpressionException, SAXException {
-        NodeList nodes = (NodeList) xpath.evaluate("//pa:fileTransferDefinitions/pa:fileTransfer",
-                document, XPathConstants.NODESET);
+    private void handleFileTransfer() throws XPathExpressionException, SAXException {
+        NodeList nodes = (NodeList) xpath.evaluate("//pa:fileTransferDefinitions/pa:fileTransfer", document,
+                XPathConstants.NODESET);
 
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
 
-            String fileTransferId = getNodeExpandedValue(node.getAttributes()
-                                                             .getNamedItem("id"));
+            String fileTransferId = getNodeExpandedValue(node.getAttributes().getNamedItem("id"));
 
             FileTransferDefinition fileTransfer = proActiveDescriptor.getFileTransfer(fileTransferId);
 
@@ -473,27 +430,22 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 }
                 NamedNodeMap attributes = transferNode.getAttributes();
                 String src = getNodeExpandedValue(attributes.getNamedItem("src"));
-                String dest = getNodeExpandedValue(attributes.getNamedItem(
-                            "dest"));
+                String dest = getNodeExpandedValue(attributes.getNamedItem("dest"));
 
                 if (transferNode.getNodeName().equals(FILE_TRANSFER_FILE_TAG)) {
                     fileTransfer.addFile(src, dest);
-                } else if (transferNode.getNodeName()
-                                           .equals(FILE_TRANSFER_DIR_TAG)) {
-                    String include = getNodeExpandedValue(attributes.getNamedItem(
-                                "include"));
-                    String exclude = getNodeExpandedValue(attributes.getNamedItem(
-                                "exclude"));
+                } else if (transferNode.getNodeName().equals(FILE_TRANSFER_DIR_TAG)) {
+                    String include = getNodeExpandedValue(attributes.getNamedItem("include"));
+                    String exclude = getNodeExpandedValue(attributes.getNamedItem("exclude"));
                     fileTransfer.addDir(src, dest, include, exclude);
                 }
             }
         }
     }
 
-    private void handleComponentDefinitions()
-        throws XPathExpressionException, SAXException {
-        NodeList nodes = (NodeList) xpath.evaluate(VIRTUAL_NODES_DEFINITIONS,
-                document, XPathConstants.NODESET);
+    private void handleComponentDefinitions() throws XPathExpressionException, SAXException {
+        NodeList nodes = (NodeList) xpath.evaluate(VIRTUAL_NODES_DEFINITIONS, document,
+                XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
             NamedNodeMap attributes = node.getAttributes();
@@ -503,8 +455,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             //            System.out.println("Virtual node definition : "
             //                    + nodeName.getNodeValue() + " - "
             //                    + nodeProperty.getNodeValue());
-            VirtualNodeImpl vn = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(getNodeExpandedValue(
-                        nodeName), false);
+            VirtualNodeImpl vn = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(
+                    getNodeExpandedValue(nodeName), false);
             String s = getNodeExpandedValue(nodeProperty);
             if (s != null) {
                 vn.setProperty(s);
@@ -517,10 +469,10 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             if (s != null) {
                 String nodeValue = s.toLowerCase();
                 waitForTimeout = Boolean.parseBoolean(nodeValue); // nodeValue.equals("y")
-                                                                  // ||
-                                                                  // nodeValue.equals("true")
-                                                                  // ||
-                                                                  // nodeValue.equals("1");
+                // ||
+                // nodeValue.equals("true")
+                // ||
+                // nodeValue.equals("1");
             }
 
             s = getNodeExpandedValue(timeout);
@@ -549,23 +501,20 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node fileTransferRetrieve = attributes.getNamedItem(FILE_TRANSFER_RETRIEVE_TAG);
             s = getNodeExpandedValue(fileTransferRetrieve);
             if (s != null) {
-                vn.addFileTransferRetrieve(proActiveDescriptor.getFileTransfer(
-                        s));
+                vn.addFileTransferRetrieve(proActiveDescriptor.getFileTransfer(s));
             }
 
             Node techServiceId = attributes.getNamedItem(TECHNICAL_SERVICE_ID);
             s = getNodeExpandedValue(techServiceId);
             if (s != null) {
-                vn.addTechnicalService(proActiveDescriptor.getTechnicalService(
-                        s));
+                vn.addTechnicalService(proActiveDescriptor.getTechnicalService(s));
             }
         }
 
         //
         // Node acquisitions
         //
-        nodes = (NodeList) xpath.evaluate(VIRTUAL_NODES_ACQUISITIONS, document,
-                XPathConstants.NODESET);
+        nodes = (NodeList) xpath.evaluate(VIRTUAL_NODES_ACQUISITIONS, document, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
             Node nodeName = node.getAttributes().getNamedItem("name");
@@ -576,33 +525,27 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
-    private void handleDeployment()
-        throws XPathExpressionException, SAXException, IOException {
+    private void handleDeployment() throws XPathExpressionException, SAXException, IOException {
         //
         // register
         //
-        NodeList deploymentNodes = (NodeList) xpath.evaluate(DEPLOYMENT,
-                document, XPathConstants.NODESET);
+        NodeList deploymentNodes = (NodeList) xpath.evaluate(DEPLOYMENT, document, XPathConstants.NODESET);
 
         if (deploymentNodes.getLength() == 0) {
-            throw new ProActiveRuntimeException(
-                "No 'deployment' node found in descriptor");
+            throw new ProActiveRuntimeException("No 'deployment' node found in descriptor");
         }
 
         Node deploymentContextItem = deploymentNodes.item(0);
-        NodeList nodes = (NodeList) xpath.evaluate(REGISTER,
-                deploymentContextItem, XPathConstants.NODESET);
+        NodeList nodes = (NodeList) xpath.evaluate(REGISTER, deploymentContextItem, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
-            Node virtualNodeName = node.getAttributes()
-                                       .getNamedItem("virtualNode");
+            Node virtualNodeName = node.getAttributes().getNamedItem("virtualNode");
 
             Node protocol = node.getAttributes().getNamedItem("protocol");
             String p = getNodeExpandedValue(protocol);
-            String protocolValue = (p != null) ? p
-                                               : PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
-            VirtualNodeImpl vnImpl = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(getNodeExpandedValue(
-                        virtualNodeName), false);
+            String protocolValue = (p != null) ? p : PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            VirtualNodeImpl vnImpl = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(
+                    getNodeExpandedValue(virtualNodeName), false);
 
             vnImpl.setRegistrationProtocol(protocolValue);
         }
@@ -613,30 +556,27 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
         // collect the mappings in a hashmap
         //
-        nodes = (NodeList) xpath.evaluate(VM_MAPPING, deploymentContextItem,
-                XPathConstants.NODESET);
+        nodes = (NodeList) xpath.evaluate(VM_MAPPING, deploymentContextItem, XPathConstants.NODESET);
 
         HashMap<String, ArrayList<String>> vmMapping = new HashMap<String, ArrayList<String>>();
 
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
             Node mapParent = node.getParentNode().getParentNode();
-            String virtualNodeName = getNodeExpandedValue(mapParent.getAttributes()
-                                                                   .getNamedItem("virtualNode"));
+            String virtualNodeName = getNodeExpandedValue(mapParent.getAttributes().getNamedItem(
+                    "virtualNode"));
             ArrayList<String> arrayList = vmMapping.get(virtualNodeName);
             if (arrayList == null) {
                 arrayList = new ArrayList<String>();
                 vmMapping.put(virtualNodeName, arrayList);
             }
-            arrayList.add(getNodeExpandedValue(node.getAttributes()
-                                                   .getNamedItem("value")));
+            arrayList.add(getNodeExpandedValue(node.getAttributes().getNamedItem("value")));
         }
 
         // set the VM mappings to each virtual node
         //
         for (String s : vmMapping.keySet()) {
-            VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(s,
-                    false);
+            VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(s, false);
             for (String vmName : vmMapping.get(s)) {
                 VirtualMachine vm = proActiveDescriptor.createVirtualMachine(vmName);
                 vn.addVirtualMachine(vm);
@@ -645,15 +585,13 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
         // current vm mappings
         //
-        nodes = (NodeList) xpath.evaluate(CURRENT_VM_MAPPING,
-                deploymentContextItem, XPathConstants.NODESET);
+        nodes = (NodeList) xpath.evaluate(CURRENT_VM_MAPPING, deploymentContextItem, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
             Node mapParent = node.getParentNode().getParentNode();
-            String virtualNodeName = getNodeExpandedValue(mapParent.getAttributes()
-                                                                   .getNamedItem("virtualNode"));
-            VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(virtualNodeName,
-                    false);
+            String virtualNodeName = getNodeExpandedValue(mapParent.getAttributes().getNamedItem(
+                    "virtualNode"));
+            VirtualNodeInternal vn = proActiveDescriptor.createVirtualNode(virtualNodeName, false);
             Node protocolAttr = node.getAttributes().getNamedItem("protocol");
             String protocol = getNodeExpandedValue(protocolAttr);
             if (protocol == null) {
@@ -665,19 +603,15 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
         // vm lookup
         //
-        nodes = (NodeList) xpath.evaluate(LOOKUP, deploymentContextItem,
-                XPathConstants.NODESET);
+        nodes = (NodeList) xpath.evaluate(LOOKUP, deploymentContextItem, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
 
-            String vnLookup = getNodeExpandedValue(node.getAttributes()
-                                                       .getNamedItem("virtualNode"));
-            String host = getNodeExpandedValue(node.getAttributes()
-                                                   .getNamedItem("host"));
+            String vnLookup = getNodeExpandedValue(node.getAttributes().getNamedItem("virtualNode"));
+            String host = getNodeExpandedValue(node.getAttributes().getNamedItem("host"));
             Node namedItem = node.getAttributes().getNamedItem("protocol");
             if (namedItem == null) {
-                throw new org.xml.sax.SAXException(
-                    "lookup Tag without any protocol defined");
+                throw new org.xml.sax.SAXException("lookup Tag without any protocol defined");
             }
             String protocol = getNodeExpandedValue(namedItem);
             Node portItem = node.getAttributes().getNamedItem("port");
@@ -687,57 +621,50 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 port = RMI_DEFAULT_PORT;
             }
 
-            VirtualNodeLookup vn = (VirtualNodeLookup) proActiveDescriptor.createVirtualNode(vnLookup,
-                    true);
+            VirtualNodeLookup vn = (VirtualNodeLookup) proActiveDescriptor.createVirtualNode(vnLookup, true);
 
             vn.setLookupInformations(host, protocol, port);
         }
 
         // vm creation and acquisition
         //
-        nodes = (NodeList) xpath.evaluate(JVM_CREATION, deploymentContextItem,
-                XPathConstants.NODESET);
+        nodes = (NodeList) xpath.evaluate(JVM_CREATION, deploymentContextItem, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
             Node jvmParent = node.getParentNode().getParentNode();
-            String jvmName = getNodeExpandedValue(jvmParent.getAttributes()
-                                                           .getNamedItem("name"));
+            String jvmName = getNodeExpandedValue(jvmParent.getAttributes().getNamedItem("name"));
             Node t = jvmParent.getAttributes().getNamedItem("askedNodes");
             VirtualMachine currentVM = proActiveDescriptor.createVirtualMachine(jvmName);
             String ts = getNodeExpandedValue(t);
             if (ts != null) {
                 currentVM.setNbNodes(new Integer(ts));
             }
-            proActiveDescriptor.registerProcess(currentVM,
-                getNodeExpandedValue(node.getAttributes().getNamedItem("refid")));
+            proActiveDescriptor.registerProcess(currentVM, getNodeExpandedValue(node.getAttributes()
+                    .getNamedItem("refid")));
         }
 
-        nodes = (NodeList) xpath.evaluate(JVM_ACQUISITION,
-                deploymentContextItem, XPathConstants.NODESET);
+        nodes = (NodeList) xpath.evaluate(JVM_ACQUISITION, deploymentContextItem, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
             Node jvmParent = node.getParentNode().getParentNode();
-            String jvmName = getNodeExpandedValue(jvmParent.getAttributes()
-                                                           .getNamedItem("name"));
+            String jvmName = getNodeExpandedValue(jvmParent.getAttributes().getNamedItem("name"));
             Node t = jvmParent.getAttributes().getNamedItem("askedNodes");
             VirtualMachine currentVM = proActiveDescriptor.createVirtualMachine(jvmName);
             String ts = getNodeExpandedValue(t);
             if (ts != null) {
                 currentVM.setNbNodes(new Integer(ts));
             }
-            proActiveDescriptor.registerService(currentVM,
-                getNodeExpandedValue(node.getAttributes().getNamedItem("refid")));
+            proActiveDescriptor.registerService(currentVM, getNodeExpandedValue(node.getAttributes()
+                    .getNamedItem("refid")));
         }
     }
 
-    private void handleInfrastructure()
-        throws XPathExpressionException, ProActiveException, SAXException {
-        NodeList t = (NodeList) xpath.evaluate(INFRASTRUCTURE, document,
-                XPathConstants.NODESET);
+    private void handleInfrastructure() throws XPathExpressionException, ProActiveException, SAXException {
+        NodeList t = (NodeList) xpath.evaluate(INFRASTRUCTURE, document, XPathConstants.NODESET);
         Node infrastructureContext = t.item(0);
 
-        NodeList nodes = (NodeList) xpath.evaluate(PROCESS_DEFINITIONS,
-                infrastructureContext, XPathConstants.NODESET);
+        NodeList nodes = (NodeList) xpath.evaluate(PROCESS_DEFINITIONS, infrastructureContext,
+                XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
 
@@ -774,8 +701,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             } else if (processType.equals(MPI_PROCESS_TAG)) {
                 new MPIProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(DEPENDENT_PROCESS_SEQUENCE_TAG)) {
-                new DependentProcessSequenceExtractor(node,
-                    infrastructureContext);
+                new DependentProcessSequenceExtractor(node, infrastructureContext);
             } else if (processType.equals(SEQUENTIAL_PROCESS_TAG)) {
                 new SequentialProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(UNICORE_PROCESS_TAG)) {
@@ -784,95 +710,82 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 new NGProcessExtractor(node, infrastructureContext);
             } else if (processType.equals(CLUSTERFORK_PROCESS_TAG)) {
                 new ClusterForkProcessExtractor(node, infrastructureContext);
-            } else if (processType.equals(PROCESS_LIST_TAG) ||
-                    processType.equals(PROCESS_LIST_BYHOST_TAG)) {
+            } else if (processType.equals(PROCESS_LIST_TAG) || processType.equals(PROCESS_LIST_BYHOST_TAG)) {
                 new ProcessListExtractor(node, infrastructureContext);
             }
         }
 
-        nodes = (NodeList) xpath.evaluate(SERVICE_DEFINITIONS,
-                infrastructureContext, XPathConstants.NODESET);
+        nodes = (NodeList) xpath.evaluate(SERVICE_DEFINITIONS, infrastructureContext, XPathConstants.NODESET);
         for (int i = 0; i < nodes.getLength(); ++i) {
             Node node = nodes.item(i);
 
-            String serviceID = getNodeExpandedValue(node.getParentNode()
-                                                        .getAttributes()
-                                                        .getNamedItem("id"));
+            String serviceID = getNodeExpandedValue(node.getParentNode().getAttributes().getNamedItem("id"));
 
             String serviceType = node.getNodeName();
 
             UniversalService service = null;
 
             if (serviceType.equals(RMI_LOOKUP_TAG)) {
-                String lookupURL = getNodeExpandedValue(node.getAttributes()
-                                                            .getNamedItem("url"));
+                String lookupURL = getNodeExpandedValue(node.getAttributes().getNamedItem("url"));
                 service = new RMIRegistryLookupService(lookupURL);
             } else if (serviceType.equals(P2P_SERVICE_TAG)) {
                 P2PDescriptorService p2pDescriptorService = new P2PDescriptorService();
 
                 service = p2pDescriptorService;
 
-                String nodesAsked = getNodeExpandedValue(node.getAttributes()
-                                                             .getNamedItem("nodesAsked"));
+                String nodesAsked = getNodeExpandedValue(node.getAttributes().getNamedItem("nodesAsked"));
                 if (nodesAsked != null) {
                     if (nodesAsked.equals("MAX")) {
                         p2pDescriptorService.setNodeNumberToMAX();
                     } else {
-                        p2pDescriptorService.setNodeNumber(Integer.parseInt(
-                                nodesAsked));
+                        p2pDescriptorService.setNodeNumber(Integer.parseInt(nodesAsked));
                     }
                 }
 
-                String acq = getNodeExpandedValue(node.getAttributes()
-                                                      .getNamedItem("acq"));
+                String acq = getNodeExpandedValue(node.getAttributes().getNamedItem("acq"));
                 if (acq != null) {
                     p2pDescriptorService.setAcq(acq);
                 }
 
-                String port = getNodeExpandedValue(node.getAttributes()
-                                                       .getNamedItem("port"));
+                String port = getNodeExpandedValue(node.getAttributes().getNamedItem("port"));
                 if (port != null) {
                     p2pDescriptorService.setPort(port);
                 }
 
-                String noa = getNodeExpandedValue(node.getAttributes()
-                                                      .getNamedItem("NOA"));
+                String noa = getNodeExpandedValue(node.getAttributes().getNamedItem("NOA"));
                 if (noa != null) {
                     p2pDescriptorService.setNoa(noa);
                 }
 
-                String ttu = getNodeExpandedValue(node.getAttributes()
-                                                      .getNamedItem("TTU"));
+                String ttu = getNodeExpandedValue(node.getAttributes().getNamedItem("TTU"));
                 if (ttu != null) {
                     p2pDescriptorService.setTtu(ttu);
                 }
 
-                String ttl = getNodeExpandedValue(node.getAttributes()
-                                                      .getNamedItem("TTL"));
+                String ttl = getNodeExpandedValue(node.getAttributes().getNamedItem("TTL"));
                 if (ttl != null) {
                     p2pDescriptorService.setTtl(ttl);
                 }
 
-                String multi_proc_nodes = getNodeExpandedValue(node.getAttributes()
-                                                                   .getNamedItem("multi_proc_nodes"));
+                String multi_proc_nodes = getNodeExpandedValue(node.getAttributes().getNamedItem(
+                        "multi_proc_nodes"));
                 if (multi_proc_nodes != null) {
                     p2pDescriptorService.setMultiProcNodes(multi_proc_nodes);
                 }
 
-                String xml_path = getNodeExpandedValue(node.getAttributes()
-                                                           .getNamedItem("xml_path"));
+                String xml_path = getNodeExpandedValue(node.getAttributes().getNamedItem("xml_path"));
                 if (xml_path != null) {
                     p2pDescriptorService.setXmlPath(xml_path);
                 }
 
-                String node_family_regexp = getNodeExpandedValue(node.getAttributes()
-                                                                     .getNamedItem("node_family_regexp"));
+                String node_family_regexp = getNodeExpandedValue(node.getAttributes().getNamedItem(
+                        "node_family_regexp"));
                 if (node_family_regexp != null) {
                     p2pDescriptorService.setNodeFamilyRegexp(node_family_regexp);
                 }
 
-                NodeList peerNodes = (NodeList) xpath.evaluate("pa:peerSet/pa:peer",
-                        node, XPathConstants.NODESET);
+                NodeList peerNodes = (NodeList) xpath.evaluate("pa:peerSet/pa:peer", node,
+                        XPathConstants.NODESET);
 
                 String[] peerList = new String[peerNodes.getLength()];
                 for (int pp = 0; pp < peerNodes.getLength(); ++pp) {
@@ -889,8 +802,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     if (childNode.getNodeType() != Node.ELEMENT_NODE) {
                         continue;
                     }
-                    String url = getNodeExpandedValue(childNode.getAttributes()
-                                                               .getNamedItem("url"));
+                    String url = getNodeExpandedValue(childNode.getAttributes().getNamedItem("url"));
 
                     String nodeName = childNode.getNodeName();
                     if (nodeName.equals(FT_RECPROCESS_TAG)) {
@@ -902,14 +814,12 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     } else if (nodeName.equals(FT_RESSERVER_TAG)) {
                         ftService.setAttachedResourceServer(url);
                     } else if (nodeName.equals(FT_TTCVALUE_TAG)) {
-                        String value = getNodeExpandedValue(childNode.getAttributes()
-                                                                     .getNamedItem("value"));
+                        String value = getNodeExpandedValue(childNode.getAttributes().getNamedItem("value"));
                         ftService.setTtcValue(value);
                     } else if (nodeName.equals(FT_GLOBALSERVER_TAG)) {
                         ftService.setGlobalServerURL(url);
                     } else if (nodeName.equals(FT_PROTO_TAG)) {
-                        String type = getNodeExpandedValue(childNode.getAttributes()
-                                                                    .getNamedItem("type"));
+                        String type = getNodeExpandedValue(childNode.getAttributes().getNamedItem("type"));
                         ftService.setProtocolType(type);
                     }
                 }
@@ -922,22 +832,19 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     protected class BasicProcessExtractor {
         protected ExternalProcess targetProcess;
 
-        public BasicProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public BasicProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             // get parent id
-            String id = getNodeExpandedValue(node.getParentNode().getAttributes()
-                                                 .getNamedItem("id"));
+            String id = getNodeExpandedValue(node.getParentNode().getAttributes().getNamedItem("id"));
 
-            String processClassName = getNodeExpandedValue(node.getAttributes()
-                                                               .getNamedItem("class"));
-            targetProcess = proActiveDescriptor.createProcess(id,
-                    processClassName);
+            String processClassName = getNodeExpandedValue(node.getAttributes().getNamedItem("class"));
+            targetProcess = proActiveDescriptor.createProcess(id, processClassName);
         }
     }
 
     protected class ProcessExtractor extends BasicProcessExtractor {
-        public ProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public ProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
 
             Node namedItem = node.getAttributes().getNamedItem("closeStream");
@@ -961,17 +868,14 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             // get all env. vars
             //
             XPathExpression varExpr = xpath.compile("//pa:variable");
-            NodeList vars = (NodeList) varExpr.evaluate(context,
-                    XPathConstants.NODESET);
+            NodeList vars = (NodeList) varExpr.evaluate(context, XPathConstants.NODESET);
 
             ArrayList<String> envVars = new ArrayList<String>();
 
             for (int i = 0; i < vars.getLength(); ++i) {
                 Node varNode = vars.item(i);
-                String name = getNodeExpandedValue(varNode.getAttributes()
-                                                          .getNamedItem("name"));
-                String value = getNodeExpandedValue(varNode.getAttributes()
-                                                           .getNamedItem("value"));
+                String name = getNodeExpandedValue(varNode.getAttributes().getNamedItem("name"));
+                String value = getNodeExpandedValue(varNode.getAttributes().getNamedItem("value"));
                 if (checkNonEmptyString(name)) {
                     envVars.add(name + "=" + value);
                 }
@@ -992,8 +896,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
                 String nodeName = child.getNodeName();
                 if (nodeName.equals(PROCESS_REFERENCE_TAG)) {
-                    String refid = getNodeExpandedValue(child.getAttributes()
-                                                             .getNamedItem("refid"));
+                    String refid = getNodeExpandedValue(child.getAttributes().getNamedItem("refid"));
                     if (!(targetProcess instanceof ExternalProcessDecorator)) {
                         throw new org.xml.sax.SAXException(
                             "found a Process defined inside a non composite process");
@@ -1001,8 +904,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
                     holdProcessRegistration(refid);
                 } else if (nodeName.equals(COMMAND_PATH_TAG)) {
-                    String value = getNodeExpandedValue(child.getAttributes()
-                                                             .getNamedItem("value"));
+                    String value = getNodeExpandedValue(child.getAttributes().getNamedItem("value"));
                     targetProcess.setCommandPath(value);
                 } else if (nodeName.equals(FILE_TRANSFER_DEPLOY_TAG)) {
                     getFileTransfer("deploy", targetProcess, child);
@@ -1017,8 +919,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             proActiveDescriptor.registerProcess(cep, refid);
         }
 
-        private FileTransferWorkShop getFileTransfer(String fileTransferQueue,
-            ExternalProcess targetProcess, Node node) throws SAXException {
+        private FileTransferWorkShop getFileTransfer(String fileTransferQueue, ExternalProcess targetProcess,
+                Node node) throws SAXException {
             FileTransferWorkShop fileTransferStructure;
             if (fileTransferQueue.equalsIgnoreCase("deploy")) {
                 fileTransferStructure = targetProcess.getFileTransferWorkShopDeploy();
@@ -1029,16 +931,14 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node namedItem = node.getAttributes().getNamedItem("refid");
             String ftRefId = getNodeExpandedValue(namedItem);
             if (ftRefId == null) {
-                throw new org.xml.sax.SAXException(node.getNodeName() +
-                    " defined without 'refid' attribute");
+                throw new org.xml.sax.SAXException(node.getNodeName() + " defined without 'refid' attribute");
             }
 
             if (ftRefId.equalsIgnoreCase(FILE_TRANSFER_IMPLICT_KEYWORD)) {
                 fileTransferStructure.setImplicit(true);
             } else {
                 fileTransferStructure.setImplicit(false);
-                fileTransferStructure.addFileTransfer(proActiveDescriptor.getFileTransfer(
-                        ftRefId));
+                fileTransferStructure.addFileTransfer(proActiveDescriptor.getFileTransfer(ftRefId));
             }
 
             NodeList childNodes = node.getChildNodes();
@@ -1061,9 +961,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             return fileTransferStructure;
         }
 
-        private void getTransferInfo(boolean src,
-            FileTransferWorkShop fileTransferStructure, Node node)
-            throws SAXException {
+        private void getTransferInfo(boolean src, FileTransferWorkShop fileTransferStructure, Node node)
+                throws SAXException {
             String[] parameter = { "prefix", "hostname", "username", "password" };
 
             for (int i = 0; i < parameter.length; i++) {
@@ -1071,11 +970,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 String t = getNodeExpandedValue(namedItem);
                 if (t != null) {
                     if (src) {
-                        fileTransferStructure.setFileTransferStructureSrcInfo(parameter[i],
-                            t);
+                        fileTransferStructure.setFileTransferStructureSrcInfo(parameter[i], t);
                     } else {
-                        fileTransferStructure.setFileTransferStructureDstInfo(parameter[i],
-                            t);
+                        fileTransferStructure.setFileTransferStructureDstInfo(parameter[i], t);
                     }
                 }
             }
@@ -1083,23 +980,21 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class JVMProcessExtractor extends ProcessExtractor {
-        public JVMProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public JVMProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
             JVMProcess jvmProcess = ((JVMProcess) targetProcess);
 
             Node namedItem = node.getAttributes().getNamedItem("priority");
             String priority = getNodeExpandedValue(namedItem);
             if (priority != null) {
-                ((JVMProcess) targetProcess).setPriority(PriorityLevel.valueOf(
-                        priority));
+                ((JVMProcess) targetProcess).setPriority(PriorityLevel.valueOf(priority));
             }
 
             namedItem = node.getAttributes().getNamedItem("os");
             String os = getNodeExpandedValue(namedItem);
             if (os != null) {
-                ((JVMProcess) targetProcess).setOperatingSystem(OperatingSystem.valueOf(
-                        os));
+                ((JVMProcess) targetProcess).setOperatingSystem(OperatingSystem.valueOf(os));
             }
 
             NodeList childNodes = node.getChildNodes();
@@ -1127,23 +1022,19 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     jvmProcess.setLog4jFile(path);
                 } else if (nodeName.equals(PROACTIVE_PROPS_FILE_TAG)) {
                     String path = getPath(child);
-                    jvmProcess.setJvmOptions("-Dproactive.configuration=" +
-                        path);
+                    jvmProcess.setJvmOptions("-Dproactive.configuration=" + path);
                 } else if (nodeName.equals(JVMPARAMETERS_TAG)) {
                     String params = getParameters(child);
                     jvmProcess.setJvmOptions(params);
                 } else if (nodeName.equals(EXTENDED_JVM_TAG)) {
-                    Node overwriteParamsArg = child.getAttributes()
-                                                   .getNamedItem("overwriteParameters");
+                    Node overwriteParamsArg = child.getAttributes().getNamedItem("overwriteParameters");
                     if ((overwriteParamsArg != null) &&
-                            "yes".equals(getNodeExpandedValue(
-                                    overwriteParamsArg))) {
+                        "yes".equals(getNodeExpandedValue(overwriteParamsArg))) {
                         jvmProcess.setOverwrite(true);
                     }
                     try {
                         proActiveDescriptor.mapToExtendedJVM((JVMProcess) targetProcess,
-                            getNodeExpandedValue(child.getAttributes()
-                                                      .getNamedItem("refid")));
+                                getNodeExpandedValue(child.getAttributes().getNamedItem("refid")));
                     } catch (ProActiveException e) {
                         throw new SAXException(e);
                     }
@@ -1153,22 +1044,21 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class RshProcessExtractor extends ProcessExtractor {
-        public RshProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public RshProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
         }
     }
 
     protected class MapRshProcessExtractor extends RshProcessExtractor {
-        public MapRshProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public MapRshProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
 
             Node namedItem = node.getAttributes().getNamedItem("parallelize");
             String t = getNodeExpandedValue(namedItem);
             if (t != null) {
-                ((MapRshProcess) targetProcess).setParallelization(
-                    "parallelize");
+                ((MapRshProcess) targetProcess).setParallelization("parallelize");
             }
 
             NodeList childNodes = node.getChildNodes();
@@ -1187,33 +1077,32 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class SshProcessExtractor extends ProcessExtractor {
-        public SshProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public SshProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
         }
     }
 
     protected class RloginProcessExtractor extends ProcessExtractor {
-        public RloginProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public RloginProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
         }
     }
 
     protected class LoadLevelerProcessExtractor extends ProcessExtractor {
-        public LoadLevelerProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public LoadLevelerProcessExtractor(Node node, Node context) throws XPathExpressionException,
+                SAXException, ProActiveException {
             super(node, context);
 
-            Node taskRepartitionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    LOADLEVELER_TASK_REPARTITION_TAG, node, XPathConstants.NODE);
+            Node taskRepartitionNode = (Node) xpath.evaluate(XMLNS_PREFIX + LOADLEVELER_TASK_REPARTITION_TAG,
+                    node, XPathConstants.NODE);
             if (taskRepartitionNode != null) {
-                new LoadLevelerTaskRepartitionExtractor(targetProcess,
-                    taskRepartitionNode);
+                new LoadLevelerTaskRepartitionExtractor(targetProcess, taskRepartitionNode);
             }
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    LOADLEVELER_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX + LOADLEVELER_OPTIONS_TAG, node,
+                    XPathConstants.NODE);
             if (optionNode != null) {
                 new LoadLevelerOptionExtractor(targetProcess, optionNode);
             }
@@ -1221,8 +1110,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class LoadLevelerOptionExtractor {
-        public LoadLevelerOptionExtractor(ExternalProcess targetProcess,
-            Node node) throws SAXException {
+        public LoadLevelerOptionExtractor(ExternalProcess targetProcess, Node node) throws SAXException {
             final NodeList childNodes = node.getChildNodes();
             final LoadLevelerProcess llProcess = (LoadLevelerProcess) targetProcess;
 
@@ -1263,14 +1151,12 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class LoadLevelerTaskRepartitionExtractor {
-        public LoadLevelerTaskRepartitionExtractor(
-            ExternalProcess targetProcess, Node node)
-            throws SAXException, XPathExpressionException {
+        public LoadLevelerTaskRepartitionExtractor(ExternalProcess targetProcess, Node node)
+                throws SAXException, XPathExpressionException {
             final LoadLevelerProcess llProcess = (LoadLevelerProcess) targetProcess;
 
-            final Node simple = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    LOADLEVELER_TASK_REPARTITION_TAG_SIMPLE, node,
-                    XPathConstants.NODE);
+            final Node simple = (Node) xpath.evaluate(XMLNS_PREFIX + LOADLEVELER_TASK_REPARTITION_TAG_SIMPLE,
+                    node, XPathConstants.NODE);
             if (simple != null) {
                 final NodeList childNodes = simple.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
@@ -1294,8 +1180,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             }
 
             final Node advanced = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    LOADLEVELER_TASK_REPARTITION_TAG_ADVANCED, node,
-                    XPathConstants.NODE);
+                LOADLEVELER_TASK_REPARTITION_TAG_ADVANCED, node, XPathConstants.NODE);
 
             if (advanced != null) {
                 final NodeList childNodes = advanced.getChildNodes();
@@ -1324,8 +1209,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class BSubProcessExtractor extends ProcessExtractor {
-        public BSubProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public BSubProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
 
             Node namedItem = node.getAttributes().getNamedItem("interactive");
@@ -1346,16 +1231,15 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 ((LSFBSubProcess) targetProcess).setJobname(t);
             }
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    BSUB_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX + BSUB_OPTIONS_TAG, node,
+                    XPathConstants.NODE);
             if (optionNode != null) {
                 new BSubOptionsExtractor(targetProcess, optionNode);
             }
         }
 
         protected class BSubOptionsExtractor {
-            public BSubOptionsExtractor(ExternalProcess targetProcess, Node node)
-                throws SAXException {
+            public BSubOptionsExtractor(ExternalProcess targetProcess, Node node) throws SAXException {
                 NodeList childNodes = node.getChildNodes();
                 LSFBSubProcess bSubProcess = (LSFBSubProcess) targetProcess;
 
@@ -1373,8 +1257,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                         String nodeValue = getNodeExpandedValue(childNode);
                         bSubProcess.setProcessorNumber(nodeValue);
                     } else if (nodeName.equals(RES_REQ_TAG)) {
-                        String nodeValue = getNodeExpandedValue(childNode.getAttributes()
-                                                                         .getNamedItem("value"));
+                        String nodeValue = getNodeExpandedValue(childNode.getAttributes().getNamedItem(
+                                "value"));
                         bSubProcess.setRes_requirement(nodeValue);
                     } else if (nodeName.equals(SCRIPT_PATH_TAG)) {
                         String path = getPath(childNode);
@@ -1386,18 +1270,17 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class GlobusProcessExtractor extends ProcessExtractor {
-        public GlobusProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public GlobusProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    GLOBUS_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX + GLOBUS_OPTIONS_TAG, node,
+                    XPathConstants.NODE);
             new GlobusOptionsExtractor(targetProcess, optionNode);
         }
 
         protected class GlobusOptionsExtractor {
-            public GlobusOptionsExtractor(ExternalProcess targetProcess,
-                Node node) throws SAXException {
+            public GlobusOptionsExtractor(ExternalProcess targetProcess, Node node) throws SAXException {
                 GlobusProcess globusProcess = (GlobusProcess) targetProcess;
                 NodeList childNodes = node.getChildNodes();
                 for (int j = 0; j < childNodes.getLength(); ++j) {
@@ -1423,8 +1306,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class GliteProcessExtractor extends ProcessExtractor {
-        public GliteProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public GliteProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
 
             GLiteProcess gliteProcess = ((GLiteProcess) targetProcess);
@@ -1520,10 +1403,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
 
         protected class GliteInputExtractor {
-            public GliteInputExtractor(GLiteProcess gliteProcess, Node node)
-                throws SAXException {
-                Node namedItem = node.getAttributes()
-                                     .getNamedItem("dataAccessProtocol");
+            public GliteInputExtractor(GLiteProcess gliteProcess, Node node) throws SAXException {
+                Node namedItem = node.getAttributes().getNamedItem("dataAccessProtocol");
                 String t = getNodeExpandedValue(namedItem);
                 if (t != null) {
                     gliteProcess.setJobDataAccessProtocol(t);
@@ -1537,8 +1418,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
 
         protected class GliteOptionsExtractor {
-            public GliteOptionsExtractor(GLiteProcess gliteProcess, Node node)
-                throws SAXException {
+            public GliteOptionsExtractor(GLiteProcess gliteProcess, Node node) throws SAXException {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
@@ -1582,8 +1462,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class UnicoreProcessExtractor extends ProcessExtractor {
-        public UnicoreProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public UnicoreProcessExtractor(Node node, Node context) throws XPathExpressionException,
+                SAXException, ProActiveException {
             super(node, context);
             UnicoreProcess unicoreProcess = ((UnicoreProcess) targetProcess);
 
@@ -1635,11 +1515,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
                         String grandChildNodeName = grandChildNode.getNodeName();
                         if (grandChildNodeName.equals(UNICORE_USITE_TAG)) {
-                            new UnicoreUSiteExtractor(grandChildNode,
-                                unicoreProcess);
+                            new UnicoreUSiteExtractor(grandChildNode, unicoreProcess);
                         } else if (grandChildNodeName.equals(UNICORE_VSITE_TAG)) {
-                            new UnicoreVSiteExtractor(grandChildNode,
-                                unicoreProcess);
+                            new UnicoreVSiteExtractor(grandChildNode, unicoreProcess);
                         }
                     }
                 }
@@ -1647,10 +1525,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
 
         protected class UnicoreUSiteExtractor {
-            public UnicoreUSiteExtractor(Node grandChildNode,
-                UnicoreProcess unicoreProcess) throws SAXException {
-                Node namedItem = grandChildNode.getAttributes()
-                                               .getNamedItem("name");
+            public UnicoreUSiteExtractor(Node grandChildNode, UnicoreProcess unicoreProcess)
+                    throws SAXException {
+                Node namedItem = grandChildNode.getAttributes().getNamedItem("name");
                 String t = getNodeExpandedValue(namedItem);
                 if (t != null) {
                     unicoreProcess.uParam.setUsiteName(t);
@@ -1671,10 +1548,9 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
 
         protected class UnicoreVSiteExtractor {
-            public UnicoreVSiteExtractor(Node grandChildNode,
-                UnicoreProcess unicoreProcess) throws SAXException {
-                Node namedItem = grandChildNode.getAttributes()
-                                               .getNamedItem("name");
+            public UnicoreVSiteExtractor(Node grandChildNode, UnicoreProcess unicoreProcess)
+                    throws SAXException {
+                Node namedItem = grandChildNode.getAttributes().getNamedItem("name");
                 String t = getNodeExpandedValue(namedItem);
                 if (t != null) {
                     unicoreProcess.uParam.setVsiteName(t);
@@ -1686,8 +1562,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     unicoreProcess.uParam.setVsiteNodes(Integer.parseInt(t));
                 }
 
-                namedItem = grandChildNode.getAttributes()
-                                          .getNamedItem("processors");
+                namedItem = grandChildNode.getAttributes().getNamedItem("processors");
                 t = getNodeExpandedValue(namedItem);
                 if (t != null) {
                     unicoreProcess.uParam.setVsiteProcessors(Integer.parseInt(t));
@@ -1699,15 +1574,13 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                     unicoreProcess.uParam.setVsiteMemory(Integer.parseInt(t));
                 }
 
-                namedItem = grandChildNode.getAttributes()
-                                          .getNamedItem("runtime");
+                namedItem = grandChildNode.getAttributes().getNamedItem("runtime");
                 t = getNodeExpandedValue(namedItem);
                 if (t != null) {
                     unicoreProcess.uParam.setVsiteRuntime(Integer.parseInt(t));
                 }
 
-                namedItem = grandChildNode.getAttributes()
-                                          .getNamedItem("priority");
+                namedItem = grandChildNode.getAttributes().getNamedItem("priority");
                 t = getNodeExpandedValue(namedItem);
                 if (t != null) {
                     unicoreProcess.uParam.setVsitePriority(t);
@@ -1717,24 +1590,22 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class PrunProcessExtractor extends ProcessExtractor {
-        public PrunProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public PrunProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
 
-            String queueName = getNodeExpandedValue(node.getAttributes()
-                                                        .getNamedItem("value"));
+            String queueName = getNodeExpandedValue(node.getAttributes().getNamedItem("value"));
             if (queueName != null) {
                 ((PrunSubProcess) targetProcess).setQueueName(queueName);
             }
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    PRUN_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX + PRUN_OPTIONS_TAG, node,
+                    XPathConstants.NODE);
             new PrunOptionsExtractor((PrunSubProcess) targetProcess, optionNode);
         }
 
         protected class PrunOptionsExtractor {
-            public PrunOptionsExtractor(PrunSubProcess prunSubProcess, Node node)
-                throws SAXException {
+            public PrunOptionsExtractor(PrunSubProcess prunSubProcess, Node node) throws SAXException {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
@@ -1761,31 +1632,28 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class PbsProcessExtractor extends ProcessExtractor {
-        public PbsProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public PbsProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
             PBSSubProcess pbsSubProcess = (PBSSubProcess) targetProcess;
 
-            String interactive = getNodeExpandedValue(node.getAttributes()
-                                                          .getNamedItem("interactive"));
+            String interactive = getNodeExpandedValue(node.getAttributes().getNamedItem("interactive"));
             if (interactive != null) {
                 pbsSubProcess.setInteractive(interactive);
             }
 
-            String queueName = getNodeExpandedValue(node.getAttributes()
-                                                        .getNamedItem("queueName"));
+            String queueName = getNodeExpandedValue(node.getAttributes().getNamedItem("queueName"));
             if (queueName != null) {
                 pbsSubProcess.setQueueName(queueName);
             }
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    PBS_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath
+                    .evaluate(XMLNS_PREFIX + PBS_OPTIONS_TAG, node, XPathConstants.NODE);
             new PbsOptionsExtractor(pbsSubProcess, optionNode);
         }
 
         protected class PbsOptionsExtractor {
-            public PbsOptionsExtractor(PBSSubProcess pbsSubProcess, Node node)
-                throws SAXException {
+            public PbsOptionsExtractor(PBSSubProcess pbsSubProcess, Node node) throws SAXException {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
@@ -1815,25 +1683,23 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class GridEngineProcessExtractor extends ProcessExtractor {
-        public GridEngineProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public GridEngineProcessExtractor(Node node, Node context) throws XPathExpressionException,
+                SAXException, ProActiveException {
             super(node, context);
             GridEngineSubProcess gridEngineSubProcess = (GridEngineSubProcess) targetProcess;
-            String queueName = getNodeExpandedValue(node.getAttributes()
-                                                        .getNamedItem("queue"));
+            String queueName = getNodeExpandedValue(node.getAttributes().getNamedItem("queue"));
             if (queueName != null) {
                 gridEngineSubProcess.setQueueName(queueName);
             }
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    GRID_ENGINE_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX + GRID_ENGINE_OPTIONS_TAG, node,
+                    XPathConstants.NODE);
             new GridEngineOptionsExtractor(gridEngineSubProcess, optionNode);
         }
 
         protected class GridEngineOptionsExtractor {
-            public GridEngineOptionsExtractor(
-                GridEngineSubProcess gridEngineSubProcess, Node node)
-                throws SAXException {
+            public GridEngineOptionsExtractor(GridEngineSubProcess gridEngineSubProcess, Node node)
+                    throws SAXException {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
@@ -1863,40 +1729,37 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class OARProcessExtractor extends ProcessExtractor {
-        public OARProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public OARProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
 
-            String interactive = getNodeExpandedValue(node.getAttributes()
-                                                          .getNamedItem("interactive"));
+            String interactive = getNodeExpandedValue(node.getAttributes().getNamedItem("interactive"));
 
             OARSubProcess oarSubProcess = ((OARSubProcess) targetProcess);
             if (interactive != null) {
                 oarSubProcess.setInteractive(interactive);
             }
 
-            String queueName = getNodeExpandedValue(node.getAttributes()
-                                                        .getNamedItem("queue"));
+            String queueName = getNodeExpandedValue(node.getAttributes().getNamedItem("queue"));
 
             if (queueName != null) {
                 oarSubProcess.setQueueName(queueName);
             }
 
-            String accessProtocol = getNodeExpandedValue(node.getAttributes()
-                                                             .getNamedItem("bookedNodesAccess"));
+            String accessProtocol = getNodeExpandedValue(node.getAttributes().getNamedItem(
+                    "bookedNodesAccess"));
 
             if (accessProtocol != null) {
                 oarSubProcess.setAccessProtocol(accessProtocol);
             }
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    OAR_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath
+                    .evaluate(XMLNS_PREFIX + OAR_OPTIONS_TAG, node, XPathConstants.NODE);
             new OAROptionsExtractor(oarSubProcess, optionNode);
         }
 
         protected class OAROptionsExtractor {
-            public OAROptionsExtractor(OARSubProcess oarSubProcess, Node node)
-                throws SAXException {
+            public OAROptionsExtractor(OARSubProcess oarSubProcess, Node node) throws SAXException {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
@@ -1918,11 +1781,10 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class OARGridProcessExtractor extends ProcessExtractor {
-        public OARGridProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public OARGridProcessExtractor(Node node, Node context) throws XPathExpressionException,
+                SAXException, ProActiveException {
             super(node, context);
-            String queueName = getNodeExpandedValue(node.getAttributes()
-                                                        .getNamedItem("queue"));
+            String queueName = getNodeExpandedValue(node.getAttributes().getNamedItem("queue"));
 
             OARGRIDSubProcess oarGridSubProcess = ((OARGRIDSubProcess) targetProcess);
 
@@ -1930,22 +1792,21 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
                 oarGridSubProcess.setQueueName(queueName);
             }
 
-            String accessProtocol = getNodeExpandedValue(node.getAttributes()
-                                                             .getNamedItem("bookedNodesAccess"));
+            String accessProtocol = getNodeExpandedValue(node.getAttributes().getNamedItem(
+                    "bookedNodesAccess"));
 
             if (accessProtocol != null) {
                 oarGridSubProcess.setAccessProtocol(accessProtocol);
             }
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    OARGRID_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX + OARGRID_OPTIONS_TAG, node,
+                    XPathConstants.NODE);
             new OARGridOptionsExtractor(oarGridSubProcess, optionNode);
         }
 
         protected class OARGridOptionsExtractor {
-            public OARGridOptionsExtractor(
-                OARGRIDSubProcess oarGridSubProcess, Node node)
-                throws SAXException {
+            public OARGridOptionsExtractor(OARGRIDSubProcess oarGridSubProcess, Node node)
+                    throws SAXException {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
@@ -1969,34 +1830,31 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class MPIProcessExtractor extends ProcessExtractor {
-        public MPIProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public MPIProcessExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
-            String mpiFileName = getNodeExpandedValue(node.getAttributes()
-                                                          .getNamedItem("mpiFileName"));
+            String mpiFileName = getNodeExpandedValue(node.getAttributes().getNamedItem("mpiFileName"));
             MPIProcess mpiProcess = ((MPIProcess) targetProcess);
             if (mpiFileName != null) {
                 mpiProcess.setMpiFileName(mpiFileName);
             }
-            String hostsFileName = getNodeExpandedValue(node.getAttributes()
-                                                            .getNamedItem("hostsFileName"));
+            String hostsFileName = getNodeExpandedValue(node.getAttributes().getNamedItem("hostsFileName"));
             if (hostsFileName != null) {
                 mpiProcess.setHostsFileName(hostsFileName);
             }
-            String mpiCommandOptions = getNodeExpandedValue(node.getAttributes()
-                                                                .getNamedItem("mpiCommandOptions"));
+            String mpiCommandOptions = getNodeExpandedValue(node.getAttributes().getNamedItem(
+                    "mpiCommandOptions"));
             if (mpiCommandOptions != null) {
                 mpiProcess.setMpiCommandOptions(mpiCommandOptions);
             }
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    MPI_PROCESS_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX + MPI_PROCESS_OPTIONS_TAG, node,
+                    XPathConstants.NODE);
             new MPIOptionsExtractor(mpiProcess, optionNode);
         }
 
         protected class MPIOptionsExtractor {
-            public MPIOptionsExtractor(MPIProcess mpiProcess, Node node)
-                throws SAXException {
+            public MPIOptionsExtractor(MPIProcess mpiProcess, Node node) throws SAXException {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
@@ -2021,73 +1879,65 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         }
     }
 
-    protected class DependentProcessSequenceExtractor
-        extends BasicProcessExtractor {
-        public DependentProcessSequenceExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+    protected class DependentProcessSequenceExtractor extends BasicProcessExtractor {
+        public DependentProcessSequenceExtractor(Node node, Node context) throws XPathExpressionException,
+                SAXException, ProActiveException {
             super(node, context);
 
-            NodeList processRefs = (NodeList) xpath.evaluate(XMLNS_PREFIX +
-                    PROCESS_REFERENCE_TAG + "/@refid", node,
-                    XPathConstants.NODESET);
+            NodeList processRefs = (NodeList) xpath.evaluate(
+                    XMLNS_PREFIX + PROCESS_REFERENCE_TAG + "/@refid", node, XPathConstants.NODESET);
             for (int i = 0; i < processRefs.getLength(); ++i) {
                 Node item = processRefs.item(i);
                 proActiveDescriptor.addProcessToSequenceList((DependentListProcess) targetProcess,
-                    getNodeExpandedValue(item));
+                        getNodeExpandedValue(item));
             }
 
-            NodeList serviceRefs = (NodeList) xpath.evaluate(XMLNS_PREFIX +
-                    SERVICE_REFERENCE_TAG + "/@refid", node,
-                    XPathConstants.NODESET);
+            NodeList serviceRefs = (NodeList) xpath.evaluate(
+                    XMLNS_PREFIX + SERVICE_REFERENCE_TAG + "/@refid", node, XPathConstants.NODESET);
             for (int i = 0; i < serviceRefs.getLength(); ++i) {
                 Node item = serviceRefs.item(i);
                 proActiveDescriptor.addServiceToSequenceList((DependentListProcess) targetProcess,
-                    getNodeExpandedValue(item));
+                        getNodeExpandedValue(item));
             }
         }
     }
 
     protected class SequentialProcessExtractor extends BasicProcessExtractor {
-        public SequentialProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public SequentialProcessExtractor(Node node, Node context) throws XPathExpressionException,
+                SAXException, ProActiveException {
             super(node, context);
-            NodeList processRefs = (NodeList) xpath.evaluate(XMLNS_PREFIX +
-                    PROCESS_REFERENCE_TAG + "/@refid", node,
-                    XPathConstants.NODESET);
+            NodeList processRefs = (NodeList) xpath.evaluate(
+                    XMLNS_PREFIX + PROCESS_REFERENCE_TAG + "/@refid", node, XPathConstants.NODESET);
             for (int i = 0; i < processRefs.getLength(); ++i) {
                 Node item = processRefs.item(i);
                 proActiveDescriptor.addProcessToSequenceList((DependentListProcess) targetProcess,
-                    getNodeExpandedValue(item));
+                        getNodeExpandedValue(item));
             }
         }
     }
 
     protected class NGProcessExtractor extends ProcessExtractor {
-        public NGProcessExtractor(Node node, Node infrastructureContext)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public NGProcessExtractor(Node node, Node infrastructureContext) throws XPathExpressionException,
+                SAXException, ProActiveException {
             super(node, infrastructureContext);
 
-            String jobname = getNodeExpandedValue(node.getAttributes()
-                                                      .getNamedItem("jobname"));
+            String jobname = getNodeExpandedValue(node.getAttributes().getNamedItem("jobname"));
             NGProcess ngProcess = ((NGProcess) targetProcess);
             if (jobname != null) {
                 ngProcess.setJobname(jobname);
             }
 
-            String queueName = getNodeExpandedValue(node.getAttributes()
-                                                        .getNamedItem("queue"));
+            String queueName = getNodeExpandedValue(node.getAttributes().getNamedItem("queue"));
             if (queueName != null) {
                 ngProcess.setQueue(queueName);
             }
 
-            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX +
-                    NG_OPTIONS_TAG, node, XPathConstants.NODE);
+            Node optionNode = (Node) xpath.evaluate(XMLNS_PREFIX + NG_OPTIONS_TAG, node, XPathConstants.NODE);
             new NGOptionsExtractor(ngProcess, optionNode);
         }
 
         protected class NGOptionsExtractor {
-            public NGOptionsExtractor(NGProcess ngProcess, Node node)
-                throws SAXException {
+            public NGOptionsExtractor(NGProcess ngProcess, Node node) throws SAXException {
                 NodeList childNodes = node.getChildNodes();
                 for (int i = 0; i < childNodes.getLength(); ++i) {
                     Node childNode = childNodes.item(i);
@@ -2114,8 +1964,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     }
 
     protected class ClusterForkProcessExtractor extends ProcessExtractor {
-        public ClusterForkProcessExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public ClusterForkProcessExtractor(Node node, Node context) throws XPathExpressionException,
+                SAXException, ProActiveException {
             super(node, context);
         }
     }
@@ -2123,25 +1973,18 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
     protected class ProcessListExtractor extends ProcessExtractor {
         private String heldProcessRegistrationRefId;
 
-        public ProcessListExtractor(Node node, Node context)
-            throws XPathExpressionException, SAXException, ProActiveException {
+        public ProcessListExtractor(Node node, Node context) throws XPathExpressionException, SAXException,
+                ProActiveException {
             super(node, context);
 
-            String closeStream = getNodeExpandedValue(node.getAttributes()
-                                                          .getNamedItem("closeStream"));
+            String closeStream = getNodeExpandedValue(node.getAttributes().getNamedItem("closeStream"));
 
-            String fixedName = getNodeExpandedValue(node.getAttributes()
-                                                        .getNamedItem("fixedName"));
-            String list = getNodeExpandedValue(node.getAttributes()
-                                                   .getNamedItem("list"));
-            String domain = getNodeExpandedValue(node.getAttributes()
-                                                     .getNamedItem("domain"));
-            String spadding = getNodeExpandedValue(node.getAttributes()
-                                                       .getNamedItem("padding"));
-            String hostlist = getNodeExpandedValue(node.getAttributes()
-                                                       .getNamedItem("hostlist"));
-            String srepeat = getNodeExpandedValue(node.getAttributes()
-                                                      .getNamedItem("repeat"));
+            String fixedName = getNodeExpandedValue(node.getAttributes().getNamedItem("fixedName"));
+            String list = getNodeExpandedValue(node.getAttributes().getNamedItem("list"));
+            String domain = getNodeExpandedValue(node.getAttributes().getNamedItem("domain"));
+            String spadding = getNodeExpandedValue(node.getAttributes().getNamedItem("padding"));
+            String hostlist = getNodeExpandedValue(node.getAttributes().getNamedItem("hostlist"));
+            String srepeat = getNodeExpandedValue(node.getAttributes().getNamedItem("repeat"));
 
             int padding = 0;
             int repeat = 1;
@@ -2155,8 +1998,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             AbstractListProcessDecorator listProcessDecorator = ((AbstractListProcessDecorator) targetProcess);
             if ((fixedName != null) && (list != null)) {
-                listProcessDecorator.setHostConfig(fixedName, list, domain,
-                    padding, repeat);
+                listProcessDecorator.setHostConfig(fixedName, list, domain, padding, repeat);
             }
 
             if (hostlist != null) {
@@ -2164,16 +2006,14 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             }
             if (heldProcessRegistrationRefId != null) {
                 ExternalProcessDecorator cep = (ExternalProcessDecorator) targetProcess;
-                proActiveDescriptor.registerProcess(cep,
-                    heldProcessRegistrationRefId);
+                proActiveDescriptor.registerProcess(cep, heldProcessRegistrationRefId);
             }
 
             if ((closeStream != null) && closeStream.equals("yes")) {
                 targetProcess.closeStream();
             }
 
-            String username = getNodeExpandedValue(node.getAttributes()
-                                                       .getNamedItem("username"));
+            String username = getNodeExpandedValue(node.getAttributes().getNamedItem("username"));
 
             if (username != null) {
                 targetProcess.setUsername(username);
@@ -2263,8 +2103,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             return null;
         }
 
-        String origin = getNodeExpandedValue(pathNode.getAttributes()
-                                                     .getNamedItem(ORIGIN_ATTRIBUTE));
+        String origin = getNodeExpandedValue(pathNode.getAttributes().getNamedItem(ORIGIN_ATTRIBUTE));
 
         if (origin == null) {
             origin = DEFAULT_ORIGIN;
@@ -2284,8 +2123,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             } else if (origin.equals(FROM_CLASSPATH_ORIGIN)) {
                 res = resolvePathFromClasspath(value);
             } else {
-                throw new org.xml.sax.SAXException(
-                    "Relative Path element defined with an unknown origin=" +
+                throw new org.xml.sax.SAXException("Relative Path element defined with an unknown origin=" +
                     origin);
             }
         }
@@ -2319,8 +2157,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
         return (n != null) && checkNonEmptyString(n.getNodeValue());
     }
 
-    protected String interpolateVariables(String value)
-        throws SAXException {
+    protected String interpolateVariables(String value) throws SAXException {
         if (org.objectweb.proactive.core.xml.VariableContract.xmlproperties != null) {
             value = org.objectweb.proactive.core.xml.VariableContract.xmlproperties.transform(value.trim());
         }
@@ -2336,8 +2173,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             return interpolateVariables(n.getNodeValue());
         }
 
-        if ((n.getNodeType() == Node.ELEMENT_NODE) &&
-                checkNonEmptyString(n.getTextContent())) {
+        if ((n.getNodeType() == Node.ELEMENT_NODE) && checkNonEmptyString(n.getTextContent())) {
             return interpolateVariables(n.getTextContent().trim());
         }
 

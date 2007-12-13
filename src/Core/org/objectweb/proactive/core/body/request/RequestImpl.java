@@ -60,10 +60,10 @@ import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
 
-public class RequestImpl extends MessageImpl implements Request,
-    java.io.Serializable {
+public class RequestImpl extends MessageImpl implements Request, java.io.Serializable {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.REQUESTS);
-    private static final Logger oneWayExceptionsLogger = ProActiveLogger.getLogger(Loggers.EXCEPTIONS_ONE_WAY);
+    private static final Logger oneWayExceptionsLogger = ProActiveLogger
+            .getLogger(Loggers.EXCEPTIONS_ONE_WAY);
     protected MethodCall methodCall;
     protected boolean ciphered;
 
@@ -90,8 +90,7 @@ public class RequestImpl extends MessageImpl implements Request,
     //
 
     // Constructor of simple requests
-    public RequestImpl(MethodCall methodCall, UniversalBody sender,
-        boolean isOneWay, long nextSequenceID) {
+    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID) {
         super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
         this.sender = sender;
@@ -107,8 +106,8 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     // Constructor of non functional requests without priority
-    public RequestImpl(MethodCall methodCall, UniversalBody sender,
-        boolean isOneWay, long nextSequenceID, boolean isNFRequest) {
+    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
+            boolean isNFRequest) {
         super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
         this.sender = sender;
@@ -125,9 +124,8 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     // Constructor of non functional requests with priority
-    public RequestImpl(MethodCall methodCall, UniversalBody sender,
-        boolean isOneWay, long nextSequenceID, boolean isNFRequest,
-        int nfRequestPriority) {
+    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
+            boolean isNFRequest, int nfRequestPriority) {
         super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
         this.methodCall = methodCall;
         this.sender = sender;
@@ -163,8 +161,7 @@ public class RequestImpl extends MessageImpl implements Request,
     //
     // -- Implements Request -----------------------------------------------
     //
-    public int send(UniversalBody destinationBody)
-        throws java.io.IOException, RenegotiateSessionException,
+    public int send(UniversalBody destinationBody) throws java.io.IOException, RenegotiateSessionException,
             CommunicationForbiddenException {
         //System.out.println("RequestSender: sendRequest  " + methodName + " to destination");
         this.sendCounter++;
@@ -217,8 +214,7 @@ public class RequestImpl extends MessageImpl implements Request,
         return this.methodCall;
     }
 
-    public void notifyReception(UniversalBody bodyReceiver)
-        throws java.io.IOException {
+    public void notifyReception(UniversalBody bodyReceiver) throws java.io.IOException {
         if (!hasBeenForwarded()) {
             return;
         }
@@ -227,16 +223,14 @@ public class RequestImpl extends MessageImpl implements Request,
         //we know c.res is a remoteBody since the call has been forwarded
         //if it is null, this is a one way call
         if (this.sender != null) {
-            this.sender.updateLocation(bodyReceiver.getID(),
-                bodyReceiver.getRemoteAdapter());
+            this.sender.updateLocation(bodyReceiver.getID(), bodyReceiver.getRemoteAdapter());
         }
     }
 
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
-    protected MethodCallResult serveInternal(Body targetBody)
-        throws ServeException {
+    protected MethodCallResult serveInternal(Body targetBody) throws ServeException {
         Object result = null;
         Throwable exception = null;
         try {
@@ -251,19 +245,18 @@ public class RequestImpl extends MessageImpl implements Request,
     }
 
     protected Reply createReply(Body targetBody, MethodCallResult result) {
-        ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager();
+        ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis())
+                .getProActiveSecurityManager();
 
-        return new ReplyImpl(targetBody.getID(), this.sequenceNumber,
-            this.methodName, result, psm);
+        return new ReplyImpl(targetBody.getID(), this.sequenceNumber, this.methodName, result, psm);
     }
 
-    public boolean crypt(ProActiveSecurityManager psm,
-        SecurityEntity destinationBody) throws RenegotiateSessionException {
+    public boolean crypt(ProActiveSecurityManager psm, SecurityEntity destinationBody)
+            throws RenegotiateSessionException {
         try {
             if (logger.isDebugEnabled()) {
-                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
-                               .debug(" sending request " +
-                    this.methodCall.getName());
+                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug(
+                        " sending request " + this.methodCall.getName());
             }
             if (!this.ciphered && !hasBeenForwarded()) {
                 this.sessionID = 0;
@@ -272,20 +265,17 @@ public class RequestImpl extends MessageImpl implements Request,
                     logger.warn("sender is null but why ?");
                 }
 
-                this.sessionID = psm.getSessionTo(destinationBody.getCertificate())
-                                    .getDistantSessionID();
+                this.sessionID = psm.getSessionTo(destinationBody.getCertificate()).getDistantSessionID();
                 long id = psm.getSessionIDTo(destinationBody.getCertificate());
 
                 if (id != 0) {
-                    this.methodCallCiphered = psm.encrypt(id, this.methodCall,
-                            ActAs.CLIENT);
+                    this.methodCallCiphered = psm.encrypt(id, this.methodCall, ActAs.CLIENT);
                     this.ciphered = true;
                     this.methodCall = null;
                     if (logger.isDebugEnabled()) {
-                        ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
-                                       .debug("methodcallciphered " +
-                            this.methodCallCiphered + ", ciphered " +
-                            this.ciphered + ", methodCall " + this.methodCall);
+                        ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug(
+                                "methodcallciphered " + this.methodCallCiphered + ", ciphered " +
+                                    this.ciphered + ", methodCall " + this.methodCall);
                     }
                 }
             }
@@ -303,15 +293,14 @@ public class RequestImpl extends MessageImpl implements Request,
         return true;
     }
 
-    protected int sendRequest(UniversalBody destinationBody)
-        throws IOException, RenegotiateSessionException,
+    protected int sendRequest(UniversalBody destinationBody) throws IOException, RenegotiateSessionException,
             CommunicationForbiddenException {
-        ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis()).getProActiveSecurityManager();
+        ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis())
+                .getProActiveSecurityManager();
         if (psm != null) {
             try {
-                if (!psm.getSessionTo(destinationBody.getCertificate())
-                            .getSecurityContext().getSendRequest()
-                            .getCommunication()) {
+                if (!psm.getSessionTo(destinationBody.getCertificate()).getSecurityContext().getSendRequest()
+                        .getCommunication()) {
                     throw new CommunicationForbiddenException();
                 }
             } catch (SecurityNotAvailableException e) {
@@ -330,26 +319,25 @@ public class RequestImpl extends MessageImpl implements Request,
         return this.ciphered;
     }
 
-    public boolean decrypt(ProActiveSecurityManager psm)
-        throws RenegotiateSessionException {
+    public boolean decrypt(ProActiveSecurityManager psm) throws RenegotiateSessionException {
         //  String localCodeBase = null;
         //     if (ciphered) {
-        ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
-                       .debug(" RequestImpl " + this.sessionID +
-            " decrypt : methodcallciphered " + this.methodCallCiphered +
-            ", ciphered " + this.ciphered + ", methodCall " + this.methodCall);
+        ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug(
+                " RequestImpl " + this.sessionID + " decrypt : methodcallciphered " +
+                    this.methodCallCiphered + ", ciphered " + this.ciphered + ", methodCall " +
+                    this.methodCall);
 
         if ((this.ciphered) && (psm != null)) {
             try {
-                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST)
-                               .debug("ReceiveRequest : this body is " +
-                    psm.getCertificate().getCert().getSubjectDN() + " " +
-                    psm.getCertificate().getCert().getPublicKey());
-                byte[] decryptedMethodCall = psm.decrypt(this.sessionID,
-                        this.methodCallCiphered, ActAs.SERVER);
+                ProActiveLogger.getLogger(Loggers.SECURITY_REQUEST).debug(
+                        "ReceiveRequest : this body is " + psm.getCertificate().getCert().getSubjectDN() +
+                            " " + psm.getCertificate().getCert().getPublicKey());
+                byte[] decryptedMethodCall = psm.decrypt(this.sessionID, this.methodCallCiphered,
+                        ActAs.SERVER);
 
                 //ProActiveLogger.getLogger("security.request").debug("ReceiveRequest :method call apres decryption : " +  ProActiveSecurityManager.displayByte(decryptedMethodCall));
-                this.methodCall = (MethodCall) ByteToObjectConverter.MarshallStream.convert(decryptedMethodCall);
+                this.methodCall = (MethodCall) ByteToObjectConverter.MarshallStream
+                        .convert(decryptedMethodCall);
                 this.ciphered = false;
 
                 //  logger.info("After decoding method call  seq id " +sequenceNumber + ":" + ciphered + ":" + sessionID + "  "+ methodCall + ":" +methodCallCiphered);
@@ -392,13 +380,10 @@ public class RequestImpl extends MessageImpl implements Request,
     // -- PRIVATE METHODS FOR SERIALIZATION
     // -----------------------------------------------
     //
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws java.io.IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
         if ((Profiling.TIMERS_COMPILED) && (this.sourceID != null)) {
-            TimerWarehouse.stopTimer(this.sourceID,
-                TimerWarehouse.BEFORE_SERIALIZATION);
-            TimerWarehouse.startTimer(this.sourceID,
-                TimerWarehouse.SERIALIZATION);
+            TimerWarehouse.stopTimer(this.sourceID, TimerWarehouse.BEFORE_SERIALIZATION);
+            TimerWarehouse.startTimer(this.sourceID, TimerWarehouse.SERIALIZATION);
         }
 
         out.defaultWriteObject();
@@ -410,13 +395,11 @@ public class RequestImpl extends MessageImpl implements Request,
 
         if ((Profiling.TIMERS_COMPILED) && (this.sourceID != null)) {
             TimerWarehouse.stopTimer(this.sourceID, TimerWarehouse.SERIALIZATION);
-            TimerWarehouse.startTimer(this.sourceID,
-                TimerWarehouse.AFTER_SERIALIZATION);
+            TimerWarehouse.startTimer(this.sourceID, TimerWarehouse.AFTER_SERIALIZATION);
         }
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.sender = (UniversalBody) in.readObject(); // it is actually a UniversalBody
     }

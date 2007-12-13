@@ -90,8 +90,8 @@ public class ProActiveBranchNBound {
      * @see Task
      * @see TaskQueue
      */
-    public static Manager newBnB(Task root, Node managerNode, Node[] nodes,
-        String queueType) throws ActiveObjectCreationException, NodeException {
+    public static Manager newBnB(Task root, Node managerNode, Node[] nodes, String queueType)
+            throws ActiveObjectCreationException, NodeException {
         Object[] args = new Object[4];
         args[0] = root;
         args[1] = managerNode;
@@ -120,8 +120,8 @@ public class ProActiveBranchNBound {
      * @see Task
      * @see TaskQueue
      */
-    public static Manager newBnB(Task root, VirtualNode virtualNode,
-        String queueType) throws ActiveObjectCreationException, NodeException {
+    public static Manager newBnB(Task root, VirtualNode virtualNode, String queueType)
+            throws ActiveObjectCreationException, NodeException {
         virtualNode.activate();
         Object[] args = new Object[4];
         args[0] = root;
@@ -153,8 +153,8 @@ public class ProActiveBranchNBound {
      * @see Task
      * @see TaskQueue
      */
-    public static Manager newBnB(Task root, Node managerNode, Node[][] nodes,
-        String queueType) throws ActiveObjectCreationException, NodeException {
+    public static Manager newBnB(Task root, Node managerNode, Node[][] nodes, String queueType)
+            throws ActiveObjectCreationException, NodeException {
         Object[] args = new Object[4];
         args[0] = root;
         args[1] = managerNode;
@@ -189,8 +189,8 @@ public class ProActiveBranchNBound {
      * @see Task
      * @see TaskQueue
      */
-    public static Manager newBnB(Task root, VirtualNode[] virtualNodes,
-        String queueType) throws ActiveObjectCreationException, NodeException {
+    public static Manager newBnB(Task root, VirtualNode[] virtualNodes, String queueType)
+            throws ActiveObjectCreationException, NodeException {
         Object[] args = new Object[4];
         args[0] = root;
         args[1] = null;
@@ -225,25 +225,20 @@ public class ProActiveBranchNBound {
      *
      * @see org.objectweb.proactive.branchnbound.core.Manage
      */
-    private static Manager activingTheManager(Object[] args)
-        throws ActiveObjectCreationException, NodeException {
+    private static Manager activingTheManager(Object[] args) throws ActiveObjectCreationException,
+            NodeException {
         assert args.length == 4 : args;
         if (logger.isDebugEnabled()) {
-            logger.debug("New Active Manager with these arguments:\n" + "\t" +
-                args[0].getClass().getName() + "\n" + "\t" +
-                args[1].getClass().getName() + "\n" + "\t" +
-                args[2].getClass().getName() + "\n" + "\t" +
-                args[3].getClass().getName() + "\n");
+            logger.debug("New Active Manager with these arguments:\n" + "\t" + args[0].getClass().getName() +
+                "\n" + "\t" + args[1].getClass().getName() + "\n" + "\t" + args[2].getClass().getName() +
+                "\n" + "\t" + args[3].getClass().getName() + "\n");
         }
         assert args[0] instanceof Task : args[0];
-        args[1] = (args[1] == null) ? NodeFactory.getDefaultNode()
-                                    : (Node) args[1];
+        args[1] = (args[1] == null) ? NodeFactory.getDefaultNode() : (Node) args[1];
         assert args[1] instanceof Node : args[1];
-        assert args[2] instanceof Node[] || args[2] instanceof Node[][] ||
-        args[2] instanceof VirtualNode[] : args[2];
+        assert args[2] instanceof Node[] || args[2] instanceof Node[][] || args[2] instanceof VirtualNode[] : args[2];
         assert args[3] instanceof String : args[3];
 
-        return (Manager) PAActiveObject.newActive(Manager.class.getName(),
-            args, (Node) args[1]);
+        return (Manager) PAActiveObject.newActive(Manager.class.getName(), args, (Node) args[1]);
     }
 }

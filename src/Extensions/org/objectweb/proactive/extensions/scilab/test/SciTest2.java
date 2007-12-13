@@ -62,15 +62,15 @@ public class SciTest2 {
         scilab.deployEngine(nameVN, pathVN, new String[] { "Scilab" });
 
         scilab.addEventListenerTask(new MSEventListener() {
-                public void actionPerformed(MSEvent evt) {
-                    GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
+            public void actionPerformed(MSEvent evt) {
+                GenTaskInfo sciTaskInfo = (GenTaskInfo) evt.getSource();
 
-                    if (sciTaskInfo.getState() == GenTaskInfo.SUCCEEDED) {
-                        displayResult(sciTaskInfo);
-                        return;
-                    }
+                if (sciTaskInfo.getState() == GenTaskInfo.SUCCEEDED) {
+                    displayResult(sciTaskInfo);
+                    return;
                 }
-            });
+            }
+        });
 
         AbstractGeneralTask task = new SciTask("id");
         task.setJobInit("n = 10;");

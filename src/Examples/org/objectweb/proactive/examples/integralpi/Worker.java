@@ -86,8 +86,7 @@ public class Worker implements Serializable {
         // ProActive initialization
         rank = PASPMD.getMyRank();
         groupSize = PASPMD.getMySPMDGroupSize();
-        workersArray = (Worker[]) PAGroup.getGroup(PASPMD.getSPMDGroup())
-                                         .toArray(new Worker[0]);
+        workersArray = (Worker[]) PAGroup.getGroup(PASPMD.getSPMDGroup()).toArray(new Worker[0]);
         body = PAActiveObject.getBodyOnThis();
 
         if (this.rank == 0) {
@@ -125,8 +124,7 @@ public class Worker implements Serializable {
 
         long elapsedTime = (System.currentTimeMillis() - startTime);
 
-        System.out.println("\n\t Worker " + rank + " Calculated x = " + sum +
-            " in " + elapsedTime + " ms\n");
+        System.out.println("\n\t Worker " + rank + " Calculated x = " + sum + " in " + elapsedTime + " ms\n");
 
         return new DoubleWrapper(sum);
     }

@@ -74,8 +74,7 @@ public class Jacobi {
         ProActiveDescriptor proActiveDescriptor = null;
         String[] nodes = null;
         try {
-            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" +
-                    args[0]);
+            proActiveDescriptor = PADeployment.getProactiveDescriptor("file:" + args[0]);
         } catch (ProActiveException e) {
             System.err.println("** ProActiveException **");
             e.printStackTrace();
@@ -100,8 +99,7 @@ public class Jacobi {
 
         SubMatrix matrix = null;
         try {
-            matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(),
-                    params, nodes);
+            matrix = (SubMatrix) PASPMD.newSPMDGroup(SubMatrix.class.getName(), params, nodes);
         } catch (ClassNotFoundException e) {
             System.err.println("** ClassNotFoundException **");
         } catch (ClassNotReifiableException e) {

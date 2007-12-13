@@ -168,16 +168,14 @@ public class CommandBuilderProActive implements CommandBuilder {
 
     public void setLog4jProperties(PathElement pe) {
         if (pe != null) {
-            GCMD_LOGGER.trace(" Set log4jProperties relpath to " +
-                pe.getRelPath());
+            GCMD_LOGGER.trace(" Set log4jProperties relpath to " + pe.getRelPath());
             log4jProperties = pe;
         }
     }
 
     public void setSecurityPolicy(PathElement pe) {
         if (pe != null) {
-            GCMD_LOGGER.trace(" Set securityPolicy relpath to " +
-                pe.getRelPath());
+            GCMD_LOGGER.trace(" Set securityPolicy relpath to " + pe.getRelPath());
             securityPolicy = pe;
         }
     }
@@ -188,8 +186,7 @@ public class CommandBuilderProActive implements CommandBuilder {
 
     public void setUserProperties(PathElement userProperties) {
         if (userProperties != null) {
-            GCMD_LOGGER.trace(" Set userProperties relpath to " +
-                userProperties.getRelPath());
+            GCMD_LOGGER.trace(" Set userProperties relpath to " + userProperties.getRelPath());
             this.userProperties = userProperties;
         }
     }
@@ -266,17 +263,16 @@ public class CommandBuilderProActive implements CommandBuilder {
     }
 
     public String buildCommand(HostInfo hostInfo, GCMApplicationDescriptor gcma) {
-        if ((proActivePath == null) &&
-                (hostInfo.getTool(Tools.PROACTIVE.id) == null)) {
+        if ((proActivePath == null) && (hostInfo.getTool(Tools.PROACTIVE.id) == null)) {
             throw new IllegalStateException(
                 "ProActive installation path must be specified with the relpath attribute inside the proactive element (GCMA), or as tool in all hostInfo elements (GCMD). HostInfo=" +
-                hostInfo.getId());
+                    hostInfo.getId());
         }
 
         if (!hostInfo.isCapacitiyValid()) {
             throw new IllegalStateException(
                 "To enable capacity autodetection nor VM Capacity nor Host Capacity must be specified. HostInfo=" +
-                hostInfo.getId());
+                    hostInfo.getId());
         }
 
         StringBuilder command = new StringBuilder();
@@ -320,26 +316,22 @@ public class CommandBuilderProActive implements CommandBuilder {
         try {
             parentURL = RuntimeFactory.getDefaultRuntime().getURL();
         } catch (ProActiveException e) {
-            GCMD_LOGGER.error("Cannot determine the URL of this runtime. Childs will not be able to register",
-                e);
+            GCMD_LOGGER.error(
+                    "Cannot determine the URL of this runtime. Childs will not be able to register", e);
             parentURL = "unkownParentURL";
         }
-        command.append("-" + StartRuntime.Params.parent.shortOpt() + " " +
-            parentURL);
+        command.append("-" + StartRuntime.Params.parent.shortOpt() + " " + parentURL);
         command.append(" ");
 
         if (hostInfo.getVmCapacity() != 0) {
-            command.append("-" + StartRuntime.Params.capacity.shortOpt() + " " +
-                hostInfo.getVmCapacity());
+            command.append("-" + StartRuntime.Params.capacity.shortOpt() + " " + hostInfo.getVmCapacity());
             command.append(" ");
         }
 
-        command.append("-" + StartRuntime.Params.topologyId.shortOpt() + " " +
-            hostInfo.getToplogyId());
+        command.append("-" + StartRuntime.Params.topologyId.shortOpt() + " " + hostInfo.getToplogyId());
         command.append(" ");
 
-        command.append("-" + StartRuntime.Params.deploymentId.shortOpt() + " " +
-            gcma.getDeploymentId());
+        command.append("-" + StartRuntime.Params.deploymentId.shortOpt() + " " + gcma.getDeploymentId());
         command.append(" ");
 
         for (int i = 1; i < hostInfo.getHostCapacity(); i++) {
@@ -375,8 +367,7 @@ public class CommandBuilderProActive implements CommandBuilder {
     public void setProActivePath(String proActivePath) {
         if (proActivePath != null) {
             this.proActivePath = new PathElement(proActivePath, PathBase.HOME);
-            GCMD_LOGGER.trace(" Set ProActive relpath to " +
-                this.proActivePath.getRelPath());
+            GCMD_LOGGER.trace(" Set ProActive relpath to " + this.proActivePath.getRelPath());
         }
     }
 

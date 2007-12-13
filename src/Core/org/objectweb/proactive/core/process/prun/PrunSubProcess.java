@@ -145,8 +145,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     public static void main(String[] args) {
         ProActiveConfiguration.load();
         try {
-            PrunSubProcess p = new PrunSubProcess(new SimpleExternalProcess(
-                        "/bin/ls "));
+            PrunSubProcess p = new PrunSubProcess(new SimpleExternalProcess("/bin/ls "));
             p.setHostsNumber("2");
             p.setQueueName("plugtest");
             p.startProcess();
@@ -317,7 +316,8 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
      * @see org.objectweb.proactive.core.process.UniversalProcess#getNodeNumber()
      */
     public int getNodeNumber() {
-        return (new Integer(getProcessorPerNodeNumber()).intValue() * (new Integer(getHostsNumber()).intValue()));
+        return (new Integer(getProcessorPerNodeNumber()).intValue() * (new Integer(getHostsNumber())
+                .intValue()));
     }
 
     /**
@@ -363,8 +363,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
     }
 
     @Override
-    protected void internalStartProcess(String command)
-        throws java.io.IOException {
+    protected void internalStartProcess(String command) throws java.io.IOException {
         //        System.out.println(
         //            "---------------Internal start process of PBSSubProcess " +
         //            command);
@@ -384,8 +383,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
         }
 
         String[] commandAndOptions = separateCommandFromOptions(targetProcess.getCommand());
-        prunCommand.append(" -no-panda -v -" + processorPerNode + " -t " +
-            bookingDuration + " ");
+        prunCommand.append(" -no-panda -v -" + processorPerNode + " -t " + bookingDuration + " ");
 
         if (queueName != null) {
             //prunCommand.append("-native '-q " + queueName + "' ");
@@ -400,8 +398,7 @@ public class PrunSubProcess extends AbstractExternalProcessDecorator {
             prunCommand.append("-o " + outputFile + " ");
         }
 
-        prunCommand.append(commandAndOptions[0] + " " + hosts + " " +
-            commandAndOptions[1]); // " -q " + queueName + " ");
+        prunCommand.append(commandAndOptions[0] + " " + hosts + " " + commandAndOptions[1]); // " -q " + queueName + " ");
 
         if (logger.isDebugEnabled()) {
             logger.debug("prun command is " + prunCommand.toString());

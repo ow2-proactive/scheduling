@@ -78,8 +78,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         this(className, target, adapter, null);
     }
 
-    public RemoteObjectImpl(String className, Object target,
-        Adapter<?> adapter, ProActiveSecurityManager psm) {
+    public RemoteObjectImpl(String className, Object target, Adapter<?> adapter, ProActiveSecurityManager psm) {
         this.target = target;
         this.className = className;
         this.proxyClassName = SynchronousProxy.class.getName();
@@ -87,8 +86,7 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         this.psm = psm;
     }
 
-    public Reply receiveMessage(Request message)
-        throws RenegotiateSessionException, ProActiveException {
+    public Reply receiveMessage(Request message) throws RenegotiateSessionException, ProActiveException {
         try {
             if (message.isCiphered() && (this.psm != null)) {
                 message.decrypt(this.psm);
@@ -106,14 +104,12 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
             //            e.printStackTrace();
             throw new ProActiveException(e);
         } catch (InvocationTargetException e) {
-            return new SynchronousReplyImpl(new MethodCallResult(null,
-                    e.getCause()));
+            return new SynchronousReplyImpl(new MethodCallResult(null, e.getCause()));
         }
     }
 
     // implements SecurityEntity ----------------------------------------------
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
+    public TypedCertificate getCertificate() throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             return this.psm.getCertificate();
         }
@@ -127,73 +123,62 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
     //        }
     //        throw new SecurityNotAvailableException();
     //    }
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException {
+    public Entities getEntities() throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             return this.psm.getEntities();
         }
         throw new SecurityNotAvailableException();
     }
 
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException {
         if (this.psm == null) {
             throw new SecurityNotAvailableException();
         }
         return this.psm.getPolicy(local, distant);
     }
 
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException {
+    public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             return this.psm.getPublicKey();
         }
         throw new SecurityNotAvailableException();
     }
 
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException, KeyExchangeException, IOException {
         if (this.psm != null) {
             return this.psm.publicKeyExchange(sessionID, signature);
         }
         throw new SecurityNotAvailableException();
     }
 
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
+            RenegotiateSessionException, IOException {
         if (this.psm != null) {
             return this.psm.randomValue(sessionID, clientRandomValue);
         }
         throw new SecurityNotAvailableException();
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException, RenegotiateSessionException, IOException {
         if (this.psm != null) {
-            return this.psm.secretKeyExchange(sessionID, encodedAESKey,
-                encodedIVParameters, encodedClientMacKey, encodedLockData,
-                parametersSignature);
+            return this.psm.secretKeyExchange(sessionID, encodedAESKey, encodedIVParameters,
+                    encodedClientMacKey, encodedLockData, parametersSignature);
         }
         throw new SecurityNotAvailableException();
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SecurityNotAvailableException, SessionException {
+            TypedCertificate distantCertificate) throws SecurityNotAvailableException, SessionException {
         if (this.psm != null) {
-            return this.psm.startNewSession(distantSessionID, policy,
-                distantCertificate);
+            return this.psm.startNewSession(distantSessionID, policy, distantCertificate);
         }
         throw new SecurityNotAvailableException();
     }
 
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException {
+    public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         if (this.psm != null) {
             this.psm.terminateSession(sessionID);
         }
@@ -203,8 +188,8 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
     public Object getObjectProxy() throws ProActiveException {
         //        Thread.dumpStack();
         try {
-            Object reifiedObjectStub = MOP.createStubObject(this.className,
-                    target.getClass(), new Class[] {  });
+            Object reifiedObjectStub = MOP
+                    .createStubObject(this.className, target.getClass(), new Class[] {});
             if (adapter != null) {
                 //            	Constructor myConstructor =   adapter.getClass().getConstructor(new Class[] {Class.forName(this.className)});
                 //            	Adapter ad = (Adapter) myConstructor.newInstance(new Object[] { MOP.createStubObject(this.className, target.getClass(), new Class[] {})});
@@ -236,13 +221,11 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
         return null;
     }
 
-    public Object getObjectProxy(RemoteRemoteObject rro)
-        throws ProActiveException {
+    public Object getObjectProxy(RemoteRemoteObject rro) throws ProActiveException {
         try {
-            Object reifiedObjectStub = MOP.createStubObject(this.className,
-                    target.getClass(), new Class[] {  });
-            ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(
-                    null, new Object[] { rro }));
+            Object reifiedObjectStub = MOP
+                    .createStubObject(this.className, target.getClass(), new Class[] {});
+            ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(null, new Object[] { rro }));
             if (adapter != null) {
                 //            	Constructor myConstructor =   adapter.getClass().getConstructor(new Class[] {Class.forName(this.className)});
                 //            	Adapter ad = (Adapter) myConstructor.newInstance(new Object[] { MOP.createStubObject(this.className, target.getClass(), new Class[] {})});
@@ -308,16 +291,15 @@ public class RemoteObjectImpl implements RemoteObject, Serializable {
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException {
+            throws SecurityNotAvailableException, AccessControlException {
         if (this.psm == null) {
             throw new SecurityNotAvailableException();
         }
         return this.psm.getProActiveSecurityManager(user);
     }
 
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException {
         if (this.psm == null) {
             throw new SecurityNotAvailableException();
         }

@@ -43,8 +43,8 @@ import org.objectweb.proactive.core.body.request.Request;
 public class RequestLog implements MessageLog {
 
     /**
-         *
-         */
+     *
+     */
 
     // Logged message and its destination
     private UniversalBody destination;

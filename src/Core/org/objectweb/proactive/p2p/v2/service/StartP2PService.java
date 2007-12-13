@@ -68,19 +68,15 @@ public class StartP2PService implements P2PConstants {
     // -------------------------------------------------------------------------
     // Tools for handling command line arguments
     // -------------------------------------------------------------------------
-    private static final String USAGE = "java " +
-        StartP2PService.class.getName() + " [-acq acquisitionMethod]" +
-        " [-port portNumber]" + " [-s Peer ...] [-f PeerListFile]\n" +
-        "More options:\n" + " -noa NOA is in number of peers\n" +
-        " -ttu TTU is in seconds\n" + " -ttl TTL is in hop\n" +
-        " -capacity List capacity of message sequence number\n" +
+    private static final String USAGE = "java " + StartP2PService.class.getName() +
+        " [-acq acquisitionMethod]" + " [-port portNumber]" + " [-s Peer ...] [-f PeerListFile]\n" +
+        "More options:\n" + " -noa NOA is in number of peers\n" + " -ttu TTU is in seconds\n" +
+        " -ttl TTL is in hop\n" + " -capacity List capacity of message sequence number\n" +
         " -exploring Percentage of agree response to determine response to exploring messag\n" +
         " -booking Expiration time for booking without use a shared node\n" +
-        " -node_acq Timeout for node acquisition\n" +
-        " -lookup Lookup frequency for nodes\n" +
+        " -node_acq Timeout for node acquisition\n" + " -lookup Lookup frequency for nodes\n" +
         " -no_multi_proc_nodes to share only a node. Otherwise, 1 node by CPU\n" +
-        " -xml_path Deployment descriptor path\n" +
-        " -no_sharing Start the service with none shared nodes";
+        " -xml_path Deployment descriptor path\n" + " -no_sharing Start the service with none shared nodes";
 
     // -------------------------------------------------------------------------
     // Class Fileds
@@ -366,19 +362,14 @@ public class StartP2PService implements P2PConstants {
 
         // For Debbugging
         logger.info("**** Starting jvm on " +
-            URIBuilder.getHostNameorIP(ProActiveInet.getInstance()
-                                                    .getInetAddress()));
+            URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress()));
 
         // NO REMOVE the isDebugEnabled test
         if (logger.isDebugEnabled()) {
-            logger.debug("**** Starting jvm with classpath " +
-                System.getProperty("java.class.path"));
-            logger.debug("****              with bootclasspath " +
-                System.getProperty("sun.boot.class.path"));
-            logger.debug("Acquisition method: " +
-                System.getProperty("proactive.p2p.acq"));
-            logger.debug("Port number: " +
-                System.getProperty("proactive.p2p.port"));
+            logger.debug("**** Starting jvm with classpath " + System.getProperty("java.class.path"));
+            logger.debug("****              with bootclasspath " + System.getProperty("sun.boot.class.path"));
+            logger.debug("Acquisition method: " + System.getProperty("proactive.p2p.acq"));
+            logger.debug("Port number: " + System.getProperty("proactive.p2p.port"));
 
             if (parsed.peerListFile != null) {
                 logger.debug("Peer list file: " + parsed.peerListFile);
@@ -467,10 +458,8 @@ public class StartP2PService implements P2PConstants {
         String bckPortValue = null;
 
         if (!acquisitionMethod.equals("ibis")) {
-            bckPortValue = System.getProperty("proactive." + acquisitionMethod +
-                    ".port");
-            System.setProperty("proactive." + acquisitionMethod + ".port",
-                portNumber);
+            bckPortValue = System.getProperty("proactive." + acquisitionMethod + ".port");
+            System.setProperty("proactive." + acquisitionMethod + ".port", portNumber);
         } else {
             bckPortValue = PAProperties.PA_RMI_PORT.getValue();
             PAProperties.PA_RMI_PORT.setValue(portNumber);
@@ -482,8 +471,7 @@ public class StartP2PService implements P2PConstants {
         // Set property port with previous value
         if (bckPortValue != null) {
             if (!acquisitionMethod.equals("ibis")) {
-                System.setProperty("proactive." + acquisitionMethod + ".port",
-                    bckPortValue);
+                System.setProperty("proactive." + acquisitionMethod + ".port", bckPortValue);
             } else {
                 System.setProperty("proactive.rmi.port", bckPortValue);
             }
@@ -493,17 +481,14 @@ public class StartP2PService implements P2PConstants {
         String url = null;
 
         try {
-            url = paRuntime.createLocalNode(P2PConstants.P2P_NODE_NAME, false,
-                    null, paRuntime.getVMInformation().getName(),
-                    Job.DEFAULT_JOBID);
+            url = paRuntime.createLocalNode(P2PConstants.P2P_NODE_NAME, false, null, paRuntime
+                    .getVMInformation().getName(), Job.DEFAULT_JOBID);
         } catch (AlreadyBoundException e) {
-            logger.warn("This name " + P2PConstants.P2P_NODE_NAME +
-                " is already bound in the registry", e);
+            logger.warn("This name " + P2PConstants.P2P_NODE_NAME + " is already bound in the registry", e);
         }
 
         // P2PService Active Object Creation
-        this.p2pService = (P2PService) PAActiveObject.newActive(P2PService.class.getName(),
-                null, url);
+        this.p2pService = (P2PService) PAActiveObject.newActive(P2PService.class.getName(), null, url);
 
         try {
             PAActiveObject.enableAC(this.p2pService);
@@ -513,8 +498,7 @@ public class StartP2PService implements P2PConstants {
             }
         }
 
-        logger.info(
-            "/////////////////  STARTING P2P SERVICE //////////////////");
+        logger.info("/////////////////  STARTING P2P SERVICE //////////////////");
 
         // Record the ProActiveRuntime in other from Servers List File
         if (!this.peers.isEmpty()) {

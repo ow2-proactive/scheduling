@@ -65,9 +65,8 @@ public class Start {
     /**
      * Called by common.Start if this version is selected.
      */
-    public static void main(int totalNbBodies, int maxIter,
-        Displayer displayer, Node[] nodes,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+    public static void main(int totalNbBodies, int maxIter, Displayer displayer, Node[] nodes,
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         logger.info("RUNNING groupcom VERSION");
 
         Cube universe = new Cube(-100, -100, -100, 200, 200, 200);
@@ -81,8 +80,7 @@ public class Start {
         Domain domainGroup = null;
         try {
             // Create all the Domains as part of a Group
-            domainGroup = (Domain) PAGroup.newGroup(Domain.class.getName(),
-                    constructorParams, nodes);
+            domainGroup = (Domain) PAGroup.newGroup(Domain.class.getName(), constructorParams, nodes);
         } catch (ClassNotReifiableException e) {
             killsupport.abort(e);
         } catch (ClassNotFoundException e) {
@@ -98,9 +96,8 @@ public class Start {
         Maestro maestro = null;
         try {
             // Supervizes the synchronisations
-            maestro = (Maestro) PAActiveObject.newActive(Maestro.class.getName(),
-                    new Object[] { domainGroup, new Integer(maxIter), killsupport },
-                    nodes[nodes.length - 1]);
+            maestro = (Maestro) PAActiveObject.newActive(Maestro.class.getName(), new Object[] { domainGroup,
+                    new Integer(maxIter), killsupport }, nodes[nodes.length - 1]);
         } catch (ActiveObjectCreationException e) {
             killsupport.abort(e);
         } catch (NodeException e) {

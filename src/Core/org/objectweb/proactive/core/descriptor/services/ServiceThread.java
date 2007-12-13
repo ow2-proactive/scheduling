@@ -95,10 +95,9 @@ public class ServiceThread extends Thread {
                 // Start asking nodes
                 P2PService p2pService = ((P2PDescriptorService) service).getP2PService();
                 String nodeFamilyRegexp = ((P2PDescriptorService) service).getNodeFamilyRegexp();
-                nodeFamilyRegexp = (nodeFamilyRegexp != null)
-                    ? nodeFamilyRegexp : "";
-                P2PNodeLookup p2pNodesLookup = p2pService.getNodes(((P2PDescriptorService) service).getNodeNumber(),
-                        nodeFamilyRegexp, this.vn.getName(), this.vn.getJobID());
+                nodeFamilyRegexp = (nodeFamilyRegexp != null) ? nodeFamilyRegexp : "";
+                P2PNodeLookup p2pNodesLookup = p2pService.getNodes(((P2PDescriptorService) service)
+                        .getNodeNumber(), nodeFamilyRegexp, this.vn.getName(), this.vn.getJobID());
                 ((VirtualNodeImpl) vn).addP2PNodesLookup(p2pNodesLookup);
                 this.nodeRequested = ((P2PDescriptorService) service).getNodeNumber();
                 // Timeout
@@ -113,8 +112,7 @@ public class ServiceThread extends Thread {
 
                 long step = 100;
                 while (askForNodes() &&
-                        ((nodeRequested == MAX_NODE) ? true
-                                                         : (System.currentTimeMillis() < this.expirationTime))) {
+                    ((nodeRequested == MAX_NODE) ? true : (System.currentTimeMillis() < this.expirationTime))) {
                     if (step > LOOK_UP_FREQ) {
                         step = LOOK_UP_FREQ;
                     }
@@ -132,19 +130,17 @@ public class ServiceThread extends Thread {
                         nodeCount++;
 
                         // ProActiveEvent
-                        ((VirtualNodeImpl) vn).nodeCreated(new NodeNotificationData(
-                                node, vn.getName()), true);
+                        ((VirtualNodeImpl) vn)
+                                .nodeCreated(new NodeNotificationData(node, vn.getName()), true);
                         // END ProActiveEvent
                         if (loggerDeployment.isInfoEnabled()) {
-                            loggerDeployment.info(
-                                "Service thread just created event for node: " +
+                            loggerDeployment.info("Service thread just created event for node: " +
                                 node.getNodeInformation().getURL());
                         }
                     }
 
                     // Sleeping with FastStart algo
-                    if ((this.nodeRequested == MAX_NODE) &&
-                            (nodes.size() == 0) && (this.nodeCount != 0)) {
+                    if ((this.nodeRequested == MAX_NODE) && (nodes.size() == 0) && (this.nodeCount != 0)) {
                         Thread.sleep(LOOK_UP_FREQ);
                     } else if (askForNodes() && (this.nodeCount == 0)) {
                         // still no node
@@ -163,10 +159,8 @@ public class ServiceThread extends Thread {
                 }
             }
         } catch (ProActiveException e) {
-            loggerDeployment.error(
-                "An exception occured while starting the service " +
-                service.getServiceName() + " for the VirtualNode " +
-                vn.getName() + " \n" + e.getMessage());
+            loggerDeployment.error("An exception occured while starting the service " +
+                service.getServiceName() + " for the VirtualNode " + vn.getName() + " \n" + e.getMessage());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -178,13 +172,11 @@ public class ServiceThread extends Thread {
             String protocol = URIBuilder.getProtocol(url);
 
             // JMX Notification
-            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime()
-                                                                     .getMBean();
+            ProActiveRuntimeWrapperMBean mbean = ProActiveRuntimeImpl.getProActiveRuntime().getMBean();
             if (mbean != null) {
-                RuntimeNotificationData notificationData = new RuntimeNotificationData(vn.getName(),
-                        url, protocol, vm.getName());
-                mbean.sendNotification(NotificationType.runtimeAcquired,
-                    notificationData);
+                RuntimeNotificationData notificationData = new RuntimeNotificationData(vn.getName(), url,
+                    protocol, vm.getName());
+                mbean.sendNotification(NotificationType.runtimeAcquired, notificationData);
             }
 
             // END JMX Notification

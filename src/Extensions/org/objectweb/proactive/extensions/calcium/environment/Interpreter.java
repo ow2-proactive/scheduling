@@ -87,8 +87,8 @@ public class Interpreter implements Serializable {
         return task;
     }
 
-    public FileStaging stageIn(Task<?> task, SkeletonSystemImpl system,
-        FileServerClient fserver) throws Exception {
+    public FileStaging stageIn(Task<?> task, SkeletonSystemImpl system, FileServerClient fserver)
+            throws Exception {
         //Keep track of current stored files
         FileStaging tfiles;
 
@@ -100,8 +100,7 @@ public class Interpreter implements Serializable {
         return tfiles;
     }
 
-    public Task<?> theLoop(Task<?> task, SkeletonSystemImpl system, Timer timer)
-        throws Exception {
+    public Task<?> theLoop(Task<?> task, SkeletonSystemImpl system, Timer timer) throws Exception {
         timer.stop();
         try {
             //Stop loop if task is finished or has ready children 
@@ -122,9 +121,8 @@ public class Interpreter implements Serializable {
         return task;
     }
 
-    public Task<?> stageOut(Task<?> task, FileStaging files,
-        SkeletonSystemImpl system, FileServerClient fserver)
-        throws Exception {
+    public Task<?> stageOut(Task<?> task, FileStaging files, SkeletonSystemImpl system,
+            FileServerClient fserver) throws Exception {
         try {
             //Update new/modified/unreferenced files
             files.stageOut(fserver, task);

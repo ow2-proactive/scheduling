@@ -55,7 +55,7 @@ import org.objectweb.proactive.core.node.Node;
 public interface RemoteFile extends Serializable {
 
     /**
-    * @return true if the file transfer operation that spawned this RemoteFile instance has finished, or an exception. false otherwise.
+     * @return true if the file transfer operation that spawned this RemoteFile instance has finished, or an exception. false otherwise.
      */
     public boolean isFinished();
 
@@ -83,8 +83,7 @@ public interface RemoteFile extends Serializable {
      * @return A new RemoteFile instance representing this file transfer operation.
      * @throws IOException If an error was detected during the initialization phase of the file transfer.
      */
-    public RemoteFile push(Node dstNode, File dstRemote)
-        throws IOException;
+    public RemoteFile push(Node dstNode, File dstRemote) throws IOException;
 
     /**
      * @return The node where the file is stored (or was meant to be stored, if an error took place).

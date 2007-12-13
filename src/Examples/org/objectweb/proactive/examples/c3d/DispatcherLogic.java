@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.c3d;
 
-
 /**
  * This interface describes methods which are accessible by classes
  * internal to the Dispatcher functionality, for example DispatcherGUI.

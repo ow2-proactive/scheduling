@@ -52,13 +52,13 @@ import org.objectweb.proactive.annotation.PublicAPI;
 public class GenerationScript extends Script<String> {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * The variable name which must be set after the evaluation
-    * of a verifiying script.
-    */
+     * The variable name which must be set after the evaluation
+     * of a verifiying script.
+     */
     public static final String RESULT_VARIABLE = "command";
 
     /**
@@ -75,20 +75,17 @@ public class GenerationScript extends Script<String> {
     }
 
     /** Directly create a script with a string. */
-    public GenerationScript(String script, String engineName)
-        throws InvalidScriptException {
+    public GenerationScript(String script, String engineName) throws InvalidScriptException {
         super(script, engineName);
     }
 
     /** Create a script from a file. */
-    public GenerationScript(File file, String[] parameters)
-        throws InvalidScriptException {
+    public GenerationScript(File file, String[] parameters) throws InvalidScriptException {
         super(file, parameters);
     }
 
     /** Create a script from an URL. */
-    public GenerationScript(URL url, String[] parameters)
-        throws InvalidScriptException {
+    public GenerationScript(URL url, String[] parameters) throws InvalidScriptException {
         super(url, parameters);
     }
 
@@ -127,13 +124,11 @@ public class GenerationScript extends Script<String> {
             if (result instanceof String) {
                 return new ScriptResult<String>((String) result);
             } else {
-                return new ScriptResult<String>(new Exception(
-                        "Bad result format : awaited String, found " +
-                        result.getClass().getName()));
+                return new ScriptResult<String>(new Exception("Bad result format : awaited String, found " +
+                    result.getClass().getName()));
             }
         } else {
-            return new ScriptResult<String>(new Exception("No binding for key " +
-                    RESULT_VARIABLE));
+            return new ScriptResult<String>(new Exception("No binding for key " + RESULT_VARIABLE));
         }
     }
 

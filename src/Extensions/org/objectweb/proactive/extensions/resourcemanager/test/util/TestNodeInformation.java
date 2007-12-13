@@ -45,18 +45,12 @@ public class TestNodeInformation {
             NodeInformation nodeInfo = nodeIM.getNodeInformation();
             String mes = "## NodeInformation : \n";
             mes += "+--------------------------------------------------------------------\n";
-            mes += ("+--> getCreationProtocolID : " + nodeInfo.getProtocol() +
-            "\n");
-            mes += ("+--> getDescriptorVMName   : " +
-            nodeInfo.getVMInformation().getDescriptorVMName() + "\n");
-            mes += ("+--> getHostName           : " +
-            nodeInfo.getVMInformation().getHostName() + "\n");
-            mes += ("+--> getJobID              : " + nodeInfo.getJobID() +
-            "\n");
-            mes += ("+--> getName               : " + nodeInfo.getName() +
-            "\n");
-            mes += ("+--> getProtocol           : " + nodeInfo.getProtocol() +
-            "\n");
+            mes += ("+--> getCreationProtocolID : " + nodeInfo.getProtocol() + "\n");
+            mes += ("+--> getDescriptorVMName   : " + nodeInfo.getVMInformation().getDescriptorVMName() + "\n");
+            mes += ("+--> getHostName           : " + nodeInfo.getVMInformation().getHostName() + "\n");
+            mes += ("+--> getJobID              : " + nodeInfo.getJobID() + "\n");
+            mes += ("+--> getName               : " + nodeInfo.getName() + "\n");
+            mes += ("+--> getProtocol           : " + nodeInfo.getProtocol() + "\n");
             mes += ("+--> getURL                : " + nodeInfo.getURL() + "\n");
             mes += "+--------------------------------------------------------------------\n";
 

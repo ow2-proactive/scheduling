@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.extensions.scilab.monitor;
 
-
 /**
  *
  * This class is a source of Scilab events

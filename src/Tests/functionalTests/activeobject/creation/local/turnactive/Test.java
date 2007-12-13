@@ -38,6 +38,7 @@ import functionalTests.FunctionalTest;
 import functionalTests.activeobject.creation.A;
 import static junit.framework.Assert.assertTrue;
 
+
 /**
  * Test turnActive method on the local default node
  */
@@ -54,7 +55,6 @@ public class Test extends FunctionalTest {
         nodeUrl = a.getNodeUrl();
 
         assertTrue(name.equals("toto"));
-        assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(
-                    ProActiveInet.getInstance().getInetAddress())) != -1);
+        assertTrue(nodeUrl.indexOf(URIBuilder.getHostNameorIP(ProActiveInet.getInstance().getInetAddress())) != -1);
     }
 }

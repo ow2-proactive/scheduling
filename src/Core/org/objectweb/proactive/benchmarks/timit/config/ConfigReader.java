@@ -67,12 +67,10 @@ public class ConfigReader {
 
         // Add the default global variable PROJECT_PATH        
         //this.globalVariables.put("PROJECT_PATH", PROJECT_PATH);
-        Iterator it = this.eTimit.getChild("globalVariables").getChildren()
-                                 .iterator();
+        Iterator it = this.eTimit.getChild("globalVariables").getChildren().iterator();
         while (it.hasNext()) {
             Element var = (Element) it.next();
-            this.globalVariables.put(var.getAttributeValue("name"),
-                var.getAttributeValue("value"));
+            this.globalVariables.put(var.getAttributeValue("name"), var.getAttributeValue("value"));
         }
 
         // Read and parse all <serie> tags

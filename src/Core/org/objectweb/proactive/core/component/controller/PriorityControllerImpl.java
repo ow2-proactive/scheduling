@@ -46,8 +46,7 @@ import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
  * @author Cedric Dalmasso
  *
  */
-public class PriorityControllerImpl extends AbstractProActiveController
-    implements PriorityController {
+public class PriorityControllerImpl extends AbstractProActiveController implements PriorityController {
     private static final String ANY_PARAMETERS = "any-parameters";
     private Map<String, Object> nf2s;
     private Map<String, Object> nf3s;
@@ -63,13 +62,11 @@ public class PriorityControllerImpl extends AbstractProActiveController
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance()
-                                               .createFcItfType(Constants.REQUEST_PRIORITY_CONTROLLER,
-                    PriorityController.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(
+                    Constants.REQUEST_PRIORITY_CONTROLLER, PriorityController.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " +
-                this.getClass().getName());
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 
@@ -77,49 +74,47 @@ public class PriorityControllerImpl extends AbstractProActiveController
     // PriorityController IMPLEMENTATION //
     ///////////////////////////////////////
     // TODO_C for a NF? priority check that the method is in a controller
-    public void setPriority(String interfaceName, String methodName,
-        RequestPriority priority) {
+    public void setPriority(String interfaceName, String methodName, RequestPriority priority) {
         switch (priority) {
-        case NF1:
-            nf2s.remove(methodName);
-            nf3s.remove(methodName);
-            break;
-        case NF2:
-            nf3s.remove(methodName);
-            nf2s.put(methodName, ANY_PARAMETERS);
-            break;
-        case NF3:
-            nf2s.remove(methodName);
-            nf3s.put(methodName, ANY_PARAMETERS);
-            break;
-        default:
-            break;
+            case NF1:
+                nf2s.remove(methodName);
+                nf3s.remove(methodName);
+                break;
+            case NF2:
+                nf3s.remove(methodName);
+                nf2s.put(methodName, ANY_PARAMETERS);
+                break;
+            case NF3:
+                nf2s.remove(methodName);
+                nf3s.put(methodName, ANY_PARAMETERS);
+                break;
+            default:
+                break;
         }
     }
 
     // TODO_C for a NF? priority check that the method is in a controller
-    public void setPriority(String interfaceName, String methodName,
-        Class<?>[] parametersTypes, RequestPriority priority) {
+    public void setPriority(String interfaceName, String methodName, Class<?>[] parametersTypes,
+            RequestPriority priority) {
         switch (priority) {
-        case NF1:
-            nf2s.remove(methodName);
-            nf3s.remove(methodName);
-            break;
-        case NF2:
-            nf3s.remove(methodName);
-            nf2s.put(methodName, parametersTypes);
-            break;
-        case NF3:
-            nf2s.remove(methodName);
-            nf3s.put(methodName, parametersTypes);
-            break;
-        default:
-            break;
+            case NF1:
+                nf2s.remove(methodName);
+                nf3s.remove(methodName);
+                break;
+            case NF2:
+                nf3s.remove(methodName);
+                nf2s.put(methodName, parametersTypes);
+                break;
+            case NF3:
+                nf2s.remove(methodName);
+                nf3s.put(methodName, parametersTypes);
+                break;
+            default:
+                break;
         }
     }
 
-    public RequestPriority getPriority(String interfaceName, String methodName,
-        Class<?>[] parametersTypes) {
+    public RequestPriority getPriority(String interfaceName, String methodName, Class<?>[] parametersTypes) {
         if (nf2s.get(methodName) != null) {
             return RequestPriority.NF2;
         } else if (nf3s.get(methodName) != null) {

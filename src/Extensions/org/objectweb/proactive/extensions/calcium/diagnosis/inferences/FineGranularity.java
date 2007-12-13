@@ -47,13 +47,11 @@ public class FineGranularity extends AbstractInference {
 
     @Override
     boolean hasSymptom(Stats stats) {
-        double overhead = stats.getProcessingTime() -
-            stats.getComputationTime();
+        double overhead = stats.getProcessingTime() - stats.getComputationTime();
 
         double value = stats.getComputationTime() / overhead;
         if (logger.isDebugEnabled() && (threshold > value)) {
-            logger.debug(this.getClass().getSimpleName() + ": " + threshold +
-                " !< " + value);
+            logger.debug(this.getClass().getSimpleName() + ": " + threshold + " !< " + value);
         }
 
         if (threshold > value) {

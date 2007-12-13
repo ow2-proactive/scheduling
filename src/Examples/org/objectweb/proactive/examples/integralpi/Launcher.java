@@ -67,14 +67,14 @@ public class Launcher {
             // The number of workers
             int np = Integer.valueOf(args[1]).intValue();
 
-            Object[] param = new Object[] {  };
+            Object[] param = new Object[] {};
             Object[][] params = new Object[np][];
             for (int i = 0; i < np; i++) {
                 params[i] = param;
             }
 
-            Worker workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(),
-                    params, provideNodes(args[0]));
+            Worker workers = (Worker) PASPMD.newSPMDGroup(Worker.class.getName(), params,
+                    provideNodes(args[0]));
 
             String input = "";
 
@@ -86,8 +86,7 @@ public class Launcher {
 
             while (numOfIterations > 0) {
                 // Prompt the user
-                System.out.print(
-                    "\nEnter the number of iterations (0 to exit) : ");
+                System.out.print("\nEnter the number of iterations (0 to exit) : ");
 
                 try {
                     // Read a line of text from the user.
@@ -100,8 +99,7 @@ public class Launcher {
                     numOfIterations = Long.parseLong(input);
                 } catch (NumberFormatException numberException) {
                     System.err.println(numberException.getMessage());
-                    System.out.println(
-                        "No valid number entered using 1 iteration...");
+                    System.out.println("No valid number entered using 1 iteration...");
                 }
 
                 if (numOfIterations <= 0) {
@@ -113,8 +111,7 @@ public class Launcher {
                 wrappedResult = firstWorker.start(numOfIterations);
                 result = wrappedResult.doubleValue();
                 error = result - Math.PI;
-                System.out.println("\nCalculated PI is " + result +
-                    " error is " + error);
+                System.out.println("\nCalculated PI is " + result + " error is " + error);
             }
 
             finish();
@@ -124,8 +121,7 @@ public class Launcher {
         }
     }
 
-    private static BufferedReader stdin = new BufferedReader(new InputStreamReader(
-                System.in));
+    private static BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
 
     private static Node[] provideNodes(String descriptorUrl) {
         try {

@@ -66,8 +66,7 @@ import org.objectweb.proactive.core.util.ClassDataCache;
  * @author Matthieu Morel
  *
  */
-public class OutputInterceptorClassGenerator
-    extends AbstractInterfaceClassGenerator {
+public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGenerator {
     List outputInterceptors;
     private static OutputInterceptorClassGenerator instance;
 
@@ -79,26 +78,22 @@ public class OutputInterceptorClassGenerator
         }
     }
 
-    public ProActiveInterface generateInterface(
-        ProActiveInterface representative, List outputInterceptors)
-        throws InterfaceGenerationFailedException {
+    public ProActiveInterface generateInterface(ProActiveInterface representative, List outputInterceptors)
+            throws InterfaceGenerationFailedException {
         this.outputInterceptors = outputInterceptors;
-        ProActiveInterface generated = generateInterface(representative.getFcItfName(),
-                representative.getFcItfOwner(),
-                (ProActiveInterfaceType) representative.getFcItfType(), false,
-                true);
+        ProActiveInterface generated = generateInterface(representative.getFcItfName(), representative
+                .getFcItfOwner(), (ProActiveInterfaceType) representative.getFcItfType(), false, true);
         ((StubObject) generated).setProxy(((StubObject) representative).getProxy());
         return generated;
     }
 
     @Override
-    public ProActiveInterface generateInterface(final String interfaceName,
-        Component owner, ProActiveInterfaceType interfaceType,
-        boolean isInternal, boolean isFunctionalInterface)
-        throws InterfaceGenerationFailedException {
+    public ProActiveInterface generateInterface(final String interfaceName, Component owner,
+            ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            throws InterfaceGenerationFailedException {
         try {
-            String representativeClassName = org.objectweb.proactive.core.component.gen.Utils.getOutputInterceptorClassName(interfaceName,
-                    interfaceType.getFcItfSignature());
+            String representativeClassName = org.objectweb.proactive.core.component.gen.Utils
+                    .getOutputInterceptorClassName(interfaceName, interfaceType.getFcItfSignature());
             Class<?> generated_class;
 
             // check whether class has already been generated
@@ -121,56 +116,45 @@ public class OutputInterceptorClassGenerator
 
                 // add Serializable interface
                 interfacesToImplement.add(pool.get(Serializable.class.getName()));
-                generatedCtClass.addInterface(pool.get(
-                        Serializable.class.getName()));
+                generatedCtClass.addInterface(pool.get(Serializable.class.getName()));
 
                 // add StubObject, so we can set the proxy
-                generatedCtClass.addInterface(pool.get(
-                        StubObject.class.getName()));
+                generatedCtClass.addInterface(pool.get(StubObject.class.getName()));
 
                 // add ItfStubObject, so we can set the sender itf
-                generatedCtClass.addInterface(pool.get(
-                        ItfStubObject.class.getName()));
+                generatedCtClass.addInterface(pool.get(ItfStubObject.class.getName()));
                 Utils.createItfStubObjectMethods(generatedCtClass);
 
                 //interfacesToImplement.add(pool.get(StubObject.class.getName()));
                 List interfacesToImplementAndSuperInterfaces = new ArrayList(interfacesToImplement);
                 addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
-                generatedCtClass.setSuperclass(pool.get(
-                        ProActiveInterfaceImpl.class.getName()));
+                generatedCtClass.setSuperclass(pool.get(ProActiveInterfaceImpl.class.getName()));
                 JavassistByteCodeStubBuilder.createStubObjectMethods(generatedCtClass);
-                CtField interfaceNameField = new CtField(ClassPool.getDefault()
-                                                                  .get(String.class.getName()),
-                        "interfaceName", generatedCtClass);
+                CtField interfaceNameField = new CtField(ClassPool.getDefault().get(String.class.getName()),
+                    "interfaceName", generatedCtClass);
                 interfaceNameField.setModifiers(Modifier.STATIC);
-                generatedCtClass.addField(interfaceNameField,
-                    "\"" + interfaceName + "\"");
+                generatedCtClass.addField(interfaceNameField, "\"" + interfaceName + "\"");
 
-                CtField methodsField = new CtField(pool.get(
-                            "java.lang.reflect.Method[]"), "overridenMethods",
-                        generatedCtClass);
+                CtField methodsField = new CtField(pool.get("java.lang.reflect.Method[]"),
+                    "overridenMethods", generatedCtClass);
                 methodsField.setModifiers(Modifier.STATIC);
                 generatedCtClass.addField(methodsField);
 
                 // field for remembering generic parameters
-                CtField genericTypesMappingField = new CtField(pool.get(
-                            "java.util.Map"), "genericTypesMapping",
-                        generatedCtClass);
+                CtField genericTypesMappingField = new CtField(pool.get("java.util.Map"),
+                    "genericTypesMapping", generatedCtClass);
 
                 genericTypesMappingField.setModifiers(Modifier.STATIC);
                 generatedCtClass.addField(genericTypesMappingField);
 
                 // add outputInterceptorsField
-                CtField outputInterceptorsField = new CtField(pool.get(
-                            List.class.getName()), "outputInterceptors",
-                        generatedCtClass);
-                generatedCtClass.addField(outputInterceptorsField,
-                    "new java.util.ArrayList();");
+                CtField outputInterceptorsField = new CtField(pool.get(List.class.getName()),
+                    "outputInterceptors", generatedCtClass);
+                generatedCtClass.addField(outputInterceptorsField, "new java.util.ArrayList();");
                 CtMethod outputInterceptorsSetter = CtNewMethod.setter("setOutputInterceptors",
                         outputInterceptorsField);
                 generatedCtClass.addMethod(outputInterceptorsSetter);
-                generatedCtClass.addInterface(pool.get(
-                        OutputInterceptorHelper.class.getName()));
+                generatedCtClass.addInterface(pool.get(OutputInterceptorHelper.class.getName()));
                 //                methodsListField.setModifiers(Modifier.STATIC);
                 // list all methods to implement
                 Map methodsToImplement = new HashMap();
@@ -207,7 +191,7 @@ public class OutputInterceptorClassGenerator
                 }
 
                 reifiedMethods = (CtMethod[]) (methodsToImplement.values()
-                                                                 .toArray(new CtMethod[methodsToImplement.size()]));
+                        .toArray(new CtMethod[methodsToImplement.size()]));
 
                 // Determines which reifiedMethods are valid for reification
                 // It is the responsibility of method checkMethod in class Utils
@@ -216,8 +200,7 @@ public class OutputInterceptorClassGenerator
                 int initialNumberOfMethods = reifiedMethods.length;
 
                 for (int i = 0; i < initialNumberOfMethods; i++) {
-                    if (JavassistByteCodeStubBuilder.checkMethod(
-                                reifiedMethods[i])) {
+                    if (JavassistByteCodeStubBuilder.checkMethod(reifiedMethods[i])) {
                         v.addElement(reifiedMethods[i]);
                     }
                 }
@@ -226,31 +209,25 @@ public class OutputInterceptorClassGenerator
 
                 reifiedMethods = validMethods;
 
-                JavassistByteCodeStubBuilder.createStaticInitializer(generatedCtClass,
-                    reifiedMethods, classesIndexer,
-                    interfaceType.getFcItfSignature(), null);
+                JavassistByteCodeStubBuilder.createStaticInitializer(generatedCtClass, reifiedMethods,
+                        classesIndexer, interfaceType.getFcItfSignature(), null);
 
-                createReifiedMethods(generatedCtClass, reifiedMethods,
-                    isFunctionalInterface);
+                createReifiedMethods(generatedCtClass, reifiedMethods, isFunctionalInterface);
 
                 //                generatedCtClass.writeFile("generated/");
                 //                System.out.println("[JAVASSIST] generated class : " +
                 //                    representativeClassName);
                 byte[] bytecode = generatedCtClass.toBytecode();
-                ClassDataCache.instance()
-                              .addClassData(representativeClassName, bytecode);
+                ClassDataCache.instance().addClassData(representativeClassName, bytecode);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("added " + representativeClassName +
-                        " to cache");
+                    logger.debug("added " + representativeClassName + " to cache");
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug("generated classes cache is : " +
-                        ClassDataCache.instance().toString());
+                    logger.debug("generated classes cache is : " + ClassDataCache.instance().toString());
                 }
 
                 // convert the bytes into a Class<?>
-                generated_class = Utils.defineClass(representativeClassName,
-                        bytecode);
+                generated_class = Utils.defineClass(representativeClassName, bytecode);
             }
 
             ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();
@@ -264,32 +241,27 @@ public class OutputInterceptorClassGenerator
             return reference;
         } catch (Exception e) {
             throw new InterfaceGenerationFailedException(
-                "Cannot generate output interceptor on interface [" +
-                interfaceName + "] with signature [" +
-                interfaceType.getFcItfSignature() + "] with javassist", e);
+                "Cannot generate output interceptor on interface [" + interfaceName + "] with signature [" +
+                    interfaceType.getFcItfSignature() + "] with javassist", e);
         }
     }
 
-    protected static void createReifiedMethods(CtClass generatedClass,
-        CtMethod[] reifiedMethods, boolean isFunctionalInterface)
-        throws NotFoundException, CannotCompileException {
+    protected static void createReifiedMethods(CtClass generatedClass, CtMethod[] reifiedMethods,
+            boolean isFunctionalInterface) throws NotFoundException, CannotCompileException {
         for (int i = 0; i < reifiedMethods.length; i++) {
             CtClass[] paramTypes = reifiedMethods[i].getParameterTypes();
-            String body = ("{\nObject[] parameters = new Object[" +
-                paramTypes.length + "];\n");
+            String body = ("{\nObject[] parameters = new Object[" + paramTypes.length + "];\n");
             for (int j = 0; j < paramTypes.length; j++) {
                 if (paramTypes[j].isPrimitive()) {
                     body += ("  parameters[" + j + "]=" +
-                    JavassistByteCodeStubBuilder.wrapPrimitiveParameter(paramTypes[j],
-                        "$" + (j + 1)) + ";\n");
+                        JavassistByteCodeStubBuilder.wrapPrimitiveParameter(paramTypes[j], "$" + (j + 1)) + ";\n");
                 } else {
                     body += ("  parameters[" + j + "]=$" + (j + 1) + ";\n");
                 }
             }
 
             body += ("org.objectweb.proactive.core.mop.MethodCall methodCall = org.objectweb.proactive.core.mop.MethodCall.getComponentMethodCall(" +
-            "(java.lang.reflect.Method)overridenMethods[" + i + "]" +
-            ", parameters, null, interfaceName, senderItfID);\n");
+                "(java.lang.reflect.Method)overridenMethods[" + i + "]" + ", parameters, null, interfaceName, senderItfID);\n");
 
             // delegate to outputinterceptors
             body += "java.util.ListIterator it = outputInterceptors.listIterator();\n";
@@ -370,10 +342,9 @@ public class OutputInterceptorClassGenerator
             body += "\n}";
             //                                 System.out.println("method : " + reifiedMethods[i].getName() +
             //                                     " : \n" + body);
-            CtMethod methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(),
-                    reifiedMethods[i].getName(),
-                    reifiedMethods[i].getParameterTypes(),
-                    reifiedMethods[i].getExceptionTypes(), body, generatedClass);
+            CtMethod methodToGenerate = CtNewMethod.make(reifiedMethods[i].getReturnType(), reifiedMethods[i]
+                    .getName(), reifiedMethods[i].getParameterTypes(), reifiedMethods[i].getExceptionTypes(),
+                    body, generatedClass);
             generatedClass.addMethod(methodToGenerate);
         }
     }

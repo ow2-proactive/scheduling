@@ -98,8 +98,7 @@ public class XMLDescriptor extends Observable {
 
         // If there is NO mainDesfinition tag.
         if (mainDefinitions.length == 0) {
-            String message = "The descriptor must contain a mainDefinition tag!\n\nFile : " +
-                this.path;
+            String message = "The descriptor must contain a mainDefinition tag!\n\nFile : " + this.path;
             setChanged();
             notifyObservers(message);
             throw new TagMissingException(this);
@@ -109,8 +108,7 @@ public class XMLDescriptor extends Observable {
 
         // If there is NO mapToVirtualNode tag.
         if (virtualNodes.length == 0) {
-            String message = "The descriptor must contain a mapToVirtualNode tag!\n\nFile : " +
-                this.path;
+            String message = "The descriptor must contain a mapToVirtualNode tag!\n\nFile : " + this.path;
             setChanged();
             notifyObservers(message);
             throw new TagMissingException(this);
@@ -154,16 +152,16 @@ public class XMLDescriptor extends Observable {
      */
     public String getImage() {
         switch (state) {
-        case LAUNCHED:
-            return /*ISharedImages.IMG_TOOL_CUT;*/ "fileSucces.gif";
-        case KILLED:
-            return /*ISharedImages.IMG_OBJS_ERROR_TSK*/ "fileError.gif";
-        case TERMINATED:
-            return /*ISharedImages.IMG_TOOL_BACK_DISABLED*/ "fileDefault.gif";
-        case ERROR:
-            return /*ISharedImages.IMG_OBJS_ERROR_TSK*/ "fileError.gif";
-        default:
-            return /*ISharedImages.IMG_OBJ_FILE*/ "fileDefault.gif";
+            case LAUNCHED:
+                return /*ISharedImages.IMG_TOOL_CUT;*/"fileSucces.gif";
+            case KILLED:
+                return /*ISharedImages.IMG_OBJS_ERROR_TSK*/"fileError.gif";
+            case TERMINATED:
+                return /*ISharedImages.IMG_TOOL_BACK_DISABLED*/"fileDefault.gif";
+            case ERROR:
+                return /*ISharedImages.IMG_OBJS_ERROR_TSK*/"fileError.gif";
+            default:
+                return /*ISharedImages.IMG_OBJ_FILE*/"fileDefault.gif";
         }
     }
 
@@ -188,10 +186,8 @@ public class XMLDescriptor extends Observable {
         }
         this.shortName = name;
     }
-    public enum FileState {DEFAULT,
-        LAUNCHED,
-        TERMINATED,
-        KILLED,
-        ERROR;
+
+    public enum FileState {
+        DEFAULT, LAUNCHED, TERMINATED, KILLED, ERROR;
     }
 }

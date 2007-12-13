@@ -77,8 +77,7 @@ public class WaitFrame {
      */
     public WaitFrame() {
         // call the other constructor
-        this("Please wait...", "Please wait...",
-            "A new window will soon appear!");
+        this("Please wait...", "Please wait...", "A new window will soon appear!");
     }
 
     /** Clean up when no longer needed */

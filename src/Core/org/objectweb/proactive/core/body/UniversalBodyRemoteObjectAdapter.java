@@ -57,16 +57,15 @@ import org.objectweb.proactive.core.security.securityentity.Entities;
 import org.objectweb.proactive.core.security.securityentity.Entity;
 
 
-public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
-    implements UniversalBody {
+public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody> implements UniversalBody {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * Cache the ID of the Body locally for speed
-    */
+     * Cache the ID of the Body locally for speed
+     */
     protected UniqueID bodyID;
 
     /**
@@ -93,16 +92,16 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
     @Override
     public boolean equals(Object o) {
         if (o instanceof UniversalBodyRemoteObjectAdapter) {
-            return ((StubObject) this.target).getProxy()
-                    .equals(((StubObject) ((UniversalBodyRemoteObjectAdapter) o).target).getProxy());
+            return ((StubObject) this.target).getProxy().equals(
+                    ((StubObject) ((UniversalBodyRemoteObjectAdapter) o).target).getProxy());
         }
 
         return false;
     }
 
     /**
-      * @see org.objectweb.proactive.core.body.UniversalBody#getID()
-      */
+     * @see org.objectweb.proactive.core.body.UniversalBody#getID()
+     */
     public UniqueID getID() {
         return bodyID;
     }
@@ -112,8 +111,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
      */
     public void createShortcut(Shortcut shortcut) throws IOException {
         //      TODO implement
-        throw new ProActiveRuntimeException(
-            "create shortcut method not implemented yet");
+        throw new ProActiveRuntimeException("create shortcut method not implemented yet");
     }
 
     /**
@@ -158,8 +156,7 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         return target.receiveFTMessage(ev);
     }
 
-    public GCResponse receiveGCMessage(GCMessage toSend)
-        throws IOException {
+    public GCResponse receiveGCMessage(GCMessage toSend) throws IOException {
         return target.receiveGCMessage(toSend);
     }
 
@@ -167,13 +164,11 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         return target.receiveReply(r);
     }
 
-    public int receiveRequest(Request request)
-        throws IOException, RenegotiateSessionException {
+    public int receiveRequest(Request request) throws IOException, RenegotiateSessionException {
         return target.receiveRequest(request);
     }
 
-    public void register(String url)
-        throws IOException, UnknownProtocolException {
+    public void register(String url) throws IOException, UnknownProtocolException {
         target.register(url);
     }
 
@@ -181,75 +176,61 @@ public class UniversalBodyRemoteObjectAdapter extends Adapter<UniversalBody>
         target.setRegistered(registered);
     }
 
-    public void updateLocation(UniqueID id, UniversalBody body)
-        throws IOException {
+    public void updateLocation(UniqueID id, UniversalBody body) throws IOException {
         target.updateLocation(id, body);
     }
 
-    public TypedCertificate getCertificate()
-        throws SecurityNotAvailableException, IOException {
+    public TypedCertificate getCertificate() throws SecurityNotAvailableException, IOException {
         return target.getCertificate();
     }
 
-    public Entities getEntities()
-        throws SecurityNotAvailableException, IOException {
+    public Entities getEntities() throws SecurityNotAvailableException, IOException {
         return target.getEntities();
     }
 
-    public SecurityContext getPolicy(Entities local, Entities distant)
-        throws SecurityNotAvailableException, IOException {
+    public SecurityContext getPolicy(Entities local, Entities distant) throws SecurityNotAvailableException,
+            IOException {
         return target.getPolicy(local, distant);
     }
 
-    public PublicKey getPublicKey()
-        throws SecurityNotAvailableException, IOException {
+    public PublicKey getPublicKey() throws SecurityNotAvailableException, IOException {
         return target.getPublicKey();
     }
 
-    public byte[] publicKeyExchange(long sessionID, byte[] signature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            KeyExchangeException, IOException {
+    public byte[] publicKeyExchange(long sessionID, byte[] signature) throws SecurityNotAvailableException,
+            RenegotiateSessionException, KeyExchangeException, IOException {
         return target.publicKeyExchange(sessionID, signature);
     }
 
-    public byte[] randomValue(long sessionID, byte[] clientRandomValue)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
+    public byte[] randomValue(long sessionID, byte[] clientRandomValue) throws SecurityNotAvailableException,
+            RenegotiateSessionException, IOException {
         return target.randomValue(sessionID, clientRandomValue);
     }
 
-    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey,
-        byte[] encodedIVParameters, byte[] encodedClientMacKey,
-        byte[] encodedLockData, byte[] parametersSignature)
-        throws SecurityNotAvailableException, RenegotiateSessionException,
-            IOException {
-        return target.secretKeyExchange(sessionID, encodedAESKey,
-            encodedIVParameters, encodedClientMacKey, encodedLockData,
-            parametersSignature);
+    public byte[][] secretKeyExchange(long sessionID, byte[] encodedAESKey, byte[] encodedIVParameters,
+            byte[] encodedClientMacKey, byte[] encodedLockData, byte[] parametersSignature)
+            throws SecurityNotAvailableException, RenegotiateSessionException, IOException {
+        return target.secretKeyExchange(sessionID, encodedAESKey, encodedIVParameters, encodedClientMacKey,
+                encodedLockData, parametersSignature);
     }
 
     public long startNewSession(long distantSessionID, SecurityContext policy,
-        TypedCertificate distantCertificate)
-        throws SecurityNotAvailableException, IOException, SessionException {
-        return target.startNewSession(distantSessionID, policy,
-            distantCertificate);
+            TypedCertificate distantCertificate) throws SecurityNotAvailableException, IOException,
+            SessionException {
+        return target.startNewSession(distantSessionID, policy, distantCertificate);
     }
 
-    public void terminateSession(long sessionID)
-        throws SecurityNotAvailableException, IOException {
+    public void terminateSession(long sessionID) throws SecurityNotAvailableException, IOException {
         target.terminateSession(sessionID);
     }
 
     public ProActiveSecurityManager getProActiveSecurityManager(Entity user)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         return this.target.getProActiveSecurityManager(user);
     }
 
-    public void setProActiveSecurityManager(Entity user,
-        PolicyServer policyServer)
-        throws SecurityNotAvailableException, AccessControlException,
-            IOException {
+    public void setProActiveSecurityManager(Entity user, PolicyServer policyServer)
+            throws SecurityNotAvailableException, AccessControlException, IOException {
         this.target.setProActiveSecurityManager(user, policyServer);
     }
 }

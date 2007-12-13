@@ -36,8 +36,8 @@ import javax.swing.tree.DefaultMutableTreeNode;
 public class TreeEngineNode extends DefaultMutableTreeNode {
 
     /**
-         *
-         */
+     *
+     */
     public static final int VALID = 0;
     public static final int SUSPECT = 1;
     private int state = VALID;

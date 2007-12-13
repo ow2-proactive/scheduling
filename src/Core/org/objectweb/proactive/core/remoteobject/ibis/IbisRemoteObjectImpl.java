@@ -45,21 +45,18 @@ import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionExcept
  * @author acontes
  *
  */
-public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject
-    implements IbisRemoteObject {
+public class IbisRemoteObjectImpl extends ibis.rmi.server.UnicastRemoteObject implements IbisRemoteObject {
     private transient InternalRemoteRemoteObject remoteObject;
 
     public IbisRemoteObjectImpl() throws ibis.rmi.RemoteException {
     }
 
-    public IbisRemoteObjectImpl(InternalRemoteRemoteObject target)
-        throws ibis.rmi.RemoteException {
+    public IbisRemoteObjectImpl(InternalRemoteRemoteObject target) throws ibis.rmi.RemoteException {
         this.remoteObject = target;
     }
 
-    public Reply receiveMessage(Request message)
-        throws RemoteException, RenegotiateSessionException, ProActiveException,
-            IOException {
+    public Reply receiveMessage(Request message) throws RemoteException, RenegotiateSessionException,
+            ProActiveException, IOException {
         return this.remoteObject.receiveMessage(message);
     }
 }

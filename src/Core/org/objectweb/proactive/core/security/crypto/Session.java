@@ -54,8 +54,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class Session implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
 
     // the session identifiant
     private long distantSessionID = 0;
@@ -121,14 +121,16 @@ public class Session implements Serializable {
 
     // security context associated to the sesssion
     private SecurityContext securityContext;
-    public enum ActAs {CLIENT,
-        SERVER;
+
+    public enum ActAs {
+        CLIENT, SERVER;
     }
+
     public Session() {
     }
 
-    public Session(long distantId, SecurityContext securityContext,
-        TypedCertificate certificate) throws SessionException {
+    public Session(long distantId, SecurityContext securityContext, TypedCertificate certificate)
+            throws SessionException {
         this.securityContext = securityContext;
         this.isSessionValidated = false;
         //        synchronized (synchronizationObject) {
@@ -154,7 +156,7 @@ public class Session implements Serializable {
         //      }
         this.distantSessionID = distantId;
         this.distantOACertificate = certificate; // The clients public key for encryption and decryption.
-                                                 //        this.distantAOPublicKey = null; // The clients authentication and signing certificate.
+        //        this.distantAOPublicKey = null; // The clients authentication and signing certificate.
     }
 
     //    public boolean isID(long ID) {
@@ -198,58 +200,53 @@ public class Session implements Serializable {
     //    public void setDistantOAPublicKey(PublicKey distantOAPublicKey) {
     //        this.distantOAPublicKey = distantOAPublicKey;
     //    }
-    public synchronized byte[][] writePDU(byte[] in, ActAs type)
-        throws Exception {
+    public synchronized byte[][] writePDU(byte[] in, ActAs type) throws Exception {
         byte[] mac = null;
         switch (type) {
-        case CLIENT:
-            // act as client
-            if (this.securityContext.getSendRequest().isIntegrityEnabled()) {
-                this.cl_mac.update(in); // Update plain text into MAC
-            }
-            if (this.securityContext.getSendRequest().isConfidentialityEnabled()) {
-                try {
-                    this.cl_cipher.init(Cipher.ENCRYPT_MODE, this.cl_aes_key,
-                        this.cl_iv, this.sec_rand);
-                    // TODO_SECURITY find why I need to force the encrypt_mode here
-                    // seems to happen when a method call is sent by an object to itself.
-                    // relation with AC ?
-                    in = this.cl_cipher.doFinal(in); // Encrypt data for recipient.
-                } catch (Exception bex) {
-                    bex.printStackTrace();
-                    throw new IOException("PDU failed to encrypt " +
-                        bex.getMessage());
+            case CLIENT:
+                // act as client
+                if (this.securityContext.getSendRequest().isIntegrityEnabled()) {
+                    this.cl_mac.update(in); // Update plain text into MAC
                 }
-            }
-
-            if (this.securityContext.getSendRequest().isIntegrityEnabled()) {
-                ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
-                               .debug("writePDU as client cl_mac :" +
-                    displayByte(this.cl_hmac_key.getEncoded()));
-                mac = this.cl_mac.doFinal();
-            }
-            break;
-        case SERVER:
-            // act as server
-            if (this.securityContext.getSendReply().isIntegrityEnabled()) {
-                this.se_mac.update(in); // Update plain text into MAC
-            }
-            if (this.securityContext.getSendReply().isConfidentialityEnabled()) {
-                try {
-                    in = this.se_cipher.doFinal(in); // Encrypt data for recipient.
-                } catch (Exception bex) {
-                    bex.printStackTrace();
-                    throw new IOException("PDU failed to encrypt " +
-                        bex.getMessage());
+                if (this.securityContext.getSendRequest().isConfidentialityEnabled()) {
+                    try {
+                        this.cl_cipher.init(Cipher.ENCRYPT_MODE, this.cl_aes_key, this.cl_iv, this.sec_rand);
+                        // TODO_SECURITY find why I need to force the encrypt_mode here
+                        // seems to happen when a method call is sent by an object to itself.
+                        // relation with AC ?
+                        in = this.cl_cipher.doFinal(in); // Encrypt data for recipient.
+                    } catch (Exception bex) {
+                        bex.printStackTrace();
+                        throw new IOException("PDU failed to encrypt " + bex.getMessage());
+                    }
                 }
-            }
 
-            if (this.securityContext.getSendReply().isIntegrityEnabled()) {
-                mac = this.se_mac.doFinal();
-            }
-            break;
-        default:
-            break;
+                if (this.securityContext.getSendRequest().isIntegrityEnabled()) {
+                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug(
+                            "writePDU as client cl_mac :" + displayByte(this.cl_hmac_key.getEncoded()));
+                    mac = this.cl_mac.doFinal();
+                }
+                break;
+            case SERVER:
+                // act as server
+                if (this.securityContext.getSendReply().isIntegrityEnabled()) {
+                    this.se_mac.update(in); // Update plain text into MAC
+                }
+                if (this.securityContext.getSendReply().isConfidentialityEnabled()) {
+                    try {
+                        in = this.se_cipher.doFinal(in); // Encrypt data for recipient.
+                    } catch (Exception bex) {
+                        bex.printStackTrace();
+                        throw new IOException("PDU failed to encrypt " + bex.getMessage());
+                    }
+                }
+
+                if (this.securityContext.getSendReply().isIntegrityEnabled()) {
+                    mac = this.se_mac.doFinal();
+                }
+                break;
+            default:
+                break;
         }
 
         //
@@ -280,69 +277,60 @@ public class Session implements Serializable {
         return true;
     }
 
-    public synchronized byte[] readPDU(byte[] in, byte[] mac, ActAs type)
-        throws IOException {
+    public synchronized byte[] readPDU(byte[] in, byte[] mac, ActAs type) throws IOException {
         // in is the encrypted data
         // mac is the mac
         switch (type) {
-        case CLIENT:
-            // act as client 
-            if (this.securityContext.getReceiveReply().isConfidentialityEnabled()) {
-                try {
-                    in = this.se_cipher.doFinal(in);
-                } catch (Exception ex) {
-                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
-                                   .debug("PDU Cipher code decryption failed, session " +
-                        this.distantSessionID);
-                    throw new IOException("PDU failed to decrypt " +
-                        ex.getMessage());
+            case CLIENT:
+                // act as client 
+                if (this.securityContext.getReceiveReply().isConfidentialityEnabled()) {
+                    try {
+                        in = this.se_cipher.doFinal(in);
+                    } catch (Exception ex) {
+                        ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug(
+                                "PDU Cipher code decryption failed, session " + this.distantSessionID);
+                        throw new IOException("PDU failed to decrypt " + ex.getMessage());
+                    }
                 }
-            }
-            if (this.securityContext.getReceiveReply().isIntegrityEnabled()) {
-                this.se_mac.update(in); // MAC is taken on plain text.
+                if (this.securityContext.getReceiveReply().isIntegrityEnabled()) {
+                    this.se_mac.update(in); // MAC is taken on plain text.
 
-                byte[] m = null;
-                m = this.se_mac.doFinal();
+                    byte[] m = null;
+                    m = this.se_mac.doFinal();
 
-                if (!isEqual(m, mac)) {
-                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
-                                   .debug("PDU Mac code failed , session " +
-                        this.distantSessionID);
-                    throw new IOException("PDU Mac code failed ");
+                    if (!isEqual(m, mac)) {
+                        ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug(
+                                "PDU Mac code failed , session " + this.distantSessionID);
+                        throw new IOException("PDU Mac code failed ");
+                    }
                 }
-            }
-            break;
-        case SERVER:
-            // act as server
-            if (this.securityContext.getReceiveRequest()
-                                        .isConfidentialityEnabled()) {
-                try {
-                    in = this.cl_cipher.doFinal(in);
-                } catch (Exception ex) {
-                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
-                                   .debug("PDU Cipher code decryption failed, session " +
-                        this.distantSessionID);
-                    throw new IOException("PDU failed to decrypt " +
-                        ex.getMessage());
+                break;
+            case SERVER:
+                // act as server
+                if (this.securityContext.getReceiveRequest().isConfidentialityEnabled()) {
+                    try {
+                        in = this.cl_cipher.doFinal(in);
+                    } catch (Exception ex) {
+                        ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug(
+                                "PDU Cipher code decryption failed, session " + this.distantSessionID);
+                        throw new IOException("PDU failed to decrypt " + ex.getMessage());
+                    }
                 }
-            }
-            if (this.securityContext.getReceiveRequest().isIntegrityEnabled()) {
-                this.cl_mac.update(in); // MAC is taken on plain text.
+                if (this.securityContext.getReceiveRequest().isIntegrityEnabled()) {
+                    this.cl_mac.update(in); // MAC is taken on plain text.
 
-                byte[] m = null;
-                m = this.cl_mac.doFinal();
+                    byte[] m = null;
+                    m = this.cl_mac.doFinal();
 
-                ProActiveLogger.getLogger(Loggers.SECURITY_SESSION)
-                               .debug("readPDU as server cl_mac :" +
-                    displayByte(this.cl_hmac_key.getEncoded()));
-                if (!isEqual(m, mac)) {
-                    throw new IOException("PDU Mac code failed, session " +
-                        this.distantSessionID);
+                    ProActiveLogger.getLogger(Loggers.SECURITY_SESSION).debug(
+                            "readPDU as server cl_mac :" + displayByte(this.cl_hmac_key.getEncoded()));
+                    if (!isEqual(m, mac)) {
+                        throw new IOException("PDU Mac code failed, session " + this.distantSessionID);
+                    }
                 }
-            }
-            break;
-        default:
-            break;
+                break;
+            default:
+                break;
         }
 
         //
@@ -356,8 +344,7 @@ public class Session implements Serializable {
     }
 
     // implements Serializable
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
+    private void writeObject(java.io.ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
         if (this.se_iv != null) {
             out.write(this.se_iv.getIV());
@@ -382,8 +369,7 @@ public class Session implements Serializable {
         //        out.write(cert);
     }
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
 
         //if (cipher) {
@@ -412,13 +398,11 @@ public class Session implements Serializable {
             this.se_mac = Mac.getInstance("HMACSHA1", "BC"); // Server side MAC
 
             if ((this.se_iv != null) && (this.se_aes_key != null)) {
-                this.se_cipher.init(Cipher.DECRYPT_MODE, this.se_aes_key,
-                    this.se_iv);
+                this.se_cipher.init(Cipher.DECRYPT_MODE, this.se_aes_key, this.se_iv);
             }
 
             if ((this.cl_iv != null) && (this.cl_aes_key != null)) {
-                this.cl_cipher.init(Cipher.ENCRYPT_MODE, this.cl_aes_key,
-                    this.cl_iv, this.sec_rand);
+                this.cl_cipher.init(Cipher.ENCRYPT_MODE, this.cl_aes_key, this.cl_iv, this.sec_rand);
             }
 
             if ((this.se_mac != null) && (this.se_hmac_key != null)) {
@@ -445,10 +429,7 @@ public class Session implements Serializable {
             return null;
         }
 
-        String[] pseudo = {
-                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C",
-                "D", "E", "F"
-            };
+        String[] pseudo = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F" };
 
         StringBuffer out = new StringBuffer(in.length * 2);
 
@@ -475,9 +456,8 @@ public class Session implements Serializable {
 
     @Override
     public String toString() {
-        return "ID : " + this.distantSessionID + "\n" + "cl_rand : " +
-        displayByte(this.cl_rand) + "\n" + "se_rand : " +
-        displayByte(this.se_rand);
+        return "ID : " + this.distantSessionID + "\n" + "cl_rand : " + displayByte(this.cl_rand) + "\n" +
+            "se_rand : " + displayByte(this.se_rand);
     }
 
     //    /**

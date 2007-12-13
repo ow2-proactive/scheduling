@@ -45,8 +45,8 @@ import org.objectweb.proactive.core.UniqueID;
 public class HistoryUpdater implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
 
     /** Reception events, i.e. id of the senders */
     public List<UniqueID> elements;
@@ -75,8 +75,8 @@ public class HistoryUpdater implements Serializable {
      * @param checkpointIndex Index of the associated checkpoint
      * @param incarnation Incarnation number of the sender
      */
-    public HistoryUpdater(List<UniqueID> elements, long base, long last,
-        UniqueID owner, int checkpointIndex, int incarnation) {
+    public HistoryUpdater(List<UniqueID> elements, long base, long last, UniqueID owner, int checkpointIndex,
+            int incarnation) {
         this.elements = elements;
         this.base = base;
         this.last = last;

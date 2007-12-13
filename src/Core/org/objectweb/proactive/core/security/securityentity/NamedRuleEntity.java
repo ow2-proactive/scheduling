@@ -44,8 +44,7 @@ public class NamedRuleEntity extends RuleEntity {
      */
     private final String name;
 
-    public NamedRuleEntity(EntityType type, KeyStore keystore, String name)
-        throws KeyStoreException {
+    public NamedRuleEntity(EntityType type, KeyStore keystore, String name) throws KeyStoreException {
         super(type, KeyStoreTools.getApplicationLevel(keystore));
         this.name = name;
     }

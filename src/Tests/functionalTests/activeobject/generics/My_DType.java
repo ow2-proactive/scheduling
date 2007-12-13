@@ -42,8 +42,8 @@ import java.io.Serializable;
 public class My_DType implements Serializable {
 
     /**
-         *
-         */
+     *
+     */
     private String str = null;
 
     public My_DType(String str) {

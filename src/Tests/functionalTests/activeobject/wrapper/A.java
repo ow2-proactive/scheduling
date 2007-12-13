@@ -53,8 +53,8 @@ import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 public class A implements RunActive, Serializable {
 
     /**
-         *
-         */
+     *
+     */
     public A() {
     }
 
@@ -75,8 +75,7 @@ public class A implements RunActive, Serializable {
     }
 
     public StringMutableWrapper testStringMutableWrapper() {
-        return new StringMutableWrapper(
-            "Alexandre dC is a famous coder <-- do you mean that ? really ?");
+        return new StringMutableWrapper("Alexandre dC is a famous coder <-- do you mean that ? really ?");
     }
 
     public FloatMutableWrapper testFloatMutableWrapper() {
@@ -100,8 +99,7 @@ public class A implements RunActive, Serializable {
     }
 
     public StringWrapper testStringWrapper() {
-        return new StringWrapper(
-            "Alexandre dC is a famous coder <-- do you mean that ? really ?");
+        return new StringWrapper("Alexandre dC is a famous coder <-- do you mean that ? really ?");
     }
 
     public FloatWrapper testFloatWrapper() {

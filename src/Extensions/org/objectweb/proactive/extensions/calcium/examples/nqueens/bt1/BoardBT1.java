@@ -46,8 +46,7 @@ public class BoardBT1 extends Board {
      * @param bound1 Columna de la fila 1 para la cual se esta calculando.
      * @param board Arreglo con el tablero generado hasta la posicion fila-1.
      */
-    public BoardBT1(int n, int solvableSize, int row, int left, int down,
-        int right, int bound1, int[] board) {
+    public BoardBT1(int n, int solvableSize, int row, int left, int down, int right, int bound1, int[] board) {
         super(n, solvableSize, row, left, down, right, bound1);
 
         if (row == 2) {

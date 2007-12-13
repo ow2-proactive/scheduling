@@ -76,8 +76,7 @@ public class Domain implements Serializable {
         this.identification = i.intValue();
         this.rock = planet;
         this.octTree = oct;
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
     /**
@@ -112,19 +111,17 @@ public class Domain implements Serializable {
                 logger.info("Compute movement.");
             }
         } else {
-            this.display.drawBody(this.rock.x, this.rock.y, this.rock.z,
-                this.rock.vx, this.rock.vy, this.rock.vz, (int) this.rock.mass,
-                (int) this.rock.diameter, this.identification, this.hostName);
+            this.display.drawBody(this.rock.x, this.rock.y, this.rock.z, this.rock.vx, this.rock.vy,
+                    this.rock.vz, (int) this.rock.mass, (int) this.rock.diameter, this.identification,
+                    this.hostName);
         }
     }
 
     /**
      * Method called when the object is redeployed on a new Node (Fault recovery, or migration).
      */
-    private void readObject(java.io.ObjectInputStream in)
-        throws java.io.IOException, ClassNotFoundException {
+    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.hostName = ProActiveInet.getInstance().getInetAddress()
-                                     .getHostName();
+        this.hostName = ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 }

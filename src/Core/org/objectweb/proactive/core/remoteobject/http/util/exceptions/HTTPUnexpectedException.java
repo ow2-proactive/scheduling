@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.remoteobject.http.util.exceptions;
 
-
 /**
  * @author sbeucler
  *

@@ -44,9 +44,8 @@ public interface FileTransferServiceSend {
      * @param numFlyingBlocks The number of simultaneous blocks that will be sent.
      * @return The result status of the operation.
      */
-    public OperationStatus send(File srcFile,
-        FileTransferServiceReceive ftsRemote, File dstFile, int bsize,
-        int numFlyingBlocks);
+    public OperationStatus send(File srcFile, FileTransferServiceReceive ftsRemote, File dstFile, int bsize,
+            int numFlyingBlocks);
 
     public void putBackInPool(FileTransferServiceReceive ftsDst);
 }

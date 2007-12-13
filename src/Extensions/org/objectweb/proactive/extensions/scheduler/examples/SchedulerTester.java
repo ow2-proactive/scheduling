@@ -99,13 +99,10 @@ public class SchedulerTester {
         try {
             // almost optional arguments...
             JOBS_HOME = args[1];
-            SchedulerTester jl = new SchedulerTester((args.length > 1)
-                    ? Integer.parseInt(args[2]) : DEFAULT_MSP,
-                    (args.length > 3) ? Integer.parseInt(args[3]) : DEFAULT_MNJ);
-            totalMaxJobs = (args.length > 4) ? Integer.parseInt(args[4])
-                                             : DEFAULT_TOTAL_NL;
-            jl.authentication = SchedulerConnection.join((args.length > 0)
-                    ? args[0] : DEFAULT_URL);
+            SchedulerTester jl = new SchedulerTester((args.length > 1) ? Integer.parseInt(args[2])
+                    : DEFAULT_MSP, (args.length > 3) ? Integer.parseInt(args[3]) : DEFAULT_MNJ);
+            totalMaxJobs = (args.length > 4) ? Integer.parseInt(args[4]) : DEFAULT_TOTAL_NL;
+            jl.authentication = SchedulerConnection.join((args.length > 0) ? args[0] : DEFAULT_URL);
             jl.randomizedTest();
         } catch (SchedulerException e) {
             // TODO Auto-generated catch block
@@ -124,8 +121,7 @@ public class SchedulerTester {
         Vector<String> jobs = null;
         try {
             // read logins
-            FileReader l = new FileReader(SchedulerTester.class.getResource(
-                        "login.cfg").getFile());
+            FileReader l = new FileReader(SchedulerTester.class.getResource("login.cfg").getFile());
             BufferedReader br = new BufferedReader(l);
             String current = br.readLine();
             while (current != null) {
@@ -160,8 +156,7 @@ public class SchedulerTester {
             System.out.println();
 
             for (String s : logins.keySet()) {
-                Thread user = new Thread(new User(s, logins.get(s), jobs,
-                            authentication));
+                Thread user = new Thread(new User(s, logins.get(s), jobs, authentication));
                 user.start();
                 this.users.add(user);
             }
@@ -188,7 +183,7 @@ public class SchedulerTester {
          * @param jobs
          */
         public User(String login, String pswd, Vector<String> jobs,
-            SchedulerAuthenticationInterface authentication) {
+                SchedulerAuthenticationInterface authentication) {
             super();
             this.login = login;
             this.pswd = pswd;
@@ -211,16 +206,13 @@ public class SchedulerTester {
 
             while (true) {
                 try {
-                    int nbJob = generator.nextInt(SchedulerTester.this.maxNbJobs) +
-                        1;
+                    int nbJob = generator.nextInt(SchedulerTester.this.maxNbJobs) + 1;
                     int job = generator.nextInt(jobs.size());
 
                     //Create job
-                    Job j = JobFactory.getFactory()
-                                      .createJob(JOBS_HOME + jobs.get(job));
-                    System.out.println("[SCHEDULER TEST] Submitting " +
-                        jobs.get(job) + " (" + nbJob + " instances) by " +
-                        this.login);
+                    Job j = JobFactory.getFactory().createJob(JOBS_HOME + jobs.get(job));
+                    System.out.println("[SCHEDULER TEST] Submitting " + jobs.get(job) + " (" + nbJob +
+                        " instances) by " + this.login);
 
                     for (int i = 0; i < nbJob; i++) {
                         // Submit job
@@ -243,8 +235,7 @@ public class SchedulerTester {
 
                 // Sleep
                 try {
-                    Thread.sleep(generator.nextInt(
-                            SchedulerTester.this.maxSubmissionPeriod) + 12000);
+                    Thread.sleep(generator.nextInt(SchedulerTester.this.maxSubmissionPeriod) + 12000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

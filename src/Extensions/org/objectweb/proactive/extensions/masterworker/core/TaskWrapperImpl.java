@@ -47,12 +47,12 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskI
 public class TaskWrapperImpl implements TaskIntern<Serializable> {
 
     /**
-         *
-         */
+     *
+     */
 
     /**
-    * The id of the task
-    */
+     * The id of the task
+     */
     protected long id = NULL_TASK_ID;
 
     /**
@@ -120,8 +120,7 @@ public class TaskWrapperImpl implements TaskIntern<Serializable> {
     /**
      * {@inheritDoc}
      */
-    public Serializable run(final WorkerMemory memory)
-        throws Exception {
+    public Serializable run(final WorkerMemory memory) throws Exception {
         return this.realTask.run(memory);
     }
 

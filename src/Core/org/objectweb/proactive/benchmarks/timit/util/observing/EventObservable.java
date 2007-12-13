@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.observing;
 
-
 /**
  * This interface defines the Observable.
  * Part of the specialized Observer/Observable pattern.

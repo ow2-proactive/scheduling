@@ -30,7 +30,6 @@
  */
 package functionalTests.descriptor.extendedjvm;
 
-
 /**
  * @author  ProActive Team
  * @version 1.0

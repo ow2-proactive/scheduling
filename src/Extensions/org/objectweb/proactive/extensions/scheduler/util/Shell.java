@@ -30,10 +30,8 @@
  */
 package org.objectweb.proactive.extensions.scheduler.util;
 
-public enum Shell {Sh("/bin/sh"),
-    Bash("/bin/bash"),
-    Zsh("/bin/zsh"),
-    Csh("/bin/csh");
+public enum Shell {
+    Sh("/bin/sh"), Bash("/bin/bash"), Zsh("/bin/zsh"), Csh("/bin/csh");
     private String command;
 
     Shell(String command) {

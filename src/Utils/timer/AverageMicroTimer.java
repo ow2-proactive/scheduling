@@ -151,8 +151,7 @@ public class AverageMicroTimer implements Timer, Serializable {
         out.defaultWriteObject();
     }
 
-    private void readObject(ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
         this.timer = new MicroTimer();
     }

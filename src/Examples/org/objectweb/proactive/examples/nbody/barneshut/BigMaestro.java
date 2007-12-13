@@ -71,7 +71,7 @@ public class BigMaestro implements Serializable {
      * @param killsupport KillSupport
      */
     public BigMaestro(Maestro[] maestroArray, Integer max,
-        org.objectweb.proactive.examples.nbody.common.Start killsupport) {
+            org.objectweb.proactive.examples.nbody.common.Start killsupport) {
         this.killsupport = killsupport;
         this.maxIter = max.intValue();
         this.maestroArray = maestroArray;

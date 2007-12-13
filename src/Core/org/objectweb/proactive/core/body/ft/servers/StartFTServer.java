@@ -68,8 +68,8 @@ public class StartFTServer {
             String p2pServer = null;
 
             if (args.length == 0) {
-                System.out.println(
-                    "Usage : startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)] [-p2p serverUrl]");
+                System.out
+                        .println("Usage : startGlobalFTServer [-proto cic|pml] [-name name] [-port portnumber] [-fdperiod faultDetectionPeriod (sec)] [-p2p serverUrl]");
             } else {
                 for (int i = 0; i < args.length; i++) {
                     if (args[i].equals("-port")) {
@@ -119,8 +119,7 @@ public class StartFTServer {
                 cs = new CheckpointServerPMLRB(server);
                 rp = new RecoveryProcessPMLRB(server);
             } else {
-                System.err.println("ERROR: " + proto +
-                    " is not a valid protocol. Aborting.");
+                System.err.println("ERROR: " + proto + " is not a valid protocol. Aborting.");
                 System.exit(1);
             }
 
@@ -136,11 +135,9 @@ public class StartFTServer {
             server.init(fd, ls, rp, rs, cs);
             server.startFailureDetector();
 
-            String host = ProActiveInet.getInstance().getInetAddress()
-                                       .getHostName();
+            String host = ProActiveInet.getInstance().getInetAddress().getHostName();
             Naming.rebind("rmi://" + host + ":" + port + "/" + name, server);
-            System.out.println("Fault-tolerance server is bound on rmi://" +
-                host + ":" + port + "/" + name);
+            System.out.println("Fault-tolerance server is bound on rmi://" + host + ":" + port + "/" + name);
         } catch (RemoteException e) {
             System.err.println("** ERROR ** Unable to launch FT server : ");
             e.printStackTrace();

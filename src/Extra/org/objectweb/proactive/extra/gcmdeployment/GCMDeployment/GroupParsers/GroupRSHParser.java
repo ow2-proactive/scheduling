@@ -48,8 +48,7 @@ public class GroupRSHParser extends AbstractGroupParser {
         GroupSSH groupSSH = (GroupSSH) super.parseGroupNode(groupNode, xpath);
 
         // Mandatory attributes
-        String hostList = GCMParserHelper.getAttributeValue(groupNode,
-                ATTR_HOST_LIST);
+        String hostList = GCMParserHelper.getAttributeValue(groupNode, ATTR_HOST_LIST);
         groupSSH.setHostList(hostList);
 
         return groupSSH;

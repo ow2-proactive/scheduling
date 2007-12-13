@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.group.threadpool;
 
-
 /**
  * This object is used by a thread pool to control the termination of the jobs.
  * A member of the ThreadPool class uses this object as a lock and perfoms
@@ -47,7 +46,6 @@ public class EndControler {
      */
 
     //  private boolean started = false;
-
     /** Suspends the current thread until all the pending jobs in the ThreadPool are done. */
     synchronized public void waitDone() {
         try {

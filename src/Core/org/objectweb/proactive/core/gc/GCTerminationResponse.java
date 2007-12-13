@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.gc;
 
-
 /**
  * When an AO makes a consensus, it notifies its referencers with this response
  * This is just an optimization

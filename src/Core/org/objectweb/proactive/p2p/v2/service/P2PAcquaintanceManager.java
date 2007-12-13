@@ -66,8 +66,8 @@ import org.objectweb.proactive.p2p.v2.service.util.P2PConstants;
  * @author Alexandre di Costanzo
  *
  */
-public class P2PAcquaintanceManager implements InitActive, RunActive,
-    Serializable, P2PConstants, ProActiveInternalObject {
+public class P2PAcquaintanceManager implements InitActive, RunActive, Serializable, P2PConstants,
+        ProActiveInternalObject {
 
     /**
      * The maximum waiting time before considering an ACQ request
@@ -157,8 +157,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         // How many peers ?
         if (this.getEstimatedNumberOfAcquaintances() < NOA) {
             // Looking for new peers
-            logger.debug("NOA is " + NOA +
-                " - Size of P2PAcquaintanceManager is " +
+            logger.debug("NOA is " + NOA + " - Size of P2PAcquaintanceManager is " +
                 this.getEstimatedNumberOfAcquaintances() +
                 " looking for new acquaintances through prefered ones");
             this.connectToPreferedAcquaintances();
@@ -167,8 +166,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         // How many peers ?
         if (this.getEstimatedNumberOfAcquaintances() < NOA) {
             // Looking for new peers
-            logger.debug("NOA is " + NOA +
-                " - Size of P2PAcquaintanceManager is " +
+            logger.debug("NOA is " + NOA + " - Size of P2PAcquaintanceManager is " +
                 this.getEstimatedNumberOfAcquaintances() +
                 " looking for new acquaintances through exploration");
 
@@ -186,8 +184,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         service.blockingServeOldest(P2PService.TTU);
         while (System.currentTimeMillis() < endTime) {
             try {
-                service.blockingServeOldest(endTime -
-                    System.currentTimeMillis());
+                service.blockingServeOldest(endTime - System.currentTimeMillis());
             } catch (ProActiveRuntimeException e) {
                 e.printStackTrace();
                 logger.debug("Certainly because the body is not active", e);
@@ -208,8 +205,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         HashSet<String> newSet = new HashSet<String>();
         String tmp = null;
         Iterator it = this.preferedAcquaintancesURLs.iterator();
-        while (it.hasNext() &&
-                (this.getEstimatedNumberOfAcquaintances() < NOA)) {
+        while (it.hasNext() && (this.getEstimatedNumberOfAcquaintances() < NOA)) {
             //remove it from the current HashSet 
             //and add it in the temporary one
             tmp = (String) it.next();
@@ -224,18 +220,16 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
                 Node distNode = NodeFactory.getNode(peerUrl);
                 P2PService peer = (P2PService) distNode.getActiveObjects(P2PService.class.getName())[0];
                 if ( //!peer.equals(this.localService) &&
-                    !this.contains(peer).booleanValue()) {
+                !this.contains(peer).booleanValue()) {
                     // Send a message to the remote peer to register myself
-                    System.out.println(
-                        "P2PAcquaintanceManager requesting peer " + peerUrl);
+                    System.out.println("P2PAcquaintanceManager requesting peer " + peerUrl);
                     //peer.registerRequest(this.localService);
                     startAcquaintanceHandShake(peerUrl, peer);
                 } else {
                     newSet.add(peerUrl);
                 }
             } catch (Exception e) {
-                System.out.println("The peer at " + peerUrl +
-                    " couldn't be contacted");
+                System.out.println("The peer at " + peerUrl + " couldn't be contacted");
                 e.printStackTrace();
                 //put it back for later use
                 newSet.add(peerUrl);
@@ -273,8 +267,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             //        System.out.println("P2PAcquaintanceManager.cleanAwaitedReplies() request sent at " + ((DatedRequest) entry.getValue()).getTime() );
             //        System.out.println("P2PAcquaintanceManager.cleanAwaitedReplies() now " + System.currentTimeMillis());
             if ((System.currentTimeMillis() - (entry.getValue()).getTime()) > MAX_WAIT_TIME) {
-                System.out.println("xxxxx Peer " + entry.getKey() +
-                    " did not reply to our request");
+                System.out.println("xxxxx Peer " + entry.getKey() + " did not reply to our request");
                 //this guy did not reply so we should put it back in the preferedACQList
                 urls.add(entry.getKey());
                 it.remove();
@@ -298,8 +291,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         //		peer.message(new AcquaintanceRequest(1,
         //		this.localService.generateUuid(), this.localService));
         System.out.println("XXXXXX putting in awaited List " + peerUrl);
-        awaitedReplies.put(buildCorrectUrl(peerUrl),
-            new DatedRequest(peer, System.currentTimeMillis()));
+        awaitedReplies.put(buildCorrectUrl(peerUrl), new DatedRequest(peer, System.currentTimeMillis()));
     }
 
     /**
@@ -316,8 +308,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @return add succesfull
      */
     public Vector<String> add(P2PService peer) {
-        return this.add(buildCorrectUrl(PAActiveObject.getActiveObjectNodeUrl(
-                    peer)), peer);
+        return this.add(buildCorrectUrl(PAActiveObject.getActiveObjectNodeUrl(peer)), peer);
     }
 
     /**
@@ -333,8 +324,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
             if (this.shouldBeAcquaintance(peer)) {
                 if (!peerUrl.matches(".*cannot contact the body.*")) {
                     result = this.acquaintances.add(peer, peerUrl);
-                    logger.info("Acquaintance " + peerUrl + " " + result +
-                        " added");
+                    logger.info("Acquaintance " + peerUrl + " " + result + " added");
                 }
                 return null;
             }
@@ -346,15 +336,13 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     }
 
     public void acqAccepted(String url, P2PService peer) {
-        logger.info("P2PAcquaintanceManager.acqAccepted() got a reply from " +
-            url);
+        logger.info("P2PAcquaintanceManager.acqAccepted() got a reply from " + url);
         System.out.println("URL:" + url + " PEER:" + peer);
         //we remove it from the awaited answers
         //if we don't do so, it might be refused because of the NOA limit
         this.removeFromAwaited(url);
         this.add(url, peer);
-        System.out.println("P2PAcquaintanceManager.acqAccepted() adding " +
-            "--" + url + "--");
+        System.out.println("P2PAcquaintanceManager.acqAccepted() adding " + "--" + url + "--");
         this.preferedAcquaintancesURLs.add(url);
         Iterator it = this.preferedAcquaintancesURLs.iterator();
         while (it.hasNext()) {
@@ -376,8 +364,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         for (int i = 0; i < tmp.length; i++) {
             System.out.println("--" + tmp[i] + "--");
         }
-        logger.info("Removing --" + url + "-- from awaited peers " +
-            awaitedReplies.remove(url));
+        logger.info("Removing --" + url + "-- from awaited peers " + awaitedReplies.remove(url));
     }
 
     /**
@@ -387,8 +374,8 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
      * @param acquaintancesURLs
      */
     public void remove(P2PService peer, Vector<String> acquaintancesURLs) {
-        boolean result = this.acquaintances.remove(peer,
-                buildCorrectUrl(PAActiveObject.getActiveObjectNodeUrl(peer)));
+        boolean result = this.acquaintances.remove(peer, buildCorrectUrl(PAActiveObject
+                .getActiveObjectNodeUrl(peer)));
         if (acquaintancesURLs != null) {
             this.addToPreferedAcq(acquaintancesURLs);
         }
@@ -413,8 +400,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     //        acquaintances.dumpAcquaintances();
     //    }
     public Vector<String> getAcquaintancesURLs() {
-        return new Vector<String>(Arrays.asList(
-                this.acquaintances.getAcquaintancesURLs()));
+        return new Vector<String>(Arrays.asList(this.acquaintances.getAcquaintancesURLs()));
     }
 
     /**
@@ -505,8 +491,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         //we are in the grey area, only accept with some probability
         //first compute the probability according to the max number
         logger.info("estimatedNOA " + this.getEstimatedNumberOfAcquaintances());
-        double prob = (-(1.0 / this.getMaxNOA()) * this.getEstimatedNumberOfAcquaintances()) +
-            2;
+        double prob = (-(1.0 / this.getMaxNOA()) * this.getEstimatedNumberOfAcquaintances()) + 2;
         logger.info("Probability to accept set to " + prob);
         return (randomizer.nextDouble() <= prob);
         //		{
@@ -539,7 +524,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     }
 
     public String[] getAwaitedRepliesUrls() {
-        return this.awaitedReplies.keySet().toArray(new String[] {  });
+        return this.awaitedReplies.keySet().toArray(new String[] {});
     }
 
     /**
@@ -573,8 +558,7 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
     }
 
     public void setMaxNOA(int noa) {
-        logger.info("P2PAcquaintanceManager.setNOA() changing noa from " + NOA +
-            " to " + noa);
+        logger.info("P2PAcquaintanceManager.setNOA() changing noa from " + NOA + " to " + noa);
         P2PAcquaintanceManager.NOA = noa;
     }
 
@@ -590,15 +574,13 @@ public class P2PAcquaintanceManager implements InitActive, RunActive,
         }
 
         System.out.println("---------------------------------------------");
-        System.out.println("----- Awaited Replies ---" +
-            this.awaitedReplies.size());
+        System.out.println("----- Awaited Replies ---" + this.awaitedReplies.size());
         Set<Map.Entry<String, DatedRequest>> map = awaitedReplies.entrySet();
         Iterator it2 = map.iterator();
         while (it2.hasNext()) {
             Map.Entry<String, DatedRequest> entry = (Map.Entry<String, DatedRequest>) it2.next();
 
-            System.out.println(entry.getKey() + " requested at " +
-                (entry.getValue()).getTime());
+            System.out.println(entry.getKey() + " requested at " + (entry.getValue()).getTime());
         }
 
         System.out.println("---------------------------------------------");

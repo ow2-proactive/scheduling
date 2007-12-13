@@ -54,19 +54,15 @@ public class A implements java.io.Serializable {
     public BooleanWrapper standardService(UniqueID caller) {
         Context current = PAActiveObject.getContext();
         Request r = current.getCurrentRequest();
-        return new BooleanWrapper((r != null) &&
-            (current.getBody().getID().equals(myID)) &&
-            (r.getSourceBodyID().equals(caller)) &&
-            (r.getMethodName().equals("standardService")));
+        return new BooleanWrapper((r != null) && (current.getBody().getID().equals(myID)) &&
+            (r.getSourceBodyID().equals(caller)) && (r.getMethodName().equals("standardService")));
     }
 
     public BooleanWrapper immediateService(UniqueID caller) {
         Context current = PAActiveObject.getContext();
         Request r = current.getCurrentRequest();
-        return new BooleanWrapper((r != null) &&
-            (current.getBody().getID().equals(myID)) &&
-            (r.getSourceBodyID().equals(caller)) &&
-            (r.getMethodName().equals("immediateService")));
+        return new BooleanWrapper((r != null) && (current.getBody().getID().equals(myID)) &&
+            (r.getSourceBodyID().equals(caller)) && (r.getMethodName().equals("immediateService")));
     }
 
     public BooleanWrapper test(A a) {

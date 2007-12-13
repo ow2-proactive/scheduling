@@ -65,8 +65,8 @@ import org.objectweb.proactive.extensions.scheduler.util.Shell;
 public class SimpleScilab extends JavaExecutable {
 
     /**
-         *
-         */
+     *
+     */
     final private static String[] DEFAULT_OUT_VARIABLE_SET = { "out" };
 
     /**
@@ -134,17 +134,13 @@ public class SimpleScilab extends JavaExecutable {
         findScilab();
 
         // We create a custom URI as the node name
-        uri = URIBuilder.buildURI("localhost", "Scilab" +
-                (new Date()).getTime()).toString();
-        System.out.println("[" + host +
-            " SCILAB TASK] Starting the Java Process");
+        uri = URIBuilder.buildURI("localhost", "Scilab" + (new Date()).getTime()).toString();
+        System.out.println("[" + host + " SCILAB TASK] Starting the Java Process");
         // We spawn a new JVM with the SCILAB library paths
         process = startProcess(uri);
         // We define the loggers which will write on standard output what comes from the java process
-        isLogger = new LoggingThread(process.getInputStream(),
-                "[" + host + " SCILAB TASK: SUBPROCESS OUT]");
-        esLogger = new LoggingThread(process.getErrorStream(),
-                "[" + host + " SCILAB TASK: SUBPROCESS ERR]");
+        isLogger = new LoggingThread(process.getInputStream(), "[" + host + " SCILAB TASK: SUBPROCESS OUT]");
+        esLogger = new LoggingThread(process.getErrorStream(), "[" + host + " SCILAB TASK: SUBPROCESS ERR]");
 
         // We start the loggers thread
         Thread t1 = new Thread(isLogger);
@@ -230,8 +226,7 @@ public class SimpleScilab extends JavaExecutable {
      * @param params parameters of the constructor
      * @throws Throwable
      */
-    protected AOSimpleScilab deploy(String uri, String workerClassName,
-        Object... params) throws Throwable {
+    protected AOSimpleScilab deploy(String uri, String workerClassName, Object... params) throws Throwable {
         ProActiveException ex = null;
         AOSimpleScilab worker = null;
         System.out.println("[" + host + " SCILAB TASK] Deploying the Worker");
@@ -241,8 +236,7 @@ public class SimpleScilab extends JavaExecutable {
         for (int i = 0; i < 30; i++) {
             try {
                 try {
-                    worker = (AOSimpleScilab) PAActiveObject.newActive(workerClassName,
-                            params, uri);
+                    worker = (AOSimpleScilab) PAActiveObject.newActive(workerClassName, params, uri);
                 } catch (ProActiveException e) {
                     ex = e;
                 }
@@ -254,8 +248,7 @@ public class SimpleScilab extends JavaExecutable {
         }
 
         if (worker == null) {
-            System.err.println("[" + host +
-                " SCILAB TASK] Worker couldn't be deployed.");
+            System.err.println("[" + host + " SCILAB TASK] Worker couldn't be deployed.");
             throw ex;
         }
 
@@ -269,14 +262,10 @@ public class SimpleScilab extends JavaExecutable {
      * @return result of the task
      * @throws Throwable
      */
-    protected Object executeInternal(String uri, TaskResult... results)
-        throws Throwable {
-        System.out.println("[" + host +
-            " SCILAB TASK] Deploying Worker (SimpleScilab)");
-        scilabWorker = deploy(uri, AOSimpleScilab.class.getName(), inputScript,
-                scriptLines, out_set);
-        System.out.println("[" + host +
-            " SCILAB TASK] Executing (SimpleScilab)");
+    protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
+        System.out.println("[" + host + " SCILAB TASK] Deploying Worker (SimpleScilab)");
+        scilabWorker = deploy(uri, AOSimpleScilab.class.getName(), inputScript, scriptLines, out_set);
+        System.out.println("[" + host + " SCILAB TASK] Executing (SimpleScilab)");
 
         // We execute the task on the worker
         Object res = scilabWorker.execute(results);
@@ -355,24 +344,20 @@ public class SimpleScilab extends JavaExecutable {
      * @throws InterruptedException
      * @throws ScilabInitException
      */
-    private final void findScilab()
-        throws IOException, InterruptedException, ScilabInitException {
-        System.out.println("[" + host +
-            " SCILAB TASK] launching script to find Scilab");
+    private final void findScilab() throws IOException, InterruptedException, ScilabInitException {
+        System.out.println("[" + host + " SCILAB TASK] launching script to find Scilab");
 
         Process p1 = null;
 
         if (os.equals(OperatingSystem.unix)) {
             // Under linux we launch an instance of the Shell
             // and then pipe to it the script's content
-            InputStream is = SimpleScilab.class.getResourceAsStream(
-                    "find_scilab_command.sh");
+            InputStream is = SimpleScilab.class.getResourceAsStream("find_scilab_command.sh");
             p1 = LinuxShellExecuter.executeShellScript(is, Shell.Bash);
         } else if (os.equals(OperatingSystem.windows)) {
             // We can't execute the script on Windows the same way,
             // we need to write the content of the batch file locally and then launch the file
-            InputStream is = SimpleScilab.class.getResourceAsStream(
-                    "find_scilab_command.bat");
+            InputStream is = SimpleScilab.class.getResourceAsStream("find_scilab_command.bat");
 
             // Code for writing the content of the stream inside a local file
             List<String> inputLines = getContentAsList(is);
@@ -386,8 +371,7 @@ public class SimpleScilab extends JavaExecutable {
             batchFile.deleteOnExit();
 
             if (batchFile.canWrite()) {
-                PrintWriter pw = new PrintWriter(new BufferedWriter(
-                            new FileWriter(batchFile)));
+                PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(batchFile)));
 
                 for (String line : inputLines) {
                     pw.println(line);
@@ -404,8 +388,7 @@ public class SimpleScilab extends JavaExecutable {
             // finally we launch the batch file
             p1 = Runtime.getRuntime().exec("find_scilab_command.bat");
         } else {
-            throw new UnsupportedOperationException("[" + host +
-                " SCILAB TASK] Finding Scilab on " + os +
+            throw new UnsupportedOperationException("[" + host + " SCILAB TASK] Finding Scilab on " + os +
                 " is not supported yet");
         }
 
@@ -420,8 +403,7 @@ public class SimpleScilab extends JavaExecutable {
         // 2nd line : the name of the os-dependant arch dir
         if (p1.waitFor() == 0) {
             scilabHome = lines.get(0);
-            System.out.println("[" + host + " SCILAB TASK] Found Scilab at : " +
-                scilabHome);
+            System.out.println("[" + host + " SCILAB TASK] Found Scilab at : " + scilabHome);
         } else {
             StringWriter error_message = new StringWriter();
             PrintWriter pw = new PrintWriter(error_message);
@@ -442,8 +424,7 @@ public class SimpleScilab extends JavaExecutable {
      */
     private List<String> getContentAsList(InputStream is) {
         ArrayList<String> lines = new ArrayList<String>();
-        BufferedReader d = new BufferedReader(new InputStreamReader(
-                    new BufferedInputStream(is)));
+        BufferedReader d = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
 
         String line = null;
 
@@ -481,8 +462,8 @@ public class SimpleScilab extends JavaExecutable {
     private static class DummyJVMProcess extends JVMProcessImpl {
 
         /**
-                 *
-                 */
+         *
+         */
         public List<String> getJavaCommand() {
             String javaCommand = buildJavaCommand();
             List<String> javaCommandList = new ArrayList<String>();
@@ -512,8 +493,7 @@ public class SimpleScilab extends JavaExecutable {
         }
 
         public void run() {
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                        streamToLog));
+            BufferedReader br = new BufferedReader(new InputStreamReader(streamToLog));
             String line = null;
             ;
 

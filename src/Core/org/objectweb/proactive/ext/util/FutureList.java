@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.ext.util;
 
-
 /**
  * <p>
  * <code>FutureList</code> is an object used to monitor a subset of all the

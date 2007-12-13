@@ -67,7 +67,7 @@ public class RSHNodeProcess extends RSHJVMProcess {
      * @param errorMessageLogger The logger that handles error stream of the target JVMProcess
      */
     public RSHNodeProcess(RemoteProcessMessageLogger inputMessageLogger,
-        RemoteProcessMessageLogger errorMessageLogger) {
+            RemoteProcessMessageLogger errorMessageLogger) {
         super(inputMessageLogger, errorMessageLogger);
         setClassname("org.objectweb.proactive.core.runtime.StartRuntime");
     }

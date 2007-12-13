@@ -95,19 +95,17 @@ public class MixedLocationMetaObjectFactory extends ProActiveMetaObjectFactory {
     //
     // -- INNER CLASSES -----------------------------------------------
     //
-    protected class RequestWithMixedLocationFactory implements RequestFactory,
-        java.io.Serializable {
+    protected class RequestWithMixedLocationFactory implements RequestFactory, java.io.Serializable {
         transient private LocationServer server = LocationServerFactory.getLocationServer();
 
-        public Request newRequest(MethodCall methodCall,
-            UniversalBody sourceBody, boolean isOneWay, long sequenceID) {
-            return new RequestWithMixedLocation(methodCall, sourceBody,
-                isOneWay, sequenceID, server);
+        public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
+                long sequenceID) {
+            return new RequestWithMixedLocation(methodCall, sourceBody, isOneWay, sequenceID, server);
         }
     }
 
-    protected static class MigrationManagerFactoryImpl
-        implements MigrationManagerFactory, java.io.Serializable {
+    protected static class MigrationManagerFactoryImpl implements MigrationManagerFactory,
+            java.io.Serializable {
         public MigrationManager newMigrationManager() {
             //System.out.println("BodyWithMixedLocation.createMigrationManager");
             return new MigrationManagerWithMixedLocation(LocationServerFactory.getLocationServer());

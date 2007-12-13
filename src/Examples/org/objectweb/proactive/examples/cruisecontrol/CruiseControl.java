@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.examples.cruisecontrol;
 
-
 /** The active object for the controller,
  * checks the speed of the car when it is on
  */

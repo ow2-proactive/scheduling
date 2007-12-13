@@ -62,8 +62,7 @@ import org.objectweb.proactive.extensions.security.loginmodule.Login;
  * @since ProActive 3.9
  *
  */
-public class SchedulerAuthentication implements InitActive,
-    SchedulerAuthenticationInterface {
+public class SchedulerAuthentication implements InitActive, SchedulerAuthenticationInterface {
 
     /** Scheduler logger */
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
@@ -78,8 +77,8 @@ public class SchedulerAuthentication implements InitActive,
     private SchedulerFrontend scheduler;
 
     /** Active state of the authentication interface :
-      * If false, user can not access the scheduler,
-      * If true user can connect to the scheduler.*/
+     * If false, user can not access the scheduler,
+     * If true user can connect to the scheduler.*/
     private boolean activated = false;
 
     /**
@@ -96,18 +95,16 @@ public class SchedulerAuthentication implements InitActive,
      * @param groupFile the file path where to check the membership of a user.
      * @param scheduler the scheduler front-end on which to connect the user after authentication success.
      */
-    public SchedulerAuthentication(String loginFile, String groupFile,
-        SchedulerFrontend scheduler) {
+    public SchedulerAuthentication(String loginFile, String groupFile, SchedulerFrontend scheduler) {
         URL jaasConfig = Login.class.getResource("jaas.config");
 
         if (jaasConfig == null) {
             throw new RuntimeException(
-                "The file 'jaas.config' has not been found and have to be at the following directory :\n" +
-                "\tclasses/Extensions/org.objectweb.proactive.extensions.security.loginmodule/");
+                "The file 'jaas.config' has not been found and have to be at the following directory :\n"
+                    + "\tclasses/Extensions/org.objectweb.proactive.extensions.security.loginmodule/");
         }
 
-        System.setProperty("java.security.auth.login.config",
-            jaasConfig.getFile());
+        System.setProperty("java.security.auth.login.config", jaasConfig.getFile());
         this.loginFile = loginFile;
         this.groupFile = groupFile;
         this.scheduler = scheduler;
@@ -123,8 +120,8 @@ public class SchedulerAuthentication implements InitActive,
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface#logAsUser(java.lang.String, java.lang.String)
      */
-    public UserSchedulerInterface logAsUser(String user, String password)
-        throws LoginException, SchedulerException {
+    public UserSchedulerInterface logAsUser(String user, String password) throws LoginException,
+            SchedulerException {
         isStarted();
         // Verify that this user//password can connect to this existing scheduler
         logger.info(user + " is trying to connect...");
@@ -145,9 +142,8 @@ public class SchedulerAuthentication implements InitActive,
         UserScheduler us = new UserScheduler();
         us.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
-        scheduler.connect(PAActiveObject.getContext().getCurrentRequest()
-                                        .getSourceBodyID(),
-            new UserIdentification(user));
+        scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(),
+                new UserIdentification(user));
 
         // return the created interface
         return us;
@@ -156,8 +152,8 @@ public class SchedulerAuthentication implements InitActive,
     /**
      * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.SchedulerAuthenticationInterface#logAsAdmin(java.lang.String, java.lang.String)
      */
-    public AdminSchedulerInterface logAsAdmin(String user, String password)
-        throws LoginException, SchedulerException {
+    public AdminSchedulerInterface logAsAdmin(String user, String password) throws LoginException,
+            SchedulerException {
         isStarted();
         // Verify that this user//password can connect (as admin) to this existing scheduler.
         logger.info("Checking admin name and password...");
@@ -177,9 +173,8 @@ public class SchedulerAuthentication implements InitActive,
         AdminScheduler as = new AdminScheduler();
         as.schedulerFrontend = scheduler;
         //add this user to the scheduler front-end
-        scheduler.connect(PAActiveObject.getContext().getCurrentRequest()
-                                        .getSourceBodyID(),
-            new UserIdentification(user, true));
+        scheduler.connect(PAActiveObject.getContext().getCurrentRequest().getSourceBodyID(),
+                new UserIdentification(user, true));
 
         // return the created interface
         return as;
@@ -187,8 +182,7 @@ public class SchedulerAuthentication implements InitActive,
 
     private void isStarted() throws SchedulerException {
         if (!activated) {
-            throw new SchedulerException(
-                "Scheduler is starting, please try to connect it later !");
+            throw new SchedulerException("Scheduler is starting, please try to connect it later !");
         }
     }
 

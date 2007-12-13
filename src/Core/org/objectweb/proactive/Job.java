@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive;
 
-
 /**
  * An object implementing this Interface provides access to its jobID
  *

@@ -177,9 +177,9 @@ public interface JVMProcess extends ExternalProcess {
     public void setOperatingSystem(OperatingSystem os);
 
     public OperatingSystem getOperatingSystem();
-    public enum PriorityLevel {low(19, "low"),
-        normal(0, "normal"),
-        high(-10, "high");
+
+    public enum PriorityLevel {
+        low(19, "low"), normal(0, "normal"), high(-10, "high");
         private int unixValue;
         private String windowsValue;
 

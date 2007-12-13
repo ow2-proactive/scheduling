@@ -71,8 +71,7 @@ public class NamesFactory {
         if (recordedName != null) {
             return recordedName;
         } else {
-            name = name.substring(name.lastIndexOf(".") + 1) + "#" +
-                (counter++);
+            name = name.substring(name.lastIndexOf(".") + 1) + "#" + (counter++);
             this.names.put(id, name);
             return name;
         }
