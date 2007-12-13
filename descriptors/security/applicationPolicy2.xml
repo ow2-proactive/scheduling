@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Policy xmlns="urn:proactive:security:1.1" schemaVersion="1.1"
+<Policy xmlns="urn:proactive:security:1.1"
 	xsi:schemaLocation="urn:proactive:security:1.1 http://www-sop.inria.fr/oasis/ProActive/schemas/security/1.1/security.xsd"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<ApplicationName>CN=Garden2</ApplicationName>
