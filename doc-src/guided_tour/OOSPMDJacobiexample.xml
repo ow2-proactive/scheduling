@@ -40,11 +40,7 @@
         <para>ProActive examples come with scripts to easily launch the
         execution under both Unix and Windows.For Jacobi, launch:</para>
 
-        <screen>ProActive/scripts/unix/group/jacobi.sh</screen>
-
-        <para>or</para>
-
-        <screen>ProActive/scripts/windows/group/jacobi.bat</screen>
+        <screen>ProActive/scripts/[unix|windows]/group/jacobi.sh</screen>
 
         <para>The computation stops after minimal difference is reached
         between two iterations (constant MINDIFF in class Jacobi.java), or
