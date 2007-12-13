@@ -78,6 +78,7 @@ public class WorldObject extends AbstractData {
     private int currentAutoResetTime = DEFAULT_AUTO_RESET_TIME;
     private boolean enableAutoReset = DEFAULT_ENABLE_AUTO_RESET;
     private String name;
+    private boolean enableMonitoring = true;
 
     //private static Logger logger = ProActiveLogger.getLogger(Loggers.JMX);
 
@@ -316,6 +317,14 @@ public class WorldObject extends AbstractData {
      */
     public boolean enableAutoResetTime() {
         return enableAutoReset;
+    }
+
+    public void enableMonitoring(boolean enable) {
+        this.enableMonitoring = enable;
+    }
+
+    public boolean getEnableMonitoring() {
+        return this.enableMonitoring;
     }
 
     /**

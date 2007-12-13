@@ -50,11 +50,13 @@ public class EnableDisableMonitoringAction extends Action
     private boolean monitoring = DEFAULT_IS_MONITORING;
     private String enableMessage = "The Monitoring is Enabled";
     private String disableMessage = "The Monitoring is Disabled";
+    private WorldObject worldObject;
 
     public EnableDisableMonitoringAction(WorldObject world) {
         super("Enable/Disable Monitoring", AS_PUSH_BUTTON);
         //this.world = world;
         this.setId(ENABLE_DISABLE_MONITORING);
+        worldObject = world;
         updateMonitoringState();
     }
 
@@ -96,7 +98,6 @@ public class EnableDisableMonitoringAction extends Action
             Console.getInstance(Activator.CONSOLE_NAME).debug(disableMessage);
         }
 
-        // TODO A faire
-        /*world.enableMonitoring(monitoring);*/
+        worldObject.enableMonitoring(monitoring);
     }
 }

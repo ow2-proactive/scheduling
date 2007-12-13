@@ -43,6 +43,7 @@ import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ic2d.jmxmonitoring.action.EnableDisableMonitoringAction;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.ActiveObject;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.NamesFactory;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.WorldObject;
@@ -172,6 +173,10 @@ public class ActiveObjectListener implements NotificationListener {
 
     @SuppressWarnings("unchecked")
     public void handleNotification(Notification notifications, Object handback) {
+        if (!ao.getWorldObject().getEnableMonitoring()) {
+            return;
+        }
+
         ConcurrentLinkedQueue notifs = (ConcurrentLinkedQueue<Notification>) notifications.getUserData();
         IC2DThreadPool.execute(new Task(notifs));
     }
