@@ -237,11 +237,6 @@
         </itemizedlist>
 
         <para>We will detail them in the next section.</para>
-
-        <para>Note: the classes managing topologies are still under
-        development. In the next release, the repetitive and tedious topology
-        related instructions (e.g. methods buildNeighborhood) won't have to be
-        written explicitly by the user, whatever the topology (2D, 3D).</para>
       </sect3>
 
       <sect3>
