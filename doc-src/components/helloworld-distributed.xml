@@ -2,125 +2,115 @@
  
 org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers.fractal
 </para>
-<screen>
- 1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
- 2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
+<programlisting lang="xml"><![CDATA[1:<?xml version="1.0" encoding="ISO-8859-1"?>
+ 2:<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
  3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
  4:
- 5:&lt;definition name="org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers">
- 6:  &lt;interface name="r" role="server" signature="java.lang.Runnable"/>
- 7:    &lt;exportedVirtualNodes>
- 8:        &lt;exportedVirtualNode name="VN1">
- 9:            &lt;composedFrom>
- 10:               &lt;composingVirtualNode component="client" name="client-node"/>
- 11:            &lt;/composedFrom>
- 12:        &lt;/exportedVirtualNode>
- 13:        &lt;exportedVirtualNode name="VN2">
- 14:            &lt;composedFrom>
- 15:                &lt;composingVirtualNode component="server" name="server-node"/>
- 16:            &lt;/composedFrom>
- 17:        &lt;/exportedVirtualNode>
- 18:    &lt;/exportedVirtualNodes>
- 19:  &lt;component name="client-wrapper"
+ 5:<definition name="org.objectweb.proactive.examples.components.helloworld.helloworld-distributed-wrappers">
+ 6:  <interface name="r" role="server" signature="java.lang.Runnable"/>
+ 7:    <exportedVirtualNodes>
+ 8:        <exportedVirtualNode name="VN1">
+ 9:            <composedFrom>
+ 10:               <composingVirtualNode component="client" name="client-node"/>
+ 11:            </composedFrom>
+ 12:        </exportedVirtualNode>
+ 13:        <exportedVirtualNode name="VN2">
+ 14:            <composedFrom>
+ 15:                <composingVirtualNode component="server" name="server-node"/>
+ 16:            </composedFrom>
+ 17:        </exportedVirtualNode>
+ 18:    </exportedVirtualNodes>
+ 19:  <component name="client-wrapper"
  20:              definition="org.objectweb.proactive.examples.components.helloworld.ClientType">
- 21:      &lt;component name="client"
+ 21:      <component name="client"
  22:                 definition="org.objectweb.proactive.examples.components.helloworld.ClientImpl"/>
- 23:      &lt;binding client="this.r" server="client.r"/>
- 24:      &lt;binding client="client.s" server="this.s"/>
- 25:      &lt;controller desc="composite"/>
- 26:  &lt;/component>
- 27:  &lt;component name="server-wrapper"
+ 23:      <binding client="this.r" server="client.r"/>
+ 24:      <binding client="client.s" server="this.s"/>
+ 25:      <controller desc="composite"/>
+ 26:  </component>
+ 27:  <component name="server-wrapper"
  28:             definition="org.objectweb.proactive.examples.components.helloworld.ServerType">    
- 29:      &lt;component name="server"
+ 29:      <component name="server"
  30:                 definition="org.objectweb.proactive.examples.components.helloworld.ServerImpl"/>
- 31:      &lt;binding client="this.s" server="server.s"/>
- 32:      &lt;controller desc="composite"/>
- 33:  &lt;/component>
- 34:  &lt;binding client="this.r" server="client-wrapper.r"/>
- 35:  &lt;binding client="client-wrapper.s" server="server-wrapper.s"/>
- 36:&lt;/definition>
-</screen >
+ 31:      <binding client="this.s" server="server.s"/>
+ 32:      <controller desc="composite"/>
+ 33:  </component>
+ 34:  <binding client="this.r" server="client-wrapper.r"/>
+ 35:  <binding client="client-wrapper.s" server="server-wrapper.s"/>
+ 36:</definition>]]></programlisting>
 
 <para>
  
  org.objectweb.proactive.examples.components.helloworld.ClientType.fractal
 </para>
-<screen>
- 1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
- 2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
+<programlisting lang="xml"><![CDATA[1:<?xml version="1.0" encoding="ISO-8859-1"?>
+ 2:<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
  3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
  4:
- 5:&lt;definition name="org.objectweb.proactive.examples.components.helloworld.ClientType"
+ 5:<definition name="org.objectweb.proactive.examples.components.helloworld.ClientType"
  6:              extends="org.objectweb.proactive.examples.components.helloworld.RootType">
- 7:    &lt;interface name="r" role="server" signature="java.lang.Runnable"/>
- 8:    &lt;interface name="s" role="client"
+ 7:    <interface name="r" role="server" signature="java.lang.Runnable"/>
+ 8:    <interface name="s" role="client"
  9:                 signature="org.objectweb.proactive.examples.components.helloworld.Service"/>
- 10:&lt;/definition>
-</screen>
+ 10:</definition>]]></programlisting>
 
 <para>
  
   org.objectweb.proactive.examples.components.helloworld.ClientImpl.fractal
  </para>
-<screen>
-  1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
-  2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
+<programlisting lang="xml"><![CDATA[1:<?xml version="1.0" encoding="ISO-8859-1"?>
+  2:<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
   3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
   4:
-  5:&lt;definition name="org.objectweb.proactive.examples.components.helloworld.ClientImpl"
+  5:<definition name="org.objectweb.proactive.examples.components.helloworld.ClientImpl"
   6:              extends="org.objectweb.proactive.examples.components.helloworld.ClientType">
-  7:    &lt;exportedVirtualNodes>
-  8:        &lt;exportedVirtualNode name="client-node">
-  9:            &lt;composedFrom>
-  10:                &lt;composingVirtualNode component="this" name="client-node"/>
-  11:            &lt;/composedFrom>
-  12:        &lt;/exportedVirtualNode>
-  13:    &lt;/exportedVirtualNodes>
-  14:    &lt;content class="org.objectweb.proactive.examples.components.helloworld.ClientImpl"/>
-  15:    &lt;virtual-node name="client-node" cardinality="single"/>
-  16:&lt;/definition>
-</screen>
+  7:    <exportedVirtualNodes>
+  8:        <exportedVirtualNode name="client-node">
+  9:            <composedFrom>
+  10:                <composingVirtualNode component="this" name="client-node"/>
+  11:            </composedFrom>
+  12:        </exportedVirtualNode>
+  13:    </exportedVirtualNodes>
+  14:    <content class="org.objectweb.proactive.examples.components.helloworld.ClientImpl"/>
+  15:    <virtual-node name="client-node" cardinality="single"/>
+  16:</definition>]]></programlisting>
  
 <para>
  
  org.objectweb.proactive.examples.components.ServerType
 </para>
-<screen> 
-1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
-2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
+<programlisting lang="xml"><![CDATA[1:<?xml version="1.0" encoding="ISO-8859-1"?>
+2:<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
 3:            "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 4:
-5:&lt;definition name="org.objectweb.proactive.examples.components.helloworld.ServerType">
-6:  &lt;interface name="s" role="server"
+5:<definition name="org.objectweb.proactive.examples.components.helloworld.ServerType">
+6:  <interface name="s" role="server"
 7:          signature="org.objectweb.proactive.examples.components.helloworld.Service"/>
-8:&lt;/definition>
-</screen>
+8:</definition>]]></programlisting>
   
  
  <para>
   
  org.objectweb.proactive.examples.components.helloworld.ServerImpl
 </para>
-<screen>
-1:&lt;?xml version="1.0" encoding="ISO-8859-1"?>
-2:&lt;!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
+<programlisting lang="xml"><![CDATA[1:<?xml version="1.0" encoding="ISO-8859-1"?>
+2:<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN"
 3:        "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
 4:
-5:&lt;definition name="org.objectweb.proactive.examples.components.helloworld.ServerImpl"
+5:<definition name="org.objectweb.proactive.examples.components.helloworld.ServerImpl"
 6:       extends="org.objectweb.proactive.examples.components.helloworld.ServerType">
-7:    &lt;exportedVirtualNodes>
-8:        &lt;exportedVirtualNode name="server-node">
-9:            &lt;composedFrom>
-10:                &lt;composingVirtualNode component="this" name="server-node"/>
-11:            &lt;/composedFrom>
-12:        &lt;/exportedVirtualNode>
-13:    &lt;/exportedVirtualNodes>
-14:  &lt;content class="org.objectweb.proactive.examples.components.helloworld.ServerImpl"/>
-15:  &lt;attributes signature="org.objectweb.proactive.examples.components.helloworld.ServiceAttributes">
-16:    &lt;attribute name="header" value="->"/>
-17:    &lt;attribute name="count" value="1"/>
-18:  &lt;/attributes>
-19:  &lt;controller desc="primitive"/>
-20:  &lt;virtual-node name="server-node" cardinality="single"/>
-21:&lt;/definition>
-</screen>
+7:    <exportedVirtualNodes>
+8:        <exportedVirtualNode name="server-node">
+9:            <composedFrom>
+10:                <composingVirtualNode component="this" name="server-node"/>
+11:            </composedFrom>
+12:        </exportedVirtualNode>
+13:    </exportedVirtualNodes>
+14:  <content class="org.objectweb.proactive.examples.components.helloworld.ServerImpl"/>
+15:  <attributes signature="org.objectweb.proactive.examples.components.helloworld.ServiceAttributes">
+16:    <attribute name="header" value="->"/>
+17:    <attribute name="count" value="1"/>
+18:  </attributes>
+19:  <controller desc="primitive"/>
+20:  <virtual-node name="server-node" cardinality="single"/>
+21:</definition>]]></programlisting>

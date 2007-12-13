@@ -1,267 +1,384 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="DescriptorProcess">
-  <title>Adding a Deployment Protocol</title>
+    <title>Adding a Deployment Protocol</title>
 
-  <sect1  id="DescriptorProcess_html_objectives">
-    <title> Objectives</title>
+    <sect1 id="DescriptorProcess_html_objectives">
+        <title>Objectives</title>
 
-    <para>ProActive support several deployment protocols. This protocols can
-    be configured through an XML Descriptor file in the <emphasis
-    role="bold">process</emphasis> section. From time to time, new protocols
-    are added. This documentation describes how to add a new deployment
-    protocol (process) to ProActive.</para>
-  </sect1>
+        <para>
+            ProActive support several deployment protocols. This
+            protocols can be configured through an XML Descriptor file
+            in the
+            <emphasis role="bold">process</emphasis>
+            section. From time to time, new protocols are added. This
+            documentation describes how to add a new deployment protocol
+            (process) to ProActive.
+        </para>
+    </sect1>
 
-  <sect1  id="DescriptorProcess_html_overview">
-    <title>  Overview</title>
+    <sect1 id="DescriptorProcess_html_overview">
+        <title>Overview</title>
 
-    <para>Adding a new process can be divided into two related tasks:</para>
-
-    <itemizedlist>
-      <listitem>
-        <para><emphasis role="bold">Java Process Class</emphasis></para>
-
-        <para>In this section, a java class that handles the specific protocol
-        must be implemented. This java class must have certain properties
-        discussed later on.</para>
-      </listitem>
-
-      <listitem>
-        <para><emphasis role="bold">XML Descriptor</emphasis></para>
-
-        <para>Since each new protocol requieres different configuration
-        parameteres, the <emphasis role="bold">DescriptorSchema.xsd</emphasis>
-        and related parsing code must be modified to handle the new process
-        and it's specific parameteres.</para>
-      </listitem>
-    </itemizedlist>
-
-    <para>Both of this tasks are closely related because the Java Process
-    Class is used when parsing the Descriptor XML.</para>
-  </sect1>
-
-  <sect1  id="DescriptorProcess_html_javaProcess">
-    <title>  Java Process Class</title>
-
-    <para>The Java Process Classes are defined in the <emphasis
-    role="bold">org.objectweb.proactive.core.process</emphasis>
-    package.</para>
-
-    <sect2 >
-      <title>Process Package Arquitecture</title>
-
-      <para>Most implementations extend the class <emphasis
-      role="bold">AbstractExternalProcessDecorator</emphasis>.</para>
-
-      <figure>
-       <title> core.process structure</title>
-       <mediaobject>
-          <imageobject>
-            <imagedata fileref="development/imgs/descriptorProcessClassDiagram.png"
-                       format="PNG" />
-          </imageobject>
-        </mediaobject>
-      </figure>
-
-      <para>In this figure, <emphasis role="bold">OARSubProcess</emphasis> and
-      <emphasis role="bold">SSHProcess</emphasis> both extend from <emphasis
-      role="bold">AbstractExternalProcessDecorator</emphasis>. Notice, that in
-      the case of SSH, more than one class maybe required to succesfully
-      implement the protocol. This is why, every protocol is implemented
-      within it's on directory in the process package:</para>
-
-      <para><literal>ProActive/src/org/objectweb/proactive/core/process/newprocessdir/</literal></para>
-
-      <para>Sometimes, implementeing a specific process requiers external
-      libraries, possibly from the original protocol client. The correct place
-      to put this external <emphasis role="bold">.jar</emphasis> libraries is
-      in:</para>
-
-      <para><literal>ProActive/lib/newprocessdir/*.jar</literal></para>
-
-      <para>Before executing a deployment using this new process, don't forget
-      to add this libraries to the <emphasis role="bold">$CLASSPATH</emphasis>
-      envirorment variable.</para>
-    </sect2>
-
-    <sect2 >
-      <title>The New Process Class</title>
-
-      <para>Usualy the new java process class will have a name such as:
-      <emphasis role="bold">ProtocolNameProcess.java</emphasis>. The <emphasis
-      role="bold">ProtocolNameProcess</emphasis> class will extend from
-      <emphasis role="bold">AbstractExternalProcessDecorator</emphasis>.
-      Therefore, at least the following inherited methods must be
-      implemented:</para>
-
-      <itemizedlist>
-        <listitem>
-          <para><emphasis role="bold">public
-          ProtocolNameProcess();</emphasis></para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">public
-          ProtocolNameProcess(ExternalProcess
-          targetProcess);</emphasis></para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">public String
-          getProcessId();</emphasis></para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">public int
-          getNodeNumber();</emphasis></para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">public UniversalProcess
-          getFinalProcess();</emphasis></para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">protected String
-          internalBuildCommand();</emphasis></para>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">protected void
-          internalStartProcess(String commandToExecute) throws
-          java.io.IOException;</emphasis></para>
-        </listitem>
-      </itemizedlist>
-    </sect2>
-
-    <sect2 >
-      <title>The StartRuntime.sh script</title>
-
-      <para>On certain clusters, a starting script might be required.
-      Sometimes, this script will be static and receive parameteres at
-      deployment time (globus, pbs, ...), and in other cases it will have to
-      be generated at deployment time (oar, oargrid). In either case, the
-      proper place to put these scipts is:</para>
-
-      <para><literal>ProActive/scripts/unix/cluster/</literal></para>
-    </sect2>
-  </sect1>
-
-  <sect1  id="DescriptorProcess_html_xmlProcess">
-    <title>  XML Descriptor Process</title>
-
-    <sect2 >
-      <title>Schema Modifications</title>
-
-      <para>The schema file is located at: <emphasis
-      role="bold">ProActive/descriptors/DescriptorSchema.xsd</emphasis>. This
-      file contains the valid tags allowed in an XML descriptor file.</para>
-
-      <itemizedlist>
-        <listitem>
-          <para><emphasis role="bold">processDefinition
-          Childs</emphasis></para>
-
-          <para>The first thing to do, is add the new process tag in:</para>
-
-          <screen>
-&lt;xs:complexType name="ProcessDefinitionType"&gt;
-    &lt;xs:choice&gt;
-        &lt;xs:element name="jvmProcess" type="JvmProcessType"/&gt;
-        &lt;xs:element name="rshProcess" type="RshProcessType"/&gt;
-        &lt;xs:element name="maprshProcess" type="MapRshProcessType"/&gt;
-        &lt;xs:element name="sshProcess" type="SshProcessType"/&gt;
-        &lt;xs:element name="processList" type="ProcessListType"/&gt;
-        &lt;xs:element name="processListbyHost" type="ProcessListbyHostType"/&gt;
-        &lt;xs:element name="rloginProcess" type="RloginProcessType"/&gt;
-        &lt;xs:element name="bsubProcess" type="BsubProcessType"/&gt;
-        &lt;xs:element name="pbsProcess" type="PbsProcessType"/&gt;
-        &lt;xs:element name="oarProcess" type="oarProcessType"/&gt;
-        &lt;xs:element name="oarGridProcess" type="oarGridProcessType"/&gt;
-        &lt;xs:element name="globusProcess" type="GlobusProcessType"/&gt;
-        &lt;xs:element name="prunProcess" type="prunProcessType"/&gt;
-        &lt;xs:element name="gridEngineProcess" type="sgeProcessType"/&gt;
-    &lt;/xs:choice&gt;
-    &lt;xs:attribute name="id" type="xs:string" use="required"/&gt;
-&lt;/xs:complexType&gt;  
-</screen>
-        </listitem>
-
-        <listitem>
-          <para><emphasis role="bold">Specific Process Tag</emphasis></para>
-
-          <para>Afterwards, all the tag attributes and subtags need to be
-          defined. In this example, we show the OARGRID tag:</para>
-
-          <screen>
-&lt;!--oarGridProcess--&gt;
-&lt;xs:complexType name="oarGridProcessType"&gt;
-    &lt;xs:sequence&gt;
-        &lt;xs:element ref="processReference"/&gt;
-        &lt;xs:element ref="commandPath" minOccurs="0"/&gt;
-        &lt;xs:element name="oarGridOption" type="OarGridOptionType"/&gt;
-    &lt;/xs:sequence&gt;
-    &lt;xs:attribute name="class" type="xs:string" use="required" 
-        fixed="org.objectweb.proactive.core.process.oar.OARGRIDSubProcess"/&gt;
-    &lt;xs:attribute name="queue" type="xs:string" use="optional"/&gt;
-    &lt;xs:attribute name="bookedNodesAccess" use="optional"&gt;
-        &lt;xs:simpleType&gt;
-            &lt;xs:restriction base="xs:string"&gt;
-                &lt;xs:enumeration value="rsh"/&gt;
-                &lt;xs:enumeration value="ssh"/&gt;
-            &lt;/xs:restriction&gt;
-        &lt;/xs:simpleType&gt;
-    &lt;/xs:attribute&gt;
-    &lt;xs:attribute name="closeStream" type="CloseStreamType" use="optional"/&gt;
-&lt;/xs:complexType&gt;
-&lt;!--oarGridOption--&gt;
-&lt;xs:complexType name="OarGridOptionType"&gt;
-    &lt;xs:sequence&gt;
-        &lt;xs:element name="resources" type="xs:string"/&gt;
-        &lt;xs:element name="walltime" type="xs:string" minOccurs="0"/&gt;
-        &lt;xs:element name="scriptPath" type="FilePathType" minOccurs="0"/&gt;
-    &lt;/xs:sequence&gt;
-&lt;/xs:complexType&gt;
-</screen>
-        </listitem>
-      </itemizedlist>
-    </sect2>
-
-    <sect2 >
-      <title>XML Parsing Handler</title>
-
-      <sect3 >
-        <title>ProActiveDescriptorConstants.java:</title>
-
-        <para>This file is located in <emphasis
-        role="bold">org.objectweb.proactive.core.descriptor.xml</emphasis>
-        package. It contains the tag names used within XML descriptor files.
-        When adding a new process, new tags should be registered in this
-        file.</para>
-      </sect3>
-
-      <sect3 >
-        <title>ProcessDefinitinonHandler.java:</title>
-
-        <para>Located in: <emphasis
-        role="bold">org.objectweb.proactive.core.descriptor.xml</emphasis>,
-        this file is the XML handler for the <emphasis
-        role="bold">process</emphasis> descriptor section.</para>
+        <para>
+            Adding a new process can be divided into two related tasks:
+        </para>
 
         <itemizedlist>
-          <listitem>
-            <para><emphasis role="bold">New XML handler
-            innerclass</emphasis></para>
+            <listitem>
+                <para>
+                    <emphasis role="bold">Java Process Class</emphasis>
+                </para>
 
-            <para>This class will parse all the process specific tags and
-            attributes. It is an innerclass in the <emphasis
-            role="bold">ProcessDefinitinonHandler.java</emphasis> file.
-            Sometimes, this class will have a subclass in charge of parsing a
-            subsection of the process tag.</para>
+                <para>
+                    In this section, a java class that handles the
+                    specific protocol must be implemented. This java
+                    class must have certain properties discussed later
+                    on.
+                </para>
+            </listitem>
 
-            <screen>
-protected class OARGRIDProcessHandler extends ProcessHandler {
+            <listitem>
+                <para>
+                    <emphasis role="bold">XML Descriptor</emphasis>
+                </para>
+
+                <para>
+                    Since each new protocol requieres different
+                    configuration parameteres, the
+                    <emphasis role="bold">
+                        DescriptorSchema.xsd
+                    </emphasis>
+                    and related parsing code must be modified to handle
+                    the new process and it's specific parameteres.
+                </para>
+            </listitem>
+        </itemizedlist>
+
+        <para>
+            Both of this tasks are closely related because the Java
+            Process Class is used when parsing the Descriptor XML.
+        </para>
+    </sect1>
+
+    <sect1 id="DescriptorProcess_html_javaProcess">
+        <title>Java Process Class</title>
+
+        <para>
+            The Java Process Classes are defined in the
+            <emphasis role="bold">
+                org.objectweb.proactive.core.process
+            </emphasis>
+            package.
+        </para>
+
+        <sect2>
+            <title>Process Package Arquitecture</title>
+
+            <para>
+                Most implementations extend the class
+                <emphasis role="bold">
+                    AbstractExternalProcessDecorator
+                </emphasis>
+                .
+            </para>
+
+            <figure>
+                <title>core.process structure</title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata
+                            fileref="development/imgs/descriptorProcessClassDiagram.png"
+                            format="PNG" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+
+            <para>
+                In this figure,
+                <emphasis role="bold">OARSubProcess</emphasis>
+                and
+                <emphasis role="bold">SSHProcess</emphasis>
+                both extend from
+                <emphasis role="bold">
+                    AbstractExternalProcessDecorator
+                </emphasis>
+                . Notice, that in the case of SSH, more than one class
+                maybe required to succesfully implement the protocol.
+                This is why, every protocol is implemented within it's
+                on directory in the process package:
+            </para>
+
+            <para>
+                <literal>
+                    ProActive/src/org/objectweb/proactive/core/process/newprocessdir/
+                </literal>
+            </para>
+
+            <para>
+                Sometimes, implementeing a specific process requiers
+                external libraries, possibly from the original protocol
+                client. The correct place to put this external
+                <emphasis role="bold">.jar</emphasis>
+                libraries is in:
+            </para>
+
+            <para>
+                <literal>ProActive/lib/newprocessdir/*.jar</literal>
+            </para>
+
+            <para>
+                Before executing a deployment using this new process,
+                don't forget to add this libraries to the
+                <emphasis role="bold">$CLASSPATH</emphasis>
+                envirorment variable.
+            </para>
+        </sect2>
+
+        <sect2>
+            <title>The New Process Class</title>
+
+            <para>
+                Usualy the new java process class will have a name such
+                as:
+                <emphasis role="bold">
+                    ProtocolNameProcess.java
+                </emphasis>
+                . The
+                <emphasis role="bold">ProtocolNameProcess</emphasis>
+                class will extend from
+                <emphasis role="bold">
+                    AbstractExternalProcessDecorator
+                </emphasis>
+                . Therefore, at least the following inherited methods
+                must be implemented:
+            </para>
+
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <emphasis role="bold">
+                            public ProtocolNameProcess();
+                        </emphasis>
+                    </para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        <emphasis role="bold">
+                            public ProtocolNameProcess(ExternalProcess
+                            targetProcess);
+                        </emphasis>
+                    </para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        <emphasis role="bold">
+                            public String getProcessId();
+                        </emphasis>
+                    </para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        <emphasis role="bold">
+                            public int getNodeNumber();
+                        </emphasis>
+                    </para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        <emphasis role="bold">
+                            public UniversalProcess getFinalProcess();
+                        </emphasis>
+                    </para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        <emphasis role="bold">
+                            protected String internalBuildCommand();
+                        </emphasis>
+                    </para>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        <emphasis role="bold">
+                            protected void internalStartProcess(String
+                            commandToExecute) throws
+                            java.io.IOException;
+                        </emphasis>
+                    </para>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+
+        <sect2>
+            <title>The StartRuntime.sh script</title>
+
+            <para>
+                On certain clusters, a starting script might be
+                required. Sometimes, this script will be static and
+                receive parameteres at deployment time (globus, pbs,
+                ...), and in other cases it will have to be generated at
+                deployment time (oar, oargrid). In either case, the
+                proper place to put these scipts is:
+            </para>
+
+            <para>
+                <literal>ProActive/scripts/unix/cluster/</literal>
+            </para>
+        </sect2>
+    </sect1>
+
+    <sect1 id="DescriptorProcess_html_xmlProcess">
+        <title>XML Descriptor Process</title>
+
+        <sect2>
+            <title>Schema Modifications</title>
+
+            <para>
+                The schema file is located at:
+                <emphasis role="bold">
+                    ProActive/descriptors/DescriptorSchema.xsd
+                </emphasis>
+                . This file contains the valid tags allowed in an XML
+                descriptor file.
+            </para>
+
+            <itemizedlist>
+                <listitem>
+                    <para>
+                        <emphasis role="bold">
+                            processDefinition Childs
+                        </emphasis>
+                    </para>
+
+                    <para>
+                        The first thing to do, is add the new process
+                        tag in:
+                    </para>
+
+                    <programlisting lang="xml"><![CDATA[<xs:complexType name="ProcessDefinitionType">
+    <xs:choice>
+        <xs:element name="jvmProcess" type="JvmProcessType"/>
+        <xs:element name="rshProcess" type="RshProcessType"/>
+        <xs:element name="maprshProcess" type="MapRshProcessType"/>
+        <xs:element name="sshProcess" type="SshProcessType"/>
+        <xs:element name="processList" type="ProcessListType"/>
+        <xs:element name="processListbyHost" type="ProcessListbyHostType"/>
+        <xs:element name="rloginProcess" type="RloginProcessType"/>
+        <xs:element name="bsubProcess" type="BsubProcessType"/>
+        <xs:element name="pbsProcess" type="PbsProcessType"/>
+        <xs:element name="oarProcess" type="oarProcessType"/>
+        <xs:element name="oarGridProcess" type="oarGridProcessType"/>
+        <xs:element name="globusProcess" type="GlobusProcessType"/>
+        <xs:element name="prunProcess" type="prunProcessType"/>
+        <xs:element name="gridEngineProcess" type="sgeProcessType"/>
+    </xs:choice>
+    <xs:attribute name="id" type="xs:string" use="required"/>
+</xs:complexType>]]></programlisting>
+                </listitem>
+
+                <listitem>
+                    <para>
+                        <emphasis role="bold">
+                            Specific Process Tag
+                        </emphasis>
+                    </para>
+
+                    <para>
+                        Afterwards, all the tag attributes and subtags
+                        need to be defined. In this example, we show the
+                        OARGRID tag:
+                    </para>
+
+                    <programlisting lang="xml"><![CDATA[<!--oarGridProcess-->
+<xs:complexType name="oarGridProcessType">
+    <xs:sequence>
+        <xs:element ref="processReference"/>
+        <xs:element ref="commandPath" minOccurs="0"/>
+        <xs:element name="oarGridOption" type="OarGridOptionType"/>
+    </xs:sequence>
+    <xs:attribute name="class" type="xs:string" use="required" 
+        fixed="org.objectweb.proactive.core.process.oar.OARGRIDSubProcess"/>
+    <xs:attribute name="queue" type="xs:string" use="optional"/>
+    <xs:attribute name="bookedNodesAccess" use="optional">
+        <xs:simpleType>
+            <xs:restriction base="xs:string">
+                <xs:enumeration value="rsh"/>
+                <xs:enumeration value="ssh"/>
+            </xs:restriction>
+        </xs:simpleType>
+    </xs:attribute>
+    <xs:attribute name="closeStream" type="CloseStreamType" use="optional"/>
+</xs:complexType>
+<!--oarGridOption-->
+<xs:complexType name="OarGridOptionType">
+    <xs:sequence>
+        <xs:element name="resources" type="xs:string"/>
+        <xs:element name="walltime" type="xs:string" minOccurs="0"/>
+        <xs:element name="scriptPath" type="FilePathType" minOccurs="0"/>
+    </xs:sequence>
+</xs:complexType>]]></programlisting>
+                </listitem>
+            </itemizedlist>
+        </sect2>
+
+        <sect2>
+            <title>XML Parsing Handler</title>
+
+            <sect3>
+                <title>ProActiveDescriptorConstants.java:</title>
+
+                <para>
+                    This file is located in
+                    <emphasis role="bold">
+                        org.objectweb.proactive.core.descriptor.xml
+                    </emphasis>
+                    package. It contains the tag names used within XML
+                    descriptor files. When adding a new process, new
+                    tags should be registered in this file.
+                </para>
+            </sect3>
+
+            <sect3>
+                <title>ProcessDefinitinonHandler.java:</title>
+
+                <para>
+                    Located in:
+                    <emphasis role="bold">
+                        org.objectweb.proactive.core.descriptor.xml
+                    </emphasis>
+                    , this file is the XML handler for the
+                    <emphasis role="bold">process</emphasis>
+                    descriptor section.
+                </para>
+
+                <itemizedlist>
+                    <listitem>
+                        <para>
+                            <emphasis role="bold">
+                                New XML handler innerclass
+                            </emphasis>
+                        </para>
+
+                        <para>
+                            This class will parse all the process
+                            specific tags and attributes. It is an
+                            innerclass in the
+                            <emphasis role="bold">
+                                ProcessDefinitinonHandler.java
+                            </emphasis>
+                            file. Sometimes, this class will have a
+                            subclass in charge of parsing a subsection
+                            of the process tag.
+                        </para>
+
+                        <programlisting lang="xml"><![CDATA[protected class OARGRIDProcessHandler extends ProcessHandler {
   public OARGRIDProcessHandler(ProActiveDescriptor proActiveDescriptor) {
     super(proActiveDescriptor);
     this.addHandler(OARGRID_OPTIONS_TAG, new OARGRIDOptionHandler());
@@ -309,23 +426,34 @@ protected class OARGRIDProcessHandler extends ProcessHandler {
       }
     }
   }
-}
-</screen>
-          </listitem>
+}]]></programlisting>
+                    </listitem>
 
-          <listitem>
-            <para><emphasis role="bold">Registering the new XML handler
-            innerclass</emphasis></para>
+                    <listitem>
+                        <para>
+                            <emphasis role="bold">
+                                Registering the new XML handler
+                                innerclass
+                            </emphasis>
+                        </para>
 
-            <para>The new XML handler innerclass must be registered to handle
-            the parsing of the newprocess tag. This is donde in the
-            constructor:</para>
+                        <para>
+                            The new XML handler innerclass must be
+                            registered to handle the parsing of the
+                            newprocess tag. This is donde in the
+                            constructor:
+                        </para>
 
-            <para><literal>public ProcessDefinitionHandler(ProActiveDescriptor
-            proActiveDescriptor){...}</literal></para>
-          </listitem>
-        </itemizedlist>
-      </sect3>
-    </sect2>
-  </sect1>
+                        <para>
+                            <literal>
+                                public
+                                ProcessDefinitionHandler(ProActiveDescriptor
+                                proActiveDescriptor){...}
+                            </literal>
+                        </para>
+                    </listitem>
+                </itemizedlist>
+            </sect3>
+        </sect2>
+    </sect1>
 </chapter>

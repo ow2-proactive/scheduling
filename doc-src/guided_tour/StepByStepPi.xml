@@ -1,40 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="viewDocbook.css"?>
 <chapter id="StepByStepPi">
-  <title>PI (3.14...)</title>
+    <title>PI (3.14...)</title>
 
-  <para>In this document we show how to create a distributed application to
-  compute the number PI using the ProActive Grid Middleware. Distributed
-  programming is achieved using the ProActive deployment framework combined
-  with the active object model.</para>
+    <para>
+        In this document we show how to create a distributed application
+        to compute the number PI using the ProActive Grid Middleware.
+        Distributed programming is achieved using the ProActive
+        deployment framework combined with the active object model.
+    </para>
 
 
-  <sect1>
-    <title>Implementation</title>
+    <sect1>
+        <title>Implementation</title>
 
-    <para>Go into the tutorial directory: <emphasis
-    role="bold">ProActive/src/org/objectweb/proactive/examples/pi/.</emphasis>
-    This directory contains:<screen>config/            &lt;-- Configuration directory
-descriptors/       &lt;-- Deployment descriptors directory
-doc/               &lt;-- Documentation directory
-fractal/           &lt;-- Component directory
-scripts/           &lt;-- Launch scripts directory
-Interval.java      &lt;-- The parameter passed to remote objects
-PiBPP.java         &lt;-- The main code
-PiComputer.java    &lt;-- The remote object code (worker)
-Results.java       &lt;-- The results returned by the workers
-<emphasis role="bold">MyPi.java          &lt;-- Base class to test Pi with ProActive</emphasis></screen></para>
+        <para>
+            Go into the tutorial directory:
+            <emphasis role="bold">
+                ProActive/src/org/objectweb/proactive/examples/pi/.
+            </emphasis>
+            This directory contains:
+            <screen>
+                config/ &lt;-- Configuration directory descriptors/
+                &lt;-- Deployment descriptors directory doc/ &lt;--
+                Documentation directory fractal/ &lt;-- Component
+                directory scripts/ &lt;-- Launch scripts directory
+                Interval.java &lt;-- The parameter passed to remote
+                objects PiBPP.java &lt;-- The main code PiComputer.java
+                &lt;-- The remote object code (worker) Results.java
+                &lt;-- The results returned by the workers
+                <emphasis role="bold">
+                    MyPi.java &lt;-- Base class to test Pi with
+                    ProActive
+                </emphasis>
+            </screen>
+        </para>
 
-    <para>In this step by step we will implement our own version of <emphasis
-    role="bold">PiBPP.java</emphasis>.</para>
+        <para>
+            In this step by step we will implement our own version of
+            <emphasis role="bold">PiBPP.java</emphasis>
+            .
+        </para>
 
-    <sect2>
-      <title>MyPi.java</title>
+        <sect2>
+            <title>MyPi.java</title>
 
-      <para>Create the file <emphasis role="bold">MyPi.java</emphasis> inside
-      the tutorial directory with initially the following content:</para>
+            <para>
+                Create the file
+                <emphasis role="bold">MyPi.java</emphasis>
+                inside the tutorial directory with initially the
+                following content:
+            </para>
 
-      <screen>package org.objectweb.proactive.examples.pi;
+            <programlisting lang="java"><![CDATA[package org.objectweb.proactive.examples.pi;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -42,76 +60,92 @@ import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.ProActiveGroup;
 import org.objectweb.proactive.core.node.Node;
 
-class <emphasis role="bold">MyPi</emphasis>{
+class MyPi{
 
 // global variables will go here
 
-public static void <emphasis role="bold">main</emphasis>(String args[]) throws Exception{
+public static void main(String args[]) throws Exception{
   
   Integer numberOfDecimals =  new Integer(args[0]);
   String descriptorPath = args[1];
 
   // the main code will go here
-} </screen>
-    </sect2>
+}]]></programlisting>
+        </sect2>
 
-    <sect2>
-      <title>Add the Deployment Descriptor</title>
+        <sect2>
+            <title>Add the Deployment Descriptor</title>
 
-      <para>Inside the main we add the code for acquiring the
-      resources.</para>
+            <para>
+                Inside the main we add the code for acquiring the
+                resources.
+            </para>
 
-      <screen>  <emphasis role="bold">ProActiveDescriptor</emphasis> descriptor = <emphasis
-          role="bold">ProActive.getProactiveDescriptor(</emphasis>descriptorPath); //Parse the xml descriptor
-  descriptor.<emphasis role="bold">activateMappings</emphasis>(); //Acquire the resources
-  <emphasis role="bold">VirtualNode</emphasis> virtualNode = descriptor.<emphasis
-          role="bold">getVirtualNode</emphasis>("computers-vn"); //Get the virtual node named "computers-vn"
-  <emphasis role="bold">Node</emphasis>[] nodes = virtualNode.<emphasis
-          role="bold">getNodes</emphasis>();</screen>
-    </sect2>
+            <screen>
+                <emphasis role="bold">ProActiveDescriptor</emphasis>
+                descriptor =
+                <emphasis role="bold">
+                    ProActive.getProactiveDescriptor(
+                </emphasis>
+                descriptorPath); //Parse the xml descriptor descriptor.
+                <emphasis role="bold">activateMappings</emphasis>
+                (); //Acquire the resources
+                <emphasis role="bold">VirtualNode</emphasis>
+                virtualNode = descriptor.
+                <emphasis role="bold">getVirtualNode</emphasis>
+                ("computers-vn"); //Get the virtual node named
+                "computers-vn"
+                <emphasis role="bold">Node</emphasis>
+                [] nodes = virtualNode.
+                <emphasis role="bold">getNodes</emphasis>
+                ();
+            </screen>
+        </sect2>
 
-    <sect2>
-      <title>Instantiate The Remote Objects</title>
+        <sect2>
+            <title>Instantiate The Remote Objects</title>
 
-      <screen>  PiComputer piComputer = (PiComputer) <emphasis role="bold">ProActiveGroup.newGroupInParallel</emphasis>(
+            <programlisting lang="java"><![CDATA[PiComputer piComputer = (PiComputer) ProActiveGroup.newGroupInParallel(
                           PiComputer.class.getName(),
                           new Object[] { numberOfDecimals }, 
                           nodes);
 
-  int numberOfWorkers = <emphasis role="bold">ProActiveGroup.getGroup</emphasis>(piComputer).size();</screen>
-    </sect2>
+  int numberOfWorkers = ProActiveGroup.getGroup(piComputer).size();]]></programlisting>
+        </sect2>
 
-    <sect2>
-      <title>Divide, Compute and Conquer</title>
+        <sect2>
+            <title>Divide, Compute and Conquer</title>
 
-      <screen>  Interval intervals = PiUtil.dividePI(numberOfWorkers, numberOfDecimals.intValue());
-<emphasis role="bold">  ProActiveGroup.setScatterGroup</emphasis>(intervals);
+            <programlisting lang="java"><![CDATA[Interval intervals = PiUtil.dividePI(numberOfWorkers, numberOfDecimals.intValue());
+  ProActiveGroup.setScatterGroup(intervals);
 
   Result results = piComputer.compute(intervals);
 
   Result result= PiUtil.conquerPI(results);
-  System.out.println("Pi:"+result);</screen>
-    </sect2>
+  System.out.println("Pi:"+result);]]></programlisting>
+        </sect2>
 
-    <sect2>
-      <title>Clean up</title>
+        <sect2>
+            <title>Clean up</title>
 
-      <screen>  descriptor.killall(true);
-  System.exit(0);</screen>
-    </sect2>
+            <programlisting lang="java"><![CDATA[  descriptor.killall(true);
+  System.exit(0);]]></programlisting>
+        </sect2>
 
-    <sect2>
-      <title>Executing the application</title>
+        <sect2>
+            <title>Executing the application</title>
 
-      <screen>pi$ cd scripts
-scripts$ ./build mypi -Ddecimals=100 -Ddescriptor=../descriptors/localhost.xml</screen>
-    </sect2>
-  </sect1>
+            <screen>
+                pi$ cd scripts scripts$ ./build mypi -Ddecimals=100
+                -Ddescriptor=../descriptors/localhost.xml
+            </screen>
+        </sect2>
+    </sect1>
 
-  <sect1>
-    <title>Putting it all together</title>
+    <sect1>
+        <title>Putting it all together</title>
 
-    <screen>package org.objectweb.proactive.examples.pi;
+        <programlisting lang="java"><![CDATA[package org.objectweb.proactive.examples.pi;
 
 import org.objectweb.proactive.ProActive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
@@ -149,7 +183,6 @@ public class MyPi {
     descriptor.killall(true);
     System.exit(0);
   }
-}
-</screen>
-  </sect1>
+}]]></programlisting>
+    </sect1>
 </chapter>

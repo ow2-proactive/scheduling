@@ -155,11 +155,9 @@ exportedVirtualNodes
     <sect1  id="adl_html_usage"  >
       <title> Usage</title>
       <para>ADL definitions correspond to component factories. ADL definition can be used directly:
-      <screen>
-      Factory factory = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
+      <programlisting lang="java"><![CDATA[Factory factory = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
       Map context = new HashMap();
-      Component c = (Component) factory.newComponent("myADLDefinition",context);
-      </screen>
+      Component c = (Component) factory.newComponent("myADLDefinition",context);]]></programlisting>
       </para>  
       <para>It is also possible to use the launcher tool, which parses the ADL, creates a corresponding component factory, and
  instantiates and assembles the components as defined in the ADL, is started from the <literal>org.objectweb.proactive.core.component.adl.Launcher</literal> class:</para>

@@ -1,24 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="AddingAFaultToleranceProtocol">
- <title>Adding a Fault-Tolerance Protocol</title>
-  
-    <para> This documentation is a quick overview of how to add a new fault-tolerance protocol within
- ProActive. A more complete version should be released with the version 3.3. If you wish to get
- more informations, please feel free to send a mail to <email>proactive@objectweb.org</email>.</para>
-<sect1  id="FaultTolerance_html_objectives" >
-      <title> Overview</title>
-      <sect2 >
-        <title>Active Object side</title>
-        <para>Fault-tolerance mechanism in ProActive is mainly based on the <literal>org.objectweb.proactive.core.body.ft.protocols.FTManager</literal> class. This class contains
- several hooks that are called before and after the main actions of an active object, e.g. sending
- or receiving a message, serving a request, etc.</para>
-        <para>
- For example, with the Pessimistic Message Logging protocol (PML), messages are logged just before
- the delivery of the message to the active object. Main methods for the FTManager of the PML
- protocol are then:</para>
-<screen>
-   /**
+    <title>Adding a Fault-Tolerance Protocol</title>
+
+    <para>
+        This documentation is a quick overview of how to add a new
+        fault-tolerance protocol within ProActive. A more complete
+        version should be released with the version 3.3. If you wish to
+        get more informations, please feel free to send a mail to
+        <email>proactive@objectweb.org</email>
+        .
+    </para>
+    <sect1 id="FaultTolerance_html_objectives">
+        <title>Overview</title>
+        <sect2>
+            <title>Active Object side</title>
+            <para>
+                Fault-tolerance mechanism in ProActive is mainly based
+                on the
+                <literal>
+                    org.objectweb.proactive.core.body.ft.protocols.FTManager
+                </literal>
+                class. This class contains several hooks that are called
+                before and after the main actions of an active object,
+                e.g. sending or receiving a message, serving a request,
+                etc.
+            </para>
+            <para>
+                For example, with the Pessimistic Message Logging
+                protocol (PML), messages are logged just before the
+                delivery of the message to the active object. Main
+                methods for the FTManager of the PML protocol are then:
+            </para>
+            <programlisting lang="java"><![CDATA[/**
      * Message must be synchronously logged before being delivered.
      * The LatestRcvdIndex table is updated
      * @see org.objectweb.proactive.core.body.ft.protocols.FTManager#onDeli\
@@ -57,20 +71,32 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
             }
         }
         return 0;
-    }
-</screen>
-        <para>The local variable <literal>this.storage</literal> is remote reference to the checkpoint server. The
- FTManager class contains a reference to each fault-tolerance server: fault-detector, checkpoint
- storage and localization server. Those reference are initialized during the creation of the
- active object.</para>
-        <para>A FTManager must define also a <literal>beforeRestartAfterRecovery()</literal> method, which is
- called when an active object is recovered. This method usually restore the state of the active
- object so as to be consistent with the others active objects of the application.</para>
-        <para>
- For example, with the PML protocol, all the messages logged before the failure must be delivered
- to the active object. The method <literal>beforeRestartAfterRecovery()</literal> thus looks like:</para>
-<screen>
-    /**
+    }]]></programlisting>
+            <para>
+                The local variable
+                <literal>this.storage</literal>
+                is remote reference to the checkpoint server. The
+                FTManager class contains a reference to each
+                fault-tolerance server: fault-detector, checkpoint
+                storage and localization server. Those reference are
+                initialized during the creation of the active object.
+            </para>
+            <para>
+                A FTManager must define also a
+                <literal>beforeRestartAfterRecovery()</literal>
+                method, which is called when an active object is
+                recovered. This method usually restore the state of the
+                active object so as to be consistent with the others
+                active objects of the application.
+            </para>
+            <para>
+                For example, with the PML protocol, all the messages
+                logged before the failure must be delivered to the
+                active object. The method
+                <literal>beforeRestartAfterRecovery()</literal>
+                thus looks like:
+            </para>
+            <programlisting lang="java"><![CDATA[/**
      * Message logs are contained in the checkpoint info structure.
      */
     public int beforeRestartAfterRecovery(CheckpointInfo ci, int inc) {
@@ -113,25 +139,52 @@ iveRequest(org.objectweb.proactive.core.body.request.Request)
             e.printStackTrace();
         }
         return 0;
-    }
-</screen>
-        <para>The parameter <literal>ci</literal> is a <literal>org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo</literal>. This object
- contains all the informations linked to the checkpoint used for recovering the active object, and
- is used to restore its state. The programmer might defines his own class implementing <literal>CheckpointInfo</literal>, to add needed informations, depending on the protocol.</para>
-      </sect2>
-      <sect2 >
-        <title>Server side</title>
-        <para>ProActive include a global server that provide fault detection, active object localization,
- resource service and checkpoint storage. For developing a new fault-tolerance protocol, the
- programmer might specify the behavior of the checkpoint storage by extending the class <literal>org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServerImpl</literal>. For
- example, only for the PML protocol and not for the CIC protocol, the checkpoint server must be
- able to log synchronously messages. The other parts of the server can be used directly.</para>
-        <para>
- To specify the recovery algorithm, the programmer must extends the <literal>org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl</literal>. In the
- case of the CIC protocol, all the active object of the application must recover after one
- failure, while only the faulty process must restart with the PML protocol; this specific behavior
- is coded in the recovery process.</para>
-      </sect2>
+    }]]></programlisting>
+            <para>
+                The parameter
+                <literal>ci</literal>
+                is a
+                <literal>
+                    org.objectweb.proactive.core.body.ft.checkpointing.CheckpointInfo
+                </literal>
+                . This object contains all the informations linked to
+                the checkpoint used for recovering the active object,
+                and is used to restore its state. The programmer might
+                defines his own class implementing
+                <literal>CheckpointInfo</literal>
+                , to add needed informations, depending on the protocol.
+            </para>
+        </sect2>
+        <sect2>
+            <title>Server side</title>
+            <para>
+                ProActive include a global server that provide fault
+                detection, active object localization, resource service
+                and checkpoint storage. For developing a new
+                fault-tolerance protocol, the programmer might specify
+                the behavior of the checkpoint storage by extending the
+                class
+                <literal>
+                    org.objectweb.proactive.core.body.ft.servers.storage.CheckpointServerImpl
+                </literal>
+                . For example, only for the PML protocol and not for the
+                CIC protocol, the checkpoint server must be able to log
+                synchronously messages. The other parts of the server
+                can be used directly.
+            </para>
+            <para>
+                To specify the recovery algorithm, the programmer must
+                extends the
+                <literal>
+                    org.objectweb.proactive.core.body.ft.servers.recovery.RecoveryProcessImpl
+                </literal>
+                . In the case of the CIC protocol, all the active object
+                of the application must recover after one failure, while
+                only the faulty process must restart with the PML
+                protocol; this specific behavior is coded in the
+                recovery process.
+            </para>
+        </sect2>
     </sect1>
-  
+
 </chapter>

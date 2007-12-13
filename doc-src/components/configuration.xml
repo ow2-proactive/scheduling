@@ -19,14 +19,13 @@
       <para>Controllers are configured in a simple XML configuration file,
       which has the following structure:</para>
 
-      <screen>
-&lt;componentConfiguration&gt;
- &lt;controllers&gt;
-   &lt;controller&gt;
- &lt;interface&gt;ControllerInterface&lt;/interface&gt;
-      &lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
-   &lt;/controller&gt;
-... </screen>
+      <programlisting lang="xml"><![CDATA[<componentConfiguration>
+ <controllers>
+   <controller>
+ <interface>ControllerInterface</interface>
+      <implementation>ControllerImplementation</implementation>
+   </controller>
+...]]></programlisting>
 
       <para>Unless they some controllers are also interceptors (see later on),
       the controllers do not have to be ordered.</para>
@@ -39,14 +38,13 @@
       "thePathToMyConfigFile") for any component in the controller description
       parameter of the newFcInstance method from the Fractal API:</para>
 
-      <screen>
- componentInstance = componentFactory.newFcInstance(
+      <programlisting lang="java"><![CDATA[componentInstance = componentFactory.newFcInstance(
    myComponentType,
    new ControllerDescription(
      "name",
      myHierarchicalType,
      thePathToMyControllerConfigFile),
-   myContentDescription); </screen>
+   myContentDescription);]]></programlisting>
     </sect2>
 
     <sect2>
@@ -72,10 +70,9 @@
         </listitem>
       </orderedlist>
 
-      <screen>
-public ControllerImplementation(Component owner) {
+      <programlisting lang="java"><![CDATA[public ControllerImplementation(Component owner) {
     super(owner);
-} </screen>
+}]]></programlisting>
 
       <orderedlist>
         <listitem>
@@ -85,8 +82,7 @@ public ControllerImplementation(Component owner) {
         </listitem>
       </orderedlist>
 
-      <screen>
-protected void setControllerItfType() {
+      <programlisting lang="java"><![CDATA[protected void setControllerItfType() {
  try {
    setItfType(ProActiveTypeFactory.instance().createFcItfType(
      "Name of the controller",
@@ -95,7 +91,7 @@ protected void setControllerItfType() {
      throw new ProActiveRuntimeException("cannot create controller type: " +
        this.getClass().getName());
    }
- } </screen>
+ }]]></programlisting>
 
       <orderedlist>
         <listitem>
@@ -127,17 +123,17 @@ protected void setControllerItfType() {
       would be an input interceptor and an output interceptor would be defined
       as follows:</para>
 
-      <screen>
-&lt;componentConfiguration&gt;
- &lt;controllers&gt;
+      <programlisting lang="xml"><![CDATA[
+<componentConfiguration>
+ <controllers>
  ....
-   &lt;controller 
+   <controller 
 input-interceptor="true" output-interceptor="true"
-&gt;
-     &lt;interface&gt;InterceptorControllerInterface&lt;/interface&gt;
-     &lt;implementation&gt;ControllerImplementation&lt;/implementation&gt;
-   &lt;/controller&gt;
-... </screen>
+>
+     <interface>InterceptorControllerInterface</interface>
+     <implementation>ControllerImplementation</implementation>
+   </controller>
+... ]]></programlisting>
 
       <para>Interceptors can be composed in a basic manner:
       sequentially.</para>
@@ -212,8 +208,7 @@ OutputInterceptor2
 
       <para>Here is a simple example of an input interceptor:</para>
 
-      <screen>
-public class MyInputInterceptor extends AbstractProActiveController
+      <programlisting lang="java"><![CDATA[public class MyInputInterceptor extends AbstractProActiveController
  implements InputInterceptor, MyController {
   public MyInputInterceptor(Component owner) {
     super(owner);
@@ -244,26 +239,23 @@ l invocation");
  invocation");
     // interception code
  }
-}
-</screen>
+}]]></programlisting>
 
       <para>The configuration file would state:</para>
 
-      <screen>
-&lt;componentConfiguration&gt;
- &lt;controllers&gt;
+      <programlisting lang="xml"><![CDATA[<componentConfiguration>
+ <controllers>
  ....
-   &lt;controller 
-     input-interceptor="true"&gt;
-     &lt;interface&gt;
+   <controller 
+     input-interceptor="true">
+     <interface>
         MyController
-     &lt;/interface&gt;
-     &lt;implementation&gt;
+     </interface>
+     <implementation>
         MyInputInterceptor
-     &lt;/implementation&gt;
-   &lt;/controller&gt;
- ...
-</screen>
+     </implementation>
+   </controller>
+ ...]]></programlisting>
     </sect2>
   </sect1>
 
@@ -372,10 +364,8 @@ l invocation");
       synchronous in the ControllerDescription object that is passed to the
       component factory:</para>
 
-      <screen>
-ControllerDescription controllerDescription = 
-            new ControllerDescription("name", Constants.COMPOSITE, Constants.SYNCHRONOUS);
-</screen>
+      <programlisting lang="java"><![CDATA[ControllerDescription controllerDescription = 
+            new ControllerDescription("name", Constants.COMPOSITE, Constants.SYNCHRONOUS);]]></programlisting>
 
       <para>When the system property proactive.components.use_shortcuts is set
       to true, the component system will automatically establish short cuts

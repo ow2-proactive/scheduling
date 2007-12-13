@@ -1,355 +1,357 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
-<chapter id="C3D_component_example">
- <title>C3D - from Active Objects to Components</title>
- 
- <sect1 >
-  <title>Overview</title>
-  
-  <para>This is an example of an application that is refactored to fit the
-   components dogma. The standard C3D example has been taken as a basis,
-   and component wrappers have been created. This way, one can see what is
-   needed to transform an application into component-oriented code.</para>
-  
-  <!-- The link to the source code is made only for the html -->
-  <para os="html">You may find the code in the 
-   <ulink url="../api/org/objectweb/proactive/examples/components/c3d/package-summary.html">examples/components/c3d</ulink>
-   directory of the proactive source.</para>
-  
-  <!-- Only the name of the package appears in the pdf -->
-  <para os="pdf">You may find the code in the 
-   <literal>examples/components/c3d</literal> directory of the proactive source.</para>
-  
- </sect1>
- 
- <sect1 >
-  <title>Using working C3D code with components</title>
-  
-  <para><figure>
-    <title>Informal description of the C3D Components hierarchy</title>
-    
-    <mediaobject>
-     <imageobject>
-      <imagedata contentwidth="100"
-                 fileref="components/pics/C3D-Components-UML.png"
-                 format="PNG" width="6in" />
-     </imageobject>
-    </mediaobject>
-   </figure></para>
-  
-  <para>We consider the working C3D application. It's nice, and has a
-   sleak GUI, but we now want to add component power to it! What we do is
-   shown on the image: add wrappers around the original object classes
-   (C3D*) and instead of linking the classes together by setting fields
-   through the initial methods, do that in the binding methods. In other
-   words, we have to spot exactly where C3DRenderingEngine, C3DUser and
-   C3DDispatcher are used by a class other than itself, and turn these
-   references into component bindings. Of course, we also have to expose
-   the interfaces that we are going to use, hence the Dispatcher, Engine
-   and User interface that have to be implemented.</para>
- </sect1>
- 
- <sect1 >
-  <title>How the application is written</title>
-  
-  <para>First of all, have a look at the doc on C3D to remember how 
-   this application is written, in <xref linkend="C3D_example"/>.
-   Most important is the class diagram, showing C3DUser, C3DDispatcher and
-   C3DRederingEngine. We decided that the only objects worth wrapping in
-   components were those three. The rest is too small to be worth the
-   hassle.</para>
-  
-  <sect2 >
-   <title>Creating the interfaces</title>
-   
-   <para>What we need to do is to extract the interfaces of the Objects,
-    ie find which methods are going to be called on the components. This
-    means find out what methods are called from outside the Active Object.
-    You can do that by searching in the classes where the calls are made
-    on active objects. For this, <emphasis role="bold">you have to know in
-     detail which classes are going to be turned into component</emphasis>.
-    If you have a code base which closely follows Object Oriented
-    Programming rules, the interfaces are already there. Indeed, when a
-    class is written, it should always go with one or more interfaces,
-    which present to the world what the class abilities are. In C3D
-    (Active Object version), these interfaces already exist: they are
-    called <literal>User</literal>, <literal>Engine</literal> and
-    <literal>Dispatcher</literal>.</para>
-   
-   <note>
-    <para><emphasis role="bold">Tricky part:</emphasis> whatever way you
-     look at components, you'll have to modify the initial code if these
-     interfaces were not created at first go. You have to replace all the
-     class references by their interface, when you use them in other
-     files. For example, if we had not already used interfaces in the C3D
-     Object code, we would have had to replace all occurrences of
-     C3DDispatcher by occurrences of Dispatcher.</para>
-   </note>
-   
-   <para>Why do we have to do that, replacing classes by interfaces?
-    That's due to the way components work. When the components are going
-    to be bound, you're not binding the classes themselves (ie the 
-    container which performs operations), but [proxies to]
-    the interfaces presenting the behaviour available. 
-    And these proxies implement the interfaces, and do not
-    extend the classes. What is highlighted here is that components enforce
-    good code design by separating behaviours.</para>
-  </sect2>
-  
-  <sect2 >
-   <title>Creating the Component Wrappers</title>
-   
-   <para>You now have to create a class that englobes the previous Active
-    Objects, and which is a component representing the same functionality.
-    How do you do that? Pretty simple. All you need to do is extend the
-    Active Object class, and add to it the non-functional interfaces which
-    go with the component. You have the binding interfaces to create,
-    which basically say how to put together two Components, tell who is
-    already attached, and how to separate them. These are the
-    <literal>lookupFc</literal>, <literal>listFc</literal>, <literal>bindFc</literal>
-    and <literal>unbindFc</literal> methods.</para>
-   
-   <para>This has been done in the <literal>*Impl</literal> files. Let's
-    consider, for example, the UserImpl class (it is shown below).What you
-    have here are those component methods. Be even more careful with this
-    <literal>bindFc</literal> method. In fact, it really binds the
-    protected <literal>Dispatcher</literal> variable
-    <literal>c3ddispatcher</literal>. This way, the
-    <literal>C3DUser</literal> code can now use this variable as if it was
-    addressing the real Active Object. Just to be precise, we have to
-    point out that you're going through proxies before reaching the
-    Component, then the Active Object. This is hidden by the ProActive
-    layer, all you should know is you're addressing a
-    <literal>Dispatcher</literal>, and you're fine! The
-    <literal>findDispatcher</literal> method has been overridden because
-    component lookup doesn't work like standard Active Object lookup.</para>
-
-    <example>
-     <title>The UserImpl class, a component wrapper</title>
-     <programlisting lang="java"><textobject>
-       <textdata fileref="examples/components/c3d/UserImpl.java" />
-      </textobject></programlisting>
-    </example>
-
-  </sect2>
-  
-  <sect2 >
-   <title>Discarding direct reference acknowledgment</title>
-   
-   <para>If you're out of luck, the code contains instructions to retain
-    references to objects that call methods on the current Object. These
-    methods have a signature ressembling <literal>method(..., ActiveObject
-     ao, ...)</literal>. This is called, in ProActive, with a
-    <literal>ProActive.getStubOnThis()</literal> (if you don't, and
-    instead use 'this', the code won't work correctly on remote hosts!).
-    If the local object uses this
-    <literal>ProActive.getStubOnThis()</literal>, you're going to have
-    trouble with components. The problem is that this design does not fit
-    the component paradigm: you should be using declared interfaces bound
-    with the bind methods, not be passing along references to self. So you
-    have to remove these from the code, and make it component-oriented.
-    But remember, <emphasis role="bold">you should be using bind methods
-     to attach other components</emphasis>.</para>
-   
-   <note>
-    <para>If you really have to keep these 
-     <literal>ProActive.getStubOnThis()</literal> references, you may,
-     because components, (or at least their internals) really are Active
-     Objects. But you should be extra careful. This "Active Object
-     reference passing" should not happen between components, as they are
-     meant to interact through their component interfaces only.</para>
-   </note>
-  </sect2>
- </sect1>
- 
- <sect1 id="fractal_gui_with_c3d">
-  <title>The C3D ADL</title>
-  
-  <para>You may be wanting to see how we have bound the components
-   together, now. Since the design is pretty simple, there is not much to
-   it. We have used the fractal ADL, to avoid hard-coding bindings. So all
-   of the information here is in the
-   <literal>examples/components/c3d/adl/</literal> directory. There are the
-   components, called '<literal>...Impl</literal>' (you can see there which
-   interfaces they propose), and a
-   '<literal>userAndComposite.fractal</literal>' file, which is where the
-   bindings are made. It includes the use of a Composite component, just
-   for the fun. Specifically, it links one user to a composite made of a
-   dispatcher and two renderers. You may want to explore these files with
-   the Fractal GUI provided with IC2D, it's easier to understand
-   graphically. Here's the code, nevertheless, for you curiosity:</para>
-  
-  <para><example>
-    <title>userAndComposite.fractal, a component ADL file</title>
-    
-    <programlisting lang="xml"><textobject>
-      <textdata fileref="examples/components/c3d/adl/userAndComposite.fractal" />
-     </textobject></programlisting>
-   </example></para>
-  
-  <para>Here's what it looks like when you explore it through the IC2D
-   Component explorer <figure>
-    <title>IC2D component explorer with the C3D example</title>
-    
-    <mediaobject>
-     <imageobject>
-      <imagedata contentwidth="100"
-                 fileref="components/pics/c3d_components.png"
-                 format="PNG" width="6in" />
-     </imageobject>
-    </mediaobject>
-   </figure></para>
- </sect1>
- 
- <sect1>
-  <title>Advanced component highlights</title>
-  
-  <sect2>
-   <title>Renaming Virtual Nodes</title>
-   
-   <para>One feature given by the component architecture is the
-    possiblity to rename <literal>Virtual Nodes</literal>. Let's see how
-    this can be used:</para>
-   
-   <para>Suppose you are only dealing with packaged software. That means
-    you may not modify the source code of some part of your application,
-    for instance because it is kindly given to you by some other company,
-    which wants to keep parts of its codebase secret. Let's say that the
-    deployment descriptor you're using does not reference the proper
-    <literal>VirtualNodes</literal>. How can you still deploy your
-    application in this case? Well, you have to
-    <emphasis>rename</emphasis> those Nodes into the names that are
-    fitting to your application. You should do that after the definition
-    of the interfaces that are defined inside the component. 
-    Here's an example of how to do that, renaming the externally provided 
-    name 'UserVirtualNode' to the name internally used by UserImpl 'User':</para>
-   
-    <para>In the main ADL file (<literal>userAndComposite.fractal</literal>) </para>
-<programlisting lang="xml">  &lt;component ... /&gt;
+<chapter id="C3D_component_example" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="http://www.docbook.org/xsd/4.2/docbook.xsd">
+    <title>C3D - from Active Objects to Components</title>
+    <sect1>
+        <title>Overview</title>
+        <para>
+            This is an example of an application that is refactored to
+            fit the components dogma. The standard C3D example has been
+            taken as a basis, and component wrappers have been created.
+            This way, one can see what is needed to transform an
+            application into component-oriented code.
+        </para>
+        <!-- The link to the source code is made only for the html -->
+        <para os="html">
+            You may find the code in the
+            <ulink
+                url="../api/org/objectweb/proactive/examples/components/c3d/package-summary.html">
+                examples/components/c3d
+            </ulink>
+            directory of the proactive source.
+        </para>
+        <!-- Only the name of the package appears in the pdf -->
+        <para os="pdf">
+            You may find the code in the
+            <literal>examples/components/c3d</literal>
+            directory of the proactive source.
+        </para>
+    </sect1>
+    <sect1>
+        <title>Using working C3D code with components</title>
+        <para>
+            <figure>
+                <title>
+                    Informal description of the C3D Components hierarchy
+                </title>
+                <mediaobject>
+                    <imageobject>
+                        <imagedata contentwidth="100"
+                            fileref="components/pics/C3D-Components-UML.png"
+                            format="PNG" width="6in" />
+                    </imageobject>
+                </mediaobject>
+            </figure>
+        </para>
+        <para>
+            We consider the working C3D application. It's nice, and has
+            a sleak GUI, but we now want to add component power to it!
+            What we do is shown on the image: add wrappers around the
+            original object classes (C3D*) and instead of linking the
+            classes together by setting fields through the initial
+            methods, do that in the binding methods. In other words, we
+            have to spot exactly where C3DRenderingEngine, C3DUser and
+            C3DDispatcher are used by a class other than itself, and
+            turn these references into component bindings. Of course, we
+            also have to expose the interfaces that we are going to use,
+            hence the Dispatcher, Engine and User interface that have to
+            be implemented.
+        </para>
+    </sect1>
+    <sect1>
+        <title>How the application is written</title>
+        <para>
+            First of all, have a look at the doc on C3D to remember how
+            this application is written, in
+            <xref linkend="C3D_example" />
+            . Most important is the class diagram, showing C3DUser,
+            C3DDispatcher and C3DRederingEngine. We decided that the
+            only objects worth wrapping in components were those three.
+            The rest is too small to be worth the hassle.
+        </para>
+        <sect2>
+            <title>Creating the interfaces</title>
+            <para>
+                What we need to do is to extract the interfaces of the
+                Objects, ie find which methods are going to be called on
+                the components. This means find out what methods are
+                called from outside the Active Object. You can do that
+                by searching in the classes where the calls are made on
+                active objects. For this,
+                <emphasis role="bold">
+                    you have to know in detail which classes are going
+                    to be turned into component
+                </emphasis>
+                . If you have a code base which closely follows Object
+                Oriented Programming rules, the interfaces are already
+                there. Indeed, when a class is written, it should always
+                go with one or more interfaces, which present to the
+                world what the class abilities are. In C3D (Active
+                Object version), these interfaces already exist: they
+                are called
+                <literal>User</literal>
+                ,
+                <literal>Engine</literal>
+                and
+                <literal>Dispatcher</literal>
+                .
+            </para>
+            <note>
+                <para>
+                    <emphasis role="bold">Tricky part:</emphasis>
+                    whatever way you look at components, you'll have to
+                    modify the initial code if these interfaces were not
+                    created at first go. You have to replace all the
+                    class references by their interface, when you use
+                    them in other files. For example, if we had not
+                    already used interfaces in the C3D Object code, we
+                    would have had to replace all occurrences of
+                    C3DDispatcher by occurrences of Dispatcher.
+                </para>
+            </note>
+            <para>
+                Why do we have to do that, replacing classes by
+                interfaces? That's due to the way components work. When
+                the components are going to be bound, you're not binding
+                the classes themselves (ie the container which performs
+                operations), but [proxies to] the interfaces presenting
+                the behaviour available. And these proxies implement the
+                interfaces, and do not extend the classes. What is
+                highlighted here is that components enforce good code
+                design by separating behaviours.
+            </para>
+        </sect2>
+        <sect2>
+            <title>Creating the Component Wrappers</title>
+            <para>
+                You now have to create a class that englobes the
+                previous Active Objects, and which is a component
+                representing the same functionality. How do you do that?
+                Pretty simple. All you need to do is extend the Active
+                Object class, and add to it the non-functional
+                interfaces which go with the component. You have the
+                binding interfaces to create, which basically say how to
+                put together two Components, tell who is already
+                attached, and how to separate them. These are the
+                <literal>lookupFc</literal>
+                ,
+                <literal>listFc</literal>
+                ,
+                <literal>bindFc</literal>
+                and
+                <literal>unbindFc</literal>
+                methods.
+            </para>
+            <para>
+                This has been done in the
+                <literal>*Impl</literal>
+                files. Let's consider, for example, the UserImpl class
+                (it is shown below).What you have here are those
+                component methods. Be even more careful with this
+                <literal>bindFc</literal>
+                method. In fact, it really binds the protected
+                <literal>Dispatcher</literal>
+                variable
+                <literal>c3ddispatcher</literal>
+                . This way, the
+                <literal>C3DUser</literal>
+                code can now use this variable as if it was addressing
+                the real Active Object. Just to be precise, we have to
+                point out that you're going through proxies before
+                reaching the Component, then the Active Object. This is
+                hidden by the ProActive layer, all you should know is
+                you're addressing a
+                <literal>Dispatcher</literal>
+                , and you're fine! The
+                <literal>findDispatcher</literal>
+                method has been overridden because component lookup
+                doesn't work like standard Active Object lookup.
+            </para>
+            <para>
+                Suppose you are only dealing with packaged software.
+                That means you may not modify the source code of some
+                part of your application, for instance because it is
+                kindly given to you by some other company, which wants
+                to keep parts of its codebase secret. Let's say that the
+                deployment descriptor you're using does not reference
+                the proper
+                <literal>VirtualNodes</literal>
+                . How can you still deploy your application in this
+                case? Well, you have to
+                <emphasis>rename</emphasis>
+                those Nodes into the names that are fitting to your
+                application. You should do that after the definition of
+                the interfaces that are defined inside the component.
+                Here's an example of how to do that, renaming the
+                externally provided name 'UserVirtualNode' to the name
+                internally used by UserImpl 'User':
+            </para>
+            <para>
+                In the main ADL file (
+                <literal>userAndComposite.fractal</literal>
+                )
+            </para>
+            <programlisting lang="xml"><![CDATA[  <component ... />
        
-    &lt;!-- mapping the node names in the descriptor file to others referenced in the component's adl files. --&gt;
-    &lt;exportedVirtualNodes&gt;
-      &lt;exportedVirtualNode name="UserVirtualNode"&gt;
-        &lt;composedFrom&gt;
-           &lt;composingVirtualNode component="user" name="User"/&gt;
-        &lt;/composedFrom&gt;
-      &lt;/exportedVirtualNode&gt;
-    &lt;/exportedVirtualNodes&gt;
+    <!-- mapping the node names in the descriptor file to others referenced in the component's adl files. -->
+    <exportedVirtualNodes>
+      <exportedVirtualNode name="UserVirtualNode">
+        <composedFrom>
+           <composingVirtualNode component="user" name="User"/>
+        </composedFrom>
+      </exportedVirtualNode>
+    </exportedVirtualNodes>
        
-    &lt;!-- Creating one user component --&gt;</programlisting>
-
-     <para>In the User ADL file (<literal>UserImpl.fractal</literal>)</para>
-<example>
-     <title>How to rename Virtual Nodes in ADL files</title>
-     <programlisting lang="xml">&lt;content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/&gt;
+    <!-- Creating one user component -->]]></programlisting>
+            <para>
+                In the User ADL file (
+                <literal>UserImpl.fractal</literal>
+                )
+            </para>
+            <example>
+                <title>How to rename Virtual Nodes in ADL files</title>
+                <programlisting lang="xml"><![CDATA[<content class="org.objectweb.proactive.examples.components.c3d.UserImpl"/>
        
-    &lt;!-- Recalling a renamed Virtual Node --&gt;
-    &lt;exportedVirtualNodes&gt;
-      &lt;exportedVirtualNode name="User"&gt;
-        &lt;composedFrom&gt;
-          &lt;composingVirtualNode component="this" name="User"/&gt;
-        &lt;/composedFrom&gt;
-      &lt;/exportedVirtualNode&gt;
-    &lt;/exportedVirtualNodes&gt;
+    <!-- Recalling a renamed Virtual Node -->
+    <exportedVirtualNodes>
+      <exportedVirtualNode name="User">
+        <composedFrom>
+          <composingVirtualNode component="this" name="User"/>
+        </composedFrom>
+      </exportedVirtualNode>
+    </exportedVirtualNodes>
        
-    &lt;controller desc="primitive"/&gt;</programlisting>
-</example>
-
-       <para>If you add this code into the
-      adl, you are saying that the <literal>VirtualNode</literal> called
-      <literal>UserVirtualNode</literal> (found in the deployment
-      descriptor file the application is using) should be recognized by
-      the application as if it was called
-      <literal>User</literal>.</para>
-   
-     
-     <note><para>Above has been described the way to rename a
-      <literal>VirtualNode</literal>; this can be used on packaged
-      software, when the <literal>VirtualNodes</literal> provided do not
-      fit the <literal>VirtualNodes</literal> needed by your
-      application.</para></note>
-     
-  </sect2>
-  
-  <sect2>
-   <title>Component lookup and registration</title>
-   
-   <para>When running the User Component alone, you are prompted for an
-    address on which to lookup a Dispatcher Component. Then the two
-    components are bound through a lookup mechanism. This is very simple
-    to use. Here's the code to do that: </para>
-   
-   <example>
-    <title>Component Lookup and Register</title>
-    
-    <para>The component Registration</para>
-    
-    <para><programlisting lang="java">Fractive.register(Fractive.getComponentRepresentativeOnThis(),
-      UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));</programlisting></para>
-    
-    <para>The Component lookup</para>
-    
-    <para><programlisting lang="java">ProActiveComponentRepresentative a = Fractive.lookup(
+    <controller desc="primitive"/>]]></programlisting>
+            </example>
+            <para>
+                If you add this code into the adl, you are saying that
+                the
+                <literal>VirtualNode</literal>
+                called
+                <literal>UserVirtualNode</literal>
+                (found in the deployment descriptor file the application
+                is using) should be recognized by the application as if
+                it was called
+                <literal>User</literal>
+                .
+            </para>
+            <note>
+                <para>
+                    Above has been described the way to rename a
+                    <literal>VirtualNode</literal>
+                    ; this can be used on packaged software, when the
+                    <literal>VirtualNodes</literal>
+                    provided do not fit the
+                    <literal>VirtualNodes</literal>
+                    needed by your application.
+                </para>
+            </note>
+        </sect2>
+        <sect2>
+            <title>Component lookup and registration</title>
+            <para>
+                When running the User Component alone, you are prompted
+                for an address on which to lookup a Dispatcher
+                Component. Then the two components are bound through a
+                lookup mechanism. This is very simple to use. Here's the
+                code to do that:
+            </para>
+            <example>
+                <title>Component Lookup and Register</title>
+                <para>The component Registration</para>
+                <para>
+                    <programlisting lang="java"><![CDATA[Fractive.register(Fractive.getComponentRepresentativeOnThis(),
+      UrlBuilder.buildUrlFromProperties("localhost", "Dispatcher"));]]></programlisting>
+                </para>
+                <para>The Component lookup</para>
+                <para>
+                    <programlisting lang="java"><![CDATA[ProActiveComponentRepresentative a = Fractive.lookup(
       UrlBuilder.buildUrl(this.hostName, "Dispatcher", protocol, this.portNumber));
-      this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");</programlisting></para>
-   </example>
-   
-   <para>For the registeration, you only need a reference on the
-    component you want to register, and build a url containing the name of
-    the host, containing an alias for the Component. </para>
-   
-   <para>The <literal>Fractive.lookup</literal> method uses a Url to find
-    the host which holds the component. This Url contains the machine name
-    of the host, communication protocl and portNumber, but also the lookup
-    name under which the desired Component has been registered under ,
-    here "Dispatcher". The last operation consists only in retreiving the
-    correct interface to which to connect to. If the interface is not
-    known at compile-time, it can be discovered at run-time with the
-    <literal>getFcInterfaces()</literal> method, which lists all the
-    interfaces available. </para>
-  </sect2>
- </sect1>
- 
- <sect1>
-  <title>How to run this example</title>
-  
-  <para>There is only one access point for this example in the scripts
-   directory: </para>
-  <screen>scripts/unix/components$ ./c3d.sh
-  --- Fractal C3D example ---------------------------------------------
-  Parameters : descriptor_file [fractal_ADL_file]
-        The first file describes your deployment of computing nodes.
-                You may want to try ../../../descriptors/components/C3D_all.xml
-        The second file describes your components layout.
-                Default is org.objectweb.proactive.examples.components.c3d.adl.userAndComposite
-  ---------------------------------------------------------</screen>
-  
-  <para>You have there the way to start this example. If you only want to
-   start the Composite (Dispatcher + Renderer), try this (don't insert the new lines): </para>
-   <screen>scripts/unix/components$ ./c3d.sh  ../../../descriptors/components/C3D_all.xml \
-   org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend</screen> 
-     
-  <para>If you want to start only a User, you will be asked for the
-   address of a Dispatcher to which to connect to: </para>
-  <screen>scripts/unix/components$ ./c3d.sh ../../../descriptors/components/C3D_all.xml \
-  org.objectweb.proactive.examples.components.c3d.adl.UserImpl</screen>
- </sect1>
- 
- <sect1>
-  <title>Source Code</title>
-  
-  <para>You may find the code of this application in the following packages: </para>
-  
-  <itemizedlist>
-   <listitem>
-    <para><literal>org.objectweb.proactive.examples.c3d</literal>, 
-     the Active Object version </para>
-   </listitem>
-   
-   <listitem>
-    <para><literal>org.objectweb.proactive.examples.components.c3d</literal>, 
-     the Component version </para>
-   </listitem>
-  </itemizedlist>
- </sect1>
-  </chapter>
+      this.c3dDispatcher = (Dispatcher) a.getFcInterface("user2dispatcher");]]></programlisting>
+                </para>
+            </example>
+            <para>
+                For the registeration, you only need a reference on the
+                component you want to register, and build a url
+                containing the name of the host, containing an alias for
+                the Component.
+            </para>
+            <para>
+                The
+                <literal>Fractive.lookup</literal>
+                method uses a Url to find the host which holds the
+                component. This Url contains the machine name of the
+                host, communication protocl and portNumber, but also the
+                lookup name under which the desired Component has been
+                registered under , here "Dispatcher". The last operation
+                consists only in retreiving the correct interface to
+                which to connect to. If the interface is not known at
+                compile-time, it can be discovered at run-time with the
+                <literal>getFcInterfaces()</literal>
+                method, which lists all the interfaces available.
+            </para>
+        </sect2>
+    </sect1>
+    <sect1>
+        <title>How to run this example</title>
+        <para>
+            There is only one access point for this example in the
+            scripts directory:
+        </para>
+        <screen>
+            scripts/unix/components$ ./c3d.sh --- Fractal C3D example
+            --------------------------------------------- Parameters :
+            descriptor_file [fractal_ADL_file] The first file describes
+            your deployment of computing nodes. You may want to try
+            ../../../descriptors/components/C3D_all.xml The second file
+            describes your components layout. Default is
+            org.objectweb.proactive.examples.components.c3d.adl.userAndComposite
+            ---------------------------------------------------------
+        </screen>
+        <para>
+            You have there the way to start this example. If you only
+            want to start the Composite (Dispatcher + Renderer), try
+            this (don't insert the new lines):
+        </para>
+        <screen>
+            scripts/unix/components$ ./c3d.sh
+            ../../../descriptors/components/C3D_all.xml \
+            org.objectweb.proactive.examples.components.c3d.adl.compositeOfDispRend
+        </screen>
+        <para>
+            If you want to start only a User, you will be asked for the
+            address of a Dispatcher to which to connect to:
+        </para>
+        <screen>
+            scripts/unix/components$ ./c3d.sh
+            ../../../descriptors/components/C3D_all.xml \
+            org.objectweb.proactive.examples.components.c3d.adl.UserImpl
+        </screen>
+    </sect1>
+    <sect1>
+        <title>Source Code</title>
+        <para>
+            You may find the code of this application in the following
+            packages:
+        </para>
+        <itemizedlist>
+            <listitem>
+                <para>
+                    <literal>
+                        org.objectweb.proactive.examples.c3d
+                    </literal>
+                    , the Active Object version
+                </para>
+            </listitem>
+            <listitem>
+                <para>
+                    <literal>
+                        org.objectweb.proactive.examples.components.c3d
+                    </literal>
+                    , the Component version
+                </para>
+            </listitem>
+        </itemizedlist>
+    </sect1>
+</chapter>
