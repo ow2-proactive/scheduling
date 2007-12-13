@@ -43,14 +43,12 @@
 					</xs:complexType>
 				</xs:element>
 			</xs:sequence>
-			<xs:attribute name="schemaVersion" type="xs:decimal"
-				use="required" fixed="1.1" />
 		</xs:complexType>
 	</xs:element>
 
 
 	<xs:simpleType name="AttributesValueType">
-		<xs:restriction base="xs:string">
+		<xs:restriction base="xs:string" >
 			<xs:enumeration value="required" />
 			<xs:enumeration value="optional" />
 			<xs:enumeration value="denied" />
