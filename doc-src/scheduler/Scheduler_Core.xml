@@ -3,11 +3,19 @@
 <chapter id="ProActive_Scheduler">
   <title>ProActive Scheduler</title>
 
+    <para><emphasis role="bold">IMPORTANT NOTE</emphasis> - Some parts of the ProActive Scheduler rely on Java Scripting capabilities (<ulink url="http://jcp.org/en/jsr/detail?id=223">JSR 223</ulink>). As a consequence, it requires either:
+    <itemizedlist>
+          <listitem> a 1.6 or greater Java Runtime Environment, without any mdifications, </listitem>
+          <listitem> or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>. Thoses files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
+          you are using the bin release or ProActive, or in the <literal>/ProActive/lib/</literal> directory if you build ProActive from the source release.</listitem>
+    </itemizedlist>
+    </para>
+
   <sect1 id="overview">
     <title>Overview</title>
 
     <para>The execution of parallel tasks on a pool of distributed resources,
-    such as network of desktop or clusters, requires a main system for
+    such as network of desktops or clusters, requires a main system for
     managing resources and handling task execution: <emphasis role="bold">a
     batch scheduler</emphasis>. A batch scheduler provides an abstraction of
     resources to users. Users submit jobs containing tasks to the <emphasis
@@ -19,15 +27,16 @@
 
     <para>In this chapter we present a ProActive based Scheduler which offers:
     <emphasis role="bold">a JAVA programming API</emphasis>, <emphasis
-    role="bold">a shell based command submitter</emphasis>, <emphasis
+    role="bold">a command-line based job submitter</emphasis>, <emphasis
     role="bold">and a graphical user or admin interface</emphasis> (Eclipse
     Plugin, see <xref linkend="Scheduler_Eclipse_Plugin" />) which can be
-    plugged on the scheduler main application.</para>
+    plugged on the scheduler core application.</para>
 
     <para>In the rest of this chapter, we will expose how the scheduler works,
     what policies govern the job management, how to create a job and how to
     get the jobs and the nodes state using either the shell communicator or
     the GUI.</para>
+    
   </sect1>
 
   <sect1 id="scheduler_concept">
@@ -85,7 +94,8 @@
       <para>There are three types of Tasks : <itemizedlist>
           <listitem>
             <para><emphasis role="bold">JAVA</emphasis>, its execution can be
-            a java class extending the 'JavaExecutable' class. </para>
+            a java class extending the <literal>org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable</literal> 
+            class. </para>
           </listitem>
 
           <listitem>
@@ -95,7 +105,7 @@
 
           <listitem>
             <para><emphasis role="bold">PROACTIVE</emphasis>, its execution
-            can be any java class extending the 'ProActiveExecutable' class.
+            can be any java class extending the <literal>org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable</literal> class.
             Coding this last one requires a knowledge base on the use of
             ProActive.</para>
           </listitem>
@@ -106,10 +116,10 @@
 
       <para>A Task may optionally be accompanied by 3 kinds of scripts
       (preScript, postScript and selectionScript) whose explanations are
-      provided in the documentation of resource manager (<xref
+      provided in the documentation of the ProActive Resource Manager (<xref
       linkend="resources_manager" />).</para>
 
-      <para>Dependencies between Tasks is also possible, and is detailed in
+      <para>Dependencies between Tasks can also be defined; this apsect is detailed in
       <xref linkend="how_dependences" />.</para>
 
       <para>The result of a Task can be marked as <emphasis
