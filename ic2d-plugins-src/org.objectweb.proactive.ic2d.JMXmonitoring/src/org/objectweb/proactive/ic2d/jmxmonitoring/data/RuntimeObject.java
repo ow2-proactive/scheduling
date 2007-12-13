@@ -38,6 +38,7 @@ import javax.management.MBeanServerInvocationHandler;
 import javax.management.NotificationListener;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.jmx.ProActiveConnection;
@@ -46,6 +47,10 @@ import org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.ic2d.console.Console;
+import org.objectweb.proactive.ic2d.jmxmonitoring.Activator;
 import org.objectweb.proactive.ic2d.jmxmonitoring.data.listener.RuntimeObjectListener;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotification;
 import org.objectweb.proactive.ic2d.jmxmonitoring.util.MVCNotificationTag;
@@ -74,6 +79,7 @@ public class RuntimeObject extends AbstractData {
     private final String hostUrlServer;
     private final String serverName;
     private ProActiveRuntimeWrapperMBean proxyMBean;
+    private transient Logger logger = ProActiveLogger.getLogger(Loggers.JMX_NOTIFICATION);
 
     /** JMX Notification listener */
     private final javax.management.NotificationListener listener;
@@ -250,6 +256,16 @@ public class RuntimeObject extends AbstractData {
                 final String[] res = proxyNodeMBean.getJobIdAndVirtualNodeName();
                 final String jobId = res[0];
                 final String virtualNodeName = res[1];
+
+                if (virtualNodeName == null) {
+                    Console.getInstance(Activator.CONSOLE_NAME)
+                           .err("Problem when getting virtual node name from the remote NodeWrapperNbean for node " +
+                        nodeName);
+                    logger.error(
+                        "Problem when getting virtual node name from the remote NodeWrapperNbean for node " +
+                        nodeName + ". A null value was received.");
+                    continue;
+                }
 
                 // Find the virtualNode if already monitored
                 VirtualNodeObject vn = getWorldObject()
