@@ -222,10 +222,11 @@ public class FunctionalTest {
         if (command != null) {
             if (command.exists()) {
                 try {
-                    Runtime.getRuntime()
-                           .exec(new String[] {
-                            command.getAbsolutePath(), null, dir.toString()
-                        });
+                    Process p = Runtime.getRuntime()
+                                       .exec(new String[] {
+                                command.getAbsolutePath()
+                            }, null, dir);
+                    p.waitFor();
                 } catch (Exception e) {
                     logger.warn(e);
                 }
@@ -233,7 +234,7 @@ public class FunctionalTest {
                 throw new IOException(command + " does not exist");
             }
         } else {
-            throw new Exception(command + " not defined for" +
+            throw new Exception("No kill script defined for" +
                 OperatingSystem.getOperatingSystem().toString());
         }
     }
@@ -249,8 +250,7 @@ public class FunctionalTest {
             try {
                 killProActiveWithScript();
             } catch (Exception scriptException) {
-                logger.warn("Script kill failed: " +
-                    scriptException.getMessage());
+                logger.warn("Script kill failed: ", scriptException);
             }
         }
     }
