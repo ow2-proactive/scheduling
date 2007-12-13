@@ -31,6 +31,7 @@
 package org.objectweb.proactive.ic2d.jmxmonitoring.data;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 
@@ -254,13 +255,14 @@ public class RuntimeObject extends AbstractData {
 
                 // Get the jobId and the virtualNodeName in one call
                 final String[] res = proxyNodeMBean.getJobIdAndVirtualNodeName();
+                Console.getInstance(Activator.CONSOLE_NAME).log("res " + res);
                 final String jobId = res[0];
                 final String virtualNodeName = res[1];
 
                 if (virtualNodeName == null) {
                     Console.getInstance(Activator.CONSOLE_NAME)
                            .err("Problem when getting virtual node name from the remote NodeWrapperNbean for node " +
-                        nodeName);
+                        name);
                     logger.error(
                         "Problem when getting virtual node name from the remote NodeWrapperNbean for node " +
                         nodeName + ". A null value was received.");
