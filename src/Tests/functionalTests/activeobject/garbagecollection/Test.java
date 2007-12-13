@@ -72,15 +72,14 @@ public class Test extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
+        /*
         if ("BEA Systems, Inc.".equals(System.getProperty("java.vendor")) &&
                 "1.6.0_01".equals(System.getProperty("java.version"))) {
-
-            /*
-             * With the local GC in this JVM, weak references
-             * to stubs are seemingly never cleared.
-             */
+             // With the local GC in this JVM, weak references
+             // to stubs are seemingly never cleared.
             return;
         }
+             */
         assertTrue(A.countCollected() == 0);
         buildGraph();
         while (A.countCollected() != 5) {
