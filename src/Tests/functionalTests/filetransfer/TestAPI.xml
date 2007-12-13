@@ -42,24 +42,14 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 				
-				<classpath>
-						<absolutePath value="${proactive.home}/classes/Core"/>
-						<absolutePath value="${proactive.home}/classes/Examples"/>
-						<absolutePath value="${proactive.home}/classes/Extensions"/>
-						<absolutePath value="${proactive.home}/classes/Extra"/>
-						<absolutePath value="${proactive.home}/classes/Tests"/>
-						<absolutePath value="${proactive.home}/classes/Utils"/>
-																								
-                         <!--absolutePath value="${proactive.home}/dist/lib/ProActive.jar"/-->
-
-                        <absolutePath value="${proactive.home}/dist/lib/*"/>
-                                                 
-                        <!-- absolutePath value="${proactive.home}/dist/lib/bouncycastle.jar"/>
-                        <absolutePath value="${proactive.home}/dist/lib/ganymed-ssh2-build210.jar"/>
-                        <absolutePath value="${proactive.home}/dist/lib/fractal.jar"/>
-                        <absolutePath value="${proactive.home}/dist/lib/javassist.jar"/>
-                        <absolutePath value="${proactive.home}/dist/lib/log4j.jar"/>
-                        <absolutePath value="${proactive.home}/dist/lib/xercesImpl.jar"/-->
+				<classpath>																						
+         			<absolutePath value="${proactive.home}/dist/lib/ProActive.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/bouncycastle.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/ganymed-ssh2-build210.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/fractal.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/javassist.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/log4j.jar"/>
+            	    <absolutePath value="${proactive.home}/dist/lib/xercesImpl.jar"/>
 				</classpath>
 					
 					<javaPath><absolutePath value="${java.home}/bin/java"/></javaPath>
@@ -75,18 +65,14 @@
 			</processDefinition>	
 			<processDefinition id="localJVMPush">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-				
-				<classpath>
-						<absolutePath value="${proactive.home}/classes/Core"/>
-						<absolutePath value="${proactive.home}/classes/Examples"/>
-						<absolutePath value="${proactive.home}/classes/Extensions"/>
-						<absolutePath value="${proactive.home}/classes/Extra"/>
-						<absolutePath value="${proactive.home}/classes/Tests"/>
-						<absolutePath value="${proactive.home}/classes/Utils"/>
-																								
-                         <!--absolutePath value="${proactive.home}/dist/lib/ProActive.jar"/-->
-
-                        <absolutePath value="${proactive.home}/dist/lib/*"/>
+				<classpath>																						
+         			<absolutePath value="${proactive.home}/dist/lib/ProActive.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/bouncycastle.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/ganymed-ssh2-build210.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/fractal.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/javassist.jar"/>
+                    <absolutePath value="${proactive.home}/dist/lib/log4j.jar"/>
+            	    <absolutePath value="${proactive.home}/dist/lib/xercesImpl.jar"/>
 				</classpath>
 					
 					<javaPath><absolutePath value="${java.home}/bin/java"/></javaPath>
