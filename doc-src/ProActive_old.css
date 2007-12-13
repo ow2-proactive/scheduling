@@ -1,53 +1,9 @@
-@charset "utf-8";
-/* CSS Document */
-
-B, EM, EMPHASIS, STRONG   { color: #00257E; font-weight: bold;}
-
-div.toc,  div.list-of-figures, div.list-of-examples, div.list-of-tables, {font-size: 10pt;}
-div.ListofTitles {font-size: 10pt; margin-left:  40px; }
-
-/* Title page (first page) customization */
-//H1 {font-weight: bold; font-size: 16pt; background-color: #00257E; color: white; font-family: Verdana, Arial, sans-serif; font-size: 18pt;}
-//H2.subtitle { background-color: white; color: #0011fe; font-family : serif, Verdana, Arial;  font-size: 40pt; }
-//H3.author { background-color: white; color: #0011fe; font-family: Verdana, Arial,sans-serif ;  font-size: 12pt; }
-
-span.part a {
-	font-size:19px;
-	font-weight:bold;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-}
-span.index, span.bibliography, span.appendix, span.chapter a {font-weight: bold;font-size: 13pt;}
-
-
-body {
-/*	background: url('../images/background.jpg');*/
-/*	background-image: url(../images/background.jpg); */
-/*	background-repeat: repeat-x;*/
-	margin-left: 5px;
-	margin-top: 5px;
-	margin-right: 5px;
-	margin-bottom: 5px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 9pt;
-	color: #555555;
-}
-body.main {
-/*	background: url('../images/background.jpg');*/
-/*	background-image: url(../images/background.jpg); */
-/*	background-repeat: repeat-x;*/
-	background-color:#E1E1E1;
-	margin-left: 5px;
-	margin-top: 5px;
-	margin-right: 5px;
-	margin-bottom: 5px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 9pt;
-	color: #555555;
+BODY {
+ font-family:Verdana,Helvetica,Arial,Times;	
+ color: black;
 }
 
 td {font-size: 9pt;}
-th { background-color: #00257E; color: white; font-weight: bold; }
-
 p {margin-left:  5px; padding-left: 5px; font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 9pt; }
 
 /* Make the items of a list dense  */
@@ -55,60 +11,23 @@ li {	font-size: 9pt;}
 li p {padding:0; margin:0;} 
 
 
+/* P  { margin-left:  8px; padding-left: 8px; } */
+th { background-color: #00257E; color: white; font-weight: bold; }
+H2 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 12pt; line-height: 1.5;}
+H3 { color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold;}
+H4 { color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 9pt; font-weight: bold;}
+B, EM, EMPHASIS, STRONG   { color: #00257E; font-weight: bold;}
 
-a   {
-	color:#3A4376;
-	font-weight:bold;
-	text-decoration:none; 
-} 
-a:hover   {
-	color:#FF9900;  
-	text-decoration:none; 
-}
-h1 {
-	font-size:19px;
-	font-weight:bold;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-}
-h2 {
-	font-size:17px;
-	font-weight:bold;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-}
-h3 {
-	color:#3A4376;
-	font-size:14px;
-	font-weight:bold;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-}
-h4 {
-	font-size:12px;
-	font-weight:bold;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-}
-h5 {
-	font-size:11px;
-	font-weight:bold;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-}
+div.toc,  div.list-of-figures, div.list-of-examples, div.list-of-tables, {font-size: 10pt;}
+div.ListofTitles {font-size: 10pt; margin-left:  40px; }
 
+/* Title page (first page) customization */
+H1 {font-weight: bold; font-size: 16pt; background-color: #00257E; color: white; font-family: Verdana, Arial, sans-serif; font-size: 18pt;}
+H2.subtitle { background-color: white; color: #0011fe; font-family : serif, Verdana, Arial;  font-size: 40pt; }
+H3.author { background-color: white; color: #0011fe; font-family: Verdana, Arial,sans-serif ;  font-size: 12pt; }
 
-.tab_menu {
-	background-color:#CCCCCC;
-}
-
-input {
-	border: 1px solid #8EA2AE;
-	padding-left: 4;
-	padding-right: 4;
-	padding-top: 1;
-	padding-bottom: 1;
-}
-
-
-code {	font-size: 10px;}
-
-.codeexample {	font-family: "Courier New", Courier, mono;}
+span.part a {font-weight: bold; font-size: 16pt; background-color: #00257E; color: white}
+span.index, span.bibliography, span.appendix, span.chapter a {font-weight: bold;font-size: 13pt;}
 
 .regularLink1 { background-color: #00257E; color: white; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold; }
 .regularLink2 { background-color: white; color: #00257E; font-family: Verdana, Helvetica, Arial, sans-serif; font-size: 10pt; font-weight: bold; }
