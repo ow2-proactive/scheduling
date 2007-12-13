@@ -30,7 +30,6 @@
  */
 package org.objectweb.proactive.core.runtime;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 
@@ -99,8 +98,7 @@ public class StartRuntime {
                     log4jFile);
             }
         }
-        System.out.println("log4j is ready");
-
+        //        System.out.println("log4j is ready");
         logger = ProActiveLogger.getLogger(Loggers.RUNTIME);
 
         ProActiveConfiguration.load();
