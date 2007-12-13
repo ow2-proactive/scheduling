@@ -5,8 +5,8 @@
 
     <para><emphasis role="bold">IMPORTANT NOTE</emphasis> - Some parts of the ProActive Scheduler rely on Java Scripting capabilities (<ulink url="http://jcp.org/en/jsr/detail?id=223">JSR 223</ulink>). As a consequence, it requires either:
     <itemizedlist>
-          <listitem> a 1.6 or greater Java Runtime Environment, without any mdifications, </listitem>
-          <listitem> or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>. Thoses files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
+          <listitem> a 1.6 or greater Java Runtime Environment, without any modifications, </listitem>
+          <listitem> or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>. Those files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
           you are using the bin release or ProActive, or in the <literal>/ProActive/lib/</literal> directory if you build ProActive from the source release.</listitem>
     </itemizedlist>
     </para>
@@ -25,11 +25,11 @@
     all issues related to distributed environment, such as faulted
     resources.</para>
 
-    <para>In this chapter we present a ProActive based Scheduler which offers:
+    <para>In this chapter we present a ProActive based Scheduler accessible either from
     <emphasis role="bold">a JAVA programming API</emphasis>, <emphasis
     role="bold">a command-line based job submitter</emphasis>, <emphasis
-    role="bold">and a graphical user or admin interface</emphasis> (Eclipse
-    Plugin, see <xref linkend="Scheduler_Eclipse_Plugin" />) which can be
+    role="bold">or from a graphical user or admin interface</emphasis> (Eclipse
+    RCP Plugin, see <xref linkend="Scheduler_Eclipse_Plugin" />) which can be
     plugged on the scheduler core application.</para>
 
     <para>In the rest of this chapter, we will expose how the scheduler works,
@@ -76,8 +76,8 @@
       <para>A finished Job contains a result, which in turn contains all of
       its tasks' results or only those marked as <emphasis
       role="bold">precious</emphasis>. In the event of a failure, the finished
-      Job contains the responsible Exceptions. Further detailes on how to
-      create a Job and the different options can be foun in: <xref
+      Job contains the cause exceptions. Further details on how to
+      create a Job and the different options can be found in: <xref
       linkend="job_creation" />.</para>
     </sect2>
 
@@ -88,31 +88,32 @@
       schedulable entity. It is included in a <emphasis
       role="bold">Job</emphasis> (see <xref linkend="what_is_job" />) and will
       be executed in accordance with the scheduling policy (see <xref
-      linkend="scheduling_policy" />), and with the available
+      linkend="scheduling_policy" />) on the available
       resources.</para>
 
       <para>There are three types of Tasks : <itemizedlist>
           <listitem>
-            <para><emphasis role="bold">JAVA</emphasis>, its execution can be
+            <para><emphasis role="bold">JAVA</emphasis>; its execution is defined by 
             a java class extending the <literal>org.objectweb.proactive.extensions.scheduler.common.task.executable.JavaExecutable</literal> 
             class. </para>
           </listitem>
 
           <listitem>
-            <para><emphasis role="bold">NATIVE</emphasis>, its execution can
-            be any user program specified by a (shell) command line.</para>
+            <para><emphasis role="bold">NATIVE</emphasis>; its execution can be any user program specified by a simple command line, or by a 'generation script', that can dynamicaly generates 
+            the command line to be executed.</para>
           </listitem>
 
           <listitem>
-            <para><emphasis role="bold">PROACTIVE</emphasis>, its execution
-            can be any java class extending the <literal>org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable</literal> class.
+            <para><emphasis role="bold">PROACTIVE</emphasis>, its execution is defined by 
+            a java class extending the <literal>org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable</literal> class.
             Coding this last one requires a knowledge base on the use of
             ProActive.</para>
           </listitem>
         </itemizedlist></para>
 
-      <para>During its execution, a Task may crash due to host failure or user
-      bugs. A Task can re-started a parameterizable number of time.</para>
+      <para>During its execution, a Task may crash due to host or code failure. 
+      A Task can be re-started a parameterizable number of time (see re-runnable in section <xref
+      linkend="task_creation" />).</para>
 
       <para>A Task may optionally be accompanied by 3 kinds of scripts
       (preScript, postScript and selectionScript) whose explanations are
@@ -531,44 +532,60 @@ public Object execute(TaskResult... results) throws Throwable {
 		      		</listitem>
 		      		<listitem>
 		      			<emphasis>scripts</emphasis>
+		      			<para> The ProActive scheduler supports portable scripts execution through the JSR 223 Java Scripting 
+		      			capabilities; scripts can be written in any language supported by the underlying Java Runtime Environment. 
+		      			Scripts are used in the ProActive scheduler to :
+		      			<itemizedlist>
+		      				<listitem>Execute some simple pre and post processings: optional pre-script and post-script 
+		      			</listitem>
+		      			<listitem>Select among available resources the node that suitable for the execution: optional selection-script can 
+		      			be associated to a task.</listitem>
+		      			<listitem>Dynamic building of a command line for a native task: optional generation-script (detailled in next section).</listitem>
+		      			</itemizedlist>
+		      			Here are some details and examples:
+		      			</para>
 		      			<itemizedlist>
 		      				<listitem>
-		      					<emphasis>pre-script</emphasis> (TODO, germ, explain prescript and give java example)
+		      					<emphasis>pre-script</emphasis> The pre-script is always executed on the node that has been selected by
+		      					the resource manager <emphasis>before</emphasis> the execution of the task itself.
 		      					<programlisting lang="java">
-	//If the script to use is in a file or URL
-	String[] args = new String("foo","bar");
-	File scriptFile = new File("path/to/script_file");
-	// File scriptURL = new URL("url/to/script_file");
-	Script script = new SimpleScript(scriptFile, args);
-	// Script script = new SimpleScript(scriptURL, args);
-	aTask.setPreScript(script);
-	//If the script to use is in a java string for example
-	Script script = new SimpleScript("Script_content", "type_of_language");
-	//where type_of_language can be javascript (rhino)
-	aTask.setPreScript(script);
+				//If the script to use is in a file or URL
+				String[] args = new String("foo","bar");
+				File scriptFile = new File("path/to/script_file");
+				// File scriptURL = new URL("url/to/script_file");
+				Script script = new SimpleScript(scriptFile, args);
+				// Script script = new SimpleScript(scriptURL, args);
+				aTask.setPreScript(script);
+				//If the script to use is in a java string for example
+				Script script = new SimpleScript("Script_content", "type_of_language");
+				//where type_of_language can be any langage supported by teh underlying JRE
+				aTask.setPreScript(script);
 		      					</programlisting>
 		      				</listitem>
 		      				<listitem>
-		      					<emphasis>post-script</emphasis> (TODO, germ, explain postscript and give java example)
+		      					<emphasis>post-script</emphasis> The pre-script is always executed on the node that has been selected by
+		      					the resource manager <emphasis>after</emphasis> the execution of the task itself.
 		      					<programlisting lang="java">
-	//same use as the pre-script
-	aTask.setPostScript(script);
+				//same construction for the script
+				aTask.setPostScript(script);
 		      					</programlisting>
 		      				</listitem>
 		      				<listitem>
-		      					<emphasis>selection script</emphasis> (TODO, germ, explain selectionscript and give java example)
+		      					<emphasis>selection script</emphasis> The selection script is always executed before the task itself on any candidate node:
+		      					the execution of a selection script must set the boolean variable <literal>selected</literal>, that indicates if the candidate node
+		      					is suitable for the execution of the associated task.
 		      					<programlisting lang="java">
-	//same construction for the script
-	//the last parameter tell if the script is dynamic or not.
-	SelectionScript selScript = new SelectionScript(script, true);
-	aTask.setSelectionScript(selScript);
+				//same construction for the script
+				//the last parameter is still not used in the current implementation
+				SelectionScript selScript = new SelectionScript(script, true);
+				aTask.setSelectionScript(selScript);
 		      					</programlisting>
 		      				</listitem>
 		      			</itemizedlist>
 		      		</listitem>
 		      	</itemizedlist>
 		      	
-		      	Now Let's explain the functioning of each separate specific features of each type of task :
+		      	<para>The following explains how to create a specific kind of task :</para>
 		      	<itemizedlist>
 		      		<listitem>
 		      			<para>
@@ -585,7 +602,9 @@ public Object execute(TaskResult... results) throws Throwable {
 		      			</para>
 		      			<para>
 		      				Here's an example that describe how to create a native task with a <emphasis>dynamic command</emphasis>
-		      				(ie: generated by a script called a generation Script) : (TODO germ, explain what is a generation script)
+		      				, i.e. generated by a script called a generation script, The generation script can only be associated to a <emphasis>native</emphasis> task: 
+		      				the execution of a selection script must set the string variable <literal>command</literal>. The value of this variable is the command
+		      					line that will be executed by the Scheduler as task execution.
 		      				<programlisting lang="java">
 	//create a new native task
 	NativeTask task2 = new NativeTask();
