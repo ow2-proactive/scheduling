@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?xml-stylesheet type="text/css" href="../viewDocbook.css"?>
 <chapter id="ProActive_Scheduler">
-  <title>ProActive Scheduler</title>
+  <title>ProActive Scheduler and Resource Manager</title>
 
-    <para><emphasis role="bold">IMPORTANT NOTE</emphasis> - Some parts of the ProActive Scheduler rely on Java Scripting capabilities (<ulink url="http://jcp.org/en/jsr/detail?id=223">JSR 223</ulink>). As a consequence, it requires either:
+    <para><emphasis role="bold">IMPORTANT NOTE</emphasis> - Some parts of the ProActive Scheduler and ProActive Resource Manager rely on Java Scripting capabilities (<ulink url="http://jcp.org/en/jsr/detail?id=223">JSR 223</ulink>). As a consequence, it requires either:
     <itemizedlist>
           <listitem> a 1.6 or greater Java Runtime Environment, without any modifications, </listitem>
           <listitem> or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>.those files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
@@ -45,37 +45,39 @@
     <sect2 id="what_is_job">
       <title>What is a Job ?</title>
 
-      <para>A <emphasis role="bold">Job</emphasis> is the entity to be given
-      to the scheduler, and is composed of one or more <emphasis
+      <para>A <emphasis role="bold">Job</emphasis> is the entity to be submitted
+      to the scheduler. It is composed of one or more <emphasis
       role="bold">Tasks</emphasis>. A Job can have one of the following types
       : <itemizedlist>
           <listitem>
             <para><emphasis role="bold">TASKSFLOW</emphasis>, represents a Job
-            that contains a bag of Tasks, which can be execute in parallel or
-            according to a dependence tree. The Tasks inside this Job type can
+            that contains a bag of Tasks, which can be executed in parallel or
+            according to a dependency tree. The Tasks inside this Job type can
             be either Java or Native. </para>
           </listitem>
 
           <listitem>
             <para><emphasis role="bold">PROACTIVE</emphasis>, represents a Job
-            that contains a ProActive application (only one ProActive Task).
-            Its execution will start with a given predefined number of nodes
-            on which you can start the computation. This kind of Job requires
+            that contains a ProActive application (embeded in <emphasis>only one ProActive Task</emphasis>).
+            Its execution starts with a given predefined number of nodes
+            on which the user can start the ProActive computation. This kind of Job requires
             the usage of the ProActive API, in order to use the given
             nodes.</para>
           </listitem>
 
-          <listitem>
+          <!--  <listitem>
             <para><emphasis role="bold">PARAMETER SWEEPING (not yet implemented)</emphasis>, is a
             Job that represents multiple executions of one type of Task with
             different given parameters. It is typically executed in parallel.
             The Tasks inside this job can also be Java or Native. </para>
-          </listitem>
+          </listitem>-->
         </itemizedlist></para>
 
       <para>A finished Job contains a result, which in turn contains all of
-      its tasks' results or only those marked as <emphasis
-      role="bold">precious</emphasis>. In the event of a failure, the finished
+      its tasks' results. However, it is possible to mark as  <emphasis
+      role="bold">precious</emphasis> the tasks which result is significant for the global Job result. The user can 
+      then retreive easily only those results.
+      In the event of a failure, the finished
       Job contains the cause exceptions. Further details on how to
       create a Job and the different options can be found in: <xref
       linkend="job_creation" />.</para>
@@ -104,9 +106,9 @@
           </listitem>
 
           <listitem>
-            <para><emphasis role="bold">PROACTIVE</emphasis>, its execution is defined by 
-            a java class extending the <literal>org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable</literal> class.
-            Coding this last one requires a knowledge base on the use of
+            <para><emphasis role="bold">PROACTIVE</emphasis>; its execution is defined by 
+            a java class extending the <literal>org.objectweb.proactive.extensions.scheduler.common.task.executable.ProActiveExecutable</literal> class, which defines the
+            deployement and the execution of a ProActive application. Coding this last one requires a knowledge base on the use of
             ProActive.</para>
           </listitem>
         </itemizedlist></para>
@@ -116,9 +118,8 @@
       linkend="task_creation" />).</para>
 
       <para>A Task may optionally be accompanied by 3 kinds of scripts
-      (preScript, postScript and selectionScript) whose explanations are
-      provided in the documentation of the ProActive Resource Manager (<xref
-      linkend="resources_manager" />).</para>
+      (pre-script, post-script and selection-script), that allow to select the suitable resource for a given task and possibly 
+      configure it before and after task execution (see <xref linkend="task_creation"/>).</para>
 
       <para>Dependencies between Tasks can also be defined; this apsect is detailed in
       <xref linkend="how_dependences" />.</para>
@@ -129,12 +130,13 @@
     </sect2>
 
     <sect2 id="how_dependences">
-      <title>What can be done with dependencies ?</title>
+      <title>Dependencies between Tasks</title>
 
       <para>Dependencies can be set between Tasks in a TaskFlow Job. It
       provides a way to execute your tasks in an ordered fashion, but also to
-      forward the results of a task to another one. An example is better than
-      a thousand words :</para>
+      forward the results of an ancestor task to its children as parameter. 
+      Dependency between task is then both a logical dependency and 
+      a data dependency.</para>
 
       <figure id="scheduler_job_img">
         <title>Task flow job example</title>
@@ -148,7 +150,7 @@
         </mediaobject>
       </figure>
 
-      <para>In this example we made an 8 Task Job (where the Job's type is
+   <para>In this example we made an 8 Task Job (where the Job's type is
       TaskFlow). As you can see, Task 4 depends on Task 1, Task 5 depends on
       Tasks 2 and 3, etc... In other words, Task 4 will wait for Task 1 to
       finish before starting, Task 5 will wait for Task 2
