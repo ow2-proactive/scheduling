@@ -549,25 +549,25 @@ public Object execute(TaskResult... results) throws Throwable {
 		      					<emphasis>pre-script</emphasis> The pre-script is always executed on the node that has been selected by
 		      					the resource manager <emphasis>before</emphasis> the execution of the task itself.
 		      					<programlisting lang="java">
-				//If the script to use is in a file or URL
-				String[] args = new String("foo","bar");
-				File scriptFile = new File("path/to/script_file");
-				// File scriptURL = new URL("url/to/script_file");
-				Script script = new SimpleScript(scriptFile, args);
-				// Script script = new SimpleScript(scriptURL, args);
-				aTask.setPreScript(script);
-				//If the script to use is in a java string for example
-				Script script = new SimpleScript("Script_content", "type_of_language");
-				//where type_of_language can be any langage supported by teh underlying JRE
-				aTask.setPreScript(script);
+	//If the script to use is in a file or URL
+	String[] args = new String("foo","bar");
+	File scriptFile = new File("path/to/script_file");
+	// File scriptURL = new URL("url/to/script_file");
+	Script script = new SimpleScript(scriptFile, args);
+	// Script script = new SimpleScript(scriptURL, args);
+	aTask.setPreScript(script);
+	//If the script to use is in a java string for example
+	Script script = new SimpleScript("Script_content", "type_of_language");
+	//where type_of_language can be any langage supported by teh underlying JRE
+	aTask.setPreScript(script);
 		      					</programlisting>
 		      				</listitem>
 		      				<listitem>
 		      					<emphasis>post-script</emphasis> The pre-script is always executed on the node that has been selected by
 		      					the resource manager <emphasis>after</emphasis> the execution of the task itself.
 		      					<programlisting lang="java">
-				//same construction for the script
-				aTask.setPostScript(script);
+	//same construction for the script
+	aTask.setPostScript(script);
 		      					</programlisting>
 		      				</listitem>
 		      				<listitem>
@@ -575,10 +575,10 @@ public Object execute(TaskResult... results) throws Throwable {
 		      					the execution of a selection script must set the boolean variable <literal>selected</literal>, that indicates if the candidate node
 		      					is suitable for the execution of the associated task.
 		      					<programlisting lang="java">
-				//same construction for the script
-				//the last parameter is still not used in the current implementation
-				SelectionScript selScript = new SelectionScript(script, true);
-				aTask.setSelectionScript(selScript);
+	//same construction for the script
+	//the last parameter is still not used in the current implementation
+	SelectionScript selScript = new SelectionScript(script, true);
+	aTask.setSelectionScript(selScript);
 		      					</programlisting>
 		      				</listitem>
 		      			</itemizedlist>
@@ -891,7 +891,7 @@ public Object execute(TaskResult... results) throws Throwable {
     </sect2>
   </sect1>
     </sect1>
-	<sect1 id="Resource_Manager">
+<sect1 id="Resource_Manager">
     <title>Resource Manager</title>
     <sect2 id="Role">
 	<title>Role</title>
