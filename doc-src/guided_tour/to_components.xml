@@ -4,7 +4,7 @@
  <title>C3D - from Active Objects to Components</title>
  
  <sect1 >
-  <title>Reason for this example</title>
+  <title>Overview</title>
   
   <para>This is an example of an application that is refactored to fit the
    components dogma. The standard C3D example has been taken as a basis,
