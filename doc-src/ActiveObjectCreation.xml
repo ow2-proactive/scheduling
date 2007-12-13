@@ -824,6 +824,7 @@
 			<programlisting lang="java"><textobject><textdata
 						fileref="code_snippets/metaObjectFactoryUsage.turnActive.txt" /></textobject></programlisting>
 		</sect2>
+	<!--//TODO - why doesn't newActive have the same parameter ?
 		<sect2>
 			<title>
 				Using
@@ -832,10 +833,9 @@
 				<literal>ProActiveObject.turnActive(...)</literal>
 			</title>
 		</sect2>
-		<!-- 
-			//TODO - why doesn't newActive have the same parameter ?
-		 -->
+			
 	</sect1>
+ -->
 
 
 
@@ -1742,7 +1742,7 @@
 							<imageobject>
 								<imagedata contentwidth="100"
 									fileref="images/threadedCallWithFuture.png"
-									format="PNG" width="6in" />
+									 />
 							</imageobject>
 						</mediaobject>
 					</figure>
@@ -1905,7 +1905,7 @@
 				fault tolerance mechanism. However, it can be too expensive
 				to checkpoint all the active objects, when fault detection 
 				is only needed for certain objects.
-				//TODO AMBIGOUS ASK
+				<!-- //TODO AMBIGOUS ASK -->
 			</para>
 
 			<para>
@@ -2023,7 +2023,8 @@
 								<emphasis role="bold">
 									FuturePool
 								</emphasis>
-								in a standard way. //TODO WHAT THE HELL ?
+								in a standard way. 
+								<!-- //TODO WHAT THE HELL ? -->
 							</para>
 		</sect2>
 
@@ -2198,13 +2199,14 @@
 			<!--  //TODO object responsabilities when  updating futures --></para>
 				
 		</sect2>
-		
+
 	</sect1>
+			<!-- //TODO add immediateService maybe and expand or remove this section, it is present in other parts of the manual		
+	
 	<sect1 id="ActiveObjectCreation_html_events">
 		<title>Event based programming</title>
 
-		<!-- //TODO add immediateService maybe ?  -->
-		<para>
+  	<para>
 			ProActive supports an event based programming model. That
 			is, an active object can schedule one of its method to be
 			called when a future is updated. This method will be
@@ -2234,4 +2236,7 @@
 			service method.
 		</para>
 	</sect1>
+	
+	-->
+	
 </chapter>
