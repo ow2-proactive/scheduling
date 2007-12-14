@@ -152,8 +152,7 @@
       <emphasis>AND</emphasis> 3, etc... In addition, the order in which you
       specify that Task 5 depends of Task 2 and 3 is very important. Indeed,
       if you set the list of dependencies for Task 5 as : 2 then 3, the result
-      of these two task will be given to Task 5 in this order. (TODO missing
-      example comparing both cases )</para>
+      of these two task will be given to Task 5 in this order.</para>
 
       <para>As shown in the following lines, the given array of TaskResults
       (<emphasis>results</emphasis>) will be an array of two results
@@ -244,8 +243,7 @@ public Object execute(TaskResult... results) throws Throwable {
             <para><emphasis role="bold">The Core</emphasis> which is the main
             entity of the Scheduler. It is in charge of scheduling Jobs
             according with the policy (which is FIFO by default), retrieve
-            scheduling events to the user and make storages in data base (TODO
-            link reference to details on data base).</para>
+            scheduling events to the user and make storages.</para>
           </listitem>
         </itemizedlist></para>
 
@@ -448,8 +446,283 @@ public Object execute(TaskResult... results) throws Throwable {
 		      </figure>
 	        </para>
 	    </sect2>
-	</sect2>
+	    
+	    <sect2 id="Create_a_job">
+	    	<title>Create a job</title>
+	    	
+	    	<para>
+	    		A job can be created using an XML descriptor. You may have to create your own executable as 
+	    		describe in the section <xref linkend="define_executable" /> in order to run your own task.
+	    		Next step if you don't want to use the scheduler java API is to write the descriptor of your
+	    		job. This last could be launch using the <emphasis>jobLauncher.sh</emphasis> script.
+	    		This script must be launched with the first parameter and optionally the others. The parameters
+	    		are :
+	    		<orderedlist>
+	    			<listitem>
+	    				<emphasis>The job descriptor</emphasis> : it is the XML file describing your job.
+	    			</listitem>
+	    			<listitem>
+	    				<emphasis>The number of this job to submit</emphasis> : it is the number of time you want to submit this job.
+	    			</listitem>
+	    			<listitem>
+	    				<emphasis>The URL of the scheduler</emphasis> : it is the URL of a started ProActive scheduler.
+	    			</listitem>
+	    		</orderedlist>
+	    		<para>
+	    			For example : <emphasis>./jobLauncher.sh ../../../descriptors/scheduler/jobs/Job_with_dep.xml 1 //localhost/</emphasis> will
+	    			submit one time the Job_with_dep job to a local scheduler.
+	    		</para>
+	    		<para>
+	    			Let's see how to create a job using the XML description.
+	    		</para>
+	    	</para>
+	    	
+	    	<sect3 id="create_proactive_job">
+	    		<title>Create a ProActive Job</title>
+	    		
+	    		Here's the details to create a ProActive job using an XML descriptor :
+	    		
+	    		<para>
+	    			<screen>
+	&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+	&lt;job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+		name="job_proActive" priority="low"&gt;
+					</screen>
+					<para>
+					The job tag can define :
+					<itemizedlist>
+						<listitem>
+							<emphasis>name</emphasis> : any string that define the job.
+						</listitem>
+						<listitem>
+							<emphasis>priority</emphasis> : the scheduling priority of the job. Values can be : 'highest', 'high', 'normal', 'low', 'lowest'
+						</listitem>
+						<listitem>
+							<emphasis>cancelOnException</emphasis> : is a way to define if your job will continue
+		      				if a user exception or error occurs during the whole job process. It means that if the value of this property is true, the job will stop immediately
+		      			every running task if one error occurs in one of the task of this job. It will have
+		      			the consequence to failed the job, but free resources for other jobs. It is useful
+		      			when it has no interest to continue after a task failure. Values can be 'true' or 'false'.
+						</listitem>
+						<listitem>
+							<emphasis>logFile</emphasis> : is the path of an optional log file. Set it if you want
+		      				to save the job generated log in a file.
+						</listitem>
+					</itemizedlist>
+					</para>
+					<para>
+						It is possible to add a description of the job as shown below :
+					</para>
+					<screen>
+		&lt;description&gt;
+			A ProActive job that will find out the Nth first prime number where N is given as argument.
+		&lt;/description&gt;
+					</screen>
+					<para>
+					In addition it is possible to define variables that can be use in the descriptor.
+					</para>
+					<screen>
+		&lt;variables&gt;
+			&lt;variable name="FOO" value="foo"/&gt;
+			...
+		&lt;/variables&gt;
+					</screen>
+					<para>
+						To use the define variable(s), just insert it(them) in the descriptor like that : <emphasis>${FOO}</emphasis>
+					</para>
+					<para>
+						Let's start with the declaration of the job. The proActive tags define the type of the job.
+					</para>
+					<screen>
+		&lt;proActive neededNodes="5"&gt;
+					</screen>
+					<para>
+						The number of needed nodes define how many nodes you need for your ProActive executable.
+						In this example, 5 needed nodes means that you want to use 4 nodes in your executable.
+		      			Indeed, one node will be used to start your executable, and the other are given to your
+		      			application.
+					</para>
+					<para>
+						Next step is to add one ProActive task on which it is possible to attach a description.
+					</para>						
+					<screen>
+			&lt;task name="Controller"&gt;
+				&lt;description&gt;Will control the workers in order to find the prime number&lt;/description&gt;
+					</screen>
+					<para>
+						As in the job, it is mandatory to add a textual name to the task. It will be a way to 
+						identify it. A second optional parameter can be added in order to define the number of times
+						the task is allowed to restart.
+						<itemizedlist>
+							<listitem>
+								<emphasis>retries</emphasis> is a way to define how many times a task will be
+				      			reran if a user or network problems occur. Set this value to <emphasis>n</emphasis> if you want the task
+				      			to be restarted <emphasis>n</emphasis> times and, so, started a maximum of <emphasis>n+1</emphasis> times.
+				      			(default is 1)
+							</listitem>
+						</itemizedlist>
+					</para>
+					<para>
+						Then the user has to set the ProActive executable that will be launched when the job will be scheduled.
+						Some initialization parameters can be set and will be automatically send to the task in the <emphasis>init</emphasis> method
+						in the executable. This optional method allow the user to initialize its task with this parameters.
+						Proceed as describe below to do such a thing :
+					</para>
+					<screen>
+				&lt;proActiveExecutable
+					class="org.objectweb.proactive.extensions.scheduler.examples.ProActiveExample"&gt;
+					&lt;parameters&gt;
+						&lt;parameter name="numberToFind" value="200"/&gt;
+					&lt;/parameters&gt;
+				&lt;/proActiveExecutable&gt;
+					</screen>
+					<para>
+						And terminate the job.
+					</para>
+					<screen>
+			&lt;/task&gt;
+		&lt;/proActive&gt;
+	&lt;/job&gt;
+	    			</screen>
+	    		</para>
+	    		<para>
+	    			A ProActive job has just been created using the XML description. User may use the jobLauncher script
+	    			to submit this new job.
+	    		</para>
+	    	</sect3>
+	    	
+	    	
+	    	<sect3 id="create_taskflow_job">
+	    		<title>Create a Task Flow Job</title>
+	    		
+	    		Here's the details to create a Task Flow job using an XML descriptor.
+	    		This example will show how to make dependences, how to add native or java executable to the job
+	    		and how the different scripts can be used.
+	    		<para>
+	    			<screen>
+	&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+	&lt;job xmlns="urn:proactive:jobdescriptor:0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
+		name="job_with_dep" priority="normal"&gt;
+		&lt;description&gt;Test of 8 tasks with variable durations and dependencies&lt;/description&gt;
+					</screen>
+					<para>
+						Until this point, every features are describe above in the ProActive section.
+					</para>
+					<screen>
+		&lt;taskFlow&gt;
+			&lt;task name="task1" retries="2"&gt;
+				&lt;!-- Task human description --&gt;
+				&lt;description&gt;This task will sleep 6s&lt;/description&gt;
+				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
+					&lt;parameters&gt;
+						&lt;parameter name="sleepTime" value="6"/&gt;
+						&lt;parameter name="number" value="1"/&gt;
+					&lt;/parameters&gt;
+				&lt;/javaExecutable&gt;
+			&lt;/task&gt;
+			&lt;task name="task2"&gt;
+				&lt;!-- Task human description --&gt;
+				&lt;description&gt;This task will sleep 10s&lt;/description&gt;
+				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
+					&lt;parameters&gt;
+						&lt;parameter name="sleepTime" value="10"/&gt;
+						&lt;parameter name="number" value="2"/&gt;
+					&lt;/parameters&gt;
+				&lt;/javaExecutable&gt;
+			&lt;/task&gt;
+			&lt;task name="task3"&gt;
 	
+				&lt;!-- Task human description --&gt;
+				&lt;description&gt;This task will sleep 4s&lt;/description&gt;
+				&lt;depends&gt;
+					&lt;task ref="task1"/&gt;
+				&lt;/depends&gt;
+				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
+					&lt;parameters&gt;
+						&lt;parameter name="sleepTime" value="4"/&gt;
+						&lt;parameter name="number" value="3"/&gt;
+					&lt;/parameters&gt;
+				&lt;/javaExecutable&gt;
+			&lt;/task&gt;
+			&lt;task name="task4" retries="2"&gt;
+				&lt;!-- Task human description --&gt;
+				&lt;description&gt;This task will sleep 5s&lt;/description&gt;
+				&lt;depends&gt;
+					&lt;task ref="task1"/&gt;
+					&lt;task ref="task2"/&gt;
+				&lt;/depends&gt;
+				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
+					&lt;parameters&gt;
+						&lt;parameter name="sleepTime" value="5"/&gt;
+						&lt;parameter name="number" value="4"/&gt;
+					&lt;/parameters&gt;
+				&lt;/javaExecutable&gt;
+			&lt;/task&gt;
+			&lt;task name="task5"&gt;
+				&lt;!-- Task human description --&gt;
+				&lt;description&gt;This task will sleep 2s&lt;/description&gt;
+				&lt;depends&gt;
+					&lt;task ref="task2"/&gt;
+				&lt;/depends&gt;
+				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
+					&lt;parameters&gt;
+						&lt;parameter name="sleepTime" value="2"/&gt;
+						&lt;parameter name="number" value="5"/&gt;
+					&lt;/parameters&gt;
+				&lt;/javaExecutable&gt;
+			&lt;/task&gt;
+			&lt;task name="task6"&gt;
+				&lt;!-- Task human description --&gt;
+				&lt;description&gt;This task will sleep 8s&lt;/description&gt;
+				&lt;depends&gt;
+					&lt;task ref="task3"/&gt;
+					&lt;task ref="task4"/&gt;
+				&lt;/depends&gt;
+				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
+					&lt;parameters&gt;
+						&lt;parameter name="sleepTime" value="8"/&gt;
+						&lt;parameter name="number" value="6"/&gt;
+					&lt;/parameters&gt;
+				&lt;/javaExecutable&gt;
+			&lt;/task&gt;
+			&lt;task name="task7" retries="2" preciousResult="true"&gt;
+				&lt;!-- Task human description --&gt;
+				&lt;description&gt;This task will sleep 6s&lt;/description&gt;
+				&lt;depends&gt;
+					&lt;task ref="task6"/&gt;
+					&lt;task ref="task4"/&gt;
+					&lt;task ref="task5"/&gt;
+				&lt;/depends&gt;
+				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
+					&lt;parameters&gt;
+						&lt;parameter name="sleepTime" value="6"/&gt;
+						&lt;parameter name="number" value="7"/&gt;
+					&lt;/parameters&gt;
+				&lt;/javaExecutable&gt;
+			&lt;/task&gt;
+			&lt;task name="task8" preciousResult="true"&gt;
+				&lt;!-- Task human description --&gt;
+				&lt;description&gt;This task will sleep 6s&lt;/description&gt;
+				&lt;depends&gt;
+					&lt;task ref="task6"/&gt;
+				&lt;/depends&gt;
+				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
+					&lt;parameters&gt;
+						&lt;parameter name="sleepTime" value="6"/&gt;
+						&lt;parameter name="number" value="8"/&gt;
+					&lt;/parameters&gt;
+				&lt;/javaExecutable&gt;
+			&lt;/task&gt;
+		&lt;/taskFlow&gt;
+	&lt;/job&gt;
+	    			</screen>
+	    		</para>
+	    	</sect3>
+	    </sect2>
+	    
+	</sect2>
 	
 	<sect2 id="with_java_API">
 		<title>Using the java API</title>
@@ -561,7 +834,7 @@ public Object execute(TaskResult... results) throws Throwable {
 		      				This method should return a Swing <literal>JPanel</literal> object that describes the result.
 		      				</listitem>
 		      			</itemizedlist>
-		      			Some usefull methods to create a specific preview class can be found in <literal>org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool</literal>, 
+		      			Some useful methods to create a specific preview class can be found in <literal>org.objectweb.proactive.extensions.scheduler.common.task.util.ResultPreviewTool</literal>, 
 		      			such as automatic display of an image file, or automatic translation between windows and unix path.
 		      			<programlisting lang="java">
 	aTask.setResultPreview(UserDefinedResultPreview.class);
@@ -756,7 +1029,7 @@ public Object execute(TaskResult... results) throws Throwable {
 		      			</programlisting>
 		      		</listitem>
 		      		<listitem>
-		      			<emphasis>Log file</emphasis> is the path of an optional log file. Set if if you want
+		      			<emphasis>Log file</emphasis> is the path of an optional log file. Set it if you want
 		      			to save the job generated log in a file.
 		      			<programlisting lang="java">
 	aJob.setLogFile("path/to/log_file");
@@ -773,7 +1046,7 @@ public Object execute(TaskResult... results) throws Throwable {
 		      			if a user exception or error occurs during the whole job process.
 		      			It means that if the value of this property is true, the job will stop immediately
 		      			every running task if one error occurs in one of the task of this job. It will have
-		      			the consequence to failed the job, but free resources for other jobs. It is usefull
+		      			the consequence to failed the job, but free resources for other jobs. It is useful
 		      			when it has no interest to continue after a task failure.
 		      			<programlisting lang="java">
 	aJob.setCancelOnError(true);
