@@ -34,6 +34,9 @@
     <para>The main principle is rather simple: an spmd group is a group of
     active objects where each one has a group referencing all the active
     objects.</para>
+    
+    <para>A MPI to ProActive summary will be presented at the end of this
+    chapter (see <xref linkend="mpi_to_proactive_summary"/>).</para>
   </sect1>
 
   <sect1 >
@@ -79,24 +82,73 @@
   </sect1>
 
   <sect1 >
-    <title>Barrier: Introduction</title>
+    <title>Synchronizing activities with barriers</title>
 
     <indexterm><primary>Barriers</primary><secondary>definition</secondary></indexterm>
+    
+    <para>Synchronizing processes is an important operation in any distributed
+    system. For example, it can help to coordinate the action of several
+    processes to perform a joint computation. It can also help to manage
+    concurrency when several processes try to reach the same resource.</para>
+    
+    <para>There is different techniques to synchronize processes between them.
+    With a SPMD application, there is the <emphasis role="bold">synchronization
+    barriers</emphasis> mechanism.</para>
+    
 
-    <para>ProActive provides three kinds of barrier to synchronize activities.
-    The feature is specially useful in a SPMD programming style. A barrier
-    stops the activity of the active object that invokes it (ie. stop serving
-    the requests which are in its request queue) until a special
-    condition is satisfied. Notice that, as the opposite of MPI or such
-    libraries, the ProActive barriers do not stop the current activity
-    immediately (when the <emphasis role="bold">barrier</emphasis> method is
-    encountered). The current request actually keeps on executing until the
-    end. The barrier will be activated at the end of the request: no other
-    request will be served until all the AOs involved in the barrier are at
-    that same point.</para>
+    
+    <para><emphasis role="bold">Particularities of the ProActive barriers
+    </emphasis></para>
+    
+    <para>Traditional barriers as those provided for example by MPI
+    have a blocking behavior. When a process meets such a barrier, it fully
+    stops its execution <emphasis>immediately</emphasis> and informs all the
+    other members of the SPMD group about its state. It is only when all the
+    other members have reach this barrier too that all the processes will be
+    able to continue their execution.</para>
+    
+    <para>However, the barriers are often used to synchronize the communication
+    between processes. Thus, a blocking barrier which will completely stop the
+    execution of a process without distinction between local computation and
+    communication is not efficient.</para>
+    
+    <para>Then ProActive provides <emphasis>non-blocking</emphasis> barriers
+    to only synchronize communication between activities.</para>
+    
+    <para>When an activity reaches during a service a <emphasis>barrier
+    instruction</emphasis>, it continues the execution of the current service
+    until its end, and tag all the next outgoing requests as <emphasis>post
+    barrier</emphasis>. Consequently, any activity receiving a request tagged
+    like this will delay its service until all the activities implied in this
+    synchronization are ready to synchronize.
+    An example of this behavior is illustrated on the
+    <xref linkend="oospmd_barriers_behavior"/>.</para>
+    <para>This example presents the timelines of three active objects which are
+    performing a <emphasis>total barrier</emphasis>. As they was sent
+    <emphasis>before</emphasis> the reach of the barrier instruction
+    (symbolized by a red point), the requests <emphasis>A</emphasis> and
+    <emphasis>B</emphasis> are served <emphasis>before</emphasis> the
+    synchronization. On the contrary, as they was sent <emphasis>after
+    </emphasis> the barrier instruction, the requests <emphasis>X</emphasis>
+    and <emphasis>Y</emphasis> are served <emphasis>after</emphasis> the
+    synchronization.</para>
+        
+    <figure id="oospmd_barriers_behavior">
+      <title>Behavior example of a total barrier</title>
 
-    <para>The three barriers are named:</para>
+      <mediaobject>
+        <imageobject role="fo">
+          <imagedata fileref="images/oospmd_barriers_schema.svg" format="SVG"/>
+        </imageobject>
+        <imageobject role="html">
+          <imagedata fileref="images/oospmd_barriers_schema.png" format="PNG"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
 
+    <para>The OO SPMD programming model provided by ProActive offers three
+    kinds of barriers to synchronize activities:</para>
+    
     <itemizedlist>
       <listitem>
         <para>the <emphasis role="bold">Total Barrier</emphasis></para>
@@ -110,11 +162,10 @@
         <para>the <emphasis role="bold">Method-based Barrier</emphasis></para>
       </listitem>
     </itemizedlist>
-
+    
     <para>Here is a presentation about how to use those barriers.</para>
-  </sect1>
 
-  <sect1 >
+  <sect2>
     <title>Total Barrier</title>
 
     <para>Total barrier directly involves the spmd group. A call to <emphasis
@@ -172,9 +223,9 @@
     <para>The programmer have to ensure that <emphasis role="bold">all the
     members of an spmd group call the barrier method</emphasis> otherwise the
     members of the group may indefinitely wait.</para>
-  </sect1>
+  </sect2>
 
-  <sect1 >
+  <sect2>
     <title>Neighbor
     barrier</title>
 
@@ -220,9 +271,9 @@
 
     <para>This barrier increases the asynchronism and reduce the amount of
     exchanged messages.</para>
-  </sect1>
+  </sect2>
 
-  <sect1 >
+  <sect2>
     <title>Method Barrier</title>
 
     <para>The Method barrier does no more involve extra messages to
@@ -252,35 +303,84 @@
     <para>A method barrier is used without any group (spmd or not). To learn
      more on Groups, please refer to <xref linkend="TypedGroupCommunication"/>.</para>
   
+  </sect2>
   </sect1>
-  <sect1>
-   <title>When does a barrier get triggered?</title>
-   <para>
-   
-    Barriers are not triggered at the place they are declared in the code. 
-    Instead, they are run at the end of the method. Look at this code:</para>
-    <programlisting lang="java">public void MyMethodWithBarrier () {
-    foo();
-    PASPMD.barrier("barrier");
-    bar();
-    } </programlisting>
-  <para>In this case, the call to bar() will be made <emphasis>BEFORE</emphasis> 
-   the barrier is really triggered. In fact, the barriers only start blocking 
-   at the <emphasis>END</emphasis> of the method. If you use something like 
-   <literal>this.asyncRefToSelf.bar()</literal>, it's ok, because then this 
-   call is put on the request queue, and will be effectively run 
-   <emphasis>AFTER</emphasis> the end of the current method. But if, like in the 
-   previous case (with the <literal> bar()</literal> method), a call is declared 
-   before the end of the method, then the barrier will be run after this call 
-   is made.</para>
   
-  <para>To enforce the barrier, you should make the barrier the last action 
-   of your method, or you can use this trick:</para>
-  <programlisting lang="java">    foo();
-    PASPMD.barrier("barrier");
-    this.asyncRefToSelf.bar();</programlisting>
-    
-    <note><para>The behavior of barrier is peculiar in this sense. You should keep 
-      in mind this particularity when writing code with barriers.</para></note>
-  </sect1>
+  <sect1>
+        <title>MPI to ProActive Summary</title>
+
+        <table id="mpi_to_proactive_summary">
+          <title>MPI to ProActive</title>
+
+          <tgroup cols="2">
+            <colspec colname="col1" colnum="1" colwidth="2*" />
+
+            <colspec colname="col2" colnum="2" colwidth="2*" />
+
+            <thead>
+              <row>
+                <entry>MPI</entry>
+
+                <entry>ProActive</entry>
+              </row>
+            </thead>
+
+            <tbody>
+              <row>
+                <entry>MPI_Init and MPI_Finalize</entry>
+
+                <entry>Activities creation</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Comm_Size</entry>
+
+                <entry>PASPMD.getMyGroupSize</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Comm_Rank</entry>
+
+                <entry>PASPMD.getMyRank</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Send and MPI_Recv</entry>
+
+                <entry>Method call</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Barrier</entry>
+
+                <entry>PASPMD.barrier</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Bcast</entry>
+
+                <entry>Method call on a group</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Scatter</entry>
+
+                <entry>Method call with a scatter group as parameter</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Gather</entry>
+
+                <entry>Result of a group communication</entry>
+              </row>
+
+              <row>
+                <entry>MPI_Reduce</entry>
+
+                <entry>Programmer's method</entry>
+              </row>
+            </tbody>
+          </tgroup>
+        </table>
+      </sect1>
 </chapter>
