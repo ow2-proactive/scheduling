@@ -2,76 +2,145 @@
 <?xml-stylesheet type="text/xsl" href="../../../src/Extra/org.objectweb.proactive.extensions.scheduler/common/xml/stylesheets/variables.xsl"?>
 <job xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="urn:proactive:jobdescriptor:0.9 http://proactive.inria.fr/schemas/jobdescriptor/0.9/schedulerjob.xsd"
-    xmlns="urn:proactive:jobdescriptor:0.9" name="Scilab_job" priority="normal" logFile="${HOME}/scilab_job.log" >
-    <description>A simple Scilab batch job, which computes the numerical integration of sin(x) between 0 and PI</description>
+    xmlns="urn:proactive:jobdescriptor:0.9" name="Scilab_job"
+    priority="normal" logFile="${HOME}/scilab_job.log">
+    <description>
+        A simple Scilab batch job, which computes the numerical
+        integration of sin(x) between 0 and PI
+    </description>
     <variables>
-        <variable name="HOME" value="/user/fviale/home"/>
-        <variable name="PROACTIVE" value="${HOME}/eclipse_workspace/ProActive_Latest"/>
-        <variable name="SCILAB_SCRIPTS" value="${PROACTIVE}/scripts/unix/scilab/examples"/>
+        <variable name="HOME" value="/user/fviale/home" />
+        <variable name="PROACTIVE"
+            value="${HOME}/eclipse_workspace/ProActive_Latest" />
+        <variable name="SCILAB_SCRIPTS"
+            value="${PROACTIVE}/scripts/unix/scilab/examples" />
     </variables>
     <taskFlow>
         <task name="t1">
-            <description>Calculates the numerical integration of sin(x) between i*PI/n and (i+1)*PI/n</description>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
+            <description>
+                Calculates the numerical integration of sin(x) between
+                i*PI/n and (i+1)*PI/n
+            </description>
+            <selection>
+                <script>
+                    <file
+                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                </script>
+            </selection>
+            <javaExecutable
+                class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
                 <parameters>
-                    <parameter name="scriptFile" value="${SCILAB_SCRIPTS}/intsin.sci"/>
-                    <parameter name="input" value="i=0;n=5;"/>
-                    <parameter name="outputs" value="out"/>
+                    <parameter name="scriptFile"
+                        value="${SCILAB_SCRIPTS}/intsin.sci" />
+                    <parameter name="input" value="i=0;n=5;" />
+                    <parameter name="outputs" value="out" />
                 </parameters>
             </javaExecutable>
         </task>
         <task name="t2">
-            <description>Calculates the numerical integration of sin(x) between i*PI/n and (i+1)*PI/n</description>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
+            <description>
+                Calculates the numerical integration of sin(x) between
+                i*PI/n and (i+1)*PI/n
+            </description>
+            <selection>
+                <script>
+                    <file
+                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                </script>
+            </selection>
+            <javaExecutable
+                class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
                 <parameters>
-                    <parameter name="scriptFile" value="${SCILAB_SCRIPTS}/intsin.sci"/>
-                    <parameter name="input" value="i=1;n=5;"/>
-                    <parameter name="outputs" value="out"/>
+                    <parameter name="scriptFile"
+                        value="${SCILAB_SCRIPTS}/intsin.sci" />
+                    <parameter name="input" value="i=1;n=5;" />
+                    <parameter name="outputs" value="out" />
                 </parameters>
             </javaExecutable>
         </task>
         <task name="t3">
-            <description>Calculates the numerical integration of sin(x) between i*PI/n and (i+1)*PI/n</description>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
+            <description>
+                Calculates the numerical integration of sin(x) between
+                i*PI/n and (i+1)*PI/n
+            </description>
+            <selection>
+                <script>
+                    <file
+                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                </script>
+            </selection>
+            <javaExecutable
+                class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
                 <parameters>
-                    <parameter name="scriptFile" value="${SCILAB_SCRIPTS}/intsin.sci"/>
-                    <parameter name="input" value="i=2;n=5;"/>
-                    <parameter name="outputs" value="out"/>
+                    <parameter name="scriptFile"
+                        value="${SCILAB_SCRIPTS}/intsin.sci" />
+                    <parameter name="input" value="i=2;n=5;" />
+                    <parameter name="outputs" value="out" />
                 </parameters>
             </javaExecutable>
         </task>
         <task name="t4">
-            <description>Calculates the numerical integration of sin(x) between i*PI/n and (i+1)*PI/n</description>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
+            <description>
+                Calculates the numerical integration of sin(x) between
+                i*PI/n and (i+1)*PI/n
+            </description>
+            <selection>
+                <script>
+                    <file
+                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                </script>
+            </selection>
+            <javaExecutable
+                class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
                 <parameters>
-                    <parameter name="scriptFile" value="${SCILAB_SCRIPTS}/intsin.sci"/>
-                    <parameter name="input" value="i=3;n=5;"/>
-                    <parameter name="outputs" value="out"/>
+                    <parameter name="scriptFile"
+                        value="${SCILAB_SCRIPTS}/intsin.sci" />
+                    <parameter name="input" value="i=3;n=5;" />
+                    <parameter name="outputs" value="out" />
                 </parameters>
             </javaExecutable>
         </task>
         <task name="t5">
-            <description>Calculates the numerical integration of sin(x) between i*PI/n and (i+1)*PI/n</description>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
+            <description>
+                Calculates the numerical integration of sin(x) between
+                i*PI/n and (i+1)*PI/n
+            </description>
+            <selection>
+                <script>
+                    <file
+                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                </script>
+            </selection>
+            <javaExecutable
+                class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
                 <parameters>
-                    <parameter name="scriptFile" value="${SCILAB_SCRIPTS}/intsin.sci"/>
-                    <parameter name="input" value="i=4;n=5;"/>
-                    <parameter name="outputs" value="out"/>
+                    <parameter name="scriptFile"
+                        value="${SCILAB_SCRIPTS}/intsin.sci" />
+                    <parameter name="input" value="i=4;n=5;" />
+                    <parameter name="outputs" value="out" />
                 </parameters>
             </javaExecutable>
         </task>
         <task name="t6" preciousResult="true">
             <description>Merge the results</description>
             <depends>
-                <task ref="t1"/>
-                <task ref="t2"/>
-                <task ref="t3"/>
-                <task ref="t4"/>
-                <task ref="t5"/>
+                <task ref="t1" />
+                <task ref="t2" />
+                <task ref="t3" />
+                <task ref="t4" />
+                <task ref="t5" />
             </depends>
-            <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
+            <selection>
+                <script>
+                    <file
+                        url="http://proactive.inria.fr/userfiles/file/scripts/checkScilab.js" />
+                </script>
+            </selection>
+            <javaExecutable
+                class="org.objectweb.proactive.extensions.scheduler.ext.scilab.SimpleScilab">
                 <parameters>
-                    <parameter name="scriptFile" value="${SCILAB_SCRIPTS}/merge.sci"/>
+                    <parameter name="scriptFile"
+                        value="${SCILAB_SCRIPTS}/merge.sci" />
                 </parameters>
             </javaExecutable>
         </task>
