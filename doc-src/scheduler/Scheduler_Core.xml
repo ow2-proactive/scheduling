@@ -35,8 +35,7 @@
     <para>In the rest of this chapter, we will expose how the scheduler works,
     what policies govern the job management, how to create a job and how to
     get the jobs and the nodes state using either the shell communicator or
-    the GUI.</para>
-    
+    the GUI.</para>  
     
     <para><emphasis role="bold">NOTE</emphasis> - Additionally, you can find <ulink url="http://proactive.inria.fr/userfiles/file/tutorials/ProActiveSchedulerTutorial.pdf ">here</ulink>
      a fully documented example of the Scheduler and Resource Manager usage. This tutorial does not require Java nor ProActive knowledge since
@@ -453,6 +452,8 @@ public Object execute(TaskResult... results) throws Throwable {
 		      </figure>
 	        </para>
 	    </sect2>
+
+	    
 	    
 	    <sect2 id="Create_a_job">
 	    	<title>Create a job</title>
@@ -1387,9 +1388,9 @@ public Object execute(TaskResult... results) throws Throwable {
         <emphasis role="bold">The Scheduler Eclipse Plugin</emphasis>
         is a
         <emphasis role="bold">graphical client</emphasis>
-        for remote monitoring and control of the ProActive Grid
-        Scheduler (See ***LINK TO SCHEDULER DOC***), including remote
-        submission of XML-defined jobs (**LINK**).
+        for remote monitoring and control of the ProActive
+        Scheduler (see <xref linkend="ProActive_Scheduler"/>), including remote
+        submission of XML-defined jobs (see <xref linkend="Create_a_job_xml"/>).
     </para>
     <para>
         The Scheduler Eclipse Plugin is available in two forms :
@@ -1489,7 +1490,7 @@ public Object execute(TaskResult... results) throws Throwable {
                     The
                     <emphasis role="bold">Result Preview</emphasis>
                     view: displays a textual or graphical preview of the
-                    result of the selected task (**LINK**).
+                    result of the selected task.
                 </para>
             </listitem>
         </itemizedlist>
@@ -1541,7 +1542,8 @@ public Object execute(TaskResult... results) throws Throwable {
                 </imageobject>
             </mediaobject>
         </figure>
-        <para>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</para>
+        <para>This view displays all jobs standard and error output (only on
+                    demand). (see <xref linkend="getjobOutputButton"/>).</para>
 
         <figure id="tasksView">
             <title>The Tasks view</title>
@@ -1553,7 +1555,33 @@ public Object execute(TaskResult... results) throws Throwable {
                 </imageobject>
             </mediaobject>
         </figure>
-        <para>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</para>
+        <para>This view provides many informations on tasks composing a job as :
+        <itemizedlist>
+        	<listitem>
+            	The task id
+            </listitem>
+        	<listitem>
+            	The task state
+            </listitem>
+        	<listitem>
+            	The task name
+            </listitem>
+        	<listitem>
+            	The host name which execute the task
+            </listitem>
+        	<listitem>
+            	The task started time
+            </listitem>
+        	<listitem>
+            	The task finished time
+            </listitem>
+        	<listitem>
+            	In the column "Re-runnable", the first number represents how many times the task was re-executed, and the second number how many times the task can be re-executed
+            </listitem>
+        	<listitem>
+            	The description of the task
+            </listitem>
+        </itemizedlist></para>
 
         <figure id="jobInfoView">
             <title>The Job Info view</title>
@@ -1565,7 +1593,45 @@ public Object execute(TaskResult... results) throws Throwable {
                 </imageobject>
             </mediaobject>
         </figure>
-        <para>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</para>
+        <para>This view provides many informations on the selected job as :
+        <itemizedlist>
+        	<listitem>
+            	The job id
+            </listitem>
+        	<listitem>
+            	The job state
+            </listitem>
+        	<listitem>
+            	The job name
+            </listitem>
+        	<listitem>
+            	The job priority
+            </listitem>
+        	<listitem>
+            	The number of pending task
+            </listitem>
+        	<listitem>
+            	The number of running task
+            </listitem>
+        	<listitem>
+            	The number of finished task
+            </listitem>
+        	<listitem>
+            	The number of task composing the job
+            </listitem>
+        	<listitem>
+            	The job submitted time
+            </listitem>
+        	<listitem>
+            	The job started time
+            </listitem>
+        	<listitem>
+            	The job finished time
+            </listitem>
+        	<listitem>
+            	The description of the job
+            </listitem>
+        </itemizedlist></para>
 
         <figure id="resultPreviewView">
             <title>The Result Preview view</title>
@@ -1577,15 +1643,15 @@ public Object execute(TaskResult... results) throws Throwable {
                 </imageobject>
             </mediaobject>
         </figure>
-        <para>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX</para>
+        <para>This view display the result of the selected task (in task view), according to the ResultPreview field (see <xref linkend="task_creation"/> </para>
     </sect2>
 
     <sect2>
 
-        <title>Connect to a started scheduler</title>
+        <title>Connect to the started ProActive Scheduler</title>
 
         <para>
-            In order to establish a connection to a ProActive Scheduler:
+            In order to establish a connection to the ProActive Scheduler:
         </para>
 
         <orderedlist>
@@ -1603,10 +1669,10 @@ public Object execute(TaskResult... results) throws Throwable {
                 <para>
                     select
                     <emphasis role="bold">
-                        "Connect to a scheduler" in the Scheduler menu
+                        "Connect to the ProActive scheduler" in the Scheduler menu
                         or in the contextual menu (right click)
                     </emphasis>
-                    , it opens the "Connect to scheduler" dialog
+                    , it opens the "Connect to the ProActive scheduler" dialog
                     displayed in the
                     <xref linkend="connectToSchedulerDialog" />
                     .
@@ -1624,8 +1690,8 @@ public Object execute(TaskResult... results) throws Throwable {
             </listitem>
 
             <para>
-                TODO : Should explain the two connections type : user
-                and admin. You talk about "user mode" later on.
+                note: If you check "log as admin" in the previous dialogue, if the ProActive scheduler accept your connection,
+                you'll be able to do more actions than an "simple" user (see <xref linkend="admin_mode"/>).
             </para>
 
         </orderedlist>
@@ -1736,7 +1802,7 @@ public Object execute(TaskResult... results) throws Throwable {
             </figure>
             <para>
                 Pause or resume the selected job (only if you are the
-                job owner) TODO : OR ADMIN ?.
+                job owner).
             </para>
 
             <figure id="changeJobPriorityButton">
@@ -1796,7 +1862,7 @@ public Object execute(TaskResult... results) throws Throwable {
             </para>
         </sect3><!-- The Jobs view buttons in User Mode -->
 
-        <sect3>
+        <sect3 id="admin_mode">
             <title>The Jobs view buttons in Administrator Mode</title>
             <para>
                 All buttons allowed in user mode are also allowed in
