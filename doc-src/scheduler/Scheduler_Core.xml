@@ -6,7 +6,7 @@
     <para><emphasis role="bold">IMPORTANT NOTE</emphasis> - Some parts of the ProActive Scheduler and ProActive Resource Manager rely on Java Scripting capabilities (<ulink url="http://jcp.org/en/jsr/detail?id=223">JSR 223</ulink>). As a consequence, it requires either:
     <itemizedlist>
           <listitem> a 1.6 or greater Java Runtime Environment, without any modifications, </listitem>
-          <listitem> or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>.those files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
+          <listitem> or, with a 1.5 JRE, the <ulink url="http://jcp.org/aboutJava/communityprocess/final/jsr223/index.html">JSR 223 jar files</ulink>. Those files must be added in the <literal>/ProActive/dist/lib/</literal> directory if
           you are using the bin release or ProActive, or in the <literal>/ProActive/lib/</literal> directory if you build ProActive from the source release.</listitem>
     </itemizedlist>
     </para>
@@ -36,6 +36,13 @@
     what policies govern the job management, how to create a job and how to
     get the jobs and the nodes state using either the shell communicator or
     the GUI.</para>
+    
+    
+    <para><emphasis role="bold">NOTE</emphasis> - Additionally, you can find <ulink url="http://proactive.inria.fr/userfiles/file/tutorials/ProActiveSchedulerTutorial.pdf ">here</ulink>
+     a fully documented example of the Scheduler and Resource Manager usage. This tutorial does not require Java nor ProActive knowledge since
+     it's is only based on graphical interface and command line actions.
+     </para>
+    
     
   </sect1>
 
