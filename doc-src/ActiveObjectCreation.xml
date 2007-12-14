@@ -207,7 +207,9 @@
 		</sect2>
 
 
-	</sect1><sect1>
+	</sect1>
+	
+	<sect1>
 		<title>Object Based Creation using <literal>ProActiveObject.turnActive(...)</literal></title>
 
 		<para>
@@ -270,8 +272,6 @@
 		</para>
 
 	</sect1>
-
-
 
 
 	<sect1>
@@ -833,10 +833,10 @@
 				<literal>ProActiveObject.turnActive(...)</literal>
 			</title>
 		</sect2>
+-->
 			
 	</sect1>
- -->
-
+ 
 
 
 	<sect1 id="ActiveObjectCreation_html_elementRole">
@@ -2239,4 +2239,6 @@
 	
 	-->
 	
+
+
 </chapter>
