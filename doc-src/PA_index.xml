@@ -64,11 +64,8 @@
 <!ENTITY TimIt SYSTEM "timit/TimIt.xml">
 <!ENTITY IC2D_EclipsePlugin SYSTEM "ic2d/IC2D_EclipsePlugin.xml">
 <!ENTITY extendingIC2D SYSTEM "ic2d/extendingIC2D.xml">
-<!ENTITY MonteCarlo SYSTEM "monteCarlo.xml">
-<!ENTITY Workflow SYSTEM "workflow.xml">
 <!ENTITY glossary SYSTEM "glossary.xml">
 <!ENTITY reference SYSTEM "definitions.xml">
-<!ENTITY Scheduler_EclipsePlugin SYSTEM "scheduler/Scheduler_EclipsePlugin.xml">
 <!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
 <!ENTITY Scheduler_Matlab SYSTEM "scheduler/Scheduler_Matlab_Ext.xml">
 
@@ -108,9 +105,7 @@
     <part id="HighLevelAPI">
    <title>Programming With High Level APIs</title>
     &MasterWorker;
-    &MonteCarlo;
     &bnb;
-    &Workflow;
     &Calcium;
     &OOSPMD;
     &mpi;
@@ -155,7 +150,6 @@
     &IC2D_EclipsePlugin;
     &scilab;
     &TimIt;
-    &Scheduler_EclipsePlugin;
     &Scheduler_Matlab;
    </part>
  
