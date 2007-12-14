@@ -5,9 +5,9 @@
 
 	<variables>
 		<descriptorVariable name="PROACTIVE_HOME"
-			value="/user/jfradj/home/WorkSpace/ProActive/" />
+			value="/home/user/ProActive" />
 		<descriptorVariable name="JAVA_HOME"
-			value="/user/jfradj/home/bin/jdk1.6.0_01/" />
+			value="/path/to/jdk1.6.0" />
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>

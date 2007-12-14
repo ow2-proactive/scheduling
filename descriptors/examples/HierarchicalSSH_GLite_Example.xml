@@ -5,9 +5,9 @@
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
     <variables>
         <descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> <!--CHANGE ME!!!! -->
-        <descriptorVariable name="REMOTE_HOME" value="/users/dsksi/emathias"/> <!--CHANGE ME!!!! -->
+        <descriptorVariable name="REMOTE_HOME" value="/remotehome/user"/> <!--CHANGE ME!!!! -->
         <descriptorVariable name="JAVA_HOME" 
-			value="/usr/java/j2sdk1.4.2_08" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+			value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
     </variables>
     <componentDefinition>
         <virtualNodesDefinition>

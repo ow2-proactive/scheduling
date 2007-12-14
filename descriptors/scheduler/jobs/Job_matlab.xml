@@ -5,7 +5,8 @@
     <description>A simple Matlab taskflow, which computes the sum of a randomly-generated array</description>
     <variables>
         <variable name="HOME" value="/user/fviale/home"/>
-        <variable name="MATLAB_SCRIPTS" value="${HOME}/matlab"/>
+        <variable name="PROACTIVE" value="${HOME}/eclipse_workspace/ProActive_Latest"/>
+        <variable name="MATLAB_SCRIPTS" value="${PROACTIVE}/scripts/unix/matlab/examples"/>
     </variables>
     <taskFlow>
         <task name="splitter">

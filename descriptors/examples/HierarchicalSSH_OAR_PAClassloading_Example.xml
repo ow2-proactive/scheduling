@@ -7,7 +7,7 @@
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA_HOME" 
-			value="/home/sophia/plugtest/jdk" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+			value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>

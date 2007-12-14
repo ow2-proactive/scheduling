@@ -8,9 +8,9 @@
 		<descriptorVariable name="PROACTIVE_HOME"
 			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA_HOME" 
-		value="/nfs/software/java/j2sdk1.4.2_07" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+		value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 		<descriptorVariable name="GLOBUS_USER_HOME"
-			value="/nfs/home/rquilici" 
+			value="/globus/home/user" 
 		/>  <!--CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>

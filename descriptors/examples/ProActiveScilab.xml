@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProActiveDescriptor xmlns="urn:proactive:deployment:3.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
-        <variables>
-        <descriptorVariable name="REMOTE_HOME" value="/user/amangin/home"/> <!--CHANGE ME!!!! -->
-        <descriptorVariable name="PROACTIVE_HOME" value="${REMOTE_HOME}/ProActive"/> <!--CHANGE ME!!!! -->
+    <variables>
+        <descriptorVariable name="PROACTIVE_HOME" value="/path/to/ProActive"/> <!--CHANGE ME!!!! -->
         <descriptorVariable name="JAVA_HOME" 
-            value="${REMOTE_HOME}/bin/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+            value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 
-		<descriptorVariable name="SCILAB_HOME" value="${REMOTE_HOME}/scilab/"/> <!-- Path to Scilab on the remote machines , CHANGE ME!!!! -->
+		<descriptorVariable name="SCILAB_HOME" value="/path/to/scilab/"/> <!-- Path to Scilab on the remote machines , CHANGE ME!!!! -->
 	</variables>
         <componentDefinition>
 		<virtualNodesDefinition>

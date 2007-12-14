@@ -4,16 +4,14 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
-		<descriptorVariable name="USER_HOME"
-			value="/home1/fabrice/IOFAb" /><!--CHANGE ME!!!! -->
 		<descriptorVariable name="PROACTIVE_HOME"
-			value="${USER_HOME}/ProActive" /><!--CHANGE ME!!!! -->
+			value="/home/user/ProActive" /><!--CHANGE ME!!!! -->
 		<descriptorVariable name="IBIS_HOME"
-			value="${USER_HOME}/Ibis" /><!--CHANGE ME!!!! -->
+			value="/path/to/Ibis" /><!--CHANGE ME!!!! -->
 		<descriptorVariable name="PRESERIALIZED_HOME"
-			value="${USER_HOME}/classlibs" /><!--CHANGE ME!!!! -->
+			value="/path/to/classlibs" /><!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA_HOME" 
-			value="/usr/local/sun-java/jdk1.4" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+			value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>

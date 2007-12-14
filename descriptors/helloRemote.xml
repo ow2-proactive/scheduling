@@ -4,9 +4,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/user/fviale/home/eclipse_workspace/ProActive_Latest"/> <!--CHANGE ME!!!! -->
+		<descriptorVariable name="PROACTIVE_HOME" value="/change/me/to/proactive/install/dir"/> <!--CHANGE ME!!!! -->
 		<descriptorVariable name="JAVA_HOME" 
-			value="/user/fviale/home/bin/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+			value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition><!-- Declare the different virtual nodes-->
@@ -47,12 +47,11 @@
 					<classpath>
 						<absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
 						<absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar"/>
-                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar"/>
-
+                        <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/dist/lib/ganymed-ssh2-build210.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/dist/lib/javassist.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/dist/lib/log4j.jar"/>
+                        <absolutePath value="${PROACTIVE_HOME}/dist/lib/xercesImpl.jar"/>
 					</classpath>
 					<javaPath>
 						<absolutePath value="${JAVA_HOME}/bin/java"/>

@@ -4,9 +4,9 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="/user/jmartin/home/SVN/ProActiveScheduler/"/> 
+		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive"/> 
 		<descriptorVariable name="JAVA_HOME" 
-			value="/user/jmartin/home/bin/jdk1.6.0_01/" />
+			value="/path/to/jdk1.6.0" />
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>

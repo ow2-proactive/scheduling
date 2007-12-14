@@ -6,7 +6,8 @@
     <description>A simple Scilab batch job, which computes the numerical integration of sin(x) between 0 and PI</description>
     <variables>
         <variable name="HOME" value="/user/fviale/home"/>
-        <variable name="SCILAB_SCRIPTS" value="${HOME}/scilab"/>
+        <variable name="PROACTIVE" value="${HOME}/eclipse_workspace/ProActive_Latest"/>
+        <variable name="SCILAB_SCRIPTS" value="${PROACTIVE}/scripts/unix/scilab/examples"/>
     </variables>
     <taskFlow>
         <task name="t1">

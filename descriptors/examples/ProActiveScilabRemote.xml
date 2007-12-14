@@ -2,12 +2,11 @@
 <ProActiveDescriptor xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:noNamespaceSchemaLocation="http://www-sop.inria.fr/oasis/proactive/schema/3.2/DescriptorSchema.xsd">
 	<variables>
-        <descriptorVariable name="REMOTE_HOME" value="/user/amangin/home"/> <!-- Path to Remote home directory : CHANGE ME!!!! -->
-        <descriptorVariable name="PROACTIVE_HOME" value="${REMOTE_HOME}/ProActive"/> <!-- Path to ProActive directory : CHANGE ME!!!! -->
+        <descriptorVariable name="PROACTIVE_HOME" value="/path/to/ProActive"/> <!-- Path to ProActive directory : CHANGE ME!!!! -->
         <descriptorVariable name="JAVA_HOME" 
-            value="${REMOTE_HOME}/bin/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
+            value="/path/to/jdk1.5.0" /><!-- Path of the remote JVM , CHANGE ME!!!! -->
 
-		<descriptorVariable name="SCILAB_HOME" value="${REMOTE_HOME}/scilab/"/> <!-- Path to Scilab on the remote machines , CHANGE ME!!!! -->
+		<descriptorVariable name="SCILAB_HOME" value="/path/to/scilab/"/> <!-- Path to Scilab on the remote machines , CHANGE ME!!!! -->
 	</variables>
 	<componentDefinition>
 		<virtualNodesDefinition>
@@ -47,7 +46,7 @@
 			<processDefinition id="localJVM">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<classpath>
-						                                                <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
+						                        <absolutePath value="${PROACTIVE_HOME}/dist/lib/ProActive.jar"/>
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/bouncycastle.jar"/>
 
                                                 <absolutePath value="${PROACTIVE_HOME}/dist/lib/fractal.jar"/>

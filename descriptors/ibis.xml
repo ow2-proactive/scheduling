@@ -5,7 +5,7 @@ xmlns="urn:proactive:deployment:3.3"
 	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
 
 	<variables>
-		<descriptorVariable name="PROACTIVE_HOME" value="../" />
+		<descriptorVariable name="PROACTIVE_HOME" value="/home/user/ProActive" />
 		<descriptorVariable name="RMI_PORT" value="5000" />
 		<descriptorVariable name="COM_PROTO" value="ibis" />
 		<descriptorVariable name="VMARGS" value="-Xmx16M -Xms16M" />
