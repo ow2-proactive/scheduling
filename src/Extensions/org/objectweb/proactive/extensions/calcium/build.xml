@@ -15,7 +15,7 @@
 		</java>
 	    <java classname="${stubgenerator.class}" fork="true">
 		    <classpath refid="project.classpath" />
-		    <arg line="-srcDir ${cl.extensions.dir} -pkg org.objectweb.proactive.extensions.calcium.proactive" />
+		    <arg line="-srcDir ${cl.extensions.dir} -pkg org.objectweb.proactive.extensions.calcium.environment.proactive" />
 	    </java>
 	</target>
 </project>
