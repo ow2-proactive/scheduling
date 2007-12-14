@@ -34,8 +34,13 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * The priority controller interface.
- *
+ * The priority controller interface. This controller manage the priority for methods exposed by the
+ * component interfaces. It's an optional controller. If it is added in the definition of the
+ * membrane the default component activity will be
+ * {@link org.objectweb.proactive.core.component.body.ComponentActivityPriority ComponentActivityPriority}
+ * otherwise
+ * {@link org.objectweb.proactive.core.component.body.ComponentActivityPriority ComponentActivity}.
+ * 
  * @author Cedric Dalmasso
  */
 @PublicAPI
@@ -43,34 +48,54 @@ public interface PriorityController {
 
     /**
      * All the possible kind of priority for a request on a component.
-     *
+     * 
      */
     public enum RequestPriority {
-        F, NF1, NF2, NF3;
+        /**
+         * Functional priority
+         */
+        F,
+        /**
+         * Non-Functional priority
+         */
+        NF1,
+        /**
+         * Non-Functional priority higher than Functional priority (F)
+         */
+        NF2,
+        /**
+         * Non-Functional priority higher than Functional priority (F) and Non-Functional priority 
+         * (NF1 and NF2)
+         */
+        NF3;
     }
 
     /**
-     * Set priority of all methods named 'methodName' in the interface
-     * 'interfaceName' to 'priority'.
-     *
-     * @param interfaceName Name of the component interface providing the
-     * method
-     * @param methodName Name of the method on which set the priority
-     * @param priority The priority
+     * Set priority of all methods named 'methodName' in the interface 'interfaceName' to
+     * 'priority'.
+     * 
+     * @param interfaceName
+     *            Name of the component interface providing the method
+     * @param methodName
+     *            Name of the method on which set the priority
+     * @param priority
+     *            The priority
      * @return true if success, else false
      */
     public void setPriority(String interfaceName, String methodName, RequestPriority priority);
 
     /**
-     * Set priority of the method named 'methodName' with the signature
-     * defined by 'parametersTypes' in the interface 'interfaceName' to
-     * 'priority'.
-     *
-     * @param interfaceName Name of the component interface providing the
-     * method
-     * @param methodName Name of the method on which set the priority
-     * @param parametersTypes The type of the method's parameters signature
-     * @param priority The priority
+     * Set priority of the method named 'methodName' with the signature defined by 'parametersTypes'
+     * in the interface 'interfaceName' to 'priority'.
+     * 
+     * @param interfaceName
+     *            Name of the component interface providing the method
+     * @param methodName
+     *            Name of the method on which set the priority
+     * @param parametersTypes
+     *            The type of the method's parameters signature
+     * @param priority
+     *            The priority
      * @return true if success, else false
      */
     public void setPriority(String interfaceName, String methodName, Class<?>[] parametersTypes,
@@ -78,10 +103,13 @@ public interface PriorityController {
 
     /**
      * Get the priority for a given method.
-     *
-     * @param interfaceName Name of the component interface
-     * @param methodName Name of the method
-     * @param parametersTypes The type of the method's parameters signature
+     * 
+     * @param interfaceName
+     *            Name of the component interface
+     * @param methodName
+     *            Name of the method
+     * @param parametersTypes
+     *            The type of the method's parameters signature
      * @return
      */
     public RequestPriority getPriority(String interfaceName, String methodName, Class<?>[] parametersTypes);
