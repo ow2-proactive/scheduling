@@ -202,16 +202,6 @@
                 <listitem>
                   <para>
                     <personname>
-                      <firstname>Javier</firstname>
-
-                      <surname>Bustos</surname>
-                    </personname>
-                  </para>
-                </listitem>
-
-                <listitem>
-                  <para>
-                    <personname>
                       <firstname>Antonio</firstname>
 
                       <surname>Cansado</surname>
@@ -622,6 +612,18 @@
                     </personname>
                   </para>
                 </listitem>
+                
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Javier</firstname>
+
+                      <surname>Bustos</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+                
               </itemizedlist>
             </entry>
           </row>
