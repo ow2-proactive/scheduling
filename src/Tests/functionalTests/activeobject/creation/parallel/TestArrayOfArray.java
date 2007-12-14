@@ -31,7 +31,9 @@
 package functionalTests.activeobject.creation.parallel;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
@@ -53,8 +55,8 @@ import static junit.framework.Assert.assertTrue;
 public class TestArrayOfArray extends FunctionalTest {
     private static final String XML_PATH = TestVnNotActivated.class.getResource(
             "/functionalTests/activeobject/creation/parallel/4_local.xml").getPath();
-    private VirtualNode vn;
-    private ProActiveDescriptor padForActiving;
+    static private VirtualNode vn;
+    static private ProActiveDescriptor padForActiving;
 
     /* Test if newActiveInParallel verify that the total of constructors is
      * equal to the total of nodes.
@@ -73,15 +75,15 @@ public class TestArrayOfArray extends FunctionalTest {
         assertTrue(aos.length == 4);
     }
 
-    @Before
-    public void initTest() throws Exception {
+    @BeforeClass
+    static public void initTest() throws Exception {
         padForActiving = PADeployment.getProactiveDescriptor(XML_PATH);
-        this.vn = padForActiving.getVirtualNode("Workers03");
-        this.vn.activate();
+        vn = padForActiving.getVirtualNode("Workers03");
+        vn.activate();
     }
 
-    @After
-    public void endTest() throws Exception {
+    @AfterClass
+    static public void endTest() throws Exception {
         if (padForActiving != null) {
             padForActiving.killall(false);
         }
