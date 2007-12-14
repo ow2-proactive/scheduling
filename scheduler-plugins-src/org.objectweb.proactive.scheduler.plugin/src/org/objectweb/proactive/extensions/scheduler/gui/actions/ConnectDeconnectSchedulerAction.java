@@ -69,7 +69,8 @@ public class ConnectDeconnectSchedulerAction extends Action {
     private void connection() {
         SelectSchedulerDialogResult dialogResult = SelectSchedulerDialog.showDialog(parent.getShell());
         if (dialogResult != null) {
-            int res = SchedulerProxy.getInstance().connectToScheduler(dialogResult);
+            int res = SchedulerProxy.getInstance()
+                                    .connectToScheduler(dialogResult);
 
             if (res == SchedulerProxy.CONNECTED) {
                 isConnected = true;
@@ -78,9 +79,9 @@ public class ConnectDeconnectSchedulerAction extends Action {
                 SelectSchedulerDialog.saveInformations();
 
                 this.setText("Disconnect");
-                this.setToolTipText("Disconnect from the scheduler");
-                this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(),
-                        "icons/disconnect.gif"));
+                this.setToolTipText("Disconnect from the ProActive Scheduler");
+                this.setImageDescriptor(ImageDescriptor.createFromFile(
+                        this.getClass(), "icons/disconnect.gif"));
 
                 // active reference
                 JobsController.getActiveView().init();
@@ -97,10 +98,11 @@ public class ConnectDeconnectSchedulerAction extends Action {
                 SeparatedJobView.setVisible(true);
             } else if (res == SchedulerProxy.LOGIN_OR_PASSWORD_WRONG) {
                 MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                        "The login and/or the password are wrong !");
+                    "The login and/or the password are wrong !");
             } else {
                 MessageDialog.openError(parent.getShell(), "Couldn't connect",
-                        "Couldn't Connect to the scheduler based on : \n" + dialogResult.getUrl());
+                    "Couldn't Connect to the scheduler based on : \n" +
+                    dialogResult.getUrl());
             }
         }
     }
@@ -112,9 +114,10 @@ public class ConnectDeconnectSchedulerAction extends Action {
 
     public void setDisconnectionMode() {
         isConnected = false;
-        this.setText("Connect to a scheduler");
-        this.setToolTipText("Connect to a started scheduler by its url");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/connect.gif"));
+        this.setText("Connect the ProActive Scheduler");
+        this.setToolTipText("Connect the started ProActive Scheduler by its url");
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "icons/connect.gif"));
     }
 
     public static ConnectDeconnectSchedulerAction newInstance(Composite parent) {

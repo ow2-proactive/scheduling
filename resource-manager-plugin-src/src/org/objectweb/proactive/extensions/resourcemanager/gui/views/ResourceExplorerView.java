@@ -13,13 +13,16 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMInitialState;
 import org.objectweb.proactive.extensions.resourcemanager.gui.actions.CollapseAllAction;
 import org.objectweb.proactive.extensions.resourcemanager.gui.actions.ConnectDeconnectResourceManagerAction;
+import org.objectweb.proactive.extensions.resourcemanager.gui.actions.AddNodeAction;
+import org.objectweb.proactive.extensions.resourcemanager.gui.actions.CreateSourceAction;
 import org.objectweb.proactive.extensions.resourcemanager.gui.actions.ExpandAllAction;
+import org.objectweb.proactive.extensions.resourcemanager.gui.actions.RemoveNodeAction;
+import org.objectweb.proactive.extensions.resourcemanager.gui.actions.RemoveSourceAction;
 import org.objectweb.proactive.extensions.resourcemanager.gui.data.ResourceManagerController;
 import org.objectweb.proactive.extensions.resourcemanager.gui.tree.ResourceExplorerTree;
 
@@ -28,16 +31,19 @@ import org.objectweb.proactive.extensions.resourcemanager.gui.tree.ResourceExplo
  * @author FRADJ Johann
  */
 public class ResourceExplorerView extends ViewPart {
-
     /** the view part id */
     public static final String ID = "org.objectweb.proactive.extensions.resourcemanager.gui.views.ResourceExplorerView";
     private static ResourceExplorerTree viewer = null;
     private DrillDownAdapter drillDownAdapter = null;
-    private Action doubleClickAction = null;
-    private Action simpleClickAction = null;
-    private ExpandAllAction expandAllAction = null;
-    private CollapseAllAction collapseAllAction = null;
-    private ConnectDeconnectResourceManagerAction connectDeconnectAction = null;
+    private static Action doubleClickAction = null;
+    private static Action simpleClickAction = null;
+    private static Action expandAllAction = null;
+    private static Action collapseAllAction = null;
+    private static Action createSourceAction = null;
+    private static Action createNodeAction = null;
+    private static Action removeNodeAction = null;
+    private static Action removeSourceAction = null;
+    private static Action connectDeconnectAction = null;
     private static Composite parent = null;
 
     /**
@@ -49,11 +55,28 @@ public class ResourceExplorerView extends ViewPart {
     public static void init() {
         RMInitialState initialState = ResourceManagerController.getLocalView().getInitialState();
         viewer.initTree(initialState);
+        expandAllAction.setEnabled(true);
+        collapseAllAction.setEnabled(true);
+        createSourceAction.setEnabled(true);
+        removeNodeAction.setEnabled(true);
+        removeSourceAction.setEnabled(true);
+        createNodeAction.setEnabled(true);
+    }
+
+    public static void clearOnDisconnection() {
+        viewer.clear();
+        if (StatisticsView.getInstance() != null)
+            StatisticsView.getInstance().clear();
+        expandAllAction.setEnabled(false);
+        collapseAllAction.setEnabled(false);
+        createSourceAction.setEnabled(false);
+        removeNodeAction.setEnabled(false);
+        removeSourceAction.setEnabled(false);
+        createNodeAction.setEnabled(false);
     }
 
     /**
-     * This is a callback that will allow us to create the viewer and initialize
-     * it.
+     * This is a callback that will allow us to create the viewer and initialize it.
      */
     @Override
     public void createPartControl(Composite theParent) {
@@ -61,18 +84,15 @@ public class ResourceExplorerView extends ViewPart {
         try {
             viewer = new ResourceExplorerTree(this, parent);
 
-            //			RMAdmin rmAdmin = RMConnection.connectAsAdmin(null);
-            //			RMMonitoring imMonitoring = RMConnection.connectAsMonitor(null);
             ResourceManagerController.getLocalView().addNodeListener(viewer);
-            //			ResourceManagerController.getActiveView().init(imMonitoring);
-            //			RMInitialState i = ResourceManagerController.getLocalView().getInitialState();
-            //			viewer.initTree(i);
+
             drillDownAdapter = new DrillDownAdapter(viewer);
 
             makeActions();
             hookContextMenu();
             contributeToActionBars();
             hookClickAction();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -82,24 +102,27 @@ public class ResourceExplorerView extends ViewPart {
         doubleClickAction = new Action() {
             @Override
             public void run() {
-                if (drillDownAdapter.canGoInto()) {
+                if (drillDownAdapter.canGoInto())
                     drillDownAdapter.goInto();
-                }
             }
         };
         simpleClickAction = new Action() {
             @Override
             public void run() {
-                //				ISelection selection = viewer.getSelection();
-                //				if (selection != null) {
-                //					Object obj = ((IStructuredSelection) selection).getFirstElement();
-                //					if (obj != null)
-                //						System.out.println("simple-click detected on " + obj.toString());
-                //				}
+                // ISelection selection = viewer.getSelection();
+                // if (selection != null) {
+                // Object obj = ((IStructuredSelection) selection).getFirstElement();
+                // if (obj != null)
+                // System.out.println("simple-click detected on " + obj.toString());
+                // }
             }
         };
         collapseAllAction = CollapseAllAction.newInstance(viewer);
         expandAllAction = ExpandAllAction.newInstance(viewer);
+        createSourceAction = CreateSourceAction.newInstance(parent);
+        removeSourceAction = RemoveSourceAction.newInstance(parent, viewer);
+        createNodeAction = AddNodeAction.newInstance(parent, viewer);
+        removeNodeAction = RemoveNodeAction.newInstance(parent, viewer);
         connectDeconnectAction = ConnectDeconnectResourceManagerAction.newInstance(parent);
     }
 
@@ -111,7 +134,6 @@ public class ResourceExplorerView extends ViewPart {
                 fillContextMenu(manager);
             }
         });
-
         Menu menu = menuMgr.createContextMenu(viewer.getControl());
         viewer.getControl().setMenu(menu);
         getSite().registerContextMenu(menuMgr, viewer);
@@ -119,18 +141,24 @@ public class ResourceExplorerView extends ViewPart {
 
     private void fillContextMenu(IMenuManager manager) {
         manager.add(connectDeconnectAction);
+        manager.add(createSourceAction);
+        manager.add(removeSourceAction);
+        manager.add(createNodeAction);
+        manager.add(removeNodeAction);
         manager.add(new Separator());
         drillDownAdapter.addNavigationActions(manager);
         manager.add(expandAllAction);
         manager.add(collapseAllAction);
-        // Other plug-ins can contribute there actions here
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     }
 
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
         IToolBarManager manager = bars.getToolBarManager();
         manager.add(connectDeconnectAction);
+        manager.add(createSourceAction);
+        manager.add(removeSourceAction);
+        manager.add(createNodeAction);
+        manager.add(removeNodeAction);
         manager.add(new Separator());
         drillDownAdapter.addNavigationActions(manager);
         manager.add(expandAllAction);
@@ -152,7 +180,7 @@ public class ResourceExplorerView extends ViewPart {
 
     /**
      * Passing the focus request to the viewer's control.
-     *
+     * 
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
     @Override
@@ -160,7 +188,3 @@ public class ResourceExplorerView extends ViewPart {
         viewer.getControl().setFocus();
     }
 }
-// private void showMessage(String message) {
-// MessageDialog.openInformation(viewer.getControl().getShell(), "Ressource
-// Explorer", message);
-// }

@@ -23,8 +23,7 @@ public class NodeInfoView extends ViewPart {
     }
 
     /**
-     * This is a callback that will allow us to create the viewer and initialize
-     * it.
+     * This is a callback that will allow us to create the viewer and initialize it.
      */
     @Override
     public void createPartControl(Composite parent) {
@@ -35,8 +34,8 @@ public class NodeInfoView extends ViewPart {
 
         TableColumn tc1 = new TableColumn(table, SWT.LEFT);
         TableColumn tc2 = new TableColumn(table, SWT.LEFT);
-        tc1.setText("Chepa");
-        tc2.setText("Toujours pas");
+        tc1.setText("name");
+        tc2.setText("value");
         tc1.setWidth(100);
         tc2.setWidth(100);
         tc1.setMoveable(true);
@@ -45,11 +44,10 @@ public class NodeInfoView extends ViewPart {
 
     /**
      * Passing the focus request to the viewer's control.
-     *
+     * 
      * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
      */
     @Override
     public void setFocus() {
-        //viewer.getControl().setFocus();
     }
 }

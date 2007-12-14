@@ -40,15 +40,16 @@ import org.eclipse.jface.viewers.TreeViewer;
  *
  */
 public class CollapseAllAction extends Action {
-    public static final boolean ENABLED_AT_CONSTRUCTION = true;
+    public static final boolean ENABLED_AT_CONSTRUCTION = false;
     private static CollapseAllAction instance = null;
     private TreeViewer viewer = null;
 
     private CollapseAllAction(TreeViewer viewer) {
-        this.viewer = viewer;
+    	this.viewer = viewer;
         this.setText("Collapse All");
         this.setToolTipText("To collapse all items");
-        this.setImageDescriptor(ImageDescriptor.createFromFile(this.getClass(), "icons/collapseall.gif"));
+        this.setImageDescriptor(ImageDescriptor.createFromFile(
+                this.getClass(), "icons/collapseall.gif"));
         this.setEnabled(ENABLED_AT_CONSTRUCTION);
     }
 

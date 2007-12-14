@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scheduler Plug-in
-Bundle-SymbolicName: org.objectweb.proactive.extra.scheduler.gui;singleton:=true
+Bundle-SymbolicName: org.objectweb.proactive.extensions.scheduler.gui;singleton:=true
 Bundle-Version: 1.0.0
 Bundle-Activator: org.objectweb.proactive.extensions.scheduler.gui.Activator
 Bundle-Vendor: ProActive

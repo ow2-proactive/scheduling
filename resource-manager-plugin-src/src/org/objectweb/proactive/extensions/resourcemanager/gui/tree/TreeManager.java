@@ -1,5 +1,9 @@
 package org.objectweb.proactive.extensions.resourcemanager.gui.tree;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -11,19 +15,23 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeEvent;
 import org.objectweb.proactive.extensions.resourcemanager.common.event.RMNodeSourceEvent;
+import org.objectweb.proactive.extensions.resourcemanager.gui.views.StatisticsView;
 
 
 /**
  * @author FRADJ Johann
  */
 public class TreeManager extends LabelProvider implements IStructuredContentProvider, ITreeContentProvider {
+
     private static TreeManager instance = null;
     private ViewPart view = null;
     private Root root = null;
+    private TreeStatistic statistic = null;
 
     private TreeManager(ViewPart view) {
         this.view = view;
         this.root = new Root();
+        this.statistic = new TreeStatistic();
     }
 
     public static void newInstance(ViewPart view) {
@@ -32,6 +40,64 @@ public class TreeManager extends LabelProvider implements IStructuredContentProv
 
     public static TreeManager getInstance() {
         return instance;
+    }
+
+    public TreeStatistic getStatistic() {
+        return statistic;
+    }
+
+    public void clear() {
+        this.root = new Root();
+        this.statistic = new TreeStatistic();
+    }
+
+    public String[] getSourcesNames(boolean dynamicToo, boolean staticToo, boolean defaultToo) {
+        TreeLeafElement[] children = root.getChildren();
+        List<String> res = new ArrayList<String>();
+        for (TreeLeafElement leaf : children) {
+            Source src = (Source) leaf;
+            if (dynamicToo && src.isDynamic()) {
+                res.add(src.getName());
+            } else if (staticToo && src.isStatic()) {
+                if (src.isTheDefault()) {
+                    if (defaultToo) {
+                        res.add(src.getName());
+                    }
+                } else {
+                    res.add(src.getName());
+                }
+            }
+        }
+        String[] tmp = new String[res.size()];
+        res.toArray(tmp);
+        Arrays.sort(tmp);
+        return tmp;
+    }
+
+    public String[] getNodesNames() {
+        List<String> res = new ArrayList<String>();
+
+        // FIXME A synchronize more efficient may be done ?
+
+        synchronized (root) {
+            for (TreeLeafElement src : root.getChildren()) {
+                TreeParentElement source = (TreeParentElement) src;
+                for (TreeLeafElement hst : source.getChildren()) {
+                    TreeParentElement host = (TreeParentElement) hst;
+                    for (TreeLeafElement jvms : host.getChildren()) {
+                        TreeParentElement jvm = (TreeParentElement) jvms;
+                        for (TreeLeafElement node : jvm.getChildren()) {
+                            res.add(node.getName());
+                        }
+                    }
+                }
+            }
+        }
+
+        String[] tmp = new String[res.size()];
+        res.toArray(tmp);
+        Arrays.sort(tmp);
+        return tmp;
     }
 
     /**
@@ -82,9 +148,8 @@ public class TreeManager extends LabelProvider implements IStructuredContentProv
      * @see org.eclipse.jface.viewers.ITreeContentProvider#hasChildren(java.lang.Object)
      */
     public boolean hasChildren(Object parent) {
-        if (parent instanceof TreeParentElement) {
+        if (parent instanceof TreeParentElement)
             return ((TreeParentElement) parent).hasChildren();
-        }
         return false;
     }
 
@@ -113,8 +178,10 @@ public class TreeManager extends LabelProvider implements IStructuredContentProv
                         return ImageDescriptor.createFromFile(this.getClass(), "icons/free.gif")
                                 .createImage();
                     case BUSY:
-                    case TO_BE_RELEASED:
                         return ImageDescriptor.createFromFile(this.getClass(), "icons/busy.gif")
+                                .createImage();
+                    case TO_BE_RELEASED:
+                        return ImageDescriptor.createFromFile(this.getClass(), "icons/to_release.gif")
                                 .createImage();
                 }
                 break;
@@ -128,102 +195,149 @@ public class TreeManager extends LabelProvider implements IStructuredContentProv
 
     public TreeParentElement addNode(RMNodeEvent nodeEvent) {
         TreeParentElement parentToRefresh = null;
+        synchronized (root) {
 
-        TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
-        if (source == null) { // if the source is null, then add it
-            source = new Source(nodeEvent.getNodeSource());
-            root.addChild(source);
-            parentToRefresh = root;
-        }
-        TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
-        if (host == null) { // if the host is null, then add it
-            host = new Host(nodeEvent.getHostName());
-            source.addChild(host);
-            if (parentToRefresh == null) {
-                parentToRefresh = source;
+            TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
+            // the source cannot be null
+
+            TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
+            if (host == null) { // if the host is null, then add it
+                host = new Host(nodeEvent.getHostName());
+                source.addChild(host);
+                if (parentToRefresh == null)
+                    parentToRefresh = source;
             }
-        }
-        TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
-        if (vm == null) { // if the vm is null, then add it
-            vm = new VirtualMachine(nodeEvent.getVMName());
-            host.addChild(vm);
-            if (parentToRefresh == null) {
-                parentToRefresh = host;
+            TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
+            if (vm == null) { // if the vm is null, then add it
+                vm = new VirtualMachine(nodeEvent.getVMName());
+                host.addChild(vm);
+                if (parentToRefresh == null)
+                    parentToRefresh = host;
             }
-        }
-        vm.addChild(new Node(nodeEvent.getNodeUrl(), nodeEvent.getState()));
+            vm.addChild(new Node(nodeEvent.getNodeUrl(), nodeEvent.getState()));
 
-        if (parentToRefresh == null) {
-            parentToRefresh = vm;
-        }
+            if (parentToRefresh == null)
+                parentToRefresh = vm;
 
+            switch (nodeEvent.getState()) {
+                case BUSY:
+                case TO_BE_RELEASED:
+                    statistic.increaseBusyNodes();
+                    break;
+                case DOWN:
+                    statistic.increaseDownNodes();
+                    break;
+                case FREE:
+                    statistic.increaseFreeNodes();
+                    break;
+            }
+            refreshStatisticsView();
+        }
         return parentToRefresh;
     }
 
     public TreeParentElement removeNode(RMNodeEvent nodeEvent) {
         TreeParentElement parentToRefresh = null;
+        synchronized (root) {
+            TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
+            TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
+            TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
 
-        TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
-        TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
-        TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
+            remove(vm, nodeEvent.getNodeUrl());
+            parentToRefresh = vm;
 
-        remove(vm, nodeEvent.getNodeUrl());
-        parentToRefresh = vm;
+            if (vm.getChildren().length == 0) {
+                remove(host, nodeEvent.getVMName());
+                parentToRefresh = host;
 
-        if (vm.getChildren().length == 0) {
-            remove(host, nodeEvent.getVMName());
-            parentToRefresh = host;
-
-            if (host.getChildren().length == 0) {
-                remove(source, nodeEvent.getHostName());
-                parentToRefresh = source;
+                if (host.getChildren().length == 0) {
+                    remove(source, nodeEvent.getHostName());
+                    parentToRefresh = source;
+                }
             }
+
+            switch (nodeEvent.getState()) {
+                case BUSY:
+                case TO_BE_RELEASED:
+                    statistic.decreaseBusyNodes();
+                    break;
+                case DOWN:
+                    statistic.decreaseDownNodes();
+                    break;
+                case FREE:
+                    statistic.decreaseFreeNodes();
+                    break;
+            }
+            refreshStatisticsView();
         }
 
-        // FIXME on enleve pas une source vide puisqu'on a dit qu'on pouvait
-        // ajouter qu'une source sans ressource(noeud) ;-)
         return parentToRefresh;
     }
 
     public TreeLeafElement changeNodeState(RMNodeEvent nodeEvent) {
-        TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
-        TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
-        TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
-        Node node = (Node) find(vm, nodeEvent.getNodeUrl());
-        node.setState(nodeEvent.getState());
-        return node;
+        synchronized (root) {
+            TreeParentElement source = (TreeParentElement) find(root, nodeEvent.getNodeSource());
+            TreeParentElement host = (TreeParentElement) find(source, nodeEvent.getHostName());
+            TreeParentElement vm = (TreeParentElement) find(host, nodeEvent.getVMName());
+            Node node = (Node) find(vm, nodeEvent.getNodeUrl());
+
+            switch (node.getState()) {
+                case BUSY:
+                case TO_BE_RELEASED:
+                    statistic.decreaseBusyNodes();
+                    break;
+                case DOWN:
+                    statistic.decreaseDownNodes();
+                    break;
+                case FREE:
+                    statistic.decreaseFreeNodes();
+                    break;
+            }
+
+            node.setState(nodeEvent.getState());
+
+            switch (node.getState()) {
+                case BUSY:
+                case TO_BE_RELEASED:
+                    statistic.increaseBusyNodes();
+                    break;
+                case DOWN:
+                    statistic.increaseDownNodes();
+                    break;
+                case FREE:
+                    statistic.increaseFreeNodes();
+                    break;
+            }
+            refreshStatisticsView();
+            return node;
+        }
     }
 
     public void addNodeSource(RMNodeSourceEvent nodeSourceEvent) {
-        TreeParentElement source = (TreeParentElement) find(root, nodeSourceEvent.getSourceName());
-        if (source == null) {
-            source = new Source(nodeSourceEvent.getSourceName());
-            root.addChild(source);
-        } else {
-            System.err.println("ADD NODE SOURCE QUI EXISTE DEJA... " + nodeSourceEvent.getSourceName());
+        synchronized (root) {
+            TreeParentElement source = (TreeParentElement) find(root, nodeSourceEvent.getSourceName());
+            if (source == null) {
+                source = new Source(nodeSourceEvent.getSourceName(), nodeSourceEvent.getSourceType());
+                root.addChild(source);
+            }
         }
     }
 
     public void removeNodeSource(RMNodeSourceEvent nodeSourceEvent) {
-        boolean debug = false;
-        for (TreeLeafElement n : root.getChildren()) {
-            if (n.getName().equals(nodeSourceEvent.getSourceName())) {
-                root.removeChild(n);
-                debug = true;
-                break;
+        synchronized (root) {
+            for (TreeLeafElement n : root.getChildren()) {
+                if (n.getName().equals(nodeSourceEvent.getSourceName())) {
+                    root.removeChild(n);
+                    break;
+                }
             }
-        }
-        if (!debug) {
-            System.err.println("REMOVE NODESOURCE RECU MAIS PAS DE NODESOURCE A ENLEVE... " +
-                nodeSourceEvent.getSourceName());
         }
     }
 
     private TreeLeafElement find(TreeParentElement parent, String name) {
         for (TreeLeafElement child : parent.getChildren())
-            if (child.getName().equals(name)) {
+            if (child.getName().equals(name))
                 return child;
-            }
         return null;
     }
 
@@ -233,5 +347,11 @@ public class TreeManager extends LabelProvider implements IStructuredContentProv
                 parent.removeChild(child);
                 break;
             }
+    }
+
+    private void refreshStatisticsView() {
+        StatisticsView view = StatisticsView.getInstance();
+        if (view != null)
+            view.maj();
     }
 }
