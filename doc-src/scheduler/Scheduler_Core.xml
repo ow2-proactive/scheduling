@@ -452,10 +452,8 @@ public Object execute(TaskResult... results) throws Throwable {
 		      </figure>
 	        </para>
 	    </sect2>
-
 	    
-	    
-	    <sect2 id="Create_a_job">
+	    <sect2 id="Create_a_job_xml">
 	    	<title>Create a job</title>
 	    	
 	    	<para>
@@ -501,21 +499,20 @@ public Object execute(TaskResult... results) throws Throwable {
 					The job tag can define :
 					<itemizedlist>
 						<listitem>
-							<emphasis>name</emphasis> : any string that define the job.
+							<emphasis>name</emphasis> : any string that define the job. (see <xref linkend="task_creation" /> for details)
 						</listitem>
 						<listitem>
-							<emphasis>priority</emphasis> : the scheduling priority of the job. Values can be : 'highest', 'high', 'normal', 'low', 'lowest'
+							<emphasis>priority</emphasis> : the scheduling priority of the job. Values can be : 'highest', 'high', 'normal', 'low', 'lowest'.
+							(see <xref linkend="task_creation" /> for details)
 						</listitem>
 						<listitem>
 							<emphasis>cancelOnException</emphasis> : is a way to define if your job will continue
-		      				if a user exception or error occurs during the whole job process. It means that if the value of this property is true, the job will stop immediately
-		      			every running task if one error occurs in one of the task of this job. It will have
-		      			the consequence to failed the job, but free resources for other jobs. It is useful
-		      			when it has no interest to continue after a task failure. Values can be 'true' or 'false'.
+		      				if a user exception or error occurs during the whole job process. (see <xref linkend="task_creation" /> for details)
+		      				 Values can be 'true' or 'false'.
 						</listitem>
 						<listitem>
 							<emphasis>logFile</emphasis> : is the path of an optional log file. Set it if you want
-		      				to save the job generated log in a file.
+		      				to save the job generated log in a file. (see <xref linkend="task_creation" /> for details)
 						</listitem>
 					</itemizedlist>
 					</para>
@@ -606,7 +603,8 @@ public Object execute(TaskResult... results) throws Throwable {
 	    		
 	    		Here's the details to create a Task Flow job using an XML descriptor.
 	    		This example will show how to make dependences, how to add native or java executable to the job
-	    		and how the different scripts can be used.
+	    		and how the different scripts can be used. You may refers to the previous explanations if something
+	    		remains unexplain in this section.
 	    		<para>
 	    			<screen>
 	&lt;?xml version="1.0" encoding="UTF-8"?&gt;
@@ -616,19 +614,140 @@ public Object execute(TaskResult... results) throws Throwable {
 		&lt;description&gt;Test of 8 tasks with variable durations and dependencies&lt;/description&gt;
 					</screen>
 					<para>
-						Until this point, every features are describe above in the ProActive section.
+						Until this point, every features are describe above in the ProActive job creation section.
+						Let's see now how to add tasks to the job and the differences between this kind of job and the ProActive one :
 					</para>
 					<screen>
 		&lt;taskFlow&gt;
 			&lt;task name="task1" retries="2"&gt;
+					</screen>
+					<para>
+						The task tag can contains several properties :
+						<itemizedlist>
+							<listitem>
+								<emphasis>name</emphasis> is describe in <xref linkend="task_creation" />.
+							</listitem>
+							<listitem>
+								<emphasis>retries</emphasis> is describe in <xref linkend="task_creation" />.
+							</listitem>
+							<listitem>
+								<emphasis>preciousResult</emphasis> see the description in <xref linkend="task_creation" />.
+								Values can be 'true' or 'false'.
+							</listitem>
+							<listitem>
+								<emphasis>resultPreviewClass</emphasis> see the description in <xref linkend="task_creation" />.
+								Value is a string representing the full java class name (the doted notation)
+							</listitem>
+						</itemizedlist>
+					</para>
+					<screen>
 				&lt;!-- Task human description --&gt;
 				&lt;description&gt;This task will sleep 6s&lt;/description&gt;
+					</screen>
+						<para>
+							At this point it is possible to use the 3 scripts 'selection', 'pre', and 'post'.
+							There usage is explain in <xref linkend="task_creation" /> in the scripts part.
+							The only thing that change in the XML notation is the first tag. Indeed, it can be
+							either 'selection', 'pre' or 'post' tags.
+							Let's see how to place it in the XML description :
+							<screen>
+				&lt;selection&gt;
+					&lt;script&gt;
+						&lt;file path="/path/to/a/script.js"/&gt;
+					&lt;/script&gt;
+				&lt;/selection&gt;
+				&lt;!-- or/and --&gt;
+				&lt;pre&gt;
+					&lt;script&gt;
+						&lt;code language="type_of_language"&gt;
+						&lt;!-- Insert here the code like it would be in a file --&gt;
+						&lt;code&gt;
+					&lt;/script&gt;
+				&lt;/pre&gt;
+				&lt;!-- or/and --&gt;
+				&lt;post&gt;
+					&lt;script&gt;
+						&lt;file path="/path/to/a/script.js"/&gt;
+					&lt;/script&gt;
+				&lt;/post&gt;
+							</screen>
+							<para>
+								The <emphasis>file</emphasis> or <emphasis>code</emphasis> tag can be exclusively added
+								in the <emphasis>script</emphasis> tag.
+								For the <emphasis>file</emphasis> tag, the attributes can be one of the following :
+								<itemizedlist>
+									<listitem>
+										<emphasis>path</emphasis> : the local path to a file.
+									</listitem>
+									<listitem>
+										<emphasis>url</emphasis> : an URL to the remote script.
+									</listitem>
+								</itemizedlist>
+								For the <emphasis>code</emphasis> tag, the type_of_language can be any language supported by the underlying JRE.
+							</para>
+						</para>
+						<para>
+							Now let's see how to add a java executable to this task :
+						</para>
+					<screen>
 				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
 					&lt;parameters&gt;
 						&lt;parameter name="sleepTime" value="6"/&gt;
 						&lt;parameter name="number" value="1"/&gt;
 					&lt;/parameters&gt;
 				&lt;/javaExecutable&gt;
+					</screen>
+						<para>
+							As the ProActive job, a java executable is added to the task by using a similar tag,
+							here the <emphasis>javaExecutable</emphasis> tag that is waiting after a <emphasis>class</emphasis> attribute.
+							This attribute must contain the java executable task class full name. The way to use parameters
+							is explain in the previous ProActive job XML creation section. As a ProActive task, the parameters
+							are send to the task in the <emphasis>init</emphasis> method as an hashMap.
+						</para>
+						<para>
+							It is also possible to add a native task under the same model but instead of taking a java class
+							as attribute, it is necessary to define exclusively two types of command :
+							<itemizedlist>
+								<listitem>
+									<emphasis>staticCommand</emphasis> is a command that will be started with the given arguments.
+									It can be a command or a path to a native executable. The command will be started with
+									the given argument(s).
+								</listitem>
+								<listitem>
+									<emphasis>dynamicCommand</emphasis> is a command generated by a 'generation script'.
+								</listitem>
+							</itemizedlist>
+							Here's two examples showing how to create a native task according to this two types of command.
+							<screen>
+					&lt;nativeExecutable&gt;
+						&lt;staticCommand
+							value="command"&gt;
+							&lt;arguments&gt;
+								&lt;argument value="1"/&gt;
+							&lt;/arguments&gt;
+						&lt;/staticCommand&gt;
+					&lt;/nativeExecutable&gt;
+							</screen>
+							<screen>
+					&lt;nativeExecutable&gt;
+						&lt;dynamicCommand&gt;
+							&lt;generation&gt;
+								&lt;script&gt;
+									&lt;file url="url/to/a/script" /&gt;
+								&lt;/script&gt;
+							&lt;/generation&gt;
+						&lt;/dynamicCommand&gt;
+					&lt;/nativeExecutable&gt;
+							</screen>
+						</para>
+						<para>
+							In the second example, the script will generate a command that will be used to start
+							the native task.
+						</para>
+						<para>
+							Let's continue with the job description.
+						</para>
+					<screen>
 			&lt;/task&gt;
 			&lt;task name="task2"&gt;
 				&lt;!-- Task human description --&gt;
@@ -657,10 +776,29 @@ public Object execute(TaskResult... results) throws Throwable {
 			&lt;task name="task4" retries="2"&gt;
 				&lt;!-- Task human description --&gt;
 				&lt;description&gt;This task will sleep 5s&lt;/description&gt;
+					</screen>
+					Last step is to define dependencies. Here's an example :
+					<screen>
 				&lt;depends&gt;
 					&lt;task ref="task1"/&gt;
 					&lt;task ref="task2"/&gt;
 				&lt;/depends&gt;
+					</screen>
+						<para>
+						The <emphasis>depends</emphasis> tag can contain one or more references to other tasks.
+						This XML tags (in the example above) just means that this task ('task4') will depend of 
+						'task1' and 'task2' in this order. As explain above, the task4 will wait until the end 
+						of task1 and task2 to start and will receive as parameters the results of task1 and task2
+						in this order. (It implies that the task names are unique).
+						The <emphasis>depends</emphasis> tag is optional.
+						</para>
+						<para>
+							Each of the features describe above can be repeated in as many task as the define number of tasks.
+						</para>
+						<para>
+							 Let's now finish this task flow job.
+						</para>
+					<screen>
 				&lt;javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint"&gt;
 					&lt;parameters&gt;
 						&lt;parameter name="sleepTime" value="5"/&gt;
@@ -728,6 +866,10 @@ public Object execute(TaskResult... results) throws Throwable {
 	    			</screen>
 	    		</para>
 	    	</sect3>
+	    	<para>
+	    		This conclude the job creation using XML descriptor. Let's see now how to create tasks and jobs
+	    		using the java API.
+	    	</para>
 	    </sect2>
 	    
 	</sect2>
@@ -876,7 +1018,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	aTask.setPreScript(script);
 	//If the script to use is in a java string for example
 	Script script = new SimpleScript("Script_content", "type_of_language");
-	//where type_of_language can be any langage supported by teh underlying JRE
+	//where type_of_language can be any language supported by the underlying JRE
 	aTask.setPreScript(script);
 		      					</programlisting>
 		      				</listitem>
