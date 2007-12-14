@@ -42,10 +42,14 @@ import org.objectweb.proactive.core.util.TimeoutAccounter;
 
 
 /**
- * This class provides wait primitives on futures, as well as the event programming interface.
+ * This class provides wait primitives on a future or on a Vector of futures.
+ * It also provides an event mechanism that allows to associate a method execution
+ * with a future update.
+ * Finally, it also provides a way to explicitely monitor an active object from which a 
+ * result is awaited.
  *
  * @author The ProActive Team
- * @since ProActive 3.9 (November 2007)
+ * @since ProActive 3.9 (December 2007)
  */
 @PublicAPI
 public class PAFuture {

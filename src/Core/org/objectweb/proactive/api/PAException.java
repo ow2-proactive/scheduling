@@ -41,9 +41,10 @@ import org.objectweb.proactive.core.mop.StubObject;
 
 /**
  * This class provides a mechanism to handle exceptions in asynchronous calls.
- *
+ * It also provide static methods that test if a future contains or not an exception.
+ * @see org.objectweb.proactive.api.PAFuture
  * @author The ProActive Team
- * @since ProActive 3.9 (November 2007)
+ * @since ProActive 3.9 (December 2007)
  */
 @PublicAPI
 public class PAException {

@@ -82,10 +82,14 @@ import org.objectweb.proactive.core.util.profiling.Profiling;
 
 
 /**
- * This class provides the main operations on active objects.
+ * This class provides the main operations on active objects. 
+ * It allows to create and terminate an active object, and to get a reference on it.
+ * It also provides methods to register and lookup an active object through the network.
+ * Finally, it allows to control the synchronicity related behaviour of an active object 
+ * such as automatic continuation or immediate services.
  *
  * @author The ProActive Team
- * @since ProActive 3.9 (November 2007)
+ * @since ProActive 3.9 (December 2007)
  */
 @PublicAPI
 public class PAActiveObject {

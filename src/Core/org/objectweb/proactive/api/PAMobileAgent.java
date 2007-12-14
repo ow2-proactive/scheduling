@@ -45,10 +45,10 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * This class provides methods to migrate active objects.
+ * This class provides several ways to migrate active objects.
  *
  * @author The ProActive Team
- * @since ProActive 3.9 (November 2007)
+ * @since ProActive 3.9 (December 2007)
  */
 @PublicAPI
 public class PAMobileAgent {

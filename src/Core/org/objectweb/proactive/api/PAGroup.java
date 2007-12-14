@@ -58,9 +58,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 /**
  * This class is the entry point to groups in ProActive.
+ * It allows to create a typed group by several different ways.
+ * It also allows to control the behavior of a group, such as parameters scattering.
  *
  * @author The ProActive Team
- * @since ProActive 3.9 (November 2007)
+ * @since ProActive 3.9 (December 2007)
  */
 @PublicAPI
 public class PAGroup {

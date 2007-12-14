@@ -54,10 +54,12 @@ import org.objectweb.proactive.core.xml.VariableContract;
 
 
 /**
- * This class provides entry points to deployment descriptors and the registration of virtual nodes.
+ * This class provides entry points to deployment descriptors.
+ * It allows to create a ProActive Descriptor from an XML file.
+ * It also allows to register and lookup a virtual node.
  *
  * @author The ProActive Team
- * @since ProActive 3.9 (November 2007)
+ * @since ProActive 3.9 (December 2007)
  */
 @PublicAPI
 public class PADeployment {

@@ -50,9 +50,9 @@ import org.objectweb.proactive.core.node.NodeException;
 
 /**
  * This class provides the creation methods for components.
- *
+ * It allows to create a component.
  * @author The ProActive Team
- * @since ProActive 3.9 (November 2007)
+ * @since ProActive 3.9 (December 2007)
  */
 @PublicAPI
 public class PAComponent {
