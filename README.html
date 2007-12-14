@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+  <meta content="text/html; charset=ISO-8859-2"
+ http-equiv="content-type">
+  <title>ProActive README</title>
+</head>
+<!--<div align="center">
+<img src="docs/html/images/ProActiveLogo.png" alt="ProActive"/></div><br></br>-->
+
+<body>
+Thanks for your interest in <span style="font-weight: bold;">ProActive</span>.<br>
+<br>
+<span style="font-weight: bold;">ProActive $ID:2007-08-30$<br>
+<br>
+</span>You can find the documentation of ProActive in the docs
+directory:<br>
+
+<ul>
+  <li><a href="docs/pdf/ProActiveManual.pdf">Offline Documentation
+in PDF format</a></li>
+</ul>
+<ul>
+  <li><a href="http://proactive.inria.fr/$ID$/html/index.html">Online Manual</a> <br>
+  </li>
+</ul>
+<ul>
+  <li><a href="http://proactive.inria.fr/$ID$/api/index.html">Online Public API documentation</a></li>
+</ul>
+
+<ul>
+  <li><a href="http://proactive.inria.fr/$ID$/api.complete/index.html">Online Complete API documentation</a></li>
+</ul>
+
+<br>
+In order to start experimenting with <span style="font-weight: bold;">ProActive:
+<br>
+</span>
+<ul>
+  <li>Set <span style="font-weight: bold;">JAVA_HOME</span>
+environment variable to the directory where 1.5 or greater JDK is
+installed</li>
+</ul>
+<ul>
+  <li>
+    <p>Run the examples by going in the scripts directory
+(<span style="font-weight: bold;">scripts/&lt;platform&gt;</span>) and
+launching the suitable scripts for your
+platform.</p>
+    <p>For instance:</p>
+    <ul>
+      <li>
+        <p>Under <span style="font-weight: bold;">Linux:</span><br>
+export JAVA_HOME=&lt;JDK_INSTALL_PATH&gt; (Bash syntax)<br>
+cd scripts/unix<br>
+./c3d_one_user.sh<br>
+If you get a "permission denied" when running scripts, check the
+permissions of the scripts and change them accordingly.<br>
+chmod -R 755 .<br>
+Check also that "." in in your PATH, otherwise you can add it with
+"export PATH=.:$PATH" (Bash syntax)<br>
+        </p>
+      </li>
+      <li>
+        <p>Under <span style="font-weight: bold;">Windows:</span><br>
+set JAVA_HOME=&lt;JDK_INSTALL_PATH&gt;<br>
+cd scripts\windows<br>
+c3d_one_user.bat<br>
+        </p>
+      </li>
+    </ul>
+  </li>
+</ul>
+<br>
+It is also possible to modify the examples by editing the code located
+in <span style="font-weight: bold;">src/org/objectweb/proactive/examples</span>.<br>
+<ul>
+  <li>
+    <p>Under <span style="font-weight: bold;">Linux:</span><br>
+cd compile<br>
+./build <span style="font-weight: bold;">examples</span>&nbsp; (check
+that the build script has executable
+permission)</p>
+  </li>
+  <li>
+    <p>Under <span style="font-weight: bold;">Windows:</span><br>
+cd compile<br>
+build.bat <span style="font-weight: bold;">examples </span><br>
+    </p>
+  </li>
+</ul>
+<br>
+If you want to <span style="font-weight: bold;">compile </span>all
+sources and generate all jar files (might be useful with SVN version):
+<br>
+<ul>
+  <li>
+    <p>Under <span style="font-weight: bold;">Linux:</span><br>
+cd compile<br>
+./build <span style="font-weight: bold;">deploy</span>&nbsp; (check that
+the build script has executable
+permission) <br>
+    </p>
+  </li>
+  <li>
+    <p>Under <span style="font-weight: bold;">Windows:</span><br>
+cd compile<br>
+build.bat <span style="font-weight: bold;">deploy</span><br>
+    </p>
+  </li>
+</ul>
+<br>
+If you want only to compile all <span style="font-weight: bold;">sources
+</span> (and not the jar files):
+<br>
+<ul>
+  <li>
+    <p>Under <span style="font-weight: bold;">Linux:</span><br>
+cd compile<br>
+./build <span style="font-weight: bold;">compile</span>&nbsp; (check
+that the build script has executable
+permission) <br>
+    </p>
+  </li>
+  <li>
+    <p>Under <span style="font-weight: bold;">Windows:</span><br>
+cd compile<br>
+build.bat <span style="font-weight: bold;">compile</span><br>
+    </p>
+  </li>
+</ul>
+<br>
+If you have any problems or questions when using ProActive feel free to
+contact us at <a href="mailto:proactive@objectweb.org">proactive@objectweb.org</a> 
+<br>
+Enjoy ProActive !<br>
+<br>
+</body>
+</html>
