@@ -7,15 +7,7 @@
 	<target name="-compile">
 		<if>
 			<bool>
-				<or>
-					<contains string="${java.version}" substring="1.6"/>
-					<contains string="${java.version}" substring="1.7"/>
-					<and>
-						<available file="${lib.dir}/script-api.jar" />
-						<available file="${lib.dir}/script-js.jar" />
-						<available file="${lib.dir}/js.jar" />
-					</and>
-				</or>
+				<available classname="javax.script.Bindings" classpathref="compile.libs" />
 			</bool>
 			<compile_extension module="resourcemanager" />
 			<else>
