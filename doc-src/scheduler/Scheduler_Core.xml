@@ -459,7 +459,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	
 	      <para>You can start the scheduler using the java API. Supposing
 	      that a Resources Manager is already started (see Resource Manager
-	      documentation <xref linkend="resources_manager" />), this can be done in
+	      documentation <xref linkend="Resource_Manager" />), this can be done in
 	      the following way:</para>
 	
 	      <programlisting lang="java">AdminScheduler.createScheduler(
@@ -1694,11 +1694,21 @@ public Object execute(TaskResult... results) throws Throwable {
 	          It means we can have a Node source which manages nodes deployed by a ProActive descriptor, 
 	          one for nodes acquired from a Peer to peer infrastructure, and another for nodes acquired from a cluster.</listitem> 
 		</itemizedlist>
+      <figure id="RM_architecture">
+        <title>resource Manager architecture</title>
+        <mediaobject>
+          <imageobject>
+            <imagedata align="center"
+                       fileref="scheduler/pics/core/rm_overview.jpg"
+                       format="JPG" />
+          </imageobject>
+        </mediaobject>
+      </figure>
 	</sect2>
-<sect2 id="nodes_sources">
-	<title>Static Node Source and Dynamic Node Source</title>
-		<para>Node Sources objects are aimed to acquire nodes for the RM, there are two kinds of Node Sources :</para>
-		<itemizedlist>
+	<sect2 id="nodes_sources">
+		<title>Static Node Source and Dynamic Node Source</title>
+			<para>Node Sources objects are aimed to acquire nodes for the RM, there are two kinds of Node Sources :</para>
+			<itemizedlist>
 	          <listitem><emphasis>Static Node Source</emphasis> defined for deploying and acquiring nodes by a ProActive descriptor. 
 	          All nodes handled by the source are kept permanently by the Resource Manager, 
 	          i.e until the termination of the RM or if Administrator ask to remove some of them.</listitem>
@@ -1715,7 +1725,7 @@ public Object execute(TaskResult... results) throws Throwable {
 			</itemizedlist>
 	</sect2>
  <sect2 id="nodes_states">
-	<title>nodes states</title>
+	<title>Nodes states</title>
 		<para>Resource Manager has to maintain states of its handled nodes, here the different nodes states : </para>
 		<itemizedlist>
 	          <listitem><emphasis>Free</emphasis> Node is available, and there is no task launched on it. 
@@ -1736,6 +1746,20 @@ public Object execute(TaskResult... results) throws Throwable {
 		 Descriptor is deployed and nodes added to the RM by a static Node Source at the RM's startup.
 		</listitem>
     </itemizedlist>
+<para>You can also start Resource Manager using the java API. Resource Manager can be started with static functions
+of RMFactory class. Here a short sample of RM instantiation with deployment of a ProActive descriptor. Nodes deployment is asked
+to RMAdmin object :</para>
+<programlisting lang="java">
+        RMFactory.startLocal(); //creates Resource Manager components 
+        RMAdmin admin = RMFactory.getAdmin(); //get RMAdmin object
+
+        //creates ProActive Descriptor object from an xml file 
+        ProActiveDescriptor pad = PADeployment.getProactiveDescriptor("myDescriptor.xml");
+        
+        //Ask to RMAdmin component to deploy the ProActive Descriptor
+        //and add deployed nodes to the RM
+        admin.addNodes(pad);
+</programlisting>
  	</sect2>
   </sect1>
 </chapter>
