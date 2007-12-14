@@ -67,7 +67,6 @@
 <!ENTITY glossary SYSTEM "glossary.xml">
 <!ENTITY reference SYSTEM "definitions.xml">
 <!ENTITY ProActive_Scheduler SYSTEM "scheduler/Scheduler_Core.xml">
-<!ENTITY Scheduler_Matlab SYSTEM "scheduler/Scheduler_Matlab_Ext.xml">
 
 ]>
 <book>
@@ -150,7 +149,6 @@
     &IC2D_EclipsePlugin;
     &scilab;
     &TimIt;
-    &Scheduler_Matlab;
    </part>
  
    <part id="ExtendingProActive">
