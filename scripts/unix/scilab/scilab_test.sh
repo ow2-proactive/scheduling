@@ -14,7 +14,7 @@ echo
 echo --- Scilab Test ---
 
 echo --- Test 1 ---
-$JAVACMD org.objectweb.proactive.ext.scilab.test.SciTest1
+$JAVACMD org.objectweb.proactive.extensions.scilab.test.SciTest1
 
 #echo --- Test 2 ---
 #$JAVACMD org.objectweb.proactive.ext.scilab.test.SciTest2 ScilabVN ProActiveScilab.xml
