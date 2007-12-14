@@ -73,10 +73,9 @@
           </listitem>-->
         </itemizedlist></para>
 
-      <para>A finished Job contains a result, which in turn contains all of
-      its tasks' results. However, it is possible to mark as  <emphasis
-      role="bold">precious</emphasis> the tasks which result is significant for the global Job result. The user can 
-      then retreive easily only those results.
+      <para>A finished Job contains a result, which in term contains all of
+      its tasks' results. However, it is possible to mark some task as  <emphasis
+      role="bold">precious</emphasis> in order to retrieve their result easily in the job result.
       In the event of a failure, the finished
       Job contains the cause exceptions. Further details on how to
       create a Job and the different options can be found in: <xref
@@ -123,10 +122,6 @@
 
       <para>Dependencies between Tasks can also be defined; this apsect is detailed in
       <xref linkend="how_dependences" />.</para>
-
-      <para>The result of a Task can be marked as <emphasis
-      role="bold">precious</emphasis>, to make it available in the Job
-      Result.</para>
     </sect2>
 
     <sect2 id="how_dependences">
