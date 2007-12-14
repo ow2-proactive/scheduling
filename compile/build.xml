@@ -593,26 +593,32 @@
 		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
 		<zip destfile="${release.dir}/ProActive-bin_${version}.zip">
 			<fileset dir="${base.dir}">
-				<include name="dist/**" />
+				<include name="dist/**"/>
+				<exclude name="dist/**/*.sh"/>
+				
 				<include name="docs/pdf/**" />
 				<include name="descriptors/**" />
-				<include name="scripts/**" />
 
 				<include name="LICENSE.txt" />
 				<include name="README.txt" />
 			</fileset>
+			<zipfileset dir="${base.dir}" filemode="755">
+				<include name="scripts/**" />
+				<include name="dist/**/*.sh"/>
+			</zipfileset>
 		</zip>
 	</target>
 
-	<target name="release.src" depends="-release.mkdir, docs" description="Source Release: sources + docs">
+	<target name="release.src" depends="-release.mkdir, manualPdf" description="Source Release: sources + docs">
 		<zip destfile="${release.dir}/ProActive-src_${version}.zip">
 			<fileset dir="${base.dir}">
 				<include name="compile/**"/>
+				<exclude name="compile/build"/>
+
 				<include name="descriptors/**"/>
 				<include name="docs/pdf/**"/>
 				<include name="lib/**"/>
 				<include name="daemon/**"/>
-				<include name="scripts/**"/>
 				<include name="src/**"/>
 
 				<include name="ic2d-plugins-src/**"/>
@@ -622,6 +628,10 @@
 				<include name="LICENSE.txt" />
 				<include name="README.txt" />
 			</fileset>
+			<zipfileset dir="${base.dir}" filemode="755">
+				<include name="scripts/**" />
+				<include name="compile/build"/>
+			</zipfileset>
 		</zip>
 	</target>
 
