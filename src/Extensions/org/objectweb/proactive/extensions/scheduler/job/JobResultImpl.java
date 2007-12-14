@@ -109,7 +109,7 @@ public class JobResultImpl implements JobResult {
                 preciousResults = new HashMap<String, TaskResult>();
             }
 
-            allResults.put(taskName, taskResult);
+            preciousResults.put(taskName, taskResult);
         }
 
         //exceptionResults
