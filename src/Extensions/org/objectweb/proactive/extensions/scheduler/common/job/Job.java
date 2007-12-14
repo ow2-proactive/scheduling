@@ -52,7 +52,7 @@ import org.objectweb.proactive.extensions.scheduler.common.scheduler.UserSchedul
  *
  * @author jlscheef - ProActiveTeam
  * @version 3.9, Sept 13, 2007
- * @since ProActive 3.2
+ * @since ProActive 3.9
  */
 @PublicAPI
 public abstract class Job implements Serializable {

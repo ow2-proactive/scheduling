@@ -45,14 +45,52 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public enum SchedulerEvent {
-    IMMEDIATE_PAUSED("schedulerImmediatePausedEvent"), RESUMED("schedulerResumedEvent"), SHUTDOWN(
-            "schedulerShutDownEvent"), SHUTTING_DOWN("schedulerShuttingDownEvent"), STARTED(
-            "schedulerStartedEvent"), STOPPED("schedulerStoppedEvent"), KILLED("schedulerKilledEvent"), JOB_KILLED(
-            "jobKilledEvent"), JOB_PAUSED("jobPausedEvent"), JOB_PENDING_TO_RUNNING(
-            "jobPendingToRunningEvent"), JOB_RESUMED("jobResumedEvent"), JOB_SUBMITTED("jobSubmittedEvent"), JOB_RUNNING_TO_FINISHED(
-            "jobRunningToFinishedEvent"), JOB_REMOVE_FINISHED("jobRemoveFinishedEvent"), TASK_PENDING_TO_RUNNING(
-            "taskPendingToRunningEvent"), TASK_RUNNING_TO_FINISHED("taskRunningToFinishedEvent"), JOB_CHANGE_PRIORITY(
-            "jobChangePriorityEvent"), PAUSED("schedulerPausedEvent");
+
+    /** The scheduler has just been paused, this pause will stop every process except the running one. */
+    IMMEDIATE_PAUSED("schedulerImmediatePausedEvent"),
+
+    /** The scheduler has just been resumed. */
+    RESUMED("schedulerResumedEvent"), SHUTDOWN("schedulerShutDownEvent"),
+
+    /** The scheduler is shutting down. */
+    SHUTTING_DOWN("schedulerShuttingDownEvent"),
+
+    /** The scheduler has just been started. */
+    STARTED("schedulerStartedEvent"),
+    /** The scheduler has just been stopped. Every jobs will be stopped and running tasks will finished. */
+    STOPPED("schedulerStoppedEvent"),
+    /** The scheduler has just been killed. */
+    KILLED("schedulerKilledEvent"),
+    /** A job has just been killed. */
+    JOB_KILLED("jobKilledEvent"),
+    /** A job has just been paused. It will finished the running task. */
+    JOB_PAUSED("jobPausedEvent"),
+
+    /** A job has just been scheduled. At least one of its task is running. */
+    JOB_PENDING_TO_RUNNING("jobPendingToRunningEvent"),
+
+    /** A job has just been resumed. */
+    JOB_RESUMED("jobResumedEvent"),
+    /** A job has just been submitted. */
+    JOB_SUBMITTED("jobSubmittedEvent"),
+
+    /** A job has just finished. All tasks are finished. */
+    JOB_RUNNING_TO_FINISHED("jobRunningToFinishedEvent"),
+
+    /** A job has just been removed from scheduler. */
+    JOB_REMOVE_FINISHED("jobRemoveFinishedEvent"),
+
+    /** A task has just been scheduled. It is now running. */
+    TASK_PENDING_TO_RUNNING("taskPendingToRunningEvent"),
+
+    /** A task has just finished. */
+    TASK_RUNNING_TO_FINISHED("taskRunningToFinishedEvent"),
+
+    /** The priority of a job has just been change. */
+    JOB_CHANGE_PRIORITY("jobChangePriorityEvent"),
+
+    /** The scheduler has just been paused. Every running job will be finished. */
+    PAUSED("schedulerPausedEvent");
     private String methodName;
 
     /**
