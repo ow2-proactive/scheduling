@@ -66,24 +66,20 @@ a:hover   {
 	text-decoration:none; 
 }
 h1 {
-	font-size:19px;
+	font-size:23px;
 	font-weight:bold;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 h2 {
-	color:white;
-	font-size:17px;
+	font-size:19px;
 	font-weight:bold;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	background-color:#282d60;
 	
 }
 h3 {
-	color:white;
-	font-size:14px;
+	font-size:17px;
 	font-weight:bold;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	background-color:#282d60;
 	
 }
 h4 {
