@@ -117,8 +117,6 @@ public class JobsOutputController {
     public void createJobOutput(JobId jobId) {
         try {
             if (!showJobOutput(jobId)) {
-                SchedulerProxy.getInstance().listenLog(jobId, Activator.getHostname(),
-                        Activator.getListenPortNumber());
                 JobOutputAppender joa = new JobOutputAppender(new JobOutput(PREFIX_JOB_OUTPUT_TITLE + jobId));
                 joa.setLayout(Log4JTaskLogs.DEFAULT_LOG_LAYOUT);
                 Logger log = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + jobId);
@@ -127,6 +125,8 @@ public class JobsOutputController {
                 log.removeAllAppenders();
                 log.addAppender(joa);
                 appenders.put(jobId, joa);
+                SchedulerProxy.getInstance().listenLog(jobId, Activator.getHostname(),
+                        Activator.getListenPortNumber());
                 showJobOutput(jobId);
             }
         } catch (Exception e) {
