@@ -2835,7 +2835,7 @@ to RMAdmin object :</para>
                 We'll write a simple Scilab job example. This example will assume that you are familiar with the example in <xref linkend="Scheduler_Matlab_More_Complex"/>. This example will compute the numerical
         integration of sin(x) between 0 and PI.
             </para>
-            <sect3 id="Scheduler_Matlab_Installation_Prerequisite">
+            <sect3 id="Scheduler_Scilab_Installation_Prerequisite">
                 <title>Installation</title>
                 <para>
                     Before starting to use the Scilab interface, you
