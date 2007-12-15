@@ -1,6 +1,6 @@
-ProActive GUI for Matlab/Scilab.
+ProActive Scheduler's Scilab extension installing guide.
 
-Before being able to use the extension and launch the GUI (scilab.sh or scilab.bat), please follow these installations steps.
+Before being able to use the extension and run Scilab scripts on the scheduler, please follow these installations steps.
 
 ---------------------------------------------  SCILAB --------------------------------------------------
 For every machines that you will be using:
@@ -43,42 +43,19 @@ Under linux, wou will have to run the following command on the Scilab directory 
 
 > make install
 
----------------------------------------------- MATLAB ---------------------------------------------------
-For every machines that you will be using:
-
-STEP 1: If you plan to use Matlab, you must have Matlab installed and a valid licence.
-
-STEP 2: IMPORTANT ! you need to compile and install Matlab Java Interface libraries, in order to do that, follow the guidelines in PROACTIVE/scripts/unix/matlab/README
- 
-
---------------------------------------------- For Both ---------------------------------------------------
-STEP 3:
-Edit paths to your SCILAB installation in the scilab_env.sh or scilab_env.bat file
-
-Comment out the following line if present in the SCILAB/scilab.star file (should be around line 190):
-show_startupinfo();
-
-To comment out just insert "//" in the beginning of the line like in Java.  
-
-STEP 4:
-If you use a source version of ProActive, compile ProActive by the following (PROACTIVE refers to the directory where you installed ProActive):
-> cd PROACTIVE/scripts/[unix|windows]/scilab
-> build.[sh|bat] compile
-
-STEP 5: 
-Read documentation on http://proactive.inria.fr/scilab.htm on how to use the GUI
-
-Edit paths inside the ProActiveScilab.xml descriptor if you want to use it to deploy on remote machines, if you want to deploy locally use the ProActiveScilabLocal.xml descriptor
-
-
-STEP 6:
-Run scilab.sh or scilab.bat. 
 
 
 
-ATTENTION :
 
-If you want to use the extension without the script, remember that the environment variables of the JVM used to launch Scilab/Matlab engines must be set according to the scilab_env.[sh|bat] script
+
+
+
+
+
+
+
+
+
 
  
 
