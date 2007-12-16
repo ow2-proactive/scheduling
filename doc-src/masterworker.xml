@@ -341,7 +341,21 @@
 
     <sect1 id="ms_api">
         <title>The API Details</title>
-
+        <sect2>
+        	<title>Before using the API</title>
+        	<para>
+        		Before using the Master/Worker, launch the examples, or
+        		write your own code, it is very useful to enable the
+        		maximum logging information to have a deeper look at how
+        		the API works. In order to do that you'll need to add
+        		the following lines in the proactive-log4j file that you
+        		are using:
+        	</para>
+        	<screen>
+        		log4j.logger.proactive.masterworker = DEBUG
+        		log4j.additivity.proactive.masterworker = false
+        	</screen>
+        </sect2>
         <sect2>
             <title>Master creation and deployment</title>
 
@@ -745,6 +759,39 @@
      */
     void setPingPeriod(long periodMillis);]]></programlisting>
             </sect3>
+            <sect3>
+            	<title>Task flooding</title>
+            	<para>
+            		The Master/Worker API's internal scheduling
+            		mechanism is quite simple. It's is based on a
+            		pulling strategy. When a worker has no more task to
+            		run, it asks the master for new tasks. The master
+            		usually gives a worker one task at the time, except
+            		the first time the worker asks for task and each
+            		time the worker has no more task to compute. In this
+            		case, the master will do a
+            		<emphasis>flooding</emphasis>
+            		, it will give to worker as many tasks as the
+            		configurable parameter of the same name. The default
+            		value of this parameter is 2, as it is expected to
+            		have at least twice as many tasks as workers. This
+            		mechanism is meant to avoid having idle workers
+            		waiting for new tasks all the time. The value of the
+            		flooding parameter should depend on how big your
+            		tasks are. A lot of small tasks should lead to a
+            		high flooding value (>10) where a small number of
+            		big tasks should lead to a small value (1-5).
+            	</para>
+            	<para>
+            	The method of the API to change the flooding parameter is the following: 
+            	</para>
+            	<programlisting lang="java"><![CDATA[    /**
+     * Sets the number of tasks initially sent to each worker
+     * default is 2 tasks
+     * @param number_of_tasks number of task to send
+     */
+    void setInitialTaskFlooding(final int number_of_tasks);]]></programlisting>
+            </sect3>
         </sect2>
         <sect2 id="ms_Workermemory">
             <title>Using the Worker Memory</title>
@@ -754,8 +801,9 @@
                     The Worker Memory principle is to allow users to
                     store and retrieve data from a
                     <emphasis>Worker's address space</emphasis>
-                    . The typical use case is when one uses the Master/Worker API to compute an iterative process. An
-                    iterative process consists generally of an
+                    . The typical use case is when one uses the
+                    Master/Worker API to compute an iterative process.
+                    An iterative process consists generally of an
                     initialization step 0, followed by n computation
                     steps, where step n needs the results of step n-1.
                     The initialization steps often requires that a large
@@ -764,7 +812,18 @@
                     would be lost at each step of the iteration, which
                     means that the initialization step 0 needs to be
                     done at step 1,2, ... n, etc...
-
+                </para>
+                <para>
+                	The Worker Memory let you send, when workers are
+                	initialized, an initial memory. Later on, when tasks
+                	are executed, workers can have access to their
+                	memory and save or load data from it. Please note that
+                	this memory is not at all what is called a "shared
+                	memory". A shared memory would mean that the SAME
+                	memory would be shared by all workers. Here, each
+                	worker has its own private memory, and if a worker
+                	modifies its memory, the memory of other workers
+                	won't be affected.
                 </para>
             </sect3>
             <sect3>
