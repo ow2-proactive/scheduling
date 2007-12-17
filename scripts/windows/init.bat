@@ -26,10 +26,10 @@ IF DEFINED CLASSPATHEXT (
 IF EXIST "%PROACTIVE%\classes" ( 
 	SET CLASSPATH=%CLASSPATH%;%PROACTIVE%\classes\Core;%PROACTIVE%\classes\Extensions;%PROACTIVE%\classes\Extra;%PROACTIVE%\classes\Examples;%PROACTIVE%\classes\IC2D-old
 	SET JARS=%PROACTIVE%\lib\
-	FOR %%j IN (%PROACTIVE%\lib\*.jar) DO SET JARS=!JARS!;%%j
+	FOR %%j IN ("%PROACTIVE%\lib\*.jar") DO SET JARS=!JARS!;%%j
 ) ELSE (
 	SET JARS=%PROACTIVE%\dist\lib\
-	FOR %%j IN (%PROACTIVE%\dist\lib\*.jar) DO SET JARS=!JARS!;%%j
+	FOR %%j IN ("%PROACTIVE%\dist\lib\*.jar") DO SET JARS=!JARS!;%%j
 )
 
 SET CLASSPATH=%CLASSPATH%;%JARS%
