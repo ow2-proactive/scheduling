@@ -585,36 +585,51 @@
 	-->
 
 	<target name="-release.mkdir">
-		<!-- Make release directories -->
+
+		 <!-- Make release directories -->
 		<mkdir dir="${release.dir}" />
 	</target>
 
 	<target name="release.bin" depends="deploy.all, manualPdf, -release.mkdir" description="Binary Release: dist + docs">
-		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
-		<zip destfile="${release.dir}/ProActive-bin_${version}.zip">
+		<delete dir="${release.dir}/ProActive_${version}"/>
+		<copy todir="${release.dir}/ProActive_${version}">
 			<fileset dir="${base.dir}">
 				<include name="dist/**"/>
-				<exclude name="dist/**/*.sh"/>
-				
+				<include name="scripts/**" />
+					
 				<include name="docs/pdf/**" />
 				<include name="descriptors/**" />
 
 				<include name="LICENSE.txt" />
 				<include name="README.txt" />
+				<include name="README.html" />
+			</fileset>			
+		</copy>
+			
+		<tar destfile="${release.dir}/ProActive-bin_${version}.tar">
+			<fileset dir="${release.dir}">
+				<include name="ProActive_${version}/**"/>
 			</fileset>
-			<zipfileset dir="${base.dir}" filemode="755">
-				<include name="scripts/**" />
-				<include name="dist/**/*.sh"/>
-			</zipfileset>
+		</tar>	
+
+			<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
+		
+		<zip destfile="${release.dir}/ProActive-bin_${version}.zip">
+			<tarfileset src="${release.dir}/ProActive-bin_${version}.tar"/>
 		</zip>
+		
+		<bzip2 
+			src="${release.dir}/ProActive-bin_${version}.tar" 
+			destfile="${release.dir}/ProActive-bin_${version}.tar.bz2"/>
 	</target>
 
 	<target name="release.src" depends="-release.mkdir, manualPdf" description="Source Release: sources + docs">
-		<zip destfile="${release.dir}/ProActive-src_${version}.zip">
+		<delete dir="${release.dir}/ProActive_${version}" />
+		<copy todir="${release.dir}/ProActive_${version}">
 			<fileset dir="${base.dir}">
 				<include name="compile/**"/>
-				<exclude name="compile/build"/>
-
+				<include name="scripts/**" />
+				
 				<include name="descriptors/**"/>
 				<include name="docs/pdf/**"/>
 				<include name="lib/**"/>
@@ -627,12 +642,23 @@
 
 				<include name="LICENSE.txt" />
 				<include name="README.txt" />
+				<include name="README.html" />
 			</fileset>
-			<zipfileset dir="${base.dir}" filemode="755">
-				<include name="scripts/**" />
-				<include name="compile/build"/>
-			</zipfileset>
+		</copy>
+		
+		<tar destfile="${release.dir}/ProActive-src_${version}.tar">
+			<fileset dir="${release.dir}">
+				<include name="Proactive_${version}/**"/>
+			</fileset>
+		</tar>
+		
+		<zip destfile="${release.dir}/ProActive-src_${version}.zip">
+			<tarfileset src="${release.dir}/ProActive-src_${version}.tar"/>
 		</zip>
+		
+		<bzip2 
+			src="${release.dir}/ProActive-bin_${version}.tar" 
+			destfile="${release.dir}/ProActive-bin_${version}.tar.bz2"/>
 	</target>
 
 
