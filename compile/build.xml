@@ -583,9 +583,10 @@
 	</target>
 
 	<target name="release.bin" depends="deploy.all, manualPdf, -release.mkdir" description="Binary Release: dist + docs">
-		<delete dir="${release.dir}/ProActive_${version}" />
-		<copy todir="${release.dir}/ProActive_${version}">
-			<fileset dir="${base.dir}">
+		<tar destfile="${release.dir}/ProActive-bin_${version}.tar">
+			<tarfileset 
+				dir="${base.dir}"
+				prefix="ProActive_${version}">
 				<include name="dist/**" />
 				<include name="scripts/**" />
 
@@ -595,13 +596,7 @@
 				<include name="LICENSE.txt" />
 				<include name="README.txt" />
 				<include name="README.html" />
-			</fileset>
-		</copy>
-
-		<tar destfile="${release.dir}/ProActive-bin_${version}.tar">
-			<fileset dir="${release.dir}">
-				<include name="ProActive_${version}/**" />
-			</fileset>
+			</tarfileset>
 		</tar>
 
 		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
@@ -614,9 +609,10 @@
 	</target>
 
 	<target name="release.src" depends="-release.mkdir, manualPdf" description="Source Release: sources + docs">
-		<delete dir="${release.dir}/ProActive_${version}" />
-		<copy todir="${release.dir}/ProActive_${version}">
-			<fileset dir="${base.dir}">
+		<tar destfile="${release.dir}/ProActive-src_${version}.tar">
+			<tarfileset 
+				dir="${base.dir}"
+				prefix="ProActive_${version}">
 				<include name="compile/**" />
 				<include name="scripts/**" />
 
@@ -633,13 +629,8 @@
 				<include name="LICENSE.txt" />
 				<include name="README.txt" />
 				<include name="README.html" />
-			</fileset>
-		</copy>
+			</tarfileset>
 
-		<tar destfile="${release.dir}/ProActive-src_${version}.tar">
-			<fileset dir="${release.dir}">
-				<include name="Proactive_${version}/**" />
-			</fileset>
 		</tar>
 
 		<zip destfile="${release.dir}/ProActive-src_${version}.zip">
