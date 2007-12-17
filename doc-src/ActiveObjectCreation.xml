@@ -1942,14 +1942,15 @@
 			</para>
 
 			<para>
-				Automatic continuations allows for using 
-				still not updated future in the normal program flow without 
-				blocking to wait for updating the result in the future.  
+				Automatic continuations allows using 
+				non-updated futures in the normal program flow without 
+				blocking to wait for updating the result contained in the future.  
 								
 				When the result is available on the object
 				that originated the creation of the future, this object
 				updates the result in all the objects to which it passed
-				the future.
+				the future. If the objects passed the future further they 
+				will updated the value in the corresponding objects. 
 			</para>
 	
 		<sect2>
@@ -1980,7 +1981,7 @@
 						static table the destination
 						<literal>Destination</literal>
 						registered for the thread
-						<literal>Thread</literal>>.
+						<literal>Thread</literal>.
 						 If it finds a destination for the future, the future notifies the
 						<literal>FuturePool</literal>
 						that it is going to leave, which in turn
@@ -2005,35 +2006,27 @@
 						future in the
 						<emphasis role="bold">FuturePool</emphasis>
 						to be able to update it when the value will be
-						available. This registration takes place in two
-						steps:
-					</para>
-							<para>
-								When the future is deserialized, it
-								registers in a static table 
+						available.
+						<!-- TODO //Ambigous needs to be exapanded-->
+						After the future is deserialized, it is 
+								registered in a static table 
 								<literal>
-									FuturePool.incomingFutures
-								</literal>>
+									FuturePool.incomingFutures</literal>.
 							</para>
-							<para>
-								In Receive [Request-Reply] method, it is
-								checked if one or many futures are
-								registered in that table, then, if true
-								these futures are registered in the
-								<emphasis role="bold">
-									FuturePool
-								</emphasis>
-								in a standard way. 
-								<!-- //TODO WHAT THE HELL ? -->
-							</para>
+							
 		</sect2>
 
-		<sect2>
-			<title>Example</title>
 
-			<para>
+
+		<sect2>
+			<title>Illustration of an Automatic Continuation</title>
+
+			<indexterm>
+				<primary>Automatic Continuation</primary>
+			</indexterm>
+						<para>
 				To illustrate how automatic continuation takes place we will use three classes:
-				<literal>A</literal>,<literal>B</literal>, and <literal>Worker</literal>. The
+				<literal>A</literal>, <literal>B</literal>, and <literal>Worker</literal>. The
 				 <literal>A</literal> and <literal>B</literal> classes are used to instantiate passive
 				 objects and the <literal> Worker </literal> class is used to instantiate an active object.
 				 The <literal>Worker</literal> class has a <literal> foo() </literal> method and the
@@ -2052,14 +2045,8 @@
 			<para>and</para>
 
 			<programlisting lang="java"><textobject><textdata fileref="code_snippets/futurePasserClassB.txt"></textdata></textobject></programlisting>
-		</sect2>
-
-		<sect2>
-			<title>Illustration of an Automatic Continuation</title>
-
-			<indexterm>
-				<primary>Automatic Continuation</primary>
-			</indexterm>
+			
+			
 			<para>
 			We will first call <literal>foo()</literal> on the worker. The call goes through the worker stub
 			and the body proxy and it is placed in the queue of the body. We are using
