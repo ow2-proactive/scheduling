@@ -94,8 +94,6 @@ public class NativeTaskLauncher extends TaskLauncher {
     @Override
     @SuppressWarnings("unchecked")
     public TaskResult doTask(SchedulerCore core, Executable executable, TaskResult... results) {
-        this.initLoggers();
-
         try {
             NativeExecutable toBeLaunched = (NativeExecutable) executable;
 

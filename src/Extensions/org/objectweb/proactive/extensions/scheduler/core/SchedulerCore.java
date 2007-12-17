@@ -637,7 +637,9 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         this.jobsToBeLogged.remove(job.getId());
 
         // remove current running tasks
-        this.currentlyRunningTasks.remove(job.getId());
+        // TODO cdelbe : When a job can be removed on failure ??
+        // Other tasks' logs should remain available...
+        // this.currentlyRunningTasks.remove(job.getId());
 
         //send event to listeners.
         frontend.jobRunningToFinishedEvent(job.getJobInfo());
@@ -658,7 +660,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         InternalJob job = jobs.get(jobId);
 
         InternalTask descriptor = job.getHMTasks().get(taskId);
-        this.currentlyRunningTasks.get(jobId).remove(taskId);
+        // job might have already been removed if job has failed...
+        Hashtable<TaskId, TaskLauncher> runningTasks = this.currentlyRunningTasks.get(jobId);
+        if (runningTasks != null) {
+            runningTasks.remove(taskId);
+        }
         try {
             //The task is terminated but it's possible to have to
             //wait for the future of the task result (TaskResult).
