@@ -6,6 +6,13 @@
   <sect1  id="TypedGroupCommunication_html_overview">
     <title>Overview</title>
 
+	<para>
+		ProActive provides <literal>typed group commu-
+		nication</literal>, meaning that only methods defined on
+		classes or interfaces implemented by members of the group
+		can be called.	
+	</para>
+
     <para>Group communication is a crucial feature for high-performance and
     Grid computing. While previous works and libraries proposed such a
     characteristic (e.g. MPI, or object-oriented frameworks), the use of
