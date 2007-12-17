@@ -24,18 +24,13 @@ goto end
 
 
 :doit
-
-IF  "%1" == "" (
-  SET SCHEDULER_URL=//localhost/SCHEDULER_NODE 
- ) ELSE (
   SET SCHEDULER_URL=%1
-)
 
 SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 
-%JAVA_CMD% -Dproactive.rmi.port=1234 org.objectweb.proactive.extensions.scheduler.AdminCommunicator %SCHEDULER_URL%
+%JAVA_CMD% org.objectweb.proactive.extensions.scheduler.examples.AdminCommunicator %SCHEDULER_URL%
 
 :end
 echo. 

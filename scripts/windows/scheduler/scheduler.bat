@@ -2,6 +2,8 @@
 echo. 
 echo --- Scheduler ---------------------------------------------
 
+echo %count%
+
 rem --- Verifying current directory
 SET COMMAND=%0
 IF NOT "%COMMAND:~-4%" == ".bat" (
@@ -24,9 +26,7 @@ goto end
 
 
 :doit
-
-  SET SCHEDULER_URL=%1
-  SET RM=%2
+  SET RM_URL=%1
 
 
 SETLOCAL ENABLEDELAYEDEXPANSION
@@ -35,7 +35,7 @@ call "%PROACTIVE%\scripts\windows\init.bat"
 
 rem This program will enable you to launch the scheduler daemon
 
-%JAVA_CMD% org.objectweb.proactive.extensions.scheduler.examples.LocalSchedulerExample %SCHEDULER_URL% %RM%
+%JAVA_CMD% org.objectweb.proactive.extensions.scheduler.examples.LocalSchedulerExample  %RM_URL%
 ENDLOCAL
 
 :end

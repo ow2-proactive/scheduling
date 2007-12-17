@@ -24,18 +24,12 @@ goto end
 
 
 :doit
-
-  SET SCHEDULER_URL=%3
-
-SET TASKS=%1
-SET SLEEP=%2
 SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..\..
 call "%PROACTIVE%\scripts\windows\init.bat"
 
-rem This program will enable you to launch the scheduler daemon
 
-%JAVA_CMD% org.objectweb.proactive.examples.scheduler.HelloWorld %TASKS% %SLEEP% %SCHEDULER_URL%
+%JAVA_CMD% org.objectweb.proactive.extensions.scheduler.examples.SimpleHelloWorld
 ENDLOCAL
 
 :end
