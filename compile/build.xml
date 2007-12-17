@@ -16,7 +16,7 @@
 		Imports		
 	-->
 
-	<property file="${user.home}/.proactive/build.properties"/>
+	<property file="${user.home}/.proactive/build.properties" />
 	<import file="common.xml" />
 	<import file="doc.xml" />
 
@@ -57,11 +57,6 @@
 
 	<path id="examples.classpath">
 		<path refid="project.classpath" />
-		<pathelement location="${lib.dir}/clibwrapper_jiio.jar" />
-		<pathelement location="${lib.dir}/jai_codec.jar" />
-		<pathelement location="${lib.dir}/jai_core.jar" />
-		<pathelement location="${lib.dir}/mlibwrapper_jai.jar" />
-		<pathelement location="${lib.dir}/jai_imageio.jar" />
 	</path>
 
 	<!-- Default testsuite can be overriden by using the -Dtest property -->
@@ -96,7 +91,7 @@
 			</fileset>
 		</else>
 	</if>
-		
+
 
 
 
@@ -106,18 +101,18 @@
 		Backward Compatibility		
 	-->
 
-	<target name="compile" depends="compile.all" description="Deprecated, see compile.all"/>
-	<target name="core" depends="compile.core" description="Deprecated, see compile.core"/>
-	<target name="examples" depends="compile.examples" description="Deprecated, see compile.examples"/>
-	<target name="extensions" depends="compile.extensions" description="Deprecated, see compile.extensions"/>
-	<target name="extra" depends="compile.extra" description="Deprecated, see compile.extra"/>
-	<target name="microTimer" depends="compile.microTimer" description="Deprecated, see compile.microTimer"/>
-	<target name="p2p_daemon" depends="compile.p2p_daemon"/>
-	<target name="stubGenerator" depends="compile.stubGenerator" description="Deprecated, see compile.stubGenerator"/>
-	<target name="tests" depends="compile.tests"/>
-	<target name="proActiveJar" depends="deploy" description="Deprecated, see deploy"/>
+	<target name="compile" depends="compile.all" description="Deprecated, see compile.all" />
+	<target name="core" depends="compile.core" description="Deprecated, see compile.core" />
+	<target name="examples" depends="compile.examples" description="Deprecated, see compile.examples" />
+	<target name="extensions" depends="compile.extensions" description="Deprecated, see compile.extensions" />
+	<target name="extra" depends="compile.extra" description="Deprecated, see compile.extra" />
+	<target name="microTimer" depends="compile.microTimer" description="Deprecated, see compile.microTimer" />
+	<target name="p2p_daemon" depends="compile.p2p_daemon" />
+	<target name="stubGenerator" depends="compile.stubGenerator" description="Deprecated, see compile.stubGenerator" />
+	<target name="tests" depends="compile.tests" />
+	<target name="proActiveJar" depends="deploy" description="Deprecated, see deploy" />
 	<target name="all" depends="compile,docs" description="build the class files and the documentation" />
-	<target name="ic2dLibClean" depends="ic2d.libClean" description="Deprecated, see ic2d.libClean"/>
+	<target name="ic2dLibClean" depends="ic2d.libClean" description="Deprecated, see ic2d.libClean" />
 	<target name="ic2dLib" depends="ic2d.libCopy" description="Deprecated, see ic2d.libCopy" />
 
 
@@ -128,10 +123,7 @@
 		Compilation		
 	-->
 
-	<target 
-		name="compile.all" 
-		depends="compile.core, compile.extensions, compile.extra, compile.util, compile.examples, compile.tests" 
-		description="Build class files (ProActive + Extensions + Extra + Examples + Utils + Tests)" />
+	<target name="compile.all" depends="compile.core, compile.extensions, compile.extra, compile.util, compile.examples, compile.tests" description="Build class files (ProActive + Extensions + Extra + Examples + Utils + Tests)" />
 
 
 	<target name="compile.core" depends="-configurationCopy" description="Compile ProActive core classes">
@@ -350,10 +342,10 @@
 			</else>
 		</if>
 		<concat destfile="${compile.dir}/Manifest.mf">
-			<fileset dir="${compile.dir}" includes="Manifest-base.mf"/>
-			<fileset dir="${osgi.manifest.dir}" includes="Manifest.mf"/>	
+			<fileset dir="${compile.dir}" includes="Manifest-base.mf" />
+			<fileset dir="${osgi.manifest.dir}" includes="Manifest.mf" />
 		</concat>
-	
+
 		<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
 			<fileset dir="${cl.proactive.dir}" includes="**" />
 			<fileset dir="${cl.extensions.dir}" includes="**" />
@@ -367,33 +359,33 @@
 			</fileset>
 		</jar>
 
-		<copy todir="${deploy.lib.dir}" >
+		<copy todir="${deploy.lib.dir}">
 			<!-- Copy all libs -->
 			<fileset dir="${lib.dir}">
-				<include name="**/*.jar"/>
-				<include name="**/*.so"/>
+				<include name="**/*.jar" />
+				<include name="**/*.so" />
 			</fileset>
 		</copy>
 
 		<copy todir="${deploy.scripts.dir}">
 			<!-- Copy script needed by legacy delpoyment -->
 			<fileset dir="${base.dir}/scripts">
-				<include name="unix/cluster/**"/>
-				<include name="windows/cluster/**"/>
-				<include name="gcmdeployment/**"/>
+				<include name="unix/cluster/**" />
+				<include name="windows/cluster/**" />
+				<include name="gcmdeployment/**" />
 			</fileset>
 		</copy>
 		<chmod perm="755">
-			<fileset dir="${deploy.scripts.dir}"/>
-				<include name="**/*.sh"/>
+			<fileset dir="${deploy.scripts.dir}" />
+			<include name="**/*.sh" />
 		</chmod>
-		
+
 	</target>
 
 
 	<target name="deploy.examples" depends="examples, deploy" description="Add examples.jar to the dist/ directory">
 		<jar destfile="${deploy.lib.dir}/ProActive_examples.jar">
-			<fileset dir="${cl.examples.dir}"/>
+			<fileset dir="${cl.examples.dir}" />
 		</jar>
 	</target>
 
@@ -586,79 +578,75 @@
 
 	<target name="-release.mkdir">
 
-		 <!-- Make release directories -->
+		<!-- Make release directories -->
 		<mkdir dir="${release.dir}" />
 	</target>
 
 	<target name="release.bin" depends="deploy.all, manualPdf, -release.mkdir" description="Binary Release: dist + docs">
-		<delete dir="${release.dir}/ProActive_${version}"/>
+		<delete dir="${release.dir}/ProActive_${version}" />
 		<copy todir="${release.dir}/ProActive_${version}">
 			<fileset dir="${base.dir}">
-				<include name="dist/**"/>
+				<include name="dist/**" />
 				<include name="scripts/**" />
-					
+
 				<include name="docs/pdf/**" />
 				<include name="descriptors/**" />
 
 				<include name="LICENSE.txt" />
 				<include name="README.txt" />
 				<include name="README.html" />
-			</fileset>			
+			</fileset>
 		</copy>
-			
+
 		<tar destfile="${release.dir}/ProActive-bin_${version}.tar">
 			<fileset dir="${release.dir}">
-				<include name="ProActive_${version}/**"/>
+				<include name="ProActive_${version}/**" />
 			</fileset>
-		</tar>	
+		</tar>
 
-			<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
-		
+		<!-- Zip with Jars: PA, PAExamples, required libs, scripts -->
+
 		<zip destfile="${release.dir}/ProActive-bin_${version}.zip">
-			<tarfileset src="${release.dir}/ProActive-bin_${version}.tar"/>
+			<tarfileset src="${release.dir}/ProActive-bin_${version}.tar" />
 		</zip>
-		
-		<bzip2 
-			src="${release.dir}/ProActive-bin_${version}.tar" 
-			destfile="${release.dir}/ProActive-bin_${version}.tar.bz2"/>
+
+		<bzip2 src="${release.dir}/ProActive-bin_${version}.tar" destfile="${release.dir}/ProActive-bin_${version}.tar.bz2" />
 	</target>
 
 	<target name="release.src" depends="-release.mkdir, manualPdf" description="Source Release: sources + docs">
 		<delete dir="${release.dir}/ProActive_${version}" />
 		<copy todir="${release.dir}/ProActive_${version}">
 			<fileset dir="${base.dir}">
-				<include name="compile/**"/>
+				<include name="compile/**" />
 				<include name="scripts/**" />
-				
-				<include name="descriptors/**"/>
-				<include name="docs/pdf/**"/>
-				<include name="lib/**"/>
-				<include name="daemon/**"/>
-				<include name="src/**"/>
 
-				<include name="ic2d-plugins-src/**"/>
-				<include name="infrastructure-manager-src/**"/>
-				<include name="scheduler-plugins-src/**"/>
+				<include name="descriptors/**" />
+				<include name="docs/pdf/**" />
+				<include name="lib/**" />
+				<include name="daemon/**" />
+				<include name="src/**" />
+
+				<include name="ic2d-plugins-src/**" />
+				<include name="infrastructure-manager-src/**" />
+				<include name="scheduler-plugins-src/**" />
 
 				<include name="LICENSE.txt" />
 				<include name="README.txt" />
 				<include name="README.html" />
 			</fileset>
 		</copy>
-		
+
 		<tar destfile="${release.dir}/ProActive-src_${version}.tar">
 			<fileset dir="${release.dir}">
-				<include name="Proactive_${version}/**"/>
+				<include name="Proactive_${version}/**" />
 			</fileset>
 		</tar>
-		
+
 		<zip destfile="${release.dir}/ProActive-src_${version}.zip">
-			<tarfileset src="${release.dir}/ProActive-src_${version}.tar"/>
+			<tarfileset src="${release.dir}/ProActive-src_${version}.tar" />
 		</zip>
-		
-		<bzip2 
-			src="${release.dir}/ProActive-bin_${version}.tar" 
-			destfile="${release.dir}/ProActive-bin_${version}.tar.bz2"/>
+
+		<bzip2 src="${release.dir}/ProActive-bin_${version}.tar" destfile="${release.dir}/ProActive-bin_${version}.tar.bz2" />
 	</target>
 
 
@@ -735,8 +723,8 @@
 
 	<macrodef name="eclipse_format_m">
 		<attribute name="loglevel" default="WARN" />
-		<element name="sourcefileset" optional="false"/>
-		
+		<element name="sourcefileset" optional="false" />
+
 		<sequential>
 			<taskdef name="javaformatter" classname="org.hibernate.tool.ant.JavaFormatterTask">
 				<classpath>
@@ -745,25 +733,15 @@
 					</fileset>
 				</classpath>
 			</taskdef>
-	
-			<copy 
-				file="${compile.dir}/eclipse_formatter_config.xml"
-				tofile="${compile.dir}/eclipse_formatter_config.properties" />
 
-			<replaceregexp 
-				file="${compile.dir}/eclipse_formatter_config.properties" 
-				match='^&lt;(.xml|/?profile).*' 
-				replace="" 
-				byline="true" />
+			<copy file="${compile.dir}/eclipse_formatter_config.xml" tofile="${compile.dir}/eclipse_formatter_config.properties" />
 
-			<replaceregexp 
-				file="${compile.dir}/eclipse_formatter_config.properties" 
-				match='.*\"(.*)\".*\"(.*)\".*' 
-				replace="\1=\2" 
-				byline="true" />
+			<replaceregexp file="${compile.dir}/eclipse_formatter_config.properties" match='^&lt;(.xml|/?profile).*' replace="" byline="true" />
+
+			<replaceregexp file="${compile.dir}/eclipse_formatter_config.properties" match='.*\"(.*)\".*\"(.*)\".*' replace="\1=\2" byline="true" />
 
 			<javaformatter configurationFile="eclipse_formatter_config.properties">
-				<sourcefileset/>
+				<sourcefileset />
 			</javaformatter>
 		</sequential>
 	</macrodef>
@@ -774,19 +752,19 @@
 				<fileset dir="${src.dir}" includes="**/*.java" />
 				<fileset dir="${ic2d-plugin.dir}" includes="**/*.java" />
 				<fileset dir="${scheduler-plugin.dir}" includes="**/*.java" />
-				<fileset dir="${resourcemanager-plugin.dir}" includes="**/*.java" />			
-				</sourcefileset>			
+				<fileset dir="${resourcemanager-plugin.dir}" includes="**/*.java" />
+			</sourcefileset>
 		</eclipse_format_m>
 	</target>
 
 
 	<target name="check" depends="-init,compile.util">
-		<delete dir="${classes.dir}/tmp"/>
+		<delete dir="${classes.dir}/tmp" />
 		<copy todir="${classes.dir}/tmp">
-				<fileset dir="${src.dir}">
-					<include name="**/*.java"/>
-				</fileset>
-				<!-- 
+			<fileset dir="${src.dir}">
+				<include name="**/*.java" />
+			</fileset>
+			<!-- 
 				<fileset dir="${ic2d-plugin.dir}" includes="**/*.java" />
 				<fileset dir="${scheduler-plugin.dir}" includes="**/*.java" />
 				<fileset dir="${resourcemanager-plugin.dir}" includes="**/*.java" />			
@@ -796,9 +774,9 @@
 		<eclipse_format_m>
 			<sourcefileset>
 				<fileset dir="${classes.dir}/tmp">
-					<include name="**/*.java"/>
+					<include name="**/*.java" />
 				</fileset>
-			</sourcefileset>			
+			</sourcefileset>
 		</eclipse_format_m>
 
 		<java resultproperty="check.failed" classname="diff.DiffJavaDir" fork="true" failonerror="false">
@@ -807,9 +785,9 @@
 			<arg value="${classes.dir}/tmp" />
 		</java>
 
-		<delete dir="${classes.dir}/tmp"/>		
+		<delete dir="${classes.dir}/tmp" />
 		<if name="check.failed" value="1">
-			<fail message="Please format your source code"/>
+			<fail message="Please format your source code" />
 		</if>
 	</target>
 
@@ -831,8 +809,8 @@
 
 
 	<target name="ic2d.libClean" description="Clean all needed libraries to IC2D">
-		<delete dir="${ic2d-plugin.dir}/${plugin.lib}/lib"/>
-		<delete file="${ic2d-plugin.dir}/${plugin.lib}/ProActive.jar"/>
+		<delete dir="${ic2d-plugin.dir}/${plugin.lib}/lib" />
+		<delete file="${ic2d-plugin.dir}/${plugin.lib}/ProActive.jar" />
 	</target>
 
 
@@ -1045,33 +1023,23 @@
 		<taskdef name="trang" classname="net.amadan.trang.ant.TrangTask">
 			<classpath>
 				<fileset dir="${base.dir}/dev/lib/trang">
-					<include name="*.jar"/>
+					<include name="*.jar" />
 				</fileset>
 			</classpath>
 		</taskdef>
 		<!-- Convert Relax NG schema from compact syntax to xml syntax -->
-		<trang failonerror="true"
-			input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc"
-			output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rng"/>
+		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rng" />
 
 		<!-- Convert Relax NG schema from compact syntax to W3C Schema -->
-		<trang failonerror="true"
-			input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc"
-			output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd"/>
-		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl"
-			in="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd"
-			out="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd"/>
+		<trang failonerror="true" input="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.rnc" output="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd" />
+		<xslt style="${base.dir}/dev/lib/trang/removeStuff.xsl" in="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd" out="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd" />
 		<delete>
-			<fileset
-				dir="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/">
-				<include name="xsi.xsd"/>
-				<include name="schedulerjob.xsd"/>
+			<fileset dir="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/">
+				<include name="xsi.xsd" />
+				<include name="schedulerjob.xsd" />
 			</fileset>
 		</delete>
-		<move
-			file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd"
-			tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd"
-		/>
+		<move file="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/temp.xsd" tofile="${src.extensions.dir}/${extensions.path}/scheduler/common/xml/schemas/jobdescriptor/0.9/schedulerjob.xsd" />
 	</target>
 
 </project>
