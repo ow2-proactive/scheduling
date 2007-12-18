@@ -131,8 +131,8 @@
 		<if name="version" value="${TODAY}">
 			<else>
 				<replaceregexp file="${src.proactive.dir}/${proactive.path}/Main.java" match="\$ID.*\$" replace="${version}" byline="true" />
-				<replaceregexp file="${base.dir}/README_others.html" match="\$ID.*\$" replace="${version}" byline="true" />
-				<replaceregexp file="${base.dir}/README_docs.html" match="\$ID.*\$" replace="${version}" byline="true" />
+				<replaceregexp file="${base.dir}/README.html" match="\$ID.*\$" replace="${version}" byline="true" />
+				<replaceregexp file="${base.dir}/README.txt" match="\$ID.*\$" replace="${version}" byline="true" />
 			</else>
 		</if>
 
@@ -583,7 +583,7 @@
 	</target>
 
 	<target name="release.bin" depends="deploy.all, manualPdf, -release.mkdir" description="Binary Release: dist + docs">
-		<tar destfile="${release.dir}/ProActive-bin_${version}.tar">
+		<tar destfile="${release.dir}/ProActive-bin_${version}.tar" longfile="gnu">
 			<tarfileset 
 				dir="${base.dir}"
 				prefix="ProActive_${version}">
@@ -609,7 +609,7 @@
 	</target>
 
 	<target name="release.src" depends="-release.mkdir, manualPdf" description="Source Release: sources + docs">
-		<tar destfile="${release.dir}/ProActive-src_${version}.tar">
+		<tar destfile="${release.dir}/ProActive-src_${version}.tar" longfile="gnu">
 			<tarfileset 
 				dir="${base.dir}"
 				prefix="ProActive_${version}">
