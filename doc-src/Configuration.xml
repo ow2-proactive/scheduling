@@ -120,19 +120,19 @@
 
             <listitem>
               <para><emphasis role="bold">schema.validation</emphasis> . Two
-              values are possible:<emphasis role="bold">enable,
-              disable</emphasis>. If enable, all xml files will be validated
+              values are possible:<emphasis role="bold">true,
+              false</emphasis>. If true, all xml files will be validated
               against provided schema. Default is <emphasis
-              role="bold">disable</emphasis></para>
+              role="bold">true</emphasis></para>
             </listitem>
 
             <listitem>
               <para><emphasis role="bold">proactive.future.ac</emphasis> . Two
-              values are possible:<emphasis role="bold">enable,
-               disable</emphasis> If 'enable' is chosen, Automatic Continuations
+              values are possible:<emphasis role="bold">true,
+              false</emphasis> If 'true' is chosen, Automatic Continuations
               <indexterm><primary>Automatic Continuation</primary><secondary>proactive.future.ac</secondary></indexterm>
               are activated (see <xref linkend="AC"/>). Default is <emphasis
-              role="bold">enable</emphasis></para>
+              role="bold">true</emphasis></para>
             </listitem>
           </itemizedlist></para>
 
@@ -152,10 +152,10 @@
         <itemizedlist>
           <listitem>
             <para><emphasis role="bold">proactive.ft</emphasis> . Two values
-            are possible: <emphasis role="bold">enable, disable</emphasis>. If
-            enable, the fault-tolerance is enable and a set of servers must be
+            are possible: <emphasis role="bold">true, false</emphasis>. If
+            true, the fault-tolerance is enable and a set of servers must be
             defined with the following properties. Default value is <emphasis
-            role="bold">disable</emphasis>.</para>
+            role="bold">false</emphasis>.</para>
           </listitem>
 
           <listitem>
@@ -463,7 +463,7 @@
    &lt;prop <emphasis role="bold">key</emphasis>='schema.validation' <emphasis
         role="bold">value</emphasis>='disable'/&gt;
    &lt;prop <emphasis role="bold">key</emphasis>='proactive.future.ac' <emphasis
-        role="bold">value</emphasis>='enable'/&gt;
+        role="bold">value</emphasis>='true'/&gt;
    &lt;prop <emphasis role="bold">key</emphasis>='proactive.communication.protocol' <emphasis
         role="bold">value</emphasis>='rmi'/&gt;
    &lt;prop <emphasis role="bold">key</emphasis>='proactive.rmi.port' <emphasis
