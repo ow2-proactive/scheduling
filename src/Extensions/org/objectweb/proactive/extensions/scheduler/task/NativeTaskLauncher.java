@@ -95,6 +95,9 @@ public class NativeTaskLauncher extends TaskLauncher {
     @SuppressWarnings("unchecked")
     public TaskResult doTask(SchedulerCore core, Executable executable, TaskResult... results) {
         try {
+            if (pre != null) {
+                this.executePreScript(null);
+            }
             NativeExecutable toBeLaunched = (NativeExecutable) executable;
 
             //launch generation script
