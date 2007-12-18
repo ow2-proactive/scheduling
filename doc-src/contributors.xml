@@ -185,6 +185,15 @@
                     </personname>
                   </para>
                 </listitem>
+                  <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Johann</firstname>
+
+                      <surname>Fradj</surname>
+                    </personname>
+                  </para>
+                </listitem>  
 				</itemizedlist>
  			</entry>
  			<entry align="center" valign="top">
@@ -298,6 +307,17 @@
                     </personname>
                   </para>
                 </listitem>  
+                <listitem>
+                  <para>
+                    <personname>
+                      <firstname>Jean-Luc</firstname>
+
+                      <surname>Scheefer</surname>
+                    </personname>
+                  </para>
+                </listitem>
+
+			
               </itemizedlist>
             </entry>
 
