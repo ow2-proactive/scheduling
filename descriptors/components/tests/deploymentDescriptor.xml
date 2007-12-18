@@ -61,11 +61,7 @@
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 			</processDefinition>
 			<processDefinition id="linuxJVM-AC">
-				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
-					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=enable"/>
-					</jvmParameters>
-				</jvmProcess>
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess"/>
 			</processDefinition>
 		</processes>
 	</infrastructure>
