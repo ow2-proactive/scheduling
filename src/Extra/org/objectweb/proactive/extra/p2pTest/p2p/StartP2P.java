@@ -82,7 +82,7 @@ public class StartP2P {
         String s = " -s" + entryPoint[0];
 
         try {
-            System.out.println("°°°°°°°°°°°°°°°°°°°°°°°°°°°Starting Entry Node°°°°°°°°°°°°°°°°°°°°°°°°°°°");
+            System.out.println("----------------- Starting Entry Node -------------------");
             Node entryNode = vn0.getNode();
 
             P2PLauncher entryp2pLauncher = (P2PLauncher) PAActiveObject.newActive(
@@ -90,8 +90,7 @@ public class StartP2P {
             entryp2pLauncher.start();
             Thread.sleep(10000);
 
-            System.out
-                    .println("°°°°°°°°°°°°°°°°°°°°°°°°°°°Starting Others Entry Nodes°°°°°°°°°°°°°°°°°°°°°°°°°°°");
+            System.out.println("----------------- Starting Others Entry Nodes -----------------");
             for (Node othersEntryNodes : vn1.getNodes()) {
                 P2PLauncher p2pLauncher = (P2PLauncher) PAActiveObject.newActive(P2PLauncher.class.getName(),
                         new Object[] { arg0 + s }, othersEntryNodes);
@@ -104,8 +103,7 @@ public class StartP2P {
                 int i = rnd.nextInt(entryPoint.length);
                 s = " -s" + entryPoint[i] + entryPoint[(i + 1) % entryPoint.length] +
                     entryPoint[(i + 2) % entryPoint.length];
-                System.out
-                        .println("°°°°°°°°°°°°°°°°°°°°°°°°°°°Starting Others Nodes°°°°°°°°°°°°°°°°°°°°°°°°°°°");
+                System.out.println("----------------- Starting Others Nodes -----------------");
                 P2PLauncher p2pLauncher = (P2PLauncher) PAActiveObject.newActive(P2PLauncher.class.getName(),
                         new Object[] { arg0 + s }, node);
                 p2pLauncher.start();
