@@ -32,7 +32,7 @@
 			<processDefinition id="linuxJVM">
 	           <jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=enable"/>
+						<parameter value="-Dproactive.future.ac=true"/>
 						<parameter value="-Dproactive.communication.protocol=ibis"/>
 						<parameter value="-Dibis.serialization=ibis"/>
 						<parameter value="-Dibis.name_server.host=localhost"/>

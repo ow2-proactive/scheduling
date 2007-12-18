@@ -5,7 +5,7 @@
 		<!--<prop key="ibis.property.file" value="/home1/fabrice/workIbis/Ibis/src/ibis/properties"/> -->
 		<prop key="proactive.locationserver" value="org.objectweb.proactive.ext.locationserver.LocationServer"/>
 		<prop key="proactive.locationserver.rmi" value="//localhost/LocationServer"/>
-		<prop key="proactive.future.ac" value="enable"/>
+		<prop key="proactive.future.ac" value="true"/>
 		<prop key="schema.validation" value="enable"/>
 		<prop key="name_server" value="localhost"/>
 		<prop key="name_server_pool" value="rutget"/>

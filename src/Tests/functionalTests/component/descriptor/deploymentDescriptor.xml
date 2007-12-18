@@ -63,7 +63,7 @@
 			<processDefinition id="linuxJVM-AC">
 				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
 					<jvmParameters>
-						<parameter value="-Dproactive.future.ac=enable"/>
+						<parameter value="-Dproactive.future.ac=true"/>
 						<parameter value="-Dproactive.test=true"/>
 					</jvmParameters>
 				</jvmProcess>
