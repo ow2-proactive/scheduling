@@ -6,6 +6,9 @@ rem
 
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..
 
+rem call script to avoid command too long errors
+call "%PROACTIVE%\scripts\windows\setproactive.bat"
+
 rem ----------------------------------------------------------------------------
 
 
