@@ -20,7 +20,7 @@ SET MATLAB_DIR=c:\Program Files\Mathworks\Matlab2006b
 REM SET MATLAB=<the name of your matlab command> 
 SET MATLAB=matlab.exe
 
-# REM SET PROACTIVE=<the path to your ProActive installation>
+REM SET PROACTIVE=<the path to your ProActive installation>
 SET PROACTIVE=c:\ProActive
 
 
