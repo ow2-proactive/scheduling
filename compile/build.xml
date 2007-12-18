@@ -49,6 +49,8 @@
 	</tstamp>
 
 	<if name="version">
+		<property name="isRelease" value="true" />
+		
 		<else>
 			<property name="version" value="${TODAY}" />
 		</else>
@@ -84,10 +86,6 @@
 				<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class" />
 				<exclude name="functionalTests/loadbalancing/Test.class" />
-
-				<!-- Disable GCM Deployment related unit tests -->
-				<exclude name="unitTests/deployment/**/*.class" />
-				<exclude name="functionalTests/gcmdeployment/**/*.class" />
 			</fileset>
 		</else>
 	</if>
@@ -230,14 +228,14 @@
 	</target>
 
 
-	<target name="compile.extra" depends="compile.core" description="Compile ProActive Extensions classes">
+	<target name="compile.extra" depends="compile.core, compile.tests" description="Compile ProActive Extensions classes">
 		<subant target="-compile" inheritall="yes" failonerror="true">
 			<fileset dir="${src.extra.dir}" includes="**/build.xml" />
 		</subant>
 	</target>
 
 
-	<target name="compile.tests" depends="compile.core, compile.extra, compile.extensions" description="Compile functional and unit tests classes">
+	<target name="compile.tests" depends="compile.core, compile.extensions" description="Compile functional and unit tests classes">
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
@@ -336,28 +334,34 @@
 
 	<target name="deploy" depends="compile.all, -deploy.mkdir" description="Populate dist/ with all needed file">
 		<!-- Update Implementation-Version -->
-		<if name="version" value="${TODAY}">
-			<else>
-				<replaceregexp file="${compile.dir}/Manifest-base.mf" match="\$ID.*\$" replace="${version}" byline="true" />
-			</else>
+		<if name="isRelease" exists="true">
+			<replaceregexp file="${compile.dir}/Manifest-base.mf" match="\$ID.*\$" replace="${version}" byline="true" />
 		</if>
 		<concat destfile="${compile.dir}/Manifest.mf">
 			<fileset dir="${compile.dir}" includes="Manifest-base.mf" />
 			<fileset dir="${osgi.manifest.dir}" includes="Manifest.mf" />
 		</concat>
 
-		<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
-			<fileset dir="${cl.proactive.dir}" includes="**" />
-			<fileset dir="${cl.extensions.dir}" includes="**" />
-			<fileset dir="${cl.extra.dir}" includes="**" />
+		 <if name="isRelease" exists="true">
+		 	<!-- Extra is not packaged in the release -->
+		 	<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
+		 		<fileset dir="${cl.proactive.dir}" includes="**" />
+		 		<fileset dir="${cl.extensions.dir}" includes="**" />
+		   		<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
+		   		<fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+		    </jar>
 
-			<fileset dir="${config.dir}">
-				<include name="ProActiveConfiguration.xml" />
-			</fileset>
-			<fileset dir="${osgi.res.dir}">
-				<include name="metadata.xml" />
-			</fileset>
-		</jar>
+		    <else>
+		    
+		    	<jar manifest="${compile.dir}/Manifest.mf" destfile="${deploy.lib.dir}/ProActive.jar">
+		    		<fileset dir="${cl.proactive.dir}" includes="**" />
+		    		<fileset dir="${cl.extensions.dir}" includes="**" />
+		  			<fileset dir="${cl.extra.dir}" includes="**" />
+					<fileset dir="${config.dir}" includes="ProActiveConfiguration.xml" />
+		            <fileset dir="${osgi.res.dir}" includes="metadata.xml" />
+		        </jar>
+			</else>
+		 </if>
 
 		<copy todir="${deploy.lib.dir}">
 			<!-- Copy all libs -->
@@ -621,6 +625,8 @@
 				<include name="lib/**" />
 				<include name="daemon/**" />
 				<include name="src/**" />
+				<!-- Extra is not released -->
+				<exclude name="src/Extra/**"/>
 
 				<include name="ic2d-plugins-src/**" />
 				<include name="infrastructure-manager-src/**" />

@@ -173,6 +173,8 @@
 				<classpath>
 					<path refid="compile.libs"/>
 					<pathelement location="${proactive.jar}"/>
+					<!-- XXX temporary workaround to allow functional tests to be moved in extra -->
+					<pathelement location="${cl.test.dir}"/>
 				</classpath>
 				<include name="@{package}/@{module}/**/*.java" />
 			</javac>
