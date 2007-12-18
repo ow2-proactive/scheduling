@@ -429,7 +429,8 @@ public class JobFactory {
             desc.setCommandLine(cmd);
         } else {
             // dynamic command
-            Node scriptNode = (Node) xpath.evaluate(addPrefixes("generation/script"), dcNode, XPathConstants.NODE);
+            Node scriptNode = (Node) xpath.evaluate(addPrefixes("generation/script"), dcNode,
+                    XPathConstants.NODE);
             Script<?> script = createScript(scriptNode);
             GenerationScript gscript = new GenerationScript(script);
             desc.setGenerationScript(gscript);
