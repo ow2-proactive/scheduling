@@ -30,8 +30,7 @@
  */
 
 public class Worker implements Serializable{
-	public PrimeWorker(){}//empty no-arg constructor needed by ProActive
-	//check for primes
+	public Worker(){}//empty no-arg constructor needed by ProActive
 	public void doNothingGracefully(){
 	}
 }
