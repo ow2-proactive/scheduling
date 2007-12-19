@@ -18,7 +18,7 @@ FOR /F %%i IN ("%EVERY%") DO (
 	IF ERRORLEVEL 1 (
 		SUBST %%i: /D 2>NUL
 		SUBST %%i: "%PROACTIVE%"
-		SET PROACTIVE=%%i: 
+		SET PROACTIVE=%%i:
 		goto :EOF
 	)
 )
