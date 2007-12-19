@@ -82,7 +82,8 @@ public class SimpleScript extends Script {
      */
     @Override
     protected ScriptResult<Object> getResult(Bindings bindings) {
-        return null;
+        // no significant result can be returned
+        return new ScriptResult<Object>();
     }
 
     /**
