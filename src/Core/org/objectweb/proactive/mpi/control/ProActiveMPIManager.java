@@ -44,7 +44,7 @@ import org.objectweb.proactive.api.PAFileTransfer;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PASPMD;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.filetransfer.RemoteFile;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.node.Node;
@@ -94,7 +94,7 @@ public class ProActiveMPIManager implements Serializable {
         // loop on the MPISpmd object list
         try {
             for (int i = 0; i < spmdList.size(); i++) {
-                VirtualNodeInternal vn = ((MPISpmd) spmdList.get(currentJobNumber)).getVn();
+                VirtualNode vn = ((MPISpmd) spmdList.get(currentJobNumber)).getVn();
                 Node[] allNodes;
                 allNodes = vn.getNodes();
                 String remoteLibraryPath = ((MPISpmd) spmdList.get(currentJobNumber)).getRemoteLibraryPath();

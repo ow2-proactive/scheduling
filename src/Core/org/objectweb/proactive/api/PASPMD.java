@@ -35,7 +35,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.body.AbstractBody;
-import org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal;
+import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.group.spmd.MethodCallBarrier;
@@ -166,7 +166,7 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroup(String className, Object[][] params, VirtualNodeInternal virtualNode)
+    public static Object newSPMDGroup(String className, Object[][] params, VirtualNode virtualNode)
             throws ClassNotFoundException, ClassNotReifiableException, ActiveObjectCreationException,
             NodeException {
         return PASPMD.newSPMDGroup(className, params, virtualNode.getNodes());
@@ -238,9 +238,8 @@ public class PASPMD {
      * @throws ClassNotReifiableException if the Class corresponding to <code>className</code> can't be reify.
      * @throws NodeException if the node was null and that the DefaultNode cannot be created
      */
-    public static Object newSPMDGroupInParallel(String className, Object[][] params,
-            VirtualNodeInternal virtualNode) throws ClassNotFoundException, ClassNotReifiableException,
-            NodeException {
+    public static Object newSPMDGroupInParallel(String className, Object[][] params, VirtualNode virtualNode)
+            throws ClassNotFoundException, ClassNotReifiableException, NodeException {
         return PASPMD.newSPMDGroupInParallel(className, params, virtualNode.getNodes());
     }
 

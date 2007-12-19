@@ -72,7 +72,7 @@ public class PADeployment {
      * @return ProActiveDescriptor. The object representation of the XML document
      * @throws ProActiveException if a problem occurs during the creation of the object
      * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
      */
     public static ProActiveDescriptor getProactiveDescriptor(String xmlDescriptorUrl)
@@ -87,7 +87,7 @@ public class PADeployment {
      * @return ProActiveDescriptor. The object representation of the XML document
      * @throws ProActiveException if a problem occurs during the creation of the object
      * @see org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal
-     * @see org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal
+     * @see org.objectweb.proactive.core.descriptor.data.VirtualNode
      * @see org.objectweb.proactive.core.descriptor.data.VirtualMachine
      */
     public static ProActiveDescriptor getProactiveDescriptor(String xmlDescriptorUrl,
