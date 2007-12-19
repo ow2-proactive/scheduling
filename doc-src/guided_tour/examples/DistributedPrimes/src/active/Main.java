@@ -31,22 +31,20 @@
 package active;
 
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.ProActive;
-import org.objectweb.proactive.api.ProDeployment;
+import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
-import org.objectweb.proactive.core.util.wrapper.LongWrapper;
-import org.objectweb.proactive.api.ProActiveObject;
+import org.objectweb.proactive.api.PAActiveObject;
 
 public class Main{
 	private static VirtualNode[] deploy(String descriptor)
 	{
 		ProActiveDescriptor pad;
 		try {
-			pad = ProDeployment.getProactiveDescriptor(descriptor);
+			pad = PADeployment.getProactiveDescriptor(descriptor);
 			//active all Virtual Nodes
 			pad.activateMappings();
 			//get the first Node available in the first Virtual Node 
@@ -68,7 +66,7 @@ public class Main{
 			//create the active object on the first node on
 			//the first virtual node available
 			//start the master
-			PrimeManager master = (PrimeManager)ProActiveObject.newActive(
+			PrimeManager master = (PrimeManager)PAActiveObject.newActive(
 					PrimeManager.class.getName(),
 		            new Object [] {},
 		            listOfVN[0].getNode());
@@ -81,15 +79,15 @@ public class Main{
 			{
 				node = vn.getNode();
 				//deploy
-				worker = (PrimeWorker)ProActiveObject.newActive(
+				worker = (PrimeWorker)PAActiveObject.newActive(
 						PrimeWorker.class.getName(),
 			            new Object [] {},
 			            node);
 				master.addWorker(worker);
 			}
 			//tell the master to start
-			master.startComputation(new LongWrapper(Long.parseLong(args[1])));
-			listOfVN[0].killAll(false);
+			master.startComputation(Long.parseLong(args[1]));
+			//listOfVN[0].killAll(true);
 		}
 		catch (NodeException nodeExcep){
 			System.err.println(nodeExcep.getMessage());
@@ -97,7 +95,11 @@ public class Main{
 		catch (ActiveObjectCreationException aoExcep){
 			System.err.println(aoExcep.getMessage());
 		}
+		catch (NumberFormatException nrExcep){
+			System.out.println("Number format is wrong !");
+			System.err.println(nrExcep.getMessage());
+			return;
+		}
 		//quitting
-		
 	}
 }
