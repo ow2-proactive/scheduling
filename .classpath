@@ -19,7 +19,6 @@
 	<classpathentry kind="lib" path="lib/bouncycastle.jar"/>
 	<classpathentry kind="lib" path="lib/bundlerepository.jar"/>
 	<classpathentry kind="lib" path="lib/classad.jar"/>
-	<classpathentry kind="lib" path="lib/clibwrapper_jiio.jar"/>
 	<classpathentry kind="lib" path="lib/client.jar"/>
 	<classpathentry kind="lib" path="lib/cog-jglobus.jar"/>
 	<classpathentry kind="lib" path="lib/cog-jglobus-1.2.jar"/>
@@ -52,7 +51,6 @@
 	<classpathentry kind="lib" path="lib/jung-1.7.4.jar"/>
 	<classpathentry kind="lib" path="lib/log4j.jar" sourcepath="/3rd_Log4j"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
-	<classpathentry kind="lib" path="lib/mlibwrapper_jai.jar"/>
 	<classpathentry kind="lib" path="lib/moduleloader.jar"/>
 	<classpathentry kind="lib" path="lib/njs_client.jar"/>
 	<classpathentry kind="lib" path="lib/oscar.jar"/>
