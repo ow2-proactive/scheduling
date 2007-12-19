@@ -493,21 +493,31 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
         // Recupere les resultats
         do {
             try {
-                int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
-                RMNode imnode = nodeResults.remove(idx);
-                ScriptResult<Boolean> res = scriptResults.remove(idx);
-                if (res.errorOccured()) {
-                    // nothing to do, just let the node in the free list
-                    logger.info("Error occured executing verifying script", res.getException());
-                } else if (res.getResult()) {
-                    // Result OK
-                    try {
-                        result.add(imnode.getNode());
-                        setBusy(imnode);
-                        imnode.setVerifyingScript(selectionScript);
-                        found++;
-                    } catch (NodeException e) {
-                        setDown(imnode);
+                if (!scriptResults.isEmpty()) {
+                    int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
+                    RMNode imnode = nodeResults.remove(idx);
+                    ScriptResult<Boolean> res = scriptResults.remove(idx);
+                    if (res.errorOccured()) {
+                        // nothing to do, just let the node in the free list
+                        logger.info("Error occured executing verifying script", res.getException());
+                    } else if (res.getResult()) {
+                        // Result OK
+                        try {
+                            result.add(imnode.getNode());
+                            setBusy(imnode);
+                            imnode.setVerifyingScript(selectionScript);
+                            found++;
+                        } catch (NodeException e) {
+                            setDown(imnode);
+                            //try on a new node if any
+                            if (!nodes.isEmpty()) {
+                                nodeResults.add(nodes.get(0));
+                                scriptResults.add(nodes.remove(0).executeScript(selectionScript));
+                            }
+                        }
+                    } else {
+                        // result is false
+                        imnode.setNotVerifyingScript(selectionScript);
                         // try on a new node if any
                         if (!nodes.isEmpty()) {
                             nodeResults.add(nodes.get(0));
@@ -515,9 +525,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
                         }
                     }
                 } else {
-                    // result is false
-                    imnode.setNotVerifyingScript(selectionScript);
-                    // try on a new node if any
                     if (!nodes.isEmpty()) {
                         nodeResults.add(nodes.get(0));
                         scriptResults.add(nodes.remove(0).executeScript(selectionScript));
@@ -575,28 +582,35 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
             }
             nodes.remove(0);
         }
-
-        // testing script results
         do {
             try {
-                int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
-
-                // idx could be -1 if an error occured in wfa (or timeout
-                // expires)
-                RMNode imnode = nodeResults.remove(idx);
-                ScriptResult<Boolean> res = scriptResults.remove(idx);
-                if (res.errorOccured()) {
-                    // nothing to do, just let the node in the free list
-                    logger.info("Error occured executing verifying script", res.getException());
-                } else if (res.getResult()) {
-                    // Result OK
-                    try {
-                        result.add(imnode.getNode());
-                        setBusy(imnode);
-                        imnode.setVerifyingScript(selectionScript);
-                        found++;
-                    } catch (NodeException e) {
-                        setDown(imnode);
+                if (!scriptResults.isEmpty()) {
+                    int idx = PAFuture.waitForAny(scriptResults, MAX_VERIF_TIMEOUT);
+                    // idx could be -1 if an error occured in wfa (or timeout
+                    // expires)
+                    RMNode imnode = nodeResults.remove(idx);
+                    ScriptResult<Boolean> res = scriptResults.remove(idx);
+                    if (res.errorOccured()) {
+                        // nothing to do, just let the node in the free list
+                        logger.info("Error occured executing verifying script", res.getException());
+                    } else if (res.getResult()) {
+                        // Result OK
+                        try {
+                            result.add(imnode.getNode());
+                            setBusy(imnode);
+                            imnode.setVerifyingScript(selectionScript);
+                            found++;
+                        } catch (NodeException e) {
+                            setDown(imnode);
+                            //try on a new node if any
+                            if (!nodes.isEmpty()) {
+                                nodeResults.add(nodes.get(0));
+                                scriptResults.add(nodes.remove(0).executeScript(selectionScript));
+                            }
+                        }
+                    } else {
+                        // result is false
+                        imnode.setNotVerifyingScript(selectionScript);
                         // try on a new node if any
                         if (!nodes.isEmpty()) {
                             nodeResults.add(nodes.get(0));
@@ -604,9 +618,6 @@ public class RMCore implements RMCoreInterface, InitActive, RMCoreSourceInt, Ser
                         }
                     }
                 } else {
-                    // result is false
-                    imnode.setNotVerifyingScript(selectionScript);
-                    // try on a new node if any
                     if (!nodes.isEmpty()) {
                         nodeResults.add(nodes.get(0));
                         scriptResults.add(nodes.remove(0).executeScript(selectionScript));
