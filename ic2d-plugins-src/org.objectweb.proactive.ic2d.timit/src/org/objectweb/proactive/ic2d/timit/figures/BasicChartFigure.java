@@ -31,7 +31,6 @@
 package org.objectweb.proactive.ic2d.timit.figures;
 
 import org.eclipse.birt.chart.device.IDeviceRenderer;
-import org.eclipse.birt.chart.device.IDisplayServer;
 import org.eclipse.birt.chart.factory.GeneratedChartState;
 import org.eclipse.birt.chart.factory.Generator;
 import org.eclipse.birt.chart.model.Chart;
@@ -46,38 +45,43 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.ic2d.timit.editparts.PrimitiveCharts;
 
 
 public class BasicChartFigure extends Figure {
-    public static final Color UNSELECTED_BORDER_COLOR = Display.getCurrent().getSystemColor(
+    public final static Color UNSELECTED_BORDER_COLOR = Display.getCurrent().getSystemColor(
             SWT.COLOR_DARK_GRAY);
-    public static final Color SELECTED_BORDER_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
-    private static int UNSELECTED_BORDER_SIZE = 2;
-    private static int SELECTED_BORDER_SIZE = 4;
+    public final static Color SELECTED_BORDER_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_RED);
+
+    public final static Color WHITE_BACKGROUND_COLOR = Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+    private final static int UNSELECTED_BORDER_SIZE = 2;
+    private final static int SELECTED_BORDER_SIZE = 4;
+
+    private final static double SCALED_VALUE = 72d / ChartUIUtil.getDisplayServer().getDpiResolution();
 
     ////////////////////////////////////////////////////////
+    private Chart chart;
     private Color currentBorderColor;
     private int currentBorderSize;
+    private final Generator gr;
+    private final Bounds bo;
+
     private GeneratedChartState state;
-    private Generator gr;
     private Image imgChart;
     private GC gc;
-    private IDeviceRenderer idr;
-    private double scaleValue;
-    private Chart chart;
     private boolean bDirty;
-    private Bounds bo;
+    private IDeviceRenderer idr;
 
     public BasicChartFigure(final Chart chart) {
-        this.chart = chart;
+        this.chart = PrimitiveCharts.createPieChart();//chart;
 
         this.currentBorderColor = UNSELECTED_BORDER_COLOR;
         this.currentBorderSize = UNSELECTED_BORDER_SIZE;
 
         this.gr = Generator.instance();
-        final IDisplayServer idsSWT = ChartUIUtil.getDisplayServer();
-        this.scaleValue = 72d / idsSWT.getDpiResolution();
-        this.bo = chart.getBlock().getBounds().scaledInstance(this.scaleValue);
+
+        this.bo = chart.getBlock().getBounds().scaledInstance(SCALED_VALUE);
+
         this.bDirty = true;
         try {
             idr = PluginSettings.instance().getDevice("dv.SWT");
@@ -112,7 +116,7 @@ public class BasicChartFigure extends Figure {
     }
 
     /**
-     * The overrided paintFigure method that handles all
+     * The paintFigure method that handles all
      * painting system.
      */
     @Override
@@ -138,11 +142,13 @@ public class BasicChartFigure extends Figure {
 
                 this.imgChart = new Image(d, r.width, r.height);
                 this.gc = new GC(this.imgChart);
-
                 this.computeState();
 
                 this.idr.setProperty(IDeviceRenderer.GRAPHICS_CONTEXT, this.gc);
             }
+            // Fill background
+            gc.setBackground(WHITE_BACKGROUND_COLOR);
+            gc.fillRectangle(0, 0, r.width, r.height);
 
             try {
                 this.gr.render(this.idr, this.state);
@@ -165,7 +171,7 @@ public class BasicChartFigure extends Figure {
             // RESCALE THE RENDERING AREA
             this.bo.setWidth(getClientArea().width);
             this.bo.setHeight(getClientArea().height);
-            this.bo.scale(this.scaleValue);
+            this.bo.scale(SCALED_VALUE);
             this.state = gr.build(this.idr.getDisplayServer(), this.chart, this.bo, null, null, null);
         } catch (Exception e) {
             e.printStackTrace();

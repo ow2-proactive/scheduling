@@ -114,10 +114,8 @@ public class BasicChartEditPart extends AbstractGraphicalEditPart implements Mou
     public final void run() {
         BasicChartFigure figure = (BasicChartFigure) getFigure();
         figure.setChart(this.basicChartObject.provideChart());
-        figure.setPreferredSize(this.getViewer().getControl().getBounds().width - 20, CHART_HEIGHT); // HERE SOMETIMES SOMTHING IS NULL TODO: FIND IT !
-        refresh();
-        figure.repaint(); // TODO : check if refresh() calls the
-        // figure.repaint() method
+        figure.setPreferredSize(this.getViewer().getControl().getBounds().width - 20, CHART_HEIGHT); // HERE SOMETIMES SOMTHING IS NULL TODO: FIND IT !        
+        figure.repaint();
     }
 
     @Override
