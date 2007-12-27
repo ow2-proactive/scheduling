@@ -45,7 +45,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.objectweb.proactive.ic2d.timit.editparts.PrimitiveCharts;
 
 
 public class BasicChartFigure extends Figure {
@@ -73,7 +72,7 @@ public class BasicChartFigure extends Figure {
     private IDeviceRenderer idr;
 
     public BasicChartFigure(final Chart chart) {
-        this.chart = PrimitiveCharts.createPieChart();//chart;
+        this.chart = chart;
 
         this.currentBorderColor = UNSELECTED_BORDER_COLOR;
         this.currentBorderSize = UNSELECTED_BORDER_SIZE;
