@@ -1,0 +1,13 @@
+// Start a FIFO service policy. Call does not return. In case of 
+// a migration, a new runActivity() will be started on the new site
+void fifoServing(); 
+
+// Invoke a LIFO policy. Call does not return. In case of 
+// a migration, a new runActivity() will be started on the new site
+void lifoServing() 
+
+// Serves the youngest request in the request queue
+void serveYoungest() 
+
+// Removes all requests in the pending queue
+void flushAll() 

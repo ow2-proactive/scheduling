@@ -1,0 +1,18 @@
+// Create an active Object of type A in the JVM specified by Node
+A a = (A) PAActiveObject.newActive('A', params, node);
+
+// A one way typed asynchronous communication towards the (remote) active object a
+// A request is sent to a
+a.foo (param); 
+
+// A typed asynchronous communication with result.
+// v is first an awaited Future to be transparently filled up after
+// service of the request and reply
+v = a.bar (param);
+
+...
+
+// Use of the result of an asynchronous call.
+// If v is still an awaited future, it triggers an automatic 
+// wait-by-necessity
+v.gee (param);

@@ -1,0 +1,11 @@
+// Creates a new AO of type classname. The AO is located on the given node,
+// or on a default node in the local JVM if the given node is null
+Object PAActiveObject.newActive(String classname, Object[] constructorParameters, Node node);
+
+// Creates a new set of AO of type classname.
+// The AO are located on each JVMs the Virtual Node is mapped onto
+Object PAActiveObject.newActive(String classname,Object[] constructorParameters,VirtualNode virtualnode);
+
+// Copy an existing Java object and turns it into an AO.
+// The AO is located on the given node, or on a default node in 
+Object turnActive(Object, Node node);
