@@ -94,11 +94,13 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, VirtualNodeInternal> virtualNodes;
     protected Map<String, ApplicationParser> applicationParsersMap;
 
-    public GCMApplicationParserImpl(File descriptor) throws IOException {
+    public GCMApplicationParserImpl(File descriptor) throws IOException, ParserConfigurationException,
+            SAXException {
         this(descriptor, null);
     }
 
-    public GCMApplicationParserImpl(File descriptor, List<String> userSchemas) throws IOException {
+    public GCMApplicationParserImpl(File descriptor, List<String> userSchemas) throws IOException,
+            ParserConfigurationException, SAXException {
         this.descriptor = descriptor;
         nodeProvidersMap = null;
         virtualNodes = null;
@@ -110,11 +112,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
         setup();
         InputSource inputSource = new InputSource(new FileInputStream(descriptor));
-        try {
-            document = documentBuilder.parse(inputSource);
-        } catch (SAXException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
-        }
+        document = documentBuilder.parse(inputSource);
     }
 
     /**
@@ -132,7 +130,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         registerApplicationParser(new ApplicationParserExecutable());
     }
 
-    public void setup() throws IOException {
+    public void setup() throws IOException, ParserConfigurationException {
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
@@ -141,23 +139,17 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         String deploymentSchema = getClass().getResource(APPLICATION_DESC_LOCATION).getFile();
 
         String commonTypesSchema = getClass().getResource(COMMON_TYPES_LOCATION).getFile();
-
+        System.out.println("#@# " + deploymentSchema);
         schemas.add(0, deploymentSchema);
         //        schemas.add(0, commonTypesSchema);
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
-        try {
-            documentBuilder = domFactory.newDocumentBuilder();
-            documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
+        documentBuilder = domFactory.newDocumentBuilder();
+        documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
 
-            XPathFactory factory = XPathFactory.newInstance();
-            xpath = factory.newXPath();
-            xpath
-                    .setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
-                        GCM_DESCRIPTOR_NAMESPACE));
-        } catch (ParserConfigurationException e) {
-            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e.getMessage());
-        }
+        XPathFactory factory = XPathFactory.newInstance();
+        xpath = factory.newXPath();
+        xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(GCM_DESCRIPTOR_NAMESPACE));
     }
 
     synchronized public Map<String, NodeProvider> getNodeProviders() throws SAXException, IOException {
