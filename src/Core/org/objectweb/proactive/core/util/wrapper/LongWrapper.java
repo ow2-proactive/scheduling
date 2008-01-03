@@ -49,7 +49,7 @@ public class LongWrapper implements Serializable {
     /**
      * The primitive value.
      */
-    private long value;
+    protected Long value;
 
     /**
      * The no arguments constructor for ProActive.
@@ -92,6 +92,6 @@ public class LongWrapper implements Serializable {
 
     @Override
     public int hashCode() {
-        return new Long(this.value).hashCode();
+        return this.value.hashCode();
     }
 }

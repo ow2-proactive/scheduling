@@ -44,12 +44,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Created on Jul 28, 2005
  */
 @PublicAPI
-public class DoubleMutableWrapper implements Serializable {
-
-    /**
-     * The primitive value.
-     */
-    private double value;
+public class DoubleMutableWrapper extends DoubleWrapper {
 
     /**
      * The no arguments constructor for ProActive.
@@ -63,15 +58,7 @@ public class DoubleMutableWrapper implements Serializable {
      * @param value the primitive <code>double</code> value.
      */
     public DoubleMutableWrapper(double value) {
-        this.value = value;
-    }
-
-    /**
-     * Return the value of the <code>double</code>.
-     * @return the primitive value.
-     */
-    public double doubleValue() {
-        return this.value;
+        super(value);
     }
 
     /**
@@ -80,32 +67,5 @@ public class DoubleMutableWrapper implements Serializable {
      */
     public void setDoubleValue(double value) {
         this.value = value;
-    }
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return this.value + "";
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object arg0) {
-        if (arg0 instanceof DoubleMutableWrapper) {
-            return ((DoubleMutableWrapper) arg0).doubleValue() == this.value;
-        }
-        return false;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return new Double(this.value).hashCode();
     }
 }

@@ -44,12 +44,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Created on Jul 28, 2005
  */
 @PublicAPI
-public class LongMutableWrapper implements Serializable {
-
-    /**
-     * The primitive value.
-     */
-    private long value;
+public class LongMutableWrapper extends LongWrapper {
 
     /**
      * The no arguments constructor for ProActive.
@@ -63,15 +58,7 @@ public class LongMutableWrapper implements Serializable {
      * @param value the primitive <code>long</code> value.
      */
     public LongMutableWrapper(long value) {
-        this.value = value;
-    }
-
-    /**
-     * Return the value of the <code>long</code>.
-     * @return the primitive value.
-     */
-    public long longValue() {
-        return this.value;
+        super(value);
     }
 
     /**
@@ -80,32 +67,5 @@ public class LongMutableWrapper implements Serializable {
      */
     public void setLongValue(long value) {
         this.value = value;
-    }
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return this.value + "";
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object arg0) {
-        if (arg0 instanceof LongMutableWrapper) {
-            return ((LongMutableWrapper) arg0).longValue() == this.value;
-        }
-        return false;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return new Long(this.value).hashCode();
     }
 }

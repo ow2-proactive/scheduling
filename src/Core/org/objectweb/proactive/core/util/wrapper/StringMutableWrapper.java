@@ -44,12 +44,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Created on Jul 28, 2005
  */
 @PublicAPI
-public class StringMutableWrapper implements Serializable {
-
-    /**
-     * The not reifiable value.
-     */
-    private String value;
+public class StringMutableWrapper extends StringWrapper implements Serializable {
 
     /**
      * The no arguments constructor for ProActive.
@@ -63,15 +58,7 @@ public class StringMutableWrapper implements Serializable {
      * @param value the class <code>String</code> value.
      */
     public StringMutableWrapper(String value) {
-        this.value = value;
-    }
-
-    /**
-     * Return the value of the <code>String</code>.
-     * @return the none reifiable value.
-     */
-    public String stringValue() {
-        return this.value;
+        super(value);
     }
 
     /**
@@ -80,32 +67,5 @@ public class StringMutableWrapper implements Serializable {
      */
     public void setStringValue(String value) {
         this.value = value;
-    }
-
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return this.value;
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object arg0) {
-        if (arg0 instanceof StringMutableWrapper) {
-            return this.value.equals(((StringMutableWrapper) arg0).stringValue());
-        }
-        return false;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return this.value.hashCode();
     }
 }

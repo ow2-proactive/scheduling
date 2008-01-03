@@ -49,7 +49,7 @@ public class IntWrapper implements Serializable {
     /**
      * The primitive value.
      */
-    private int value;
+    protected Integer value;
 
     /**
      * The no arguments constructor for ProActive.
@@ -92,6 +92,6 @@ public class IntWrapper implements Serializable {
 
     @Override
     public int hashCode() {
-        return new Integer(this.value).hashCode();
+        return this.value.hashCode();
     }
 }

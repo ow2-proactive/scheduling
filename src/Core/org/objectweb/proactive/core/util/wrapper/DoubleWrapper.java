@@ -49,7 +49,7 @@ public class DoubleWrapper implements Serializable {
     /**
      * The primitive value.
      */
-    private double value;
+    protected Double value;
 
     /**
      * The no arguments constructor for ProActive.
@@ -92,6 +92,6 @@ public class DoubleWrapper implements Serializable {
 
     @Override
     public int hashCode() {
-        return new Double(this.value).hashCode();
+        return this.value.hashCode();
     }
 }

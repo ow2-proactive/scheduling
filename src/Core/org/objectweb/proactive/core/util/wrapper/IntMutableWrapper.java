@@ -44,12 +44,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Created on Jul 28, 2005
  */
 @PublicAPI
-public class IntMutableWrapper implements Serializable {
-
-    /**
-     * The primitive value.
-     */
-    private int value;
+public class IntMutableWrapper extends IntWrapper implements Serializable {
 
     /**
      * The no arguments constructor for ProActive.
@@ -63,15 +58,7 @@ public class IntMutableWrapper implements Serializable {
      * @param value the primitive <code>int</code> value.
      */
     public IntMutableWrapper(int value) {
-        this.value = value;
-    }
-
-    /**
-     * Return the value of the <code>int</code>.
-     * @return the primitive value.
-     */
-    public int intValue() {
-        return this.value;
+        super(value);
     }
 
     /**
@@ -82,30 +69,4 @@ public class IntMutableWrapper implements Serializable {
         this.value = value;
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return this.value + "";
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object arg0) {
-        if (arg0 instanceof IntMutableWrapper) {
-            return ((IntMutableWrapper) arg0).intValue() == this.value;
-        }
-        return false;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return new Integer(this.value).hashCode();
-    }
 }

@@ -49,7 +49,7 @@ public class FloatWrapper implements Serializable {
     /**
      * The primitive value.
      */
-    private float value;
+    protected Float value;
 
     /**
      * The no arguments constructor for ProActive.
@@ -92,6 +92,6 @@ public class FloatWrapper implements Serializable {
 
     @Override
     public int hashCode() {
-        return new Float(this.value).hashCode();
+        return this.value.hashCode();
     }
 }

@@ -49,7 +49,7 @@ public class BooleanWrapper implements Serializable {
     /**
      * The primitive value.
      */
-    private boolean value;
+    protected Boolean value;
 
     /**
      * The no arguments constructor for ProActive.
@@ -92,6 +92,6 @@ public class BooleanWrapper implements Serializable {
 
     @Override
     public int hashCode() {
-        return new Boolean(this.value).hashCode();
+        return this.value.hashCode();
     }
 }

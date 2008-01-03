@@ -44,12 +44,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Created on Jul 28, 2005
  */
 @PublicAPI
-public class FloatMutableWrapper implements Serializable {
-
-    /**
-     * The primitive value.
-     */
-    private float value;
+public class FloatMutableWrapper extends FloatWrapper implements Serializable {
 
     /**
      * The no arguments constructor for ProActive.
@@ -63,15 +58,7 @@ public class FloatMutableWrapper implements Serializable {
      * @param value the primitive <code>float</code> value.
      */
     public FloatMutableWrapper(float value) {
-        this.value = value;
-    }
-
-    /**
-     * Return the value of the <code>float</code>.
-     * @return the primitive value.
-     */
-    public float floatValue() {
-        return this.value;
+        super(value);
     }
 
     /**
@@ -90,22 +77,4 @@ public class FloatMutableWrapper implements Serializable {
         return this.value + "";
     }
 
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object arg0) {
-        if (arg0 instanceof FloatMutableWrapper) {
-            return ((FloatMutableWrapper) arg0).floatValue() == this.value;
-        }
-        return false;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return new Float(this.value).hashCode();
-    }
 }

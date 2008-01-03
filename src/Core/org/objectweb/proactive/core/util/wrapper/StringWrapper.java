@@ -49,7 +49,7 @@ public class StringWrapper implements Serializable {
     /**
      * The not reifiable value.
      */
-    private String value;
+    protected String value;
 
     /**
      * The no arguments constructor for ProActive.

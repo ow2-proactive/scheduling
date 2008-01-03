@@ -45,12 +45,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 
 @PublicAPI
-public class BooleanMutableWrapper implements Serializable {
-
-    /**
-     * The primitive value.
-     */
-    private boolean value;
+public class BooleanMutableWrapper extends BooleanWrapper {
 
     /**
      * The no arguments constructor for ProActive.
@@ -64,15 +59,7 @@ public class BooleanMutableWrapper implements Serializable {
      * @param value the primitive <code>boolean</code> value.
      */
     public BooleanMutableWrapper(boolean value) {
-        this.value = value;
-    }
-
-    /**
-     * Return the value of the <code>boolean</code>.
-     * @return the primitive value.
-     */
-    public boolean booleanValue() {
-        return value;
+        super(value);
     }
 
     /**
@@ -83,30 +70,4 @@ public class BooleanMutableWrapper implements Serializable {
         this.value = value;
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString() {
-        return this.value + "";
-    }
-
-    /**
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object arg0) {
-        if (arg0 instanceof BooleanMutableWrapper) {
-            return ((BooleanMutableWrapper) arg0).booleanValue() == this.value;
-        }
-        return false;
-    }
-
-    /**
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-        return new Boolean(this.value).hashCode();
-    }
 }
