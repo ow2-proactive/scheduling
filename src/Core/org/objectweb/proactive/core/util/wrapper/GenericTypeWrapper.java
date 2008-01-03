@@ -32,6 +32,8 @@ package org.objectweb.proactive.core.util.wrapper;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * <p>A reifiable object for wrapping the Java type <code>Object</code>.</p>
@@ -39,6 +41,7 @@ import java.io.Serializable;
  *
  * @author ProActive Team
  */
+@PublicAPI
 public class GenericTypeWrapper<T extends Object> implements Serializable {
 
     /**

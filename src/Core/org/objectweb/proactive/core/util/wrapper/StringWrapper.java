@@ -32,6 +32,8 @@ package org.objectweb.proactive.core.util.wrapper;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * <p>An reifiable object for wrapping the Java type <code>String</code>.</p>
@@ -41,6 +43,7 @@ import java.io.Serializable;
  *
  * Created on Jul 28, 2005
  */
+@PublicAPI
 public class StringWrapper implements Serializable {
 
     /**
