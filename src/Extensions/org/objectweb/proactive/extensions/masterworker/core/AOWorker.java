@@ -164,23 +164,6 @@ public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory 
         PAActiveObject.setImmediateService("heartBeat");
         PAActiveObject.setImmediateService("terminate");
 
-        //        RequestQueue rq = ((AbstractBody) body).getRequestQueue();
-        //        RequestFactory rf = ProActiveMetaObjectFactory.newInstance().newRequestFactory();
-        //        long id = ((BodyImpl) body).getNextSequenceID();
-        //        Method meth = null;
-        //        try {
-        //            meth = this.getClass().getMethod("initialGetTask");
-        //        } catch (SecurityException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        } catch (NoSuchMethodException e) {
-        //            // TODO Auto-generated catch block
-        //            e.printStackTrace();
-        //        }
-        //        MethodCall call = new MethodCall(meth, null, new Object[0]);
-        //        Request req = rf.newRequest(call,body, true,id);
-        //        rq.add(req);
-
         // Initial Task
         ((AOWorker) stubOnThis).initialGetTask();
     }
@@ -259,6 +242,9 @@ public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory 
         ((AOWorker) stubOnThis).scheduleTask();
     }
 
+    /**
+     * ScheduleTask : find a new task to run
+     */
     public void scheduleTask() {
         while ((pendingTasks.size() == 0) && (pendingTasksFutures.size() > 0)) {
             pendingTasks.addAll(pendingTasksFutures.remove());
