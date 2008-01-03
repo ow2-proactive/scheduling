@@ -90,7 +90,7 @@
 					<element name="configuration" minOccurs="0">
 						<complexType>
 							<all>
-								<element name="bootclasspath" type="pa:pathType" minOccurs="0"/>
+								<element name="bootClasspath" type="pa:pathType" minOccurs="0"/>
 								<element name="java" type="pa:pathElementType" minOccurs="0" maxOccurs="1" />
 								<element name="jvmarg" type="pa:valueType" minOccurs="0"/>
 								<element name="applicationClasspath" type="pa:classpathType" minOccurs="0" maxOccurs="1"/>
