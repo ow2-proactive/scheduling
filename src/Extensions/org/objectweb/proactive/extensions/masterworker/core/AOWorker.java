@@ -38,15 +38,12 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.InitActive;
-import org.objectweb.proactive.RunActive;
-import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
-import org.objectweb.proactive.extensions.masterworker.interfaces.internal.ResultIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskProvider;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
@@ -58,7 +55,7 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
  * They execute tasks needed by the master
  * @author fviale
  */
-public class AOWorker implements InitActive, RunActive, Serializable, Worker, WorkerMemory {
+public class AOWorker implements InitActive, Serializable, Worker, WorkerMemory {
 
     /**
      *
@@ -83,16 +80,6 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker, Wo
      * The entity which will provide tasks to the worker (i.e. the master)
      */
     protected TaskProvider<Serializable> provider;
-
-    /**
-     * Tells if the worker is terminated
-     */
-    protected boolean terminated;
-
-    /**
-     * Tells if the worker is currently sleeping (not asking new tasks)
-     */
-    protected boolean isSleeping;
 
     /**
      * The memory of the worker <br>
@@ -173,11 +160,29 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker, Wo
      */
     public void initActivity(final Body body) {
         stubOnThis = PAActiveObject.getStubOnThis();
-        isSleeping = false;
-        terminated = false;
-        PAActiveObject.setImmediateService("getName");
+        //PAActiveObject.setImmediateService("getName");
         PAActiveObject.setImmediateService("heartBeat");
         PAActiveObject.setImmediateService("terminate");
+
+        //        RequestQueue rq = ((AbstractBody) body).getRequestQueue();
+        //        RequestFactory rf = ProActiveMetaObjectFactory.newInstance().newRequestFactory();
+        //        long id = ((BodyImpl) body).getNextSequenceID();
+        //        Method meth = null;
+        //        try {
+        //            meth = this.getClass().getMethod("initialGetTask");
+        //        } catch (SecurityException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        } catch (NoSuchMethodException e) {
+        //            // TODO Auto-generated catch block
+        //            e.printStackTrace();
+        //        }
+        //        MethodCall call = new MethodCall(meth, null, new Object[0]);
+        //        Request req = rf.newRequest(call,body, true,id);
+        //        rq.add(req);
+
+        // Initial Task
+        ((AOWorker) stubOnThis).initialGetTask();
     }
 
     /**
@@ -192,14 +197,24 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker, Wo
      * @return initial task to solve
      */
     @SuppressWarnings("unchecked")
-    protected void initialGetTask() {
+    public void initialGetTask() {
         if (logger.isDebugEnabled()) {
             logger.debug(name + " asks a new task...");
         }
+        if (provider == null) {
+            System.out.println("Boom P");
+        }
+        if (name == null)
+            System.out.println("Boom N");
+        if (stubOnThis == null)
+            System.out.println("Boom S");
 
         // InitialTask
         pendingTasks = (Queue<TaskIntern<Serializable>>) PAFuture.getFutureValue(provider.getTasks(
                 (Worker) stubOnThis, name));
+
+        // Schedule
+        ((AOWorker) stubOnThis).scheduleTask();
     }
 
     /**
@@ -207,7 +222,7 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker, Wo
      * @param task task to run
      * @return the same task, but containing the result
      */
-    protected ResultIntern<Serializable> handleTask(final TaskIntern<Serializable> task) {
+    public void handleTask(final TaskIntern<Serializable> task) {
         Serializable resultObj = null;
         ResultInternImpl result = new ResultInternImpl(task);
 
@@ -224,59 +239,39 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker, Wo
 
         // We store the result inside our internal version of the task
         result.setResult(resultObj);
-        return result;
+        if (logger.isDebugEnabled()) {
+            logger.debug(name + " sends the result of task " + result.getId() + " and asks a new task...");
+        }
+
+        // We send the result back to the master
+        Queue<TaskIntern<Serializable>> newTasks;
+        if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
+            if (logger.isDebugEnabled()) {
+                logger.debug(name + " requests a task flooding...");
+            }
+            newTasks = provider.sendResultAndGetTasks(result, name, true);
+        } else {
+            newTasks = provider.sendResultAndGetTasks(result, name, false);
+        }
+        pendingTasksFutures.offer(newTasks);
+
+        // Schedule
+        ((AOWorker) stubOnThis).scheduleTask();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @SuppressWarnings("unchecked")
-    public void runActivity(final Body body) {
-        Service service = new Service(body);
+    public void scheduleTask() {
+        while ((pendingTasks.size() == 0) && (pendingTasksFutures.size() > 0)) {
+            pendingTasks.addAll(pendingTasksFutures.remove());
+        }
+        if (pendingTasks.size() > 0) {
+            TaskIntern<Serializable> newTask = pendingTasks.remove();
+            // We handle the current Task
+            ((AOWorker) stubOnThis).handleTask(newTask);
 
-        while (body.isActive()) {
-            while (!isSleeping) {
-                initialGetTask();
-
-                while (!isSleeping) {
-                    while ((pendingTasks.size() == 0) && (pendingTasksFutures.size() > 0)) {
-                        pendingTasks.addAll(pendingTasksFutures.remove());
-                    }
-                    if (pendingTasks.size() == 0) {
-                        // if there is nothing to do we sleep
-                        isSleeping = true;
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(name + " sleeps...");
-                        }
-                    } else {
-                        TaskIntern<Serializable> newTask = pendingTasks.remove();
-
-                        ResultIntern<Serializable> result = handleTask(newTask);
-
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(name + " sends the result of task " + result.getId() +
-                                " and asks a new task...");
-                        }
-
-                        newTask = null;
-
-                        // We send the result back to the master
-                        Queue<TaskIntern<Serializable>> newTasks;
-                        if ((pendingTasks.size() == 0) && (pendingTasksFutures.size() == 0)) {
-                            newTasks = provider.sendResultAndGetTasks(result, name, true);
-                        } else {
-                            newTasks = provider.sendResultAndGetTasks(result, name, false);
-                        }
-                        pendingTasksFutures.offer(newTasks);
-                    }
-                }
-            }
-
-            service.waitForRequest();
-
-            // We serve any outstanding request
-            if (body.isActive()) {
-                service.serveOldest();
+        } else {
+            // if there is nothing to do we sleep i.e. we do nothing
+            if (logger.isDebugEnabled()) {
+                logger.debug(name + " sleeps...");
             }
         }
     }
@@ -296,7 +291,6 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker, Wo
             logger.debug("Terminating " + name + "...");
         }
 
-        this.terminated = true;
         PAActiveObject.terminateActiveObject(true);
         if (logger.isDebugEnabled()) {
             logger.debug(name + " terminated...");
@@ -309,9 +303,10 @@ public class AOWorker implements InitActive, RunActive, Serializable, Worker, Wo
      * {@inheritDoc}
      */
     public void wakeup() {
-        isSleeping = false;
         if (logger.isDebugEnabled()) {
             logger.debug(name + " wakes up...");
         }
+        // Initial Task
+        ((AOWorker) stubOnThis).initialGetTask();
     }
 }
