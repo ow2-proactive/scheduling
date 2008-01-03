@@ -68,7 +68,6 @@
 			</element>
 		</sequence>
 		<attribute name="id" type="string" use="required"></attribute>
-		<attribute name="raref" type="string"></attribute>
 		<attribute name="capacity" type="pa:capacityType"></attribute>
 	</complexType>
 
