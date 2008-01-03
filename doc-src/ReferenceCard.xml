@@ -210,89 +210,56 @@
   </sect1>
 
   <sect1>
-    <title>Main principles: asynchronous method calls and implicit
+    <title>Main Principles: Asynchronous Method Calls And Implicit
     futures</title>
 
-    <para><programlisting lang="java">A a = (A) ProActive.newActive('A', params, node);
-   // Create an active Object of type A in the JVM specified by Node
-a.foo (param); 
-   // A one way typed asynchronous communication towards the (remote) AO a
-   // A request is sent to a,
-v = a.bar (param);
-   // A typed asynchronous communication with result.
-   // v is first an awaited Future, to be transparently filled up after
-   // service of the request, and reply
-...
-v.gee (param);
-   // Use of the result of an asynchronous call.
-   // If v is still an awaited future, it triggers an automatic 
-   // wait: Wait-by-necessity</programlisting></para>
+    <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/asynchronous_method_calls_and_implicit_futures.txt" /></textobject></programlisting>
   </sect1>
 
   <sect1>
     <title>Explicit Synchronization</title>
 
-    <para><programlisting lang="java"><emphasis role="bold"> boolean </emphasis>isAwaited(Object);
-   // Returns True if the object is still an awaited Future 
+    <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/explicit_synchronization.txt" /></textobject></programlisting>
 
- <emphasis role="bold">void </emphasis> waitFor(Object);
-   // Blocks until the object is no longer awaited
-   // A request is sent to a,
-
- <emphasis role="bold">void </emphasis> waitForAll(Vector);
-   // Blocks until all the objects in Vector are no longer awaited  
-
-
- <emphasis role="bold">int </emphasis>waitForAny(Vector);
-   // Blocks until one of the objects in Vector is no longer awaited.
-   // Returns the index of the available future.</programlisting></para>
   </sect1>
 
   <sect1>
-    <title>Programming AO Activity and services</title>
+    <title>Programming Active Objects' Activity And Services</title>
 
     <para>When an AO must implement an activity that is not FIFO, the
     RunActive interface has to be implemented: it specifies the AO behavior in
-    the method named runActivity():</para>
+    the method named <literal>runActivity()</literal>:</para>
 
-    <para><programlisting lang="java"><emphasis role="bold">Interface </emphasis>RunActive <emphasis
-          role="bold">
-void</emphasis> runActivity(Body body) 
-    // The activity of the active object instance of the current class</programlisting>Example:</para>
+    <programlisting lang="java"><textobject><textdata
+		fileref="../src/Core/org/objectweb/proactive/RunActive.java" /></textobject></programlisting>
+	<para>Example:</para>
 
-    <para><programlisting><emphasis role="bold">public class </emphasis>A <emphasis
-          role="bold">implements</emphasis> RunActive { 
-  // Implements RunActive for programming a specific behavior 
+   <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/RunActive_example.txt" /></textobject></programlisting>
 
-  // runActivity() is automatically called when such an AO is created <emphasis
-          role="bold">
-  public void </emphasis> runActivity(Body body) { 
-    Service service = new Service(body); 
-    while ( terminate ) { 
-        ... // Do some activity on its own 
-        ... 
-        ... // Do some services, e.g. a FIFO service on method named foo 
-        service.serveOldest('foo'); 
-        ... 
-        } 
-    } 
-}</programlisting>Two other interfaces can also be specified:</para>
+    
+    <para> Two other interfaces can also be specified:</para>
 
-    <para><programlisting lang="java"><emphasis role="bold">Interface </emphasis>InitActive <emphasis
-          role="bold">
-void </emphasis> initActivity(Body body) 
-    // Initializes the activity of the active object. 
-    // not called in case of restart after migration 
-    // Called before runActivity() method, and only once: <emphasis
-          role="bold">
+    <para> The method <literal> initActivity(Body body) </literal> initializes the activity of
+	    the active object. It is called once before the <literal>runActivity(Body body)</literal> method.
+	    It is not called again if the active object restarts after migration.</para>
 
-Interface </emphasis>EndActive <emphasis role="bold">
-void </emphasis> endActivity(Body body) 
-    // Finalizes the active object after the activity stops by itself. 
-    // Called after the execution of runActivity() method, and only once: 
-    // not called before a migration</programlisting></para>
+    <programlisting lang="java"><textobject><textdata
+		fileref="../src/Core/org/objectweb/proactive/InitActive.java" /></textobject></programlisting>
+
+	<para>The method <literal> endActivity(Body body) </literal> finalizes the activity of
+    	the active object. It is called once after the execution of the <literal>runActivity(Body body)</literal> method.
+    </para>
+    
+    <programlisting lang="java"><textobject><textdata
+		fileref="../src/Core/org/objectweb/proactive/EndActive.java" /></textobject></programlisting>
+
   </sect1>
-
+	<!--
+		//TODO: check reactive 
+	 -->
   <sect1>
     <title>Reactive Active Object</title>
 
@@ -325,105 +292,57 @@ void </emphasis> endActivity(Body body)
              } 
     }</programlisting></para>
 
-    <para>It also allows one to specify explicit termination of AOs (there is
-    currently no Distributed Garbage Collector). Of course, the reactivity is
+    <para>It also allows one to specify explicit termination of AOs. Of course, the reactivity is
     up to the length of going around the loop. Similar techniques can be used
     to start, suspend, restart, and stop AOs.</para>
   </sect1>
 
   <sect1>
     <title>Service methods</title>
-
+	<para>The following method are in the <literal>Service</literal> class.
+	They can be used to control how requests are served.</para>
     <para><emphasis role="bold">Non-blocking services:</emphasis> returns
     immediately if no matching request is pending</para>
 
-    <para><programlisting lang="java"><emphasis role="bold">void </emphasis>serveOldest(); 
-// Serves the oldest request in the request queue <emphasis role="bold">
-
-void </emphasis> serveOldest(String methodName) 
-// Serves the oldest request aimed at a method of name methodName <emphasis
-          role="bold">
-
-void </emphasis>serveOldest(RequestFilter requestFilter) 
-// Serves the oldest request matching the criteria given be the filter</programlisting></para>
-
+		  <programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/non-blocking_services.txt" /></textobject></programlisting>
+				
     <para><emphasis role="bold">Blocking services:</emphasis> waits until a
     matching request can be served</para>
 
-    <programlisting lang="java"><emphasis role="bold">void </emphasis>blockingServeOldest(); 
-// Serves the oldest request in the request queue <emphasis role="bold">
-
-void </emphasis> blockingServeOldest(String methodName) 
-
-// Serves the oldest request aimed at a method of name methodName <emphasis
-        role="bold">
-
-void </emphasis>blockingServeOldest(RequestFilter requestFilter) 
-// Serves the oldest request matching the criteria given be the filter</programlisting>
+		  <programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/blocking_services.txt" /></textobject></programlisting>
 
     <para><emphasis role="bold">Blocking timed services:</emphasis> wait a
     matching request at most a time given in ms</para>
 
-    <programlisting lang="java"><emphasis role="bold">void </emphasis>blockingServeOldest (long timeout) 
-// Serves the oldest request in the request queue. 
-// Returns after timeout (in ms) if no request is available 
- <emphasis role="bold">
-void </emphasis> blockingServeOldest(String methodName, long timeout) 
-// Serves the oldest request aimed at a method of name methodName 
-// Returns after timeout (in ms) if no request is available <emphasis
-        role="bold">
+		     <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/blocking_timed_services.txt" /></textobject></programlisting>
 
-void </emphasis>blockingServeOldest(RequestFilter requestFilter) 
-// Serves the oldest request matching the criteria given be the filter</programlisting>
 
     <para><emphasis role="bold">Waiting primitives:</emphasis></para>
 
-    <programlisting lang="java">void waitForRequest(); 
-// Wait until a request is available or until the body terminates 
-
-void  waitForRequest(String methodName); 
-// Wait until a request is available on the given method name, 
-// or until the body terminates</programlisting>
+  	     <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/waiting_primitives.txt" /></textobject></programlisting>
 
     <para><emphasis role="bold">Others:</emphasis></para>
 
-    <programlisting lang="java"><emphasis role="bold">void </emphasis>fifoServing(); 
-// Start a FIFO service policy. Call does not return. In case of 
-// a migration, a new runActivity() will be started on the new site <emphasis
-        role="bold">
+     <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/other_services.txt" /></textobject></programlisting>
 
-void </emphasis> lifoServing() 
-// Invoke a LIFO policy. Call does not return. In case of 
-// a migration, a new runActivity() will be started on the new site <emphasis
-        role="bold">
-
-void </emphasis> serveYoungest() 
-// Serves the youngest request in the request queue <emphasis role="bold">
-
-void </emphasis> flushAll() 
-// Removes all requests in the pending queue</programlisting>
   </sect1>
 
   <sect1>
     <title>Active Object Creation:</title>
 
-    <para><programlisting lang="java">Object newActive(String classname, Object[] constructorParameters,Node node);
-   // Creates a new AO of type classname. The AO is located on the given node,
-   // or on a default node in the local JVM if the given node is nul
-
-Object newActive(String classname,Object[] constructorParameters,VirtualNode virtualnode);
-   // Creates a new set of AO of type classname.
-   // The AO are located on each JVMs the Virtual Node is mapped onto
-
-Object turnActive(Object, Node node);
-   // Copy an existing Java object and turns it into an AO.
-   // The AO is located on the given node, or on a default node in </programlisting></para>
+     <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/ao_creation.txt" /></textobject></programlisting>
   </sect1>
 
   <sect1>
     <title>Groups:</title>
 
-    <para><programlisting lang="java">A ga = (A) ProActiveGroup.newGroup( 'A', params, nodes);
+    <para><programlisting lang="java">A ga = (A) PAGroup.newGroup( 'A', params, nodes);
    // Created at once a group of AO of type 'A' in the JVMs specified 
    // by nodes. ga is a Typed Group of type 'A'. 
    // The number of AO being created matches the number of param arrays.
@@ -440,7 +359,7 @@ gv.gee (...);
    // collective operation: gee method is called in parallel on each object\
  in group. 
    // Wait-by-necessity occurs when results are awaited */
-Group ag = ProActiveGroup.getGroup(ga);
+Group ag = PAGroup.getGroup(ga);
    // Get the group representation of a typed group
 ag.add(o);
    // Add object in the group ag. o can be a standard Java object or an AO,
@@ -468,40 +387,40 @@ A ga2 = (A) ag.getGroupByType();
     <para>Methods both in Interface Group, and static in class
     ProActiveGroup</para>
 
-    <programlisting><emphasis role="bold">boolean </emphasis> ProActiveGroup.allAwaited (Object); 
+    <programlisting><emphasis role="bold">boolean </emphasis> PAGroup.allAwaited (Object); 
 // Returns True if object is a group and all members are still awaited <emphasis
         role="bold">
 
-boolean </emphasis>ProActiveGroup.allArrived (Object); 
+boolean </emphasis>PAGroup.allArrived (Object); 
 // Returns False only if at least one member is still awaited <emphasis
         role="bold">
 
-void </emphasis> ProActiveGroup.waitAll (Object); 
+void </emphasis> PAGroup.waitAll (Object); 
 // Wait for all the members in group to arrive (all no longer awaited) <emphasis
         role="bold">
 
-void </emphasis> ProActiveGroup.waitN (Object, int nb); 
+void </emphasis> PAGroup.waitN (Object, int nb); 
 // Wait for at least nb members in group to arrive
 <emphasis role="bold">
-int </emphasis> ProActiveGroup.waitOneAndGetIndex (Object); 
+int </emphasis> PAGroup.waitOneAndGetIndex (Object); 
 // Waits for at least one member to arrived, and returns its index</programlisting>
   </sect1>
 
   <sect1>
     <title>OO SPMD</title>
 
-    <para><programlisting lang="java">A spmdGroup  =  (A) ProSPMD.newSPMDGroup('A', params, nodes);
+    <para><programlisting lang="java">A spmdGroup  =  (A) PASPMD.newSPMDGroup('A', params, nodes);
    // Creates an SPMD group and creates all members with params on the nodes.
    // An SPMD group is a typed group in which every member has a reference to
    // the others (the SPMD group itself).
 
-A mySpmdGroup = (A) ProSPMD.getSPMDGroup();
+A mySpmdGroup = (A) PASPMD.getSPMDGroup();
    // Returns the SPMD group of the activity.
 
-int rank = ProSPMD.getMyRank();
+int rank = PASPMD.getMyRank();
    // Returns the rank of the activity in its SPMD group.
 
-ProSPMD.barrier('barrierID');
+PASPMD.barrier('barrierID');
    // Blocks the activity (after the end of the current service) until all
    // other members of the SPMD group invoke the same barrier. 
    // Three barriers are available: total barrier, neighbors based barrier
@@ -511,8 +430,8 @@ ProSPMD.barrier('barrierID');
   <sect1>
     <title>Migration</title>
 
-    <para>Methods both in Interface Group, and static in class
-    ProActiveGroup</para>
+    <para>Methods both in Interface MigrationController, and static in class
+    PAMobileAgent</para>
 
     <programlisting lang="java"><emphasis role="bold">void </emphasis> migrateTo(Object o); 
 // Migrate the current AO to the same JVM as the AO <emphasis role="bold">
@@ -527,15 +446,17 @@ int </emphasis> void migrateTo(Node node);
     method, that upon service will call the static migrateTo primitive:</para>
 
     <programlisting lang="java"><emphasis role="bold">public void </emphasis>moveTo(Object) { 
-<emphasis role="bold">  try</emphasis>{ ProActive.migrateTo(t); } <emphasis
+<emphasis role="bold">  try</emphasis>{ PAMobileAgent.migrateTo(t); } <emphasis
         role="bold">
   catch</emphasis> (Exception e) { 
     e.printStackTrace(); 
     logger.info('Cannot migrate.'); 
   } 
-} <emphasis role="bold">
-
-void </emphasis>onDeparture(String MethodName); 
+  
+} 
+</programlisting>
+To define a migration strategy we implement the methods in in the interface <literal>MigrationStrategyManager</literal>:
+<programlisting lang="java"><emphasis role="bold">void </emphasis>onDeparture(String MethodName); 
 // Specification of a method to execute before migration <emphasis role="bold">
 
 void </emphasis> onArrival(String MethodName); 
@@ -545,10 +466,10 @@ void </emphasis> onArrival(String MethodName);
 void </emphasis>setMigrationStrategy(MigrationStrategy); 
 // Specifies a migration itinerary <emphasis role="bold">
 
-void </emphasis>migrationStrategy.add(Destination); 
+void </emphasis>MigrationStrategy.add(Destination); 
 // Adds a JVM destination to an itinerary <emphasis role="bold">
 
-void </emphasis>migrationStrategy.remove(Destination d) ; 
+void </emphasis>MigrationStrategy.remove(Destination d) ; 
 // Remove a JVM destination in an itinerary</programlisting>
   </sect1>
 
@@ -744,7 +665,7 @@ pad.killall(boolean softly);
     and which id deployed on a web server which location is
     http://localhost:8080.</para>
 
-    <programlisting lang="java">A a = (A) ProActiveObject.newActive('A', new Object []{}); 
+    <programlisting lang="java">A a = (A) PAActiveObject.newActive('A', new Object []{}); 
        // Constructs an active object 
 
 String [] methods = new String [] {'foo',  'bar'}; 
