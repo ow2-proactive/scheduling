@@ -228,14 +228,14 @@
 	</target>
 
 
-	<target name="compile.extra" depends="compile.core, compile.tests" description="Compile ProActive Extensions classes">
+	<target name="compile.extra" depends="compile.core" description="Compile ProActive Extensions classes">
 		<subant target="-compile" inheritall="yes" failonerror="true">
 			<fileset dir="${src.extra.dir}" includes="**/build.xml" />
 		</subant>
 	</target>
 
 
-	<target name="compile.tests" depends="compile.core, compile.extensions" description="Compile functional and unit tests classes">
+	<target name="compile.tests" depends="compile.core, compile.extensions, compile.extra" description="Compile functional and unit tests classes">
 		<javac srcdir="${src.test.dir}" destdir="${cl.test.dir}" includes="unitTests/**" deprecation="on" source="${source}" debug="${debug}">
 			<classpath refid="project.classpath" />
 		</javac>
