@@ -48,11 +48,6 @@
 				</complexType>
 			</element>
 			<element name="fileTransfer" type="pa:fileTransferType" minOccurs="0" maxOccurs="unbounded"></element>
-			<element name="executable" minOccurs="0">
-				<complexType>
-					<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
-				</complexType>
-			</element>
 		</sequence>
 		<attribute name="id" type="pa:idType"></attribute>
 	</complexType>
@@ -91,7 +86,7 @@
 							<all>
 								<element name="bootClasspath" type="pa:pathType" minOccurs="0"/>
 								<element name="java" type="pa:pathElementType" minOccurs="0" maxOccurs="1" />
-								<element name="jvmarg" type="pa:valueType" minOccurs="0"/>
+								<element name="jvmarg" type="string" minOccurs="0"/>
 								<element name="applicationClasspath" type="pa:classpathType" minOccurs="0" maxOccurs="1"/>
 								<element name="proactiveClasspath" type="pa:classpathType" minOccurs="0" maxOccurs="1"/>
 								<element name="securityPolicy" type="pa:pathElementType" minOccurs="0" maxOccurs="1"/>
@@ -150,7 +145,7 @@
 		</sequence>
 	</complexType>
 
-	<complexType name="ressourcesType">
+	<complexType name="resourcesType">
 		<sequence>
 			<element name="nodeProvider" type="pa:nodeProviderType" minOccurs="0" maxOccurs="unbounded">
 			</element>
@@ -161,7 +156,7 @@
 		<sequence>
 			<element name="environment" type="pa:environmentType" minOccurs="0" />
 			<element name="application" type="pa:applicationType" minOccurs="1" maxOccurs="1"></element>
-			<element name="resources" type="pa:ressourcesType" minOccurs="1" maxOccurs="1"></element>
+			<element name="resources" type="pa:resourcesType" minOccurs="1" maxOccurs="1"></element>
 		</sequence>
 	</complexType>
 
