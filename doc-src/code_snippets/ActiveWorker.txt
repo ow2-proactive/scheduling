@@ -31,6 +31,6 @@
 
 public class Worker implements Serializable{
 	public Worker(){}//empty no-arg constructor needed by ProActive
-	public void doNothingGracefully(){
-	}
+	public Worker(Long age, String Name){};
+	public void doNothingGracefully(){};
 }
