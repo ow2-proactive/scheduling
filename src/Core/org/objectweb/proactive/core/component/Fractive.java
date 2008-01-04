@@ -56,6 +56,7 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -102,6 +103,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author Matthieu Morel
  */
+@PublicAPI
 public class Fractive implements ProActiveGenericFactory, Component, Factory {
     private static Fractive instance = null;
     private TypeFactory typeFactory = ProActiveTypeFactoryImpl.instance();
