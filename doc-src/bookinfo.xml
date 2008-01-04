@@ -26,9 +26,9 @@ And Concurrent Computing</subtitle>
   </copyright>
 
   <legalnotice id="LegalNotice">
-    <para>ProActive is a GRID Java middleware, with source code under Open Source License. </para>
+    <para>ProActive is a GRID Java middleware, with the source code under the GPL2 licence. </para>
 
-    <para>Copyright INRIA 1997-2007.</para>
+    <para>Copyright INRIA 1997-2008.</para>
   </legalnotice>
 
   <mediaobject>
