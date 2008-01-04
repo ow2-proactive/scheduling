@@ -33,6 +33,7 @@ package org.objectweb.proactive;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.request.BlockingRequestQueue;
 import org.objectweb.proactive.core.body.request.Request;
@@ -42,6 +43,7 @@ import org.objectweb.proactive.core.component.body.ComponentBody;
 
 
 /**
+ * 
  * <P>
  * Service is a utility class that provides many useful methods to serve requests.
  * It is usually instantiated once at the beginning of the runActivity() method of
@@ -79,6 +81,7 @@ import org.objectweb.proactive.core.component.body.ComponentBody;
  * @see RunActive
  *
  */
+@PublicAPI
 public class Service {
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
