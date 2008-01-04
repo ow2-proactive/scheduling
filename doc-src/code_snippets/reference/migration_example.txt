@@ -1,0 +1,9 @@
+public void moveTo(Object) { 
+  try {
+     PAMobileAgent.migrateTo(t);
+  }
+  catch (Exception e) { 
+     e.printStackTrace(); 
+     logger.info('Cannot migrate.'); 
+  } 
+}
