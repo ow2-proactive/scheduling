@@ -164,8 +164,6 @@ public class TestDeploymentDescriptorParser {
         String userSchema = getClass().getResource("testfiles/deployment/SampleDeploymentExtension.xsd")
                 .getFile();
 
-        userSchema = "/home/glaurent/workspace/proactive_trunk/classes/Tests/unitTests/deployment/descriptorParser/testfiles/deployment/SampleDeploymentExtension.xsd";
-
         ArrayList<String> schemas = new ArrayList<String>();
         schemas.add(userSchema);
 
