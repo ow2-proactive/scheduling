@@ -54,7 +54,7 @@ import org.xml.sax.SAXException;
 
 public class TestApplicationDescriptorParser {
     final static String TEST_APP_DIR = TestApplicationDescriptorParser.class.getClass().getResource(
-            "/unitTests/deployment/descriptorParser/testfiles/application").getFile();
+            "/Tests/unitTests/gcmdeployment/descriptorParser/testfiles/application").getFile();
 
     //    @Test
     public void test() throws IOException, XPathExpressionException, SAXException,
@@ -108,7 +108,7 @@ public class TestApplicationDescriptorParser {
 
             String userSchema = getClass()
                     .getResource(
-                            "/unitTests/deployment/descriptorParser/testfiles/application/SampleApplicationExtension.xsd")
+                            "/Tests/unitTests/gcmdeployment/descriptorParser/testfiles/application/SampleApplicationExtension.xsd")
                     .toString();
 
             ArrayList<String> schemas = new ArrayList<String>();
