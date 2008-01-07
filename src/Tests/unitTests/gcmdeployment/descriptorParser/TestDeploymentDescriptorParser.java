@@ -165,7 +165,7 @@ public class TestDeploymentDescriptorParser {
                 .getFile());
 
         URL userSchema = getClass().getResource("testfiles/deployment/SampleDeploymentExtension.xsd");
-        
+
         ArrayList<String> schemas = new ArrayList<String>();
         schemas.add(userSchema.toString());
 
