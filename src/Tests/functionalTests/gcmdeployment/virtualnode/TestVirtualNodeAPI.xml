@@ -4,11 +4,13 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 
-	<!-- broken sample descriptor - remove ? -->
+	<environment>
+		<javaPropertyVariable name="proactive.home"/>
+	</environment>
 
 	<application>
 		
-		<proactive  relpath="ProActive">
+		<proactive  relpath="${proactive.home}">
 			<configuration>
 				<jvmarg value="-Dproactive.test=true"/>
 			</configuration>
