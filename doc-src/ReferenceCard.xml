@@ -342,43 +342,8 @@
   <sect1>
     <title>Groups:</title>
 
-    <para><programlisting lang="java">A ga = (A) PAGroup.newGroup( 'A', params, nodes);
-   // Created at once a group of AO of type 'A' in the JVMs specified 
-   // by nodes. ga is a Typed Group of type 'A'. 
-   // The number of AO being created matches the number of param arrays.
-   // Nodes can be a Virtual Node defined in an XML descriptor */
-ga.foo(...);
-   // A general group communication without result.
-   // A request to foo is sent in parallel to AO in group ga  */
-V gv = ga.bar(...);
-   // A general group communication with a result.
-   // gv is a typed group of 'V', which is first a group
-   // of awaited Futures, to be filled up asynchronously 
-gv.gee (...);
-   // Use of the result of an asynchronous group call. It is also a  
-   // collective operation: gee method is called in parallel on each object\
- in group. 
-   // Wait-by-necessity occurs when results are awaited */
-Group ag = PAGroup.getGroup(ga);
-   // Get the group representation of a typed group
-ag.add(o);
-   // Add object in the group ag. o can be a standard Java object or an AO,
-   // and in any case must be of a compatible type 
-ag.remove(index)
-   // Removes the object at the specified index
-A ga2 = (A) ag.getGroupByType();
-   // Returns to the typed view of a group
-   
-<emphasis role="bold">void</emphasis> setScatterGroup(g);
-   // By default, a group used as a parameter of a group communication
-   // is sent to all as it is (deep copy of the group).
-   // When set to scatter, upon a group call (ga.foo(g)) such a scatter 
-   // parameter is dispatched in a round robing fashion to AOs in the
-   // target group, e.g. upon ga.foo(g) */  
-     
-<emphasis role="bold">void </emphasis> unsetScatterGroup(g);
-   // Get back to the default: entire group transmission in all group
-   // communications, e.g. upon ga.foo(g) */</programlisting></para>
+    <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/groups.txt" /></textobject></programlisting>
   </sect1>
 
   <sect1>
@@ -387,155 +352,81 @@ A ga2 = (A) ag.getGroupByType();
     <para>Methods both in Interface Group, and static in class
     ProActiveGroup</para>
 
-    <programlisting><emphasis role="bold">boolean </emphasis> PAGroup.allAwaited (Object); 
-// Returns True if object is a group and all members are still awaited <emphasis
-        role="bold">
-
-boolean </emphasis>PAGroup.allArrived (Object); 
-// Returns False only if at least one member is still awaited <emphasis
-        role="bold">
-
-void </emphasis> PAGroup.waitAll (Object); 
-// Wait for all the members in group to arrive (all no longer awaited) <emphasis
-        role="bold">
-
-void </emphasis> PAGroup.waitN (Object, int nb); 
-// Wait for at least nb members in group to arrive
-<emphasis role="bold">
-int </emphasis> PAGroup.waitOneAndGetIndex (Object); 
-// Waits for at least one member to arrived, and returns its index</programlisting>
+  <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/explicit_group_synchronization.txt" /></textobject></programlisting>
   </sect1>
 
   <sect1>
     <title>OO SPMD</title>
 
-    <para><programlisting lang="java">A spmdGroup  =  (A) PASPMD.newSPMDGroup('A', params, nodes);
-   // Creates an SPMD group and creates all members with params on the nodes.
-   // An SPMD group is a typed group in which every member has a reference to
-   // the others (the SPMD group itself).
-
-A mySpmdGroup = (A) PASPMD.getSPMDGroup();
-   // Returns the SPMD group of the activity.
-
-int rank = PASPMD.getMyRank();
-   // Returns the rank of the activity in its SPMD group.
-
-PASPMD.barrier('barrierID');
-   // Blocks the activity (after the end of the current service) until all
-   // other members of the SPMD group invoke the same barrier. 
-   // Three barriers are available: total barrier, neighbors based barrier
-   // and method based barrier. </programlisting></para>
+  <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/oospmd.txt" /></textobject></programlisting>
   </sect1>
 
   <sect1>
     <title>Migration</title>
 
-    <para>Methods both in Interface MigrationController, and static in class
-    PAMobileAgent</para>
+    <para>Methods both in the interface <literal>MigrationController</literal>, and in class
+    <literal>PAMobileAgent</literal></para>
 
-    <programlisting lang="java"><emphasis role="bold">void </emphasis> migrateTo(Object o); 
-// Migrate the current AO to the same JVM as the AO <emphasis role="bold">
-
-void </emphasis> void migrateTo(String nodeURL); 
-// Migrate the current AO to JVM given by the node URL 
-<emphasis role="bold">
-int </emphasis> void migrateTo(Node node); 
-// Migrate the current AO to JVM given by the node</programlisting>
-
-    <para>To initiate the migration of an object from outside, define a public
+ <programlisting lang="java"><textobject><textdata
+		fileref="code_snippets/reference/migration_methods.txt" /></textobject></programlisting>
+    
+        <para>To initiate the migration of an object from outside, define a public
     method, that upon service will call the static migrateTo primitive:</para>
 
-    <programlisting lang="java"><emphasis role="bold">public void </emphasis>moveTo(Object) { 
-<emphasis role="bold">  try</emphasis>{ PAMobileAgent.migrateTo(t); } <emphasis
-        role="bold">
-  catch</emphasis> (Exception e) { 
-    e.printStackTrace(); 
-    logger.info('Cannot migrate.'); 
-  } 
-  
-} 
-</programlisting>
-To define a migration strategy we implement the methods in in the interface <literal>MigrationStrategyManager</literal>:
-<programlisting lang="java"><emphasis role="bold">void </emphasis>onDeparture(String MethodName); 
-// Specification of a method to execute before migration <emphasis role="bold">
-
-void </emphasis> onArrival(String MethodName); 
-// Specification of a method to execute after migration, upon the 
-// arrival in a new JVM <emphasis role="bold">
-
-void </emphasis>setMigrationStrategy(MigrationStrategy); 
-// Specifies a migration itinerary <emphasis role="bold">
-
-void </emphasis>MigrationStrategy.add(Destination); 
-// Adds a JVM destination to an itinerary <emphasis role="bold">
-
-void </emphasis>MigrationStrategy.remove(Destination d) ; 
-// Remove a JVM destination in an itinerary</programlisting>
+	 <programlisting lang="java"><textobject><textdata
+			fileref="code_snippets/reference/migration_example.txt" /></textobject></programlisting>
+    
+		<para>To define a migration strategy we implement the methods in in the interface <literal>MigrationStrategyManager</literal>:
+		</para>
+		 <programlisting lang="java"><textobject><textdata
+			fileref="code_snippets/reference/migration_strategy.txt" /></textobject></programlisting>
   </sect1>
 
   <sect1>
     <title>Components</title>
 
-    <para>Components are formed from AOs, a component is linked and
-    communicates with other remote components. A component can be composite,
-    made of other components, and as such itself distributed over several
+    <para>Components are formed from AOs. A component can be linked and
+    can communicate with other remote components. A component can be composite,
+    made of other components, and distributed over several
     machines. Component systems are defined in XML files (ADL: Architecture
     Description Language); these files describe the definition, the assembly,
     and the bindings of components.</para>
    
    <indexterm><primary>ADL</primary></indexterm>
 
-    <para>Components follow the Fractal hierarchical component model
-    specification and API, see http://fractal.objectweb.org</para>
+    <para>Components follow the <xref ulink="http://fractal.objectweb.org">Fractal hierarchical component model</xref>
+    specification and API. </para>
 
     <para>The following methods are specific to ProActive.</para>
 
-    <para>In the class org.objectweb.proactive.ProActive:</para>
+    <para>In the class <literal>PAComponent</literal>:</para>
 
-    <programlisting lang="java">Component newActiveComponent('A', params, VirtualNode, ComponentParameters); 
-// Creates a new ProActive component from the specified class A. 
-// The component is distributed on JVMs specified by the Virtual Node 
-// The ComponentParameters defines the configuration of a component: 
-// name of component, interfaces (server and client), etc. 
-// Returns a reference to a component, as defined in the Fractal API</programlisting>
-
-    <para>In the class org.objectweb.proactive.core.component.Fractive:</para>
-
-    <programlisting lang="java">ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature); 
-// This method is used in primitive components. 
-// It generates a client collective interface named itfName, and typed as itfSignature. 
-// This collective interface is a typed ProActive group.</programlisting>
+ 		<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/new_component.txt" /></textobject></programlisting>
+			
+    <para><literal>Fractive:</literal></para>
+ 		<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/fractive_component.txt" /></textobject></programlisting>
   </sect1>
 
   <sect1>
     <title>Security:</title>
 
-    <para>An X.509 Public Key Infrastructure (PKI) allowing communication
+    <para>ProActive has an X.509 Public Key Infrastructure (PKI) allowing communication
     Authentication, Integrity, and Confidentiality (AIC) to be configured in
-    an XML security file, at deployment, outside any source code. Security is
-    compatible with mobility, allows for hierarchical domain specificationand
+    an XML security file at deployment and outside any source code. Security is
+    compatible with mobility, allows for hierarchical domain specification and
     dynamically negotiated policies.</para>
 
     <para><emphasis role="bold">Example of specification:</emphasis></para>
 
-    <programlisting lang="XML">&lt;Rule&gt; 
- &lt;From&gt;
-  &lt;Entity type='VN' name='VN1'/&gt; 
- &lt;/From&gt;
-  &lt;To&gt; 
-   &lt;Entity type='VN' name='VN2'/&gt; 
-  &lt;/To&gt; 
-  &lt;Communication&gt; 
-   &lt;Request value='authorized'&gt; 
-    &lt;Attributes authentication='required' integrity='required' confidentiality='optional'/&gt; 
-   &lt;/Request&gt; 
-  &lt;/Communication&gt; 
-  &lt;Migration&gt;denied&lt;/Migration&gt; 
-  &lt;AOCreation&gt;denied&lt;/AOCreation&gt; 
-&lt;/Rule&gt;</programlisting>
+		<programlisting lang="XML"><textobject><textdata
+				fileref="code_snippets/reference/xml_security_file.txt" /></textobject></programlisting>
 
-    <para>This rule specifies that: from Virual Node 'VN1' to the VN 'VN2',
-    the communications (requests) are authorized, provided authentication and
+    <para>This rule specifies that communications (requests) are authorized 
+    from Virtual Node 'VN1' to the VN 'VN2', provided that authentication and
     integrity are being used, while confidentiality is optional. Migration and
     AO creation are not authorized.</para>
   </sect1>
@@ -553,82 +444,25 @@ void </emphasis>MigrationStrategy.remove(Destination d) ;
     descriptors allow to abstract away from source code: machines, creation,
     lookup and registry protocols.</para>
 
-    <para><emphasis role="bold">Descriptor example: creates one jvm on the
-    local machine</emphasis></para>
+    <para><emphasis role="bold">Descriptor example that creates three JVMs on the
+    local machine: </emphasis></para>
 
-    <para><programlisting lang="xml">&lt;ProActiveDescriptor xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' 
-      xsi:noNamespaceSchemaLocation='DescriptorSchema.xsd'&gt;
+ 		<programlisting lang="XML"><textobject><textdata
+				fileref="../src/Examples/org/objectweb/proactive/examples/masterworker/WorkersLocal.xml" /></textobject></programlisting>
+    
+    <para>We can also specify lists of hosts for deployment: </para>
+ 		<programlisting lang="XML"><textobject><textdata
+				fileref="../src/Examples/org/objectweb/proactive/examples/masterworker/RSHListbyHost_Example.xml" /></textobject></programlisting>
 
-  &lt;virtualNodesDefinition&gt;
-    &lt;virtualNode name='<emphasis role="bold">Dispatcher</emphasis>'/&gt;  &lt;!-- Name of the Virtual Node that will be used in program source --&gt;
-  &lt;/virtualNodesDefinition&gt;
-  &lt;componentDefinition/&gt;
-    &lt;deployment&gt;
-      &lt;mapping&gt;
-      &lt;!-- This part contains the mapping VNs -- JVMs --&gt;
-        &lt;map virtualNode='<emphasis role="bold">Dispatcher</emphasis>'&gt;
-          &lt;jvmSet&gt;
-             &lt;vmName value='<emphasis role="bold">Jvm1</emphasis>'/&gt;             &lt;!-- Virtual Node Dispatcher is mapped onto Jvm1 --&gt;
-          &lt;/jvmSet&gt;
-        &lt;/map&gt;
-      &lt;/mapping&gt;
-      &lt;jvms&gt;
-        &lt;jvm name='<emphasis role="bold">Jvm1</emphasis>'&gt;
-        &lt;!-- This part defines how the jvm will be obtained: creation or
-             acquisition: creation in this example --&gt;
-          &lt;creation&gt;
-            &lt;processReference refid='<emphasis role="bold">creationProcess</emphasis>'/&gt;
-            &lt;!-- Jvm1 will be created using creationProcess defined below --&gt;
-          &lt;/creation&gt;
-        &lt;/jvm&gt;
-      &lt;/jvms&gt;
-    &lt;/deployment&gt;
-    &lt;infrastructure&gt;
-      &lt;processes&gt;
-        &lt;processDefinition id='<emphasis role="bold">creationProcess</emphasis>'&gt;
-         &lt;!-- Definition of creationProcess referenced above --&gt;
-          &lt;jvmProcess class='org.objectweb.proactive.core.process.JVMNodeProcess'/&gt;
-         &lt;!-- creationProcess is a jvmProcess. The jvm will be created on
-              the local machine using default settings (classpath, java path,...)  --&gt;
-        &lt;/processDefinition&gt;
-      &lt;/processes&gt;
-    &lt;/infrastructure&gt;
-  &lt;componentDefinition&gt;
-&lt;/ProActiveDescriptor&gt;     </programlisting></para>
+
 
     <para><emphasis role="bold">Deployment API</emphasis></para>
+	<para>Deployment is done in several steps: load the XML descriptor file, activate the virtual nodes, and
+	manipulate nodes and objects.
+	</para>
+		<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/deployment_api.txt" /></textobject></programlisting>
 
-    <programlisting lang="java">ProActiveDescriptor pad = ProActive.getProActiveDescriptor(String File); 
-// Returns a ProActiveDescriptor object from the xml 
-// descriptor file name 
-
-pad.activateMapping(String VN); 
-// Activates the given Virtual Node: launches or acquires 
-// all the JVMs the VN is mapped onto
-
-pad.activateMappings(); 
-// Activates all VNs defined in the ProActiveDescriptor 
-
-VirtualNode vn = pad.getVirtualNode(String) 
-// Created  at once a group of AO of type 'A' in the JVMs specified 
-// by the given vn. The Virtual Node is automatically activated if not 
-// explicitly done before 
-
-Node[] n = vn.getNodes(); 
-// Returns all nodes mapped to the target Virtual Node 
-
-Object[] n[0].getActiveObjects(); 
-// Returns a reference to all AOs deployed on the target Node 
-
-ProActiveRuntime part = n[0].getProActiveRuntime(); 
-// Returns a reference to the ProActive Runtime (the JVM) where the 
-// node has been created 
-
-pad.killall(boolean softly); 
-// Kills all the JVMs deployed with the descriptor 
-// not softly: all JVMs are killed abruptely 
-// softly: all JVMs that originated the creation of a rmi registry 
-// wait until registry is empty before dying</programlisting>
   </sect1>
 
   <sect1>
@@ -637,26 +471,15 @@ pad.killall(boolean softly);
     <para><emphasis role="bold">Functional exceptions with
     asynchrony</emphasis></para>
 
-    <programlisting lang="java">ProActive.tryWithCatch(MyException.class);
-// Just before the <emphasis role="bold">try</emphasis> 
-<emphasis role="bold">try</emphasis> { 
-    // Some asynchronous calls with exceptions 
-    // One can use ProActive.throwArrivedException() and 
-    // ProActive.waitForPotentialException() here 
-     ProActive.endTryWithCatch();
-     // At the end of the <emphasis role="bold">try</emphasis> 
-    } <emphasis role="bold">catch</emphasis> (MyException e) { 
-    // ... 
-    } <emphasis role="bold">finally</emphasis> { 
-       ProActive.removeTryWithCatch();
-    // At the beginning of the <emphasis role="bold">finally</emphasis> }</programlisting>
+		<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/trywithcatch.txt" /></textobject></programlisting>
   </sect1>
 
   <sect1>
     <title>Export Active Objects as Web services</title>
 
     <para>ProActive allows active objects exportation as web services. The
-    service is deployed onto a Jakarta Tomcat web server with a given url. It
+    service is deployed onto a Jakarta Tomcat web server with a given URL. It
     is identified by its urn, an unique id of the service. It is also possible
     to choose the exported methods of the object.</para>
 
@@ -665,17 +488,8 @@ pad.killall(boolean softly);
     and which id deployed on a web server which location is
     http://localhost:8080.</para>
 
-    <programlisting lang="java">A a = (A) PAActiveObject.newActive('A', new Object []{}); 
-       // Constructs an active object 
-
-String [] methods = new String [] {'foo',  'bar'}; 
-//A String array containing the exported methods
-
-WebServices.exposeAsWebService(a,'http://localhost:8080','a',methods);
-//Export the active object as a web service
-
-WebServices.unExposeAsWebService('a', 'http://localhost:8080'); 
-//Undeploy the service 'a' on the web server located at http://localhost:8080</programlisting>
+		<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/export_to_web_service.txt" /></textobject></programlisting>
   </sect1>
 
   <sect1>
@@ -694,33 +508,8 @@ WebServices.unExposeAsWebService('a', 'http://localhost:8080');
     <para><emphasis role="bold">A Fault-tolerant deployment
     descriptor</emphasis></para>
 
-    <para><programlisting lang="xml">&lt;ProActiveDescriptor&gt; 
-   ...
-   &lt;virtualNodesDefinition&gt; 
-     &lt;virtualNode name='NonFT-Workers' property='multiple'/&gt; 
-     &lt;virtualNode name='FT-Workers' property='multiple' ftServiceId='appli'/&gt;
-   &lt;/virtualNodesDefinition&gt; 
-   ... 
-   &lt;serviceDefinition id='appli'&gt;
-     &lt;faultTolerance&gt; 
-       
-            &lt;!-- Protocol selection: cic or pml --&gt;
-       &lt;protocol type='cic' /&gt;   
-
-           &lt;!-- URL of the fault-tolerance server --&gt;   
-       &lt;globalServer url='rmi://localhost:1100/FTServer'/&gt;
-
-        &lt;!-- URL of the resource server; all the nodes mapped on this virtual 
-             node will be registred in as resource nodes for recovery --&gt;       
-       &lt;resourceServer url='rmi://localhost:1100/FTServer'/&gt;
-
-         &lt;!--  Average time in seconds between two consecutive checkpoints for each object --&gt;
-       &lt;ttc value='5'/&gt; 
-     &lt;/faultTolerance&gt; 
-   &lt;/serviceDefinition&gt; 
-  &lt;/services&gt; 
-  ...
-&lt;/ProActiveDescriptor&gt;</programlisting></para>
+		<programlisting lang="XML"><textobject><textdata
+				fileref="code_snippets/reference/fault_descriptor.txt" /></textobject></programlisting>
 
     <para><emphasis role="bold">Starting the fault-tolerance
     server</emphasis></para>
@@ -804,60 +593,28 @@ WebServices.unExposeAsWebService('a', 'http://localhost:8080');
     <para>Now you have a P2P Infrastructure running, you might want to deploy
     your ProActive application on it. That is simple, just modify the XML
     deployment descriptor:</para>
-
-    <programlisting lang="xml">... 
-&lt;jvms&gt; 
-  &lt;jvm name='Jvm1'&gt; 
-     &lt;acquisition&gt;
-       &lt;serviceReference refid='p2plookup'/&gt; 
-    &lt;/acquisition&gt;
-  &lt;/jvm&gt; 
- ... 
-&lt;/jvms&gt; 
-... 
-&lt;infrastructure&gt; 
-  ...
-  &lt;services&gt; 
-    &lt;serviceDefinition id='p2plookup'&gt; 
-      &lt;P2PService nodesAsked='2' acq='rmi' port='6666'&gt; 
-        &lt;peerSet&gt;
-          &lt;peer&gt;//second.peer.host&lt;/peer&gt; 
-        &lt;/peerSet&gt;
-     &lt;/P2PService&gt; 
-   &lt;/serviceDefinition&gt; 
-   ... 
- &lt;/services&gt; 
- ...
-&lt;/infrastructure&gt; 
-...</programlisting>
+	<!-- //TODO check if the descriptor is correct -->
+	<programlisting lang="XML"><textobject><textdata
+				fileref="code_snippets/reference/p2p_descriptor.txt" /></textobject></programlisting>
 
     <para>In the <emphasis role="bold">nodesAsked</emphasis> argument, a
     special value <emphasis role="bold">MAX</emphasis> is allowed. When it is
-    used, the P2P infrastructure returns the maximun number of nodes avilable,
-    and continue while the application running to return new nodes to the
-    application. To use all the benefit of that feature, you might add a nodes
-    creation event listener to your application.</para>
-
+    used, the P2P infrastructure returns the maximum number of nodes available,
+    and continues to return new nodes to the
+    application while the application is running. To use all the benefits of the feature, we need to add a nodes
+    creation event listener to the application.</para>
+	<!-- This is not correct check -->
     <para><emphasis role="bold">Usage Example:</emphasis></para>
 
-    <programlisting lang="java">// getting the p2p virtual node 
-VirtualNode vn = pad.getVirtualNode('p2pvn'); 
+	<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/p2p_example.txt" /></textobject></programlisting>
 
-// adding 'this' as a listener
-((VirtualNodeImpl) vn).addNodeCreationEventListener(<emphasis role="bold">this</emphasis>); 
-
-// then activate the virtual node 
-vn.activate();</programlisting>
-
-    <para>'this' has to implement the NodeCreationEventListener
+  <para>'this' has to implement the NodeCreationEventListener
     interface:</para>
 
-    <programlisting lang="java"><emphasis role="bold">public void</emphasis>
-    nodeCreated(NodeCreationEvent event) { 
-        // get the node Node 
-        newNode = event.getNode(); 
-        // now you can create an active object on your node.
-    }</programlisting>
+ 	<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/p2p_example1.txt" /></textobject></programlisting>
+
   </sect1>
 
   <sect1>
@@ -865,38 +622,9 @@ vn.activate();</programlisting>
 
     <para>Firstly, create your own task:</para>
 
-    <programlisting lang="java"><emphasis role="bold">import</emphasis> org.objectweb.proactive.branchnbound.core.Task; <emphasis
-        role="bold">
+	<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/bnb.txt" /></textobject></programlisting>
 
-public class</emphasis> YourTask <emphasis role="bold">extends</emphasis> Task { 
-   <emphasis role="bold">
-  public</emphasis> Result execute() { 
-     // Your code here for computing a solution 
-   } <emphasis role="bold">
-
-  public</emphasis> Vector split() { 
-    // Your code for generating sub-tasks 
-    } 
- 
-  <emphasis role="bold">public Result</emphasis> gather(Result[] results) { 
-    // Override optional 
-    // Default behavior based on the smallest gave by the compareTo 
-    } <emphasis role="bold">
-
-  public void</emphasis> initLowerBound() { 
-    // Your code here for computing a lower bound 
-    } <emphasis role="bold">
-
-  public void</emphasis> initUpperBound() { 
-    // Your code here for computing a lower bound 
-    } 
-
-  <emphasis role="bold">public int</emphasis> compareTo(Object arg) { 
-     // Strongly recommended to override this method 
-     // with your behavior 
-     } 
-
-}</programlisting>
 
     <para>How to interact with the framework from inside a task:</para>
 
@@ -904,30 +632,16 @@ public class</emphasis> YourTask <emphasis role="bold">extends</emphasis> Task {
       <listitem>
         <para>Some class variables:</para>
 
-        <programlisting lang="java"><emphasis role="bold">protected</emphasis> Result initLowerBound; 
-  // to store your lower bound
+	<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/bnb_variables.txt" /></textobject></programlisting>
 
-<emphasis role="bold">protected</emphasis> Result initUpperBound; 
-  // to store you upper bound
-
-<emphasis role="bold">protected</emphasis> Object bestKnownSolution; 
-  // set by the framework with the best current solution
-
-<emphasis role="bold">protected</emphasis> Worker worker; 
-  // to interact with the framework (see below)</programlisting>
       </listitem>
 
       <listitem>
         <para>Interact with the framework (inside a Task):</para>
 
-        <programlisting lang="java"><emphasis role="bold">this</emphasis>.worker.setBestCurrentResult(newBestSolution); 
-  // the worker will broadcast the solution in all Tasks
-
-<emphasis role="bold">this</emphasis>.worker.sendSubTasksToTheManager(subTaskList); 
-  // send a set of sub-tasks for computation to the framework
-
-BooleanWrapper workersAvailable = <emphasis role="bold">this</emphasis>.worker.isHungry(); 
-// for a smart split, check for free workers</programlisting>
+	<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/bnb_interact.txt" /></textobject></programlisting>
       </listitem>
     </itemizedlist>
 
@@ -949,43 +663,38 @@ BooleanWrapper workersAvailable = <emphasis role="bold">this</emphasis>.worker.i
 
     <para>Finally, start the compution:</para>
 
-    <programlisting lang="java">Task task = <emphasis role="bold">new</emphasis> YourTask(someArguments); 
-Manager manager = ProActiveBranchNBound.newBnB(task, nodes, LargerQueueImpl.class.getName()); 
+	<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/bnb_start.txt" /></textobject></programlisting>
 
-Result futureResult = manager.start();
-    // this call is asynchronous ...</programlisting>
-
-    <para>Keep in mind that is only 'initLower/UpperBound' and 'split' methods
+    <para>Keep in mind that only 'initLower/UpperBound' and 'split' methods
     are called on the root task. The 'execute' method is called on the root
-    task's splitted task. Here the methods order execution:</para>
+    task's splitted task. The methods  execution  order is:</para>
 
     <orderedlist>
       <listitem>
-        <para>rootTask.initLowerBound(); // compute a first lower bound</para>
+        <para><literal>rootTask.initLowerBound(); // compute a first lower bound</literal></para>
       </listitem>
 
       <listitem>
-        <para>rootTask.initUpperBound(); // compute a first upper bound</para>
+        <para><literal>rootTask.initUpperBound(); // compute a first upper bound</literal></para>
       </listitem>
 
       <listitem>
-        <para>Task splitted = rootTask.split(); // generate a set of
-        tasks</para>
+        <para><literal>Task splitted = rootTask.split(); // generate a set of
+        tasks</literal></para>
       </listitem>
 
       <listitem>
-        <para><emphasis role="bold">for</emphasis> i <emphasis
-        role="bold">in</emphasis> splitted <emphasis role="bold">do in
-        parallel</emphasis></para>
+        <para><literal>for i in splitted do in
+        parallel</literal></para>
 
-        <programlisting lang="java">splitted[i].initLowerBound();
-splitted[i].initUpperBound();
-Result ri = splitted.execute();</programlisting>
-      </listitem>
+  		<programlisting lang="java"><textobject><textdata
+				fileref="code_snippets/reference/split.txt" /></textobject></programlisting>
+	</listitem>
 
       <listitem>
-        <para>Result final = rootTask.gather(Result[] ri); // gathering all
-        result</para>
+        <para><literal>Result final = rootTask.gather(Result[] ri); // gathering all
+        result</literal></para>
       </listitem>
     </orderedlist>
   </sect1>
@@ -997,31 +706,7 @@ Result ri = splitted.execute();</programlisting>
     deployment time. This files are specified using the ProActive XML
     Deployment Descriptor in the following way:</para>
 
-    <para><programlisting lang="xml">&lt;VirtualNode name='exampleVNode' <emphasis
-          role="bold">FileTransferDeploy</emphasis>='<emphasis role="bold">example</emphasis>'/&gt;
-....
-&lt;/deployment&gt;
-&lt;<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
-  &lt;<emphasis role="bold">FileTransfer</emphasis> id='<emphasis role="bold">example</emphasis>'&gt;
-      &lt;<emphasis role="bold">file</emphasis> src='hello.dat' dest='world.dat'/&gt;
-      &lt;<emphasis role="bold">dir</emphasis> src='exampledir' dest='exampledir'/&gt;
-  &lt;/<emphasis role="bold">FileTransfer</emphasis>&gt;
-  ...
-&lt;/<emphasis role="bold">FileTransferDefinitions</emphasis>&gt;
-&lt;infrastructure&gt;
-....
-&lt;processDefinition id='xyz'&gt;
-  &lt;sshProcess&gt;...
-    &lt;<emphasis role="bold">FileTransferDeploy</emphasis>='<emphasis
-          role="bold">implicit</emphasis>'&gt; 
-&lt;!-- referenceID or keyword 'implicit' (inherit)--&gt;
-      &lt;<emphasis role="bold">copyProtocol</emphasis>&gt;processDefault, scp, rcp&lt;/<emphasis
-          role="bold">copyProtocol</emphasis>&gt;
-      &lt;<emphasis role="bold">sourceInfo</emphasis> prefix='/home/user'/&gt;
-      &lt;<emphasis role="bold">destinationInfo</emphasis> prefix='/tmp' hostname='foo.org' username='smith' /&gt;
-    &lt;/<emphasis role="bold">FileTransferDeploy</emphasis>&gt;
-  &lt;/sshProcess&gt;
-&lt;/processDefinition&gt;
-...</programlisting></para>
+    <programlisting lang="XML"><textobject><textdata
+				fileref="code_snippets/reference/file_transfer.txt" /></textobject></programlisting>
   </sect1>
 </appendix>
