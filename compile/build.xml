@@ -85,7 +85,13 @@
 				<exclude name="functionalTests/component/collectiveitf/multicast/Tester.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/TesterImpl.class" />
 				<exclude name="functionalTests/component/collectiveitf/multicast/classbased/TesterImpl.class" />
+		
+				<!-- Load balancing is no longer maintained -->
 				<exclude name="functionalTests/loadbalancing/Test.class" />
+
+				<!-- Launcher is broken since commit #7223 -->
+				<exclude name="functionalTests/descriptor/launcher/**" />
+				
 			</fileset>
 		</else>
 	</if>
@@ -247,13 +253,9 @@
 		</javac>
 		<copy toDir="${cl.test.dir}">
 			<fileset dir="${src.test.dir}">
-				<include name="functionalTests/**/*.xml" />
-				<include name="functionalTests/**/*.fractal" />
-				<include name="functionalTests/**/*.properties" />
-				<include name="functionalTests/**/*.xsd" />
-				<include name="functionalTests/**/*.p12" />
-				<include name="unitTests/**/*.txt" />
-				<include name="performanceTests/**/*.xml" />
+				<include name="**/*.xml" />
+				<include name="**/*.txt" />
+				<include name="**/*.xsd" />
 			</fileset>
 		</copy>
 	</target>
