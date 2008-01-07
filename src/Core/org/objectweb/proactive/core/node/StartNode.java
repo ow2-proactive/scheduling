@@ -33,6 +33,7 @@ package org.objectweb.proactive.core.node;
 import java.rmi.AlreadyBoundException;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
@@ -91,7 +92,7 @@ public class StartNode {
             }
 
             e.printStackTrace();
-            System.exit(1);
+            PALifeCycle.exitFailure();
         }
     }
 
