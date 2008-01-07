@@ -2,18 +2,23 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
 	</import>
 
 	<complexType name="prunProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="hostList" type="pa:ListType" minOccurs="0" />
-					<element name="hostsNumber" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="hostList" type="cpa:ListType" minOccurs="0" />
+					<element name="hostsNumber" type="cpa:PosintOrVariableType" minOccurs="0" />
 					<element name="processorPerNode" minOccurs="0">
 						<simpleType>
 							<restriction base="integer">
@@ -22,8 +27,8 @@
 							</restriction>
 						</simpleType>
 					</element>
-					<element name="wallTime" type="pa:TimeOrVariableType" minOccurs="0" />
-					<element name="stdout" type="pa:TextOrVariableType" minOccurs="0" />
+					<element name="wallTime" type="cpa:TimeOrVariableType" minOccurs="0" />
+					<element name="stdout" type="cpa:TextOrVariableType" minOccurs="0" />
 				</sequence>
 				<attribute name="queue" type="string" use="optional" />
 			</extension>

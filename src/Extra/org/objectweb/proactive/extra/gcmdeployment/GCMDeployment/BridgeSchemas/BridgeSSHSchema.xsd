@@ -2,20 +2,25 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
 	</import>
 
 	<complexType name="bridgeTypeSSH">
 		<complexContent>
 			<extension base="pa:abstractBridgeElementType">
 				<sequence>
-					<element name="privateKey" type="pa:pathElementType" minOccurs="0" maxOccurs="1" />
+					<element name="privateKey" type="cpa:pathElementType" minOccurs="0" maxOccurs="1" />
 				</sequence>
-				<attribute name="hostname" type="pa:hostnameType" use="required" />
-				<attribute name="username" type="pa:usernameType"></attribute>
+				<attribute name="hostname" type="cpa:hostnameType" use="required" />
+				<attribute name="username" type="cpa:usernameType"></attribute>
 				<attribute name="commandPath" type="string"></attribute>
 				<attribute name="commandOptions" type="string"></attribute>
 			</extension>

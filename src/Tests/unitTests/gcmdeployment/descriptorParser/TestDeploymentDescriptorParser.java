@@ -32,6 +32,8 @@ package unitTests.gcmdeployment.descriptorParser;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,12 +44,13 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.AbstractBridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentParserImpl;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.AbstractBridgeParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.AbstractGroupParser;
 import org.objectweb.proactive.extra.gcmdeployment.process.bridge.AbstractBridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
@@ -161,11 +164,10 @@ public class TestDeploymentDescriptorParser {
         File descriptor = new File(getClass().getResource("testfiles/deployment/group_bridge_ext.xml")
                 .getFile());
 
-        String userSchema = getClass().getResource("testfiles/deployment/SampleDeploymentExtension.xsd")
-                .getFile();
-
+        URL userSchema = getClass().getResource("testfiles/deployment/SampleDeploymentExtension.xsd");
+        
         ArrayList<String> schemas = new ArrayList<String>();
-        schemas.add(userSchema);
+        schemas.add(userSchema.toString());
 
         System.out.println("Parsing " + descriptor.getAbsolutePath() + " with custom schema " + userSchema);
         GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor, schemas);

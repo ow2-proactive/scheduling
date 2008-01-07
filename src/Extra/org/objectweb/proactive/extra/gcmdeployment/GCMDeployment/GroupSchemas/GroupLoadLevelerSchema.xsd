@@ -2,25 +2,30 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
 	</import>
 
 	<complexType name="loadLevelerProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="directory" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="directory" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
 					<element name="resources" type="string" minOccurs="0" />
-					<element name="maxTime" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="arguments" type="pa:argumentListType" minOccurs="0" />
-					<element name="nbTasks" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="cpusPerTask" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="tasksPerHost" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="maxTime" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="arguments" type="cpa:argumentListType" minOccurs="0" />
+					<element name="nbTasks" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="cpusPerTask" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="tasksPerHost" type="cpa:PosintOrVariableType" minOccurs="0" />
 				</sequence>
 				<attribute name="jobName" type="string" />
 			</extension>

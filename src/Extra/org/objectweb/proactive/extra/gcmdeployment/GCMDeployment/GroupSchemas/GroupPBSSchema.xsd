@@ -2,10 +2,15 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
 	</import>
 
 	<!--PBSProcess-->
@@ -13,14 +18,14 @@
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="nodes" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="processorPerNodes" type="pa:PosintOrVariableType" minOccurs="0" />
+					<element name="nodes" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="processorPerNodes" type="cpa:PosintOrVariableType" minOccurs="0" />
 					<element name="mailWhen" type="string" minOccurs="0" />
 					<element name="mailTo" type="string" minOccurs="0" />
-					<element name="joinOutput" type="pa:BooleanOrVariableType" minOccurs="0" />
-					<element name="wallTime" type="pa:TimeOrVariableType" minOccurs="0" />
-					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="joinOutput" type="cpa:BooleanOrVariableType" minOccurs="0" />
+					<element name="wallTime" type="cpa:TimeOrVariableType" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
 				</sequence>
 				<attribute name="queue" type="string" use="optional" />
 				<attribute name="jobName" type="string" use="required" />

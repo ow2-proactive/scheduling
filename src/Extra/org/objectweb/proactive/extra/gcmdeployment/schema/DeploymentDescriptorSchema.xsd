@@ -2,18 +2,20 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"	
 	elementFormDefault="qualified">
 
-	<include schemaLocation="CommonTypes.xsd"></include>
-
+	<!-- <include schemaLocation="CommonTypes.xsd"></include>  -->
+ 	<import schemaLocation="CommonTypes.xsd" namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"></import>
+ 
 	<complexType name="abstractGroupElementType" abstract="true">
 		<sequence>
-			<element name="environment" type="pa:environmentVariablesType" minOccurs="0" />
-			<element name="scriptPath" type="pa:pathElementType" minOccurs="0" />
+			<element name="environment" type="cpa:environmentVariablesType" minOccurs="0" />
+			<element name="scriptPath" type="cpa:pathElementType" minOccurs="0" />
 		</sequence>
-		<attribute name="id" type="pa:idType" use="required" />
-		<attribute name="username" type="pa:usernameType" />
-		<attribute name="commandPath" type="pa:pathElementGeneralType" />
+		<attribute name="id" type="cpa:idType" use="required" />
+		<attribute name="username" type="cpa:usernameType" />
+		<attribute name="commandPath" type="cpa:pathElementGeneralType" />
 		<attribute name="bookedNodesAccess">
 			<simpleType>
 				<restriction base="string">
@@ -87,7 +89,7 @@
 				<sequence>
 					<element name="host" type="pa:hostRefType"></element>
 				</sequence>
-				<attribute name="refid" type="pa:idType" use="required" />
+				<attribute name="refid" type="cpa:idType" use="required" />
 			</extension>
 		</complexContent>
 	</complexType>
@@ -104,7 +106,7 @@
 					<element name="bridge" type="pa:bridgeRefType" minOccurs="0" maxOccurs="unbounded"></element>
 					<element name="host" type="pa:hostRefType" minOccurs="0" maxOccurs="1" />
 				</sequence>
-				<attribute name="refid" type="pa:idType" use="required" />
+				<attribute name="refid" type="cpa:idType" use="required" />
 				<attribute name="relay" type="string"></attribute>
 			</extension>
 		</complexContent>
@@ -125,15 +127,15 @@
 
 	<complexType name="toolType">
 		<attribute name="id" type="string"></attribute>
-		<attribute name="path" type="pa:pathElementGeneralType"></attribute>
+		<attribute name="path" type="cpa:pathElementGeneralType"></attribute>
 		<attribute name="version" type="string"></attribute>
 	</complexType>
 
 	<complexType name="homeDirectoryType">
 		<complexContent>
-			<restriction base="pa:pathElementType">
-				<attribute name="base" type="pa:pathElementBaseType" fixed="root" use="required"></attribute>
-				<attribute name="relpath" type="pa:pathElementGeneralType" use="required"></attribute>
+			<restriction base="cpa:pathElementType">
+				<attribute name="base" type="cpa:pathElementBaseType" fixed="root" use="required"></attribute>
+				<attribute name="relpath" type="cpa:pathElementGeneralType" use="required"></attribute>
 			</restriction>
 		</complexContent>
 	</complexType>
@@ -143,15 +145,15 @@
 			<element name="homeDirectory" type="pa:homeDirectoryType"></element>
 			<element name="tool" type="pa:toolType" minOccurs="0" maxOccurs="unbounded"></element>
 		</sequence>
-		<attribute name="id" type="pa:idType" use="required"></attribute>
-		<attribute name="os" type="pa:osType" use="required"></attribute>
+		<attribute name="id" type="cpa:idType" use="required"></attribute>
+		<attribute name="os" type="cpa:osType" use="required"></attribute>
 		<attribute name="username" type="string"></attribute>
 		<attribute name="hostCapacity" type="positiveInteger" use="optional" />
 		<attribute name="vmCapacity" type="positiveInteger" use="optional" />
 	</complexType>
 
 	<complexType name="hostRefType">
-		<attribute name="refid" type="pa:idType" use="required" />
+		<attribute name="refid" type="cpa:idType" use="required" />
 	</complexType>
 
 	<complexType name="abstractInfrastructureType"></complexType>
@@ -169,7 +171,7 @@
 	</complexType>
 
 	<complexType name="abstractBridgeElementType">
-		<attribute name="id" type="pa:idType" use="required" />
+		<attribute name="id" type="cpa:idType" use="required" />
 	</complexType>
 
 	<element name="abstractBridgeElement" type="pa:abstractBridgeElementType"></element>
@@ -192,7 +194,7 @@
 	<element name="GCMDeployment">
 		<complexType>
 			<sequence>
-				<element name="environment" type="pa:environmentType" minOccurs="0" />
+				<element name="environment" type="cpa:environmentType" minOccurs="0" />
 				<element name="resources" type="pa:resourceType" />
 				<element name="acquisition" type="pa:acquisitionType" minOccurs="0" />
 				<element name="infrastructure" type="pa:infrastructureType" />

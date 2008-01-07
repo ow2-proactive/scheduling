@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GCMDeployment xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension allGroupsSchema.xsd">
-
-	<!-- http://www-sop.inria.fr/oasis/ProActive/schemas ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-		
-		GCMDeployment/GroupSchemas/GroupGLiteSchema.xsd
-	-->
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                     ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
+	http://www-sop.inria.fr/oasis/ProActive/commonSchemas                                   ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/CommonTypes.xsd
+	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension     ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/ProtocolsSchema.xsd
+	"
+>
 
 	<environment>
-		<descriptorVariable name="USERNAME" value="jsmith" />
+		<cpa:descriptorVariable name="USERNAME" value="jsmith" />
 	</environment>
 
 	<resources>
@@ -129,9 +128,9 @@
 				<paext:stderr>trace/err.log</paext:stderr>
 				<paext:maxTime>15000000</paext:maxTime>
 				<paext:arguments>
-					<pa:arg>arg1</pa:arg>
-					<pa:arg>25</pa:arg>
-					<pa:arg>foo bar</pa:arg>
+					<cpa:arg>arg1</cpa:arg>
+					<cpa:arg>25</cpa:arg>
+					<cpa:arg>foo bar</cpa:arg>
 				</paext:arguments>
 				<paext:nbTasks>10</paext:nbTasks>
 				<paext:tasksPerHost>1</paext:tasksPerHost>
@@ -140,8 +139,8 @@
 			<paext:gridbusGroup id="gridbusgroup">
 				<pa:scriptPath base="root" relpath="./calc" />
 				<paext:arguments>
-					<pa:arg>arg1</pa:arg>
-					<pa:arg>arg2</pa:arg>
+					<cpa:arg>arg1</cpa:arg>
+					<cpa:arg>arg2</cpa:arg>
 				</paext:arguments>
 			</paext:gridbusGroup>
 

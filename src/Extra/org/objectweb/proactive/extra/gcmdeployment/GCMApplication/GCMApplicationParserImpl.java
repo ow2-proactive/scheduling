@@ -33,6 +33,8 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,15 +49,15 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
+import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParserExecutable;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParserProactive;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorFactory;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDescriptorParams;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
-import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
@@ -136,12 +138,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-        String deploymentSchema = getClass().getResource(APPLICATION_DESC_LOCATION).getFile();
+        URL deploymentSchema = getClass().getResource(APPLICATION_DESC_LOCATION);
 
-        String commonTypesSchema = getClass().getResource(COMMON_TYPES_LOCATION).getFile();
+        URL commonTypesSchema = getClass().getResource(COMMON_TYPES_LOCATION);
         System.out.println("#@# " + deploymentSchema);
-        schemas.add(0, deploymentSchema);
-        //        schemas.add(0, commonTypesSchema);
+        schemas.add(commonTypesSchema.toString());
+        schemas.add(deploymentSchema.toString());
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         documentBuilder = domFactory.newDocumentBuilder();

@@ -33,6 +33,7 @@ package org.objectweb.proactive.extra.gcmdeployment;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -102,18 +103,20 @@ public class GCMEnvironmentParser implements GCMParserConstants {
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-        String deploymentSchema = GCMDeploymentParserImpl.class.getClass().getResource(
-                DEPLOYMENT_DESC_LOCATION).getFile();
+        URL deploymentSchema = GCMDeploymentParserImpl.class.getClass().getResource(DEPLOYMENT_DESC_LOCATION);
 
-        String commonTypesSchema = GCMDeploymentParserImpl.class.getClass()
-                .getResource(COMMON_TYPES_LOCATION).getFile();
+        URL commonTypesSchema = GCMDeploymentParserImpl.class.getClass().getResource(COMMON_TYPES_LOCATION);
 
-        String extensionSchemas = GCMDeploymentParserImpl.class.getClass().getResource(
-                EXTENSION_SCHEMAS_LOCATION).getFile();
+        URL protocolsSchema = GCMDeploymentParserImpl.class
+                .getClass()
+                .getResource(
+                        "/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/ProtocolsSchema.xsd");
 
-        schemas.add(0, extensionSchemas);
-        schemas.add(0, deploymentSchema);
-        //        schemas.add(0, commonTypesSchema); // not needed - it is included by the deployment schema
+        // DO NOT change the order here, it would break validation
+        //
+        schemas.add(commonTypesSchema.toString());
+        schemas.add(deploymentSchema.toString());
+        schemas.add(protocolsSchema.toString());
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {

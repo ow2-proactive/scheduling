@@ -2,17 +2,22 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
 	</import>
 
 	<complexType name="bridgeTypeRSH">
 		<complexContent>
 			<extension base="pa:abstractBridgeElementType">
-				<attribute name="hostname" type="pa:hostnameType" use="required" />
-				<attribute name="username" type="pa:usernameType"></attribute>
+				<attribute name="hostname" type="cpa:hostnameType" use="required" />
+				<attribute name="username" type="cpa:usernameType"></attribute>
 				<attribute name="commandPath" type="string"></attribute>
 			</extension>
 		</complexContent>

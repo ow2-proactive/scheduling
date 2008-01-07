@@ -2,22 +2,27 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
 	</import>
 
 	<complexType name="globusProcessType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="count" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="maxTime" type="pa:PosintOrVariableType" minOccurs="0" />
-					<element name="directory" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
+					<element name="count" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="maxTime" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="directory" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdin" type="cpa:pathElementGeneralType" minOccurs="0" />
 				</sequence>
 				<attribute name="hostname" type="string" use="required" />
 				<attribute name="queue" type="string" use="optional" />

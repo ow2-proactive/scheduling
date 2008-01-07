@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	elementFormDefault="qualified">
 
 	<simpleType name="variableRefType">
 		<restriction base="string">
@@ -10,21 +12,21 @@
 
 	<!--PosintOrVariableType is defined as a union of a positive integer or a variable ref-->
 	<simpleType name="PosintOrVariableType">
-		<union memberTypes="positiveInteger pa:variableRefType" />
+		<union memberTypes="positiveInteger cpa:variableRefType" />
 	</simpleType>
 	<!--BooleanOrVariableType is defined as a union of a positive integer or a variable ref-->
 	<simpleType name="BooleanOrVariableType">
-		<union memberTypes="boolean pa:variableRefType" />
+		<union memberTypes="boolean cpa:variableRefType" />
 	</simpleType>
 	<simpleType name="TimeOrVariableType">
-		<union memberTypes="time pa:variableRefType" />
+		<union memberTypes="time cpa:variableRefType" />
 	</simpleType>
 	<simpleType name="TextOrVariableType">
-		<union memberTypes="string pa:variableRefType" />
+		<union memberTypes="string cpa:variableRefType" />
 	</simpleType>
 	<!--ListType is defined as a union of a positive integer or a variable ref-->
 	<simpleType name="ListType">
-		<union memberTypes="pa:variableRefType">
+		<union memberTypes="cpa:variableRefType">
 			<!--hostlist element is a list of string. For instance galere10.inria.fr pf3.inria.fr galere11.inria.fr -->
 			<simpleType>
 				<list itemType="string" />
@@ -34,7 +36,7 @@
 
 	<!--CloseStreamType is defined as a global element, it's the union of a CloseStream and a variable type.-->
 	<simpleType name="CloseStreamType">
-		<union memberTypes="pa:variableRefType">
+		<union memberTypes="cpa:variableRefType">
 			<simpleType>
 				<restriction base="string">
 					<enumeration value="yes" />
@@ -75,19 +77,25 @@
 	</simpleType>
 
 	<complexType name="pathElementType">
-		<attribute name="base" type="pa:pathElementBaseType" use="required"></attribute>
-		<attribute name="relpath" type="pa:pathElementGeneralType" use="required"></attribute>
+		<attribute name="base" type="cpa:pathElementBaseType"
+			use="required">
+		</attribute>
+		<attribute name="relpath" type="cpa:pathElementGeneralType"
+			use="required">
+		</attribute>
 	</complexType>
 
 	<complexType name="pathType">
 		<sequence>
-			<element name="pathElement" type="pa:pathElementType" maxOccurs="unbounded" minOccurs="1"></element>
+			<element name="pathElement" type="cpa:pathElementType"
+				maxOccurs="unbounded" minOccurs="1">
+			</element>
 		</sequence>
 	</complexType>
 
 	<complexType name="classpathType">
 		<complexContent>
-			<extension base="pa:pathType">
+			<extension base="cpa:pathType">
 				<attribute name="type" use="required">
 					<simpleType>
 						<restriction base="string">
@@ -104,12 +112,16 @@
 		<all>
 			<element name="source">
 				<complexType>
-					<attribute name="path" type="pa:pathElementGeneralType"></attribute>
+					<attribute name="path"
+						type="cpa:pathElementGeneralType">
+					</attribute>
 				</complexType>
 			</element>
 			<element name="dest">
 				<complexType>
-					<attribute name="relpath" type="pa:pathElementGeneralType"></attribute>
+					<attribute name="relpath"
+						type="cpa:pathElementGeneralType">
+					</attribute>
 				</complexType>
 			</element>
 		</all>
@@ -123,7 +135,7 @@
 	</simpleType>
 
 	<simpleType name="hostnameType">
-		<union memberTypes="pa:variableRefType">
+		<union memberTypes="cpa:variableRefType">
 			<simpleType>
 				<restriction base="string">
 					<pattern value="[a-z0-9.]+" />
@@ -133,7 +145,7 @@
 	</simpleType>
 
 	<simpleType name="usernameType">
-		<union memberTypes="pa:variableRefType">
+		<union memberTypes="cpa:variableRefType">
 			<simpleType>
 				<restriction base="string">
 					<pattern value="[a-z0-9]+" />
@@ -155,28 +167,49 @@
 		</attribute>
 	</complexType>
 
-	<element name="abstractVariable" abstract="true" type="pa:variableType"></element>
-	<element name="descriptorVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
-	<element name="descriptorDefaultVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
-	<element name="javaPropertyVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
-	<element name="programVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
-	<element name="programDefaultVariable" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
-	<element name="javaPropertyDescriptorDefault" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
-	<element name="javaPropertyProgramDefault" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
-	<element name="includeXMLFile" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
-	<element name="includePropertyFile" substitutionGroup="pa:abstractVariable" type="pa:variableType"></element>
+	<element name="abstractVariable" abstract="true"
+		type="cpa:variableType">
+	</element>
+	<element name="descriptorVariable"
+		substitutionGroup="cpa:abstractVariable" type="cpa:variableType">
+	</element>
+	<element name="descriptorDefaultVariable"
+		substitutionGroup="cpa:abstractVariable" type="cpa:variableType">
+	</element>
+	<element name="javaPropertyVariable"
+		substitutionGroup="cpa:abstractVariable" type="cpa:variableType">
+	</element>
+	<element name="programVariable"
+		substitutionGroup="cpa:abstractVariable" type="cpa:variableType">
+	</element>
+	<element name="programDefaultVariable"
+		substitutionGroup="cpa:abstractVariable" type="cpa:variableType">
+	</element>
+	<element name="javaPropertyDescriptorDefault"
+		substitutionGroup="cpa:abstractVariable" type="cpa:variableType">
+	</element>
+	<element name="javaPropertyProgramDefault"
+		substitutionGroup="cpa:abstractVariable" type="cpa:variableType">
+	</element>
+	<element name="includeXMLFile"
+		substitutionGroup="cpa:abstractVariable" type="cpa:variableType">
+	</element>
+	<element name="includePropertyFile"
+		substitutionGroup="cpa:abstractVariable" type="cpa:variableType">
+	</element>
 
 	<complexType name="dummyType"></complexType>
 
 	<complexType name="environmentType">
 		<sequence>
-			<element ref="pa:abstractVariable" maxOccurs="unbounded" />
+			<element ref="cpa:abstractVariable" maxOccurs="unbounded" />
 		</sequence>
 	</complexType>
 
 	<complexType name="environmentVariablesType">
 		<sequence>
-			<element name="variable" type="pa:variableType" maxOccurs="unbounded" />
+			<element name="variable" type="cpa:variableType"
+				maxOccurs="unbounded" />
 		</sequence>
 	</complexType>
 

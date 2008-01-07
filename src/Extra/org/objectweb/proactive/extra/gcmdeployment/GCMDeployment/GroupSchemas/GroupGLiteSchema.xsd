@@ -2,36 +2,34 @@
 <schema xmlns="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	elementFormDefault="qualified">
 
 	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
 		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
 	</import>
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
+	</import>
 
-
-	<!--gLiteProcess element has six children: processReference element, gLiteOptions which contains JDLFilePath child and SdtOutput child 
-		environment, rank, inputData, requirements-->
-	<!--Environment : List of string representing environment settings that hava to be performed on the execution machine.-->
-	<!--Requirements : String representing job requirements on ressources. Default is : Requirements = other.GlueCEStateStatusus == "Production";-->
-	<!--InputData : string or list of string representing physical file location on SE. Names have to be prefixed with "lfn", "guid", "lds", "query".-->
-	<!--Rank : ClassAd foating-point expression that states how to rank CEs that have already met the Requirements expression. Default is : Rank = -other.GlueCEStateEstimatedResponseTime; -->
 	<complexType name="gLiteGroupType">
 		<complexContent>
 			<extension base="pa:abstractGroupElementType">
 				<sequence>
-					<element name="requirements" type="pa:TextOrVariableType" minOccurs="0" />
+					<element name="requirements" type="cpa:TextOrVariableType" minOccurs="0" />
 					<element name="inputData" type="paext:gLiteInputDataType" minOccurs="0" />
 					<element name="rank" type="paext:gLiteRankType" />
-					<element name="JDLTransferDeploy" type="pa:fileTransferType" minOccurs="0" maxOccurs="1" />
-					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="configFile" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="JDLFilePath" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="JDLRemoteFilePath" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="arguments" type="pa:argumentListType" minOccurs="0" />
-					<element name="inputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
-					<element name="outputSandbox" type="pa:TextOrVariableType" minOccurs="0" />
+					<element name="JDLTransferDeploy" type="cpa:fileTransferType" minOccurs="0" maxOccurs="1" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdin" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="configFile" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="JDLFilePath" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="JDLRemoteFilePath" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="arguments" type="cpa:argumentListType" minOccurs="0" />
+					<element name="inputSandbox" type="cpa:TextOrVariableType" minOccurs="0" />
+					<element name="outputSandbox" type="cpa:TextOrVariableType" minOccurs="0" />
 				</sequence>
 				<attribute name="hostname" type="string" />
 				<attribute name="virtualOrganisation" type="string" use="required" />
@@ -51,8 +49,8 @@
 	<!--gLiteRankType-->
 	<complexType name="gLiteRankType">
 		<simpleContent>
-			<extension base="pa:TextOrVariableType">
-				<attribute name="fuzzyrank" type="pa:BooleanOrVariableType" default="false" />
+			<extension base="cpa:TextOrVariableType">
+				<attribute name="fuzzyrank" type="cpa:BooleanOrVariableType" default="false" />
 			</extension>
 		</simpleContent>
 	</complexType>

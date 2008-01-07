@@ -1,0 +1,384 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
+	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+	elementFormDefault="qualified">
+
+	<import schemaLocation="../../schema/CommonTypes.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
+	</import>
+
+	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
+		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
+	</import>
+ 
+	<complexType name="arcProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="count" type="cpa:PosintOrVariableType"
+						minOccurs="0" />
+					<element name="arguments" type="cpa:argumentListType"
+						minOccurs="0" />
+					<element name="inputFiles"
+						type="paext:arcFileTransferType" minOccurs="0" />
+					<element name="outputFiles"
+						type="paext:arcFileTransferType" minOccurs="0" />
+					<element name="stdout"
+						type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr"
+						type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdin"
+						type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="maxTime"
+						type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="notify" type="string" minOccurs="0" />
+				</sequence>
+				<attribute name="jobName" type="string" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="arcFileTransferType">
+		<sequence>
+			<element name="transfer">
+				<complexType>
+					<attribute name="filename" type="string" />
+					<attribute name="location" type="string" />
+				</complexType>
+			</element>
+		</sequence>
+	</complexType>
+
+	<element name="arcGroup" type="paext:arcProcessType"
+		substitutionGroup="pa:abstractShElement">
+	</element>
+
+	<complexType name="cgspProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+ 					<element name="count" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="directory" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+				</sequence>
+				<attribute name="hostname" type="string" />
+				<attribute name="queue" type="string" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="cgspGroup" type="paext:cgspProcessType" substitutionGroup="pa:abstractShElement"></element>
+
+	<complexType name="furaProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="description" type="string" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdin" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="maxTime" type="cpa:PosintOrVariableType" minOccurs="0" />
+				</sequence>
+				<attribute name="jobName" type="string" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="furaGroup" type="paext:furaProcessType" substitutionGroup="pa:abstractShElement"></element>
+
+	<complexType name="gLiteGroupType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="requirements" type="cpa:TextOrVariableType" minOccurs="0" />
+					<element name="inputData" type="paext:gLiteInputDataType" minOccurs="0" />
+					<element name="rank" type="paext:gLiteRankType" />
+					<element name="JDLTransferDeploy" type="cpa:fileTransferType" minOccurs="0" maxOccurs="1" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdin" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="configFile" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="JDLFilePath" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="JDLRemoteFilePath" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="arguments" type="cpa:argumentListType" minOccurs="0" />
+					<element name="inputSandbox" type="cpa:TextOrVariableType" minOccurs="0" />
+					<element name="outputSandbox" type="cpa:TextOrVariableType" minOccurs="0" />
+				</sequence>
+				<attribute name="hostname" type="string" />
+				<attribute name="virtualOrganisation" type="string" use="required" />
+				<attribute name="JDLFileName" type="string" />
+				<attribute name="Type" type="string" default="job" />
+				<attribute name="executable" type="string" default="/bin/sh" />
+				<attribute name="jobType" type="string" default="normal" />
+				<attribute name="outputse" type="string" />
+				<attribute name="retryCount" type="string" />
+				<attribute name="myProxyServer" type="string" />
+				<attribute name="nodes" type="string" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+
+	<!--gLiteRankType-->
+	<complexType name="gLiteRankType">
+		<simpleContent>
+			<extension base="cpa:TextOrVariableType">
+				<attribute name="fuzzyrank" type="cpa:BooleanOrVariableType" default="false" />
+			</extension>
+		</simpleContent>
+	</complexType>
+	<!--gLiteInputDataType-->
+	<complexType name="gLiteInputDataType">
+		<attribute name="dataAccessProtocol" type="string" />
+		<attribute name="storageIndex" type="string" />
+		<attribute name="dataCatalog" type="string" />
+	</complexType>
+	<!-- end of gLiteProcessType -->
+
+	<element name="gLiteGroup" type="paext:gLiteGroupType" substitutionGroup="pa:abstractShElement"></element>
+
+	<complexType name="globusProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="count" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="maxTime" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="directory" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdin" type="cpa:pathElementGeneralType" minOccurs="0" />
+				</sequence>
+				<attribute name="hostname" type="string" use="required" />
+				<attribute name="queue" type="string" use="optional" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="globusGroup" type="paext:globusProcessType" substitutionGroup="pa:abstractShElement"></element>
+
+	<complexType name="gridbusProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="arguments" type="cpa:argumentListType" minOccurs="0" />
+				</sequence>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="gridbusGroup" type="paext:gridbusProcessType" substitutionGroup="pa:abstractShElement"></element>
+
+	<!--gridEngine process -->
+	<complexType name="gridEngineProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+                <sequence>
+					<element name="hostsNumber" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="wallTime" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="parallelEnvironment" type="cpa:TextOrVariableType" minOccurs="0" />
+					<element name="directory" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+				</sequence>
+				<attribute name="queue" type="string" use="optional" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="gridEngineGroup" type="paext:gridEngineProcessType" substitutionGroup="pa:abstractShElement"></element>
+
+	<complexType name="loadLevelerProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="directory" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="resources" type="string" minOccurs="0" />
+					<element name="maxTime" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="arguments" type="cpa:argumentListType" minOccurs="0" />
+					<element name="nbTasks" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="cpusPerTask" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="tasksPerHost" type="cpa:PosintOrVariableType" minOccurs="0" />
+				</sequence>
+				<attribute name="jobName" type="string" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="loadLevelerGroup" type="paext:loadLevelerProcessType" substitutionGroup="pa:abstractShElement"></element>
+
+	<complexType name="lsfGroupType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="hostList" type="cpa:ListType" minOccurs="0" />
+					<element name="processorsNumber" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="resourceRequirement" type="string" minOccurs="0" />
+				</sequence>
+				<attribute name="interactive" type="cpa:BooleanOrVariableType" use="optional" />
+				<attribute name="jobName" type="string" use="optional" />
+				<attribute name="queue" type="string" use="optional" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="lsfGroup" substitutionGroup="pa:abstractShElement" type="paext:lsfGroupType"></element>
+
+	<complexType name="oarGroupType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="resources" type="paext:oarResourcesType" minOccurs="0" />
+					<element name="directory" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+				</sequence>
+				<attribute name="interactive" type="cpa:BooleanOrVariableType" use="optional" />
+				<attribute name="queue" type="string" use="optional" />
+				<attribute name="type" use="optional">
+					<simpleType>
+						<restriction base="string">
+							<enumeration value="deploy" />
+							<enumeration value="besteffort" />
+							<enumeration value="cosystem" />
+							<enumeration value="checkpoint" />
+							<enumeration value="timesharing" />
+						</restriction>
+					</simpleType>
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="oarResourcesType">
+		<simpleContent>
+			<extension base="cpa:TextOrVariableType">
+				<attribute name="nodes" type="cpa:PosintOrVariableType" use="optional"></attribute>
+				<attribute name="cpu" type="cpa:PosintOrVariableType" use="optional"></attribute>
+				<attribute name="core" type="cpa:PosintOrVariableType" use="optional"></attribute>
+			</extension>
+		</simpleContent>
+	</complexType>
+
+	<element name="oarGroup" type="paext:oarGroupType" substitutionGroup="pa:abstractShElement" />
+
+	<complexType name="oarshGroupType">
+		<complexContent>
+			<extension base="paext:groupTypeSSH">
+				<attribute name="jobId" type="cpa:PosintOrVariableType" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="oarshGroup" type="paext:oarshGroupType" substitutionGroup="pa:abstractShElement"></element>
+
+	<!--PBSProcess-->
+	<complexType name="pbsProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="nodes" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="processorPerNodes" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="mailWhen" type="string" minOccurs="0" />
+					<element name="mailTo" type="string" minOccurs="0" />
+					<element name="joinOutput" type="cpa:BooleanOrVariableType" minOccurs="0" />
+					<element name="wallTime" type="cpa:TimeOrVariableType" minOccurs="0" />
+					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
+					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
+				</sequence>
+				<attribute name="queue" type="string" use="optional" />
+				<attribute name="jobName" type="string" use="required" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="pbsGroup" type="paext:pbsProcessType" substitutionGroup="pa:abstractShElement" />
+
+	<complexType name="groupTypeRSH">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<attribute name="hostList" type="string" use="required" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<complexType name="prunProcessType">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="hostList" type="cpa:ListType" minOccurs="0" />
+					<element name="hostsNumber" type="cpa:PosintOrVariableType" minOccurs="0" />
+					<element name="processorPerNode" minOccurs="0">
+						<simpleType>
+							<restriction base="integer">
+								<minInclusive value="1" />
+								<maxInclusive value="2" />
+							</restriction>
+						</simpleType>
+					</element>
+					<element name="wallTime" type="cpa:TimeOrVariableType" minOccurs="0" />
+					<element name="stdout" type="cpa:TextOrVariableType" minOccurs="0" />
+				</sequence>
+				<attribute name="queue" type="string" use="optional" />
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="prunGroup" type="paext:prunProcessType" substitutionGroup="pa:abstractShElement" />
+
+
+	<element name="rshGroup" substitutionGroup="pa:abstractShElement" type="paext:groupTypeRSH" />
+
+
+	<complexType name="groupTypeSSH">
+		<complexContent>
+			<extension base="pa:abstractGroupElementType">
+				<sequence>
+					<element name="privateKey" type="cpa:pathElementType"
+						minOccurs="0" maxOccurs="1" />
+				</sequence>
+				<attribute name="commandOptions" type="string"></attribute>
+				<attribute name="hostList" type="string"
+					use="required">
+				</attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="sshGroup" substitutionGroup="pa:abstractShElement"
+		type="paext:groupTypeSSH">
+	</element>
+
+	<complexType name="bridgeTypeOARSH">
+		<complexContent>
+			<extension base="paext:bridgeTypeSSH">
+				<attribute name="jobId" type="cpa:PosintOrVariableType" use="required"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="oarshBridge" type="paext:bridgeTypeOARSH" substitutionGroup="pa:abstractBridgeElement"></element>
+
+	<complexType name="bridgeTypeSSH">
+		<complexContent>
+			<extension base="pa:abstractBridgeElementType">
+				<sequence>
+					<element name="privateKey" type="cpa:pathElementType" minOccurs="0" maxOccurs="1" />
+				</sequence>
+				<attribute name="hostname" type="cpa:hostnameType" use="required" />
+				<attribute name="username" type="cpa:usernameType"></attribute>
+				<attribute name="commandPath" type="string"></attribute>
+				<attribute name="commandOptions" type="string"></attribute>
+			</extension>
+		</complexContent>
+	</complexType>
+
+	<element name="sshBridge" type="paext:bridgeTypeSSH" substitutionGroup="pa:abstractBridgeElement"></element>
+
+
+</schema>

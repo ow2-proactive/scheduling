@@ -33,6 +33,7 @@ package unitTests.gcmdeployment.descriptorParser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,10 +43,10 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.AbstractApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptorImpl;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationParserImpl;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.AbstractApplicationParser;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.objectweb.proactive.extra.gcmdeployment.process.commandbuilder.CommandBuilderScript;
 import org.w3c.dom.Node;
@@ -54,7 +55,7 @@ import org.xml.sax.SAXException;
 
 public class TestApplicationDescriptorParser {
     final static String TEST_APP_DIR = TestApplicationDescriptorParser.class.getClass().getResource(
-            "/Tests/unitTests/gcmdeployment/descriptorParser/testfiles/application").getFile();
+            "/unitTests/gcmdeployment/descriptorParser/testfiles/application").getFile();
 
     //    @Test
     public void test() throws IOException, XPathExpressionException, SAXException,
@@ -106,13 +107,12 @@ public class TestApplicationDescriptorParser {
             }
             System.out.println(file);
 
-            String userSchema = getClass()
+            URL userSchema = getClass()
                     .getResource(
-                            "/Tests/unitTests/gcmdeployment/descriptorParser/testfiles/application/SampleApplicationExtension.xsd")
-                    .toString();
+                            "/unitTests/gcmdeployment/descriptorParser/testfiles/application/SampleApplicationExtension.xsd");
 
             ArrayList<String> schemas = new ArrayList<String>();
-            schemas.add(userSchema);
+            schemas.add(userSchema.toString());
 
             GCMApplicationParserImpl parser = new GCMApplicationParserImpl(file, schemas);
 
