@@ -1,0 +1,5 @@
+Task task = new YourTask(someArguments); 
+Manager manager = ProActiveBranchNBound.newBnB(task, nodes, LargerQueueImpl.class.getName()); 
+
+// this call is asynchronous 
+Result futureResult = manager.start();

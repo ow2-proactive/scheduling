@@ -1,0 +1,8 @@
+// getting the p2p virtual node 
+VirtualNode vn = pad.getVirtualNode('p2pvn'); 
+
+// adding 'this' as a listener
+((VirtualNodeImpl) vn).addNodeCreationEventListener(<emphasis role="bold">this</emphasis>); 
+
+// then activate the virtual node 
+vn.activate();

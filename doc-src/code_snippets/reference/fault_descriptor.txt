@@ -1,0 +1,54 @@
+<ProActiveDescriptor> 
+	.......
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="Workers" property="multiple"
+				ftServiceId="appli" />
+			<virtualNode name="Failed" property="multiple"
+				ftServiceId="resources" />
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+		<mapping>
+			<map virtualNode="Workers">
+				<jvmSet>
+					<vmName value="Jvm1" />
+					<vmName value="Jvm2" />
+					<vmName value="Jvm3" />
+				</jvmSet>
+			</map>
+			<map virtualNode="Failed">
+				<jvmSet>
+					<vmName value="JvmS1" />
+					<vmName value="JvmS2" />
+				</jvmSet>
+			</map>
+		</mapping>
+	.....
+	</deployment>
+	.....
+  	<services>
+			<serviceDefinition id="appli">
+				<faultTolerance>
+				     <!-- Protocol selection: cic or pml -->
+					<protocol type="cic"></protocol>
+					<!-- URL of the fault-tolerance server -->   
+					<globalServer url="rmi://eon11:1100/FTServer"></globalServer>
+			         <!--  Average time in seconds between two consecutive checkpoints for each object -->
+					<ttc value="15"></ttc>
+				</faultTolerance>
+			</serviceDefinition>
+			<serviceDefinition id="resources">
+				<faultTolerance>
+					<protocol type="cic"></protocol>
+					<globalServer url="rmi://eon11:1100/FTServer"></globalServer>
+  				    <!-- URL of the resource server; all the nodes mapped on this virtual 
+             		node will be registred in as resource nodes for recovery -->  				
+					<resourceServer url="rmi://eon11:1100/FTServer" />
+					<!--  Average time in seconds between two consecutive checkpoints for each object -->
+					<ttc value="15"></ttc>
+				</faultTolerance>
+			</serviceDefinition>
+		</services>
+	.....
+</ProActiveDescriptor>

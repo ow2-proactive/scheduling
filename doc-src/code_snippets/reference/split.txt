@@ -1,0 +1,3 @@
+splitted[i].initLowerBound();
+splitted[i].initUpperBound();
+Result ri = splitted.execute();
