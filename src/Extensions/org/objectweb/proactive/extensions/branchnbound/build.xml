@@ -6,10 +6,11 @@
 	
 	<target name="-compile">
 		<compile_extension module="branchnbound" />
-			
+<!--			
 		<java classname="${stubgenerator.class}" fork="true">
 			<classpath refid="project.classpath" />
 			<arg line="-srcDir ${cl.extensions.dir} -pkg org.objectweb.proactive.extensions.branchnbound" />
 		</java>
+-->
 	</target>
 </project>
