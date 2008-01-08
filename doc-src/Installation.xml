@@ -371,24 +371,111 @@
 	 </sect1>
 	 <sect1>
 	 	<title>IC2D Installation</title>
-    	<para>You can download the archive file (a standard zip file) containing 
-    	IC2D from the <ulink url="http://proactive.inria.fr/download_ic2d_latest.htm">
-    	 download section </ulink> of the ProActive home page. You will be asked to accept 
-    	 the license agreement and provide a few details including your email address.
-    	 Within a few minutes you will  receive an email containing 
-    	 a password and an URL where you will be able to download the latest release of IC2D.</para>
-    	 <para>Unzip the archive using your favorite ZIP program, such as 
-    	 <ulink url="http://www.winzip.com/">Winzip</ulink> under Windows or 
-    	 the <ulink url="http://www.info-zip.org/pub/infozip/"> unzip </ulink>
-    	 command-line utility under most Linux/Unix systems. 
-    	 Unzipping the archive creates an IC2D directory and all the files contained in 
-    	 the archive go into this directory and its subdirectories.</para>
-    	 <para>
-    	 	Run IC2D from the installation folder to start monitoring.
-    	 	For information on using IC2D read <xref linkend="IC2D_EclipsePlugin"/> 
-    	 </para>
-    	 <para>
-
-	 	</para>
+	 	
+	 	<sect2>
+	 		<title>Normal Usage Installation</title>
+	    	<para>You can download the archive file (a standard zip file) containing 
+	    	IC2D from the <ulink url="http://proactive.inria.fr/download_ic2d_latest.htm">
+	    	 download section </ulink> of the ProActive home page. You will be asked to accept 
+	    	 the license agreement and provide a few details including your email address.
+	    	 Within a few minutes you will  receive an email containing 
+	    	 a password and an URL where you will be able to download the latest release of IC2D.</para>
+	    	 <para>Unzip the archive using your favorite ZIP program, such as 
+	    	 <ulink url="http://www.winzip.com/">Winzip</ulink> under Windows or 
+	    	 the <ulink url="http://www.info-zip.org/pub/infozip/"> unzip </ulink>
+	    	 command-line utility under most Linux/Unix systems. 
+	    	 Unzipping the archive creates an IC2D directory and all the files contained in 
+	    	 the archive go into this directory and its subdirectories.</para>
+	    	 <para>
+	    	 	Run IC2D from the installation folder to start monitoring.
+	    	 	For information on using IC2D read <xref linkend="IC2D_EclipsePlugin"/> 
+	    	 </para>
+	 	</sect2>
+		<sect2>	
+			<title> Development Installation</title>
+			<para>
+				If you want to develop IC2D or plugins for IC2D the installation steps are
+				the following: 
+		 	</para>
+		 	<orderedlist>
+		 	
+		 		<listitem>
+		 			Download and unpack the RCP/Plug-in Developers version of <ulink url="http://www.eclipse.org/downloads/">Eclipse</ulink>.
+		 		</listitem>
+		 		<listitem>
+		 			Install <ulink url="http://subclipse.tigris.org/install.html">Subversion
+		 			</ulink> or your SVN client of choice.
+		 		</listitem>
+		 		<listitem>
+		 			Download ProActive for development through the anonymous or authenticated SVN.
+		 			The <ulink url="https://gforge.inria.fr/scm/?group_id=180">SVN</ulink>  and 
+		 			<ulink url="http://siteadmin.gforge.inria.fr/eclipse-ssh.html">Eclipse</ulink> configuration
+		 			information can be found on the <ulink url="http://gforge.inria.fr/">INRIA gForge</ulink> website.  
+		 		</listitem>
+		 		<listitem>
+		 			Compile IC2D and ProActive by running 
+		 				<programlisting><textobject><textdata fileref="code_snippets/compile_ic2d.txt"></textdata></textobject></programlisting>
+		 		</listitem>
+		 		<listitem>
+		 			<para>Import the IC2D plugin by going to  File --> Import.</para>
+		 			<para>Import from the ProActive project in the workspace.</para>
+							 			
+						<informalfigure>
+							<mediaobject>
+								<imageobject>
+									<imagedata
+										fileref="images/IC2D_development_installation/eclipse_import.png" 
+										 />
+								</imageobject>
+							</mediaobject>
+						</informalfigure>
+						<para>Browse for the directory containing the IC2D plugins.	</para>
+						<informalfigure>
+							<mediaobject>
+								<imageobject>
+									<imagedata
+										fileref="images/IC2D_development_installation/eclipse_import_browse.png"/>
+								</imageobject>
+							</mediaobject>
+						</informalfigure>
+						<para>The directory
+							is <literal>ic2d-plugins-src</literal> in the ProActive installation
+							directory.</para>
+						
+						<informalfigure>
+							<mediaobject>
+								<imageobject>
+									<imagedata
+										fileref="images/IC2D_development_installation/browse_window.png"/>
+								</imageobject>
+							</mediaobject>
+						</informalfigure>
+						<para>
+						When the plugins have finished loading click on the
+						Finish button and Eclipse should look like this:</para>
+						
+						<informalfigure>
+							<mediaobject>
+								<imageobject>
+									<imagedata fileref="images/IC2D_development_installation/eclipse_with_plugins.png"/>
+								</imageobject>
+							</mediaobject>
+						</informalfigure>						
+		 			
+		 		</listitem>
+		 		<listitem>
+		 			Install  the <ulink url="http://www.eclipse.org/birt/phoenix/">Business Intelligence and Reporting Tools </ulink> 
+		 			used by TimIt for profiling.
+		 			For this go to Help-> Software Updates -> Find And Install. -> Europa Discovery --> Charting And Reporting 
+		 		</listitem>
+		 		<listitem>
+		 			After the Birt installation is done go to ic2dproduct and click Synchronize
+		 			and click on Launch Application. Don't worry if the launch fails we will fix that in the next step.
+		 		</listitem>
+		 		<listitem>
+		 			Open the Run Dialog, click on ic2d.product, click on Plugins, select all the workspace plugins, click on add required, click on validate, click on apply, click on run 
+		 		</listitem>
+		 	</orderedlist>
+		 </sect2>
 	 </sect1>
 </chapter>
