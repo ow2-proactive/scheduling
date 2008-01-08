@@ -110,6 +110,8 @@ public class GCMParserHelper implements GCMParserConstants {
                 return namespace;
             } else if ("paext".equals(prefix)) {
                 return GCMParserConstants.GCM_DESCRIPTOR_EXTENSION_NAMESPACE;
+            } else if ("cpa".equals(prefix)) {
+                return GCMParserConstants.GCM_COMMON_TYPES_NAMESPACE;
             } else if ("pauext".equals(prefix)) {
                 return "http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaUserExtension";
             } else if ("xml".equals(prefix)) {
