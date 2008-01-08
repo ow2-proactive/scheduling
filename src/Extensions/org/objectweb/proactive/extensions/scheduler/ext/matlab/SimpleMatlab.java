@@ -53,7 +53,9 @@ import java.util.StringTokenizer;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -127,7 +129,9 @@ public class SimpleMatlab extends JavaExecutable {
         findMatlab();
 
         // We create a custom URI as the node name
-        uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime()).toString();
+        uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
+                Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
+                .toString();
         System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
         // We spawn a new JVM with the MATLAB library paths
         process = startProcess(uri);
@@ -333,20 +337,17 @@ public class SimpleMatlab extends JavaExecutable {
         File jarFile = new File(jarFileURL.toURI());
         File libDirFile = jarFile.getParentFile();
         URI ptolemyLibDirURI = libDirFile.toURI().resolve(
-                matlabVersion + os.fileSeparator() + matlabLibDirName);
+                matlabVersion + os.fileSeparator() + matlabLibDirName + os.fileSeparator());
         File answer = new File(ptolemyLibDirURI);
+
         if (!answer.exists() || !answer.canRead()) {
-            throw new MatlabInitException(
-                "Can't find ptolemy native library at " +
-                    answer +
-                    ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab_scilab/matlab_interface. Refer to README file.");
+            throw new MatlabInitException("Can't find ptolemy native library at " + answer +
+                ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab. Refer to README file.");
         } else {
             File libraryFile = new File(ptolemyLibDirURI.resolve(System.mapLibraryName("ptmatlab")));
             if (!libraryFile.exists() || !libraryFile.canRead()) {
-                throw new MatlabInitException(
-                    "Can't find ptolemy native library at " +
-                        libraryFile +
-                        ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab_scilab/matlab_interface. Refer to README file.");
+                throw new MatlabInitException("Can't find ptolemy native library at " + libraryFile +
+                    ". The native library is generated from scripts in PROACTIVE/scripts/unix/matlab. Refer to README file.");
             }
         }
         return answer;
@@ -377,14 +378,13 @@ public class SimpleMatlab extends JavaExecutable {
         String lastDir = null;
         int lastIndex = matlabLibDirName.lastIndexOf(os.fileSeparator());
         if (lastIndex != -1) {
-            lastDir = matlabLibDirName.substring(lastIndex);
+            lastDir = matlabLibDirName.substring(lastIndex + 1);
         } else {
             lastDir = matlabLibDirName;
         }
 
         newPath = newPath + (matlabHome + os.fileSeparator() + "bin");
-        newPath = newPath + os.pathSeparator() +
-            (matlabHome + os.fileSeparator() + os.fileSeparator() + matlabLibDirName);
+        newPath = newPath + os.pathSeparator() + (matlabHome + os.fileSeparator() + matlabLibDirName);
         newPath = newPath +
             os.pathSeparator() +
             (matlabHome + os.fileSeparator() + "sys" + os.fileSeparator() + "os" + os.fileSeparator() + lastDir);
@@ -463,6 +463,7 @@ public class SimpleMatlab extends JavaExecutable {
             matlabCommandName = file.getName();
             matlabHome = file.getParentFile().getParentFile().getAbsolutePath();
             matlabLibDirName = lines.get(1);
+            System.out.println("MATLAB LIB DIR:" + matlabLibDirName);
             matlabVersion = lines.get(2);
             System.out.println("MATLAB VERSION:" + matlabVersion);
         } else {

@@ -16,8 +16,8 @@ fi
 if [ "$scilab_home" != "" ]; then
     echo $scilab_home
 else
-    echo "Scilab dir not found"
-    echo
+    host=`hostname`
+    echo "Scilab dir not found on $host"
     exit 1
 fi
 echo

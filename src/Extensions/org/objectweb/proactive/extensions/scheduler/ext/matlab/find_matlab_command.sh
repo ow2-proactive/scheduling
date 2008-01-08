@@ -25,7 +25,9 @@ while [[ $i -lt 8 && "$cmd_line" == "" ]]; do
 						matlab_lib_dir=bin/glnx86
 						;;
 					x86_64*)
-						matlab_lib_dir=bin/glnxa64
+						# doesn't work properly yet with 64 bits binaries
+						# matlab_lib_dir=bin/glnxa64
+						matlab_lib_dir=bin/glnx86
 						;;
 					*)
 						matlab_lib_dir=bin/glnx86
@@ -51,7 +53,8 @@ done
 if [ "$cmd_line" != "" ]; then
     echo $cmd_line
 else
-    echo "Matlab not found"
+    host=`hostname`
+    echo "Matlab not found on $host"
     echo
     exit 1
 fi

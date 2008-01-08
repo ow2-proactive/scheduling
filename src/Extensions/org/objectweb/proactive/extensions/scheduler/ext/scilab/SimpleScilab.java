@@ -51,7 +51,9 @@ import java.util.StringTokenizer;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -134,7 +136,10 @@ public class SimpleScilab extends JavaExecutable {
         findScilab();
 
         // We create a custom URI as the node name
-        uri = URIBuilder.buildURI("localhost", "Scilab" + (new Date()).getTime()).toString();
+        //uri = URIBuilder.buildURI("localhost", "Scilab" + (new Date()).getTime()).toString();
+        uri = URIBuilder.buildURI("localhost", "Scilab" + (new Date()).getTime(),
+                Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
+                .toString();
         System.out.println("[" + host + " SCILAB TASK] Starting the Java Process");
         // We spawn a new JVM with the SCILAB library paths
         process = startProcess(uri);
@@ -227,17 +232,20 @@ public class SimpleScilab extends JavaExecutable {
      * @throws Throwable
      */
     protected AOSimpleScilab deploy(String uri, String workerClassName, Object... params) throws Throwable {
-        ProActiveException ex = null;
+        Exception ex = null;
         AOSimpleScilab worker = null;
         System.out.println("[" + host + " SCILAB TASK] Deploying the Worker");
 
         // We create an active object on the given node URI, the JVM corresponding to this node URI is starting,
         // so we retry for 30 seconds until the JVM has started and we can create the Active Object
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 50; i++) {
             try {
                 try {
                     worker = (AOSimpleScilab) PAActiveObject.newActive(workerClassName, params, uri);
-                } catch (ProActiveException e) {
+                    if (worker != null) {
+                        break;
+                    }
+                } catch (Exception e) {
                     ex = e;
                 }
 
@@ -312,7 +320,9 @@ public class SimpleScilab extends JavaExecutable {
         // javaCommandBuilder.setJavaPath(System.getenv("JAVA_HOME") +
         //     "/bin/java");
         // we set as well the java.library.path property (precaution)
-        javaCommandBuilder.setJvmOptions("-Djava.library.path=" + libPath);
+        javaCommandBuilder.setJvmOptions("-Djava.library.path=\"" + libPath + "\"" +
+            " -Dproactive.rmi.port=" + Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()) +
+            " -Dproactive.http.port=" + Integer.parseInt(PAProperties.PA_XMLHTTP_PORT.getValue()));
 
         pb.command(javaCommandBuilder.getJavaCommand());
 

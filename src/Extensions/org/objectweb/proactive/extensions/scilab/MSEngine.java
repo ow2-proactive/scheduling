@@ -36,7 +36,9 @@ import java.util.Date;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.process.AbstractExternalProcess;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -112,7 +114,9 @@ public class MSEngine implements Serializable {
             logger.debug("->MSEngine In:activate");
         }
 
-        String uri = URIBuilder.buildURI("localhost", "" + idEngine + (new Date()).getTime()).toString();
+        String uri = URIBuilder.buildURI("localhost", "" + idEngine + (new Date()).getTime(),
+                Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
+                .toString();
         try {
             process = new JVMProcessImpl();
             process.setInputMessageLogger(new AbstractExternalProcess.StandardOutputMessageLogger());
