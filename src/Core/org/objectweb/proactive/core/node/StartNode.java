@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.URIBuilder;
@@ -69,7 +70,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class StartNode {
     public static final int DEFAULT_CLASSFILE_SERVER_PORT = 2001;
     static Logger logger;
-    protected static final int DEFAULT_PORT = 1099;
+    protected static final int DEFAULT_PORT = Integer.parseInt(PAProperties.PA_RMI_PORT.getValue());
     protected static final int MAX_RETRY = 3;
     protected static final String NO_REBIND_OPTION_NAME = "-noRebind";
     protected static final String NO_CLASS_SERVER_OPTION_NAME = "-noClassServer";
@@ -116,7 +117,17 @@ public class StartNode {
             printUsage();
         } else {
             nodeURL = args[0];
-            registryPortNumber = URIBuilder.getPortNumber(nodeURL);
+            int port = URIBuilder.getPortNumber(nodeURL);
+            if (port != 0) {
+                registryPortNumber = URIBuilder.getPortNumber(nodeURL);
+                String protocol = URIBuilder.getProtocol(nodeURL);
+                if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER)) {
+                    PAProperties.PA_RMI_PORT.setValue(registryPortNumber);
+                } else if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
+                    PAProperties.PA_XMLHTTP_PORT.setValue(registryPortNumber);
+                }
+                // We don't change anything for SSH or IBIS
+            }
             checkOptions(args, 1);
             readClassPath(args, 1);
         }
