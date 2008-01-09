@@ -59,6 +59,7 @@
 				<packageset dir="${src.extra.dir}" />
 
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
 				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
 	
@@ -89,6 +90,8 @@
 					<param name="-file" value="${compile.dir}/publishedCoreClasses" />
 				</doclet>
 				<packageset dir="${src.proactive.dir}"/>
+				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 			</javadoc>
 			
 			<javadoc source="${source}">
@@ -100,6 +103,8 @@
 					<param name="-file" value="${compile.dir}/publishedExtensionsClasses" />
 				</doclet>
 				<packageset dir="${src.extensions.dir}"/>
+				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 			</javadoc>
 						
 			<javadoc source="${source}">
@@ -112,6 +117,8 @@
 					<param name="-file" value="${compile.dir}/publishedExtraClasses" />
 				</doclet>
 				<packageset dir="${src.extra.dir}"/>
+				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 				
 			</javadoc>
 						
@@ -137,6 +144,7 @@
 				<fileset dir="${src.extra.dir}" includesfile="${compile.dir}/publishedExtraClasses"/>
 
 				<link href="http://fractal.objectweb.org/current/doc/javadoc/fractal/" />
+				<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
 				<doctitle><![CDATA[ProActive ${version}<br><a href='../html/index.html'>(documentation is here)</a><br>]]></doctitle>
 				<bottom><![CDATA[<i>Copyright 1997-2007 INRIA All Rights Reserved.</i>]]></bottom>
 				
