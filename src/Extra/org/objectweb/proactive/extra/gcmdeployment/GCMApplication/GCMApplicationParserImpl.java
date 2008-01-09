@@ -113,7 +113,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
         }
     }
-    
+
     public GCMApplicationParserImpl(File descriptor) throws IOException, ParserConfigurationException,
             SAXException, XPathExpressionException, TransformerException {
         this(descriptor, null);
@@ -135,7 +135,8 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         try {
 
             // process variables first
-            GCMEnvironmentParser environmentParser = new GCMApplicationEnvironmentParser(descriptor, userSchemas);
+            GCMEnvironmentParser environmentParser = new GCMApplicationEnvironmentParser(descriptor,
+                userSchemas);
 
             Map<String, String> variableMap = environmentParser.getVariableMap();
 
@@ -154,7 +155,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
             InputSource processedInputSource = new InputSource(new FileInputStream(tempFile));
             documentBuilder = domFactory.newDocumentBuilder();
             documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
-            
+
             document = documentBuilder.parse(processedInputSource);
 
         } catch (SAXException e) {
