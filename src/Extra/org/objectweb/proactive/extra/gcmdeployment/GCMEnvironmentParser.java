@@ -48,7 +48,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.core.xml.VariableContract;
 import org.objectweb.proactive.core.xml.VariableContractType;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentParserImpl;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -103,21 +102,7 @@ public class GCMEnvironmentParser implements GCMParserConstants {
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-        URL deploymentSchema = GCMDeploymentParserImpl.class.getClass().getResource(DEPLOYMENT_DESC_LOCATION);
-
-        URL commonTypesSchema = GCMDeploymentParserImpl.class.getClass().getResource(COMMON_TYPES_LOCATION);
-
-        URL protocolsSchema = GCMDeploymentParserImpl.class
-                .getClass()
-                .getResource(
-                        "/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/ProtocolsSchema.xsd");
-
-        // DO NOT change the order here, it would break validation
-        //
-        schemas.add(commonTypesSchema.toString());
-        schemas.add(deploymentSchema.toString());
-        schemas.add(protocolsSchema.toString());
-        domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
+        setupSchemas();
 
         try {
             documentBuilder = domFactory.newDocumentBuilder();
@@ -131,6 +116,24 @@ public class GCMEnvironmentParser implements GCMParserConstants {
         } catch (ParserConfigurationException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
         }
+    }
+
+    protected void setupSchemas() {
+        URL deploymentSchema = this.getClass().getResource(DEPLOYMENT_DESC_LOCATION);
+
+        URL commonTypesSchema = this.getClass().getResource(COMMON_TYPES_LOCATION);
+
+        URL protocolsSchema = this
+                .getClass()
+                .getResource(
+                        "/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/ProtocolsSchema.xsd");
+
+        // DO NOT change the order here, it would break validation
+        //
+        schemas.add(0, protocolsSchema.toString());
+        schemas.add(0, deploymentSchema.toString());
+        schemas.add(0, commonTypesSchema.toString());
+        domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
     }
 
     protected void parseEnvironment() throws XPathExpressionException, SAXException {
@@ -164,7 +167,9 @@ public class GCMEnvironmentParser implements GCMParserConstants {
             String varName = GCMParserHelper.getAttributeValue(node, "name");
 
             String varValue = variableContract.transform(GCMParserHelper.getAttributeValue(node, "value"));
-
+            if (varValue == null) {
+                varValue = "";
+            }
             variableContract.setDescriptorVariable(varName, varValue, varContractType);
         }
     }

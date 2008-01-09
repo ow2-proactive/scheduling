@@ -32,6 +32,7 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -50,6 +51,8 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
+import org.objectweb.proactive.extra.gcmdeployment.GCMDescriptorProcessor;
+import org.objectweb.proactive.extra.gcmdeployment.GCMEnvironmentParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParser;
@@ -70,10 +73,8 @@ import org.xml.sax.SAXException;
 
 
 /*
- * FIXME: Improvements needed
- *  - Refactoring & Cleanup
- *         - Put all "magic strings" in a warehouse
- *  - Write some comment to explain how it works
+ * FIXME: Improvements needed - Refactoring & Cleanup - Put all "magic strings" in a warehouse -
+ * Write some comment to explain how it works
  */
 public class GCMApplicationParserImpl implements GCMApplicationParser {
     private static final String XPATH_GCMAPP = "/pa:GCMApplication/";
@@ -96,13 +97,30 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, VirtualNodeInternal> virtualNodes;
     protected Map<String, ApplicationParser> applicationParsersMap;
 
+    protected static class GCMApplicationEnvironmentParser extends GCMEnvironmentParser {
+
+        public GCMApplicationEnvironmentParser(File descriptor, List<String> userSchemas) throws IOException,
+                SAXException {
+            super(descriptor, userSchemas);
+        }
+
+        @Override
+        protected void setupSchemas() {
+            URL applicationSchema = getClass().getResource(APPLICATION_DESC_LOCATION);
+            URL commonTypesSchema = this.getClass().getResource(COMMON_TYPES_LOCATION);
+            schemas.add(commonTypesSchema.toString());
+            schemas.add(applicationSchema.toString());
+            domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
+        }
+    }
+    
     public GCMApplicationParserImpl(File descriptor) throws IOException, ParserConfigurationException,
-            SAXException {
+            SAXException, XPathExpressionException, TransformerException {
         this(descriptor, null);
     }
 
     public GCMApplicationParserImpl(File descriptor, List<String> userSchemas) throws IOException,
-            ParserConfigurationException, SAXException {
+            ParserConfigurationException, SAXException, TransformerException, XPathExpressionException {
         this.descriptor = descriptor;
         nodeProvidersMap = null;
         virtualNodes = null;
@@ -113,8 +131,45 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         registerUserApplicationParsers();
 
         setup();
-        InputSource inputSource = new InputSource(new FileInputStream(descriptor));
-        document = documentBuilder.parse(inputSource);
+
+        try {
+
+            // process variables first
+            GCMEnvironmentParser environmentParser = new GCMApplicationEnvironmentParser(descriptor, userSchemas);
+
+            Map<String, String> variableMap = environmentParser.getVariableMap();
+
+            InputSource inputSource = new InputSource(new FileInputStream(descriptor));
+
+            Document baseDocument = documentBuilder.parse(inputSource);
+
+            GCMDescriptorProcessor descriptorProcessor = new GCMDescriptorProcessor(variableMap, baseDocument);
+
+            File tempFile = File.createTempFile(descriptor.getName(), "tmp");
+
+            FileOutputStream outputStream = new FileOutputStream(tempFile);
+            descriptorProcessor.transform(outputStream);
+            outputStream.close();
+
+            InputSource processedInputSource = new InputSource(new FileInputStream(tempFile));
+            documentBuilder = domFactory.newDocumentBuilder();
+            documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
+            
+            document = documentBuilder.parse(processedInputSource);
+
+        } catch (SAXException e) {
+            String msg = "parsing problem with document " + descriptor.getCanonicalPath();
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(msg + " - " + e.getMessage());
+            throw new SAXException(msg, e);
+        } catch (TransformerException e) {
+            String msg = "problem when evaluating variables with document " + descriptor.getCanonicalPath();
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(msg + " - " + e.getMessage());
+            throw new TransformerException(msg, e);
+        } catch (XPathExpressionException e) {
+            GCMDeploymentLoggers.GCMA_LOGGER.fatal(e);
+            throw e;
+        }
+
     }
 
     /**
@@ -138,12 +193,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         domFactory.setValidating(true);
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
-        URL deploymentSchema = getClass().getResource(APPLICATION_DESC_LOCATION);
+        URL applicationSchema = getClass().getResource(APPLICATION_DESC_LOCATION);
 
         URL commonTypesSchema = getClass().getResource(COMMON_TYPES_LOCATION);
-        System.out.println("#@# " + deploymentSchema);
+        System.out.println("#@# " + applicationSchema);
         schemas.add(commonTypesSchema.toString());
-        schemas.add(deploymentSchema.toString());
+        schemas.add(applicationSchema.toString());
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         documentBuilder = domFactory.newDocumentBuilder();
@@ -199,14 +254,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
                 // get fileTransfers
                 /*
-                HashSet<FileTransferBlock> fileTransferBlocks = new HashSet<FileTransferBlock>();
-                NodeList fileTransferNodes = (NodeList) xpath.evaluate(XPATH_FILETRANSFER,
-                        node, XPathConstants.NODESET);
-                for (int j = 0; j < fileTransferNodes.getLength(); ++j) {
-                    Node fileTransferNode = fileTransferNodes.item(j);
-                    FileTransferBlock fileTransferBlock = GCMParserHelper.parseFileTransferNode(fileTransferNode);
-                    fileTransferBlocks.add(fileTransferBlock);
-                }
+                 * HashSet<FileTransferBlock> fileTransferBlocks = new HashSet<FileTransferBlock>();
+                 * NodeList fileTransferNodes = (NodeList) xpath.evaluate(XPATH_FILETRANSFER, node,
+                 * XPathConstants.NODESET); for (int j = 0; j < fileTransferNodes.getLength(); ++j) {
+                 * Node fileTransferNode = fileTransferNodes.item(j); FileTransferBlock
+                 * fileTransferBlock = GCMParserHelper.parseFileTransferNode(fileTransferNode);
+                 * fileTransferBlocks.add(fileTransferBlock); }
                  */
                 nodeProvidersMap.put(nodeProvider.getId(), nodeProvider);
             }
