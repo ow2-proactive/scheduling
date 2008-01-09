@@ -6,31 +6,38 @@
   <sect1  id="TypedGroupCommunication_html_overview">
     <title>Overview</title>
 
-	<para>
-		ProActive provides <literal>typed group commu-
-		nication</literal>, meaning that only methods defined on
+    <para>Group communication is a crucial feature for high-performance and
+	    Grid computing. While previous works and libraries proposed such a
+	    characteristic (e.g. MPI, or object-oriented frameworks), the use of
+	    groups imposed specific constraints on programmers, for instance the use
+	    of dedicated interfaces to trigger group communications. We aim at a more
+	    flexible mechanism by proposing a scheme where,
+	    given a Java class, one can initiate group communications using the
+	    standard public methods of the class together with the classical dot
+	    notation; in this way, group communications remains typed.
+	</para>
+
+    <para>In order to ease the use of the group communication, we provide a
+	    set of static methods on the <literal>ProActiveGroup</literal> class and a
+	    set of methods on the <literal>Group</literal> interface.	ProActive
+	    also provides <literal>typed group communication</literal>, meaning that only methods defined on
 		classes or interfaces implemented by members of the group
 		can be called.	
 	</para>
+	<para>
+	 	There are several ways to create groups of active objects. 	Similar to active objects,
+	 	we have instantiation based creation and object based creation. Instantiation based
+	 	creation is done through <literal>newGroup(..)</literal> and <literal>
+	 	newGroupInParallel</literal> while object based creation is done through 
+	 	<literal> turnActiveAsGroup(...)</literal>. The following table contains
+	 	the list of parameters that these two methods take. As the parameters are 
+	 	similar with the ones used for active object creation we will only present those
+	 	that are specific to group creation. 
+	 	To understand the parameters that are not explained here read <xref linkend="ActiveObjectCreation"/>
+	 	as it contains a detailed explanation of every active object creation parameter.  
+	</para>
 
-    <para>Group communication is a crucial feature for high-performance and
-    Grid computing. While previous works and libraries proposed such a
-    characteristic (e.g. MPI, or object-oriented frameworks), the use of
-    groups imposed specific constraints on programmers, for instance the use
-    of dedicated interfaces to trigger group communications.</para>
-
-    <para>We aim at a more flexible mechanism. We propose a scheme where,
-    given a Java class, one can initiate group communications using the
-    standard public methods of the class together with the classical dot
-    notation; in that way, group communications remains typed.</para>
-
-    <para>In order to ease the use of the group communication, we provide a
-    set of static methods on the <literal>ProActiveGroup</literal> class and a
-    set of methods on the <literal>Group</literal> interface.</para>
-
-    <para>Here, a short compilation about the syntax and some method used in
-    the Group Communication API is presented. More informations follow.</para>
-
+<!-- 
     
       <para><programlisting lang="java">   // created at once, 
    // with parameters specified  in params,
@@ -47,32 +54,53 @@ V vg = ag1.bar(...);
    // triggered on results
 vg.f1();</programlisting></para>
     
+     -->
+     
+     
+     	<figure>
+			<title>Group creation methods and parameters</title>
+			<mediaobject>
+				<imageobject>
+					<imagedata
+						fileref="images/groupCreationMethodsTable.png" 
+						contentwidth="100" format="PNG"	width="6in" align="center" />
+				</imageobject>
+			</mediaobject>
+	</figure>
+    
+    <para>
+    	In this chapter we will show how to create a group, send a request to the
+    	members of the group, and retrieve the results. 
+		For the examples  we will be using the following
+			class that can be instantiated as an active	object:
+		</para>	
+		<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/ActiveWorker.txt" /></textobject></programlisting>
+
   </sect1>
 
   <sect1  id="TypedGroupCommunication_html_Creation" >
     
 
-   <title>Creation of a Group</title>
+   <title>Instantiation Typed Group Creation</title>
 
 	 <indexterm><primary>Group</primary><secondary>Creation</secondary></indexterm>
     
-	 <para>Any object that is reifiable has the ability to be included in a
+ 	   
+
+    <para>Any object that is reifiable can be included in a
     group. Groups are created using the static method
-    <literal>ProActiveGroup.newGroup</literal>. The common superclass for all
-    the group members has to be specified, thus giving the group a minimal
-    type.</para>
-
-    <para>Let us take a standard Java class:</para>
-
+    <literal>PAGroup.newGroup(...)</literal> or <literal>PAGroup.newGroupInParallel(...)</literal>.
     
-      <para><programlisting lang="java">class A { 
-  public A() {}
-  public void foo (...) {...}
-  public V bar (...) {...}
-  ...
-}</programlisting></para>
-    
+    The common superclass for all the group members has to be specified, thus giving the group a minimal
+    type. We will be using the <literal>Worker</literal> class specified above. </para>
 
+  
+  		<programlisting lang="java"><textobject><textdata
+						fileref="code_snippets/groupInstantiationCreation.txt" /></textobject></programlisting>
+  
+  
+   
     <para>Here are examples of some group creation operations:</para>
 
     
@@ -83,19 +111,19 @@ Object[][] params = {{...} , {...} , ... };
 Node[] nodes  = { ... , ..., ... };
    // Solution 1: 
    // create an empty group of type 'A'
-A ag1 = (A) ProActiveGroup.newGroup('A');
+A ag1 = (A) PAGroup.newGroup('A');
    // Solution 2: 
    // a group of type 'A' and its members are 
    // created at once, 
    // with parameters specified  in params,
    // and on the nodes specified in nodes
-A ag2 = (A) ProActiveGroup.newGroup('A', params, nodes);
+A ag2 = (A) PAGroup.newGroup('A', params, nodes);
    // Solution 3: 
    // a group of type 'A'  and its members are 
    // created at once, 
    // with parameters specified in params,
    // and on the nodes directly specified 
-A ag3 = (A) ProActiveGroup.newGroup('A', params[], 
+A ag3 = (A) PAGroup.newGroup('A', params[], 
                    {rmi://globus1.inria.fr/Node1,
                     rmi://globus2.inria.fr/Node2});</programlisting></para>
     
@@ -124,7 +152,7 @@ A ag3 = (A) ProActiveGroup.newGroup('A', params[],
     executed through one representation are immediately reported on the other
     one. In order to switch from one representation to the other, two methods
     have been defined : the static method named
-    <literal>ProActiveGroup.getGroup</literal>, returns the Group form
+    <literal>PAGroup.getGroup</literal>, returns the Group form
     associated to the given group object; the method
     <literal>getGroupBytype</literal> defined in the <literal>Group</literal>
     interface does the opposite.</para>
@@ -142,7 +170,7 @@ B b  = (B) ProActive.newActive('B', paramsB[], node);
    // For management purposes, get the representation
    // as a group given a typed group, created with
    // code on the left column:
-Group gA = ProActiveGroup.getGroup(ag1);
+Group gA = PAGroup.getGroup(ag1);
    // Now, add objects to the group:
    // Note that active and non-active objects 
    // may be mixed in groups
@@ -193,7 +221,7 @@ vg.f1();</programlisting></para>
 
     <para>To take advantage with the asynchronous remote method call model of
     ProActive, some new synchronization mechanisms have been added. Static
-    methods defined in the <literal>ProActiveGroup</literal> class enable to
+    methods defined in the <literal>PAGroup</literal> class enable to
     execute various forms of synchronisation. For instance:
     <literal>waitOne</literal>, <literal>waitN</literal>,
     <literal>waitAll</literal>, <literal>waitTheNth</literal>,
@@ -204,9 +232,9 @@ vg.f1();</programlisting></para>
 V vg = ag1.bar(); 
    // To wait and capture the first returned 
    // member of vg
-V v = (V) ProActiveGroup.waitAndGetOne(vg);
+V v = (V) PAGroup.waitAndGetOne(vg);
    // To wait all the members of vg are arrived
-ProActiveGroup.waitAll(vg);
+PAGroup.waitAll(vg);
 </programlisting></para>
     
   </sect1>
@@ -234,7 +262,7 @@ ProActiveGroup.waitAll(vg);
     on a group, is to pass a deep copy of the group of type P to all members.
     Thus, in order to scatter this group of elements of type P instead, the
     programmer must apply the static method <literal>setScatterGroup</literal>
-    of the <literal>ProActiveGroup</literal> class to the group. In order to
+    of the <literal>PAGroup</literal> class to the group. In order to
     switch back to the default behaviour, the static method
     <literal>unsetScatterGroup</literal> is available.</para>
 
@@ -244,7 +272,7 @@ ProActiveGroup.waitAll(vg);
 ag1.foo(gb);
    // Change the distribution mode of the 
    // parameter group:
-ProActiveGroup.setScatterGroup(gb);
+PAGroup.setScatterGroup(gb);
    // Scatter the members of gb onto the 
    // members of ag1:
 ag1.foo(gb);</programlisting></para>
