@@ -39,7 +39,7 @@ import java.util.List;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.objectweb.proactive.api.PAVersion;
+import org.jdom.Namespace;
 import org.objectweb.proactive.benchmarks.timit.TimIt;
 import org.objectweb.proactive.benchmarks.timit.util.XMLHelper;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
@@ -66,14 +66,52 @@ public class BasicResultWriter {
     /** The name of the output file */
     private String filename;
 
+    /** The default namespace */
+    private Namespace defaultNS;
+
+    /**
+     * Creates an instance of this class with a given filename and a default namespace.
+     * @param filename The name of the xml file
+     * @param defaultNamespace An instance of the default namespace
+     */
+    public BasicResultWriter(String filename, Namespace defaultNamespace) {
+        this.eTimit = new Element("timit", defaultNamespace);
+        this.defaultNS = defaultNamespace;
+        this.document = new Document(this.eTimit);
+        this.filename = filename;
+    }
+
     /**
      * Creates an instance of this class with a given filename.
      * @param filename The name of the xml file
      */
     public BasicResultWriter(String filename) {
-        this.eTimit = new Element("timit");
-        this.document = new Document(this.eTimit);
-        this.filename = filename;
+        this(filename, Namespace.NO_NAMESPACE);
+    }
+
+    /**
+     * Creates an instance of this class with a given filename and a default namespace uri.
+     * @param filename The name of the xml file
+     * @param defaultNamespaceURI The default namespace uri
+     */
+    public BasicResultWriter(String filename, String defaultNamespaceURI) {
+        this(filename, Namespace.getNamespace(defaultNamespaceURI));
+    }
+
+    /**
+     * Creates an instance of this class with advanced parameters in order to specify the schema.
+     * @param filename The name of the xml file
+     * @param defaultNamespaceURI The default namespace uri
+     * @param schemaFilename The filename of the schema and its location
+     */
+    public BasicResultWriter(String filename, String defaultNamespaceURI, String schemaFilename) {
+        this(filename, defaultNamespaceURI);
+        // Declare and set the schema location
+        Namespace xsiNS = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+        this.eTimit.addNamespaceDeclaration(xsiNS);
+        // Add schema location
+        this.eTimit.setAttribute(new Attribute("schemaLocation", defaultNamespaceURI + " " + schemaFilename,
+            xsiNS));
     }
 
     /**
@@ -86,7 +124,7 @@ public class BasicResultWriter {
         }
 
         // Create the ao element
-        Element aoElement = new Element("ao");
+        Element aoElement = new Element("ao", defaultNS);
         this.fillTimersResults(aoElement, bag);
         Iterator it = aoElement.getDescendants();
         while (it.hasNext()) {
@@ -98,17 +136,20 @@ public class BasicResultWriter {
     }
 
     /**
-     * Use this method to add timers results to a single file.
-     * @param bag A bag of timer results
+     * Use this method to add some additional information and the version of proActive
+     * @param globalInformation Some additional information
+     * @param proActiveVersion The current proActive version
      */
-    public void addGlobalInformationElement(String globalInformation) {
+    public void addGlobalInformationElement(String globalInformation, String proActiveVersion) {
         if (globalInformation == null) {
             return;
         }
 
         // Create the globalInformation element
-        Element globalInformationElement = new Element("globalInformation");
-        globalInformationElement.setAttribute(new Attribute("value", globalInformation));
+        Element globalInformationElement = new Element("globalInformation", defaultNS);
+        globalInformationElement.setAttribute(new Attribute("info", globalInformation));
+        // Set the proActiveVersion values as an attribute value
+        globalInformationElement.setAttribute(new Attribute("proActiveVersion", proActiveVersion));
         // Attach the globalInformationElement element as a child to the timit element
         this.eTimit.addContent(globalInformationElement);
     }
@@ -129,10 +170,8 @@ public class BasicResultWriter {
         rootElement.setAttribute(new Attribute("uniqueID", uniqueID));
         // Set the otherInformation value as an attribute value
         rootElement.setAttribute(new Attribute("otherInformation", otherInformation));
-        // Set the proActiveVersion values as an attribute value
-        rootElement.setAttribute(new Attribute("proActiveVersion", PAVersion.getProActiveVersion()));
         // Create the timers element
-        Element timersElement = new Element("timers");
+        Element timersElement = new Element("timers", defaultNS);
         rootElement.addContent(timersElement);
 
         // Finding and adding all roots
@@ -140,7 +179,7 @@ public class BasicResultWriter {
             // If the current is the root add it to the tree
             BasicTimer currentRoot = timersList.get(i);
             if (currentRoot.getParent() == null) {
-                Element createdElement = createTimerElement(currentRoot);
+                Element createdElement = createTimerElement(currentRoot, defaultNS);
                 timersElement.addContent(createdElement);
                 timersList.remove(i);
                 i--;
@@ -148,7 +187,7 @@ public class BasicResultWriter {
                 for (int j = 0; j < timersList.size(); j++) {
                     BasicTimer b = timersList.get(j);
                     if (b.getParent().equals(currentRoot)) {
-                        Element directChildElement = createTimerElement(b);
+                        Element directChildElement = createTimerElement(b, defaultNS);
                         createdElement.addContent(directChildElement);
                         timersList.remove(j);
                         j--;
@@ -203,7 +242,7 @@ public class BasicResultWriter {
             if (timerToAdd.getParent().getName().equals(ee.getAttributeValue("name")) &&
                 (timerToAdd.getParent().getParent().getId() == Integer.valueOf(ee
                         .getAttributeValue("parentId")))) {
-                ee.addContent(createTimerElement(timerToAdd));
+                ee.addContent(createTimerElement(timerToAdd, defaultNS));
                 return true;
             }
         }
@@ -217,8 +256,8 @@ public class BasicResultWriter {
      *            The timer to create an element of.
      * @return The created element.
      */
-    private static final Element createTimerElement(final BasicTimer currentTimer) {
-        final Element newTimerElement = new Element("timer");
+    private static final Element createTimerElement(final BasicTimer currentTimer, Namespace namespace) {
+        final Element newTimerElement = new Element("timer", namespace);
         // Set the name as an attribute
         newTimerElement.setAttribute(new Attribute("name", currentTimer.getName()));
         double totalTimeValueInMillis = (currentTimer.getTotalTime()) / 1000000d;
@@ -228,8 +267,8 @@ public class BasicResultWriter {
         newTimerElement.setAttribute(new Attribute("avgTimeInMillis", "" +
             (totalTimeValueInMillis / currentTimer.getStartStopCoupleCount())));
         // Set the number of startStopCoupleCount value
-        newTimerElement.setAttribute(new Attribute("startStopCoupleCount", "" +
-            currentTimer.getStartStopCoupleCount()));
+        newTimerElement
+                .setAttribute(new Attribute("invocations", "" + currentTimer.getStartStopCoupleCount()));
         // Set the temporary parent name
         newTimerElement.setAttribute(new Attribute("parentId", ((currentTimer.getParent() == null) ? ""
                 : ("" + currentTimer.getParent().getId()))));
@@ -255,7 +294,7 @@ public class BasicResultWriter {
      * @param timeInNanos The initial time is taken in nanoseconds
      * @return The formatted representation of the time value.
      */
-    private static final String checkBestFormat(double t) {
+    public static final String checkBestFormat(double t) {
         double timeInNanos = t;
         String format = null;
         double result = 0;
