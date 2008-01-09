@@ -107,7 +107,7 @@ public class TimItBasicReductor implements ProActiveInternalObject {
         File folder = new File(TimItBasicConfigurator.DEFAULT_OUTPUT_DIRECTORY);
         folder.mkdir();
         BasicResultWriter finalWriter = new BasicResultWriter(folder.getAbsolutePath() + "/" + filename);
-        finalWriter.addGlobalInformationElement(globalInformation);
+        finalWriter.addGlobalInformationElement(globalInformation, PAVersion.getProActiveVersion());
         Iterator<ResultBag> resultsIterator = this.results.iterator();
         while (resultsIterator.hasNext()) {
             ResultBag currentResultBag = resultsIterator.next();
