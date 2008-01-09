@@ -466,16 +466,65 @@
 		 		<listitem>
 		 			Install  the <ulink url="http://www.eclipse.org/birt/phoenix/">Business Intelligence and Reporting Tools </ulink> 
 		 			used by TimIt for profiling.
-		 			For this go to Help-> Software Updates -> Find And Install. -> Europa Discovery --> Charting And Reporting 
+		 			To install go to Help-> Software Updates -> Find And Install.
+		 		
+		 		
+		 		
+		 				<informalfigure>
+							<mediaobject>
+								<imageobject>
+									<imagedata fileref="images/IC2D_development_installation/update_manager.png"/>
+								</imageobject>
+							</mediaobject>
+						</informalfigure>		
+		 		<para>Select Europa Discovery:</para>
+		 				<informalfigure>
+							<mediaobject>
+								<imageobject>
+									<imagedata fileref="images/IC2D_development_installation/europa_discovery.png"/>
+								</imageobject>
+							</mediaobject>
+						</informalfigure>		
+
+		 		<para>Select "Charting and Reporting" and then click the Select Required button:</para>
+		 				<informalfigure>
+							<mediaobject>
+								<imageobject>
+									<imagedata fileref="images/IC2D_development_installation/birt_selected.png"/>
+								</imageobject>
+							</mediaobject>
+						</informalfigure>
+			 		
+		 		</listitem>
+		 		<listitem><para>
+		 			After the Birt installation is done, go to ic2dproduct and click Synchronize
+		 			and then click on Launch Application. Don't worry if the launch fails we will fix that in the next step.
+		 		</para>
+		 		
+		 				<informalfigure>
+							<mediaobject>
+								<imageobject>
+									<imagedata fileref="images/IC2D_development_installation/ic2dproduct.png"/>
+								</imageobject>
+							</mediaobject>
+						</informalfigure>
+		 		
+		 		
 		 		</listitem>
 		 		<listitem>
-		 			After the Birt installation is done go to ic2dproduct and click Synchronize
-		 			and click on Launch Application. Don't worry if the launch fails we will fix that in the next step.
-		 		</listitem>
-		 		<listitem>
-		 			Open the Run Dialog, click on ic2d.product, click on Plugins, select all the workspace plugins, click on add required, click on validate, click on apply, click on run 
+		 			Open the Run Dialog, click on ic2d.product, click on Plugins tab, select all the workspace plugins, click on the Add Required button, click on Apply, and then click on Run. 
+		 		
+		 				<informalfigure>
+							<mediaobject>
+								<imageobject>
+									<imagedata fileref="images/IC2D_development_installation/select_run_plugins.png"/>
+								</imageobject>
+							</mediaobject>
+							</informalfigure>
+		 		
 		 		</listitem>
 		 	</orderedlist>
+		 	<para>You now have a running IC2D application. Feel free to test and improve the code. </para>
 		 </sect2>
 	 </sect1>
 </chapter>
