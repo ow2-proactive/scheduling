@@ -187,6 +187,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
 
             document = documentBuilder.parse(processedInputSource);
+
         } catch (SAXException e) {
             String msg = "parsing problem with document " + descriptor.getCanonicalPath();
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " + e.getMessage());
@@ -275,9 +276,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
 
         // DO NOT change the order here, it would break validation
         //
-        schemas.add(commonTypesSchema.toString());
-        schemas.add(deploymentSchema.toString());
-        schemas.add(protocolsSchema.toString());
+        schemas.add(0, protocolsSchema.toString());
+        schemas.add(0, deploymentSchema.toString());
+        schemas.add(0, commonTypesSchema.toString());
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         try {
