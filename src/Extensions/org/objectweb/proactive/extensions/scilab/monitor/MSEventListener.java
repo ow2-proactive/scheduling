@@ -32,12 +32,15 @@ package org.objectweb.proactive.extensions.scilab.monitor;
 
 import java.util.EventListener;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  *
  * This interface is a listener for Scilab events
  *
  */
+@PublicAPI
 public interface MSEventListener extends EventListener {
     public void actionPerformed(MSEvent evt);
 }
