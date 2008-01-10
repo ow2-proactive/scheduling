@@ -30,11 +30,14 @@
  */
 package org.objectweb.proactive.benchmarks.timit.util.basic;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 /**
  * A Basic timer in nano seconds.
  *
  * @author vbodnart
  */
+@PublicAPI
 public class BasicTimer implements java.io.Serializable {
 
     /** A static variable to switch to debug mode */
