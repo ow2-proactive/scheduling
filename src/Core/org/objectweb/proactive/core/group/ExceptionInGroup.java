@@ -28,13 +28,18 @@
  *
  * ################################################################
  */
+
 package org.objectweb.proactive.core.group;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * This class represents an throwable occured in a group communication.
  *
  * @author Laurent Baduel
  */
+@PublicAPI
 public class ExceptionInGroup extends RuntimeException {
 
     /** The Object who throwns the Throwable */

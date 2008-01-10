@@ -33,12 +33,15 @@ package org.objectweb.proactive.core.group;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * An exception that contains a list of the ExceptionInGroup occured in a group.
  *
  * @author Laurent Baduel
  */
+@PublicAPI
 public class ExceptionListException extends RuntimeException implements Iterable<ExceptionInGroup> {
 
     /** A vector implements the list */
