@@ -32,12 +32,15 @@ package org.objectweb.proactive.extensions.calcium.skeletons;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Skeleton structure visitors must implement this interface.
  *
  * @author The ProActive Team (mleyton)
  */
+@PublicAPI
 public interface SkeletonVisitor {
     public <P extends Serializable, R extends Serializable> void visit(Farm<P, R> skeleton);
 
