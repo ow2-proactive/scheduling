@@ -30,11 +30,15 @@
  */
 package org.objectweb.proactive;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
 /**
  * This is a marker which must be implemented by all non functional active objects,
  * e.g. load balancing objects, p2p objects, IC2D spy.
  * @author cdelbe
  * @since 2.2
  */
+@PublicAPI
 public interface ProActiveInternalObject {
 }
