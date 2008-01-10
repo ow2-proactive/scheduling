@@ -30,12 +30,16 @@
  */
 package org.objectweb.proactive.core.component.exceptions;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
 /**
  * Exception thrown if parameters cannot be dispatched from or to a collective interface.
  *
  * @author Matthieu Morel
  *
  */
+@PublicAPI
 public class ParameterDispatchException extends Exception {
     public ParameterDispatchException() {
         super();
