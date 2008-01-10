@@ -45,7 +45,7 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  * <li> Every results of every tasks executed in the job.</li>
  * <li> Every results that have generated an exception.</li>
  * <li> Every results that you pointed out as precious result.</li>
- * <ul>
+ * </ul>
  *
  * @author jlscheef - ProActiveTeam
  * @version 3.9, Jul 5, 2007
