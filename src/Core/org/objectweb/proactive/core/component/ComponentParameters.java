@@ -35,6 +35,7 @@ import java.util.ArrayList;
 
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -48,6 +49,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
  *
  * @author Matthieu Morel
  */
+@PublicAPI
 public class ComponentParameters implements Serializable {
     private ComponentType componentType;
     private ControllerDescription controllerDesc;
