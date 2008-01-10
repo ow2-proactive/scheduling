@@ -32,6 +32,8 @@ package org.objectweb.proactive.extensions.resourcemanager.common.event;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * Upper class for RM's event objects
@@ -40,6 +42,7 @@ import java.io.Serializable;
  * @version 3.9
  * @since ProActive 3.9
  */
+@PublicAPI
 public class RMEvent implements Serializable {
 
     /** Resource manager URL */
