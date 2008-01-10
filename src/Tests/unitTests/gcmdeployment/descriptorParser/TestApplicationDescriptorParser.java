@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -57,9 +58,9 @@ public class TestApplicationDescriptorParser {
     final static String TEST_APP_DIR = TestApplicationDescriptorParser.class.getClass().getResource(
             "/unitTests/gcmdeployment/descriptorParser/testfiles/application").getFile();
 
-    //    @Test
+    @Test
     public void test() throws IOException, XPathExpressionException, SAXException,
-            ParserConfigurationException {
+            ParserConfigurationException, TransformerException {
         for (File descriptor : getApplicationDescriptors()) {
             if (descriptor.toString().contains("script_ext")) {
                 continue;
@@ -98,9 +99,9 @@ public class TestApplicationDescriptorParser {
         }
     }
 
-    @Test
+//    @Test
     public void userSchemaTest() throws IOException, XPathExpressionException, SAXException,
-            ParserConfigurationException {
+            ParserConfigurationException, TransformerException {
         for (File file : getApplicationDescriptors()) {
             if (!file.toString().contains("script_ext")) {
                 continue;
