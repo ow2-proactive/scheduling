@@ -35,7 +35,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
-import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
@@ -55,7 +54,6 @@ import org.objectweb.proactive.extensions.branchnbound.core.queue.TaskQueue;
  *
  * Created on Apr 25, 2005
  */
-@PublicAPI
 public class Worker implements Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.P2P_SKELETONS_WORKER);
     private Worker selfWorkerGroup = null;
