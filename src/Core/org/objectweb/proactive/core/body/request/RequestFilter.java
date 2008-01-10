@@ -32,6 +32,8 @@ package org.objectweb.proactive.core.body.request;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
  * <p>
@@ -48,6 +50,7 @@ import java.io.Serializable;
  * @since   ProActive 0.9
  *
  */
+@PublicAPI
 public interface RequestFilter extends Serializable {
 
     /**
