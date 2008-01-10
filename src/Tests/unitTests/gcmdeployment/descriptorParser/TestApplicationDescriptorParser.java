@@ -99,7 +99,7 @@ public class TestApplicationDescriptorParser {
         }
     }
 
-//    @Test
+    //    @Test
     public void userSchemaTest() throws IOException, XPathExpressionException, SAXException,
             ParserConfigurationException, TransformerException {
         for (File file : getApplicationDescriptors()) {
