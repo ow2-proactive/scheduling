@@ -31,6 +31,7 @@
 package org.objectweb.proactive.core;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -47,6 +48,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since   ProActive 0.9
  *
  */
+@PublicAPI
 public class UniqueID implements java.io.Serializable, Comparable {
     private java.rmi.server.UID id;
     private java.rmi.dgc.VMID vmID;
