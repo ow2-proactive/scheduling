@@ -36,6 +36,7 @@ import java.util.Map;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
@@ -45,6 +46,7 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
  * @author Matthieu Morel
  *
  */
+@PublicAPI
 public class ContentControllerExceptionListException extends Exception {
     Map<Component, IllegalLifeCycleException> lifeCycleExceptions = null;
     Map<Component, IllegalContentException> contentExceptions = null;
