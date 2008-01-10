@@ -30,6 +30,10 @@
  */
 package org.objectweb.proactive.core.migration;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
+@PublicAPI
 public interface Destination {
 
     /**
