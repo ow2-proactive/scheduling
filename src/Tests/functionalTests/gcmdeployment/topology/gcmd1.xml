@@ -33,7 +33,7 @@
 		</hosts>
 
 		<bridges>
-			<paext:sshBridge
+			<sshBridge
 				id="bLocal"
 				hostname="localhost"
 				commandOptions="-2" />
@@ -41,7 +41,7 @@
 		</bridges>
 		
 		<groups>
-			<paext:sshGroup id="gLocal" hostList="localhost localhost"/>
+			<sshGroup id="gLocal" hostList="localhost localhost"/>
 		</groups>
 	</infrastructure>
 </GCMDeployment>

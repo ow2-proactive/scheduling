@@ -30,17 +30,17 @@
 		</hosts>
 	
 		<bridges>
-			<paext:sshBridge
+			<sshBridge
 				id="bridge1"
 				hostname="localhost"
 				commandOptions="-2" />
 
-			<paext:sshBridge
+			<sshBridge
 				id="bridge2"
 				hostname="localhost"
 				commandOptions="-2" />
 				
-			<paext:sshBridge
+			<sshBridge
 				id="bridge3"
 				hostname="localhost"
 				commandOptions="-2" />
@@ -48,7 +48,7 @@
 		</bridges>
 		
 		<groups>
-			<paext:sshGroup
+			<sshGroup
 				id="group3"
 				hostList="localhost localhost"/>
 		</groups>
