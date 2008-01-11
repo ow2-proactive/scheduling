@@ -118,7 +118,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
     private static final String XPATH_BRIDGES = "dep:bridges/*";
     private static final String XPATH_GROUPS = "dep:groups/*";
     private static final String XPATH_HOSTS = "dep:hosts/dep:host";
-    private static final String XPATH_HOST = PA_HOST;
+    private static final String XPATH_HOST = "dep:host";
     private static final String XPATH_DESCRIPTOR_VARIABLE = "dep:descriptorVariable";
 
     protected DocumentBuilderFactory domFactory;
