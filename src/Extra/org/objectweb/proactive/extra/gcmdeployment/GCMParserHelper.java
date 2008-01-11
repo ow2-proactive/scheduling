@@ -118,7 +118,6 @@ public class GCMParserHelper implements GCMParserConstants {
         }
 
         public String getNamespaceURI(String prefix) {
-            System.out.println("@#@ prefix=" + prefix);
             if (prefix == null) {
                 throw new NullPointerException("Null prefix");
             } else if (GCM_APPLICATION_NAMESPACE_PREFIX.equals(prefix)) {
