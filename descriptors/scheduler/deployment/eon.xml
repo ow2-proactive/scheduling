@@ -23,7 +23,7 @@
 			</map>
 		</mapping>
 		<jvms>
-			<jvm name="eon">
+			<jvm name="eon" askedNodes="8">
 				<creation>
 					<processReference refid="SSH"/>
 				</creation>
