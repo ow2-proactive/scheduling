@@ -76,7 +76,8 @@ public class ApplicationParserProactive extends AbstractApplicationParser {
         CommandBuilderProActive commandBuilderProActive = (CommandBuilderProActive) commandBuilder;
 
         String relPath = GCMParserHelper.getAttributeValue(paNode, "relpath");
-        commandBuilderProActive.setProActivePath(relPath);
+        String base = GCMParserHelper.getAttributeValue(paNode, "base");
+        commandBuilderProActive.setProActivePath(relPath, base);
 
         try {
             Node configNode = (Node) xpath.evaluate(XPATH_CONFIGURATION, paNode, XPathConstants.NODE);

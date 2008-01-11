@@ -129,8 +129,14 @@
 					</xsd:element>
 
 				</xsd:sequence>
-				<xsd:attribute name="relpath"
-					type="pathElementGeneralType" use="optional">
+				<xsd:attribute name="relpath" type="pathElementGeneralType" use="required" />
+				<xsd:attribute name="base" use="required">
+					<xsd:simpleType>
+						<xsd:restriction base="xsd:string">
+							<xsd:enumeration value="home" />
+							<xsd:enumeration value="root" />
+						</xsd:restriction>
+					</xsd:simpleType>
 				</xsd:attribute>
 			</xsd:extension>
 		</xsd:complexContent>

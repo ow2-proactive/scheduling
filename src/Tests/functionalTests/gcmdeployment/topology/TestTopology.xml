@@ -10,7 +10,7 @@
 	
 	<application>
 		
-		<proactive relpath="${proactive.home}">
+		<proactive relpath="${proactive.home}" base="root">
 			<configuration>
 				<jvmarg value="-Dproactive.test=true"/>
 			</configuration>

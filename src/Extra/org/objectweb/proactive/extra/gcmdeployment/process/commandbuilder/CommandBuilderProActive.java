@@ -365,8 +365,12 @@ public class CommandBuilderProActive implements CommandBuilder {
     }
 
     public void setProActivePath(String proActivePath) {
+        setProActivePath(proActivePath, PathBase.HOME.name());
+    }
+
+    public void setProActivePath(String proActivePath, String base) {
         if (proActivePath != null) {
-            this.proActivePath = new PathElement(proActivePath, PathBase.HOME);
+            this.proActivePath = new PathElement(proActivePath, base);
             GCMD_LOGGER.trace(" Set ProActive relpath to " + this.proActivePath.getRelPath());
         }
     }
