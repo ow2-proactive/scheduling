@@ -1,40 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
 
-	<complexType name="prunProcessType">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="hostList" type="cpa:ListType" minOccurs="0" />
-					<element name="hostsNumber" type="cpa:PosintOrVariableType" minOccurs="0" />
-					<element name="processorPerNode" minOccurs="0">
-						<simpleType>
-							<restriction base="integer">
-								<minInclusive value="1" />
-								<maxInclusive value="2" />
-							</restriction>
-						</simpleType>
-					</element>
-					<element name="wallTime" type="cpa:TimeOrVariableType" minOccurs="0" />
-					<element name="stdout" type="cpa:TextOrVariableType" minOccurs="0" />
-				</sequence>
-				<attribute name="queue" type="string" use="optional" />
-			</extension>
-		</complexContent>
-	</complexType>
+	<xs:complexType name="prunProcessType">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+				<xs:sequence>
+					<xs:element name="hostList" type="ListType" minOccurs="0" />
+					<xs:element name="hostsNumber" type="PosintOrVariableType" minOccurs="0" />
+					<xs:element name="processorPerNode" minOccurs="0">
+						<xs:simpleType>
+							<xs:restriction base="xs:integer">
+								<xs:minInclusive value="1" />
+								<xs:maxInclusive value="2" />
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:element>
+					<xs:element name="wallTime" type="TimeOrVariableType" minOccurs="0" />
+					<xs:element name="stdout" type="TextOrVariableType" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="queue" type="xs:string" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<element name="prunGroup" type="paext:prunProcessType" substitutionGroup="pa:abstractShElement" />
+	<xs:element name="prunGroup" type="prunProcessType" substitutionGroup="abstractShElement" />
 
-</schema>
+</xs:schema>

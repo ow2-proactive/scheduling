@@ -5,7 +5,6 @@
 	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
 	xmlns:pauext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaUserExtension"
 	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                 ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
 	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd
 	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaUserExtension SampleDeploymentExtension.xsd	
@@ -13,7 +12,7 @@
 >
  
 	<environment>
-		<cpa:descriptorVariable name="USERNAME" value="cmathieu" />
+		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
 
 	<resources>

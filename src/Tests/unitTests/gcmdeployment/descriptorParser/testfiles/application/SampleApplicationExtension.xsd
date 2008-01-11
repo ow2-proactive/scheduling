@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<xsd:schema
+	targetNamespace="urn:gcm:application:extension"
+	xmlns="urn:gcm:application:extension"
+	xmlns:gcmap="urn:gcm:application:1.0"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xi="http://www.w3.org/2001/XInclude"
+	xsi:schemaLocation="urn:gcm:application:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd"
 	elementFormDefault="qualified">
+	
+	<xsd:import 
+		schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd"
+		namespace="urn:gcm:application:1.0"/>
 
-	<import schemaLocation="../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
+	<xsd:complexType name="myapplicationType">
+		<xsd:complexContent>
+			<xsd:extension base="gcmap:applicationNodeType">
+				<xsd:attribute name="someattr" type="xsd:string"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 
-	<complexType name="myapplicationType">
-		<complexContent>
-			<extension base="pa:applicationNodeType">
-				<attribute name="someattr" type="string"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
+	<xsd:element name="myapplication" substitutionGroup="gcmap:abstractApplicationElement" type="myapplicationType"/>
 
-	<element name="myapplication" substitutionGroup="pa:abstractApplicationElement" type="paext:myapplicationType"/>
-
-</schema>
+</xsd:schema>

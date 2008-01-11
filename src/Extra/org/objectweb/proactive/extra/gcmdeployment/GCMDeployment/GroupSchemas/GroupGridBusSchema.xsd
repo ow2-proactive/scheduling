@@ -1,28 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
+	
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
+	<xs:complexType name="gridbusProcessType">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+				<xs:sequence>
+					<xs:element name="arguments" type="argumentListType" minOccurs="0" />
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<complexType name="gridbusProcessType">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="arguments" type="cpa:argumentListType" minOccurs="0" />
-				</sequence>
-			</extension>
-		</complexContent>
-	</complexType>
+	<xs:element name="gridbusGroup" type="gridbusProcessType" substitutionGroup="abstractShElement"/>
 
-	<element name="gridbusGroup" type="paext:gridbusProcessType" substitutionGroup="pa:abstractShElement"></element>
-
-</schema>
+</xs:schema>

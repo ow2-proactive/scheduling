@@ -1,30 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pa:GCMDeployment xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<GCMDeployment 
+	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"	
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                                     ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	                    http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	
-	
-	 ">
+	xsi:schemaLocation="urn:gcm:deployment:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
 
-	<pa:resources>
-		<pa:group refid="mygroup">
-			<pa:host refid="WRONG_ID" />
-		</pa:group>
-	</pa:resources>
+	<resources>
+		<group refid="mygroup">
+			<host refid="WRONG_ID" />
+		</group>
+	</resources>
 
-	<pa:infrastructure>
+	<infrastructure>
 	
-		<pa:groups>
+		<groups>
 			<paext:sshGroup id="mygroup" hostList="host" />
-		</pa:groups>
+		</groups>
 
-		<pa:hosts>
-			<pa:host id="myhost" os="unix">
-				<pa:homeDirectory base="root" relpath="" />
-			</pa:host>
-		</pa:hosts>
+		<hosts>
+			<host id="myhost" os="unix">
+				<homeDirectory base="root" relpath="" />
+			</host>
+		</hosts>
 
-	</pa:infrastructure>
+	</infrastructure>
 
-</pa:GCMDeployment>
+</GCMDeployment>

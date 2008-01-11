@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <GCMApplication
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns="urn:gcm:application:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 

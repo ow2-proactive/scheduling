@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <GCMApplication
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
+	xmlns="urn:gcm:application:1.0"
+	xmlns:ext="urn:gcm:application:extension"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas
-	../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd
-	http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchemaExtension
-	SampleApplicationExtension.xsd">
+	xsi:schemaLocation="
+		urn:gcm:application:extension SampleApplicationExtension.xsd
+		urn:gcm:application:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 
 	<application>
-		<paext:myapplication someattr="foobar" />
+		<ext:myapplication someattr="foobar" />
 	</application>
 
 	<resources>

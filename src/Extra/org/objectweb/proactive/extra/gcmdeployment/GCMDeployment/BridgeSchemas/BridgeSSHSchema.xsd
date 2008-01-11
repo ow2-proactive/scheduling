@@ -1,33 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>
 
-	<complexType name="bridgeTypeSSH">
-		<complexContent>
-			<extension base="pa:abstractBridgeElementType">
-				<sequence>
-					<element name="privateKey" type="cpa:pathElementType" minOccurs="0" maxOccurs="1" />
-				</sequence>
-				<attribute name="hostname" type="cpa:hostnameType" use="required" />
-				<attribute name="username" type="cpa:usernameType"></attribute>
-				<attribute name="commandPath" type="string"></attribute>
-				<attribute name="commandOptions" type="string"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
+	<xs:complexType name="bridgeTypeSSH">
+		<xs:complexContent>
+			<xs:extension base="abstractBridgeElementType">
+				<xs:sequence>
+					<xs:element name="privateKey" type="pathElementType" minOccurs="0" maxOccurs="1" />
+				</xs:sequence>
+				<xs:attribute name="hostname" type="hostnameType" use="required" />
+				<xs:attribute name="username" type="usernameType"/>
+				<xs:attribute name="commandPath" type="xs:string"/>
+				<xs:attribute name="commandOptions" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<element name="sshBridge" type="paext:bridgeTypeSSH" substitutionGroup="pa:abstractBridgeElement"></element>
-
-
-</schema>
+	<xs:element name="sshBridge" type="bridgeTypeSSH" substitutionGroup="abstractBridgeElement"/>
+</xs:schema>

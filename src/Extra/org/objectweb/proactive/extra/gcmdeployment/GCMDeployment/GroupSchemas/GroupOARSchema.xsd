@@ -1,54 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
+	
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
+	<xs:complexType name="oarGroupType">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+				<xs:sequence>
+					<xs:element name="resources" type="oarResourcesType" minOccurs="0" />
+					<xs:element name="directory" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="interactive" type="BooleanOrVariableType" use="optional" />
+				<xs:attribute name="queue" type="xs:string" use="optional" />
+				<xs:attribute name="type" use="optional">
+					<xs:simpleType>
+						<xs:restriction base="xs:string">
+							<xs:enumeration value="deploy" />
+							<xs:enumeration value="besteffort" />
+							<xs:enumeration value="cosystem" />
+							<xs:enumeration value="checkpoint" />
+							<xs:enumeration value="timesharing" />
+						</xs:restriction>
+					</xs:simpleType>
+				</xs:attribute>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<complexType name="oarGroupType">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="resources" type="paext:oarResourcesType" minOccurs="0" />
-					<element name="directory" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
-				</sequence>
-				<attribute name="interactive" type="cpa:BooleanOrVariableType" use="optional" />
-				<attribute name="queue" type="string" use="optional" />
-				<attribute name="type" use="optional">
-					<simpleType>
-						<restriction base="string">
-							<enumeration value="deploy" />
-							<enumeration value="besteffort" />
-							<enumeration value="cosystem" />
-							<enumeration value="checkpoint" />
-							<enumeration value="timesharing" />
-						</restriction>
-					</simpleType>
-				</attribute>
-			</extension>
-		</complexContent>
-	</complexType>
+	<xs:complexType name="oarResourcesType">
+		<xs:simpleContent>
+			<xs:extension base="TextOrVariableType">
+				<xs:attribute name="nodes" type="PosintOrVariableType" use="optional"></xs:attribute>
+				<xs:attribute name="cpu" type="PosintOrVariableType" use="optional"></xs:attribute>
+				<xs:attribute name="core" type="PosintOrVariableType" use="optional"></xs:attribute>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
 
-	<complexType name="oarResourcesType">
-		<simpleContent>
-			<extension base="cpa:TextOrVariableType">
-				<attribute name="nodes" type="cpa:PosintOrVariableType" use="optional"></attribute>
-				<attribute name="cpu" type="cpa:PosintOrVariableType" use="optional"></attribute>
-				<attribute name="core" type="cpa:PosintOrVariableType" use="optional"></attribute>
-			</extension>
-		</simpleContent>
-	</complexType>
-
-	<element name="oarGroup" type="paext:oarGroupType" substitutionGroup="pa:abstractShElement" />
-
-</schema>
+	<xs:element name="oarGroup" type="oarGroupType" substitutionGroup="abstractShElement" />
+</xs:schema>

@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GCMDeployment xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<GCMDeployment 
+	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                     ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	http://www-sop.inria.fr/oasis/ProActive/commonSchemas                                   ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/CommonTypes.xsd
-	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension     ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/ProtocolsSchema.xsd
-	"
->
+	xsi:schemaLocation="urn:gcm:deployment:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
 
 	<environment>
-		<cpa:descriptorVariable name="USERNAME" value="jsmith" />
+		<descriptorVariable name="USERNAME" value="jsmith" />
 	</environment>
 
 	<resources>
@@ -34,132 +28,132 @@
 		<groups>
 
 
-			<paext:sshGroup id="LAN_INRIA" hostList="node2 node4 host[10-20]" username="${USERNAME}"
+			<sshGroup id="LAN_INRIA" hostList="node2 node4 host[10-20]" username="${USERNAME}"
 				commandPath="/usr/local/bin/ssh">
-				<pa:scriptPath base="proactive" relpath="myscript.sh" />
-			</paext:sshGroup>
+				<scriptPath base="proactive" relpath="myscript.sh" />
+			</sshGroup>
 
-			<paext:pbsGroup id="pbsgroup1" queue="queue01@pbsserver" jobName="demoJob"
+			<pbsGroup id="pbsgroup1" queue="queue01@pbsserver" jobName="demoJob"
 				commandPath="/usr/local/bin/pbs">
-				<pa:scriptPath base="home" relpath="scripts/pbsjob.sh" />
-				<paext:nodes>50</paext:nodes>
-			</paext:pbsGroup>
+				<scriptPath base="home" relpath="scripts/pbsjob.sh" />
+				<nodes>50</nodes>
+			</pbsGroup>
 
-			<paext:prunGroup id="prungroup1" queue="prunqueue">
-				<paext:hostList>prunhost[00-10]</paext:hostList>
-				<paext:processorPerNode>2</paext:processorPerNode>
-			</paext:prunGroup>
+			<prunGroup id="prungroup1" queue="prunqueue">
+				<hostList>prunhost[00-10]</hostList>
+				<processorPerNode>2</processorPerNode>
+			</prunGroup>
 
-			<paext:gridEngineGroup id="gridEngineGroup">
-				<pa:scriptPath base="home" relpath="jobs/jobscript1.sh" />
-				<paext:hostsNumber>10</paext:hostsNumber>
-				<paext:wallTime>500000</paext:wallTime>
-				<paext:directory>"jobs/job_datas</paext:directory>
-				<paext:stderr>jobs/jobtrace_err.txt</paext:stderr>
-			</paext:gridEngineGroup>
+			<gridEngineGroup id="gridEngineGroup">
+				<scriptPath base="home" relpath="jobs/jobscript1.sh" />
+				<hostsNumber>10</hostsNumber>
+				<wallTime>500000</wallTime>
+				<directory>"jobs/job_datas</directory>
+				<stderr>jobs/jobtrace_err.txt</stderr>
+			</gridEngineGroup>
 
-			<paext:gLiteGroup id="gliteGroup2" virtualOrganisation="proactive" JDLFileName="job.jdl" jobType="normal"
+			<gLiteGroup id="gliteGroup2" virtualOrganisation="proactive" JDLFileName="job.jdl" jobType="normal"
 				retryCount="3">
-				<paext:requirements>
+				<requirements>
 					other.GlueCEUniqueID == "grid10.lal.in2p3.fr:2119/jobmanager-pbs-sdj"
-				</paext:requirements>
-				<paext:rank>-other.GlueCEStateEstimatedResponseTime</paext:rank>
-				<paext:stdout>stdout.log</paext:stdout>
-				<paext:stderr>error.log</paext:stderr>
-				<paext:configFile>scripts/unix/proactiveVO/proactiveVO.conf</paext:configFile>
-				<paext:JDLFilePath>/users/dsksi/emathias/JDL</paext:JDLFilePath>
-				<paext:JDLRemoteFilePath>/users/dsksi/emathias/JDL</paext:JDLRemoteFilePath>
-				<paext:inputSandbox>
+				</requirements>
+				<rank>-other.GlueCEStateEstimatedResponseTime</rank>
+				<stdout>stdout.log</stdout>
+				<stderr>error.log</stderr>
+				<configFile>scripts/unix/proactiveVO/proactiveVO.conf</configFile>
+				<JDLFilePath>/users/dsksi/emathias/JDL</JDLFilePath>
+				<JDLRemoteFilePath>/users/dsksi/emathias/JDL</JDLRemoteFilePath>
+				<inputSandbox>
 					${PROACTIVE_HOME}/dist/lib/classes.jar ${PROACTIVE_HOME}/lib/glite-wms-jdlj.jar
 					${PROACTIVE_HOME}/scripts/unix/cluster/gLiteStartRuntime.sh
-				</paext:inputSandbox>
-				<paext:outputSandbox>error.log stdout.log</paext:outputSandbox>
-			</paext:gLiteGroup>
+				</inputSandbox>
+				<outputSandbox>error.log stdout.log</outputSandbox>
+			</gLiteGroup>
 
-			<paext:gLiteGroup id="gliteGroup" virtualOrganisation="proactive" jobType="normal"
+			<gLiteGroup id="gliteGroup" virtualOrganisation="proactive" jobType="normal"
 				retryCount="3">
-				<paext:rank>-other.GlueCEStateEstimatedResponseTime</paext:rank>
-				<paext:stdout>stdout.log</paext:stdout>
-				<paext:stderr>error.log</paext:stderr>
-				<paext:configFile>scripts/unix/proactiveVO/proactiveVO.conf</paext:configFile>
-			</paext:gLiteGroup>
+				<rank>-other.GlueCEStateEstimatedResponseTime</rank>
+				<stdout>stdout.log</stdout>
+				<stderr>error.log</stderr>
+				<configFile>scripts/unix/proactiveVO/proactiveVO.conf</configFile>
+			</gLiteGroup>
 
-			<paext:globusGroup hostname="globus_frontend" id="globusgroup">
-				<paext:count>8</paext:count>
-				<paext:maxTime>120</paext:maxTime>
-				<paext:stderr>${GLOBUS_USER_HOME}/error.txt</paext:stderr>
-			</paext:globusGroup>
-
-
-			<paext:oarGroup bookedNodesAccess="ssh" id="oargroup" interactive="true">
-				<pa:scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh" />
-				<paext:resources nodes="2" cpu="4" />
-				<paext:stderr>trace/err.log</paext:stderr>
-			</paext:oarGroup>
-
-			<paext:oarshGroup id="oarshgroup" hostList="host1 host2" jobId="42">
-				<pa:scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh" />
-			</paext:oarshGroup>
-
-			<paext:lsfGroup id="lsfgroup">
-				<pa:scriptPath base="proactive" relpath="scripts/unix/cluster/startRuntime.sh" />
-				<paext:processorsNumber>2</paext:processorsNumber>
-				<paext:resourceRequirement>value="span[ptile=2]"</paext:resourceRequirement>
-			</paext:lsfGroup>
-
-			<paext:arcGroup id="arcgroup" jobName="arcjob">
-				<pa:scriptPath base="root" relpath="/usr/local/arc/scripts/unix/cluster/startRuntime.sh" />
-				<paext:stderr>trace/err.log</paext:stderr>
-				<paext:maxTime>10000000</paext:maxTime>
-			</paext:arcGroup>
-
-			<paext:furaGroup id="furagroup" jobName="furajob">
-				<pa:scriptPath base="root" relpath="/usr/local/fura/scripts/jobscript.sh" />
-				<paext:description>Fura job descriptor sample</paext:description>
-				<paext:stdout>trace/results.log</paext:stdout>
-				<paext:stderr>trace/err.log</paext:stderr>
-				<paext:maxTime>15000000</paext:maxTime>
-			</paext:furaGroup>
-
-			<paext:loadLevelerGroup id="loadlevelergroup">
-				<pa:scriptPath base="root" relpath="/usr/local/loadleveler/scripts/jobscript.sh" />
-				<paext:directory>datadir/jobdata1</paext:directory>
-				<paext:stdout>trace/results.log</paext:stdout>
-				<paext:stderr>trace/err.log</paext:stderr>
-				<paext:maxTime>15000000</paext:maxTime>
-				<paext:arguments>
-					<cpa:arg>arg1</cpa:arg>
-					<cpa:arg>25</cpa:arg>
-					<cpa:arg>foo bar</cpa:arg>
-				</paext:arguments>
-				<paext:nbTasks>10</paext:nbTasks>
-				<paext:tasksPerHost>1</paext:tasksPerHost>
-			</paext:loadLevelerGroup>
-
-			<paext:gridbusGroup id="gridbusgroup">
-				<pa:scriptPath base="root" relpath="./calc" />
-				<paext:arguments>
-					<cpa:arg>arg1</cpa:arg>
-					<cpa:arg>arg2</cpa:arg>
-				</paext:arguments>
-			</paext:gridbusGroup>
+			<globusGroup hostname="globus_frontend" id="globusgroup">
+				<count>8</count>
+				<maxTime>120</maxTime>
+				<stderr>${GLOBUS_USER_HOME}/error.txt</stderr>
+			</globusGroup>
 
 
-			<paext:cgspGroup id="cgspgroup" hostname="cgsp.inria.fr">
-				<pa:scriptPath base="root" relpath="./calc" />
-				<paext:count>50</paext:count>
-				<paext:directory>datadir/jobdata1</paext:directory>
-				<paext:stdout>trace/results.log</paext:stdout>
-				<paext:stderr>trace/err.log</paext:stderr>
+			<oarGroup bookedNodesAccess="ssh" id="oargroup" interactive="true">
+				<scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh" />
+				<resources nodes="2" cpu="4" />
+				<stderr>trace/err.log</stderr>
+			</oarGroup>
+
+			<oarshGroup id="oarshgroup" hostList="host1 host2" jobId="42">
+				<scriptPath base="proactive" relpath="scripts/unix/cluster/oarStartRuntime.sh" />
+			</oarshGroup>
+
+			<lsfGroup id="lsfgroup">
+				<scriptPath base="proactive" relpath="scripts/unix/cluster/startRuntime.sh" />
+				<processorsNumber>2</processorsNumber>
+				<resourceRequirement>value="span[ptile=2]"</resourceRequirement>
+			</lsfGroup>
+
+			<arcGroup id="arcgroup" jobName="arcjob">
+				<scriptPath base="root" relpath="/usr/local/arc/scripts/unix/cluster/startRuntime.sh" />
+				<stderr>trace/err.log</stderr>
+				<maxTime>10000000</maxTime>
+			</arcGroup>
+
+			<furaGroup id="furagroup" jobName="furajob">
+				<scriptPath base="root" relpath="/usr/local/fura/scripts/jobscript.sh" />
+				<description>Fura job descriptor sample</description>
+				<stdout>trace/results.log</stdout>
+				<stderr>trace/err.log</stderr>
+				<maxTime>15000000</maxTime>
+			</furaGroup>
+
+			<loadLevelerGroup id="loadlevelergroup">
+				<scriptPath base="root" relpath="/usr/local/loadleveler/scripts/jobscript.sh" />
+				<directory>datadir/jobdata1</directory>
+				<stdout>trace/results.log</stdout>
+				<stderr>trace/err.log</stderr>
+				<maxTime>15000000</maxTime>
+				<arguments>
+					<arg>arg1</arg>
+					<arg>25</arg>
+					<arg>foo bar</arg>
+				</arguments>
+				<nbTasks>10</nbTasks>
+				<tasksPerHost>1</tasksPerHost>
+			</loadLevelerGroup>
+
+			<gridbusGroup id="gridbusgroup">
+				<scriptPath base="root" relpath="./calc" />
+				<arguments>
+					<arg>arg1</arg>
+					<arg>arg2</arg>
+				</arguments>
+			</gridbusGroup>
+
+
+			<cgspGroup id="cgspgroup" hostname="cgsp.inria.fr">
+				<scriptPath base="root" relpath="./calc" />
+				<count>50</count>
+				<directory>datadir/jobdata1</directory>
+				<stdout>trace/results.log</stdout>
+				<stderr>trace/err.log</stderr>
 				
-			</paext:cgspGroup>
+			</cgspGroup>
 
 		</groups>
 
 		<bridges>
-			<paext:sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
+			<sshBridge id="SEA" hostname="sea.inria.fr" username="${USERNAME}" commandPath="" />
 			
-			<paext:oarshBridge id="oarbridge" hostname="oargrid.inria.fr" jobId="12" />
+			<oarshBridge id="oarbridge" hostname="oargrid.inria.fr" jobId="12" />
 			
 		</bridges>
 	</infrastructure>

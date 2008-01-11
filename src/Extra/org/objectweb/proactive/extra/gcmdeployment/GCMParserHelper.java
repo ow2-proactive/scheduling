@@ -30,19 +30,33 @@
  */
 package org.objectweb.proactive.extra.gcmdeployment;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.FileTransferBlock;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -104,16 +118,13 @@ public class GCMParserHelper implements GCMParserConstants {
         }
 
         public String getNamespaceURI(String prefix) {
+            System.out.println("@#@ prefix=" + prefix);
             if (prefix == null) {
                 throw new NullPointerException("Null prefix");
-            } else if ("pa".equals(prefix)) {
-                return namespace;
-            } else if ("paext".equals(prefix)) {
-                return GCMParserConstants.GCM_DESCRIPTOR_EXTENSION_NAMESPACE;
-            } else if ("cpa".equals(prefix)) {
-                return GCMParserConstants.GCM_COMMON_TYPES_NAMESPACE;
-            } else if ("pauext".equals(prefix)) {
-                return "http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaUserExtension";
+            } else if (GCM_APPLICATION_NAMESPACE_PREFIX.equals(prefix)) {
+                return GCMParserConstants.GCM_APPLICATION_NAMESPACE;
+            } else if (GCM_DEPLOYMENT_NAMESPACE_PREFIX.equals(prefix)) {
+                return GCMParserConstants.GCM_DEPLOYMENT_NAMESPACE;
             } else if ("xml".equals(prefix)) {
                 return XMLConstants.XML_NS_URI;
             }
@@ -186,4 +197,28 @@ public class GCMParserHelper implements GCMParserConstants {
 
         return environment;
     }
+
+    public static DocumentBuilder getNewDocumentBuilder(DocumentBuilderFactory domFactory) {
+        return getNewDocumentBuilder(domFactory, null);
+    }
+
+    public static DocumentBuilder getNewDocumentBuilder(DocumentBuilderFactory domFactory,
+            ErrorHandler errorHandler) {
+        try {
+            DocumentBuilder documentBuilder = domFactory.newDocumentBuilder();
+            if (errorHandler == null) {
+                errorHandler = new MyDefaultHandler();
+            }
+            documentBuilder.setErrorHandler(errorHandler);
+
+            return documentBuilder;
+        } catch (ParserConfigurationException e) {
+            return null;
+        }
+    }
+
+    public static String elementInNS(String prefixNS, String element) {
+        return prefixNS + ":" + element;
+    }
+
 }

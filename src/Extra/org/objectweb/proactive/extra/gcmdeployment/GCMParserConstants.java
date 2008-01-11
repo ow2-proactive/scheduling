@@ -35,38 +35,18 @@ public interface GCMParserConstants {
     static public final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
     static public final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
     public static final String COMMON_TYPES_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/CommonTypes.xsd";
+
     public static final String EXTENSION_SCHEMAS_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd";
     public static final String DEPLOYMENT_DESC_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd";
+    public static final String GCM_DEPLOYMENT_NAMESPACE = "urn:gcm:deployment:1.0";
+    public static final String GCM_DEPLOYMENT_NAMESPACE_PREFIX = "dep";
+
     public static final String APPLICATION_DESC_LOCATION = "/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd";
-    public static final String GCM_DESCRIPTOR_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas";
-    public static final String GCM_COMMON_TYPES_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/commonSchemas";
-    public static final String GCM_DESCRIPTOR_EXTENSION_NAMESPACE = "http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension";
-    public static final String GCM_DESCRIPTOR_NAMESPACE_PREFIX = "pa:";
-    public static final String GCM_COMMON_TYPES_NAMESPACE_PREFIX = "cpa:";
-    public static final String VARIABLES_DESCRIPTOR_TAG = "descriptorVariable";
-    public static final String VARIABLES_PROGRAM_TAG = "programVariable";
-    public static final String VARIABLES_DESCRIPTOR_DEFAULT_TAG = "descriptorDefaultVariable";
-    public static final String VARIABLES_PROGRAM_DEFAULT_TAG = "programDefaultVariable";
-    public static final String VARIABLES_JAVAPROPERTY_TAG = "javaPropertyVariable";
-    public static final String VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG = "javaPropertyDescriptorDefault";
-    public static final String VARIABLES_JAVAPROPERTY_PROGRAM_TAG = "javaPropertyProgramDefault";
-    public static final String VARIABLES_INCLUDE_XML_FILE_TAG = "includeXMLFile";
-    public static final String VARIABLES_INCLUDE_PROPERTY_FILE_TAG = "includePropertyFile";
-    public static final String VARIABLES_DESCRIPTOR = GCM_COMMON_TYPES_NAMESPACE_PREFIX +
-        VARIABLES_DESCRIPTOR_TAG;
-    public static final String VARIABLES_PROGRAM = GCM_COMMON_TYPES_NAMESPACE_PREFIX + VARIABLES_PROGRAM_TAG;
-    public static final String VARIABLES_DESCRIPTOR_DEFAULT = GCM_COMMON_TYPES_NAMESPACE_PREFIX +
-        VARIABLES_DESCRIPTOR_DEFAULT_TAG;
-    public static final String VARIABLES_PROGRAM_DEFAULT = GCM_COMMON_TYPES_NAMESPACE_PREFIX +
-        VARIABLES_PROGRAM_DEFAULT_TAG;
-    public static final String VARIABLES_JAVAPROPERTY = GCM_COMMON_TYPES_NAMESPACE_PREFIX +
-        VARIABLES_JAVAPROPERTY_TAG;
-    public static final String VARIABLES_JAVAPROPERTY_DESCRIPTOR = GCM_COMMON_TYPES_NAMESPACE_PREFIX +
-        VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG;
-    public static final String VARIABLES_JAVAPROPERTY_PROGRAM = GCM_COMMON_TYPES_NAMESPACE_PREFIX +
-        VARIABLES_JAVAPROPERTY_PROGRAM_TAG;
-    public static final String VARIABLES_INCLUDE_XML_FILE = GCM_COMMON_TYPES_NAMESPACE_PREFIX +
-        VARIABLES_INCLUDE_XML_FILE_TAG;
-    public static final String VARIABLES_INCLUDE_PROPERTY_FILE = GCM_COMMON_TYPES_NAMESPACE_PREFIX +
-        VARIABLES_INCLUDE_PROPERTY_FILE_TAG;
+    public static final String GCM_APPLICATION_NAMESPACE = "urn:gcm:application:1.0";
+    public static final String GCM_APPLICATION_NAMESPACE_PREFIX = "app";
+
+    public static final String[] VARIABLES_TAGS = { "descriptorVariable", "programVariable",
+            "descriptorDefaultVariable", "programDefaultVariable", "javaPropertyVariable",
+            "javaPropertyDescriptorDefault", "javaPropertyProgramDefault", "includeXMLFile",
+            "includePropertyFile" };
 }

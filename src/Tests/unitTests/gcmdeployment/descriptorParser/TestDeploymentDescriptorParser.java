@@ -69,7 +69,6 @@ public class TestDeploymentDescriptorParser {
         System.out.println("Parsing " + descriptor.getAbsolutePath());
         GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
 
-        parser.parseEnvironment();
         parser.parseInfrastructure();
         parser.parseResources();
     }
@@ -83,7 +82,6 @@ public class TestDeploymentDescriptorParser {
         System.out.println("Parsing " + descriptor.getAbsolutePath());
         GCMDeploymentParserImpl parser = new GCMDeploymentParserImpl(descriptor);
 
-        parser.parseEnvironment();
         parser.parseInfrastructure();
         parser.parseResources();
     }
@@ -175,7 +173,6 @@ public class TestDeploymentDescriptorParser {
         parser.registerGroupParser(new UserGroupParser());
         parser.registerBridgeParser(new UserBridgeParser());
 
-        parser.parseEnvironment();
         parser.parseInfrastructure();
         parser.parseResources();
     }
@@ -198,7 +195,7 @@ public class TestDeploymentDescriptorParser {
             gotException = e.getMessage().contains(errMsg) || e.getException().getMessage().contains(errMsg);
         }
 
-        Assert.assertTrue(gotException);
+        Assert.assertTrue(descriptor.getAbsolutePath(), gotException);
     }
 
     @Test

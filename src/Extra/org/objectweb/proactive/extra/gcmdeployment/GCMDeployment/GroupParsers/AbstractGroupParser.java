@@ -45,7 +45,7 @@ import org.w3c.dom.NodeList;
 
 
 public abstract class AbstractGroupParser implements GroupParser {
-    protected static final String NODE_EXT_NAMESPACE = "paext:";
+    protected static final String NODE_EXT_NAMESPACE = "";
 
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         String id = GCMParserHelper.getAttributeValue(groupNode, "id");
@@ -70,12 +70,12 @@ public abstract class AbstractGroupParser implements GroupParser {
         }
 
         try {
-            Node environmentNode = (Node) xpath.evaluate("pa:environment", groupNode, XPathConstants.NODE);
+            Node environmentNode = (Node) xpath.evaluate("environment", groupNode, XPathConstants.NODE);
 
             if (environmentNode != null) {
                 Map<String, String> envVars = new HashMap<String, String>();
 
-                NodeList argNodes = (NodeList) xpath.evaluate("pa:variable", environmentNode,
+                NodeList argNodes = (NodeList) xpath.evaluate("variable", environmentNode,
                         XPathConstants.NODESET);
 
                 for (int i = 0; i < argNodes.getLength(); ++i) {
@@ -88,7 +88,7 @@ public abstract class AbstractGroupParser implements GroupParser {
                 group.setEnvironment(envVars);
             }
 
-            Node scriptPath = (Node) xpath.evaluate("pa:scriptPath", groupNode, XPathConstants.NODE);
+            Node scriptPath = (Node) xpath.evaluate("scriptPath", groupNode, XPathConstants.NODE);
 
             if (scriptPath != null) {
                 group.setScriptPath(GCMParserHelper.parsePathElementNode(scriptPath));

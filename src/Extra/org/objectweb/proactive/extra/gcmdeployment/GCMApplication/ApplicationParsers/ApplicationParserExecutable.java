@@ -49,11 +49,11 @@ import org.xml.sax.SAXException;
 
 
 public class ApplicationParserExecutable extends AbstractApplicationParser {
-    private static final String XPATH_PATH = "pa:path";
-    private static final String XPATH_NODE_PROVIDER = "pa:nodeProvider";
-    private static final String XPATH_COMMAND = "pa:command";
-    private static final String XPATH_ARG = "pa:arg";
-    private static final String XPATH_FILE_TRANSFER = "pa:fileTransfer";
+    private static final String XPATH_PATH = "app:path";
+    private static final String XPATH_NODE_PROVIDER = "app:nodeProvider";
+    private static final String XPATH_COMMAND = "app:command";
+    private static final String XPATH_ARG = "app:arg";
+    private static final String XPATH_FILE_TRANSFER = "app:fileTransfer";
     protected static final String NODE_NAME = "executable";
 
     @Override

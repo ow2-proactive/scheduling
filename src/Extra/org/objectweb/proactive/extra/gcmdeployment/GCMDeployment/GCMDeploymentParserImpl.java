@@ -33,10 +33,7 @@ package org.objectweb.proactive.extra.gcmdeployment.GCMDeployment;
 import static org.objectweb.proactive.core.mop.Utils.makeDeepCopy;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,10 +51,7 @@ import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.VariableContract;
-import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDescriptorProcessor;
-import org.objectweb.proactive.extra.gcmdeployment.GCMEnvironmentParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeOARSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.BridgeParsers.BridgeParser;
@@ -79,6 +73,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.Gr
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupPrunParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupRSHParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.GroupSSHParser;
+import org.objectweb.proactive.extra.gcmdeployment.environment.Environment;
 import org.objectweb.proactive.extra.gcmdeployment.process.Bridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.Group;
 import org.objectweb.proactive.extra.gcmdeployment.process.HostInfo;
@@ -112,24 +107,24 @@ import org.xml.sax.SAXException;
  *
  */
 public class GCMDeploymentParserImpl implements GCMDeploymentParser {
-    private static final String PA_HOST = GCM_DESCRIPTOR_NAMESPACE_PREFIX + "host";
-    private static final String PA_GROUP = GCM_DESCRIPTOR_NAMESPACE_PREFIX + "group";
-    private static final String PA_BRIDGE = GCM_DESCRIPTOR_NAMESPACE_PREFIX + "bridge";
-    private static final String XPATH_GCMDEPLOYMENT = "/pa:GCMDeployment/";
-    private static final String XPATH_INFRASTRUCTURE = XPATH_GCMDEPLOYMENT + "pa:infrastructure";
-    private static final String XPATH_RESOURCES = XPATH_GCMDEPLOYMENT + "pa:resources";
-    private static final String XPATH_ENVIRONMENT = XPATH_GCMDEPLOYMENT + "pa:environment";
-    private static final String XPATH_TOOL = "pa:tool";
-    private static final String XPATH_HOME_DIRECTORY = "pa:homeDirectory";
-    private static final String XPATH_BRIDGES = "pa:bridges/*";
-    private static final String XPATH_GROUPS = "pa:groups/*";
-    private static final String XPATH_HOSTS = "pa:hosts/pa:host";
+    private static final String PA_HOST = "host";
+    private static final String PA_GROUP = "group";
+    private static final String PA_BRIDGE = "bridge";
+    private static final String XPATH_GCMDEPLOYMENT = "/dep:GCMDeployment/";
+    private static final String XPATH_INFRASTRUCTURE = XPATH_GCMDEPLOYMENT + "dep:infrastructure";
+    private static final String XPATH_RESOURCES = XPATH_GCMDEPLOYMENT + "dep:resources";
+    private static final String XPATH_TOOL = "dep:tool";
+    private static final String XPATH_HOME_DIRECTORY = "dep:homeDirectory";
+    private static final String XPATH_BRIDGES = "dep:bridges/*";
+    private static final String XPATH_GROUPS = "dep:groups/*";
+    private static final String XPATH_HOSTS = "dep:hosts/dep:host";
     private static final String XPATH_HOST = PA_HOST;
-    private static final String XPATH_DESCRIPTOR_VARIABLE = "pa:descriptorVariable";
-    protected Document document;
+    private static final String XPATH_DESCRIPTOR_VARIABLE = "dep:descriptorVariable";
+
     protected DocumentBuilderFactory domFactory;
     protected XPath xpath;
-    protected DocumentBuilder documentBuilder;
+    protected Document document;
+
     protected List<String> schemas;
     protected Map<String, GroupParser> groupParserMap;
     protected Map<String, BridgeParser> bridgeParserMap;
@@ -151,41 +146,23 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             SAXException, IOException, TransformerException, XPathExpressionException,
             ParserConfigurationException {
         this.descriptor = descriptor;
-        infrastructure = new GCMDeploymentInfrastructure();
-        resources = new GCMDeploymentResources();
-        groupParserMap = new HashMap<String, GroupParser>();
-        bridgeParserMap = new HashMap<String, BridgeParser>();
-        variableContract = new VariableContract();
-        schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
+        this.infrastructure = new GCMDeploymentInfrastructure();
+        this.resources = new GCMDeploymentResources();
+        this.groupParserMap = new HashMap<String, GroupParser>();
+        this.bridgeParserMap = new HashMap<String, BridgeParser>();
+        this.variableContract = new VariableContract();
+        this.schemas = (userSchemas != null) ? new ArrayList<String>(userSchemas) : new ArrayList<String>();
 
-        setup();
+        setupJAXP();
+
         registerDefaultGroupParsers();
         registerUserGroupParsers();
         registerDefaultBridgeParsers();
         registerUserBridgeParsers();
         try {
-            // process variables first
-            GCMEnvironmentParser environmentParser = new GCMEnvironmentParser(descriptor, userSchemas);
-
-            Map<String, String> variableMap = environmentParser.getVariableMap();
-
-            InputSource inputSource = new InputSource(new FileInputStream(descriptor));
-
-            Document baseDocument = documentBuilder.parse(inputSource);
-
-            GCMDescriptorProcessor descriptorProcessor = new GCMDescriptorProcessor(variableMap, baseDocument);
-
-            File tempFile = File.createTempFile(descriptor.getName(), "tmp");
-
-            FileOutputStream outputStream = new FileOutputStream(tempFile);
-            descriptorProcessor.transform(outputStream);
-            outputStream.close();
-
-            InputSource processedInputSource = new InputSource(new FileInputStream(tempFile));
-
-            documentBuilder = domFactory.newDocumentBuilder();
-            documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
-
+            DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
+            InputSource processedInputSource = Environment.replaceVariables(descriptor, documentBuilder,
+                    xpath, GCM_DEPLOYMENT_NAMESPACE_PREFIX);
             document = documentBuilder.parse(processedInputSource);
 
         } catch (SAXException e) {
@@ -199,9 +176,6 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             String msg = "problem when evaluating variables with document " + descriptor.getCanonicalPath();
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " + e.getMessage());
             throw new TransformerException(msg, e);
-        } catch (ParserConfigurationException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e);
-            throw e;
         }
     }
 
@@ -253,7 +227,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * setup xml parser (inserting schemas, setting up xpath query engine)
      * @throws IOException
      */
-    protected void setup() throws IOException {
+    protected void setupJAXP() throws IOException {
         // System.setProperty("jaxp.debug", "1");
         System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
                 "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
@@ -264,82 +238,16 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         domFactory.setAttribute(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
 
         // Must use URLs here so schemas can be fetched from jars
-        //
-        URL deploymentSchema = GCMDeploymentParserImpl.class.getClass().getResource(DEPLOYMENT_DESC_LOCATION);
-
-        URL commonTypesSchema = GCMDeploymentParserImpl.class.getClass().getResource(COMMON_TYPES_LOCATION);
-
-        URL protocolsSchema = GCMDeploymentParserImpl.class
-                .getClass()
-                .getResource(
-                        "/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/ProtocolsSchema.xsd");
+        URL extensionSchema = GCMDeploymentParserImpl.class.getClass()
+                .getResource(EXTENSION_SCHEMAS_LOCATION);
 
         // DO NOT change the order here, it would break validation
-        //
-        schemas.add(0, protocolsSchema.toString());
-        schemas.add(0, deploymentSchema.toString());
-        schemas.add(0, commonTypesSchema.toString());
+        schemas.add(extensionSchema.toString());
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
-        try {
-            documentBuilder = domFactory.newDocumentBuilder();
-            documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
-
-            XPathFactory factory = XPathFactory.newInstance();
-            xpath = factory.newXPath();
-            xpath
-                    .setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(
-                        GCM_DESCRIPTOR_NAMESPACE));
-        } catch (ParserConfigurationException e) {
-            GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
-        }
-    }
-
-    /**
-     * parse the &lt;environment&gt; tag and fill up the variables map which
-     * is returned by {@link #getEnvironment()}
-     * 
-     * @throws XPathExpressionException
-     */
-    public void parseEnvironment() throws XPathExpressionException {
-        Node environmentNode = (Node) xpath.evaluate(XPATH_ENVIRONMENT, document, XPathConstants.NODE);
-
-        String[][] pairs = new String[][] {
-                { VARIABLES_JAVAPROPERTY_DESCRIPTOR, VARIABLES_JAVAPROPERTY_DESCRIPTOR_TAG },
-                { VARIABLES_JAVAPROPERTY_PROGRAM, VARIABLES_JAVAPROPERTY_PROGRAM_TAG },
-                { VARIABLES_JAVAPROPERTY, VARIABLES_JAVAPROPERTY_TAG },
-                { VARIABLES_DESCRIPTOR, VARIABLES_DESCRIPTOR_TAG },
-                { VARIABLES_PROGRAM, VARIABLES_PROGRAM_TAG },
-                { VARIABLES_PROGRAM_DEFAULT, VARIABLES_PROGRAM_DEFAULT_TAG },
-                { VARIABLES_DESCRIPTOR_DEFAULT, VARIABLES_DESCRIPTOR_DEFAULT_TAG }, };
-
-        for (int i = 0; i < pairs.length; ++i) {
-            VariableContractType varContractType = VariableContractType.getType(pairs[i][1]);
-            processVariables(environmentNode, pairs[i][0], varContractType);
-        }
-    }
-
-    /**
-     * process a single variable node from the &lt;environment&gt; tag
-     * 
-     * @param environmentNode
-     * @param expr
-     * @param varContractType
-     * @throws XPathExpressionException
-     */
-    private void processVariables(Node environmentNode, String expr, VariableContractType varContractType)
-            throws XPathExpressionException {
-        Object result = xpath.evaluate(expr, environmentNode, XPathConstants.NODESET);
-        NodeList nodes = (NodeList) result;
-        for (int i = 0; i < nodes.getLength(); ++i) {
-            Node node = nodes.item(i);
-
-            String varName = GCMParserHelper.getAttributeValue(node, "name");
-
-            String varValue = GCMParserHelper.getAttributeValue(node, "value");
-
-            variableContract.setDescriptorVariable(varName, varValue, varContractType);
-        }
+        XPathFactory factory = XPathFactory.newInstance();
+        xpath = factory.newXPath();
+        xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(GCM_DEPLOYMENT_NAMESPACE));
     }
 
     /**
@@ -471,14 +379,14 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             String childNodeName = childNode.getNodeName();
             String childRefId = GCMParserHelper.getAttributeValue(childNode, "refid");
 
-            if (childNodeName.equals("pa:group")) {
+            if (childNodeName.equals("group")) {
                 Group group = getGroup(childRefId);
                 parseGroupResource(childNode, group);
                 bridge.addGroup(group);
-            } else if (childNodeName.equals("pa:host")) {
+            } else if (childNodeName.equals("host")) {
                 HostInfo hostInfo = getHostInfo(childRefId);
                 bridge.setHostInfo(hostInfo);
-            } else if (childNodeName.equals("pa:bridge")) {
+            } else if (childNodeName.equals("bridge")) {
                 Bridge childBridge = getBridge(childRefId);
                 parseBridgeResource(childNode, childBridge);
                 bridge.addBridge(childBridge);

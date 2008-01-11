@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GCMDeployment xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<GCMDeployment 
+	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                     ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	http://www-sop.inria.fr/oasis/ProActive/commonSchemas                                   ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/CommonTypes.xsd
-	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension     ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/GCMDeployment/GroupSchemas/ProtocolsSchema.xsd
-	">
-
+	xsi:schemaLocation="urn:gcm:deployment:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
 
 	<environment>
-		<cpa:descriptorVariable name="USERNAME" value="cmathieu" />
+		<descriptorVariable name="USERNAME" value="cmathieu" />
 	</environment>
 
 	<resources>
@@ -35,14 +29,14 @@
 		</hosts>
 
 		<groups>
-			<paext:sshGroup id="LAN_INRIA"
+			<sshGroup id="LAN_INRIA"
 				hostList="cheypa schubby petawawa naruto" username="${USERNAME}"
 				commandPath="/usr/local/bin/ssh">
-			</paext:sshGroup>
+			</sshGroup>
 		</groups>
 
 		<bridges>
-			<paext:sshBridge id="SEA" hostname="sea.inria.fr"
+			<sshBridge id="SEA" hostname="sea.inria.fr"
 				username="${USERNAME}" commandPath="" />
 		</bridges>
 	</infrastructure>

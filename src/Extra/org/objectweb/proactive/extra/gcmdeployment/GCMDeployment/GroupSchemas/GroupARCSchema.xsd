@@ -1,58 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
-
-	<complexType name="arcProcessType">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="count" type="cpa:PosintOrVariableType"
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
+	
+	<xs:complexType name="arcProcessType">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+				<xs:sequence>
+					<xs:element name="count" type="PosintOrVariableType"
 						minOccurs="0" />
-					<element name="arguments" type="cpa:argumentListType"
+					<xs:element name="arguments" type="argumentListType"
 						minOccurs="0" />
-					<element name="inputFiles"
-						type="paext:arcFileTransferType" minOccurs="0" />
-					<element name="outputFiles"
-						type="paext:arcFileTransferType" minOccurs="0" />
-					<element name="stdout"
-						type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="stderr"
-						type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdin"
-						type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="maxTime"
-						type="cpa:PosintOrVariableType" minOccurs="0" />
-					<element name="notify" type="string" minOccurs="0" />
-				</sequence>
-				<attribute name="jobName" type="string" />
-			</extension>
-		</complexContent>
-	</complexType>
+					<xs:element name="inputFiles"
+						type="arcFileTransferType" minOccurs="0" />
+					<xs:element name="outputFiles"
+						type="arcFileTransferType" minOccurs="0" />
+					<xs:element name="stdout"
+						type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stderr"
+						type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stdin"
+						type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="maxTime"
+						type="PosintOrVariableType" minOccurs="0" />
+					<xs:element name="notify" type="xs:string" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="jobName" type="xs:string" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<complexType name="arcFileTransferType">
-		<sequence>
-			<element name="transfer">
-				<complexType>
-					<attribute name="filename" type="string" />
-					<attribute name="location" type="string" />
-				</complexType>
-			</element>
-		</sequence>
-	</complexType>
+	<xs:complexType name="arcFileTransferType">
+		<xs:sequence>
+			<xs:element name="transfer">
+				<xs:complexType>
+					<xs:attribute name="filename" type="xs:string" />
+					<xs:attribute name="location" type="xs:string" />
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
 
-	<element name="arcGroup" type="paext:arcProcessType"
-		substitutionGroup="pa:abstractShElement">
-	</element>
+	<xs:element name="arcGroup" type="arcProcessType"
+		substitutionGroup="abstractShElement">
+	</xs:element>
 
-</schema>
+</xs:schema>

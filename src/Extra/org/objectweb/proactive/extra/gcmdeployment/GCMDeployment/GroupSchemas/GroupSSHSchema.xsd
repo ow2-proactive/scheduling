@@ -1,30 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
+	
+	<xs:complexType name="groupTypeSSH">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+				<xs:sequence>
+					<xs:element name="privateKey" type="pathElementType" minOccurs="0" maxOccurs="1" />
+				</xs:sequence>
+				<xs:attribute name="commandOptions" type="xs:string"/>
+				<xs:attribute name="hostList" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<complexType name="groupTypeSSH">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="privateKey" type="cpa:pathElementType" minOccurs="0" maxOccurs="1" />
-				</sequence>
-				<attribute name="commandOptions" type="string"></attribute>
-				<attribute name="hostList" type="string" use="required"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<element name="sshGroup" substitutionGroup="pa:abstractShElement" type="paext:groupTypeSSH"></element>
-
-</schema>
+	<xs:element name="sshGroup" substitutionGroup="abstractShElement" type="groupTypeSSH"/>
+</xs:schema>

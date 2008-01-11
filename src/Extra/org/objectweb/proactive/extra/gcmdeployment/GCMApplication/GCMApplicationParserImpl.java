@@ -31,10 +31,7 @@
 package org.objectweb.proactive.extra.gcmdeployment.GCMApplication;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,8 +48,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
-import org.objectweb.proactive.extra.gcmdeployment.GCMDescriptorProcessor;
-import org.objectweb.proactive.extra.gcmdeployment.GCMEnvironmentParser;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extra.gcmdeployment.Helpers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.ApplicationParsers.ApplicationParser;
@@ -64,6 +59,7 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GCMDeploymentDe
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeImpl;
 import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNodeInternal;
+import org.objectweb.proactive.extra.gcmdeployment.environment.Environment;
 import org.objectweb.proactive.extra.gcmdeployment.process.CommandBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -77,42 +73,26 @@ import org.xml.sax.SAXException;
  * Write some comment to explain how it works
  */
 public class GCMApplicationParserImpl implements GCMApplicationParser {
-    private static final String XPATH_GCMAPP = "/pa:GCMApplication/";
+    private static final String XPATH_GCMAPP = "/app:GCMApplication/";
     private static final String XPATH_VIRTUAL_NODE = XPATH_GCMAPP +
-        "pa:application/pa:proactive/pa:virtualNode";
-    private static final String XPATH_NODE_PROVIDERS = XPATH_GCMAPP + "pa:resources/pa:nodeProvider";
-    private static final String XPATH_APPLICATION = XPATH_GCMAPP + "pa:application";
-    private static final String XPATH_NODE_PROVIDER = "pa:nodeProvider";
-    private static final String XPATH_FILETRANSFER = "pa:filetransfer";
-    private static final String XPATH_FILE = "pa:file";
+        "app:application/app:proactive/app:virtualNode";
+    private static final String XPATH_NODE_PROVIDERS = XPATH_GCMAPP + "app:resources/app:nodeProvider";
+    private static final String XPATH_APPLICATION = XPATH_GCMAPP + "app:application";
+    private static final String XPATH_NODE_PROVIDER = "app:nodeProvider";
+    private static final String XPATH_FILETRANSFER = "app:filetransfer";
+    private static final String XPATH_FILE = "app:file";
     public static final String ATTR_RP_CAPACITY = "capacity";
     protected File descriptor;
+
     protected Document document;
     protected DocumentBuilderFactory domFactory;
-    protected List<String> schemas;
     protected XPath xpath;
-    protected DocumentBuilder documentBuilder;
+
+    protected List<String> schemas;
     protected CommandBuilder commandBuilder;
     protected Map<String, NodeProvider> nodeProvidersMap;
     protected Map<String, VirtualNodeInternal> virtualNodes;
     protected Map<String, ApplicationParser> applicationParsersMap;
-
-    protected static class GCMApplicationEnvironmentParser extends GCMEnvironmentParser {
-
-        public GCMApplicationEnvironmentParser(File descriptor, List<String> userSchemas) throws IOException,
-                SAXException {
-            super(descriptor, userSchemas);
-        }
-
-        @Override
-        protected void setupSchemas() {
-            URL applicationSchema = getClass().getResource(APPLICATION_DESC_LOCATION);
-            URL commonTypesSchema = this.getClass().getResource(COMMON_TYPES_LOCATION);
-            schemas.add(commonTypesSchema.toString());
-            schemas.add(applicationSchema.toString());
-            domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
-        }
-    }
 
     public GCMApplicationParserImpl(File descriptor) throws IOException, ParserConfigurationException,
             SAXException, XPathExpressionException, TransformerException {
@@ -130,32 +110,12 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         registerDefaultApplicationParsers();
         registerUserApplicationParsers();
 
-        setup();
+        setupJAXP();
 
         try {
-
-            // process variables first
-            GCMEnvironmentParser environmentParser = new GCMApplicationEnvironmentParser(descriptor,
-                userSchemas);
-
-            Map<String, String> variableMap = environmentParser.getVariableMap();
-
-            InputSource inputSource = new InputSource(new FileInputStream(descriptor));
-
-            Document baseDocument = documentBuilder.parse(inputSource);
-
-            GCMDescriptorProcessor descriptorProcessor = new GCMDescriptorProcessor(variableMap, baseDocument);
-
-            File tempFile = File.createTempFile(descriptor.getName(), "tmp");
-
-            FileOutputStream outputStream = new FileOutputStream(tempFile);
-            descriptorProcessor.transform(outputStream);
-            outputStream.close();
-
-            InputSource processedInputSource = new InputSource(new FileInputStream(tempFile));
-            documentBuilder = domFactory.newDocumentBuilder();
-            documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
-
+            DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
+            InputSource processedInputSource = Environment.replaceVariables(descriptor, documentBuilder,
+                    xpath, GCM_APPLICATION_NAMESPACE_PREFIX);
             document = documentBuilder.parse(processedInputSource);
 
         } catch (SAXException e) {
@@ -188,7 +148,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         registerApplicationParser(new ApplicationParserExecutable());
     }
 
-    public void setup() throws IOException, ParserConfigurationException {
+    public void setupJAXP() throws IOException, ParserConfigurationException {
         domFactory = DocumentBuilderFactory.newInstance();
         domFactory.setNamespaceAware(true);
         domFactory.setValidating(true);
@@ -198,16 +158,13 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
         URL commonTypesSchema = getClass().getResource(COMMON_TYPES_LOCATION);
         System.out.println("#@# " + applicationSchema);
-        schemas.add(commonTypesSchema.toString());
+        //        schemas.add(commonTypesSchema.toString());
         schemas.add(applicationSchema.toString());
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
-        documentBuilder = domFactory.newDocumentBuilder();
-        documentBuilder.setErrorHandler(new GCMParserHelper.MyDefaultHandler());
-
         XPathFactory factory = XPathFactory.newInstance();
         xpath = factory.newXPath();
-        xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(GCM_DESCRIPTOR_NAMESPACE));
+        xpath.setNamespaceContext(new GCMParserHelper.ProActiveNamespaceContext(GCM_APPLICATION_NAMESPACE));
     }
 
     synchronized public Map<String, NodeProvider> getNodeProviders() throws SAXException, IOException {

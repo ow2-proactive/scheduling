@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <GCMApplication
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema"
+	xmlns="urn:gcm:application:extension"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas/ApplicationDescriptorSchema ../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
+	xsi:schemaLocation="urn:gcm:application:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 
 	<application>
 		<executable>

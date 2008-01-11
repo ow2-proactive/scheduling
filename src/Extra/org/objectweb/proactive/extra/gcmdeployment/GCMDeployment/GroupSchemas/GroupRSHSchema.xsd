@@ -1,26 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
 
-	<complexType name="groupTypeRSH">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<attribute name="hostList" type="string" use="required" />
-			</extension>
-		</complexContent>
-	</complexType>
+	<xs:complexType name="groupTypeRSH">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+				<xs:attribute name="hostList" type="xs:string" use="required" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<element name="rshGroup" substitutionGroup="pa:abstractShElement" type="paext:groupTypeRSH" />
-
-</schema>
+	<xs:element name="rshGroup" substitutionGroup="abstractShElement" type="groupTypeRSH" />
+</xs:schema>

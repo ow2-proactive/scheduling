@@ -1,33 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
+	
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
+	<xs:complexType name="lsfGroupType">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+				<xs:sequence>
+					<xs:element name="hostList" type="ListType" minOccurs="0" />
+					<xs:element name="processorsNumber" type="PosintOrVariableType" minOccurs="0" />
+					<xs:element name="resourceRequirement" type="xs:string" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="interactive" type="BooleanOrVariableType" use="optional" />
+				<xs:attribute name="jobName" type="xs:string" use="optional" />
+				<xs:attribute name="queue" type="xs:string" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<complexType name="lsfGroupType">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="hostList" type="cpa:ListType" minOccurs="0" />
-					<element name="processorsNumber" type="cpa:PosintOrVariableType" minOccurs="0" />
-					<element name="resourceRequirement" type="string" minOccurs="0" />
-				</sequence>
-				<attribute name="interactive" type="cpa:BooleanOrVariableType" use="optional" />
-				<attribute name="jobName" type="string" use="optional" />
-				<attribute name="queue" type="string" use="optional" />
-			</extension>
-		</complexContent>
-	</complexType>
-
-	<element name="lsfGroup" substitutionGroup="pa:abstractShElement" type="paext:lsfGroupType"></element>
-
-</schema>
+	<xs:element name="lsfGroup" substitutionGroup="abstractShElement" type="lsfGroupType"/>
+</xs:schema>

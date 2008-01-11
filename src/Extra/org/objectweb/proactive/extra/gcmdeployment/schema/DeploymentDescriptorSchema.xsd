@@ -1,246 +1,245 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"	
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"	
 	elementFormDefault="qualified">
 
 	<!-- <include schemaLocation="CommonTypes.xsd"></include>  -->
- 	<import schemaLocation="CommonTypes.xsd" namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"></import>
+ 	<xsd:include schemaLocation="CommonTypes.xsd"/>
  
-	<complexType name="abstractGroupElementType" abstract="true">
-		<sequence>
-			<element name="environment" type="cpa:environmentVariablesType" minOccurs="0" />
-			<element name="scriptPath" type="cpa:pathElementType" minOccurs="0" />
-		</sequence>
-		<attribute name="id" type="cpa:idType" use="required" />
-		<attribute name="username" type="cpa:usernameType" />
-		<attribute name="commandPath" type="cpa:pathElementGeneralType" />
-		<attribute name="bookedNodesAccess">
-			<simpleType>
-				<restriction base="string">
-					<enumeration value="rsh" />
-					<enumeration value="ssh" />
-					<enumeration value="oarsh" />
-				</restriction>
-			</simpleType>
-		</attribute>
-	</complexType>
+	<xsd:complexType name="abstractGroupElementType" abstract="true">
+		<xsd:sequence>
+			<xsd:element name="environment" type="environmentVariablesType" minOccurs="0" />
+			<xsd:element name="scriptPath" type="pathElementType" minOccurs="0" />
+		</xsd:sequence>
+		<xsd:attribute name="id" type="idType" use="required" />
+		<xsd:attribute name="username" type="usernameType" />
+		<xsd:attribute name="commandPath" type="pathElementGeneralType" />
+		<xsd:attribute name="bookedNodesAccess">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="rsh" />
+					<xsd:enumeration value="ssh" />
+					<xsd:enumeration value="oarsh" />
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
 
-	<element name="abstractShElement" type="pa:abstractGroupElementType"></element>
+	<xsd:element name="abstractShElement" type="abstractGroupElementType"></xsd:element>
 
-	<complexType name="peerSetType">
-		<sequence>
-			<element name="peer" type="string" maxOccurs="unbounded" />
-		</sequence>
-	</complexType>
+	<xsd:complexType name="peerSetType">
+		<xsd:sequence>
+			<xsd:element name="peer" type="xsd:string" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<!-- a 'MAX' string constant -->
-	<simpleType name="MAX">
-		<restriction base="string">
-			<enumeration value="MAX"></enumeration>
-		</restriction>
-	</simpleType>
+	<!-- a 'MAX' xsd:string constant -->
+	<xsd:simpleType name="MAX">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="MAX"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
 
-	<simpleType name="lookupProtocolType">
-		<restriction base="string">
-			<enumeration value="RMI"></enumeration>
-			<enumeration value="HTTP"></enumeration>
-			<enumeration value="IBIS"></enumeration>
-		</restriction>
-	</simpleType>
+	<xsd:simpleType name="lookupProtocolType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="RMI"></xsd:enumeration>
+			<xsd:enumeration value="HTTP"></xsd:enumeration>
+			<xsd:enumeration value="IBIS"></xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
 
-	<complexType name="localClientType">
-		<attribute name="protocol" type="pa:lookupProtocolType"></attribute>
-		<attribute name="port" type="positiveInteger"></attribute>
-	</complexType>
+	<xsd:complexType name="localClientType">
+		<xsd:attribute name="protocol" type="lookupProtocolType"></xsd:attribute>
+		<xsd:attribute name="port" type="xsd:positiveInteger"></xsd:attribute>
+	</xsd:complexType>
 
-	<complexType name="p2pType">
-		<sequence>
-			<element name="localClient" type="pa:localClientType"></element>
-			<element name="peerSet" type="pa:peerSetType"></element>
-		</sequence>
-		<attribute name="nodesAsked">
-			<simpleType>
-				<union memberTypes="positiveInteger pa:MAX" />
-			</simpleType>
-		</attribute>
-	</complexType>
+	<xsd:complexType name="p2pType">
+		<xsd:sequence>
+			<xsd:element name="localClient" type="localClientType"></xsd:element>
+			<xsd:element name="peerSet" type="peerSetType"></xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="nodesAsked">
+			<xsd:simpleType>
+				<xsd:union memberTypes="xsd:positiveInteger MAX" />
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
 
-	<complexType name="lookupType">
-		<attribute name="type" type="pa:lookupProtocolType"></attribute>
-		<attribute name="hostList" type="string"></attribute>
-		<attribute name="port" type="positiveInteger"></attribute>
-	</complexType>
+	<xsd:complexType name="lookupType">
+		<xsd:attribute name="type" type="lookupProtocolType"></xsd:attribute>
+		<xsd:attribute name="hostList" type="xsd:string"></xsd:attribute>
+		<xsd:attribute name="port" type="xsd:positiveInteger"></xsd:attribute>
+	</xsd:complexType>
 
 
-	<complexType name="acquisitionType">
-		<sequence>
-			<element name="lookup" type="pa:lookupType" minOccurs="1" maxOccurs="1" />
-			<element name="p2p" type="pa:p2pType" minOccurs="0" />
-		</sequence>
-	</complexType>
+	<xsd:complexType name="acquisitionType">
+		<xsd:sequence>
+			<xsd:element name="lookup" type="lookupType" minOccurs="1" maxOccurs="1" />
+			<xsd:element name="p2p" type="p2pType" minOccurs="0" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<complexType name="abstractResourceType"></complexType>
+	<xsd:complexType name="abstractResourceType"></xsd:complexType>
 
-	<complexType name="groupRefType">
-		<complexContent>
-			<extension base="pa:abstractResourceType">
-				<sequence>
-					<element name="host" type="pa:hostRefType"></element>
-				</sequence>
-				<attribute name="refid" type="cpa:idType" use="required" />
-			</extension>
-		</complexContent>
-	</complexType>
+	<xsd:complexType name="groupRefType">
+		<xsd:complexContent>
+			<xsd:extension base="abstractResourceType">
+				<xsd:sequence>
+					<xsd:element name="host" type="hostRefType"></xsd:element>
+				</xsd:sequence>
+				<xsd:attribute name="refid" type="idType" use="required" />
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 
-	<complexType name="bridgeRefType">
-		<complexContent>
-			<extension base="pa:abstractResourceType">
+	<xsd:complexType name="bridgeRefType">
+		<xsd:complexContent>
+			<xsd:extension base="abstractResourceType">
 				<!-- FIXME: At least one of these elements mustbe present - but this can't be done
-					because there must be at most one host, so either we turn this into a sequence of elements
+					because there must be at most one host, so either we turn this into a xsd:sequence of elements
 					of an abstract common type, and then we have to check in the parser that there is at most one host,
 					or we keep it as it is and check in the parser that at least one element is present -->
-				<sequence>
-					<element name="group" type="pa:groupRefType" minOccurs="0" maxOccurs="unbounded"></element>
-					<element name="bridge" type="pa:bridgeRefType" minOccurs="0" maxOccurs="unbounded"></element>
-					<element name="host" type="pa:hostRefType" minOccurs="0" maxOccurs="1" />
-				</sequence>
-				<attribute name="refid" type="cpa:idType" use="required" />
-				<attribute name="relay" type="string"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
+				<xsd:sequence>
+					<xsd:element name="group" type="groupRefType" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+					<xsd:element name="bridge" type="bridgeRefType" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+					<xsd:element name="host" type="hostRefType" minOccurs="0" maxOccurs="1" />
+				</xsd:sequence>
+				<xsd:attribute name="refid" type="idType" use="required" />
+				<xsd:attribute name="relay" type="xsd:string"></xsd:attribute>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
 
-	<element name="abstractResourceElement" abstract="true" type="pa:abstractResourceType"></element>
+	<xsd:element name="abstractResourceElement" abstract="true" type="abstractResourceType"></xsd:element>
 
-	<element name="group" substitutionGroup="pa:abstractResourceElement" type="pa:groupRefType"></element>
+	<xsd:element name="group" substitutionGroup="abstractResourceElement" type="groupRefType"></xsd:element>
 
-	<element name="bridge" substitutionGroup="pa:abstractResourceElement" type="pa:bridgeRefType"></element>
+	<xsd:element name="bridge" substitutionGroup="abstractResourceElement" type="bridgeRefType"></xsd:element>
 
-	<complexType name="resourceType">
-		<sequence>
-			<element name="host" type="pa:hostRefType" minOccurs="0" maxOccurs="1"></element>
-			<element ref="pa:abstractResourceElement" minOccurs="0" maxOccurs="unbounded"></element>
-		</sequence>
-	</complexType>
+	<xsd:complexType name="resourceType">
+		<xsd:sequence>
+			<xsd:element name="host" type="hostRefType" minOccurs="0" maxOccurs="1"></xsd:element>
+			<xsd:element ref="abstractResourceElement" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<complexType name="toolType">
-		<attribute name="id" type="string"></attribute>
-		<attribute name="path" type="cpa:pathElementGeneralType"></attribute>
-		<attribute name="version" type="string"></attribute>
-	</complexType>
+	<xsd:complexType name="toolType">
+		<xsd:attribute name="id" type="xsd:string"></xsd:attribute>
+		<xsd:attribute name="path" type="pathElementGeneralType"></xsd:attribute>
+		<xsd:attribute name="version" type="xsd:string"></xsd:attribute>
+	</xsd:complexType>
 
-	<complexType name="homeDirectoryType">
-		<complexContent>
-			<restriction base="cpa:pathElementType">
-				<attribute name="base" type="cpa:pathElementBaseType" fixed="root" use="required"></attribute>
-				<attribute name="relpath" type="cpa:pathElementGeneralType" use="required"></attribute>
-			</restriction>
-		</complexContent>
-	</complexType>
+	<xsd:complexType name="homeDirectoryType">
+		<xsd:complexContent>
+			<xsd:restriction base="pathElementType">
+				<xsd:attribute name="base" type="pathElementBaseType" fixed="root" use="required"></xsd:attribute>
+				<xsd:attribute name="relpath" type="pathElementGeneralType" use="required"></xsd:attribute>
+			</xsd:restriction>
+		</xsd:complexContent>
+	</xsd:complexType>
 
-	<complexType name="hostType">
-		<sequence>
-			<element name="homeDirectory" type="pa:homeDirectoryType"></element>
-			<element name="tool" type="pa:toolType" minOccurs="0" maxOccurs="unbounded"></element>
-		</sequence>
-		<attribute name="id" type="cpa:idType" use="required"></attribute>
-		<attribute name="os" type="cpa:osType" use="required"></attribute>
-		<attribute name="username" type="string"></attribute>
-		<attribute name="hostCapacity" type="positiveInteger" use="optional" />
-		<attribute name="vmCapacity" type="positiveInteger" use="optional" />
-	</complexType>
+	<xsd:complexType name="hostType">
+		<xsd:sequence>
+			<xsd:element name="homeDirectory" type="homeDirectoryType"></xsd:element>
+			<xsd:element name="tool" type="toolType" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="id" type="idType" use="required"></xsd:attribute>
+		<xsd:attribute name="os" type="osType" use="required"></xsd:attribute>
+		<xsd:attribute name="username" type="xsd:string"></xsd:attribute>
+		<xsd:attribute name="hostCapacity" type="xsd:positiveInteger" use="optional" />
+		<xsd:attribute name="vmCapacity" type="xsd:positiveInteger" use="optional" />
+	</xsd:complexType>
 
-	<complexType name="hostRefType">
-		<attribute name="refid" type="cpa:idType" use="required" />
-	</complexType>
+	<xsd:complexType name="hostRefType">
+		<xsd:attribute name="refid" type="idType" use="required" />
+	</xsd:complexType>
 
-	<complexType name="abstractInfrastructureType"></complexType>
+	<xsd:complexType name="abstractInfrastructureType"></xsd:complexType>
 
-	<complexType name="hostsType">
-		<sequence>
-			<element name="host" type="pa:hostType" minOccurs="1" maxOccurs="unbounded" />
-		</sequence>
-	</complexType>
+	<xsd:complexType name="hostsType">
+		<xsd:sequence>
+			<xsd:element name="host" type="hostType" minOccurs="1" maxOccurs="unbounded" />
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<complexType name="groupsType">
-		<sequence minOccurs="1">
-			<element ref="pa:abstractShElement" minOccurs="1" maxOccurs="unbounded"></element>
-		</sequence>
-	</complexType>
+	<xsd:complexType name="groupsType">
+		<xsd:sequence minOccurs="1">
+			<xsd:element ref="abstractShElement" minOccurs="1" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<complexType name="abstractBridgeElementType">
-		<attribute name="id" type="cpa:idType" use="required" />
-	</complexType>
+	<xsd:complexType name="abstractBridgeElementType">
+		<xsd:attribute name="id" type="idType" use="required" />
+	</xsd:complexType>
 
-	<element name="abstractBridgeElement" type="pa:abstractBridgeElementType"></element>
+	<xsd:element name="abstractBridgeElement" type="abstractBridgeElementType"></xsd:element>
 
 
-	<complexType name="bridgesType">
-		<sequence>
-			<element ref="pa:abstractBridgeElement" maxOccurs="unbounded"></element>
-		</sequence>
-	</complexType>
+	<xsd:complexType name="bridgesType">
+		<xsd:sequence>
+			<xsd:element ref="abstractBridgeElement" maxOccurs="unbounded"></xsd:element>
+		</xsd:sequence>
+	</xsd:complexType>
 
-	<complexType name="infrastructureType">
-		<all>
-			<element name="hosts" type="pa:hostsType" minOccurs="0" />
-			<element name="groups" type="pa:groupsType" minOccurs="0" />
-			<element name="bridges" type="pa:bridgesType" minOccurs="0" />
-		</all>
-	</complexType>
+	<xsd:complexType name="infrastructureType">
+		<xsd:all>
+			<xsd:element name="hosts" type="hostsType" minOccurs="0" />
+			<xsd:element name="groups" type="groupsType" minOccurs="0" />
+			<xsd:element name="bridges" type="bridgesType" minOccurs="0" />
+		</xsd:all>
+	</xsd:complexType>
 
-	<element name="GCMDeployment">
-		<complexType>
-			<sequence>
-				<element name="environment" type="cpa:environmentType" minOccurs="0" />
-				<element name="resources" type="pa:resourceType" />
-				<element name="acquisition" type="pa:acquisitionType" minOccurs="0" />
-				<element name="infrastructure" type="pa:infrastructureType" />
-			</sequence>
-		</complexType>
+	<xsd:element name="GCMDeployment">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="environment" type="environmentType" minOccurs="0" />
+				<xsd:element name="resources" type="resourceType" />
+				<xsd:element name="acquisition" type="acquisitionType" minOccurs="0" />
+				<xsd:element name="infrastructure" type="infrastructureType" />
+			</xsd:sequence>
+		</xsd:complexType>
 
 		<!-- Groups refid/id key correctness -->
 		<!--  -->
-		<key name="idKeyGroups">
-			<selector xpath="pa:infrastructure/pa:groups/*" />
-			<field xpath="@id" />
-		</key>
-		<keyref name="refIdKeyGroups" refer="pa:idKeyGroups">
-			<selector xpath="pa:resources/pa:group"></selector>
-			<field xpath="@refid"></field>
-		</keyref>
+		<xsd:key name="idKeyGroups">
+			<xsd:selector xpath="infrastructure/groups/*" />
+			<xsd:field xpath="@id" />
+		</xsd:key>
+		<xsd:keyref name="refIdKeyGroups" refer="idKeyGroups">
+			<xsd:selector xpath="resources/group"></xsd:selector>
+			<xsd:field xpath="@refid"></xsd:field>
+		</xsd:keyref>
 
 		<!-- Bridges refid/id key correctness -->
 		<!--  -->
-		<key name="idKeyBridges">
-			<selector xpath="pa:infrastructure/pa:bridges/*" />
-			<field xpath="@id" />
-		</key>
-		<keyref name="refIdKeyBridge" refer="pa:idKeyBridges">
-			<selector xpath="pa:resources/pa:bridge"></selector>
-			<field xpath="@refid"></field>
-		</keyref>
+		<xsd:key name="idKeyBridges">
+			<xsd:selector xpath="infrastructure/bridges/*" />
+			<xsd:field xpath="@id" />
+		</xsd:key>
+		<xsd:keyref name="refIdKeyBridge" refer="idKeyBridges">
+			<xsd:selector xpath="resources/bridge"></xsd:selector>
+			<xsd:field xpath="@refid"></xsd:field>
+		</xsd:keyref>
 
 		<!-- Hosts refid/id key correctness -->
 		<!--  -->
-		<key name="idKeyHosts">
-			<selector xpath="pa:infrastructure/pa:hosts/*" />
-			<field xpath="@id" />
-		</key>
-		<keyref name="refIdKeyHost" refer="pa:idKeyHosts">
-			<selector xpath="pa:resources/pa:host"></selector>
-			<field xpath="@refid"></field>
-		</keyref>
-		<keyref name="refIdKeyGroupHost" refer="pa:idKeyHosts">
-			<selector xpath="pa:resources/pa:group/pa:host"></selector>
-			<field xpath="@refid"></field>
-		</keyref>
+		<xsd:key name="idKeyHosts">
+			<xsd:selector xpath="infrastructure/hosts/*" />
+			<xsd:field xpath="@id" />
+		</xsd:key>
+		<xsd:keyref name="refIdKeyHost" refer="idKeyHosts">
+			<xsd:selector xpath="resources/host"></xsd:selector>
+			<xsd:field xpath="@refid"></xsd:field>
+		</xsd:keyref>
+		<xsd:keyref name="refIdKeyGroupHost" refer="idKeyHosts">
+			<xsd:selector xpath="resources/group/host"></xsd:selector>
+			<xsd:field xpath="@refid"></xsd:field>
+		</xsd:keyref>
 
-	</element>
+	</xsd:element>
 
-</schema>
+</xsd:schema>
 
 
 

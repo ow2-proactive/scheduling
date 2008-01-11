@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas" elementFormDefault="qualified">
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
+	elementFormDefault="qualified">
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
 
 	<!--gLiteProcess element has six children: processReference element, gLiteOptions which contains JDLFilePath child and SdtOutput child 
 		environment, rank, inputData, requirements-->
@@ -15,45 +12,45 @@
 	<!--Requirements : String representing job requirements on ressources. Default is : Requirements = other.GlueCEStateStatusus == "Production";-->
 	<!--InputData : string or list of string representing physical file location on SE. Names have to be prefixed with "lfn", "guid", "lds", "query".-->
 	<!--Rank : ClassAd foating-point expression that states how to rank CEs that have already met the Requirements expression. Default is : Rank = -other.GlueCEStateEstimatedResponseTime; -->
-	<complexType name="gLiteProcessType">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="inputData" type="paext:gLiteInputDataType" minOccurs="0" />
-					<element name="rank" type="paext:gLiteRankType" />
-					<element name="stdout" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stderr" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdin" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="configFile" type="pa:pathElementGeneralType" minOccurs="0" />
-					<element name="arguments" type="pa:argumentListType" minOccurs="0" />
-				</sequence>
-				<attribute name="hostname" type="string" />
-				<attribute name="virtualOrganisation" type="string" use="required" />
-				<attribute name="Type" type="string" default="job" />
-				<attribute name="executable" type="string" default="/bin/sh" />
-				<attribute name="jobType" type="string" default="normal" />
-				<attribute name="nodeNumber" type="string" />
-			</extension>
-		</complexContent>
-	</complexType>
+	<xs:complexType name="gLiteProcessType">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+				<xs:sequence>
+					<xs:element name="inputData" type="gLiteInputDataType" minOccurs="0" />
+					<xs:element name="rank" type="gLiteRankType" />
+					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stdin" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="configFile" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="arguments" type="argumentListType" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="hostname" type="xs:string" />
+				<xs:attribute name="virtualOrganisation" type="xs:string" use="required" />
+				<xs:attribute name="Type" type="xs:string" default="job" />
+				<xs:attribute name="executable" type="xs:string" default="/bin/sh" />
+				<xs:attribute name="jobType" type="xs:string" default="normal" />
+				<xs:attribute name="nodeNumber" type="xs:string" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
 
 	<!--gLiteRankType-->
-	<complexType name="gLiteRankType">
-		<simpleContent>
-			<extension base="pa:TextOrVariableType">
-				<attribute name="fuzzyrank" type="pa:BooleanOrVariableType" default="false" />
-			</extension>
-		</simpleContent>
-	</complexType>
+	<xs:complexType name="gLiteRankType">
+		<xs:simpleContent>
+			<xs:extension base="TextOrVariableType">
+				<xs:attribute name="fuzzyrank" type="BooleanOrVariableType" default="false" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
 	<!--gLiteInputDataType-->
-	<complexType name="gLiteInputDataType">
-		<attribute name="dataAccessProtocol" type="string" />
-		<attribute name="storageIndex" type="string" />
-		<attribute name="dataCatalog" type="string" />
-	</complexType>
+	<xs:complexType name="gLiteInputDataType">
+		<xs:attribute name="dataAccessProtocol" type="xs:string" />
+		<xs:attribute name="storageIndex" type="xs:string" />
+		<xs:attribute name="dataCatalog" type="xs:string" />
+	</xs:complexType>
 	<!-- end of gLiteProcessType -->
 
-	<element name="gLiteGroup" type="paext:gLiteProcessType" substitutionGroup="pa:abstractShElement"></element>
+	<xs:element name="gLiteGroup" type="gLiteProcessType" substitutionGroup="abstractShElement"/>
 
-</schema>
+</xs:schema>

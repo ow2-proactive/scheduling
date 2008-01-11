@@ -1,29 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
-
-	<include schemaLocation="GroupSSHSchema.xsd" />
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
+	<xs:include schemaLocation="GroupSSHSchema.xsd" />
 
 
-	<complexType name="oarshGroupType">
-		<complexContent>
-			<extension base="paext:groupTypeSSH">
-				<attribute name="jobId" type="cpa:PosintOrVariableType" />
-			</extension>
-		</complexContent>
-	</complexType>
+	<xs:complexType name="oarshGroupType">
+		<xs:complexContent>
+			<xs:extension base="groupTypeSSH">
+				<xs:attribute name="jobId" type="PosintOrVariableType" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<element name="oarshGroup" type="paext:oarshGroupType" substitutionGroup="pa:abstractShElement"></element>
-
-</schema>
+	<xs:element name="oarshGroup" type="oarshGroupType" substitutionGroup="abstractShElement"/>
+</xs:schema>

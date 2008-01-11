@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pa:GCMDeployment xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<GCMDeployment 
+	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"	
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                                     ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	                    http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	
-	
-	 ">
-	<pa:resources />
-	<pa:infrastructure>
-		<pa:groups>
-			<paext:sshGroup hostList="host" id="not_unique" />
-			<paext:sshGroup hostList="host" id="not_unique" />
-		</pa:groups>
-	</pa:infrastructure>
-</pa:GCMDeployment>
+	xsi:schemaLocation="urn:gcm:deployment:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
+
+	<resources />
+	<infrastructure>
+		<groups>
+			<sshGroup hostList="host" id="not_unique" />
+			<sshGroup hostList="host" id="not_unique" />
+		</groups>
+	</infrastructure>
+</GCMDeployment>

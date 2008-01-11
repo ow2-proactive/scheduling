@@ -49,14 +49,14 @@ import org.xml.sax.SAXException;
 
 
 public class ApplicationParserProactive extends AbstractApplicationParser {
-    private static final String XPATH_JAVA = "pa:java";
-    private static final String XPATH_JVMARG = "pa:jvmarg";
-    private static final String XPATH_CONFIGURATION = "pa:configuration";
-    private static final String XPATH_PROACTIVE_CLASSPATH = "pa:proactiveClasspath";
-    private static final String XPATH_APPLICATION_CLASSPATH = "pa:applicationClasspath";
-    private static final String XPATH_SECURITY_POLICY = "pa:securityPolicy";
-    private static final String XPATH_LOG4J_PROPERTIES = "pa:log4jProperties";
-    private static final String XPATH_USER_PROPERTIES = "pa:userProperties";
+    private static final String XPATH_JAVA = "app:java";
+    private static final String XPATH_JVMARG = "app:jvmarg";
+    private static final String XPATH_CONFIGURATION = "app:configuration";
+    private static final String XPATH_PROACTIVE_CLASSPATH = "app:proactiveClasspath";
+    private static final String XPATH_APPLICATION_CLASSPATH = "app:applicationClasspath";
+    private static final String XPATH_SECURITY_POLICY = "app:securityPolicy";
+    private static final String XPATH_LOG4J_PROPERTIES = "app:log4jProperties";
+    private static final String XPATH_USER_PROPERTIES = "app:userProperties";
     protected static final String NODE_NAME = "proactive";
 
     @Override

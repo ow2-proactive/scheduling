@@ -1,34 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
-
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
+	
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
 
 	<!--gridEngine process -->
-	<complexType name="gridEngineProcessType">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-                <sequence>
-					<element name="hostsNumber" type="cpa:PosintOrVariableType" minOccurs="0" />
-					<element name="wallTime" type="cpa:PosintOrVariableType" minOccurs="0" />
-					<element name="parallelEnvironment" type="cpa:TextOrVariableType" minOccurs="0" />
-					<element name="directory" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
-				</sequence>
-				<attribute name="queue" type="string" use="optional" />
-			</extension>
-		</complexContent>
-	</complexType>
+	<xs:complexType name="gridEngineProcessType">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+                <xs:sequence>
+					<xs:element name="hostsNumber" type="PosintOrVariableType" minOccurs="0" />
+					<xs:element name="wallTime" type="PosintOrVariableType" minOccurs="0" />
+					<xs:element name="parallelEnvironment" type="TextOrVariableType" minOccurs="0" />
+					<xs:element name="directory" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="queue" type="xs:string" use="optional" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<element name="gridEngineGroup" type="paext:gridEngineProcessType" substitutionGroup="pa:abstractShElement"></element>
-</schema>
+	<xs:element name="gridEngineGroup" type="gridEngineProcessType" substitutionGroup="abstractShElement"/>
+</xs:schema>

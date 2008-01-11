@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<GCMDeployment
-	xmlns="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<GCMDeployment 
+	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"	
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                 ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension ../../../../../../Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd
-	">
+	xsi:schemaLocation="urn:gcm:deployment:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
 
 	<resources>
 		<bridge refid="bSchubby">	
@@ -24,13 +20,11 @@
 		</hosts>
 		
 		<bridges>
-			<paext:sshBridge
+			<sshBridge
 				commandPath="/usr/bin/ssh"
 				hostname="schubby.inria.fr"
 				id="bSchubby"
 				username="cmathieu"/>
 		</bridges>
 	</infrastructure>
-
-
 </GCMDeployment>

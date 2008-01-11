@@ -1,28 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
 
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
+	<xs:complexType name="bridgeTypeRSH">
+		<xs:complexContent>
+			<xs:extension base="abstractBridgeElementType">
+				<xs:attribute name="hostname" type="hostnameType" use="required" />
+				<xs:attribute name="username" type="usernameType"/>
+				<xs:attribute name="commandPath" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
-	<complexType name="bridgeTypeRSH">
-		<complexContent>
-			<extension base="pa:abstractBridgeElementType">
-				<attribute name="hostname" type="cpa:hostnameType" use="required" />
-				<attribute name="username" type="cpa:usernameType"></attribute>
-				<attribute name="commandPath" type="string"></attribute>
-			</extension>
-		</complexContent>
-	</complexType>
+	<xs:element name="rshBridge" type="bridgeTypeRSH" substitutionGroup="abstractBridgeElement"/>
 
-	<element name="rshBridge" type="paext:bridgeTypeRSH" substitutionGroup="pa:abstractBridgeElement"></element>
-
-</schema>
+</xs:schema>

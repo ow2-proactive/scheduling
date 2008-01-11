@@ -1,67 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema xmlns="http://www.w3.org/2001/XMLSchema"
-	targetNamespace="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"
-	xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
-	xmlns:cpa="http://www-sop.inria.fr/oasis/ProActive/commonSchemas"
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="urn:gcm:deployment:1.0"
+	xmlns="urn:gcm:deployment:1.0"
 	elementFormDefault="qualified">
-
-	<import schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/schemas">
-	</import>
-	<import schemaLocation="../../schema/CommonTypes.xsd"
-		namespace="http://www-sop.inria.fr/oasis/ProActive/commonSchemas">
-	</import>
-
-	<complexType name="gLiteGroupType">
-		<complexContent>
-			<extension base="pa:abstractGroupElementType">
-				<sequence>
-					<element name="requirements" type="cpa:TextOrVariableType" minOccurs="0" />
-					<element name="inputData" type="paext:gLiteInputDataType" minOccurs="0" />
-					<element name="rank" type="paext:gLiteRankType" />
-					<element name="JDLTransferDeploy" type="cpa:fileTransferType" minOccurs="0" maxOccurs="1" />
-					<element name="stdout" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="stderr" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="stdin" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="configFile" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="JDLFilePath" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="JDLRemoteFilePath" type="cpa:pathElementGeneralType" minOccurs="0" />
-					<element name="arguments" type="cpa:argumentListType" minOccurs="0" />
-					<element name="inputSandbox" type="cpa:TextOrVariableType" minOccurs="0" />
-					<element name="outputSandbox" type="cpa:TextOrVariableType" minOccurs="0" />
-				</sequence>
-				<attribute name="hostname" type="string" />
-				<attribute name="virtualOrganisation" type="string" use="required" />
-				<attribute name="JDLFileName" type="string" />
-				<attribute name="Type" type="string" default="job" />
-				<attribute name="executable" type="string" default="/bin/sh" />
-				<attribute name="jobType" type="string" default="normal" />
-				<attribute name="outputse" type="string" />
-				<attribute name="retryCount" type="string" />
-				<attribute name="myProxyServer" type="string" />
-				<attribute name="nodes" type="string" />
-			</extension>
-		</complexContent>
-	</complexType>
+	
+	<xs:include schemaLocation="../../schema/DeploymentDescriptorSchema.xsd"/>	
+	
+	<xs:complexType name="gLiteGroupType">
+		<xs:complexContent>
+			<xs:extension base="abstractGroupElementType">
+				<xs:sequence>
+					<xs:element name="requirements" type="TextOrVariableType" minOccurs="0" />
+					<xs:element name="inputData" type="gLiteInputDataType" minOccurs="0" />
+					<xs:element name="rank" type="gLiteRankType" />
+					<xs:element name="JDLTransferDeploy" type="fileTransferType" minOccurs="0" maxOccurs="1" />
+					<xs:element name="stdout" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stderr" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="stdin" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="configFile" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="JDLFilePath" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="JDLRemoteFilePath" type="pathElementGeneralType" minOccurs="0" />
+					<xs:element name="arguments" type="argumentListType" minOccurs="0" />
+					<xs:element name="inputSandbox" type="TextOrVariableType" minOccurs="0" />
+					<xs:element name="outputSandbox" type="TextOrVariableType" minOccurs="0" />
+				</xs:sequence>
+				<xs:attribute name="hostname" type="xs:string" />
+				<xs:attribute name="virtualOrganisation" type="xs:string" use="required" />
+				<xs:attribute name="JDLFileName" type="xs:string" />
+				<xs:attribute name="Type" type="xs:string" default="job" />
+				<xs:attribute name="executable" type="xs:string" default="/bin/sh" />
+				<xs:attribute name="jobType" type="xs:string" default="normal" />
+				<xs:attribute name="outputse" type="xs:string" />
+				<xs:attribute name="retryCount" type="xs:string" />
+				<xs:attribute name="myProxyServer" type="xs:string" />
+				<xs:attribute name="nodes" type="xs:string" />
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
 
 
 	<!--gLiteRankType-->
-	<complexType name="gLiteRankType">
-		<simpleContent>
-			<extension base="cpa:TextOrVariableType">
-				<attribute name="fuzzyrank" type="cpa:BooleanOrVariableType" default="false" />
-			</extension>
-		</simpleContent>
-	</complexType>
+	<xs:complexType name="gLiteRankType">
+		<xs:simpleContent>
+			<xs:extension base="TextOrVariableType">
+				<xs:attribute name="fuzzyrank" type="BooleanOrVariableType" default="false" />
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
 	<!--gLiteInputDataType-->
-	<complexType name="gLiteInputDataType">
-		<attribute name="dataAccessProtocol" type="string" />
-		<attribute name="storageIndex" type="string" />
-		<attribute name="dataCatalog" type="string" />
-	</complexType>
+	<xs:complexType name="gLiteInputDataType">
+		<xs:attribute name="dataAccessProtocol" type="xs:string" />
+		<xs:attribute name="storageIndex" type="xs:string" />
+		<xs:attribute name="dataCatalog" type="xs:string" />
+	</xs:complexType>
 	<!-- end of gLiteProcessType -->
 
-	<element name="gLiteGroup" type="paext:gLiteGroupType" substitutionGroup="pa:abstractShElement"></element>
+	<xs:element name="gLiteGroup" type="gLiteGroupType" substitutionGroup="abstractShElement"/>
 
-</schema>
+</xs:schema>

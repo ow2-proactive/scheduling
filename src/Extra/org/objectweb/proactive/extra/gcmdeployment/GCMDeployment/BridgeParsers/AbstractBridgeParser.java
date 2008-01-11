@@ -42,7 +42,7 @@ public abstract class AbstractBridgeParser implements BridgeParser {
     static final String ATT_HOSTNAME = "hostname";
     static final String ATT_USERNAME = "username";
     static final String ATT_COMMANDPATH = "commandPath";
-    static final String NODE_EXT_NAMESPACE = "paext:";
+    static final String NODE_EXT_NAMESPACE = "";
 
     public AbstractBridgeParser() {
     }
