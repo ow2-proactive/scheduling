@@ -156,9 +156,6 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
         URL applicationSchema = getClass().getResource(APPLICATION_DESC_LOCATION);
 
-        URL commonTypesSchema = getClass().getResource(COMMON_TYPES_LOCATION);
-        System.out.println("#@# " + applicationSchema);
-        //        schemas.add(commonTypesSchema.toString());
         schemas.add(applicationSchema.toString());
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
