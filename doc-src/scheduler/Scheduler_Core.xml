@@ -64,7 +64,7 @@
 
           <listitem>
             <para><emphasis role="bold">PROACTIVE</emphasis>, represents a Job
-            that contains a ProActive application (embeded in <emphasis>only one ProActive Task</emphasis>).
+            that contains a ProActive application (embedded in <emphasis>only one ProActive Task</emphasis>).
             Its execution starts with a given predefined number of nodes
             on which the user can start the ProActive computation. This kind of Job requires
             the usage of the ProActive API, in order to use the given
@@ -402,8 +402,24 @@ public Object execute(TaskResult... results) throws Throwable {
 		    </para>
 		
 		    <para>
-		    	<emphasis>scheduler.sh</emphasis> can be started with 1 optional
-		      	argument : <itemizedlist>
+		    	<emphasis>scheduler.sh</emphasis> can be started with 2 optional
+		      	arguments : <itemizedlist>
+		          <listitem>
+		            <para>
+		            	A path (folder) containing the 2 authentication files (using the "-a PATH" option) :
+		            	<itemizedlist>
+			            	<listitem>
+					            <para><emphasis>"login.cfg"</emphasis>: A file describing the users
+			            		and their passwords authorized to connect to the scheduler. </para>
+			          		</listitem>
+			            	<listitem>
+			            		<para><emphasis>"group.cfg"</emphasis>: A file describing the group
+			           		 	on which each user belongs. These groups will be used to identify
+			            		admin or user rights. </para>
+			          		</listitem>
+			            </itemizedlist>
+		            </para>
+		          </listitem>
 		          <listitem>
 		            <para>
 		            	The URL of a resources manager already started. (ie:
@@ -411,6 +427,20 @@ public Object execute(TaskResult... results) throws Throwable {
 		            </para>
 		          </listitem>
 		        </itemizedlist>
+		   	</para>
+		   	<para>
+		   		For example, the following line will launch a scheduler with a local resource manager and
+		   		a personal path for the authentication files :
+		   		<itemizedlist>
+		   			<listitem>
+		   				./scheduler.sh -a /user/home/scheduler/authFiles/ //localhost/
+		   			</listitem>
+		   		</itemizedlist>
+		   		The path "/user/home/scheduler/authFiles/" have to contain the two authentication files.
+		   	</para>
+		   	<para>
+		   		It is also possible to launch the scheduler with only one of the options or no option.
+		   		No option will start a local scheduler by creating a new local resource manager with default node description.
 		   	</para>
 		</sect2>
 		
@@ -886,21 +916,31 @@ public Object execute(TaskResult... results) throws Throwable {
 	      the following way:</para>
 	
 	      <programlisting lang="java">AdminScheduler.createScheduler(
-	    LocalSchedulerExample.class.getResource("login.cfg").getFile(),
-	                LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
+	    			"path/to/authentication_files/",
 	                rm,
 	                "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");</programlisting>
 	
 	      <para>Arguments are respectively: <orderedlist>
 	          <listitem>
-	            <para><emphasis>loginFile</emphasis>: A file describing the users
-	            and passwords authorized to connect to the scheduler.</para>
-	          </listitem>
-	
-	          <listitem>
-	            <para><emphasis>groupFile</emphasis>: A file describing the group
-	            on which each user belongs. These groups will be used to identify
-	            admin or user rights. </para>
+	            <para><emphasis>Authentication files path</emphasis>: A path containing the 2
+	            needed files :
+	            <itemizedlist>
+	            	<listitem>
+			            <para><emphasis>"login.cfg"</emphasis>: A file describing the users
+	            		and their passwords authorized to connect to the scheduler. </para>
+	          		</listitem>
+	            	<listitem>
+	            		<para><emphasis>"group.cfg"</emphasis>: A file describing the group
+	           		 	on which each user belongs. These groups will be used to identify
+	            		admin or user rights. </para>
+	          		</listitem>
+	            </itemizedlist>
+	            </para>
+	            <para>
+	            These 2 files are used to manage the security and right access into the scheduler.
+	            A user can then only connect it if their username is in the login file and will check that
+	            the password is corresponding.
+	            </para>
 	          </listitem>
 	
 	          <listitem>
@@ -923,8 +963,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	      at the same time :</para>
 	
 	      <programlisting lang="java">AdminScheduler.createScheduler(
-	   LocalSchedulerExample.class.getResource("login.cfg").getFile(),
-	                LocalSchedulerExample.class.getResource("groups.cfg").getFile(),
+	   				"path/to/authentication_files/",
 	                "login",
 	                "password",
 	                rm,

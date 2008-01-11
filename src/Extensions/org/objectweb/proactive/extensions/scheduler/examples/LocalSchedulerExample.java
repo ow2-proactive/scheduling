@@ -31,7 +31,6 @@
 package org.objectweb.proactive.extensions.scheduler.examples;
 
 import java.net.URI;
-
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PADeployment;
@@ -61,14 +60,26 @@ public class LocalSchedulerExample {
         //get the path of the file
         ResourceManagerProxy imp = null;
 
-        try {
-            if (args.length > 0) {
-                try {
-                    imp = ResourceManagerProxy.getProxy(new URI(args[0]));
+        String rm = null;
+        String authPath = ".";
 
-                    logger.info("[SCHEDULER] Connect to ResourceManager on " + args[0]);
+        if (args.length > 0 && args[0].startsWith("-a")) {
+            authPath = args[1];
+            if (args.length > 2) {
+                rm = args[2];
+            }
+        } else if (args.length > 0) {
+            rm = args[0];
+        }
+
+        try {
+            if (rm != null) {
+                try {
+                    imp = ResourceManagerProxy.getProxy(new URI(rm));
+
+                    logger.info("[SCHEDULER] Connect to ResourceManager on " + rm);
                 } catch (Exception e) {
-                    throw new Exception("ResourceManager doesn't exist on " + args[0]);
+                    throw new Exception("ResourceManager doesn't exist on " + rm);
                 }
             } else {
                 RMFactory.startLocal();
@@ -100,8 +111,7 @@ public class LocalSchedulerExample {
                 logger.info("ResourceManager created on " + PAActiveObject.getActiveObjectNodeUrl(imp));
             }
 
-            AdminScheduler.createScheduler(LocalSchedulerExample.class.getResource("login.cfg").getFile(),
-                    LocalSchedulerExample.class.getResource("groups.cfg").getFile(), imp,
+            AdminScheduler.createScheduler(authPath, imp,
                     "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");
         } catch (Exception e) {
             e.printStackTrace();

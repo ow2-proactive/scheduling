@@ -30,7 +30,10 @@
  */
 package org.objectweb.proactive.extensions.scheduler.core;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,12 +41,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.Map.Entry;
 import java.util.Vector;
-
+import java.util.Map.Entry;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
-import org.apache.log4j.MDC;
 import org.apache.log4j.net.SocketAppender;
 import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.Body;
@@ -257,8 +258,12 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
         //PAActiveObject.setImmediateService("listenLog");
         Service service = new Service(body);
 
+        //used to read the enumerate schedulerState in order to know when submit is possible.
+        //have to be immediate service
+        body.setImmediateService("isSubmitPossible");
+
         //set the filter for serveAll method
-        RequestFilter filter = new MainLoopRequestFilter("submit", "pause", "terminate", "listenLog");
+        RequestFilter filter = new MainLoopRequestFilter("submit", "terminate", "listenLog");
         createPingThread();
 
         // default scheduler state is started
@@ -523,15 +528,21 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
     }
 
     /**
+     * Return true if a submit is possible, false if not.
+     * 
+     * @return true if a submit is possible, false if not.
+     */
+    public boolean isSubmitPossible() {
+        return !((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.STOPPED));
+    }
+
+    /**
      * Submit a new job to the scheduler.
      *
      * @param job the job to be scheduled.
      * @throws SchedulerException
      */
-    public void submit(InternalJob job) throws SchedulerException {
-        if ((state == SchedulerState.SHUTTING_DOWN) || (state == SchedulerState.STOPPED)) {
-            throw new SchedulerException("Scheduler is stopped, cannot submit new job !");
-        }
+    public void submit(InternalJob job) {
 
         job.submit();
         // add job to core
@@ -564,10 +575,11 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                     logger.warn("[SCHEDULER] Cannot open log file " + job.getLogFile() + " : " +
                         e.getMessage());
                 }
-            } else {
-                throw new RuntimeException("[SCHEDULER] Appender for job " + job.getId() +
-                    " is already activated");
             }
+            //            else {
+            //                throw new RuntimeException("[SCHEDULER] Appender for job " + job.getId() +
+            //                    " is already activated");
+            //            }
         }
 
         //sending event to client
@@ -740,6 +752,20 @@ public class SchedulerCore implements SchedulerCoreInterface, RunActive {
                 runningJobs.remove(job);
                 finishedJobs.add(job);
                 logger.info("[SCHEDULER] Terminated job " + jobId);
+                //TOREMOVE TODO
+                if (new Integer(jobId.toString()) % 500 == 0) {
+                    /* A VIRER */
+                    try {
+                        PrintWriter fsave = new PrintWriter(new File(
+                            "/auto/sea/u/sea/0/user/jlscheef/Desktop/sched.out"));
+                        fsave.println("[SCHEDULER] Terminated job " + jobId);
+                        fsave.close();
+                    } catch (FileNotFoundException e1) {
+                        e1.printStackTrace();
+                    }
+                    /* A VIRER */
+                }
+                //TOREMOVE
 
                 // terminate loggers
                 Logger l = Logger.getLogger(Log4JTaskLogs.JOB_LOGGER_PREFIX + job.getId());

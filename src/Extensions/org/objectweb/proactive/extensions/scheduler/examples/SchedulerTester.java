@@ -47,6 +47,7 @@ import javax.security.auth.login.LoginException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.scheduler.common.exception.JobCreationException;
 import org.objectweb.proactive.extensions.scheduler.common.exception.SchedulerException;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
 import org.objectweb.proactive.extensions.scheduler.common.job.JobFactory;
@@ -87,6 +88,7 @@ public class SchedulerTester {
     public static int totalMaxJobs;
     public static int currentNBjobs = 0;
     public final static Object synchro = new Object();
+    private HashMap<String, Job> alreadySubmitted = new HashMap<String, Job>();
 
     /**
      * args[0] = [schedulerURL]
@@ -98,14 +100,14 @@ public class SchedulerTester {
     public static void main(String[] args) {
         try {
             // almost optional arguments...
-            JOBS_HOME = args[1];
+            JOBS_HOME = (args[1].endsWith(System.getProperty("file.separator"))) ? args[1] : args[1] +
+                System.getProperty("file.separator");
             SchedulerTester jl = new SchedulerTester((args.length > 1) ? Integer.parseInt(args[2])
                     : DEFAULT_MSP, (args.length > 3) ? Integer.parseInt(args[3]) : DEFAULT_MNJ);
             totalMaxJobs = (args.length > 4) ? Integer.parseInt(args[4]) : DEFAULT_TOTAL_NL;
             jl.authentication = SchedulerConnection.join((args.length > 0) ? args[0] : DEFAULT_URL);
             jl.randomizedTest();
         } catch (SchedulerException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -121,7 +123,7 @@ public class SchedulerTester {
         Vector<String> jobs = null;
         try {
             // read logins
-            FileReader l = new FileReader(SchedulerTester.class.getResource("login.cfg").getFile());
+            FileReader l = new FileReader("login.cfg");
             BufferedReader br = new BufferedReader(l);
             String current = br.readLine();
             while (current != null) {
@@ -144,7 +146,8 @@ public class SchedulerTester {
             // remove non *xml
             jobs = new Vector<String>();
             for (int i = 0; i < jobsTmp.length; i++) {
-                if (jobsTmp[i].endsWith("xml")) {
+                //TODO jlscheef ATTENTION  && !jobsTmp[i].matches(".*lab.*") existe pour test
+                if (jobsTmp[i].endsWith("xml") && !jobsTmp[i].matches(".*lab.*")) {
                     jobs.add(jobsTmp[i]);
                 }
             }
@@ -152,6 +155,11 @@ public class SchedulerTester {
             System.out.print("[SCHEDULER TEST] Used jobs are : ");
             for (String s : jobs) {
                 System.out.print(s + ", ");
+                //preparing the jobs
+                System.out.println("[SCHEDULER TEST] Preparing " + s);
+                //Create job
+                Job j = JobFactory.getFactory().createJob(JOBS_HOME + s);
+                alreadySubmitted.put(s, j);
             }
             System.out.println();
 
@@ -163,6 +171,8 @@ public class SchedulerTester {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JobCreationException e) {
             e.printStackTrace();
         }
     }
@@ -209,9 +219,10 @@ public class SchedulerTester {
                     int nbJob = generator.nextInt(SchedulerTester.this.maxNbJobs) + 1;
                     int job = generator.nextInt(jobs.size());
 
-                    //Create job
-                    Job j = JobFactory.getFactory().createJob(JOBS_HOME + jobs.get(job));
-                    System.out.println("[SCHEDULER TEST] Submitting " + jobs.get(job) + " (" + nbJob +
+                    //get the random job name
+                    String jobName = jobs.get(job);
+
+                    System.out.println("[SCHEDULER TEST] Submitting " + jobName + " (" + nbJob +
                         " instances) by " + this.login);
 
                     for (int i = 0; i < nbJob; i++) {
@@ -224,7 +235,7 @@ public class SchedulerTester {
                             }
                         }
                         if (submit) {
-                            results.add(scheduler.submit(j));
+                            results.add(scheduler.submit(alreadySubmitted.get(jobName)));
                         } else {
                             break;
                         }
@@ -235,7 +246,7 @@ public class SchedulerTester {
 
                 // Sleep
                 try {
-                    Thread.sleep(generator.nextInt(SchedulerTester.this.maxSubmissionPeriod) + 12000);
+                    Thread.sleep(generator.nextInt(maxSubmissionPeriod) + 12000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

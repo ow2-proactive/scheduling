@@ -30,6 +30,7 @@
  */
 package org.objectweb.proactive.extensions.scheduler.core;
 
+import java.io.File;
 import javax.security.auth.login.LoginException;
 
 import org.apache.log4j.Logger;
@@ -64,26 +65,47 @@ import org.objectweb.proactive.extensions.scheduler.resourcemanager.ResourceMana
 @PublicAPI
 public class AdminScheduler extends UserScheduler implements AdminSchedulerInterface {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
     /** Logger to be used for all messages related to the scheduler */
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
+    /** Login file name */
+    private static final String LOGIN_FILENAME = "login.cfg";
+    private static final String GROUP_FILENAME = "group.cfg";
 
     /**
      * Create a new scheduler at the specified URL plugged on the given resource manager.<br>
      * This will provide a connection interface to allow the access to a restricted number of user.<br>
      * It will return an admin scheduler able to managed the scheduler.
      *
-     * @param loginFile the path where are stored the allowed login//password.
-     * @param groupFile the path where to check the membership of a user.
+     * @param authPath the path where to find the authentication files.<br>
+     * File names have to be :<ul>
+     * <li>"login.cfg" the file where are stored the allowed login//password.</li>
+     * <li>"group.cfg" the file where to check the membership of a user.</li></ul>
      * @param rm the resource manager to plug on the scheduler.
      * @param policyFullClassName the full policy class name for the scheduler.
      */
-    public static void createScheduler(String loginFile, String groupFile, ResourceManagerProxy rm,
-            String policyFullClassName) throws AdminSchedulerException {
+    public static void createScheduler(String authPath, ResourceManagerProxy rm, String policyFullClassName)
+            throws AdminSchedulerException {
         logger.info("********************* STARTING NEW SCHEDULER *******************");
 
         //check arguments...
         if (rm == null) {
             throw new AdminSchedulerException("The Entity manager must be set !");
+        }
+        //get authentication file paths
+        authPath = authPath.endsWith(File.separator) ? authPath : authPath + File.separator;
+        String loginFile = authPath + LOGIN_FILENAME;
+        String groupFile = authPath + GROUP_FILENAME;
+
+        if (new File(loginFile).exists() && new File(groupFile).exists()) {
+            logger.info("Using Login file at : " + loginFile);
+            logger.info("Using Group file at : " + groupFile);
+        } else {
+            throw new AdminSchedulerException(
+                "The authentication path does not exist or does not contain the group and login files !");
         }
 
         //check that the scheduler is an active object
@@ -114,13 +136,7 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
             logger.info("Creating scheduler authentication interface...");
             schedulerAuth = (SchedulerAuthentication) PAActiveObject.newActive(SchedulerAuthentication.class
                     .getName(), new Object[] { loginFile, groupFile, schedulerFrontend });
-            // adding NFE listener to managed non functional exceptions
-            // that occurs in Proactive Core
-            //ProActive.addNFEListenerOnAO(schedulerFrontend,
-            //    new NFEHandler("Scheduler Front-end"));
-            //ProActive.addNFEListenerOnAO(schedulerAuth,
-            //    new NFEHandler("Scheduler authentication"));
-            // registering the scheduler proxy at the given URL
+
             logger.info("Registering scheduler...");
 
             String schedulerUrl = "//localhost/" + SchedulerConnection.SCHEDULER_DEFAULT_NAME;
@@ -146,8 +162,10 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * but will throw a SchedulerException due to the failure of admin connection.<br>
      * In fact, while the scheduler is restarting after a crash, no one can connect it during the whole restore process.
      *
-     * @param loginFile the path where are stored the allowed login//password.
-     * @param groupFile the path where to check the membership of a user.
+     * @param authPath the path where to find the authentication files.<br>
+     * File names have to be :<ul>
+     * <li>"login.cfg" the file where are stored the allowed login//password.</li>
+     * <li>"group.cfg" the file where to check the membership of a user.</li></ul>
      * @param login the admin login.
      * @param password the admin password.
      * @param rm the resource manager to plug on the scheduler.
@@ -157,10 +175,10 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
      * @throws AdminSchedulerException if an admin connection exception occurs.
      * @throws LoginException if a user login/password exception occurs.
      */
-    public static AdminSchedulerInterface createScheduler(String loginFile, String groupFile, String login,
-            String password, ResourceManagerProxy rm, String policyFullClassName)
-            throws AdminSchedulerException, SchedulerException, LoginException {
-        createScheduler(loginFile, groupFile, rm, policyFullClassName);
+    public static AdminSchedulerInterface createScheduler(String authPath, String login, String password,
+            ResourceManagerProxy rm, String policyFullClassName) throws AdminSchedulerException,
+            SchedulerException, LoginException {
+        createScheduler(authPath, rm, policyFullClassName);
 
         SchedulerAuthenticationInterface auth = SchedulerConnection.join(null);
 
@@ -217,6 +235,9 @@ public class AdminScheduler extends UserScheduler implements AdminSchedulerInter
         return schedulerFrontend.coreShutdown();
     }
 
+    /**
+     * @see org.objectweb.proactive.extensions.scheduler.common.scheduler.AdminSchedulerInterface#kill()
+     */
     public BooleanWrapper kill() throws SchedulerException {
         return schedulerFrontend.coreKill();
     }

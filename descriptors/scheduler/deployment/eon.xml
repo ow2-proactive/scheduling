@@ -1,0 +1,1083 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ProActiveDescriptor
+	xmlns="urn:proactive:deployment:3.3"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:proactive:deployment:3.3 http://www-sop.inria.fr/oasis/ProActive/schemas/deployment/3.3/deployment.xsd">
+	
+	<variables>
+		<descriptorVariable name="PROACTIVE_HOME" value="/user/jlscheef/home/workspace/ProActiveScheduler"/> 
+		<descriptorVariable name="JAVA_HOME" 
+			value="/user/jlscheef/home/bin/jdk1.6.0_01" />
+	</variables>
+	<componentDefinition>
+		<virtualNodesDefinition>
+			<virtualNode name="SchedulerVN" property="multiple"/>
+		</virtualNodesDefinition>
+	</componentDefinition>
+	<deployment>
+           <mapping>
+			<map virtualNode="SchedulerVN">
+				<jvmSet>
+					<vmName value="Jvm1"/>
+					<vmName value="Jvm2"/>
+					<vmName value="Jvm3"/>
+					<vmName value="Jvm4"/>
+					<vmName value="Jvm5"/>
+					<vmName value="Jvm6"/>
+					<vmName value="Jvm7"/>
+					<vmName value="Jvm8"/>
+					<vmName value="Jvm9"/>
+					<vmName value="Jvm10"/>
+					<vmName value="Jvm11"/>
+					<vmName value="Jvm12"/>
+					<vmName value="Jvm13"/>
+					<vmName value="Jvm14"/>
+					<vmName value="Jvm15"/>
+					<vmName value="Jvm16"/>
+					<vmName value="Jvm17"/>
+					<vmName value="Jvm18"/>
+					<vmName value="Jvm19"/>
+					<vmName value="Jvm20"/>
+					<vmName value="Jvm21"/>
+					<vmName value="Jvm22"/>
+					<vmName value="Jvm23"/>
+					<vmName value="Jvm24"/>
+					<vmName value="Jvm25"/>
+					<vmName value="Jvm26"/>
+					<vmName value="Jvm27"/>
+					<vmName value="Jvm28"/>
+					<vmName value="Jvm29"/>
+					<vmName value="Jvm30"/>
+					<vmName value="Jvm31"/>
+					<vmName value="Jvm32"/>
+					<vmName value="Jvm33"/>
+					<vmName value="Jvm34"/>
+					<vmName value="Jvm35"/>
+					<vmName value="Jvm36"/>
+					<vmName value="Jvm37"/>
+					<vmName value="Jvm38"/>
+					<vmName value="Jvm39"/>
+					<vmName value="Jvm40"/>
+					<vmName value="Jvm41"/>
+					<vmName value="Jvm42"/>
+					<vmName value="Jvm43"/>
+					<vmName value="Jvm44"/>
+					<vmName value="Jvm45"/>
+					<vmName value="Jvm46"/>
+					<vmName value="Jvm47"/>
+					<vmName value="Jvm48"/>
+					<vmName value="Jvm49"/>
+					<vmName value="Jvm50"/>
+					<vmName value="Jvm51"/>
+					<vmName value="Jvm52"/>
+					<vmName value="Jvm53"/>
+					<vmName value="Jvm54"/>
+					<vmName value="Jvm55"/>
+					<vmName value="Jvm56"/>
+					<vmName value="Jvm57"/>
+					<vmName value="Jvm58"/>
+					<vmName value="Jvm59"/>
+					<vmName value="Jvm60"/>
+					<vmName value="Jvm61"/>
+					<vmName value="Jvm62"/>
+					<vmName value="Jvm63"/>
+					<vmName value="Jvm64"/>
+					<vmName value="Jvm65"/>
+					<vmName value="Jvm66"/>
+					<vmName value="Jvm67"/>
+					<vmName value="Jvm68"/>
+					<vmName value="Jvm69"/>
+					<vmName value="Jvm70"/>
+					<vmName value="Jvm71"/>
+					<vmName value="Jvm72"/>
+					<vmName value="Jvm73"/>
+					<vmName value="Jvm74"/>
+					<vmName value="Jvm75"/>
+					<vmName value="Jvm76"/>
+					<vmName value="Jvm77"/>
+					<vmName value="Jvm78"/>
+					<vmName value="Jvm79"/>
+					<vmName value="Jvm80"/>
+					<vmName value="Jvm81"/>
+					<vmName value="Jvm82"/>
+					<vmName value="Jvm83"/>
+					<vmName value="Jvm84"/>
+					<vmName value="Jvm85"/>
+					<vmName value="Jvm86"/>
+					<vmName value="Jvm87"/>
+					<vmName value="Jvm88"/>
+					<vmName value="Jvm89"/>
+					<vmName value="Jvm90"/>
+					<vmName value="Jvm91"/>
+					<vmName value="Jvm92"/>
+					<vmName value="Jvm93"/>
+					<vmName value="Jvm94"/>
+					<vmName value="Jvm95"/>
+					<vmName value="Jvm96"/>
+					<vmName value="Jvm97"/>
+					<vmName value="Jvm98"/>
+					<vmName value="Jvm99"/>
+					<vmName value="Jvm100"/>
+					<vmName value="Jvm101"/>
+					<vmName value="Jvm102"/>
+					<vmName value="Jvm103"/>
+					<vmName value="Jvm104"/>
+					<vmName value="Jvm105"/>
+					<vmName value="Jvm106"/>
+					<vmName value="Jvm107"/>
+					<vmName value="Jvm108"/>
+					<vmName value="Jvm109"/>
+					<vmName value="Jvm110"/>
+					<vmName value="Jvm111"/>
+					<vmName value="Jvm112"/>
+					<vmName value="Jvm113"/>
+					<vmName value="Jvm114"/>
+					<vmName value="Jvm115"/>
+					<vmName value="Jvm116"/>
+					<vmName value="Jvm117"/>
+					<vmName value="Jvm118"/>
+					<vmName value="Jvm119"/>
+					<vmName value="Jvm120"/>
+					<vmName value="Jvm121"/>
+					<vmName value="Jvm122"/>
+					<vmName value="Jvm123"/>
+					<vmName value="Jvm124"/>
+					<vmName value="Jvm125"/>
+					<vmName value="Jvm126"/>
+					<vmName value="Jvm127"/>
+					<vmName value="Jvm128"/>
+					<vmName value="Jvm129"/>
+					<vmName value="Jvm130"/>
+					<vmName value="Jvm131"/>
+					<vmName value="Jvm132"/>
+					<vmName value="Jvm133"/>
+					<vmName value="Jvm134"/>
+					<vmName value="Jvm135"/>
+					<vmName value="Jvm136"/>
+					<vmName value="Jvm137"/>
+					<vmName value="Jvm138"/>
+					<vmName value="Jvm139"/>
+					<vmName value="Jvm140"/>
+					<vmName value="Jvm141"/>
+					<vmName value="Jvm142"/>
+					<vmName value="Jvm143"/>
+					<vmName value="Jvm144"/>
+					<vmName value="Jvm145"/>
+					<vmName value="Jvm146"/>
+					<vmName value="Jvm147"/>
+					<vmName value="Jvm148"/>
+					<vmName value="Jvm149"/>
+					<vmName value="Jvm150"/>
+					<vmName value="Jvm151"/>
+					<vmName value="Jvm152"/>
+				</jvmSet>
+			</map>
+		</mapping>
+		<jvms>
+			<jvm name="Jvm1">
+				<creation>
+					<processReference refid="localJVM1"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm2">
+				<creation>
+					<processReference refid="localJVM1"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm3">
+				<creation>
+					<processReference refid="localJVM1"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm4">
+				<creation>
+					<processReference refid="localJVM1"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm5">
+				<creation>
+					<processReference refid="localJVM1"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm6">
+				<creation>
+					<processReference refid="localJVM1"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm7">
+				<creation>
+					<processReference refid="localJVM1"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm8">
+				<creation>
+					<processReference refid="localJVM1"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm9">
+				<creation>
+					<processReference refid="localJVM2"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm10">
+				<creation>
+					<processReference refid="localJVM2"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm11">
+				<creation>
+					<processReference refid="localJVM2"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm12">
+				<creation>
+					<processReference refid="localJVM2"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm13">
+				<creation>
+					<processReference refid="localJVM2"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm14">
+				<creation>
+					<processReference refid="localJVM2"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm15">
+				<creation>
+					<processReference refid="localJVM2"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm16">
+				<creation>
+					<processReference refid="localJVM2"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm17">
+				<creation>
+					<processReference refid="localJVM3"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm18">
+				<creation>
+					<processReference refid="localJVM3"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm19">
+				<creation>
+					<processReference refid="localJVM3"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm20">
+				<creation>
+					<processReference refid="localJVM3"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm21">
+				<creation>
+					<processReference refid="localJVM3"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm22">
+				<creation>
+					<processReference refid="localJVM3"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm23">
+				<creation>
+					<processReference refid="localJVM3"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm24">
+				<creation>
+					<processReference refid="localJVM3"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm25">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm26">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm27">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm28">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm29">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm30">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm31">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm32">
+				<creation>
+					<processReference refid="localJVM4"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm33">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm34">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm35">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm36">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm37">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm38">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm39">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm40">
+				<creation>
+					<processReference refid="localJVM5"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm41">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm42">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm43">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm44">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm45">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm46">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm47">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm48">
+				<creation>
+					<processReference refid="localJVM6"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm49">
+				<creation>
+					<processReference refid="localJVM7"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm50">
+				<creation>
+					<processReference refid="localJVM7"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm51">
+				<creation>
+					<processReference refid="localJVM7"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm52">
+				<creation>
+					<processReference refid="localJVM7"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm53">
+				<creation>
+					<processReference refid="localJVM7"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm54">
+				<creation>
+					<processReference refid="localJVM7"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm55">
+				<creation>
+					<processReference refid="localJVM7"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm56">
+				<creation>
+					<processReference refid="localJVM7"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm57">
+				<creation>
+					<processReference refid="localJVM8"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm58">
+				<creation>
+					<processReference refid="localJVM8"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm59">
+				<creation>
+					<processReference refid="localJVM8"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm60">
+				<creation>
+					<processReference refid="localJVM8"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm61">
+				<creation>
+					<processReference refid="localJVM8"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm62">
+				<creation>
+					<processReference refid="localJVM8"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm63">
+				<creation>
+					<processReference refid="localJVM8"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm64">
+				<creation>
+					<processReference refid="localJVM8"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm65">
+				<creation>
+					<processReference refid="localJVM9"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm66">
+				<creation>
+					<processReference refid="localJVM9"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm67">
+				<creation>
+					<processReference refid="localJVM9"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm68">
+				<creation>
+					<processReference refid="localJVM9"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm69">
+				<creation>
+					<processReference refid="localJVM9"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm70">
+				<creation>
+					<processReference refid="localJVM9"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm71">
+				<creation>
+					<processReference refid="localJVM9"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm72">
+				<creation>
+					<processReference refid="localJVM9"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm73">
+				<creation>
+					<processReference refid="localJVM10"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm74">
+				<creation>
+					<processReference refid="localJVM10"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm75">
+				<creation>
+					<processReference refid="localJVM10"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm76">
+				<creation>
+					<processReference refid="localJVM10"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm77">
+				<creation>
+					<processReference refid="localJVM10"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm78">
+				<creation>
+					<processReference refid="localJVM10"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm79">
+				<creation>
+					<processReference refid="localJVM10"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm80">
+				<creation>
+					<processReference refid="localJVM10"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm81">
+				<creation>
+					<processReference refid="localJVM11"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm82">
+				<creation>
+					<processReference refid="localJVM11"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm83">
+				<creation>
+					<processReference refid="localJVM11"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm84">
+				<creation>
+					<processReference refid="localJVM11"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm85">
+				<creation>
+					<processReference refid="localJVM11"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm86">
+				<creation>
+					<processReference refid="localJVM11"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm87">
+				<creation>
+					<processReference refid="localJVM11"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm88">
+				<creation>
+					<processReference refid="localJVM11"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm89">
+				<creation>
+					<processReference refid="localJVM12"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm90">
+				<creation>
+					<processReference refid="localJVM12"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm91">
+				<creation>
+					<processReference refid="localJVM12"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm92">
+				<creation>
+					<processReference refid="localJVM12"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm93">
+				<creation>
+					<processReference refid="localJVM12"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm94">
+				<creation>
+					<processReference refid="localJVM12"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm95">
+				<creation>
+					<processReference refid="localJVM12"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm96">
+				<creation>
+					<processReference refid="localJVM12"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm97">
+				<creation>
+					<processReference refid="localJVM13"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm98">
+				<creation>
+					<processReference refid="localJVM13"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm99">
+				<creation>
+					<processReference refid="localJVM13"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm100">
+				<creation>
+					<processReference refid="localJVM13"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm101">
+				<creation>
+					<processReference refid="localJVM13"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm102">
+				<creation>
+					<processReference refid="localJVM13"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm103">
+				<creation>
+					<processReference refid="localJVM13"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm104">
+				<creation>
+					<processReference refid="localJVM13"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm105">
+				<creation>
+					<processReference refid="localJVM14"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm106">
+				<creation>
+					<processReference refid="localJVM14"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm107">
+				<creation>
+					<processReference refid="localJVM14"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm108">
+				<creation>
+					<processReference refid="localJVM14"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm109">
+				<creation>
+					<processReference refid="localJVM14"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm110">
+				<creation>
+					<processReference refid="localJVM14"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm111">
+				<creation>
+					<processReference refid="localJVM14"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm112">
+				<creation>
+					<processReference refid="localJVM14"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm113">
+				<creation>
+					<processReference refid="localJVM15"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm114">
+				<creation>
+					<processReference refid="localJVM15"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm115">
+				<creation>
+					<processReference refid="localJVM15"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm116">
+				<creation>
+					<processReference refid="localJVM15"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm117">
+				<creation>
+					<processReference refid="localJVM15"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm118">
+				<creation>
+					<processReference refid="localJVM15"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm119">
+				<creation>
+					<processReference refid="localJVM15"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm120">
+				<creation>
+					<processReference refid="localJVM15"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm121">
+				<creation>
+					<processReference refid="localJVM16"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm122">
+				<creation>
+					<processReference refid="localJVM16"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm123">
+				<creation>
+					<processReference refid="localJVM16"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm124">
+				<creation>
+					<processReference refid="localJVM16"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm125">
+				<creation>
+					<processReference refid="localJVM16"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm126">
+				<creation>
+					<processReference refid="localJVM16"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm127">
+				<creation>
+					<processReference refid="localJVM16"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm128">
+				<creation>
+					<processReference refid="localJVM16"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm129">
+				<creation>
+					<processReference refid="localJVM17"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm130">
+				<creation>
+					<processReference refid="localJVM17"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm131">
+				<creation>
+					<processReference refid="localJVM17"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm132">
+				<creation>
+					<processReference refid="localJVM17"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm133">
+				<creation>
+					<processReference refid="localJVM17"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm134">
+				<creation>
+					<processReference refid="localJVM17"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm135">
+				<creation>
+					<processReference refid="localJVM17"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm136">
+				<creation>
+					<processReference refid="localJVM17"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm137">
+				<creation>
+					<processReference refid="localJVM18"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm138">
+				<creation>
+					<processReference refid="localJVM18"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm139">
+				<creation>
+					<processReference refid="localJVM18"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm140">
+				<creation>
+					<processReference refid="localJVM18"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm141">
+				<creation>
+					<processReference refid="localJVM18"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm142">
+				<creation>
+					<processReference refid="localJVM18"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm143">
+				<creation>
+					<processReference refid="localJVM18"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm144">
+				<creation>
+					<processReference refid="localJVM18"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm145">
+				<creation>
+					<processReference refid="localJVM19"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm146">
+				<creation>
+					<processReference refid="localJVM19"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm147">
+				<creation>
+					<processReference refid="localJVM19"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm148">
+				<creation>
+					<processReference refid="localJVM19"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm149">
+				<creation>
+					<processReference refid="localJVM19"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm150">
+				<creation>
+					<processReference refid="localJVM19"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm151">
+				<creation>
+					<processReference refid="localJVM19"/>
+				</creation>
+			</jvm>
+			<jvm name="Jvm152">
+				<creation>
+					<processReference refid="localJVM19"/>
+				</creation>
+			</jvm>
+		</jvms>
+	</deployment>
+	<infrastructure>
+		<processes>
+			<processDefinition id="localJVM1">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon2">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM2">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon3">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM3">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon4">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM4">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon5">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM5">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon6">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM6">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon7">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM7">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon8">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM8">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon9">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM9">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon10">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM10">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon11">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM11">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon12">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM12">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon13">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM13">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon14">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM14">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon15">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM15">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon16">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM16">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon17">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM17">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon18">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM18">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon19">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="localJVM19">
+				<sshProcess
+					class="org.objectweb.proactive.core.process.ssh.SSHProcess" 
+					hostname="eon20">
+					<processReference refid="JVM"/>
+				</sshProcess>
+			</processDefinition>
+			<processDefinition id="JVM">
+				<jvmProcess class="org.objectweb.proactive.core.process.JVMNodeProcess">
+					<javaPath>
+						<absolutePath value="${JAVA_HOME}/bin/java"/>
+					</javaPath>
+				</jvmProcess>
+			</processDefinition>
+		</processes>
+	</infrastructure>
+</ProActiveDescriptor>

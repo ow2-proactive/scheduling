@@ -7,20 +7,12 @@
 		<task name="task1">
 			<!-- Task human description -->
 			<description>This task will sleep 8s</description>
-			<!--
-				<pre>
-				<script url="http://fiacre.inria.fr:10080/test.js" />
-				</pre> -->
 			<javaExecutable class="org.objectweb.proactive.extensions.scheduler.examples.WaitAndPrint">
 				<parameters>
 					<parameter name="sleepTime" value="8"/>
 					<parameter name="number" value="1"/>
 				</parameters>
 			</javaExecutable>
-			<!-- 
-				<post>
-				<script file="/user/jmartin/home/scripts/test.js" />
-				</post> -->
 		</task>
 		<task name="task2">
 			<!-- Task human description -->
