@@ -3,8 +3,6 @@
 echo
 echo --- DemoGetResult ----------------------------------------------
 
-  SCHEDULER_URL=$1
-
 
 workingDir=..
 PROACTIVE=$workingDir/../..

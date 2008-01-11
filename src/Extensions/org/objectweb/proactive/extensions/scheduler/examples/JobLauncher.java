@@ -39,7 +39,6 @@ import java.util.Date;
 import org.apache.log4j.FileAppender;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveInet;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.scheduler.common.job.Job;
@@ -55,6 +54,14 @@ import org.objectweb.proactive.extensions.scheduler.util.logforwarder.SimpleLogg
 public class JobLauncher {
     public static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
+    /**
+     * @param args
+     * [0] username
+     * [1] password
+     * [2] schedulerURL
+     * [3] jobPath
+     * [4] numberOfJobToLaunch
+     */
     public static void main(String[] args) {
         try {
             //GET SCHEDULER
@@ -69,15 +76,16 @@ public class JobLauncher {
                 pos++;
             }
 
-            if (args.length > 2) {
+            pos += 2;
+            if (args.length > 4) {
                 jobUrl = args[pos];
                 nbJob = Integer.parseInt(args[pos + 1]);
                 auth = SchedulerConnection.join(args[pos + 2]);
-            } else if (args.length > 1) {
+            } else if (args.length > 3) {
                 jobUrl = args[pos];
                 nbJob = Integer.parseInt(args[pos + 1]);
                 auth = SchedulerConnection.join(null);
-            } else if (args.length > 0) {
+            } else if (args.length > 2) {
                 jobUrl = args[pos];
                 auth = SchedulerConnection.join(null);
             } else {
@@ -85,7 +93,7 @@ public class JobLauncher {
                 System.exit(0);
             }
 
-            UserSchedulerInterface scheduler = auth.logAsUser("chri", "chri");
+            UserSchedulerInterface scheduler = auth.logAsUser(args[pos - 2], args[pos - 1]);
 
             //CREATE JOB
             Job j = JobFactory.getFactory().createJob(jobUrl);

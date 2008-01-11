@@ -36,8 +36,8 @@
 				<processList 
 					class="org.objectweb.proactive.core.process.ssh.SSHProcessList"  
 					fixedName="eon" 
-					list="[1-20]"
-					domain="">
+					list="[2-20]"
+					domain=".inria.fr">
 						<processReference refid="JVM"/>
 				</processList>
 			</processDefinition>

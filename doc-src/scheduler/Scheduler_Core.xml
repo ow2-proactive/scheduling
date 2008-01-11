@@ -456,8 +456,19 @@ public Object execute(TaskResult... results) throws Throwable {
 		    </para>
 		
 		    <para>
-		    	<emphasis>communicator.sh</emphasis> can be started with 1 optional
-		      	argument : <itemizedlist>
+		    	<emphasis>communicator.sh</emphasis> can be started with 2 mandatory arguments and 1
+		    	optional : <itemizedlist>
+		          <listitem>
+		            <para>
+		            	The username of the one who wants to connect. (must be in login.cfg file)
+		            	For the communicator, the user must be admin group. (in group.cfg file)
+		            </para>
+		          </listitem>
+		          <listitem>
+		            <para>
+		            	The password corresponding to the username. (must be in login.cfg file as well) 
+		            </para>
+		          </listitem>
 		          <listitem>
 		            <para>
 		            	The URL of a started scheduler. (ie:
@@ -1411,6 +1422,16 @@ public Object execute(TaskResult... results) throws Throwable {
 	              scheduling.</para>
 	            </listitem>
 	          </orderedlist></para>
+	          <para>
+	          To submit a job using a command line, use the <emphasis role="bold">jobLauncher.sh</emphasis> script
+	          in the script/[os]/scheduler directory. This can be used as follow :
+	          <itemizedlist>
+	          	<listitem>
+	          		./jobLauncher username password schedulerURL path/to/a/job.xml nb_of_jobs_to_submit
+	          		(ie : <emphasis>./jobLauncher usr pwd //localhost/ job_2_task.xml 1</emphasis>)
+	          	</listitem>
+	          </itemizedlist>
+	          </para>
 	      </sect3>
 	      
 	      <sect3 id="get_job_result">
@@ -1445,6 +1466,17 @@ public Object execute(TaskResult... results) throws Throwable {
 	JobResult myResult = scheduler.getJobResult(myJobId);
 	        	</programlisting>
 	        </para>
+	        <para>
+	          To get the result of a job using a command line, use the <emphasis role="bold">getResult.sh</emphasis> script
+	          in the script/[os]/scheduler directory. This can be used as follow :
+	          <itemizedlist>
+	          	<listitem>
+	          		./getResult username password schedulerURL
+	          		(ie : <emphasis>./getResult usr pwd //localhost/</emphasis>)
+	          	</listitem>
+	          </itemizedlist>
+	          It will print the result on the screen as the toString() java method could have done it.
+	          </para>
 	      </sect3>
 	      
 	      <sect3 id="add_listener">

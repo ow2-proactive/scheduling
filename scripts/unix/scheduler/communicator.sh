@@ -3,8 +3,6 @@
 echo
 echo --- Communicator ----------------------------------------------
 
-SCHEDULER_URL=$1
-
 workingDir=..
 PROACTIVE=$workingDir/../..
 CLASSPATH=.

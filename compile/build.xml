@@ -856,6 +856,7 @@
 				<include name="org/**/*.xsd" />
 				<include name="org/**/*.png" />
 				<include name="org/objectweb/proactive/core/component/adl/xml/proactive.dtd" />
+				<include name="org/**/jaas.config" />
 			</fileset>
 		</copy>
 	</target>

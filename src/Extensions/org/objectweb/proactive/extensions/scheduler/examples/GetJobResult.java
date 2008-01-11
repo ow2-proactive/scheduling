@@ -52,20 +52,25 @@ import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
  *
  */
 public class GetJobResult {
+    /**
+     * @param args
+     * [0] username
+     * [1] password
+     * [3] schedulerURL
+     */
     public static void main(String[] args) {
         try {
             //GET SCHEDULER
             UserSchedulerInterface scheduler;
             SchedulerAuthenticationInterface auth;
 
-            if (args.length > 0) {
-                auth = SchedulerConnection.join("//" + args[0] + "/" +
-                    SchedulerConnection.SCHEDULER_DEFAULT_NAME);
+            if (args.length > 2) {
+                auth = SchedulerConnection.join(args[2]);
             } else {
                 auth = SchedulerConnection.join(null);
             }
 
-            scheduler = auth.logAsUser("chri", "chri");
+            scheduler = auth.logAsUser(args[0], args[1]);
 
             InputStreamReader reader = new InputStreamReader(System.in);
 

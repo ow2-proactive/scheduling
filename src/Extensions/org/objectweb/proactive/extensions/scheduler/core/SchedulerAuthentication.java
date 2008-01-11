@@ -64,6 +64,11 @@ import org.objectweb.proactive.extensions.security.loginmodule.Login;
  */
 public class SchedulerAuthentication implements InitActive, SchedulerAuthenticationInterface {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 390L;
+
     /** Scheduler logger */
     private static Logger logger = ProActiveLogger.getLogger(Loggers.SCHEDULER);
 
@@ -104,7 +109,7 @@ public class SchedulerAuthentication implements InitActive, SchedulerAuthenticat
                     + "\tclasses/Extensions/org.objectweb.proactive.extensions.security.loginmodule/");
         }
 
-        System.setProperty("java.security.auth.login.config", jaasConfig.getFile());
+        System.setProperty("java.security.auth.login.config", jaasConfig.toString());
         this.loginFile = loginFile;
         this.groupFile = groupFile;
         this.scheduler = scheduler;

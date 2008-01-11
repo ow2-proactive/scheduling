@@ -80,17 +80,23 @@ public class AdminCommunicator {
         System.err.print(message);
     }
 
+    /**
+     * @param args
+     * [0] username
+     * [1] password
+     * [3] schedulerURL
+     */
     public static void main(String[] args) {
         try {
             SchedulerAuthenticationInterface auth;
 
-            if (args.length > 0) {
-                auth = SchedulerConnection.join(args[0]);
+            if (args.length > 2) {
+                auth = SchedulerConnection.join(args[2]);
             } else {
                 auth = SchedulerConnection.join(null);
             }
 
-            scheduler = auth.logAsAdmin("jl", "jl");
+            scheduler = auth.logAsAdmin(args[0], args[1]);
             stopCommunicator = false;
             startCommandListener();
         } catch (Exception e) {
