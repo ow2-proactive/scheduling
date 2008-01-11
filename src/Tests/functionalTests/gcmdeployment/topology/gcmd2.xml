@@ -1,36 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<pa:GCMDeployment xmlns:pa="http://www-sop.inria.fr/oasis/ProActive/schemas"
+<GCMDeployment 
+	xmlns="urn:gcm:deployment:1.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:paext="http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension"	
-	xsi:schemaLocation="http://www-sop.inria.fr/oasis/ProActive/schemas                                     /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/DeploymentDescriptorSchema.xsd
-	                    http://www-sop.inria.fr/oasis/ProActive/schemas/DeploymentDescriptorSchemaExtension /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
+	xsi:schemaLocation="urn:gcm:deployment:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ExtensionSchemas.xsd	">
 	
-	<pa:resources>
-		<pa:bridge refid="bridge1">
-			<pa:bridge refid="bridge2">
-				<pa:bridge refid="bridge3">
-					<pa:group refid="group3">
-						<pa:host refid="host3"/>
-					</pa:group>
-				</pa:bridge>
-				<pa:host refid="host2" />
-			</pa:bridge>
-		</pa:bridge>         
-	</pa:resources>
+	<resources>
+		<bridge refid="bridge1">
+			<bridge refid="bridge2">
+				<bridge refid="bridge3">
+					<group refid="group3">
+						<host refid="host3"/>
+					</group>
+				</bridge>
+				<host refid="host2" />
+			</bridge>
+		</bridge>         
+	</resources>
 
-	<pa:infrastructure>
+	<infrastructure>
 		
-		<pa:hosts>
-			<pa:host id="host2" os="unix" hostCapacity="1" vmCapacity="1">
-				<pa:homeDirectory base="root" relpath="/user/cmathieu/home"/>				
-			</pa:host>
+		<hosts>
+			<host id="host2" os="unix" hostCapacity="1" vmCapacity="1">
+				<homeDirectory base="root" relpath="/user/cmathieu/home"/>				
+			</host>
 		
-			<pa:host id="host3" os="unix" hostCapacity="1" vmCapacity="1">
-				<pa:homeDirectory base="root" relpath="/user/cmathieu/home"/>				
-			</pa:host>
-		</pa:hosts>
+			<host id="host3" os="unix" hostCapacity="1" vmCapacity="1">
+				<homeDirectory base="root" relpath="/user/cmathieu/home"/>				
+			</host>
+		</hosts>
 	
-		<pa:bridges>
+		<bridges>
 			<paext:sshBridge
 				id="bridge1"
 				hostname="localhost"
@@ -46,13 +45,13 @@
 				hostname="localhost"
 				commandOptions="-2" />
 				
-		</pa:bridges>
+		</bridges>
 		
-		<pa:groups>
+		<groups>
 			<paext:sshGroup
 				id="group3"
 				hostList="localhost localhost"/>
-		</pa:groups>
+		</groups>
 		
-	</pa:infrastructure>
-</pa:GCMDeployment>
+	</infrastructure>
+</GCMDeployment>
