@@ -2,9 +2,12 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	targetNamespace="urn:gcm:deployment:1.0"
 	xmlns="urn:gcm:deployment:1.0"	
+	xmlns:ns="urn:gcm:deployment:1.0"	
 	elementFormDefault="qualified">
 
-	<!-- <include schemaLocation="CommonTypes.xsd"></include>  -->
+	<!-- DO NOT REMOVE the 'ns' namespace : it's used by the xpath selectors in
+	the identity constraints - they don't work if specified without a namespace 
+	  -->
  	<xsd:include schemaLocation="CommonTypes.xsd"/>
  
 	<xsd:complexType name="abstractGroupElementType" abstract="true">
@@ -203,37 +206,37 @@
 		<!-- Groups refid/id key correctness -->
 		<!--  -->
 		<xsd:key name="idKeyGroups">
-			<xsd:selector xpath="infrastructure/groups/*" />
+			<xsd:selector xpath="ns:infrastructure/ns:groups/*" />
 			<xsd:field xpath="@id" />
 		</xsd:key>
 		<xsd:keyref name="refIdKeyGroups" refer="idKeyGroups">
-			<xsd:selector xpath="resources/group"></xsd:selector>
+			<xsd:selector xpath="ns:resources/ns:group"></xsd:selector>
 			<xsd:field xpath="@refid"></xsd:field>
 		</xsd:keyref>
 
 		<!-- Bridges refid/id key correctness -->
 		<!--  -->
 		<xsd:key name="idKeyBridges">
-			<xsd:selector xpath="infrastructure/bridges/*" />
+			<xsd:selector xpath="ns:infrastructure/ns:bridges/*" />
 			<xsd:field xpath="@id" />
 		</xsd:key>
 		<xsd:keyref name="refIdKeyBridge" refer="idKeyBridges">
-			<xsd:selector xpath="resources/bridge"></xsd:selector>
+			<xsd:selector xpath="ns:resources/ns:bridge"></xsd:selector>
 			<xsd:field xpath="@refid"></xsd:field>
 		</xsd:keyref>
 
 		<!-- Hosts refid/id key correctness -->
 		<!--  -->
 		<xsd:key name="idKeyHosts">
-			<xsd:selector xpath="infrastructure/hosts/*" />
+			<xsd:selector xpath="ns:infrastructure/ns:hosts/*" />
 			<xsd:field xpath="@id" />
 		</xsd:key>
 		<xsd:keyref name="refIdKeyHost" refer="idKeyHosts">
-			<xsd:selector xpath="resources/host"></xsd:selector>
+			<xsd:selector xpath="ns:resources/ns:host"></xsd:selector>
 			<xsd:field xpath="@refid"></xsd:field>
 		</xsd:keyref>
 		<xsd:keyref name="refIdKeyGroupHost" refer="idKeyHosts">
-			<xsd:selector xpath="resources/group/host"></xsd:selector>
+			<xsd:selector xpath="ns:resources/ns:group/ns:host"></xsd:selector>
 			<xsd:field xpath="@refid"></xsd:field>
 		</xsd:keyref>
 
