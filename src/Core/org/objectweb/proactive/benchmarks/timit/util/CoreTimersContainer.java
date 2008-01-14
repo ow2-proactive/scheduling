@@ -185,13 +185,12 @@ public class CoreTimersContainer implements TimerProvidable {
 
         // Analyse the reified object class in order to create a timer per public method        
         final Class<?> reifiedObjectClass = reifiedObject.getClass();
-        final String reifiedObjectClassCanonicalName = reifiedObjectClass.getCanonicalName();
         final Method[] methods = reifiedObjectClass.getMethods();
         for (final Method m : methods) {
             // Modifier.isPublic(mod) && !Modifier.isStatic(mod) && !Modifier.isFinal(mod)
             if ((m.getModifiers() == 1) && !"equals".equals(m.getName()) && !"hashCode".equals(m.getName()) &&
                 !"toString".equals(m.getName())) {
-                String timerName = reifiedObjectClassCanonicalName + "." + m.getName() + "(";
+                String timerName = m.getName() + "(";
                 Class<?>[] paramClasses = m.getParameterTypes();
                 int paramLength = paramClasses.length;
                 for (int i = 0; i < paramLength; i++) {
