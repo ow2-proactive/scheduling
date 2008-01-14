@@ -102,7 +102,7 @@
       <title><literal>throwArrivedException()</literal> and <literal>waitForPotentialException()</literal></title>
 
       <para>We have seen the 3 methods mandatory to perform asynchronous calls
-      with exceptions, but the complete API includes two more calls. So far,
+      with exceptions, however the complete API includes two more calls. So far
       the blocks boundaries define the barries. But, some control over the
       barrier is provided thanks to two additional methods.</para>
 
@@ -114,12 +114,13 @@
       being thrown back in the user code. In this case, the exception is
       thrown by this method.</para>
 
-      <para>The method behaviour is thus dependant on the timing. That is,
+      <para>The method behaviour is thus dependent on the timing. That is,
       calling this method may or may not result in an exception being thrown,
-      depending on the time for an exception to come back. That's why another
-      method is provided, this is <literal>PAException.waitForPotentialException()</literal>.
-      Unlike the previous one, this method is blocking. After calling this
-      method, either an exception is thrown, or it is assured that all
+      depending on the time for an exception to come back. That is why another
+      method is provided:  <literal>PAException.waitForPotentialException()</literal>.
+      Unlike the previous <literal>PAException.throwArrivedException()</literal>,
+       this method is blocking. After calling this
+      method, either an exception is thrown or it is assured that all
       previous calls in the block completed successfully, so no exception can
       be thrown from the previous calls.</para>
     </sect2>
