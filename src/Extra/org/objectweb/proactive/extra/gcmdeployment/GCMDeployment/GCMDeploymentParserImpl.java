@@ -141,7 +141,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             XPathExpressionException, TransformerException, ParserConfigurationException {
         this(descriptor, null);
     }
-    
+
     public GCMDeploymentParserImpl(File descriptor, List<String> userSchemas) throws RuntimeException,
             SAXException, IOException, TransformerException, XPathExpressionException,
             ParserConfigurationException {
@@ -168,9 +168,9 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             // are ignored, and validation fails
             //
             DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
-            
+
             document = documentBuilder.parse(processedInputSource);
-            
+
         } catch (SAXException e) {
             String msg = "parsing problem with document " + descriptor.getCanonicalPath();
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " + e.getMessage());
@@ -234,7 +234,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * @throws IOException
      */
     protected void setupJAXP() throws IOException {
-//        System.setProperty("jaxp.debug", "1");
+        //        System.setProperty("jaxp.debug", "1");
         System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
                 "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
 
