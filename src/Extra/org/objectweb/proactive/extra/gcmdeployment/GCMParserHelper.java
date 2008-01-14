@@ -203,7 +203,8 @@ public class GCMParserHelper implements GCMParserConstants {
             throws XPathExpressionException {
         ArrayList<String> environment = new ArrayList<String>();
 
-        NodeList argNodes = (NodeList) xpath.evaluate("dep:variable", environmentNode, XPathConstants.NODESET);
+        NodeList argNodes = (NodeList) xpath
+                .evaluate("dep:variable", environmentNode, XPathConstants.NODESET);
 
         for (int i = 0; i < argNodes.getLength(); ++i) {
             Node argNode = argNodes.item(i);
