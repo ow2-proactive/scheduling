@@ -8,10 +8,12 @@ import java.io.OutputStream;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.TransformerException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -19,16 +21,18 @@ import org.xml.sax.SAXException;
 
 public class Environment {
 
-    public static InputSource replaceVariables(File descriptor, DocumentBuilder documentBuilder, XPath xpath,
-            String namespace) throws IOException, SAXException, XPathExpressionException,
+    public static InputSource replaceVariables(File descriptor, DocumentBuilderFactory domFactory,
+            XPath xpath, String namespace) throws IOException, SAXException, XPathExpressionException,
             TransformerException {
         // Get the variable map
         EnvironmentParser environmentParser;
         Map<String, String> variableMap;
-        environmentParser = new EnvironmentParser(descriptor, documentBuilder, xpath, namespace);
+        environmentParser = new EnvironmentParser(descriptor, domFactory, xpath, namespace);
         variableMap = environmentParser.getVariableMap();
 
-        Document baseDocument = documentBuilder.parse(descriptor);
+        DocumentBuilder newDocumentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
+
+        Document baseDocument = newDocumentBuilder.parse(descriptor);
         EnvironmentTransformer environmentTransformer;
         environmentTransformer = new EnvironmentTransformer(variableMap, baseDocument);
 

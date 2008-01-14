@@ -113,9 +113,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
         setupJAXP();
 
         try {
+            InputSource processedInputSource = Environment.replaceVariables(descriptor, domFactory, xpath,
+                    GCM_APPLICATION_NAMESPACE_PREFIX);
             DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
-            InputSource processedInputSource = Environment.replaceVariables(descriptor, documentBuilder,
-                    xpath, GCM_APPLICATION_NAMESPACE_PREFIX);
             document = documentBuilder.parse(processedInputSource);
 
         } catch (SAXException e) {

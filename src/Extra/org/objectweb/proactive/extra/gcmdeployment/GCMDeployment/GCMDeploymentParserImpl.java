@@ -141,7 +141,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
             XPathExpressionException, TransformerException, ParserConfigurationException {
         this(descriptor, null);
     }
-
+    
     public GCMDeploymentParserImpl(File descriptor, List<String> userSchemas) throws RuntimeException,
             SAXException, IOException, TransformerException, XPathExpressionException,
             ParserConfigurationException {
@@ -160,11 +160,17 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
         registerDefaultBridgeParsers();
         registerUserBridgeParsers();
         try {
-            DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
-            InputSource processedInputSource = Environment.replaceVariables(descriptor, documentBuilder,
-                    xpath, GCM_DEPLOYMENT_NAMESPACE_PREFIX);
-            document = documentBuilder.parse(processedInputSource);
+            InputSource processedInputSource = Environment.replaceVariables(descriptor, domFactory, xpath,
+                    GCM_DEPLOYMENT_NAMESPACE_PREFIX);
 
+            // we need to create a new DocumentBuilder before each parsing,
+            // otherwise the schemas set in setupJAXP() through JAXP_SCHEMA_SOURCE
+            // are ignored, and validation fails
+            //
+            DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
+            
+            document = documentBuilder.parse(processedInputSource);
+            
         } catch (SAXException e) {
             String msg = "parsing problem with document " + descriptor.getCanonicalPath();
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(msg + " - " + e.getMessage());
@@ -228,7 +234,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
      * @throws IOException
      */
     protected void setupJAXP() throws IOException {
-        // System.setProperty("jaxp.debug", "1");
+//        System.setProperty("jaxp.debug", "1");
         System.setProperty("javax.xml.parsers.DocumentBuilderFactory",
                 "com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl");
 
@@ -242,7 +248,7 @@ public class GCMDeploymentParserImpl implements GCMDeploymentParser {
                 .getResource(EXTENSION_SCHEMAS_LOCATION);
 
         // DO NOT change the order here, it would break validation
-        schemas.add(extensionSchema.toString());
+        schemas.add(0, extensionSchema.toString());
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         XPathFactory factory = XPathFactory.newInstance();

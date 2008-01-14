@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -16,7 +17,6 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extra.gcmdeployment.GCMDeploymentLoggers;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserConstants;
 import org.objectweb.proactive.extra.gcmdeployment.GCMParserHelper;
-import org.objectweb.proactive.extra.gcmdeployment.core.GCMHost;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -32,18 +32,19 @@ class EnvironmentParser {
     protected VariableContract variableContract;
     protected String namespace;
 
-    protected EnvironmentParser(File descriptor, DocumentBuilder documentBuilder, XPath xpath,
+    protected EnvironmentParser(File descriptor, DocumentBuilderFactory domFactory, XPath xpath,
             String namespace) throws IOException, SAXException {
-        this(descriptor, documentBuilder, xpath, namespace, null);
+        this(descriptor, domFactory, xpath, namespace, null);
     }
 
-    protected EnvironmentParser(File descriptor, DocumentBuilder documentBuilder, XPath xpath,
+    protected EnvironmentParser(File descriptor, DocumentBuilderFactory domFactory, XPath xpath,
             String namespace, List<String> userSchemas) throws IOException, SAXException {
         this.xpath = xpath;
         this.namespace = namespace;
 
         InputSource inputSource = new InputSource(new FileInputStream(descriptor));
         try {
+            DocumentBuilder documentBuilder = GCMParserHelper.getNewDocumentBuilder(domFactory);
             document = documentBuilder.parse(inputSource);
         } catch (SAXException e) {
             GCMDeploymentLoggers.GCMD_LOGGER.fatal(e.getMessage());
