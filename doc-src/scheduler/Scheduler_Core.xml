@@ -929,7 +929,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	      <programlisting lang="java">AdminScheduler.createScheduler(
 	    			"path/to/authentication_files/",
 	                rm,
-	                "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");</programlisting>
+	                "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");</programlisting>
 	
 	      <para>Arguments are respectively: <orderedlist>
 	          <listitem>
@@ -978,7 +978,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	                "login",
 	                "password",
 	                rm,
-	                "org.objectweb.proactive.extra.scheduler.policy.PriorityPolicy");</programlisting>
+	                "org.objectweb.proactive.extensions.scheduler.policy.PriorityPolicy");</programlisting>
 	
 	      <para>Where arguments are the same plus a <emphasis>login</emphasis> and
 	      a <emphasis>password</emphasis> as a string. The user must be in the
@@ -1543,7 +1543,7 @@ public Object execute(TaskResult... results) throws Throwable {
 
       <para>Create and add a new scheduling policy remains a very simple work.
       You just have to implements the
-      <emphasis>org.objectweb.proactive.extra.scheduler.policy.PolicyInterface</emphasis>
+      <emphasis>org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface</emphasis>
       and start a new Scheduler with this new policy, or dynamically change it
       if the scheduler is already running.</para>
 
@@ -1571,7 +1571,7 @@ public Object execute(TaskResult... results) throws Throwable {
     /**
      * This method return the tasks using FIFO policy according to the jobs priorities.
      *
-     * @see org.objectweb.proactive.extra.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
+     * @see org.objectweb.proactive.extensions.scheduler.policy.PolicyInterface#getReadyTasks(java.util.List)
      */
     @Override
     public Vector&lt;EligibleTaskDescriptor&gt; getOrderedTasks(
@@ -2406,7 +2406,7 @@ public Object execute(TaskResult... results) throws Throwable {
                         java program that will connect to the Matlab
                         engine and launch the given script inside it.
                     </para>
-                    <programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
+                    <programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
     <parameters>
         <parameter name="input" value="in=[1 0 3 -2 5 1];"/>
         <parameter name="script" value="out=roots(in);"/>
@@ -2577,14 +2577,14 @@ public Object execute(TaskResult... results) throws Throwable {
                 <title>
                     New Tasks : MatlabSplitter and MatlabCollector
                 </title>
-                <programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.MatlabSplitter">
+                <programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.MatlabSplitter">
     <parameters>
         <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/splitter.m"/>
         <parameter name="input" value="in=round(rand(1,1000000)*100-50)"/>
         <parameter name="number_of_children" value="6"/>
     </parameters>
 </javaExecutable>]]></programlisting>
-                <programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.MatlabCollector">
+                <programlisting lang="xml"><![CDATA[<javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.MatlabCollector">
     <parameters>
         <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/collector.m"/>
     </parameters>
@@ -2653,7 +2653,7 @@ public Object execute(TaskResult... results) throws Throwable {
             <file url="http://proactive.inria.fr/userfiles/file/scripts/checkMatlab.js"/>
         </script>
     </selection>
-    <javaExecutable class="org.objectweb.proactive.extra.scheduler.ext.matlab.SimpleMatlab">
+    <javaExecutable class="org.objectweb.proactive.extensions.scheduler.ext.matlab.SimpleMatlab">
         <parameters>
             <parameter name="index" value="0"/>
             <parameter name="scriptFile" value="${MATLAB_SCRIPTS}/summer.m"/>
