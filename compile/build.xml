@@ -256,6 +256,7 @@
 				<include name="**/*.xml" />
 				<include name="**/*.txt" />
 				<include name="**/*.xsd" />
+				<include name="**/*.fractal" />
 			</fileset>
 		</copy>
 	</target>
