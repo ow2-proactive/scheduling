@@ -110,6 +110,22 @@ public class GCMParserHelper implements GCMParserConstants {
         }
     }
 
+    /**
+     * Although the descriptors do not use a namespace prefix, JAXP's xpath queries have to use one
+     * (this is a limitation of jaxp).
+     * 
+     * For instance, given the following document part :
+     * &lt;resource&gt;
+     *   &lt;host&gt;
+     *   ...
+     *   &lt;/host&gt;
+     * &lt;/resource&gt;
+     * 
+     * The query to fetch the 'host' node will be "dep:resource/dep:host".
+     *   
+     * @author glaurent
+     *
+     */
     static public class ProActiveNamespaceContext implements NamespaceContext {
         protected String namespace;
 
@@ -143,7 +159,7 @@ public class GCMParserHelper implements GCMParserConstants {
 
     static public List<PathElement> parseClasspath(XPath xpath, Node classPathNode)
             throws XPathExpressionException {
-        NodeList pathElementNodes = (NodeList) xpath.evaluate("pa:pathElement", classPathNode,
+        NodeList pathElementNodes = (NodeList) xpath.evaluate("dep:pathElement", classPathNode,
                 XPathConstants.NODESET);
 
         ArrayList<PathElement> res = new ArrayList<PathElement>();
@@ -173,7 +189,7 @@ public class GCMParserHelper implements GCMParserConstants {
             throws XPathExpressionException {
         ArrayList<String> args = new ArrayList<String>();
 
-        NodeList argNodes = (NodeList) xpath.evaluate("pa:arg", argumentListNode, XPathConstants.NODESET);
+        NodeList argNodes = (NodeList) xpath.evaluate("dep:arg", argumentListNode, XPathConstants.NODESET);
 
         for (int i = 0; i < argNodes.getLength(); ++i) {
             Node argNode = argNodes.item(i);
@@ -187,7 +203,7 @@ public class GCMParserHelper implements GCMParserConstants {
             throws XPathExpressionException {
         ArrayList<String> environment = new ArrayList<String>();
 
-        NodeList argNodes = (NodeList) xpath.evaluate("pa:variable", environmentNode, XPathConstants.NODESET);
+        NodeList argNodes = (NodeList) xpath.evaluate("dep:variable", environmentNode, XPathConstants.NODESET);
 
         for (int i = 0; i < argNodes.getLength(); ++i) {
             Node argNode = argNodes.item(i);
