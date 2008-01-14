@@ -6,12 +6,14 @@
 
 	<environment>
 		<javaPropertyVariable name="proactive.home"/>
+		<javaPropertyVariable name="java.home"/>
 	</environment>
 	
 	<application>
 		
 		<proactive relpath="${proactive.home}" base="root">
 			<configuration>
+				<java base="root" relpath="${java.home}/bin/java"/>
 				<jvmarg value="-Dproactive.test=true"/>
 			</configuration>
 			

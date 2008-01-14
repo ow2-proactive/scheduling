@@ -4,10 +4,16 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="urn:gcm:application:1.0 /user/cmathieu/home/TMP/junit/src/Extra/org/objectweb/proactive/extra/gcmdeployment/schema/ApplicationDescriptorSchema.xsd">
 	
+	<environment>
+		<javaPropertyVariable name="proactive.home"/>
+		<javaPropertyVariable name="java.home"/>
+	</environment>
+		
 	<application>
 		
-		<proactive relpath="ProActive" base="root">
+		<proactive relpath="proactive.home" base="root">
 			<configuration>
+				<java base="root" relpath="${java.home}/bin/java"/>
 				<jvmarg value="-Dproactive.test=true"/>
 			</configuration>
 			
