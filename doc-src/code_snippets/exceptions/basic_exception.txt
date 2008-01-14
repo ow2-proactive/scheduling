@@ -1,0 +1,7 @@
+try {
+   Result r = someAO.someMethodCall(); // Asynchronous method call that can throw an exception
+   // ...
+   doSomethingWith(r);
+}  catch (SomeException se) {
+   doSomethingWithMyException(se);
+}  

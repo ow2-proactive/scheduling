@@ -1,0 +1,11 @@
+PAException.tryWithCatch(SomeException.class);
+try {
+   Result r = someAO.someMethodCall(); // Asynchronous method call that can throw an exception
+   // ...
+   doSomethingWith(r);
+   PAException.endTryWithCatch();
+} catch (SomeException se) {
+   doSomethingWithMyException(se);
+} finally {
+   PAException.removeTryWithCatch();
+} 

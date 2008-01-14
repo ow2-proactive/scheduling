@@ -1,0 +1,19 @@
+$ ProActive/scripts/unix/trywithcatch.sh MyClass.java 
+--- ProActive TryWithCatch annotator -----------------------
+$ diff -u MyClass.java~ MyClass.java
+--- MyClass.java~
++++ MyClass.java
+@@ -1,9 +1,13 @@
+ public class MyClass {
+   public MyClass someMethod(AnotherClass a) {
++     PAException.tryWithCatch(AnException.class);
+         try {
+            return a.aMethod();
++           PAException.endTryWithCatch();
+         } catch (AnException ae) {
+            return null;
++        } finally {
++           PAException.removeTryWithCatch();
+         }
+   }
+ }
