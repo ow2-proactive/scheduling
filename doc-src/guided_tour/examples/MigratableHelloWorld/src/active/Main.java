@@ -99,6 +99,6 @@ public class Main{
 			System.err.println(ioExcep.getMessage());
 		}
 		//quitting
-		ProActive.exitSuccess();
+		ProActiveLifeCycle.exitSuccess();
 	}
 }
