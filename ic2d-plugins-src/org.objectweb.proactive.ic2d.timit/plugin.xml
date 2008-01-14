@@ -31,5 +31,15 @@
          point="org.objectweb.proactive.ic2d.JMXmonitoring.actions_extension">
       <action_class class="org.objectweb.proactive.ic2d.timit.actions.GetTimerSnapshotAction"/>
    </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.objectweb.proactive.ic2d.timit.editors.PieChartEditor"
+            extensions="xml"
+            icon="icons/sample.gif"
+            id="org.objectweb.proactive.ic2d.timit.editors.PieChartEditor"
+            name="Pie Editor">
+      </editor>
+   </extension>
    
 </plugin>

@@ -35,14 +35,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.gef.EditPart;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IPersistableElement;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
+import org.objectweb.proactive.ic2d.timit.editors.IPieChartEditorInput;
+import org.objectweb.proactive.ic2d.timit.util.Utils;
 import org.objectweb.proactive.ic2d.timit.views.TimerTreeView;
 
 
-public class TimerEditPart extends AbstractTimerTreeEditPart {
+public class TimerEditPart extends AbstractTimerTreeEditPart implements IPieChartEditorInput {
     public static final Color HEADER_COLOR = new Color(Display.getCurrent(), 225, 225, 255);
     protected TimerTreeView timerTreeView;
     private TreeItem widgetTreeItem;
@@ -96,12 +100,22 @@ public class TimerEditPart extends AbstractTimerTreeEditPart {
         TimerTreeNodeObject model = (TimerTreeNodeObject) getModel();
 
         // If root is selected
-        if ((model.getParent() == null) && (model.getCurrentTimer() == null)) {
+        if (model.getCurrentTimer() == null) {
+
             // Set the target for delete tree action
             if (this.getSelected() == TimerEditPart.SELECTED_PRIMARY) {
                 this.timerTreeView.getDeleteTreeAction().setTarget(model);
             } else if (this.getSelected() == TimerEditPart.SELECTED_NONE) {
                 this.timerTreeView.getDeleteTreeAction().setTarget(null);
+            }
+
+        } else { // A TreeItem was selected  
+            // Set the target for delete tree action
+            if (this.getSelected() == TimerEditPart.SELECTED_PRIMARY) {
+                if (model.getChildren().size() > 1)
+                    this.timerTreeView.getPieAction().setTarget(this);
+            } else if (this.getSelected() == TimerEditPart.SELECTED_NONE) {
+                this.timerTreeView.getPieAction().setTarget(null);
             }
         }
     }
@@ -120,7 +134,6 @@ public class TimerEditPart extends AbstractTimerTreeEditPart {
             for (final TimerTreeNodeObject child : getModelChildren()) {
                 child.firePropertyChange(TimerTreeNodeObject.P_CHILDREN, null, null);
             }
-
             // Incoming event to update the name of the current TimerObject
             // representation
         } else if (evt.getPropertyName().equals(TimerTreeNodeObject.P_LABEL)) {
@@ -181,4 +194,107 @@ public class TimerEditPart extends AbstractTimerTreeEditPart {
         // Refresh children list
         this.refreshChildren();
     }
+
+    /////////////////////////////////////////
+    // IPieChartEditorInput implementation // 
+    /////////////////////////////////////////
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.ic2d.timit.editors.IPieChartEditorInput#getCategoryNames()
+     */
+    public String[] getCategoryNames() {
+        TimerTreeNodeObject target = (TimerTreeNodeObject) getModel();
+        java.util.ArrayList<String> res = new java.util.ArrayList<String>(target.getChildren().size());
+        for (TimerTreeNodeObject t : target.getChildren()) {
+            if (Double.valueOf(t.getFormatedPercentageFromParent()) > 0) {
+                res.add(t.getLabelName());
+            }
+        }
+        return res.toArray(new String[res.size()]);
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.objectweb.proactive.ic2d.timit.editors.IPieChartEditorInput#getCategoryValues()
+     */
+    public Double[] getCategoryValues() {
+        TimerTreeNodeObject target = (TimerTreeNodeObject) getModel();
+        java.util.ArrayList<Double> res = new java.util.ArrayList<Double>(target.getChildren().size());
+        for (TimerTreeNodeObject t : target.getChildren()) {
+            if (Double.valueOf(t.getFormatedPercentageFromParent()) > 0) {
+                res.add(Double.valueOf(t.getFormatedPercentageFromParent()));
+            }
+        }
+        return res.toArray(new Double[res.size()]);
+    }
+
+    @Override
+    public String getSeriesLabelFormat() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IEditorInput#exists()
+     */
+    public boolean exists() {
+        return true;
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
+     */
+    public ImageDescriptor getImageDescriptor() {
+        return null;
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IEditorInput#getName()
+     */
+    public String getName() {
+        TimerTreeNodeObject totalTimer = ((TimerTreeNodeObject) getModel()).getTotalTimer();
+        return totalTimer.getSourceChartObject().getAoObject().getName() + " - " +
+            ((TimerTreeNodeObject) getModel()).getLabelName();
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IEditorInput#getToolTipText()
+     */
+    public String getToolTipText() {
+        TimerTreeNodeObject totalTimer = ((TimerTreeNodeObject) getModel()).getTotalTimer();
+        return totalTimer.getSourceChartObject().getAoObject().getName() + " - " +
+            ((TimerTreeNodeObject) getModel()).getLabelName() + ": " +
+            Utils.formatMillis(((TimerTreeNodeObject) getModel()).getCurrentTimer().getTotalTime() / 1000000); // The total time is in nanoseconds
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.ui.IEditorInput#getPersistable()
+     */
+    public IPersistableElement getPersistable() {
+        return null;
+    }
+
+    /**
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.core.runtime.IAdaptable#getAdapter(java.lang.Class)
+     */
+    @SuppressWarnings("unchecked")
+    public Object getAdapter(Class adapter) {
+        return null;
+    }
+
 }

@@ -38,6 +38,7 @@ import java.util.Locale;
 
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.ic2d.timit.data.AbstractObject;
+import org.objectweb.proactive.ic2d.timit.data.BasicChartObject;
 
 
 public class TimerTreeNodeObject extends AbstractObject {
@@ -51,6 +52,8 @@ public class TimerTreeNodeObject extends AbstractObject {
     protected double percentageFromTotal;
     protected double currentTotalTimeInMsInDouble;
     protected String labelName;
+    /** The source chart object available only for root timer */
+    protected BasicChartObject sourceChartObject;
     protected TimerTreeNodeObject parent;
     protected TimerTreeNodeObject totalTimer;
     protected BasicTimer currentTimer;
@@ -65,6 +68,7 @@ public class TimerTreeNodeObject extends AbstractObject {
         this.parent = parent;
         this.currentTimer = currentTimer;
         this.labelName = currentTimer.getName();
+
         if (parent != null) {
             parent.children.add(this);
         }
@@ -132,6 +136,10 @@ public class TimerTreeNodeObject extends AbstractObject {
         return currentTotalTimeInMsInDouble;
     }
 
+    public TimerTreeNodeObject getTotalTimer() {
+        return this.totalTimer;
+    }
+
     public final String getFormatedCurrentTotalTimeInDouble() {
         return String.format(Locale.US, "%1.2f", this.currentTotalTimeInMsInDouble);
     }
@@ -184,5 +192,13 @@ public class TimerTreeNodeObject extends AbstractObject {
 
     public double getCurrentTotalTimeInMsInDouble() {
         return currentTotalTimeInMsInDouble;
+    }
+
+    public void setSourceChartObject(BasicChartObject sourceChartObject) {
+        this.sourceChartObject = sourceChartObject;
+    }
+
+    public BasicChartObject getSourceChartObject() {
+        return sourceChartObject;
     }
 }

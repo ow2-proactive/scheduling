@@ -40,6 +40,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Display;
 import org.objectweb.proactive.ic2d.timit.data.timeline.TimeIntervalManager;
+import org.objectweb.proactive.ic2d.timit.util.Utils;
 
 
 public class TimeAxisFigure extends Figure {
@@ -98,7 +99,7 @@ public class TimeAxisFigure extends Figure {
         graphics.setFont(DEFAULT_TEXT_FONT);
 
         // Write first value
-        String sTime = TimeIntervalManager.convertTimeInMicrosToString(rawTimeCounter);
+        String sTime = Utils.convertTimeInMicrosToString(rawTimeCounter);
 
         graphics.setForegroundColor(ColorConstants.gray);
         int defaultNbDash = (r.height - DEFAULT_TIME_TEXT_HEIGHT_MARGIN) / DEFAULT_DASH_SIZE;
@@ -129,7 +130,7 @@ public class TimeAxisFigure extends Figure {
                     break;
                 }
 
-                sTime = TimeIntervalManager.convertTimeInMicrosToString(rawTimeCounter);
+                sTime = Utils.convertTimeInMicrosToString(rawTimeCounter);
 
                 graphics.setForegroundColor(ColorConstants.gray);
                 nbDash = defaultNbDash;

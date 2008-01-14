@@ -38,6 +38,7 @@ import java.util.List;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
+import org.objectweb.proactive.api.PAVersion;
 import org.objectweb.proactive.benchmarks.timit.result.BasicResultWriter;
 import org.objectweb.proactive.benchmarks.timit.util.basic.BasicTimer;
 import org.objectweb.proactive.benchmarks.timit.util.basic.ResultBag;
@@ -100,7 +101,9 @@ public class SaveToXmlAction extends Action {
                 timersList, c.getAoObject().getName() + " on " + c.getAoObject().getParent().getName()));
         }
 
-        final BasicResultWriter finalWriter = new BasicResultWriter(path);
+        // Declare and set the default namespace      
+        final BasicResultWriter finalWriter = new BasicResultWriter(path, "urn:proactive:timit",
+            "timitSchema.xsd");
 
         // Load date formatter
         final DateFormat df = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
@@ -110,7 +113,8 @@ public class SaveToXmlAction extends Action {
         now.setTime(System.currentTimeMillis());
 
         // Can possibly add the current JVM version
-        finalWriter.addGlobalInformationElement("This XML file was generated : " + df.format(now));
+        finalWriter.addGlobalInformationElement("This XML file was generated : " + df.format(now), PAVersion
+                .getProActiveVersion());
 
         // Add results to the output writer
         for (final ResultBag resultBag : results) {

@@ -46,6 +46,7 @@ import org.objectweb.proactive.ic2d.timit.actions.tree.CollapseAllAction;
 import org.objectweb.proactive.ic2d.timit.actions.tree.DeleteTreeAction;
 import org.objectweb.proactive.ic2d.timit.actions.tree.ExpandAllAction;
 import org.objectweb.proactive.ic2d.timit.actions.tree.SaveToXmlAction;
+import org.objectweb.proactive.ic2d.timit.actions.tree.SwitchToTimerPieViewAction;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeHolder;
 import org.objectweb.proactive.ic2d.timit.data.tree.TimerTreeNodeObject;
 import org.objectweb.proactive.ic2d.timit.editparts.tree.TreeEditPartFactory;
@@ -74,6 +75,7 @@ public class TimerTreeView extends ViewPart {
     protected ExpandAllAction expandAllAction;
     protected CollapseAllAction collapseAllAction;
     protected DeleteTreeAction deleteTreeAction;
+    protected SwitchToTimerPieViewAction pieAction;
     private EditDomain editDomain;
 
     public TimerTreeView() {
@@ -92,10 +94,55 @@ public class TimerTreeView extends ViewPart {
         this.treeViewer.setEditPartFactory(new TreeEditPartFactory(this));
         this.treeViewer.setContents(this.timerTreeHolder);
 
+        // --------------------
+        IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
+
+        // Adds "DeleteTreeAction" action to the view's toolbar
+        this.deleteTreeAction = new DeleteTreeAction();
+        toolBarManager.add(deleteTreeAction);
+
+        toolBarManager.add(new Separator());
+
+        // Adds "SaveToXmlAction" action to the view's toolbar
+        this.saveToXmlAction = new SaveToXmlAction(this.timerTreeHolder);
+        toolBarManager.add(saveToXmlAction);
+
+        // Adds "ExpandAllAction" action to the view's toolbar
+        this.expandAllAction = new ExpandAllAction(this.timerTreeHolder);
+        toolBarManager.add(expandAllAction);
+
+        // Adds "CollapseAllAction" action to the view's toolbar
+        this.collapseAllAction = new CollapseAllAction(this.timerTreeHolder);
+        toolBarManager.add(collapseAllAction);
+
+        // Adds "CollapseAllAction" action to the view's toolbar
+        this.pieAction = new SwitchToTimerPieViewAction();
+        toolBarManager.add(pieAction);
+
+        /////////////////        
+
         RootTreeEditPart t = (RootTreeEditPart) this.treeViewer.getRootEditPart();
 
         final Tree tree = (Tree) t.getWidget();
-
+        //        tree.addSelectionListener(new SelectionListener() {
+        //
+        //			@Override
+        //			public final void widgetDefaultSelected(SelectionEvent e) {						
+        //			}
+        //
+        //			@Override
+        //			public final void widgetSelected(SelectionEvent e) {
+        //				System.out.println(".widgetSelected() ---------> " + e.widget.getData() + " ---> " + e.widget.getData("model.ref"));
+        //				if ( e.widget.getData("model.ref") instanceof TimerTreeNodeObject ){
+        //					TimerTreeNodeObject model = (TimerTreeNodeObject)e.widget.getData("model.ref");
+        //					
+        //					if ( model.getChildren().size() > 1 ){
+        //						TimerTreeView.this.pieAction.setTarget(model);
+        //					}
+        //				}				
+        //			}
+        //        	
+        //        });
         tree.setHeaderVisible(true);
         tree.setLinesVisible(true);
 
@@ -152,26 +199,6 @@ public class TimerTreeView extends ViewPart {
         invocationsColumn.addListener(SWT.Selection, sortListener);
         parentPercentColumn.addListener(SWT.Selection, sortListener);
 
-        // --------------------
-        IToolBarManager toolBarManager = getViewSite().getActionBars().getToolBarManager();
-
-        // Adds "DeleteTreeAction" action to the view's toolbar
-        this.deleteTreeAction = new DeleteTreeAction();
-        toolBarManager.add(deleteTreeAction);
-
-        toolBarManager.add(new Separator());
-
-        // Adds "SaveToXmlAction" action to the view's toolbar
-        this.saveToXmlAction = new SaveToXmlAction(this.timerTreeHolder);
-        toolBarManager.add(saveToXmlAction);
-
-        // Adds "ExpandAllAction" action to the view's toolbar
-        this.expandAllAction = new ExpandAllAction(this.timerTreeHolder);
-        toolBarManager.add(expandAllAction);
-
-        // Adds "CollapseAllAction" action to the view's toolbar
-        this.collapseAllAction = new CollapseAllAction(this.timerTreeHolder);
-        toolBarManager.add(collapseAllAction);
     }
 
     @Override
@@ -184,5 +211,9 @@ public class TimerTreeView extends ViewPart {
 
     public TreeViewer getTreeViewer() {
         return treeViewer;
+    }
+
+    public SwitchToTimerPieViewAction getPieAction() {
+        return pieAction;
     }
 }

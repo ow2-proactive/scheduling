@@ -232,6 +232,7 @@ public class BasicChartObject {
                     if (this.rootTimer == null) {
                         this.rootTimer = new TimerTreeNodeObject(basicTimer, null);
                         this.rootTimer.setTotalTimerAndCompute(this.rootTimer);
+                        this.rootTimer.setSourceChartObject(this);
                         this.timersMap.put(basicTimer.getId(), this.rootTimer);
                         this.timersList.add(this.rootTimer);
                     }

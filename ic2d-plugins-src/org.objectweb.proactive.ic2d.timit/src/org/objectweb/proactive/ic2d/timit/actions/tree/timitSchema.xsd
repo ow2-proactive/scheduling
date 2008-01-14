@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:proactive:timit"
+            elementFormDefault="qualified" xmlns:tns="urn:proactive:timit">
+    <xsd:element name="timit">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="tns:globalInformation"/>
+                <xsd:element ref="tns:ao" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="globalInformation">
+        <xsd:complexType>
+            <xsd:attribute name="info" type="xsd:string"/>
+            <xsd:attribute name="proActiveVersion" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="ao">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="tns:timers"/>
+            </xsd:sequence>
+            <xsd:attribute name="className" type="xsd:string"/>
+            <xsd:attribute name="uniqueID" type="xsd:string"/>
+            <xsd:attribute name="otherInformation" type="xsd:string"/>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="timers">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="tns:timer" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:element name="timer">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="tns:timer" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:attribute name="name" type="xsd:string"/>
+            <xsd:attribute name="totalTimeInMillis" type="xsd:double"/>
+            <xsd:attribute name="avgTimeInMillis" type="xsd:double"/>
+            <xsd:attribute name="invocations" type="xsd:positiveInteger"/>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

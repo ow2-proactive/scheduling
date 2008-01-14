@@ -30,17 +30,14 @@
  */
 package org.objectweb.proactive.ic2d.timit.data.timeline;
 
-import java.text.Format;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-
+/**
+ * An instance of this class represents a time interval expressed in millesconds
+ * 
+ * @author vbodnart
+ *
+ */
 public class TimeIntervalManager {
     public static final int MINIMAL_TIMESTAMP_VALUE_IN_MICROSECONDS = 50000;
-    private static final Format MILLISECONDS_FORMATTER = new SimpleDateFormat("SSS");
-    private static final Format SECONDS_FORMATTER = new SimpleDateFormat("ss.SSS");
-    private static final Format MINUTES_FORMATTER = new SimpleDateFormat("mm.ss.SSS");
-    private static final Format HOURS_FORMATTER = new SimpleDateFormat("HH.mm.ss.SSS");
 
     /**
      * The time interval represented in microseconds.
@@ -114,38 +111,6 @@ public class TimeIntervalManager {
 
     public void setTimeStep(long timeStep) {
         this.timeStep = timeStep;
-    }
-
-    /**
-     * A static method to convert time in microseconds into its human-readable String representation.
-     * @param timeInMicros The time in microseconds to convert
-     * @return A String representation
-     */
-    public static final String convertTimeInMicrosToString(final long timeInMicros) {
-        String result = "";
-        if ((timeInMicros / 1000) < 1) {
-            result = timeInMicros + "\u00b5s";
-        } else {
-            long timeInMillis = timeInMicros / 1000;
-            long micros = timeInMicros % 1000;
-            Date date = new Date(timeInMillis);
-            if ((timeInMillis / 1000) < 1) {
-                result = MILLISECONDS_FORMATTER.format(date) + "." + micros + "ms"; // use milliseconds
-            } else {
-                double timeInSeconds = timeInMillis / 1000; // Check if minutes is not ok
-                if ((timeInSeconds / 60) < 1) {
-                    result = SECONDS_FORMATTER.format(date) + "." + micros + "s"; // use seconds
-                } else {
-                    double timeInMinutes = timeInSeconds / 60; // Check if hours is not ok
-                    if ((timeInMinutes / 60) < 1) {
-                        result = MINUTES_FORMATTER.format(date) + "." + micros + "m"; // use minutes                      
-                    } else {
-                        result = HOURS_FORMATTER.format(date) + "." + micros + "h"; // use hours
-                    }
-                }
-            }
-        }
-        return result;
     }
 
     public boolean isInited() {
