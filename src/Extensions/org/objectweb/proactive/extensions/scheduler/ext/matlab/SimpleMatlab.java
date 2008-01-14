@@ -82,13 +82,13 @@ public class SimpleMatlab extends JavaExecutable {
     protected String inputScript = null;
 
     // the name of the Matlab command on this machine
-    protected String matlabCommandName = null;
+    protected static String matlabCommandName = null;
 
     // The lines of the Matlab script
-    protected List<String> scriptLines = null;
+    protected ArrayList<String> scriptLines = null;
 
     // The URI to which the spawned JVM(Node) is registered
-    protected String uri = null;
+    protected static String uri = null;
     private LoggingThread esLogger = null;
 
     // Threads which collect the JVM's stdout and stderr  
@@ -98,20 +98,20 @@ public class SimpleMatlab extends JavaExecutable {
     private DummyJVMProcess javaCommandBuilder;
 
     // the Home Dir of Matlab on this machine
-    private String matlabHome = null;
+    private static String matlabHome = null;
 
     // the name of the arch dir to find native libraries (can be win32, glnx86, ...)
-    private String matlabLibDirName = null;
+    private static String matlabLibDirName = null;
 
     // the Active Object worker located in the spawned JVM
-    private AOSimpleMatlab matlabWorker;
+    private static AOSimpleMatlab matlabWorker;
 
     // the OS where this JVM is running
-    private OperatingSystem os = OperatingSystem.getOperatingSystem();
+    private static OperatingSystem os = OperatingSystem.getOperatingSystem();
 
     // The process holding the spanwned JVM
-    private Process process = null;
-    private String matlabVersion;
+    private static Process process = null;
+    private static String matlabVersion;
 
     // ProActive No Arg Constructor    
     public SimpleMatlab() {
@@ -124,17 +124,25 @@ public class SimpleMatlab extends JavaExecutable {
                 throw res.getException();
             }
         }
+        if (process == null) {
+            // First we try to find MATLAB
+            findMatlab();
 
-        // First we try to find MATLAB
-        findMatlab();
+            // We create a custom URI as the node name
+            uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
+                    Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
+                    .toString();
+            System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
+            // We spawn a new JVM with the MATLAB library paths
 
-        // We create a custom URI as the node name
-        uri = URIBuilder.buildURI("localhost", "Matlab" + (new Date()).getTime(),
-                Constants.RMI_PROTOCOL_IDENTIFIER, Integer.parseInt(PAProperties.PA_RMI_PORT.getValue()))
-                .toString();
-        System.out.println("[" + host + " MATLAB TASK] Starting the Java Process");
-        // We spawn a new JVM with the MATLAB library paths
-        process = startProcess(uri);
+            process = startProcess(uri);
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                public void run() {
+                    process.destroy();
+                }
+            }));
+
+        }
         // We define the loggers which will write on standard output what comes from the java process
         isLogger = new LoggingThread(process.getInputStream(), "[" + host + " MATLAB TASK: SUBPROCESS OUT]");
         esLogger = new LoggingThread(process.getErrorStream(), "[" + host + " MATLAB TASK: SUBPROCESS ERR]");
@@ -161,8 +169,8 @@ public class SimpleMatlab extends JavaExecutable {
         }
 
         // Then we destroy the process and return the results
-        process.destroy();
-        process = null;
+        //process.destroy();
+        //process = null;
 
         return res;
     }
@@ -262,16 +270,24 @@ public class SimpleMatlab extends JavaExecutable {
      */
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
         System.out.println("[" + host + " MATLAB TASK] Deploying Worker (SimpleMatlab)");
-        matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabCommandName, inputScript,
-                scriptLines);
+        if (matlabWorker == null) {
+            matlabWorker = deploy(uri, AOSimpleMatlab.class.getName(), matlabCommandName);
+
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                public void run() {
+                    matlabWorker.terminate();
+                }
+            }));
+        }
         System.out.println("[" + host + " MATLAB TASK] Executing (SimpleMatlab)");
+        matlabWorker.init(inputScript, scriptLines);
 
         // We execute the task on the worker
         Object res = matlabWorker.execute(index, results);
         // We wait for the result
         res = PAFuture.getFutureValue(res);
         // We make a synchronous call to terminate
-        matlabWorker.terminate();
+        //matlabWorker.terminate();
 
         return res;
     }
@@ -446,7 +462,7 @@ public class SimpleMatlab extends JavaExecutable {
                 " is not supported yet");
         }
 
-        List<String> lines = getContentAsList(p1.getInputStream());
+        ArrayList<String> lines = getContentAsList(p1.getInputStream());
 
         for (String ln : lines) {
             System.out.println(ln);
@@ -484,7 +500,7 @@ public class SimpleMatlab extends JavaExecutable {
      * @param is input stream to read
      * @return content as list of strings
      */
-    private List<String> getContentAsList(InputStream is) {
+    private ArrayList<String> getContentAsList(InputStream is) {
         ArrayList<String> lines = new ArrayList<String>();
         BufferedReader d = new BufferedReader(new InputStreamReader(new BufferedInputStream(is)));
 

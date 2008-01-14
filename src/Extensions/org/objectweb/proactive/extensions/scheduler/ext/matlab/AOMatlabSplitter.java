@@ -59,13 +59,19 @@ public class AOMatlabSplitter extends AOSimpleMatlab {
      * @param scriptLines a list of lines which represent the main script
      * @param numberOfChildren the number of children to which the input will be divided
      */
-    public AOMatlabSplitter(String matlabCommandName, String inputScript, ArrayList<String> scriptLines,
-            Integer numberOfChildren) {
-        super(matlabCommandName, inputScript, scriptLines);
+    public AOMatlabSplitter(String matlabCommandName) {
+        super(matlabCommandName);
+
+    }
+
+    public void init(String inputScript, ArrayList<String> scriptLines, Integer numberOfChildren) {
+        super.init(inputScript, scriptLines);
         this.numberOfChildren = numberOfChildren;
     }
 
     public Object execute(TaskResult... results) throws Throwable {
+        MatlabEngine.Connection conn = MatlabEngine.acquire();
+        conn.clear();
         if (results.length > 1) {
             throw new InvalidNumberOfParametersException(results.length);
         }
@@ -82,18 +88,20 @@ public class AOMatlabSplitter extends AOSimpleMatlab {
             }
 
             Token in = (Token) res.value();
-            MatlabEngine.put("in", in);
+            conn.put("in", in);
         }
 
-        MatlabEngine.put("nout", new IntToken(numberOfChildren));
-        executeScript();
+        conn.put("nout", new IntToken(numberOfChildren));
+        executeScript(conn);
 
-        Token result = MatlabEngine.get("out");
+        Token result = conn.get("out");
 
         if (!(result instanceof ArrayToken)) {
             throw new IllegalReturnTypeException(result.getClass());
         }
 
-        return new SplittedResult((ArrayToken) result);
+        SplittedResult splitted = new SplittedResult((ArrayToken) result);
+        conn.release();
+        return splitted;
     }
 }

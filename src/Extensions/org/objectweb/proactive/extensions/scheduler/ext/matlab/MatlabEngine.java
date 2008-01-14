@@ -38,12 +38,23 @@ import ptolemy.kernel.util.IllegalActionException;
 import ptolemy.matlab.Engine;
 
 
+/**
+ * This class is a wrapper for the access to the Matlab Engine
+ * @author fviale
+ *
+ */
 public class MatlabEngine {
     static Engine eng = null;
     static long[] engineHandle;
     static String commandName;
+    static boolean locked = false;
+    static long locker = 0L;
 
-    static void init() throws IllegalActionException {
+    // In order to prevent that different threads access the matlab engine at the same time,
+    // we use
+    static Connection instance = new MatlabEngine.Connection();
+
+    static synchronized void init() throws IllegalActionException {
         if (eng == null) {
             try {
                 eng = new Engine();
@@ -83,24 +94,134 @@ public class MatlabEngine {
         return commandName;
     }
 
-    public static void evalString(String command) throws IllegalActionException {
+    private MatlabEngine() {
+
+    }
+
+    private static void waitLock() {
+        while (locked == true) {
+            Thread.yield();
+        }
+    }
+
+    /**
+     * Acquire a connection to the matlab engine
+     * @return an engine connection
+     */
+    public synchronized static Connection acquire() {
+        waitLock();
+        locked = true;
+        return instance;
+    }
+
+    /**
+     * Release the connection to the matlab engine
+     */
+    private synchronized static void release() {
+        locked = false;
+    }
+
+    /**
+     * Clears the engine's workspace
+     * @throws IllegalActionException
+     */
+    private synchronized static void clear() throws IllegalActionException {
+        init();
+        eng.evalString(engineHandle, "clear");
+    }
+
+    /**
+     * Evaluate the given string in the workspace
+     * @param command
+     * @throws IllegalActionException
+     */
+    private synchronized static void evalString(String command) throws IllegalActionException {
         init();
         eng.evalString(engineHandle, command);
     }
 
-    public static Token get(String variableName) throws IllegalActionException {
+    /**
+     * Extract a variable from the workspace
+     * @param variableName name of the variable
+     * @return value of the variable
+     * @throws IllegalActionException
+     */
+    private synchronized static Token get(String variableName) throws IllegalActionException {
         init();
-
         return eng.get(engineHandle, variableName);
     }
 
-    public static void put(String variableName, Token token) throws IllegalActionException {
+    /**
+     * Push a variable in to the workspace
+     * @param variableName name of the variable
+     * @param token value
+     * @throws IllegalActionException
+     */
+    private synchronized static void put(String variableName, Token token) throws IllegalActionException {
         init();
         eng.put(engineHandle, variableName, token);
     }
 
+    /**
+     * Close the engine
+     */
     public static void close() {
         eng.close(engineHandle);
         eng = null;
+    }
+
+    /**
+     * Public access to the engine, locking the engine is necessary to have a public access
+     * @author fviale
+     *
+     */
+    public static class Connection {
+        private Connection() {
+
+        }
+
+        /**
+         * Evaluate the given string in the workspace
+         * @param command
+         * @throws IllegalActionException
+         */
+        public void evalString(String command) throws IllegalActionException {
+            MatlabEngine.evalString(command);
+        }
+
+        /**
+         * Extract a variable from the workspace
+         * @param variableName name of the variable
+         * @return value of the variable
+         * @throws IllegalActionException
+         */
+        public Token get(String variableName) throws IllegalActionException {
+            return MatlabEngine.get(variableName);
+        }
+
+        /**
+         * Push a variable in to the workspace
+         * @param variableName name of the variable
+         * @param token value
+         * @throws IllegalActionException
+         */
+        public void put(String variableName, Token token) throws IllegalActionException {
+            MatlabEngine.put(variableName, token);
+        }
+
+        /**
+         * Clears the engine's workspace
+         * @throws IllegalActionException
+         */
+        public void clear() throws IllegalActionException {
+            MatlabEngine.clear();
+        }
+
+        /**
+         * Release the engine connection
+         */
+        public void release() {
+            MatlabEngine.release();
+        }
     }
 }

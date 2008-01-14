@@ -63,9 +63,17 @@ public class MatlabSplitter extends SimpleMatlab {
     @Override
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
         System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabSplitter)");
-        splitterWorker = (AOMatlabSplitter) deploy(uri, AOMatlabSplitter.class.getName(), matlabCommandName,
-                inputScript, scriptLines, numberOfChildren);
+        if (splitterWorker == null) {
+            splitterWorker = (AOMatlabSplitter) deploy(uri, AOMatlabSplitter.class.getName(),
+                    matlabCommandName);
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                public void run() {
+                    splitterWorker.terminate();
+                }
+            }));
+        }
         System.out.println("[" + host + " MATLAB TASK] Executing (MatlabSplitter)");
+        splitterWorker.init(inputScript, scriptLines, numberOfChildren);
 
         Object res = splitterWorker.execute(results);
         res = PAFuture.getFutureValue(res);

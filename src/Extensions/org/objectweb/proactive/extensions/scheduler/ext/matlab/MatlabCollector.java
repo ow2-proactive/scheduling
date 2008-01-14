@@ -46,8 +46,17 @@ public class MatlabCollector extends SimpleMatlab {
     @Override
     protected Object executeInternal(String uri, TaskResult... results) throws Throwable {
         System.out.println("[" + host + " MATLAB TASK] Deploying Worker (MatlabCollector)");
-        collectorWorker = (AOMatlabCollector) deploy(uri, AOMatlabCollector.class.getName(),
-                matlabCommandName, inputScript, scriptLines);
+        if (collectorWorker == null) {
+            collectorWorker = (AOMatlabCollector) deploy(uri, AOMatlabCollector.class.getName(),
+                    matlabCommandName);
+            Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+                public void run() {
+                    collectorWorker.terminate();
+                }
+            }));
+        }
+
+        collectorWorker.init(inputScript, scriptLines);
         System.out.println("[" + host + " MATLAB TASK] Executing (Collector)");
 
         Object res = collectorWorker.execute(results);

@@ -32,6 +32,7 @@ package org.objectweb.proactive.extensions.scheduler.ext.matlab;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.objectweb.proactive.extensions.scheduler.common.task.TaskResult;
 import org.objectweb.proactive.extensions.scheduler.ext.matlab.exception.InvalidNumberOfParametersException;
@@ -58,18 +59,18 @@ public class AOSimpleMatlab implements Serializable {
      * @param inputScript  a pre-matlab script that will be launched before the main one (e.g. to set input params)
      * @param scriptLines a list of lines which represent the main script
      */
-    public AOSimpleMatlab(String matlabCommandName, String inputScript, ArrayList<String> scriptLines) {
-        this.inputScript = inputScript;
-        this.scriptLines = scriptLines;
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            public void run() {
-                MatlabEngine.close();
-            }
-        }));
+    public AOSimpleMatlab(String matlabCommandName) {
         MatlabEngine.setCommandName(matlabCommandName);
     }
 
+    public void init(String inputScript, ArrayList<String> scriptLines) {
+        this.inputScript = inputScript;
+        this.scriptLines = scriptLines;
+    }
+
     public Object execute(int index, TaskResult... results) throws Throwable {
+        MatlabEngine.Connection conn = MatlabEngine.acquire();
+        conn.clear();
         if (results.length > 1) {
             throw new InvalidNumberOfParametersException(results.length);
         }
@@ -84,20 +85,22 @@ public class AOSimpleMatlab implements Serializable {
 
                 SplittedResult sr = (SplittedResult) res.value();
                 Token tok = sr.getResult(index);
-                MatlabEngine.put("in", tok);
+                conn.put("in", tok);
             } else {
                 if (!(res.value() instanceof Token)) {
                     throw new InvalidParameterException(res.value().getClass());
                 }
 
                 Token in = (Token) res.value();
-                MatlabEngine.put("in", in);
+                conn.put("in", in);
             }
         }
 
-        executeScript();
+        executeScript(conn);
 
-        return MatlabEngine.get("out");
+        Token out = conn.get("out");
+        conn.release();
+        return out;
     }
 
     /**
@@ -114,15 +117,15 @@ public class AOSimpleMatlab implements Serializable {
      * Executes both input and main scripts on the engine
      * @throws Throwable
      */
-    protected final void executeScript() throws Throwable {
+    protected final void executeScript(MatlabEngine.Connection conn) throws Throwable {
         if (inputScript != null) {
             System.out.println("Feeding input");
-            MatlabEngine.evalString(inputScript);
+            conn.evalString(inputScript);
         }
 
         String execScript = prepareScript();
         System.out.println("Executing Script");
-        MatlabEngine.evalString(execScript);
+        conn.evalString(execScript);
     }
 
     /**

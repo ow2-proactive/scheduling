@@ -54,11 +54,13 @@ public class AOMatlabCollector extends AOSimpleMatlab {
      * @param inputScript  a pre-matlab script that will be launched before the main one (e.g. to set input params)
      * @param scriptLines a list of lines which represent the main script
      */
-    public AOMatlabCollector(String matlabCommandName, String inputScript, ArrayList<String> scriptLines) {
-        super(matlabCommandName, inputScript, scriptLines);
+    public AOMatlabCollector(String matlabCommandName) {
+        super(matlabCommandName);
     }
 
     public Object execute(TaskResult... results) throws Throwable {
+        MatlabEngine.Connection conn = MatlabEngine.acquire();
+        conn.clear();
         if (results.length <= 0) {
             throw new InvalidNumberOfParametersException(results.length);
         }
@@ -88,9 +90,11 @@ public class AOMatlabCollector extends AOSimpleMatlab {
         }
 
         ArrayToken collectArray = new ArrayToken(tokens);
-        MatlabEngine.put("in", collectArray);
-        executeScript();
+        conn.put("in", collectArray);
+        executeScript(conn);
 
-        return MatlabEngine.get("out");
+        Token out = conn.get("out");
+        conn.release();
+        return out;
     }
 }
