@@ -53,17 +53,17 @@ public class TestGCMApplicationDescriptorAPI extends Abstract {
         gcma = API.getGCMApplicationDescriptor(getDescriptor(this));
 
         Assert.assertFalse(gcma.isStarted());
-        Assert.assertTrue(gcma.getCurrentNodes().size() == 0);
-        Assert.assertTrue(gcma.getCurrentUnusedNodes().size() == 0);
-        Assert.assertTrue(gcma.getVirtualNodes().size() == 2);
+        Assert.assertEquals(0, gcma.getCurrentNodes().size());
+        Assert.assertEquals(0, gcma.getCurrentUnusedNodes().size());
+        Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
         gcma.startDeployment();
         waitAllocation();
 
         Assert.assertTrue(gcma.isStarted());
-        Assert.assertTrue(gcma.getCurrentNodes().size() == 11);
-        Assert.assertTrue(gcma.getCurrentUnusedNodes().size() == 1);
-        Assert.assertTrue(gcma.getVirtualNodes().size() == 2);
+        Assert.assertEquals(11, gcma.getCurrentNodes().size());
+        Assert.assertEquals(1, gcma.getCurrentUnusedNodes().size());
+        Assert.assertEquals(2, gcma.getVirtualNodes().size());
 
         VirtualNode vn1 = gcma.getVirtualNode("vn1");
         Assert.assertNotNull(vn1);
