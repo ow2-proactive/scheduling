@@ -506,17 +506,29 @@ public Object execute(TaskResult... results) throws Throwable {
 	    		are :
 	    		<orderedlist>
 	    			<listitem>
+			            <para>
+			            	The username of the one who wants to connect to 
+			            	the scheduler in order to submit the job. (must be in login.cfg file)
+			            </para>
+			          </listitem>
+			          <listitem>
+			            <para>
+			            	The password corresponding to the username. (must be in login.cfg file as well) 
+			            </para>
+			          </listitem>
+	    			<listitem>
+	    				<emphasis>The URL of the scheduler</emphasis> : it is the URL of a started ProActive scheduler.
+	    			</listitem>
+	    			<listitem>
 	    				<emphasis>The job descriptor</emphasis> : it is the XML file describing your job.
 	    			</listitem>
 	    			<listitem>
 	    				<emphasis>The number of this job to submit</emphasis> : it is the number of time you want to submit this job.
 	    			</listitem>
-	    			<listitem>
-	    				<emphasis>The URL of the scheduler</emphasis> : it is the URL of a started ProActive scheduler.
-	    			</listitem>
+	    			
 	    		</orderedlist>
 	    		<para>
-	    			For example : <emphasis>./jobLauncher.sh ../../../descriptors/scheduler/jobs/Job_with_dep.xml 1 //localhost/</emphasis> will
+	    			For example : <emphasis>./jobLauncher.sh username password ../../../descriptors/scheduler/jobs/Job_with_dep.xml 1 //localhost/</emphasis> will
 	    			submit one time the Job_with_dep job to a local scheduler.
 	    		</para>
 	    		<para>
