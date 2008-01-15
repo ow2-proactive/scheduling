@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="org.objectweb.proactive.resourcemanager.Application">
+         </run>
+      </application>
+   </extension>
+   <extension
+         id="resourcemanager"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.objectweb.proactive.resourcemanager.application"
+            name="ProActive Resource Manager">
+         <property
+               name="windowImages"
+               value="icons/alt_window_16.gif,icons/alt_window_32.gif"/>
+         <property
+               name="startupForegroundColor"
+               value="EB791F"/>
+         <property
+               name="startupMessageRect"
+               value="10,30,435,20"/>
+         <property
+               name="startupProgressRect"
+               value="10,10,435,15"/>
+      </product>
+   </extension>
+
+</plugin>
