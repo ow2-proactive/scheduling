@@ -502,7 +502,7 @@ public Object execute(TaskResult... results) throws Throwable {
 	    		describe in the section <xref linkend="define_executable" /> in order to run your own task.
 	    		Next step if you don't want to use the scheduler java API is to write the descriptor of your
 	    		job. This last could be launch using the <emphasis>jobLauncher.sh</emphasis> script.
-	    		This script must be launched with the first parameter and optionally the others. The parameters
+	    		This script must be launched with the first three parameters and optionally the others. The parameters
 	    		are :
 	    		<orderedlist>
 	    			<listitem>
@@ -517,15 +517,14 @@ public Object execute(TaskResult... results) throws Throwable {
 			            </para>
 			          </listitem>
 	    			<listitem>
-	    				<emphasis>The URL of the scheduler</emphasis> : it is the URL of a started ProActive scheduler.
-	    			</listitem>
-	    			<listitem>
 	    				<emphasis>The job descriptor</emphasis> : it is the XML file describing your job.
 	    			</listitem>
 	    			<listitem>
 	    				<emphasis>The number of this job to submit</emphasis> : it is the number of time you want to submit this job.
 	    			</listitem>
-	    			
+	    			<listitem>
+	    				<emphasis>The URL of the scheduler</emphasis> : it is the URL of a started ProActive scheduler.
+	    			</listitem>
 	    		</orderedlist>
 	    		<para>
 	    			For example : <emphasis>./jobLauncher.sh username password ../../../descriptors/scheduler/jobs/Job_with_dep.xml 1 //localhost/</emphasis> will
