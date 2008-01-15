@@ -104,11 +104,7 @@ public abstract class AbstractGroupParser implements GroupParser {
      * (no namespace)
      * @return the nodeName as a String
      */
-    protected abstract String getBaseNodeName();
+    public abstract String getNodeName();
 
     public abstract AbstractGroup createGroup();
-
-    public String getNodeName() {
-        return getBaseNodeName();
-    }
 }

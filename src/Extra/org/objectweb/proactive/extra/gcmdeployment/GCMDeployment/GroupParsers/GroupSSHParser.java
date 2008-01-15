@@ -65,7 +65,7 @@ public class GroupSSHParser extends AbstractGroupParser {
     }
 
     @Override
-    public String getBaseNodeName() {
+    public String getNodeName() {
         return NODE_NAME;
     }
 }

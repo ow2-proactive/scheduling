@@ -59,7 +59,7 @@ public class BridgeOARSHParser extends BridgeSSHParser {
     }
 
     @Override
-    public String getBaseNodeName() {
+    public String getNodeName() {
         return NODE_NAME;
     }
 }

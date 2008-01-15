@@ -108,8 +108,8 @@ public class TestDeploymentDescriptorParser {
         }
 
         @Override
-        public String getBaseNodeName() {
-            return "myGroup";
+        public String getNodeName() {
+            return "pauext:myGroup";
         }
 
         @Override
@@ -130,13 +130,8 @@ public class TestDeploymentDescriptorParser {
         }
 
         @Override
-        protected String getNodeNameSpace() {
-            return "pauext:";
-        }
-
-        @Override
-        public String getBaseNodeName() {
-            return "myBridge";
+        public String getNodeName() {
+            return "pauext:myBridge";
         }
 
         @Override

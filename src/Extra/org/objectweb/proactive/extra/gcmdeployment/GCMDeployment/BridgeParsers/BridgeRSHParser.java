@@ -63,7 +63,7 @@ public class BridgeRSHParser extends AbstractBridgeParser {
     }
 
     @Override
-    public String getBaseNodeName() {
+    public String getNodeName() {
         return NODE_NAME;
     }
 }

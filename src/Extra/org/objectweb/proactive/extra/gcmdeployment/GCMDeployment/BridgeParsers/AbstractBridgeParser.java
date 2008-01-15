@@ -42,7 +42,6 @@ public abstract class AbstractBridgeParser implements BridgeParser {
     static final String ATT_HOSTNAME = "hostname";
     static final String ATT_USERNAME = "username";
     static final String ATT_COMMANDPATH = "commandPath";
-    static final String NODE_EXT_NAMESPACE = "";
 
     public AbstractBridgeParser() {
     }
@@ -72,17 +71,5 @@ public abstract class AbstractBridgeParser implements BridgeParser {
 
     public abstract AbstractBridge createBridge();
 
-    protected abstract String getBaseNodeName();
-
-    /**
-     * Returns the node's XML namespace associated
-     * @return the namespace as a String
-     */
-    protected String getNodeNameSpace() {
-        return NODE_EXT_NAMESPACE;
-    }
-
-    public String getNodeName() {
-        return getNodeNameSpace() + getBaseNodeName();
-    }
+    public abstract String getNodeName();
 }
