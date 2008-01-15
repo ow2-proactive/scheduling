@@ -11,7 +11,7 @@
 		
 	<application>
 		
-		<proactive relpath="proactive.home" base="root">
+		<proactive relpath="${proactive.home}" base="root">
 			<configuration>
 				<java base="root" relpath="${java.home}/bin/java"/>
 				<jvmarg value="-Dproactive.test=true"/>
