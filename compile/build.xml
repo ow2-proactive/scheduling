@@ -253,11 +253,7 @@
 		</javac>
 		<copy toDir="${cl.test.dir}">
 			<fileset dir="${src.test.dir}">
-				<include name="**/*.xml" />
-				<include name="**/*.txt" />
-				<include name="**/*.xsd" />
-				<include name="**/*.fractal" />
-				<include name="**/*.p12" />
+				<exclude name="**/*.java"/>
 			</fileset>
 		</copy>
 	</target>
