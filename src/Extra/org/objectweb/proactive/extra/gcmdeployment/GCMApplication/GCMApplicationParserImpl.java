@@ -156,7 +156,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
 
         URL applicationSchema = getClass().getResource(APPLICATION_DESC_LOCATION);
 
-        schemas.add(applicationSchema.toString());
+        schemas.add(0, applicationSchema.toString());
         domFactory.setAttribute(JAXP_SCHEMA_SOURCE, schemas.toArray());
 
         XPathFactory factory = XPathFactory.newInstance();
