@@ -121,11 +121,6 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
         }
     }
 
-    public long getMaxCapacity() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
     public VariableContract getEnvironment() {
         return environment;
     }
@@ -136,41 +131,6 @@ public class GCMDeploymentDescriptorImpl implements GCMDeploymentDescriptor {
 
     public GCMDeploymentParser getParser() {
         return parser;
-    }
-
-    @SuppressWarnings("unused")
-    static public class UnitTestGCMDeploymentDescriptorImpl {
-        @Test
-        public void test() {
-            CommandBuilder commandBuilder = new CommandBuilderDummy("sleep 60");
-
-            HostInfo hostInfo = new HostInfoImpl();
-
-            List<String> groupCommands = new ArrayList<String>();
-            groupCommands.add("ssh duff");
-            groupCommands.add("ssh naruto");
-            GroupDummy group = new GroupDummy(groupCommands);
-            group.setHostInfo(hostInfo);
-
-            BridgeDummy bridge = new BridgeDummy("ssh cheypa");
-            bridge.setId("dummyBridge");
-            bridge.addGroup(group);
-
-            GCMDeploymentResources resources = new GCMDeploymentResources();
-            // resources.addBridge(bridge);
-            resources.addGroup(group);
-
-            GCMDeploymentDescriptorImpl gcmd = new GCMDeploymentDescriptorImpl();
-            gcmd.resources = resources;
-
-            GCMD_LOGGER.warn("Starting...");
-            gcmd.start(commandBuilder, null);
-        }
-
-        public static void main(String[] args) {
-            UnitTestGCMDeploymentDescriptorImpl test = new UnitTestGCMDeploymentDescriptorImpl();
-            test.test();
-        }
     }
 
     public String getDescriptorFilePath() {
