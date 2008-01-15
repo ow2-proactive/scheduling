@@ -463,23 +463,25 @@
 
 
 	<target name="with.clover">
-		<taskdef resource="clovertasks" />
+		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar"/>
 		<clover-setup initString="ProActiveCoverage.db" />
 	</target>
 
 
 	<target name="clover.report" depends="with.clover">
-		<taskdef resource="clovertasks" />
+		<taskdef resource="cloverlib.xml" classpath="${base.dir}/compile/lib/clover.jar"/>
 		<!-- generate a historypoint for the current coverage -->
 		<clover-historypoint historyDir="${clover.historypoint.dir}" />
 		<clover-report>
 			<!-- generate a current report -->
 			<current title="ProActive" outfile="${clover.report.dir}">
+				<testresults dir="${junit.dir}" includes="TEST-*.xml"/>
 				<format type="html" />
 				<fileset dir="${src.dir}">
 					<include name="Core/**/*.java" />
 					<include name="Extensions/**/*.java" />
 					<include name="Extra/**/*.java" />
+					<include name="Tests/**/*.java" />
 				</fileset>
 				<sourcepath>
 					<dirset dir="${src.dir}">
@@ -494,7 +496,9 @@
 				<format type="html" />
 			</historical>
 		</clover-report>
+<!--
 		<clover-clean />
+-->
 	</target>
 
 
