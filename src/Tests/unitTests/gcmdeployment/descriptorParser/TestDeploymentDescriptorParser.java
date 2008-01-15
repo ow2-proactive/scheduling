@@ -32,7 +32,6 @@ package unitTests.gcmdeployment.descriptorParser;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +49,6 @@ import org.objectweb.proactive.extra.gcmdeployment.GCMDeployment.GroupParsers.Ab
 import org.objectweb.proactive.extra.gcmdeployment.process.bridge.AbstractBridge;
 import org.objectweb.proactive.extra.gcmdeployment.process.group.AbstractGroup;
 import org.w3c.dom.Node;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
@@ -107,11 +105,6 @@ public class TestDeploymentDescriptorParser {
         @Override
         public AbstractGroup createGroup() {
             return new UserGroup();
-        }
-
-        @Override
-        protected String getNodeNameSpace() {
-            return "pauext:";
         }
 
         @Override
