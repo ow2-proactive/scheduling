@@ -81,12 +81,6 @@ public class Executor {
         }
     }
 
-    public void awaitTermination() throws InterruptedException {
-        for (Thread t : threads) {
-            t.join();
-        }
-    }
-
     private enum MonitorType {
         STDOUT, STDERR;
     }
