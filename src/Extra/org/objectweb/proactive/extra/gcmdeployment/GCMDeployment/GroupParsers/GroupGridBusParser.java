@@ -44,7 +44,7 @@ import org.w3c.dom.Node;
 
 
 public class GroupGridBusParser extends AbstractGroupParser {
-    private static final String XPATH_ARGUMENTS = NODE_EXT_NAMESPACE + "arguments";
+    private static final String XPATH_ARGUMENTS = "arguments";
     private static final String NODE_NAME = "gridbusGroup";
 
     @Override

@@ -40,9 +40,9 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupLSFParser extends AbstractGroupParser {
-    private static final String NODE_NAME_RESOURCE_REQUIREMENT = NODE_EXT_NAMESPACE + "resourceRequirement";
-    private static final String NODE_NAME_PROCESSOR = NODE_EXT_NAMESPACE + "processor";
-    private static final String NODE_NAME_HOSTLIST = NODE_EXT_NAMESPACE + "hostlist";
+    private static final String NODE_NAME_RESOURCE_REQUIREMENT = "resourceRequirement";
+    private static final String NODE_NAME_PROCESSOR = "processor";
+    private static final String NODE_NAME_HOSTLIST = "hostlist";
     private static final String NODE_NAME = "lsfGroup";
     private static final String ATTR_INTERACTIVE = "interactive";
     private static final String ATTR_JOBNAME = "jobname";

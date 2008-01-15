@@ -40,10 +40,10 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupOARParser extends AbstractGroupParser {
-    private static final String NODE_NAME_RESOURCES = NODE_EXT_NAMESPACE + "resources";
-    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE + "directory";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
-    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
+    private static final String NODE_NAME_RESOURCES = "resources";
+    private static final String NODE_NAME_DIRECTORY = "directory";
+    private static final String NODE_NAME_STDOUT = "stdout";
+    private static final String NODE_NAME_STDERR = "stderr";
     private static final String ATTR_QUEUE = "queue";
     private static final String ATTR_INTERACTIVE = "interactive";
     private static final String ATTR_TYPE = "type";

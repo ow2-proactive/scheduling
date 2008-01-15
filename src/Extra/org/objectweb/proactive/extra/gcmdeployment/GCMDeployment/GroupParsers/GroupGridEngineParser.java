@@ -40,12 +40,12 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupGridEngineParser extends AbstractGroupParser {
-    private static final String NODE_NAME_WALL_TIME = NODE_EXT_NAMESPACE + "wallTime";
-    private static final String NODE_NAME_PARALLEL_ENVIRONMENT = NODE_EXT_NAMESPACE + "parallelEnvironment";
-    private static final String NODE_NAME_HOSTS_NUMBER = NODE_EXT_NAMESPACE + "hostsNumber";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
-    private static final Object NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
-    private static final Object NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE + "directory";
+    private static final String NODE_NAME_WALL_TIME = "wallTime";
+    private static final String NODE_NAME_PARALLEL_ENVIRONMENT = "parallelEnvironment";
+    private static final String NODE_NAME_HOSTS_NUMBER = "hostsNumber";
+    private static final String NODE_NAME_STDOUT = "stdout";
+    private static final Object NODE_NAME_STDERR = "stderr";
+    private static final Object NODE_NAME_DIRECTORY = "directory";
     private static final String NODE_NAME = "gridEngineGroup";
     private static final String ATTR_QUEUE = "queue";
 

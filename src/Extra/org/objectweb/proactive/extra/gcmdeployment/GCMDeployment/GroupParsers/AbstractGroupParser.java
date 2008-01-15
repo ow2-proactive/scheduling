@@ -45,7 +45,6 @@ import org.w3c.dom.NodeList;
 
 
 public abstract class AbstractGroupParser implements GroupParser {
-    protected static final String NODE_EXT_NAMESPACE = "";
 
     public AbstractGroup parseGroupNode(Node groupNode, XPath xpath) {
         String id = GCMParserHelper.getAttributeValue(groupNode, "id");
@@ -109,15 +108,7 @@ public abstract class AbstractGroupParser implements GroupParser {
 
     public abstract AbstractGroup createGroup();
 
-    /**
-     * Returns the node's XML namespace associated
-     * @return the namespace as a String
-     */
-    protected String getNodeNameSpace() {
-        return NODE_EXT_NAMESPACE;
-    }
-
     public String getNodeName() {
-        return getNodeNameSpace() + getBaseNodeName();
+        return getBaseNodeName();
     }
 }

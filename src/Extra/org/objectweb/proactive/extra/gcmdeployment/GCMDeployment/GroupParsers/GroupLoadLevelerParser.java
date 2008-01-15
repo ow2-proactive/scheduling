@@ -44,15 +44,15 @@ import org.w3c.dom.NodeList;
 
 
 public class GroupLoadLevelerParser extends AbstractGroupParser {
-    private static final String NODE_NAME_TASKS_PER_HOST = NODE_EXT_NAMESPACE + "tasksPerHost";
-    private static final String NODE_NAME_CPUS_PER_TASK = NODE_EXT_NAMESPACE + "cpusPerTask";
-    private static final String NODE_NAME_NB_TASKS = NODE_EXT_NAMESPACE + "nbTasks";
-    private static final String NODE_NAME_ARGUMENTS = NODE_EXT_NAMESPACE + "arguments";
-    private static final String NODE_NAME_MAX_TIME = NODE_EXT_NAMESPACE + "maxTime";
-    private static final String NODE_NAME_RESOURCES = NODE_EXT_NAMESPACE + "resources";
-    private static final String NODE_NAME_DIRECTORY = NODE_EXT_NAMESPACE + "directory";
-    private static final String NODE_NAME_STDERR = NODE_EXT_NAMESPACE + "stderr";
-    private static final String NODE_NAME_STDOUT = NODE_EXT_NAMESPACE + "stdout";
+    private static final String NODE_NAME_TASKS_PER_HOST = "tasksPerHost";
+    private static final String NODE_NAME_CPUS_PER_TASK = "cpusPerTask";
+    private static final String NODE_NAME_NB_TASKS = "nbTasks";
+    private static final String NODE_NAME_ARGUMENTS = "arguments";
+    private static final String NODE_NAME_MAX_TIME = "maxTime";
+    private static final String NODE_NAME_RESOURCES = "resources";
+    private static final String NODE_NAME_DIRECTORY = "directory";
+    private static final String NODE_NAME_STDERR = "stderr";
+    private static final String NODE_NAME_STDOUT = "stdout";
     private static final String ATTR_JOB_NAME = "jobName";
     private static final String NODE_NAME = "loadLevelerGroup";
 
