@@ -96,7 +96,7 @@ public class NativeTaskLauncher extends TaskLauncher {
     public TaskResult doTask(SchedulerCore core, Executable executable, TaskResult... results) {
         try {
             if (pre != null) {
-                this.executePreScript(null);
+                this.executePreScript(getNodes().get(0));
             }
             NativeExecutable toBeLaunched = (NativeExecutable) executable;
 

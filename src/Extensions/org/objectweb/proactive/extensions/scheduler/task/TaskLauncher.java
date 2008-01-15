@@ -135,7 +135,7 @@ public class TaskLauncher implements InitActive {
         try {
             //launch pre script
             if (pre != null) {
-                this.executePreScript(null);
+                this.executePreScript(getNodes().get(0));
             }
 
             //init task
