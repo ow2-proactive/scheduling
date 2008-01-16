@@ -85,11 +85,11 @@
    &guidedindex;
    &capabilities-intro;
   &hands_on_programming; 
-   &StepByStepPi;
+<!--    &StepByStepPi;
    &OOSPMDJacobiexample;
    &nbody;
    &guidedComp;
-   &conclusion;
+   &conclusion;  -->
   </part>
   
   <part id="ProActiveProgramming">
