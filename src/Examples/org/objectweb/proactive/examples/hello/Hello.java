@@ -30,22 +30,21 @@
  */
 package org.objectweb.proactive.examples.hello;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.api.PALifeCycle;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.ProActiveInet;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
+import org.objectweb.proactive.extra.gcmdeployment.API;
+import org.objectweb.proactive.extra.gcmdeployment.GCMApplication.GCMApplicationDescriptor;
+import org.objectweb.proactive.extra.gcmdeployment.core.VirtualNode;
 
 
-/** A stripped-down Active Object example.
- * The object has only one public method, sayHello()
- * The object does nothing but reflect the host its on. */
 public class Hello implements java.io.Serializable {
     static Logger logger = ProActiveLogger.getLogger(Loggers.EXAMPLES);
     private final String message = "Hello World!";
@@ -67,24 +66,42 @@ public class Hello implements java.io.Serializable {
         return ProActiveInet.getInstance().getInetAddress().getHostName();
     }
 
+    //    public static class Deployer {
+    //        public boolean gotNodeAttached = false;
+    //
+    //        public void nodeAttached(Node node, VirtualNode vNode) {
+    //            System.out.println("Recieved Node Attachment notif");
+    //            gotNodeAttached = true;
+    //        }
+    //        
+    //    }
+
     /** The call that starts the Acive Objects, and displays results.
      * @param args must contain the name of an xml descriptor */
     public static void main(String[] args) throws Exception {
         // Access the nodes of the descriptor file
-        ProActiveDescriptor descriptorPad = PADeployment.getProactiveDescriptor(args[0]);
-        descriptorPad.activateMappings();
-        VirtualNode vnode = descriptorPad.getVirtualNode("Hello");
-        Node[] nodes = vnode.getNodes();
+
+        GCMApplicationDescriptor applicationDescriptor = API.getGCMApplicationDescriptor(new File(
+            "/home/glaurent/workspace/proactive_trunk/descriptors/helloApplicationLocal.xml"));
+
+        VirtualNode vnode = applicationDescriptor.getVirtualNode("Hello");
+
+        applicationDescriptor.startDeployment();
+
+        while (vnode.getNbCurrentNodes() == 0) {
+            Thread.sleep(1000);
+        }
+
+        Node firstNode = vnode.getCurrentNodes().iterator().next();
 
         // Creates an active instance of class Hello2 on the local node
-        Hello hello = (Hello) PAActiveObject.newActive(Hello.class.getName(), // the class to deploy
+        final Hello hello = (Hello) PAActiveObject.newActive(Hello.class.getName(), // the class to deploy
                 null, // the arguments to pass to the constructor, here none
-                nodes[0]); // which jvm should be used to hold the Active Object
+                firstNode); // which jvm should be used to hold the Active Object
 
-        // get and display a value 
         StringMutableWrapper received = hello.sayHello(); // possibly remote call
         logger.info("On " + getHostName() + ", a message was received: " + received); // potential wait-by-necessity 
-        descriptorPad.killall(true);
+        applicationDescriptor.kill();
         PALifeCycle.exitSuccess();
     }
 }
