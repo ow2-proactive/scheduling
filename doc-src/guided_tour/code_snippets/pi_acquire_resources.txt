@@ -1,0 +1,7 @@
+//Parse the xml descriptor descriptor
+ProActiveDescriptor descriptor = PADeployment.getProactiveDescriptor(descriptorPath); 
+//Acquire the resources
+descriptor.activateMappings(); 
+//Get the virtual node named "computers-vn"
+VirtualNode virtualNode = descriptor.getVirtualNode("computers-vn"); 
+Node [] nodes = virtualNode.getNodes();

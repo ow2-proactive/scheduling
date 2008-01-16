@@ -1,0 +1,2 @@
+descriptor.killall(true);
+System.exit(0);

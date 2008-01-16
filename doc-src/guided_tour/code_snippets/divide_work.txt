@@ -1,0 +1,5 @@
+Interval intervals = PiUtil.dividePI(numberOfWorkers, numberOfDecimals.intValue());
+PAGroup.setScatterGroup(intervals);
+Result results = piComputer.compute(intervals);
+Result result= PiUtil.conquerPI(results);
+System.out.println("Pi:"+result);
